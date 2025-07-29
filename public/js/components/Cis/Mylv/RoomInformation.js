@@ -1,6 +1,6 @@
 import FhcCalendar from "../../Calendar/Base.js";
 
-import ApiStudenplan from '../../../api/factory/lvPlan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 
 import { useEventLoader } from '../../../composables/EventLoader.js';
 
@@ -37,7 +37,8 @@ export default {
 				week: {
 					collapseEmptyDays: false
 				}
-			}
+			},
+			teachingunits: null
 		}
 	},
 	computed: {
@@ -100,8 +101,8 @@ export default {
 		
 		const { events } = useEventLoader(rangeInterval, (start, end) => {
 			return [
-				$api.call(ApiStudenplan.getRoomInfo(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
-				$api.call(ApiStudenplan.getOrtReservierungen(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
+				$api.call(ApiLvPlan.getRoomInfo(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
+				$api.call(ApiLvPlan.getOrtReservierungen(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
 			];
 		});
 
@@ -109,6 +110,17 @@ export default {
 			rangeInterval,
 			events
 		};
+	},
+	created() {
+		this.$api
+			.call(ApiLvPlan.getStunden())
+			.then(res => {
+				return this.teachingunits = res.data.map(el => ({
+					id: el.stunde,
+					start: el.beginn,
+					end: el.ende
+				}));
+			});
 	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
@@ -129,6 +141,7 @@ export default {
 			show-btns
 			:events="events || []"
 			:backgrounds="backgrounds"
+			:time-grid="teachingunits"
 		>
 			<template v-slot="{ event, mode }">
 				<div
