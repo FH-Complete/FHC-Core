@@ -1,6 +1,6 @@
 import FhcCalendar from "../../Calendar/Base.js";
 
-import ApiStudenplan from '../../../api/factory/lvPlan.js';
+import ApiLvPlan from '../../../api/factory/lvPlan.js';
 
 import { useEventLoader } from '../../../composables/EventLoader.js';
 
@@ -37,7 +37,8 @@ export default {
 				week: {
 					collapseEmptyDays: false
 				}
-			}
+			},
+			teachingunits: null
 		}
 	},
 	computed: {
@@ -100,8 +101,8 @@ export default {
 		
 		const { events } = useEventLoader(rangeInterval, (start, end) => {
 			return [
-				$api.call(ApiStudenplan.getRoomInfo(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
-				$api.call(ApiStudenplan.getOrtReservierungen(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
+				$api.call(ApiLvPlan.getRoomInfo(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate())),
+				$api.call(ApiLvPlan.getOrtReservierungen(props.propsViewData.ort_kurzbz, start.toISODate(), end.toISODate()))
 			];
 		});
 
@@ -109,6 +110,17 @@ export default {
 			rangeInterval,
 			events
 		};
+	},
+	created() {
+		this.$api
+			.call(ApiLvPlan.getStunden())
+			.then(res => {
+				return this.teachingunits = res.data.map(el => ({
+					id: el.stunde,
+					start: el.beginn,
+					end: el.ende
+				}));
+			});
 	},
 	template: /*html*/`
 	<div class="fhc-roominformation d-flex flex-column h-100">
@@ -129,62 +141,29 @@ export default {
 			show-btns
 			:events="events || []"
 			:backgrounds="backgrounds"
+			:time-grid="teachingunits"
 		>
 			<template v-slot="{ event, mode }">
-				<component
-					v-if="mode == 'event'"
-					:is="renderers[event.type]?.modalContent"
-					:event="event"
-				></component>
-				<component
-					v-else-if="mode == 'eventheader'"
-					:is="renderers[event.type]?.modalTitle"
-					:event="event"
-				></component>
 				<div
-					v-else-if="mode == 'month'"
-					:class="'event-type-' + event.type"
+					:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
+					:type="mode == 'day' ? 'button' : undefined"
 	 				:style="eventStyle(event)"
-					class="d-flex flex-column align-items-center justify-content-evenly h-100"
 				>
-					<span>{{ event?.topic }}</span>
-				</div>
-				<div
-					v-else-if="mode == 'week'"
-					:class="'event-type-' + event.type"
-	 				:style="eventStyle(event)"
-					class="border border-secondary d-flex flex-column align-items-center justify-content-evenly h-100"
-					type="button"
-				>
-					<span>{{ event?.topic }}</span>
-					<span v-for="lektor in event?.lektor">{{ lektor.kurzbz }}</span>
-					<span>{{ event?.ort_kurzbz }}</span>
-				</div>
-				<div
-					v-else-if="mode == 'day'"
-					:class="'event-type-' + event.type"
-	 				:style="eventStyle(event)"
-					type="button"
-					class="border border-secondary d-flex align-items-center justify-content-center text-center h-100"
-				>
-					<div class="col ">
-						<p>{{ $p.t('lehre/lehrveranstaltung') }}:</p>
-						<p class="m-0">
-							{{ event?.topic }}
-						</p>
-					</div>
-					<div class="col ">
-						<p>{{ $p.t('lehre/lektor') }}:</p>
-						<p class="m-0" v-for="lektor in event?.lektor">
-							{{ lektor.kurzbz }}
-						</p>
-					</div>
-					<div class="col ">
-						<p>{{ $p.t('profil/Ort') }}: </p>
-						<p class="m-0">
-							{{ event?.ort_kurzbz }}
-						</p>
-					</div>
+					<component
+						v-if="mode == 'event'"
+						:is="renderers[event.type]?.modalContent"
+						:event="event"
+					></component>
+					<component
+						v-else-if="mode == 'eventheader'"
+						:is="renderers[event.type]?.modalTitle"
+						:event="event"
+					></component>
+					<component
+						v-else
+						:is="renderers[event.type]?.calendarEvent"
+						:event="event"
+					></component>
 				</div>
 			</template>
 		</fhc-calendar>

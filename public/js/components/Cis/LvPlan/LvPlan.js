@@ -43,7 +43,8 @@ export default {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null
+			uid: null,
+			teachingunits: null
 		};
 	},
 	computed:{
@@ -158,6 +159,15 @@ export default {
 			.then(res => {
 				this.uid = res.data.uid;
 			});
+		this.$api
+			.call(ApiLvPlan.getStunden())
+			.then(res => {
+				return this.teachingunits = res.data.map(el => ({
+					id: el.stunde,
+					start: el.beginn,
+					end: el.ende
+				}));
+			});
 	},
 	template:/*html*/`
 	<div class="fhc-lvplan d-flex flex-column h-100" v-if="renderers">
@@ -186,6 +196,7 @@ export default {
 			show-btns
 			:events="events || []"
 			:backgrounds="backgrounds"
+			:time-grid="teachingunits"
 		>
 			<template v-slot="{ event, mode }">
 				<div
