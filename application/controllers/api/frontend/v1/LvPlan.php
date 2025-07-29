@@ -19,6 +19,8 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use CI3_Events as Events;
+use \DateTime as DateTime;
+use \DateTimeZone as DateTimeZone;
 
 class LvPlan extends FHCAPI_Controller
 {
@@ -89,16 +91,22 @@ class LvPlan extends FHCAPI_Controller
 		}
 
 		// fetching moodle events
+		$this->load->config('calendar');
+		$tz = new DateTimeZone($this->config->item('timezone'));
+		$start = new DateTime($start_date);
+		$start->setTimezone($tz);
+		$end = new DateTime($end_date);
+		$end->setTimezone($tz);
+		$end->modify('+1 day -1 second');
 		$moodle_events = [];
 		Events::trigger(
 			'moodleCalendarEvents',
-			function & () use (&$moodle_events)
-			{
+			function & () use (&$moodle_events) {
 				return $moodle_events;
 			},
 			[
-				'start_date' => $start_date,
-				'end_date' => $end_date, 
+				'start_date' => $start->format('c'),
+				'end_date' => $end->format('c'),
 				'username' => getAuthUID()
 			]
 		);
