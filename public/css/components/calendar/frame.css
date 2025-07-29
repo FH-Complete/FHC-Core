@@ -89,6 +89,10 @@
 .fhc-calendar-base-grid .grid-allday .all-day-events {
 	background-color: var(--fhc-calendar-bg-allday);
 }
+.fhc-calendar-base-grid .grid-allday .all-day-events {
+	max-height: var(--fhc-calendar-maxheight-allday);
+	overflow-y: auto;
+}
 .fhc-calendar-base-grid .grid-main {
 	grid-gap: var(--fhc-calendar-gap, 1px);
 	background-color: var(--fhc-calendar-bg-body-gap, var(--fhc-calendar-bg-gap));

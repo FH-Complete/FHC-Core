@@ -35,18 +35,20 @@ export default {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + `/CisVue/Cms/content/${this.event.ort_content_id}`
 		},
 		start_time: function () {
-			if (!this.event.start) return 'N/A';
-			if (!(this.event.start instanceof Date)) {
-				return this.event.start;
+			if (!this.event.beginn)
+				return 'N/A';
+			if (!(this.event.beginn instanceof Date)) {
+				return this.event.beginn;
 			}
-			return numberPadding(this.event.start.getHours()) + ":" + numberPadding(this.event.start.getMinutes());
+			return numberPadding(this.event.beginn.getHours()) + ":" + numberPadding(this.event.beginn.getMinutes());
 		},
 		end_time: function () {
-			if (!this.event.end) return 'N/A';
-			if (!(this.event.end instanceof Date)) {
-				return this.event.end;
+			if (!this.event.ende)
+				return 'N/A';
+			if (!(this.event.ende instanceof Date)) {
+				return this.event.ende;
 			}
-			return numberPadding(this.event.end.getHours()) + ":" + numberPadding(this.event.end.getMinutes());
+			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());
 		}
 	},
 	methods: {
@@ -90,6 +92,14 @@ export default {
 					</tr>
 					<tr>
 						<th>{{
+								$p.t('ui','zeitraum')?
+								$p.t('ui','zeitraum')+':'
+								:''
+							}}</th>
+						<td>{{start_time + ' - ' + end_time}}</td>
+					</tr>
+					<tr>
+						<th>{{
 							$p.t('global','raum')?
 							$p.t('global','raum')+':'
 							:''
@@ -121,14 +131,6 @@ export default {
 								</div>
 							</div>
 						</td>
-					</tr>
-					<tr>
-						<th>{{
-								$p.t('ui','zeitraum')?
-								$p.t('ui','zeitraum')+':'
-								:''
-							}}</th>
-						<td>{{start_time + ' - ' + end_time}}</td>
 					</tr>
 					<tr>
 						<th>{{
