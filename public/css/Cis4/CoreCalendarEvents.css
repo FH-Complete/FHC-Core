@@ -16,7 +16,7 @@
 	grid-template-columns: auto 1fr;
 	justify-items: center;
 }
-.listPageContainer .feiertagEventContent{
+.listPageContainer .feiertagEventContent {
 	display: flex;
 	justify-content: center;
 }
