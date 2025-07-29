@@ -210,23 +210,6 @@ $config['student'] = [
 		JOIN public.tbl_person p USING(person_id)"
 ];
 
-$config['studentcis'] = $config['student'];
-unset($config['studentcis']['searchfields']['email']);
-unset($config['studentcis']['searchfields']['tel']);
-$config['studentcis']['resultfields'] = [
-	"s.student_uid AS uid",
-	"s.matrikelnr",
-	"p.person_id",
-	"(p.vorname || ' ' || p.nachname) AS name",
-	"ARRAY[s.student_uid || '@' || '" . DOMAIN . "'] AS email",
-	"CASE
-		WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
-		ELSE NULL END
-		AS photo_url",
-	"b.aktiv"
-];
-$config['studentcis']['renderer'] = 'student';
-
 $config['prestudent'] = [
 	'primarykey' => 'prestudent_id',
 	'table' => 'public.tbl_prestudent',
@@ -511,6 +494,7 @@ $config['employee'] = [
 		) k ON (k.standort_id = m.standort_id)"
 ];
 
+// TODO(chris): move to searchpv21.php
 $config['unassigned_employee'] = $config['employee'];
 $config['unassigned_employee']['alias'] = ['mitarbeiter_ohne_zuordnung'];
 $config['unassigned_employee']['prepare'] = "unassigned_employee AS (
@@ -671,12 +655,6 @@ $config['organisationunit'] = [
 		LEFT JOIN public.tbl_organisationseinheittyp type_parent
 			ON (oe_parent.organisationseinheittyp_kurzbz = type_parent.organisationseinheittyp_kurzbz)"
 ];
-
-$config['active_organisationunit'] = $config['organisationunit'];
-$config['active_organisationunit']['alias'] = ['aou', 'aktive organisationseinheit', 'aoe'];
-$config['active_organisationunit']['prepare'] = 'active_organisationseinheit AS (SELECT * FROM public.tbl_organisationseinheit WHERE aktiv = true)';
-$config['active_organisationunit']['table'] = 'active_organisationseinheit';
-$config['active_organisationunit']['renderer'] = 'organisationunit';
 
 $config['room'] = [
 	'alias' => ['raum'],

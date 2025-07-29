@@ -147,7 +147,7 @@ export default {
 			this.$refs.stvList.reload();
 		},
 		searchfunction(params, config) {
-			return this.$api.call(ApiSearchbar.searchAdvanced(params), config);
+			return this.$api.call(ApiSearchbar.searchStv(params), config);
 		}
 	},
 	created() {

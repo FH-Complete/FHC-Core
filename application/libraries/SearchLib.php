@@ -40,17 +40,25 @@ class SearchLib
 	
 	/**
 	 * Gets the CI instance and loads model
+	 *
+	 * @param array		$params
+	 * @return void
 	 */
-	public function __construct()
+	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 
+		$config = $params['config'] ?? null;
 		// It is loaded only to have the DB functions available
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
 
 		// Load Config
-		$this->_ci->load->config('search', true);
+		$this->_ci->load->config('search', true, (boolean)$config);
 		$this->_ci->load->config('searchfunctions', true);
+		if ($config) {
+			$this->_ci->load->config($config, true);
+			$this->_ci->config->set_item('search', $this->_ci->config->item($config));
+		}
 
 		$this->_ci->load->library('PhrasesLib', [['search'], null], 'search_phrases');
 

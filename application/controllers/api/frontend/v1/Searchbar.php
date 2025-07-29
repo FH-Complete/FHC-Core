@@ -36,7 +36,8 @@ class Searchbar extends FHCAPI_Controller
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
 			'search' => self::PERM_LOGGED,
-			'searchAdvanced' => self::PERM_LOGGED
+			'searchCis' => self::PERM_LOGGED,
+			'searchStv' => self::PERM_LOGGED
 		]);
 	}
 
@@ -71,9 +72,25 @@ class Searchbar extends FHCAPI_Controller
 	/**
 	 * Gets a JSON body via HTTP POST and provides the parameters
 	 */
-	public function searchAdvanced()
+	public function searchCis()
 	{
-		$this->load->library('SearchLib');
+		return $this->searchAdvanced([ 'config' => 'searchcis' ]);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	public function searchStv()
+	{
+		return $this->searchAdvanced([ 'config' => 'searchstv' ]);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	private function searchAdvanced($config)
+	{
+		$this->load->library('SearchLib', $config);
 		$this->load->library('form_validation');
 
 		// Checks if the searchstr and the types parameters are in the POSTed JSON

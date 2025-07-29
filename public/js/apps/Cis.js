@@ -17,9 +17,9 @@ const app = Vue.createApp({
 				calcheightonly: true,
                 types: [
                     "employee",
-					"studentcis",
+					"student",
                     "room",
-                    "active_organisationunit",
+                    "organisationunit",
 					"cms",
 					"dms"
                 ],
@@ -137,7 +137,7 @@ const app = Vue.createApp({
     },
     methods: {
         searchfunction: function(searchsettings) {
-        	return this.$api.call(ApiSearchbar.searchAdvanced(searchsettings));
+        	return this.$api.call(ApiSearchbar.searchCis(searchsettings));
         }
     }
 });
