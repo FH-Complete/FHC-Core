@@ -100,7 +100,7 @@ export default {
 						childactions: [
 						]
 					},
-					mergedperson: {
+					mergedPerson: {
 						defaultaction: {
 							type: "link",
 							action: data => this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id)

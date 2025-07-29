@@ -231,8 +231,10 @@ class SearchLib
 				GROUP BY " . $this->_formatPrimarykeys($table_config['primarykey']) . "
 			)";
 
+			$renderer = $table_config['renderer'] ?? $type;
 			$selects[] = "
 				SELECT
+					" . $this->_ci->db->escape($renderer) . " AS renderer,
 					" . $this->_ci->db->escape($type) . " AS type,
 					rank,
 					TO_JSONB((SELECT x FROM (SELECT " . implode(", ", $table_config['resultfields'] ?? ['*']) . ") x)) AS data

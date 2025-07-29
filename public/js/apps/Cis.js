@@ -45,7 +45,7 @@ const app = Vue.createApp({
 						},
 						childactions: []
 					},
-                    raum: {
+                    room: {
                         defaultaction: {
                             type: "link",
 							renderif: function(data) {

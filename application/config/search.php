@@ -225,6 +225,7 @@ $config['studentcis']['resultfields'] = [
 		AS photo_url",
 	"b.aktiv"
 ];
+$config['studentcis']['renderer'] = 'student';
 
 $config['prestudent'] = [
 	'primarykey' => 'prestudent_id',
@@ -538,6 +539,7 @@ $config['unassigned_employee']['searchfields']['tel']['join']['on'] = "
 	kontakttyp = 'telefon' 
 	AND tbl_kontakt.standort_id = unassigned_employee.standort_id
 ";
+$config['unassigned_employee']['renderer'] = 'employee';
 
 $config['organisationunit'] = [
 	'alias' => ['ou', 'organisationseinheit', 'oe'],
@@ -674,6 +676,7 @@ $config['active_organisationunit'] = $config['organisationunit'];
 $config['active_organisationunit']['alias'] = ['aou', 'aktive organisationseinheit', 'aoe'];
 $config['active_organisationunit']['prepare'] = 'active_organisationseinheit AS (SELECT * FROM public.tbl_organisationseinheit WHERE aktiv = true)';
 $config['active_organisationunit']['table'] = 'active_organisationseinheit';
+$config['active_organisationunit']['renderer'] = 'organisationunit';
 
 $config['room'] = [
 	'alias' => ['raum'],

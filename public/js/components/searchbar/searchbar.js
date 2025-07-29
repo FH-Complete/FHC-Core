@@ -1,5 +1,5 @@
 import person from "./result/person.js";
-import raum from "./result/room.js";
+import room from "./result/room.js";
 import employee from "./result/employee.js";
 import organisationunit from "./result/organisationunit.js";
 import student from "./result/student.js";
@@ -34,19 +34,19 @@ export default {
             lastQuery: ''
       };
     },
-    components: {
-      person: person,
-      raum: raum,
-      employee: employee,
-      organisationunit: organisationunit,
-      student: student,
-      prestudent: prestudent,
-      dms,
-      cms,
-      mergedStudent,
-      mergedPerson
-    },
-    template: /*html*/`
+	components: {
+		person,
+		room,
+		employee,
+		organisationunit,
+		student,
+		prestudent,
+		dms,
+		cms,
+		mergedStudent,
+		mergedPerson
+	},
+	template: /*html*/`
         <form
             ref="searchform"
             class="d-flex me-3"
@@ -92,17 +92,15 @@ export default {
                   </div>
                   <div v-else-if="this.error !== null">{{ error }}</div>
                   <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
-                  <template v-else="" v-for="res in searchresult">
-                    <person v-if="res.type === 'person'" :res="res" :actions="searchoptions.actions.person" @actionexecuted="hideresult"></person>
-                    <student v-else-if="res.type === 'student' || res.type === 'studentStv' || res.type === 'studentcis'" :mode="searchmode" :res="res" :actions="searchoptions.actions.student" @actionexecuted="hideresult"></student>
-                    <prestudent v-else-if="res.type === 'prestudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.prestudent" @actionexecuted="hideresult"></prestudent>
-                    <merged-student v-else-if="res.type === 'mergedstudent'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedstudent" @actionexecuted="hideresult"></merged-student>
-                    <merged-person v-else-if="res.type === 'mergedperson'" :mode="searchmode" :res="res" :actions="searchoptions.actions.mergedperson" @actionexecuted="hideresult"></merged-person>
-                    <employee v-else-if="res.type === 'mitarbeiter' || res.type === 'mitarbeiter_ohne_zuordnung' || res.type === 'employee'  || res.type === 'unassigned_employee'" :res="res" :actions="searchoptions.actions.employee" @actionexecuted="hideresult"></employee>
-                    <organisationunit v-else-if="res.type === 'organisationunit' || res.type === 'active_organisationunit'" :res="res" :actions="searchoptions.actions.organisationunit" @actionexecuted="hideresult"></organisationunit>
-                    <raum v-else-if="res.type === 'raum' || res.type === 'room'" :mode="searchmode" :res="res" :actions="searchoptions.actions.raum || searchoptions.actions.room" @actionexecuted="hideresult"></raum>
-                    <dms v-else-if="res.type === 'dms'" :res="res" :actions="searchoptions.actions.dms" @actionexecuted="hideresult"></dms>
-                    <cms v-else-if="res.type === 'cms'" :res="res" :actions="searchoptions.actions.cms" @actionexecuted="hideresult"></cms>
+                  <template v-else v-for="res in searchresult">
+                    <component
+                        v-if="isValidRenderer(res.renderer)"
+                        :is="res.renderer"
+                        :mode="searchmode"
+                        :res="res"
+                        :actions="searchoptions.actions[dash2camelCase(res.renderer)]"
+                        @actionexecuted="hideresult"
+                    ></component>
                     <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
                   </template>
                 </div>
@@ -279,17 +277,17 @@ export default {
                     if (this.searchoptions.mergeResults) {
                         let counter = 0;
                         let mergeTypes = [];
-                        let mergedType = 'merged';
+                        let mergedType = 'merged-';
                         let mergeKey = '';
 
                         switch (this.searchoptions.mergeResults) {
                         case 'student':
-                            mergeTypes = ['student', 'studentStv', 'prestudent'];
+                            mergeTypes = ['student', 'prestudent'];
                             mergedType += this.searchoptions.mergeResults;
                             mergeKey = 'uid';
                             break;
                         case 'person':
-                            mergeTypes = ['person', 'employee', 'unassigned_employee', 'mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'student', 'studentStv', 'prestudent'];
+                            mergeTypes = ['person', 'employee', 'student', 'prestudent'];
                             mergedType += this.searchoptions.mergeResults;
                             mergeKey = 'person_id';
                             break;
@@ -297,13 +295,14 @@ export default {
 
                         if (mergeTypes.length) {
                             res = Object.values(res.reduce((a, c) => {
-                                if (!mergeTypes.includes(c.type)) {
+                                if (!mergeTypes.includes(c.renderer)) {
                                     a['nomerge' + counter++] = c;
                                 } else if (c[mergeKey] === null) {
                                     a['nomerge' + counter++] = c;
                                 } else if (a[c[mergeKey]] === undefined) {
                                     a[c[mergeKey]] = {
                                         rank: c.rank,
+                                        renderer: mergedType,
                                         type: mergedType,
                                         list: [c]
                                     };
@@ -365,6 +364,13 @@ export default {
                 this.hideresult,
                 100
             );
+        },
+        dash2camelCase(string) {
+            return string.replace(/-([a-z])/g, g => g[1].toUpperCase());
+        },
+        isValidRenderer(renderer) {
+            const camelCaseRenderer = this.dash2camelCase(renderer);
+            return Object.keys(this.$.components).includes(camelCaseRenderer);
         }
     }
 };
