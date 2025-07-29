@@ -48,15 +48,16 @@
 	justify-content: space-evenly;
 	align-items: center;
 }
-.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	justify-content: center;
-	grid-template-columns: repeat(2, auto);
-	border-bottom: solid 1px;
-	height: auto!important;
+.weekPageContainer .lehreinheitEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
 }
-.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader :last-child:not(:first-child):before {
-	content: "-";
-	margin-inline-start: .15em;
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	border-inline-end: solid 1px var(--bs-secondary);
+	align-self: stretch;
+	align-content: center;
+	padding: .25em .5em .25em .25em;
+	margin-inline-end: .25rem;
 }
 .weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
 	display: flex;

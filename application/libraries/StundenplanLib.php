@@ -70,8 +70,7 @@ class StundenplanLib{
 				return error(getData($lv_result));
 			}
 			$lv = getData($lv_result)[0];
-			return $stundenplan_data;
-			
+			return success($stundenplan_data);
 		}
 		
 		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($student_uid));
