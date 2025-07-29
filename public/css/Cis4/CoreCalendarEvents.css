@@ -1,185 +1,93 @@
-/* Lehreinheits Events in Month Page */
-.monthPageContainer .lehreinheitEventContent{
-	display: flex;
-	border-bottom: 1px solid var(--bs-border-color);	
-}
-
-.monthPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	display:none;
-}
-
-
-.monthPageContainer .lehreinheitEventContent #lehreinheitEventText {
-	width: 100%;
-	font-size: .875em;
-	overflow:hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	display:flex;
-	justify-content: space-evenly;
-	align-items:center;
-	
-}
-
-.monthPageContainer .lehreinheitEventContent #lehreinheitEventText #lehreinheitLektoren{
-	display:none;
-}
-
-.monthPageContainer .lehreinheitEventContent #lektorEllipsis {
-	display: none;
-}
-
-/* Lehreinheits Events in Week Page */
-.weekPageContainer .lehreinheitEventContent {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	grid-template-rows: 1fr;
-
-}
-
-@media(max-width: 1199px){
-	.weekPageContainer .lehreinheitEventContent {
-			grid-template-columns: 1fr;
-		}
-}
-
-
-.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	display: grid;
-	padding: .25rem .5rem .25rem .25rem;
-	margin-right: .25rem;
-	align-content: center;
-	border-right: 1px solid var(--bs-secondary);
-}
-
-
-.weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
-	display: flex;
-	flex-direction: column;
-	column-gap: 5px;
-	overflow-y: scroll;
+/* All */
+.weekPageContainer,
+.dayPageContainer {
 	height: 100%;
-	min-height:auto;
-	justify-content: space-between;
-	align-items:center;
-
 }
 
-/* Lehreinheits Events in Day Page */
-.dayPageContainer .lehreinheitEventContent {
-	display: flex;
-	padding-left:4rem;
-	justify-content: space-evenly;
-	align-items: center;
-
-}
-
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	display:grid;
-	align-content: center;
-}
-
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventText {
-	display: contents;
-}
-
-.dayPageContainer .lehreinheitEventContent #lehreinheitEventText *{
-	font-weight: 500;
-}
-
-/* Ferientage Events in Month Page */
-.monthPageContainer .feiertagEventContent {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	justify-items: center;
-	align-items:center;
-	color: var(--fhc-light);
-}
-
-.monthPageContainer .feiertagEventContent #ferienEventIcon{
-	margin: 0.5rem;
-}
-
-.monthPageContainer .feiertagEventContent #ferienEventTitle {
-
-}
-
-/* Ferientage Events in Week Page */
-.weekPageContainer .feiertagEventContent {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	justify-items: center;
-	align-items:center;
-	color: var(--fhc-light);
-}
-.weekPageContainer .feiertagEventContent {
-	display: grid;
-	grid-template-columns: auto 1fr;
-	justify-items: center;
+/* Feiertag */
+.feiertagEventContent {
 	align-items: center;
 	color: var(--fhc-light);
 }
-
-.weekPageContainer .feiertagEventContent #ferienEventIcon {
-	margin: 0.25rem;
-}
-
-.weekPageContainer .feiertagEventContent #ferienEventTitle {
-	
-}
-
-/* Ferientage Events in Day Page */
+.monthPageContainer .feiertagEventContent,
+.weekPageContainer .feiertagEventContent,
 .dayPageContainer .feiertagEventContent {
 	display: grid;
 	grid-template-columns: auto 1fr;
 	justify-items: center;
-	align-items: center;
-	color: var(--fhc-light);
 }
-
-.dayPageContainer .feiertagEventContent #ferienEventIcon {
-	margin: 0.5rem;
-}
-
-.dayPageContainer .feiertagEventContent #ferienEventTitle {}
-
-/* List Page Container Styles */
-
-/* Ferientage Events for List Page */
-
 .listPageContainer .feiertagEventContent{
 	display: flex;
 	justify-content: center;
-	align-items: center;
-	color: var(--fhc-light);
 }
 
-.listPageContainer .feiertagEventContent #ferienEventIcon{
-	margin: 0.5rem;
+.monthPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: 0 .5rem;
+}
+.weekPageContainer .feiertagEventContent #ferienEventIcon,
+.dayPageContainer .feiertagEventContent #ferienEventIcon,
+.listPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: .5rem;
 }
 
-.listPageContainer .feiertagEventContent #ferienEventTitle{
+.listPageContainer .feiertagEventContent #ferienEventTitle {
 	flex-grow: 1;
 }
 
-/* Lehreinheits Events in List Page */
-.listPageContainer .lehreinheitEventContent {
+/* Lehreinheit */
+.monthPageContainer .lehreinheitEventContent {
+	padding: 0!important;
+}
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventHeader,
+.monthPageContainer .lehreinheitEventContent #lehreinheitLektoren,
+.monthPageContainer .lehreinheitEventContent #lektorEllipsis {
+	display: none!important;
+}
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventText {
 	display: flex;
-	padding-left: 4rem;
 	justify-content: space-evenly;
 	align-items: center;
-
 }
-
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	justify-content: center;
+	grid-template-columns: repeat(2, auto);
+	border-bottom: solid 1px;
+	height: auto!important;
+}
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader :last-child:not(:first-child):before {
+	content: "-";
+	margin-inline-start: .15em;
+}
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+}
+.dayPageContainer .lehreinheitEventContent,
+.listPageContainer .lehreinheitEventContent {
+	display: flex;
+	align-items: center;
+}
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader,
 .listPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
-	display: grid;
 	align-content: center;
+	padding-inline-end: .5em;
+	border-inline-end: solid 1px;
+	margin-inline-end: .5em;
 }
-
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText,
 .listPageContainer .lehreinheitEventContent #lehreinheitEventText {
-	display: contents;
+	flex: 1 1 auto;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .25em;
+	justify-content: center;
 }
-
-.listPageContainer .lehreinheitEventContent #lehreinheitEventText * {
-	font-weight: 500;
+.dayPageContainer .lehreinheitEventContent #lehreinheitTopic,
+.dayPageContainer .lehreinheitEventContent #lehreinheitOrt,
+.listPageContainer .lehreinheitEventContent #lehreinheitTopic,
+.listPageContainer .lehreinheitEventContent #lehreinheitOrt {
+	flex: 0 0 100%;
+	text-align: center;
 }

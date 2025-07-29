@@ -56,7 +56,6 @@
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event.event-header {
 	--event-bg: transparent;
 	font-weight: bold;
-	text-indent: 0;
 	font-size: var(--fhc-calendar-fontsize-month-day, 1rem);
 }
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event.event-header .disabled {
@@ -69,11 +68,11 @@
 /* Grid */
 .fhc-calendar-base-grid {
 	--fhc-calendar-axis-collapsible: .2fr;
-	background-color: var(--fhc-calendar-gap);
-	grid-gap: 2px;
+	background-color: var(--fhc-calendar-bg-gap);
+	grid-gap: var(--fhc-calendar-gap-header, calc(var(--fhc-calendar-gap, 1px) * 2));
 }
 .fhc-calendar-base-grid .grid-header {
-	background-color: var(--fhc-calendar-gap-header);
+	background-color: var(--fhc-calendar-bg-header-gap, var(--fhc-calendar-bg-gap));
 }
 .fhc-calendar-base-grid .grid-header:before,
 .fhc-calendar-base-grid .grid-allday:before {
@@ -84,22 +83,22 @@
 	background-color: var(--fhc-calendar-bg-header);
 }
 .fhc-calendar-base-grid .grid-allday {
-	background-color: var(--fhc-calendar-gap-allday);
+	background-color: var(--fhc-calendar-bg-allday-gap, var(--fhc-calendar-bg-gap));
 }
 .fhc-calendar-base-grid .grid-allday:before,
 .fhc-calendar-base-grid .grid-allday .all-day-events {
 	background-color: var(--fhc-calendar-bg-allday);
 }
 .fhc-calendar-base-grid .grid-main {
-	grid-gap: 1px;
-	background-color: var(--fhc-calendar-gap-body);
+	grid-gap: var(--fhc-calendar-gap, 1px);
+	background-color: var(--fhc-calendar-bg-body-gap, var(--fhc-calendar-bg-gap));
 }
 .fhc-calendar-base-grid .grid-main .part-header,
 .fhc-calendar-base-grid .grid-main .part-body {
 	background-color: var(--fhc-calendar-bg-body);
 }
 .fhc-calendar-base-grid-line {
-	grid-gap: 1px;
+	grid-gap: var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
 }
 .fhc-calendar-base-label-time {
 	display: flex;
@@ -118,7 +117,7 @@
 .fhc-calendar-mode-day .event-details {
 	padding: 1.5rem;
 	width: 100%;
-	border-left: solid 1px var(--fhc-calendar-gap);
+	border-left: solid 1px var(--fhc-calendar-bg-gap);
 }
 .fhc-calendar-mode-day .today {
 	background-color: var(--fhc-calendar-bg-day-today);
@@ -132,14 +131,14 @@
 /* Month */
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line {
 	overflow: hidden;
-	line-height: 1.5;
+	line-height: 1.8;
 	grid-template-rows: 2em;
-	grid-auto-rows: calc(var(--fhc-calendar-fontsize-event, .875rem) + 2 * var(--fhc-calendar-margin-event-icon, .5rem));
+	grid-auto-rows: 1.8em;
 	font-size: var(--fhc-calendar-fontsize-event, .875rem);
 }
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event {
-	text-indent: .5em;
-	height: calc(var(--fhc-calendar-fontsize-event, .875rem) + 2 * var(--fhc-calendar-margin-event-icon, .5rem));
+	font-size: 1em;
+	height: 1.8em;
 	overflow: hidden;
 }
 .fhc-calendar-mode-month .fhc-calendar-base-grid-line-event .placeholder-glow {

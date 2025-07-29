@@ -1,17 +1,17 @@
 .event {
 	cursor: pointer;
-}
-.fhc-calendar-mode-week .all-day-events .event .weekPageContainer {
-	padding: .25rem;
-}
-.fhc-calendar-mode-day .event,
-.fhc-calendar-mode-week .event {
-	margin: 0 .5rem;
 	font-size: var(--fhc-calendar-fontsize-event, .875rem);
+}
+.fhc-calendar-mode-day .fhc-calendar-base-grid-line,
+.fhc-calendar-mode-week .fhc-calendar-base-grid-line {
+	padding: 0 var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
 }
 .fhc-calendar-mode-day .all-day-events .event,
 .fhc-calendar-mode-week .all-day-events .event {
-	margin: .25rem;
+	margin: var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px)) 0;
+}
+.fhc-calendar-mode-list .event {
+	margin-bottom: var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
 }
 /* Border */
 .fhc-calendar-mode-day .grid-main .event > *,
@@ -64,6 +64,7 @@
 }
 .fhc-calendar-base .event > * {
 	background-color: var(--event-bg, var(--event-default-bg));
+	color: var(--event-color, var(--fhc-calendar-color-event, #000));
 }
 .fhc-calendar-base .event > *:hover {
 	filter: brightness(120%);

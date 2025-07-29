@@ -173,6 +173,7 @@ export default {
 		<hr>
 		<fhc-calendar
 			ref="calendar"
+			class="responsive-calendar"
 			:date="currentDay"
 			:modes="modes"
 			:mode-options="modeOptions"

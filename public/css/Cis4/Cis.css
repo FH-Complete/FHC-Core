@@ -1,6 +1,7 @@
 /* basic */
 @import '../components/searchbar/searchbar.css';
 @import '../components/Sprachen.css';
+@import './Cis/Calendar.css';
 
 html {
   font-size: 0.875em;
@@ -567,6 +568,7 @@ html {
 @media (max-width: 991.98px) {
   #cis-main{
     padding: 0.75rem 0.75rem;
+    height: calc(100vh - var(--fhc-cis-header-height));
   }
   #cis-main > :first-child {
     margin-top: var(--fhc-cis-header-height);
