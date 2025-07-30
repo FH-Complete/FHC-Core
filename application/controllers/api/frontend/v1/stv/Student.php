@@ -103,6 +103,7 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('p.familienstand');
 		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
 		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('p.anrede');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -178,6 +179,7 @@ class Student extends FHCAPI_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
 		$this->load->library('form_validation');
 
@@ -188,7 +190,15 @@ class Student extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
-		$this->form_validation->set_rules('semester', 'Semester', 'integer');
+		$this->form_validation->set_rules('semester', 'Semester', 'integer', [
+				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+			]
+		);
+
+		$this->form_validation->set_rules('alias', 'Alias', 'regex_match[/^[-a-z0-9\_\.]*[a-z0-9]{1,}\.[-a-z0-9\_]{1,}$/]',
+		[
+			'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
+		]);
 
 		$this->load->library('UDFLib');
 		
@@ -300,10 +310,36 @@ class Student extends FHCAPI_Controller
 
 		// Do Updates
 		if (count($update_lehrverband)) {
+
 			$curstudlvb = $this->StudentlehrverbandModel->load([
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
 			]);
+
+			$data = $this->getDataOrTerminateWithError($curstudlvb);
+			$data = current($data);
+
+			$verbandCurrent = $data->verband;
+			$studiengang_kz = $data->studiengang_kz;
+			$semesterCurrent = $data->semester;
+			$gruppeCurrent = $data->gruppe;
+
+			$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : $verbandCurrent;
+			$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : $gruppeCurrent;
+			$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : $semesterCurrent;
+
+			//check if existing Lehrverband of new data to avoid Error
+			$result = $this->LehrverbandModel->loadWhere([
+				'verband' => $verband,
+				'gruppe' => $gruppe,
+				'semester' => $semester,
+				'studiengang_kz' => $studiengang_kz,
+			]);
+
+			if(!hasData($result))
+			{
+				$this->terminateWithError($this->p->t('lehre', 'error_noLehrverband'), self::ERROR_TYPE_GENERAL);
+			}
 
 			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
 			{
