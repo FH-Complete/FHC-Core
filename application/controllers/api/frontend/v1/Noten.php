@@ -69,8 +69,8 @@ class Noten extends FHCAPI_Controller
 
 		// get studenten for lva & sem with zeugnisnote if available
 		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
-//		$studentenData = $this->getDataOrTerminateWithError($studenten);
-		$studentenData = getData($studenten);
+		$studentenData = $this->getDataOrTerminateWithError($studenten);
+//		$studentenData = getData($studenten);
 		$this->addMeta('$studentenData', $studentenData);
 		
 		$func = function ($value) {

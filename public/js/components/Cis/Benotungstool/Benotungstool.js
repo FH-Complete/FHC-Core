@@ -143,7 +143,6 @@ export const Benotungstool = {
 					
 					return true;  // student can be selected to add pruefung
 				},
-				rowFormatter: this.unselectableFormatter,
 				columns: [
 				{
 					formatter: "rowSelection",
@@ -203,15 +202,19 @@ export const Benotungstool = {
 					formatter: this.notenFormatter,
 					headerFilter: 'list',
 					headerFilterParams: () => {
-						return { values: ["\u00A0",...this.notenOptions.map(opt => opt.bezeichnung)] } // TODO: fix option render height lmao...
+						return { values: ["\u00A0",this.$p.t('benotungstool/c4noteEmpty') ,this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 					},
 					headerFilterFunc: this.notenFilterFunc,
 					widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')),
-					headerFilter: true,
 					field: 'note',
 					formatter: this.notenFormatter,
+					headerFilter: 'list',
+					headerFilterParams: () => {
+						return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
+					},
+					headerFilterFunc: this.notenFilterFunc,
 					widthGrow: 1}, 
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), field: 'kommPruef', widthGrow: 1, formatter: this.pruefungFormatter, hozAlign:"center", minWidth: 150}
 			],
@@ -219,9 +222,33 @@ export const Benotungstool = {
 			}	
 		},
 		notenFilterFunc(filterVal, rowVal) {
+			// option of the searchterm
 			const opt = this.notenOptions.find(opt => opt.bezeichnung === filterVal)
-			if(opt.note == rowVal) return true
-			if(filterVal === "" || filterVal === null) return true
+			// searchterm is not empty fallback and the note finds an option match
+			if(rowVal !== null && rowVal !== undefined && opt?.note == rowVal) {
+				return true
+			}
+			
+			// empty searchterm fallback to show all
+			if(filterVal === "\u00A0" || filterVal === "" || filterVal === null) {
+				return true
+			}
+			
+			// specific searchterm cases
+			if(filterVal === this.$p.t('benotungstool/c4positiv')) {
+				// option of the rowValue
+				const valOpt = this.notenOptions.find(opt => opt.note == rowVal)
+				if(!valOpt) return false
+				return valOpt.positiv
+			}
+			if(filterVal === this.$p.t('benotungstool/c4negativ')) {
+				const valOpt = this.notenOptions.find(opt => opt.note == rowVal)
+				if(!valOpt) return false
+				return !valOpt.positiv
+			}
+			if(filterVal === this.$p.t('benotungstool/c4noteEmpty') && rowVal === null) {
+				return true
+			}
 			
 			return false
 		},
@@ -701,7 +728,51 @@ export const Benotungstool = {
 					lv_id: e.value.lehrveranstaltung_id
 				}
 			})
+			
+			// reload related LE to LV to repopulate LE filter dropdown
+			
+			// TODO: reset old LE selection to null
+			this.$api.call(ApiLehre.getLeForLv(e.value.lehrveranstaltung_id, this.sem_kurzbz)).then(res => {
 
+				const data =  []
+				// TODO: could be done on server in some shared function, copied from anw extension for now
+				res.data?.retval?.forEach(entry => {
+
+					const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
+					if (existing) {
+						// supplement info
+						existing.infoString += ', '
+						if (entry.gruppe_kurzbz !== null) {
+							existing.infoString += entry.gruppe_kurzbz
+						} else {
+							existing.infoString += entry.kurzbzlang + '-' + entry.semester
+								+ (entry.verband ? entry.verband : '')
+								+ (entry.gruppe ? entry.gruppe : '')
+						}
+					} else {
+						// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
+						// so a new entry will always start with those groups, others are appended afterwards
+						entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
+						if (entry.gruppe_kurzbz !== null) {
+							entry.infoString += entry.gruppe_kurzbz
+						} else {
+							entry.infoString += entry.kurzbzlang + '-' + entry.semester
+								+ (entry.verband ? entry.verband : '')
+								+ (entry.gruppe ? entry.gruppe : '')
+						}
+
+						data.push(entry)
+					}
+				})
+
+				data.forEach(entry => {
+					entry.infoString += ' | 👥' + entry.studentcount + ' | 📅' + entry.termincount
+				})
+
+				this.lehreinheiten = [...data]
+
+			})
+			
 			// reload data
 			this.loadNoten(e.value.lehrveranstaltung_id, this.sem_kurzbz)
 		},
@@ -716,7 +787,7 @@ export const Benotungstool = {
 			})
 			
 			// diff lv_id -> reload zugewiesene lv
-			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, this.sem_kurzbz)).then(res => {
+			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, e.value.studiensemester_kurzbz)).then(res => {
 				this.lehrveranstaltungen = res.data
 
 				// build dropdown option string
@@ -726,6 +797,49 @@ export const Benotungstool = {
 
 				this.selectedLehrveranstaltung = this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == this.lv_id)
 			}).then(()=>{
+
+				// TODO: reset old LE selection to null
+				this.$api.call(ApiLehre.getLeForLv(this.lv_id, e.value.studiensemester_kurzbz)).then(res => {
+
+					const data =  []
+					// TODO: could be done on server in some shared function, copied from anw extension for now
+					res.data?.retval?.forEach(entry => {
+
+						const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
+						if (existing) {
+							// supplement info
+							existing.infoString += ', '
+							if (entry.gruppe_kurzbz !== null) {
+								existing.infoString += entry.gruppe_kurzbz
+							} else {
+								existing.infoString += entry.kurzbzlang + '-' + entry.semester
+									+ (entry.verband ? entry.verband : '')
+									+ (entry.gruppe ? entry.gruppe : '')
+							}
+						} else {
+							// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
+							// so a new entry will always start with those groups, others are appended afterwards
+							entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
+							if (entry.gruppe_kurzbz !== null) {
+								entry.infoString += entry.gruppe_kurzbz
+							} else {
+								entry.infoString += entry.kurzbzlang + '-' + entry.semester
+									+ (entry.verband ? entry.verband : '')
+									+ (entry.gruppe ? entry.gruppe : '')
+							}
+
+							data.push(entry)
+						}
+					})
+
+					data.forEach(entry => {
+						entry.infoString += ' | 👥' + entry.studentcount + ' | 📅' + entry.termincount
+					})
+
+					this.lehreinheiten = [...data]
+
+				})
+				
 				// reload data
 				this.loadNoten(this.lv_id, e.value.studiensemester_kurzbz)
 			})
@@ -802,11 +916,23 @@ export const Benotungstool = {
 						// antritte might have changed due to different benotung
 						s.hoechsterAntritt = this.getAntrittCountStudent(s)
 					}
-
+					
+					// TODO: maybe fake rerun the selectable check by just assigning
+					// css classes tabulator-selectable/tabulator-unselectable on row elements
+					
+					// const rows = this.$refs.notenTable.tabulator.getRows()
+					// const row = rows.find(r => {
+					// 	const data = r.getData()
+					// 	return data.uid == this.pruefungStudent.uid
+					// })
+					// row.reformat()
 					this.$refs.notenTable.tabulator.redraw(true)
 					
 					this.$fhcAlert.alertInfo('Prüfung gespeichert') //  TODO: phrase
 				}
+			}).finally(()=> {
+				this.pruefungStudent = null
+				this.pruefung = null
 			})
 			
 			this.$refs.modalContainerPruefung.hide()
@@ -863,7 +989,7 @@ export const Benotungstool = {
 				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
 				// col filled for consistency reasons?
 
-				// TODO: test if this holds true
+				// TODO: test if this holds true, maybe in case where there are only kommPruef?
 				const originalNote = index === 0
 				cols.push({
 					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
@@ -878,10 +1004,12 @@ export const Benotungstool = {
 			})
 
 			cols.push(kommCol) // keep kommPruef Col as last
-			// redraw table
+
+			// set Cols
+			this.$refs.notenTable.tabulator.clearSort()
+			this.$refs.notenTable.tabulator.setColumns(cols)
 			
-			
-			
+			// redraw table outside this function
 		},
 		saveNoteneingabe() {
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
@@ -1141,7 +1269,6 @@ export const Benotungstool = {
 					<div class="col-6">
 						<datepicker
 							v-model="selectedPruefungDate"
-							@update:model-value="handleChangePruefungDatum"
 							:clearable="false"
 							:enableTimePicker="false"
 							:text-input="true"
@@ -1193,7 +1320,6 @@ export const Benotungstool = {
 					<div class="col-6">
 						<datepicker
 							v-model="selectedPruefungDate"
-							@update:model-value="handleChangePruefungDatum"
 							:clearable="false"
 							:enableTimePicker="false"
 							:text-input="true"
@@ -1205,7 +1331,7 @@ export const Benotungstool = {
 				<div class="row justify-content-center mt-4">
 					<div class="col-1 text-center">{{$p.t('lehre/note')}}:</div>
 					<div class="col-6">
-						<Dropdown @change="handleChangePruefungNote" :placeholder="$p.t('lehre/note')" 
+						<Dropdown :placeholder="$p.t('lehre/note')" 
 							:style="{'width': '100%'}" :optionLabel="getOptionLabelNotePruefung" 
 							v-model="selectedPruefungNote" :options="notenOptionsLehre" showClear>
 							<template #optionsgroup="slotProps">
@@ -1220,12 +1346,11 @@ export const Benotungstool = {
 			</template>
 		 </bs-modal>
 
-
 		<div v-show="loading" style="position: absolute; width: 100vw; height: 100vh; background: rgba(255,255,255,0.5); z-index: 8500; display: flex; justify-content: center; align-items: center;">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 
-		<div class="row">
+		<div class="row" style="max-width: 90vw;">
 			<div class="col-4">
 				<h2>{{$p.t('benotungstool/benotungstoolTitle')}}</h2>
 				<h4>{{ lv?.bezeichnung }}</h4>
@@ -1233,7 +1358,7 @@ export const Benotungstool = {
 			<div class="col-2">
 				<div class="col-lg-auto">
 					<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv" 
-						v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen">
+						v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
 						<template #optionsgroup="slotProps">
 							<div> {{ option.fullString }} </div>
 						</template>
@@ -1244,7 +1369,7 @@ export const Benotungstool = {
 			<div class="col-2">
 				<div class="col-lg-auto">
 					<Dropdown @change="leChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLe" 
-						v-model="selectedLehreinheit" :options="lehreinheiten" showClear>
+						v-model="selectedLehreinheit" :options="lehreinheiten" showClear appendTo="self">
 						<template #optionsgroup="slotProps">
 							<div> {{ option.infoString }} </div>
 						</template>
@@ -1255,7 +1380,7 @@ export const Benotungstool = {
 			<div class="col-2">
 				<div class="col-lg-auto">
 					<Dropdown @change="ssChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabel" 
-						v-model="selectedSemester" :options="studiensemester">
+						v-model="selectedSemester" :options="studiensemester" appendTo="self">
 						<template #optionsgroup="slotProps">
 							<div> {{ option.studiensemester_kurzbz }} </div>
 						</template>
@@ -1265,27 +1390,27 @@ export const Benotungstool = {
 		</div>
 		<hr>
 		
-			
-		 <core-filter-cmpt
-		 	v-if="tabulatorCanBeBuilt"
-			@uuidDefined="handleUuidDefined"
-			:title="''"
-			ref="notenTable"
-			:tabulator-options="notenTableOptions"
-			:tabulator-events="notenTableEventHandlers"
-			tableOnly
-			:sideMenu="false"
-		 >
-			 <template #actions>
-				<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
-					{{$p.t('benotungstool/approveGrades')}} <i class="fa fa-save"></i>
-				</button>
-				<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
-					{{$p.t('benotungstool/c4addNewPruefung')}} <i class="fa fa-plus"></i>
-				</button>
-			 </template>
-		 </core-filter-cmpt>
-
+		<div class="row" style="overflow-x: auto;">
+			<core-filter-cmpt
+				v-if="tabulatorCanBeBuilt"
+				@uuidDefined="handleUuidDefined"
+				:title="''"
+				ref="notenTable"
+				:tabulator-options="notenTableOptions"
+				:tabulator-events="notenTableEventHandlers"
+				tableOnly
+				:sideMenu="false"
+			>
+				 <template #actions>
+					<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
+						{{$p.t('benotungstool/approveGrades')}} <i class="fa fa-save"></i>
+					</button>
+					<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
+						{{$p.t('benotungstool/c4addNewPruefung')}} <i class="fa fa-plus"></i>
+					</button>
+				 </template>
+			</core-filter-cmpt>
+		</div>
     `,
 };
 
