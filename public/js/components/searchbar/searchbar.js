@@ -228,12 +228,6 @@ export default {
 			// removes the event listener checkSettingsVisibility when the collapsible is hidden
 			document.removeEventListener("click", this.checkSettingsVisibility);
 		},
-        allSearchOptions: function() {
-            this.searchsettings.types = [];
-            for( const idx in this.searchoptions.types ) {
-                this.searchsettings.types.push(this.searchoptions.types[idx]);
-            }
-        },
 		calcSearchResultHeight: function() {
 			const rect = this.$refs.results.getBoundingClientRect();
 			if( rect.height > 0 && rect.height < (window.innerHeight * 0.8) ) {
