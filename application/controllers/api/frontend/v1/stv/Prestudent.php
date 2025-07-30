@@ -147,7 +147,7 @@ class Prestudent extends FHCAPI_Controller
 				in_array($prop, ['zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code'])
 				&& !isset($update_prestudent[$prop])
 				&& array_key_exists($prop, $_POST)
-			) 
+			)
 			{
 				$update_prestudent[$prop] = null;
 			}
