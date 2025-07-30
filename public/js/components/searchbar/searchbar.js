@@ -55,19 +55,35 @@ export default {
             @focusin="searchfocusin"
             @focusout="searchfocusout"
         >
-			<div ref="searchbox" class="h-100 input-group me-2">
+			<div
+				ref="searchbox"
+				class="h-100 input-group me-2 searchbar_searchbox"
+				:class="showresult ? 'open' : 'closed'"
+			>
 				<span class="input-group-text">
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</span>
                 <input
+                	ref="input"
                     @keyup="search"
                     @focus="showsearchresult"
                     v-model="searchsettings.searchstr"
-                    class="form-control"
+                    class="form-control searchbar_input"
                     type="search"
                     :placeholder="$p.t('search/input_search_label', {types:search_types_string})"
                     :aria-label="$p.t('search/input_search_label', {types:search_types_string})"
                 >
+				<span
+					v-if="searchsettings.searchstr"
+					class="w-0 position-relative searchbar_input_clear"
+				>
+					<button
+						class="position-absolute end-0 btn bg-transparent"
+						@click="clearInput"
+					>
+						<i class="fas fa-close"></i>
+					</button>
+				</span>
                 <span
                     data-bs-toggle="collapse"
                     data-bs-target="#searchSettings"
@@ -170,6 +186,11 @@ export default {
 		}
 	},
     methods: {
+    	clearInput() {
+    		this.searchsettings.searchstr = "";
+    		this.hideresult();
+    		this.$refs.input.focus()
+    	},
 		getSearchTypes: function () {
 			let result = this.allSearchTypes();
 			if (this.searchoptions.origin) {

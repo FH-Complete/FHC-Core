@@ -10,6 +10,17 @@
 }
 
 
+.searchbar_input:focus,
+.searchbar_input:focus ~ .searchbar_input_clear {
+	z-index: 5; /* same as bootstrap .input-group > .form-control:focus */
+}
+
+
+.searchbar_searchbox.open {
+	z-index: 10000;
+}
+
+
 .searchbar_settings {
     position: absolute; 
     z-index: 9999; 
