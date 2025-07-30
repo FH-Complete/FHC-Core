@@ -75,10 +75,10 @@ export default {
 				origin: 'stv',
 				cssclass: "position-relative",
 				calcheightonly: true,
-				types: [
-					"student",
-					"prestudent"
-				],
+				types: {
+					student: Vue.computed(() => this.$p.t('search/type_student')),
+					prestudent: Vue.computed(() => this.$p.t('search/type_prestudent'))
+				},
 				actions: {
 					student: {
 						defaultaction: {

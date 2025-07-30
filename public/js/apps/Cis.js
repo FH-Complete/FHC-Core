@@ -15,14 +15,14 @@ const app = Vue.createApp({
 				origin: "cis",
 				cssclass: "",
 				calcheightonly: true,
-                types: [
-                    "employee",
-					"student",
-                    "room",
-                    "organisationunit",
-					"cms",
-					"dms"
-                ],
+				types: {
+					employee: Vue.computed(() => this.$p.t("search/type_employee")),
+					student: Vue.computed(() => this.$p.t("search/type_student")),
+					room: Vue.computed(() => this.$p.t("search/type_room")),
+					organisationunit: Vue.computed(() => this.$p.t("search/type_organisationunit")),
+					cms: Vue.computed(() => this.$p.t("search/type_cms")),
+					dms: Vue.computed(() => this.$p.t("search/type_dms"))
+				},
                 actions: {
                     employee: {
                         defaultaction: {
