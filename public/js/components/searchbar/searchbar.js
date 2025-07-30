@@ -73,14 +73,13 @@ export default {
 		}
 	},
 	template: /*html*/`
-        <form
-            ref="searchform"
-            class="d-flex me-3"
-            :class="searchoptions.cssclass"
-            action="javascript:void(0);"
-            @focusin="searchfocusin"
-            @focusout="searchfocusout"
-        >
+		<form
+			ref="searchform"
+			class="d-flex me-3"
+			action="javascript:void(0);"
+			@focusin="searchfocusin"
+			@focusout="searchfocusout"
+		>
 			<div
 				ref="searchbox"
 				class="h-100 input-group me-2 searchbar_searchbox"

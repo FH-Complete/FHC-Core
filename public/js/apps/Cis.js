@@ -13,7 +13,6 @@ const app = Vue.createApp({
         return {
             searchbaroptions: {
 				origin: "cis",
-				cssclass: "",
 				calcheightonly: true,
 				types: {
 					employee: Vue.computed(() => this.$p.t("search/type_employee")),
