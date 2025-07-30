@@ -78,7 +78,7 @@ export default {
 					class="w-0 position-relative searchbar_input_clear"
 				>
 					<button
-						class="position-absolute end-0 btn bg-transparent"
+						class="position-absolute top-0 bottom-0 end-0 btn bg-transparent"
 						@click="clearInput"
 					>
 						<i class="fas fa-close"></i>
