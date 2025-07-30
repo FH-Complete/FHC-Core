@@ -95,6 +95,14 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect('b.alias');
+		$this->PrestudentModel->addSelect('p.geburtsnation');
+		$this->PrestudentModel->addSelect('p.sprache');
+		$this->PrestudentModel->addSelect('p.gebort');
+		$this->PrestudentModel->addSelect('p.homepage');
+		$this->PrestudentModel->addSelect('p.anmerkung');
+		$this->PrestudentModel->addSelect('p.familienstand');
+		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
+		$this->PrestudentModel->addSelect('p.matr_nr');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
