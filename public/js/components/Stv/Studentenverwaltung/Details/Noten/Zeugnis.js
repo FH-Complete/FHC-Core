@@ -5,14 +5,22 @@ import ZeugnisDocuments from './Zeugnis/Documents.js';
 import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
 
 export default {
+	name: 'Zeugnis',
 	components: {
 		CoreFilterCmpt,
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
-	inject: [
-		'config'
-	],
+	inject: {
+		config: {
+			from: 'config',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		student: Object,
 		allSemester: Boolean
@@ -103,7 +111,8 @@ export default {
 									.call(
 										ApiStvGrades.getGradeFromPoints(
 											filterTerm,
-											cell.getData().lehrveranstaltung_id
+											cell.getData().lehrveranstaltung_id,
+											this.currentSemester
 										),
 										{ errorHandling: false }
 									)
@@ -201,7 +210,7 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
 					this.student.prestudent_id,
-					this.allSemester
+						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];

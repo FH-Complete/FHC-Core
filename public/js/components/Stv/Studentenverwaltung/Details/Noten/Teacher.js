@@ -9,6 +9,12 @@ export default {
 	emits: [
 		"copied"
 	],
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		student: Object,
 		allSemester: Boolean
@@ -24,7 +30,7 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getTeacherProposal(
 					this.student.prestudent_id,
-					this.allSemester
+						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
