@@ -10,6 +10,18 @@ import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
 
 export default {
+	components: {
+		person,
+		room,
+		employee,
+		organisationunit,
+		student,
+		prestudent,
+		dms,
+		cms,
+		mergedStudent,
+		mergedPerson
+	},
     props: [ "searchoptions", "searchfunction" ],
     provide() {
         return {
@@ -22,7 +34,7 @@ export default {
         hidetimer: null,
         searchsettings: {
             searchstr: this.getSearchStr(),
-            types: this.getSearchTypes(),
+            types: this.getInitiallySelectedTypes(),
         },
         searchresult: [],
         searchmode: '',
@@ -34,17 +46,31 @@ export default {
             lastQuery: ''
       };
     },
-	components: {
-		person,
-		room,
-		employee,
-		organisationunit,
-		student,
-		prestudent,
-		dms,
-		cms,
-		mergedStudent,
-		mergedPerson
+	computed:{
+		searchTypesPlaceholder() {
+			if (!this.searchsettings.types.length) {
+				return Object.values(this.typeLabels).join(' / ');
+			}
+			return this.searchsettings.types.map(type => this.typeLabels[type]).join(' / ');
+		},
+		types() {
+			if (!this.searchoptions.types)
+				return [];
+			if (Array.isArray(this.searchoptions.types))
+				return this.searchoptions.types;
+			return Object.keys(this.searchoptions.types);
+		},
+		typeLabels() {
+			if (!this.searchoptions.types)
+				return {};
+			if (Array.isArray(this.searchoptions.types)) {
+				return this.searchoptions.types.reduce((res, type) => {
+					res[type] = type;
+					return res
+				}, {});
+			}
+			return this.searchoptions.types;
+		}
 	},
 	template: /*html*/`
         <form
@@ -70,8 +96,8 @@ export default {
                     v-model="searchsettings.searchstr"
                     class="form-control searchbar_input"
                     type="search"
-                    :placeholder="$p.t('search/input_search_label', {types:search_types_string})"
-                    :aria-label="$p.t('search/input_search_label', {types:search_types_string})"
+                    :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+                    :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
                 >
 				<span
 					v-if="searchsettings.searchstr"
@@ -123,22 +149,45 @@ export default {
               </div>
             </div>
 
-            <div id="searchSettings"  ref="settings"
+			<div
+				id="searchSettings"
+				ref="settings"
 				@[\`shown.bs.collapse\`]="handleShowSettings"
 				@[\`hide.bs.collapse\`]="handleHideSettings"
-                class="top-100 end-0 searchbar_settings text-white collapse" tabindex="-1">
-              <div class="d-flex flex-column m-3" v-if="searchoptions.types.length > 0">
-              <span class="fw-light mb-2">{{ $p.t('search/applyfilter_label') }}</span>  
-              <template v-for="(type, index) in searchoptions.types" :key="type">
-                    <div class="form-check form-switch">
-                        <input class="fhc-switches form-check-input" type="checkbox" role="switch" :id="$.uid + 'search_type_' + index" :value="type" v-model="searchsettings.types">
-                        <label class="ps-2 form-check-label non-selectable" :for="$.uid + 'search_type_' + index">{{ type }}</label>
-                    </div>
-                </template>
-              </div>
+				class="top-100 end-0 searchbar_settings text-white collapse"
+				tabindex="-1"
+			>
+				<div
+					v-if="types.length > 0"
+					class="d-flex flex-column m-3"
+				>
+					<span class="fw-light mb-2">
+						{{ $p.t('search/applyfilter_label') }}
+					</span>
+					<template
+						v-for="(label, value) in typeLabels"
+						:key="value"
+					>
+						<div class="form-check form-switch">
+							<input
+								class="fhc-switches form-check-input"
+								type="checkbox"
+								role="switch"
+								:id="$.uid + 'search_type_' + value"
+								:value="value"
+								v-model="searchsettings.types"
+							>
+							<label
+								class="ps-2 form-check-label non-selectable"
+								:for="$.uid + 'search_type_' + value"
+							>
+								{{ label }}
+							</label>
+						</div>
+					</template>
+				</div>
             </div>
-        
-          </form>
+		</form>
     `,
     watch:{
 		'searchsettings.searchstr': function (newSearchValue) {
@@ -146,28 +195,16 @@ export default {
 				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
 			}
 		},
-    },
-	computed:{
-		search_types_string(){
-			if (Array.isArray(this.searchsettings.types) && this.searchsettings.types.length > 0){
-				return this.searchsettings.types.join(' / ');
-			}else{
-				return JSON.stringify(this.searchsettings.types);
-			}
-		},
-		
-	},
-    beforeMount: function() {
-		this.$watch('searchsettings.types', newValue => {
-			if (Array.isArray(newValue) && newValue.length === 0){
-				this.searchsettings.types = this.allSearchTypes();
+		'searchsettings.types'(newValue) {
+			if (Array.isArray(newValue) && newValue.length === 0) {
+				this.searchsettings.types = [...this.types];
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
-			if(Array.isArray(newValue) && this.searchoptions.origin){
+			if (Array.isArray(newValue) && this.searchoptions.origin) {
 				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
 			}
 			this.search();
-		});
+		}
     },
 	mounted(){
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
@@ -191,22 +228,21 @@ export default {
     		this.hideresult();
     		this.$refs.input.focus()
     	},
-		getSearchTypes: function () {
-			let result = this.allSearchTypes();
+		getInitiallySelectedTypes() {
+			let result = false;
 			if (this.searchoptions.origin) {
 				let localStorageValue = localStorage.getItem(`${this.searchoptions.origin}_searchtypes`);
 				if (localStorageValue) {
 					result = JSON.parse(localStorageValue);
 				}
 			}
-			return result;
-		},
-		allSearchTypes() {
-			let allTypes = [];
-			for (const idx in this.searchoptions.types) {
-				allTypes.push(this.searchoptions.types[idx]);
-			};
-			return allTypes;
+			if (result)
+				return result;
+			if (!this.searchoptions.types)
+				return [];
+			if (Array.isArray(this.searchoptions.types))
+				return [...this.searchoptions.types];
+			return Object.keys(this.searchoptions.types);
 		},
 		getSearchStr: function(){
 			if (!this.searchoptions.origin)
