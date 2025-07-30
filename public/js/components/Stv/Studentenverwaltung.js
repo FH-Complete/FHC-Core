@@ -114,10 +114,15 @@ export default {
 		}
 	},
 	methods: {
-		onSelectVerband({link, studiengang_kz}) {
+		onSelectVerband( {link, studiengang_kz}) {
+			let urlpath = String(link);
+			if (!urlpath.match(/\/prestudent/))
+			{
+				urlpath = this.studiensemesterKurzbz + '/' + urlpath;
+			}
 			this.studiengangKz = studiengang_kz;
 			this.$refs.stvList.updateUrl(
-				ApiStv.students.verband(link)
+				ApiStv.students.verband(urlpath)
 			);
 		},
 		studiensemesterChanged(v) {
