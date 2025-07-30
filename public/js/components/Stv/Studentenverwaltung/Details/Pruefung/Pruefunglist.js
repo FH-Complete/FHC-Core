@@ -89,7 +89,7 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				index: 'pruefung_id',
