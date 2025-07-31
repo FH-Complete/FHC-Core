@@ -44577,6 +44577,46 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldInvalidAlias',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alias ist ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Alias is invalid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldLessThan10000',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} darf maximal 4-stellig sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Field {Field} must contain a number less then 10000.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC-4 Finetuning END
 );
 

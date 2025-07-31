@@ -137,8 +137,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
@@ -317,6 +315,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"

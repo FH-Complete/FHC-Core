@@ -168,7 +168,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
-				selectable: true,
 				index: 'abschlusspruefung_id',
 				persistenceID: 'stv-details-finalexam'
 			},
@@ -542,6 +541,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_finalexam')"
 			@click:new="actionNewAbschlusspruefung"

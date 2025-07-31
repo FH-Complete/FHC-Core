@@ -89,7 +89,7 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				index: 'pruefung_id',
@@ -420,6 +420,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('lehre', 'pruefung')"
 			@click:new="actionNewPruefung"

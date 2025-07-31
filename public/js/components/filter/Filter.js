@@ -66,6 +66,7 @@ export const CoreFilterCmpt = {
 		tableOnly: Boolean,
 		noColumnFilter:Boolean,
 		reload: Boolean,
+		reloadBtnInfotext: String,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
@@ -648,7 +649,6 @@ export const CoreFilterCmpt = {
 				</h3>
 			</div>
 		</div>
-
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
@@ -658,7 +658,7 @@ export const CoreFilterCmpt = {
 						{{ newBtnLabel }}
 					</button>
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
-						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
+						<span class="fa-solid fa-rotate-right" aria-hidden="true"  :title="reloadBtnInfotext ? reloadBtnInfotext : 'Reload'" ></span>
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>

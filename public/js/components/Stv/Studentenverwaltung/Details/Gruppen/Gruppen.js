@@ -78,7 +78,6 @@ export default {
 				],
 				layout: 'fitDataFill',
 				height: 'auto',
-				selectable: true,
 				index: 'group_id',
 				persistenceID: 'stv-details-gruppe'
 			},
@@ -180,6 +179,7 @@ export default {
 						table-only
 						:side-menu="false"
 						reload
+						:reload-btn-infotext="this.$p.t('table', 'reload')"
 					>
 					</core-filter-cmpt>
 				</div>

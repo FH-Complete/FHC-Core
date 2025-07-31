@@ -574,7 +574,7 @@ export default {
 						v-model="data.gsstudientyp_kurzbz"
 						name="gsstudientyp_kurzbz"
 						>
-						<option v-for="typ in listStgTyp" :key="typ.typ" :value="typ.typ">{{typ.bezeichnung}}</option>
+						<option v-for="typ in listStgTyp" :key="typ.gsstudientyp_kurzbz" :value="typ.gsstudientyp_kurzbz">{{typ.bezeichnung}}</option>
 					</form-input>
 				</div>
 				

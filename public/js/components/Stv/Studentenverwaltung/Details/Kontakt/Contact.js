@@ -95,7 +95,6 @@ export default{
 					},
 				],
 				height:	'auto',
-				selectable:	true,
 				index: 'kontakt_id',
 				persistenceID: 'stv-details-kontakt-contact'
 			},
@@ -449,6 +448,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'kontakt')"
 			@click:new="actionNewContact"

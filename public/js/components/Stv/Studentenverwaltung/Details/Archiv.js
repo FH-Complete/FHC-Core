@@ -130,6 +130,7 @@ export default {
 							let editButton = document.createElement('button');
 							editButton.className = 'btn btn-outline-secondary';
 							editButton.innerHTML = '<i class="fa fa-edit"></i>';
+							editButton.title = this.$p.t('ui', 'bearbeiten');
 							editButton.addEventListener('click', () =>
 								this.$refs.edit.open(cell.getData())
 							);
@@ -139,6 +140,7 @@ export default {
 						let deleteButton = document.createElement('button');
 						deleteButton.className = 'btn btn-outline-secondary';
 						deleteButton.innerHTML = '<i class="fa fa-trash"></i>';
+						deleteButton.title = this.$p.t('ui', 'loeschen');
 						deleteButton.addEventListener('click', evt => {
 							evt.stopPropagation();
 							this.$fhcAlert
@@ -262,6 +264,7 @@ export default {
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template #actions>
 				<div class="input-group w-auto">

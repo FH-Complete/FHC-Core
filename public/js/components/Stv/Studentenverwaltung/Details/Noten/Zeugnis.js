@@ -273,6 +273,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template v-if="['both', 'header'].includes(config.edit) || ['both', 'header'].includes(config.delete)" #actions="{selected}">
 				<zeugnis-actions :selected="selected" @set-grade="setGrade" @delete-grade="deleteGrade"></zeugnis-actions>
