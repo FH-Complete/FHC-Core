@@ -82,7 +82,7 @@ export default {
 						field: "text_stripped",
 						width: 250,
 						formatter: "html",
-						clipContents: true,
+						//clipContents: true,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -254,7 +254,7 @@ export default {
 							title: this.$p.t('global', 'text'),
 							width: 250,
 							tooltip: true,
-							clipContents: true,
+							//clipContents: true,
 						});
 
 						// Force layout recalculation for handling overflow text
