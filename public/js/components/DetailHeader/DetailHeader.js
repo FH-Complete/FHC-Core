@@ -132,8 +132,7 @@ export default {
 						<h2 class="h4">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
-							{{headerData[0].nachname}}
-							<span v-if="headerData[0].titelpost">, </span>
+							{{headerData[0].nachname}}<span v-if="headerData[0].titelpost">, </span>
 							{{headerData[0].titelpost}}
 						</h2>
 
