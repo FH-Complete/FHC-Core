@@ -10,6 +10,18 @@
 }
 
 
+.searchbar_input_clear {
+	/* 1rem * 5 / 8 = width of icon */
+	margin-inline-start: calc(-1rem * 5 / 8 - var(--bs-btn-padding-x) * 2 - var(--bs-border-width)) !important;
+	border: 0;
+	margin-inline-end: 1px;
+	z-index: 1;
+}
+.searchbar_input_clear:hover,
+.searchbar_input_clear:focus {
+	color: var(--bs-body-color);
+	background-color: transparent;
+}
 .searchbar_input:focus,
 .searchbar_input:focus ~ .searchbar_input_clear {
 	z-index: 5; /* same as bootstrap .input-group > .form-control:focus */

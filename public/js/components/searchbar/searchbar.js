@@ -98,17 +98,13 @@ export default {
                     :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
                     :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
                 >
-				<span
+				<button
 					v-if="searchsettings.searchstr"
-					class="w-0 position-relative searchbar_input_clear"
+					class="searchbar_input_clear btn btn-outline-secondary"
+					@click="clearInput"
 				>
-					<button
-						class="position-absolute top-0 bottom-0 end-0 btn bg-transparent"
-						@click="clearInput"
-					>
-						<i class="fas fa-close"></i>
-					</button>
-				</span>
+					<i class="fas fa-close"></i>
+				</button>
                 <span
                     data-bs-toggle="collapse"
                     data-bs-target="#searchSettings"
