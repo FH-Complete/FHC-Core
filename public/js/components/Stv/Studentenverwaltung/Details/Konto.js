@@ -248,6 +248,7 @@ export default {
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="$p.t('konto/buchung')"
 			:new-btn-disabled="stg_kz === ''"

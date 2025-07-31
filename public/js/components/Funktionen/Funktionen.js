@@ -444,6 +444,7 @@ export default {
 				table-only
 				:side-menu="false"
 				:reload= "!this.stylePv21"
+				:reload-btn-infotext="this.$p.t('table', 'reload')"
 				new-btn-show
 				:new-btn-class="this.newBtnStyle"
 				:new-btn-label="this.$p.t('person', 'funktion')"

@@ -420,6 +420,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('lehre', 'pruefung')"
 			@click:new="actionNewPruefung"

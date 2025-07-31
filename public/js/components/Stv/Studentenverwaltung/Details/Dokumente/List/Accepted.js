@@ -336,6 +336,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 	 	>
 			<template #actions="{selected}">
 				<button
