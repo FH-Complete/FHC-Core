@@ -10,6 +10,7 @@ import mergedStudent from "./result/mergedstudent.js";
 import mergedPerson from "./result/mergedperson.js";
 
 export default {
+	name: "FhcSearchbar",
 	components: {
 		person,
 		room,

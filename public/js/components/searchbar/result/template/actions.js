@@ -1,6 +1,7 @@
 import ResultAction from "./action.js";
 
 export default {
+	name: 'SearchbarResultTemplateActions',
 	components: {
 		ResultAction
 	},
@@ -10,7 +11,7 @@ export default {
 		actions: Array
 	},
 	template: `
-	<div v-if="actions.length" class="searchbar-actions">
+	<div v-if="actions.length" class="searchbar-result-template-actions">
 		<result-action
 			v-for="(action, index) in actions"
 			:key="action.label"

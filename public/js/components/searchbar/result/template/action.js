@@ -1,4 +1,5 @@
 export default {
+	name: 'SearchbarResultTemplateAction',
 	emits: [ 'actionexecuted' ],
 	props: { 
 		res: Object,
@@ -22,7 +23,7 @@ export default {
 		}
 	},
 	template: `
-	<a :href="actionHref" @click="actionFunc">
+	<a class="searchbar-result-template-action" :href="actionHref" @click="actionFunc">
 		<slot>{{ $p.t('search/action_default_label') }}</slot>
 	</a>`
 };

@@ -1,6 +1,7 @@
 import TemplateFrame from "./template/frame.js";
 
 export default {
+	name: 'SearchbarResultStudent',
 	components: {
 		TemplateFrame
 	},

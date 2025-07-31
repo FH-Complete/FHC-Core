@@ -2,6 +2,7 @@ import ResultAction from "./action.js";
 import ResultActions from "./actions.js";
 
 export default {
+	name: 'SearchbarResultTemplateFrame',
 	components: {
 		ResultAction,
 		ResultActions
@@ -15,7 +16,7 @@ export default {
 		imageFallback: String
 	},
 	template: `
-	<div class="searchbar-result">
+	<div class="searchbar-result-template-frame">
 		<div class="searchbar_grid">
 			<div class="searchbar_icon">
 				<result-action

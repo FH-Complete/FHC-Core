@@ -135,13 +135,13 @@
 
 /* new variant with template/frame */
 
-.searchbar-result {
+.searchbar-result-template-frame {
 	border-bottom: 1px solid lightgrey;
 	margin-bottom: 1rem;
 	padding-bottom: 1rem;
 }
 
-.searchbar-actions {
+.searchbar-result-template-actions {
 	display: flex;
 	flex-wrap: wrap;
 	gap: .5rem;

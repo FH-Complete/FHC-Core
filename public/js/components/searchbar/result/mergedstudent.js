@@ -2,7 +2,8 @@ import ResultPrestudent from "./prestudent.js";
 import ResultStudent from "./student.js";
 
 export default {
-	components: {
+name: 'SearchbarResultMergedstudent',
+		components: {
 		ResultPrestudent,
 		ResultStudent
 	},

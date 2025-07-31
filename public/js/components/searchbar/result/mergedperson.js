@@ -2,6 +2,7 @@ import TemplateFrame from "./template/frame.js";
 import TemplateAction from "./template/action.js";
 
 export default {
+	name: 'SearchbarResultMergedperson',
 	components: {
 		TemplateFrame,
 		TemplateAction
