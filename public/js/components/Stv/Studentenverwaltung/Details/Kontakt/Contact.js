@@ -95,7 +95,6 @@ export default{
 					},
 				],
 				height:	'auto',
-				selectable:	true,
 				index: 'kontakt_id',
 				persistenceID: 'stv-details-kontakt-contact'
 			},

@@ -87,7 +87,6 @@ export default{
 					},
 				],
 				height:	'auto',
-				selectable:	true,
 				index: 'bankverbindung_id',
 				persistenceID: 'stv-details-kontakt-bankaccount'
 			},

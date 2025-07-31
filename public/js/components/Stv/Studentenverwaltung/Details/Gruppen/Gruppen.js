@@ -78,7 +78,6 @@ export default {
 				],
 				layout: 'fitDataFill',
 				height: 'auto',
-				selectable: true,
 				index: 'group_id',
 				persistenceID: 'stv-details-gruppe'
 			},

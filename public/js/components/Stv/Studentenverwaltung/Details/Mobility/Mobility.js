@@ -113,7 +113,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
-				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
 			},

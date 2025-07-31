@@ -168,7 +168,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
-				selectable: true,
 				index: 'abschlusspruefung_id',
 				persistenceID: 'stv-details-finalexam'
 			},

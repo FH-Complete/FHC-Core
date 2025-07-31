@@ -137,8 +137,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [

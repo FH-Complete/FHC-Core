@@ -178,8 +178,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				//responsiveLayout: "collapse",
 				maxHeight: '200px',
-				//selectableRangeMode: 'click',
-				//selectable: true,
 				index: 'notiz_id',
 				persistenceID: 'core-notiz'
 			},
