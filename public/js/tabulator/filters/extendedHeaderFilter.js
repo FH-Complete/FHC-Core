@@ -41,6 +41,17 @@ function parseFilterExpression(expression)
 
 export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParams)
 {
+	const fields = Array.isArray(filterParams?.field)
+		? filterParams.field
+		: [filterParams?.field];
+
+	if (fields.length > 1 && rowData)
+	{
+		rowValue = fields
+			.map(f => rowData[f] ?? '')
+			.filter(Boolean)
+			.join(' ');
+	}
 	if (typeof headerValue === 'boolean')
 	{
 		return rowValue === headerValue;

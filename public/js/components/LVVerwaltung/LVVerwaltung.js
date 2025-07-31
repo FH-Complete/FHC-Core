@@ -26,16 +26,22 @@ export default {
 		defaultSemester: String,
 		lvRoot: String,
 		permissions: Object,
-		config: Object
+		config: Object,
+		stg: { type: String, required: false },
+		semester: { type: Number, required: false, default: null },
+		studiensemester_kurzbz: { type: String, required: false, default: null },
+		emp: { type: String, required: false, default: null }
 	},
 	computed: {
-		type(){
-			return this.$route.params.type
+		selectedStudiensemester() {
+			return this.studiensemester_kurzbz != null
+				? this.studiensemester_kurzbz
+				: this.defaultSemester;
 		}
 	},
 	provide() {
 		return {
-			currentSemester: Vue.computed(() => this.studiensemesterKurzbz),
+			currentSemester: Vue.computed(() => this.selectedStudiensemester),
 			dropdowns: this.dropdowns,
 			configShowVertragsdetails: this.config.showVertragsdetails,
 			configShowGewichtung: this.config.showGewichtung,
@@ -49,18 +55,26 @@ export default {
 		}
 	},
 	mounted() {
-		this.updateFilter(this.$route);
+		this.updateFilter();
 	},
 	watch: {
-		'$route'(to) {
-			this.updateFilter(to);
+		stg() {
+			this.updateFilter();
+		},
+		semester() {
+			this.updateFilter();
+		},
+		selectedStudiensemester() {
+			this.updateFilter();
+		},
+		emp() {
+			this.updateFilter();
 		},
 	},
 	data() {
 		return {
 			selected: [],
-			studiensemesterKurzbz: this.defaultSemester,
-			stg: "",
+			studiengang: "",
 			filter: {},
 			endpoint: ApiStudiengangTree,
 			dropdowns: {
@@ -95,20 +109,16 @@ export default {
 		}
 	},
 	methods: {
-		updateFilter(route)
+		updateFilter()
 		{
-			let filter = { ...route.params, ...route.query };
-			if (!filter.activeFilter)
-			{
-				if (filter.emp)
-				{
-					filter.activeFilter = 'employee';
-				}
-				else if (filter.stg)
-				{
-					filter.activeFilter = 'verband';
-				}
+			const filter = {
+				stg: this.stg,
+				emp: this.emp,
+				semester: this.semester,
+				studiensemester_kurzbz: this.selectedStudiensemester,
+				activeFilter: this.emp ? 'employee' : this.stg ? 'verband' : null
 			}
+
 			this.filter = filter;
 		},
 		handleRowClicked(data)
@@ -117,18 +127,26 @@ export default {
 		},
 		onSelectEmployee(emp)
 		{
-			let stg = this.stg === '' ? null : this.stg;
+			const { stg, semester } = this.filter;
 
-			this.$router.push({
-				name: 'byEmp',
-				params: { emp, stg, activeFilter: 'employee'},
-			});
+			let studiensemester_kurzbz = this.selectedStudiensemester;
+			const params = { emp };
+
+			if (stg)
+				params.stg = stg;
+			if (semester !== null)
+				params.semester = semester;
+			if (studiensemester_kurzbz)
+				params.studiensemester_kurzbz = studiensemester_kurzbz;
+
+			this.$router.push({ name: 'byEmp', params })
 		},
 
 		onSelectVerband({link})
 		{
 			let stg = null;
 			let semester = null;
+			let studiensemester_kurzbz = this.selectedStudiensemester;
 
 			if (typeof link === 'number')
 				stg = link;
@@ -137,28 +155,22 @@ export default {
 				[stg, semester] = link.split('/');
 			}
 
-			this.stg = stg;
+			const routeName = this.filter.emp ? 'byEmp' : 'byStg';
+			const params = { stg };
 
-			if (this.filter && this.filter.emp)
-			{
-				this.$router.push({
-					name: 'byEmp',
-					params: { emp: this.filter.emp, stg, activeFilter: 'employee' },
-				});
-			}
-			else
-			{
-				this.$router.push({
-					name: 'byStg',
-					params: { stg, semester, activeFilter: 'verband' },
-				});
-			}
+			if (semester !== null)
+				params.semester = Number(semester);
+			if (studiensemester_kurzbz)
+				params.studiensemester_kurzbz = studiensemester_kurzbz;
+			if (this.filter.emp)
+				params.emp = this.filter.emp;
 
+			this.$router.push({ name: routeName, params });
 			this.selected = [];
 		},
 		resetEmployeeFilter()
 		{
-			const newParams = { ...this.$route.params, activeFilter: 'verband' };
+			const newParams = { ...this.filter, activeFilter: 'verband' };
 			if (newParams.stg === '')
 				this.$router.replace({ name: 'index' });
 			else
@@ -166,24 +178,24 @@ export default {
 				delete newParams.emp;
 				newParams.semester = null;
 				this.$router.replace({ name: 'byStg', params: newParams });
-
 			}
 		},
 		searchfunction(params) {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		studiensemesterChanged(newValue) {
-			this.studiensemesterKurzbz = newValue;
-			this.$refs.lvTable.reload();
+			const routeName = this.filter.activeFilter === 'employee' ? 'byEmp' : 'byStg';
+			const newParams = {...this.filter, studiensemester_kurzbz: newValue};
+			this.$router.push({ name: routeName, params: newParams });
 			this.selected = [];
 		},
 	},
 	created() {
-		if (this.$route.params.stg !== undefined)
+		if (this.stg !== undefined)
 		{
-			this.selectedStudiengang = this.$route.params?.semester !== '' && this.$route.params?.semester
-				? `${this.$route.params.stg}/${this.$route.params.semester}`
-				: this.$route.params.stg;
+			this.selectedStudiengang = this.semester !== '' && this.semester
+				? `${this.stg}/${this.semester}`
+				: this.stg;
 		}
 
 		this.$p.loadCategory(['lehre', 'person', 'global'])
@@ -250,7 +262,7 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%" :preselectedKey="selectedStudiengang" :endpoint="endpoint"></stv-verband>
-					<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
+					<stv-studiensemester :default="selectedStudiensemester" @changed="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
