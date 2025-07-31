@@ -47,7 +47,7 @@ export default {
             lastQuery: ''
       };
     },
-	computed:{
+	computed: {
 		searchTypesPlaceholder() {
 			if (!this.searchsettings.types.length) {
 				return Object.values(this.typeLabels).join(' / ');
