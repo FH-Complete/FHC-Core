@@ -105,19 +105,19 @@ export default {
 				>
 					<i class="fas fa-close"></i>
 				</button>
-                <span
+                <button
                     data-bs-toggle="collapse"
                     data-bs-target="#searchSettings"
                     aria-expanded="false"
                     aria-controls="searchSettings"
                     ref="settingsbutton"
-                    class="input-group-text"
+                    class="searchbar_setting_btn btn btn-secondary"
                     type="button"
                     :title="$p.t('search/button_filter_label')"
                     :aria-label="$p.t('search/button_filter_label')"
                 >
                     <i class="fas fa-cog"></i>
-                </span>
+                </button>
             </div>
 
             <div v-show="showresult"
