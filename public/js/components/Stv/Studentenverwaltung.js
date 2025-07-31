@@ -201,17 +201,17 @@ export default {
 		//FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto = 'ma0068@technikum-wien.at';this.$fhcAlert.handleSystemError(1);
 		if (this.$route.params.id) {
 			this.$refs.stvList.updateUrl(
-				ApiStv.students.uid(this.$route.params.id),
+				ApiStv.students.uid(this.$route.params.id, this.studiensemesterKurzbz),
 				true
 			);
 		} else if (this.$route.params.prestudent_id) {
 			this.$refs.stvList.updateUrl(
-				ApiStv.students.prestudent(this.$route.params.prestudent_id),
+				ApiStv.students.prestudent(this.$route.params.prestudent_id, this.studiensemesterKurzbz),
 				true
 			);
 		} else if (this.$route.params.person_id) {
 			this.$refs.stvList.updateUrl(
-				ApiStv.students.person(this.$route.params.person_id),
+				ApiStv.students.person(this.$route.params.person_id, this.studiensemesterKurzbz),
 				true
 			);
 		}

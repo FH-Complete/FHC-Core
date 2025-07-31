@@ -103,8 +103,8 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(:num)/([A-Z]{2,3})/(:nu
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(:num)/([A-Z]{2,3})/(:num)/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3/$4/$5';
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/(:num)/([A-Z]{2,3})/(:num)/(:any)/(:any)'] = 'api/frontend/v1/stv/Students/getStudentsOrgform/$1/$2/$3/$4/$5/$6';
 
-// // (studiensemester_kurzbz)/student/(uid)
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/student/(:any)'] = 'api/frontend/v1/stv/Students/getStudent/$1/$2';
+// // (studiensemester_kurzbz)/uid/(uid)
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/uid/(:any)'] = 'api/frontend/v1/stv/Students/getStudent/$1/$2';
 // // (studiensemester_kurzbz)/prestudent/(prestudent_id)
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'api/frontend/v1/stv/Students/getPrestudent/$1/$2';
 // // (studiensemester_kurzbz)/person/(person_id)

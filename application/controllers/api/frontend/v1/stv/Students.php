@@ -82,7 +82,7 @@ class Students extends FHCAPI_Controller
 	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/(verband)			=> getStudentsOrgform
 	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/(verband)/(gruppe)	=> getStudentsOrgform
 	 *
-	 * /(studiensemester_kurzbz)/student/(student_uid)		=> getStudent
+	 * /(studiensemester_kurzbz)/uid/(student_uid)		=> getStudent
 	 * /(studiensemester_kurzbz)/prestudent/(prestudent_id)	=> getPrestudent
 	 * /(studiensemester_kurzbz)/person/(person_id)			=> getPerson
 	 */
