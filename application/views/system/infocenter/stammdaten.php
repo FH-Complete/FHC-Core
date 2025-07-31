@@ -43,12 +43,15 @@
 				<td>
 					<select id="buergerschaft" disabled>
 						<?php
-						foreach ($all_nations as $nation)
+						if (is_array($all_nations))
 						{
-							$selected = '';
-							if ($nation->nation_code === $stammdaten->staatsbuergerschaft_code)
-								$selected = 'selected';
-							echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+							foreach ($all_nations as $nation)
+							{
+								$selected = '';
+								if ($nation->nation_code === $stammdaten->staatsbuergerschaft_code)
+									$selected = 'selected';
+								echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+							}
 						}
 						?>
 					</select>
@@ -61,12 +64,15 @@
 					?>
 					<select id="geschlecht" disabled>
 						<?php
-						foreach ($all_genders as $gender)
+						if (is_array($all_genders))
 						{
-							$selected = '';
-							if ($gender->geschlecht === $stammdaten->geschlecht)
-								$selected = 'selected';
-							echo "<option value='". $gender->geschlecht ."' " . $selected . ">". ucfirst($gender->bezeichnung_mehrsprachig[$language]) . "</option>";
+							foreach ($all_genders as $gender)
+							{
+								$selected = '';
+								if ($gender->geschlecht === $stammdaten->geschlecht)
+									$selected = 'selected';
+								echo "<option value='". $gender->geschlecht ."' " . $selected . ">". ucfirst($gender->bezeichnung_mehrsprachig[$language]) . "</option>";
+							}
 						}
 						?>
 					</select>
@@ -79,12 +85,15 @@
 					<select id="gebnation" disabled>
 
 					<?php
-						foreach ($all_nations as $nation)
+						if (is_array($all_nations))
 						{
-							$selected = '';
-							if ($nation->nation_code === $stammdaten->geburtsnation_code)
-								$selected = 'selected';
-							echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+							foreach ($all_nations as $nation)
+							{
+								$selected = '';
+								if ($nation->nation_code === $stammdaten->geburtsnation_code)
+									$selected = 'selected';
+								echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+							}
 						}
 					?>
 					</select>
@@ -154,12 +163,15 @@
 							<?php if (isset($adresse->nationkurztext)): ?>
 								<select id="nation_<?php echo $adresse->adresse_id ?>" disabled>
 									<?php
-									foreach ($all_nations as $nation)
+									if (is_array($all_nations))
 									{
-										$selected = '';
-										if ($nation->nation_code === $adresse->nation)
-											$selected = 'selected';
-										echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+										foreach ($all_nations as $nation)
+										{
+											$selected = '';
+											if ($nation->nation_code === $adresse->nation)
+												$selected = 'selected';
+											echo "<option value='". $nation->nation_code ."' " . $selected . ">". $nation->langtext . "</option>";
+										}
 									}
 									?>
 								</select>
