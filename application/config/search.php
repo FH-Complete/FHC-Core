@@ -210,6 +210,23 @@ $config['student'] = [
 		JOIN public.tbl_person p USING(person_id)"
 ];
 
+$prestudent_sort = [
+	"Student",
+	"Incoming",
+	"Outgoing",
+	"Diplomand",
+	"Unterbrecher",
+	"Aufgenommener",
+	"Wartender",
+	"Bewerber",
+	"Interessent",
+	"Abgewiesener",
+	"Absolvent",
+	"Abbrecher",
+	"Ausserordentlicher",
+	"Praktikant"
+];
+$prestudent_sort_array = "array['" . implode("','", $prestudent_sort) . "']";
 $config['prestudent'] = [
 	'primarykey' => 'prestudent_id',
 	'table' => 'public.tbl_prestudent',
@@ -322,7 +339,8 @@ $config['prestudent'] = [
 			),
 			sg.orgform_kurzbz
 		) AS orgform",
-		"b.aktiv"
+		"b.aktiv",
+		"array_position(" . $prestudent_sort_array . ", public.get_rolle_prestudent(ps.prestudent_id, NULL)) AS sort"
 	],
 	'resultjoin' => "
 		LEFT JOIN public.tbl_prestudent ps USING (prestudent_id)

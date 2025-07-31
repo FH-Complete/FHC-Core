@@ -64,7 +64,7 @@ export default {
 						return false;
 					}
 					return true;
-				});
+				}).sort((a, b) => (a.sort || 0) - (b.sort || 0));
 			return students.length ? students : null;
 		},
 		emails() {
