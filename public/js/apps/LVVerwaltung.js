@@ -1,6 +1,5 @@
 import LVVerwaltung from "../components/LVVerwaltung/LVVerwaltung.js";
 import Phrasen from "../plugins/Phrasen.js";
-import {DEFAULT_MODE_RAUMINFO} from "../components/Cis/Mylv/RoomInformation";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
