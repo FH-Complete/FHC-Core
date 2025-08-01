@@ -101,19 +101,11 @@ export default {
 					mergedPerson: {
 						defaultaction: {
 							type: "link",
-							action: data => this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id)
+							action: this.buildPersonSearchResultLink
 						},
 						defaultactionstudent: {
 							type: "link",
-							action: data => {
-								if (data.prestudent_id) {
-									return this.$fhcApi.getUri('/studentenverwaltung/prestudent/' + data.prestudent_id);
-								} else if (data.uid) {
-									return this.$fhcApi.getUri('/studentenverwaltung/student/' + data.uid);
-								} else {
-									return this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id);
-								}
-							}
+							action: this.buildMergedPersonSearchResultLink
 						},
 						childactions: []
 					}
@@ -142,21 +134,38 @@ export default {
 		}
 	},
 	methods: {
+		buildMergedPersonSearchResultLink(data) {
+			if (data.prestudent_id) {
+				return this.buildPrestudentSearchResultLink(data);
+			} else if (data.uid) {
+				return this.buildStudentSearchResultLink(data);
+			} else {
+				return this.buildPersonSearchResultLink(data);
+			}
+		},
 		buildPrestudentSearchResultLink(data) {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
-				+ '/studentenverwaltung'
+			return this.$fhcApi.getUri(
+				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/prestudent/'
-				+ data.prestudent_id;
+				+ data.prestudent_id
+				);
 		},
 		buildStudentSearchResultLink(data) {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
-				+ '/studentenverwaltung'
+			return this.$fhcApi.getUri(
+				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/student/'
-				+ data.uid;
+				+ data.uid
+				);
+		},
+		buildPersonSearchResultLink(data) {
+			return this.$fhcApi.getUri(
+				'/studentenverwaltung'
+				+ '/' + this.studiensemesterKurzbz
+				+ '/person/'
+				+ data.person_id
+				);
 		},
 		onSelectVerband( {link, studiengang_kz}) {
 			let urlpath = String(link);
