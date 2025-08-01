@@ -35,7 +35,8 @@ class Noten extends FHCAPI_Controller
 			'getNotenvorschlagStudent' => self::PERM_LOGGED,
 			'saveNotenvorschlag' => self::PERM_LOGGED,
 			'saveStudentPruefung' => self::PERM_LOGGED,
-			'createPruefungen' => self::PERM_LOGGED
+			'createPruefungen' => self::PERM_LOGGED,
+			'saveNotenvorschlagBulk' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -108,6 +109,8 @@ class Noten extends FHCAPI_Controller
 		}
 
 		// send $grades reference to moodle addon
+		
+		// TODO: event getExterneNoten
 		Events::trigger(
 			'moodleGrades',
 			function & () use (&$grades)
@@ -555,6 +558,72 @@ class Noten extends FHCAPI_Controller
 		$lvgesamtnote->load($lv_id, $student_uid, $sem_kurzbz);
 		
 		$this->terminateWithSuccess(array($ret, $lvgesamtnote));
+	}
+
+	public function saveNotenvorschlagBulk() {
+		$result = $this->getPostJSON();
+
+		if(!property_exists($result, 'lv_id') || !property_exists($result, 'sem_kurzbz') ||
+			!property_exists($result, 'noten')) {
+			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		}
+
+		$lv_id = $result->lv_id;
+		$sem_kurzbz = $result->sem_kurzbz;
+		$noten = $result->noten;
+		
+		$retLvNoten = [];
+		$responseMsgs = [];
+		
+		foreach($noten as $note)
+		{
+			$lvgesamtnote = new lvgesamtnote();
+			if (!$lvgesamtnote->load($lv_id, $note->uid, $sem_kurzbz))
+			{
+				$lvgesamtnote->student_uid = $note->uid;
+				$lvgesamtnote->lehrveranstaltung_id = $lv_id;
+				$lvgesamtnote->studiensemester_kurzbz = $sem_kurzbz;
+				$lvgesamtnote->note = trim($note->note);
+				$lvgesamtnote->mitarbeiter_uid = getAuthUID();
+				$lvgesamtnote->benotungsdatum = date("Y-m-d H:i:s");
+				$lvgesamtnote->freigabedatum = null;
+				$lvgesamtnote->freigabevon_uid = null;
+				$lvgesamtnote->bemerkung = null;
+				$lvgesamtnote->updateamum = null;
+				$lvgesamtnote->updatevon = null;
+				$lvgesamtnote->insertamum = date("Y-m-d H:i:s");
+				$lvgesamtnote->insertvon = getAuthUID();
+				$lvgesamtnote->punkte =// TODO: deprecated?
+				$new = true;
+				$response = "neu";
+			}
+			else
+			{
+				$lvgesamtnote->note = trim($note->note);
+				$lvgesamtnote->punkte = null; // TODO: deprecated?
+				$lvgesamtnote->benotungsdatum = date("Y-m-d H:i:s");
+				$lvgesamtnote->updateamum = date("Y-m-d H:i:s");
+				$lvgesamtnote->updatevon = getAuthUID();
+				$new = false;
+				if ($lvgesamtnote->freigabedatum)
+					$response = "update_f";
+				else
+					$response = "update";
+			}
+
+			if (!$lvgesamtnote->save($new))
+				$responseMsgs[] = $lvgesamtnote->errormsg;
+			else
+				$responseMsgs[] = $response;
+			
+			
+			$lvgesamtnote->load($lv_id, $note->uid, $sem_kurzbz);
+
+			$retLvNoten[] = $lvgesamtnote;
+		}
+
+		$this->terminateWithSuccess(array($retLvNoten, $responseMsgs));
+
 	}
 	
 	public function createPruefungen() {

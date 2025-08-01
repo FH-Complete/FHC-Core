@@ -31,9 +31,17 @@ class Benotungstool extends Auth_Controller
 		
 		// TODO: check if related CIS config is also loaded when being routed in Cis4 by vuerouter
 		// TODO: check if new benotungstool should be configurable the exact same way?
+
+		
 		$viewData = array(
 			'uid'=>getAuthUID(),
-			'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN
+			'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
+			'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
+			'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
+			'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
+			'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
+			'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
+			'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG
 		);
 
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Benotungstool']);

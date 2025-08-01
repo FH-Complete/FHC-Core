@@ -12,6 +12,7 @@ export const Benotungstool = {
 		CoreFilterCmpt,
 		Dropdown: primevue.dropdown,
 		Password: primevue.password,
+		Textarea: primevue.textarea,
 		Datepicker: VueDatePicker,
 		Multiselect: primevue.multiselect
 	},
@@ -49,6 +50,7 @@ export const Benotungstool = {
 			changedNotenCounter: 0,
 			tabulatorUuid: Vue.ref(0),
 			domain: '',
+			importString: '',
 			teilnoten: null,
 			lv: null,
 			studenten: null,
@@ -107,6 +109,102 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
+		parseNote(rowParts, notenbulk) {
+			const uid = rowParts[0]
+
+			const student = this.studenten.find(s => s.uid === uid)
+			if(!student) return
+
+			const note = rowParts[1]
+
+			// find notenoption and check if its allowed to use in lehre
+			const notenOption = this.notenOptions.find(n => n.note == note)
+			if(!notenOption.lehre) return
+
+			notenbulk.push({uid, note})
+		},
+		parsePruefung(rowParts, notenbulk) {
+			const uid = rowParts[0]
+
+			const student = this.studenten.find(s => s.uid === uid)
+			if(!student) return
+
+			const datum = rowParts[1] // should be in 'YYYY.MM.DD'
+			const datumObj = datum
+			
+			const year = datumObj.getFullYear();
+			const month = String(datumObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+			const day = String(datumObj.getDate()).padStart(2, '0');
+			const dateStr = `${year}-${month}-${day}`
+			
+			const note = rowParts[2]
+
+			// find notenoption and check if its allowed to use in lehre
+			const notenOption = this.notenOptions.find(n => n.note == note)
+			if(!notenOption.lehre) return
+		},
+		saveNotenBulk(notenbulk) {
+			this.$api.call(ApiNoten.saveNotenvorschlagBulk(this.lv_id, this.sem_kurzbz, notenbulk)).then(res => {
+				console.log(res)
+				if(res.meta.status === 'success') {
+					const lvNoten = res.data[0]
+
+					lvNoten.forEach(lvn => {
+						// 1.) get relevant student row by uid
+						const s = this.studenten.find(s => s.uid === lvn.uid)
+						s.note_vorschlag = lvn.note // TODO: check if note_vorschlag should be changed by import
+
+						this.teilnoten[s.uid].note_lv = lvn.note
+						s.freigabedatum = this.parseDate(lvn['freigabedatum'])
+						s.benotungsdatum = this.parseDate(lvn['benotungsdatum'])
+
+						s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
+					})
+
+				}
+
+				// 2.) set note_vorschlag field
+
+				// 4.) update rows with note_lv = note_vorschlag & recalculate freigabestatus
+			})
+		},
+		savePruefungBulk(pruefungenbulk) {
+			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
+				.then((res)=> {
+					if(res.meta.status === 'success') {
+
+
+
+
+						this.$fhcAlert.alertInfo('Prüfungen gespeichert') //  TODO: phrase
+					}
+				})
+		},
+		importNoten() {
+			console.log('importNoten', this.importString)
+			
+			// TODO: check for signs of notenimport or pruefung import
+			
+			const rows = this.importString.split('\n')
+			const bulk = []
+			let mode = ''
+			// read the lines
+			rows.forEach(r => {
+				const rowParts = r.split('\t')
+				if(rowParts.length === 3) {
+					this.parsePruefung(rowParts, bulk)
+					mode = 'pruefung' // if line parts are not uniform we are in trouble
+				} else if(rowParts.length === 2) {
+					this.parseNote(rowParts, bulk)
+					mode = 'note'
+				}
+			})
+			
+			if(mode === 'note') this.saveNotenBulk(bulk)
+			else if (mode === 'pruefung')  this.savePruefungBulk(bulk)
+			
+			this.$refs.modalContainerNotenImport.hide()
+		},
 		selectionArraysAreEqual(arr1, arr2) {
 			if(arr1.length !== arr2.length) return false
 
@@ -408,7 +506,7 @@ export const Benotungstool = {
 				const date = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
 				
 				// First column (date)
-				rowDiv.appendChild(createCol(date, 'col-4 d-flex align-items-center'));
+				rowDiv.appendChild(createCol(date, 'col-4 d-flex justify-content-center align-items-center'));
 
 				const noteDefEntry = data.note ? this.notenOptions.find(n => n.note == data[field].note) : null
 
@@ -418,7 +516,7 @@ export const Benotungstool = {
 				// no actions on kommPruef allowed
 				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
 				if(field === 'kommPruef' || colDef.originalNote) { 
-					rowDiv.appendChild(createCol('', 'col-4 d-flex justify-content-center align-items-center')); // append empty col4 to have formatting similar
+					// rowDiv.appendChild(createCol('', 'col-4 d-flex justify-content-center align-items-center')); // append empty col4 to have formatting similar
 					return rowDiv
 				} 
 				
@@ -450,17 +548,22 @@ export const Benotungstool = {
 		openPruefungModal(student, pruefung = null, field) {
 			this.pruefungStudent = student
 			this.pruefung = pruefung
-			
 			const dateStr = this.pruefung?.datum ?? field
 		
 			const pruefungDateParts = dateStr.split('-')
+			
+			// does not work correctly
 
 			// new date obj so datepicker picks ob the change by ref
-			const newDate = new Date()
-			newDate.setFullYear(pruefungDateParts[0])
-			newDate.setMonth(pruefungDateParts[1])
-			newDate.setMonth(newDate.getMonth() - 1) // acount for js date month offset
-			newDate.setDate(pruefungDateParts[2])
+			// const newDate = new Date()
+			// newDate.setFullYear(+pruefungDateParts[0])
+			// newDate.setMonth(+pruefungDateParts[1])
+			// // newDate.setMonth(newDate.getMonth() - 1) // acount for js date month offset
+			// newDate.setDate(+pruefungDateParts[2])
+			
+			// works correctly
+			const newDate = new Date(+pruefungDateParts[0], +pruefungDateParts[1], +pruefungDateParts[2])
+			newDate.setMonth(newDate.getMonth() - 1)
 			this.selectedPruefungDate = newDate
 			
 			
@@ -1037,6 +1140,9 @@ export const Benotungstool = {
 		openNewPruefungsdatumModal() {
 			this.$refs.modalContainerNeuesPruefungsdatum.show()
 		},
+		openNotenImportModal() {
+			this.$refs.modalContainerNotenImport.show()
+		},
 		getOptionLabelNotePruefung(option) {
 			return option.bezeichnung
 		},
@@ -1233,12 +1339,13 @@ export const Benotungstool = {
 			return counter
 		},
 		getSaveBtnClass() {
-			// return "btn btn-primary ml-2"
 			return this.changedNoten?.length ? "btn btn-primary ml-2" : "btn btn-secondary ml-2"
 		},
 		getNewBtnClass() {
 			return "btn btn-primary ml-2"
-			// return !this.changedData.length ? "btn btn-secondary ml-2" : "btn btn-primary ml-2"
+		},
+		getNotenImportBtnClass() {
+			return "btn btn-primary ml-2"
 		},
 		changedNoten() {
 			const v = this.changedNotenCounter // hack to trigger computed
@@ -1259,6 +1366,19 @@ export const Benotungstool = {
 		this.setupMounted()
 	},
 	template: `
+		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
+			<template v-slot:title>{{$p.t('benotungstool/c4notenImportieren')}}</template>
+			<template v-slot:default>
+				
+				<div class="row mt-4 justify-content-center">
+					<Textarea v-model="importString" rows="5"></Textarea>
+				</div>
+				
+			</template>
+			<template v-slot:footer>
+				<button type="button" class="btn btn-primary" @click="importNoten">{{ $p.t('benotungstool/c4import') }}</button>
+			</template>
+		</bs-modal>
 
 		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{$p.t('benotungstool/c4addNewPruefung')}}</template>
@@ -1407,6 +1527,9 @@ export const Benotungstool = {
 					</button>
 					<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
 						{{$p.t('benotungstool/c4addNewPruefung')}} <i class="fa fa-plus"></i>
+					</button>
+					<button @click="openNotenImportModal" role="button" :class="getNotenImportBtnClass">
+						{{$p.t('benotungstool/c4notenImportieren')}} <i class="fa fa-file-import"></i>
 					</button>
 				 </template>
 			</core-filter-cmpt>

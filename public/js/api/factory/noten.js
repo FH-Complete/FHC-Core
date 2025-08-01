@@ -57,4 +57,14 @@ export default {
 			params: { uids, datum, lva_id, sem_kurzbz }
 		};
 	},
+	saveNotenvorschlagBulk(lv_id, sem_kurzbz, noten) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/saveNotenvorschlagBulk',
+			params: { lv_id, sem_kurzbz, noten }
+		};
+	},
+	saveStudentPruefungBulk(lv_id, sem_kurzbz, pruefungen) {
+		
+	}
 };
