@@ -58,7 +58,7 @@ export default {
 		},
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
+			default: props => luxon.DateTime.now().setZone(props.timezone).startOf('day')
 		},
 		modes: {
 			type: Object,
