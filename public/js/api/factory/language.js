@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2025 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,16 +16,10 @@
  */
 
 export default {
-	search(searchsettings, config) {
-		const url = '/api/frontend/v1/searchbar/search';
-		return this.$fhcApi.post(url, searchsettings, config);
-	},
-	searchAdvanced(searchsettings, config) {
-		const url = '/api/frontend/v1/searchbar/searchAdvanced';
-		return this.$fhcApi.post(url, searchsettings, config);
-	},
-	searchdummy(searchsettings) {
-		const url = 'public/js/apps/api/dummyapi.php/Search';
-		return this.$fhcApi.post(url, searchsettings);
+	getAll() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/language/get'
+		};
 	}
 };

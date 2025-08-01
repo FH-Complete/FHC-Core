@@ -75,12 +75,12 @@ export default {
 		return {
 			selected: [],
 			searchbaroptions: {
-				cssclass: "position-relative",
+				origin: 'stv',
 				calcheightonly: true,
-				types: [
-					"studentStv",
-					"prestudent"
-				],
+				types: {
+					student: Vue.computed(() => this.$p.t('search/type_student')),
+					prestudent: Vue.computed(() => this.$p.t('search/type_prestudent'))
+				},
 				actions: {
 					student: {
 						defaultaction: {
@@ -101,8 +101,28 @@ export default {
 						},
 						childactions: [
 						]
+					},
+					mergedPerson: {
+						defaultaction: {
+							type: "link",
+							action: data => this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id)
+						},
+						defaultactionstudent: {
+							type: "link",
+							action: data => {
+								if (data.prestudent_id) {
+									return this.$fhcApi.getUri('/studentenverwaltung/prestudent/' + data.prestudent_id);
+								} else if (data.uid) {
+									return this.$fhcApi.getUri('/studentenverwaltung/student/' + data.uid);
+								} else {
+									return this.$fhcApi.getUri('/studentenverwaltung/person/' + data.person_id);
+								}
+							}
+						},
+						childactions: []
 					}
-				}
+				},
+				mergeResults: 'person'
 			},
 			studiengangKz: undefined,
 			studiensemesterKurzbz: this.defaultSemester,
@@ -128,8 +148,8 @@ export default {
 		reloadList() {
 			this.$refs.stvList.reload();
 		},
-		searchfunction(params) {
-			return this.$api.call(ApiSearchbar.search(params));
+		searchfunction(params, config) {
+			return this.$api.call(ApiSearchbar.searchStv(params), config);
 		}
 	},
 	created() {
@@ -217,7 +237,11 @@ export default {
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">FHC 4.0</a>
 			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
-			<core-searchbar :searchoptions="searchbaroptions" :searchfunction="searchfunction" class="searchbar w-100"></core-searchbar>
+			<core-searchbar
+				:searchoptions="searchbaroptions"
+				:searchfunction="searchfunction"
+				class="searchbar position-relative w-100"
+			></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
