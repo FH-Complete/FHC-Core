@@ -15,6 +15,7 @@ export default {
     template: `
 		<template v-if="this.renderif()">
 			<a :class="this.cssclass" :href="this.getactionhref()"
+				:alt="$p.t('ui','aktion')"
 				@click="this.execaction()">
 				<slot>Action</slot>
 			</a>

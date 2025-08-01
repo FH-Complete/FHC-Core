@@ -5,28 +5,44 @@
 
 @import url(./switches.css);
 
-#search-filter{
-    border: 1px solid #ced4da;
+:root{
+	--fhc-searchbar-shadow: var(--fhc-shadow-40, #ced4da);
+	--fhc-searchbar-settings-background-color: var(--fhc-dark, #343a40);
+	--fhc-searchbar-results-background-color: var(--fhc-background, #fff);
+	--fhc-searchbar-results-border-color: var(--fhc-border, lightgrey);
+	--fhc-searchbar-results-link-color: var(--fhc-link, #0d6efd);
+	--fhc-searchbar-results-btn-color: var(--bs-btn-color, white);
 }
 
-
 .searchbar_settings {
-    position: absolute; 
+	position: absolute; 
     z-index: 9999; 
-    background-color: #343a40;
+    background-color: var(--fhc-searchbar-settings-background-color);
 }
 
 .searchbar_results {
     position: absolute; 
     z-index: 9998; 
-    background-color: #fff; 
-    border: 1px solid lightgrey;
+    background-color: var(--fhc-searchbar-results-background-color);
+    border: 1px solid var(--fhc-searchbar-results-border-color);
     padding: .5rem;
     top: 100%;
     width: 100%;
     left: 0;
     right: 0;
-	box-shadow: 2px 2px 4px rgba(0, 0, 0, .4);
+	box-shadow: 2px 2px 4px var(--fhc-searchbar-shadow);
+}
+
+.searchbar_results a{
+	color: var(--fhc-searchbar-results-link-color);
+}
+/*
+.searchbar_results a:not(a~i) {
+	color: inherit;
+}
+*/
+.searchbar_results a.btn {
+	color: var(--fhc-searchbar-results-btn-color);
 }
 
 .searchbar_results_scroller {
@@ -35,7 +51,7 @@
 }
 
 .searchbar_result {
-    border-bottom: 1px solid lightgrey;
+    border-bottom: 1px solid var(--fhc-searchbar-results-border-color);
     margin-bottom: 1rem;
 }
 
