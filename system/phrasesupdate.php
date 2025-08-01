@@ -31627,12 +31627,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'termine',
+		'phrase' => 'termineV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterricht laut Stundenplan',
+				'text' => 'Unterricht laut LV-Plan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -31652,7 +31652,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterricht laut Stundenplan',
+				'text' => 'Unterricht laut LV-Plan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32107,12 +32107,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'zeitNichtAusStundenplanBeginn',
+		'phrase' => 'zeitNichtAusStundenplanBeginnV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtbeginn entspricht keinem Unterrichtstermin laut Stundenplan.',
+				'text' => 'Unterrichtbeginn entspricht keinem Unterrichtstermin laut LV-Plan.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32127,12 +32127,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'zeitNichtAusStundenplanEnde',
+		'phrase' => 'zeitNichtAusStundenplanEndeV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtende entspricht keinem Unterrichtstermin laut Stundenplan.',
+				'text' => 'Unterrichtende entspricht keinem Unterrichtstermin laut LV-Plan.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32147,12 +32147,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'datumNichtAusStundenplan',
+		'phrase' => 'datumNichtAusStundenplanV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Datum entspricht keinem Stundenplan Termin.',
+				'text' => 'Datum entspricht keinem LV-Plan Termin.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32323,14 +32323,14 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'tooltipLektorStartKontrolleV2',
+		'phrase' => 'tooltipLektorStartKontrolleV4',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Um eine Anwesenheitskontrolle für Ihre ausgewählte Unterrichtsgruppe durchzuführen, wählen Sie bitte einen Termin aus dem Stundenplan aus oder geben händisch die gewünschte Gültigkeitkeitsdauer der Kontrolle an.
+				'text' => 'Um eine Anwesenheitskontrolle für Ihre ausgewählte Unterrichtsgruppe durchzuführen, wählen Sie bitte einen Termin aus dem LV-Plan aus oder geben händisch die gewünschte Gültigkeitkeitsdauer der Kontrolle an.
 
-				Die Gültigkeitsdauer bestimmt die Gewichtung der Anwesenheit in Relation zum Gesamtausmaß, sie können diese aber nach eigenem Ermessen anpassen und müssen sich nicht streng an die Termine im Stundenplan halten.
+				Die Gültigkeitsdauer bestimmt die Gewichtung der Anwesenheit in Relation zum Gesamtausmaß, sie können diese aber nach eigenem Ermessen anpassen und müssen sich nicht streng an die Termine im LV-Plan halten.
 
 				Sie können pro Datum und Unterrichtsgruppe mehrere Anwesenheitskontrollen am Tag durchführen, solange sich diese nicht in Ihren Zeiten überschneiden und eine Mindestlänge von {0} Minuten beträgt.',
 				'description' => '',
@@ -32599,12 +32599,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'termineAusStundenplan',
+		'phrase' => 'termineAusStundenplanV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterricht Termine laut Stundenplan',
+				'text' => 'Unterricht Termine laut LV-Plan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32619,12 +32619,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'tooltipUnterrichtZeitCustom',
+		'phrase' => 'tooltipUnterrichtZeitCustomV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtszeiten werden aus dem Stundenplan geladen, überschreiben Sie diese nur falls Ihre tatsächliche Unterrichtszeiten davon abweichen!',
+				'text' => 'Unterrichtszeiten werden aus dem LV-Plan geladen, überschreiben Sie diese nur falls Ihre tatsächliche Unterrichtszeiten davon abweichen!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -32639,12 +32639,12 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'tooltipUnterrichtDatumCustom',
+		'phrase' => 'tooltipUnterrichtDatumCustomV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Unterrichtsdaten werden aus dem Stundenplan geladen, überschreiben Sie dieses nur falls Ihr tatsächliches Unterrichtsdatum abweicht!',
+				'text' => 'Unterrichtsdaten werden aus dem LV-Plan geladen, überschreiben Sie dieses nur falls Ihr tatsächliches Unterrichtsdatum abweicht!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40200,7 +40200,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Stundenplan',
+				'text' => 'LV-Plan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
