@@ -131,7 +131,6 @@ const router = VueRouter.createRouter({
 });
 
 router.afterEach((to, from, failure) => {
-	console.log('vue router afterEach: ' + to.params.studiensemester_kurzbz);
 	if (to.params.studiensemester_kurzbz) {
 		document.title = to.params.studiensemester_kurzbz + ' - Studierendenverwaltung FH-Complete';
 	} else {
