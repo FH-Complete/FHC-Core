@@ -85,9 +85,7 @@ export default {
 					student: {
 						defaultaction: {
 							type: "link",
-							action: function(data) {
-								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/studentenverwaltung/student/' + data.uid;
-							}
+							action: this.buildStudentSearchResultLink
 						},
 						childactions: [
 						]
@@ -95,9 +93,7 @@ export default {
 					prestudent: {
 						defaultaction: {
 							type: "link",
-							action: function(data) {
-								return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/studentenverwaltung/prestudent/' + data.prestudent_id;
-							}
+							action: this.buildPrestudentSearchResultLink
 						},
 						childactions: [
 						]
@@ -133,15 +129,61 @@ export default {
 			}
 		}
 	},
+	watch: {
+		'$attrs.url_studiensemester_kurzbz': function (newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.studiensemesterKurzbz = newVal;
+				this.$refs.stvList.updateUrl();
+				this.$refs.details.reload();
+			}
+		},
+		'$attrs.url_mode': function () {
+			this.handlePersonUrl();
+		}
+	},
 	methods: {
-		onSelectVerband({link, studiengang_kz}) {
+		buildPrestudentSearchResultLink(data) {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/studentenverwaltung'
+				+ '/' + this.studiensemesterKurzbz
+				+ '/prestudent/'
+				+ data.prestudent_id;
+		},
+		buildStudentSearchResultLink(data) {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/studentenverwaltung'
+				+ '/' + this.studiensemesterKurzbz
+				+ '/student/'
+				+ data.uid;
+		},
+		onSelectVerband( {link, studiengang_kz}) {
+			let urlpath = String(link);
+			if (!urlpath.match(/\/prestudent/))
+			{
+				urlpath = 'CURRENT_SEMESTER' + '/' + urlpath;
+			}
 			this.studiengangKz = studiengang_kz;
 			this.$refs.stvList.updateUrl(
-				ApiStv.students.verband(link)
-			);
+				ApiStv.students.verband(urlpath)
+				);
+			this.$router.push({
+				name: 'studiensemester',
+				params: {
+					studiensemester_kurzbz: this.studiensemesterKurzbz
+				}
+			});
 		},
 		studiensemesterChanged(v) {
 			this.studiensemesterKurzbz = v;
+
+			this.$router.push({
+				params: {
+					studiensemester_kurzbz: v
+				}
+			});
+
 			this.$refs.stvList.updateUrl();
 			this.$refs.details.reload();
 		},
@@ -150,9 +192,38 @@ export default {
 		},
 		searchfunction(params, config) {
 			return this.$api.call(ApiSearchbar.searchStv(params), config);
+		},
+		handlePersonUrl() {
+			if (this.$route.params.id) {
+				this.$refs.stvList.updateUrl(
+					ApiStv.students.uid(this.$route.params.id, 'CURRENT_SEMESTER'),
+					true
+					);
+			} else if (this.$route.params.prestudent_id) {
+				this.$refs.stvList.updateUrl(
+					ApiStv.students.prestudent(this.$route.params.prestudent_id, 'CURRENT_SEMESTER'),
+					true
+					);
+			} else if (this.$route.params.person_id) {
+				this.$refs.stvList.updateUrl(
+					ApiStv.students.person(this.$route.params.person_id, 'CURRENT_SEMESTER'),
+					true
+					);
+			}
 		}
 	},
 	created() {
+		if (!this.$attrs?.url_studiensemester_kurzbz) {
+			this.$router.replace({
+				name: 'studiensemester',
+				params: {
+					studiensemester_kurzbz: this.defaultSemester
+				}
+			});
+		} else {
+			this.studiensemesterKurzbz = this.$attrs.url_studiensemester_kurzbz;
+		}
+
 		this.$api
 			.call(ApiStv.kontakt.address.getNations())
 			.then(result => {
@@ -214,23 +285,7 @@ export default {
 	mounted() {
 		//Test manu Systemerror
 		//FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto = 'ma0068@technikum-wien.at';this.$fhcAlert.handleSystemError(1);
-		if (this.$route.params.id) {
-			this.$refs.stvList.updateUrl(
-				ApiStv.students.uid(this.$route.params.id),
-				true
-			);
-		} else if (this.$route.params.prestudent_id) {
-			this.$refs.stvList.updateUrl(
-				ApiStv.students.prestudent(this.$route.params.prestudent_id),
-				true
-			);
-		} else if (this.$route.params.person_id) {
-			this.$refs.stvList.updateUrl(
-				ApiStv.students.person(this.$route.params.person_id),
-				true
-			);
-		}
-
+		this.handlePersonUrl();
 	},
 	template: `
 	<div class="stv">
@@ -250,7 +305,7 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester :default="defaultSemester" @changed="studiensemesterChanged"></stv-studiensemester>
+					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<vertical-split>

@@ -1,5 +1,6 @@
 <?php
 
+$config['number_displayed_past_studiensemester_default'] = 5;
 $config['tabs'] =
 	[
 		'details' => [
