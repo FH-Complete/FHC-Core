@@ -49,6 +49,33 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
+			name: 'studiengang',
+			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/:studiengang`,
+			component: FhcStudentenverwaltung,
+			props: (route) => {
+				return {
+					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
+					url_studiengang: route.params.studiengang,
+				};
+			},
+			beforeEnter: (to, from, next) => {
+				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
+				if (!isSemester) {
+					return next({name: 'index'});
+				}
+				const isStudiengang = /^[A-Z]{3}/.test(to.params.studiengang);
+				if (!isStudiengang) {
+					return next({
+						name: 'studiensemester',
+						params: {
+							studiensemester_kurzbz: to.params.studiensemester_kurzbz
+						}
+					});
+				}
+				next();
+			}
+		},
+		{
 			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/prestudent/:prestudent_id`,
 			component: FhcStudentenverwaltung,
 			props: (route) => {
@@ -131,11 +158,14 @@ const router = VueRouter.createRouter({
 });
 
 router.afterEach((to, from, failure) => {
-	if (to.params.studiensemester_kurzbz) {
-		document.title = to.params.studiensemester_kurzbz + ' - Studierendenverwaltung FH-Complete';
-	} else {
-		document.title = 'Studierendenverwaltung FH-Complete';
+	let title = 'Studierendenverwaltung FH-Complete';
+	if (to.params.studiengang) {
+		title = to.params.studiengang + ' ' + title;
 	}
+	if (to.params.studiensemester_kurzbz) {
+		title = to.params.studiensemester_kurzbz + ' ' + title;
+	}
+	document.title = title;
 });
 
 const app = Vue.createApp({
