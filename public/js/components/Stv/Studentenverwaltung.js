@@ -127,14 +127,7 @@ export default {
 		},
 		'url_studiengang': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
-				const stg = this.lists.stgs.find((element) => {
-					const kuerzel = (element.typ + element.kurzbz).toUpperCase();
-					return (this.url_studiengang === kuerzel);
-				});
-				if (stg) {
-					this.studiengangKz = stg.studiengang_kz;
-					this.studiengangKuerzel = (stg.typ + stg.kurzbz).toUpperCase();
-				}
+				this.checkUrlStudiengang();
 			}
 		},
 		'url_mode': function () {
@@ -226,6 +219,25 @@ export default {
 					true
 					);
 			}
+		},
+		checkUrlStudiengang() {
+			if (this.url_studiengang) {
+				const stg = this.lists.stgs.find((element) => {
+					const kuerzel = (element.typ + element.kurzbz).toUpperCase();
+					return (this.url_studiengang === kuerzel);
+				});
+				if (stg) {
+					this.studiengangKz = stg.studiengang_kz;
+					this.studiengangKuerzel = (stg.typ + stg.kurzbz).toUpperCase();
+				} else {
+					this.$router.replace({
+						name: 'studiensemester',
+						params: {
+							studiensemester_kurzbz: this.studiensemesterKurzbz
+						}
+					});
+				}
+			}
 		}
 	},
 	created() {
@@ -273,17 +285,7 @@ export default {
 			.then(result => {
 				this.lists.stgs = result.data;
 				this.lists.active_stgs = this.lists.stgs.filter(stg => stg.aktiv);
-
-				if (this.url_studiengang) {
-					const stg = this.lists.stgs.find((element) => {
-						const kuerzel = (element.typ + element.kurzbz).toUpperCase();
-						return (this.url_studiengang === kuerzel);
-					});
-					if (stg) {
-						this.studiengangKz = stg.studiengang_kz;
-						this.studiengangKuerzel = (stg.typ + stg.kurzbz).toUpperCase();
-					}
-				}
+				this.checkUrlStudiengang();
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
