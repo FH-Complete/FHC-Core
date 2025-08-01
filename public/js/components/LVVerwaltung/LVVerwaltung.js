@@ -28,7 +28,7 @@ export default {
 		permissions: Object,
 		config: Object,
 		stg: { type: String, required: false },
-		semester: { type: Number, required: false, default: null },
+		semester: { type: [Number, String], required: false, default: null },
 		studiensemester_kurzbz: { type: String, required: false, default: null },
 		emp: { type: String, required: false, default: null }
 	},
@@ -159,7 +159,7 @@ export default {
 			const params = { stg };
 
 			if (semester !== null)
-				params.semester = Number(semester);
+				params.semester = semester;
 			if (studiensemester_kurzbz)
 				params.studiensemester_kurzbz = studiensemester_kurzbz;
 			if (this.filter.emp)
@@ -176,7 +176,7 @@ export default {
 			else
 			{
 				delete newParams.emp;
-				newParams.semester = null;
+
 				this.$router.replace({ name: 'byStg', params: newParams });
 			}
 		},

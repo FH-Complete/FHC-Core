@@ -322,7 +322,7 @@ EOSQL;
 		if (hasData($result))
 		{
 			$lehrveranstaltung = getData($result)[0];
-			$oe_result = $this->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id, $lehrveranstaltung->studiengang_kz);
+			$oe_result = $this->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id);
 			return success(hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array(''));
 		}
 	}

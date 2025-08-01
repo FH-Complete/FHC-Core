@@ -31,6 +31,7 @@ const router = VueRouter.createRouter({
 					studiensemester_kurzbz: studiensemester_kurzbz,
 					emp: emp,
 					stg: stg,
+					semester: semester
 				};
 			},
 			beforeEnter: (to, from, next) => {
@@ -62,12 +63,12 @@ const router = VueRouter.createRouter({
 					studiensemester_kurzbz = undefined;
 
 				if (stg === '')
-					semester = undefined;
+					stg = undefined;
 
 				return {
 					studiensemester_kurzbz: studiensemester_kurzbz,
 					stg: stg,
-					semester: semester != null ? Number(semester) : null,
+					semester: semester,
 				};
 			},
 			beforeEnter: (to, from, next) => {

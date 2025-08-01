@@ -80,7 +80,7 @@ class Lehreinheit extends FHCAPI_Controller
 
 		$lehrveranstaltung = getData($lehrveranstaltung_result)[0];
 
-		$oe_result = $this->_ci->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id, $lehrveranstaltung->studiengang_kz);
+		$oe_result = $this->_ci->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id);
 		$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
 
 		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&

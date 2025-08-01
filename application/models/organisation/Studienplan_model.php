@@ -107,6 +107,8 @@ class Studienplan_model extends DB_Model
 		));
 	}
 
+	// Deprecated
+	// im Lehrveranstaltung_model vorhanden
 	public function getAllOesForLv($lehrveranstaltung_id)
 	{
 		$this->addDistinct('oe_kurzbz');

@@ -1161,7 +1161,7 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 		if (!is_null($verband))
 		{
-			$qry .= ' AND (orgform_kurzbz = ? OR orgform_kurzbz IS NULL)';
+			$qry .= ' AND (tbl_lehrveranstaltung.orgform_kurzbz = ? OR tbl_lehrveranstaltung.orgform_kurzbz IS NULL)';
 			$params[] = $verband;
 		}
 
@@ -1198,31 +1198,29 @@ class Lehrveranstaltung_model extends DB_Model
 		";
 	}
 
-	public function getAllOe($lv_id, $stg_kz = null)
+	public function getAllOe($lv_id)
 	{
-		$qry = "(SELECT DISTINCT oe_kurzbz
-			FROM lehre.tbl_studienplan_lehrveranstaltung
-			JOIN lehre.tbl_studienplan USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-			JOIN public.tbl_studiengang USING(studiengang_kz)
-			WHERE lehrveranstaltung_id = ?)";
+		$qry = "SELECT DISTINCT oe_kurzbz
+				FROM lehre.tbl_studienplan_lehrveranstaltung
+					JOIN lehre.tbl_studienplan USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE lehrveranstaltung_id = ?
 
-		$params = array($lv_id);
-		if (!is_null($stg_kz))
-		{
-			$qry .= ' UNION 
-					(SELECT oe_kurzbz
-					FROM public.tbl_studiengang WHERE studiengang_kz = ?)';
-			$params[] = $stg_kz;
-		}
-		else
-		{
-			$qry .= ' UNION
-					(SELECT oe_kurzbz
-					FROM public.tbl_studiengang WHERE studiengang_kz = (SELECT tbl_lehrveranstaltung.studiengang_kz FROM lehre.tbl_lehrveranstaltung WHERE lehrveranstaltung_id = ?))
-			';
-			$params[] = $lv_id;
-		}
+				UNION
+
+				(
+					SELECT oe_kurzbz
+					FROM public.tbl_studiengang 
+					WHERE studiengang_kz = (
+						SELECT tbl_lehrveranstaltung.studiengang_kz 
+						FROM lehre.tbl_lehrveranstaltung 
+						WHERE lehrveranstaltung_id = ?
+					)
+				)
+			";
+
+		$params = array($lv_id, $lv_id);
 
 		return $this->execReadOnlyQuery($qry, $params);
 	}
