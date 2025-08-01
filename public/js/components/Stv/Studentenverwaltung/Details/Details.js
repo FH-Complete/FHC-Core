@@ -37,6 +37,10 @@ export default {
 		},
 		lists: {
 			from: 'lists'
+		},
+		$reloadList: {
+			from: '$reloadList',
+			required: true
 		}
 	},
 	props: {
@@ -116,7 +120,28 @@ export default {
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};
-					this.$refs.form.setFeedback(true, result.data);
+
+					const feedback = result.data;
+
+					//to avoid empty alert for updateam, updatevon
+					const cleanedFeedback = {};
+
+					const formElement = this.$refs.form.$el || this.$refs.form;
+					const inputElements = formElement.querySelectorAll('[name]');
+					const validFieldNames = Array.from(inputElements).map(el => el.getAttribute('name'));
+
+					for (const key in feedback) {
+						if (validFieldNames.includes(key)) {
+							cleanedFeedback[key] = feedback[key];
+						}
+					}
+
+					if (Object.keys(cleanedFeedback).length > 0) {
+						this.$refs.form.setFeedback(true, cleanedFeedback);
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					}
+
+					this.$reloadList();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -256,6 +281,7 @@ export default {
 						no-today
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						teleport

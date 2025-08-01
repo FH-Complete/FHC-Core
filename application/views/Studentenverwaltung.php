@@ -15,11 +15,14 @@
 			'notiz',
 		),
 		'customCSSs' => [
+			#datepicker fuer component functions
 			'public/css/components/vue-datepicker.css',
 			'public/css/components/primevue.css',
-			'public/css/Studentenverwaltung.css'
+			'public/css/Studentenverwaltung.css',
+			'public/css/components/function.css'
 		],
 		'customJSs' => [
+			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
@@ -37,7 +40,10 @@ $configArray = [
 	//replaced by possibility to hide each formular field via config stv.php
 	#'showZgvDoktor' => !defined('ZGV_DOKTOR_ANZEIGEN') ? false : ZGV_DOKTOR_ANZEIGEN,
 	#'showZgvErfuellt' => !defined('ZGV_ERFUELLT_ANZEIGEN') ? false : ZGV_ERFUELLT_ANZEIGEN
-	'showHintKommPrfg' => !defined('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT') ? false : FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT
+	'showHintKommPrfg' => !defined('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT') ? false : FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT,
+	'showAufnahmegruppen' => !defined('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN') ? false : FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN,
+	'allowUebernahmePunkte' => !defined('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME') ? true : FAS_REIHUNGSTEST_PUNKTEUEBERNAHME,
+	'useReihungstestPunkte' => !defined('FAS_REIHUNGSTEST_PUNKTE') ? true : FAS_REIHUNGSTEST_PUNKTE,
 ];
 ?>
 
