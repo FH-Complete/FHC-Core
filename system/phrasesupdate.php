@@ -44600,18 +44600,38 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'error_fieldLessThan10000',
+		'phrase' => 'error_fieldLessThan1000',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Das Eingabefeld {field} darf maximal 4-stellig sein.',
+				'text' => 'Das Eingabefeld {field} muss kleiner als 1000 sein.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
 				'text' => 'The Field {Field} must contain a number less then 10000.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNoValidNumber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine gültige Zahl sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Input Field {field} has to be a valid number',
 				'description' => '',
 				'insertvon' => 'system'
 			)

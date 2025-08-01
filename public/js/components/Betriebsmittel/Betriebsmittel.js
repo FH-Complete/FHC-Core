@@ -290,12 +290,6 @@ export default {
 			this.formData.anmerkung = null;
 			this.formData.beschreibung = null;
 			this.statusNew = true;
-		},
-		//helper function: workaround to trigger validation if input is not a number
-		normalizeKaution() {
-			if (this.formData.kaution === null || this.formData.kaution === '') {
-				this.formData.kaution = 'xxx'
-			}
 		}
 	},
 	created() {
@@ -406,10 +400,9 @@ export default {
 				
 				<div class="row mb-3">
 					<form-input
-						type="number"
+						type="text"
 						:label="$p.t('infocenter/kaution')"
 						name="kaution"
-						@blur="normalizeKaution"
 						v-model="formData.kaution"
 						>
 					</form-input>
