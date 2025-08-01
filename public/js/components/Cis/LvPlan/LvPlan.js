@@ -1,13 +1,7 @@
-import FhcCalendar from "../../Calendar/Base.js";
+import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
-
-import { useEventLoader } from '../../../composables/EventLoader.js';
-
-import ModeDay from '../../Calendar/Mode/Day.js';
-import ModeWeek from '../../Calendar/Mode/Week.js';
-import ModeMonth from '../../Calendar/Mode/Month.js';
 
 export const DEFAULT_MODE_LVPLAN = 'Week'
 
@@ -16,9 +10,6 @@ export default {
 	components: {
 		FhcCalendar
 	},
-	inject: [
-		"renderers"
-	],
 	props: {
 		viewData: Object, // NOTE(chris): this is inherited from router-view
 		propsViewData: Object
@@ -26,25 +17,11 @@ export default {
 	data() {
 		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
-			modes: {
-				day: Vue.markRaw(ModeDay),
-				week: Vue.markRaw(ModeWeek),
-				month: Vue.markRaw(ModeMonth)
-			},
-			modeOptions: {
-				day: {
-					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
-				},
-				week: {
-					collapseEmptyDays: false
-				}
-			},
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
 			uid: null,
-			teachingunits: null
+			lv: null
 		};
 	},
 	computed:{
@@ -53,25 +30,6 @@ export default {
 		},
 		currentMode() {
 			return this.propsViewData?.mode || DEFAULT_MODE_LVPLAN;
-		},
-		backgrounds() {
-			let now = luxon.DateTime.now().setZone(this.viewData.timezone);
-
-			if (this.currentMode == 'Month')
-				return [
-					{
-						class: 'background-past',
-						end: now.startOf('day')
-					}
-				];
-
-			return [
-				{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}
-			];
 		},
 		downloadLinks() {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
@@ -101,11 +59,6 @@ export default {
 		}
 	},
 	methods: {
-		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
-			return '--event-bg:#' + event.farbe;
-		},
 		handleChangeDate(day, newMode) {
 			return this.handleChangeMode(newMode, day);
 		},
@@ -123,35 +76,22 @@ export default {
 			});
 		},
 		updateRange(rangeInterval) {
-			this.rangeInterval = rangeInterval;
 			this.$api
 				.call(ApiLvPlan.studiensemesterDateInterval(
-					this.rangeInterval.end.startOf('week').toISODate()
+					rangeInterval.end.startOf('week').toISODate()
 				))
 				.then(res => {
 					this.studiensemester_kurzbz = res.data.studiensemester_kurzbz;
 					this.studiensemester_start = res.data.start;
 					this.studiensemester_ende = res.data.ende;
 				});
-		}
-	},
-	setup(props) {
-		const $api = Vue.inject('$api');
-
-		const rangeInterval = Vue.ref(null);
-		
-		const { events, lv } = useEventLoader(rangeInterval, (start, end) => {
+		},
+		getPromiseFunc(start, end) {
 			return [
-				$api.call(ApiLvPlan.LvPlanEvents(start.toISODate(), end.toISODate(), props.propsViewData.lv_id)),
-				$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+				this.$api.call(ApiLvPlan.LvPlanEvents(start.toISODate(), end.toISODate(), this.propsViewData.lv_id)),
+				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
 			];
-		});
-
-		return {
-			rangeInterval,
-			events,
-			lv
-		};
+		}
 	},
 	created() {
 		this.$api
@@ -159,19 +99,10 @@ export default {
 			.then(res => {
 				this.uid = res.data.uid;
 			});
-		this.$api
-			.call(ApiLvPlan.getStunden())
-			.then(res => {
-				return this.teachingunits = res.data.map(el => ({
-					id: el.stunde,
-					start: el.beginn,
-					end: el.ende
-				}));
-			});
 	},
-	template:/*html*/`
-	<div class="fhc-lvplan d-flex flex-column h-100" v-if="renderers">
-		<h2 @click="modeOptions.week.collapseEmptyDays = !modeOptions.week.collapseEmptyDays">
+	template: /*html*/`
+	<div class="cis-lvplan-personal d-flex flex-column h-100">
+		<h2>
 			{{ $p.t('lehre/stundenplan') }}
 			<span style="padding-left: 0.4em;" v-show="studiensemester_kurzbz">
 				{{ studiensemester_kurzbz }}
@@ -183,45 +114,17 @@ export default {
 		<hr>
 		<fhc-calendar
 			ref="calendar"
-			class="responsive-calendar"
+			v-model:lv="lv"
+			:timezone="viewData.timezone"
+			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
-			:modes="modes"
-			:mode-options="modeOptions"
 			:mode="currentMode"
 			@update:date="handleChangeDate"
 			@update:mode="handleChangeMode"
 			@update:range="updateRange"
-			:timezone="viewData.timezone"
-			:locale="$p.user_locale.value"
-			show-btns
-			:events="events || []"
-			:backgrounds="backgrounds"
-			:time-grid="teachingunits"
+			class="responsive-calendar"
 		>
-			<template v-slot="{ event, mode }">
-				<div
-					:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
-					:type="mode == 'day' ? 'button' : undefined"
-	 				:style="eventStyle(event)"
-				>
-					<component
-						v-if="mode == 'event'"
-						:is="renderers[event.type]?.modalContent"
-						:event="event"
-					></component>
-					<component
-						v-else-if="mode == 'eventheader'"
-						:is="renderers[event.type]?.modalTitle"
-						:event="event"
-					></component>
-					<component
-						v-else
-						:is="renderers[event.type]?.calendarEvent"
-						:event="event"
-					></component>
-				</div>
-			</template>
-			<template #actions>
+			<template>
 				<div
 					v-if="downloadLinks"
 					class="d-flex gap-1 justify-items-start"
