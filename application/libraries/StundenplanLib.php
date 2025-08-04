@@ -8,125 +8,177 @@ use \DateTimeZone as DateTimeZone;
 use \DateInterval as DateInterval;
 use \DatePeriod as DatePeriod;
 
-class StundenplanLib{
+class StundenplanLib
+{
 
 	private $_ci; // Code igniter instance
 	
 
 	/**
-	 * fetches Stundenplan events from a UID and start/end date
-	 * @access public
+	 * fetches Stundenplan events for the loggedin user between start and end
+	 * or for a lv
 	 *
+	 * @param string		$start
+	 * @param string		$end
+	 * @param string|null	$lehrveranstaltung_id
+	 * @return stdClass
+	 * @access public
 	 */
-	public function getStundenplan($start_date, $end_date, $lv_id = null){
+	public function getStundenplan($start, $end, $lehrveranstaltung_id = null)
+	{
+		if (!$lehrveranstaltung_id && $lehrveranstaltung_id !== 0)
+			return $this->getEventsUser($start, $end);
+
+		return $this->getEventsLv($lehrveranstaltung_id, $start, $end);
+	}
+
+	/**
+	 * fetches Stundenplan events for the loggedin user between start and end
+	 *
+	 * @param string		$start
+	 * @param string		$end
+	 * @return stdClass
+	 * @access public
+	 */
+	public function getEventsUser($start, $end)
+	{
 		$this->_ci =& get_instance();
 
-		// Load Config
-		$this->_ci->load->config('calendar');
+		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
-		$this->_ci->load->model('ressource/Mitarbeiter_model','MitarbeiterModel');
-		$this->_ci->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$this->_ci->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
-		$this->_ci->load->model('person/Benutzergruppe_model','BenutzergruppeModel');
-		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
-		
-
-		$student_uid = getAuthUID();
-		if(is_null($student_uid))
-		{
+		$uid = getAuthUID();
+		if (is_null($uid))
 			return error("No UID");
-		}
 		
-		$semester_range = $this->studienSemesterErmitteln($start_date,$end_date);
-		if(isError($semester_range))
-		{
-			return error(getData($semester_range));
-		}
+		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($uid));
+
+		if ($is_mitarbeiter)
+			return $this->getEventsEmployee($uid, $start, $end);
+
+		return $this->getEventsStudent($uid, $start, $end);
+	}
+
+	/**
+	 * fetches Stundenplan events for a student between start and end
+	 *
+	 * @param string		$student_uid
+	 * @param string		$start
+	 * @param string		$end
+	 * @return stdClass
+	 * @access public
+	 */
+	public function getEventsStudent($student_uid, $start, $end)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$semester_range = $this->studienSemesterErmitteln($start, $end);
+		if (isError($semester_range))
+			return $semester_range;
 		$semester_range = getData($semester_range);
+
 		$this->sortStudienSemester($semester_range);
+
 		$function_error = $this->applyLoadUeberSemesterHaelfte($semester_range);
-		if(!is_null($function_error)){
+		if ($function_error)
 			return $function_error;
-		}
 		
-		if($lv_id) { // fetch Stundenplan for lva, irrelevant of who is requesting it (for now)
+		// getting the gruppen_kurzbz of the student in the different studiensemester
+		$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range);
+		if (isError($benutzer_gruppen))
+			return $benutzer_gruppen;
+		$benutzer_gruppen = getData($benutzer_gruppen);
 
-			$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanLVA($start_date, $end_date, $lv_id);
-			if(isError($stundenplan_data))
-			{
-				return error(getData($stundenplan_data));
-			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
-			$function_error = $this->expand_object_information($stundenplan_data);
-			if(!is_null($function_error)){
-				return $function_error;
-			}
-
-			// query lv itself in case its Stundenplan is being queried and it has no entries
-			$this->_ci->load->model('education/Lehrveranstaltung_model','LehrveranstaltungModel');
-			$lv_result = $this->_ci->LehrveranstaltungModel->load($lv_id);
-			if(isError($lv_result))
-			{
-				return error(getData($lv_result));
-			}
-			$lv = getData($lv_result)[0];
-			return success($stundenplan_data);
-		}
+		// getting the student_lehrverbaende of the student in the different studiensemester
+		$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range);
+		if (isError($student_lehrverband))
+			return $student_lehrverband;
+		$student_lehrverband = getData($student_lehrverband);
 		
-		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($student_uid));
-		if($is_mitarbeiter)
-		{
-			
-			$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanMitarbeiter($start_date, $end_date, $student_uid);
-			if(isError($stundenplan_data))
-			{
-				return error(getData($stundenplan_data));
-			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
-			$function_error = $this->expand_object_information($stundenplan_data);
-			if(!is_null($function_error)){
-				return error($function_error);
-			}
-			return success($stundenplan_data);
-		} else {
-			// getting the gruppen_kurzbz of the student in the different studiensemester
-			$benutzer_gruppen = $this->fetchBenutzerGruppenFromStudiensemester($semester_range);
-			if(isError($benutzer_gruppen))
-			{
-				return error(getData($benutzer_gruppen));
-			}
-			$benutzer_gruppen = getData($benutzer_gruppen);
-
-			// getting the student_lehrverbaende of the student in the different studiensemester
-			$student_lehrverband = $this->fetchStudentlehrverbandFromStudiensemester($semester_range);
-			if(isError($student_lehrverband))
-			{
-				return error(getData($student_lehrverband));
-			}
-			$student_lehrverband = getData($student_lehrverband);
-			
-			$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery($start_date, $end_date, $semester_range, $benutzer_gruppen, $student_lehrverband);
-			if(!$stundenplan_query)
-			{
-				return success([]);
-			}
-			
-			
-			$stundenplan_data = $this->_ci->StundenplanModel->stundenplanGruppierung($stundenplan_query);
-			if(isError($stundenplan_data))
-			{
-				return error(getData($stundenplan_data));
-			}
-			$stundenplan_data = getData($stundenplan_data) ?? [];
-
-			$function_error = $this->expand_object_information($stundenplan_data);
-			if(!is_null($function_error)){
-				return $function_error;
-			}
-			
-			return success($stundenplan_data);
-		}
+		$stundenplan_query = $this->_ci->StundenplanModel->getStundenplanQuery(
+			$start,
+			$end,
+			$semester_range,
+			$benutzer_gruppen,
+			$student_lehrverband
+		);
+		if (!$stundenplan_query)
+			return success([]);
 		
+		$stundenplan_data = $this->_ci->StundenplanModel->stundenplanGruppierung($stundenplan_query);
+		if (isError($stundenplan_data))
+			return $stundenplan_data;
+		$stundenplan_data = getData($stundenplan_data) ?? [];
+
+		$function_error = $this->expandObjectInformation($stundenplan_data);
+		if ($function_error)
+			return $function_error;
+		
+		return success($stundenplan_data);
+	}
+
+	/**
+	 * fetches Stundenplan events for an employee between start and end
+	 *
+	 * @param string		$uid
+	 * @param string		$start
+	 * @param string		$end
+	 * @return stdClass
+	 * @access public
+	 */
+	public function getEventsEmployee($uid, $start, $end)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanMitarbeiter($start, $end, $uid);
+		if (isError($stundenplan_data))
+			return $stundenplan_data;
+		$stundenplan_data = getData($stundenplan_data) ?? [];
+
+		$function_error = $this->expandObjectInformation($stundenplan_data);
+		if ($function_error)
+			return $function_error;
+		
+		return success($stundenplan_data);
+	}
+
+	/**
+	 * fetches Stundenplan events for a LV between start and end
+	 *
+	 * @param integer		$lehrveranstaltung_id
+	 * @param string		$start
+	 * @param string		$end
+	 * @return stdClass
+	 * @access public
+	 */
+	public function getEventsLv($lehrveranstaltung_id, $start, $end)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanLVA($start, $end, $lehrveranstaltung_id);
+		if (isError($stundenplan_data))
+			return $stundenplan_data;
+		$stundenplan_data = getData($stundenplan_data) ?? [];
+
+		$function_error = $this->expandObjectInformation($stundenplan_data);
+		if ($function_error)
+			return $function_error;
+
+		// query lv itself in case its Stundenplan is being queried and it has no entries
+		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$lv_result = $this->_ci->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		if (isError($lv_result))
+			return $lv_result;
+		if (!hasData($lv_result))
+			return error('LV not found');
+		
+		return success($stundenplan_data);
 	}
 
 	/**
@@ -152,7 +204,7 @@ class StundenplanLib{
 		if (isError($roomplan_data))
 			return $roomplan_data;
 
-		$this->expand_object_information($roomplan_data->retval);
+		$this->expandObjectInformation($roomplan_data->retval);
 
 		return $roomplan_data;
 	}
@@ -173,6 +225,8 @@ class StundenplanLib{
 		$this->_ci->load->config('calendar');
 		// Load Models
 		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
 		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter(getAuthUID()));
 		
@@ -186,7 +240,7 @@ class StundenplanLib{
 		if (isError($reservierungen))
 			return $reservierungen;
 		
-		$function_error = $this->expand_object_information($reservierungen->retval);
+		$function_error = $this->expandObjectInformation($reservierungen->retval);
 		
 		if (!is_null($function_error))
 			return $function_error;
@@ -228,9 +282,15 @@ class StundenplanLib{
 		return success($lektoren);
 	}
 
-	public function expand_object_information($data){
+	public function expandObjectInformation($data)
+	{
 		$this->_ci =& get_instance();
 		
+		// Load Config
+		$this->_ci->load->config('calendar');
+		// Load Model
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
 		foreach ($data as $item)
 		{
 			$tz = new DateTimeZone($this->_ci->config->item('timezone'));
@@ -324,69 +384,64 @@ class StundenplanLib{
 		$ferienEvents = $this->_ci->FerienModel->execReadOnlyQuery("
 		SELECT * 
 		FROM lehre.tbl_ferien
-		WHERE (bisdatum >= ? AND vondatum <= ?) AND (studiengang_kz = 0 OR studiengang_kz = ?)
-		",[$start_date, $end_date, $studiengang_kz]);
+		WHERE (bisdatum >= ? AND vondatum < ?) AND (studiengang_kz = 0 OR studiengang_kz = ?)
+		", [$start_date, $end_date, $studiengang_kz]);
 
-		if (isError($ferienEvents)) {
-			return error(getData($ferienEvents));
-		}
+		if (isError($ferienEvents))
+			return $ferienEvents;
+		
 		$ferienEvents = getData($ferienEvents);
-		
-		if(is_array($ferienEvents) && count($ferienEvents) > 0){
-			
-			$ferienEvents = array_map(function($event){
-				$event_start = new DateTime($event->vondatum);
-				$event_end = new DateTime($event->bisdatum);
-				$event_end->modify('+1 day');
-	
-				$interval = new DateInterval('P1D');
-				$period = new DatePeriod($event_start, $interval, $event_end);
-				$event->dates = iterator_to_array($period);
-				return $event;
-			}, $ferienEvents);
-	
-			$start_date = new DateTime($start_date);
-			$start_date->setTime(0, 0, 0);
-			$end_date = new DateTime($end_date);
-			$end_date->setTime(23, 59, 59);
 
-			$ferienEventsFlattened=[];
-			foreach($ferienEvents as $ferien_event){
-				foreach($ferien_event->dates as $date){
-					if ($date < $start_date || $date > $end_date)
-						continue;
-					$event = new stdClass();
-					$event->bezeichnung = $ferien_event->bezeichnung;
-					$event->datum = $date->format('Y-m-d');
-					$event->type = 'ferien';
-					$ferienEventsFlattened[] = $event;
-				}
-			};
-	
-			$today=new DateTime();
-			$ferienEventsFlattened = array_map(function($event) use($today, $tz){
-				$ferien_event = (object) array(
-					'type' => 'ferien',
-					'beginn' => $today->format('H:i:s'),
-					'ende' => $today->format('H:i:s'),
-					'isostart' => (new DateTime($event->datum . ' 00:00:00', $tz))->format('c'),
-					'isoend' => (new DateTime($event->datum . ' 23:59:59', $tz))->format('c'),
-					'allDayEvent' => true,
-					'datum' => $event->datum,
-					'topic' => $event->bezeichnung,
-					'titel' => $event->bezeichnung,
-					'farbe' => '00689E'
-				);
-				return $ferien_event;
-			}, $ferienEventsFlattened);
-			
-			return success($ferienEventsFlattened);
-		}
-		else{
+		if (!$ferienEvents)
 			return success([]);
-		}
-
 		
+		$ferienEvents = array_map(function ($event) {
+			$event_start = new DateTime($event->vondatum);
+			$event_end = new DateTime($event->bisdatum);
+			$event_end->modify('+1 day');
+
+			$interval = new DateInterval('P1D');
+			$period = new DatePeriod($event_start, $interval, $event_end);
+			$event->dates = iterator_to_array($period);
+			return $event;
+		}, $ferienEvents);
+
+		$start_date = new DateTime($start_date);
+		$start_date->setTime(0, 0, 0);
+		$end_date = new DateTime($end_date);
+		$end_date->setTime(23, 59, 59);
+
+		$ferienEventsFlattened = [];
+		foreach ($ferienEvents as $ferien_event) {
+			foreach ($ferien_event->dates as $date) {
+				if ($date < $start_date || $date > $end_date)
+					continue;
+				$event = new stdClass();
+				$event->bezeichnung = $ferien_event->bezeichnung;
+				$event->datum = $date->format('Y-m-d');
+				$event->type = 'ferien';
+				$ferienEventsFlattened[] = $event;
+			}
+		};
+
+		$today = new DateTime();
+		$ferienEventsFlattened = array_map(function ($event) use ($today, $tz) {
+			$ferien_event = (object)array(
+				'type' => 'ferien',
+				'beginn' => $today->format('H:i:s'),
+				'ende' => $today->format('H:i:s'),
+				'isostart' => (new DateTime($event->datum . ' 00:00:00', $tz))->format('c'),
+				'isoend' => (new DateTime($event->datum . ' 23:59:59', $tz))->format('c'),
+				'allDayEvent' => true,
+				'datum' => $event->datum,
+				'topic' => $event->bezeichnung,
+				'titel' => $event->bezeichnung,
+				'farbe' => '00689E'
+			);
+			return $ferien_event;
+		}, $ferienEventsFlattened);
+		
+		return success($ferienEventsFlattened);
 	}
 
 	// start of the private functions ########################################################################################################
@@ -437,8 +492,10 @@ class StundenplanLib{
 
 	
 
-	private function fetchBenutzerGruppenFromStudiensemester($semester_range){
-		$student_uid = getAuthUID();
+	private function fetchBenutzerGruppenFromStudiensemester($student_uid, $semester_range)
+	{
+		$this->_ci->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
+
 		$benutzer_gruppen = [];
 		// for each studiensemester fetch the benutzer gruppen and add them to an associate $bentuzer_gruppen array
 		/*
@@ -499,8 +556,10 @@ class StundenplanLib{
 		return success($benutzer_gruppen);
 	}
 
-	private function fetchStudentlehrverbandFromStudiensemester($semester_range){
-		$student_uid = getAuthUID();
+	private function fetchStudentlehrverbandFromStudiensemester($student_uid, $semester_range)
+	{
+		$this->_ci->load->model('person/Benutzergruppe_model', 'BenutzergruppeModel');
+
 		$student_lehrverband = [];
 		// for each studiensemester fetch the studentlehrverbaende and add them to an associate $student_lehrverband array
 		/*
@@ -566,7 +625,10 @@ class StundenplanLib{
 		return success($student_lehrverband);
 	}
 
-	private function applyLoadUeberSemesterHaelfte(&$semester_range){
+	private function applyLoadUeberSemesterHaelfte(&$semester_range)
+	{
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
 		/*
 		@var($semester_collection)
 		convert the array of studiensemester into an associative array with the studiensemester as the key 
@@ -692,30 +754,29 @@ class StundenplanLib{
 		}
 	}
 
-	private function studienSemesterErmitteln($start_date,$end_date){
-		
+	private function studienSemesterErmitteln($start_date, $end_date)
+	{
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
 		// gets all studiensemester from the student from start_date to end_date
-		$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date,$end_date);
-		if(isError($semester_range))
-		{
-			return error(getData($semester_range));
-		}
-		$semester_range = array_map( 
-			function($sem)
-			{
+		$semester_range = $this->_ci->StudiensemesterModel->getByDateRange($start_date, $end_date);
+		if (isError($semester_range))
+			return $semester_range;
+		
+		$semester_range = array_map(
+			function ($sem) {
 				return $sem->studiensemester_kurzbz;
 			},
 			getData($semester_range) ?: []
 		);
 
 		// if no studiensemester is found for the given timespan, get the nearest studiensemester
-		if(count($semester_range) == 0)
+		if (count($semester_range) == 0)
 		{
 			$aktuelle_studiensemester = $this->_ci->StudiensemesterModel->getNearest();
-			if(isError($aktuelle_studiensemester))
-			{
-				return error(getData($aktuelle_studiensemester));
-			}
+			if (isError($aktuelle_studiensemester))
+				return $aktuelle_studiensemester;
+			
 			$aktuelle_studiensemester = getData($aktuelle_studiensemester);
 			if (count($aktuelle_studiensemester) == 0) {
 				return error("No aktuelles semester");
@@ -723,8 +784,8 @@ class StundenplanLib{
 			$aktuelle_studiensemester = current($aktuelle_studiensemester)->studiensemester_kurzbz;
 			// push aktuelles semester in active semester array
 			array_push($semester_range, $aktuelle_studiensemester);
-
 		}
+
 		return success($semester_range);
 	}
 }
