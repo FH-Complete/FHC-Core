@@ -38,7 +38,7 @@ $config['student']['resultjoin'] = "
 		JOIN public.tbl_person p USING(person_id)";
 
 $config['organisationunit'] = $CI->config->item('organisationunit', 'search');
-$config['organisationunit']['prepare'] = 'active_organisationseinheit AS (SELECT * FROM public.tbl_organisationseinheit WHERE aktiv = true)';
+$config['organisationunit']['prepare'] = 'active_organisationseinheit AS (SELECT * FROM public.tbl_organisationseinheit WHERE aktiv = true AND organisationseinheittyp_kurzbz <> \'Container\')';
 $config['organisationunit']['table'] = 'active_organisationseinheit';
 
 $config['room'] = $CI->config->item('room', 'search');
