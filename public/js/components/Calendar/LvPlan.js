@@ -130,8 +130,8 @@ export default {
 		:backgrounds="backgrounds"
 		:time-grid="teachingunits"
 		show-btns
-		@update:date="$emit('update:date', $event)"
-		@update:mode="$emit('update:mode', $event)"
+		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
+		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
 		@update:range="updateRange"
 	>
 		<template v-slot="{ event, mode }">
