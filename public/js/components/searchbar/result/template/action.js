@@ -16,9 +16,8 @@ export default {
 	},
 	methods: {
 		actionFunc() {
-			if (this.action.type !== 'function')
-				return;
-			this.action.action(this.res);
+			if (this.action.type === 'function')
+				this.action.action(this.res);
 			this.$emit('actionexecuted');
 		}
 	},

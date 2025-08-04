@@ -77,6 +77,7 @@ export default {
 		<form
 			ref="searchform"
 			class="d-flex me-3"
+			:class="searchoptions.cssclass"
 			action="javascript:void(0);"
 			@focusin="searchfocusin"
 			@focusout="searchfocusout"
@@ -136,7 +137,7 @@ export default {
                         :is="res.renderer"
                         :mode="searchmode"
                         :res="res"
-                        :actions="searchoptions.actions[dash2camelCase(res.renderer)]"
+                        :actions="getActions(res)"
                         @actionexecuted="hideresult"
                     ></component>
                     <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
@@ -418,6 +419,13 @@ export default {
         isValidRenderer(renderer) {
             const camelCaseRenderer = this.dash2camelCase(renderer);
             return Object.keys(this.$.components).includes(camelCaseRenderer);
-        }
+        },
+		getActions(res) {
+			let actions = this.searchoptions.actions[this.dash2camelCase(res.renderer)];
+			if (actions) {
+				return actions;
+			}
+			return this.searchoptions.actions[res.type];
+		}
     }
 };
