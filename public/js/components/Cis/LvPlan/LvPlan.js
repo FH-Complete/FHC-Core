@@ -124,25 +124,23 @@ export default {
 			@update:range="updateRange"
 			class="responsive-calendar"
 		>
-			<template>
-				<div
-					v-if="downloadLinks"
-					class="d-flex gap-1 justify-items-start"
-				>
-					<div v-for="{ title, icon, link } in downloadLinks">
-						<a
-							:href="link"
-							:aria-label="title"
-							class="py-1 btn btn-outline-secondary"
-						>
-							<div class="d-flex flex-column">
-								<i aria-hidden="true" :class="icon"></i>
-								<span style="font-size:.5rem">{{ title }}</span>
-							</div>
-						</a>
-					</div>
+			<div
+				v-if="downloadLinks"
+				class="d-flex gap-1 justify-items-start"
+			>
+				<div v-for="{ title, icon, link } in downloadLinks">
+					<a
+						:href="link"
+						:aria-label="title"
+						class="py-1 btn btn-outline-secondary"
+					>
+						<div class="d-flex flex-column">
+							<i aria-hidden="true" :class="icon"></i>
+							<span style="font-size:.5rem">{{ title }}</span>
+						</div>
+					</a>
 				</div>
-			</template>
+			</div>
 		</fhc-calendar>
 	</div>`
 };
