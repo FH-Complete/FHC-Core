@@ -35,7 +35,7 @@ export default {
 			type: Array,
 			required: true,
 			validator(value) {
-				return value.every(item => 
+				return value.every(item =>
 					item instanceof luxon.Duration
 					|| Number.isInteger(item)
 					|| (
@@ -124,7 +124,7 @@ export default {
 			for (var date of this.axisMain)
 				for (var part of partsEnds)
 					ends.push(date.plus(part));
-			
+
 			return ends;
 		},
 		axisMainBorders() {
@@ -212,7 +212,7 @@ export default {
 	methods: {
 		mapIntoMainAxis(target) {
 			const result = Array.from({length: this.axisMain.length}, () => Array());
-			
+
 			target.forEach(event => {
 				const start = event.start || this.axisMainBorders[0].plus(-1);
 				const end = event.end || this.axisMainBorders[this.axisMainBorders.length - 1].plus(1);
@@ -264,13 +264,13 @@ export default {
 
 			return dayTimestamp + this.start + Math.floor((this.end - this.start) * mouseFrac);
 		},
-		
+
 		/* SCROLLING */
 		enableAutoScroll() {
 			if (!this.resizeObserver)
 				this.resizeObserver = new ResizeObserver(this.scrollToEarliestEvent);
 			this.resizeObserver.observe(this.$refs.body);
-			
+
 			if (!this.mutationObserver)
 				this.mutationObserver = new MutationObserver(mutations => {
 					if (mutations.some(m => m.addedNodes.length && [].some.call(m.addedNodes, el => el.matches && el.matches('.fhc-calendar-base-grid-line-event'))))
@@ -294,14 +294,22 @@ export default {
 		},
 		scrollToEarliestEvent() {
 			const eventElements = this.$refs.scroller.querySelectorAll('.fhc-calendar-base-grid-line-event');
-			const earliestEventOffset = eventElements.values()
+			let elements = [];
+
+			// Firefox ESR 128 Workaround ArrayIterator Reduce not available
+			if (typeof eventElements.values().reduce == 'function')
+				elements = eventElements.values();
+			else
+				elements = [...eventElements.values()];
+
+			const earliestEventOffset = elements
 				.reduce((res, el) => {
 					const top = el.offsetTop;
 					if (!res[1] || top < res[0])
 						return [top, el];
 					return res;
 				}, [0, null]);
-			
+
 			this.userScroll = false;
 			if (earliestEventOffset[1]) {
 				earliestEventOffset[1].scrollIntoView({ behavior: "smooth" });
