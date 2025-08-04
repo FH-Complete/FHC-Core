@@ -115,7 +115,7 @@ class LvPlan extends FHCAPI_Controller
 
 		$this->load->model('education/Studentlehrverband_model','StudentLehrverbandModel');
 		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$current_Studiensemester = $this->StudiensemesterModel->getAkt();
+		$current_Studiensemester = $this->StudiensemesterModel->getByDate($start_date);
 		$current_Studiensemester = $this->getDataOrTerminateWithError($current_Studiensemester);
 		$current_Studiensemester = current($current_Studiensemester)->studiensemester_kurzbz;
 		$studiengang = $this->StudentLehrverbandModel->loadWhere(["student_uid"=>getAuthUID(),"studiensemester_kurzbz"=>$current_Studiensemester]);
