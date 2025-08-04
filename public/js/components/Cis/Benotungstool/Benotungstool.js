@@ -109,52 +109,157 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
-		parseNote(rowParts, notenbulk) {
-			const uid = rowParts[0]
+		isValidDate_ddmmyyyy(str) {
+			if (typeof str !== 'string') return false;
+		
+			// Check format: dd.mm.yyyy
+			const regex = /^(\d{2})\.(\d{2})\.(\d{4})$/;
+			const match = str.match(regex);
+			if (!match) return false;
+		
+			// Extract date parts
+			const day = parseInt(match[1], 10);
+			const month = parseInt(match[2], 10);
+			const year = parseInt(match[3], 10);
+		
+			// Check valid ranges
+			if (month < 1 || month > 12 || day < 1 || day > 31) return false;
+		
+			// Handle months with different days and leap years
+			const date = new Date(year, month - 1, day);
+			return (
+				date.getFullYear() === year &&
+				date.getMonth() === month - 1 &&
+				date.getDate() === day
+			);
+		},
+		identifyUid(str) {
+			if (typeof str !== 'string') return null;
+			const firstChar = str.charAt(0);
+		
+			if (/^[0-9]$/.test(firstChar)) {
+				return 'matrikelnr';
+			} else if (/^[a-zA-Z]$/.test(firstChar)) {
+				return 'uid';
+			} else {
+				return null;
+			}
+		},
+		validatePruefungBulk(pruefungen) {
+			// need to check pruefungen for validity in respect to the students nr of antritte
+			// pruefungsdatum will be validated aswell so we dont get a termin 3 chronologically before
+			// a termin 2 which is totally possible in the old tool
+			const validatedPruefungen = []
+			pruefungen.forEach( p => {
+				const student = this.studenten.find(s => s.uid === p.uid)
+				// check if student antrittCount is too high already
+				if(student.hoechsterAntritt >= 3) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits ' + student.hoechsterAntritt + ' Prüfungsantritte abgelegt. Die Zeile wurde übersprungen.')
+					return
+				}
 
-			const student = this.studenten.find(s => s.uid === uid)
-			if(!student) return
+				// get student for pruefung and check if proposed datum does not conflict (no new pruefungen before existing ones)
+				const youngerPruefung = student.pruefungen.find(pr => {
+					return pr.dateObj >= p.dateObj
+				})
+				if(youngerPruefung) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits eine Prüfung am '+ youngerPruefung.datum +' eingetragen. Die Zeile wurde übersprungen.')
+					return
+				}
+				
+				validatedPruefungen.push(p)
+			})
+			
+			pruefungen.splice(0, pruefungen.length, ...validatedPruefungen);
+		},
+		validateNotenBulk(noten) {
+			// in case we need to further validate noten, currently parser does all
+		},
+		parseNote(rowParts, notenbulk, rowNum) {
+			const id = this.identifyUid(rowParts[0])
+			let student = null
+			if(id === 'matrikelnr') { // find student by matrnr and use uid later on
+				student = this.studenten.find(s => s.matrikelnr === rowParts[0])
+			} else if(id === 'uid') {
+				student = this.studenten.find(s => s.uid === uid)
+			}
+			if(!student) {
+				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				return
+			}
 
 			const note = rowParts[1]
 
 			// find notenoption and check if its allowed to use in lehre
 			const notenOption = this.notenOptions.find(n => n.note == note)
-			if(!notenOption.lehre) return
+			if(!notenOption.lehre) {
+				this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				return
+			}
 
-			notenbulk.push({uid, note})
+			notenbulk.push({uid: student.uid, note})
 		},
-		parsePruefung(rowParts, notenbulk) {
-			const uid = rowParts[0]
+		parsePruefung(rowParts, pruefungbulk, rowNum) {
+			const id = this.identifyUid(rowParts[0])
+			let student = null
+			if(id === 'matrikelnr') { // find student by matrnr and use uid later on
+				student = this.studenten.find(s => s.matrikelnr === rowParts[0])
+			} else if(id === 'uid') {
+				student = this.studenten.find(s => s.uid === rowParts[0])
+			}
+			if(!student) {
+				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				return
+			}
 
-			const student = this.studenten.find(s => s.uid === uid)
-			if(!student) return
-
-			const datum = rowParts[1] // should be in 'YYYY.MM.DD'
-			const datumObj = datum
-			
-			const year = datumObj.getFullYear();
-			const month = String(datumObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-			const day = String(datumObj.getDate()).padStart(2, '0');
+			const datum = rowParts[1] // should be in 'dd.MM.yyyy'
+			if(!this.isValidDate_ddmmyyyy(datum)) {
+				this.$fhcAlert.alertWarning('Ungültiges Datumformat für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + '. Bitte verwenden Sie das Format "DD.MM.YYYY". Die Zeile wurde übersprungen.')
+				return	
+			}
+			const datumParts = datum.split('.')
+			const day = datumParts[0]
+			const month = datumParts[1].padStart(2, '0')
+			const year = datumParts[2].padStart(2, '0')
 			const dateStr = `${year}-${month}-${day}`
+			
+			// build date obj for validation later on
+			let monthInt = parseInt(month, 10)
+			monthInt -= 1
+			const dateObj = new Date(year, monthInt, day)
 			
 			const note = rowParts[2]
 
 			// find notenoption and check if its allowed to use in lehre
 			const notenOption = this.notenOptions.find(n => n.note == note)
-			if(!notenOption.lehre) return
+			if(!notenOption.lehre) {
+				
+				
+				this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				return
+			}
+			
+			const typ = this.getPruefungstypForStudentByAntritt(student)
+			
+			pruefungbulk.push({uid: student.uid, datum: dateStr, note, typ, lehreinheit_id: student.lehreinheit_id, dateObj})
 		},
 		saveNotenBulk(notenbulk) {
+			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlagBulk(this.lv_id, this.sem_kurzbz, notenbulk)).then(res => {
-				console.log(res)
 				if(res.meta.status === 'success') {
+					this.$fhcAlert.alertWarning('Noten erfolgreich importiert') // TODO: phrase
 					const lvNoten = res.data[0]
+					
 
 					lvNoten.forEach(lvn => {
 						// 1.) get relevant student row by uid
-						const s = this.studenten.find(s => s.uid === lvn.uid)
+						const s = this.studenten.find(s => s.uid === lvn.student_uid)
 						s.note_vorschlag = lvn.note // TODO: check if note_vorschlag should be changed by import
 
+						s.lv_note = lvn.note
+						
 						this.teilnoten[s.uid].note_lv = lvn.note
+						// recalculate freigabestatus
 						s.freigabedatum = this.parseDate(lvn['freigabedatum'])
 						s.benotungsdatum = this.parseDate(lvn['benotungsdatum'])
 
@@ -163,45 +268,130 @@ export const Benotungstool = {
 
 				}
 
-				// 2.) set note_vorschlag field
-
-				// 4.) update rows with note_lv = note_vorschlag & recalculate freigabestatus
+				this.$refs.notenTable.tabulator.redraw(true)
+			}).finally(()=>{
+				this.loading = false
 			})
 		},
 		savePruefungBulk(pruefungenbulk) {
+			this.loading = false
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
 					if(res.meta.status === 'success') {
+						this.$fhcAlert.alertWarning('Prüfungen erfolgreich importiert und gespeichert') //  TODO: phrase
+						this.handleAddNewPruefungenResponse(res, pruefungenbulk)
+					}
+				}).finally(()=>{this.loading = false})
+		},
+		handleAddNewPruefungenResponse(res, uids) {
+			const pruefungen = res.data
+			uids.forEach(entry => {
+				const saved = pruefungen[entry.uid].savedPruefung
+				const extra = pruefungen[entry.uid].extraPruefung
 
+				const student = this.studenten.find(s => s.uid == entry.uid)
+				if(!student) return
 
+				// check for extra pruefung (termin1) to add before
+				if(extra) {
+					extra.datum = extra.datum.split(' ')[0]
+					if(!this.distinctPruefungsDates.includes(extra.datum)) {
+						this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
+					}
 
+					student.pruefungen.push(extra)
+					student[extra.datum] = extra
+				}
 
-						this.$fhcAlert.alertInfo('Prüfungen gespeichert') //  TODO: phrase
+				if(!this.distinctPruefungsDates.includes(saved.datum)) {
+					this.insertSortedDate(this.distinctPruefungsDates, saved.datum)
+				}
+
+				// add pruefung to pruefungen array
+				student.pruefungen.push(saved)
+
+				// add pruefung to student via its datum as a field
+				student[saved.datum] = saved
+
+				// usually should be in order naturally, just to be save
+				student.pruefungen.sort((p1, p2) => {
+					if(p1.datum > p2.datum) {
+						return 1
+					} else if (p1.datum < p2.datum) {
+						return -1
+					} else {
+						return 0
 					}
 				})
+
+				// recalculate student antritte
+				student.hoechsterAntritt = this.getAntrittCountStudent(student)
+			})
+
+			// add col to table
+			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
+			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+
+			// TODO: could reuse cols instead of recreating all from a variable maybe
+			this.distinctPruefungsDates.forEach((date, index)=>{
+				const dateparts = date.split('-')
+				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
+
+				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
+				// col filled for consistency reasons?
+
+				// TODO: test if this holds true
+				const originalNote = index === 0
+				cols.push({
+					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
+					field: date,
+					formatter: this.pruefungFormatter,
+					titleFormatter: this.pruefungTitleFormatter,
+					hozAlign:"center",
+					widthGrow: 1,
+					minWidth: 150,
+					originalNote
+				})
+			})
+
+			cols.push(kommCol) // keep kommPruef Col as last
+			// redraw table
+
+			this.loading = false
+
+			this.$refs.notenTable.tabulator.clearSort()
+			this.$refs.notenTable.tabulator.setColumns(cols)
+			this.$refs.notenTable.tabulator.setData(this.studenten);
+			this.$refs.notenTable.tabulator.redraw(true);
 		},
 		importNoten() {
-			console.log('importNoten', this.importString)
-			
-			// TODO: check for signs of notenimport or pruefung import
-			
 			const rows = this.importString.split('\n')
 			const bulk = []
 			let mode = ''
 			// read the lines
-			rows.forEach(r => {
+			rows.forEach((r,i) => {
 				const rowParts = r.split('\t')
 				if(rowParts.length === 3) {
-					this.parsePruefung(rowParts, bulk)
+					this.parsePruefung(rowParts, bulk, i)
 					mode = 'pruefung' // if line parts are not uniform we are in trouble
 				} else if(rowParts.length === 2) {
-					this.parseNote(rowParts, bulk)
+					this.parseNote(rowParts, bulk, i)
 					mode = 'note'
 				}
 			})
 			
-			if(mode === 'note') this.saveNotenBulk(bulk)
-			else if (mode === 'pruefung')  this.savePruefungBulk(bulk)
+			// parsers check for notenOption.lehre === true and if student uid/matrikelnr matches
+			
+			// pruefungen check for younger pruefungen, so there are no further antritte with 
+			// previous dates from automatic imports 
+			if(mode === 'note') {
+				this.validateNotenBulk(bulk)
+				this.saveNotenBulk(bulk)
+			}
+			else if (mode === 'pruefung') {
+				this.validatePruefungBulk(bulk)
+				this.savePruefungBulk(bulk)
+			}
 			
 			this.$refs.modalContainerNotenImport.hide()
 		},
@@ -502,16 +692,18 @@ export const Benotungstool = {
 			}
 			
 			if(data[field]) {
-				const dateParts = data[field].datum.split('-')
-				const date = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
+				// showing date in 
 				
-				// First column (date)
-				rowDiv.appendChild(createCol(date, 'col-4 d-flex justify-content-center align-items-center'));
+				// const dateParts = data[field].datum.split('-')
+				// const date = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
+				//
+				// // First column (date)
+				// rowDiv.appendChild(createCol(date, 'col-4 d-flex justify-content-center align-items-center'));
 
 				const noteDefEntry = data.note ? this.notenOptions.find(n => n.note == data[field].note) : null
 
 				// Second column (note_bezeichnung)
-				rowDiv.appendChild(createCol(noteDefEntry.bezeichnung || '', 'col-auto ms-auto d-flex justify-content-center align-items-center'));
+				rowDiv.appendChild(createCol(noteDefEntry.bezeichnung || '', 'col-auto d-flex justify-content-center align-items-center'));
 				
 				// no actions on kommPruef allowed
 				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
@@ -533,6 +725,11 @@ export const Benotungstool = {
 				return rowDiv;
 				
 			} else if (canAdd) { // return new btn action
+				
+				// dont render the add button in cells where a younger pruefung exists for the students
+				const youngerPruefung = data.pruefungen.find(p => p.datum > field) 
+				if(youngerPruefung) return rowDiv
+				
 				const button = document.createElement('button');
 				button.className = 'btn btn-outline-secondary';
 				button.textContent = 'Add'; // TODO: phrase
@@ -636,6 +833,9 @@ export const Benotungstool = {
 			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 			
 			this.pruefungen?.forEach(p => {
+				const dateParts = p.datum.split('-')
+				p.dateObj = new Date(dateParts[0], +(dateParts[1]) - 1, dateParts[2])
+				
 				const student = this.studenten.find(s => s.uid === p.student_uid)
 				
 				if(!student) return
@@ -995,7 +1195,7 @@ export const Benotungstool = {
 				typ
 			)).then(res => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertInfo('Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt') // TODO: phrase
+					this.$fhcAlert.alertWarning('Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt') // TODO: phrase
 					
 					const s = this.studenten.find(s => s.uid === res.data[1]?.student_uid)
 					
@@ -1031,7 +1231,7 @@ export const Benotungstool = {
 					// row.reformat()
 					this.$refs.notenTable.tabulator.redraw(true)
 					
-					this.$fhcAlert.alertInfo('Prüfung gespeichert') //  TODO: phrase
+					this.$fhcAlert.alertWarning('Prüfung gespeichert') //  TODO: phrase
 				}
 			}).finally(()=> {
 				this.pruefungStudent = null
@@ -1118,7 +1318,7 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
 				.then((res) => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertInfo('Noten gespeichert')
+					this.$fhcAlert.alertWarning('Noten gespeichert')
 				}
 				
 				res.data.forEach(d => {
@@ -1178,88 +1378,11 @@ export const Benotungstool = {
 				this.sem_kurzbz,
 			)).then(res => {
 				if(res.meta.status === "success") {
-					this.$fhcAlert.alertInfo('Prüfung an ' + dateStr + ' angelegt') // TODO: phrase
+					this.$fhcAlert.alertWarning('Prüfung an ' + dateStr + ' angelegt') // TODO: phrase
 					
-					const pruefungen = res.data
-					uids.forEach(entry => {
-						const saved = pruefungen[entry.uid].savedPruefung
-						const extra = pruefungen[entry.uid].extraPruefung
-						
-						const student = this.studenten.find(s => s.uid == entry.uid)
-						if(!student) return
-
-						// check for extra pruefung (termin1) to add before
-						if(extra) {
-							extra.datum = extra.datum.split(' ')[0]
-							if(!this.distinctPruefungsDates.includes(extra.datum)) {
-								this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
-							}
-							
-							student.pruefungen.push(extra)
-							student[extra.datum] = extra
-						}
-
-						if(!this.distinctPruefungsDates.includes(saved.datum)) {
-							this.insertSortedDate(this.distinctPruefungsDates, saved.datum)
-						}
-						
-						// add pruefung to pruefungen array
-						student.pruefungen.push(saved)
-						
-						// add pruefung to student via its datum as a field
-						student[saved.datum] = saved
-
-						// usually should be in order naturally, just to be save
-						student.pruefungen.sort((p1, p2) => {
-							if(p1.datum > p2.datum) {
-								return 1
-							} else if (p1.datum < p2.datum) {
-								return -1
-							} else {
-								return 0
-							}
-						})
-
-						// recalculate student antritte
-						student.hoechsterAntritt = this.getAntrittCountStudent(student)
-						
-					})
 					
-					// add col to table
-					const cols = [...this.notenTableOptions.columns.slice(0, -1)];
-					const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
-
-					// TODO: could reuse cols instead of recreating all from a variable maybe
-					this.distinctPruefungsDates.forEach((date, index)=>{
-						const dateparts = date.split('-')
-						const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
-
-						// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
-						// col filled for consistency reasons?
-
-						// TODO: test if this holds true
-						const originalNote = index === 0
-						cols.push({
-							title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
-							field: date,
-							formatter: this.pruefungFormatter,
-							titleFormatter: this.pruefungTitleFormatter,
-							hozAlign:"center",
-							widthGrow: 1,
-							minWidth: 150,
-							originalNote
-						})
-					})
-
-					cols.push(kommCol) // keep kommPruef Col as last
-					// redraw table
-
-					this.loading = false
-
-					this.$refs.notenTable.tabulator.clearSort()
-					this.$refs.notenTable.tabulator.setColumns(cols)
-					this.$refs.notenTable.tabulator.setData(this.studenten);
-					this.$refs.notenTable.tabulator.redraw(true);
+					this.handleAddNewPruefungenResponse(res, uids)
+					
 				}
 			})
 		},
@@ -1442,6 +1565,7 @@ export const Benotungstool = {
 							v-model="selectedPruefungDate"
 							:clearable="false"
 							:enableTimePicker="false"
+							format="dd.MM.yyyy"
 							:text-input="true"
 							:auto-apply="true">
 						</datepicker>

@@ -65,6 +65,10 @@ export default {
 		};
 	},
 	saveStudentPruefungBulk(lv_id, sem_kurzbz, pruefungen) {
-		
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/savePruefungenBulk',
+			params: { lv_id, sem_kurzbz, pruefungen }
+		};
 	}
 };

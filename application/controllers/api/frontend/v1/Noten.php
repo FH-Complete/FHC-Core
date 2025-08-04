@@ -36,7 +36,8 @@ class Noten extends FHCAPI_Controller
 			'saveNotenvorschlag' => self::PERM_LOGGED,
 			'saveStudentPruefung' => self::PERM_LOGGED,
 			'createPruefungen' => self::PERM_LOGGED,
-			'saveNotenvorschlagBulk' => self::PERM_LOGGED
+			'saveNotenvorschlagBulk' => self::PERM_LOGGED,
+			'savePruefungenBulk' => self::PERM_LOGGED
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -497,7 +498,7 @@ class Noten extends FHCAPI_Controller
 				$pr_3->save();
 			}
 		} else {
-			// TODO: proper error phrase
+			// TODO: proper error phrase that explains better why we terminated with error
 			$this->terminateWithError("Typ is not termin2 or termin3.", 'general');
 		}
 		
@@ -651,6 +652,35 @@ class Noten extends FHCAPI_Controller
 			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
 		}
 
+		$this->terminateWithSuccess($ret);
+	}
+
+	public function savePruefungenBulk() {
+		$result = $this->getPostJSON();
+
+		if(!property_exists($result, 'lv_id') || !property_exists($result, 'sem_kurzbz') ||
+			!property_exists($result, 'pruefungen')) {
+			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		}
+
+		$lv_id = $result->lv_id;
+		$sem_kurzbz = $result->sem_kurzbz;
+		$pruefungen = $result->pruefungen;
+		
+		$ret = [];
+
+		foreach ($pruefungen as $pruefung) {
+			$student_uid = $pruefung->uid;
+			$typ = $pruefung->typ;
+			$note = $pruefung->note; // TODO: parameterize for import maybe
+			$datum = $pruefung->datum;
+			$punkte = ''; // TODO: check punkte feature
+
+			$lehreinheit_id = $pruefung->lehreinheit_id;
+			$ret[$student_uid] = $this->savePruefungstermin($typ, $student_uid, $lv_id, $sem_kurzbz, $lehreinheit_id, $note, $punkte, $datum);
+		}
+		
+		
 		$this->terminateWithSuccess($ret);
 	}
 
