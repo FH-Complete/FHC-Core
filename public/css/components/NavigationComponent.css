@@ -4,7 +4,7 @@
 
  :root{
 	--fhc-nav-component-bg: var(--fhc-tertiary, #f8f8f8);
-	--fhc-nav-component-border: var(--fhc-border, #5e5e5e);
+	--fhc-nav-component-border: var(--fhc-border, #e7e7e7);
 	--fhc-nav-component-color: var(--fhc-text, #5e5e5e);
 	--fhc-nav-left-component-border: var(--fhc-border, #e7e7e7);
 	--fhc-nav-left-component-bg: var(--fhc-tertiary, #f8f8f8);
@@ -99,4 +99,3 @@
 	margin: 0 0 0 250px;
 	padding: 30px 30px;
 }
-
