@@ -3,7 +3,8 @@ import PluginsPhrasen from '../../plugins/Phrasen.js';
 import Theme from '../../plugin/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
-import LvPlan, {DEFAULT_MODE_LVPLAN} from "../../components/Cis/LvPlan/LvPlan.js";
+import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
+import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
 import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
@@ -154,10 +155,14 @@ const router = VueRouter.createRouter({
 			path: "/Cis/LvPlan/:lv_id(\\d+)", 
 			name: "LvPlanOld",
 			component: LvPlan,
-			redirect: (to) => {
+			redirect(to) {
+				const route = Vue.unref(router.currentRoute);
+				const { mode, focus_date } = route.params; // keep mode and focus_date if available
 				return { // redirect to longer LvPlan url and map params
 					name: "LvPlan",
 					params: {
+						mode,
+						focus_date,
 						lv_id: to.params.lv_id
 					},
 				};
@@ -167,42 +172,20 @@ const router = VueRouter.createRouter({
 			path: `/Cis/LvPlan/:mode?/:focus_date?/:lv_id?`,
 			name: 'LvPlan',
 			component: LvPlan,
-			props: (route) => { // validate and set mode/focus date if for some reason missing
-				const validModes = ["Month", "Week", "Day"];
-
-				// check mode string
-				const mode = route.params.mode &&
-					validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
-						? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
-						: DEFAULT_MODE_LVPLAN;
-
-				// default to today date if not provided or string forms invalid date
-				const d = new Date(route.params.focus_date)
-				const focus_date = !isNaN(d) ? route.params.focus_date : new Date().toISOString().split("T")[0];
-				// for consistency reasons format the props into one object but actually use a new name to we dont collide with
-				// existing viewData declaration written from codeigniter 3 into routerview tag
+			props(route) {
 				return {
-					propsViewData: {
-						mode,
-						focus_date,
-						lv_id: route.params.lv_id
-					}
+					propsViewData: route.params
 				};
-			},
-			beforeEnter: (to, from, next) => {
-				//  missing mode or focus_date -> set defaults
-				if (!to.params.mode || !to.params.focus_date) {
-					next({
-						name: "LvPlan",
-						params: {
-							mode: to.params.mode || DEFAULT_MODE_LVPLAN,
-							focus_date: to.params.focus_date || new Date().toISOString().split("T")[0],
-							lv_id: to.params.lv_id
-						}
-					});
-				} else {
-					next();
-				}
+			}
+		},
+		{
+			path: `/Cis/MyLvPlan/:mode?/:focus_date?`,
+			name: 'MyLvPlan',
+			component: MyLvPlan,
+			props(route) {
+				return {
+					propsViewData: route.params
+				};
 			}
 		},
 		{

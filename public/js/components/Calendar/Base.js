@@ -258,6 +258,9 @@ export default {
 				this.modalEvent.closeFn();
 		}
 	},
+	beforeUnmount() {
+		this.hideEventModal();
+	},
 	template: /* html */`
 	<div class="fhc-calendar-base h-100">
 		<base-draganddrop

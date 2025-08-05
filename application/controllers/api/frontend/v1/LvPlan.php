@@ -36,9 +36,12 @@ class LvPlan extends FHCAPI_Controller
             'Stunden' => self::PERM_LOGGED,
             'getReservierungen' => self::PERM_LOGGED,
 			'LvPlanEvents' => self::PERM_LOGGED,
+			'eventsPersonal' => self::PERM_LOGGED,
+			'eventsLv' => self::PERM_LOGGED,
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
 			'getLvPlanForStudiensemester' => self::PERM_LOGGED,
+			'getLv' => self::PERM_LOGGED
 		]);
 
         $this->load->library('LogLib');
@@ -51,100 +54,95 @@ class LvPlan extends FHCAPI_Controller
 		));
 
         $this->load->library('form_validation');
-
-		//load models
-		$this->load->model('ressource/Stundenplan_model', 'StundenplanModel');
-		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
-
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-	 /**
+	/**
      * fetches LvPlan and Moodle events together
      * @access public
      *
      */
-	public function LvPlanEvents(){
+	public function LvPlanEvents()
+	{
+		$hasLv = $this->input->post('lv_id');
+
+		return $hasLv ? $this->eventsLv() : $this->eventsPersonal();
+	}
+
+	/**
+	 * fetches LvPlan, Moodle and Ferien events together for the logged in user
+	 *
+	 * @access public
+	 */
+	public function eventsPersonal()
+	{
 		$this->load->library('StundenplanLib');
 
 		// form validation
-		$this->load->library('form_validation');
-		$this->form_validation->set_data($_GET);
 		$this->form_validation->set_rules('start_date', "start_date", "required");
 		$this->form_validation->set_rules('end_date', "end_date", "required");
-		if ($this->form_validation->run() === FALSE)
+		
+		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		// storing the get parameter in local variables
-		$start_date = $this->input->get('start_date', TRUE);
-		$end_date = $this->input->get('end_date', TRUE);
-		$lv_id = $this->input->get('lv_id', TRUE);
+		// storing the post parameter in local variables
+		$start_date = $this->input->post('start_date', true);
+		$end_date = $this->input->post('end_date', true);
 
-		$res_lvplan_events = $this->stundenplanlib->getStundenplan($start_date,$end_date,$lv_id);
-		$lvplan_events = $this->getDataOrTerminateWithError($res_lvplan_events);
-		if( is_null($lvplan_events) || isEmptyArray($lvplan_events) )
-		{
-			$lvplan_events = array();
-		}
+		// fetching lvplan events
+		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date);
+		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
 		// fetching moodle events
-		$this->load->config('calendar');
-		$tz = new DateTimeZone($this->config->item('timezone'));
-		$start = new DateTime($start_date);
-		$start->setTimezone($tz);
-		$end = new DateTime($end_date);
-		$end->setTimezone($tz);
-		$end->modify('+1 day -1 second');
-		$moodle_events = [];
-		Events::trigger(
-			'moodleCalendarEvents',
-			function & () use (&$moodle_events) {
-				return $moodle_events;
-			},
-			[
-				'start_date' => $start->format('c'),
-				'end_date' => $end->format('c'),
-				'username' => getAuthUID()
-			]
-		);
+		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date);
 
-		$lvAndMoodleEvents = array_merge($lvplan_events,$moodle_events);
+		// fetching ferien events
+		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
+		
 
-		$this->load->model('education/Studentlehrverband_model','StudentLehrverbandModel');
-		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$current_Studiensemester = $this->StudiensemesterModel->getByDate($start_date);
-		$current_Studiensemester = $this->getDataOrTerminateWithError($current_Studiensemester);
-		$current_Studiensemester = current($current_Studiensemester)->studiensemester_kurzbz;
-		$studiengang = $this->StudentLehrverbandModel->loadWhere(["student_uid"=>getAuthUID(),"studiensemester_kurzbz"=>$current_Studiensemester]);
-		$studiengang = $this->getDataOrTerminateWithError($studiengang);
-		if(!empty($studiengang)){
-			$studiengang = current($studiengang)->studiengang_kz;
-		}else{
-			$studiengang = 0;
-		}
+		$this->terminateWithSuccess(array_merge(
+			$lvplanEvents,
+			$moodleEvents,
+			$ferienEvents
+		));
+	}
 
-		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang);
-		$ferienEvents = $this->getDataOrTerminateWithError($ferienEvents);
-		$allEvents = array_merge($lvAndMoodleEvents,$ferienEvents);
-		// sort array with moodle events first
-		usort($lvAndMoodleEvents, function($a, $b){
-			if ($a->type === 'moodle' && $b->type !== 'moodle') {
-				return -1;
-			} elseif ($a->type !== 'moodle' && $b->type === 'moodle') {
-				return 1;
-			} elseif ($a->type === 'ferien' && ($b->type !== 'moodle' && $b->type !== 'ferien')) {
-				return -1;
-			} elseif (($a->type !== 'ferien' && $a->type !== 'moodle') && $b->type === 'ferien') {
-				return 1;
-			} else {
-				return 0;
-			}
-		});
+	/**
+	 * fetches LvPlan and Ferien events together for the lv
+	 *
+	 * @access public
+	 */
+	public function eventsLv()
+	{
+		$this->load->library('StundenplanLib');
 
-		$this->terminateWithSuccess($allEvents);
+		// form validation
+		$this->form_validation->set_rules('start_date', "start_date", "required");
+		$this->form_validation->set_rules('end_date', "end_date", "required");
+		$this->form_validation->set_rules('lv_id', "lv_id", "required|integer");
+		
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// storing the post parameter in local variables
+		$start_date = $this->input->post('start_date', true);
+		$end_date = $this->input->post('end_date', true);
+		$lv_id = $this->input->post('lv_id', true);
+
+		// fetching lvplan events
+		$result = $this->stundenplanlib->getEventsLv($lv_id, $start_date, $end_date);
+		$lvplanEvents = $this->getDataOrTerminateWithError($result);
+
+		// fetching ferien events
+		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
+		
+
+		$this->terminateWithSuccess(array_merge(
+			$lvplanEvents,
+			$ferienEvents
+		));
 	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
@@ -193,9 +191,6 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	public function getRoomplan()
 	{
-		// form validation
-		$this->load->library('form_validation');
-
 		$this->form_validation->set_rules('ort_kurzbz', "Ort", "required");
 		$this->form_validation->set_rules('start_date', "start_date", "required");
 		$this->form_validation->set_rules('end_date', "end_date", "required");
@@ -228,9 +223,6 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	public function getReservierungen($ort_kurzbz = null)
 	{
-		//form validation
-		$this->load->library('form_validation');
-		
 		$this->form_validation->set_rules('start_date', "StartDate", "required");
 		$this->form_validation->set_rules('end_date', "EndDate", "required");
 		
@@ -259,6 +251,112 @@ class LvPlan extends FHCAPI_Controller
 		$this->terminateWithSuccess($result);
 	}
 
-	
+	/**
+	 * get details for a lv
+	 * @access public
+	 *
+	 * @param integer		$lehrveranstaltung_id
+	 * @return void
+	 */
+	public function getLv($lehrveranstaltung_id)
+	{
+		if (!$lehrveranstaltung_id && $lehrveranstaltung_id !== 0 && $lehrveranstaltung_id !== '0')
+			return show_404();
 
+		// Load Phrases
+		$this->loadPhrases(['lehre']);
+
+		// Validation
+		$this->form_validation->set_data([
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
+		]);
+
+		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung_id'), 'integer');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Get Data
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+
+		$result = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess(current($result));
+	}
+
+	/**
+	 * fetch moodle events
+	 *
+	 * @param string		$start_date
+	 * @param string		$end_date
+	 * @return array
+	 */
+	private function fetchMoodleEvents($start_date, $end_date)
+	{
+		$this->load->config('calendar');
+
+		$tz = new DateTimeZone($this->config->item('timezone'));
+		
+		$start = new DateTime($start_date);
+		$start->setTimezone($tz);
+		
+		$end = new DateTime($end_date);
+		$end->setTimezone($tz);
+		$end->modify('+1 day -1 second');
+		
+		$moodle_events = [];
+		
+		Events::trigger(
+			'moodleCalendarEvents',
+			function & () use (&$moodle_events) {
+				return $moodle_events;
+			},
+			[
+				'start_date' => $start->format('c'),
+				'end_date' => $end->format('c'),
+				'username' => getAuthUID()
+			]
+		);
+
+		return $moodle_events;
+	}
+
+	/**
+	 * fetch ferien events
+	 *
+	 * @param string		$start_date
+	 * @param string		$end_date
+	 * @return array
+	 */
+	private function fetchFerienEvents($start_date, $end_date)
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('education/Studentlehrverband_model', 'StudentLehrverbandModel');
+
+		$currentStudiensemester = $this->StudiensemesterModel->getByDate($start_date);
+		$currentStudiensemester = $this->getDataOrTerminateWithError($currentStudiensemester);
+		
+		if ($currentStudiensemester) {
+			$studentsemester_kurzbz = current($currentStudiensemester)->studiensemester_kurzbz;
+
+			$studiengang = $this->StudentLehrverbandModel->loadWhere([
+				"student_uid" => getAuthUID(),
+				"studiensemester_kurzbz" => $studentsemester_kurzbz
+			]);
+			$studiengang = $this->getDataOrTerminateWithError($studiengang);
+			
+			if ($studiengang)
+				$studiengang_kz = current($studiengang)->studiengang_kz;
+			else
+				$studiengang_kz = 0;
+		} else {
+			$studiengang_kz = 0;
+		}
+
+		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang_kz);
+		
+		return $this->getDataOrTerminateWithError($ferienEvents);
+	}
 }
