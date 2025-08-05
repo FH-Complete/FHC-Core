@@ -404,6 +404,10 @@ export default {
             if( this.hidetimer !== null ) {
                 clearTimeout(this.hidetimer);
             }
+			if (this.searchsettings.searchstr.length >= 2
+				&& this.searchresult.length === 0) {
+				this.search();
+			}
         },
         searchfocusout: function(e) {
             e.preventDefault();
