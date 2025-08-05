@@ -294,21 +294,13 @@ export default {
 		},
 		scrollToEarliestEvent() {
 			const eventElements = this.$refs.scroller.querySelectorAll('.fhc-calendar-base-grid-line-event');
-			let elements = [];
 
-			// Firefox ESR 128 Workaround ArrayIterator Reduce not available
-			if (typeof eventElements.values().reduce == 'function')
-				elements = eventElements.values();
-			else
-				elements = [...eventElements.values()];
-
-			const earliestEventOffset = elements
-				.reduce((res, el) => {
-					const top = el.offsetTop;
-					if (!res[1] || top < res[0])
-						return [top, el];
-					return res;
-				}, [0, null]);
+			let earliestEventOffset = [0, null];
+			for (var el of eventElements.values()) {
+				const top = el.offsetTop;
+				if (!earliestEventOffset[1] || top < earliestEventOffset[0])
+					earliestEventOffset = [top, el];
+			}
 
 			this.userScroll = false;
 			if (earliestEventOffset[1]) {
