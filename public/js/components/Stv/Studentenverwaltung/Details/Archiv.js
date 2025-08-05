@@ -71,11 +71,14 @@ export default {
 			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-						ApiStvArchiv.getArchiv(
-							this.modelValue.person_id ? [this.modelValue.person_id] : null || this.modelValue.map(e => e.person_id)
-						)
-					),
+					ApiStvArchiv.getArchiv(
+						this.modelValue.person_id ? [this.modelValue.person_id] : null || this.modelValue.map(e => e.person_id)
+					)
+				),
 				ajaxResponse: (url, params, response) => response.data,
+				layout:"fitDataTable",
+				index: 'akte_id',
+				persistenceID: 'stv-details-archiv',
 				columns: [
 					{title: "Akte Id", field: "akte_id", visible: false},
 					{title: this.$p.t('stv', 'archiv_title'), field: "titel"},
@@ -147,8 +150,8 @@ export default {
 								evt.stopPropagation();
 								this.$fhcAlert
 									.confirmDelete()
-									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz : this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
-									.then(params => this.$api.call(ApiStvArchiv.delete(params.akte_id, params.studiengang_kz)))
+									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz: this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
+									.then(this.$fhcApi.factory.stv.archiv.delete)
 									.then(() => {
 										//cell.getRow().delete();
 										this.reload();
@@ -163,22 +166,22 @@ export default {
 						maxWidth: 150,
 						frozen: true
 					}
-				],
-				layout:"fitDataTable",
-				index: 'akte_id',
-				persistenceID: 'stv-details-archiv'
-			},
-			tabulatorEvents: [
+				]
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: "rowDblClick",
 					handler: (e, row) => {
 						this.actionDownload(row.getData().akte_id);
 					}
 				}
-			]
-		};
-	},
-	computed: {
+			];
+
+			return events;
+		}
 	},
 	watch: {
 		modelValue() {
