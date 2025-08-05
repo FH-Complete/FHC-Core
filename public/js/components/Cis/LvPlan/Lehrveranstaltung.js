@@ -34,6 +34,17 @@ export default {
 			if (isNaN(parseInt(this.propsViewData?.lv_id)))
 				return null;
 			return this.propsViewData.lv_id;
+		},
+		lvTitle() {
+			if (this.currentLv === null)
+				return '';
+			if (!this.lv)
+				return '';
+
+			if (this.$p.user_language.value === 'English')
+				return this.lv.bezeichnung_english;
+
+			return this.lv.bezeichnung;
 		}
 	},
 	methods: {
@@ -73,8 +84,8 @@ export default {
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
 		<h2>
 			{{ $p.t('lehre/stundenplan') }}
-			<span v-if="lv" class="ps-3">
-				{{ $p.user_language.value === 'German' ? lv.bezeichnung : lv.bezeichnung_english }}
+			<span v-if="lvTitle" class="ps-3">
+				{{ lvTitle }}
 			</span>
 		</h2>
 		<hr>
