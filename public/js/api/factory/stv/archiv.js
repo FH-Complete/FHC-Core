@@ -1,6 +1,5 @@
 export default {
 	getArchiv(person_id) {
-		console.log(person_id);
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/stv/archiv/getArchiv',
