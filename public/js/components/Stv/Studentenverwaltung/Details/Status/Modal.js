@@ -13,8 +13,8 @@ export default{
 		FormInput
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
+		currentSemester: {
+			from: 'currentSemester',
 		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
@@ -106,7 +106,7 @@ export default{
 				this.statusId = prestudent.prestudent_id;
 				this.formData = {
 					status_kurzbz: 'Interessent',
-					studiensemester_kurzbz: this.defaultSemester,
+					studiensemester_kurzbz: this.currentSemester,
 					ausbildungssemester: 1,
 					datum: new Date(),
 					bestaetigtam: new Date(),

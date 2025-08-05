@@ -16,9 +16,6 @@ export default{
 		StatusDropdown
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
-		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
 			default: false
