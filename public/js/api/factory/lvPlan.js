@@ -87,4 +87,10 @@ export default {
 			}
 		};
 	},
+	getLv(lehrveranstaltung_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/LvPlan/getLv/' + lehrveranstaltung_id
+		};
+	}
 };

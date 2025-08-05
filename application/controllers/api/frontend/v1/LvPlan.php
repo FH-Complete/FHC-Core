@@ -41,6 +41,7 @@ class LvPlan extends FHCAPI_Controller
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
 			'getLvPlanForStudiensemester' => self::PERM_LOGGED,
+			'getLv' => self::PERM_LOGGED
 		]);
 
         $this->load->library('LogLib');
@@ -248,6 +249,41 @@ class LvPlan extends FHCAPI_Controller
 		$result = $this->LehreinheitModel->load($lehreinheit_id);
 		$result = current($this->getDataOrTerminateWithError($result))->studiensemester_kurzbz;
 		$this->terminateWithSuccess($result);
+	}
+
+	/**
+	 * get details for a lv
+	 * @access public
+	 *
+	 * @param integer		$lehrveranstaltung_id
+	 * @return void
+	 */
+	public function getLv($lehrveranstaltung_id)
+	{
+		if (!$lehrveranstaltung_id && $lehrveranstaltung_id !== 0 && $lehrveranstaltung_id !== '0')
+			return show_404();
+
+		// Load Phrases
+		$this->loadPhrases(['lehre']);
+
+		// Validation
+		$this->form_validation->set_data([
+			'lehrveranstaltung_id' => $lehrveranstaltung_id
+		]);
+
+		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung_id'), 'integer');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Get Data
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+
+		$result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+
+		$result = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess(current($result));
 	}
 
 	/**
