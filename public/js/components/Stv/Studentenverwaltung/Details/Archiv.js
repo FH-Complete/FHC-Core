@@ -5,6 +5,7 @@ import AkteEdit from "./Archiv/Edit.js";
 import ApiStvArchiv from '../../../../api/factory/stv/archiv.js';
 
 export default {
+	name: 'Archiv',
 	components: {
 		CoreFilterCmpt,
 		FormInput,
@@ -151,7 +152,9 @@ export default {
 								this.$fhcAlert
 									.confirmDelete()
 									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz: this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
-									.then(this.$fhcApi.factory.stv.archiv.delete)
+									.then((params) => {
+										return this.$api.call(ApiStvArchiv.delete(params.akte_id, params.studiengang_kz))
+									})
 									.then(() => {
 										//cell.getRow().delete();
 										this.reload();
@@ -256,7 +259,7 @@ export default {
 
 	},
 	template: `
-	<div class="stv-details-konto h-100 d-flex flex-column">
+	<div class="stv-details-archiv h-100 d-flex flex-column">
 		<core-filter-cmpt
 			ref="table"
 			table-only
