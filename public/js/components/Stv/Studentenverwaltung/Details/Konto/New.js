@@ -17,8 +17,8 @@ export default {
 		lists: {
 			from: 'lists'
 		},
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -89,7 +89,7 @@ export default {
 				buchungsdatum: new Date(),
 				buchungstext: '',
 				mahnspanne: 30,
-				studiensemester_kurzbz: this.defaultSemester,
+				studiensemester_kurzbz: this.currentSemester,
 				credit_points: null,
 				anmerkung: ''
 			};
