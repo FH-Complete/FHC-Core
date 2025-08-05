@@ -1,6 +1,6 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
 import PluginsPhrasen from '../../plugins/Phrasen.js';
-import Theme from '../../plugin/Theme.js';
+import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
