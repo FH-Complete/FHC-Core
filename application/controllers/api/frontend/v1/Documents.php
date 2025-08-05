@@ -152,7 +152,7 @@ class Documents extends FHCAPI_Controller
 	 * @param string				$xml
 	 * @param string				$xsl
 	 * @param string				$sign_user (optional)
-	 * 
+	 *
 	 * @return array with Akte data and export data
 	 */
 	private function _getAkteExportData($xml, $xsl, $sign_user = null)
@@ -235,7 +235,7 @@ class Documents extends FHCAPI_Controller
 			$student = current($this->getDataOrTerminateWithError($result));
 
 			$ss = $this->input->post_get('ss');
-			
+
 			if ($ss !== null) {
 				$this->load->model('crm/prestudentstatus_model', 'PrestudentstatusModel');
 				$result = $this->PrestudentstatusModel->getLastStatus($student->prestudent_id, $ss);
@@ -334,7 +334,7 @@ class Documents extends FHCAPI_Controller
 				$this->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
 				$result = $this->PrestudentModel->load($prestudent_id);
 				$prestudent = current($this->getDataOrTerminateWithError($result));
-				
+
 				$studiengang_kz = $prestudent->studiengang_kz;
 				$akteData['person_id'] = $prestudent->person_id;
 				$akteData['titel'] = mb_substr($xsl . "_" . $prestudent->kuerzel, 0, 64);
@@ -380,7 +380,7 @@ class Documents extends FHCAPI_Controller
 			// TODO: was bedeutet wenn keine berechtigung?
 			if (!$access_rights || !$access_rights->berechtigung)
 				return show_404();
-			
+
 			$allowed = false;
 			foreach ($access_rights->berechtigung as $access_right) {
 				if ($this->permissionlib->isBerechtigt($access_right)) {
@@ -454,11 +454,11 @@ class Documents extends FHCAPI_Controller
 
 		if (!$vorlage->archivierbar)
 			$this->terminateWithError($this->p->t("stv", "grades_error_archive"));
-		
+
 		if ($sign_user && !$vorlage->signierbar)
 			$this->terminateWithError($this->p->t("stv", "grades_error_sign"));
 
-		
+
 		$this->load->library('DocumentExportLib');
 
 		// XML Data
