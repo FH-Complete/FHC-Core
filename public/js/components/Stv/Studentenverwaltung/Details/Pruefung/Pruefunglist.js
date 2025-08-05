@@ -89,10 +89,11 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				persistenceID:'stv-details-pruefung-pruefung-list'
+				index: 'pruefung_id',
+				persistenceID: 'stv-details-pruefung-list'
 			},
 			tabulatorEvents: [
 				{
@@ -123,7 +124,7 @@ export default{
 							title: this.$p.t('ui', 'pruefung_id')
 						});
 						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('ui', 'lehreinheit_id')
+							title: this.$p.t('global', 'lehreinheit_id')
 						});
 						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
 							title: this.$p.t('ui', 'mitarbeiter_uid')
@@ -349,7 +350,7 @@ export default{
 			else {
 				this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
 			}
-		},
+		}
 	},
 	watch: {
 		//adaption to go directly through different semesters
@@ -419,6 +420,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('lehre', 'pruefung')"
 			@click:new="actionNewPruefung"
@@ -432,7 +434,7 @@ export default{
 				<p v-else class="fw-bold mt-3">{{ $p.t('exam', 'edit_pruefung') }}</p>
 			</template>
 	
-			<form-form class="row pt-3" ref="examData">
+			<form-form class="row pt-3" ref="examData" @submit.prevent>
 				<legend>Details</legend>
 				
 				<!--DropDown Lehrveranstaltung-->
@@ -536,6 +538,7 @@ export default{
 					:label="$p.t('global/datum')"
 					auto-apply
 					:enable-time-picker="false"
+					text-input
 					format="dd.MM.yyyy"
 					preview-format="dd.MM.yyyy"
 					:teleport="true"

@@ -1,0 +1,99 @@
+/* All */
+.weekPageContainer,
+.dayPageContainer {
+	height: 100%;
+}
+
+/* Feiertag */
+.feiertagEventContent {
+	align-items: center;
+	color: var(--fhc-light);
+}
+.monthPageContainer .feiertagEventContent,
+.weekPageContainer .feiertagEventContent,
+.dayPageContainer .feiertagEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+	justify-items: center;
+}
+.listPageContainer .feiertagEventContent {
+	display: flex;
+	justify-content: center;
+}
+
+.monthPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: 0 .5rem;
+}
+.weekPageContainer .feiertagEventContent #ferienEventIcon,
+.dayPageContainer .feiertagEventContent #ferienEventIcon,
+.listPageContainer .feiertagEventContent #ferienEventIcon {
+	margin: .5rem;
+}
+
+.listPageContainer .feiertagEventContent #ferienEventTitle {
+	flex-grow: 1;
+}
+
+/* Lehreinheit */
+.monthPageContainer .lehreinheitEventContent {
+	padding: 0!important;
+}
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventHeader,
+.monthPageContainer .lehreinheitEventContent #lehreinheitLektoren,
+.monthPageContainer .lehreinheitEventContent #lektorEllipsis {
+	display: none!important;
+}
+.monthPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+}
+.weekPageContainer .lehreinheitEventContent {
+	display: grid;
+	grid-template-columns: auto 1fr;
+}
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	border-inline-end: solid 1px var(--bs-secondary);
+	align-self: stretch;
+	align-content: center;
+	padding: .25em .5em .25em .25em;
+	margin-inline-end: .25rem;
+}
+.weekPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-evenly;
+	align-items: center;
+}
+.dayPageContainer .lehreinheitEventContent,
+.listPageContainer .lehreinheitEventContent {
+	display: flex;
+	align-items: center;
+}
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventHeader,
+.listPageContainer .lehreinheitEventContent #lehreinheitEventHeader {
+	align-content: center;
+	padding-inline-end: .5em;
+	border-inline-end: solid 1px;
+	margin-inline-end: .5em;
+}
+.dayPageContainer .lehreinheitEventContent #lehreinheitEventText,
+.listPageContainer .lehreinheitEventContent #lehreinheitEventText {
+	flex: 1 1 auto;
+	display: flex;
+	flex-wrap: wrap;
+	gap: .25em;
+	justify-content: center;
+}
+.dayPageContainer .lehreinheitEventContent #lehreinheitTopic,
+.dayPageContainer .lehreinheitEventContent #lehreinheitOrt,
+.listPageContainer .lehreinheitEventContent #lehreinheitTopic,
+.listPageContainer .lehreinheitEventContent #lehreinheitOrt {
+	flex: 0 0 100%;
+	text-align: center;
+}
+
+.fhc-roominformation .lehreinheitEventContent #lehreinheitOrt {
+	display: none;
+}
+

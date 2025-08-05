@@ -61,6 +61,13 @@ export default {
 			params: dms
 		};
 	},
+	updateProfilbild(dms) {
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/ProfilUpdate/updateProfilbild`,
+			params: dms
+		};
+	},
 	getProfilRequestFiles(requestID) {
 		return {
 			method: 'get',

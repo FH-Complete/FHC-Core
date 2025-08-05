@@ -116,6 +116,8 @@ class Konto extends FHCAPI_Controller
 	{
 		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
 
+		$this->BuchungstypModel->addOrder('beschreibung');
+		
 		$result = $this->BuchungstypModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
