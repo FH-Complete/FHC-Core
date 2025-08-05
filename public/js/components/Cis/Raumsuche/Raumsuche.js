@@ -197,7 +197,7 @@ export const Raumsuche =  {
 		this.setupMounted()
 	},
 	template: `
-	<h1 class="h3">{{$p.t('lvplan/raumsuche')}}</h1>
+	<h1 class="h3">{{$p.t('rauminfo/roomSearch')}}</h1>
 	<hr>
 	<div class="row">
 		<div class="col-12 col-lg-2">
