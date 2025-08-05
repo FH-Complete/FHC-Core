@@ -12,8 +12,8 @@ export default {
 		AkteEdit
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -217,7 +217,7 @@ export default {
 					archiveFunction({
 						xml: this.getXmlByXsl(this.selectedVorlage.vorlage_kurzbz),
 						xsl: this.selectedVorlage.vorlage_kurzbz,
-						ss: this.defaultSemester,
+						ss: this.currentSemester,
 						uid: archiveData.uid,
 						prestudent_id: archiveData.prestudent_id
 					})
