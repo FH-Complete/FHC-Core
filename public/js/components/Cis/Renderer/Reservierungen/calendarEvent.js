@@ -1,30 +1,83 @@
 export default {
-	methods: {
-		convertTime: function ([hour, minute]) {
-			let date = new Date();
-			date.setHours(hour);
-			date.setMinutes(minute);
-			// returns date string as hh:mm
-			return date.toLocaleTimeString(this.$p.user_locale, { hour: '2-digit', minute: '2-digit', hour12: false });
-
-		},
-	},
 	props: {
 		event: {
 			type: Object,
-			required: true,
-		},
+			required: true
+		}
 	},
-	template: `
-	<div class="lehreinheitEventContent h-100 w-100 p-1" >
-		<div id="lehreinheitEventHeader" class="h-100 " v-if="!event.allDayEvent && event?.beginn && event?.ende" >
-			<span class="small">{{convertTime(event.beginn.split(":"))}}</span>
-			<span class="small">{{convertTime(event.ende.split(":"))}}</span>
+	computed: {
+		tooltipString() {
+			const tooltipArray = [];
+
+			tooltipArray.push([
+				this.$p.t('global/uhrzeit'),
+				[this.start, this.end].join(' - ')
+			].join(": "));
+			
+			tooltipArray.push([
+				this.$p.t('profilUpdate/topic'),
+				this.event.topic
+			].join(": "));
+			
+			tooltipArray.push([
+				this.$p.t('person/ort'),
+				this.event.ort_kurzbz
+			].join(": "));
+			
+			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
+				if (this.event.lektor.length > 3) {
+					tooltipArray.push([
+						this.$p.t('lehre/lektor'),
+						this.event.lektor.slice(0, 3).map(lektor => lektor.kurzbz).join("\n")
+						+ "\n" + this.$p.t('lehre/weitereLektoren', [this.event.lektor.length - 3])
+					].join(": "));
+				} else {
+					tooltipArray.push([
+						this.$p.t('lehre/lektor'),
+						this.event.lektor.map(lektor => lektor.kurzbz).join("\n")
+					].join(": "));
+				}
+			}
+			
+			return tooltipArray.join("\n");
+		},
+		start() {
+			return luxon.Duration
+				.fromISOTime(this.event.beginn)
+				.toISOTime({ suppressSeconds: true });
+		},
+		end() {
+			return luxon.Duration
+				.fromISOTime(this.event.ende)
+				.toISOTime({ suppressSeconds: true });
+		}
+	},
+	template: /* html */`
+	<div
+		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1"
+	>
+		<div
+			v-if="!event.allDayEvent && event?.beginn && event?.ende"
+			class="event-time d-grid h-100"
+		>
+			<span>{{ start }}</span>
+			<span>{{ end }}</span>
 		</div>
-		<div id="lehreinheitEventText">
-			<span>{{event.topic}}</span>
-			<span v-for="lektor in event.lektor">{{lektor.kurzbz}}</span>
-			<span>{{event.ort_kurzbz}}</span>
+		<div class="event-text" v-tooltip="tooltipString">
+			<span class="event-topic">{{ event.topic }}</span>
+			<span
+				v-for="lektor in event.lektor.slice(0, 3)"
+				class="event-lectors"
+			>
+				{{ lektor.kurzbz }}
+			</span>
+			<span
+				v-if="event.lektor.length > 3"
+				class="event-lectors-plus"
+			>
+				... +{{ event.lektor.length - 3 }}
+			</span>
+			<span class="event-place">{{ event.ort_kurzbz }}</span>
 		</div>
 	</div>
 	`,

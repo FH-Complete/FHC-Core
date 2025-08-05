@@ -34,7 +34,7 @@ export default {
 		start_time: function () {
 			if (!this.event.beginn)
 				return 'N/A';
-			if (!this.event.beginn instanceof Date) {
+			if (!(this.event.beginn instanceof Date)) {
 				return this.event.beginn;
 			}
 			return numberPadding(this.event.beginn.getHours()) + ":" + numberPadding(this.event.beginn.getMinutes());
@@ -42,7 +42,7 @@ export default {
 		end_time: function () {
 			if (!this.event.ende)
 				return 'N/A';
-			if (!this.event.ende instanceof Date) {
+			if (!(this.event.ende instanceof Date)) {
 				return this.event.ende;
 			}
 			return numberPadding(this.event.ende.getHours()) + ":" + numberPadding(this.event.ende.getMinutes());

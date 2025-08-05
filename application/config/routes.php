@@ -62,6 +62,7 @@ $route['api/v1/ressource/[B|b]etriebsmittelperson/(:any)'] = 'api/v1/ressource/b
 $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
+$route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 
 // Studierendenverwaltung List Routes
 $route['api/frontend/v1/stv/[sS]tudents/inout'] = 'api/frontend/v1/stv/Students/index';

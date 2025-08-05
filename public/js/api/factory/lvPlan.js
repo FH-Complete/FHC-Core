@@ -30,8 +30,21 @@ export default {
 			params: { start_date, end_date, lv_id }
 		};
 	},
+	eventsPersonal(start_date, end_date) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/lvPlan/eventsPersonal',
+			params: { start_date, end_date }
+		};
+	},
+	eventsLv(lv_id, start_date, end_date) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/lvPlan/eventsLv',
+			params: { lv_id, start_date, end_date }
+		};
+	},
 	getStunden() {
-		// TODO(chris): seems to be called from nowhere?
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/LvPlan/Stunden'
@@ -65,7 +78,7 @@ export default {
 	},
 	LvPlanEvents(start_date, end_date, lv_id) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/LvPlan/LvPlanEvents',
 			params: { 
 				start_date: start_date, 
@@ -74,4 +87,10 @@ export default {
 			}
 		};
 	},
+	getLv(lehrveranstaltung_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/LvPlan/getLv/' + lehrveranstaltung_id
+		};
+	}
 };
