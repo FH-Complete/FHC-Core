@@ -34,7 +34,7 @@ class Archiv extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'get' => ['admin:r', 'assistenz:r'],
+			'getArchiv' => ['admin:r', 'assistenz:r'],
 			'getArchivVorlagen' => ['admin:r', 'assistenz:r'],
 			'archive' => ['admin:w', 'assistenz:w'],
 			'download' => ['admin:w', 'assistenz:w'],
@@ -60,9 +60,9 @@ class Archiv extends FHCAPI_Controller
 	 
 	 * @return void
 	 */
-	public function get()
+	public function getArchiv()
 	{
-		$person_id = $this->input->post('person_id');
+		$person_id = $this->input->get('person_id');
 
 		$this->load->library('form_validation');
 
