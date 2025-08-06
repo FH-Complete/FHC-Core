@@ -42,10 +42,13 @@ export default {
 		}
 
 		function _clean_return_value(response) {
+			if (typeof response.data === 'string' || response.data instanceof String)
+				return _clean_return_value({ data: response });
+
 			const result = response.data;
 			delete response.data;
 			if (!result.meta)
-				result.meta = {response};
+				result.meta = { response };
 			else
 				result.meta.response = response;
 			return result;
@@ -159,6 +162,77 @@ export default {
 				return fhcApiAxios.post(uri, data, config);
 			},
 			call(factory, configoverwrite, form) {
+				if (Array.isArray(factory)) {
+					const $fhcAlert = app.config.globalProperties.$fhcAlert;
+					const $api = app.config.globalProperties.$api;
+
+					Promise
+						.allSettled(factory.map((config, index) => {
+							if (Array.isArray(config))
+								return $api.call(config[1], {
+									errorHeader: config[0],
+									errorHandling: false
+								});
+							else
+								return $api.call(config, {
+									errorHeader: '#' + index,
+									errorHandling: false
+								});
+						}))
+						.then(res => {
+							// TODO(chris): obey form & configoverwrite
+							let messagesError = [];
+							let messagesSuccessful = [];
+
+							res.forEach(result => {
+								if (result.status === 'fulfilled') {
+									//console.log(JSON.parse(result.value.data));
+									const successTitle = "<dt>" + result.value.data + "</dt>";
+									messagesSuccessful.push(successTitle + "ok");
+								} else {
+									const errorTitle = "<dt>" + result.reason.config.errorHeader + "</dt>";
+									const errorMsg = JSON.parse(result.reason.request.response);
+									const fullMessage = errorMsg.errors.map(error => {
+										if (error.type == 'validation') {
+											// TODO(chris): do we want the keys?
+											return '<dd>' + Object.values(error.messages).join("</dd><dd>") + '</dd>';
+										}
+										// TODO(chris): other types
+										if (error.message)
+											return '<dd>' + error.message + '</dd>';
+										if (error.messages)
+											return '<dd>' + error.messages.join("\n") + '</dd>';
+										// TODO(chris): what to do here
+										return '<dd>' + "Generic Error" + '</dd>'; // TODO(chris): translate
+									}).join("\n");
+									messagesError.push(errorTitle + fullMessage);
+								}
+							});
+
+							if (messagesError.length)
+							{
+								const test = document.createElement('b');
+								$fhcAlert.alertDefault(
+									'error',
+									messagesError.length + " Fehler", // TODO(chris): translate
+									'<dl>' + messagesError.join("") + '</dl>',
+									true,
+									true
+								);
+							}
+							if (messagesSuccessful.length)
+							{
+								const test = document.createElement('b');
+								$fhcAlert.alertDefault(
+									'info',
+									'Feedback',
+								messagesSuccessful.length + " erfolgreiche Statusänderung(en) durchgeführt", // TODO(chris): translate
+									false,
+									true
+								);
+							}
+						});
+				}
 				let {method, url, params, config} = factory;
 				if (configoverwrite !== undefined) {
 					config = configoverwrite;

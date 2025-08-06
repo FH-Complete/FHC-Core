@@ -24,7 +24,6 @@ class Status extends FHCAPI_Controller
 			'updateStatus' => ['admin:rw', 'assistenz:rw'],
 			'advanceStatus' => ['admin:rw', 'assistenz:rw'],
 			'confirmStatus' => ['admin:rw', 'assistenz:rw'],
-
 		]);
 
 		//Load Models
@@ -435,9 +434,10 @@ class Status extends FHCAPI_Controller
 		]);
 
 		if (!$this->form_validation->run())
+		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
 
-		
 		$this->load->library('PrestudentLib');
 
 		$this->db->trans_start();
@@ -623,8 +623,9 @@ class Status extends FHCAPI_Controller
 		]);
 
 		if (!$this->form_validation->run())
+		{
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
-
+		}
 
 		// Start DB transaction
 		$this->db->trans_start();
