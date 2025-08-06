@@ -216,13 +216,13 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Feiertag',
+				'text' => 'Ferien / Feiertag',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Holiday',
+				'text' => 'Holidays',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -40857,7 +40857,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Stundenplan',
+				'text' => 'LV-Plan',
 				'description' => '',
 				'insertvon' => 'system'
 			),
