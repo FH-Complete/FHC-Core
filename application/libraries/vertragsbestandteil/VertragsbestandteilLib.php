@@ -34,6 +34,8 @@ class VertragsbestandteilLib
 	protected $DienstverhaeltnisModel;
 	/** @var Vertragsbestandteil_model */
 	protected $VertragsbestandteilModel;
+	/** @var GehaltsbestandeilModel */
+	protected $GehaltbestandteilModel;
 	/** @var Benutzer_model */
 	protected $BenutzerModel;
 	/**
@@ -58,6 +60,9 @@ class VertragsbestandteilLib
 		$this->CI->load->model('vertragsbestandteil/Vertragsbestandteil_model',
 			'VertragsbestandteilModel');
 		$this->VertragsbestandteilModel = $this->CI->VertragsbestandteilModel;
+		$this->CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model',
+			'GehaltbestandteilModel');
+		$this->GehaltbestandteilModel = $this->CI->GehaltbestandteilModel;
 		$this->CI->load->model('person/benutzer_model',
 			'BenutzerModel');
 		$this->BenutzerModel = $this->CI->BenutzerModel;
@@ -325,6 +330,15 @@ class VertragsbestandteilLib
 
 	private function deleteVertragsbestandteilHelper(Vertragsbestandteil $vertragsbestandteil)
 	{
+		
+		$dv =  $this->fetchDienstverhaeltnis($vertragsbestandteil->getDienstverhaeltnis_id());
+		$hasGehaltsPermission = $this->PermissionLib->isberechtigt('basis/gehaelter', 's', $dv->getOe_kurzbz());
+		$vbHasGehaltsbestandteile = $this->GehaltbestandteilModel->existsGehaltsbestandteil($vertragsbestandteil->getVertragsbestandteil_id());
+
+		if (!$hasGehaltsPermission && $vbHasGehaltsbestandteile)
+		{
+			throw new Exception('delete Gehaltsbestandteil permission denied');
+		}
 
 		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
 			$vertragsbestandteil->getVertragsbestandteiltyp_kurzbz());

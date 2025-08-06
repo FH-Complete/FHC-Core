@@ -129,6 +129,15 @@ LEFT JOIN
 			array($dienstverhaeltnis_id),
 			$this->getEncryptedColumns());
     }
+
+	public function existsGehaltsbestandteil($vertragsbestandteil_id)
+	{
+		$qry = "select count(*) from hr.tbl_gehaltsbestandteil where vertragsbestandteil_id=?";
+		$ret = $this->execQuery($qry,
+			array($vertragsbestandteil_id));
+		$d = getData($ret);
+		return $d !== null && $d > 0;
+	}
 	
 	public function getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
 		$includefuture=false, $withvalorisationhistory=true)
