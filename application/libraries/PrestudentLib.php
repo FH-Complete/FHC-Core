@@ -500,11 +500,6 @@ class PrestudentLib
 
 		$student = current(getData($result));
 
-
-		$this->_ci->load->library('VariableLib', ['uid' => $authUID]);
-		$semester_aktuell = $this->_ci->variablelib->getVar('semester_aktuell');
-
-
 		// Update Aktionen
 
 		// Status updaten
@@ -545,8 +540,8 @@ class PrestudentLib
 		// Studentlehrverband updaten
 		$result = $this->_ci->StudentlehrverbandModel->update([
 			'student_uid' => $student->student_uid,
-			'studiensemester_kurzbz' => $semester_aktuell
-		], [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+			], [
 			'semester' => $ausbildungssemester,
 			'verband' => '',
 			'gruppe' => '',

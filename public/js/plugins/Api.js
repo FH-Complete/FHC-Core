@@ -6,7 +6,9 @@ export default {
 		if (app.config.globalProperties.$api) {
 			return;
 		}
-		app.use(FhcAlert);
+
+		if (!app.config.globalProperties.$fhcAlert)
+			app.use(FhcAlert);
 
 		function _get_config(form, uri, data, config) {
 			if (typeof form == 'string' && config === undefined) {
@@ -42,6 +44,8 @@ export default {
 		function _clean_return_value(response) {
 			const result = response.data;
 			delete response.data;
+			if (!result)
+				return {meta: {response}, data: null};
 			if (!result.meta)
 				result.meta = {response};
 			else
