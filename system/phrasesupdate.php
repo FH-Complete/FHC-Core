@@ -31767,7 +31767,7 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
-		'phrase' => 'kontrolldatum',
+		'phrase' => 'kontrolldatumV2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -31778,7 +31778,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Attendance Check Date',
+				'text' => 'Check Date',
 				'description' => '',
 				'insertvon' => 'system'
 			)
