@@ -15,6 +15,13 @@ class GehaltsbestandteilLib
 	protected $CI;
 	/** @var Gehaltsbestandteil_model */
 	protected $GehaltsbestandteilModel;
+	/** @var Dienstverhaeltnis_model */
+	protected $DienstverhaeltnisModel;
+
+	/**
+	 * @var PermissionLib
+	 */
+	protected $PermissionLib;
 
 	protected $loggedInUser;
 	
@@ -24,8 +31,25 @@ class GehaltsbestandteilLib
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 
 			'GehaltsbestandteilModel');
+		$this->CI->load->model('vertragsbestandteil/Dienstverhaeltnis_model',
+			'DienstverhaeltnisModel');
+		$this->DienstverhaeltnisModel = $this->CI->DienstverhaeltnisModel;
 		$this->CI->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib');
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
+		$this->CI->load->library('PermissionLib', null, 'PermissionLib');
+		$this->PermissionLib = $this->CI->PermissionLib;
+	}
+
+	public function fetchDienstverhaeltnis($dienstverhaeltnis_id)
+	{
+		$result = $this->DienstverhaeltnisModel->load($dienstverhaeltnis_id);
+		$dv = null;
+		if(null !== ($row = getData($result)))
+		{
+			$dv = new Dienstverhaeltnis();
+			$dv->hydrateByStdClass($row[0], true);
+		}
+		return $dv;
 	}
 
 	public function fetchGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
@@ -121,16 +145,24 @@ class GehaltsbestandteilLib
 	{
 		$this->setUIDtoPGSQL();
 
-		// delete Gehaltsabrechnung
-		$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
-
-		//
-		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
-		
-		if (isError($ret))
+		$dv = $this->fetchDienstverhaeltnis($gehaltsbestandteil->getDienstverhaeltnis_id());
+		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 'd', $dv->getOe_kurzbz())) 
 		{
-			throw new Exception('error deleting gehaltsbestandteil');
+			// delete Gehaltsabrechnung
+			$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
+
+			//
+			$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
+			
+			if (isError($ret))
+			{
+				throw new Exception('error deleting gehaltsbestandteil');
+			}
+
+		} else {
+			throw new Exception('permission denied for deleting gehaltsbestandteil');
 		}
+		
 	}
 	
 	public function endGehaltsbestandteil(Gehaltsbestandteil $gehaltsbestandteil, $enddate)
