@@ -351,7 +351,7 @@ class VertragsbestandteilLib
 		}
 
 		try
-		{	
+		{
 			$gehaltsbestandteile = $vertragsbestandteil->getGehaltsbestandteile();
 			$this->GehaltsbestandteilLib->deleteGehaltsbestandteile($gehaltsbestandteile);
 		}
