@@ -1,6 +1,13 @@
 import accessibility from "../directives/accessibility.js";
 
+import TabView from '../../../index.ci.php/public/js/components/primevue/tabview/tabview.esm.min.js';
+import TabPanel from '../../../index.ci.php/public/js/components/primevue/tabpanel/tabpanel.esm.min.js';
+
 export default {
+	components: {
+		tabview: TabView,
+		tabpanel: TabPanel
+	},
 	directives: {
 		accessibility
 	},
@@ -17,7 +24,11 @@ export default {
 		default: String,
 		modelValue: [String, Number, Boolean, Array, Object, Date, Function, Symbol],
 		vertical: Boolean,
-		border: Boolean
+		border: Boolean,
+		useprimevue: {
+			type: Boolean,
+			default: false
+		}
 	},
 	data() {
 		return {
@@ -39,6 +50,15 @@ export default {
 			set(v) {
 				this.$emit('update:modelValue', v);
 			}
+		},
+		calcActiveIndex: function() {
+			let keys = Object.keys(this.tabs);
+			let index = keys.indexOf(this.default);
+			if( index === -1 ) {
+				return 0;
+			} else {
+				return index;
+			}
 		}
 	},
 	watch: {
@@ -47,6 +67,10 @@ export default {
 		}
 	},
 	methods: {
+		handleTabClick: function(index) {
+			let keys = Object.keys(this.tabs);
+			this.change(keys[index]);
+		},
 		change(key) {
 			this.$emit("change", key)
 			this.current = key;
@@ -77,7 +101,8 @@ export default {
 					component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
 					title: Vue.computed(() => item.title || key),
 					config: item.config,
-					key
+					key,
+					value: {}
 				}
 			}
 
@@ -99,6 +124,28 @@ export default {
 		this.initConfig(this.config);
 	},
 	template: `
+	<template v-if="useprimevue">
+
+	<tabview 
+		:scrollable="true" 
+		:lazy="true"
+		:activeIndex="calcActiveIndex"
+		@tab-click="handleTabClick"
+	>
+		<tabpanel 
+			v-for="tab in tabs" 
+			:key="tab.key" 
+			:header="tab.title"
+		>
+			<keep-alive>
+				<component :is="tab.component" v-model="value" :config="tab.config"></component>
+			</keep-alive>
+		</tabpanel>
+	</tabview>
+
+	</template>
+	<template v-else="">
+
 	<div class="fhc-tabs d-flex" :class="vertical ? 'align-items-stretch gap-3' : (border ? 'flex-column' : 'flex-column gap-3')" v-if="Object.keys(tabs).length">
 		<div class="nav" :class="vertical ? 'nav-pills flex-column' : 'nav-tabs'">
 			<div
@@ -118,5 +165,7 @@ export default {
 				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
 			</keep-alive>
 		</div>
-	</div>`
+	</div>
+
+	</template>`
 };

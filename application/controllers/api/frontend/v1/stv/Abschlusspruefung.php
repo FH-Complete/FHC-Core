@@ -20,6 +20,8 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'getBeurteilungen' => ['admin:rw', 'assistenz:rw'],
 			'getAkadGrade' => ['admin:rw', 'assistenz:rw'],
 			'getMitarbeiter' => ['admin:rw', 'assistenz:rw'],
+			'getAllMitarbeiter' => ['admin:rw', 'assistenz:rw'],
+			'getAllPersons' => ['admin:rw', 'assistenz:rw'],
 			'getPruefer' => ['admin:rw', 'assistenz:rw'],
 			'getTypStudiengang' => ['admin:rw', 'assistenz:rw'],
 			'checkForExistingExams' => ['admin:rw', 'assistenz:rw'],
@@ -38,6 +40,51 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		// Load models
 		$this->load->model('education/Abschlusspruefung_model', 'AbschlusspruefungModel');
+
+
+		//Permission checks for Studiengangsarray
+		$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
+
+		if ($this->router->method == 'insertAbschlusspruefung' || $this->router->method == 'updateAbschlusspruefung')
+		{
+			$student_uid = $this->input->post('uid') ?: ($this->input->post('formData')['student_uid'] ?? null);
+
+			if(!$student_uid)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
+			}
+			$this->_checkAllowedStgsFromUid($student_uid, $allowedStgs);
+		}
+
+		if ($this->router->method == 'deleteAbschlusspruefung')
+		{
+			$abschlusspruefung_id = $this->input->post('id');
+
+			if(!$abschlusspruefung_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Abschlusspruefung ID']), self::ERROR_TYPE_GENERAL);
+			}
+			$result = $this->AbschlusspruefungModel->load(
+				array('abschlusspruefung_id' => $abschlusspruefung_id)
+			);
+			$data = $this->getDataOrTerminateWithError($result);
+			$student_uid = current($data)->student_uid;
+
+			$this->_checkAllowedStgsFromUid($student_uid, $allowedStgs);
+		}
+	}
+
+	private function _checkAllowedStgsFromUid($student_uid, $allowedStgs)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(['student_uid' => $student_uid]);
+		$data = $this->getDataOrTerminateWithError($result);
+		$studiengang_kz = current($data)->studiengang_kz;
+
+		if (!in_array($studiengang_kz, $allowedStgs))
+		{
+			return $this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg'), self::ERROR_TYPE_GENERAL);
+		}
 	}
 
 	public function getAbschlusspruefung($student_uid)
@@ -149,16 +196,16 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$studiengang_kz= $this->input->post('studiengang_kz');
 
-/*		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
-			$this->load->library('form_validation');
+		/*		if (!$studiengang_kzs || !is_array($studiengang_kzs)) {
+					$this->load->library('form_validation');
 
-			$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
-				'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
-			]);
+					$this->form_validation->set_rules('studiengang_kzs', '', 'required|is_null', [
+						'is_null' => $this->p->t('ui', 'error_fieldMustBeArray')
+					]);
 
-			if (!$this->form_validation->run())
-				$this->terminateWithValidationErrors($this->form_validation->error_array());
-		}*/
+					if (!$this->form_validation->run())
+						$this->terminateWithValidationErrors($this->form_validation->error_array());
+				}*/
 
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -224,19 +271,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$formData = $this->input->post('formData');
 
-		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
-		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz'] = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
-		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
-		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
-		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
-		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
-		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
-		$_POST['datum']= $formData['datum'];
-		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['anmerkung'] = $formData['anmerkung'];
-		$_POST['protokoll']= $formData['protokoll'];
-		$_POST['note'] = $formData['note'];
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
@@ -261,19 +296,19 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$result = $this->AbschlusspruefungModel->insert([
 			'student_uid' => $student_uid,
-			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-			'akadgrad_id' => $this->input->post('akadgrad_id'),
-			'vorsitz' => $this->input->post('vorsitz'),
-			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
-			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
-			'datum' => $this->input->post('datum'), //TODO(Manu) check if minute format like FAS
-			'sponsion' => $this->input->post('sponsion'),
-			'pruefer1' => $this->input->post('pruefer1'),
-			'pruefer2' => $this->input->post('pruefer2'),
-			'pruefer3' => $this->input->post('pruefer3'),
-			'protokoll' => $this->input->post('protokoll'),
-			'note' => $this->input->post('note'),
-			'anmerkung' => $this->input->post('anmerkung'),
+			'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
+			'akadgrad_id' => $formData['akadgrad_id'],
+			'vorsitz' => $formData['vorsitz'],
+			'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
+			'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
+			'datum' => $formData['datum'], //TODO(Manu) check if minute format like FAS
+			'sponsion' => $formData['sponsion'],
+			'pruefer1' => $formData['pruefer1'],
+			'pruefer2' => $formData['pruefer2'],
+			'pruefer3' => $formData['pruefer3'],
+			'protokoll' => $formData['protokoll'],
+			'note' => $formData['note'],
+			'anmerkung' => $formData['anmerkung'],
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID()
 		]);
@@ -295,25 +330,17 @@ class Abschlusspruefung extends FHCAPI_Controller
 		}
 
 		$formData = $this->input->post('formData');
-		$_POST['student_uid'] = $formData['student_uid'];
-		$_POST['pruefungstyp_kurzbz'] = $formData['pruefungstyp_kurzbz'];
-		$_POST['akadgrad_id']= $formData['akadgrad_id'];
-		$_POST['vorsitz'] =  isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
-		$_POST['pruefer1'] = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
-		$_POST['pruefer2'] = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
-		$_POST['pruefer3'] = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
-		$_POST['pruefungsantritt_kurzbz'] = $formData['pruefungsantritt_kurzbz'];
-		$_POST['abschlussbeurteilung_kurzbz'] = $formData['abschlussbeurteilung_kurzbz'];
-		$_POST['datum']= $formData['datum'];
-		$_POST['sponsion']= $formData['sponsion'];
-		$_POST['anmerkung'] = $formData['anmerkung'];
-		$_POST['protokoll']= $formData['protokoll'];
-		$_POST['note'] = $formData['note'];
+		$vorsitz = isset($formData['vorsitz']['mitarbeiter_uid']) ? $formData['vorsitz']['mitarbeiter_uid'] :  $formData['vorsitz'];
+		$pruefer1 = isset($formData['pruefer1']['person_id']) ? $formData['pruefer1']['person_id'] : $formData['pruefer1'];
+		$pruefer2 = isset($formData['pruefer2']['person_id']) ? $formData['pruefer2']['person_id'] : $formData['pruefer2'];
+		$pruefer3 = isset($formData['pruefer3']['person_id']) ? $formData['pruefer3']['person_id'] : $formData['pruefer3'];
+
+		$this->form_validation->set_data($formData);
 
 		$this->form_validation->set_rules('pruefungstyp_kurzbz', 'Typ', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Typ'])
 		]);
-		
+
 		$this->form_validation->set_rules('akadgrad_id', 'AkadGrad', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'AkadGrad'])
 		]);
@@ -334,25 +361,25 @@ class Abschlusspruefung extends FHCAPI_Controller
 
 		$result = $this->AbschlusspruefungModel->update(
 			[
-			'abschlusspruefung_id' => $abschlusspruefung_id
+				'abschlusspruefung_id' => $abschlusspruefung_id
 			],
 			[
-			'student_uid' => $this->input->post('student_uid'),
-			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-			'akadgrad_id' => $this->input->post('akadgrad_id'),
-			'vorsitz' => $this->input->post('vorsitz'),
-			'pruefungsantritt_kurzbz' => $this->input->post('pruefungsantritt_kurzbz'),
-			'abschlussbeurteilung_kurzbz' => $this->input->post('abschlussbeurteilung_kurzbz'),
-			'datum' => $this->input->post('datum'),
-			'sponsion' => $this->input->post('sponsion'),
-			'pruefer1' => $this->input->post('pruefer1'),
-			'pruefer2' => $this->input->post('pruefer2'),
-			'pruefer3' => $this->input->post('pruefer3'),
-			'protokoll' => $this->input->post('protokoll'),
-			'note' => $this->input->post('note'),
-			'anmerkung' => $this->input->post('anmerkung'),
-			'insertamum' => date('c'),
-			'insertvon' => getAuthUID()
+				'student_uid' => $formData['student_uid'],
+				'pruefungstyp_kurzbz' => $formData['pruefungstyp_kurzbz'],
+				'akadgrad_id' => $formData['akadgrad_id'],
+				'vorsitz' => $vorsitz,
+				'pruefungsantritt_kurzbz' => $formData['pruefungsantritt_kurzbz'],
+				'abschlussbeurteilung_kurzbz' => $formData['abschlussbeurteilung_kurzbz'],
+				'datum' => $formData['datum'],
+				'sponsion' => $formData['sponsion'],
+				'pruefer1' => $pruefer1,
+				'pruefer2' => $pruefer2,
+				'pruefer3' => $pruefer3,
+				'protokoll' => $formData['protokoll'],
+				'note' => $formData['note'],
+				'anmerkung' => $formData['anmerkung'],
+				'updateamum' => date('c'),
+				'updatevon' => getAuthUID()
 			]
 		);
 
@@ -416,5 +443,59 @@ class Abschlusspruefung extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('abschlusspruefung', 'error_studentOhneFinalExam', ['id'=> $uids]), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess('step3');
+	}
+
+	/*
+	* returns list of all Mitarbeiter
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllMitarbeiter()
+	{
+		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
+
+		$sql = "
+			SELECT
+			    ma.mitarbeiter_uid as mitarbeiter_uid,
+				CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid, ')') as label
+			FROM
+			  public.tbl_mitarbeiter ma
+			  JOIN public.tbl_benutzer bn ON (bn.uid = ma.mitarbeiter_uid)
+			  JOIN public.tbl_person p ON (p.person_id = bn.person_id)
+			ORDER BY
+			p.nachname ASC
+			";
+
+		$result = $this->MitarbeiterModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/*
+	* returns list of all Persons
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllPersons()
+	{
+		$this->load->model('person/Person_model', 'PersonModel');
+
+		$sql = "
+			SELECT
+			    p.vorname, p.nachname, p.person_id,
+				CONCAT(p.nachname, ' ', p.vorname) as label
+			FROM
+			  public.tbl_person p
+			 -- JOIN public.tbl_benutzer bn ON (p.person_id = bn.person_id)
+			  -- and bn.aktiv = 'true'
+			ORDER BY
+			p.nachname ASC
+			";
+
+		//TODO(manu) check if filter active benutzer
+
+		$result = $this->PersonModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 }
