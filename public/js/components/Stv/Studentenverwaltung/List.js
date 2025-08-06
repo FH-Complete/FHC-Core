@@ -111,7 +111,7 @@ export default {
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
-						row.getElement().classList.add('text-muted');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
 
