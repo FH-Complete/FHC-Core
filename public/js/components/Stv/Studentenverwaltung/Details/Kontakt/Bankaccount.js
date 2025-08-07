@@ -86,10 +86,7 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
-				selectable:	true,
 				index: 'bankverbindung_id',
 				persistenceID: 'stv-details-kontakt-bankaccount'
 			},
@@ -350,6 +347,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('person', 'bankverbindung')"
 			@click:new="actionNewBankverbindung"

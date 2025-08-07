@@ -16,22 +16,34 @@
  */
 
 export default {
-	uid(uid) {
+	uid(uid, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/uid/'
+			+ encodeURIComponent(uid);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/uid/' + uid
+			url: url
 		};
 	},
-	prestudent(prestudent_id) {
+	prestudent(prestudent_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/prestudent/'
+			+ encodeURIComponent(prestudent_id);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/prestudent/' + prestudent_id
+			url: url
 		};
 	},
-	person(person_id) {
+	person(person_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/person/'
+			+ encodeURIComponent(person_id);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/person/' + person_id
+			url: url
 		};
 	},
 	verband(relative_path) {

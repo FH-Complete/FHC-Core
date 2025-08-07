@@ -58,6 +58,20 @@ export default {
 							FHC_JS_DATA_STORAGE_OBJECT.app_root
 						);
 					});
+					Vue.nextTick(()=>{
+						document.querySelectorAll(".card-header").forEach((el) => {
+							el.classList.add("fhc-primary");
+						});
+						document.querySelectorAll(".row").forEach((el) => {
+							el.classList.add("w-100");
+							el.classList.add("align-items-center");
+							
+						});
+						document.querySelectorAll(".row h2").forEach((el) => {
+							el.classList.add("mb-0");
+						});
+
+					})
 				});
 		},
 		loadNewPageContent(data) {
@@ -66,6 +80,7 @@ export default {
 				.then(res => res.data)
 				.then(result => {
 					this.content = result;
+					
 				});
 		}
   },
@@ -80,11 +95,11 @@ export default {
 			});
   },
   template: /*html*/ `
-  	<h2 >News</h2>
+  	<h2 class="fhc-primary-color">News</h2>
 	<hr/>
 	<pagination v-show="content?true:false" :page_size="page_size"  @page="page=$event.page; loadNewPageContent($event)" :maxPageCount="maxPageCount">
 	</pagination>
-	<div class="container-fluid">
+	<div class="container-fluid mt-4">
 		<div class="row">
 			<div class="col" v-html="content">
 			</div>

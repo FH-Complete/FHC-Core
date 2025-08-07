@@ -27,6 +27,10 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 		},
+		hasAssistenzPermissionForStgs: {
+			from: 'hasAssistenzPermissionForStgs',
+			default: false
+		},
 	},
 	props: {
 		student: Object
@@ -109,7 +113,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
-				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
 			},
@@ -160,8 +163,8 @@ export default {
 				bisio_id: null,
 				localPurposes: [],
 				localSupports: [],
-				lehrveranstaltung_id: '',
-				lehreinheit_id: ''
+				lehrveranstaltung_id: null,
+				lehreinheit_id: null
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -184,6 +187,10 @@ export default {
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
 		},
+		isBerechtigtForStudiengang(){
+			const currentKz = this.student.studiengang_kz.toString();
+			return this.hasAssistenzPermissionForStgs.includes(currentKz);
+		}
 	},
 	methods: {
 		actionNewMobility() {
@@ -239,7 +246,7 @@ export default {
 			this.loadItems();
 		},
 		resetLehreinheit(){
-			this.formData.lehreinheit_id = '';
+			this.formData.lehreinheit_id = null;
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
@@ -264,12 +271,7 @@ export default {
 				.call(ApiStvMobility.loadMobility(bisio_id))
 				.then(result => {
 					this.formData = result.data;
-					if(this.formData.lehrveranstaltung_id === null) {
-						this.formData.lehrveranstaltung_id = '';
-					}
-					if(this.formData.lehreinheit_id === null) {
-						this.formData.lehreinheit_id = '';
-					}
+
 					if(this.formData.lehrveranstaltung_id > 0 ) {
 						this.loadItems();
 					}
@@ -291,6 +293,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					this.reload();
+					this.$refs.purposes.resetLocalData();
+					this.$refs.supports.resetLocalData();
 				});
 		},
 		deleteMobility(bisio_id) {
@@ -314,8 +318,8 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
-			this.formData.lehrveranstaltung_id = '',
-			this.formData.lehreinheit_id = '',
+			this.formData.lehrveranstaltung_id = null,
+			this.formData.lehreinheit_id = null,
 			this.statusNew = true;
 			this.listLes = [];
 		},
@@ -431,6 +435,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_mobility')"
 			@click:new="actionNewMobility"
@@ -444,14 +449,13 @@ export default {
 				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
 			</template>
 
-
 			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
 				<div class="row my-3">
 					<legend class="col-6">BIS</legend>
 					<legend class="col-6">Outgoing</legend>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						container-class="col-6 stv-details-mobility-von"
@@ -460,6 +464,7 @@ export default {
 						v-model="formData.von"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="von"
 						:teleport="true"
@@ -474,7 +479,7 @@ export default {
 						name="lehrveranstaltung_id"
 						@change="handleLVchanged"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="lv in listLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -493,6 +498,7 @@ export default {
 						v-model="formData.bis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="bis"
 						:teleport="true"
@@ -507,7 +513,7 @@ export default {
 						name="lehreinheit_id"
 						:disabled="listLes.length > 0 ? false : true"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="le in listLes"
 							:key="le.lehreinheit_id"
