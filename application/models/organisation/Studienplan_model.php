@@ -157,4 +157,17 @@ class Studienplan_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($lv_id));
 	}
 
+
+	public function getStudienplaeneForPerson($person_id)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('ps.*');
+		$this->addJoin('public.tbl_prestudentstatus pss', 'studienplan_id');
+		$this->addJoin('public.tbl_prestudent ps', 'prestudent_id');
+
+		return $this->loadWhere([
+			'person_id' => $person_id
+		]);
+	}
 }

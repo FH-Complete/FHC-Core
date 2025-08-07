@@ -28,16 +28,16 @@ components:{
 	StudiengangVertretung,
 },
 template:/*html*/`
-
+		<div id="fhc-studiengang-informationen">
 		<template v-if="studiengang?.bezeichnung && semester">
-			<div class="card card-body mb-3">
+			<div class="card card-body mb-3 border-0">
 				<div class="mb-1">
 					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiengang')}}:</h2>
 					<span class="mb-1">{{studiengang?.bezeichnung}}</span>
 				</div>
 				<div class="mb-1">
 					<h2 class="h4 mb-1 pb-0">Moodle:</h2>
-					<a class="mb-1" target="_blank" :href="moodleLink">{{studiengang?.kurzbzlang}}</a>
+					<a class="fhc-link-color mb-1" target="_blank" :href="moodleLink">{{studiengang?.kurzbzlang}}</a>
 				</div>
 				<div :class="{'mb-1':studiengang?.zusatzinfo_html}">
 					<h2 class="h4 mb-1 pb-0">{{$p.t('lehre','studiensemester')}}: </h2>
@@ -74,6 +74,7 @@ template:/*html*/`
 		<template v-if="jahrgangsvertr && Array.isArray(jahrgangsvertr) && jahrgangsvertr.length >0">
 			<studiengang-vertretung :title="$p.t('studiengangInformation', 'Jahrgangsvertretung')" :vertretungsList="jahrgangsvertr"></studiengang-vertretung>
 		</template>
+		</div>
 	
 `,
 computed:{

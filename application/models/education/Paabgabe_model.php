@@ -30,4 +30,35 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execQuery($qry, array($projektarbeit_id));
 	}
+
+	/**
+	 * Gets all Paabgabe Termin Deadlines of zugewiesene Projektarbeiten as a Mitarbeiter for Terminübersicht Abgabetool.
+	 * @param int $person_id
+	 * @return object
+	 */
+	public function getDeadlines($person_id)
+	{
+		$qry = "SELECT
+					DISTINCT TO_CHAR(tbl_paabgabe.datum, 'DD.MM.YYYY') as datum, tbl_paabgabe.fixtermin, tbl_paabgabe.kurzbz,
+					person_student.vorname as stud_vorname, person_student.nachname as stud_nachname,
+					person_student.titelpre as stud_titelpre, person_student.titelpost as stud_titelpost,
+					tbl_lehrveranstaltung.semester, UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) as stg,
+					tbl_paabgabetyp.bezeichnung as typ_bezeichnung
+				FROM
+					campus.tbl_paabgabe
+					JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+					JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
+					JOIN public.tbl_benutzer bn_student ON(tbl_projektarbeit.student_uid=bn_student.uid)
+					JOIN public.tbl_person person_student ON(bn_student.person_id=person_student.person_id)
+					JOIN lehre.tbl_lehreinheit ON(tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
+					JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
+					JOIN public.tbl_studiengang ON(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
+					JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
+				WHERE
+					tbl_projektbetreuer.person_id= ? AND tbl_paabgabe.datum>=now() AND bn_student.aktiv
+				ORDER BY datum";
+
+		return $this->execReadOnlyQuery($qry, array($person_id));
+	}
+	
 }

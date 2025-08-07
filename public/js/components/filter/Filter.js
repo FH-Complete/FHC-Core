@@ -66,6 +66,7 @@ export const CoreFilterCmpt = {
 		tableOnly: Boolean,
 		noColumnFilter:Boolean,
 		reload: Boolean,
+		reloadBtnInfotext: String,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
@@ -75,10 +76,14 @@ export const CoreFilterCmpt = {
 		newBtnDisabled: Boolean,
 		newBtnLabel: String,
 		uniqueId: String,
-		// TODO soll im master kommen?
+
 		idField: String,
 		parentIdField: String,
-		countOnly: Boolean
+		countOnly: Boolean,
+		useSelectionSpan: {
+			type: Boolean,
+			default: true
+		}
 	},
 	data: function() {
 		return {
@@ -216,16 +221,21 @@ export const CoreFilterCmpt = {
 			}
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
-					height: 500,
 					layout: "fitDataStretchFrozen",
 					movableColumns: true,
 					columnDefaults:{
 						tooltip: true
 					},
 					placeholder,
-					reactiveData: true,
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
+
+			// set default height if no height property is set
+			if (tabulatorOptions.height === undefined &&
+				tabulatorOptions.minHeight === undefined &&
+				tabulatorOptions.maxHeight === undefined) {
+				tabulatorOptions.height = 500;
+			}
 
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
@@ -234,7 +244,7 @@ export const CoreFilterCmpt = {
 
 			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
-			// TODO check ob im core bleiben soll
+
 			if (this.idField) {
 				// enable nested tabulator if parent Id given
 				if (this.parentIdField) tabulatorOptions.dataTree = true;
@@ -258,7 +268,7 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
-			// TODO check ob im core so bleiben soll
+
 			// if nested tabulator, restructure data
 			if (this.parentIdField && this.idField) {
 				this.tabulator.on("dataLoading", data => {
@@ -575,7 +585,7 @@ export const CoreFilterCmpt = {
 				this.getFilter
 			);
 		},
-		// TODO check ob im core so bleiben soll
+
 		// append child to it's parent
 		appendChild(data, child) {
 			// get parent id
@@ -643,7 +653,6 @@ export const CoreFilterCmpt = {
 				</h3>
 			</div>
 		</div>
-
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
@@ -653,9 +662,9 @@ export const CoreFilterCmpt = {
 						{{ newBtnLabel }}
 					</button>
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
-						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
+						<span class="fa-solid fa-rotate-right" aria-hidden="true"  :title="reloadBtnInfotext ? reloadBtnInfotext : 'Reload'" ></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">
+					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
 						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
@@ -664,17 +673,17 @@ export const CoreFilterCmpt = {
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<span v-else-if="description">{{ description }}</span>
-					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+					<span v-else-if="description" v-html="description"></span>
+					<a aria-label="filter" v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
-					<a v-if="filterActive"  class="btn btn-link px-0 text-dark" :title="$p.t('ui','filterdelete')" @click="clearFilters">
+					<a aria-label="filter" v-if="filterActive"  class="btn btn-link px-0 fhc-text" :title="$p.t('ui','filterdelete')" @click="clearFilters">
 						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
-					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
+					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
-					<table-download class="btn btn-link px-0 text-dark" :tabulator="tabulator" :config="download"></table-download>
+					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
 				</div>
 			</div>
 

@@ -153,34 +153,61 @@ class Notiz_model extends DB_Model
 	 */
 	public function getNotizWithDocEntries($id, $type, $withoutTags = true)
 	{
-		$this->addSelect("tbl_notiz.*, 
-			count(dms_id) as countDoc, 
-			z.notizzuordnung_id,
-			(CASE
-				WHEN tbl_notiz.updateamum >= tbl_notiz.insertamum THEN tbl_notiz.updateamum 
-				ELSE tbl_notiz.insertamum
-			END) AS lastUpdate,
-			regexp_replace(tbl_notiz.text, '<[^>]*>', '', 'g') as text_stripped,
-			TO_CHAR(tbl_notiz.start::timestamp, 'DD.MM.YYYY') AS start_format,
-			TO_CHAR(tbl_notiz.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
-			z.notiz_id, 
-			z.person_id as id, 
-			{$type} as type_id
-		");
-
-		$this->addJoin('public.tbl_notizzuordnung z', 'notiz_id');
-		$this->addJoin('public.tbl_notiz_dokument dok', 'notiz_id', 'LEFT');
-		$this->addJoin('campus.tbl_dms_version', 'dms_id', 'LEFT');
-
-		$this->db->where("z.{$type}", $id);
+			$qry = "
+				SELECT
+						n.*, 
+						  CASE
+							WHEN person_verfasser.vorname IS NOT NULL AND person_verfasser.vorname != ''
+							  OR person_verfasser.nachname IS NOT NULL AND person_verfasser.nachname != ''
+							THEN CONCAT(person_verfasser.vorname, ' ', person_verfasser.nachname)
+							ELSE NULL
+						  END AS verfasser,
+						  CASE
+							WHEN person_bearbeiter.vorname IS NOT NULL AND person_bearbeiter.vorname != ''
+							  OR person_bearbeiter.nachname IS NOT NULL AND person_bearbeiter.nachname != ''
+							THEN CONCAT(person_bearbeiter.vorname, ' ', person_bearbeiter.nachname)
+							ELSE NULL
+						  END AS bearbeiter,
+						count(dms_id) as countDoc, z.notizzuordnung_id,
+						(CASE
+							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
+							ELSE n.insertamum
+						END) AS lastUpdate,
+						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
+						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
+						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
+						z.notiz_id, z.person_id as id, ? as type_id
+						
+				FROM
+						public.tbl_notiz n
+				JOIN 
+							public.tbl_notizzuordnung z USING (notiz_id)
+				LEFT JOIN 
+							public.tbl_notiz_dokument dok USING (notiz_id)
+				LEFT JOIN 
+							campus.tbl_dms_version USING (dms_id)
+				LEFT JOIN 
+						      public.tbl_benutzer p_verfasser ON (p_verfasser.uid = n.verfasser_uid)
+  				LEFT JOIN 
+						      public.tbl_person person_verfasser ON (person_verfasser.person_id = p_verfasser.person_id)
+  				LEFT JOIN 
+						      public.tbl_benutzer p_bearbeiter ON (p_bearbeiter.uid = n.bearbeiter_uid)
+				LEFT JOIN 
+						      public.tbl_person person_bearbeiter ON (person_bearbeiter.person_id = p_bearbeiter.person_id)
+				WHERE 
+				   z.$type  = ?";
 
 		if ($withoutTags)
-			$this->db->where('tbl_notiz.typ IS NULL');
+			$qry .= " AND tbl_notiz.typ IS NULL";
 
-		$this->addGroupBy('notiz_id');
-		$this->addGroupBy('z.notizzuordnung_id');
+			$qry .= "GROUP BY 
+					notiz_id, z.notizzuordnung_id,
+ 					person_verfasser.vorname, person_verfasser.nachname,
+					person_bearbeiter.vorname, person_bearbeiter.nachname
+			";
 
-		return $this->load();
+		return $this->execQuery($qry, array($type, $id));
+
 	}
 
 
