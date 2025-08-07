@@ -408,16 +408,19 @@ export default {
 			
 			this.draggedItem = item;
 			
-			this.$emit('draggedItem',item);
-			
-			this.draggedNode = evt.target.closest(".drop-grid-item");
-			//clones the widget for the drag Image
-			let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
-			
-			clone.style.zIndex = 5;
-			clone.classList.add("widgetClone");
-			this.$refs.container.appendChild(clone);
-			this.clonedWidget = clone;
+			this.$emit('draggedItem', item);
+			// workaround for chrome fireing event dragend when styles are manipulated during dragging
+			setTimeout(() => {
+				this.draggedNode = evt.target.closest(".drop-grid-item");
+				//clones the widget for the drag Image
+				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
+
+				clone.style.zIndex = 5;
+				clone.classList.add("widgetClone");
+				this.$refs.container.appendChild(clone);
+				this.clonedWidget = clone;
+			}, 0);
+
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
