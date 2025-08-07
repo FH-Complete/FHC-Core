@@ -248,7 +248,7 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveNotenvorschlagBulk(this.lv_id, this.sem_kurzbz, notenbulk)).then(res => {
 				if(res.meta.status === 'success') {
 					this.$fhcAlert.alertWarning('Noten erfolgreich importiert') // TODO: phrase
-					const lvNoten = res.data[0]
+					const lvNoten = res.data
 					
 
 					lvNoten.forEach(lvn => {
@@ -605,8 +605,8 @@ export const Benotungstool = {
 				if (res.meta.status === 'success') {
 					const s = this.studenten.find(s => s.uid === data.uid)
 					this.teilnoten[s.uid].note_lv = data.note_vorschlag
-					s.freigabedatum = this.parseDate(res.data[1]['freigabedatum'])
-					s.benotungsdatum = this.parseDate(res.data[1]['benotungsdatum'])
+					s.freigabedatum = this.parseDate(res.data[0]['freigabedatum'])
+					s.benotungsdatum = this.parseDate(res.data[0]['benotungsdatum'])
 
 					s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
 					
@@ -992,10 +992,6 @@ export const Benotungstool = {
 						data.push(entry)
 					}
 				})
-
-				data.forEach(entry => {
-					entry.infoString += ' | 👥' + entry.studentcount + ' | 📅' + entry.termincount
-				})
 				
 				this.lehreinheiten = [...data]
 				
@@ -1068,10 +1064,6 @@ export const Benotungstool = {
 					}
 				})
 
-				data.forEach(entry => {
-					entry.infoString += ' | 👥' + entry.studentcount + ' | 📅' + entry.termincount
-				})
-
 				this.lehreinheiten = [...data]
 
 			})
@@ -1133,10 +1125,6 @@ export const Benotungstool = {
 
 							data.push(entry)
 						}
-					})
-
-					data.forEach(entry => {
-						entry.infoString += ' | 👥' + entry.studentcount + ' | 📅' + entry.termincount
 					})
 
 					this.lehreinheiten = [...data]
@@ -1614,8 +1602,14 @@ export const Benotungstool = {
 				<div class="col-lg-auto">
 					<Dropdown @change="leChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLe" 
 						v-model="selectedLehreinheit" :options="lehreinheiten" showClear appendTo="self">
-						<template #optionsgroup="slotProps">
-							<div> {{ option.infoString }} </div>
+						<template #option="slotProps">
+							<div> 
+								{{ slotProps.option.infoString }} 
+								<i class="fa-solid fa-user"></i> 
+								{{ slotProps.option.studentcount }}
+								<i class="fa-solid fa-calendar-days"></i>
+								{{ slotProps.option.termincount }}
+							</div>
 						</template>
 					</Dropdown>
 				</div>
