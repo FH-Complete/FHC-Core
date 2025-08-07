@@ -12,26 +12,35 @@ export default {
 	},
 	data() {
 		return {
-			endpoint: ApiNotizPerson
+			endpoint: ApiNotizPerson,
+			countNotiz: ''
 		};
+	},
+	methods: {
+		updateCountNotes(countNew){
+			this.headerSuffix = "(" +  countNew + ")";
+			this.$emit('update:suffix', this.headerSuffix);
+		}
 	},
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
-<!--	mit factory als endpoint	-->
-		<core-notiz
-			class="overflow-hidden"
-			:endpoint="endpoint"
-			ref="formc"
-			notiz-layout="popupModal"
-			type-id="person_id"
-			:id="modelValue.person_id"
-			show-document
-			show-tiny-mce
-			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
-			>
-		</core-notiz>
-		
 	
+
+<!--	Test Version classicFas for enter with one click vs popupModal-->
+	<core-notiz
+		class="overflow-hidden"
+		:endpoint="endpoint"
+		ref="formc"
+		notiz-layout="classicFas"
+		type-id="person_id"
+		:id="modelValue.person_id"
+		show-document
+		show-tiny-mce
+		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+		@updateCount="updateCountNotes"
+		>
+</core-notiz>
+
 <!--		
 ---------------------------------------------------------------------------------------------
 -------------------- DESCRIPTION FOR PARAMETER PROPS ----------------------------------------

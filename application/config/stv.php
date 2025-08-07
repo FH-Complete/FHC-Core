@@ -57,6 +57,10 @@ $config['tabs'] =
 			//if true, Anrechnungen can be added and edited in tab Anrechnungen
 			'editableAnrechnungen' => false,
 		],
+		'notes' => [
+			//if true, the count of Messages will be shown in the header of the Tab Messages
+			'showCountNotes' => true
+		]
 	];
 	
 // List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined
