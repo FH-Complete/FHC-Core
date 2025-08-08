@@ -4,7 +4,7 @@ import ApiNoten from "../../../api/factory/noten.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
-
+import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
 export const Benotungstool = {
 	name: "Benotungstool",
 	components: {
@@ -39,7 +39,6 @@ export const Benotungstool = {
 			loading: false,
 			selectedUids: [], // shared selection state
 			selectedLehreinheit: null,
-			lehreinheiten: null,
 			tabulatorCanBeBuilt: false,
 			selectedPruefungNote: null,
 			selectedPruefungDate: new Date(), // v-model for pruefung edit datepicker
@@ -960,42 +959,8 @@ export const Benotungstool = {
 				this.selectedLehrveranstaltung = this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == this.lv_id)
 			})
 			
-			this.$api.call(ApiLehre.getLeForLv(this.lv_id, this.sem_kurzbz)).then(res => {
-
-				const data =  []
-				// TODO: could be done on server in some shared function, copied from anw extension for now
-				res.data?.retval?.forEach(entry => {
-
-					const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
-					if (existing) {
-						// supplement info
-						existing.infoString += ', '
-						if (entry.gruppe_kurzbz !== null) {
-							existing.infoString += entry.gruppe_kurzbz
-						} else {
-							existing.infoString += entry.kurzbzlang + '-' + entry.semester
-								+ (entry.verband ? entry.verband : '')
-								+ (entry.gruppe ? entry.gruppe : '')
-						}
-					} else {
-						// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
-						// so a new entry will always start with those groups, others are appended afterwards
-						entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
-						if (entry.gruppe_kurzbz !== null) {
-							entry.infoString += entry.gruppe_kurzbz
-						} else {
-							entry.infoString += entry.kurzbzlang + '-' + entry.semester
-								+ (entry.verband ? entry.verband : '')
-								+ (entry.gruppe ? entry.gruppe : '')
-						}
-
-						data.push(entry)
-					}
-				})
-				
-				this.lehreinheiten = [...data]
-				
-			})
+			LehreinheitenModule.setupContext(this.$.appContext.config.globalProperties)
+			LehreinheitenModule.bindParams(Vue.ref(Vue.computed(() => this.LeDropdownParams)));
 			
 			// fetch sem_kurzbz dropdown
 			this.$api.call(ApiStudiensemester.getStudiensemester()).then(res => {
@@ -1028,46 +993,6 @@ export const Benotungstool = {
 				}
 			})
 			
-			// reload related LE to LV to repopulate LE filter dropdown
-			
-			// TODO: reset old LE selection to null
-			this.$api.call(ApiLehre.getLeForLv(e.value.lehrveranstaltung_id, this.sem_kurzbz)).then(res => {
-
-				const data =  []
-				// TODO: could be done on server in some shared function, copied from anw extension for now
-				res.data?.retval?.forEach(entry => {
-
-					const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
-					if (existing) {
-						// supplement info
-						existing.infoString += ', '
-						if (entry.gruppe_kurzbz !== null) {
-							existing.infoString += entry.gruppe_kurzbz
-						} else {
-							existing.infoString += entry.kurzbzlang + '-' + entry.semester
-								+ (entry.verband ? entry.verband : '')
-								+ (entry.gruppe ? entry.gruppe : '')
-						}
-					} else {
-						// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
-						// so a new entry will always start with those groups, others are appended afterwards
-						entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
-						if (entry.gruppe_kurzbz !== null) {
-							entry.infoString += entry.gruppe_kurzbz
-						} else {
-							entry.infoString += entry.kurzbzlang + '-' + entry.semester
-								+ (entry.verband ? entry.verband : '')
-								+ (entry.gruppe ? entry.gruppe : '')
-						}
-
-						data.push(entry)
-					}
-				})
-
-				this.lehreinheiten = [...data]
-
-			})
-			
 			// reload data
 			this.loadNoten(e.value.lehrveranstaltung_id, this.sem_kurzbz)
 		},
@@ -1092,44 +1017,6 @@ export const Benotungstool = {
 
 				this.selectedLehrveranstaltung = this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == this.lv_id)
 			}).then(()=>{
-
-				// TODO: reset old LE selection to null
-				this.$api.call(ApiLehre.getLeForLv(this.lv_id, e.value.studiensemester_kurzbz)).then(res => {
-
-					const data =  []
-					// TODO: could be done on server in some shared function, copied from anw extension for now
-					res.data?.retval?.forEach(entry => {
-
-						const existing = data.find(e => e.lehreinheit_id === entry.lehreinheit_id)
-						if (existing) {
-							// supplement info
-							existing.infoString += ', '
-							if (entry.gruppe_kurzbz !== null) {
-								existing.infoString += entry.gruppe_kurzbz
-							} else {
-								existing.infoString += entry.kurzbzlang + '-' + entry.semester
-									+ (entry.verband ? entry.verband : '')
-									+ (entry.gruppe ? entry.gruppe : '')
-							}
-						} else {
-							// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
-							// so a new entry will always start with those groups, others are appended afterwards
-							entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
-							if (entry.gruppe_kurzbz !== null) {
-								entry.infoString += entry.gruppe_kurzbz
-							} else {
-								entry.infoString += entry.kurzbzlang + '-' + entry.semester
-									+ (entry.verband ? entry.verband : '')
-									+ (entry.gruppe ? entry.gruppe : '')
-							}
-
-							data.push(entry)
-						}
-					})
-
-					this.lehreinheiten = [...data]
-
-				})
 				
 				// reload data
 				this.loadNoten(this.lv_id, e.value.studiensemester_kurzbz)
@@ -1441,6 +1328,15 @@ export const Benotungstool = {
 		}
 	},
 	computed: {
+		LehreinheitenModule() {
+			return LehreinheitenModule;
+		},
+		LeDropdownParams() {
+			return {
+				lv_id: this.lv_id,
+				sem_kurzbz: this.sem_kurzbz
+			}	
+		},	
 		getStudentenOptions() {
 			return this.studenten ? this.studenten : []
 		},
@@ -1597,11 +1493,11 @@ export const Benotungstool = {
 					</Dropdown>
 				</div>
 			</div>
-			
+
 			<div class="col-2">
 				<div class="col-lg-auto">
-					<Dropdown @change="leChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLe" 
-						v-model="selectedLehreinheit" :options="lehreinheiten" showClear appendTo="self">
+					<Dropdown @change="leChanged" :style="{'width': '100%'}" v-bind="LehreinheitenModule"
+						v-model="selectedLehreinheit" showClear appendTo="self">
 						<template #option="slotProps">
 							<div> 
 								{{ slotProps.option.infoString }} 
