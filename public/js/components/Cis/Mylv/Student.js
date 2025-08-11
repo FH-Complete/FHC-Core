@@ -75,17 +75,16 @@ export default {
 			this.$refs.studiensemester.selectedIndex++;
 			this.$refs.studiensemester.dispatchEvent(new Event('change', { bubbles: true }));
 		},
-		setHash(val) {
-			// TODO: make this a router param to enable history
-			location.hash = val;
+		updateRouter(val) {
+			this.$router.push(`/Cis/MyLv/${val}`);
 		}
 	},
 	created() {
 		axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Studiensemester').then(res => {
 			this.studiensemester = res.data.retval || [];
-			const hash = location.hash.substring(1);
-			if (hash && this.studiensemester.filter(s => s.studiensemester_kurzbz == hash).length)
-				this.currentSemester = hash;
+			const routerStudiensemester = this.$route.params.studiensemester;
+			if (routerStudiensemester && this.studiensemester.filter(s => s.studiensemester_kurzbz == routerStudiensemester).length)
+				this.currentSemester = routerStudiensemester;
 			else
 				this.currentSemester = this.nearestSem;
 		});
@@ -104,7 +103,7 @@ export default {
 					<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
 						<i class="fa fa-caret-left" aria-hidden="true"></i>
 					</button>
-					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
+					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="updateRouter($event.target.value)">
 						<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
 					</select>
 					<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">

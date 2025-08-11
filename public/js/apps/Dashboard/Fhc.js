@@ -137,11 +137,12 @@ const router = VueRouter.createRouter({
 			component: CmsNews,
 			props: true
 		},
+		//dafadsdafadsdafadsdafadsdafadsdafadsdafadsdafads
 		{
-			path: `/Cis/MyLv`,
+			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
 			component: MylvStudent,
-			props: true
+			props: true,
 		},
 		{
 			path: `/Cis/MyLv/Info/:studien_semester/:lehrveranstaltung_id`,
