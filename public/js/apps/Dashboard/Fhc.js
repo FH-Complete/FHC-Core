@@ -137,7 +137,6 @@ const router = VueRouter.createRouter({
 			component: CmsNews,
 			props: true
 		},
-		//dafadsdafadsdafadsdafadsdafadsdafadsdafadsdafads
 		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
