@@ -119,6 +119,12 @@ export default {
 				activeFilter: this.emp ? 'employee' : this.stg ? 'verband' : null
 			}
 
+			if (this.stg !== undefined)
+			{
+				this.selectedStudiengang = this.semester !== '' && this.semester
+					? `${this.stg}/${this.semester}`
+					: this.stg;
+			}
 			this.filter = filter;
 		},
 		handleRowClicked(data)
@@ -164,7 +170,6 @@ export default {
 				params.studiensemester_kurzbz = studiensemester_kurzbz;
 			if (this.filter.emp)
 				params.emp = this.filter.emp;
-
 			this.$router.push({ name: routeName, params });
 			this.selected = [];
 		},
@@ -191,13 +196,6 @@ export default {
 		},
 	},
 	created() {
-		if (this.stg !== undefined)
-		{
-			this.selectedStudiengang = this.semester !== '' && this.semester
-				? `${this.stg}/${this.semester}`
-				: this.stg;
-		}
-
 		this.$p.loadCategory(['lehre', 'person', 'global'])
 
 		this.$api.call(ApiDetails.getStudiensemester())
@@ -261,7 +259,7 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband @select-verband="onSelectVerband" class="col" style="height:0%" :preselectedKey="selectedStudiengang" :endpoint="endpoint"></stv-verband>
+					<stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				
