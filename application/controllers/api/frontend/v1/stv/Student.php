@@ -68,12 +68,14 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function get($prestudent_id)
+	public function get($prestudent_id, $studiensemester_kurzbz)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
-
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$this->PrestudentModel->addSelect('p.person_id');
 		$this->PrestudentModel->addSelect('p.titelpre');
@@ -158,7 +160,7 @@ class Student extends FHCAPI_Controller
 	{
 		$laufendesStudiensemester = '';
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$result = $this->StudiensemesterModel->getNearest();
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		if(hasData($result)) {
 			$laufendesStudiensemester = (getData($result))[0]->studiensemester_kurzbz;
 		}
@@ -173,7 +175,7 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function save($prestudent_id)
+	public function save($prestudent_id, $studiensemester_kurzbz)
 	{
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -181,13 +183,17 @@ class Student extends FHCAPI_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
 		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->load->library('form_validation');
 
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
+
 		$authuid = getAuthUID();
 		$now = date('c');
-
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
 
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 

@@ -73,23 +73,18 @@ $rt = new reihungstest();
 
 if(isset($_GET['include_id']) && isset($_GET['studiengang_kz']))
 {
-	error_log("in zweig get zukuenfigte");
 	$include_id=$_GET['include_id'];
-	error_log("include_Id:" . $include_id);
 	$studiengang_kz=$_GET['studiengang_kz'];
-	error_log(" stg_kz: " . $studiengang_kz);
 	$rt->getZukuenftige($include_id, $studiengang_kz);
 }
 elseif(isset($_GET['prestudent_id']))
 {
 	$include_ids=array();
-	error_log("prestudent");
 	$prestudent = new prestudent();
 	$prestudent->getPrestudentRolle($_GET['prestudent_id'], 'Interessent');
 	$studienplan_arr = array();
 	foreach($prestudent->result as $row)
 	{
-		error_log( $row->studienplan_id);
 		$studienplan_arr[] = $row->studienplan_id;
 	}
 

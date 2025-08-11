@@ -47,6 +47,8 @@ export default {
 
 			const result = response.data;
 			delete response.data;
+			if (!result)
+				return {meta: {response}, data: null};
 			if (!result.meta)
 				result.meta = { response };
 			else

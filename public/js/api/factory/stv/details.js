@@ -16,16 +16,22 @@
  */
 
 export default {
-	get(prestudent_id) {
+	get(prestudent_id, studiensemester_kurzbz) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/student/get/' + prestudent_id
+			url: 'api/frontend/v1/stv/student/get/'
+				+ encodeURIComponent(prestudent_id)
+				+ '/'
+				+ encodeURIComponent(studiensemester_kurzbz)
 		};
 	},
-	save(prestudent_id, params) {
+	save(prestudent_id, studiensemester_kurzbz, params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/student/save/' + prestudent_id,
+			url: 'api/frontend/v1/stv/student/save/'
+				+ encodeURIComponent(prestudent_id)
+				+ '/'
+				+ encodeURIComponent(studiensemester_kurzbz),
 			params
 		};
 	},

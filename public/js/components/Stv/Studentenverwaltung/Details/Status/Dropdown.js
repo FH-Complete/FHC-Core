@@ -14,6 +14,10 @@ export default {
 		$reloadList: {
 			from: '$reloadList',
 			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	emits: [
@@ -243,6 +247,7 @@ export default {
 			return askForSemester();
 		},
 		changeStatus(data) {
+			data.currentSemester = this.currentSemester;
 			this.$api.call(this.prestudentIds.map(prestudent_id => [
 				prestudent_id,
 				ApiStvStatus.changeStatus(prestudent_id, data)

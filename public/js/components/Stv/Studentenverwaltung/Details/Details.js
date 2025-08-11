@@ -41,6 +41,10 @@ export default {
 		$reloadList: {
 			from: '$reloadList',
 			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	props: {
@@ -101,7 +105,7 @@ export default {
 	methods: {
 		updateStudent(n) {
 			return this.$api
-				.call(ApiStvDetails.get(n.prestudent_id))
+				.call(ApiStvDetails.get(n.prestudent_id, this.currentSemester))
 				.then(result => {
 					this.data = result.data;
 					if (!this.data.familienstand)
@@ -116,7 +120,11 @@ export default {
 
 			this.$refs.form.clearValidation();
 			return this.$refs.form
-				.call(ApiStvDetails.save(this.modelValue.prestudent_id, this.changed))
+				.call(ApiStvDetails.save(
+					this.modelValue.prestudent_id,
+					this.currentSemester,
+					this.changed
+					))
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};

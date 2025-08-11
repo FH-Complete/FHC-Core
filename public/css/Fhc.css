@@ -10,7 +10,7 @@
   font-size: calc(1.325rem + .9vw);
 }
 .fhc-header > :first-child > small {
-  color: var(--bs-secondary);
+  color: var(--fhc-tertiary);
   font-size: .65em;
   padding-inline-start: 1em;
 }
@@ -104,4 +104,56 @@
 }
 .modal-msg .modal-content {
 	height: 95vh;
+}
+
+.fhcSkipLink {
+  position: absolute;
+  left: -10px;
+  top: -10px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.fhcSkipLink::before {
+   content: "Skip to main content"
+ }
+
+.fhcSkipLink:focus {
+  position: absolute;
+  z-index: 9999999;
+  top: var(--fhc-cis-header-height);
+  left: var(--fhc-cis-menu-width);
+  height: 100px;
+  width: 800px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #0044cc;
+  background-color: #ffeb3b;
+  text-decoration: none;
+  padding: 12px 18px;
+  border-radius: 6px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease-in-out;
+}
+
+.fhcSkipLink:hover {
+  background-color: #ffcc00;
+  color: #002b80;
+  transform: scale(1.05);
+}
+
+.fhc-bullet::before {
+  content: "• ";
+  font-weight: bold;
+  display: inline-block;
+  transform: scale(2);
+}
+
+.fhc-bullet-red::before {
+  color: green;
+}
+
+.fhc-bullet-green::before {
+  color: red;
 }

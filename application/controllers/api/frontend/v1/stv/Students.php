@@ -48,139 +48,108 @@ class Students extends FHCAPI_Controller
 	}
 
 	/**
-	 * Remap calls:
-	 * /													=> return []
-	 * /inout												=> return []
-	 * /inout/incoming										=> getIncoming
-	 * /inout/outgoing										=> getOutgoing
-	 * /inout/gemeinsamestudien								=> getGemeinsamestudien
-	 * /(studiengang_kz)									=> getStudents
-	 * /(studiengang_kz)/prestudent							=> getPrestudents
-	 * /(studiengang_kz)/prestudent/*						=> getPrestudents
-	 * /(studiengang_kz)/(semester)							=> getStudents
-	 * /(studiengang_kz)/(semester)/grp/(gruppe_kurzbz)		=> getStudents
-	 * /(studiengang_kz)/(semester)/(verband)				=> getStudents
-	 * /(studiengang_kz)/(semester)/(verband)/(gruppe)		=> getStudents
-	 * /(studiengang_kz)/(org_form)							=> getStudents
-	 * /(studiengang_kz)/(org_form)/prestudent				=> getPrestudents
-	 * /(studiengang_kz)/(org_form)/prestudent/*			=> getPrestudents
-	 * /(studiengang_kz)/(org_form)/(semester)				=> getStudents
-	 * /(studiengang_kz)/(org_form)/(semester)/grp/(gruppe_kurzbz)
-	 * 														=> getStudents
-	 * /(studiengang_kz)/(org_form)/(semester)/(verband)	=> getStudents
-	 * /(studiengang_kz)/(org_form)/(semester)/(verband)/(gruppe)
-	 * 														=> getStudents
-	 * /student/(student_uid)								=> getStudent
-	 * /prestudent/(prestudent_id)							=> getPrestudent
-	 * /person/(person_id)									=> getPerson
+	 * Routing
 	 *
-	 * @param string		$method
-	 * @param array			$params				(optional)
+	 * /inout												=> index
+	 * /(studiensemester_kurzbz)							=> index
+	 * /(studiensemester_kurzbz)/inout						=> index
 	 *
+	 * /(studiensemester_kurzbz)/inout/incoming				=> getIncoming
+	 * /(studiensemester_kurzbz)/inout/outgoing				=> getOutgoing
+	 * /(studiensemester_kurzbz)/inout/gemeinsamestudien	=> getGemeinsamestudien
+	 *
+	 * /(studiengang_kz)/prestudent													=> getPrestudents
+	 * /(studiengang_kz)/prestudent/(studiensemester_kurzbz)						=> getPrestudents
+	 * /(studiengang_kz)/prestudent/(studiensemester_kurzbz)/(filter)				=> getPrestudents
+	 * /(studiengang_kz)/prestudent/(studiensemester_kurzbz)/(filter)/(otherfilter)	=> getPrestudents
+	 *
+	 * /(studiengang_kz)/(orgform)/prestudent													=> getPrestudentsOrgform
+	 * /(studiengang_kz)/(orgform)/prestudent/(studiensemester_kurzbz)							=> getPrestudentsOrgform
+	 * /(studiengang_kz)/(orgform)/prestudent/(studiensemester_kurzbz)/(filter)					=> getPrestudentsOrgform
+	 * /(studiengang_kz)/(orgform)/prestudent/(studiensemester_kurzbz)/(filter)/(otherfilter)	=> getPrestudentsOrgform
+	 *
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(semester)/grp/(gruppe)	=> getStudentsSpezialguppe
+	 *
+	 * /(studiensemester_kurzbz)/(studiengang_kz)								=> getStudents
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(semester)					=> getStudents
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(semester)/(verband)			=> getStudents
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(semester)/(verband)/(gruppe) => getStudents
+	 *
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/grp/(gruppe) => getStudentsOrgformSpezialgruppe
+	 *
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)									=> getStudentsOrgform
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)						=> getStudentsOrgform
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/(verband)			=> getStudentsOrgform
+	 * /(studiensemester_kurzbz)/(studiengang_kz)/(orgform)/(semester)/(verband)/(gruppe)	=> getStudentsOrgform
+	 *
+	 * /(studiensemester_kurzbz)/uid/(student_uid)		=> getStudent
+	 * /(studiensemester_kurzbz)/prestudent/(prestudent_id)	=> getPrestudent
+	 * /(studiensemester_kurzbz)/person/(person_id)			=> getPerson
+	 */
+
+	public function index()
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->terminateWithSuccess([]);
+	}
+
+	/**
 	 * @return void
 	 */
-	public function _remap($method, $params = [])
+	public function getIncoming()
 	{
-		if ($method == '' || $method == 'index')
-			return $this->terminateWithSuccess([]);
+		$this->addMeta('ci_method', __FUNCTION__);
+		// TODO(chris): IMPLEMENT!
+		$this->terminateWithSuccess([]);
+	}
 
-		if ($method == 'inout') {
-			if (!count($params))
-				return $this->terminateWithSuccess([]);
-			switch ($params[0]) {
-				case 'incoming':
-					return $this->getIncoming();
-				case 'outgoing':
-					return $this->getOutgoing();
-				case 'gemeinsamestudien':
-					return $this->getGemeinsamestudien();
-				default:
-					return show_404();
-			}
-		}
+	/**
+	 * @return void
+	 */
+	public function getOutgoing()
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		// TODO(chris): IMPLEMENT!
+		$this->terminateWithSuccess([]);
+	}
 
-		$count = count($params);
-		if (!$count)
-			return $this->getStudents($method);
+	/**
+	 * @return void
+	 */
+	public function getGemeinsamestudien()
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		// TODO(chris): IMPLEMENT!
+		$this->terminateWithSuccess([]);
+	}
 
-		if ($method == 'uid' && $count == 1)
-			return $this->getStudent($params[0]);
-
-		if ($method == 'prestudent' && $count == 1)
-			return $this->getPrestudent($params[0]);
-
-		if ($method == 'person' && $count == 1)
-			return $this->getPerson($params[0]);
-
-		if (is_numeric($params[0])) {
-			$sem = $params[0];
-			if ($count == 3 && $params[1] == 'grp') {
-				$g = $params[2];
-				$ver = null;
-				$grp = null;
-			} else {
-				$g = null;
-				$ver = $count > 1 ? $params[1] : null;
-				$grp = $count > 2 ? $params[2] : null;
-			}
-			return $this->getStudents($method, $sem, $ver, $grp, $g);
-		} elseif ($params[0] == 'prestudent') {
-			if ($count == 1)
-				return $this->getPrestudents($method);
-			if ($count == 2)
-				return $this->getPrestudents($method, $params[1]);
-			return $this->getPrestudents($method, $params[1], $params[$count-1]);
-		} else {
-			$org = $params[0];
-			if ($count > 1 && $params[1] == 'prestudent') {
-				if ($count == 2)
-					return $this->getPrestudents($method, null, null, $org);
-				if ($count == 3)
-					return $this->getPrestudents($method, $params[2], null, $org);
-				return $this->getPrestudents($method, $params[2], $params[$count-1], $org);
-			}
-			$sem = $count > 1 ? $params[1] : null;
-			if ($count == 4 && $params[2] == 'grp') {
-				$g = $params[3];
-				$ver = null;
-				$grp = null;
-			} else {
-				$g = null;
-				$ver = $count > 2 ? $params[2] : null;
-				$grp = $count > 3 ? $params[3] : null;
-			}
-
-			return $this->getStudents($method, $sem, $ver, $grp, $g, $org);
-		}
+	public function getPrestudents($studiengang_kz,
+		$studiensemester_kurzbz = null, $filter = null
+	)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiengang_kz' => $studiengang_kz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'filter' => $filter
+		));
 		
-		show_404();
+		$this->fetchPrestudents($studiengang_kz, $studiensemester_kurzbz, $filter);
 	}
 
-	/**
-	 * @return void
-	 */
-	protected function getIncoming()
+	public function getPrestudentsOrgform($studiengang_kz, $orgform_kurzbz,
+		$studiensemester_kurzbz = null, $filter = null
+	)
 	{
-		// TODO(chris): IMPLEMENT!
-		$this->terminateWithSuccess([]);
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function getOutgoing()
-	{
-		// TODO(chris): IMPLEMENT!
-		$this->terminateWithSuccess([]);
-	}
-
-	/**
-	 * @return void
-	 */
-	protected function getGemeinsamestudien()
-	{
-		// TODO(chris): IMPLEMENT!
-		$this->terminateWithSuccess([]);
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiengang_kz' => $studiengang_kz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'filter' => $filter,
+			'orgform_kurzbz' => $orgform_kurzbz
+		));
+		
+		$this->fetchPrestudents($studiengang_kz, $studiensemester_kurzbz, $filter, $orgform_kurzbz);
 	}
 
 	/**
@@ -191,7 +160,7 @@ class Students extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	protected function getPrestudents($studiengang_kz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
+	protected function fetchPrestudents($studiengang_kz, $studiensemester_kurzbz = null, $filter = null, $orgform_kurzbz = null)
 	{
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -379,8 +348,73 @@ class Students extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	public function getStudents($studiensemester_kurzbz,
+		$studiengang_kz, $semester = null, $verband = null, $gruppe = null
+	)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $studiengang_kz,
+			'semester' => $semester,
+			'verband' => $verband,
+			'gruppe' => $gruppe
+		));
+		
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, $verband, $gruppe, null, null);
+	}
+
+	public function getStudentsOrgform($studiensemester_kurzbz,
+		$studiengang_kz, $orgform_kurzbz, $semester = null, $verband = null, $gruppe = null
+	)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $studiengang_kz,
+			'orgform_kurzbz' => $orgform_kurzbz,
+			'semester' => $semester,
+			'verband' => $verband,
+			'gruppe' => $gruppe
+		));
+		
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, $verband, $gruppe, null, $orgform_kurzbz);
+	}
+
+	public function getStudentsSpezialgruppe($studiensemester_kurzbz,
+		$studiengang_kz, $semester, $gruppe_kurzbz,
+		$orgform_kurzbz = null)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $studiengang_kz,
+			'semester' => $semester,
+			'gruppe_kurzbz' => $gruppe_kurzbz
+		));
+		
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, null, null, $gruppe_kurzbz, null);
+	}
+
+	public function getStudentsOrgformSpezialgruppe($studiensemester_kurzbz,
+		$orgform_kurzbz, $studiengang_kz, $semester, $gruppe_kurzbz
+	)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'orgform_kurzbz' => $orgform_kurzbz,
+			'studiengang_kz' => $studiengang_kz,
+			'semester' => $semester,
+			'gruppe_kurzbz' => $gruppe_kurzbz
+		));
+		
+		$this->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester, null, null, $gruppe_kurzbz, $orgform_kurzbz);
+	}
+
 	/**
 	 * @param integer		$studiengang_kz
+	 * @param string		$studiensemester_kurzbz
 	 * @param integer		$semester						(optional)
 	 * @param string		$verband						(optional)
 	 * @param integer		$gruppe							(optional)
@@ -389,11 +423,15 @@ class Students extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	protected function getStudents($studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null)
+	protected function fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		/*
 			$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
@@ -478,9 +516,20 @@ class Students extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	protected function getPrestudent($prestudent_id)
+	public function getPrestudent($studiensemester_kurzbz, $prestudent_id)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'prestudent_id' => $prestudent_id,
+		));
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -536,9 +585,20 @@ class Students extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	protected function getStudent($student_uid)
+	public function getStudent($studiensemester_kurzbz, $student_uid)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'student_uid' => $student_uid,
+		));
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
@@ -592,13 +652,25 @@ class Students extends FHCAPI_Controller
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
 	 * @param integer		$person_id
 	 *
 	 * @return void
 	 */
-	protected function getPerson($person_id)
+	public function getPerson($studiensemester_kurzbz, $person_id)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'person_id' => $person_id,
+		));
+
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 

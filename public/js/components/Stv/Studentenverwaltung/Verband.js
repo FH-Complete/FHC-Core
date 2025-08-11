@@ -8,11 +8,22 @@ export default {
 	emits: [
 		'selectVerband'
 	],
+	props: {
+		endpoint: {
+			type: Object,
+			required: true,
+		},
+		preselectedKey: {
+			type: String,
+			default: null
+		}
+	},
 	data() {
 		return {
 			loading: true,
 			nodes: [],
 			selectedKey: [],
+			expandedKeys: {},
 			filters: {}, // TODO(chris): filter only 1st level?
 			favorites: {on: false, list: []}
 		}
@@ -23,6 +34,13 @@ export default {
 				return this.nodes.filter(node => this.favorites.list.includes(node.key));
 			
 			return this.nodes;
+		}
+	},
+	watch: {
+		'preselectedKey': function (newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.setPreselection();
+			}
 		}
 	},
 	methods: {
@@ -37,7 +55,7 @@ export default {
 				return res.pop();
 			return null;
 		},
-		onExpandTreeNode(node) {
+		async onExpandTreeNode(node) {
 			if (!node.children) {
 				if (node.data.link) {
 					let activeEl = null;
@@ -48,8 +66,8 @@ export default {
 					});
 					this.loading = true;
 					
-					this.$api
-						.call(ApiStvVerband.get(node.data.link))
+					return this.$api
+						.call(this.endpoint.get(node.data.link))
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
@@ -61,7 +79,7 @@ export default {
 
 							let treeitem = this.$refs.tree.$el.querySelector('[data-tree-item-key="' + node.key + '"]');
 							treeitem = treeitem.closest('[role="row"]');
-							
+
 							this.$nextTick(() => {
 								if (activeEl == document.activeElement)
 									treeitem.dispatchEvent(new KeyboardEvent('keydown', {
@@ -97,7 +115,7 @@ export default {
 		async filterFav() {
 			this.favorites.on = !this.favorites.on;
 			this.$api
-				.call(ApiStvVerband.favorites.set(
+				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
 				))
 				.then(result => {
@@ -121,9 +139,9 @@ export default {
 			} else {
 				this.favorites.list.push(key.data.link + '');
 			}
-			
+
 			this.$api
-				.call(ApiStvVerband.favorites.set(
+				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
 				))
 				.then(result => {
@@ -154,22 +172,58 @@ export default {
 				let items = e.target.querySelectorAll('[data-link-fav-add][tabindex="-1"]');
 				items.forEach(el => el.tabIndex = 0);
 			}
+		},
+		async setPreselection()
+		{
+			if (!this.preselectedKey)
+				return;
+
+			let rawKey = this.preselectedKey
+
+			if (!rawKey || typeof rawKey !== 'string')
+				return;
+
+			const parts = this.preselectedKey.split('/');
+			let currentKey = parts[0];
+			let currentNode = this.findNodeByKey(currentKey);
+
+			if (!currentNode)
+				return;
+
+			for (let i = 1; i < parts.length; i++)
+			{
+				this.expandedKeys[currentNode.key] = true;
+
+				await this.onExpandTreeNode(currentNode);
+
+				currentKey += '-' + parts[i];
+				currentNode = this.findNodeByKey(currentKey);
+
+				if (!currentNode)
+				{
+					return;
+				}
+			}
+
+			this.selectedKey = {[currentNode.key]: true};
+			this.onSelectTreeNode(currentNode);
 		}
 	},
 	mounted() {
 		this.$api
-			.call(ApiStvVerband.get())
+			.call(this.endpoint.get())
 			.then(result => {
 				this.nodes = result.data.map(el => {
 					el.root = true;
 					return this.mapResultToTreeData(el);
 				});
+				this.setPreselection();
 				this.loading = false;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(ApiStvVerband.favorites.get())
+			.call(this.endpoint.favorites.get())
 			.then(result => {
 				if (result.data) {
 					this.favorites = JSON.parse(result.data);
@@ -185,6 +239,7 @@ export default {
 			:value="filteredNodes"
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
+			v-model:expanded-keys="expandedKeys"
 			v-model:selection-keys="selectedKey"
 			@node-select="onSelectTreeNode"
 			scrollable

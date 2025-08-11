@@ -22,25 +22,34 @@ export default {
 			url: 'api/frontend/v1/stv/grades/list'
 		};
 	},
-	getCertificate(prestudent_id, all) {
-		all = all ? '/all' : '';
+	getCertificate(prestudent_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/grades/getCertificate/' + encodeURIComponent(prestudent_id);
+		if (!!studiensemester_kurzbz) {
+			url = url + '/' + encodeURIComponent(studiensemester_kurzbz);
+		}
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/grades/getCertificate/' + prestudent_id + all
+			url: url
 		};
 	},
-	getTeacherProposal(prestudent_id, all) {
-		all = all ? '/all' : '';
+	getTeacherProposal(prestudent_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/grades/getTeacherProposal/' + encodeURIComponent(prestudent_id);
+		if (!!studiensemester_kurzbz) {
+			url = url + '/' + encodeURIComponent(studiensemester_kurzbz);
+		}
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/grades/getTeacherProposal/' + prestudent_id + all
+			url: url
 		};
 	},
-	getRepeaterGrades(prestudent_id, all) {
-		all = all ? '/all' : '';
+	getRepeaterGrades(prestudent_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/grades/getRepeaterGrades/' + encodeURIComponent(prestudent_id);
+		if (!!studiensemester_kurzbz) {
+			url = url + '/' + encodeURIComponent(studiensemester_kurzbz);
+		}
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/grades/getRepeaterGrades/' + prestudent_id + all
+			url: url
 		};
 	},
 	updateCertificate({lehrveranstaltung_id, student_uid, studiensemester_kurzbz, note, lehrveranstaltung_bezeichnung}) {
@@ -86,11 +95,15 @@ export default {
 			}
 		};
 	},
-	getGradeFromPoints(points, lehrveranstaltung_id) {
+	getGradeFromPoints(points, lehrveranstaltung_id, studiensemester_kurzbz) {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/grades/getGradeFromPoints',
-			params: { points, lehrveranstaltung_id }
+			params: {
+				"points": points,
+				"lehrveranstaltung_id": lehrveranstaltung_id,
+				"studiensemester_kurzbz": studiensemester_kurzbz
+			}
 		};
 	}
 };

@@ -30,8 +30,9 @@ export default {
 			from: 'hasAdminPermission',
 			default: false
 		},
-		defaultSemester: {
-			from: 'defaultSemester',
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	props: {
@@ -107,7 +108,7 @@ export default {
 	methods: {
 		loadPrestudent() {
 			return this.$api
-				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id))
+				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id, this.currentSemester))
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;

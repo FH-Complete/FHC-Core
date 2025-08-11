@@ -29,6 +29,7 @@ class Status extends FHCAPI_Controller
 		//Load Models
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
@@ -188,9 +189,13 @@ class Status extends FHCAPI_Controller
 		$studiensemester_kurzbz = $lastStatusData->studiensemester_kurzbz;
 		if ($status_kurzbz == Prestudentstatus_model::STATUS_ABSOLVENT
 			|| $status_kurzbz == Prestudentstatus_model::STATUS_DIPLOMAND
-		) {
-			$this->load->library('VariableLib', ['uid' => getAuthUID()]);
-			$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		)
+		{
+			$studiensemester_kurzbz = $this->input->post('currentSemester');
+			if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+			{
+				$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+			}
 		}
 
 		$ausbildungssemester = $lastStatusData->ausbildungssemester;
