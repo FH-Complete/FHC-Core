@@ -195,7 +195,11 @@ export default {
 		},
 		studiengangTitel(studiengang) {
 			if (!studiengang) return "";
-			return `${studiengang?.kurzbzlang} (${studiengang?.bezeichnung})`;
+			if(this.isGermanLanguage){
+				return `${studiengang?.kurzbzlang} (${studiengang?.bezeichnung})`;
+			}else{
+				return `${studiengang?.kurzbzlang} (${studiengang?.english})`;
+			}
 		},
 		studiensemesterTitel(studiensemester){
 			if (!studiensemester) return "";
@@ -213,9 +217,12 @@ export default {
 	},
 
 	computed:{
+		isGermanLanguage(){
+			return this.$p.user_language.value == "German"
+		},
 		selectedLehrveranstaltungTitel(){
 			const studiengang = this.studiengaenge.find((studiengang) => studiengang.studiengang_kz == this.selectedStudiengang);
-			return `${this.selectedLehrveranstaltung?.bezeichnung} ${this.selectedLehrveranstaltung?.lehrform_kurzbz} / ${studiengang.kurzbzlang}-${this.selectedSemester} ${this.selectedLehrveranstaltung?.orgform_kurzbz} (${this.selectedStudiensemester})`;
+			return `${this.isGermanLanguage ? this.selectedLehrveranstaltung?.bezeichnung : this.selectedLehrveranstaltung?.bezeichnung_english} ${this.selectedLehrveranstaltung?.lehrform_kurzbz} / ${studiengang.kurzbzlang}-${this.selectedSemester} ${this.selectedLehrveranstaltung?.orgform_kurzbz} (${this.selectedStudiensemester})`;
 		},
 		computedStudienOrdnung(){
 			if(!this.studienOrdnung) return null;
@@ -232,14 +239,14 @@ export default {
 			let result = [];
 			Object.entries(this.computedStudienOrdnung).forEach(([key,value])=>{
 				result.push({
-					bezeichnung: `Studienordnung: ${key}`,
+					bezeichnung: `${this.$p.t('studium', 'studienordnung') }: ${key}`,
 					disabled: true,
 				});
 				value.forEach((studienplan)=>{
 					result.push({
 						studienplan:studienplan,
 						diabled: false,
-						bezeichnung: `${studienplan?.bezeichnung}-${studienplan?.orgform_kurzbz} ( ${studienplan?.orgform_bezeichnung}, ${studienplan?.sprache} )`
+						bezeichnung: `${studienplan?.bezeichnung}-${studienplan?.orgform_kurzbz} ( ${this.isGermanLanguage ? studienplan?.orgform_bezeichnung : studienplan?.orgform_bezeichnung_english}, ${studienplan?.sprache} )`
 							
 					});
 				})
@@ -264,14 +271,14 @@ export default {
 		})
 
 	},
-	template: `
+	template: /*html*/`
 	<div>
-	<h2>Studium</h2>
+	<h2>{{$p.t('studium','studium')}}</h2>
 	<hr>
 	<lv-uebersicht ref="lvUebersicht" :titel="selectedLehrveranstaltungTitel" :event="selectedLehrveranstaltung" :studiensemester="selectedStudiensemester" v-if="selectedLehrveranstaltung">
 		<template #content>
 			<div v-if="Array.isArray(selectedLehrveranstaltung.lektoren) && selectedLehrveranstaltung.lektoren.length>0" class="mb-4">
-				<h4>Lektoren:</h4>
+				<h4>{{$p.t('studium','lektoren')}}:</h4>
 				<a :href="'mailto:'+lektor?.email" class="fhc-link-color mx-2" v-for="lektor in selectedLehrveranstaltung.lektoren">{{lektor.name}}</a>
 			</div>
 			<h4>Menu:</h4>
@@ -279,7 +286,7 @@ export default {
 	</lv-uebersicht>
 	<div class="lvOptions">
 		<div>
-		<h6>Studiensemester:</h6>
+		<h6>{{$p.t('studium','studiensemester')}}:</h6>
 		<div class="input-group">
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
@@ -294,7 +301,7 @@ export default {
 		</div>
 
 		<div>
-		<h6>Studiengang:</h6>
+		<h6>{{$p.t('lehre','studiengang')}}:</h6>
 		<div class="input-group">
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
@@ -309,7 +316,7 @@ export default {
 		</div>
 
 		<div>
-		<h6>Semester:</h6>
+		<h6>{{$p.t('lehre','semester')}}:</h6>
 		<div class="input-group">
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
@@ -324,7 +331,7 @@ export default {
 		</div>
 
 		<div>
-		<h6>Studienordnung:</h6>
+		<h6>{{$p.t('studium','studienordnung')}}:</h6>
 		<div class="input-group">
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
@@ -345,13 +352,13 @@ export default {
 	<template v-for="lehrveranstaltung in lehrveranstaltungen" :key="lehrveranstaltung.lehrveranstaltung_id">
 		<div  class="card" v-if="Array.isArray(lehrveranstaltung.lehrveranstaltungen) && lehrveranstaltung.lehrveranstaltungen.length >0" >
 			<div class="card-header">
-				<h5 class=" card-title">{{lehrveranstaltung.bezeichnung}}</h5>
+				<h5 class=" card-title">{{isGermanLanguage == 'German' ? lehrveranstaltung.bezeichnung : lehrveranstaltung.bezeichnung_english }}</h5>
 				<h6 class=" card-subtitle">{{lehrveranstaltung.lehrform_kurzbz}}</h6>
 			</div>
 			<div class="card-body">
 				<ul class="list-group list-group-flush">
 					<li class="d-flex list-group-item" v-for="lv in lehrveranstaltung.lehrveranstaltungen">
-						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{lv.bezeichnung}}</a>
+						<a class="fhc-link-color d-block me-auto" href="#" @click="openLvUebersicht(lv)">{{isGermanLanguage == 'German' ? lv.bezeichnung : lv.bezeichnung_english}}</a>
 						<p>{{lv.lehrform_kurzbz}}</p>
 					</li>	
 				</ul>

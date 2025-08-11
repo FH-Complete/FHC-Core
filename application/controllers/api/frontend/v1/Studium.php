@@ -63,20 +63,21 @@ class Studium extends FHCAPI_Controller
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
 			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
 			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
-			
-			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
-			$student_studiengang = $studentLehrverband->studiengang_kz;
-			$student_semester = $studentLehrverband->semester;
-			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
-			
-			if(!isset($parameter_studiensemester))
-			$parameter_studiensemester = $student_studiensemester;
-			if(!isset($parameter_studiengang))
-			$parameter_studiengang = $student_studiengang;
-			if(!isset($parameter_semester))
-			$parameter_semester = $student_semester;
-			if(!isset($parameter_studienplan))
-			$parameter_studienplan = $student_studienplan;
+			if($studentLehrverband){
+				$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
+				$student_studiengang = $studentLehrverband->studiengang_kz;
+				$student_semester = $studentLehrverband->semester;
+				$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
+				
+				if(!isset($parameter_studiensemester))
+				$parameter_studiensemester = $student_studiensemester;
+				if(!isset($parameter_studiengang))
+				$parameter_studiengang = $student_studiengang;
+				if(!isset($parameter_semester))
+				$parameter_semester = $student_semester;
+				if(!isset($parameter_studienplan))
+				$parameter_studienplan = $student_studienplan;
+			}
 		}  
 
 		if(isset($parameter_studiensemester)){
@@ -216,6 +217,8 @@ class Studium extends FHCAPI_Controller
 		$studienplaene = array_map(function($studienplan){
 			$orgform = current($this->getDataOrTerminateWithError($this->OrgformModel->loadWhere(["orgform_kurzbz" => $studienplan->orgform_kurzbz])));
 			$studienplan->orgform_bezeichnung = $orgform->bezeichnung;
+			// bezeichnung_mehrsprachig
+			$studienplan->orgform_bezeichnung_english = $orgform->bezeichnung_mehrsprachig[1];
 			return $studienplan;
 		},$studienplaene);
 		return $studienplaene;
