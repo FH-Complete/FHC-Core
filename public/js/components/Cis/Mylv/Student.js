@@ -89,6 +89,12 @@ export default {
 				this.currentSemester = this.nearestSem;
 		});
 	},
+	beforeRouteUpdate(to, from, next){
+		if (to.params.studiensemester && this.studiensemester.filter(s => s.studiensemester_kurzbz == to.params.studiensemester).length && to.params.studiensemester != this.currentSemester)
+			this.currentSemester = to.params.studiensemester;
+		next();
+
+	},
 	template: `
 
 	<h2>{{$p.t('lehre/myLV')}}</h2>
