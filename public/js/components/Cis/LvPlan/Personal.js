@@ -19,7 +19,9 @@ export default {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
 			studiensemester_ende: null,
-			uid: null
+			uid: null,
+			isMitarbeiter: false,
+			isStudent: false
 		};
 	},
 	computed:{
@@ -36,7 +38,15 @@ export default {
 		downloadLinks() {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
 				return false;
-			
+
+			let type = false;
+			type = this.isStudent ? 'student' : type;
+			type = this.isMitarbeiter ? 'lektor' : type;
+			if (false === type)
+			{
+				return;
+			}
+
 			const opts = { zone: this.viewData.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
@@ -47,7 +57,7 @@ export default {
 
 			const download_link = FHC_JS_DATA_STORAGE_OBJECT.app_root
 				+ 'cis/private/lvplan/stpl_kalender.php'
-				+ '?type=student'
+				+ '?type=' + type
 				+ '&pers_uid=' + this.uid
 				+ '&begin=' + start
 				+ '&ende=' + ende;
@@ -96,9 +106,11 @@ export default {
 	},
 	created() {
 		this.$api
-			.call(ApiAuthinfo.getAuthUID())
+			.call(ApiAuthinfo.getAuthInfo())
 			.then(res => {
 				this.uid = res.data.uid;
+				this.isMitarbeiter = res.data.isMitarbeiter;
+				this.isStudent = res.data.isStudent;
 			});
 	},
 	template: /*html*/`
