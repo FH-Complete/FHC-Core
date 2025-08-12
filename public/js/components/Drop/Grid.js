@@ -439,7 +439,7 @@ export default {
 				})
 				this.dragEnd();
 				this.dragCancel();
-			} 
+			}
 			if (!this.active)
 				return this.dragCancel();
 			this.checkPinnedWidgetAnimation();
@@ -454,14 +454,14 @@ export default {
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
-							this.draggedOffset[0] -= x;
+							this.draggedOffset[0] += x;
 							x = 0;
 						} else if (x + this.draggedItem.w > this.cols) {
 							this.draggedOffset[0] += this.cols - this.draggedItem.w - x;
 							x = this.cols - this.draggedItem.w;
 						}
 						if (y < 0) {
-							this.draggedOffset[1] -= y;
+							this.draggedOffset[1] += y;
 							y = 0;
 						}
 						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
@@ -481,6 +481,7 @@ export default {
 			}
 		},
 		dragCancel() {
+			this.removeWidgetClones();
 			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
@@ -492,6 +493,7 @@ export default {
 			
 		},
 		dragEnd() {
+			this.removeWidgetClones();
 			if (this.mode == MODE_IDLE)
 				return;
 			// clean up unused classes
@@ -501,10 +503,7 @@ export default {
 				ele.classList.remove("denied-dragging-animation");
 			})
 			
-			let widgetClones = document.getElementsByClassName("widgetClone");
-			for (let i=0; i <widgetClones.length; i++){ 
-				this.$refs.container.removeChild(widgetClones[i]);
-			}
+			
 			
 			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
 				return this.dragCancel();
@@ -595,6 +594,12 @@ export default {
 				draggedItemNode.classList.add("border-danger");
 			}else{
 				draggedItemNode.classList.remove("border-danger");
+			}
+		},
+		removeWidgetClones(){
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
 			}
 		},
 		mouseDown(){
