@@ -348,7 +348,7 @@ export default {
 	template: `
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow" style="background-color: green !important;">
-			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}} <span style="font-size: 10px;line-height: 1.25;display: inline-block;width: 120px;text-wrap: wrap;text-align: right;">DEMO Datenstand 10.06.2025</span></a>
+			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}} <span style="font-size: 10px;line-height: 1.25;display: inline-block;width: 110px;text-wrap: wrap;text-align: right;">DEMO Datenstand 10.06.2025</span></a>
 			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
 			<core-searchbar
 				:searchoptions="searchbaroptions"
