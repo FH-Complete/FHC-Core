@@ -45,6 +45,13 @@ class Students extends FHCAPI_Controller
 
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+		$this->load->library('PhrasesLib');
+		$this->loadPhrases(
+			array(
+				'lehre'
+			)
+		);
+
 	}
 
 	/**

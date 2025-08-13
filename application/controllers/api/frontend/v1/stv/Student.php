@@ -159,7 +159,7 @@ class Student extends FHCAPI_Controller
 	{
 		$laufendesStudiensemester = '';
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$result = $this->StudiensemesterModel->getNearest();
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		if(hasData($result)) {
 			$laufendesStudiensemester = (getData($result))[0]->studiensemester_kurzbz;
 		}
