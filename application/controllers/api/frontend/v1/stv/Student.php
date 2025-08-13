@@ -276,8 +276,13 @@ class Student extends FHCAPI_Controller
 		$update_person = array();
 		foreach ($array_allowed_props_person as $prop) {
 			$val = $this->input->post($prop);
-			if ($val !== null) {
+			if ($val !== null)
+			{
 				$update_person[$prop] = $val;
+			}
+			if($prop == 'foto' && $val == '')
+			{
+				$update_person[$prop] = null;
 			}
 		}
 
