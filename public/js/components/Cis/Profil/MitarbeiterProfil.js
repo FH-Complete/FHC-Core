@@ -27,13 +27,13 @@ export default {
 		ProfilInformation,
 	},
 
-	inject: ["sortProfilUpdates", "collapseFunction", "language"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
 
 	data() {
 		return {
 			showModal: false,
 			editDataFilter: null,
-
+			preloadedPhrasen:{},
 			// tabulator options
 			funktionen_table_options: {
 				persistenceID: "filterTableMaProfilFunktionen",
@@ -58,21 +58,21 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
+						title: Vue.computed(() => this.preloadedPhrasen.bezeichnungPhrase),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
+						title: Vue.computed(() => this.preloadedPhrasen.organisationseinheitPhrase),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
+						title: Vue.computed(() => this.preloadedPhrasen.gueltigVonPhrase),
 						field: "Gültig_von",
 						headerFilter: true,
 						resizable: true,
@@ -80,7 +80,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
+						title: Vue.computed(() => this.preloadedPhrasen.gueltigBisPhrase),
 						field: "Gültig_bis",
 						headerFilter: true,
 						resizable: true,
@@ -88,7 +88,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
+						title: Vue.computed(() => this.preloadedPhrasen.wochenstundenPhrase),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -121,14 +121,14 @@ export default {
 						visible: true
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
+						title: Vue.computed(() => this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
+						title: Vue.computed(() => this.preloadedPhrasen.inventarnummerPhrase),
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -136,7 +136,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
+						title: Vue.computed(() => this.preloadedPhrasen.ausgabedatumPhrase),
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
@@ -215,8 +215,8 @@ export default {
 	},
 
 	computed: {
-		editable() {
-			return this.data?.editAllowed ?? false;
+		fotoStatus() {
+			return this.data?.fotoStatus ?? null;
 		},
 		getTelefonValue() {
 			if(this.data.standort_telefon?.kontakt) {
@@ -280,6 +280,18 @@ export default {
 	},
 
 	created() {
+		// preload phrasen
+		this.$p.loadCategory(["ui","lehre","global","profil"]).then(() => {
+			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
+			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
+			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
+			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
+			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
+			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
+			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
+			this.preloadedPhrasen.ausgabedatumPhrase = this.$p.t('profil/ausgabedatum');
+			this.preloadedPhrasen.loaded=true;
+		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 
@@ -295,21 +307,21 @@ export default {
 			this.setTableColumnTitles()
 		}
 	},
-	template: /*html*/ ` 
+	template: /*html*/ `
 <div class="container-fluid text-break fhc-form"  >
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
         <div  class="d-md-none col-12 ">
             <!--TODO: uncomment when implemented
                 <div class="row mb-3">
                            <div class="col">
-                           <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>    
+                           <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                            </div>
                          </div>-->
             <!-- Bearbeiten Button -->
-            <div class="row mb-3 ">
+            <div v-if="isEditable" class="row mb-3 ">
                 <div class="col">
-                    <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                    <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">
                             <div class="col-auto">
                                 <i class="fa fa-edit"></i>
@@ -321,7 +333,7 @@ export default {
             </div>
             <div v-if="data.profilUpdates" class="row mb-3">
                 <div class="col">
-                    <!-- MOBILE PROFIL UPDATES -->  
+                    <!-- MOBILE PROFIL UPDATES -->
                     <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates" ></fetch-profil-updates>
                 </div>
             </div>
@@ -331,13 +343,13 @@ export default {
         <div class="col-sm-12 col-md-8 col-xxl-9 ">
             <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
             <!-- INFORMATION CONTENT START -->
-            <!-- ROW WITH THE PROFIL INFORMATION --> 
+            <!-- ROW WITH THE PROFIL INFORMATION -->
             <div class="row mb-4">
                 <div  class="col-lg-12 col-xl-6 ">
                     <div class="row mb-4">
                         <div class="col">
                             <!-- PROFIL INFORMATION -->
-                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
+                            <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <div class="row mb-4">
@@ -408,18 +420,20 @@ export default {
             <div class="row">
                 <div class="col-12 mb-4" >
                     <!-- FUNKTIONEN TABELLE -->
-                    <core-filter-cmpt 
+                    <core-filter-cmpt
+						v-if="preloadedPhrasen.loaded"
                     	@tableBuilt="funktionenTableBuilt"
-						:title="$p.t('person','funktionen')"  
-						ref="funktionenTable" 
-						:tabulator-options="funktionen_table_options"  
-						tableOnly 
+						:title="$p.t('person','funktionen')"
+						ref="funktionenTable"
+						:tabulator-options="funktionen_table_options"
+						tableOnly
 						:sideMenu="false"
                      />
                 </div>
                 <div class="col-12 mb-4" >
                     <!-- BETRIEBSMITTEL TABELLE -->
-                    <core-filter-cmpt 
+                    <core-filter-cmpt
+						v-if="preloadedPhrasen.loaded"
                     	@tableBuilt="betriebsmittelTableBuilt"
 						:title="$p.t('profil','entlehnteBetriebsmittel')"
 						ref="betriebsmittelTable"
@@ -446,7 +460,7 @@ export default {
             <!-- Bearbeiten Button -->
             <div class="row d-none d-md-block ">
                 <div class="col mb-3">
-                    <button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+                    <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">
                             <div class="col-auto">
                                 <i class="fa fa-edit"></i>

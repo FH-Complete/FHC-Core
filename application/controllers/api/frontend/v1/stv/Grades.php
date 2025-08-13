@@ -74,14 +74,15 @@ class Grades extends FHCAPI_Controller
 	 * (Entries in lehre.tbl_zeugnisnote)
 	 *
 	 * @param string				$prestudent_id
-	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 * @param string|null			$studiensemester_kurzbz If studiensemester_kurzbz only this semesters grades will be loaded, otherwise all semesters grades will be loaded.
 	 *
 	 * @return void
 	 */
-	public function getCertificate($prestudent_id, $all = null)
+	public function getCertificate($prestudent_id, $studiensemester_kurzbz = null)
 	{
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$result = $this->StudentModel->loadWhere([
 			'prestudent_id' => $prestudent_id
@@ -91,12 +92,13 @@ class Grades extends FHCAPI_Controller
 		if (!$student)
 			$this->terminateWithSuccess([]);
 		
-		
 		$student_uid = current($student)->student_uid;
 
-		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : null;
+		if ($studiensemester_kurzbz !== null && !$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
-		
 		$result = $this->ZeugnisnoteModel->getZeugnisnoten($student_uid, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
@@ -109,14 +111,15 @@ class Grades extends FHCAPI_Controller
 	 * (Entries in campus.tbl_lvgesamtnote)
 	 *
 	 * @param string				$prestudent_id
-	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 * @param string|null			$studiensemester_kurzbz If studiensemester_kurzbz only this semesters grades will be loaded, otherwise all semesters grades will be loaded.
 	 *
 	 * @return void
 	 */
-	public function getTeacherProposal($prestudent_id, $all = null)
+	public function getTeacherProposal($prestudent_id, $studiensemester_kurzbz = null)
 	{
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$result = $this->StudentModel->loadWhere([
 			'prestudent_id' => $prestudent_id
@@ -129,9 +132,11 @@ class Grades extends FHCAPI_Controller
 		
 		$student_uid = current($student)->student_uid;
 
-		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : null;
+		if ($studiensemester_kurzbz !== null && !$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
-		
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten(null, $student_uid, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
@@ -144,17 +149,20 @@ class Grades extends FHCAPI_Controller
 	 * or as not allowed because of the repeating of a semester.
 	 *
 	 * @param string				$prestudent_id
-	 * @param string|null			$all (optional) If null only the current semesters grades will be loaded, otherwise all semesters grades will be loaded.
+	 * @param string|false			$studiensemester_kurzbz If studiensemester_kurzbz only this semesters grades will be loaded, otherwise all semesters grades will be loaded.
 	 *
 	 * @return void
 	 */
-	public function getRepeaterGrades($prestudent_id, $all = null)
+	public function getRepeaterGrades($prestudent_id, $studiensemester_kurzbz = false)
 	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->load->library('AntragLib');
 
-		$studiensemester_kurzbz = ($all === null) ? $this->variablelib->getVar('semester_aktuell') : false;
+		if ($studiensemester_kurzbz !== false && !$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
-		
 		$result = $this->antraglib->getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz);
 
 		$grades = $this->getDataOrTerminateWithError($result);
@@ -456,13 +464,19 @@ class Grades extends FHCAPI_Controller
 	
 		$this->form_validation->set_rules("lehrveranstaltung_id", $this->p->t('lehre', 'lehrveranstaltung'), "required|integer");
 		$this->form_validation->set_rules("points", $this->p->t("stv", "grades_points"), "required|numeric");
+		$this->form_validation->set_rules("studiensemester_kurzbz", $this->p->t("lehre", "studiensemester"), "required|regex_match[/^[WS]S[0-9]{4}$/]");
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		
-		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
+
+		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 		
 		$result = $this->NotenschluesselaufteilungModel->getNote(
 			$this->input->post('points'),

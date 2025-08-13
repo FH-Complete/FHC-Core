@@ -79,8 +79,9 @@ class BetriebsmittelP extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired')
 		]);
 
-		$this->form_validation->set_rules('kaution', 'Kaution', 'numeric|less_than_equal_to[9999.99]', [
-			'numeric' => $this->p->t('ui', 'error_fieldNotNumeric')
+		$this->form_validation->set_rules('kaution', 'Kaution', 'callback_valid_number|callback_not_less_than_equal', [
+			'valid_number' => $this->p->t('ui', 'error_fieldNoValidNumber'),
+			'not_less_than_equal' => $this->p->t('ui', 'error_fieldLessThan1000'),
 		]);
 
 		$this->form_validation->set_rules('ausgegebenam', 'Ausgegeben am', 'required|is_valid_date', [
@@ -162,6 +163,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 		], [
 			'uid_in_person' => $this->p->t('person', 'error_uidNotInPerson')
 		]);
+
 		$this->validateNewOrUpdate();
 
 		$betriebsmitteltyp = $this->input->post('betriebsmitteltyp');
@@ -171,6 +173,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 		$betriebsmittel_id = $this->input->post('betriebsmittel_id');
 		$anmerkung = $this->input->post('anmerkung');
 		$kaution = $this->input->post('kaution');
+		if($kaution) $kaution = str_replace(',', '.', $kaution);
 		$ausgegebenam = $this->input->post('ausgegebenam');
 		$retouram = $this->input->post('retouram');
 		$uid = $this->input->post('uid');
@@ -254,6 +257,7 @@ class BetriebsmittelP extends FHCAPI_Controller
 		$betriebsmittel_id = $this->input->post('betriebsmittel_id');
 		$anmerkung = $this->input->post('anmerkung');
 		$kaution = $this->input->post('kaution');
+		if($kaution) $kaution = str_replace(',', '.', $kaution);
 		$ausgegebenam = $this->input->post('ausgegebenam');
 		$retouram = $this->input->post('retouram');
 
@@ -391,6 +395,26 @@ class BetriebsmittelP extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
+	}
+
+	public function valid_number($number)
+	{
+		if(is_null($number)) return true;
+		$number = str_replace(',', '.', $number);
+		if (!is_numeric($number))
+		{
+			return false;
+		}
+		return true;
+	}
+
+	public function not_less_than_equal($number)
+	{
+		$number = str_replace(',', '.', $number);
+		if ($number < 1000)
+			return true;
+		return false;
+
 	}
 }
 

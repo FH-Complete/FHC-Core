@@ -83,6 +83,10 @@ class Config extends FHCAPI_Controller
 			'title' => 'Status',
 			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
 		];
+		$result['documents'] = [
+			'title' => $this->p->t('stv', 'tab_documents'),
+			'component' => './Stv/Studentenverwaltung/Details/Dokumente.js'
+		];
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
 			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
@@ -99,6 +103,15 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_resources'),
 			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
+		$result['groups'] = [
+			'title' => $this->p->t('stv', 'tab_groups'),
+			'component' => './Stv/Studentenverwaltung/Details/Gruppen.js'
+		];
+		$result['messages'] = [
+			'title' => $this->p->t('stv', 'tab_messages'),
+			'component' => './Stv/Studentenverwaltung/Details/Messages.js'
+		];
+
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
 			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
@@ -117,6 +130,12 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
 		];
 
+		$result['exemptions'] = [
+			'title' => $this->p->t('lehre', 'anrechnungen'),
+			'component' => './Stv/Studentenverwaltung/Details/Anrechnungen.js',
+			'config' => $config['exemptions']
+		];
+
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
@@ -126,6 +145,34 @@ class Config extends FHCAPI_Controller
 		$result['mobility'] = [
 			'title' => $this->p->t('stv', 'tab_mobility'),
 			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+		];
+
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
+		];
+
+		$result['jointstudies'] = [
+			'title' => $this->p->t('stv', 'tab_jointstudies'),
+			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js'
+		];
+
+		$result['coursedates'] = [
+			'title' => $this->p->t('stv', 'tab_courseDates'),
+			'component' => './Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js'
+		];
+
+		$result['admissionDates'] = [
+			'title' => $this->p->t('stv', 'tab_admissionDates'),
+			'component' => './Stv/Studentenverwaltung/Details/Aufnahmetermine.js'
+		];
+
+		$result['functions'] = [
+			'title' => $this->p->t('stv', 'tab_functions'),
+			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -163,9 +210,16 @@ class Config extends FHCAPI_Controller
 			]
 		];
 		$result['finalexam'] = [
-			'title' =>  $this->p->t('stv', 'tab_finalexam'),
+			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
+		];
+		$result['archive'] = [
+			'title' => $this->p->t('stv', 'tab_archive'),
+			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'config' => [
+				'showEdit' => $this->permissionlib->isBerechtigt('admin')
+			]
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
@@ -303,7 +357,7 @@ class Config extends FHCAPI_Controller
 		$title_eng = $this->p->t("global", "englisch");
 		$title_ff = $this->p->t("stv", "document_certificate");
 		$title_lv = $this->p->t("stv", "document_coursecertificate");
-		
+
 		$link_ff = "documents/export/" .
 			"zertifikat.rdf.php/" .
 			"Zertifikat" .

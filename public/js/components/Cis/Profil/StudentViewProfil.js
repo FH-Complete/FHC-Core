@@ -26,8 +26,8 @@ export default {
 	methods: {},
 
 	computed: {
-		editable() {
-			return this.data?.editAllowed ?? false;
+		fotoStatus() {
+			return this.data?.fotoStatus ?? null;
 		},
 		profilInformation() {
 			if (!this.data) {
@@ -115,7 +115,7 @@ export default {
                 <div  class="col-lg-12 col-xl-6 ">
                     <div class="row mb-4">
                         <div class="col">
-                            <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')" :editable="editable"></profil-information>
+                            <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
