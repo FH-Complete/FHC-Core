@@ -83,5 +83,11 @@ export default {
 			method: 'get',
 			url: 'api/frontend/v1/notiz/notizPerson/isBerechtigt/'
 		};
+	},
+	getCountNotes(person_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/notiz/notizPerson/getCountNotes/' + person_id
+		};
 	}
 };

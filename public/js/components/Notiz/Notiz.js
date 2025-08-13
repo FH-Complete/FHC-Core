@@ -296,6 +296,7 @@ export default {
 				showId: false,
 				showLastupdate: false
 			},
+			newCount: null
 		}
 	},
 	methods: {
@@ -367,6 +368,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
+					this.getCountNotes();
 				});
 		},
 		deleteNotiz(notiz_id) {
@@ -381,6 +383,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
+					this.getCountNotes();
 				});
 		},
 		loadNotiz(notiz_id) {
@@ -424,6 +427,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
+					this.getCountNotes();
 				});
 		},
 		reload() {
@@ -464,7 +468,6 @@ export default {
 				});
 		},
 		initTinyMCE() {
-
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
@@ -503,15 +506,30 @@ export default {
 				this.showVariables[columnToShow] = true;
 			});
 		},
+		getCountNotes(){
+			return this.$api
+				.call(this.endpoint.getCountNotes(this.id))
+				.then(
+					result => {
+						this.newCount = result.data;
+						this.$nextTick(() => {
+							this.$emit('updateCount', this.newCount);
+						});
+					})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	created() {
 		this.initializeShowVariables();
 		this.getUid();
 	},
 	async mounted() {
-		if(this.showTinyMce){
-			this.initTinyMCE();
+		if (this.showTinyMce) {
+			await this.initTinyMCE();
 		}
+		this.$nextTick(() => {
+			this.getCountNotes();
+		});
 	},
 	watch: {
 		//watcher für Tinymce-Textfeld
@@ -548,16 +566,17 @@ export default {
 			this.reload();
 		}
 	},
-	beforeDestroy() {
-		if(this.showTinyMce) {
-			this.editor.destroy();
+	beforeUnmount() {
+		if (this.editor && tinymce.get(this.editor.id)) {
+			tinymce.get(this.editor.id).remove();
+			this.editor = null;
 		}
 	},
 	template: `
 	<div class="core-notiz">
 	
 		<div v-if="notizLayout=='classicFas'">
-		
+
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
