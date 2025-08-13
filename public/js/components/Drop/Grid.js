@@ -434,11 +434,8 @@ export default {
 		},
 		dragOver(evt) {
 			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
-				this.positionUpdates = this.positionUpdates?.filter(item => {
-					return item.widgetid == this.draggedItem.data.widgetid;
-				})
-				this.dragEnd();
 				this.dragCancel();
+				
 			}
 			if (!this.active)
 				return this.dragCancel();
@@ -464,7 +461,7 @@ export default {
 							this.draggedOffset[1] += y;
 							y = 0;
 						}
-						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
+						this.positionUpdates= this.dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
@@ -494,8 +491,11 @@ export default {
 		},
 		dragEnd() {
 			this.removeWidgetClones();
-			if (this.mode == MODE_IDLE)
+			this.toggleDraggedItemOverlay(false);
+			
+			if (this.mode == MODE_IDLE){
 				return;
+			}
 			// clean up unused classes
 			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
 			draggedItemNode.classList.remove("border-danger");
@@ -503,16 +503,19 @@ export default {
 				ele.classList.remove("denied-dragging-animation");
 			})
 			
-			
-			
-			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
-				return this.dragCancel();
+			//if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
+				//return this.dragCancel();
+
 			this.mode = MODE_IDLE;
 			let updated = [];
 			this.convertGridResultToUpdate(this.positionUpdates, updated);
 			updated = this._updateFixedPositions(updated);
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
+
+			this.draggedItem = null;
+			this.draggedNode = null;
+			this.$emit('draggedItem', null);
 		},
 		_updateFixedPositions(updated) {
 			updated.forEach((item, index) => {
@@ -617,7 +620,7 @@ export default {
 		@touchmove="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
-		@drop="dragEnd"
+		@drop="dragEnd($event)"
 		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
@@ -631,7 +634,7 @@ export default {
 				@mouse-up="mouseUp"
 				@start-resize="startResize"
 				@dragging="dragging"
-				@end-drag="dragCancel"
+				@end-drag="dragEnd"
 				@touch-end="dragEnd();mouseUp();"
 				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
