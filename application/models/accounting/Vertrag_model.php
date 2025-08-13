@@ -384,6 +384,60 @@ class Vertrag_model extends DB_Model
 	    }
     }
 
+	public function getVertrag($mitarbeiter_uid, $lehreinheit_id)
+	{
+		$this->addSelect('tbl_lehreinheitmitarbeiter.*, tbl_vertrag.*, status.bezeichnung as vertragsstatus, status.vertragsstatus_kurzbz');
+		$this->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'vertrag_id');
+		$this->addJoin('lehre.tbl_vertragstyp', 'vertragstyp_kurzbz', 'LEFT');
+		$this->addJoin('
+			(
+				SELECT DISTINCT ON(vertrag_id) vertrag_id,
+					bezeichnung, 
+					tbl_vertragsstatus.vertragsstatus_kurzbz 
+				FROM lehre.tbl_vertrag_vertragsstatus 
+					JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz) 
+				ORDER BY vertrag_id, datum DESC
+			) as status', 'status.vertrag_id = lehre.tbl_vertrag.vertrag_id', 'LEFT');
+
+		return $this->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid, 'lehreinheit_id' => $lehreinheit_id));
+	}
+
+	public function cancelVertrag($vertrag_id, $mitarbeiter_uid)
+	{
+		$vertrag = $this->load($vertrag_id);
+
+		if (!hasData($vertrag))
+			return error("Contract not found");
+
+		$vertrag = getData($vertrag)[0];
+
+		$this->_updateVertragRelevant($vertrag->vertrag_id);
+
+		return $this->VertragvertragsstatusModel->insert(array(
+			'vertrag_id' => $vertrag->vertrag_id,
+			'vertragsstatus_kurzbz' => 'storno',
+			'uid' => $mitarbeiter_uid,
+			'datum' => 'NOW()',
+			'insertamum' => 'NOW()',
+			'insertvon' => getAuthUID()
+		));
+	}
+
+	public function deleteVertrag($vertrag_id)
+	{
+		$vertrag = $this->load($vertrag_id);
+
+		if (!hasData($vertrag))
+			return error("Contract not found");
+
+		$vertrag = getData($vertrag)[0];
+
+		$this->_updateVertragRelevant($vertrag->vertrag_id);
+
+		$this->VertragvertragsstatusModel->delete(array('vertrag_id' => $vertrag->vertrag_id));
+		return $this->delete(array('vertrag_id' => $vertrag->vertrag_id));
+	}
+
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
 
@@ -415,4 +469,20 @@ class Vertrag_model extends DB_Model
 
         return $bezeichnung;
     }
+
+	private function _updateVertragRelevant($vertrag_id)
+	{
+		$this->LehreinheitmitarbeiterModel->update(
+			array("vertrag_id" => $vertrag_id),
+			array(
+				'vertrag_id' => null
+			)
+		);
+		$this->ProjektbetreuerModel->update(
+			array("vertrag_id" => $vertrag_id),
+			array(
+				'vertrag_id' => null
+			)
+		);
+	}
 }
