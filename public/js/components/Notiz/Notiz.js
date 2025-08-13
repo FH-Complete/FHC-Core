@@ -517,6 +517,9 @@ export default {
 						});
 					})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		getSuffix() {
+			return '(bhtest)';
 		}
 	},
 	created() {

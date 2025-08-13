@@ -67,9 +67,9 @@ export default {
 		}
 	},
 	methods: {
-		handleTabClick: function(index) {
+		handleTabClick: function (e) {
 			let keys = Object.keys(this.tabs);
-			this.change(keys[index]);
+			this.change(keys[e.index]);
 		},
 		change(key) {
 			this.$emit("change", key)
@@ -108,8 +108,24 @@ export default {
 					title: Vue.computed(() => item.title || key),
 					config: item.config,
 					key,
-					value
+					value,
+					suffixhelper: null
 				};
+
+				const fetchhelper = async function (tab, item) {
+					if (!item.showSuffix)
+						return null;
+
+					const mod = await import(item.suffixhelper);
+					tab.suffixhelper = mod.getSuffix;
+					// TODO call suffixhelper with modelValue - but modelValue not defined in this scope
+					/*
+					tab.suffixhelper(modelValue).then((response) => {
+						tab.value.suffix = response.data;
+					});
+					 */
+				};
+				fetchhelper(tabs[key], item);
 			}
 
 			if (Array.isArray(config))
