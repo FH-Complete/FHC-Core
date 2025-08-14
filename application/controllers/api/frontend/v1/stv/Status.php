@@ -731,15 +731,15 @@ class Status extends FHCAPI_Controller
 					REST_Controller::HTTP_FORBIDDEN
 				);
 
-			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($oldstatus->datum);
+			//TODO(Manu) check this check, meanwhile not active
+/*			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($oldstatus->datum);
 
-			//TODO(Manu) comment out: should not appear during delete (shiva)
 			if (!$this->getDataOrTerminateWithError($result))
 				$this->terminateWithError(
 					$this->p->t('lehre', 'error_dataVorMeldestichtag'),
 					self::ERROR_TYPE_GENERAL,
 					REST_Controller::HTTP_FORBIDDEN
-				);
+				);*/
 		}
 
 		// Start DB transaction
