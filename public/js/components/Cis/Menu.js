@@ -1,7 +1,7 @@
 import CisMenuEntry from "./Menu/Entry.js";
 import FhcSearchbar from "../searchbar/searchbar.js";
-import CisSprachen from "./Sprachen.js";
-
+import CisSprachen from "./Sprachen.js"
+import ThemeSwitch from "./ThemeSwitch.js";
 import ApiCisMenu from '../../api/factory/cis/menu.js';
 
 export default {
@@ -9,6 +9,7 @@ export default {
         CisMenuEntry,
         FhcSearchbar,
 		CisSprachen,
+		ThemeSwitch,
     },
     props: {
 		rootUrl: String,
@@ -26,6 +27,7 @@ export default {
 			url:null,
 			urlMatchRankings:[],
 			navUserDropdown:null,
+			menuOpen:true,
         };
     },
 	provide(){
@@ -36,6 +38,13 @@ export default {
 		}
 	},
 	computed:{
+		menuCollapseAriaLabel(){
+			if(this.menuOpen){
+				return this.$p.t('global', 'collapseMenu');
+			}else{
+				return this.$p.t('global', 'extendMenu');
+			}
+		},
 		highestMatchingUrlCount(){
 			// gets the hightest ranking inside the array
 			let highestMatch = Math.max(...this.urlMatchRankings);
@@ -97,7 +106,7 @@ export default {
 		this.fetchMenu();
 	},
 	mounted(){
-		this.$p.loadCategory(['ui', 'global'])
+		this.$p.loadCategory(['ui', 'global', 'profilUpdate'])
 		this.navUserDropdown = new bootstrap.Collapse(this.$refs.navUserDropdown,{
 			toggle: false
 		});
@@ -106,31 +115,36 @@ export default {
 	<button id="nav-main-btn" class="navbar-toggler rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-	<fhc-searchbar ref="searchbar" id="nav-search" style="background-color:var(--fhc-cis-primary)" class="fhc-searchbar w-100 py-1 py-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
-    <a id="nav-logo" class="d-none d-lg-block" :href="rootUrl">
-        <img :src="logoUrl" alt="Logo">
-    </a>
+	<fhc-searchbar ref="searchbar" id="nav-search" class="fhc-searchbar w-100 py-1 py-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
+    <div id="nav-logo" class="d-none d-lg-block">
+		<div class="d-flex h-100 justify-content-between">
+			<a :href="rootUrl">
+				<img :src="logoUrl" alt="Corporate Identity Logo">
+			</a>
+			<theme-switch></theme-switch>
+		</div>
+    </div>
 	<div id="nav-user">
 		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-			<img :src="avatarUrl" class="bg-dark avatar rounded-circle border border-dark"/>
+			<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
 		</button>
 		<ul ref="navUserDropdown"
 		@[\`shown.bs.collapse\`]="handleShowNavUser"
 		@[\`hide.bs.collapse\`]="handleHideNavUser"
 		id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
-			<li class="btn-level-2"><a class="btn btn-level-2 rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
-			<li class="btn-level-2">
+			<li><a class="fhc-dark-bg btn rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
+			<li >
 				<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
 			</li>
-			<li class="btn-level-2"><hr class="dropdown-divider m-0 "></li>
-			<li><a class="btn btn-level-2 rounded-0 d-block" :href="logoutUrl">Logout</a></li>
+			<li><hr class="dropdown-divider m-0 "></li>
+			<li ><a class="fhc-dark-bg btn rounded-0 d-block" :href="logoutUrl">Logout</a></li>
 		</ul>
 	</div>
-    <nav id="nav-main" class="offcanvas offcanvas-start bg-dark" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
+    <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
-			<div id="nav-main-toggle" class="position-static d-none d-lg-block bg-dark">
-				<button type="button" class="btn bg-dark text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
-					<i class="fa fa-arrow-circle-left"></i>
+			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">
+				<button :aria-label="menuCollapseAriaLabel"  type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
+					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-text"></i>
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">

@@ -5,6 +5,7 @@ import ObjectUtils from "../../helpers/ObjectUtils.js";
 import ApiDashboard from '../../api/factory/cis/dashboard.js';
 
 export default {
+	name: 'Dashboard',
 	components: {
 		DashboardSection,
 		DashboardWidgetPicker
@@ -18,9 +19,8 @@ export default {
 		viewData: {
 			type: Object,
 			required: true,
-			default: () => ({name: '', uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.name && value.uid && value.timezone
 			}
 		}
 	},
@@ -35,6 +35,8 @@ export default {
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
+			widgetsSetup: Vue.computed(() => this.widgets),
+			timezone: Vue.computed(() => this.viewData.timezone)
 		}
 	},
 	computed: {
@@ -70,7 +72,7 @@ export default {
 					funktion_kurzbz: section_name,
 					widgets: [widget]
 				}).then(result => {
-					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
+					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
 					widget.id = newId;
 					this.sections.forEach(section => {
 						if (section.name == section_name) {
@@ -143,16 +145,29 @@ export default {
 		}
 	},
 	created() {
+		this.$p.loadCategory('dashboard');
+		axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {
+			params: {
+				db: this.dashboard
+			}
+		}).then(res => {
+			res.data.retval.forEach(widget => {
+				widget.arguments = JSON.parse(widget.arguments);
+				widget.setup = JSON.parse(widget.setup);
+			});
+			this.widgets = res.data.retval;
+		}).catch(err => console.error('ERROR:', err));
+
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
 		}}).then(res => {
-			for (var name in res.data.retval.widgets) {
+			for (var name in res.data.retval) {
 				let widgets = [];
 				let remove = [];
-				for (var wid in res.data.retval.widgets[name]) {
-					res.data.retval.widgets[name][wid].id = wid;
-					if (res.data.retval.widgets[name][wid].custom || res.data.retval.widgets[name][wid].preset)
-						widgets.push(res.data.retval.widgets[name][wid]);
+				for (var wid in res.data.retval[name].widgets) {
+					res.data.retval[name].widgets[wid].id = wid;
+					if (res.data.retval[name].widgets[wid].custom || res.data.retval[name].widgets[wid].preset)
+						widgets.push(res.data.retval[name].widgets[wid]);
 					else
 						remove.push(wid);
 				}
@@ -162,6 +177,13 @@ export default {
 				});
 				remove.forEach(wid => this.widgetRemove(name, wid));
 			}
+			this.sections = this.sections.sort((section1, section2) => {
+				if(section1.name == 'custom')
+					return 1;
+				if (section2.name == 'custom')
+					return -1;
+				return section2.widgets.length - section1.widgets.length;
+			});
 		}).catch(err => console.error('ERROR:', err));
 	},
 	async beforeMount() {
@@ -174,7 +196,7 @@ export default {
 	<div class="core-dashboard">
 		<h3 v-show="viewDataInternal?.name">
 			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
-			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode"><i class="fa-solid fa-gear"></i></button>
+			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
 		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>

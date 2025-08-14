@@ -22,7 +22,7 @@ import filter from "./filter.js";
 import studstatus from "./studstatus.js";
 import profil from "./profil.js";
 import profilUpdate from "./profilUpdate.js";
-import stundenplan from "./stundenplan.js";
+import lvPlan from "./lvPlan.js";
 import bookmark from "./bookmark.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
@@ -33,10 +33,14 @@ import ort from "./ort.js";
 import cms from "./cms.js";
 import lehre from "./lehre.js";
 import addons from "./addons.js";
+import messages from "./messages.js";
+import vorlagen from "./vorlagen.js";
 import studiengang from "./studiengang.js";
 import menu from "./menu.js";
 import dashboard from "./dashboard.js";
 import authinfo from "./authinfo.js";
+import studium from "./studium.js";
+import language from "./language.js";
 
 export default {
     search,
@@ -47,7 +51,7 @@ export default {
     studstatus,
     profil,
     profilUpdate,
-    stundenplan,
+    lvPlan,
     bookmark,
     stv,
     notiz,
@@ -58,7 +62,12 @@ export default {
     cms,
     lehre,
     addons,
+    messages,
+    vorlagen,
+    addons,
 	studiengang,
 	menu,
 	authinfo,
+	studium,
+    language
 };
