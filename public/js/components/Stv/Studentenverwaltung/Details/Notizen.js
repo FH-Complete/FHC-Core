@@ -16,12 +16,6 @@ export default {
 			countNotiz: ''
 		};
 	},
-	methods: {
-		updateCountNotes(countNew){
-			this.headerSuffix = "(" +  countNew + ")";
-			this.$emit('update:suffix', this.headerSuffix);
-		}
-	},
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
 	
@@ -37,7 +31,7 @@ export default {
 		show-document
 		show-tiny-mce
 		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
-		@updateCount="updateCountNotes"
+		@reload="$emit('update:suffix')"
 		>
 </core-notiz>
 
