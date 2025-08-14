@@ -1,15 +1,9 @@
-import {CoreRESTClient} from '../../../RESTClient.js';
-
-
-import PvTree from "../../../../../index.ci.php/public/js/components/primevue/tree/tree.esm.min.js";
-import PvTreetable from "../../../../../index.ci.php/public/js/components/primevue/treetable/treetable.esm.min.js";
-import PvColumn from "../../../../../index.ci.php/public/js/components/primevue/column/column.esm.min.js";
+import ApiStvVerband from '../../../api/factory/stv/verband.js';
 
 export default {
 	components: {
-		PvTree,
-		PvTreetable,
-		PvColumn
+		PvTreetable: primevue.treetable,
+		PvColumn: primevue.column
 	},
 	emits: [
 		'selectVerband'
@@ -31,14 +25,15 @@ export default {
 			selectedKey: [],
 			expandedKeys: {},
 			filters: {}, // TODO(chris): filter only 1st level?
-			favnodes: [],
 			favorites: {on: false, list: []}
 		}
 	},
 	computed: {
 		filteredNodes() {
-			// TODO(chris): what to display actually?
-			return this.favorites.on ? this.favnodes : this.nodes;
+			if (this.favorites.on)
+				return this.nodes.filter(node => this.favorites.list.includes(node.key));
+			
+			return this.nodes;
 		}
 	},
 	watch: {
@@ -118,69 +113,49 @@ export default {
 			return cp;
 		},
 		async filterFav() {
-			if (!this.favorites.on && !this.favnodes.length && this.favorites.list.length) {
-				this.loading = true;
-				this.favnodes = await this.loadNodes(this.favorites.list);
-			}
 			this.favorites.on = !this.favorites.on;
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				));
-			this.loading = false;
-		},
-		async loadNodes(links) {
-			let sortedInParents = links.reduce((o, link) => {
-				link = link + '';
-				let parent,
-					parts = link.split('/');
-				if (parts.length == 1) {
-					parent = '_';
-				} else {
-					parts.pop();
-					parent = parts.join('/');
-				}
-				if (!o[parent])
-					o[parent] = [link];
-				else
-					o[parent].push(link);
-				return o;
-			}, {});
-			
-			let promises = [];
-			for (let parent in sortedInParents)
-				promises.push(
-					this.$api
-						.call(this.endpoint.get(parent == '_' ? '' : parent))
-						.then(res => res.data)
-						.then(res => res.filter(node => sortedInParents[parent].includes(node.link + '')))
-				);
-			
-			// NOTE(chris): merge the resulting arrays and transform them to an associative one
-			let result = [].concat.apply([], await Promise.all(promises)).reduce((o, node) => {
-				o[node.link + ''] = this.mapResultToTreeData({...node, leaf: true, children: undefined});
-				return o;
-			}, {});
-
-			return links.map(link => result[link]);
+				))
+				.then(result => {
+					if (result.meta?.removed) {
+						this.favorites.list = this.favorites.list
+							.filter(fav => !result.meta.removed.includes(fav));
+						const items = result.meta.removed.map(
+							rem => this.nodes.find(
+								node => node.data.link == rem
+							).label
+						).join(',\n');
+						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
+					}
+				});
 		},
 		async markFav(key) {
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
-				if (this.favnodes.length)
-					this.favnodes = this.favnodes.filter(node => node.data.link != key.data.link);
 				this.favorites.list.splice(index, 1);
 			} else {
-				if (this.favnodes.length || this.favorites.on)
-					this.favnodes.push((await this.loadNodes([key.data.link])).pop());
 				this.favorites.list.push(key.data.link + '');
 			}
 
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				));
+				))
+				.then(result => {
+					if (result.meta?.removed) {
+						this.favorites.list = this.favorites.list
+							.filter(fav => !result.meta.removed.includes(fav));
+						const items = "\n" + result.meta.removed.map(
+							rem => this.nodes.find(
+								node => node.data.link == rem
+							).label
+						).join(",\n");
+						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
+					}
+				});
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -238,7 +213,10 @@ export default {
 		this.$api
 			.call(this.endpoint.get())
 			.then(result => {
-				this.nodes = result.data.map(this.mapResultToTreeData);
+				this.nodes = result.data.map(el => {
+					el.root = true;
+					return this.mapResultToTreeData(el);
+				});
 				this.setPreselection();
 				this.loading = false;
 			})
@@ -248,21 +226,12 @@ export default {
 			.call(this.endpoint.favorites.get())
 			.then(result => {
 				if (result.data) {
-					let f = JSON.parse(result.data);
-					if (f.on) {
-						this.loading = true;
-						this.favorites = f;
-						this.loadNodes(this.favorites.list).then(res => {
-							this.favnodes = res;
-							this.loading = false;
-						});
-					} else
-						this.favorites = f;
+					this.favorites = JSON.parse(result.data);
 				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="overflow-auto" tabindex="-1">
 		<pv-treetable
 			ref="tree"
@@ -278,35 +247,64 @@ export default {
 			@focusin="setFavFocus"
 			@focusout="unsetFavFocus"
 			:filters="filters"
+		>
+			<pv-column
+				field="name"
+				expander
+				class="text-break"
 			>
-			<pv-column field="name" expander>
 				<template #header>
 					<div class="text-right">
 						<div class="p-input-icon-left">
 							<i class="pi pi-search"></i>
-							<input type="text" v-model="filters['global']" class="form-control ps-5" placeholder="Search" />
+							<input
+								type="text"
+								v-model="filters['global']"
+								class="form-control ps-5"
+								placeholder="Search"
+							>
 						</div>
 					</div>
 				</template>
-				<template #body="{node}">
-					<span :data-tree-item-key="node.key" :title="node.data.studiengang_kz">
+				<template #body="{ node }">
+					<span
+						:data-tree-item-key="node.key"
+						:title="node.data.studiengang_kz"
+					>
 						{{node.data.name}}
 					</span>
 				</template>
 			</pv-column>
-			<pv-column field="fav" headerStyle="flex: 0 0 auto" style="flex: 0 0 auto">
+			<pv-column
+				field="fav"
+				class="flex-shrink-0 flex-grow-0"
+				header-class="flex-shrink-0 flex-grow-0"
+			>
 				<template #header>
-					<a href="#" @click.prevent="filterFav"><i :class="favorites.on ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
-				</template>
-				<template #body="{node, column}">
 					<a
+						v-if="favorites.on || favorites.list.length"
 						href="#"
-						@click.prevent="markFav(node)"
-						@keydown.enter.stop.prevent="markFav(node)"
+						@click.prevent="filterFav"
+					>
+						<i
+							:class="favorites.on ? 'fa-solid' : 'fa-regular'"
+							class="fa-star"
+						></i>
+					</a>
+				</template>
+				<template #body="{ node }">
+					<a
+						v-if="node.data.root"
+						href="#"
 						tabindex="-1"
 						data-link-fav-add
-						>
-						<i :class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'" class="fa-star"></i>
+						@click.prevent="markFav(node)"
+						@keydown.enter.stop.prevent="markFav(node)"
+					>
+						<i
+							:class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'"
+							class="fa-star"
+						></i>
 					</a>
 				</template>
 			</pv-column>
