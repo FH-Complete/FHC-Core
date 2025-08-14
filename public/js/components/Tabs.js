@@ -14,7 +14,7 @@ export default {
 	emits: [
 		'update:modelValue',
 		'change',
-		'changed',
+		'changed'
 	],
 	props: {
 		config: {
@@ -109,23 +109,8 @@ export default {
 					config: item.config,
 					key,
 					value,
-					suffixhelper: null
+					suffixhelper: item.suffixhelper ?? null
 				};
-
-				const fetchhelper = async function (tab, item) {
-					if (!item.showSuffix)
-						return null;
-
-					const mod = await import(item.suffixhelper);
-					tab.suffixhelper = mod.getSuffix;
-					// TODO call suffixhelper with modelValue - but modelValue not defined in this scope
-					/*
-					tab.suffixhelper(modelValue).then((response) => {
-						tab.value.suffix = response.data;
-					});
-					 */
-				};
-				fetchhelper(tabs[key], item);
 			}
 
 			if (Array.isArray(config))
@@ -141,14 +126,34 @@ export default {
 			}
 			this.tabs = tabs;
 		},
-		updateSuffix(event) {
-			if (this.currentTab?.value) {
-				this.currentTab.value.suffix = event;
+		updateSuffix() {
+			this.getTabSuffix(this.currentTab);
+		},
+		async getTabSuffix(tab) {
+			if (!tab.value.showSuffix) {
+				return;
 			}
+
+			if (tab.suffixhelper !== null) {
+				const suffixhelper = await import(tab.suffixhelper);
+				const suffix = await suffixhelper.getSuffix(this.$api, this.modelValue);
+				tab.value.suffix = suffix;
+			} else {
+				tab.value.suffix = '';
+			}
+		},
+		getTabSuffixes() {
+			Object.entries(this.tabs).forEach(([key, item]) => this.getTabSuffix(item));
 		}
 	},
 	created() {
 		this.initConfig(this.config);
+	},
+	mounted() {
+		this.getTabSuffixes();
+	},
+	updated() {
+		this.getTabSuffixes();
 	},
 	template: `
 	<template v-if="useprimevue">
@@ -162,7 +167,7 @@ export default {
 			<tabpanel
 				v-for="tab in tabs"
 				:key="tab.key"
-				:header="tab.title + (tab.value.showSuffix && tab.value.suffix ? tab.value.suffix : '')"
+				:header="tab.title + ((tab.value.showSuffix && tab.value.suffix !== '') ? ' ' + tab.value.suffix : '')"
 			>
 				<keep-alive>
 					<component

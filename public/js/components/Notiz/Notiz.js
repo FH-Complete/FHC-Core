@@ -295,8 +295,7 @@ export default {
 				showType_id: false,
 				showId: false,
 				showLastupdate: false
-			},
-			newCount: null
+			}
 		}
 	},
 	methods: {
@@ -368,7 +367,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
-					this.getCountNotes();
 				});
 		},
 		deleteNotiz(notiz_id) {
@@ -383,7 +381,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
-					this.getCountNotes();
 				});
 		},
 		loadNotiz(notiz_id) {
@@ -427,7 +424,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
-					this.getCountNotes();
 				});
 		},
 		reload() {
@@ -505,21 +501,6 @@ export default {
 				const columnToShow = "show" + column.charAt(0).toUpperCase() + column.slice(1);
 				this.showVariables[columnToShow] = true;
 			});
-		},
-		getCountNotes(){
-			return this.$api
-				.call(this.endpoint.getCountNotes(this.id))
-				.then(
-					result => {
-						this.newCount = result.data;
-						this.$nextTick(() => {
-							this.$emit('updateCount', this.newCount);
-						});
-					})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		getSuffix() {
-			return '(bhtest)';
 		}
 	},
 	created() {
@@ -530,9 +511,6 @@ export default {
 		if (this.showTinyMce) {
 			await this.initTinyMCE();
 		}
-		this.$nextTick(() => {
-			this.getCountNotes();
-		});
 	},
 	watch: {
 		//watcher für Tinymce-Textfeld
