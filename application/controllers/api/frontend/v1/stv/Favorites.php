@@ -35,8 +35,6 @@ class Favorites extends FHCAPI_Controller
 
 		// Load models
 		$this->load->model('system/Variable_model', 'VariableModel');
-
-		// TODO(chris): variable table might be to small to store favorites!
 	}
 
 	public function index()
@@ -61,6 +59,17 @@ class Favorites extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$favorites = $this->input->post('favorites');
+
+		$removed = [];
+		while (strlen($favorites) > 64) {
+			$favObj = json_decode($favorites);
+			if (!$favObj->list)
+				break;
+			$removed[] = array_shift($favObj->list);
+			$favorites = json_encode($favObj);
+		}
+		if ($removed)
+			$this->addMeta('removed', $removed);
 
 		$result = $this->VariableModel->setVariable(getAuthUID(), 'stv_favorites', $favorites);
 

@@ -295,7 +295,7 @@ export default {
 				showType_id: false,
 				showId: false,
 				showLastupdate: false
-			},
+			}
 		}
 	},
 	methods: {
@@ -464,7 +464,6 @@ export default {
 				});
 		},
 		initTinyMCE() {
-
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
@@ -502,15 +501,15 @@ export default {
 				const columnToShow = "show" + column.charAt(0).toUpperCase() + column.slice(1);
 				this.showVariables[columnToShow] = true;
 			});
-		},
+		}
 	},
 	created() {
 		this.initializeShowVariables();
 		this.getUid();
 	},
 	async mounted() {
-		if(this.showTinyMce){
-			this.initTinyMCE();
+		if (this.showTinyMce) {
+			await this.initTinyMCE();
 		}
 	},
 	watch: {
@@ -548,16 +547,17 @@ export default {
 			this.reload();
 		}
 	},
-	beforeDestroy() {
-		if(this.showTinyMce) {
-			this.editor.destroy();
+	beforeUnmount() {
+		if (this.editor && tinymce.get(this.editor.id)) {
+			tinymce.get(this.editor.id).remove();
+			this.editor = null;
 		}
 	},
 	template: `
 	<div class="core-notiz">
 	
 		<div v-if="notizLayout=='classicFas'">
-		
+
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
