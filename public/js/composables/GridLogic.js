@@ -23,9 +23,34 @@ class GridLogic {
 		const i = y*this.w + x;
 		return !this.grid[i] && this.grid[i] !== 0;
 	}
+	getMaxY(){
+		return this.data.reduce((acc, item) => { 
+			if (item?.y > acc) {
+				 acc = item.y; 
+			} 
+			return acc; 
+		}, 0);
+	}
+	getFreeSlots() {
+		const freeSlots = [];
+		let biggestY = this.getMaxY();
+		let totalSpaces = this.w * (biggestY+1);
+		for(let i=0; i < totalSpaces; i++){
+			if (!this.grid[i] && this.grid[i] !== 0){
+				this.grid[i] = undefined;
+			}
+		}
+		for(let i =0; i < this.grid.length; i++){
+			if (!this.grid[i] && this.grid[i] !== 0){
+				let x = i % this.w;
+				let y = Math.floor(i / this.w);
+				freeSlots.push({x, y});
+			}
+		}
+		return freeSlots;
+	}
 	add(item, prefer) {
 		let occupiers = this.getItemsInFrame(item.frame);
-
 		if (!occupiers.length) {
 			item.frame.forEach(f => this.grid[f] = item.index);
 			this.data[item.index] = item;
@@ -63,6 +88,7 @@ class GridLogic {
 				});
 				item.frame.forEach(f => this.grid[f] = item.index);
 				this.data[item.index] = item;
+
 				return result;
 			} else {
 				console.error('FATAL', "can't arrange item on grid");
@@ -70,8 +96,11 @@ class GridLogic {
 		}
 	}
 	move(item, x, y) {
+		if (item.data.place[this.w]?.pinned)
+			return [];
 		if (item.x == x && item.y == y)
 			return [];
+		
 		this.remove(item);
 
 		let prefer = undefined;
@@ -87,10 +116,38 @@ class GridLogic {
 				prefer = DIR_RIGHT;
 		}
 
+		const originalFrame = [...item.frame];
+
 		const currItem = {...item};
 		currItem.x = x;
 		currItem.y = y;
 		currItem.frame = this.getItemFrame(currItem);
+		let occupiers = this.getItemsInFrame(currItem.frame);
+		
+		// does not update if the target conatins pinned widgets
+		if (occupiers.some(frame => this.data[frame]?.data.place[this.w]?.pinned)) {
+			return [];
+		}
+		
+		// checks if target contains widget with the same high and width
+		let occupiersData = occupiers.map(occupier => this.data[occupier]);
+		let occupiersFrame = occupiersData.map(occupier => occupier.frame).flat();
+		if (!occupiersFrame.some(frame => !currItem.frame.includes(frame)) && !occupiersFrame.some(frame => originalFrame.includes(frame))){
+			let replaceUpdate = [];
+			let newOccupierFrames = [];
+			for(let f of originalFrame){
+				if(newOccupierFrames.includes(f)){
+					continue;
+				}
+				let occ = occupiersData.shift();
+				if(occ){
+					newOccupierFrames = [...newOccupierFrames, ...this.getItemFrame({ ...occ, ...this.getSingleFramePosition(f) })];
+					replaceUpdate[occ.index] = { index: occ.index, ...this.getSingleFramePosition(f)}
+				}
+			}
+			replaceUpdate[item.index] = { index: item.index, x, y };
+			return replaceUpdate;
+		}
 		
 		const updates = this.add(currItem, prefer);
 		updates[item.index] = {index: item.index, x, y};
@@ -107,7 +164,9 @@ class GridLogic {
 		currItem.frame = this.getItemFrame(currItem);
 		
 		const updates = this.add(currItem);
-		updates[item.index] = {index: item.index, w, h};
+		if(updates)
+			updates[item.index] = {index: item.index, w, h, x:item.x, y:item.y, resize:true};
+
 		return updates;
 	}
 	tryMoving(index, prefer) {
@@ -145,25 +204,27 @@ class GridLogic {
 		let targetframe;
 		switch(dir) {
 			case DIR_UP:
-				if (this.data[index].y - amount < 0)
+				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].y - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-this.w*amount);
 				move.y = -amount;
 				break;
 			case DIR_DOWN:
+				if (this.data[index].data?.place[this.w]?.pinned)
+					return false;
 				if (this.data[index].y + this.data[index].h + amount > this.h)
 					cost += .4;
 				targetframe = this.data[index].frame.map(i => i+this.w*amount);
 				move.y = amount;
 				break;
 			case DIR_LEFT:
-				if (this.data[index].x - amount < 0)
+				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].x - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-amount);
 				move.x = -amount;
 				break;
 			case DIR_RIGHT:
-				if (this.data[index].x + this.data[index].w + amount > this.w)
+				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].x + this.data[index].w + amount > this.w)
 					return false;
 				targetframe = this.data[index].frame.map(i => i+amount);
 				move.x = amount;
@@ -199,6 +260,9 @@ class GridLogic {
 			for (let j = 0; j < item.h; j++)
 				frame.push(i + item.x + (j + item.y) * this.w);
 		return frame;
+	}
+	getSingleFramePosition(frame){
+		return { x: frame % this.w, y: Math.floor(frame / this.w)};
 	}
 	debug() {
 		return this.grid;

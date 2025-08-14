@@ -25,7 +25,7 @@ export default{
 					{title:"Studienplan", field:"bezeichnung"},
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"},
-					{title:"PrestudentId", field:"prestudent_id", visible:false}
+					{title:"Prestudent ID", field:"prestudent_id", visible:false}
 				],
 				rowFormatter: row => {
 					const rowData = row.getData();
@@ -57,6 +57,10 @@ export default{
 
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('lehre', 'studienplan')
+						});
+
+						cm.getColumnByField('prestudent_id').component.updateDefinition({
+							title: this.$p.t('ui', 'prestudent_id')
 						});
 					}
 				}

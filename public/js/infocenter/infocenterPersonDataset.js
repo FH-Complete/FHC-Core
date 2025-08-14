@@ -50,12 +50,21 @@ var InfocenterPersonDataset = {
 			'</select>' +
 			'<select class="form-control auswahlAbsageAbgeschickt" style="width:auto; float:left;">' +
 			'<option value="null" selected="selected"> Bewerbung abgeschickt? </option>' +
+			'<option value="all"> Beide </option>' +
 			'<option value="true"> Ja </option>' +
 			'<option value="false"> Nein </option>' +
 			'</select>' +
 			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
 
+		let rueckstellung = '<br />' +
+			'<select id="rueckstellungtype" class="form-control" style="width:auto; float:left;">' +
+			'<option disabled value="null" selected>' + FHC_PhrasesLib.t('infocenter', 'statusAuswahl') + '</option>' +
+			'</select>' +
+			'<input id="rueckstellungdate" type="text" class="form-control"  style="width:auto; float:left;" placeholder="Parkdatum">' +
+			'<button class="form-control btn btn-default rueckstellBtn" style="width:auto; float:left"> Zurückstellen </button>';
+
 		InfocenterPersonDataset.getAbsageData();
+		Rueckstellung.getStatus()
 
 		var studienSemesterHtml = '<button class="btn btn-default btn-xs decStudiensemester">' +
 			'<i class="fa fa-chevron-left"></i>' +
@@ -98,10 +107,22 @@ var InfocenterPersonDataset = {
 			"<div class='row'>"+
 				"<div class='col-xs-12'>"+auswahlAbsageToggle+"</div>"+
 				"<div class='col-xs-12' id='absagePunkte' style='display:none'>"+auswahlAbsage+"</div>"+
+				"<div class='col-xs-12' id='rueckstellung' style='display:none'>"+rueckstellung+"</div>"+
 			"</div>" +
 			"<div class='h-divider'></div>" +
 			"<hr class='studiensemesterline'>"
 		)
+
+		let rueckstelldate = new Date();
+
+		rueckstelldate.setDate(rueckstelldate.getDate() + 14);
+		$('#rueckstellungdate').attr("value", $.datepicker.formatDate("dd.mm.yy", rueckstelldate));
+
+		$("#rueckstellungdate").datepicker({
+			"dateFormat": "dd.mm.yy",
+			"minDate": 1
+		});
+
 		$("button.incStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(1);
 		});
@@ -123,6 +144,29 @@ var InfocenterPersonDataset = {
 			$(".absageModalForAll").modal("show");
 		});
 
+		$('button.rueckstellBtn').click(function()
+		{
+			let idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
+
+			if(idsel.length <= 0)
+				return FHC_DialogLib.alertInfo("Bitte wählen Sie die Personen aus.");
+
+			let type = $('#rueckstellungtype').val()
+
+			if (type === null)
+				return FHC_DialogLib.alertInfo("Bitte ein Rückstellgrund auswählen.");
+
+			let personen = [];
+
+			for (let i = 0; i < idsel.length; i++)
+			{
+				personen.push($(idsel[i]).val());
+			}
+
+			let date = $("#rueckstellungdate").val();
+			Rueckstellung.setForPersons(personen, type, date)
+		});
+
 		$('#saveAbsageForAll').click(function()
 		{
 			InfocenterPersonDataset.saveAbsageForAll();
@@ -131,6 +175,7 @@ var InfocenterPersonDataset = {
 		$('a.absageToggle').click(function()
 		{
 			$('#absagePunkte').toggle();
+			$('#rueckstellung').toggle();
 		})
 
 		var personcount = 0;
@@ -356,6 +401,11 @@ var InfocenterPersonDataset = {
 									text: value.bezeichnung_mehrsprachig[0]
 							}))
 						})
+
+						$('.auswahlAbsageStg').append($("<option/>", {
+							value: 'all',
+							text: 'Alle'
+						}))
 						$.each(data.studiengaenge, function(key, value){
 							$('.auswahlAbsageStg').append($("<option/>", {
 									value: value.studiengang,
