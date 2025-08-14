@@ -274,8 +274,23 @@ export default {
 		dragging(event){
 			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
-				this.clonedWidget.style.top = `${this.clientY-20}px`;
-				this.clonedWidget.style.left = `${this.clientX-15}px`;
+				
+				const containerRect = this.$refs.container.getBoundingClientRect();
+				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
+				
+				let desiredTop = this.clientY - 20;
+				let desiredLeft = this.clientX - 15;
+				
+				const minTop = 0;
+				const maxTop = containerRect.height - clonedWidgetRect.height;
+				const minLeft = 0;
+				const maxLeft = containerRect.width - clonedWidgetRect.width;
+				
+				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
+				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
+				
+				this.clonedWidget.style.top = `${constrainedTop}px`;
+				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
 		},
 		createNewGrid(items) {
@@ -413,6 +428,7 @@ export default {
 			setTimeout(() => {
 				this.draggedNode = evt.target.closest(".drop-grid-item");
 				//clones the widget for the drag Image
+				
 				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
 
 				clone.style.zIndex = 5;
