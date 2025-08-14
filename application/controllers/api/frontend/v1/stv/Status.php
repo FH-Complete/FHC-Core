@@ -287,11 +287,11 @@ class Status extends FHCAPI_Controller
 		]);
 
 		$this->form_validation->set_rules('_default', '', [
-			['meldestichtag_not_exceeded', function () use ($datum, $isBerechtigtNoStudstatusCheck) {
+			['meldestichtag_not_exceeded', function () use ($datum_string, $isBerechtigtNoStudstatusCheck) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
 
-				$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($datum);
+				$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($datum_string);
 
 				return !$this->getDataOrTerminateWithError($result);
 			}],
@@ -733,6 +733,7 @@ class Status extends FHCAPI_Controller
 
 			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($oldstatus->datum);
 
+			//TODO(Manu) comment out: should not appear during delete (shiva)
 			if (!$this->getDataOrTerminateWithError($result))
 				$this->terminateWithError(
 					$this->p->t('lehre', 'error_dataVorMeldestichtag'),
