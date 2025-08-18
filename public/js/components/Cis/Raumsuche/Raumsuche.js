@@ -13,6 +13,7 @@ export const Raumsuche =  {
 	},
 	data() {
 		return {
+			preloadedPhrasen:null,
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
@@ -52,14 +53,38 @@ export const Raumsuche =  {
 				layout: 'fitColumns',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('rauminfo/raum_kurzbz')), field: 'ort_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('global/nummer')), field: 'nummer', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('global/personen')), field: 'personen', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/rauminfo')),
-						field: 'linkInfo', formatter: this.linkFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('rauminfo/roomReservations')), 
-						field: 'linkRes', formatter: this.linkFormatter, widthGrow: 1}
+					{
+						title: Vue.computed(() => this.preloadedPhrasen.raum_kurzbz), 
+						field: 'ort_kurzbz', 
+						widthGrow: 1
+					},
+					{
+						title: Vue.computed(() => this.preloadedPhrasen.bezeichnung), 
+						field: 'bezeichnung', 
+						widthGrow: 2
+					},
+					{ 
+						title: Vue.computed(() => this.preloadedPhrasen.nummer), 
+						field: 'nummer', 
+						widthGrow: 1
+					},
+					{
+						title: Vue.computed(() => this.preloadedPhrasen.personen), 
+						field: 'personen', 
+						widthGrow: 1
+					},
+					{
+						title: Vue.computed(() => this.preloadedPhrasen.rauminfo),
+						field: 'linkInfo', 
+						formatter: this.linkFormatter, 
+						widthGrow: 1
+					},
+					{
+						title: Vue.computed(() => this.preloadedPhrasen.roomReservations), 
+						field: 'linkRes', 
+						formatter: this.linkFormatter, 
+						widthGrow: 1
+					}
 				],
 				persistence: false,
 			},
@@ -190,8 +215,18 @@ export const Raumsuche =  {
 			return this.$theme.theme_name.value == 'dark';
 		}
 	},
-	created() {
-		
+	async created() {
+		await this.$p.loadCategory(['global', 'rauminfo']).then(()=>{
+			this.preloadedPhrasen = {
+				noDataAvailable : this.$p.t('global/noDataAvailable'),
+				nummer : this.$p.t('global', 'nummer'),
+				personen : this.$p.t('global', 'personen'),
+				raum_kurzbz : this.$p.t('rauminfo', 'raum_kurzbz'),
+				bezeichnung : this.$p.t('global', 'bezeichnung'),
+				rauminfo : this.$p.t('rauminfo', 'rauminfo'),
+				roomReservations : this.$p.t('rauminfo', 'roomReservations')
+			};
+		});
 	},
 	mounted() {
 		this.setupMounted()
@@ -258,6 +293,7 @@ export const Raumsuche =  {
 	
 
      <core-filter-cmpt 
+	 	v-if="preloadedPhrasen"
 		@uuidDefined="handleUuidDefined"
 		:title="''"  
 		ref="raumsucheTable" 
