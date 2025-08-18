@@ -61,11 +61,31 @@ export default {
 		}
 	},
 	methods: {
+		filterEntries(entries) {
+			if (!entries) return entries;
+
+			const filteredEntries = entries.filter((entry)=>{
+				if(entry.aktiv)
+					return true;
+				else 
+					return false;
+			})
+			
+			filteredEntries.forEach((filteredEntry,index) => {
+				if (Array.isArray(filteredEntry?.childs) && filteredEntry?.childs.length > 0) {
+					filteredEntries[index].childs =this.filterEntries(filteredEntry.childs);
+				}	
+				
+			});
+			
+			return filteredEntries;
+		},
 		fetchMenu() {
 			return this.$api
 				.call(ApiCisMenu.getMenu())
 				.then(res => res.data)
 				.then(menu => {
+					console.log(menu,"this is the menu")
 					this.entries = menu;
 				});
 		},
@@ -150,7 +170,7 @@ export default {
 			<div class="offcanvas-body p-0">
 				<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
 					<div>
-						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in filterEntries(entries)" :key="entry.content_id" :entry="entry" />
 					</div>
 				</div>
 			</div>
