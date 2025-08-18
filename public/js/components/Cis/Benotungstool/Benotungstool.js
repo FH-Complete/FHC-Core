@@ -5,11 +5,14 @@ import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
+import MobilityLegende from '../../Mobility/Legende.js';
+
 export const Benotungstool = {
 	name: "Benotungstool",
 	components: {
 		BsModal,
 		CoreFilterCmpt,
+		MobilityLegende,
 		Dropdown: primevue.dropdown,
 		Password: primevue.password,
 		Textarea: primevue.textarea,
@@ -73,7 +76,7 @@ export const Benotungstool = {
 			{
 				event: "cellClick",
 				handler: async (e, cell) => {
-					
+					console.log('cellClick Handler normal')
 				}
 			},
 			{
@@ -430,20 +433,42 @@ export const Benotungstool = {
 					
 					return true;  // student can be selected to add pruefung
 				},
+				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: [
 				{
 					formatter: "rowSelection",
-					titleFormatter: "rowSelection", // Adds "select all" checkbox in header
+					titleFormatter: function (cell, formatterParams, onRendered) {
+						// Create the built-in checkbox
+						let checkbox = document.createElement("input");
+						checkbox.type = "checkbox";
+
+						// Handle "select all" manually
+						checkbox.addEventListener("click", (e) => {
+							e.stopPropagation();
+							console.log("Custom select all handler");
+
+							// Or call your function
+							if (formatterParams && formatterParams.handleClick) {
+								formatterParams.handleClick(e, cell);
+							}
+						});
+
+						return checkbox;
+					},
 					hozAlign: "center",
 					headerSort: false,
+					titleFormatterParams: {
+						handleClick: this.selectAllHandler
+					},
 					cellClick: function (e, cell) {
+						
 						cell.getRow().toggleSelect();
 					},
 					width: 50,
 				},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCount')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
-				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc:"sum"},
+				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter},
@@ -467,7 +492,7 @@ export const Benotungstool = {
 						if(!noteOption) return true
 						
 						// also if student has any pruefungsnote disable noten selection
-						if(this.pruefungen.find(p => p.student_uid == rowData.uid)) return false
+						if(this.pruefungen?.find(p => p.student_uid == rowData.uid)) return false
 						
 						return noteOption.lkt_ueberschreibbar
 					},
@@ -476,7 +501,7 @@ export const Benotungstool = {
 						const value = cell.getValue()
 						const match = this.notenOptions?.find(opt => opt.note == value)
 						const val =  match ? match.bezeichnung : value
-						const p = this.pruefungen.find(p => p.student_uid == rowData.uid)
+						const p = this.pruefungen?.find(p => p.student_uid == rowData.uid)
 						let style = ''
 						
 						if(val === undefined) return ''
@@ -497,16 +522,75 @@ export const Benotungstool = {
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')),
 					field: 'note',
 					formatter: this.notenFormatter,
+					topCalc: this.negativeNotenCalc,
+					topCalcFormatter: this.negativeNotenCalcFormatter,
 					headerFilter: 'list',
 					headerFilterParams: () => {
 						return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 					},
 					headerFilterFunc: this.notenFilterFunc,
 					widthGrow: 1}, 
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), field: 'kommPruef', widthGrow: 1, formatter: this.pruefungFormatter, hozAlign:"center", minWidth: 150}
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), 
+					field: 'kommPruef', widthGrow: 1, 
+					formatter: this.pruefungFormatter, 
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
+					hozAlign:"center", minWidth: 150}
 			],
 				persistence: false,
 			}	
+		},
+		selectAllHandler(e, col) {
+			const table = col.getTable();
+			const rows = table.getRows();
+
+			// custom select all logic
+			const allowed = rows.filter(r => r.getData().selectable);
+			const selected = allowed.every(r => r.isSelected());
+
+			if(selected){
+				allowed.forEach(r => r.deselect());
+			} else {
+				allowed.forEach(r => r.select());
+			}
+
+			// stop Tabulator’s built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		fixTabulatorSelectionFormatter(row) {
+			// if a row is not selectable, remove the checkbox from the dom
+			
+			const data = row.getData()
+			
+			const notSelectable = data.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef') || data.hoechsterAntritt >= 3
+			if(notSelectable) row.getElement().children[0]?.children[0]?.remove()
+		},
+		terminCalcFunc(entries) {
+			return entries.reduce((acc, cur) => {
+				if(cur !== undefined) acc++
+				return acc
+			}, 0)
+		},
+		terminCalcFormatter(cell) {
+			const cellval = cell.getValue()
+			// TODO: phrase
+			return 'Prüflinge: ' + cellval
+		},
+		negativeNotenCalcFormatter(cell) {
+			const cellval = cell.getValue()
+			// TODO: phrase
+			return 'Negativ: ' + cellval
+		},
+		negativeNotenCalc(entries) {
+			return entries.reduce((acc, cur) => {
+				const opt = this.notenOptions.find(opt => opt.note == cur)
+				if(opt && !opt.positiv) acc++
+				return acc
+			}, 0)
+		},
+		sumCalcFunc(entries) {
+			return entries.length	
 		},
 		notenFilterFunc(filterVal, rowVal) {
 			// option of the searchterm
@@ -885,6 +969,15 @@ export const Benotungstool = {
 					else s.teilnote += ('<span style="color: red;">'+g.text +'</span>'+ '<br/>')
 				})
 				
+				Object.defineProperty(s, 'selectable', {
+					get() {
+						const kP = s.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef')
+						return !(kP || s.hoechsterAntritt >= 3)
+					},
+					enumerable: true,
+					configurable: true
+				})
+				
 			})
 
 			this.distinctPruefungsDates.sort((d1, d2) => {
@@ -910,6 +1003,8 @@ export const Benotungstool = {
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
@@ -1338,7 +1433,7 @@ export const Benotungstool = {
 			}	
 		},	
 		getStudentenOptions() {
-			return this.studenten ? this.studenten : []
+			return this.studenten ? this.studenten.filter(s => s.selectable) : []
 		},
 		getKommPruefCount(){
 			let counter = 0
@@ -1548,6 +1643,8 @@ export const Benotungstool = {
 				 </template>
 			</core-filter-cmpt>
 		</div>
+		
+		<MobilityLegende/>
     `,
 };
 

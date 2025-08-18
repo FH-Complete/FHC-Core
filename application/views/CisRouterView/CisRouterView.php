@@ -36,7 +36,8 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/multiselect/multiselect.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js'
+		'public/js/apps/Dashboard/Fhc.js',
+		'vendor/olifolkerd/tabulator5/src/js/modules/ColumnCalcs/ColumnCalcs.js'
 	),
 
 );
