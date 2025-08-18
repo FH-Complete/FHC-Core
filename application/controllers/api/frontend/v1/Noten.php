@@ -128,7 +128,7 @@ class Noten extends FHCAPI_Controller
 		
 		// TODO: event getExterneNoten
 		Events::trigger(
-			'moodleGrades',
+			'getExternalGrades',
 			function & () use (&$grades)
 			{
 				return $grades;

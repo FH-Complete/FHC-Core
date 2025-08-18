@@ -28,9 +28,9 @@ export const Benotungstool = {
 		viewData: {
 			type: Object,
 			required: true,
-			default: () => ({name: '', uid: ''}),
+			default: () => ({uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.uid
 			}
 		}
 	},
@@ -443,7 +443,7 @@ export const Benotungstool = {
 				},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCount')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
-				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1},
+				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc:"sum"},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter},
