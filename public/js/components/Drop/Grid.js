@@ -434,6 +434,8 @@ export default {
 				clone.style.zIndex = 5;
 				clone.classList.add("widgetClone");
 				this.$refs.container.appendChild(clone);
+				const hiddenWidget = clone.querySelector("[style='display: none;']");
+				hiddenWidget.style.removeProperty("display");
 				this.clonedWidget = clone;
 			}, 0);
 
