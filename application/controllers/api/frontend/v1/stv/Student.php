@@ -710,4 +710,9 @@ class Student extends FHCAPI_Controller
 			return true;
 		return !!$value;
 	}
+
+	public function isValidDate($value)
+	{
+		return isValidDate($value);
+	}
 }
