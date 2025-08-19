@@ -135,12 +135,13 @@ export default {
 			<div class="modal-content">
 				<div v-if="$slots.title" class="modal-header" :class="headerClass">
 					<h5 class="modal-title"><slot name="title"/></h5>
-					<slot name="popoutButton"></slot>
-					<button type="button" class="btn ms-2" v-if="allowFullscreenExpand" @click="toggleFullscreen">
-					  <i v-if="!fullscreen" class="fa-solid fa-expand"></i>
-					  <i v-else class="fa-solid fa-compress"></i>
-					</button>
-					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<div class="d-flex align-items-center ms-auto">
+						<button type="button" class="btn ms-auto" style="filter: invert(1)" v-if="allowFullscreenExpand" @click="toggleFullscreen">
+						  <i v-if="!fullscreen" class="fa-solid fa-expand"></i>
+						  <i v-else class="fa-solid fa-compress"></i>
+						</button>
+						<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
 					<slot name="modal-header-content"></slot>
 				</div>
 				<div class="modal-body" :class="bodyClass">
