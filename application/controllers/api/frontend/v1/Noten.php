@@ -46,7 +46,10 @@ class Noten extends FHCAPI_Controller
 		// Loads phrases system
 		$this->loadPhrases([
 			'global',
-			'benotungstool'
+			'person',
+			'benotungstool',
+			'lehre',
+			'ui'
 		]);
 		require_once(FHCPATH . 'include/mobilitaet.class.php');
 		
@@ -70,9 +73,6 @@ class Noten extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 
 		// todo: check various other berechtigungen if its mitarbeiter/lektor/zugeteilterLektor?
-
-		
-
 		// get studenten for lva & sem with zeugnisnote if available
 		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
 		$studentenData = $this->getDataOrTerminateWithError($studenten);
@@ -91,10 +91,6 @@ class Noten extends FHCAPI_Controller
 		
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
-
-//			$student = new student();
-//			$student->load($uid);
-//			$student->result[]= $student;
 			
 			$res = $this->StudentModel->load([$uid]);
 			$this->addMeta($uid, $res);
@@ -279,16 +275,19 @@ class Noten extends FHCAPI_Controller
 		}
 		$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
 		
-		$studlist = "<table border='1'><tr>
-			<td><b>" . $this->p->t('global','personenkz') . "</b></td>
-			<td><b>" . $this->p->t('global','studiengang') . "</b></td>
-			<td><b>" . $this->p->t('global','nachname') . "</b></td>
-			<td><b>" . $this->p->t('global','vorname') . "</b></td>
-		";
-		$studlist .= "<td><b>" . $this->p->t('benotungstool','note') . "</b></td>";
-		$studlist .= "<td><b>" . $this->p->t('benotungstool','bearbeitetvon') . "</b></td></tr>";
+		$studlist = "<table border='1'><tr>";
 
-
+		if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE) {
+			$studlist .= "<td><b>" . $this->p->t('person','personenkennzeichen') . "</b></td>\n
+			<td><b>" . $this->p->t('lehre','studiengang') . "</b></td>\n
+			<td><b>" . $this->p->t('benotungstool','c4nachname') . "</b></td>\n
+			<td><b>" . $this->p->t('benotungstool','c4vorname') . "</b></td>\n";
+			$studlist .= "<td><b>" . $this->p->t('benotungstool','c4grade') . "</b></td>\n";
+			$studlist .= "<td><b>" . $this->p->t('ui','bearbeitetVon') . "</b></td></tr>\n";
+		} else {
+			$studlist .= "<td><b>" . $this->p->t('person','uid') . "</b></td></tr>\n";
+		}
+		
 		foreach($result->noten as $note) {
 
 			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
@@ -318,45 +317,40 @@ class Noten extends FHCAPI_Controller
 							$ret[] = array('uid' => $note->uid, 'freigabedatum' => $lvgesamtnote->freigabedatum, 'benotungsdatum' => $lvgesamtnote->benotungsdatum);
 						}
 					}
-
-					// TODO: find the real config for that
-					// defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
-					if (true)
+					 
+					if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
 					{
 						$studlist .= "<tr><td>" . trim($note->matrikelnr) . "</td>";
-						$studlist .= "<tr><td>" . trim($note->kuerzel) . "</td>";
-						$studlist .= "<tr><td>" . trim($note->nachname) . "</td>";
-						$studlist .= "<tr><td>" . trim($note->vorname) . "</td>";
+						$studlist .= "<td>" . trim($note->kuerzel) . "</td>";
+						$studlist .= "<td>" . trim($note->nachname) . "</td>";
+						$studlist .= "<td>" . trim($note->vorname) . "</td>";
 
 						// TODO: if defined(CIS_PUNKTE) ...
-						
-						// TODO: note bezeichnung
-						$studlist .= "<td>" .$note->note. "</td>";
+						$studlist .= "<td>" .$note->noteBezeichnung. "</td>";
 
 						$studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
-//						if ($lvgesamtnote->updatevon != '')
-//							$studlist .= " (" . $lvgesamtnote->updatevon . ")";
+						if ($lvgesamtnote->updatevon != '')
+							$studlist .= " (" . $lvgesamtnote->updatevon . ")";
 						$studlist .= "</td></tr>";
+					} else {
+						$studlist .= "<tr><td>" . trim($note->uid) . "</td></tr>\n";
 					}
 				}
 			}
 		}
 		$studlist .= "</table>";
 
-		// TODO: find the real config for that
-		// defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
-		if (true)
-		{
-			$this->sendEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
-		}
-		
-		$this->addMeta('studlist', $studlist);
+		// always send the mail, config toggles data contents
+		$this->sendEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
 		
 		$this->terminateWithSuccess($ret);
 	}
 
 	private function sendEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
 	{
+		$emailAdressen[] = getAuthUID() . "@" . DOMAIN; // also send mail to lektors own adress
+		$adressen = implode(";", $emailAdressen);
+		
 		foreach ($emailAdressen as $email)
 		{
 			// Prepare mail content
@@ -364,8 +358,8 @@ class Noten extends FHCAPI_Controller
 				'lektor' => $lektorFullName,
 				'lvaname' => $lvaFullName,
 				'studlist' => $studlist,
-				'notencount' => $notenCount,
-				'adressen' => $emailAdressen
+				'neuenotencount' => $notenCount,
+				'adressen' => $adressen
 			);
 
 			// Send mail

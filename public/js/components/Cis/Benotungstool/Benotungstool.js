@@ -79,7 +79,7 @@ export const Benotungstool = {
 					this.selectedUids = data.filter(d => d.selectable);
 				}
 			},
-		{
+			{
 				event: "cellEdited",
 				handler: async (cell) => {
 					const field = cell.getField()
@@ -101,7 +101,7 @@ export const Benotungstool = {
 						row.reformat() // trigger reformat of arrow
 					}
 				}
-			}
+			},
 			]};
 	},
 	methods: {
@@ -428,6 +428,7 @@ export const Benotungstool = {
 					return true;  // student can be selected to add pruefung
 				},
 				rowFormatter: this.fixTabulatorSelectionFormatter,
+				debugEventsExternal:true,
 				columns: [
 				{
 					formatter: function (cell, formatterParams, onRendered) {
@@ -1481,6 +1482,11 @@ export const Benotungstool = {
 			const cs = this.studenten ? this.studenten.reduce((acc, cur) => {
 				const teilnote = this.teilnoten[cur.uid]
 				if(teilnote.note_lv && (cur.benotungsdatum > cur.freigabedatum)) {
+					
+					// write noteBezeichnung into changed Note so we can send emails in backend easier...
+					const opt = this.notenOptions.find(opt => opt.note == cur.lv_note) 
+					cur.noteBezeichnung = opt.bezeichnung
+					
 					acc.push(cur)
 				}
 				return acc
