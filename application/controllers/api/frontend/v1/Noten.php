@@ -41,17 +41,24 @@ class Noten extends FHCAPI_Controller
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
+		$this->load->library('PhrasesLib');
 		
 		// Loads phrases system
 		$this->loadPhrases([
-			'global'
+			'global',
+			'benotungstool'
 		]);
 		require_once(FHCPATH . 'include/mobilitaet.class.php');
 		
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+
+		$this->load->helper('hlp_sancho_helper');
+
 	}
 	
 	public function getStudentenNoten() {
@@ -125,8 +132,6 @@ class Noten extends FHCAPI_Controller
 		}
 
 		// send $grades reference to moodle addon
-		
-		// TODO: event getExterneNoten
 		Events::trigger(
 			'getExternalGrades',
 			function & () use (&$grades)
@@ -239,34 +244,139 @@ class Noten extends FHCAPI_Controller
 		
 		// TODO: also do something similar when updating/creating a pruefung!
 		
+		$res = $this->LehrveranstaltungModel->load($lv_id);
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError('Keine gültige Lehrveranstaltung gefunden für ID: '.$lv_id);
+		}
+
+		$lv = getData($res)[0];
+
+		$studiengang_kz = $lv->studiengang_kz;
+		$res = $this->StudiengangModel->load($studiengang_kz);
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
+		}
+		$sg = getData($res)[0];
+		$lvaFullName = $sg->kurzbzlang . ' ' . $lv->semester . '.Semester
+					' . $lv->bezeichnung . " - " .$lv->lehrform_kurzbz. " " . $lv->orgform_kurzbz . " - " . $sem_kurzbz;
+		
+		$emails = explode(', ', $sg->email);
+		
+
+		$res = $this->PersonModel->load(getAuthPersonId());
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError('Keine gültige Person gefunden für ID: '.getAuthPersonId());
+		}
+		$pers = getData($res)[0];
+		$lektorFullName = $pers->anrede.' '.$pers->vorname.' '.$pers->nachname; //.' ('.$pers->kurzbz.')';
+
+		
+		$res = $this->StudienplanModel->getStudienplanByLvaSemKurzbz($lv_id, $sem_kurzbz);
+		$data = getData($res);
+		$studienplan_bezeichnung = '';
+		foreach ($data as $row) {
+			$studienplan_bezeichnung .= $row->bezeichnung . ' ';
+		}
+		$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
+		
+		$studlist = "<table border='1'><tr>
+			<td><b>" . $this->p->t('global','personenkz') . "</b></td>
+			<td><b>" . $this->p->t('global','studiengang') . "</b></td>
+			<td><b>" . $this->p->t('global','nachname') . "</b></td>
+			<td><b>" . $this->p->t('global','vorname') . "</b></td>
+		";
+		$studlist .= "<td><b>" . $this->p->t('benotungstool','note') . "</b></td>";
+		$studlist .= "<td><b>" . $this->p->t('benotungstool','bearbeitetvon') . "</b></td></tr>";
+
+
 		foreach($result->noten as $note) {
 
-			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
-			
-			if (!isError($result) && hasData($result))
+			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
+
+			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
-				$lvgesamtnote = getData($result)[0];
+				$lvgesamtnote = getData($resultLVGes)[0];
+				$this->addMeta($note->uid, $lvgesamtnote);
 				if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 				{
-					$lvgesamtnote->freigabedatum = date("Y-m-d H:i:s");
-					$lvgesamtnote->freigabevon_uid = getAuthUID();
-					if($lvgesamtnote->save()) {
-						$ret[] = array('uid' => $note->uid, 'freigabedatum' => $lvgesamtnote->freigabedatum, 'benotungsdatum' => $lvgesamtnote->benotungsdatum);
+
+					$id = $this->LvgesamtnoteModel->update(
+						[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
+						array(
+							'note' => $note->note,
+							'freigabevon_uid' => getAuthUID(),
+							'freigabedatum' => date("Y-m-d H:i:s"),
+							'updateamum' => date("Y-m-d H:i:s"),
+							'updatevon' => getAuthUID()
+						)
+					);
+
+					if($id) {
+						$res = $this->LvgesamtnoteModel->load($id->retval);
+						if(hasData($res)) {
+							$lvgesamtnote = getData($res)[0];
+							$ret[] = array('uid' => $note->uid, 'freigabedatum' => $lvgesamtnote->freigabedatum, 'benotungsdatum' => $lvgesamtnote->benotungsdatum);
+						}
 					}
 
-					if (defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE)
+					// TODO: find the real config for that
+					// defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
+					if (true)
 					{
-						// TODO: infomail an studiengangsassistenz
-						// Enthalten sind MatrikelNr., Vorname, Nachname und Note der neuen oder geänderten Einträge.
-					}
+						$studlist .= "<tr><td>" . trim($note->matrikelnr) . "</td>";
+						$studlist .= "<tr><td>" . trim($note->kuerzel) . "</td>";
+						$studlist .= "<tr><td>" . trim($note->nachname) . "</td>";
+						$studlist .= "<tr><td>" . trim($note->vorname) . "</td>";
 
+						// TODO: if defined(CIS_PUNKTE) ...
+						
+						// TODO: note bezeichnung
+						$studlist .= "<td>" .$note->note. "</td>";
+
+						$studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
+//						if ($lvgesamtnote->updatevon != '')
+//							$studlist .= " (" . $lvgesamtnote->updatevon . ")";
+						$studlist .= "</td></tr>";
+					}
 				}
 			}
+		}
+		$studlist .= "</table>";
 
+		// TODO: find the real config for that
+		// defined('CIS_GESAMTNOTE_FREIGABEMAIL_NOTE') && CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
+		if (true)
+		{
+			$this->sendEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
 		}
 		
+		$this->addMeta('studlist', $studlist);
 		
 		$this->terminateWithSuccess($ret);
+	}
+
+	private function sendEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
+	{
+		foreach ($emailAdressen as $email)
+		{
+			// Prepare mail content
+			$body_fields = array(
+				'lektor' => $lektorFullName,
+				'lvaname' => $lvaFullName,
+				'studlist' => $studlist,
+				'notencount' => $notenCount,
+				'adressen' => $emailAdressen
+			);
+
+			// Send mail
+			sendSanchoMail(
+				'Notenfreigabe',
+				$body_fields,
+				$email,
+				$betreff
+			);
+		}
+
 	}
 
 	public function getNotenvorschlagStudent() {

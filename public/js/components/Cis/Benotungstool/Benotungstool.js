@@ -74,15 +74,9 @@ export const Benotungstool = {
 				}
 			},
 			{
-				event: "cellClick",
-				handler: async (e, cell) => {
-					console.log('cellClick Handler normal')
-				}
-			},
-			{
 				event: "rowSelectionChanged",
 				handler: async (data, rows) => {
-					this.selectedUids = data;
+					this.selectedUids = data.filter(d => d.selectable);
 				}
 			},
 		{
@@ -436,18 +430,33 @@ export const Benotungstool = {
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: [
 				{
-					formatter: "rowSelection",
+					formatter: function (cell, formatterParams, onRendered) {
+						// create the built-in checkbox
+						let checkbox = document.createElement("input");
+						checkbox.type = "checkbox";
+
+						// Handle select manually
+						checkbox.addEventListener("click", (e) => {
+							e.stopPropagation();
+
+							// call our function
+							if (formatterParams && formatterParams.handleClick) {
+								formatterParams.handleClick(e, cell);
+							}
+						});
+
+						return checkbox;
+					},
 					titleFormatter: function (cell, formatterParams, onRendered) {
-						// Create the built-in checkbox
+						// create the built-in checkbox
 						let checkbox = document.createElement("input");
 						checkbox.type = "checkbox";
 
 						// Handle "select all" manually
 						checkbox.addEventListener("click", (e) => {
 							e.stopPropagation();
-							console.log("Custom select all handler");
 
-							// Or call your function
+							// call our function
 							if (formatterParams && formatterParams.handleClick) {
 								formatterParams.handleClick(e, cell);
 							}
@@ -457,12 +466,11 @@ export const Benotungstool = {
 					},
 					hozAlign: "center",
 					headerSort: false,
+					formatterParams: {
+						handleClick: this.selectHandler
+					},
 					titleFormatterParams: {
 						handleClick: this.selectAllHandler
-					},
-					cellClick: function (e, cell) {
-						
-						cell.getRow().toggleSelect();
 					},
 					width: 50,
 				},
@@ -540,8 +548,21 @@ export const Benotungstool = {
 				persistence: false,
 			}	
 		},
-		selectAllHandler(e, col) {
-			const table = col.getTable();
+		selectHandler(e, cell) {
+			const row = cell.getRow();
+
+			if(row.isSelected()){
+				row.deselect();
+			} else {
+				row.select();
+			}
+
+			// stop Tabulator’s built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		selectAllHandler(e, cell) {
+			const table = cell.getTable();
 			const rows = table.getRows();
 
 			// custom select all logic
@@ -564,7 +585,9 @@ export const Benotungstool = {
 			const data = row.getData()
 			
 			const notSelectable = data.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef') || data.hoechsterAntritt >= 3
-			if(notSelectable) row.getElement().children[0]?.children[0]?.remove()
+			if(notSelectable) {
+				row.getElement().children[0]?.children[0]?.remove()
+			}
 		},
 		terminCalcFunc(entries) {
 			return entries.reduce((acc, cur) => {
@@ -1402,8 +1425,12 @@ export const Benotungstool = {
 				const found = newVal.find(stud => stud.uid == rowData.uid)
 				if (found) {
 					row.select(); // ensure row is selected
+					const cb = row.getElement().children[0]?.children[0]
+					if(cb) cb.checked = true
 				} else {
 					row.deselect(); // ensure row is deselected
+					const cb = row.getElement().children[0]?.children[0]
+					if(cb) cb.checked = false
 				}
 			});
 		},
