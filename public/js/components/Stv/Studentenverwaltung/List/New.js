@@ -193,7 +193,7 @@ export default {
 
 			// TODO(chris): move to fhcapi.factory
 			this.$refs.form
-				.send('api/frontend/v1/stv/student/add', data)
+				.post('api/frontend/v1/stv/student/add', data)
 				.then(result => {
 					this.$fhcAlert.alertSuccess('Gespeichert');
 					this.$refs.modal.hide();
