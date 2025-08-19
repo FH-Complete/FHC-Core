@@ -57,6 +57,7 @@ $this->phrasen['pruefung/listeOhneNamenDrucken'] = 'Liste ohne Namen drucken';
 $this->phrasen['pruefung/pruefungsraum'] = 'Prüfungsraum: ';
 $this->phrasen['pruefung/pruefungsort'] = 'Prüfungsort ';
 $this->phrasen['pruefung/imBuero'] = ' im Büro';
+$this->phrasen['pruefung/andererRaum'] = 'anderer Raum';
 $this->phrasen['pruefung/raum'] = ' Raum';
 $this->phrasen['pruefung/raumSpeichern'] = ' Raum speichern';
 $this->phrasen['pruefung/reihunghErfolgreichGeaendert'] = 'Reihung erfolgreich geändert.';
@@ -95,6 +96,7 @@ $this->phrasen['pruefung/lvVonStudiengang'] = 'Lehrveranstaltungen von Studienga
 $this->phrasen['pruefung/lvAlle'] = 'Alle Lehrveranstaltungen';
 $this->phrasen['pruefung/anmeldungSpeichern'] = 'Anmeldung speichern';
 $this->phrasen['pruefung/studienverpflichtung'] = 'Studienverpflichtung';
+$this->phrasen['pruefung/ects'] = 'ECTS';
 
 // liste
 $this->phrasen['pruefung/anmeldungsliste'] = 'Anmeldungsliste';

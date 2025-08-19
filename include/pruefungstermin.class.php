@@ -37,6 +37,7 @@ class pruefungstermin extends basis_db{
     public $anmeldung_von;	    //date
     public $anmeldung_bis;	    //date
     public $ort_kurzbz;		    //varchar(16)
+    public $anderer_raum;		    //text
     public $sammelklausur;		//boolean
     
     /**
@@ -93,6 +94,7 @@ class pruefungstermin extends basis_db{
 		$this->anmeldung_von= $row->anmeldung_von;
                 $this->anmeldung_bis = $row->anmeldung_bis;
 		$this->ort_kurzbz = $row->ort_kurzbz;
+		$this->anderer_raum = $row->anderer_raum;
 		$this->sammelklausur = $row->sammelklausur;
             }
             return true;
@@ -179,7 +181,8 @@ class pruefungstermin extends basis_db{
 		    . 'teilnehmer_min='.$this->db_add_param($this->teilnehmer_min).', '
 		    . 'anmeldung_von='.$this->db_add_param($this->anmeldung_von).', '
 		    . 'anmeldung_bis='.$this->db_add_param($this->anmeldung_bis).', '
-		    . 'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).' '
+		    . 'ort_kurzbz='.$this->db_add_param($this->ort_kurzbz).', '
+		    . 'anderer_raum='.$this->db_add_param($this->anderer_raum).' '
 		    . 'WHERE pruefungstermin_id='.$this->db_add_param($this->pruefungstermin_id).';';
 	}
 	
@@ -228,6 +231,7 @@ class pruefungstermin extends basis_db{
 		$obj->anmeldung_von= $row->anmeldung_von;
                 $obj->anmeldung_bis = $row->anmeldung_bis;
 		$obj->ort_kurzbz = $row->ort_kurzbz;
+		$obj->anderer_raum = $row->anderer_raum;
 		$obj->sammelklausur = $row->sammelklausur;
 		array_push($this->result, $obj);
 	    }

@@ -57,6 +57,7 @@ $this->phrasen['pruefung/listeOhneNamenDrucken'] = 'Liste ohne Namen drucken';
 $this->phrasen['pruefung/pruefungsraum'] = 'Prüfungsraum: ';
 $this->phrasen['pruefung/pruefungsort'] = 'Prüfungsort ';
 $this->phrasen['pruefung/imBuero'] = ' im Büro';
+$this->phrasen['pruefung/andererRaum'] = 'other Room';
 $this->phrasen['pruefung/raum'] = ' Raum';
 $this->phrasen['pruefung/raumSpeichern'] = ' Raum speichern';
 $this->phrasen['pruefung/reihunghErfolgreichGeaendert'] = 'Reihung erfolgreich geändert.';

@@ -108,7 +108,7 @@ switch($method)
 		break;
 	case 'getPruefungenStudiengang':
 		$studiensemester = filter_input(INPUT_POST,"studiensemester");
-		$data = getPruefungenStudiengang($uid, $studiensemester);
+		$data = getPruefungenStudiengangBySemester($studiensemester);
 		break;
 	case 'saveKommentar':
 		$data = saveKommentar();
@@ -120,7 +120,8 @@ switch($method)
 	case 'saveRaum':
 		$terminId = $_REQUEST["terminId"];
 		$ort_kurzbz = $_REQUEST["ort_kurzbz"];
-		$data = saveRaum($terminId, $ort_kurzbz, $uid);
+		$anderer_raum = $_REQUEST["anderer_raum"];
+		$data = saveRaum($terminId, $ort_kurzbz, $uid, $anderer_raum);
 		break;
 	case 'getLvKompatibel':
 		$lvid = filter_input(INPUT_POST, "lehrveranstaltung_id");
@@ -397,6 +398,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$lv_besucht = false;
 	$studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
 	$studiengang_kz = filter_input(INPUT_POST, "studiengang_kz");
+	$ects = filter_input(INPUT_POST, "ects");
 
 	//Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
 	$maxAnzahlVersuche = 0;
@@ -731,6 +733,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 					else
 						$anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
 
+					if (defined('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE') && (CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE === true))
+					{
+						$anmeldung->ects = $ects;
+					}
 					if($anmeldung->save(true))
 					{
 						$pruefung = new pruefungCis($termin->pruefung_id);
@@ -1166,6 +1172,53 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
 	return $data;
 }
 
+function getPruefungenStudiengangBySemester($aktStudiensemester)
+{
+	$result = array();
+	$pruefungen = new pruefungCis();
+	$pruefungen->getPruefungByStudiensemester($aktStudiensemester);
+
+	if((!empty($pruefungen->lehrveranstaltungen)))
+	{
+		$lehrveranstaltungen = [];
+		foreach ($pruefungen->lehrveranstaltungen as $prf)
+		{
+			$pruefung = new pruefungCis();
+			$pruefung->load($prf->pruefung_id);
+
+			if ($pruefung->storniert)
+				continue;
+
+			$pruefung->getTermineByPruefung();
+
+			$lvid = $prf->lehrveranstaltung_id;
+
+			if (!isset($lehrveranstaltungen[$lvid]))
+			{
+				$lv = new stdClass();
+				$lehrveranstaltung = new lehrveranstaltung();
+				$lehrveranstaltung->load($lvid);
+
+				$studiengang = new studiengang();
+				$studiengang->load($lehrveranstaltung->studiengang_kz);
+
+				$lv->bezeichnung = $lehrveranstaltung->bezeichnung;
+				$lv->lehrveranstaltung_id = $lvid;
+				$lv->studiengang = $studiengang->kuerzel;
+				$lv->pruefung = [];
+				$lehrveranstaltungen[$lvid] = $lv;
+			}
+
+			$lehrveranstaltungen[$lvid]->pruefung[] = $pruefung;
+		}
+		$result = array_values($lehrveranstaltungen);
+	}
+	$data['result']=$result;
+	$data['error']='false';
+	$data['errormsg']='';
+	return $data;
+}
+
 /**
  *
  * @return typespeichert ein Kommentar zu einer Prüfungsanmeldung
@@ -1246,7 +1299,7 @@ function compareRaeume($a, $b)
 	return strcmp($a->ort_kurzbz, $b->ort_kurzbz);
 }
 
-function saveRaum($terminId, $ort_kurzbz, $uid)
+function saveRaum($terminId, $ort_kurzbz, $uid, $anderer_raum = '')
 {
 	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
 	$pruefungstermin = new pruefungstermin($terminId);
@@ -1265,7 +1318,24 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	{
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
-	if($ort_kurzbz === "buero")
+
+	if ($ort_kurzbz === "" && $anderer_raum !== "")
+	{
+		$pruefungstermin->anderer_raum = $anderer_raum;
+
+		if($pruefungstermin->save(false))
+		{
+			$data['result']="reserviert";
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$pruefungstermin->errormsg;
+		}
+	}
+	else if($ort_kurzbz === "buero")
 	{
 		$pruefungstermin->ort_kurzbz = $mitarbeiter->ort_kurzbz;
 		if($pruefungstermin->save(false))

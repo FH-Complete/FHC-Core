@@ -95,7 +95,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		#prfWrapper {
 		position: absolute;
 		height: 70%;
-		width: 300px;
+		width: 40%;
 		top: 180px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
@@ -117,9 +117,9 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		#anmWrapper {
 		position: absolute;
 		/*top: 45px;*/
-		left: 350px;
+		left: 45%;
 		top: 180px;
-		width: 500px;
+		width: 40%;
 		height: 70%;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
@@ -228,7 +228,6 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 	<script>
 		$(document).ready(function()
 		{
-			loadStudiengaenge();
 			$("#filter_studiensemester").css("visibility","visible");
 
 			$("#raumDialog").dialog({
@@ -236,17 +235,36 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 				autoOpen: false,
 				width: "400px"
 			});
+
+			$("#kommentarDialog").dialog({
+				modal: true,
+				autoOpen: false,
+				width: "400px",
+				buttons: {
+					Ok: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+
+			$("#table4").tablesorter(
+				{
+
+					widgets: ["zebra"],
+					headers: {
+						0: { sorter: false },
+						3: { sorter: 'shortDate',
+							dateFormat: 'ddmmyyyy' },
+						4: { sorter: 'time' },
+						5: { sorter: 'time' }
+					}
+				});
+
 		});
 	</script>
 	<h1><?php echo $p->t('pruefung/anmeldungenVerwalten'); ?></h1>
 	<div id='stgWrapper'>
-		<div id='studiengaenge'>
-		<div>
-			<h2><?php echo $p->t('global/studiengang'); ?></h2>
-			<div id='stgListe'>
 
-			</div>
-		</div>
 		<div>
 			<h2><?php echo $p->t('global/studiensemester'); ?></h2>
 			<?php
@@ -255,7 +273,6 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 			$studiensemester->getPlusMinus(null, 5);
 			foreach($studiensemester->studiensemester as $sem)
 			{
-				/*@var $sem studiensemester */
 				if ($aktuellesSemester == $sem->studiensemester_kurzbz)
 				{
 				echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
@@ -273,9 +290,20 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 	<div id='prfWrapper'>
 		<div id='pruefungen'>
 		<h2><?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?></h2>
-		<ul id="pruefungenListe">
-
-		</ul>
+		<table id="table4" class="tablesorter" style="display:none">
+			<thead>
+				<tr>
+					<th></th>
+					<th><?php echo $p->t('global/studiengang'); ?></th>
+					<th><?php echo $p->t('global/lehrveranstaltung'); ?></th>
+					<th><?php echo $p->t('global/datum'); ?></th>
+					<th><?php echo $p->t('global/von'); ?></th>
+					<th><?php echo $p->t('global/bis'); ?></th>
+					<th><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?></th>
+				</tr>
+			</thead>
+			<tbody id="pruefungenListe"></tbody>
+		</table>
 		</div>
 	</div>
 	<div id='anmWrapper'>
@@ -310,6 +338,9 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 
 			</div>
 		</div>
+		</div>
+		<div id="kommentarDialog" title="<?php echo $p->t('pruefung/anmerkungDesStudenten'); ?>" style="display:none;">
+			<div id="kommentarimDialog"></div>
 		</div>
 	</div>
 
