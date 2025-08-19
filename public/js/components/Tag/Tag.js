@@ -22,11 +22,15 @@ export default {
 		savepoint: {},
 		values: {
 			type: Array,
-			required: true
+			required: false,
 		},
 		confirmLimit: {
 			type: Number,
 			default: 20
+		},
+		readonly: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -55,7 +59,7 @@ export default {
 	mounted() {},
 	methods: {
 		init() {
-			if (!this.endpoint)
+			if (!this.endpoint || this.readonly)
 				return;
 			this.endpoint.getTags()
 				.then(response => response.data)
@@ -201,12 +205,12 @@ export default {
 	},
 	template: `
 		<div class="plus_button_container" @mouseleave="hideList">
-			<span :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
-			<button @mouseover="showList = true" 
-					:disabled="!values || values.length === 0"
-					class="btn btn-sm">
-				<i class="fa-solid fa-tag fa-xl"></i>
-			</button>
+			<span  v-if="!readonly" :title="values.length === 0 ? 'Bitte Zeilen markieren' : ''">
+				<button @mouseover="showList = true" 
+						:disabled="!values || values.length === 0"
+						class="btn btn-sm">
+					<i class="fa-solid fa-tag fa-xl"></i>
+				</button>
 			</span>
 			<ul v-if="showList" class="dropdown_list">
 				<li v-for="(item, index) in tags" :key="index" @click="openModal(item)" :title="item.bezeichnung">
@@ -230,6 +234,7 @@ export default {
 						v-model="tagData.notiz"
 						type="textarea"
 						field="notiz"
+						:readonly="readonly"
 						placeholder="Notiz..."
 					></form-input>
 					<div class="modificationdate">
@@ -243,7 +248,7 @@ export default {
 					</div>
 				</div>
 			</template>
-			<template #footer>
+			<template #footer v-if="!readonly">
 				<div class="d-flex justify-content-between w-100">
 					<div>
 						<button 
