@@ -11,6 +11,16 @@ export default  {
             required:true,
             default:null,
         },
+		studiensemester: {
+			type: String,
+			required: false,
+			default: null,
+		},
+		titel: {
+			type: String,
+			required: false,
+			default: null,
+		},
 		// prop used to preselect a menu item and skip the grid overview
 		preselectedMenu: {
 			type: Object,
@@ -23,7 +33,8 @@ export default  {
             result: false,
             menu: [],
 			isMenuSelected:false,
-            
+			hasLvPlanEintraege: true,
+			lvEvaluierungMessage: "",
         }
     },
     mixins:[BsModal],
@@ -31,6 +42,7 @@ export default  {
         BsModal,
 		LvMenu,
     },
+	inject: ["studium_studiensemester"],
     methods:{
         
         hiddenModal: function(){
@@ -39,7 +51,7 @@ export default  {
         showModal: function(){
 			if (!this.preselectedMenu) {
                 this.$api
-                    .call(ApiAddons.getLvMenu(this.event.lehrveranstaltung_id, this.event.studiensemester_kurzbz))
+					.call(ApiAddons.getLvMenu(this.event.lehrveranstaltung_id, (this.studiensemester ?? this.event.studiensemester_kurzbz)))
                     .then(res => {
     					if (res.data) {
     						this.menu = res.data;
@@ -48,20 +60,54 @@ export default  {
 			} else {
 				this.isMenuSelected = true;
 			}
+
+			// check lv evaluierung info
+			if (this.studium_studiensemester) {
+				this.$fhcApi.factory.studium.getLvEvaluierungInfo(this.studium_studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+					.then(data => data.data)
+					.then(res => {
+						this.lvEvaluierungMessage = res.message;
+					})
+			}
+
+			// check if the lv has lvplan entries for this studiensemester
+			if (this.studiensemester && this.event) {
+				return this.$fhcApi.factory.studium.getLvPlanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+					.then(data => data.data)
+					.then(res => {
+						if (Array.isArray(res) && res.length > 0) {
+							this.hasLvPlanEintraege = true;
+						} else {
+							this.hasLvPlanEintraege = false;
+						}
+					});
+			}
+			
         },
     },
-    mounted(){
+	mounted(){
         this.modal = this.$refs.modalContainer;
     },
+	beforeUnmount(){
+		this.$refs.modalContainer.hide();
+	},
     template:/*html*/`
     <bs-modal :bodyClass="isMenuSelected ? '' : 'px-4 py-5'" @showBsModal="showModal" @hiddenBsModal="hiddenModal" ref="modalContainer" :dialogClass="{'modal-lg': !isMenuSelected, 'modal-fullscreen':isMenuSelected}">
-        <template #title>
-            <span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
-            <span v-else>Lehrveranstaltungs Übersicht</span>
+
+		<template #title>
+            <template v-if="titel">
+				<span>{{titel}}</span>
+			</template>
+			<template v-else>
+				<span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
+				<span v-else>Lehrveranstaltungs Übersicht</span>
+			</template>
 
         </template>
         <template #default>
-			<lv-menu v-model:isMenuSelected="isMenuSelected" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
+			<div class="mb-4" v-if="lvEvaluierungMessage" v-html="lvEvaluierungMessage"></div>
+			<slot name="content"></slot>
+			<lv-menu v-model:isMenuSelected="isMenuSelected" :hasLvPlanEintraege="hasLvPlanEintraege" :preselectedMenu="preselectedMenu" :menu="menu" @hideModal="hide"></lv-menu>
         </template>
         
     </bs-modal>
