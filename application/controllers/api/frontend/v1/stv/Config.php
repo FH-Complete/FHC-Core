@@ -62,10 +62,15 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Details.js',
 			'config' => $config['details']
 		];
+
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
-			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
+			'component' => './Stv/Studentenverwaltung/Details/Notizen.js',
+			'config'	=> $config['notes'],
+			'showSuffix' => ($config['notes']['showCountNotes'] ?? false),
+			'suffixhelper' => APP_ROOT . 'public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js'
 		];
+
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
 			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',

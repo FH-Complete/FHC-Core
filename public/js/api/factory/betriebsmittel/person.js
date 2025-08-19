@@ -16,10 +16,13 @@
  */
 
 export default {
-	getAllBetriebsmittel(type, id) {
+	getAllBetriebsmittel(type, id, betriebsmitteltypes) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/betriebsmittel/betriebsmittelP/getAllBetriebsmittel/' + type + '/' + id
+			url: 'api/frontend/v1/betriebsmittel/betriebsmittelP/getAllBetriebsmittel/' + type + '/' + id,
+			params: {
+				betriebsmitteltypes
+			}
 		};
 	},
 	addNewBetriebsmittel(person_id, params) {
@@ -48,10 +51,13 @@ export default {
 			url: 'api/frontend/v1/betriebsmittel/betriebsmittelP/deleteBetriebsmittel/' +	betriebsmittelperson_id
 		};
 	},
-	getTypenBetriebsmittel() {
+	getTypenBetriebsmittel(betriebsmitteltypes) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/betriebsmittel/betriebsmittelP/getTypenBetriebsmittel/'
+			url: 'api/frontend/v1/betriebsmittel/betriebsmittelP/getTypenBetriebsmittel/',
+			params: {
+				betriebsmitteltypes
+			}
 		};
 	},
 	loadInventarliste(query) {

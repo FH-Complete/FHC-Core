@@ -29,14 +29,24 @@ export default {
 		uid: {
 			type: [Number, String],
 			required: true
-		}
+		},
+		/** List of types to allow for creation */
+		betriebsmittelTypes: {
+			type: Array,
+			default: null
+		},
+		/**
+		 * If true: only show the types specified in 'betriebsmittelTypes'.
+		 * If false: show all available types.
+		 */
+		filterByProvidedTypes: Boolean
 	},
 	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-					this.endpoint.getAllBetriebsmittel(this.typeId, this.id)
+					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
@@ -294,7 +304,7 @@ export default {
 	},
 	created() {
 		return this.$api
-			.call(this.endpoint.getTypenBetriebsmittel())
+			.call(this.endpoint.getTypenBetriebsmittel(this.betriebsmittelTypes))
 			.then(result => {
 				this.listBetriebsmitteltyp = result.data;
 			})

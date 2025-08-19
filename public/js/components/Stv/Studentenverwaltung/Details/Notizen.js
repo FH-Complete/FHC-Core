@@ -17,21 +17,23 @@ export default {
 	},
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
-<!--	mit factory als endpoint	-->
-		<core-notiz
-			class="overflow-hidden"
-			:endpoint="endpoint"
-			ref="formc"
-			notiz-layout="popupModal"
-			type-id="person_id"
-			:id="modelValue.person_id"
-			show-document
-			show-tiny-mce
-			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
-			>
-		</core-notiz>
-		
 	
+
+<!--	Test Version classicFas for enter with one click vs popupModal-->
+	<core-notiz
+		class="overflow-hidden"
+		:endpoint="endpoint"
+		ref="formc"
+		notiz-layout="popupModal"
+		type-id="person_id"
+		:id="modelValue.person_id"
+		show-document
+		show-tiny-mce
+		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+		@reload="$emit('update:suffix')"
+		>
+</core-notiz>
+
 <!--		
 ---------------------------------------------------------------------------------------------
 -------------------- DESCRIPTION FOR PARAMETER PROPS ----------------------------------------

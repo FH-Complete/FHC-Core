@@ -18,6 +18,7 @@ class NotizPerson extends Notiz_Controller
 			'loadDokumente' => ['admin:r', 'assistenz:r'],
 			'getMitarbeiter' => ['admin:r', 'assistenz:r'],
 			'isBerechtigt' => ['admin:r', 'assistenz:r'],
+			'getCountNotes' => ['admin:r', 'assistenz:r'],
 		]);
 	}
 
