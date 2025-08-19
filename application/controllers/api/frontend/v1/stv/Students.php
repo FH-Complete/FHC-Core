@@ -334,18 +334,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect("'' AS gruppe");
 		$this->addSelectPrioRel();
 
-		//add status per semester
-		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
-		);
-
 		$this->addFilter($studiensemester_kurzbz);
 
 		$result = $this->PrestudentModel->loadWhere($where);
@@ -462,18 +450,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect("'' AS priorisierung_relativ");
 
-		//add status per semester
-		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
-		);
-
 
 		$where = [];
 
@@ -562,18 +538,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 
-		//add status per semester
-		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
-		);
-
 		$this->addSelectPrioRel();
 
 		$this->addFilter($studiensemester_kurzbz);
@@ -631,18 +595,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 
-		//add status per semester
-		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
-		);
-
 		$this->addSelectPrioRel();
 
 
@@ -695,18 +647,6 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.semester');
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
-
-		//add status per semester
-		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
-		);
 
 		$this->addSelectPrioRel();
 
@@ -771,6 +711,18 @@ class Students extends FHCAPI_Controller
 		// semester
 		// verband
 		// gruppe
+
+		//add status per semester
+		$this->PrestudentModel->addSelect(
+			"(
+				SELECT status_kurzbz
+				FROM public.tbl_prestudentstatus pss
+				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
+				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
+				LIMIT 1
+				) AS statusofsemester"
+		);
 
 		$this->PrestudentModel->addSelect('UPPER(stg.typ || stg.kurzbz) AS studiengang');
 		$this->PrestudentModel->addSelect('tbl_prestudent.studiengang_kz');
