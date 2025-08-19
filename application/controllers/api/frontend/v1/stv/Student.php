@@ -694,7 +694,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		$this->terminateWithSuccess(true);
+		return success(true);
 	}
 
 	public function requiredIfNotPersonId($value)
