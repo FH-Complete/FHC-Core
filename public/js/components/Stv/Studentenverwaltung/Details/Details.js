@@ -158,6 +158,16 @@ export default {
 		},
 		reload(){
 			this.updateStudent(this.modelValue);
+		},
+		sendInfomail(){
+			const subject = this.$p.t('person', 'betreffProfilfoto');
+			const subjectEncoded = encodeURIComponent(subject);
+
+			const body = this.$p.t('person', 'mailText_profilfoto');
+			const bodyWithNewLines = body.replace(/\\n/g, '\n');
+			const bodyEncoded = encodeURIComponent(bodyWithNewLines);
+
+			window.location.href = "mailto:" + this.modelValue.mail_intern + "?subject=" + subjectEncoded + "&body=" + bodyEncoded;
 		}
 	},
 	created() {
@@ -400,8 +410,10 @@ export default {
 						container-class="col-4 stv-details-details-foto"
 						:label="$p.t('person', 'foto')"
 						type="UploadImage"
+						titleActionButton="Infomail"
 						v-model="data.foto"
 						name="foto"
+						@actionbutton-clicked="sendInfomail"
  						>
  						<img alt="No Image" :src="noImageSrc" class="w-100">
 					</form-input>
