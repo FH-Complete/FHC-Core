@@ -41,6 +41,10 @@ html {
 	color: var(--fhc-primary-highlight) !important;
 }
 
+.fhc-primary-text{
+	color: var(--fhc-light) !important;
+}
+
 .fhc-body-bg{
 	background-color:var(--fhc-background) !important;
 }
@@ -50,19 +54,27 @@ html {
 }
 
 .fhc-secondary-bg{
-	background-color: var(--fhc-tertiary) !important;
-}
-
-.fhc-secondary-color {
-	color: var(--fhc-tertiary) !important;
-}
-
-.fhc-tertiary-bg{
 	background-color: var(--fhc-secondary) !important;
 }
 
-.fhc-tertiary-color {
+.fhc-secondary-color {
 	color: var(--fhc-secondary) !important;
+}
+
+.fhc-secondary-text{
+	color: var(--fhc-secondary-text) !important;
+}
+
+.fhc-tertiary-bg{
+	background-color: var(--fhc-tertiary) !important;
+}
+
+.fhc-tertiary-color {
+	color: var(--fhc-tertiary) !important;
+}
+
+.fhc-tertiary-text{
+	color: var(--fhc-tertiary-text) !important;
 }
 
 .fhc-fourth-bg {
@@ -73,12 +85,20 @@ html {
 	color: var(--fhc-fourth) !important;
 }
 
+.fhc-fourth-text {
+	color: var(--fhc-fourth-text) !important;
+}
+
 .fhc-fifth-bg {
 	background-color: var(--fhc-fifth) !important;
 }
 
 .fhc-fifth-color {
 	color: var(--fhc-fifth) !important;
+}
+
+.fhc-fifth-text {
+	color: var(--fhc-fifth-text) !important;
 }
 
 .fhc-body{
@@ -127,22 +147,22 @@ html {
 	--fhc-cis-menu-lvl-1-color-hover: var(--fhc-light);
 
 	--fhc-cis-menu-lvl-2-bg: var(--fhc-secondary);
-	--fhc-cis-menu-lvl-2-color: var(--fhc-text);
+	--fhc-cis-menu-lvl-2-color: var(--fhc-secondary-text);
 	--fhc-cis-menu-lvl-2-bg-hover: var(--fhc-secondary-highlight);
 	--fhc-cis-menu-lvl-2-color-hover: var(--fhc-text);
 
 	--fhc-cis-menu-lvl-3-bg: var(--fhc-tertiary);
-	--fhc-cis-menu-lvl-3-color: var(--fhc-text);
+	--fhc-cis-menu-lvl-3-color: var(--fhc-secondary-text);
 	--fhc-cis-menu-lvl-3-bg-hover: var(--fhc-tertiary-highlight);
 	--fhc-cis-menu-lvl-3-color-hover: var(--fhc-text);
 
 	--fhc-cis-menu-lvl-4-bg: var(--fhc-fourth);
-	--fhc-cis-menu-lvl-4-color: var(--fhc-text);
+	--fhc-cis-menu-lvl-4-color: var(--fhc-secondary-text);
 	--fhc-cis-menu-lvl-4-bg-hover: var(--fhc-fourth-highlight);
 	--fhc-cis-menu-lvl-4-color-hover: var(--fhc-text);
 
 	--fhc-cis-menu-lvl-5-bg: var(--fhc-fifth);
-	--fhc-cis-menu-lvl-5-color: var(--fhc-text);
+	--fhc-cis-menu-lvl-5-color: var(--fhc-secondary-text);
 	--fhc-cis-menu-lvl-5-bg-hover: var(--fhc-fifth-highlight);
 	--fhc-cis-menu-lvl-5-color-hover: var(--fhc-text);
 	--fhc-cis-grade-positive: var(--fhc-success);

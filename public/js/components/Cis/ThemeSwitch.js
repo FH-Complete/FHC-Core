@@ -27,6 +27,7 @@ export default {
 	<button id="themeSwitch" :aria-label="$p.t('global','switchTheme',[nextTheme])" @click="switchTheme(nextTheme)" class="fhc-primary-highlight-bg align-self-center btn btn-secondary rounded-5">
 		<i v-if="theme == 'light'" class="fa-solid fa-sun " aria-hidden="true"></i>
 		<i v-else-if="theme == 'dark'" class="fa-solid fa-moon " aria-hidden="true"></i>
+		<i v-else-if="theme == 'contrast'" class="fa-solid fa-circle-half-stroke " aria-hidden="true"></i>
 		<!--<i v-else-if="theme == 'purple'" class="fa-solid fa-wine-bottle" aria-hidden="true"></i>-->
 	</button>
 	`

@@ -144,7 +144,7 @@ export default {
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">
 				<button :aria-label="menuCollapseAriaLabel"  type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
-					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-text"></i>
+					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-secondary-text"></i>
 				</button>
 			</div>
 			<div class="offcanvas-body p-0">
