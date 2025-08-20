@@ -164,8 +164,60 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
-		// TODO(chris): IMPLEMENT!
-		$this->terminateWithSuccess([]);
+		
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+
+		$this->PrestudentModel->addJoin(
+			"(
+				SELECT prestudent_id 
+				FROM bis.tbl_bisio bis 
+				JOIN public.tbl_student USING (student_uid)
+				JOIN public.tbl_studiensemester stdsem ON (
+					(bis.von >= stdsem.start AND bis.von <= stdsem.ende) 
+					OR 
+					(bis.bis >= stdsem.start AND bis.bis <= stdsem.ende) 
+					OR 
+					(bis.von <= stdsem.start AND bis.bis >= stdsem.ende)
+				)
+				WHERE NOT EXISTS (
+					SELECT 1 
+					FROM public.tbl_prestudentstatus 
+					WHERE status_kurzbz = 'Incoming'
+					AND prestudent_id = tbl_student.prestudent_id
+				) AND stdsem.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				GROUP BY prestudent_id
+			) test",
+			"prestudent_id"
+		);
+
+
+		$this->prepareQuery($studiensemester_kurzbz);
+
+
+		$this->PrestudentModel->addSelect("COALESCE(
+			v.semester::text, 
+			CASE 
+				WHEN pls.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') 
+				THEN pls.ausbildungssemester::text 
+				ELSE ''::text 
+			END
+		) AS semester", false);
+		$this->PrestudentModel->addSelect("COALESCE(v.verband::text, ''::text)");
+		$this->PrestudentModel->addSelect("COALESCE(v.gruppe::text, ''::text)");
+		
+		$this->addSelectPrioRel();
+
+		$this->addFilter($studiensemester_kurzbz);
+
+
+		$result = $this->PrestudentModel->load();
+		
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	/**
