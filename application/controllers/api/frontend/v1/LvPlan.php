@@ -96,13 +96,8 @@ class LvPlan extends FHCAPI_Controller
 		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
 		// fetching moodle events
-		if(defined('CIS_LVPLAN_MOODLE_INTEGRATION') && CIS_LVPLAN_MOODLE_INTEGRATION)
-		{
-			$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date);
-		}else{
-			$moodleEvents = [];
-		}
-
+		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date);
+		
 		// fetching ferien events
 		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
 		
