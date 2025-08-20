@@ -29,7 +29,7 @@ class Vertraege extends FHCAPI_Controller
 			'getHeader' => ['vertrag/mitarbeiter:r'],
 			'getPersonAbteilung' => ['vertrag/mitarbeiter:r'],
 			'getLeitungOrg' => ['vertrag/mitarbeiter:r'],
-			]);
+		]);
 
 		//Load Models and Libraries
 		$this->load->model('accounting/Vertrag_model', 'VertragModel');

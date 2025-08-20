@@ -12,34 +12,34 @@ class Mitarbeiter_model extends DB_Model
 		$this->pk = 'mitarbeiter_uid';
 	}
 
-    /**
-     * Checks if the user is a Mitarbeiter.
-     * @param string $uid
-     * @param boolean null $fixangestellt
-     * @return array
-     */
-    public function isMitarbeiter($uid, $fixangestellt = null)
-    {
-        $this->addSelect('1');
+	/**
+	 * Checks if the user is a Mitarbeiter.
+	 * @param string $uid
+	 * @param boolean null $fixangestellt
+	 * @return array
+	 */
+	public function isMitarbeiter($uid, $fixangestellt = null)
+	{
+		$this->addSelect('1');
 
-        if (is_bool($fixangestellt))
-        {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'fixangestellt' => $fixangestellt));
-        }
-        else    // default
-        {
-            $result = $this->loadWhere(array('mitarbeiter_uid' => $uid));
-        }
+		if (is_bool($fixangestellt))
+		{
+			$result = $this->loadWhere(array('mitarbeiter_uid' => $uid, 'fixangestellt' => $fixangestellt));
+		}
+		else    // default
+		{
+			$result = $this->loadWhere(array('mitarbeiter_uid' => $uid));
+		}
 
-        if(hasData($result))
-        {
-            return success(true);
-        }
-        else
-        {
-            return success(false);
-        }
-    }
+		if(hasData($result))
+		{
+			return success(true);
+		}
+		else
+		{
+			return success(false);
+		}
+	}
 
 	/**
 	 * Laedt das Personal
@@ -132,7 +132,7 @@ class Mitarbeiter_model extends DB_Model
 			$qry .= " WHERE p.person_id = ?";
 		}
 
-		$qry.= " 
+		$qry.= "
 			GROUP BY
 				b.uid, p.person_id, p.vorname, p.nachname, b.alias
 			ORDER BY
@@ -336,7 +336,7 @@ class Mitarbeiter_model extends DB_Model
 
 		if (hasData($kurzbzexists) && getData($kurzbzexists)[0])
 			return error('No Kurzbezeichnung could be generated');
-	
+
 		return success($kurzbz);
 	}
 
@@ -361,14 +361,14 @@ class Mitarbeiter_model extends DB_Model
 			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 
 		$qry = "
-			SELECT " . $returnwert . "  
-			FROM 
-				public.tbl_mitarbeiter ma 
-			JOIN 
+			SELECT " . $returnwert . "
+			FROM
+				public.tbl_mitarbeiter ma
+			JOIN
 				public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
-			JOIN 
+			JOIN
 				public.tbl_person p on (p.person_id = b.person_id)
-			WHERE 
+			WHERE
 				lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
@@ -386,18 +386,47 @@ class Mitarbeiter_model extends DB_Model
 	 */
 	public function getMitarbeiterFromLV($lehrveranstaltung_id)
 	{
-	$qry = "SELECT DISTINCT
-				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
-			FROM 
+		$qry = "SELECT DISTINCT
+				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid
+			FROM
 				lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
-			WHERE 
+			WHERE
 				lehrveranstaltung_id= ?
-			AND 
-				mitarbeiter_uid=uid 
-			AND 
+			AND
+				mitarbeiter_uid=uid
+			AND
 				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		$parametersArray = array($lehrveranstaltung_id);
+
+		return $this->execQuery($qry, $parametersArray);
+	}
+
+	/**
+	 * Get Lektoren by studiengang_kz
+	 *
+	 * @param $studiengang_kz
+	 * @return array with Mitarbeiter
+	 */
+	public function getLektoren($studiengang_kz)
+	{
+		$qry = "
+			SELECT DISTINCT
+			    campus.vw_mitarbeiter.uid,
+				campus.vw_mitarbeiter.vorname,
+				campus.vw_mitarbeiter.nachname,
+				studiengang_kz,
+				tbl_studiengang.typ,
+				tbl_studiengang.kurzbz AS stg_kurzbz
+			FROM
+			  campus.vw_mitarbeiter
+			  JOIN public.tbl_benutzerfunktion USING (uid)
+			  JOIN public.tbl_studiengang USING(oe_kurzbz)
+				WHERE studiengang_kz = ?
+				AND lektor is true
+			ORDER BY campus.vw_mitarbeiter.nachname";
+
+		$parametersArray = array($studiengang_kz);
 
 		return $this->execQuery($qry, $parametersArray);
 	}

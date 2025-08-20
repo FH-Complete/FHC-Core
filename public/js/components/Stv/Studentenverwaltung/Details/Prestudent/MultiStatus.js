@@ -16,9 +16,6 @@ export default{
 		StatusDropdown
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
-		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
 			default: false
@@ -428,6 +425,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"

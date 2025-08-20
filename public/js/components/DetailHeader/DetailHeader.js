@@ -108,6 +108,7 @@ export default {
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
+
 				<div
 					v-for="person in headerData"
 					:key="person.person_id"
@@ -148,15 +149,15 @@ export default {
 						{{headerData[0].verband}}
 						<strong v-if="headerData[0].gruppe" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 						{{headerData[0].gruppe}}
-					 </h5>
+					</h5>
 
-					  <h5 class="h6">
+					<h5 class="h6">
 						<strong class="text-muted">Email </strong>
 						<span>
 							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
 						</span>
-						<strong class="text-muted"> | Status </strong>
-						 {{headerData[0].status}}
+						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
+						 {{headerData[0].statusofsemester}}
 						<strong class="text-muted"> | {{$p.t('person', 'matrikelnummer')}} </strong>
 						  {{headerData[0].matr_nr}}
 					  </h5>
