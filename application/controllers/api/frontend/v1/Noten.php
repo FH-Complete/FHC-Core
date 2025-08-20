@@ -242,7 +242,7 @@ class Noten extends FHCAPI_Controller
 		
 		$res = $this->LehrveranstaltungModel->load($lv_id);
 		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError('Keine gültige Lehrveranstaltung gefunden für ID: '.$lv_id);
+			$this->terminateWithError($this->p->t('benotungstool', 'noValidLvFoundForId', [$lv_id]));
 		}
 
 		$lv = getData($res)[0];
@@ -250,7 +250,7 @@ class Noten extends FHCAPI_Controller
 		$studiengang_kz = $lv->studiengang_kz;
 		$res = $this->StudiengangModel->load($studiengang_kz);
 		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
+			$this->terminateWithError($this->p->t('benotungstool', 'noValidStudiengangFoundForId', [$studiengang_kz]));
 		}
 		$sg = getData($res)[0];
 		$lvaFullName = $sg->kurzbzlang . ' ' . $lv->semester . '.Semester
@@ -261,7 +261,7 @@ class Noten extends FHCAPI_Controller
 
 		$res = $this->PersonModel->load(getAuthPersonId());
 		if(isError($res) || !hasData($res)) {
-			$this->terminateWithError('Keine gültige Person gefunden für ID: '.getAuthPersonId());
+			$this->terminateWithError($this->p->t('benotungstool', 'noValidPersonFoundForId', [getAuthPersonId()]));
 		}
 		$pers = getData($res)[0];
 		$lektorFullName = $pers->anrede.' '.$pers->vorname.' '.$pers->nachname; //.' ('.$pers->kurzbz.')';
@@ -273,7 +273,7 @@ class Noten extends FHCAPI_Controller
 		foreach ($data as $row) {
 			$studienplan_bezeichnung .= $row->bezeichnung . ' ';
 		}
-		$betreff = 'Notenfreigabe ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
+		$betreff = $this->p->t('benotungstool','notenfreigabe').' ' . $lv->bezeichnung . ' ' . $lv->orgform_kurzbz . ' - ' . $studienplan_bezeichnung;
 		
 		$studlist = "<table border='1'><tr>";
 
@@ -493,7 +493,7 @@ class Noten extends FHCAPI_Controller
 		$this->addMeta('$pruefungenChanged', $pruefungenChanged);
 		$this->addMeta('$lvgesamtnote', $lvgesamtnote);
 		$savedPruefung = $pruefungenChanged['savedPruefung'] ?? null;
-		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null; // TODO: test
+		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null;
 
 		$savedPruefungData = count($savedPruefung) > 0 ? $savedPruefung[0] : null;
 		$extraPruefungData = count($extraPruefung) > 0 ? $extraPruefung[0] : null;
@@ -509,8 +509,8 @@ class Noten extends FHCAPI_Controller
 		
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		
-
-		if($typ == "Termin2") {
+		if($typ == "Termin2") 
+		{
 			
 			// Wenn eine Nachprüfung angelegt wird, wird zuerst eine Pruefung mit 1. Termin angelegt welche für die ursprüngliche Note
 			// vor den Prüfungsantritten zählt
@@ -537,7 +537,7 @@ class Noten extends FHCAPI_Controller
 				}
 				else if(!hasData($resultLV))// set Termin1 note to "noch nicht eingetragen"
 				{
-					$pr_note = 9;
+					$pr_note = 9; 
 					$pr_punkte = null;
 					$benotungsdatum = $jetzt;
 				}
@@ -550,7 +550,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $pr_note,
-						'punkte' => $pr_punkte,
+//						'punkte' => $pr_punkte,
 						'pruefungstyp_kurzbz' => "Termin1",
 						'datum' => $benotungsdatum,
 						'anmerkung' => "",
@@ -581,7 +581,7 @@ class Noten extends FHCAPI_Controller
 						'updateamum' => $jetzt,
 						'updatevon' => getAuthUID(),
 						'note' => $note,
-						'punkte' => $punkte,
+//						'punkte' => $punkte,
 						'datum' => $datum,
 						'anmerkung' => ""
 					)
@@ -600,7 +600,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $note,
-						'punkte' => null,//$punkte,
+//						'punkte' => null,//$punkte,
 						'pruefungstyp_kurzbz' => $typ,
 						'datum' => $datum,
 						'anmerkung' => "",
@@ -617,7 +617,8 @@ class Noten extends FHCAPI_Controller
 				}
 			}
 
-		} else if($typ == "Termin3") {
+		} else if($typ == "Termin3") 
+		{
 
 			$result3 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin3", $lva_id, $stsem);
 
@@ -631,7 +632,7 @@ class Noten extends FHCAPI_Controller
 						'updateamum' => $jetzt,
 						'updatevon' => getAuthUID(),
 						'note' => $note,
-						'punkte' => $punkte,
+//						'punkte' => $punkte,
 						'datum' => $datum,
 						'anmerkung' => ""
 					)
@@ -650,7 +651,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $note,
-						'punkte' => null,//$punkte,
+//						'punkte' => null,//$punkte,
 						'pruefungstyp_kurzbz' => $typ,
 						'datum' => $datum,
 						'anmerkung' => "",
@@ -668,8 +669,7 @@ class Noten extends FHCAPI_Controller
 				
 			}
 		} else {
-			// TODO: proper error phrase that explains better why we terminated with error
-			$this->terminateWithError("Typ is not termin2 or termin3.", 'general');
+			$this->terminateWithError($this->p->t('benotungstool', 'wrongPruefungType', [$student_uid, $typ]), 'general');
 		}
 		
 		return $pruefungenChanged;
@@ -749,7 +749,6 @@ class Noten extends FHCAPI_Controller
 		$noten = $result->noten;
 		
 		$retLvNoten = [];
-		$responseMsgs = [];
 		
 		foreach($noten as $note)
 		{
@@ -857,7 +856,6 @@ class Noten extends FHCAPI_Controller
 			$lehreinheit_id = $pruefung->lehreinheit_id;
 			$ret[$student_uid] = $this->savePruefungstermin($typ, $student_uid, $lv_id, $sem_kurzbz, $lehreinheit_id, $note, $punkte, $datum);
 		}
-		
 		
 		$this->terminateWithSuccess($ret);
 	}

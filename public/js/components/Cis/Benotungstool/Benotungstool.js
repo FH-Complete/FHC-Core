@@ -39,6 +39,9 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
+			neuesPruefungsdatumModalVisible: false,
+			offsetLeft: 0,
+			headerEl: null,
 			loading: false,
 			selectedUids: [], // shared selection state
 			selectedLehreinheit: null,
@@ -76,7 +79,16 @@ export const Benotungstool = {
 			{
 				event: "rowSelectionChanged",
 				handler: async (data, rows) => {
-					this.selectedUids = data.filter(d => d.selectable);
+					// avoid an expensive update loop if selection happens in modal
+					if(this.neuesPruefungsdatumModalVisible) return
+					
+					if(data.length == 1 && this.selectedUids.length == 1 && data[0].uid === this.selectedUids[0].uid){
+						// special case to work around an internal tabulator selection quirk
+						this.selectedUids = []
+					} else {
+						this.selectedUids = data.filter(d => d.selectable);
+					}
+					
 				}
 			},
 			{
@@ -101,7 +113,7 @@ export const Benotungstool = {
 						row.reformat() // trigger reformat of arrow
 					}
 				}
-			},
+			}
 			]};
 	},
 	methods: {
@@ -243,7 +255,7 @@ export const Benotungstool = {
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlagBulk(this.lv_id, this.sem_kurzbz, notenbulk)).then(res => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertWarning('Noten erfolgreich importiert') // TODO: phrase
+					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/notenImportSuccessAlert'))
 					const lvNoten = res.data
 					
 
@@ -274,7 +286,7 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
 					if(res.meta.status === 'success') {
-						this.$fhcAlert.alertWarning('Prüfungen erfolgreich importiert und gespeichert') //  TODO: phrase
+						this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungImportSuccessAlert'))
 						this.handleAddNewPruefungenResponse(res, pruefungenbulk)
 					}
 				}).finally(()=>{this.loading = false})
@@ -282,8 +294,8 @@ export const Benotungstool = {
 		handleAddNewPruefungenResponse(res, uids) {
 			const pruefungen = res.data
 			uids.forEach(entry => {
-				const saved = pruefungen[entry.uid].savedPruefung
-				const extra = pruefungen[entry.uid].extraPruefung
+				const saved = pruefungen[entry.uid].savedPruefung?.[0]
+				const extra = pruefungen[entry.uid].extraPruefung?.[0]
 
 				const student = this.studenten.find(s => s.uid == entry.uid)
 				if(!student) return
@@ -332,9 +344,7 @@ export const Benotungstool = {
 			this.distinctPruefungsDates.forEach((date, index)=>{
 				const dateparts = date.split('-')
 				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
-
-				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
-				// col filled for consistency reasons?
+				
 
 				// TODO: test if this holds true
 				const originalNote = index === 0
@@ -346,7 +356,8 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 150,
-					originalNote
+					originalNote,
+					visible: true
 				})
 			})
 
@@ -419,7 +430,7 @@ export const Benotungstool = {
 				selectable: true,
 				selectableRangeMode: "click", // shift+click
 				selectablePersistence: false, // reset selection on table reload
-				selectableCheck: function(row){
+				selectableCheck: function(row, e){
 					const data = row.getData();
 					
 					if(data['kommPruef']) return false
@@ -558,7 +569,7 @@ export const Benotungstool = {
 				row.select();
 			}
 
-			// stop Tabulator’s built-in handler
+			// stop built-in handler
 			e.stopPropagation();
 			return false;
 		},
@@ -576,7 +587,7 @@ export const Benotungstool = {
 				allowed.forEach(r => r.select());
 			}
 
-			// stop Tabulator’s built-in handler
+			// stop built-in handler
 			e.stopPropagation();
 			return false;
 		},
@@ -598,13 +609,11 @@ export const Benotungstool = {
 		},
 		terminCalcFormatter(cell) {
 			const cellval = cell.getValue()
-			// TODO: phrase
-			return 'Prüflinge: ' + cellval
+			return this.$p.t('benotungstool/prueflingSelection')+': ' + cellval
 		},
 		negativeNotenCalcFormatter(cell) {
 			const cellval = cell.getValue()
-			// TODO: phrase
-			return 'Negativ: ' + cellval
+			return this.$p.t('benotungstool/c4negativ')+': ' + cellval
 		},
 		negativeNotenCalc(entries) {
 			return entries.reduce((acc, cur) => {
@@ -717,8 +726,8 @@ export const Benotungstool = {
 
 					s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
 					
-					row.update({ lv_note: data.note_vorschlag })
-					row.update({ freigegeben: 'changed' })
+					row.update({ lv_note: data.note_vorschlag, freigegeben: 'changed' })
+					// row.update({ freigegeben: 'changed' })
 					row.reformat() // trigger reformat of arrow
 					this.changedNotenCounter++;
 				}
@@ -822,7 +831,7 @@ export const Benotungstool = {
 				// Third column (button)
 				const button = document.createElement('button');
 				button.className = 'btn btn-outline-secondary';
-				button.textContent = 'Change'; // TODO: phrase
+				button.textContent = this.$p.t('benotungstool/changePruefungButtonText');
 				button.addEventListener('click', () => {
 					this.openPruefungModal(data, data[field], field);
 				});
@@ -839,7 +848,7 @@ export const Benotungstool = {
 				
 				const button = document.createElement('button');
 				button.className = 'btn btn-outline-secondary';
-				button.textContent = 'Add'; // TODO: phrase
+				button.textContent = this.$p.t('benotungstool/addPruefungButtonText');
 				button.addEventListener('click', () => {
 					this.openPruefungModal(data, null, field)
 				});
@@ -998,6 +1007,9 @@ export const Benotungstool = {
 						const kP = s.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef')
 						return !(kP || s.hoechsterAntritt >= 3)
 					},
+					set() {
+						// empty setter so tabulator doesnt scream	
+					},
 					enumerable: true,
 					configurable: true
 				})
@@ -1032,7 +1044,8 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
-					originalNote
+					originalNote,
+					visible: true
 				})
 			})
 
@@ -1099,8 +1112,30 @@ export const Benotungstool = {
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
+			
+			this.headerEl = document.getElementById('nav-main')
+			if(this.headerEl) {
+				this.headerEl.addEventListener("shown.bs.collapse", this.handleSidebar);
+				this.headerEl.addEventListener("hidden.bs.collapse", this.handleSidebar);
+				this.handleSidebar()
+			}
+			
+			
+			
+			
 			this.loadNoten(this.lv_id, this.sem_kurzbz)
-			this.calcMaxTableHeight()
+			// this.calcMaxTableHeight()
+			
+		},
+		handleSidebar() {
+			// this.$refs.notenTable.tabulator.blockRedraw(); // stop automatic resizes
+			
+			this.offsetLeft = this.headerEl.getBoundingClientRect().width;
+			
+			// setTimeout(() => {
+			// 	this.$refs.notenTable.tabulator.restoreRedraw(); // re-enable
+			// 	this.$refs.notenTable.tabulator.redraw(true);    // manual recalculation
+			// }, 400); // after animation finishes
 			
 		},
 		lvChanged(e) {
@@ -1188,8 +1223,8 @@ export const Benotungstool = {
 				this.sem_kurzbz,
 				typ
 			)).then(res => {
-				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertWarning('Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt') // TODO: phrase
+				if(res.meta.status === 'success') { //'Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt'
+					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungSaveForUid', [this.pruefungStudent.uid]))
 					
 					const s = this.studenten.find(s => s.uid === res.data[1]?.student_uid)
 					
@@ -1214,18 +1249,18 @@ export const Benotungstool = {
 						s.hoechsterAntritt = this.getAntrittCountStudent(s)
 					}
 					
-					// TODO: maybe fake rerun the selectable check by just assigning
-					// css classes tabulator-selectable/tabulator-unselectable on row elements
-					
-					// const rows = this.$refs.notenTable.tabulator.getRows()
-					// const row = rows.find(r => {
-					// 	const data = r.getData()
-					// 	return data.uid == this.pruefungStudent.uid
-					// })
-					// row.reformat()
+					const oldScrollLeft = this.$refs.notenTable.tabulator.rowManager.scrollLeft
+					const oldScrollTop = this.$refs.notenTable.tabulator.rowManager.scrollTop
 					this.$refs.notenTable.tabulator.redraw(true)
-					
-					this.$fhcAlert.alertWarning('Prüfung gespeichert') //  TODO: phrase
+
+					Vue.nextTick(()=> {
+						const table = this.$refs.notenTable.tabulator.element.querySelector('.tabulator-tableholder')
+						if(table) {
+							table.scrollLeft = oldScrollLeft;
+							table.oldScrollTop = oldScrollTop;
+						}
+					})
+
 				}
 			}).finally(()=> {
 				this.pruefungStudent = null
@@ -1296,7 +1331,8 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
-					originalNote
+					originalNote,
+					visible: true
 				})
 			})
 
@@ -1372,7 +1408,7 @@ export const Benotungstool = {
 				this.sem_kurzbz,
 			)).then(res => {
 				if(res.meta.status === "success") {
-					this.$fhcAlert.alertWarning('Prüfung an ' + dateStr + ' angelegt') // TODO: phrase
+					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungAngelegtAn', [dateStr]))
 					
 					
 					this.handleAddNewPruefungenResponse(res, uids)
@@ -1492,7 +1528,7 @@ export const Benotungstool = {
 				return acc
 			}, []) : []
 			return cs
-		}
+		},
 	},
 	created() {
 		this.setupCreated()
@@ -1500,7 +1536,12 @@ export const Benotungstool = {
 	mounted() {
 		this.setupMounted()
 	},
+	unmounted() {
+		this.headerEl.removeEventlistener(this.handleSidebar)
+		this.headerEl.removeEventlistener(this.handleSidebar)
+	},
 	template: `
+
 		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{$p.t('benotungstool/c4notenImportieren')}}</template>
 			<template v-slot:default>
@@ -1515,7 +1556,10 @@ export const Benotungstool = {
 			</template>
 		</bs-modal>
 
-		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg"
+			@hideBsModal="neuesPruefungsdatumModalVisible = false"
+			@showBsModal="neuesPruefungsdatumModalVisible = true"
+			>
 			<template v-slot:title>{{$p.t('benotungstool/c4addNewPruefung')}}</template>
 			<template v-slot:default>
 				<div class="row justify-content-center">
@@ -1606,7 +1650,7 @@ export const Benotungstool = {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 
-		<div class="row" style="max-width: 90vw;">
+		<div class="row">
 			<div class="col-4">
 				<h2>{{$p.t('benotungstool/benotungstoolTitle')}}</h2>
 				<h4>{{ lv?.bezeichnung }}</h4>
@@ -1652,7 +1696,7 @@ export const Benotungstool = {
 		</div>
 		<hr>
 		
-		<div class="row" style="overflow-x: auto;">
+		<div class="row" :style="'overflow-x: auto; max-width: calc(98vw - ' + offsetLeft + 'px);'">
 			<core-filter-cmpt
 				v-if="tabulatorCanBeBuilt"
 				@uuidDefined="handleUuidDefined"
@@ -1677,7 +1721,7 @@ export const Benotungstool = {
 			</core-filter-cmpt>
 		</div>
 		
-		<MobilityLegende/>
+		<MobilityLegende/>		
     `,
 };
 
