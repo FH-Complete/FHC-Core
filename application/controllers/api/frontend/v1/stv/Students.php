@@ -839,7 +839,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect("(
 			SELECT count(*)
 			FROM (
-				SELECT *, public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) AS laststatus
+				SELECT *, public.get_rolle_prestudent(pss.prestudent_id, NULL) AS laststatus
 				FROM public.tbl_prestudent pss
 				JOIN public.tbl_prestudentstatus USING (prestudent_id)
 				WHERE person_id = p.person_id
