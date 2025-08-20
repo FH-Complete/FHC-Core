@@ -116,6 +116,17 @@ class Students extends FHCAPI_Controller
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 
+		$this->PrestudentModel->addJoin(
+			"(
+				SELECT prestudent_id 
+				FROM public.tbl_prestudentstatus
+				WHERE status_kurzbz = 'Incoming'
+				AND studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+			) test",
+			"prestudent_id"
+		);
+
+
 		$this->prepareQuery($studiensemester_kurzbz);
 
 		$this->PrestudentModel->addSelect("COALESCE(
@@ -133,14 +144,6 @@ class Students extends FHCAPI_Controller
 
 		$this->addFilter($studiensemester_kurzbz);
 
-
-		$selectIncoming = "SELECT 1 
-			FROM public.tbl_prestudentstatus test 
-			WHERE test.prestudent_id=tbl_prestudent.prestudent_id 
-			AND test.status_kurzbz='Incoming' 
-			AND test.studiensemester_kurzbz=v.studiensemester_kurzbz";
-
-		$this->PrestudentModel->db->where("EXISTS (" . $selectIncoming . ")", null, false);
 
 		$result = $this->PrestudentModel->load();
 		
