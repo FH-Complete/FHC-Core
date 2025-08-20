@@ -111,8 +111,43 @@ class Students extends FHCAPI_Controller
 		$this->addMeta('ci_params', [
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		]);
-		// TODO(chris): IMPLEMENT!
-		$this->terminateWithSuccess([]);
+		
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+
+		$this->prepareQuery($studiensemester_kurzbz);
+
+		$this->PrestudentModel->addSelect("COALESCE(
+			v.semester::text, 
+			CASE 
+				WHEN pls.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') 
+				THEN pls.ausbildungssemester::text 
+				ELSE ''::text 
+			END
+		) AS semester", false);
+		$this->PrestudentModel->addSelect("COALESCE(v.verband::text, ''::text)");
+		$this->PrestudentModel->addSelect("COALESCE(v.gruppe::text, ''::text)");
+		
+		$this->addSelectPrioRel();
+
+		$this->addFilter($studiensemester_kurzbz);
+
+
+		$selectIncoming = "SELECT 1 
+			FROM public.tbl_prestudentstatus test 
+			WHERE test.prestudent_id=tbl_prestudent.prestudent_id 
+			AND test.status_kurzbz='Incoming' 
+			AND test.studiensemester_kurzbz=v.studiensemester_kurzbz";
+
+		$this->PrestudentModel->db->where("EXISTS (" . $selectIncoming . ")", null, false);
+
+		$result = $this->PrestudentModel->load();
+		
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	/**
