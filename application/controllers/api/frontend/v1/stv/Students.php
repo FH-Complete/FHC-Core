@@ -101,31 +101,46 @@ class Students extends FHCAPI_Controller
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
+	 *
 	 * @return void
 	 */
-	public function getIncoming()
+	public function getIncoming($studiensemester_kurzbz)
 	{
 		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		]);
 		// TODO(chris): IMPLEMENT!
 		$this->terminateWithSuccess([]);
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
+	 *
 	 * @return void
 	 */
-	public function getOutgoing()
+	public function getOutgoing($studiensemester_kurzbz)
 	{
 		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		]);
 		// TODO(chris): IMPLEMENT!
 		$this->terminateWithSuccess([]);
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
+	 *
 	 * @return void
 	 */
-	public function getGemeinsamestudien()
+	public function getGemeinsamestudien($studiensemester_kurzbz)
 	{
 		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', [
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		]);
 		// TODO(chris): IMPLEMENT!
 		$this->terminateWithSuccess([]);
 	}
