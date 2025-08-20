@@ -342,9 +342,11 @@ class Students extends FHCAPI_Controller
 		$this->prepareQuery($studiensemester_kurzbz);
 		
 		$this->PrestudentModel->addSelect("
-			CASE WHEN ps.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') 
-			THEN ps.ausbildungssemester::text 
-			ELSE ''::text END AS semester", false);
+			CASE 
+				WHEN pls.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') 
+				THEN ps.ausbildungssemester::text 
+				ELSE ''::text 
+			END AS semester", false);
 		$this->PrestudentModel->addSelect("'' AS verband");
 		$this->PrestudentModel->addSelect("'' AS gruppe");
 		$this->addSelectPrioRel();
@@ -549,9 +551,16 @@ class Students extends FHCAPI_Controller
 			);*/
 		$this->prepareQuery($studiensemester_kurzbz);
 
-		$this->PrestudentModel->addSelect("COALESCE(v.semester::text, CASE WHEN public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN public.get_absem_prestudent(tbl_prestudent.prestudent_id, NULL)::text ELSE ''::text END) AS semester", false);
-		$this->PrestudentModel->addSelect('v.verband');
-		$this->PrestudentModel->addSelect('v.gruppe');
+		$this->PrestudentModel->addSelect("COALESCE(
+			v.semester::text, 
+			CASE 
+				WHEN pls.status_kurzbz IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') 
+				THEN pls.ausbildungssemester::text 
+				ELSE ''::text 
+			END
+		) AS semester", false);
+		$this->PrestudentModel->addSelect("COALESCE(v.verband::text, ''::text)");
+		$this->PrestudentModel->addSelect("COALESCE(v.gruppe::text, ''::text)");
 
 		$this->addSelectPrioRel();
 
@@ -796,12 +805,12 @@ class Students extends FHCAPI_Controller
 			SELECT count(*)
 			FROM (
 				SELECT *, public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) AS laststatus
-				FROM PUBLIC.tbl_prestudent pss
-				JOIN PUBLIC.tbl_prestudentstatus USING (prestudent_id)
+				FROM public.tbl_prestudent pss
+				JOIN public.tbl_prestudentstatus USING (prestudent_id)
 				WHERE person_id = p.person_id
 				AND studiensemester_kurzbz = (
 					SELECT studiensemester_kurzbz
-					FROM PUBLIC.tbl_prestudentstatus
+					FROM public.tbl_prestudentstatus
 					WHERE prestudent_id = tbl_prestudent.prestudent_id
 					AND status_kurzbz = 'Interessent'
 					LIMIT 1
@@ -810,7 +819,7 @@ class Students extends FHCAPI_Controller
 			) prest
 			WHERE laststatus NOT IN ('Abbrecher', 'Abgewiesener', 'Absolvent')
 			AND priorisierung <= tbl_prestudent.priorisierung
-		) || ' (' || tbl_prestudent.priorisierung || ')' AS priorisierung_relativ", false);
+		) || ' (' || COALESCE(tbl_prestudent.priorisierung::text, ' '::text) || ')' AS priorisierung_relativ", false);
 	}
 
 	/**
