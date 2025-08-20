@@ -20,8 +20,8 @@ export default {
 		getUid(params){
 			return this.$fhcApi.get('api/frontend/v1/messages/messages/getUid/'+ params.id + '/' + params.type_id);
 		},
-		getVorlagentext(vorlage_kurzbz){
-			return this.$fhcApi.get('api/frontend/v1/messages/messages/getVorlagentext/' + vorlage_kurzbz);
+		getDataVorlage(vorlage_kurzbz){
+			return this.$fhcApi.get('api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz);
 		},
 		getNameOfDefaultRecipient(params){
 			return this.$fhcApi.get('api/frontend/v1/messages/messages/getNameOfDefaultRecipient/' + params.id + '/' + params.type_id);
