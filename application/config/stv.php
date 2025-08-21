@@ -85,9 +85,9 @@ if (!defined('ZGV_DOKTOR_ANZEIGEN') || !ZGV_DOKTOR_ANZEIGEN) {
 }
 
 $config['student_tab_order'] = [
-	'messages',
 	'details',
 	'notes',
+	'messages',
 	'contact',
 	'prestudent',
 	'status',
@@ -101,14 +101,15 @@ $config['student_tab_order'] = [
 	'mobility',
 	'jointstudies',
 	'admissionDates',
-	'functions',
-	'resources',
 	'groups',
+	'functions',
 	'coursedates',
+	'resources',
 ];
 $config['students_tab_order'] = [
 	'banking',
 	'status',
+	'groups',
 	'finalexam',
 	'archive',
 ];
