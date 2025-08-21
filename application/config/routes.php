@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -51,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   my-controller/my-method -> my_controller/my_method
 */
 $route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
-$route['translate_uri_dashes'] = FALSE;
+$route['translate_uri_dashes'] = false;
 
 // Class name conflicts
 $route['api/v1/organisation/[S|s]tudiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
