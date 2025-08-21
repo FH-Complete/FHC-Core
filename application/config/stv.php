@@ -83,3 +83,32 @@ if (!defined('ZGV_DOKTOR_ANZEIGEN') || !ZGV_DOKTOR_ANZEIGEN) {
 		$fieldsZgvDoktor
 	);
 }
+
+$config['student_tab_order'] = [
+	'messages',
+	'details',
+	'notes',
+	'contact',
+	'prestudent',
+	'status',
+	'documents',
+	'archive',
+	'banking',
+	'grades',
+	'exam',
+	'exemptions',
+	'finalexam',
+	'mobility',
+	'jointstudies',
+	'admissionDates',
+	'functions',
+	'resources',
+	'groups',
+	'coursedates',
+];
+$config['students_tab_order'] = [
+	'banking',
+	'status',
+	'finalexam',
+	'archive',
+];
