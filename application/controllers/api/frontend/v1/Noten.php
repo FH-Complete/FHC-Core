@@ -29,15 +29,15 @@ class Noten extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStudentenNoten' => self::PERM_LOGGED, // todo: berechtigung
-			'getNoten' => self::PERM_LOGGED,
-			'saveStudentenNoten' => self::PERM_LOGGED, // todo: berechtigungen!
-			'getNotenvorschlagStudent' => self::PERM_LOGGED,
-			'saveNotenvorschlag' => self::PERM_LOGGED,
-			'saveStudentPruefung' => self::PERM_LOGGED,
-			'createPruefungen' => self::PERM_LOGGED,
-			'saveNotenvorschlagBulk' => self::PERM_LOGGED,
-			'savePruefungenBulk' => self::PERM_LOGGED
+			'getStudentenNoten' => array('lehre/benotungstool:rw'),
+			'getNoten' => array('lehre/benotungstool:rw'),
+			'saveStudentenNoten' => array('lehre/benotungstool:rw'),
+			'getNotenvorschlagStudent' => array('lehre/benotungstool:rw'),
+			'saveNotenvorschlag' => array('lehre/benotungstool:rw'),
+			'saveStudentPruefung' => array('lehre/benotungstool:rw'),
+			'createPruefungen' => array('lehre/benotungstool:rw'),
+			'saveNotenvorschlagBulk' => array('lehre/benotungstool:rw'),
+			'savePruefungenBulk' => array('lehre/benotungstool:rw')
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -63,7 +63,16 @@ class Noten extends FHCAPI_Controller
 		$this->load->helper('hlp_sancho_helper');
 
 	}
-	
+
+
+	/**
+	 * GET METHOD
+	 * expects 'lv_id', 'sem_kurzbz'
+	 * returns List of all Students of given lehrveranstaltung and semester and fetches their grades.
+	 * Loads LvGesamtnote aswell as Teilnoten from externalSources via getExternalGrades Event.
+	 * Calculates the Notenvorschlag for every student based on averaging their Teilnoten.
+	 * Finally also fetches all Prüfungen for every student which are linked to lva and semester.
+	 */
 	public function getStudentenNoten() {
 		$lv_id = $this->input->get("lv_id",TRUE);
 		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
@@ -71,13 +80,10 @@ class Noten extends FHCAPI_Controller
 		if (!isset($lv_id) || isEmptyString($lv_id)
 			|| !isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-
-		// todo: check various other berechtigungen if its mitarbeiter/lektor/zugeteilterLektor?
+		
 		// get studenten for lva & sem with zeugnisnote if available
 		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
 		$studentenData = $this->getDataOrTerminateWithError($studenten);
-//		$studentenData = getData($studenten);
-		$this->addMeta('$studentenData', $studentenData);
 		
 		$func = function ($value) {
 			return $value->uid;
@@ -85,15 +91,11 @@ class Noten extends FHCAPI_Controller
 		
 		$grades = array();
 		$student_uids = array_map($func, $studentenData);
-
-		$res = $this->StudentModel->load(['be21b081']);
-		$this->addMeta('be21b081', $res);
 		
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
 			
 			$res = $this->StudentModel->load([$uid]);
-			$this->addMeta($uid, $res);
 			if(!isError($res) && hasData($res)) $student = getData($res)[0];
 
 			$prestudent_id = $student->prestudent_id;
@@ -112,7 +114,7 @@ class Noten extends FHCAPI_Controller
 			$grades[$uid]['mobility'] = $eintrag;
 			
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
-			$this->addMeta('getLvGesamtNoten', $result);
+
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
 				$grades[$uid]['note_lv'] = $lvgesamtnote->note;
@@ -139,9 +141,8 @@ class Noten extends FHCAPI_Controller
 				'stsem' => $sem_kurzbz
 			]
 		);
-		$this->addMeta('$grades', $grades);
 		
-		// calculate notenvorschläge from teilnoten, TODO: seperate function + own endpoint
+		// calculate notenvorschläge from teilnoten
 		foreach($studentenData as $student) {
 			$g = $grades[$student->uid]['grades'];
 			$note_lv = $grades[$student->uid]['note_lv'];
@@ -208,11 +209,14 @@ class Noten extends FHCAPI_Controller
 		// get all prüfungen with noten held in that semester in that lva
 		$pruefungen = $this->LePruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
 		$pruefungenData = getData($pruefungen);
-//		$pruefungenData = $this->getDataOrTerminateWithError($pruefungen);
-		$this->addMeta('$pruefungenData', $pruefungenData);
+		
 		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN, $grades));
 	}
 
+	/**
+	 * GET METHOD
+	 * returns List of all available & active NotenOptions 
+	 */
 	public function getNoten() {
 		$this->load->model('education/Note_model', 'NoteModel');
 
@@ -220,7 +224,17 @@ class Noten extends FHCAPI_Controller
 		$noten = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($noten);
 	}
-	
+
+	/**
+	 * POST METHOD
+	 * expects 'lv_id', 'sem_kurzbz', 'password', 'noten'
+	 * Notenfreigabe method which checks the users password as a security measure.
+	 * Tries to load Lehrveranstaltung, Studiengang and Person via Model in order to validate the coherency of input parameters
+	 * lv_id & sem_kurzbz in relation to the noten array delivered.
+	 * Updates the LvGesamtnote note, aswell as freigabedatum, which is key in the logic of the freigegeben/offen/changed notenStatus
+	 * Along this process builds a html table to be placed in a confirmation email (uid only and full variant depending on config)
+	 * which is being sent to the Lektor, aswell as the assigned Assistenz.
+	 */
 	public function saveStudentenNoten() {
 		$result = $this->getPostJSON();
 
@@ -237,8 +251,6 @@ class Noten extends FHCAPI_Controller
 		$sem_kurzbz = $result->sem_kurzbz;
 		
 		$ret = [];
-		
-		// TODO: also do something similar when updating/creating a pruefung!
 		
 		$res = $this->LehrveranstaltungModel->load($lv_id);
 		if(isError($res) || !hasData($res)) {
@@ -295,7 +307,7 @@ class Noten extends FHCAPI_Controller
 			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
 				$lvgesamtnote = getData($resultLVGes)[0];
-				$this->addMeta($note->uid, $lvgesamtnote);
+
 				if ($lvgesamtnote->benotungsdatum > $lvgesamtnote->freigabedatum)
 				{
 
@@ -346,6 +358,7 @@ class Noten extends FHCAPI_Controller
 		$this->terminateWithSuccess($ret);
 	}
 
+	
 	private function sendEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
 	{
 		$emailAdressen[] = getAuthUID() . "@" . DOMAIN; // also send mail to lektors own adress
@@ -373,12 +386,26 @@ class Noten extends FHCAPI_Controller
 
 	}
 
+	/**
+	 * GET METHOD
+	 * should return Notenvorschlag for single Students, not yet implemented since it is not needed anywhere right now,
+	 * but could be useful later on.
+	 */
 	public function getNotenvorschlagStudent() {
 		// TODO: Notenvorschlag laden allgemeiner Endpunkt, der im Backend mit Logik (z.B. Moodle) angepasst werden kann.
 		
 		$this->terminateWithSuccess();
 	}
-	
+
+	/**
+	 * POST METHOD
+	 * expects 'datum', 'lva_id', 'student_uid', 'note'
+	 * Inserts or updates a pruefung for lva & student_uid at given datum (YYYY-MM-DD). When creating a new
+	 * Pruefung, sets the provided (Prüfungs-) Note.
+	 * Updates the LvGesamtnote of student.
+	 * Can return 1 or 2 Prüfungen, since the original grade before the first prüfung is being saved as "Termin1" when
+	 * a "Termin2" is being created.
+	 */
 	public function saveStudentPruefung() { // einzelne pruefung speichern
 		$result = $this->getPostJSON();
 
@@ -489,9 +516,7 @@ class Noten extends FHCAPI_Controller
 			}
 			
 		}
-
-		$this->addMeta('$pruefungenChanged', $pruefungenChanged);
-		$this->addMeta('$lvgesamtnote', $lvgesamtnote);
+		
 		$savedPruefung = $pruefungenChanged['savedPruefung'] ?? null;
 		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null;
 
@@ -500,7 +525,10 @@ class Noten extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess(array($savedPruefungData, $lvgesamtnote, $extraPruefungData));
 	}
-	
+
+	/**
+	 * private helper method to update/insert pruefungstermine 
+	 */
 	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum) 
 	{
 		$jetzt = date("Y-m-d H:i:s");
@@ -525,8 +553,6 @@ class Noten extends FHCAPI_Controller
 
 				$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
 				
-				$this->addMeta('$resultLV', $resultLV);
-				
 				// update Termin1 note
 				if (hasData($resultLV))
 				{
@@ -541,8 +567,6 @@ class Noten extends FHCAPI_Controller
 					$pr_punkte = null;
 					$benotungsdatum = $jetzt;
 				}
-
-				$this->addMeta('$pr_punkte', $pr_punkte);
 				
 				$id = $this->LePruefungModel->insert(
 					array(
@@ -562,7 +586,6 @@ class Noten extends FHCAPI_Controller
 					)
 				);
 				if($id) {
-					$this->addMeta('idTermin1', $id);
 					$res = $this->LePruefungModel->load($id->retval);
 					if(hasData($res)) $pruefungenChanged['extraPruefung'] = getData($res);
 				}
@@ -675,6 +698,12 @@ class Noten extends FHCAPI_Controller
 		return $pruefungenChanged;
 	}
 
+	/**
+	 * POST METHOD
+	 * expects 'sem_kurzbz', 'lv_id', 'student_uid', 'note'
+	 * Method that sets lv_note of student in lva and semester from provided Points/Grade Selection.
+	 * Updates the note & benotungsdatum, which is key in the noten state offen/freigegeben/changed
+	 */
 	public function saveNotenvorschlag() {
 		$result = $this->getPostJSON();
 
@@ -689,7 +718,7 @@ class Noten extends FHCAPI_Controller
 		$note = $result->note;
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $student_uid, $sem_kurzbz);
-		$this->addMeta('getLvGesamtNoten', $result);
+
 		if(!isError($result) && hasData($result)) {
 			$lvgesamtnote = getData($result)[0];
 			
@@ -736,6 +765,11 @@ class Noten extends FHCAPI_Controller
 		$this->terminateWithSuccess(array($lvgesamtnote));
 	}
 
+	/**
+	 * POST METHOD
+	 * expects 'sem_kurzbz', 'lv_id', 'noten'
+	 * Bulk variant of saveNotenvorschlag, used when importing grades from csv.
+	 */
 	public function saveNotenvorschlagBulk() {
 		$result = $this->getPostJSON();
 
@@ -754,7 +788,7 @@ class Noten extends FHCAPI_Controller
 		{
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
-			$this->addMeta('getLvGesamtNoten', $result);
+
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
 
@@ -803,7 +837,13 @@ class Noten extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($retLvNoten);
 	}
-	
+
+	/**
+	 * POST METHOD
+	 * expects 'uids', 'datum'
+	 * Bulk variant of saveStudentPruefung, used when creating a new Prüfung for several students. Always sets note to
+	 * "noch nicht eingetragen" for the created Prüfung.
+	 */
 	public function createPruefungen() {
 		$result = $this->getPostJSON();
 
@@ -832,6 +872,11 @@ class Noten extends FHCAPI_Controller
 		$this->terminateWithSuccess($ret);
 	}
 
+	/**
+	 * POST METHOD
+	 * expects 'lv_id', 'sem_kurzbz', 'pruefungen'
+	 * Bulk variant of saveStudentPruefung, used when importing pruefungsdata from csv with available noten.
+	 */
 	public function savePruefungenBulk() {
 		$result = $this->getPostJSON();
 

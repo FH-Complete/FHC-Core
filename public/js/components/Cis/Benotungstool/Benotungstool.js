@@ -439,7 +439,6 @@ export const Benotungstool = {
 					return true;  // student can be selected to add pruefung
 				},
 				rowFormatter: this.fixTabulatorSelectionFormatter,
-				debugEventsExternal:true,
 				columns: [
 				{
 					formatter: function (cell, formatterParams, onRendered) {
@@ -1063,7 +1062,9 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.getStudentenNoten(lv_id, sem_kurzbz))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
-				})
+				}).finally(()=> {
+					this.loading = false
+			})
 		},
 		handleUuidDefined(uuid) {
 			this.tabulatorUuid = uuid
@@ -1106,6 +1107,8 @@ export const Benotungstool = {
 				this.notenOptionsLehre = res.data.filter(n => n.lehre === true)
 				this.notenTableOptions = this.getNotenTableOptions()
 				this.tabulatorCanBeBuilt = true // because promises would be more work and not much better here
+			}).catch(e => {
+				this.loading = false
 			})
 			
 		},
