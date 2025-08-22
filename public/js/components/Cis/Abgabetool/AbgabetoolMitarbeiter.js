@@ -3,6 +3,7 @@ import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js"
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
+import ApiAbgabe from '../../../api/abgabe.js'
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -176,13 +177,13 @@ export const AbgabetoolMitarbeiter = {
 		},
 		addSeries() {
 			this.saving = true
-			this.$fhcApi.factory.lehre.postSerientermin(
+			this.$api.call(ApiAbgabe.postSerientermin(
 				this.serienTermin.datum.toISOString(),
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
 				this.selectedData?.map(projekt => projekt.projektarbeit_id)
-			).then(res => {
+			)).then(res => {
 				if (res.meta.status === "success" && res.data) {
 					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))
 					// TODO: sticky lifetime erhöhen um sinnvoll lesen zu können?
@@ -321,7 +322,7 @@ export const AbgabetoolMitarbeiter = {
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},
 		loadProjektarbeiten(all = false, callback) {
-			this.$fhcApi.factory.lehre.getMitarbeiterProjektarbeiten(this.viewData?.uid ?? null, all)
+			this.$api.call(ApiAbgabe.getMitarbeiterProjektarbeiten(all))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				}).finally(() => {
@@ -332,7 +333,7 @@ export const AbgabetoolMitarbeiter = {
 		},
 		loadAbgaben(details) {
 			return new Promise((resolve) => {
-				this.$fhcApi.factory.lehre.getStudentProjektabgaben(details)
+				this.$api.call(ApiAbgabe.getStudentProjektabgaben(details))
 					.then(res => {
 						resolve(res)
 					})
@@ -369,7 +370,13 @@ export const AbgabetoolMitarbeiter = {
 
 	},
 	created() {
-
+		// fetch abgabetypen options
+		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
+			this.paabgabetypOptions = res.data
+			this.tabulatorCanBeBuilt = true // because promises would be more work and not much better here
+		}).catch(e => {
+			this.loading = false
+		})
 	},
 	mounted() {
 		this.setupMounted()

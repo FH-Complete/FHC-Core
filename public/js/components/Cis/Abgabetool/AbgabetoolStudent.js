@@ -186,14 +186,14 @@ export const AbgabetoolStudent = {
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},
 		loadProjektarbeiten() {
-			this.$fhcApi.factory.lehre.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null)
+			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
 		},
 		loadAbgaben(details) {
 			return new Promise((resolve) => {
-				this.$fhcApi.factory.lehre.getStudentProjektabgaben(details)
+				this.$api.call(ApiAbgabe.getStudentProjektabgaben(details))
 					.then(res => {
 						resolve(res)
 					})

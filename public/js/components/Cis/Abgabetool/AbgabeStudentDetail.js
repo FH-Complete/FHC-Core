@@ -74,7 +74,7 @@ export const AbgabeStudentDetail = {
 			for (let i = 0; i < this.enduploadTermin.file.length; i++) {
 				formData.append('file', this.enduploadTermin.file[i]);
 			}
-			this.$fhcApi.factory.lehre.postStudentProjektarbeitEndupload(formData)
+			this.$api.call(ApiAbgabe.postStudentProjektarbeitEndupload(formData))
 				.then(res => {
 					this.handleUploadRes(res)
 				})
@@ -82,7 +82,9 @@ export const AbgabeStudentDetail = {
 			this.$refs.modalContainerEnduploadZusatzdaten.hide()
 		},
 		downloadAbgabe(termin) {
-			this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
+			// TODO: test
+			this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
+			// this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
 		},
 		formatDate(dateParam) {
 			const date = new Date(dateParam)
@@ -117,7 +119,8 @@ export const AbgabeStudentDetail = {
 				for (let i = 0; i < termin.file.length; i++) {
 					formData.append('file', termin.file[i]);
 				}
-				this.$fhcApi.factory.lehre.postStudentProjektarbeitZwischenabgabe(formData)
+
+				this.$api.call(ApiAbgabe.postStudentProjektarbeitZwischenabgabe(formData))
 					.then(res => {
 						this.handleUploadRes(res)
 					})

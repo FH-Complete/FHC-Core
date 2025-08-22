@@ -84,7 +84,7 @@ export const DeadlineOverview = {
 			this.tableBuiltResolve = resolve
 		},
 		loadDeadlines() {
-			this.$fhcApi.factory.lehre.fetchDeadlines(this.person_uid_prop ??  null)
+			this.$api.call(ApiAbgabe.fetchDeadlines(this.person_uid_prop ??  null))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
