@@ -34,6 +34,7 @@ class UHSTAT1 extends FHC_Controller
 		// load models
 		$this->load->model('codex/Oehbeitrag_model', 'OehbeitragModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 		$this->load->model('codex/Abschluss_model', 'AbschlussModel');
 		$this->load->model('codex/Uhstat1daten_model', 'Uhstat1datenModel');
@@ -429,6 +430,17 @@ class UHSTAT1 extends FHC_Controller
 			&& isset($_SESSION[self::LOGIN_SESSION_INDEX])
 		)
 			return $_SESSION[self::PERSON_ID_SESSION_INDEX];
+
+		// ...check if student is successfully logged in
+		$loggedInPersonId = getAuthPersonId();
+		if (isset($loggedInPersonId) && is_numeric($loggedInPersonId))
+		{
+			// check if the the user is a student and if the benutzer is active
+			$this->StudentModel->addSelect('1');
+			$this->StudentModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_student.student_uid");
+			$res = $this->StudentModel->loadWhere(["public.tbl_benutzer.person_id" => $loggedInPersonId, "public.tbl_benutzer.aktiv" => TRUE]);
+			if (hasData($res)) return $loggedInPersonId;
+		}
 
 		// if person id passed directly...
 		$person_id = $this->input->post('person_id');
