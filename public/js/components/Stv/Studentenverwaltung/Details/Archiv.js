@@ -5,14 +5,15 @@ import AkteEdit from "./Archiv/Edit.js";
 import ApiStvArchiv from '../../../../api/factory/stv/archiv.js';
 
 export default {
+	name: 'Archiv',
 	components: {
 		CoreFilterCmpt,
 		FormInput,
 		AkteEdit
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -151,7 +152,9 @@ export default {
 								this.$fhcAlert
 									.confirmDelete()
 									.then(result => result ? {akte_id: cell.getData().akte_id, studiengang_kz: this.modelValue.studiengang_kz} : Promise.reject({handled:true}))
-									.then(this.$fhcApi.factory.stv.archiv.delete)
+									.then((params) => {
+										return this.$api.call(ApiStvArchiv.delete(params.akte_id, params.studiengang_kz))
+									})
 									.then(() => {
 										//cell.getRow().delete();
 										this.reload();
@@ -214,7 +217,7 @@ export default {
 					archiveFunction({
 						xml: this.getXmlByXsl(this.selectedVorlage.vorlage_kurzbz),
 						xsl: this.selectedVorlage.vorlage_kurzbz,
-						ss: this.defaultSemester,
+						ss: this.currentSemester,
 						uid: archiveData.uid,
 						prestudent_id: archiveData.prestudent_id
 					})
@@ -256,7 +259,7 @@ export default {
 
 	},
 	template: `
-	<div class="stv-details-konto h-100 d-flex flex-column">
+	<div class="stv-details-archiv h-100 d-flex flex-column">
 		<core-filter-cmpt
 			ref="table"
 			table-only
@@ -264,6 +267,7 @@ export default {
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template #actions>
 				<div class="input-group w-auto">

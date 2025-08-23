@@ -444,6 +444,7 @@ export default {
 				table-only
 				:side-menu="false"
 				:reload= "!this.stylePv21"
+				:reload-btn-infotext="this.$p.t('table', 'reload')"
 				new-btn-show
 				:new-btn-class="this.newBtnStyle"
 				:new-btn-label="this.$p.t('person', 'funktion')"
@@ -555,6 +556,7 @@ export default {
 							:label="$p.t('ui/from') + ' *'"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"
@@ -569,6 +571,7 @@ export default {
 							:label="$p.t('global/bis')"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"

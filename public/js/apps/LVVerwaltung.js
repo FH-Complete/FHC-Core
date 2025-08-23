@@ -13,8 +13,36 @@ const router = VueRouter.createRouter({
 		},
 		{
 			name: `byEmp`,
-			path: `/emp/:emp/:stg?`,
-			component: LVVerwaltung
+			path: `/emp/:studiensemester_kurzbz/:emp/:stg?/:semester?`,
+			component: LVVerwaltung,
+			props: route => {
+				let {emp, stg, semester, studiensemester_kurzbz} = route.params;
+
+				if (emp === '')
+					emp = undefined;
+
+				if (stg === '')
+					stg = undefined;
+
+				if (studiensemester_kurzbz === '')
+					studiensemester_kurzbz = undefined;
+
+				return {
+					studiensemester_kurzbz: studiensemester_kurzbz,
+					emp: emp,
+					stg: stg,
+					semester: semester
+				};
+			},
+			beforeEnter: (to, from, next) => {
+				const { studiensemester_kurzbz } = to.params;
+				const isSemester = /^(SS|WS)\d{4}$/.test(studiensemester_kurzbz);
+
+				if (!isSemester)
+					return next({ path: '/' });
+				else
+					next();
+			}
 		},
 		/*{
 			name: `byFachbereich`,
@@ -23,13 +51,41 @@ const router = VueRouter.createRouter({
 		},*/
 		{
 			name: `byStg`,
-			path: `/stg/:stg/:semester?`,
-			component: LVVerwaltung
+			path: '/stg/:studiensemester_kurzbz/:stg?/:semester?/',
+			component: LVVerwaltung,
+			props: route => {
+				let { studiensemester_kurzbz, stg, semester } = route.params;
+
+				if (semester === '')
+					semester = undefined;
+
+				if (studiensemester_kurzbz === '')
+					studiensemester_kurzbz = undefined;
+
+				if (stg === '')
+					stg = undefined;
+
+				return {
+					studiensemester_kurzbz: studiensemester_kurzbz,
+					stg: stg,
+					semester: semester,
+				};
+			},
+			beforeEnter: (to, from, next) => {
+				const studiensemester_kurzbz = to.params?.studiensemester_kurzbz
+				const isSemester = /^(SS|WS)\d{4}$/.test(studiensemester_kurzbz);
+
+				if (!isSemester)
+					return next({ path: '/' });
+				else
+					next();
+			}
 		},
 		{
 			path: '/:pathMatch(.*)*',
 			redirect: '/'
-		}
+		},
+
 	]
 });
 

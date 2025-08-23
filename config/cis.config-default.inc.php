@@ -296,4 +296,6 @@ define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
 
+// Weiterleiten zu CIS neu (wenn Rechte vorhanden)
+define('CIS_REDIRECT_TO_CIS4', false);
 ?>

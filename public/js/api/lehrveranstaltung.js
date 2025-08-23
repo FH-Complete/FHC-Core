@@ -7,16 +7,24 @@ export default {
 			url: '/api/frontend/v1/Lehrveranstaltung/loadByLV/' + encodeURIComponent(lehrveranstaltung_id)
 		};
 	},
-	getByStg(studiengang_kz, semester)
+	getByStg(studiensemester_kurzbz, studiengang_kz, semester = null)
 	{
-		return ("/api/frontend/v1/Lehrveranstaltung/loadByStudiengang/" + encodeURIComponent(studiengang_kz) + "/" + encodeURIComponent(semester));
-	},
+		let path = "/api/frontend/v1/Lehrveranstaltung/getByStg/" + encodeURIComponent(studiensemester_kurzbz) + "/" + encodeURIComponent(studiengang_kz);
 
-	getByEmpStg(mitarbeiter_uid, stg)
+		if (semester)
+			path += "/" + encodeURIComponent(semester);
+
+		return path;
+	},
+	getByEmp(studiensemester_kurzbz, mitarbeiter_uid, stg = null)
 	{
-		return ("/api/frontend/v1/Lehrveranstaltung/loadByEmployee/" + encodeURIComponent(mitarbeiter_uid) + "/" + encodeURIComponent(stg));
-	},
+		let path = "/api/frontend/v1/Lehrveranstaltung/getByEmp/" + encodeURIComponent(studiensemester_kurzbz) + "/" + encodeURIComponent(mitarbeiter_uid);
 
+		if (stg)
+			path += "/" + encodeURIComponent(stg);
+
+		return path;
+	},
 	getTable(url)
 	{
 		return {

@@ -42,7 +42,6 @@ export default {
 								hour12: false
 							});
 						}},
-					{title: "Akzeptiertvon", field: "insertvonma"},
 					{
 						title: "UploadDatum", field: "hochgeladenamum",
 						formatter: function (cell) {
@@ -57,6 +56,7 @@ export default {
 								hour12: false
 							});
 						}},
+					{title: "Akzeptiertvon", field: "insertvonma"},
 					{title: "Kurzbz", field: "dokument_kurzbz", visible: false},
 					{title: "Prestudent ID", field: "prestudent_id", visible: false},
 					{title: "nachgereicht", field: "nachgereicht", visible: false,
@@ -66,10 +66,10 @@ export default {
 							tickElement: '<i class="fa fa-check text-secondary"></i>',
 							crossElement: '<i class="fa fa-xmark text-secondary"></i>'
 						}},
-					{title: "infotext", field: "infotext"},
+					{title: "Infotext", field: "infotext"},
 					{title: "akte_id", field: "akte_id"},
 					{title: "dms_id", field: "dms_id", visible: false},
-					{title: "titel", field: "titel_intern"},
+					{title: "titel", field: "titel_intern", visible: false},
 					{title: "vorhanden", field: "vorhanden",
 						formatter:"tickCross",
 						hozAlign:"center",
@@ -151,7 +151,7 @@ export default {
 				height: 300,
 				selectable: true,
 				selectableRangeMode: 'click',
-				persistenceID: 'core-details-documents-accepted',
+				persistenceID: 'core-details-documents-accepted-2025072101',
 				listDocuments: [],
 			},
 			tabulatorEvents: [
@@ -172,7 +172,7 @@ export default {
 							title: this.$p.t('mobility', 'kurzbz')
 						});
 						cm.getColumnByField('insertvonma').component.updateDefinition({
-							title: this.$p.t('global', 'uploaddatum')
+							title: this.$p.t('dokumente', 'akzeptiertVon')
 						});
 						cm.getColumnByField('hochgeladenamum').component.updateDefinition({
 							title: this.$p.t('global', 'uploaddatum')
@@ -196,7 +196,7 @@ export default {
 							title: this.$p.t('global', 'akte_id')
 						});
 						cm.getColumnByField('nachgereicht_am').component.updateDefinition({
-							title: this.$p.t('global', 'dokument')
+							title: this.$p.t('dokumente', 'nachreichungAm')
 						});
 					}
 				},
@@ -336,6 +336,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 	 	>
 			<template #actions="{selected}">
 				<button

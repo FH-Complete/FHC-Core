@@ -26,13 +26,13 @@ export default {
 		FetchProfilUpdates,
 		EditProfil,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction", "language"],
+	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
 	data() {
 		return {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-
+			preloadedPhrasen:{},
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
@@ -42,7 +42,7 @@ export default {
 				height: 200,
 				layout: "fitColumns",
 				columns: [{
-					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
+					title: Vue.computed(() => this.preloadedPhrasen.zutrittsGruppenPhrase),
 					field: "bezeichnung"
 				}],
 			},
@@ -68,14 +68,14 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
+						title: Vue.computed(()=>this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title:  Vue.computed(() => this.$p.t('profil/inventarnummer')),
+						title: Vue.computed(() =>this.preloadedPhrasen.inventarnummerPhrase) ,
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -83,7 +83,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
+						title: Vue.computed(() =>this.preloadedPhrasen.ausgabedatum) ,
 						field: "Ausgegeben_am",
 						headerFilter: true,
 						minWidth: 200,
@@ -163,8 +163,9 @@ export default {
 	},
 
 	computed: {
-		editable() {
-			return this.data?.editAllowed ?? false;
+		
+		fotoStatus() {
+			return this.data?.fotoStatus ?? null;
 		},
 
 		filteredEditData() {
@@ -228,6 +229,14 @@ export default {
 		},
 	},
 	created() {
+		// preload phrasen
+		this.$p.loadCategory('profil').then(() => {
+			this.preloadedPhrasen.zutrittsGruppenPhrase = this.$p.t('profil/zutrittsGruppen');
+			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
+			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
+			this.preloadedPhrasen.ausgabedatum = this.$p.t('profil/ausgabedatum');
+			this.preloadedPhrasen.loaded = true;
+		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 	},
@@ -239,9 +248,9 @@ export default {
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" 
-    :value="JSON.parse(JSON.stringify(filteredEditData))" :title="$p.t('profil','profilBearbeiten')"></edit-profil>
-    <!-- ROW --> 
+    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal"
+    :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <!-- ROW -->
     <div class="row">
         <!-- HIDDEN QUICK LINKS -->
         <div  class="d-md-none col-12 ">
@@ -251,11 +260,11 @@ export default {
                     <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
                 </div>
             </div>-->
-            
+
 			<!-- Bearbeiten Button -->
-			<div v-if="editable" class="row ">
+			<div v-if="isEditable" class="row ">
 				<div class="col mb-3">
-					<button @click="showEditProfilModal" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="showEditProfilModal" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>
@@ -267,31 +276,31 @@ export default {
 			</div>
 				<div v-if="data.profilUpdates" class="row mb-3">
 					<div class="col">
-						<!-- MOBILE PROFIL UPDATES -->  
+						<!-- MOBILE PROFIL UPDATES -->
 						<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 					</div>
 				</div>
 			</div>
 			<!-- END OF HIDDEN QUCK LINKS -->
-			
+
 			<!-- MAIN PANNEL -->
 			<div class="col-sm-12 col-md-8 col-xxl-9 ">
 				<!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
 				<!-- INFORMATION CONTENT START -->
-				<!-- ROW WITH THE PROFIL INFORMATION --> 
+				<!-- ROW WITH THE PROFIL INFORMATION -->
 				<div class="row mb-4 ">
 					<div  class="col-lg-12 col-xl-6 ">
 						<div class="row mb-4">
 							<div class="col">
 								<!-- PROFIL INFORMATION -->
-								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :editable="editable"></profil-information>
+								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
 							</div>
 						</div>
 						<div class="row mb-4">
 							<div  class=" col-lg-12">
 								<!-- STUDENT INFO -->
 								<role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
-							</div> 
+							</div>
 						</div>
 					<!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
 					</div>
@@ -326,7 +335,7 @@ export default {
 							</div>
 						</div>
 					</div>
-			
+
 					<div class="row mb-4">
 						<div class="col">
 							<!-- PRIVATE ADRESSEN-->
@@ -344,7 +353,7 @@ export default {
 								<div class="card-body">
 									<div class="gy-3 row ">
 										<div v-for="element in data.adressen" class="col-12">
-											<Adresse :data="element"></Adresse> 
+											<Adresse :data="element"></Adresse>
 										</div>
 									</div>
 								</div>
@@ -356,16 +365,18 @@ export default {
 			<!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
 			<div class="row">
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
-					@tableBuilt="betriebsmittelTableBuilt" 
-					:title="$p.t('profil','entlehnteBetriebsmittel')"  
-					ref="betriebsmittelTable" 
-					:tabulator-options="betriebsmittel_table_options" 
-					tableOnly 
+					<core-filter-cmpt
+					v-if="preloadedPhrasen.loaded"
+					@tableBuilt="betriebsmittelTableBuilt"
+					:title="$p.t('profil','entlehnteBetriebsmittel')"
+					ref="betriebsmittelTable"
+					:tabulator-options="betriebsmittel_table_options"
+					tableOnly
 					:sideMenu="false" />
-				</div> 
+				</div>
 				<div class="col-12 mb-4" >
-					<core-filter-cmpt 
+					<core-filter-cmpt
+					v-if="preloadedPhrasen.loaded"
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 
@@ -388,7 +399,7 @@ export default {
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">
-					<button @click="()=>showEditProfilModal()" type="button" class="text-start  w-100 btn btn-outline-secondary" >
+					<button @click="()=>showEditProfilModal()" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
 							<div class="col-2">
 								<i class="fa fa-edit"></i>

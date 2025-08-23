@@ -168,7 +168,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
-				selectable: true,
 				index: 'abschlusspruefung_id',
 				persistenceID: 'stv-details-finalexam'
 			},
@@ -225,7 +224,7 @@ export default {
 							title: this.$p.t('global', 'typ')
 						});
 						cm.getColumnByField('abschlusspruefung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'abschlusspruefung_id')
+							title: this.$p.t('abschlusspruefung', 'abschlusspruefung_id')
 						});
 						/*
 						cm.getColumnByField('actions').component.updateDefinition({
@@ -542,6 +541,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_finalexam')"
 			@click:new="actionNewAbschlusspruefung"
@@ -717,6 +717,7 @@ export default {
 						v-model="formData.datum"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="datum"
 						:teleport="true"
@@ -740,6 +741,7 @@ export default {
 						v-model="formData.sponsion"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="sponsion"
 						:teleport="true"

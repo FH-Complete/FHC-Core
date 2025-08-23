@@ -30,7 +30,7 @@ export default {
 	{
 		return {
 			method: 'post',
-			url: '/api/frontend/v1/lv/gruppe/deleteLVPlan/',
+			url: '/api/frontend/v1/lv/gruppe/deleteFromLVPlan/',
 			params: deleteData
 		};
 	},

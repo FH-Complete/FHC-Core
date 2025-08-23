@@ -132,8 +132,7 @@ export default {
 						<h2 class="h4">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
-							{{headerData[0].nachname}}
-							<span v-if="headerData[0].titelpost">, </span>
+							{{headerData[0].nachname}}<span v-if="headerData[0].titelpost">, </span>
 							{{headerData[0].titelpost}}
 						</h2>
 
@@ -155,8 +154,8 @@ export default {
 						<span>
 							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
 						</span>
-						<strong class="text-muted"> | Status </strong>
-						 {{headerData[0].status}}
+						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
+						 {{headerData[0].statusofsemester}}
 						<strong class="text-muted"> | {{$p.t('person', 'matrikelnummer')}} </strong>
 						  {{headerData[0].matr_nr}}
 					  </h5>

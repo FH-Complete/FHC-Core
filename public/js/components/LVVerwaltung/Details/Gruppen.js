@@ -103,7 +103,7 @@ export default{
 		{
 			const query = event.query.toLowerCase().trim();
 			this.filteredGroups = this.dropdowns.gruppen_array.filter(gruppe => {
-				return gruppe.gruppe_kurzbz.toLowerCase().includes(query);
+				return gruppe.gruppe_kurzbz.toLowerCase().includes(query) || gruppe?.bezeichnung?.toLowerCase().includes(query);
 			}).map(gruppe => ({
 				label: gruppe.bezeichnung
 					? `${gruppe.gruppe_kurzbz.trim()} (${gruppe.bezeichnung})`

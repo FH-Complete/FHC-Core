@@ -137,8 +137,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
@@ -292,12 +290,6 @@ export default {
 			this.formData.anmerkung = null;
 			this.formData.beschreibung = null;
 			this.statusNew = true;
-		},
-		//helper function: workaround to trigger validation if input is not a number
-		normalizeKaution() {
-			if (this.formData.kaution === null || this.formData.kaution === '') {
-				this.formData.kaution = 'xxx'
-			}
 		}
 	},
 	created() {
@@ -317,6 +309,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"
@@ -407,10 +400,9 @@ export default {
 				
 				<div class="row mb-3">
 					<form-input
-						type="number"
+						type="text"
 						:label="$p.t('infocenter/kaution')"
 						name="kaution"
-						@blur="normalizeKaution"
 						v-model="formData.kaution"
 						>
 					</form-input>
@@ -434,6 +426,7 @@ export default {
 						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -449,6 +442,7 @@ export default {
 						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"

@@ -41,6 +41,13 @@ export default {
 			return this.favorites.on ? this.favnodes : this.nodes;
 		}
 	},
+	watch: {
+		'preselectedKey': function (newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.setPreselection();
+			}
+		}
+	},
 	methods: {
 		findNodeByKey(key, arr) {
 			if (!arr)
@@ -223,7 +230,8 @@ export default {
 				}
 			}
 
-			this.selectedKey = { [currentNode.key]: true };
+			this.selectedKey = {[currentNode.key]: true};
+			this.onSelectTreeNode(currentNode);
 		}
 	},
 	mounted() {

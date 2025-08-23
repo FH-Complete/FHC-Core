@@ -93,9 +93,10 @@ export default {
 							if (countNotizen > 0){
 								buttonNotes.innerHTML = countNotizen + this.$p.t('anrechnung', 'existingNotes');
 							}
-							else
+							else {
 								buttonNotes.innerHTML = '+' + this.$p.t('global', 'notiz');
-
+							}
+							buttonNotes.title = this.$p.t('ui', 'notizHinzufuegen');
 							buttonNotes.addEventListener('click', (event) =>
 								this.addNote(cell.getData().anrechnung_id)
 							);
@@ -137,6 +138,9 @@ export default {
 						});
 						cm.getColumnByField('lehrveranstaltung_bez_kompatibel').component.updateDefinition({
 							title: this.$p.t('anrechnung', 'lehrveranstaltung_bez_kompatibel'),
+						});
+						cm.getColumnByField('status').component.updateDefinition({
+							title: this.$p.t('global', 'status'),
 						});
 						cm.getColumnByField('genehmigt_von').component.updateDefinition({
 							title: this.$p.t('anrechnung', 'genehmigtVon'),
@@ -353,6 +357,7 @@ export default {
 							table-only
 							:side-menu="false"
 							reload
+							:reload-btn-infotext="this.$p.t('table', 'reload')"
 						>
 						</core-filter-cmpt>
 					</template>

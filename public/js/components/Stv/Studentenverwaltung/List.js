@@ -8,9 +8,16 @@ export default {
 		CoreFilterCmpt,
 		ListNew
 	},
-	inject: [
-		'lists'
-	],
+	inject: {
+		'lists': {
+			from: 'lists',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		selected: Array,
 		studiengangKz: Number,
@@ -104,7 +111,7 @@ export default {
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
-						row.getElement().classList.add('text-muted');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
 
@@ -155,7 +162,8 @@ export default {
 			filterKontoMissingCounter: undefined,
 			count: 0,
 			filteredcount: 0,
-			selectedcount: 0
+			selectedcount: 0,
+			currentEndpointRawUrl: ''
 		}
 	},
 	methods: {
@@ -192,12 +200,20 @@ export default {
 
 			if( endpoint === undefined ) 
 			{
-				endpoint = { url: '' };
+				endpoint = {url: this.currentEndpointRawUrl};
 			} 
 			else if( endpoint.url === undefined ) 
 			{
-				endpoint.url = '';
+				endpoint.url = this.currentEndpointRawUrl;
+			} else
+			{
+				this.currentEndpointRawUrl = endpoint.url;
 			}
+
+			endpoint.url = endpoint.url.replace(
+				'CURRENT_SEMESTER',
+				encodeURIComponent(this.currentSemester)
+				);
 
 			const params = {}, filter = {};
 			if (this.filterKontoCount0)

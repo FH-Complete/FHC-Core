@@ -93,7 +93,7 @@ $config['navigation_header'] = array(
 				),
 				'zverfueg' => array(
 					'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
-					'description' => 'Zeitverf&uuml;gbarkeit',
+					'description' => 'Zeitverfügbarkeit',
 					'expand' => true,
 					'sort' => 45,
 					'requiredPermissions' => array(

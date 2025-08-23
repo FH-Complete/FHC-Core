@@ -1,8 +1,6 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
 
-import ApiMessages from '../../../api/factory/messages/messages.js';
-
 export default {
 	name: "TableMessages",
 	components: {
@@ -16,7 +14,7 @@ export default {
 	},
 	props: {
 		endpoint: {
-			type: String,
+			type: Object,
 			required: true
 		},
 		typeId: String,
@@ -41,7 +39,7 @@ export default {
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
 				columns: [
 					{title: "subject", field: "subject"},
-					{title: "body", field: "body", visible: false},
+					{title: "body", field: "body", formatter: "html", visible: false},
 					{title: "message_id", field: "message_id", visible: false},
 					{
 						title: "Datum",
@@ -63,9 +61,9 @@ export default {
 					{title: "recipient", field: "recipient"},
 					{title: "senderId", field: "sender_id"},
 					{title: "recipientId", field: "recipient_id"},
-					{title: "relationmessage_id", field: "relationmessage_id"},
+					{title: "Relationmessage ID", field: "relationmessage_id"},
 					{
-						title: "status",
+						title: "Status",
 						field: "status",
 						formatterParams: [
 							"unread",
@@ -257,7 +255,7 @@ export default {
 		},
 		deleteMessage(message_id){
 			return this.$api
-				.call(ApiMessages.deleteMessage(message_id))
+				.call(this.endpoint.deleteMessage(message_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -318,7 +316,7 @@ export default {
 		},
 		loadAjaxCall(url, config, params){
 			return this.$api.call(
-				ApiMessages.getMessages(params)
+				this.endpoint.getMessages(params)
 			);
 		}
 	},
@@ -349,7 +347,7 @@ export default {
 				type_id: this.typeId
 			};
 			this.$api
-				.call(ApiMessages.getPersonId(params))
+				.call(this.endpoint.getPersonId(params))
 				.then(result => {
 					this.personId = result.data;
 				})
@@ -403,6 +401,7 @@ export default {
 						table-only
 						:side-menu="false"
 						reload
+						:reload-btn-infotext="this.$p.t('table', 'reload')"
 						new-btn-show
 						:new-btn-label="this.$p.t('global', 'nachricht')"
 						@click:new="actionNewMessage"

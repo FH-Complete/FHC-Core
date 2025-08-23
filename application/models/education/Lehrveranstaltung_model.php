@@ -452,16 +452,6 @@ class Lehrveranstaltung_model extends DB_Model
 	 */
 	public function getLvsByStudentWithGrades($student_uid, $studiensemester_kurzbz, $sprache = null, $lvid=null)
 	{
-		if ($sprache) {
-			$sprache_qry = $this->db->compile_binds('SELECT index FROM public.tbl_sprache WHERE sprache = ?', [$sprache]);
-			$bezeichnung = 'bezeichnung_mehrsprachig[(' . $sprache_qry . ')]';
-			$sgbezeichnung = $sprache == 'English' ? 'COALESCE(sg.english, sg.bezeichnung)' : 'sg.bezeichnung';
-			$lvbezeichnung = $sprache == 'English' ? 'COALESCE(v.bezeichnung_english, v.bezeichnung)' : 'v.bezeichnung';
-		} else {
-			$bezeichnung = 'bezeichnung';
-			$sgbezeichnung = 'sg.bezeichnung';
-			$lvbezeichnung = 'v.bezeichnung';
-		}
 
 		$this->addDistinct();
 		// TODO(chris): selects
@@ -501,16 +491,20 @@ class Lehrveranstaltung_model extends DB_Model
 		$this->addSelect('znn.positiv');
 
 		#$this->addSelect('splv.module');
-		$this->addSelect($lvbezeichnung . ' AS bezeichnung');
-		$this->addSelect($sgbezeichnung . ' AS sg_bezeichnung');
+		$this->addSelect('v.bezeichnung AS bezeichnung');
+		$this->addSelect('v.bezeichnung_english AS bezeichnung_eng');
+		$this->addSelect('sg.bezeichnung AS sg_bezeichnung');
+		$this->addSelect('sg.english AS sg_bezeichnung_eng');
 		$this->addSelect('UPPER(sg.typ::VARCHAR(1) || sg.kurzbz) AS studiengang_kuerzel');
 		
 		//also adds returns the index of the grade
 		//TODO: ist zeugnissnote immer gleich wie die lvgesamtnote
 		$this->addSelect('COALESCE(zn.note::numeric,gn.note::numeric) as note_index');
 		$this->addSelect('COALESCE(znn.positiv,gnn.positiv) as positiv');
-		$this->addSelect('COALESCE(gnn.' . $bezeichnung . ', gnn.bezeichnung, gn.note::text) AS lvnote');
-		$this->addSelect('COALESCE(znn.' . $bezeichnung . ', znn.bezeichnung, zn.note::text) AS znote');
+		$this->addSelect('gnn.bezeichnung_mehrsprachig AS lvnotebez');
+		$this->addSelect('gnn.note AS lvnote');
+		$this->addSelect('znn.bezeichnung_mehrsprachig AS znotebez');
+		$this->addSelect('znn.note AS znote');
 
 		// TODO(chris): Potentielle Anpassung "Eine UID"
 		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'lehrveranstaltung_id');
@@ -989,6 +983,43 @@ class Lehrveranstaltung_model extends DB_Model
 		return $this->execQuery($qry, $params);
 	}
 
+	/**
+	 * Gets lehrveranstaltungen of Studienplan
+	 * @param $studienplan_id ID des Studienplans
+	 * @param $semester Semester optional
+	 * @return array|null
+	 */
+	public function getLvsByStudienplanId($studienplan_id, $semester = null)
+	{
+		$params = array($studienplan_id);
+
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+			tbl_studienplan_lehrveranstaltung.curriculum,
+			tbl_studienplan_lehrveranstaltung.export,
+			tbl_studienplan_lehrveranstaltung.genehmigung
+		FROM lehre.tbl_lehrveranstaltung
+		JOIN lehre.tbl_studienplan_lehrveranstaltung
+		USING(lehrveranstaltung_id)
+		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ?
+		";
+
+		if ($semester !== null)
+		{
+			$qry.= " AND tbl_studienplan_lehrveranstaltung.semester = ?";
+			$params[] = $semester;
+		}
+
+		$qry .= " ORDER BY stpllv_sort, semester, sort";
+
+		return $this->execQuery($qry, $params);
+	}
+
 	public function getLvsByOrganization($oe_kurzbz)
 	{
 		$qry="
@@ -1122,9 +1153,9 @@ class Lehrveranstaltung_model extends DB_Model
 
 		$qry .= "
 			SELECT DISTINCT on(lehrveranstaltung_id) lehrveranstaltung_id, 
-				kurzbz as lv_kurzbz,
-				bezeichnung as lv_bezeichnung,
-				bezeichnung_english as lv_bezeichnung_english,
+				tbl_lehrveranstaltung.kurzbz as lv_kurzbz,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				tbl_lehrveranstaltung.bezeichnung_english as lv_bezeichnung_english,
 				studiengang_kz,
 				semester,
 				tbl_lehrveranstaltung.sprache,
@@ -1133,7 +1164,7 @@ class Lehrveranstaltung_model extends DB_Model
 				tbl_lehrveranstaltung.anmerkung,
 				tbl_lehrveranstaltung.lehre,
 				lehreverzeichnis as lv_lehreverzeichnis,
-				aktiv,
+				tbl_lehrveranstaltung.aktiv,
 				planfaktor as lv_planfaktor,
 				planlektoren as lv_planlektoren,
 				planpersonalkosten as lv_planpersonalkosten,
@@ -1143,9 +1174,11 @@ class Lehrveranstaltung_model extends DB_Model
 				''::text as studienplan_id,
 				'' as studienplan_bezeichnung,
 				'' as studienplan_lehrveranstaltung_id_parent,
-				tbl_lehrveranstaltung.lehrtyp_kurzbz
+				tbl_lehrveranstaltung.lehrtyp_kurzbz,
+				UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang
 			FROM lehre.tbl_lehrveranstaltung 
 				JOIN lehre.tbl_lehreinheit USING (lehrveranstaltung_id)
+				JOIN public.tbl_studiengang USING(studiengang_kz)
 				WHERE studiengang_kz = ?
 					AND studiensemester_kurzbz = ?
 		";
@@ -1159,7 +1192,7 @@ class Lehrveranstaltung_model extends DB_Model
 		}
 		if (!is_null($verband))
 		{
-			$qry .= ' AND (orgform_kurzbz = ? OR orgform_kurzbz IS NULL)';
+			$qry .= ' AND (tbl_lehrveranstaltung.orgform_kurzbz = ? OR tbl_lehrveranstaltung.orgform_kurzbz IS NULL)';
 			$params[] = $verband;
 		}
 
@@ -1178,133 +1211,48 @@ class Lehrveranstaltung_model extends DB_Model
 	{
 		return "
 		SELECT
-				lehrveranstaltung_id, kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
+				lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
 				tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
 				plankostenprolektor as lv_plankostenprolektor, lehrform_kurzbz as lv_lehrform_kurzbz, tbl_lehrveranstaltung.orgform_kurzbz,
 				tbl_studienplan_lehrveranstaltung.studienplan_id::text as studienplan_id, tbl_studienplan.bezeichnung as studienplan_bezeichnung, tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent::text,
-				tbl_lehrveranstaltung.lehrtyp_kurzbz
+				tbl_lehrveranstaltung.lehrtyp_kurzbz, UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang
 			FROM
 			    lehre.tbl_lehrveranstaltung
 				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
 				JOIN lehre.tbl_studienplan USING(studienplan_id)
+				JOIN tbl_studiengang USING(studiengang_kz)
 			WHERE
 				tbl_lehrveranstaltung.aktiv AND ((studienplan_id, tbl_studienplan_lehrveranstaltung.semester) IN ( " . implode(',', $placeholders) . "))
 			UNION
 		";
 	}
 
-	public function getAllOe($lv_id, $stg_kz = null)
+	public function getAllOe($lv_id)
 	{
 		$qry = "SELECT DISTINCT oe_kurzbz
-			FROM lehre.tbl_studienplan_lehrveranstaltung
-			JOIN lehre.tbl_studienplan USING(studienplan_id)
-			JOIN lehre.tbl_studienordnung USING(studienordnung_id)
-			JOIN public.tbl_studiengang USING(studiengang_kz)
-			WHERE lehrveranstaltung_id = ? ";
+				FROM lehre.tbl_studienplan_lehrveranstaltung
+					JOIN lehre.tbl_studienplan USING(studienplan_id)
+					JOIN lehre.tbl_studienordnung USING(studienordnung_id)
+					JOIN public.tbl_studiengang USING(studiengang_kz)
+				WHERE lehrveranstaltung_id = ?
 
-		$params = array($lv_id);
-		if (!is_null($stg_kz))
-		{
-			$qry .= ' OR studiengang_kz = ?';
-			$params[] = $stg_kz;
-		}
+				UNION
+
+				(
+					SELECT oe_kurzbz
+					FROM public.tbl_studiengang 
+					WHERE studiengang_kz = (
+						SELECT tbl_lehrveranstaltung.studiengang_kz 
+						FROM lehre.tbl_lehrveranstaltung 
+						WHERE lehrveranstaltung_id = ?
+					)
+				)
+			";
+
+		$params = array($lv_id, $lv_id);
 
 		return $this->execReadOnlyQuery($qry, $params);
-	}
-
-	/**
-	 * Gets Lehrveranstaltungen for a student, as needed for a Projektarbeit.
-	 * @param student_uid
-	 * @param studiengang_kz optional, all Lvs of this Studiengang will be included 
-	 * @param additional_lehrveranstaltung_id optional, this lv will be added to result
-	 * @return object success or error
-	 */
-	public function getLvsForProjektarbeit($student_uid, $studiengang_kz = null, $additional_lehrveranstaltung_id = null)
-	{
-		$params = array($student_uid, $student_uid);
-
-		$qry = "
-			SELECT *
-			FROM
-				lehre.tbl_lehrveranstaltung
-			WHERE
-				(
-					lehrveranstaltung_id IN (
-
-						SELECT
-							lehrveranstaltung_id
-						FROM
-							campus.vw_student_lehrveranstaltung
-						WHERE
-							uid=?
-
-						UNION
-
-						SELECT
-							lehrveranstaltung_id
-						FROM
-							lehre.tbl_zeugnisnote
-						WHERE
-							student_uid=?
-					)";
-
-		if (isset($studiengang_kz))
-		{
-			$params[] = $studiengang_kz;
-			$qry .= " OR (studiengang_kz = ? AND semester IS NOT NULL)";
-		}
-
-		if (isset($additional_lehrveranstaltung_id))
-		{
-			$params[] = $additional_lehrveranstaltung_id;
-			$qry .= " OR lehrveranstaltung_id = ?";
-		}
-
-		$qry .= "
-				)
-				AND projektarbeit = TRUE
-			ORDER BY
-				semester, bezeichnung";
-
-		return $this->execQuery($qry, $params);
-	}
-
-	/**
-	 * Gets lehrveranstaltungen of Studienplan
-	 * @param $studienplan_id ID des Studienplans
-	 * @param $semester Semester optional
-	 * @return array|null
-	 */
-	public function getLvsByStudienplanId($studienplan_id, $semester = null)
-	{
-		$params = array($studienplan_id);
-
-		$qry = "SELECT tbl_lehrveranstaltung.*,
-			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
-			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
-			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
-			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
-			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
-			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
-			tbl_studienplan_lehrveranstaltung.curriculum,
-			tbl_studienplan_lehrveranstaltung.export,
-			tbl_studienplan_lehrveranstaltung.genehmigung
-		FROM lehre.tbl_lehrveranstaltung
-		JOIN lehre.tbl_studienplan_lehrveranstaltung
-		USING(lehrveranstaltung_id)
-		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ?
-		";
-
-		if ($semester !== null)
-		{
-			$qry.= " AND tbl_studienplan_lehrveranstaltung.semester = ?";
-			$params[] = $semester;
-		}
-
-		$qry .= " ORDER BY stpllv_sort, semester, sort";
-
-		return $this->execQuery($qry, $params);
 	}
 }

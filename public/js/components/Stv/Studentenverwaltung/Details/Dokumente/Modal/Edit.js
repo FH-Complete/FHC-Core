@@ -107,6 +107,7 @@ export default {
 							:label="$p.t('dokumente/nachreichungAm')"
 							auto-apply
 							:enable-time-picker="false"
+							text-input
 							format="dd.MM.yyyy"
 							preview-format="dd.MM.yyyy"
 							:teleport="true"

@@ -80,7 +80,7 @@ class Lehreinheit extends FHCAPI_Controller
 
 		$lehrveranstaltung = getData($lehrveranstaltung_result)[0];
 
-		$oe_result = $this->_ci->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id, $lehrveranstaltung->studiengang_kz);
+		$oe_result = $this->_ci->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id);
 		$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
 
 		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
@@ -164,7 +164,6 @@ class Lehreinheit extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-
 		$updateData = array();
 		foreach ($updatableFields as $field)
 		{
@@ -182,6 +181,12 @@ class Lehreinheit extends FHCAPI_Controller
 		$result = $this->_ci->LehreinheitModel->insert(
 			$updateData
 		);
+
+		if (!isset($updateData['unr']))
+		{
+			$unr = getData($result);
+			$this->_ci->LehreinheitModel->update($unr, array('unr' => $unr));
+		}
 
 		$this->terminateWithSuccess($result);
 	}
@@ -210,6 +215,7 @@ class Lehreinheit extends FHCAPI_Controller
 
 		$lehreinheit_id_new = getData($insert_result);
 
+		$this->_ci->LehreinheitModel->update(array('lehreinheit_id' => $lehreinheit_id_new), array('unr' => $lehreinheit_id_new));
 		if (in_array($art, array('gruppen', 'alle')))
 		{
 			$gruppen_result = $this->_ci->LehreinheitgruppeModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
@@ -408,7 +414,9 @@ class Lehreinheit extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
-		$oe_array = $result;
+		$oe_array = [];
+		if (hasData($result))
+			$oe_array = getData($result);
 
 		if (!$this->_ci->permissionlib->isBerechtigtMultipleOe('admin', $oe_array, 'suid') &&
 			!$this->_ci->permissionlib->isBerechtigtMultipleOe('assistenz', $oe_array, 'suid') &&

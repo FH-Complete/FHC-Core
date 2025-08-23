@@ -113,7 +113,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
-				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
 			},
@@ -436,6 +435,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_mobility')"
 			@click:new="actionNewMobility"
@@ -464,6 +464,7 @@ export default {
 						v-model="formData.von"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="von"
 						:teleport="true"
@@ -497,6 +498,7 @@ export default {
 						v-model="formData.bis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="bis"
 						:teleport="true"

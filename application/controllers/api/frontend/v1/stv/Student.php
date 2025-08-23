@@ -68,11 +68,14 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function get($prestudent_id)
+	public function get($prestudent_id, $studiensemester_kurzbz)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$this->PrestudentModel->addSelect('p.person_id');
 		$this->PrestudentModel->addSelect('p.titelpre');
@@ -94,6 +97,15 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect('b.alias');
+		$this->PrestudentModel->addSelect('p.geburtsnation');
+		$this->PrestudentModel->addSelect('p.sprache');
+		$this->PrestudentModel->addSelect('p.gebort');
+		$this->PrestudentModel->addSelect('p.homepage');
+		$this->PrestudentModel->addSelect('p.anmerkung');
+		$this->PrestudentModel->addSelect('p.familienstand');
+		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
+		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('p.anrede');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -109,6 +121,16 @@ class Student extends FHCAPI_Controller
 				false
 			);
 		}
+		$this->PrestudentModel->addSelect(
+			"(
+				SELECT status_kurzbz
+				FROM public.tbl_prestudentstatus pss
+				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
+				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
+				LIMIT 1
+				) AS statusofsemester"
+		);
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');
@@ -118,13 +140,17 @@ class Student extends FHCAPI_Controller
 			'LEFT'
 		);
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'p.person_id = tbl_prestudent.person_id');
+/*		$this->PrestudentModel->addJoin('public.tbl_prestudentstatus pss', 'pss.prestudent_id = tbl_prestudent.prestudent_id
+										AND pss.studiensemester_kurzbz = ' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+										'LEFT');*/
 
-		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->PrestudentModel->loadWhere(['tbl_prestudent.prestudent_id' => $prestudent_id]);
 		
 		$student = $this->getDataOrTerminateWithError($result);
 		
 		if (!$student)
 			return show_404();
+
 
 		$this->terminateWithSuccess(current($student));
 	}
@@ -133,7 +159,7 @@ class Student extends FHCAPI_Controller
 	{
 		$laufendesStudiensemester = '';
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$result = $this->StudiensemesterModel->getNearest();
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		if(hasData($result)) {
 			$laufendesStudiensemester = (getData($result))[0]->studiensemester_kurzbz;
 		}
@@ -148,24 +174,37 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function save($prestudent_id)
+	public function save($prestudent_id, $studiensemester_kurzbz)
 	{
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->load->library('form_validation');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
 		$authuid = getAuthUID();
 		$now = date('c');
 
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
-		$this->form_validation->set_rules('semester', 'Semester', 'integer');
+		$this->form_validation->set_rules('semester', 'Semester', 'integer', [
+				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+			]
+		);
+
+		$this->form_validation->set_rules('alias', 'Alias', 'regex_match[/^[-a-z0-9\_\.]*[a-z0-9]{1,}\.[-a-z0-9\_]{1,}$/]',
+		[
+			'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
+		]);
 
 		$this->load->library('UDFLib');
 		
@@ -277,10 +316,36 @@ class Student extends FHCAPI_Controller
 
 		// Do Updates
 		if (count($update_lehrverband)) {
+
 			$curstudlvb = $this->StudentlehrverbandModel->load([
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
 			]);
+
+			$data = $this->getDataOrTerminateWithError($curstudlvb);
+			$data = current($data);
+
+			$verbandCurrent = $data->verband;
+			$studiengang_kz = $data->studiengang_kz;
+			$semesterCurrent = $data->semester;
+			$gruppeCurrent = $data->gruppe;
+
+			$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : $verbandCurrent;
+			$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : $gruppeCurrent;
+			$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : $semesterCurrent;
+
+			//check if existing Lehrverband of new data to avoid Error
+			$result = $this->LehrverbandModel->loadWhere([
+				'verband' => $verband,
+				'gruppe' => $gruppe,
+				'semester' => $semester,
+				'studiengang_kz' => $studiengang_kz,
+			]);
+
+			if(!hasData($result))
+			{
+				$this->terminateWithError($this->p->t('lehre', 'error_noLehrverband'), self::ERROR_TYPE_GENERAL);
+			}
 
 			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
 			{

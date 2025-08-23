@@ -27,8 +27,8 @@ class Lehrveranstaltung extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'loadByEmployee' => ['admin:r', 'assistenz:r'],
-			'loadByStudiengang' => ['admin:r', 'assistenz:r'],
+			'getByEmp' => ['admin:r', 'assistenz:r'],
+			'getByStg' => ['admin:r', 'assistenz:r'],
 			'loadByLV' => ['admin:r', 'assistenz:r'],
 		]);
 
@@ -37,15 +37,24 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
-	}
-	public function loadByEmployee($mitarbeiter_uid = null, $stg_kz = null)
-	{
-		if (is_null($mitarbeiter_uid))
-			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$studiensemester_kurzbz = $this->_ci->variablelib->getVar('semester_aktuell');
+		$this->loadPhrases(
+			array(
+				'ui'
+			)
+		);
+	}
+
+	public function getByEmp($studiensemester_kurzbz = null, $mitarbeiter_uid = null, $stg_kz = null)
+	{
+
+		if (is_null($mitarbeiter_uid))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 
 		$lehrveranstaltungen = $this->_ci->LehreinheitModel->getLvsByEmployee($mitarbeiter_uid, $studiensemester_kurzbz, $stg_kz);
 		$lehrveranstaltungen_data = $this->getDataOrTerminateWithError($lehrveranstaltungen);
@@ -54,7 +63,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
 		{
-			$lehreinheiten = $this->_ci->LehreinheitModel->getLEByLV($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid);
+			$lehreinheiten = $this->_ci->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz, $mitarbeiter_uid);
 			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
 
 			if (!isset($lehrveranstaltung->_children))
@@ -66,11 +75,10 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($tree);
 	}
-
-	public function loadByStudiengang($studiengang_kz = null, $semester = null)
+	public function getByStg($studiensemester_kurzbz = null, $studiengang_kz = null, $semester = null)
 	{
-		if (is_null($studiengang_kz) || !ctype_digit((string)$studiengang_kz))
-			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+		if (is_null($studiengang_kz) || !preg_match("/^-?[1-9][0-9]*$/", (string)$studiengang_kz))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
 		$verband = null;
 		if (!is_null($semester) && !is_numeric($semester))
@@ -81,7 +89,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$this->_ci->load->model('organisation/Studienplan_model', 'StudienplanModel');
 
-		$studiensemester_kurzbz = $this->_ci->variablelib->getVar('semester_aktuell');
+		$studiensemester_kurzbz = $this->getStudiensemesterKurzbz($studiensemester_kurzbz);
 		$studienplan_data = $this->_ci->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz, $semester, $verband);
 
 		$studienplan_ids = array();
@@ -100,7 +108,6 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		$lehrveranstaltungen_data = $this->_ci->LehrveranstaltungModel->getLvsByStudiengang($studienplan_ids, $placeholders, $only_ids, $studiengang_kz, $studiensemester_kurzbz, $semester, $verband);
 		$lehrveranstaltungen_data = hasData($lehrveranstaltungen_data) ? getData($lehrveranstaltungen_data) : array();
-
 
 		$tree = [];
 		foreach ($lehrveranstaltungen_data as $row)
@@ -164,7 +171,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 		if (is_null($lehrveranstaltung_id) || !ctype_digit((string)$lehrveranstaltung_id))
 			$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$this->_ci->LehrveranstaltungModel->addSelect('lehrveranstaltung_id, lehrform_kurzbz, lehre, bezeichnung as lvbezeichnung');
+		$this->_ci->LehrveranstaltungModel->addSelect('lehrveranstaltung_id, lehrform_kurzbz, lehre, bezeichnung as lvbezeichnung, sprache');
 		$lehrveranstaltung_result = $this->_ci->LehrveranstaltungModel->loadWhere(array('lehrveranstaltung_id' => $lehrveranstaltung_id));
 		$lehrveranstaltung_result = $this->getDataOrTerminateWithError($lehrveranstaltung_result);
 		$lehrveranstaltung = $lehrveranstaltung_result[0];
@@ -202,7 +209,7 @@ class Lehrveranstaltung extends FHCAPI_Controller
 
 		foreach ($lehrveranstaltungen_data as $lehrveranstaltung)
 		{
-			$lehreinheiten = $this->LehreinheitModel->getLEByLV($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz);
+			$lehreinheiten = $this->LehreinheitModel->getByLvidStudiensemester($lehrveranstaltung->lehrveranstaltung_id, $studiensemester_kurzbz);
 			$lehreinheiten_data = $this->getDataOrTerminateWithError($lehreinheiten);
 
 			if (!isset($lehrveranstaltung->_children))
@@ -239,5 +246,20 @@ class Lehrveranstaltung extends FHCAPI_Controller
 				$this->assignUniqueIndex($node->_children, $counter);
 			}
 		}
+	}
+
+	private function getStudiensemesterKurzbz($studiensemester_kurzbz = null)
+	{
+		if (!is_null($studiensemester_kurzbz))
+		{
+			$studiensemester_result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
+
+			if (isError($studiensemester_result) || !hasData($studiensemester_result))
+				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+			return getData($studiensemester_result)[0]->studiensemester_kurzbz;
+		}
+
+		$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 	}
 }

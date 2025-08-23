@@ -298,6 +298,7 @@ class Akte_model extends DB_Model
 			$this->db->where('person_id', $person_id);
 
 		$this->addOrder('erstelltam', 'DESC');
+		$this->addOrder('akte_id', 'DESC');
 
 		return $this->loadWhere([
 			'archiv' => true
