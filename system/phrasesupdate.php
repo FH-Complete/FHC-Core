@@ -33827,11 +33827,11 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Die "Digitale Anwesenheiten Timeline" ist ein experimentelles feature, welches eine zeitliche Visualisierung von Entschuldigungszeiträumen und Kontrollzeiträumen im Kontext eines Studenten anzeigt.
-				
+
 					Wenn Sie auf eine aufgelistete Entschuldigung oder Kontrolle klicken, versucht die Timeline diese zu finden, falls diese im angegebenen Zeitraum liegt, welcher standardmäßig das gesamte aktuelle Jahr beträgt. Sie können diese Grenzen manuell anpassen.
-					
+
 					Wenn man innerhalb der Timeline scrollt, ändert sich der visuelle Abstand zwischen einzelnen Tagen.
-					
+
 					Bei Klick auf eine gerenderte Datumsreichweite in der Timeline, listet sich oben rechts eine Liste von zugehörigen Attributen auf, welche Administratoren und Entwicklern in Fehlerfällen helfen sollen den Zustand der digitalen Amwesenheiten im Kontext eines Studierenden nachzuvollziehen',
 				'description' => '',
 				'insertvon' => 'system'
@@ -33841,30 +33841,10 @@ array(
 				'text' => 'The "Digital Attendance Timeline" is an experimental feature that displays a temporal visualization of excuse periods and check-in periods in the context of a student.
 
 					When you click on a listed excuse or check-in period, the timeline attempts to find it if it falls within the specified period, which by default is the entire current year. You can adjust these boundaries manually.
-					
+
 					Scrolling within the timeline changes the visual spacing between individual days.
-					
+
 					Clicking on a rendered date range in the timeline displays a list of associated attributes in the upper right corner. These attributes are intended to help administrators and developers understand the status of digital attendance in the context of a student in case of errors.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'anwesenheiten',
-		'category' => 'global',
-		'phrase' => 'lehreinheit_id',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'LV-Teil ID',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Teaching unit ID',
 				'description' => '',
 				'insertvon' => 'system'
 			)
