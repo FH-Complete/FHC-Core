@@ -236,7 +236,7 @@ class Content_model extends DB_Model
 							LEFT JOIN
 								campus.tbl_contentsprache s1 ON c1.content_id=s1.content_id AND s1.sprache=?
 							WHERE
-								sichtbar=true
+								sichtbar=true AND c1.aktiv = true
 						) s2
 						LEFT JOIN
 							campus.tbl_contentsprache s3 USING(content_id, sprache)
@@ -277,7 +277,7 @@ class Content_model extends DB_Model
 			JOIN 
 				campus.tbl_contentsprache s USING(contentsprache_id)
 			LEFT JOIN 
-				campus.tbl_contentchild k ON(m.content_id=k.content_id)
+				campus.tbl_contentchild k ON(m.content_id=k.content_id) and c.aktiv = true
 			WHERE EXISTS (
 				SELECT 1 
 				FROM campus.tbl_contentgruppe 
