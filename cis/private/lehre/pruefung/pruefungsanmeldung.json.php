@@ -106,7 +106,7 @@ switch($method)
 	case 'getStudiengaenge':
 		$data = getStudiengaenge();
 		break;
-	case 'getPruefungenStudiengang':
+	case 'getPruefungenStudiensemester':
 		$studiensemester = filter_input(INPUT_POST,"studiensemester");
 		$data = getPruefungenStudiengangBySemester($studiensemester);
 		break;
@@ -966,9 +966,13 @@ function alleBestaetigen($uid)
 	global $p;
 	$lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
 	$pruefungstermin_id = $_REQUEST["termin_id"];
+	$emails = $_REQUEST["emails"];
 	$pruefungstermin = new pruefungstermin($pruefungstermin_id);
 	$pruefungsanmeldung = new pruefungsanmeldung();
 	$pranmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+
+	$mail_benutzer = [];
+	$mail_inhalt = [];
 	foreach($pranmeldungen as $a)
 	{
 		$anmeldung = new pruefungsanmeldung($a->pruefungsanmeldung_id);
@@ -982,6 +986,13 @@ function alleBestaetigen($uid)
 				$ma = new mitarbeiter($uid);
 				$datum = new datum();
 				$ort = new ort($termin->ort_kurzbz);
+
+				$ortbezeichnung = $ort->bezeichnung;
+				if (is_null($termin->ort_kurzbz) && !is_null($termin->anderer_raum))
+				{
+					$ortbezeichnung = $termin->anderer_raum;
+				}
+
 				$pruefung = new pruefungCis($termin->pruefung_id);
 
 				$to = $anm->uid."@".DOMAIN;
@@ -1001,15 +1012,64 @@ function alleBestaetigen($uid)
 				}
 				else
 					$html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "H:i")."<br>";
-				$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
+				$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ortbezeichnung."<br>";
 				$html .= "<br>";
 				$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
 				$html .= "<br>";
+
+				$mail_benutzer[] = [
+					'uid' => $anm->uid
+				];
+
+				if (empty($mail_inhalt))
+				{
+					$mail_inhalt = array(
+						'von' => $ma->vorname." ".$ma->nachname,
+						'lv' => $lv->bezeichnung,
+						'ort' => $ortbezeichnung,
+						'datum' => $datum->formatDatum($termin->von, "d.m.Y") . ' ' . $p->t('pruefung/emailBodyUm') . ' ' . (isset($von) ? $von : $datum->formatDatum($termin->von, "H:i")),
+						'dauer' => $pruefung->einzeln ? ($pruefung->pruefungsintervall . ' ' . $p->t('pruefung/emailBodyMinuten')): '');
+				}
 
 				$mail = new mail($to, $from, $subject,$p->t('pruefung/emailBodyBitteHtmlSicht'));
 				$mail->setHTMLContent($html);
 				$mail->send();
 			}
+		}
+	}
+
+	if (!empty($emails) && !empty($mail_inhalt))
+	{
+		foreach ($emails as $email)
+		{
+			$from = "noreply@".DOMAIN;
+			$subject = $p->t('pruefung/emailSubjectAnmeldungBestaetigung');
+			$html = $p->t('pruefung/sammelemailBody',array($mail_inhalt['lv'], $mail_inhalt['datum'], $mail_inhalt['von']));
+
+			if ($mail_inhalt['ort'])
+			{
+				$html .= $p->t('pruefung/sammelemailBody2',array($mail_inhalt['ort']));
+			}
+
+			$html .= "<br /><table border='1'>
+						<thead>
+							<tr>
+								<th>UID</th>
+							</tr>
+						</thead>
+						<tbody>";
+
+			foreach($mail_benutzer as $benutzer)
+			{
+				$html .= "<tr>
+							<td>" . htmlspecialchars($benutzer['uid']) . "</td>
+						</tr>";
+			}
+			$html .= "</tbody></table><br />";
+
+			$mail = new mail($email, $from, $subject, $p->t('pruefung/emailBodyBitteHtmlSicht'));
+			$mail->setHTMLContent($html);
+			$mail->send();
 		}
 	}
 	$data['result']=true;
@@ -1038,6 +1098,12 @@ function anmeldungBestaetigen($uid)
 	$ort = new ort($termin->ort_kurzbz);
 	$pruefung = new pruefungCis($termin->pruefung_id);
 
+	$ortbezeichnung = $ort->bezeichnung;
+	if (is_null($termin->ort_kurzbz) && !is_null($termin->anderer_raum))
+	{
+		$ortbezeichnung = $termin->anderer_raum;
+	}
+
 	$to = $anmeldung->uid."@".DOMAIN;
 	$from = "noreply@".DOMAIN;
 	$subject = $p->t('pruefung/emailSubjectAnmeldungBestaetigung');
@@ -1055,7 +1121,7 @@ function anmeldungBestaetigen($uid)
 	}
 	else
 		$html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "H:i")."<br>";
-	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
+	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ortbezeichnung."<br>";
 	$html .= "<br>";
 	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
 	$html .= "<br>";
@@ -1178,7 +1244,7 @@ function getPruefungenStudiengangBySemester($aktStudiensemester)
 	$pruefungen = new pruefungCis();
 	$pruefungen->getPruefungByStudiensemester($aktStudiensemester);
 
-	if((!empty($pruefungen->lehrveranstaltungen)))
+	if(!empty($pruefungen->lehrveranstaltungen))
 	{
 		$lehrveranstaltungen = [];
 		foreach ($pruefungen->lehrveranstaltungen as $prf)

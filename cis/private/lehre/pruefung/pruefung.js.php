@@ -863,7 +863,8 @@ function writeAnmeldungen(data, showMessage = true)
 		});
 		liste += "</ul>";
 		$("#anmeldung_hinzufuegen").html("<input id='anmeldung_hinzufuegen_uid' type='text' placeholder='StudentIn-UID' /><input type='button' value='<?php echo $p->t('global/hinzufuegen'); ?>' onclick='saveAnmeldung(\""+lehrveranstaltung_id+"\",\""+terminId+"\");'/>");
-		$("#reihungSpeichernButton").html("<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><input type='button' value='<?php echo $p->t('pruefung/alleBestaetigen'); ?>' onclick='alleBestaetigen(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
+		$("#reihungSpeichernButton").html("<label for='emails'>E-Mail: <input type='email' id='emails' multiple /> <br /><br />" +
+			"<input type='button' value='<?php echo $p->t('pruefung/reihungSpeichern'); ?>' onclick='saveReihung(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'><input type='button' value='<?php echo $p->t('pruefung/alleBestaetigen'); ?>' onclick='alleBestaetigen(\""+terminId+"\", \""+lehrveranstaltung_id+"\");'>");
 		$("#lvdaten").html(lv_bezeichnung+" ("+prf_termin+")");
 		$("#anmeldeDaten").html(liste);
 		$("#listeDrucken").html(listenLinks);
@@ -1036,6 +1037,30 @@ function anmeldungLoeschen(pruefungsanmeldung_id, termin_id, lehrveranstaltung_i
  */
 function alleBestaetigen(termin_id, lehrveranstaltung_id)
 {
+	const input = $('#emails').val();
+
+	let emails = '';
+	if (input)
+	{
+		emails = input.split(",").map(s => s.trim());
+		const re = /^([\w-+]+(?:\.[\w-+]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,63}(?:\.[a-z]{2})?)$/i;
+
+		let valid = true;
+		$.each(emails, function(index, email)
+		{
+			if (re.test(email) === false)
+			{
+				alert("<?php echo $p->t('pruefung/bitteEmailAngeben')?>");
+				valid = false;
+				return false;
+			}
+		});
+
+		if (!valid)
+			return false;
+
+	}
+
 	$.ajax({
 		dataType: 'json',
 		url: "./pruefungsanmeldung.json.php",
@@ -1043,7 +1068,8 @@ function alleBestaetigen(termin_id, lehrveranstaltung_id)
 		data: {
 			method: "alleBestaetigen",
 			termin_id: termin_id,
-			lehrveranstaltung_id: lehrveranstaltung_id
+			lehrveranstaltung_id: lehrveranstaltung_id,
+			emails: emails
 		},
 		error: loadError,
 		success: function(data){
@@ -1115,15 +1141,12 @@ function loadStudiengaenge()
 }
 
 /**
- * Lädt alle Prüfungen zu einem Studiengang
- * @param {type} studiengang_kz Studiengangskennzahl
+ * Lädt alle Prüfungen zu einem Studiensemester
+ * @param {type} studiensemester Studiensemester
  * @returns {undefined}
  */
-function loadPruefungStudiengang(studiengang_kz, studiensemester)
+function loadPruefungStudiengang(studiensemester)
 {
-	if(studiengang_kz === undefined)
-		studiengang_kz = $("#select_studiengang option:selected").val();
-
 	if(studiensemester === undefined)
 		studiensemester = $("#filter_studiensemester option:selected").val();
 
@@ -1132,8 +1155,7 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 		url: "./pruefungsanmeldung.json.php",
 		type: "POST",
 		data: {
-			method: "getPruefungenStudiengang",
-			studiengang_kz: studiengang_kz,
+			method: "getPruefungenStudiensemester",
 			studiensemester: studiensemester
 		},
 		error: loadError,
@@ -1148,7 +1170,14 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 
 					data.result.forEach(function(e)
 					{
-						let termine = e?.pruefung[0]?.termine || [];
+						let termine = [];
+						if (e.pruefung) {
+							e.pruefung.forEach(p => {
+								if (p.termine) {
+									termine = termine.concat(p.termine);
+								}
+							});
+						}
 
 						if (termine.length === 0)
 						{
@@ -1169,7 +1198,12 @@ function loadPruefungStudiengang(studiengang_kz, studiensemester)
 
 								rows += `
 									<tr>
-										<td><input type="checkbox" /></td>
+										<td><input type="checkbox"
+											class="termin-checkbox"
+											data-termin-id="${d.pruefungstermin_id}"
+											data-lv-id="${e.lehrveranstaltung_id}"
+											data-datum="${vonDate}"
+										/></td>
 										<td>${e.studiengang}</td>
 										<td>${e.bezeichnung}</td>
 										<td>${vonDate}</td>

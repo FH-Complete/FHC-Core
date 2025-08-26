@@ -247,18 +247,16 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 				}
 			});
 
-			$("#table4").tablesorter(
-				{
-
-					widgets: ["zebra"],
-					headers: {
-						0: { sorter: false },
-						3: { sorter: 'shortDate',
-							dateFormat: 'ddmmyyyy' },
-						4: { sorter: 'time' },
-						5: { sorter: 'time' }
-					}
-				});
+			$("#table4").tablesorter({
+				widgets: ["zebra"],
+				headers: {
+					0: { sorter: false },
+					3: { sorter: 'shortDate',
+						dateFormat: 'ddmmyyyy' },
+					4: { sorter: 'time' },
+					5: { sorter: 'time' }
+				}
+			});
 
 		});
 	</script>

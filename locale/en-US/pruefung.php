@@ -78,6 +78,7 @@ $this->phrasen['pruefung/unbegrenzt'] = 'unlimited';
 $this->phrasen['pruefung/bewertungenZu'] = 'Bewertungen zu';
 $this->phrasen['pruefung/keineAuswahl'] = 'Keine Auswahl';
 $this->phrasen['pruefung/alleBestaetigen'] = 'Confirm all';
+$this->phrasen['pruefung/bitteEmailAngeben'] = 'Please enter a valid E-Mail Address.';
 
 // pruefungsbewertung
 $this->phrasen['pruefung/pruefungsbewertungTitle'] = 'Prüfungsbewertung';
@@ -139,6 +140,14 @@ $this->phrasen['pruefung/emailBodyMinuten'] = 'Minuten';
 $this->phrasen['pruefung/emailBodyOrt'] = 'Ort:';
 $this->phrasen['pruefung/emailBodyLinkZurAnmeldung'] = 'Link zur Anmeldung';
 $this->phrasen['pruefung/emailBodyBitteHtmlSicht'] = 'Bitte sehen Sie sich die Nachricht in HTML Sicht an, um den Link vollständig darzustellen.';
+
+// Sammelmail
+$this->phrasen['pruefung/sammelemailBody'] = 'The exam registrations for %s on %s have been confirmed by %s. <br />';
+$this->phrasen['pruefung/sammelemailBody2'] = 'Place: %s<br />';
+$this->phrasen['pruefung/sammelemailBodyBestaetigt'] = 'Confirmed by';
+$this->phrasen['pruefung/sammelemailBodyPruefung'] = 'Exam';
+$this->phrasen['pruefung/sammelemailBodyTermin'] = 'Exam date';
+$this->phrasen['pruefung/sammelemailBodyDauer'] = 'Duration';
 
 $this->phrasen['pruefung/emailLektorSubjectAnmeldung'] = 'Anmeldung zur Prüfung';
 $this->phrasen['pruefung/emailLektorStudentIn'] = 'StudentIn';
