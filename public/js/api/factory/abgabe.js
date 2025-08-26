@@ -17,25 +17,17 @@ export default {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postStudentProjektarbeitEndupload',
-			params: { formData },
+			params: formData,
 			config: {Headers: { "Content-Type": "multipart/form-data" }}
 		};
-		
-		// const url = '/api/frontend/v1/Lehre/postStudentProjektarbeitEndupload';
-		// const headers = {Headers: { "Content-Type": "multipart/form-data" }}
-		// return this.$fhcApi.post(url, formData, headers)
 	},
 	postStudentProjektarbeitZwischenabgabe(formData) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postStudentProjektarbeitZwischenabgabe',
-			params: { formData },
+			params: formData,
 			config: {Headers: { "Content-Type": "multipart/form-data" }}
 		};
-		
-		// const url = '/api/frontend/v1/Lehre/postStudentProjektarbeitZwischenabgabe';
-		// const headers = {Headers: { "Content-Type": "multipart/form-data" }}
-		// return this.$fhcApi.post(url, formData, headers)
 	},
 	getStudentProjektarbeitAbgabeFile(paabgabe_id, student_uid) {
 		// TODO: check if this is fine with new api scheme
@@ -59,6 +51,8 @@ export default {
 				paabgabe_id: termin.paabgabe_id,
 				paabgabetyp_kurzbz: termin.bezeichnung.paabgabetyp_kurzbz,
 				datum: termin.datum,
+				note: termin.note,
+				upload_required: termin.upload_required,
 				fixtermin: termin.fixtermin,
 				insertvon: termin.insertvon,
 				kurzbz: termin.kurzbz,
@@ -92,5 +86,12 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Abgabe/getPaAbgabetypen'
 		};
-	}
+	},
+	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
+	getNoten(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getNoten'
+		};
+	},
 };

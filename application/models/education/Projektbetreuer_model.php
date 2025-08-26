@@ -231,4 +231,40 @@ class Projektbetreuer_model extends DB_Model
 
 		return $this->execQuery($qry, array($projektarbeit_id, $betreuer_person_id));
 	}
+
+	/**
+	 * Gets email of a Betreuer for a Projektarbeit.
+	 * Projektarbeitbetreuer can be external employees, which should be contacted on their private
+	 * email contact, if they have one. Internal Betreuer should be contacted on their "uid@DOMAIN" adress.
+	 * @param int betreuer_person_id
+	 * @return object success or error
+	 */
+	public function getBetreuerEmail($betreuer_person_id) {
+		// TODO: check if benutzer uid exists, not fixangestellt
+		
+		$qry ="
+			SELECT uid,
+			   CASE
+				   WHEN public.tbl_mitarbeiter.fixangestellt = false
+					   THEN (
+							SELECT kontakt AS email
+							FROM public.tbl_kontakt
+							WHERE  
+								public.tbl_kontakt.person_id = ? AND
+								kontakttyp = 'email'
+							)
+				   
+						ELSE ( 
+							SELECT public.tbl_benutzer.uid || '@' || '".DOMAIN."' AS email
+			       			FROM public.tbl_benutzer
+			       			WHERE person_id = ?
+							)
+				   END AS email
+		FROM public.tbl_benutzer
+			JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)           
+		WHERE person_id = ?
+		";
+
+		return $this->execReadOnlyQuery($qry, array($betreuer_person_id, $betreuer_person_id, $betreuer_person_id));
+	}
 }

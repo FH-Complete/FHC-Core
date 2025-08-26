@@ -1,6 +1,7 @@
 import Upload from '../../../components/Form/Upload/Dms.js';
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 const today = new Date()
 export const AbgabeStudentDetail = {
@@ -198,7 +199,7 @@ export const AbgabeStudentDetail = {
 		getEid() {
 			return this.$p.t('abgabetool/c4eidesstattlicheErklaerung')
 		},
-		getEnduploadErlaubt() {
+		getAllowedToSendEndupload() {
 			return !this.eidAkzeptiert
 		}
 	},
@@ -371,7 +372,7 @@ export const AbgabeStudentDetail = {
 				
 			</template>
 			<template v-slot:footer>
-				<button class="btn btn-primary" :disabled="getEnduploadErlaubt" @click="triggerEndupload">{{$p.t('ui/hochladen')}}</button>
+				<button class="btn btn-primary" :disabled="getAllowedToSendEndupload" @click="triggerEndupload">{{$p.t('ui/hochladen')}}</button>
 			</template>
 		</bs-modal>
 	 	

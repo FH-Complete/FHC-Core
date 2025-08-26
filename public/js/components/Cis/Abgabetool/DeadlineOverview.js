@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 export const DeadlineOverview = {
 	name: "DeadlineOverview",

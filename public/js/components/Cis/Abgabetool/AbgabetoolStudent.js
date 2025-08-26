@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeStudentDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js";
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
@@ -82,6 +83,9 @@ export const AbgabetoolStudent = {
 			]};
 	},
 	methods: {
+		checkQualityGates(termine, enduploadtermin) {
+				return true
+		},
 		isPastDate(date) {
 			return new Date(date) < new Date(Date.now())	
 		},
@@ -91,10 +95,11 @@ export const AbgabetoolStudent = {
 				pa.abgabetermine = res.data[0].retval
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
-					termin.allowedToUpload = true
+					// termin.allowedToUpload = true
 					
 					// TODO: fixtermin logic?
-					if(termin.bezeichnung == 'Endupload' && this.isPastDate(termin.datum)) {
+					if(termin.bezeichnung == 'Endupload' && 
+						(this.isPastDate(termin.datum) || this.checkQualityGates(pa.abgabetermine, termin))) {
 						
 						// termin.allowedToUpload = false
 					} else {

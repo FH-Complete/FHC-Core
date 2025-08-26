@@ -1,5 +1,6 @@
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 const today = new Date()
 export const AbgabeMitarbeiterDetail = {
@@ -12,6 +13,7 @@ export const AbgabeMitarbeiterDetail = {
 		Textarea: primevue.textarea,
 		VueDatePicker
 	},
+	inject: ['abgabeTypeOptions', 'allowedNotenOptions'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -23,30 +25,7 @@ export const AbgabeMitarbeiterDetail = {
 			oldPaBeurteilungLink: 'https://moodle.technikum-wien.at/mod/page/view.php?id=1005052', // TODO: inject from app & app provide link from config
 			eidAkzeptiert: false,
 			enduploadTermin: null,
-			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
-			// TODO: fetch types
-			allAbgabeTypes: [
-				{
-					paabgabetyp_kurzbz: 'abstract',
-					bezeichnung: 'Entwurf'
-				},
-				{
-					paabgabetyp_kurzbz: 'zwischen',
-					bezeichnung: 'Zwischenabgabe'
-				},
-				{
-					paabgabetyp_kurzbz: 'note',
-					bezeichnung: 'Benotung'
-				},
-				{
-					paabgabetyp_kurzbz: 'end',
-					bezeichnung: 'Endupload'
-				},
-				{
-					paabgabetyp_kurzbz: 'enda',
-					bezeichnung: 'Endabgabe im Sekretariat'
-				}
-			]
+			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages
 		}
 	},
 	methods: {
@@ -55,6 +34,9 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		saveTermin(termin) {
 			const paabgabe_id = termin.paabgabe_id
+			// 9 => magic number for "noch nicht eingetragen"
+			termin.note = termin.note?.note ?? 9
+			
 			this.$api.call(ApiAbgabe.postProjektarbeitAbgabe(termin)).then( (res) => {
 				if(res?.meta?.status == 'success') {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
@@ -69,8 +51,10 @@ export const AbgabeMitarbeiterDetail = {
 							'fixtermin': false,
 							'kurzbz': '',
 							'datum': new Date().toISOString().split('T')[0],
-							'paabgabetyp_kurzbz': '',
-							'bezeichnung': '',
+							'paabgabetyp_kurzbz': termin.paabgabetyp_kurzbz,
+							'note': this.allowedNotenOptions.find(opt => opt.note == termin.note?.note),
+							'upload_required': termin.upload_required,
+							'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz),
 							'abgabedatum': null,
 							'insertvon': this.viewData?.uid ?? '',
 							'allowedToSave': true,
@@ -149,6 +133,9 @@ export const AbgabeMitarbeiterDetail = {
 		getOptionLabelAbgabetyp(option){
 			return option.bezeichnung
 		},
+		getNotenOptionLabel(option) {
+			return option.bezeichnung
+		},
 		formatDate(dateParam) {
 			const date = new Date(dateParam)
 			// handle missing leading 0
@@ -200,9 +187,7 @@ export const AbgabeMitarbeiterDetail = {
 	template: `
 		<div v-if="projektarbeit">
 		
-
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
-
 
 			<div class="row">
 				<div class="col-8">
@@ -248,7 +233,9 @@ export const AbgabeMitarbeiterDetail = {
 					<div style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
 					<div class="col-2">{{$p.t('abgabetool/c4zieldatum')}}</div>
 					<div class="col-2">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-4">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4note')}}</div>
+					<div class="col-1">{{$p.t('abgabetool/c4upload_required')}}</div>
+					<div class="col-2">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 					<div class="col">
 						
@@ -278,12 +265,30 @@ export const AbgabeMitarbeiterDetail = {
 							:style="{'width': '100%'}"
 							:disabled="!termin.allowedToSave"
 							v-model="termin.bezeichnung"
-							:options="allAbgabeTypes"
+							:options="abgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>
-					<div class="col-4 d-flex justify-content-center align-items-center">
-						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="60" :disabled="!termin.allowedToSave"></Textarea>
+					<div class="col-2 d-flex justify-content-center align-items-center">
+						<Dropdown 
+							v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
+							:style="{'width': '100%'}"
+							v-model="termin.note"
+							:options="allowedNotenOptions"
+							:optionLabel="getNotenOptionLabel">
+						</Dropdown>
+					</div>
+					<div class="col-1 d-flex justify-content-center align-items-center">
+						<Checkbox 
+							v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
+							v-model="termin.upload_required"
+							:binary="true" 
+							:pt="{ root: { class: 'ml-auto' }}"
+						>
+						</Checkbox>
+					</div>
+					<div class="col-2 d-flex justify-content-center align-items-center">
+						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="30" :disabled="!termin.allowedToSave"></Textarea>
 					</div>
 					<div class="col-1 d-flex justify-content-center align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
@@ -310,7 +315,6 @@ export const AbgabeMitarbeiterDetail = {
 				</div>
 			</div>
 		 </div>
-
 `,
 };
 

@@ -164,6 +164,7 @@ export default {
 				return fhcApiAxios.post(uri, data, config);
 			},
 			call(factory, configoverwrite, form) {
+				debugger
 				if (Array.isArray(factory)) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 					const $api = app.config.globalProperties.$api;

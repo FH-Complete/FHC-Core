@@ -3,7 +3,7 @@ import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js"
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
-import ApiAbgabe from '../../../api/abgabe.js'
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -15,6 +15,12 @@ export const AbgabetoolMitarbeiter = {
 		Dropdown: primevue.dropdown,
 		Textarea: primevue.textarea,
 		VueDatePicker
+	},
+	provide() {
+		return {
+			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
+			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions)
+		}
 	},
 	props: {
 		viewData: {
@@ -30,29 +36,9 @@ export const AbgabetoolMitarbeiter = {
 		return {
 			saving: false,
 			loading: false,
-			// TODO: fetch types
-			allAbgabeTypes: [
-				{
-					paabgabetyp_kurzbz: 'abstract',
-					bezeichnung: 'Entwurf'
-				},
-				{
-					paabgabetyp_kurzbz: 'zwischen',
-					bezeichnung: 'Zwischenabgabe'
-				},
-				{
-					paabgabetyp_kurzbz: 'note',
-					bezeichnung: 'Benotung'
-				},
-				{
-					paabgabetyp_kurzbz: 'end',
-					bezeichnung: 'Endupload'
-				},
-				{
-					paabgabetyp_kurzbz: 'enda',
-					bezeichnung: 'Endabgabe im Sekretariat'
-				}
-			],
+			abgabeTypeOptions: null,
+			notenOptions: null,
+			allowedNotenOptions: null,
 			serienTermin: Vue.reactive({
 				datum: new Date(),
 				bezeichnung: {
@@ -222,6 +208,8 @@ export const AbgabetoolMitarbeiter = {
 					'fixtermin': false,
 					'kurzbz': '',
 					'datum': new Date().toISOString().split('T')[0],
+					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+					'upload_required': false,
 					'paabgabetyp_kurzbz': '',
 					'bezeichnung': '',
 					'abgabedatum': null,
@@ -229,6 +217,7 @@ export const AbgabetoolMitarbeiter = {
 					
 				})
 				pa.abgabetermine.forEach(termin => {
+					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
 					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
 					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
@@ -370,10 +359,23 @@ export const AbgabetoolMitarbeiter = {
 
 	},
 	created() {
+		// fetch noten options
+		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
+		this.$api.call(ApiAbgabe.getNoten()).then(res => {
+			this.notenOptions = res.data
+			// TODO: more sophisticated way to filter for these two, in essence it is still hardcoded
+			this.allowedNotenOptions = this.notenOptions.filter(
+				opt => opt.bezeichnung === 'Bestanden' 
+					|| opt.bezeichnung === 'Nicht bestanden'
+					|| opt.bezeichnung === 'Noch nicht eingetragen'
+			)
+		}).catch(e => {
+			this.loading = false
+		})
+		
 		// fetch abgabetypen options
 		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
-			this.paabgabetypOptions = res.data
-			this.tabulatorCanBeBuilt = true // because promises would be more work and not much better here
+			this.abgabeTypeOptions = res.data
 		}).catch(e => {
 			this.loading = false
 		})
@@ -419,7 +421,7 @@ export const AbgabetoolMitarbeiter = {
 						<Dropdown 
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
-							:options="allAbgabeTypes"
+							:options="abgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>

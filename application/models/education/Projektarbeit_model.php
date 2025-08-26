@@ -167,6 +167,8 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabe.fixtermin,
 					campus.tbl_paabgabe.kurzbz,
 					campus.tbl_paabgabe.datum,
+					campus.tbl_paabgabe.note,
+					campus.tbl_paabgabe.upload_required,
 					campus.tbl_paabgabetyp.paabgabetyp_kurzbz, 
 					campus.tbl_paabgabetyp.bezeichnung, 
 					campus.tbl_paabgabe.abgabedatum,
