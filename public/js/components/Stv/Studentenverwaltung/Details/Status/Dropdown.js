@@ -151,7 +151,17 @@ export default {
 				ApiStvStatus.addStudent(prestudent_id, data),
 				{ errorHeader: prestudent_id }
 			]))
-			.then(() => {
+			.then(result => {
+				const messagesSuccessful = result.filter(res => res.status == 'fulfilled');
+				if (messagesSuccessful.length) {
+					this.$fhcAlert.alertDefault(
+						'info',
+						'Feedback',
+						messagesSuccessful.length + " erfolgreiche Statusänderung(en) durchgeführt", // TODO(chris): translate
+						false,
+						true
+					);
+				}
 				this.$emit('reloadTable');
 				this.$reloadList();
 			});
