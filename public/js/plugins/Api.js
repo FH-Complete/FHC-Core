@@ -486,7 +486,7 @@ export default {
 				if (Array.isArray(factory)) {
 					const $api = app.config.globalProperties.$api;
 
-					Promise
+					return Promise
 						.allSettled(factory.map((config, index) => {
 							if (!Array.isArray(config))
 								config = ['#' + index, config];
@@ -526,6 +526,8 @@ export default {
 							for (var errType in typedErrors) {
 								errorConfig.handler[errType](typedErrors[errType]);
 							}
+							
+							return result;
 						});
 				}
 				let { method, url, params, config } = factory;
