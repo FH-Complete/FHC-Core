@@ -1,5 +1,6 @@
 <?php
 
+$config['number_displayed_past_studiensemester_default'] = 5;
 $config['tabs'] =
 	[
 		'details' => [
@@ -52,6 +53,14 @@ $config['tabs'] =
 					],
 				],
 			],
+		],
+		'exemptions' => [
+			//if true, Anrechnungen can be added and edited in tab Anrechnungen
+			'editableAnrechnungen' => false,
+		],
+		'notes' => [
+			//if true, the count of Messages will be shown in the header of the Tab Messages
+			'showCountNotes' => true
 		]
 	];
 	
