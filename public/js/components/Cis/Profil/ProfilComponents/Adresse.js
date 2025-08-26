@@ -19,7 +19,7 @@ export default {
     
         <!-- column 1 in the address row -->
         <div class="col-1 text-center">
-            <i class="fa fa-location-dot fa-lg" style="color:#00649C "></i>
+            <i class="fa fa-location-dot fa-lg fhc-link-color" ></i>
         </div>
         
         <div  class="col-11 col-sm-8 col-xl-11 col-xxl-8 order-1">

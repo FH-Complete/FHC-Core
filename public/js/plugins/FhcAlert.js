@@ -96,6 +96,7 @@ import PvConfig from "../../../index.ci.php/public/js/components/primevue/config
 import PvToast from "../../../index.ci.php/public/js/components/primevue/toast/toast.esm.min.js";
 import PvConfirm from "../../../index.ci.php/public/js/components/primevue/confirmdialog/confirmdialog.esm.min.js";
 import PvConfirmationService from "../../../index.ci.php/public/js/components/primevue/confirmationservice/confirmationservice.esm.min.js";
+import FhcPhrasen from "./Phrasen.js";
 
 import {CoreRESTClient} from '../RESTClient.js';
 
@@ -138,8 +139,17 @@ const helperApp = Vue.createApp({
 			return FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto !== '';
 		}
 	},
-	template: `
-	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999"></pv-toast>
+	template: /* html */`
+	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999">
+		<template #message="{ message }">
+			<!--span :class="slotProps.iconClass"></span-->
+			<div class="p-toast-message-text">
+				<span class="p-toast-summary">{{ message.summary }}</span>
+				<div v-if="message.detail && message.html" class="p-toast-detail" v-html="message.detail"></div>
+				<div v-else-if="message.detail" class="p-toast-detail">{{ message.detail }}</div>
+			</div>
+		</template>
+	</pv-toast>
 	<pv-toast ref="alert" class="fhc-alert" :base-z-index="99999" position="center">
 		<template #message="slotProps">
 			<i class="fa fa-circle-exclamation fa-2xl mt-3"></i>
@@ -168,7 +178,7 @@ const helperApp = Vue.createApp({
 					</a>
 				</div>
 				<div ref="messageCard" :id="'fhcAlertCollapseMessageCard' + slotProps.message.id" class="collapse mt-3">
-					<div class="card card-body text-body small">
+					<div class="card card-body text-body small alertCollapseText">
 						{{slotProps.message.detail}}
 					</div>
 				</div>
@@ -180,6 +190,7 @@ const helperApp = Vue.createApp({
 
 helperApp.use(PvConfig);
 helperApp.use(PvConfirmationService);
+//helperApp.use(FhcPhrasen);
 
 const helperAppInstance = helperApp.mount(helperAppContainer);
 
@@ -188,6 +199,9 @@ document.body.appendChild(helperAppContainer);
 
 export default {
 	install: (app, options) => {
+		if (!app.config.globalProperties.$p)
+			app.use(FhcPhrasen);
+
 		const $fhcAlert = {
 			alertSuccess(message) {
 				if (Array.isArray(message))
@@ -210,19 +224,25 @@ export default {
 				helperAppInstance.$refs.toast.add({ severity: 'error', summary: 'Achtung', detail: message });
 			},
 			alertSystemError(message) {
+				//TODO(Manu) for translation of content of template: restructure in data
+				//and update definitions with  translations
+
 				if (Array.isArray(message))
 					return message.forEach(this.alertSystemError);
-				helperAppInstance.$refs.alert.add({ severity: 'error', summary: 'Systemfehler', detail: message});
+				helperAppInstance.$refs.alert.add({
+					severity: 'error',
+					summary: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerror')),
+					detail: message});
 			},
 			confirmDelete() {
 				return new Promise((resolve, reject) => {
 					helperAppInstance.$confirm.require({
 						group: 'fhcAlertConfirm',
-						header: 'Achtung',
-						message: 'Möchten Sie sicher löschen?',
-						acceptLabel: 'Löschen',
+						header: Vue.computed(() => app.config.globalProperties.$p.t('alert/attention')),
+						message: Vue.computed(() => app.config.globalProperties.$p.t('alert/confirm_delete')),
+						acceptLabel: Vue.computed(() => app.config.globalProperties.$p.t('ui/loeschen')),
 						acceptClass: 'p-button-danger',
-						rejectLabel: 'Abbrechen',
+						rejectLabel: Vue.computed(() => app.config.globalProperties.$p.t('ui/abbrechen')),
 						rejectClass: 'p-button-secondary',
 						accept() {
 							resolve(true);
@@ -237,11 +257,11 @@ export default {
 				return new Promise((resolve, reject) => {
 					helperAppInstance.$confirm.require({
 						group: options?.group ?? 'fhcAlertConfirm',
-						header: options?.header ?? 'Achtung',
+						header: options?.header ?? Vue.computed(() => app.config.globalProperties.$p.t('alert/attention')),
 						message: options?.message ?? '',
 						acceptLabel: options?.acceptLabel ?? 'Ok',
 						acceptClass: options?.acceptClass ?? 'btn btn-primary',
-						rejectLabel: options?.rejectLabel ?? 'Abbrechen',
+						rejectLabel: options?.rejectLabel ?? Vue.computed(() => app.config.globalProperties.$p.t('ui/abbrechen')),
 						rejectClass: options?.rejectClass ?? 'btn btn-outline-secondary',
 						accept() {
 							resolve(true);
@@ -252,18 +272,18 @@ export default {
 					});
 				});
 			},
-			alertDefault(severity, title, message, sticky = false) {
-				let options = { severity: severity, summary: title, detail: message};
+			alertDefault(severity, title, message, sticky = false, html = false) {
+				let options = { severity: severity, summary: title, detail: message, html };
 				
 				if (!sticky)
 					options.life = 3000;
 
 				helperAppInstance.$refs.toast.add(options);
 			},
-			alertMultiple(messageArray, severity = 'info', title = 'Info', sticky = false){
+			alertMultiple(messageArray, severity = 'info', title = 'Info', sticky = false, html = false){
 				// Check, if array has only string values
 				if (messageArray.every(message => typeof message === 'string')) {
-					messageArray.forEach(message => this.alertDefault(severity, title, message, sticky));
+					messageArray.forEach(message => this.alertDefault(severity, title, message, sticky, html));
 					return true;
 				}
 				return false;
