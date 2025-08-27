@@ -58,9 +58,10 @@ class Messages extends Auth_Controller
 		$body = $this->input->post('body');
 		$recipients_ids = $this->input->post('recipients_ids');
 		$relationmessage_id = $this->input->post('relationmessage_id');
+		$systemuser = $this->input->post('systemuser');
 		$type = $this->input->post('type');
 
-		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($type, $recipients_ids, $subject, $body, $relationmessage_id);
+		$sendImplicitTemplate = $this->CLMessagesModel->sendImplicitTemplate($type, $recipients_ids, $subject, $body, $relationmessage_id, isset($systemuser));
 		if (isSuccess($sendImplicitTemplate))
 		{
 			$this->load->view('system/messages/htmlMessageSentSuccess');
@@ -93,16 +94,29 @@ class Messages extends Auth_Controller
 	public function parseMessageText()
 	{
 		$receiver_id = $this->input->post('receiver_id');
+		$systemuser = $this->input->post('systemuser');
 		$text = $this->input->post('text');
 		$type = $this->input->post('type');
 
+		$sender_uid = null;
+
+		if ($systemuser === "true")
+		{
+			$this->BenutzerModel->addSelect('uid');
+			if (!$result = getData($this->BenutzerModel->getFromPersonId($this->config->item(MessageLib::CFG_SYSTEM_PERSON_ID))))
+			{
+				show_error('No sender_uid found');
+			}
+			$sender_uid = $result[0]->uid;
+		}
 		if ($type == Messages_model::TYPE_PERSONS)
 		{
-			$this->outputJson($this->CLMessagesModel->parseMessageTextPerson($receiver_id, $text));
+			$this->outputJson($this->CLMessagesModel->parseMessageTextPerson($receiver_id, $text, $sender_uid));
+
 		}
 		elseif ($type == Messages_model::TYPE_PRESTUDENTS)
 		{
-			$this->outputJson($this->CLMessagesModel->parseMessageTextPrestudent($receiver_id, $text));
+			$this->outputJson($this->CLMessagesModel->parseMessageTextPrestudent($receiver_id, $text, $sender_uid));
 		}
 		else
 		{

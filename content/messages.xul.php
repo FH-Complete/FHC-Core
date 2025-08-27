@@ -126,6 +126,10 @@ echo ']>
 			class="sortDirectionIndicator"
 			sort="rdf:http://www.technikum-wien.at/messages/rdf#statusdatum"/>
 		<splitter class="tree-splitter"/>
+		<treecol id="messages-tree-status" label="Hinzugefügt von" flex="2" hidden="false"
+			class="sortDirectionIndicator"
+			sort="rdf:http://www.technikum-wien.at/messages/rdf#insertvon"/>
+		<splitter class="tree-splitter"/>
 	</treecols>
 
 	<template>
@@ -142,6 +146,7 @@ echo ']>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#recipient_id"/>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#status"/>
 					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#statusdatum"/>
+					<treecell label="rdf:http://www.technikum-wien.at/messages/rdf#insertvon"/>
 				</treerow>
 			</treeitem>
 		</treechildren>

@@ -468,7 +468,8 @@ class MessageLib
 			'body' => $body,
 			'priority' => $priority,
 			'relationmessage_id' => $relationmessage_id,
-			'oe_kurzbz' => $senderOU
+			'oe_kurzbz' => $senderOU,
+			'insertvon' => isLogged() ? getAuthUID() : null
 		);
 
 		$saveMessageResult = $this->_ci->MessageModel->insert($messageData);
@@ -481,7 +482,8 @@ class MessageLib
 				'person_id' => $receiver_id,
 				'message_id' => $messageId,
 				'token' => generateToken(),
-				'oe_kurzbz' => $receiverOU
+				'oe_kurzbz' => $receiverOU,
+				'insertvon' => isLogged() ? getAuthUID() : null
 			);
 
 			$saveMessageResult = $this->_ci->RecipientModel->insert($recipientData);

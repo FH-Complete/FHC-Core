@@ -8,7 +8,7 @@ function tinymcePreviewSetContent()
 	{
 		if ($("#recipients").children(":selected").val() > -1)
 		{
-			parseMessageText($("#recipients").children(":selected").val(), tinyMCE.get("bodyTextArea").getContent());
+			parseMessageText($("#recipients").children(":selected").val(),$("#sender").val(), tinyMCE.get("bodyTextArea").getContent(), $("#systemuser").prop("checked"));
 		}
 		else
 		{
@@ -17,13 +17,14 @@ function tinymcePreviewSetContent()
 	}
 }
 
-function parseMessageText(receiver_id, text)
+function parseMessageText(receiver_id, sender_id, text, systemuser)
 {
 	FHC_AjaxClient.ajaxCallPost(
 		"system/messages/Messages/parseMessageText",
 		{
 			receiver_id: receiver_id,
 			text: text,
+			systemuser: systemuser,
 			type: $("#type").val()
 		},
 		{

@@ -30,6 +30,24 @@
 					</div>
 				</div>
 				<form id="sendForm" method="post" action="<?php echo site_url('/system/messages/Messages/sendImplicitTemplate'); ?>">
+					<?php if($allowSenderChange) : ?>
+					<div class="row">
+						<div class="form-group">
+							<div class="col-lg-1 msgfieldcol-left">
+								<label>
+									<?php echo ucfirst($this->p->t('global', 'sender')); ?>:
+								</label>
+							</div>
+							<div class="col-lg-6 msgfieldcol-right">
+								<div class="checkbox-inline">
+									<input type="checkbox" name="systemuser" id="systemuser">
+									<?php echo "Systemuser?" ?>
+								</div>
+							</div>
+						</div>
+					</div>
+					<?php endif; ?>
+
 					<div class="row">
 						<div class="form-group">
 							<div class="col-lg-1 msgfieldcol-left">
@@ -98,11 +116,11 @@
                             <br>
                             <div class="form-group">
                                 <label>
-									
+
 									<?php echo ucfirst($this->p->t('ui', 'meineFelder')); ?>:
 
                                 </label>
-								
+
 								<?php
 								$size = count($user_fields) > 5 ? 5 : count($user_fields);
 								echo $this->widgetlib->widget(

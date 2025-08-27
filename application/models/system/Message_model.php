@@ -109,11 +109,16 @@ class Message_model extends DB_Model
 						re.vornamen AS revornamen,
 						s.status,
 						s.statusinfo,
-						s.insertamum AS statusamum
+						s.insertamum AS statusamum,
+						mp.vorname as insertvorname,
+						mp.nachname as insertnachname
 				  FROM public.tbl_msg_message m
 						JOIN public.tbl_msg_recipient r ON m.message_id = r.message_id
 						JOIN public.tbl_person se ON (m.person_id = se.person_id)
 						JOIN public.tbl_person re ON (r.person_id = re.person_id)
+				
+						LEFT JOIN public.tbl_benutzer mb ON (mb.uid = m.insertvon)
+						LEFT JOIN public.tbl_person mp ON (mp.person_id = mb.person_id)
 						LEFT JOIN (
 							SELECT message_id, person_id, status, statusinfo, insertamum
 							  FROM public.tbl_msg_status

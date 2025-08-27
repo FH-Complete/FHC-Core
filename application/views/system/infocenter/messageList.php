@@ -11,6 +11,7 @@ $widthColumn = $msgExists === true ? 8 : 12;
 			<th><?php echo  ucfirst($this->p->t('global','empfaenger')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('global','betreff')) ?></th>
 			<th><?php echo  ucfirst($this->p->t('global','gelesenAm')) ?></th>
+			<th><?php echo  ucfirst($this->p->t('lehre','insert_von')) ?></th>
 		</tr>
 		</thead>
 		<tbody>
@@ -21,6 +22,7 @@ $widthColumn = $msgExists === true ? 8 : 12;
 				<td><?php echo $message->revorname.' '.$message->renachname ?></td>
 				<td><?php echo $message->subject ?></td>
 				<td><?php echo isset($message->statusamum) ? date_format(date_create($message->statusamum), 'd.m.Y H:i:s') : '' ?></td>
+				<td><?php echo $message->insertvorname.' '.$message->insertnachname ?></td>
 			</tr>
 		<?php endforeach; ?>
 		</tbody>

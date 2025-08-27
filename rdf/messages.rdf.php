@@ -53,7 +53,8 @@ SELECT
 	m.person_id as sender_id,
 	r.person_id as recipient_id,
 	MAX(ss.status) as status,
-	MAX(ss.insertamum) as statusdatum
+	MAX(ss.insertamum) as statusdatum,
+	CASE WHEN m.insertvon IS NOT NULL THEN (SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer ON tbl_person.person_id = tbl_benutzer.person_id WHERE tbl_benutzer.uid = m.insertvon) END as insertvon
 FROM public.tbl_msg_message m
      JOIN public.tbl_msg_recipient r USING(message_id)
      JOIN public.tbl_msg_status ss ON(r.message_id = ss.message_id AND ss.person_id = r.person_id)
@@ -71,7 +72,8 @@ SELECT
 	m.person_id as sender_id,
 	r.person_id as recipient_id,
 	MAX(ss.status) as status,
-	MAX(ss.insertamum) as statusdatum
+	MAX(ss.insertamum) as statusdatum,
+	CASE WHEN m.insertvon IS NOT NULL THEN (SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person JOIN public.tbl_benutzer ON tbl_person.person_id = tbl_benutzer.person_id WHERE tbl_benutzer.uid = m.insertvon) END as insertvon
 FROM public.tbl_msg_recipient r
      JOIN public.tbl_msg_status ss USING(message_id, person_id)
      JOIN public.tbl_msg_message m USING(message_id)
@@ -113,6 +115,7 @@ if($db->db_query($qry))
 		$oRdf->obj[$i]->setAttribut('recipient',$row->recipient,true);
 		$oRdf->obj[$i]->setAttribut('sender_id',$row->sender_id,true);
 		$oRdf->obj[$i]->setAttribut('recipient_id',$row->recipient_id,true);
+		$oRdf->obj[$i]->setAttribut('insertvon',$row->insertvon,true);
 
 		if($row->relationmessage_id!='')
 			$oRdf->addSequence($row->message_id, $row->relationmessage_id);
