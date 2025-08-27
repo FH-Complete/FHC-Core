@@ -47040,26 +47040,6 @@ and represent the current state of research on the topic. The prescribed citatio
 	),
 	array(
 		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'lehreinheit_id',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Lehreinheit ID',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Teaching Unit ID',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'dateFrom',
 		'insertvon' => 'system',
@@ -47158,26 +47138,7 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
-	array(
-		'app' => 'core',
-		'category' => 'global',
-		'phrase' => 'termine',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Termine',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Dates',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
+	
 	// FHC 4 Lehrveranstaltungstermine ENDE ---------------------------------------------------------------------------
 	// FHC4 STUDIERENDENVERWALTUNG AUFNAHMETERMINE START ---------------------------------------------------------------
 	array(
