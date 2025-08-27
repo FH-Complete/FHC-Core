@@ -311,10 +311,10 @@ export default {
 			const result = _merge_error_config(config?.errorHandling);
 
 			if (!config?.form) {
-				result.combine.form = [];
+				result.combine = { ...result.combine, form: [] };
 			} else {
 				const formHandler = result.handler.form;
-				result.handler.form = errors => formHandler(config.form, errors);
+				result.handler = { ...result.handler, form: errors => formHandler(config.form, errors) };
 			}
 
 			return result;
