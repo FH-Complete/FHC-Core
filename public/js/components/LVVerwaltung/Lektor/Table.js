@@ -199,7 +199,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
-			:new-btn-label="$p.t('lehre', 'addlektor')"
+			:new-btn-label="$p.t('lehre', 'addLektor')"
 			new-btn-show
 			@click:new="showAutocomplete = !showAutocomplete"
 			>
