@@ -11,6 +11,18 @@ export default {
 		CisSprachen,
 		ThemeSwitch,
     },
+	directives:{
+		navToggleButton:{
+			updated(el, binding, vnode, prevVnode){
+				const { menuOpen, themeName } = binding.value;
+				if(menuOpen && themeName === "contrast"){
+					el.querySelector('i').style.setProperty('color', 'white', 'important')
+				} else if (!menuOpen && themeName === "contrast"){
+					el.querySelector('i').style.setProperty('color', 'black', 'important')
+				}
+			}
+		}
+	},
     props: {
 		rootUrl: String,
         logoUrl: String,
@@ -143,7 +155,7 @@ export default {
     <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">
-				<button :aria-label="menuCollapseAriaLabel"  type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
+				<button v-navToggleButton="{menuOpen, themeName: $theme.theme_name.value}" :aria-label="menuCollapseAriaLabel" :title="menuCollapseAriaLabel" type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
 					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-secondary-text"></i>
 				</button>
 			</div>
