@@ -244,4 +244,20 @@ class pruefungstermin extends basis_db{
 	}
 	
     }
+
+	public function delete($pruefungstermin_id)
+	{
+		$qry = "DELETE FROM campus.tbl_pruefungstermin WHERE pruefungstermin_id=".$this->db_add_param($pruefungstermin_id).";";
+
+		if($this->db_query($qry))
+		{
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler beim Löschen des Eintrages';
+			return false;
+		}
+	}
+
 }

@@ -1554,6 +1554,36 @@ class lehrveranstaltung extends basis_db
 		}
 	}
 
+	public function loadLVkompatibelWithStudienplan($lehrveranstaltung_id, $studienplan_id)
+	{
+		if (!is_numeric($lehrveranstaltung_id))
+		{
+			$this->errormsg = 'Lehrveranstaltung_id muss eine gueltige Zahl sein';
+			return false;
+		}
+		if (!is_numeric($studienplan_id))
+		{
+			$this->errormsg = 'Studienplan_id muss eine gueltige Zahl sein';
+			return false;
+		}
+
+		$qry = "SELECT studienplan_lehrveranstaltung_id, lehrveranstaltung_id_kompatibel
+				FROM lehre.tbl_lehrveranstaltung_kompatibel
+					JOIN lehre.tbl_studienplan_lehrveranstaltung ON lehrveranstaltung_id_kompatibel = tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id
+				WHERE tbl_lehrveranstaltung_kompatibel.lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)."
+				;";
+
+		if($this->db_query($qry))
+		{
+			$data = array();
+			while($row = $this->db_fetch_object())
+			{
+				$data[] = ['lehrveranstaltung_id_kompatibel' => $row->lehrveranstaltung_id_kompatibel, 'studienplan_lehrveranstaltung_id' => $row->studienplan_lehrveranstaltung_id];
+			}
+			return $data;
+		}
+	}
+	
 	/**
 	 * Lädt alle kompatiblen LVs zu einer Lehrveranstaltung
 	 * @param $lehrveranstaltung_id ID der Lehrveranstaltung

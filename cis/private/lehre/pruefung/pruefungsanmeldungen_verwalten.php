@@ -258,6 +258,36 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 				}
 			});
 
+
+			$('#zusammenlegen').on('click', function() {
+				let ausgewaehlte_termine = $('.termin-checkbox:checked');
+
+				if (ausgewaehlte_termine.length === 0)
+					return;
+
+				let erster_termin = ausgewaehlte_termine.first();
+				let erstes_datum = erster_termin.data('datum');
+				let erste_lvid = erster_termin.data('lv-id');
+
+				let termine = [];
+				ausgewaehlte_termine.each(function() {{
+					let termin = $(this);
+					let datum = termin.data('datum');
+					let lv_id = termin.data('lv-id');
+
+					if (erstes_datum !== datum)
+						return alert("Die ausgewählten Termine liegen nicht am selben Tag und können daher nicht zusammengelegt werden.")
+					if (erste_lvid !== lv_id)
+						return alert("Bei den ausgewählten Terminen handelt es sich um unterschiedliche Lehrveranstaltungen, die daher nicht zusammengelegt werden können.")
+
+					termine.push(termin.data('termin-id'));
+				}})
+
+				if (termine.length > 0)
+				{
+					terminezusammenlegen(termine, erste_lvid);
+				}
+			})
 		});
 	</script>
 	<h1><?php echo $p->t('pruefung/anmeldungenVerwalten'); ?></h1>

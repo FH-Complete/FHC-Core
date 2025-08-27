@@ -110,6 +110,11 @@ switch($method)
 		$studiensemester = filter_input(INPUT_POST,"studiensemester");
 		$data = getPruefungenStudiengangBySemester($studiensemester);
 		break;
+	case 'terminezusammenlegen':
+		$termine = filter_input(INPUT_POST, 'termine', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+		$lv_id = filter_input(INPUT_POST, 'lv_id');
+		$data = terminezusammenlegen($termine, $lv_id);
+		break;
 	case 'saveKommentar':
 		$data = saveKommentar();
 		break;
@@ -1281,6 +1286,211 @@ function getPruefungenStudiengangBySemester($aktStudiensemester)
 	}
 	$data['result']=$result;
 	$data['error']='false';
+	$data['errormsg']='';
+	return $data;
+}
+
+function terminezusammenlegen($termine, $lv_id)
+{
+	$result = array();
+	$alle_termine = array();
+	$error = false;
+	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
+	foreach($termine as $termin)
+	{
+		$pruefungstermin = new pruefungstermin();
+		$pruefungstermin->load($termin);
+		$pruefung = new pruefungCis();
+		$pruefung->load($pruefungstermin->pruefung_id);
+		$pruefung->getLehrveranstaltungenByPruefung();
+
+		$lehrveranstaltungen = array_column($pruefung->lehrveranstaltungen, 'lehrveranstaltung_id');
+		if (!in_array($lv_id, $lehrveranstaltungen))
+			continue;
+
+		$pruefung->lehrveranstaltung_id = $lv_id;
+		$pruefung->termin = $pruefungstermin;
+		$alle_termine[] = $pruefung;
+	}
+
+
+	if (count($alle_termine) >= 1)
+	{
+		usort($alle_termine, function($a, $b) {
+			return strcmp($a->termin->von, $b->termin->von);
+		});
+
+		$first_termin = $alle_termine[0];
+
+		$first_mitarbeiter = $first_termin->mitarbeiter_uid;
+		$first_date = date('Y-m-d', strtotime($first_termin->termin->von));
+		$first_studiensemester = $first_termin->studiensemester_kurzbz;
+		$first_sammelklausur = $first_termin->termin->sammelklausur;
+		$first_ort = $first_termin->termin->ort_kurzbz;
+		$first_raum = $first_termin->termin->anderer_raum;
+		$first_lv = $first_termin->lehrveranstaltung_id;
+		$first_titel = $first_termin->titel;
+
+		$max_von = strtotime($first_termin->termin->von);
+		$max_bis = strtotime($first_termin->termin->bis);
+		$teilnehmer_min = (int)$first_termin->termin->teilnehmer_min;
+		$teilnehmer_max = (int)$first_termin->termin->teilnehmer_max;
+
+
+		$prevEnd = $max_bis;
+
+		foreach ($alle_termine as $termin)
+		{
+			if (date('Y-m-d', strtotime($termin->termin->von)) !== $first_date)
+			{
+				$data['errormsg'] = 'Nicht der gleiche Tag!';
+				$error = true;
+			}
+
+			if ($termin->mitarbeiter_uid !== $first_mitarbeiter)
+			{
+				$data['errormsg'] = 'Unterschiedliche Lektoren!';
+				$error = true;
+			}
+
+			if ($termin->studiensemester_kurzbz !== $first_studiensemester)
+			{
+				$data['errormsg'] = 'Unterschiedliche Studiensemester!';
+				$error = true;
+			}
+
+			if ($termin->termin->sammelklausur !== $first_sammelklausur)
+			{
+				$data['errormsg'] = 'Sammelklausur unterschiedlich!';
+				$error = true;
+			}
+
+			if (!($termin->termin->ort_kurzbz === $first_ort || $first_termin->termin->anderer_raum = $first_raum))
+			{
+				$data['errormsg'] = 'Ort/Raum unterschiedlich!';
+				$error = true;
+			}
+
+			if ($termin->lehrveranstaltung_id !== $first_lv)
+			{
+				$data['errormsg'] = 'Lehrveranstaltungen unterscheiden sich!';
+				$error = true;
+			}
+
+
+			$start = strtotime($termin->termin->von);
+			$max_von = min($max_von, $start);
+			$max_bis = max($max_bis, strtotime($termin->termin->bis));
+			$teilnehmer_min = min($teilnehmer_min, (int)$termin->termin->teilnehmer_min);
+			$teilnehmer_max = max($teilnehmer_max, (int)$termin->termin->teilnehmer_max);
+
+			if (($start - $prevEnd > 0) && $first_ort)
+			{
+				$stunde = new stunde();
+
+				$gapStartStr = date('Y-m-d H:i:s', $prevEnd);
+				$gapEndStr = date('Y-m-d H:i:s', $start);
+
+				$gapStartArr = explode(' ', $gapStartStr);
+				$gapEndArr = explode(' ', $gapEndStr);
+
+				$stunden = $stunde->getStunden($gapStartArr[1], $gapEndArr[1]);
+
+				$reservierung = new reservierung();
+				$reserviert = false;
+
+				$reservierungs_stunden = $reservierung->getReservierungen($first_ort, $gapStartArr[0]);
+
+				$need_stunden = array_diff($stunden, $reservierungs_stunden);
+
+				foreach ($need_stunden as $h)
+				{
+					if ($reservierung->isReserviert($first_ort, $gapStartArr[0], $h))
+						$reserviert = true;
+				}
+
+				if (!$terminkollision && $reserviert && !$first_sammelklausur)
+				{
+					$error = true;
+					$data['errormsg'] = 'Kann nicht zusammengelegt werden, da der Raum reserviert ist';
+				}
+				else
+				{
+					$reservierung->studiengang_kz = "0";
+					$reservierung->ort_kurzbz = $first_ort;
+					$reservierung->uid = $first_mitarbeiter;
+					$reservierung->datum = $gapStartArr[0];
+					$reservierung->titel = $first_titel;
+					if (strlen($first_titel) > 10)
+					{
+						$reservierung->titel = "Prüfung";
+					}
+					$reservierung->beschreibung = "Prüfung";
+					$reservierung->insertamum = date('Y-m-d G:i:s');
+					$reservierung->insertvon = get_uid();
+					$reservierungError = false;
+
+					foreach ($need_stunden as $h)
+					{
+						$reservierung->stunde = $h;
+						if (!$reservierungError)
+						{
+							if (!$reservierung->save(true))
+							{
+								$error = true;
+								$data['errormsg'] = $reservierung->errormsg;
+								$reservierungError = true;
+							}
+						}
+					}
+				}
+			}
+			$prevEnd = strtotime($termin->termin->bis);
+		}
+
+		if (!$error)
+		{
+			$first_pruefungstermin =  new pruefungstermin();
+			$first_pruefungstermin->load($first_termin->termin->pruefungstermin_id);
+
+			$first_pruefungstermin->von = date('Y-m-d H:i:s', $max_von);
+			$first_pruefungstermin->bis = date('Y-m-d H:i:s', $max_bis);
+			$first_pruefungstermin->teilnehmer_min = $teilnehmer_min;
+			$first_pruefungstermin->teilnehmer_max = $teilnehmer_max;
+
+			$first_pruefungstermin->save();
+
+			$alle_termine = array_slice($alle_termine, 1);
+
+			foreach ($alle_termine as $termin)
+			{
+				$anmeldung_termin = new pruefungsanmeldung();
+				$anmeldungen_termine = $anmeldung_termin->getAnmeldungenByTermin($termin->termin->pruefungstermin_id);
+
+				if (count($anmeldungen_termine) === 0)
+				{
+					$first_pruefungstermin->delete($termin->termin->pruefungstermin_id);
+				}
+				$i = 0;
+				$anmeldungen_termine_count = count($anmeldungen_termine);
+				foreach ($anmeldungen_termine as $anmeldungtermin)
+				{
+					$anmeldung = new pruefungsanmeldung();
+					$anmeldung->load($anmeldungtermin->pruefungsanmeldung_id);
+					$old_pruefuengstermin_id = $anmeldung->pruefungstermin_id;
+					$anmeldung->pruefungstermin_id = $first_termin->termin->pruefungstermin_id;
+					if ($anmeldung->save(false) && ($i === $anmeldungen_termine_count - 1))
+					{
+						$first_pruefungstermin->delete($old_pruefuengstermin_id);
+					}
+					$i ++;
+				}
+			}
+		}
+	}
+
+	$data['result']= $result;
+	$data['error']= $error ? 'true' : 'false';
 	$data['errormsg']='';
 	return $data;
 }

@@ -1231,6 +1231,42 @@ function loadPruefungStudiengang(studiensemester)
 	});
 }
 
+function terminezusammenlegen(termine, lv_id)
+{
+	if(termine.length <= 1)
+		return;
+
+	$.ajax({
+		dataType: 'json',
+		url: "./pruefungsanmeldung.json.php",
+		type: "POST",
+		data: {
+			method: "terminezusammenlegen",
+			'termine[]': termine,
+			lv_id: lv_id
+		},
+		error: loadError,
+		success: function(data){
+			if(data.error === 'false')
+			{
+				loadPruefungStudiengang()
+				$("#anmeldung_hinzufuegen").empty();
+				$("#lvdaten").empty();
+				$("#anmeldeDaten").empty();
+				$("#reihungSpeichernButton").empty();
+				$("#kommentar").empty();
+				$("#kommentarSpeichernButton").empty();
+				$("#raumLink").empty();
+				$("#listeDrucken").empty();
+			}
+			else
+			{
+				messageBox("message", data.errormsg, "red", "highlight", 10000);
+			}
+		}
+	});
+}
+
 /**
  * Zeigt das Formularfeld zur Eingabe eines Kommentars in der Anmeldungsverwaltung an.
  * @param {String} vorname Vorname des Studenten

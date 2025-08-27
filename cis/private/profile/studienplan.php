@@ -359,7 +359,7 @@ drawTree($tree,0);
 
 function drawTree($tree, $depth)
 {
-	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
+	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext, $studienplan_id;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
 	global $anrechnung;
 
@@ -401,7 +401,10 @@ function drawTree($tree, $depth)
 			echo '&nbsp;&nbsp;&nbsp;&nbsp;';
 
 		$lvkompatibel = new lehrveranstaltung();
-		$lvkompatibel_arr = $lvkompatibel->loadLVkompatibel($row_tree->lehrveranstaltung_id);
+
+		$studienplaene_kompatibel = $lvkompatibel->loadLVkompatibelWithStudienplan($row_tree->lehrveranstaltung_id, $studienplan_id);
+
+		$lvkompatibel_arr = array_unique(array_column($studienplaene_kompatibel, 'lehrveranstaltung_id_kompatibel'));
 		$lvkompatibel_arr[]=$row_tree->lehrveranstaltung_id;
 
 		$abgeschlossen=false;
@@ -414,6 +417,24 @@ function drawTree($tree, $depth)
 			else
 				$abgeschlossen=false;
 		}
+		else if (!empty($studienplaene_kompatibel))
+		{
+			foreach ($studienplaene_kompatibel as $kompatibel)
+			{
+				$lvregelExists = $lvregel->exists($kompatibel['studienplan_lehrveranstaltung_id']);
+
+				if ($lvregelExists)
+				{
+					if ($lvregel->isAbgeschlossen($uid, $kompatibel['studienplan_lehrveranstaltung_id']))
+						$abgeschlossen=true;
+					else
+						$abgeschlossen=false;
+
+					break;
+				}
+			}
+		}
+
 		$lvinfo = new lvinfo();
 		switch(getSprache())
 		{
@@ -583,15 +604,38 @@ function drawTree($tree, $depth)
 				{
 					$semesterlock=true;
 				}
-				else
+
+				if (!$semesterlock && !empty($studienplaene_kompatibel))
 				{
-					//check if rules are fulfilled just for actual or next studiensemester
-					if($stsem === $aktornext)
+					foreach ($studienplaene_kompatibel as $kompatibel)
 					{
-						$result = $lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem);
-						if((is_array($result)) && ($result[0] !== true))
+						if (!$lvregel->checkSemester($kompatibel['studienplan_lehrveranstaltung_id'], $semester))
 						{
-							$regelerfuellt=false;
+							$semesterlock = true;
+							break;
+						}
+					}
+				}
+
+				//check if rules are fulfilled just for actual or next studiensemester
+				if($stsem === $aktornext && !$semesterlock)
+				{
+					$result = $lvregel->isZugangsberechtigt($uid, $row_tree->studienplan_lehrveranstaltung_id, $stsem);
+					if((is_array($result)) && ($result[0] !== true))
+					{
+						$regelerfuellt = false;
+					}
+
+					if ($regelerfuellt && !empty($studienplaene_kompatibel))
+					{
+						foreach ($studienplaene_kompatibel as $kompatibel)
+						{
+							$result = $lvregel->isZugangsberechtigt($uid, $kompatibel['studienplan_lehrveranstaltung_id'], $stsem);
+							if (is_array($result) && $result[0] !== true)
+							{
+								$regelerfuellt = false;
+								break;
+							}
 						}
 					}
 				}
