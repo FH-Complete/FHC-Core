@@ -87,7 +87,7 @@ export default {
 				class="h-100 input-group me-2 searchbar_searchbox"
 				:class="showresult ? 'open' : 'closed'"
 			>
-				<span class="input-group-text">
+				<span class="input-group-text" type="button" @click="$refs.input.focus()">
 					<i class="fa-solid fa-magnifying-glass"></i>
 				</span>
                 <input
