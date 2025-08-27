@@ -103,7 +103,7 @@ export default {
 		<div class="row">
 			<div class="col" v-html="content">
 			</div>
-			<div class="col-auto position-sticky " style="top:var(--fhc-cis-header-height); align-self:flex-start;">
+			<div class="col-auto " style="align-self:flex-start;">
 				<div style="width:15rem">
 					<studiengang-information></studiengang-information>
 				</div>
