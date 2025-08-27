@@ -46,7 +46,10 @@ export const Profil = {
 	props: {
 		uid: {
 			type: String,
-			default: 'Profil'
+			required:false,
+		},
+		viewData: {
+			type: Object,
 		}
 	},
 	data() {
@@ -59,10 +62,12 @@ export const Profil = {
 			data: null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
 			notFoundUID: null,
+			isEditable: this.viewData.editable ?? false,
 		};
 	},
 	provide() {
 		return {
+			isEditable: Vue.computed(()=>this.isEditable),
 			profilUpdateStates: Vue.computed(() =>
 				this.profilUpdateStates ? this.profilUpdateStates : false
 			),
@@ -153,18 +158,19 @@ export const Profil = {
 					console.error(error);
 				});
 			
-			let uid = this.uid ?? location.pathname.split("/").pop();
-
+			
 			this.$api
-				.call(ApiProfil.getView(uid))
-				.then((res) => {
-					if (!res.data) {
-						this.notFoundUID = uid;
-					} else {
-						this.view = res.data?.view;
-						this.data = res.data?.data;
-					}
-				});	
+				.call(ApiProfil.profilViewData(this.$route.params.uid??null))
+				.then((response) => response.data).then(data=>{
+					this.view = data?.profil_data.view;
+					this.data = data?.profil_data.data;
+					this.isEditable = data?.editable ?? false;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -254,6 +260,7 @@ export const Profil = {
 		},
 	},
 	computed: {
+		
 		filteredEditData() {
 			if (!this.data) {
 				return;
@@ -365,7 +372,7 @@ export const Profil = {
 			this.load()
 		}
 	},
-	async created() {
+	created() {
 		this.load()
 	},
 	template: `

@@ -1284,7 +1284,6 @@ class InfoCenter extends Auth_Controller
 				'nachname' => $this->input->post('nachname'),
 				'titelpost' => isEmptyString($this->input->post('titelpost')) ? null : $this->input->post('titelpost'),
 				'gebdatum' => isEmptyString($this->input->post('gebdatum')) ? null : date("Y-m-d", strtotime($this->input->post('gebdatum'))),
-				'svnr' => isEmptyString($this->input->post('svnr')) ? null : $this->input->post('svnr'),
 				'staatsbuergerschaft' => isEmptyString($this->input->post('buergerschaft')) ? null : $this->input->post('buergerschaft'),
 				'geschlecht' => $this->input->post('geschlecht'),
 				'geburtsnation' => isEmptyString($this->input->post('gebnation')) ? null : $this->input->post('gebnation'),
@@ -1860,7 +1859,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Loads all necessary Person data: Stammdaten (name, svnr, contact, ...), Dokumente, Logs and Notizen
+	 * Loads all necessary Person data: Stammdaten (name, contact, ...), Dokumente, Logs and Notizen
 	 * @param $person_id
 	 * @return array
 	 */

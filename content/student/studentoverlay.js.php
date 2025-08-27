@@ -3553,6 +3553,15 @@ function StudentZeugnisDokumentArchivieren()
 			xml = 'abschlussdokument_lehrgaenge.xml.php';
 			break;
 
+		case 'microcredentialzertifikat_1':
+		case 'microcredentialzertifikat_2':
+		case 'microcredentialzertifikat_3':
+		case 'microcredential_1':
+		case 'microcredential_2':
+		case 'microcredential_3':
+			xml = 'microcredential.xml.php';
+			break;
+			
 		default:
 			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
@@ -4783,7 +4792,7 @@ function StudentNotenMoveFromAntrag()
 
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	req.add('student_uid', uid);
-	
+
 	var txt = "?";
 	for(var q in req.parms) {
 		txt = txt+'&'+req.parms[q].name+'='+encodeURIComponent(req.parms[q].value);

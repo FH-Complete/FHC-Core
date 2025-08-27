@@ -29,14 +29,24 @@ export default {
 		uid: {
 			type: [Number, String],
 			required: true
-		}
+		},
+		/** List of types to allow for creation */
+		betriebsmittelTypes: {
+			type: Array,
+			default: null
+		},
+		/**
+		 * If true: only show the types specified in 'betriebsmittelTypes'.
+		 * If false: show all available types.
+		 */
+		filterByProvidedTypes: Boolean
 	},
 	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-					this.endpoint.getAllBetriebsmittel(this.typeId, this.id)
+					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
@@ -137,8 +147,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
@@ -296,7 +304,7 @@ export default {
 	},
 	created() {
 		return this.$api
-			.call(this.endpoint.getTypenBetriebsmittel())
+			.call(this.endpoint.getTypenBetriebsmittel(this.betriebsmittelTypes))
 			.then(result => {
 				this.listBetriebsmitteltyp = result.data;
 			})
@@ -311,6 +319,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"
@@ -427,6 +436,7 @@ export default {
 						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -442,6 +452,7 @@ export default {
 						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"

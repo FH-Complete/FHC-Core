@@ -161,7 +161,7 @@ export default {
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
-        	<button v-if="editModeIsActive" class="btn btn-outline-secondary btn-sm w-100 mt-2" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
             <template v-if="shared">
 
@@ -173,12 +173,12 @@ export default {
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
-							<a href="#" @click.prevent="openEditModal(link)" v-show="configMode || editModeIsActive">
-								<i class="fa fa-edit me-1"></i>
+							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" v-tooltip="{showDelay:1000,value:'edit bookmark'}">
+								<i class="fa fa-edit me-1" aria-hidden="true"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a href="#" @click.prevent="removeLink(link.bookmark_id)" v-show="configMode || editModeIsActive">
-								<i class="fa fa-regular fa-trash-can" style="color: #e01b24;"></i>
+							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" v-tooltip="{showDelay:1000,value:'delete bookmark'}" @click.prevent="removeLink(link.bookmark_id)">
+								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
 							</a>
 						</div>
 					</div>
@@ -198,40 +198,36 @@ export default {
         </div>
     </div>
 	<!--EDIT MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="editForm">
+	<teleport to="body">
 		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
 			</template>
 			<template #default>
-				<label class="form-label" for="editTitle">Title</label>
-				<form-input id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<label class="form-label" for="editUrl">Url</label>
-				<form-input id="editUrl" v-model="url_input" name="url"></form-input>
+				<form-input  :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
+				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
 			</template>
 			<template #footer>
 				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
 			</template>
 		</bs-modal>
-	</core-form>
-
+	</teleport>
 	<!--CREATE MODAL-->
-	<core-form draggable="true" @dragstart="stopDrag" @drag="stopDrag" @dragend="stopDrag" v-if="editModeIsActive " ref="createForm">
+	<teleport to="body">
 		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
 			<template #title>
 				<h2>{{$p.t('bookmark','newLink')}}</h2>
 			</template>
 			<template #default>
-				<label class="form-label" for="insertTitle">Title</label>
-				<form-input id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<label class="form-label" for="insertUrl">Url</label>
-				<form-input id="insertUrl" v-model="url_input" name="url"></form-input>
+				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
+				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
 			</template>
 			<template #footer>
 				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
 			</template>
 		</bs-modal>
-	</core-form>`,
+	</teleport>
+	`,
 };
 
 /*
