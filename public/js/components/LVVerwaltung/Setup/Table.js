@@ -61,42 +61,6 @@ export default {
 	},
 	data() {
 		return {
-			fieldTitleMap: {
-				lv_kurzbz: ['lehre', 'kurzbz'],
-				tags: ['ui', 'tags'],
-				lehrveranstaltung_id: ['lehre', 'lehrveranstaltung_id'],
-				lv_bezeichnung: ['ui', 'bezeichnung'],
-				lv_bezeichnung_english: ['lehre', 'bezeichnungeng'],
-				lv_studiengang_kz: ['lehre', 'studiengangskennzahlLehre'],
-				studiengang: ['lehre', 'studiengang'],
-				semester: ['lehre', 'semester'],
-				sprache: ['global', 'sprache'],
-				lv_ects: ['lehre', 'ects'],
-				semesterstunden: ['lehre', 'semesterstunden'],
-				anmerkung: ['global', 'anmerkung'],
-				lehre: ['lehre', 'lehre'],
-				lehreverzeichnis: ['ui', 'lehreverzeichnis'],
-				aktiv: ['person', 'aktiv'],
-				planfaktor: ['ui', 'planfaktor'],
-				planlektoren: ['ui', 'planlektoren'],
-				planpersonalkosten: ['ui', 'planpersonalkosten'],
-				plankostenprolektor: ['ui', 'plankostenprolektor'],
-				orgform_kurzbz: ['lehre', 'organisationsform'],
-				studienplan_id: ['ui', 'studienplan_id'],
-				studienplan_bezeichnung: ['ui', 'studienplan_bezeichnung'],
-				lehrtyp_kurzbz: ['ui', 'lehrtyp_kurzbz'],
-				lehrform_kurzbz: ['lehre', 'lehrform'],
-				le_planstunden: ['lehre', 'leplanstunden'],
-				lehreinheit_id: ['lehre', 'lehreinheit_id'],
-				stundenblockung: ['lehre', 'stundenblockung'],
-				wochenrythmus: ['lehre', 'wochenrhytmus'],
-				startkw: ['lehre', 'startkw'],
-				raumtyp: ['lehre', 'raumtyp'],
-				raumtypalternativ: ['lehre', 'raumtypalternativ'],
-				gruppen: ['lehre', 'gruppen'],
-				lektoren: ['lehre', 'lehrende'],
-			},
-
 			expanded: [],
 			selectedColumnValues: [],
 			tagEndpoint: ApiTag,
@@ -168,7 +132,7 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				persistenceID: 'lehrveranstaltungen_2025_07_11_v1',
+				persistenceID: 'lehrveranstaltungen_2025_07_31_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -348,7 +312,7 @@ export default {
 					{title: this.$p.t('lehre', 'raumtyp'), field: "raumtyp", headerFilter: true, headerFilterFuncParams: {field: 'raumtyp'}, visible: false},
 					{title: this.$p.t('lehre', 'raumtypalternativ'), field: "raumtypalternativ", headerFilter: true, headerFilterFuncParams: {field: 'raumtypalternativ'}, visible: false},
 					{title: this.$p.t('lehre', 'gruppen'), field: "gruppen", headerFilter: true, headerFilterFuncParams: {field: 'gruppen'}},
-					{title: this.$p.t('lehre', 'lehrende'), field: "lektoren", headerFilter: true, headerFilterFuncParams: {field: 'lektoren'}},
+					{title: this.$p.t('lehre', 'lehrende'), field: "lektoren", headerFilter: true, headerFilterFuncParams: {field: ['lektoren', 'vorname', 'nachname']}},
 				],
 			}
 
@@ -417,18 +381,14 @@ export default {
 		{
 			if (this.filter.activeFilter === 'employee' && this.filter.emp)
 			{
-				return this.$api.getUri(ApiLv.getByEmpStg(
-					this.filter.emp,
-					this.filter.stg
-				));
+				const { emp, stg, studiensemester_kurzbz } = this.filter;
+				return this.$api.getUri(ApiLv.getByEmp(studiensemester_kurzbz, emp, stg));
 			}
 
 			if (this.filter.activeFilter === 'verband' && this.filter.stg)
 			{
-				return this.$api.getUri(ApiLv.getByStg(
-					this.filter.stg,
-					this.filter.semester
-				));
+				const { stg, semester, studiensemester_kurzbz } = this.filter;
+				return this.$api.getUri(ApiLv.getByStg(studiensemester_kurzbz, stg, semester));
 			}
 		},
 		resetEmployeeFilter()
@@ -436,16 +396,6 @@ export default {
 			const newFilter = { ...this.filter };
 			delete newFilter.emp;
 			newFilter.activeFilter = 'verband';
-		},
-		buildParams()
-		{
-			const params = {};
-			for (const [key, value] of Object.entries(this.filter)) {
-				if (value !== undefined && value !== null) {
-					params[key] = value;
-				}
-			}
-			return params;
 		},
 		showLehreinheitModal() {
 			this.resetModal();
@@ -649,7 +599,7 @@ export default {
 
 			let rootRows = this.$refs.table.tabulator.getRows(true);
 			var lastRow = rootRows[rootRows.length - 1];
-			lastRow.treeCollapse(true)
+			lastRow?.treeCollapse(true)
 
 			this.currentTreeLevel = 0;
 		},

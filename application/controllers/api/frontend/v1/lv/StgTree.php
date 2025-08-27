@@ -86,6 +86,32 @@ class StgTree extends FHCAPI_Controller
 		]);
 		$list = $this->getDataOrTerminateWithError($result);
 
+		$result = $this->StudiengangModel->load($studiengang_kz);
+		$result = $this->getDataOrTerminateWithError($result);
+		if ($result)
+		{
+			if (current($result)->mischform)
+			{
+				$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
+
+				$this->StudienordnungModel->addDistinct();
+				$this->StudienordnungModel->addSelect("CONCAT(studiengang_kz, '/', p.orgform_kurzbz) AS link");
+				$this->StudienordnungModel->addSelect("p.orgform_kurzbz AS name");
+				$this->StudienordnungModel->addSelect("TRUE as leaf", false);
+
+				$this->StudienordnungModel->addJoin('lehre.tbl_studienplan p', 'studienordnung_id');
+
+				$result = $this->StudienordnungModel->loadWhere([
+					'aktiv' => true,
+					'studiengang_kz' => $studiengang_kz,
+					'p.orgform_kurzbz !=' => 'DDP'
+				]);
+				$result = $this->getDataOrTerminateWithError($result);
+
+				$list = array_merge($list, $result);
+			}
+		}
+
 		$this->terminateWithSuccess($list);
 	}
 }

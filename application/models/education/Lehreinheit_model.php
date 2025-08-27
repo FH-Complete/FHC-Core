@@ -322,7 +322,7 @@ EOSQL;
 		if (hasData($result))
 		{
 			$lehrveranstaltung = getData($result)[0];
-			$oe_result = $this->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id, $lehrveranstaltung->studiengang_kz);
+			$oe_result = $this->LehrveranstaltungModel->getAllOe($lehrveranstaltung->lehrveranstaltung_id);
 			return success(hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array(''));
 		}
 	}
@@ -356,6 +356,8 @@ EOSQL;
 						gruppen.gruppen,
 						mitarbeiter.lektoren,
 						mitarbeiter.le_planstunden,
+						mitarbeiter.vorname,
+						mitarbeiter.nachname,
 						mitarbeiter.semesterstunden,
 						fachbereich.bezeichnung as fachbereich,
 						UPPER(CONCAT(tbl_studiengang.typ,tbl_studiengang.kurzbz)) as studiengang,
@@ -659,11 +661,15 @@ EOSQL;
 					 SELECT
 						tbl_lehreinheitmitarbeiter.lehreinheit_id,
 						STRING_AGG(m.kurzbz, ' ') AS lektoren,
+						STRING_AGG(tbl_person.vorname, ' ') AS vorname,
+						STRING_AGG(tbl_person.nachname, ' ') AS nachname,
 						STRING_AGG(tbl_lehreinheitmitarbeiter.semesterstunden::text, ' ') AS semesterstunden,
 						STRING_AGG(tbl_lehreinheitmitarbeiter.planstunden::text, ' ') AS le_planstunden
 					FROM lehre.tbl_lehreinheitmitarbeiter
 						JOIN public.tbl_mitarbeiter m USING (mitarbeiter_uid)
 						JOIN lehreinheiten USING(lehreinheit_id)
+						JOIN public.tbl_benutzer ON mitarbeiter_uid = uid
+						JOIN public.tbl_person ON tbl_benutzer.person_id = tbl_person.person_id
 					GROUP BY tbl_lehreinheitmitarbeiter.lehreinheit_id
 				)";
 	}

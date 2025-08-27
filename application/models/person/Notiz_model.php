@@ -197,11 +197,8 @@ class Notiz_model extends DB_Model
 				WHERE 
 				   z.$type  = ?";
 
-
-			if ($withoutTags)
-			{
-				$qry .= " AND n.typ IS NULL";
-			}
+		if ($withoutTags)
+			$qry .= " AND n.typ IS NULL ";
 
 			$qry .= "GROUP BY 
 					notiz_id, z.notizzuordnung_id,
