@@ -3,6 +3,7 @@ import FhcFragment from "../Fragment.js";
 let _uuid = {};
 
 export default {
+	name: "FormInput",
 	inheritAttrs: false,
 	components: {
 		FhcFragment
@@ -220,7 +221,7 @@ export default {
 			if (this.tag == 'VueDatePicker' && !this._.components.VueDatePicker) {
 				this._.components.VueDatePicker = Vue.defineAsyncComponent(() => import("../vueDatepicker.js.php"));
 			} else if (this.tag == 'PvAutocomplete' && !this._.components.PvAutocomplete) {
-				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));
+				this._.components.PvAutocomplete = primevue.autocomplete;
 			} else if (this.tag == 'UploadImage' && !this._.components.UploadImage) {
 				this._.components.UploadImage = Vue.defineAsyncComponent(() => import("./Upload/Image.js"));
 			} else if (this.tag == 'UploadDms' && !this._.components.UploadDms) {
