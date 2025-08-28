@@ -45,14 +45,6 @@ html {
 	color: var(--fhc-light) !important;
 }
 
-.fhc-body-bg{
-	background-color:var(--fhc-background) !important;
-}
-
-.fhc-body-color{
-	color: var(--fhc-text) !important;
-}
-
 .fhc-secondary-bg{
 	background-color: var(--fhc-secondary) !important;
 }
@@ -104,6 +96,12 @@ html {
 .fhc-body{
 	color:var(--fhc-text);
 	background-color: var(--fhc-background);
+	border-color: var(--fhc-border);
+}
+
+.fhc-body-highlight {
+	color: var(--fhc-text);
+	background-color: var(--fhc-background-highlight);
 	border-color: var(--fhc-border);
 }
 

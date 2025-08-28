@@ -14,7 +14,7 @@
 	--fhc-calendar-border-event: var(--bs-secondary, #6c757d);
 	--fhc-calendar-radius-event: var(--bs-border-radius, .375rem);
 
-	--fhc-calendar-bg-markings-past: var(--fhc-beige-10, rgba(245, 233, 215, 0.5));
+	--fhc-calendar-bg-markings-past: var(--fhc-outdated, rgba(245, 233, 215, 0.5));
 	--fhc-calendar-border-markings-past: var(--fhc-calendar-border);
 	--fhc-calendar-bg-markings-past-label: var(--fhc-calendar-bg);
 	--fhc-calendar-border-markings-past-label: var(--fhc-calendar-border);
