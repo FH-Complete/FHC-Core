@@ -34,7 +34,6 @@ export default {
 		printDokument(url, scope){
 			//TODO Manu(check if logic not in content (Zutrittkarte also in content folder))
 			let linkToPdf = this.cisRoot + 'content/' + url;
-			console.log("in print " + linkToPdf + " scope" + scope);
 			window.open(linkToPdf, '_blank');
 		}
 	},
@@ -42,71 +41,57 @@ export default {
 	<div class="stv-document-dropdown">
 		<div class="btn-group">
 			<button
-				v-if="!showDropDownMulti"
 				ref="toolbarButton"
 				type="button"
-				class="btn btn-secondary dropdown-toggle"
+				class="btn btn-secondary dropdown-toggle px-5 ms-4"
 				data-bs-toggle="dropdown"
 				data-bs-auto-close="outside"
 				aria-expanded="false"
-				@[\`show.bs.dropdown\`]="event => { if (event.target.closest('.tabulator-row')) event.target.closest('.tabulator-row').style.zIndex = 12 }"
-				@[\`hidden.bs.dropdown\`]="event => { if (event.target.closest('.tabulator-row')) event.target.closest('.tabulator-row').style.zIndex = '' }"
 				>
 				{{this.$p.t('dokumente','dokument_erstellen')}}
 			</button>
-			<button
-				v-else
-				ref="toolbarButton"
-				type="button"
-				class="btn btn-secondary dropdown-toggle"
-				data-bs-toggle="dropdown"
-				data-bs-auto-close="outside"
-				aria-expanded="false"
-				>
-				multi: {{this.$p.t('tools','dokument_erstellen')}}
-			</button>
 
-		  <ul class="dropdown-menu dropdown-menu-right">
-			<template v-for="doc in documents" :key="doc.id">
-				<li v-if="doc.type === 'documenturl'">
-				  <button class="dropdown-item" type="button" @click="printDokument(doc.url, doc.scope)">
-				  {{ doc.name }}
-				  </button>
-				</li>
+			<ul class="dropdown-menu dropdown-menu-right">
+				<template v-for="doc in documents" :key="doc.id">
+					<li v-if="doc.type === 'documenturl'">
+					  <button class="dropdown-item" type="button" @click="printDokument(doc.url, doc.scope)">
+					  {{ doc.name }}
+					  </button>
+					</li>
 
-				<li v-else-if="doc.type === 'submenu'" class="dropend">
-				  <a
-				  class="dropdown-item dropdown-toggle"
-				  href="#"
-				  role="button"
-				  data-bs-toggle="dropdown"
-				  aria-expanded="false"
-				  >
-				  {{ doc.name }}
-				  </a>
+					<li v-else-if="doc.type === 'submenu'" class="dropend">
+					  <a
+					  class="dropdown-item dropdown-toggle"
+					  href="#"
+					  role="button"
+					  data-bs-toggle="dropdown"
+					  aria-expanded="false"
+					  >
+					  {{ doc.name }}
+					  </a>
 
-				  <ul class="dropdown-menu">
-					  <template v-for="child in doc.data" :key="child.id">
-						<li v-if="child.type === 'documenturl'">
-						<button class="dropdown-item" type="button" @click="printDokument(child.url, child.scope)">
-						  {{ child.name }}
-						</button>
-						</li>
-						<li v-else-if="child.type === 'submenu'" class="dropend">
-						<a
-						  class="dropdown-item dropdown-toggle"
-						  href="#"
-						  role="button"
-						  data-bs-toggle="dropdown"
-						  aria-expanded="false"
-						>
-						  {{ child.name }}
-						</a>
-						</li>
-					  </template>
-				  </ul>
-				</li>
-			</template>
+					  <ul class="dropdown-menu">
+						  <template v-for="child in doc.data" :key="child.id">
+							<li v-if="child.type === 'documenturl'">
+							<button class="dropdown-item" type="button" @click="printDokument(child.url, child.scope)">
+							  {{ child.name }}
+							</button>
+							</li>
+							<li v-else-if="child.type === 'submenu'" class="dropend">
+							<a
+							  class="dropdown-item dropdown-toggle"
+							  href="#"
+							  role="button"
+							  data-bs-toggle="dropdown"
+							  aria-expanded="false"
+							>
+							  {{ child.name }}
+							</a>
+							</li>
+						  </template>
+					  </ul>
+					</li>
+				</template>
 		  </ul>
 
 	</div>

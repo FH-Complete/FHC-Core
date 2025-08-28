@@ -572,28 +572,20 @@ class Dokumente extends FHCAPI_Controller
 
 	public function getDocumentDropDown($prestudent_id, $studiensemester_kurzbz, $studiengang_kz)
 	{
-		//TODO(Manu) Berechtigungen hasPermissionOutputformat
-		//TODO(Manu) remove: just for test ouput
-		$hasPermissionOutputformat = false;
+		//permission to create also odt, and doc outputs of certain documents(menu abschlusspruefung)
+		$hasPermissionOutputformat = $this->permissionlib->isBerechtigt('system/change_outputformat', 's');
 
-		//TODO(Manu) Validierungen
-		if (!$prestudent_id) {
-			$this->terminateWithError('Prestudent id is required.');
-		}
+		if (!$prestudent_id)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Prestudent_id']), self::ERROR_TYPE_GENERAL);
 		if (!$studiensemester_kurzbz)
-			$this->terminateWithError("kein Studiensemester");
-		if (!$studiengang_kz)
-			$this->terminateWithError("kein Studiengang_kz");
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiensemester']), self::ERROR_TYPE_GENERAL);
+		if(!$studiengang_kz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
+
 
 		$uid = $this->_loadUIDFromPrestudent($prestudent_id);
 		$semArray = $this->_getEntriesStudiensemester();
 		$stgTyp = $this->_getStudiengangstyp($studiengang_kz);
-
-		//TODO(Manu) check if if Array[0] bis Array[4] befüllt
-		//TODO(Manu) handling stgTyp ungleich b,m,d
-
-		//	$semString = implode(";", $semArray);
-		//	$this->terminateWithError("Semester " . $semString . " " . $semArray[0] . " " . $semArray[1]);
 
 		$documents = [
 			$this->buildDropdownEntry("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
@@ -605,7 +597,6 @@ class Dokumente extends FHCAPI_Controller
 			$this->buildDropdownEntry("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uid, 60, null),
 			$this->buildDropdownEntry("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uid, 61, null),
 
-			// Studienerfolg Menüs automatisch
 			$this->buildStudienerfolgSubmenu("de", $uid, $semArray, $studiensemester_kurzbz),
 			$this->buildStudienerfolgSubmenu("en", $uid, $semArray, $studiensemester_kurzbz),
 			$this->buildStudienerfolgSubmenu("de", $uid, $semArray, $studiensemester_kurzbz, true),
@@ -617,7 +608,7 @@ class Dokumente extends FHCAPI_Controller
 				"name" => "Verwaltung des StudierendenStatus",
 				"order" => 110,
 				"data" => [
-					$this->buildDropdownEntry("Abmeldung", "Abmeldung", "xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldungl&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
+					$this->buildDropdownEntry("Abmeldung", "Abmeldung", "xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
 					$this->buildDropdownEntry("Abmeldung durch Stgl", "AntragAbmeldungStgl", "xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
 					$this->buildDropdownEntry("Unterbrechung", "Unterbrechung", "xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
 					$this->buildDropdownEntry("Wiederholung", "Abmeldung durch Ablauf der Wiederholungsfrist", "xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
@@ -651,8 +642,11 @@ class Dokumente extends FHCAPI_Controller
 		return $documents || null;
 	}
 
-	public function getDocumentDropDownMulti()
+	public function getDocumentDropDownMulti($studiensemester_kurzbz,$studiengang_kz)
 	{
+		//permission to create also odt, and doc outputs of certain documents (menu abschlusspruefung)
+		$hasPermissionOutputformat = $this->permissionlib->isBerechtigt('system/change_outputformat', 's');
+
 		$studentUids = $this->input->get('studentUids');
 		$prestudentIds = [];
 
@@ -661,134 +655,71 @@ class Dokumente extends FHCAPI_Controller
 				$prestudent_id = $this-> _loadPrestudentFromUid($uid);
 				$prestudentIds[] = $prestudent_id;
 			}
-		} else {
-			echo "No prestudent IDs received.";
 		}
+		else
+		{
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Array StudentUIDs']), self::ERROR_TYPE_GENERAL);
+		}
+
+		if (!$studiensemester_kurzbz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiensemester']), self::ERROR_TYPE_GENERAL);
+		if(!$studiengang_kz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
+
 
 		$uidString = implode(";", $studentUids);
 		$prestudentIdsString = implode(";", $prestudentIds);
 
+		$semArray = $this->_getEntriesStudiensemester();
+		$stgTyp = $this->_getStudiengangstyp($studiengang_kz);
 
 		$documents = [
-			[
-				"id"   => "accountinfo1",
-				"type" => "documenturl",
-				"name" => "Accountinfoblatt",
-				"url"  => "pdfExport.php?xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf&uid=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "ausbildungsvertrag1_de",
-				"type" => "documenturl",
-				"name" => "Ausbildungsvertrag Deutsch",
-				"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&uid=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "ausbildungsvertrag1_en",
-				"type" => "documenturl",
-				"name" => "Ausbildungsvertrag Englisch",
-				"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&uid=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "submenu_studienerfolg_1",
-				"type" => "submenu",
-				"name" => "Studienerfolg",
-				"data" => [
-					[
-						"id"   => "submenu_studienerfolg_sem1",
-						"type" => "submenu",
-						"name" => "Studienerfolg WS2025",
-						"data" => [
-							[
-								"id"   => "studienerfolg_sem_alle_1",
-								"type" => "submenu",
-								"name" => "Studienerfolg WS2025 Alle",
-								"data"  => [
-									[
-										"id"   => "studienerfolg_sem_alle_1_FA",
-										"type" => "documenturl",
-										"name" => "Studienerfolg Alle FINANZAMT",
-										"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&uid=" . $uidString,
-										"scope" => "prestudent"
-									],
-									[
-										"id"   => "studienerfolg_sem_alle_1_nichtFA",
-										"type" => "documenturl",
-										"name" => "Studienerfolg Alle NICHT FINANZAMT",
-										"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&uid=" . $uidString,
-										"scope" => "prestudent"
-									]
-								]
+			$this->buildDropdownEntry("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uidString, 10, null),
+			$this->buildDropdownEntry("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uidString, 20, null),
+			$this->buildDropdownEntry("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uidString, 21, null),
+			$this->buildDropdownEntry("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 40, null),
+			$this->buildDropdownEntry("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 41, null),
+			$this->buildDropdownEntry("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,100, "zutrittskarte.php"),
+			$this->buildDropdownEntry("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uidString, 60, null),
+			$this->buildDropdownEntry("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uidString, 61, null),
 
-							]
-						]
-					]
-				]
-			],
+			// Studienerfolg Menüs automatisch
+			$this->buildStudienerfolgSubmenu("de", $uidString, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("en", $uidString, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("de", $uidString, $semArray, $studiensemester_kurzbz, true),
+			$this->buildStudienerfolgSubmenu("en", $uidString, $semArray, $studiensemester_kurzbz, true),
+
 			[
-				"id"   => "submenu_studstatus",
+				"id" => "submenu_studstatus",
 				"type" => "submenu",
 				"name" => "Verwaltung des StudierendenStatus",
+				"order" => 110,
 				"data" => [
-					[
-						"id"   => "Abmeldung",
-						"type" => "documenturl",
-						"name" => "Abmeldung",
-						"url"  => "pdfExport.php?xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&output=pdf&uid=" . $uidString,
-						"scope" => "prestudent"
-					],
-					[
-						"id"   => "Abmeldung durch Stg",
-						"type" => "documenturl",
-						"name" => "AntragAbmeldungStgl",
-						"url"  => "pdfExport.php?xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&output=pdf&uid=" . $uidString,
-						"scope" => "prestudent"
-					]
+					$this->buildDropdownEntry("Abmeldung", "Abmeldung", "xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					$this->buildDropdownEntry("Abmeldung durch Stgl", "AntragAbmeldungStgl", "xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					$this->buildDropdownEntry("Unterbrechung", "Unterbrechung", "xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					$this->buildDropdownEntry("Wiederholung", "Abmeldung durch Ablauf der Wiederholungsfrist", "xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
 				]
 			],
-			[
-				"id"   => "zutrittskarte",
-				"type" => "documenturl",
-				"name" => "Zutrittskarte",
-				"url"  => "zutrittskarte.php?xsl=ZutrittskarteStud&output=pdf&data=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "zutrittskarte",
-				"type" => "parameterurl",
-				"name" => "Zutrittskarte",
-				"baseurl" => "zutrittskarte.php",
- 				"parameterurl" =>"xsl=ZutrittskarteStud&output=pdf&data=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "studienbestaetigung",
-				"type" => "documenturl",
-				"name" => "Studienbestätigung",
-				"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&uid=" . $uidString,
-				"scope" => "prestudent"
-			],
-			[
-				"id"   => "studienerfolg",
-				"type" => "documenturl",
-				"name" => "Studienbestätigung",
-				"url"  => "pdfExport.php?xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&uid=" . $uidString,
-				"scope" => "prestudent"
-			],
 
+			$this->loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uidString),
+
+			//TODO(Manu) also in Fas multi not working
+/*			$this->buildDropdownEntry("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uidString, 80, null),
+			*/
+
+			$this->buildDropdownEntry("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uidString, 81, null)
 		];
 
-/*		Events::trigger('DocumentGenerationDropDownMulti',
+		Events::trigger('DocumentGenerationDropDownMulti',
 			// passing $menu per reference
 			function & () use (&$documents) {
 				return $documents;
 			},
-			$prestudent_id,
+			$studentUids,
 			$studiensemester_kurzbz,
 			$studiengang_kz
-		);*/
+		);
 
 		usort($documents, function ($a, $b) {
 			$orderA = isset($a['order']) ? (int)$a['order'] : PHP_INT_MAX;
@@ -796,7 +727,6 @@ class Dokumente extends FHCAPI_Controller
 			return $orderA <=> $orderB;
 		});
 
-	//	FireEvent(DocumentGenerationDropDownMulti(&$documents);
 
 		$this->terminateWithSuccess($documents);
 
@@ -977,9 +907,7 @@ class Dokumente extends FHCAPI_Controller
 		else if ($stgTyp == 'm' || $stgTyp == 'd')
 			$postfix = 'Master';
 		else
-			//TODO(Manu) sollte nicht null sein!! -> dropdown wird  im Falle von Lehrgängen nicht erstellt
-			return null;
-
+			return [];
 
 		$arrayFinalExam = [
 			'pruefungsprotokoll' => [

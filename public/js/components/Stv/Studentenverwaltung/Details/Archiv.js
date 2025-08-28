@@ -224,14 +224,11 @@ export default {
 			return retval;
 		},
 		showDropDownMulti(){
-
 			if (this.modelValue.length) {
-				console.log("started comp property showDropdown Multi " + this.modelValue.length);
 				return true;
 			}
 			return false;
 		}
-
 	},
 	watch: {
 		modelValue() {
@@ -308,17 +305,18 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		if (this.modelValue.length) {
-			console.log("multi" + this.modelValue.length);
-			console.log(this.studentUids);
+			const params = {
+				studiensemester_kurzbz: this.currentSemester,
+				studiengang_kz: this.stg_kz
+			};
 			this.$api
-				.call(ApiStvDocuments.getDocumentDropdownMulti(this.studentUids))
+				.call(ApiStvDocuments.getDocumentDropdownMulti(this.studentUids, params))
 				.then(result => {
 					console.log(result);
 					this.documentDropdownObject = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		} else {
-			console.log("single");
 			const params = {
 				prestudent_id: this.modelValue.prestudent_id,
 				studiensemester_kurzbz: this.currentSemester,
