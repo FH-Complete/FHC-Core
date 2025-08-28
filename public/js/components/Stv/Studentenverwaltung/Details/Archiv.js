@@ -312,7 +312,6 @@ export default {
 			this.$api
 				.call(ApiStvDocuments.getDocumentDropdownMulti(this.studentUids, params))
 				.then(result => {
-					console.log(result);
 					this.documentDropdownObject = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -325,7 +324,6 @@ export default {
 			this.$api
 				.call(ApiStvDocuments.getDocumentDropdown(params))
 				.then(result => {
-					console.log(result);
 					this.documentDropdownObject = result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
