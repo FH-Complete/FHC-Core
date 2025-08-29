@@ -2,6 +2,8 @@ import raum_contentmittitel from './Content_types/Raum_contentmittitel.js'
 import general from './Content_types/General.js'
 import BsConfirm from "../../Bootstrap/Confirm.js";
 import news_content from './Content_types/News_content.js';
+import iframe_content from './Content_types/Iframe_content.js';
+
 import ApiCms from '../../../api/factory/cms.js';
 
 export default {
@@ -24,6 +26,7 @@ export default {
 		raum_contentmittitel,
 		news_content,
 		general,
+		iframe_content
 	},
 	data() {
 		return {
@@ -83,6 +86,8 @@ export default {
 					return "raum_contentmittitel";
 				case "news":
 					return "news_content";
+				case "iframe":
+					return "iframe_content";
 				default:
 					return "general";
 			};
