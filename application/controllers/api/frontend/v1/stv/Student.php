@@ -694,7 +694,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		$this->terminateWithSuccess(true);
+		return success(true);
 	}
 
 	public function requiredIfNotPersonId($value)
@@ -709,5 +709,10 @@ class Student extends FHCAPI_Controller
 		if (!$_POST['address']['func'])
 			return true;
 		return !!$value;
+	}
+
+	public function isValidDate($value)
+	{
+		return isValidDate($value);
 	}
 }
