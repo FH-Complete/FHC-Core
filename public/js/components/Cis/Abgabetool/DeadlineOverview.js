@@ -110,7 +110,7 @@ export const DeadlineOverview = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.deadlineTableOptions.height = window.visualViewport.height - rect.top
+			this.deadlineTableOptions.height = window.visualViewport.height - rect.top - 30
 			this.$refs.deadlineTable.tabulator.setHeight(this.deadlineTableOptions.height)
 		},
 		async setupMounted() {

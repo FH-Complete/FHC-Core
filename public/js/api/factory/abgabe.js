@@ -1,4 +1,10 @@
 export default {
+	getConfig() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getConfig'
+		};
+	},
 	getStudentProjektarbeiten(uid) {
 		return {
 			method: 'get',
@@ -51,12 +57,13 @@ export default {
 				paabgabe_id: termin.paabgabe_id,
 				paabgabetyp_kurzbz: termin.bezeichnung.paabgabetyp_kurzbz,
 				datum: termin.datum,
-				note: termin.note,
-				upload_required: termin.upload_required,
+				note: termin.note_pk,
+				upload_allowed: termin.upload_allowed,
 				fixtermin: termin.fixtermin,
 				insertvon: termin.insertvon,
 				kurzbz: termin.kurzbz,
-				projektarbeit_id: termin.projektarbeit_id 
+				projektarbeit_id: termin.projektarbeit_id,
+				betreuer_person_id: termin.betreuer_person_id
 			}
 		};
 	},

@@ -13,7 +13,7 @@ export const AbgabeMitarbeiterDetail = {
 		Textarea: primevue.textarea,
 		VueDatePicker
 	},
-	inject: ['abgabeTypeOptions', 'allowedNotenOptions'],
+	inject: ['abgabeTypeOptions', 'allowedNotenOptions', 'turnitin_link', 'old_abgabe_beurteilung_link'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -22,7 +22,6 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
-			oldPaBeurteilungLink: 'https://moodle.technikum-wien.at/mod/page/view.php?id=1005052', // TODO: inject from app & app provide link from config
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages
@@ -34,18 +33,15 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		saveTermin(termin) {
 			const paabgabe_id = termin.paabgabe_id
-			// 9 => magic number for "noch nicht eingetragen"
-			termin.note = termin.note?.note ?? 9
 			
+			termin.note_pk = termin.note?.note ?? null
+			termin.betreuer_person_id = this.projektarbeit.betreuer_person_id
 			this.$api.call(ApiAbgabe.postProjektarbeitAbgabe(termin)).then( (res) => {
 				if(res?.meta?.status == 'success') {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
-
 					if(paabgabe_id === -1) { // new abgabe has been inserted
-						termin.paabgabe_id = res?.data?.retval
-
+						termin.paabgabe_id = res?.data?.paabgabe_id
 						this.projektarbeit.abgabetermine.push({ // new abgatermin row
-
 							'paabgabe_id': -1,
 							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
 							'fixtermin': false,
@@ -53,7 +49,7 @@ export const AbgabeMitarbeiterDetail = {
 							'datum': new Date().toISOString().split('T')[0],
 							'paabgabetyp_kurzbz': termin.paabgabetyp_kurzbz,
 							'note': this.allowedNotenOptions.find(opt => opt.note == termin.note?.note),
-							'upload_required': termin.upload_required,
+							'upload_allowed': termin.upload_allowed,
 							'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz),
 							'abgabedatum': null,
 							'insertvon': this.viewData?.uid ?? '',
@@ -61,12 +57,9 @@ export const AbgabeMitarbeiterDetail = {
 							'allowedToDelete': true
 						})
 					}
-					
-					
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
-				
 			})
 		},
 		deleteTermin(termin) {
@@ -76,8 +69,6 @@ export const AbgabeMitarbeiterDetail = {
 					// this.$p.t('global/tooltipLektorDeleteKontrolle', [this.$entryParams.permissions.kontrolleDeleteMaxReach ])
 					const deletedTerminIndex = this.projektarbeit.abgabetermine.findIndex(t => t.paabgabe_id === termin.paabgabe_id)
 					this.projektarbeit.abgabetermine.splice(deletedTerminIndex, 1)
-
-
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
@@ -92,15 +83,13 @@ export const AbgabeMitarbeiterDetail = {
 			return true;
 		},
 		downloadAbgabe(termin) {
-			// TODO: test
 			this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
-			// this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
 		},
 		dateDiffInDays(datum, today){
 			const oneDayMs = 1000 * 60 * 60 * 24
 			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
 		},
-		getDateStyle(termin) {
+		getDateStyle(termin, mode) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
@@ -108,21 +97,31 @@ export const AbgabeMitarbeiterDetail = {
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
 			let color = 'white'
 			let fontColor = 'black'
+			let icon = '';
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
 					color = 'red'
 					fontColor = 'white'
+					icon = 'fa-triangle-exclamation'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
 					color = 'yellow'
+					icon = 'fa-circle-exclamation'
 				}
 			} else if(abgabedatum > datum) {
 				color = 'pink' // aka "hellrot"
 				fontColor = 'white'
+				icon = 'fa-circle-question'
 			} else {
 				color = 'green'
+				icon = 'fa-square-check'
 			}
 
-			return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
+			//return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
+			if(  typeof mode !== 'undefined' || mode === 'icon') {
+				return icon;
+			} else {
+				return 'abgabe-zieldatum-border-' + color;
+			}
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -153,8 +152,7 @@ export const AbgabeMitarbeiterDetail = {
 			window.open(link, '_blank')
 		},
 		openPlagiatcheck() {
-			// todo: hardcoded turnitin link?
-			const link = "https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start"
+			const link = this.turnitin_link
 			window.open(link, '_blank')
 		},
 		openBenotung() {
@@ -175,8 +173,17 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		endUploadVorhanden(){
 			return this.projektarbeit?.abgabetermine.find(abgabe => abgabe.paabgabetyp_kurzbz === 'end' && abgabe.abgabedatum !== null)
+		},
+		qualityGateTerminAvailable() {
+			let qgatefound = false
+			this.projektarbeit?.abgabetermine.forEach(abgabe => {
+				if(abgabe.bezeichnung?.paabgabetyp_kurzbz == 'qualgate1'
+					|| abgabe?.bezeichnung?.paabgabetyp_kurzbz == 'qualgate2') {
+					qgatefound = true
+				}
+			})
+			return qgatefound
 		}
-		
 	},
 	created() {
 
@@ -185,7 +192,7 @@ export const AbgabeMitarbeiterDetail = {
 
 	},
 	template: `
-		<div v-if="projektarbeit">
+		<div v-if="projektarbeit" style="max-width: 95%">
 		
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
 
@@ -199,20 +206,20 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="col">
 						<div class="row">
 							<button :disabled="!getSemesterBenotbar || !endUploadVorhanden" class="btn btn-secondary border-0" @click="openBenotung" style="width: 80%;">
-								benoten
-								<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+								{{ $p.t('abgabetool/c4benoten') }}
+								<i class="fa-solid fa-user-check"></i>
 							</button>
 						</div>
 						<div class="row" style="width: 90%;">
 							<span v-if="!getSemesterBenotbar" v-html="$p.t('abgabetool/c4aeltereParbeitBenoten', oldPaBeurteilungLink)"></span>
-							<span v-else-if="!endUploadVorhanden">Kein Endupload vorhanden!</span>
+							<span v-else-if="!endUploadVorhanden">{{ $p.t('abgabetool/c4noEnduploadFound') }}</span>
 						</div>
 					</div>
 					<div class="col">
 						<div class="row">
 							<button v-if="projektarbeit?.betreuerart_kurzbz !== 'Zweitbegutachter'" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="width: 80%;">
-								zur Plagiatsprüfung
-								<i style="margin-left: 8px" class="fa-solid fa-user-check"></i>
+								{{ $p.t('abgabetool/c4plagiatcheck_link')}}
+								<i class="fa-solid fa-user-check"></i>
 							</button>
 						</div>
 						
@@ -220,8 +227,8 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="col">
 						<div class="row">
 							<button class="btn btn-secondary border-0" @click="openStudentPage" style="width: 80%;">
-								Studentenansicht
-								<i style="margin-left: 8px" class="fa-solid fa-eye"></i>
+								{{ $p.t('abgabetool/c4student_perspective')}}
+								<i class="fa-solid fa-eye"></i>
 							</button>
 						</div>
 						
@@ -230,86 +237,87 @@ export const AbgabeMitarbeiterDetail = {
 			</div>
 			<div id="uploadWrapper">
 				<div class="row" style="margin-bottom: 12px;">
-					<div style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4zieldatum')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4note')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4upload_required')}}</div>
-					<div class="col-2">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
-					<div class="col-1">{{$p.t('abgabetool/c4abgabedatum')}}</div>
-					<div class="col">
-						
+					<div class="fw-bold" style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>
+					<div class="row" style="max-width: calc(100% - 100px)">
+						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
+						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
+						<div v-show="qualityGateTerminAvailable" class="col-2 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
+						<div v-show="qualityGateTerminAvailable" class="col-1 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>
+						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+						<div class="col-1 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
+						<div class="col">
+							
+						</div>
 					</div>
 				</div>
 				<div v-if="!projektarbeit?.abgabetermine?.length">keine Termine gefunden!</div>
 				<div class="row" v-for="termin in projektarbeit.abgabetermine">
 					<div style="width: 100px" class="d-flex justify-content-center align-items-center">
-						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>
+						<i v-if="termin.fixtermin" class="fa-solid fa-2x fa-circle-check fhc-bullet-red"></i>
+						<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>
+<!--						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>-->
 					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">
-						<div :style="getDateStyle(termin)">
-							<VueDatePicker
-								style="width: 95%;"
-								v-model="termin.datum"
-								:clearable="false"
+					<div class="row" style="max-width: calc(100% - 100px)">
+						<div class="col-2 d-flex justify-content-center align-items-center">
+							<div class="position-relative" :class="getDateStyle(termin)">
+								<VueDatePicker
+									style="width: 95%;"
+									v-model="termin.datum"
+									:clearable="false"
+									:disabled="!termin.allowedToSave"
+									:enable-time-picker="false"
+									:format="formatDate"
+									:text-input="true"
+									auto-apply>
+								</VueDatePicker>
+								<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>
+							</div>				
+						</div>
+						<div class="col-2 d-flex justify-content-center align-items-center">
+							<Dropdown 
+								:style="{'width': '100%'}"
 								:disabled="!termin.allowedToSave"
-								:enable-time-picker="false"
-								:format="formatDate"
-								:text-input="true"
-								auto-apply>
-							</VueDatePicker>
-						</div>				
-					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">
-						<Dropdown 
-							:style="{'width': '100%'}"
-							:disabled="!termin.allowedToSave"
-							v-model="termin.bezeichnung"
-							:options="abgabeTypeOptions"
-							:optionLabel="getOptionLabelAbgabetyp">
-						</Dropdown>
-					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">
-						<Dropdown 
-							v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
-							:style="{'width': '100%'}"
-							v-model="termin.note"
-							:options="allowedNotenOptions"
-							:optionLabel="getNotenOptionLabel">
-						</Dropdown>
-					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
-						<Checkbox 
-							v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
-							v-model="termin.upload_required"
-							:binary="true" 
-							:pt="{ root: { class: 'ml-auto' }}"
-						>
-						</Checkbox>
-					</div>
-					<div class="col-2 d-flex justify-content-center align-items-center">
-						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="30" :disabled="!termin.allowedToSave"></Textarea>
-					</div>
-					<div class="col-1 d-flex justify-content-center align-items-center">
-						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
-							<i class="fa-solid fa-file-pdf"></i>
-						</a>
-					</div>
-					<div class="col-2 align-content-center">
-						<div class="row">
-							<div class="col-6">
-								<button v-if="termin.allowedToSave" class="btn btn-primary border-0" @click="saveTermin(termin)">
-									Speichern
-									<i style="margin-left: 8px" class="fa-solid fa-floppy-disk"></i>
-								</button>
-							</div>
-							<div class="col-6">
-								<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" class="btn btn-primary border-0" @click="deleteTermin(termin)">
-									Löschen
-									<i style="margin-left: 8px" class="fa-solid fa-trash"></i>
-								</button>
-							</div>
+								v-model="termin.bezeichnung"
+								:options="abgabeTypeOptions"
+								:optionLabel="getOptionLabelAbgabetyp">
+							</Dropdown>
+						</div>
+						<div v-if="qualityGateTerminAvailable || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'" class="col-2 d-flex justify-content-center align-items-center">
+							<Dropdown 
+								v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
+								:style="{'width': '100%'}"
+								v-model="termin.note"
+								:options="allowedNotenOptions"
+								:optionLabel="getNotenOptionLabel">
+							</Dropdown>
+						</div>
+						<div v-if="qualityGateTerminAvailable || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'" class="col-1 d-flex justify-content-center align-items-center">
+							<Checkbox 
+								v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"
+								v-model="termin.upload_allowed"
+								:binary="true" 
+								:pt="{ root: { class: 'ml-auto' }}"
+							>
+							</Checkbox>
+						</div>
+						<div class="col-2 d-flex justify-content-center align-items-center">
+							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" cols="20" :disabled="!termin.allowedToSave"></Textarea>
+						</div>
+						<div class="col-1 d-flex justify-content-center align-items-center">
+							{{ termin.abgabedatum?.split("-").reverse().join(".") }}
+							<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
+								<i class="fa-solid fa-2x fa-file-pdf"></i>
+							</a>
+						</div>
+						<div class="col-2 align-content-center">
+							<button v-if="termin.allowedToSave" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
+								{{ $p.t('abgabetool/c4save') }}
+								<i class="fa-solid fa-floppy-disk"></i>
+							</button>
+							<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" style="max-height: 40px;" class="btn btn-primary border-0" @click="deleteTermin(termin)">
+								{{ $p.t('abgabetool/c4delete') }}
+								<i class="fa-solid fa-trash"></i>
+							</button>
 						</div>
 					</div>
 				</div>

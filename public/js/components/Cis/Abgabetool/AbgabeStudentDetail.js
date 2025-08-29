@@ -15,6 +15,7 @@ export const AbgabeStudentDetail = {
 		Textarea: primevue.textarea,
 		VueDatePicker
 	},
+	inject: ['notenOptions'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -83,9 +84,7 @@ export const AbgabeStudentDetail = {
 			this.$refs.modalContainerEnduploadZusatzdaten.hide()
 		},
 		downloadAbgabe(termin) {
-			// TODO: test
 			this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
-			// this.$fhcApi.factory.lehre.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid)
 		},
 		formatDate(dateParam) {
 			const date = new Date(dateParam)
@@ -181,6 +180,10 @@ export const AbgabeStudentDetail = {
 		},
 		getOptionLabel(option) {
 			return option.sprache
+		},
+		getTerminNoteBezeichnung(termin) {
+			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
+			return noteOpt ? noteOpt.bezeichnung : ''
 		}
 	},
 	watch: {
@@ -201,6 +204,16 @@ export const AbgabeStudentDetail = {
 		},
 		getAllowedToSendEndupload() {
 			return !this.eidAkzeptiert
+		},
+		qualityGateTerminAvailable() {
+			let qgatefound = false
+			this.projektarbeit?.abgabetermine.forEach(abgabe => {
+				if(abgabe.paabgabetyp_kurzbz == 'qualgate1'
+					|| abgabe.paabgabetyp_kurzbz == 'qualgate2') {
+					qgatefound = true
+				}
+			})
+			return qgatefound
 		}
 	},
 	created() {
@@ -221,8 +234,10 @@ export const AbgabeStudentDetail = {
 				<div class="row" style="margin-bottom: 12px;">
 					<div class="col-1 fw-bold text-center">{{$p.t('abgabetool/c4fixtermin')}}</div>
 					<div class="col-2 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
-					<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-					<div class="col-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
+					<div class="col-1 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
+					<div v-show="qualityGateTerminAvailable" class="col-1 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
+					<div v-show="qualityGateTerminAvailable" class="col-1 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>
+					<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 					<div class="col-1 fw-bold text-center">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 					<div class="col-3 fw-bold">
 						{{$p.t('abgabetool/c4fileupload')}}
@@ -250,14 +265,27 @@ export const AbgabeStudentDetail = {
 							<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>
 						</div>
 					</div>
-					<div class="col-2 d-flex justify-content-start align-items-start">{{ termin.bezeichnung }}</div>
-					<div class="col-3 d-flex justify-content-start align-items-start">
-						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="3" cols="45" :disabled="true"></Textarea>
+					<div class="col-1 d-flex justify-content-start align-items-start">{{ termin.bezeichnung }}</div>
+					<div v-if="qualityGateTerminAvailable || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'" class="col-1 d-flex justify-content-start align-items-start">
+						{{ getTerminNoteBezeichnung(termin) }}
 					</div>
-					<div class="col-1 d-flex flex-column justify-content-start align-items-center">
+					<div v-if="qualityGateTerminAvailable || termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'" class="col-1 d-flex justify-content-center align-items-start">
+						<Checkbox 
+							v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'"
+							disabled
+							v-model="termin.upload_allowed"
+							:binary="true" 
+							:pt="{ root: { class: 'ml-auto' }}"
+						>
+						</Checkbox>
+					</div>
+					<div class="col-2 d-flex justify-content-start align-items-start">
+						<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" cols="45" :disabled="true"></Textarea>
+					</div>
+					<div class="col-1 d-flex justify-content-start align-items-center">
 						{{ termin.abgabedatum?.split("-").reverse().join(".") }}
 						<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
-							<i class="fa-solid fa-3x fa-file-pdf"></i>
+							<i class="fa-solid fa-2x fa-file-pdf"></i>
 						</a>
 					</div>
 					<div class="col-3" v-if="!viewMode">
@@ -267,8 +295,8 @@ export const AbgabeStudentDetail = {
 							</div>
 							<div class="col-4">
 								<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
-									Upload
-									<i style="margin-left: 8px" class="fa-solid fa-upload"></i>
+									{{$p.t('abgabetool/c4upload')}}
+									<i class="fa-solid fa-upload"></i>
 								</button>
 							</div>
 						</div>
@@ -289,7 +317,7 @@ export const AbgabeStudentDetail = {
 				</div>
 				<div class="row mb-3 align-items-start">
 					
-					<p class="ml-4 mr-4">Titel: {{ projektarbeit?.titel }}</p>
+					<p class="ml-4 mr-4">{{$p.t('abgabetool/c4titel')}}: {{ projektarbeit?.titel }}</p>
 				
 				</div>
 			</template>

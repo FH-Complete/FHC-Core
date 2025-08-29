@@ -34,7 +34,7 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table
 	{
 
 		$qry = "ALTER TABLE campus.tbl_paabgabe
-				ADD COLUMN note SMALLINT NOT NULL DEFAULT 9,
+				ADD COLUMN note SMALLINT DEFAULT NULL,
 				ADD CONSTRAINT tbl_paabgabe_note_fkey
 					FOREIGN KEY (note)
 					REFERENCES lehre.tbl_note(note)
@@ -47,16 +47,16 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table
 	}
 }
 
-if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabe' AND column_name = 'upload_required'"))
+if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabe' AND column_name = 'upload_allowed'"))
 {
 	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "ALTER TABLE campus.tbl_paabgabe
-				ADD COLUMN IF NOT EXISTS upload_required boolean DEFAULT false;";
+				ADD COLUMN IF NOT EXISTS upload_allowed boolean DEFAULT false;";
 
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_paabgabe: '.$db->db_last_error().'</strong><br>';
 		else
-			echo '<br>paabgabe column upload_required default false hinzugefuegt';
+			echo '<br>paabgabe column upload_allowed default false hinzugefuegt';
 	}
 }

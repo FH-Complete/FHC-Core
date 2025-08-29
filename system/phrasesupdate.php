@@ -41490,7 +41490,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "details",
+				'text' => "Details",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41510,7 +41510,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "semester",
+				'text' => "Semester",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41530,7 +41530,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "degree program",
+				'text' => "Degree program",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41550,7 +41550,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "contact",
+				'text' => "Contact",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41590,7 +41590,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "project type",
+				'text' => "Project type",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41610,7 +41610,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "title",
+				'text' => "Title",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41670,7 +41670,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "target date",
+				'text' => "Target date",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41730,7 +41730,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "submission date",
+				'text' => "Submission date",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41779,6 +41779,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4benoten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Benoten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Grade",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4allowedFileTypes',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -41791,6 +41811,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Upload-File is not a PDF!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4save',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Speichern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Save",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Löschen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Delete",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42171,6 +42231,146 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Show Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4note',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Note",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4upload_allowed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Upload erlaubt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload allowed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4student_perspective',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studentenansicht",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student perspective',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4upload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hochladen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4plagiatcheck_link',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "zur Plagiatsprüfung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plagiarism check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4plagiatcheck_link',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "zur Plagiatsprüfung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plagiarism check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4noEnduploadFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kein Endupload vorhanden!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No final submission found!',
 				'description' => '',
 				'insertvon' => 'system'
 			)

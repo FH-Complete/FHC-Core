@@ -36,6 +36,7 @@ class Abgabe extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
+			'getConfig' => self::PERM_LOGGED,
 			'getStudentProjektarbeiten' => self::PERM_LOGGED, // TODO: abgabetool berechtigung?
 			'getStudentProjektabgaben' => self::PERM_LOGGED,
 			'postStudentProjektarbeitZwischenabgabe' => self::PERM_LOGGED,
@@ -70,6 +71,22 @@ class Abgabe extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
+	/**
+	 * loads config related to abgabetool, found in application/config/abgabe
+	 */
+	public function getConfig() {
+		$this->load->config('abgabe');
+		$old_abgabe_beurteilung_link =$this->config->item('old_abgabe_beurteilung_link');
+		$turnitin_link =$this->config->item('turnitin_link');
+		
+		$ret = array(
+			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
+			'turnitin_link' => $turnitin_link
+		);
+		
+		$this->terminateWithSuccess($ret);
+	}
+	
 	/**
 	 * fetches all projektabgabetermine for a given projektarbeit_id used in cis4 student abgabetool
 	 */
@@ -116,9 +133,19 @@ class Abgabe extends FHCAPI_Controller
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
 
 		if ($isMitarbeiter && $isZugeteilterBetreuer){
-			$projektarbeiten = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer($uid);
+			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer($uid);
 		} else {
-			$projektarbeiten = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
+			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
+		}
+
+		$projektarbeiten = getData($result);
+		
+		// TODO: save access to this, array could be empty
+		foreach($projektarbeiten as $pa) {
+			$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
+			
+			// TODO: save access
+			$pa->email = getData($result)[0]->private_email;
 		}
 
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN, $uid));
@@ -327,12 +354,8 @@ class Abgabe extends FHCAPI_Controller
 			$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
 			$maildata['bewertunglink'] = $num_rows_sem >= 1 && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 			$maildata['token'] = "";
-
-			// TODO: clarify if all betreuer are mitarbeiter and have benutzer entries
-			// or if uid = null has to be checked WITH
-			// 'CASE WHEN tbl_benutzer.uid IS NULL THEN kontakt ELSE tbl_benutzer.uid || '@".DOMAIN."' END AS email'
 			
-			$email = $this->getBetreuerEmail($bperson_id);
+			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
 			
 			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
 
@@ -401,12 +424,7 @@ class Abgabe extends FHCAPI_Controller
 							$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
 							$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
 							$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
-
-
-							$email = $this->getBetreuerEmail($bperson_id);
-
-							if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
-
+							
 
 							$mailres = sendSanchoMail(
 								'ParbeitsbeurteilungEndupload',
@@ -464,12 +482,13 @@ class Abgabe extends FHCAPI_Controller
 		$fixtermin = $_POST['fixtermin'];
 		$kurzbz = $_POST['kurzbz'];
 		$note = $_POST['note'];
-		$upload_required = $_POST['upload_required'];
+		$upload_allowed = $_POST['upload_allowed'];
+		$betreuer_person_id = $_POST['betreuer_person_id'];
 
 		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
 			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
 			|| !isset($datum) || isEmptyString($datum)
-			|| !isset($datum) || isEmptyString($datum)
+			|| !isset($kurzbz)
 			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 
@@ -484,7 +503,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
-					'upload_required' => $upload_required,
+					'upload_allowed' => $upload_allowed,
 					'insertvon' => getAuthUID(),
 					'insertamum' => date('Y-m-d H:i:s')
 				)
@@ -499,24 +518,37 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
-					'upload_required' => $upload_required,
+					'upload_allowed' => $upload_allowed,
 					'updatevon' => getAuthUID(),
 					'updateamum' => date('Y-m-d H:i:s')
 				)
 			);
 			
 		}
-
-		$paabgabe_id = $this->getDataOrTerminateWithError($result);
-		
-		$paabgabe = $this->PaabgabeModel->load($paabgabe_id);
 		
 		// check if $paaabgabe is a qual gate and its note is deemed negative
 		// -> send email to student with that info
+		$paabgabe_id = $this->getDataOrTerminateWithError($result);
 		
-		// TODO: DEFAULT NOTE 9 OR DEFAULT NOTE NULL? 9 COUNTS AS NEGATIV :/
+		$result = $this->PaabgabeModel->load($paabgabe_id);
+		$paabgabeArr = $this->getDataOrTerminateWithError($result);
+		$paabgabe = $paabgabeArr[0];
+		$this->addMeta('paabgabe', $paabgabeArr);
+
+		// check if abgabe even has note
+		if($paabgabe->note) {
+			$this->load->model('education/Note_model', 'NoteModel');
+			$result = $this->NoteModel->load($paabgabe->note);
+			$noteArr = $this->getDataOrTerminateWithError($result);
+			$note = $noteArr[0];
+			if($note->positiv === false) {
+				$this->addMeta('noteNegativ', true);
+					
+				$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
+			}
+		}
 		
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($paabgabe);
 	}
 
 	public function deleteProjektarbeitAbgabe() {
@@ -556,7 +588,7 @@ class Abgabe extends FHCAPI_Controller
 
 		if (!isset($projektarbeit_ids) || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
 			|| !isset($datum) || isEmptyString($datum)
-			|| !isset($kurzbz) || isEmptyString($kurzbz)
+			|| !isset($kurzbz)
 			|| !isset($bezeichnung) || isEmptyString($bezeichnung)
 			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
@@ -664,11 +696,11 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess($paabgabetypen);
 	}
 	
-	private function getBetreuerEmail($person_id) {
-		$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
-		$result = $this->ProjektbetreuerModel->getBetreuerEmail($person_id);
+	private function getProjektbetreuerEmail($projektarbeit_id) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
 		$email = $this->getDataOrTerminateWithError($result);
-		return $email[0]->email;
+		return $email[0]->private_email;
 	}
 
 	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
@@ -685,7 +717,24 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess($noten);
 	}
 	
-	private function sendQualGateNegativEmail($student_uid) {
+	private function sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+		$projektarbeit = $projektarbeitArr[0];
+		
+		$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer_person_id);
+		$anredeArr = $this->getDataOrTerminateWithError($result);
+		$anrede = $anredeArr[0];
+		
+		$student_uid = $projektarbeit->student_uid;
+
+		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
+		$result = $this->PaabgabetypModel->load($paabgabe->paabgabetyp_kurzbz);
+		$paabgabetyp_kurzbzArr = $this->getDataOrTerminateWithError($result);
+		$paabgabetyp_kurzbz = $paabgabetyp_kurzbzArr[0];
+		
 		// Mail an Student wenn Qualgate negativ beurteilt wurde
 		$student = new student();
 		if(!$student->load($student_uid))
@@ -696,21 +745,21 @@ class Abgabe extends FHCAPI_Controller
 		$tomail = $student_uid.'@'.DOMAIN;
 		
 		
-		// TODO: emaildata
+		// TODO: datum format 
 		$data = array(
-			'betreuerfullname' => $student->vorname,
-			'qualgatebezeichnung' => $student->nachname,
-			'datum' => $datum,
-			'projektarbeitname' => $name
+			'betreuerfullname' => $anrede->first,
+			'qualgatebezeichnung' => $paabgabetyp_kurzbz->bezeichnung,
+			'datum' => $paabgabe->datum,
+			'projektarbeitname' => $projektarbeit->titel
 		);
 
+		$this->addMeta('$emaildata', $data);
+		
 		$mailres = sendSanchoMail(
 			'QualGateNegativ',
 			$data,
 			$tomail,
 			$subject
 		);
-		
-		return $mailres;
 	}
 }

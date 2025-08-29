@@ -168,7 +168,7 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabe.kurzbz,
 					campus.tbl_paabgabe.datum,
 					campus.tbl_paabgabe.note,
-					campus.tbl_paabgabe.upload_required,
+					campus.tbl_paabgabe.upload_allowed,
 					campus.tbl_paabgabetyp.paabgabetyp_kurzbz, 
 					campus.tbl_paabgabetyp.bezeichnung, 
 					campus.tbl_paabgabe.abgabedatum,
@@ -189,7 +189,28 @@ class Projektarbeit_model extends DB_Model
 						WHERE public.tbl_person.person_id= ?";
 
 		return $this->execReadOnlyQuery($qry_betr, [$bperson_id]);
+	}
+	
+	public function getProjektbetreuerEmail($projektarbeit_id) {
+		$qry = "SELECT (
+				   SELECT kontakt
+				   FROM public.tbl_kontakt
+				   WHERE kontakttyp = 'email'
+					 AND person_id = pers.person_id
+				   ORDER BY
+					   CASE WHEN zustellung THEN 0 ELSE 1 END,
+					   insertamum DESC NULLS LAST
+				   LIMIT 1
+			   ) AS private_email
+		FROM lehre.tbl_projektarbeit pa
+				 JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
+				 JOIN public.tbl_person pers USING (person_id)
+				 LEFT JOIN public.tbl_benutzer ben USING (person_id)
+				 LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
+		WHERE (ben.aktiv OR ben.aktiv IS NULL)
+		  AND projektarbeit_id = ?";
 
+		return $this->execReadOnlyQuery($qry, [$projektarbeit_id]);
 	}
 
 	public function getProjektarbeitBenutzer($uid) {
@@ -225,7 +246,7 @@ class Projektarbeit_model extends DB_Model
 				FROM
 					(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
 							tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
-							tbl_projektbetreuer.betreuerart_kurzbz, tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
+							tbl_projektbetreuer.person_id as betreuer_person_id, tbl_projektbetreuer.betreuerart_kurzbz, tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
 							tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
 					 FROM lehre.tbl_projektarbeit
 							  LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)

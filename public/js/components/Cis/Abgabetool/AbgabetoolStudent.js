@@ -10,6 +10,11 @@ export const AbgabetoolStudent = {
 		AbgabeDetail,
 		VerticalSplit
 	},
+	provide() {
+		return {
+			notenOptions: Vue.computed(() => this.notenOptions)
+		}
+	},
 	props: {
 		student_uid_prop: {
 			default: null
@@ -25,6 +30,7 @@ export const AbgabetoolStudent = {
 	},
 	data() {
 		return {
+			notenOptions: null,
 			tabulatorUuid: Vue.ref(0),
 			domain: '',
 			student_uid: null,
@@ -83,27 +89,42 @@ export const AbgabetoolStudent = {
 			]};
 	},
 	methods: {
-		checkQualityGates(termine, enduploadtermin) {
-				return true
+		checkQualityGates(termine) {
+			let qgate1Passed = false
+			let qgate2Passed = false
+			
+			termine.forEach(t => {
+				const noteOption = this.notenOptions.find(opt => opt.note == t.note)
+				if(noteOption && noteOption.positiv) {
+					if(t.paabgabetyp_kurzbz == 'qualgate1') {
+						qgate1Passed = true
+					} else if(t.paabgabetyp_kurzbz == 'qualgate2') {
+						qgate2Passed = true
+					}
+				}
+			})
+
+			return qgate1Passed && qgate2Passed
 		},
 		isPastDate(date) {
 			return new Date(date) < new Date(Date.now())	
 		},
 		setDetailComponent(details){
 			this.loadAbgaben(details).then((res)=> {
-				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
+				const pa = this.projektarbeiten?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
-					// termin.allowedToUpload = true
-					
+					termin.allowedToUpload = false
+					// termin.datum = '2025-10-16'
 					// TODO: fixtermin logic?
-					if(termin.bezeichnung == 'Endupload' && 
-						(this.isPastDate(termin.datum) || this.checkQualityGates(pa.abgabetermine, termin))) {
+					if(termin.paabgabetyp_kurzbz == 'enda') {
 						
-						// termin.allowedToUpload = false
+						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
+					} else if(termin.paabgabetyp_kurzbz == 'qualgate1' || termin.paabgabetyp_kurzbz == 'qualgate2') {
+						termin.allowedToUpload = termin.upload_allowed
 					} else {
-						// termin.allowedToUpload = true
+						termin.allowedToUpload = true
 					}
 
 				})
@@ -111,7 +132,6 @@ export const AbgabetoolStudent = {
 				pa.student_uid = this.student_uid
 
 				this.selectedProjektarbeit = pa
-
 				
 				this.$refs.verticalsplit.showBoth()
 				
@@ -150,8 +170,12 @@ export const AbgabetoolStudent = {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
-		buildMailToLink(abgabe) {
-			return 'mailto:' + abgabe.mitarbeiter_uid +'@'+ this.domain
+		buildMailToLink(projekt) {
+			if(projekt.mitarbeiter_uid) { // standard
+				return 'mailto:' + projekt.mitarbeiter_uid +'@'+ this.domain
+			} else { // private
+				return 'mailto:' + projekt.email
+			}
 		},
 		buildBetreuer(abgabe) {
 			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
@@ -160,7 +184,7 @@ export const AbgabetoolStudent = {
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			this.student_uid = data[2]
-			const d = data[0]?.retval?.map(projekt => {
+			const d = data[0]?.map(projekt => {
 				let mode = 'detailTermine'
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
@@ -213,7 +237,7 @@ export const AbgabetoolStudent = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.abgabeTableOptions.height = window.visualViewport.height - rect.top
+			this.abgabeTableOptions.height = window.visualViewport.height - rect.top - 100
 			this.$refs.abgabeTable.tabulator.setHeight(this.abgabeTableOptions.height)
 		},
 		async setupMounted() {
@@ -223,7 +247,7 @@ export const AbgabetoolStudent = {
 			this.loadProjektarbeiten()
 
 			this.$refs.verticalsplit.collapseBottom()
-			//this.calcMaxTableHeight()
+			this.calcMaxTableHeight()
 		}
 	},
 	watch: {
@@ -235,34 +259,43 @@ export const AbgabetoolStudent = {
 		}
 	},
 	created() {
+		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
+		this.$api.call(ApiAbgabe.getNoten()).then(res => {
+			this.notenOptions = res.data
+		}).catch(e => {
+			this.loading = false
+		})
 
 	},
 	mounted() {
 		this.setupMounted()
 	},
 	template: `
-	<vertical-split ref="verticalsplit">				
-		<template #top>
-			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
-			<hr>
-				
-			 <core-filter-cmpt
-			 	@uuidDefined="handleUuidDefined"
-				:title="''"  
-				ref="abgabeTable" 
-				:tabulator-options="abgabeTableOptions"  
-				:tabulator-events="abgabeTableEventHandlers"
-				tableOnly
-				:sideMenu="false"
-			 />
-			 
-		 </template>
-		<template #bottom>
-			<div v-show="selectedProjektarbeit"> 
-				<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-			 </div>
-		</template>
-	</vertical-split>
+<!--	low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways	-->
+	<div style="max-height:40vw;"> 
+		<vertical-split ref="verticalsplit">				
+			<template #top>
+				<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+				<hr>
+					
+				 <core-filter-cmpt
+					@uuidDefined="handleUuidDefined"
+					:title="''"  
+					ref="abgabeTable" 
+					:tabulator-options="abgabeTableOptions"  
+					:tabulator-events="abgabeTableEventHandlers"
+					tableOnly
+					:sideMenu="false"
+				 />
+				 
+			 </template>
+			<template #bottom>
+				<div v-show="selectedProjektarbeit" style="max-width: 95%"> 
+					<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+				 </div>
+			</template>
+		</vertical-split>
+	</div>
     `,
 };
 
