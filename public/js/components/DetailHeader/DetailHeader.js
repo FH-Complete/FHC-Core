@@ -17,6 +17,10 @@ export default {
 			type: Number,
 			required: false
 		},
+		mitarbeiter_uid: {
+			type: String,
+			required: false
+		},
 		typeHeader: {
 			type: String,
 			default: 'student',
@@ -41,19 +45,30 @@ export default {
 	created(){
 		if(this.person_id) {
 			this.getHeader(this.person_id);
-
 			this.loadDepartmentData(this.mitarbeiter_uid)
 				.then(() => {
 					// Call getLeitungOrg only after departmentData is loaded
 					this.getLeitungOrg(this.departmentData.oe_kurzbz);
 				})
 				.catch((error) => {
-					console.error("Error loading department data:", error);
+					console.error("Error loading department data: ", error);
 				});
 		}
 	},
 	watch: {
 		person_id: {
+			handler(newVal) {
+				if (newVal) {
+					this.getHeader(this.person_id);
+					this.loadDepartmentData(this.mitarbeiter_uid).
+					then(() => {
+						this.getLeitungOrg(this.departmentData.oe_kurzbz);
+					});
+				}
+			},
+			deep: true,
+		},
+/*		person_id: {
 			handler(newVal) {
 				if (newVal) {
 					this.getHeader(this.person_id);
@@ -64,7 +79,7 @@ export default {
 				}
 			},
 			deep: true,
-		},
+		},*/
 	},
 	data(){
 		return{

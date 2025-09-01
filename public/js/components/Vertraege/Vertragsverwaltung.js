@@ -60,6 +60,7 @@ export default {
 						<div class="col" v-if="person_id!=null">
 							<fhc-header
 								:person_id="person_id"
+								:mitarbeiter_uid="this.mitarbeiter_uid"
 								typeHeader="mitarbeiter"
 								@redirectToLeitung="redirectToLeitung"
 							></fhc-header>

@@ -1558,6 +1558,33 @@ $filters = array(
 			}',
 		'oe_kurzbz' => null,
 	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'vertragsverwaltung',
+		'filter_kurzbz' => 'Vertragsverwaltung',
+		'description' => '{Vertragsverwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Vertragsverwaltung",
+				"columns": [
+					{"name": "UID"},
+					{"name": "PersonId"},
+					{"name": "Nachname"},
+					{"name": "Vorname"},
+					{"name": "aktiv"},
+					{"name": "Geburtsdatum"},
+					{"name": "Unternehmen"},
+					{"name": "Firma"},
+					{"name": "Vertragsarten"},
+					{"name": "IDs Dienstverhältnis"},
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
 
 );
 
