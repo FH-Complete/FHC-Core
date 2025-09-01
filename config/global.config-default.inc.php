@@ -263,9 +263,6 @@ define('CIS_SAALPLAN_ALLERAEUME_OPTION', false);
 //Legt fest ob Bestätigungsmails über eine Anmelung zu einer Prüfung an eine einzelne Person erfolgt oder an den jeweiligen Lektor. (Leerstring für jeweiligen Lektor | uid);
 define('CIS_PRUEFUNG_MAIL_EMPFAENGER_ANMEDLUNG',"");
 
-//Gibt an, ob die Studierenden bei der Anmeldung zu einer Prüfung den Ausmas an ECTS angeben können
-define('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE', false);
-
 // Username fuer STIP Schnittstelle
 define('STIP_USER_NAME','stipendienstelle');
 // Passwort fuer STIP Schnittstelle
