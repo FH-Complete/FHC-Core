@@ -140,11 +140,16 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 				let uebernahmenCheckboxen = $("input[name='lvUebernehmenCheckbox']:checked");
 				let checkboxenUebernahmeCount = uebernahmenCheckboxen.length;
 
-				if (!lvidFrom || !lvidTo)
+				let lvidautoFrom = $('#autocompleteFrom').data("lv-id");
+				let lvidautoTo = $('#autocompleteTo').data("lv-id");
+
+				if ((!lvidFrom && !lvidautoFrom) || (!lvidTo && !lvidautoTo))
 				{
 					alert("Bitte in beiden Dropdowns eine LV auswählen!");
 					return;
 				}
+
+				lvidTo = lvidTo || lvidautoTo;
 
 				if (checkboxenUebernahmeCount === 0)
 				{
@@ -159,7 +164,18 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 						done++;
 						if (done === checkboxenUebernahmeCount)
 						{
-							$('#lvDropdownTo').trigger('change');
+							let drodpwonval = $('#lvDropdownTo').val();
+							const autocompleteval  = $('#autocompleteTo').data('lv-id');
+
+							if (drodpwonval)
+							{
+								$('#lvDropdownTo').trigger('change');
+							}
+							else if (autocompleteval)
+							{
+								callLoadKompatibleLvs(autocompleteval, 'To');
+
+							}
 						}
 					});
 				});
@@ -211,9 +227,7 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 				loadKompatibleLvs(side)
 			})
 
-			$('#kompatibleLVs' + side).tablesorter({
-				widgets: ["zebra"]
-			});
+			$('#kompatibleLVs' + side).data('ts-initialized', false);
 
 			$("#autocomplete" + side).autocomplete({
 				source: "lehrveranstaltung_kompatibel_vergleichen.php?autocomplete=" + side,
@@ -230,11 +244,22 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 				},
 				select: function(event, ui) {
 					callLoadKompatibleLvs(ui.item.lehrveranstaltung_id, side)
+					$(this).data("lv-id", ui.item.lehrveranstaltung_id);
 					$("#lvBezeichnung" + side).html(ui.item.bezeichnung);
 				}
 			});
 
 
+		}
+
+		function sortTable(side)
+		{
+			if ($("#kompatibleLVs" + side + " tbody tr").length > 0 && !$('#kompatibleLVs' + side).data('ts-initialized'))
+			{
+				$('#kompatibleLVs' + side).tablesorter({
+					widgets: ["zebra"],
+				});
+			}
 		}
 
 		function loadSemester(side)
@@ -318,6 +343,7 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 					});
 					$("#kompatibleLVs" + side + " tbody").html(html);
 
+					sortTable(side);
 					markDifferences();
 				},
 				error: function(jqXHR, textStatus, errorThrown)
@@ -328,8 +354,14 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 		}
 
 		function markDifferences() {
-			const fromVal = $("#lvDropdownFrom").val();
-			const toVal   = $("#lvDropdownTo").val();
+			let fromVal = $("#lvDropdownFrom").val();
+			let toVal   = $("#lvDropdownTo").val();
+
+			let lvidautoFrom = $('#autocompleteFrom').data("lv-id");
+			let lvidautoTo = $('#autocompleteTo').data("lv-id");
+
+			fromVal = fromVal || lvidautoFrom;
+			toVal = toVal || lvidautoTo;
 
 			if (!fromVal || fromVal === "null" || !toVal || toVal === "null")
 			{

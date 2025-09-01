@@ -288,6 +288,8 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 					terminezusammenlegen(termine, erste_lvid);
 				}
 			})
+
+			loadPruefungStudiengang();
 		});
 	</script>
 	<h1><?php echo $p->t('pruefung/anmeldungenVerwalten'); ?></h1>
@@ -318,6 +320,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 	<div id='prfWrapper'>
 		<div id='pruefungen'>
 		<h2><?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?></h2>
+		<button id="zusammenlegen">Termine zusammenlegen</button>
 		<table id="table4" class="tablesorter" style="display:none">
 			<thead>
 				<tr>
