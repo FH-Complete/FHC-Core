@@ -5,7 +5,7 @@ export default {
 	inject: {
 		domain: {
 			from: 'configDomain',
-			default: 'technikum-wien.at'
+			default: 'fhcomplete.info'
 		},
 	},
 	props: {
