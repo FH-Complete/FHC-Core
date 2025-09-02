@@ -114,49 +114,40 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
 
-		$projektbetreuer = $this->input->post('projektbetreuerListe');
+		$projektbetreuer = $this->input->post('projektbetreuer');
 
-		if (!is_array($projektbetreuer))
-			return $this->terminateWithError($this->p->t('projektarbeit', 'error_invalidProjektbetreuer'), self::ERROR_TYPE_GENERAL);
-
-		foreach ($projektbetreuer as $pb)
-		{
-			if ($this->_validate($pb) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
-		}
+		if ($this->_validate($projektbetreuer) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$result = null;
 
-		foreach ($projektbetreuer as $pb)
+		$betreuer = [
+			'projektarbeit_id' => $projektarbeit_id,
+			'person_id' => $projektbetreuer['person_id'],
+			'note' => $projektbetreuer['note'],
+			'stunden' => $projektbetreuer['stunden'],
+			'stundensatz' => $projektbetreuer['stundensatz'],
+			'betreuerart_kurzbz' => $projektbetreuer['betreuerart_kurzbz']
+		];
+
+		if (isset($projektbetreuer['person_id_old']) && isset($projektbetreuer['betreuerart_kurzbz_old']))
 		{
-			$betreuer = [
-				'projektarbeit_id' => $projektarbeit_id,
-				'person_id' => $pb['person_id'],
-				'note' => $pb['note'],
-				'stunden' => $pb['stunden'],
-				'stundensatz' => $pb['stundensatz'],
-				'betreuerart_kurzbz' => $pb['betreuerart_kurzbz']
-			];
-
-			if (isset($pb['person_id_old']) && isset($pb['betreuerart_kurzbz_old']))
-			{
-				$result = $this->ProjektbetreuerModel->update(
-					[
-						'projektarbeit_id' => $projektarbeit_id,
-						'person_id' => $pb['person_id_old'],
-						'betreuerart_kurzbz' => $pb['betreuerart_kurzbz_old']
-					],
-					array_merge($betreuer, ['updateamum' => date('c'), 'updatevon' => getAuthUID()])
-				);
-			}
-			else
-			{
-				$result = $this->ProjektbetreuerModel->insert(
-					array_merge($betreuer, ['insertamum' => date('c'), 'insertvon' => getAuthUID()])
-				);
-			}
-
-			if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			$result = $this->ProjektbetreuerModel->update(
+				[
+					'projektarbeit_id' => $projektarbeit_id,
+					'person_id' => $projektbetreuer['person_id_old'],
+					'betreuerart_kurzbz' => $projektbetreuer['betreuerart_kurzbz_old']
+				],
+				array_merge($betreuer, ['updateamum' => date('c'), 'updatevon' => getAuthUID()])
+			);
 		}
+		else
+		{
+			$result = $this->ProjektbetreuerModel->insert(
+				array_merge($betreuer, ['insertamum' => date('c'), 'insertvon' => getAuthUID()])
+			);
+		}
+
+		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}

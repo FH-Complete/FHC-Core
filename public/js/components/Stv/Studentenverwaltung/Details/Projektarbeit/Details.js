@@ -15,10 +15,6 @@ export default {
 		defaultSemester: {
 			from: 'defaultSemester'
 		}
-		//~ config: {
-			//~ from: 'config',
-			//~ required: true
-		//~ }
 	},
 	computed: {
 		// prepared Lehreinheiten (with compound Bezeichnung)
@@ -169,6 +165,7 @@ export default {
 		},
 		loadProjektarbeit(projektarbeit_id) {
 
+			this.resetForm();
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
 				.then(result => {

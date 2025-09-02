@@ -42,11 +42,11 @@ export default {
 			url: 'api/frontend/v1/stv/projektbetreuer/getNoten'
 		};
 	},
-	saveProjektbetreuer(projektarbeit_id, projektbetreuerListe) {
+	saveProjektbetreuer(projektarbeit_id, projektbetreuer) {
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/projektbetreuer/saveProjektbetreuer',
-			params: { projektarbeit_id, projektbetreuerListe }
+			params: { projektarbeit_id, projektbetreuer }
 		};
 	},
 	deleteProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {

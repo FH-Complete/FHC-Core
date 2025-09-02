@@ -310,13 +310,13 @@ class Projektarbeit extends FHCAPI_Controller
 			'projekttyp_kurzbz' => $formData['projekttyp_kurzbz'],
 			'firma_id' => $formData['firma_id'] ?? null,
 			'lehreinheit_id' => $formData['lehreinheit_id'],
-			'beginn' => $formData['beginn'] ?? null,
-			'ende' => $formData['ende'] ?? null,
+			'beginn' => isset($formData['beginn']) && !isEmptyString($formData['beginn']) ? $formData['beginn'] : null,
+			'ende' => isset($formData['ende']) && !isEmptyString($formData['ende']) ? $formData['ende'] : null,
 			'note' => $formData['note'] ?? null,
 			'final' => $formData['final'] ?? null,
 			'freigegeben' => $formData['freigegeben'] ?? null,
 			'anmerkung' => $formData['anmerkung'] ?? null,
-			'gesperrtbis' => $formData['gesperrtbis'] ?? null
+			'gesperrtbis' => isset($formData['gesperrtbis']) && !isEmptyString($formData['gesperrtbis']) ? $formData['gesperrtbis'] : null
 		];
 	}
 

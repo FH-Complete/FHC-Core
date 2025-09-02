@@ -132,6 +132,10 @@ export default {
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'projektarbeit', 'ui']);
+
+						// Force layout recalculation for handling overflow text
+						this.$refs.projektbetreuerTable.tabulator.redraw(true);
+
 					}
 				},
 				{
@@ -193,7 +197,7 @@ export default {
 					if (idx >= 0) { // if betreuer found
 						betreuer = projektbetreuerListe[idx];
 
-						// set currently edited betreuera
+						// set currently edited betreuer
 						this.formData = betreuer;
 
 						// set download link
@@ -259,46 +263,31 @@ export default {
 
 			if (projektarbeit_id) {
 				this.projektarbeit_id = projektarbeit_id;
-				this.$api
-					.call(ApiStvProjektbetreuer.getProjektbetreuer(projektarbeit_id))
-					.then(result => {
-						this.$refs.projektbetreuerTable.tabulator.setData(this.addIds(result.data));
-						this.resetForm();
-					})
-					.catch(this.$fhcAlert.handleSystemError);
+				this.getProjektbetreuer();
 			} else {
 				this.$refs.projektbetreuerTable.tabulator.setData([]);
 				this.resetForm();
 			}
 		},
-		// confirming Betreuer means adding/updating him in list (but not yet saving in db)
-		confirmProjektbetreuer() {
-			if (!this.betreuerFormOpened) return;
-
-			if (typeof this.formData.betreuer_id == 'undefined') {
-				this.formData.betreuer_id = this.getNewBetreuerId();
-				this.$refs.projektbetreuerTable.tabulator.addData(this.addAutoCompleteBetreuerToFormData(this.formData));
-			} else {
-				this.$refs.projektbetreuerTable.tabulator.updateData([this.formData]);
-			}
-
-			this.resetModes();
-		},
-		confirmProjektbetreuerAfterValidation() {
-			//if (!this.formDataModified()) return;
-
-			this.validateProjektbetreuer()
+		getProjektbetreuer() {
+			this.$api
+				.call(ApiStvProjektbetreuer.getProjektbetreuer(this.projektarbeit_id))
 				.then(result => {
-					this.confirmProjektbetreuer();
+					this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
 					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		saveProjektbetreuer(projektarbeit_id) {
-			this.confirmProjektbetreuer();
-			return this.$refs.formProjektbetreuer.call(
-				ApiStvProjektbetreuer.saveProjektbetreuer(projektarbeit_id, this.$refs.projektbetreuerTable.tabulator.getData())
-			);
+		saveProjektbetreuer() {
+			this.$refs.formProjektbetreuer.call(
+				ApiStvProjektbetreuer.saveProjektbetreuer(this.projektarbeit_id, this.getFormDataWithBetreuer())
+			)
+			.then(result => {
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				this.getProjektbetreuer();
+				this.resetModes();
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 		},
 		searchBetreuer(event) {
 			if (this.abortController.betreuer) {
@@ -311,16 +300,6 @@ export default {
 				.then(result => {
 					this.filteredBetreuer = result.data;
 				});
-		},
-		// validate betreuer for data
-		validateProjektbetreuer() {
-			let alleBetreuer = this.$refs.projektbetreuerTable.tabulator.getData();
-
-			if (this.betreuerFormOpened) {
-				alleBetreuer.push(this.addAutoCompleteBetreuerToFormData(this.formData));
-			}
-
-			return this.$refs.formProjektbetreuer.call(ApiStvProjektbetreuer.validateProjektbetreuer(alleBetreuer));
 		},
 		resetForm() {
 			this.formData = this.getDefaultFormData();
@@ -360,7 +339,7 @@ export default {
 			return betreuerListe;
 		},
 		// add the betreuer selected in automomplete to betreuer liste
-		addAutoCompleteBetreuerToFormData() {
+		getFormDataWithBetreuer() {
 			let preparedFormData = this.formData;
 
 			preparedFormData.projektarbeit_id = this.projektarbeit_id;
@@ -385,16 +364,6 @@ export default {
 			// if form data has not already been modified by user, set the default stunden
 			if (!this.formDataModified()) this.formData.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 		},
-		// get a new betreuer id (max + 1) 
-		getNewBetreuerId() {
-			let max = 0;
-
-			for (const betreuer of this.$refs.projektbetreuerTable.tabulator.getData()) {
-				if (betreuer.betreuer_id > max) max = betreuer.betreuer_id;
-			}
-
-			return max + 1;
-		},
 		// check if form data has been modified since initial data has been captured
 		formDataModified() {
 			if (this.autocompleteSelectedBetreuer != null) return true;
@@ -405,9 +374,6 @@ export default {
 			}
 
 			return false;
-		},
-		reload() {
-			this.$refs.projektbetreuerTable.reloadTable();
 		},
 		actionNewPerson() {
 			this.$refs.newPersonModal.reset();
@@ -422,7 +388,7 @@ export default {
 			this.$api
 				.call(ApiStvProjektbetreuer.getPerson(result.person_id))
 				.then(response => {
-					// set the new person in autocomplete field
+					// set the new person in Betreuer autocomplete field
 					this.autocompleteSelectedBetreuer = response.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -541,8 +507,8 @@ export default {
 
 			</form-form>
 
-			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="confirmProjektbetreuerAfterValidation">
-				{{ $p.t('projektarbeit', 'betreuerBestaetigen') }}
+			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="saveProjektbetreuer">
+				{{ $p.t('projektarbeit', 'betreuerSpeichern') }}
 			</button>
 			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
