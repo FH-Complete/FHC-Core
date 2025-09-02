@@ -83,6 +83,8 @@ export default {
 				});
 		},
 		open() {
+
+			this.getBuchungstypen(this.currentSemester);
 			this.data = {
 				buchungstyp_kurzbz: '',
 				betrag: '-0.00',
@@ -105,7 +107,7 @@ export default {
 			const text = typ.standardtext || '';
 			const creditpoints = typ.credit_points || '';
 
-			if (!this.data.betrag || this.data.betrag == '-0.00')
+			if (!this.data.betrag || this.data.betrag == '-0.00' || this.data.betrag !== amount)
 				this.data.betrag = amount;
 
 			if (!this.data.buchungstext)
@@ -113,7 +115,18 @@ export default {
 
 			if (this.config.showCreditpoints && (this.data.credit_points == '0.00' || this.data.credit_points === null))
 				this.data.credit_points = creditpoints;
-		}
+		},
+		getBuchungstypen(studiensemester_kurzbz)
+		{
+			this.$api
+				.call(ApiKonto.getBuchungstypen(studiensemester_kurzbz))
+				.then(result => {
+					this.lists.buchungstypen = result.data;
+					if (this.data.buchungstyp_kurzbz)
+						this.checkDefaultBetrag(this.data.buchungstyp_kurzbz);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 	},
 	template: `
 	<core-form ref="form" class="stv-details-konto-edit" @submit.prevent="save">
@@ -166,6 +179,7 @@ export default {
 				<form-input
 					type="select"
 					v-model="data.studiensemester_kurzbz"
+					@change="getBuchungstypen(data.studiensemester_kurzbz)"
 					name="studiensemester_kurzbz"
 					:label="$p.t('lehre/studiensemester')"
 					>

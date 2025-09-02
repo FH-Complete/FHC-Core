@@ -65,10 +65,14 @@ export default {
 			params: { buchungsnr }
 		};
 	},
-	getBuchungstypen() {
+	getBuchungstypen(studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/konto/getBuchungstypen'
+		if (!!studiensemester_kurzbz)
+			url = url + '/' + encodeURIComponent(studiensemester_kurzbz);
+
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/konto/getBuchungstypen'
+			url: url
 		};
-	}
+	},
 };

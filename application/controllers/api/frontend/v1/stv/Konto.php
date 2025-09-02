@@ -48,7 +48,8 @@ class Konto extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'konto'
+			'konto',
+			'lehre'
 		]);
 	}
 
@@ -112,7 +113,7 @@ class Konto extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	public function getBuchungstypen()
+	public function getBuchungstypen($studiensemester_kurzbz = null)
 	{
 		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
 
@@ -122,6 +123,7 @@ class Konto extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
+		$this->_getOEHBeitrag($data, $studiensemester_kurzbz);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -493,5 +495,44 @@ class Konto extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess();
+	}
+
+	private function _getOEHBeitrag(&$data, $studiensemester_kurzbz = null)
+	{
+		if (is_null($studiensemester_kurzbz))
+		{
+			$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+			$studiensemester_akt = $this->variablelib->getVar('semester_aktuell');
+		}
+		else
+		{
+			$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+			if ($this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+				$studiensemester_akt = $studiensemester_kurzbz;
+			else
+				$this->terminateWithError($this->p->t('lehre', 'error_noStudiensemester'));
+		}
+
+		$this->load->model('codex/Oehbeitrag_model', 'OehbeitragModel');
+		$oehBeitrag = $this->OehbeitragModel->getByStudiensemester($studiensemester_akt);
+
+		$oehStandardbetrag = null;
+		if (hasData($oehBeitrag))
+		{
+			$oeh = getData($oehBeitrag)[0];
+			$summe = ($oeh->studierendenbeitrag + $oeh->versicherung) * -1;
+			$oehStandardbetrag = number_format((float)$summe, 2, '.', '');
+		}
+
+		if ($oehStandardbetrag !== null)
+		{
+			$data = array_map(function ($buchungstyp) use ($oehStandardbetrag) {
+				if (isset($buchungstyp->buchungstyp_kurzbz) && (strtolower($buchungstyp->buchungstyp_kurzbz) === 'oeh'))
+				{
+					$buchungstyp->standardbetrag = $oehStandardbetrag;
+				}
+				return $buchungstyp;
+			}, $data);
+		}
 	}
 }

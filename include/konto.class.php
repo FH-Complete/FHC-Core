@@ -25,6 +25,7 @@
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
 require_once(dirname(__FILE__).'/'.EXT_FKT_PATH.'/generateZahlungsreferenz.inc.php');
+require_once(dirname(__FILE__).'/variable.class.php');
 
 class konto extends basis_db
 {
@@ -432,6 +433,8 @@ class konto extends basis_db
 
 		$qry.=" ORDER BY beschreibung";
 
+		$oehBeitrag = $this->_getOEHBeitrag();
+
 		if($this->db_query($qry))
 		{
 			while($row = $this->db_fetch_object())
@@ -440,7 +443,15 @@ class konto extends basis_db
 
 				$typ->buchungstyp_kurzbz = $row->buchungstyp_kurzbz;
 				$typ->beschreibung = $row->beschreibung;
-				$typ->standardbetrag = $row->standardbetrag;
+				if (strtolower($typ->buchungstyp_kurzbz) === 'oeh' && $oehBeitrag)
+				{
+					$typ->standardbetrag = $oehBeitrag;
+				}
+				else
+				{
+					$typ->standardbetrag = $row->standardbetrag;
+				}
+
 				$typ->standardtext = $row->standardtext;
 				$typ->credit_points = $row->credit_points;
 				$typ->aktiv = $this->db_parse_bool($row->aktiv);
@@ -983,6 +994,38 @@ class konto extends basis_db
 				$persons[] = $row->nachname . ' ' . $row->vorname;
 			}
 			return $persons;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Abfrage aufgetreten';
+			return false;
+		}
+	}
+
+	private function _getOEHBeitrag()
+	{
+		$variablen_obj = new variable();
+		$variablen_obj->loadVariables(get_uid());
+
+		$qry = "WITH semstart AS (
+					SELECT start FROM public.tbl_studiensemester
+					WHERE studiensemester_kurzbz = '". $this->db_escape($variablen_obj->variable->semester_aktuell) . "'
+				)
+				SELECT * FROM bis.tbl_oehbeitrag oehb
+				JOIN public.tbl_studiensemester semvon ON oehb.von_studiensemester_kurzbz = semvon.studiensemester_kurzbz
+				LEFT JOIN public.tbl_studiensemester sembis ON oehb.bis_studiensemester_kurzbz = sembis.studiensemester_kurzbz
+				JOIN semstart ON semstart.start::date >= semvon.start::date AND (sembis.studiensemester_kurzbz IS NULL OR semstart.start::date <= sembis.start::date)
+				ORDER BY semvon.start
+				LIMIT 1";
+
+		if ($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				$summe = ($row->studierendenbeitrag + $row->versicherung) * -1;
+				return number_format((float)$summe, 2, '.', '');
+			}
+			return false;
 		}
 		else
 		{
