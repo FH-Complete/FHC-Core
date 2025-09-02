@@ -60,3 +60,17 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table
 			echo '<br>paabgabe column upload_allowed default false hinzugefuegt';
 	}
 }
+
+if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabe' AND column_name = 'notiz'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "ALTER TABLE campus.tbl_paabgabe
+				ADD COLUMN IF NOT EXISTS notiz text DEFAULT NULL;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabe: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>paabgabe column notiz default '' hinzugefuegt";
+	}
+}

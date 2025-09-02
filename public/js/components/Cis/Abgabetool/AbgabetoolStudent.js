@@ -2,10 +2,12 @@ import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeStudentDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import BsModal from "../../Bootstrap/Modal.js";
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
+		BsModal,
 		CoreFilterCmpt,
 		AbgabeDetail,
 		VerticalSplit
@@ -43,16 +45,61 @@ export const AbgabetoolStudent = {
 				minHeight: 250,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
+				responsiveLayout: "collapse",
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung', formatter: this.beurteilungFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail', formatter: this.mailFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4betreuer')), field: 'betreuer', formatter: this.centeredTextFormatter,widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'typ', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', formatter: this.centeredTextFormatter, widthGrow: 8}
+					{
+						formatter:"responsiveCollapse",
+						width:30, minWidth:30, hozAlign:"center", resizable:false, headerSort:false
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details',
+						formatter: this.detailFormatter,
+						widthGrow: 1, tooltip: false
+						, responsive: 0, minWidth: 80
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung',
+						formatter: this.beurteilungFormatter,
+						widthGrow: 1, tooltip: false
+						, responsive: 0, minWidth: 80
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem',
+						formatter: this.centeredTextFormatter,
+						widthGrow: 1
+						, responsive: 5, minWidth: 120
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg',
+						formatter: this.centeredTextFormatter,
+						widthGrow: 1
+						, responsive: 6, minWidth: 120
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail',
+						formatter: this.mailFormatter,
+						widthGrow: 1
+						, responsive: 0, minWidth: 80
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4betreuer')), field: 'betreuer',
+						formatter: this.centeredTextFormatter,
+						widthGrow: 2
+						, responsive: 7, minWidth: 300
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'typ',
+						formatter: this.centeredTextFormatter,
+						widthGrow: 1
+						, responsive: 8, minWidth: 200
+					},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', 
+						formatter: this.centeredTextFormatter,
+						widthGrow: 8
+						, responsive: 1, minWidth: 420
+					}
 				],
 				persistence: false,
 			},
@@ -132,8 +179,9 @@ export const AbgabetoolStudent = {
 				pa.student_uid = this.student_uid
 
 				this.selectedProjektarbeit = pa
-				
-				this.$refs.verticalsplit.showBoth()
+
+				this.$refs.modalContainerAbgabeDetail.show()
+				// this.$refs.verticalsplit.showBoth()
 				
 			})
 			
@@ -141,29 +189,29 @@ export const AbgabetoolStudent = {
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
 				'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</p></div>'
 		},
 		detailFormatter(cell) {
 			const val = cell.getValue()
 
 			if(val.mode === 'detailTermine') {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
 					'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
 			} else if (val.mode === 'beurteilungDownload') {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
 					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
 			}
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
 					'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
 		beurteilungFormatter(cell) {
 			const val = cell.getValue()
 			if(val) {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
 					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
 			} else return '-'
 		},
@@ -213,6 +261,11 @@ export const AbgabetoolStudent = {
 
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.$refs.abgabeTable.tabulator.setData(d);
+
+			Vue.nextTick(()=>{
+				this.$refs.abgabeTable?.tabulator.setColumns(this.$refs.abgabeTable?.tabulator.getColumnDefinitions())
+
+			})
 		},
 		loadProjektarbeiten() {
 			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
@@ -245,9 +298,15 @@ export const AbgabetoolStudent = {
 			await this.tableBuiltPromise
 			
 			this.loadProjektarbeiten()
+			
 
-			this.$refs.verticalsplit.collapseBottom()
-			this.calcMaxTableHeight()
+			// window.addEventListener("resize", this.redrawHandler);
+			// this.$refs.verticalsplit.collapseBottom()
+		},
+		redrawHandler() {
+			console.log('redrawHandler')
+			this.$refs.abgabeTable?.tabulator.setColumns(this.$refs.abgabeTable?.tabulator.getColumnDefinitions())
+			this.$refs.abgabeTable?.tabulator.redraw(true)
 		}
 	},
 	watch: {
@@ -270,32 +329,36 @@ export const AbgabetoolStudent = {
 	mounted() {
 		this.setupMounted()
 	},
+	unmounted() {
+		// window.removeEventListener("resize", this.redrawHandler);
+	},
 	template: `
-<!--	low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways	-->
-	<div style="max-height:40vw;"> 
-		<vertical-split ref="verticalsplit">				
-			<template #top>
-				<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
-				<hr>
-					
-				 <core-filter-cmpt
-					@uuidDefined="handleUuidDefined"
-					:title="''"  
-					ref="abgabeTable" 
-					:tabulator-options="abgabeTableOptions"  
-					:tabulator-events="abgabeTableEventHandlers"
-					tableOnly
-					:sideMenu="false"
-				 />
-				 
-			 </template>
-			<template #bottom>
-				<div v-show="selectedProjektarbeit" style="max-width: 95%"> 
-					<AbgabeDetail :viewMode="isViewMode" :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-				 </div>
-			</template>
-		</vertical-split>
-	</div>
+	
+	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
+		dialogClass="modal-fullscreen">
+		<template v-slot:title>
+			<div>
+				abgabe detail wtb phrasen
+			</div>
+		</template>
+		<template v-slot:default>
+			<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+			
+		</template>
+	</bs-modal>
+	
+	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+	<hr>
+		
+	 <core-filter-cmpt
+		@uuidDefined="handleUuidDefined"
+		:title="''"  
+		ref="abgabeTable" 
+		:tabulator-options="abgabeTableOptions"  
+		:tabulator-events="abgabeTableEventHandlers"
+		tableOnly
+		:sideMenu="false"
+	 />
     `,
 };
 

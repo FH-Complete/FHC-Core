@@ -236,8 +236,8 @@ export const AbgabetoolMitarbeiter = {
 				
 				this.selectedProjektarbeit = pa
 				
-				
-				this.$refs.verticalsplit.showBoth()
+				this.$refs.modalContainerAbgabeDetail.show()
+				// this.$refs.verticalsplitthis.$refs.verticalsplit.showBoth()
 				
 			
 			})
@@ -345,7 +345,7 @@ export const AbgabetoolMitarbeiter = {
 
 			this.loadProjektarbeiten()
 
-			this.$refs.verticalsplit.collapseBottom()
+			// this.$refs.verticalsplit.collapseBottom()
 			this.calcMaxTableHeight()
 			
 		}
@@ -441,12 +441,27 @@ export const AbgabetoolMitarbeiter = {
 				<button type="button" class="btn btn-primary" @click="addSeries">{{ $p.t('global/speichern') }}</button>
 			</template>
 		</bs-modal>	
+		
+		
+		<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
+			dialogClass="modal-fullscreen">
+			<template v-slot:title>
+				<div>
+					abgabe detail wtb phrasen
+				</div>
+			</template>
+			<template v-slot:default>
+				<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+				
+			</template>
+		</bs-modal>	
+		
 		<!--	low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways	-->
 		<div style="max-height:40vw;"> 
 		
-			<vertical-split ref="verticalsplit">		
-				
-				<template #top>
+<!--			<vertical-split ref="verticalsplit">		-->
+<!--				-->
+<!--				<template #top>-->
 					<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
 					<hr>
 					<core-filter-cmpt
@@ -485,13 +500,13 @@ export const AbgabetoolMitarbeiter = {
 						</template>
 					</core-filter-cmpt>
 	
-				</template>
-				<template #bottom>
-					<div v-show="selectedProjektarbeit" ref="selProj"> 
-						<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-					</div>
-				</template>
-			</vertical-split>
+<!--				</template>-->
+<!--				<template #bottom>-->
+<!--					<div v-show="selectedProjektarbeit" ref="selProj"> -->
+<!--						<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>-->
+<!--					</div>-->
+<!--				</template>-->
+<!--			</vertical-split>-->
 		
 		</div>
     `,

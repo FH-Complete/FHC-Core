@@ -33,7 +33,8 @@ $includesArray = array(
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js'
+		'public/js/apps/Dashboard/Fhc.js',
+		'vendor/olifolkerd/tabulator5/src/js/modules/ResponsiveLayout/ResponsiveLayout.js'
 	),
 
 );
