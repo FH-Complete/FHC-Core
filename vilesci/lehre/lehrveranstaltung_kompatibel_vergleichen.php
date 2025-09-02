@@ -165,7 +165,7 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 						if (done === checkboxenUebernahmeCount)
 						{
 							let drodpwonval = $('#lvDropdownTo').val();
-							const autocompleteval  = $('#autocompleteTo').data('lv-id');
+							let autocompleteval  = $('#autocompleteTo').data('lv-id');
 
 							if (drodpwonval)
 							{
@@ -179,6 +179,18 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 						}
 					});
 				});
+			}),
+
+			$('#alleLVsMarkieren').on("click", function()
+			{
+				let checkboxen = $("#kompatibleLVsFrom tbody tr.missing-in-to").find("input[name='lvUebernehmenCheckbox']");
+				checkboxen.prop("checked", true);
+			}),
+
+			$('#alleLVsAbwaehlen').on("click", function()
+			{
+				let checkboxen = $("#kompatibleLVsFrom tbody").find("input[name='lvUebernehmenCheckbox']");
+				checkboxen.prop("checked", false);
 			})
 		});
 
@@ -245,7 +257,7 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 				select: function(event, ui) {
 					callLoadKompatibleLvs(ui.item.lehrveranstaltung_id, side)
 					$(this).data("lv-id", ui.item.lehrveranstaltung_id);
-					$("#lvBezeichnung" + side).html(ui.item.bezeichnung);
+					$("#lvBezeichnung" + side).html(ui.item.bezeichnung +  " (ID: " + ui.item.lehrveranstaltung_id + ")");
 				}
 			});
 
@@ -301,7 +313,7 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 		{
 			let lv_id = $("#lvDropdown" + side).val();
 
-			if (lv_id == "null")
+			if (lv_id === null)
 				$("#lvBezeichnung" + side).html("")
 			else
 			{
@@ -543,13 +555,42 @@ if (isset($_REQUEST['autocomplete']) && ($_REQUEST['autocomplete'] === 'From' ||
 					alert(data.errormsg);
 				}
 
-				if ($('#lvDropdownFrom').val() === $('#lvDropdownTo').val())
+				let fromValDropdown = $("#lvDropdownFrom").val();
+				let toValDropdwon   = $("#lvDropdownTo").val();
+
+				let lvidautoFrom = $('#autocompleteFrom').data("lv-id");
+				let lvidautoTo = $('#autocompleteTo').data("lv-id");
+
+				let fromVal = fromValDropdown || lvidautoFrom;
+				let toVal = toValDropdwon || lvidautoTo;
+
+
+				if (fromVal === toVal)
 				{
-					$('#lvDropdownFrom').trigger('change');
-					$('#lvDropdownTo').trigger('change');
+					if (fromValDropdown)
+						$('#lvDropdownFrom').trigger('change');
+					else if (lvidautoFrom)
+						callLoadKompatibleLvs(fromVal, 'From');
+
+					if (toValDropdwon)
+						$('#lvDropdownTo').trigger('change');
+					else if (lvidautoFrom)
+						callLoadKompatibleLvs(toVal, 'To');
 				}
 				else
-					$('#lvDropdown' + side).trigger('change');
+				{
+					let dropdownVal = $("#lvDropdown" + side).val();
+					let autoVal = $('#autocomplete' + side).data("lv-id");
+					if (dropdownVal)
+					{
+						$('#lvDropdown' + side).trigger('change');
+					}
+					else if (autoVal)
+					{
+						callLoadKompatibleLvs(autoVal, side);
+					}
+				}
+
 			}).error(function(data)
 			{
 				alert(data.responseText);
@@ -622,6 +663,10 @@ echo "<div class='container'>
 	</div>
 	Kompatible Lehrveranstaltungen - <span id='lvBezeichnungFrom'></span>
 	
+	<br />
+	<br />
+	<input type='button' id='alleLVsMarkieren' value='Alle fehlenden auswählen'/>
+	<input type='button' id='alleLVsAbwaehlen' value='Alle abwählen'/>
 	<table style='width: auto;' class='tablesorter' id='kompatibleLVsFrom'>
 			<thead>
 				<tr>
