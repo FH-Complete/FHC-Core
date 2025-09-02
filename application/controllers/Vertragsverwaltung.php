@@ -9,6 +9,7 @@ class Vertragsverwaltung extends Auth_Controller
 		$permissions = [];
 		$router = load_class('Router');
 		$permissions[$router->method] = ['vertrag/mitarbeiter:r'];
+		#$permissions[$router->method] = ['admin:rw'];
 		parent::__construct($permissions);
 
 		// Load Libraries

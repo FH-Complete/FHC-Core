@@ -181,13 +181,13 @@ export default {
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
-			<div class="row">
-				<div class="col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 position-relative"
-						style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
+
+				<div class="col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
-					  class="d-block h-100 rounded"
+					  class="d-block w-100 h-100 rounded"
 					  alt="Profilbild"
 					  :src="'data:image/jpeg;base64,' + headerDataMa.foto"
+					  style="object-fit: contain;"
 					/>
 					<template v-if="headerDataMa.foto_sperre">
 						<i
@@ -198,28 +198,42 @@ export default {
 				</div>
 
 				<!--show Ma-Details-->
-				<div class="col-md-10">
-					<h5>{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}
-					</h5>
+				<div class="col-md-9 text-nowrap mt-2">
+					<h4>{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}</h4>
 					<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong>
 						{{departmentData.bezeichnung}}
 					<span v-if="leitungData.uid"> | </span>
 					<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
-					<a href="#" @click.prevent="redirectToLeitung">
+					<a href="#" @click.prevent="redirectToLeitung" >
 						{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
 					</a>
 					<p>
 						<strong class="text-muted">Email </strong>
-						 <span v-if="!headerDataMa?.alias">
-							<a :href="'mailto:'+headerDataMa?.uid+'@'+domain">{{headerDataMa.uid}}@{{domain}}</a>
+						 <span v-if="headerDataMa && (headerDataMa.alias === undefined || headerDataMa.alias === null || headerDataMa.alias === '')">
+							<a :href="'mailto:' + mitarbeiter_uid + '@' + domain">
+							  {{ mitarbeiter_uid }}@{{ domain }}
+							</a>
 						</span>
-						<span v-if="headerDataMa?.alias">
+						<span v-else>
 							<a :href="'mailto:'+headerDataMa?.alias+'@'+domain">{{headerDataMa.alias}}@{{domain}}</a>
 						</span>
 						<span v-if="headerDataMa?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerDataMa?.telefonklappe}}</span>
 					</p>
 				</div>
-			</div>
+
+				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
+					<div class="d-flex py-1">
+						<div class="px-2">
+							<h4 class="mb-1">PNr</h4>
+							<h6 class="text-muted">{{ headerDataMa?.person_id }}</h6>
+						</div>
+						<div class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1">UID</h4>
+							<h6 class="text-muted">{{ mitarbeiter_uid }}</h6>
+						</div>
+					</div>
+				</div>
+
 		</template>
 	</div>
 	`

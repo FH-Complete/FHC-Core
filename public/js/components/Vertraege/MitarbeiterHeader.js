@@ -15,9 +15,14 @@ export default {
 			type: Object,
 			required: true
 		},
+		domain: {
+			type: String,
+			required: true
+		}
 	},
 	data() {
 		return {
+			tabulatorData: [],
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
@@ -25,23 +30,15 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "UID", field: "uid", headerFilter:"input"},
-					{title: "personID", field: "person_id", visible: false, headerFilter:"input"},
-					{title: "Nachname", field: "nachname", headerFilter:"input"},
-					{title: "Vorname", field: "vorname", headerFilter:"input"},
-					{
-						title: "Aktiv", field: "aktiv", headerFilter: "input",
-						formatter:"tickCross",
-						hozAlign:"center",
-						formatterParams: {
-							tickElement: '<i class="fa fa-check text-success"></i>',
-							crossElement: '<i class="fa fa-xmark text-danger"></i>'
-						}
-					},
+					{title: "UID", field: "uid", headerFilter: "input"},
+					{title: "personID", field: "person_id", visible: false, headerFilter: "input"},
+					{title: "Nachname", field: "nachname", visible: true, headerFilter: "input"},
+					{title: "Vorname", field: "vorname", visible: true, headerFilter: "input"},
 					{
 						title: "Geburtsdatum",
 						field: "gebdatum",
-						headerFilter:"input",
+						headerFilter: "input",
+						visible: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr);
@@ -52,12 +49,38 @@ export default {
 							});
 						}
 					},
-					{title: "Unternehmen", field: "unternehmen", headerFilter:"input"},
-					{title: "Vertragsarten", field: "vertragsarten", headerFilter:"input"},
-					{title: "Ids Dienstverträge", field: "ids", headerFilter:"input"},
+					{
+						title: "Aktiv", field: "aktiv", visible: false, headerFilter: true, width: 85,
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatter: function(cell) {
+							return cell.getValue() === "aktiv"
+								? '<i class="fa fa-check text-success"></i>'
+								: '<i class="fa fa-xmark text-danger"></i>';
+						}
+					},
+					{title: "Unternehmen", field: "unternehmen", visible: false, headerFilter: "input"},
+					{title: "Vertragsarten", field: "vertragsarten", visible: true, headerFilter: "input"},
+					{title: "Ids Dienstverträge", field: "ids", visible: true, headerFilter: "input"},
+
+					{
+						title: "email", field: "email", headerFilter: "input",
+						visible: false,
+						formatter: (cell, formatterParams, onRendered) => {
+
+							let email = cell.getValue() + '@';
+
+							let container = document.createElement('div');
+							container.className = "d-flex";
+							container.append(email);
+							container.append(cell.getData().emailDomain);
+							return container;
+						},
+					},
 				],
 				layout: 'fitColumns',
-				persistenceID: 'core-mitarbeiter',
+				persistenceID: 'core-mitarbeiter_20250901',
+				footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 				selectableRangeMode: 'click',
 				selectable: true,
 			},
@@ -74,18 +97,21 @@ export default {
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
+						cm.getColumnByField('uid').component.updateDefinition({
+							visible: true
+						});
+
 						cm.getColumnByField('person_id').component.updateDefinition({
 							title: this.$p.t('person', 'person_id')
 						});
 
 						cm.getColumnByField('nachname').component.updateDefinition({
-							title: this.$p.t('person', 'nachname')
+							title: this.$p.t('person', 'nachname'),
+							visible: true
 						});
 						cm.getColumnByField('vorname').component.updateDefinition({
-							title: this.$p.t('person', 'vorname')
-						});
-						cm.getColumnByField('aktiv').component.updateDefinition({
-							title: this.$p.t('global', 'aktiv')
+							title: this.$p.t('person', 'vorname'),
+							visible: true
 						});
 						cm.getColumnByField('gebdatum').component.updateDefinition({
 							title: this.$p.t('person', 'geburtsdatum')
@@ -94,17 +120,41 @@ export default {
 							title: this.$p.t('person', 'firma')
 						});
 						cm.getColumnByField('vertragsarten').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsarten')
+							title: this.$p.t('vertrag', 'vertragsarten'),
+							visible: true
 						});
 						cm.getColumnByField('ids').component.updateDefinition({
-							title: this.$p.t('vertrag', 'idsDienstverhaeltnisse')
+							title: this.$p.t('vertrag', 'idsDienstverhaeltnisse'),
+							visible: true
+						});
+						cm.getColumnByField('aktiv').component.updateDefinition({
+							title: this.$p.t('global', 'aktiv'),
+							width: 45
 						});
 					}
-				}
+				},
+				{
+					event: "dataFiltered",
+					handler: function(filters, rows) {
+						let el = document.getElementById("search_count");
+						el.innerHTML = rows.length;
+					}
+				},
+				{
+					event: 'dataLoaded',
+					handler: (data) => {
+						let el = document.getElementById("total_count");
+						el.innerHTML = data.length;
+
+						this.tabulatorData = data.map(item => {
+							item.emailDomain = document.createElement('div');
+							return item;
+						});
+					}
+				},
 			],
 			selectedPerson: null,
 			selectedUid: null,
-			isFilterSet: false,
 		}
 	},
 	methods: {
@@ -117,41 +167,22 @@ export default {
 				uid: this.selectedUid
 			});
 		},
-		onSwitchChange() {
-			if (this.isFilterSet) {
-				this.$refs.table.tabulator.setFilter("aktiv", "=", true);
-			}
-			else {
-				this.$refs.table.tabulator.clearFilter();
-			}
-		},
 	},
 	template: `
-	<div class="core-mitarbeiter-header">
-		<h4>{{$p.t('vertrag', 'vertragsverwaltung')}}</h4>
-		
-	
-<!--	filter: show only active employees-->
-		<div class="justify-content-end py-3">
-			<form-input
-				container-class="form-switch"
-				type="checkbox"
-				:label="$p.t('vertrag/nurAktiveMaAnzeigen')"
-				v-model="isFilterSet"
-				@change="onSwitchChange"
-				>
-			</form-input>
-		</div>
 		
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
-			table-only
+			filter-type="Vertragsverwaltung"
 			:side-menu="false"
 			>
 		</core-filter-cmpt>
 
-	</div>`
+		<Teleport v-for="data in tabulatorData" :key="data.uid" :to="data.emailDomain">
+			{{domain}}
+		</Teleport>
+
+`
 }
 

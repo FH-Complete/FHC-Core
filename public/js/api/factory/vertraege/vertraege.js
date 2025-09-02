@@ -126,6 +126,7 @@ export default {
 			params
 		};
 	},
+	//loaded by mitarbeiter_header_js
 	getMitarbeiter(){
 		return {
 			method: 'get',

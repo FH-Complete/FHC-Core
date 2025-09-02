@@ -332,4 +332,5 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
 	),
+
 );

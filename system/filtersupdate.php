@@ -1567,7 +1567,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "Vertragsverwaltung",
+				"name": "MA Vertragsverwaltung (aktiv)",
 				"columns": [
 					{"name": "UID"},
 					{"name": "PersonId"},
@@ -1579,13 +1579,13 @@ $filters = array(
 					{"name": "Firma"},
 					{"name": "Vertragsarten"},
 					{"name": "IDs Dienstverhältnis"},
+					{"name": "email"}
 				],
-				"filters": []
-			}
-		',
+				"filters": [
+					]
+			}',
 		'oe_kurzbz' => null,
 	),
-
 );
 
 // Loop through the filters array

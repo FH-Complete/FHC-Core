@@ -46,12 +46,12 @@ export default {
 		<core-navigation-cmpt/>
 
 		<div class="vv">
-			<main>
 				<vertical-split ref="vsplit">
 					<template #top>	
 						<div class="d-flex flex-column" style="height: 100%;">
 							<mitarbeiter-header
 								:endpoint="endpoint"
+								:domain="config.domain"
 								@selectionChanged="handleSelection"
 								/>
 						</div>
@@ -72,7 +72,6 @@ export default {
 						</div>
 					</template>
 				</vertical-split>
-			</main>	
 		</div>
 		`
 }
