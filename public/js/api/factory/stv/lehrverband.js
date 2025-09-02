@@ -16,39 +16,16 @@
  */
 
 export default {
-	add(uid, gruppe_kurzbz, studiensemester_kurzbz) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/stv/gruppen/add/',
-			params: {
-				uid,
-				gruppe_kurzbz,
-				studiensemester_kurzbz
-			}
-		};
-	},
-	search(query, studiengang_kz) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/stv/gruppen/search/',
-			params: {
-				query,
-				studiengang_kz
-			}
-		};
-	},
-	getGruppen(id) {
+	hasOrgforms(studiengang_kz) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/Gruppen/getGruppen/' + id
+			url: 'api/frontend/v1/stv/lehrverband/hasOrgforms/' + studiengang_kz
 		};
 	},
-	deleteGroup(params) {
+	getTree(studiengang_kz) {
 		return {
-			method: 'post',
-			url: 'api/frontend/v1/stv/Gruppen/deleteGruppe/',
-			params
+			method: 'get',
+			url: 'api/frontend/v1/stv/lehrverband/getTree/' + studiengang_kz
 		};
 	}
-}
-
+};
