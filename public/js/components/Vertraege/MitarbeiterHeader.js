@@ -53,16 +53,14 @@ export default {
 						title: "Aktiv", field: "aktiv", visible: false, headerFilter: true, width: 85,
 						formatter:"tickCross",
 						hozAlign:"center",
-						formatter: function(cell) {
-							return cell.getValue() === "aktiv"
-								? '<i class="fa fa-check text-success"></i>'
-								: '<i class="fa fa-xmark text-danger"></i>';
+					    formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
 					},
 					{title: "Unternehmen", field: "unternehmen", visible: false, headerFilter: "input"},
 					{title: "Vertragsarten", field: "vertragsarten", visible: true, headerFilter: "input"},
 					{title: "Ids Dienstverträge", field: "ids", visible: true, headerFilter: "input"},
-
 					{
 						title: "email", field: "email", headerFilter: "input",
 						visible: false,
@@ -77,6 +75,7 @@ export default {
 							return container;
 						},
 					},
+					{title: "Filter aktiv/all", field: "aktiv_status", visible:false, headerFilter: "input"}
 				],
 				layout: 'fitColumns',
 				persistenceID: 'core-mitarbeiter_20250901',

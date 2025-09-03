@@ -1567,7 +1567,7 @@ $filters = array(
 		'default_filter' => true,
 		'filter' => '
 			{
-				"name": "MA Vertragsverwaltung (aktiv)",
+				"name": "MA Vertragsverwaltung (aktiv/all)",
 				"columns": [
 					{"name": "UID"},
 					{"name": "PersonId"},
@@ -1579,9 +1579,16 @@ $filters = array(
 					{"name": "Firma"},
 					{"name": "Vertragsarten"},
 					{"name": "IDs Dienstverhältnis"},
-					{"name": "email"}
+					{"name": "email"},
+					{"name": "aktiv_status"}
 				],
 				"filters": [
+					{
+						"name": "aktiv_status",
+						"option": "",
+						"operation": "equal",
+						"condition": "aktiv"
+					}
 					]
 			}',
 		'oe_kurzbz' => null,
