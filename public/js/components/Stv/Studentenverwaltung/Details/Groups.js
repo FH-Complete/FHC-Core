@@ -105,7 +105,7 @@ export default {
 				const first = this.modelValue.find(Boolean);
 				if (this.modelValue.every(ps => ps.studiengang_kz === first.studiengang_kz))
 					return first.studiengang_kz;
-				return false;
+				return undefined;
 			}
 			return this.modelValue.studiengang_kz;
 		}
