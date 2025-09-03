@@ -76,7 +76,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		width: 850px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
-		border: 1px solid #dddddd;
+		/*border: 1px solid #dddddd;*/
 		/*box-shadow: 0em 0em 2em 0.5em #888888 inset;*/
 		}
 
