@@ -97,7 +97,7 @@ class Betriebsmittelperson_model extends DB_Model
 		return $this->loadWhere($condition);
 	}
 
-	public function getBetriebsmittelData($id, $type_id)
+	public function getBetriebsmittelData($id, $type_id, $betriesmitteltypes = null)
 	{
 		switch ($type_id) {
 			case 'person_id':
@@ -113,6 +113,15 @@ class Betriebsmittelperson_model extends DB_Model
 				return error("ID nicht gültig");
 		}
 
+		$cond .= " = ? ";
+		$params[] = $id;
+
+		if ($betriesmitteltypes && !isEmptyArray($betriesmitteltypes))
+		{
+			$cond .= " AND bm.betriebsmitteltyp IN ?";
+			$params[] = $betriesmitteltypes;
+		}
+
 		$query = "
 			SELECT 
 			bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung,
@@ -126,9 +135,9 @@ class Betriebsmittelperson_model extends DB_Model
 			JOIN 
 				wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
 			WHERE 
-				" . $cond . " = ? ";
+				" . $cond;
 
-		return $this->execQuery($query, array($id));
+		return $this->execQuery($query, $params);
 	}
 
 	/**

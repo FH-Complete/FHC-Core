@@ -309,7 +309,8 @@ xmlns:form="urn:oasis:names:tc:opendocument:xmlns:form:1.0"
 			<text:p text:style-name="P4">(nz) ... nicht zugelassen</text:p>
 			<text:p text:style-name="P4">(ma) ... MitarbeiterIn</text:p>
 			<text:p text:style-name="P4">(a.o.) ... Außerordentliche/r HörerIn</text:p>
-			<text:p text:style-name="P4">(d.d.) ... Double Degree Program</text:p>
+			<text:p text:style-name="P4">(d.d.i) ... Double Degree Incoming Program</text:p>
+			<text:p text:style-name="P4">(d.d.o) ... Double Degree Outgoing Program</text:p>
 			<text:p text:style-name="P4"/>
 			<text:p text:style-name="P5">
 				<xsl:choose>
