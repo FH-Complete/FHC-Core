@@ -251,7 +251,7 @@ export default {
 					</div>
 				</div>
 			</template>
-			<template #footer v-if="!readonly || !tagData.readonly">
+			<template #footer v-if="!readonly && !tagData.readonly">
 				<div class="d-flex justify-content-between w-100">
 					<div>
 						<button 

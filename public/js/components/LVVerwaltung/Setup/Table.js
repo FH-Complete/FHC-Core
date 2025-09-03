@@ -445,7 +445,7 @@ export default {
 							if (!tagExists)
 							{
 								addedTag.id = tag.id;
-								tags.push({ ...addedTag });
+								tags.unshift({ ...addedTag });
 								targetRow.update({ tags: JSON.stringify(tags) });
 								targetRow.reformat();
 							}
