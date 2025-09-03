@@ -1365,7 +1365,7 @@ function terminezusammenlegen($termine, $lv_id)
 				$error = true;
 			}
 
-			if (!($termin->termin->ort_kurzbz === $first_ort || $first_termin->termin->anderer_raum = $first_raum))
+			if (!($termin->termin->ort_kurzbz === $first_ort || $first_termin->termin->anderer_raum == $first_raum))
 			{
 				$data['errormsg'] = 'Ort/Raum unterschiedlich!';
 				$error = true;
@@ -1491,7 +1491,7 @@ function terminezusammenlegen($termine, $lv_id)
 
 	$data['result']= $result;
 	$data['error']= $error ? 'true' : 'false';
-	$data['errormsg']='';
+	//$data['errormsg']='';
 	return $data;
 }
 
