@@ -689,10 +689,26 @@ EOSQL;
 
 	private function _getTagsCTE()
 	{
+		$this->load->config('lvverwaltung');
+		$tags = $this->config->item('tags');
+
+		$whereTags = '';
+		if (is_array($tags) && !isEmptyArray($tags))
+		{
+			$tags = array_keys($tags);
+
+			foreach ($tags as $key => $tag)
+			{
+				$tags[$key] = $this->db->escape($tag);
+			}
+
+			$whereTags = " AND tbl_notiz_typ.typ_kurzbz IN (" . implode(",", $tags) . ")";
+		}
+
 		return "tag_data_agg AS (
 					SELECT
 						lehreinheit_id,
-						COALESCE(json_agg(tag ORDER BY id), '[]'::json) AS tags
+						COALESCE(json_agg(tag ORDER BY done), '[]'::json) AS tags
 					FROM (
 							SELECT DISTINCT ON (public.tbl_notiz.notiz_id)
 								tbl_notiz.notiz_id AS id,
@@ -705,8 +721,9 @@ EOSQL;
 							FROM public.tbl_notizzuordnung
 								JOIN public.tbl_notiz ON tbl_notizzuordnung.notiz_id = tbl_notiz.notiz_id
 								JOIN public.tbl_notiz_typ ON tbl_notiz.typ = tbl_notiz_typ.typ_kurzbz
-							WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehreinheiten)
-						) AS tag
+							WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehreinheiten)"
+								. $whereTags.
+						") AS tag
 					GROUP BY lehreinheit_id
 				)";
 	}
