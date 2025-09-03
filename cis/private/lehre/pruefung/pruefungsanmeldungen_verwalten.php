@@ -252,7 +252,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 				headers: {
 					0: { sorter: false },
 					3: { sorter: 'shortDate',
-						dateFormat: 'ddmmyyyy' },
+						dateFormat: 'dd.mm.yyyy' },
 					4: { sorter: 'time' },
 					5: { sorter: 'time' }
 				}
