@@ -1,4 +1,3 @@
-import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeStudentDetail.js";
 import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
@@ -7,8 +6,9 @@ import BsModal from "../../Bootstrap/Modal.js";
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
+		Accordion: primevue.accordion,
+		AccordionTab: primevue.accordiontab,
 		BsModal,
-		CoreFilterCmpt,
 		AbgabeDetail,
 		VerticalSplit
 	},
@@ -34,117 +34,113 @@ export const AbgabetoolStudent = {
 	data() {
 		return {
 			notenOptions: null,
-			tabulatorUuid: Vue.ref(0),
 			domain: '',
 			student_uid: null,
 			detail: null,
 			projektarbeiten: null,
 			selectedProjektarbeit: null,
-			tableBuiltResolve: null,
-			tableBuiltPromise: null,
-			dataProcessedPromise: null,
-			dataProcessedResolve: null,
-			abgabeTableOptions: {
-				minHeight: 250,
-				index: 'projektarbeit_id',
-				layout: 'fitColumns',
-				responsiveLayout: "collapse",
-				placeholder: this.$p.t('global/noDataAvailable'),
-				columns: [
-					{
-						formatter:"responsiveCollapse",
-						width:30, minWidth:30, hozAlign:"center", resizable:false, headerSort:false
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details',
-						formatter: this.detailFormatter,
-						widthGrow: 1, tooltip: false
-						, responsive: 0, minWidth: 80
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung',
-						formatter: this.beurteilungFormatter,
-						widthGrow: 1, tooltip: false
-						, responsive: 0, minWidth: 80
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem',
-						formatter: this.centeredTextFormatter,
-						widthGrow: 1
-						, responsive: 5, minWidth: 120
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg',
-						formatter: this.centeredTextFormatter,
-						widthGrow: 1
-						, responsive: 6, minWidth: 120
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail',
-						formatter: this.mailFormatter,
-						widthGrow: 1
-						, responsive: 0, minWidth: 80
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4betreuer')), field: 'betreuer',
-						formatter: this.centeredTextFormatter,
-						widthGrow: 2
-						, responsive: 7, minWidth: 300
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'typ',
-						formatter: this.centeredTextFormatter,
-						widthGrow: 1
-						, responsive: 8, minWidth: 200
-					},
-					{
-						title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', 
-						formatter: this.centeredTextFormatter,
-						widthGrow: 8
-						, responsive: 1, minWidth: 420
-					}
-				],
-				persistence: false,
-			},
-			abgabeTableEventHandlers: [
-			{
-				event: "tableBuilt",
-				handler: async () => {
-					this.tableBuiltResolve()
-				}
-			},
-			{
-				event: "dataProcessed",
-				handler: async () => {
-					console.log('dataProcessed event')
-					this.dataProcessedResolve()
-				}
-			},
-			{
-				event: "cellClick",
-				handler: async (e, cell) => {
-					
-					if(cell.getColumn().getField() === "details") {
-						const val = cell.getValue()
-						
-						if(val.mode === 'detailTermine') {
-							this.setDetailComponent(cell.getValue())
-						} else if (val.mode === 'beurteilungDownload') {
-							const pdfExportLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
-							// const pdfExportLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
-							window.open(pdfExportLink, '_blank')
-						}
-
-					} else if (cell.getColumn().getField() === "beurteilung") {
-						const val = cell.getValue()
-						
-						if(val != '-') window.open(val, '_blank')
-					} 
-					e.stopPropagation()
-
-				}
-			}
-			]};
+			// abgabeTableOptions: {
+			// 	minHeight: 250,
+			// 	index: 'projektarbeit_id',
+			// 	layout: 'fitColumns',
+			// 	responsiveLayout: "collapse",
+			// 	placeholder: this.$p.t('global/noDataAvailable'),
+			// 	columns: [
+			// 		{
+			// 			formatter:"responsiveCollapse",
+			// 			width:30, minWidth:30, hozAlign:"center", resizable:false, headerSort:false
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details',
+			// 			formatter: this.detailFormatter,
+			// 			widthGrow: 1, tooltip: false
+			// 			, responsive: 0, minWidth: 80
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung',
+			// 			formatter: this.beurteilungFormatter,
+			// 			widthGrow: 1, tooltip: false
+			// 			, responsive: 0, minWidth: 80
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem',
+			// 			formatter: this.centeredTextFormatter,
+			// 			widthGrow: 1
+			// 			, responsive: 5, minWidth: 120
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg',
+			// 			formatter: this.centeredTextFormatter,
+			// 			widthGrow: 1
+			// 			, responsive: 6, minWidth: 120
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail',
+			// 			formatter: this.mailFormatter,
+			// 			widthGrow: 1
+			// 			, responsive: 0, minWidth: 80
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4betreuer')), field: 'betreuer',
+			// 			formatter: this.centeredTextFormatter,
+			// 			widthGrow: 2
+			// 			, responsive: 7, minWidth: 300
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'typ',
+			// 			formatter: this.centeredTextFormatter,
+			// 			widthGrow: 1
+			// 			, responsive: 8, minWidth: 200
+			// 		},
+			// 		{
+			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', 
+			// 			formatter: this.centeredTextFormatter,
+			// 			widthGrow: 8
+			// 			, responsive: 1, minWidth: 420
+			// 		}
+			// 	],
+			// 	persistence: false,
+			// },
+			// abgabeTableEventHandlers: [
+			// {
+			// 	event: "tableBuilt",
+			// 	handler: async () => {
+			// 		this.tableBuiltResolve()
+			// 	}
+			// },
+			// {
+			// 	event: "dataProcessed",
+			// 	handler: async () => {
+			// 		console.log('dataProcessed event')
+			// 		this.dataProcessedResolve()
+			// 	}
+			// },
+			// {
+			// 	event: "cellClick",
+			// 	handler: async (e, cell) => {
+			//		
+			// 		if(cell.getColumn().getField() === "details") {
+			// 			const val = cell.getValue()
+			//			
+			// 			if(val.mode === 'detailTermine') {
+			// 				this.setDetailComponent(cell.getValue())
+			// 			} else if (val.mode === 'beurteilungDownload') {
+			// 				const pdfExportLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
+			// 				// const pdfExportLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
+			// 				window.open(pdfExportLink, '_blank')
+			// 			}
+			//
+			// 		} else if (cell.getColumn().getField() === "beurteilung") {
+			// 			const val = cell.getValue()
+			//			
+			// 			if(val != '-') window.open(val, '_blank')
+			// 		} 
+			// 		e.stopPropagation()
+			//
+			// 	}
+			// }
+			// ]
+		};
 	},
 	methods: {
 		checkQualityGates(termine) {
@@ -195,7 +191,6 @@ export const AbgabetoolStudent = {
 				// this.$refs.verticalsplit.showBoth()
 				
 			})
-			
 		},
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()
@@ -226,13 +221,6 @@ export const AbgabetoolStudent = {
 					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
 			} else return '-'
 		},
-		tableResolve(resolve) {
-			this.tableBuiltResolve = resolve
-		},
-		dataResolve(resolve) {
-			console.log('dataResolve')
-			this.dataProcessedResolve = resolve
-		},
 		buildMailToLink(projekt) {
 			if(projekt.mitarbeiter_uid) { // standard
 				return 'mailto:' + projekt.mitarbeiter_uid +'@'+ this.domain
@@ -244,10 +232,10 @@ export const AbgabetoolStudent = {
 			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		async setupData(data){
-			this.projektarbeiten = data[0]
+			// this.projektarbeiten = data[0]
 			this.domain = data[1]
 			this.student_uid = data[2]
-			const d = data[0]?.map(projekt => {
+			this.projektarbeiten = data[0]?.map(projekt => {
 				let mode = 'detailTermine'
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
@@ -257,6 +245,7 @@ export const AbgabetoolStudent = {
 				}
 				
 				return {
+					...projekt,
 					details: {
 						student_uid: this.student_uid,
 						projektarbeit_id: projekt.projektarbeit_id,
@@ -273,23 +262,6 @@ export const AbgabetoolStudent = {
 					titel: projekt.titel
 				}
 			})
-
-			// this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
-			this.$refs.abgabeTable.tabulator.setData(d);
-			await this.dataProcessedPromise
-
-
-			// TODO: proper event handling cleanup
-			
-			// todo in general fix this nasty race condition
-			const t = this.$refs.abgabeTable.tabulator;
-			t.on("renderComplete", () => {
-				// only if container width is small enough to trigger collapse
-				if (t.element.offsetWidth < 600 || this.isMobile) {
-					t.setColumns(t.getColumnDefinitions());
-					t.redraw(true)
-				}
-			});
 			
 		},
 		loadProjektarbeiten() {
@@ -306,33 +278,15 @@ export const AbgabetoolStudent = {
 					})
 			})	
 		},
-		handleUuidDefined(uuid) {
-			this.tabulatorUuid = uuid
-		},
-		calcMaxTableHeight() {
-			const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
-			const tableDataSet = document.getElementById('filterTableDataset' + tableID);
-			if(!tableDataSet) return
-			const rect = tableDataSet.getBoundingClientRect();
-
-			this.abgabeTableOptions.height = window.visualViewport.height - rect.top - 100
-			this.$refs.abgabeTable.tabulator.setHeight(this.abgabeTableOptions.height)
-		},
 		async setupMounted() {
-			this.tableBuiltPromise = new Promise(this.tableResolve)
-			this.dataProcessedPromise = new Promise(this.dataResolve)
-			await this.tableBuiltPromise
-			// this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.loadProjektarbeiten()
-			
-
-			// window.addEventListener("resize", this.redrawHandler);
-			// this.$refs.verticalsplit.collapseBottom()
 		},
-		redrawHandler() {
-			console.log('redrawHandler')
-			this.$refs.abgabeTable?.tabulator.setColumns(this.$refs.abgabeTable?.tabulator.getColumnDefinitions())
-			this.$refs.abgabeTable?.tabulator.redraw(true)
+		getAccTabHeaderForProjektarbeit(projektarbeit) {
+			let title = ''
+			
+			title += projektarbeit.titel
+			
+			return title
 		}
 	},
 	watch: {
@@ -355,9 +309,6 @@ export const AbgabetoolStudent = {
 	mounted() {
 		this.setupMounted()
 	},
-	unmounted() {
-		// window.removeEventListener("resize", this.redrawHandler);
-	},
 	template: `
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
@@ -375,16 +326,66 @@ export const AbgabetoolStudent = {
 	
 	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
 	<hr>
-		
-	 <core-filter-cmpt
-		@uuidDefined="handleUuidDefined"
-		:title="''"  
-		ref="abgabeTable" 
-		:tabulator-options="abgabeTableOptions"  
-		:tabulator-events="abgabeTableEventHandlers"
-		tableOnly
-		:sideMenu="false"
-	 />
+	
+	<div v-if="projektarbeiten === null || projektarbeiten === []">
+		Keine Projektarbeiten gefunden!
+	</div>
+	
+	<Accordion :multiple="true" :activeIndex="[0]">
+		<template v-for="projektarbeit in projektarbeiten">
+			<AccordionTab :header="getAccTabHeaderForProjektarbeit(projektarbeit)" style="padding: 0px;">
+					
+				<div class="row">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4details')}}</div>
+					<div class="col-8 col-md-9">
+						<button @click="setDetailComponent(projektarbeit.details)" class="btn btn-primary">
+							Projektdetails öffnen <a><i class="fa fa-folder-open"></i></a>
+						</button>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4beurteilung')}}</div>
+					<div class="col-8 col-md-9">
+						<a v-if="projektarbeit.beurteilung"><i class="fa fa-file-pdf" style="color:#00649C"></i></a>
+						<a v-else>Keine Beurteilung vorhanden</a>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4sem')}}</div>
+					<div class="col-8 col-md-9">
+						{{ projektarbeit.sem }}
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4stg')}}</div>
+					<div class="col-8 col-md-9">
+						<div class="col-1 d-flex justify-content-start align-items-start">
+							{{ projektarbeit.stg }}
+						</div>
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuer')}}</div>
+					<div class="col-8 col-md-9">
+						{{ projektarbeit.betreuer }}
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4projekttyp')}}</div>
+					<div class="col-8 col-md-9">
+						{{ projektarbeit.projekttypbezeichnung }}					
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4titel')}}</div>
+					<div class="col-8 col-md-9">
+						{{ projektarbeit.titel }}	
+					</div>
+				</div>
+			</AccordionTab>
+		</template>
+	</Accordion>
+	
     `,
 };
 

@@ -205,21 +205,23 @@ export const AbgabetoolMitarbeiter = {
 				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
 				pa.isCurrent = res.data[1]
-				pa.abgabetermine.push({ // new abgatermin row
-
-					'paabgabe_id': -1,
-					'projektarbeit_id': pa.projektarbeit_id,
-					'fixtermin': false,
-					'kurzbz': '',
-					'datum': new Date().toISOString().split('T')[0],
-					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-					'upload_allowed': false,
-					'paabgabetyp_kurzbz': '',
-					'bezeichnung': '',
-					'abgabedatum': null,
-					'insertvon': this.viewData?.uid ?? ''
-					
-				})
+				
+				// pa.abgabetermine.push({ // new abgatermin row
+				//
+				// 	'paabgabe_id': -1,
+				// 	'projektarbeit_id': pa.projektarbeit_id,
+				// 	'fixtermin': false,
+				// 	'kurzbz': '',
+				// 	'datum': new Date().toISOString().split('T')[0],
+				// 	'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+				// 	'upload_allowed': false,
+				// 	'paabgabetyp_kurzbz': '',
+				// 	'bezeichnung': '',
+				// 	'abgabedatum': null,
+				// 	'insertvon': this.viewData?.uid ?? ''
+				//	
+				// })
+				
 				pa.abgabetermine.forEach(termin => {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
@@ -237,8 +239,6 @@ export const AbgabetoolMitarbeiter = {
 				this.selectedProjektarbeit = pa
 				
 				this.$refs.modalContainerAbgabeDetail.show()
-				// this.$refs.verticalsplitthis.$refs.verticalsplit.showBoth()
-				
 			
 			})
 		},
@@ -459,54 +459,43 @@ export const AbgabetoolMitarbeiter = {
 		<!--	low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways	-->
 		<div style="max-height:40vw;"> 
 		
-<!--			<vertical-split ref="verticalsplit">		-->
-<!--				-->
-<!--				<template #top>-->
-					<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
-					<hr>
-					<core-filter-cmpt
-						:title="''"  
-						@uuidDefined="handleUuidDefined"
-						ref="abgabeTable"
-						:newBtnShow="true"
-						:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
-						:newBtnDisabled="!selectedData.length"
-						@click:new=openAddSeriesModal
-						:tabulator-options="abgabeTableOptions"  
-						:tabulator-events="abgabeTableEventHandlers"
-						tableOnly
-						:sideMenu="false"
-						:useSelectionSpan="false"
-					>
-						<template #actions>
-							<button @click="toggleShowAll(!showAll)" role="button" class="btn btn-secondary ml-2">
-								<i v-show="!showAll" class="fa fa-eye"></i>
-								<i v-show="showAll" class="fa fa-eye-slash"></i>
-								{{ $p.t('abgabetool/showAll') }}
-							</button>
-							
-							<button @click="showDeadlines" role="button" class="btn btn-secondary ml-2">
-								<i class="fa fa-hourglass-end"></i>
-								{{ $p.t('abgabetool/showDeadlines') }}
-							</button>
-							
-							<div v-show="saving">
-								{{ $p.t('abgabetool/currentlySaving') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-							</div>
-							<div v-show="loading">
-								{{ $p.t('abgabetool/currentlyLoading') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-							</div>
-							
-						</template>
-					</core-filter-cmpt>
-	
-<!--				</template>-->
-<!--				<template #bottom>-->
-<!--					<div v-show="selectedProjektarbeit" ref="selProj"> -->
-<!--						<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>-->
-<!--					</div>-->
-<!--				</template>-->
-<!--			</vertical-split>-->
+			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+			<hr>
+			<core-filter-cmpt
+				:title="''"  
+				@uuidDefined="handleUuidDefined"
+				ref="abgabeTable"
+				:newBtnShow="true"
+				:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
+				:newBtnDisabled="!selectedData.length"
+				@click:new=openAddSeriesModal
+				:tabulator-options="abgabeTableOptions"  
+				:tabulator-events="abgabeTableEventHandlers"
+				tableOnly
+				:sideMenu="false"
+				:useSelectionSpan="false"
+			>
+				<template #actions>
+					<button @click="toggleShowAll(!showAll)" role="button" class="btn btn-secondary ml-2">
+						<i v-show="!showAll" class="fa fa-eye"></i>
+						<i v-show="showAll" class="fa fa-eye-slash"></i>
+						{{ $p.t('abgabetool/showAll') }}
+					</button>
+					
+					<button @click="showDeadlines" role="button" class="btn btn-secondary ml-2">
+						<i class="fa fa-hourglass-end"></i>
+						{{ $p.t('abgabetool/showDeadlines') }}
+					</button>
+					
+					<div v-show="saving">
+						{{ $p.t('abgabetool/currentlySaving') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+					</div>
+					<div v-show="loading">
+						{{ $p.t('abgabetool/currentlyLoading') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+					</div>
+					
+				</template>
+			</core-filter-cmpt>
 		
 		</div>
     `,

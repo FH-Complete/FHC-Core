@@ -485,6 +485,7 @@ class Abgabe extends FHCAPI_Controller
 		$fixtermin = $_POST['fixtermin'];
 		$kurzbz = $_POST['kurzbz'];
 		$note = $_POST['note'];
+		$notiz = $_POST['notiz'];
 		$upload_allowed = $_POST['upload_allowed'];
 		$betreuer_person_id = $_POST['betreuer_person_id'];
 
@@ -506,6 +507,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
+					'notiz' => $notiz,
 					'upload_allowed' => $upload_allowed,
 					'insertvon' => getAuthUID(),
 					'insertamum' => date('Y-m-d H:i:s')
@@ -521,6 +523,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
+					'notiz' => $notiz,
 					'upload_allowed' => $upload_allowed,
 					'updatevon' => getAuthUID(),
 					'updateamum' => date('Y-m-d H:i:s')

@@ -241,10 +241,9 @@ export const AbgabeStudentDetail = {
 				<p> {{projektarbeit?.titel}}</p>
 			</div>
 			
-<!--			 TODO: arrange this properly in mobile view, left col is a bit tight and all-->
-			<Accordion ref="accordion" :multiple="true" :activeIndex="[0]">
+			<Accordion :multiple="true" :activeIndex="[0]">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
-					<AccordionTab :header="getAccTabHeaderForTermin(termin)" style="padding: 0px;" :pt="tabPassthroughStyle">
+					<AccordionTab :header="getAccTabHeaderForTermin(termin)" style="padding: 0px;">
 							
 						<div class="row">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>

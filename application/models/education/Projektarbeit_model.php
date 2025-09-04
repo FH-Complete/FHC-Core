@@ -169,6 +169,7 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabe.datum,
 					campus.tbl_paabgabe.note,
 					campus.tbl_paabgabe.upload_allowed,
+					campus.tbl_paabgabe.notiz,
 					campus.tbl_paabgabetyp.paabgabetyp_kurzbz, 
 					campus.tbl_paabgabetyp.bezeichnung, 
 					campus.tbl_paabgabe.abgabedatum,
