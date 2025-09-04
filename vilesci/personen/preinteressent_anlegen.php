@@ -140,7 +140,6 @@ function disablefields(obj)
 	document.getElementById('vorname').disabled=val;
 	document.getElementById('geschlecht').disabled=val;
 	document.getElementById('geburtsdatum').disabled=val;
-	document.getElementById('svnr').disabled=val;
 	document.getElementById('ersatzkennzeichen').disabled=val;
 	//document.getElementById('adresse').disabled=val;
 	//document.getElementById('plz').disabled=val;
@@ -156,21 +155,6 @@ function disablefields(obj)
 		document.getElementById('ueb1').style.display = 'none';
 		document.getElementById('ueb2').style.display = 'none';
 		document.getElementById('ueb3').style.display = 'none';
-	}
-}
-
-function GeburtsdatumEintragen()
-{
-	svnr = document.getElementById('svnr').value;
-	gebdat = document.getElementById('geburtsdatum');
-	
-	if(svnr.length==10 && gebdat.value=='')
-	{
-		var tag = svnr.substr(4,2);
-		var monat = svnr.substr(6,2);
-		var jahr = svnr.substr(8,2);
-		
-		gebdat.value='19'+jahr+'-'+monat+'-'+tag;
 	}
 }
 
@@ -368,7 +352,6 @@ $email = (isset($_REQUEST['email'])?$_REQUEST['email']:'');
 $telefon = (isset($_REQUEST['telefon'])?$_REQUEST['telefon']:'');
 $mobil = (isset($_REQUEST['mobil'])?$_REQUEST['mobil']:'');
 $person_id = (isset($_REQUEST['person_id'])?$_REQUEST['person_id']:'');
-$svnr = (isset($_REQUEST['svnr'])?$_REQUEST['svnr']:'');
 $ersatzkennzeichen = (isset($_REQUEST['ersatzkennzeichen'])?$_REQUEST['ersatzkennzeichen']:'');
 $ueberschreiben = (isset($_REQUEST['ueberschreiben'])?$_REQUEST['ueberschreiben']:'');
 
@@ -413,7 +396,6 @@ if(isset($_POST['save']))
 		$person->geschlecht = $geschlecht;
 		$person->gebdatum = $datum_obj->formatDatum($geburtsdatum,'Y-m-d');
 		$person->staatsbuergerschaft = $nation;
-		$person->svnr = $svnr;
 		$person->ersatzkennzeichen = $ersatzkennzeichen;
 		$person->aktiv = true;
 		$person->insertamum = date('Y-m-d H:i:s');
@@ -689,7 +671,6 @@ if($result = $db->db_query($qry))
 }
 echo '</SELECT>';
 echo '</td></tr>';
-echo '<tr><td>SVNR</td><td><input type="text" id="svnr" size="10" maxlength="10" name="svnr" value="'.$svnr.'" onblur="GeburtsdatumEintragen()" /></td></tr>';
 echo '<tr><td>Ersatzkennzeichen</td><td><input type="text" id="ersatzkennzeichen" size="10" maxlength="10" name="ersatzkennzeichen" value="'.$ersatzkennzeichen.'" /></td></tr>';
 echo '<tr><td>Geburtsdatum</td><td><input type="text" id="geburtsdatum" size="10" maxlength="10" name="geburtsdatum" value="'.$geburtsdatum.'" /> (Format dd.mm.JJJJ)</td></tr>';
 echo '<tr><td>Geburtsort</td><td><input type="text" id="gebort" size="30" maxlength="255" name="gebort" value="'.$gebort.'" /></td></tr>';
@@ -884,7 +865,7 @@ if($where!='')
 		$stg_obj = new studiengang();
 		$stg_obj->getAll('typ, kurzbz', false);
 		
-		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>SVNR</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
+		echo '<table><tr><th></th><th>Nachname</th><th>Vorname</th><th>GebDatum</th><th>Geschlecht</th><th>Adresse</th><th>Status</th><th>Details</th></tr>';
 		while($row = $db->db_fetch_object($result))
 		{
 			$status = '';
@@ -905,7 +886,7 @@ if($where!='')
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
 			
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->gebdatum</td><td>".((strpos($status, 'Mitarbeiter') !== false) ? $row->svnr : '')."</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id='$row->person_id'";
 			if($result_adr = $db->db_query($qry_adr))
 				while($row_adr=$db->db_fetch_object($result_adr))
