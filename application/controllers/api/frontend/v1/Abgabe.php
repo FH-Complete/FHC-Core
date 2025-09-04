@@ -140,13 +140,16 @@ class Abgabe extends FHCAPI_Controller
 
 		$projektarbeiten = getData($result);
 		
-		// TODO: save access to this, array could be empty
-		foreach($projektarbeiten as $pa) {
-			$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
-			
-			// TODO: save access
-			$pa->email = getData($result)[0]->private_email;
+		if(count($projektarbeiten)) {
+			// TODO: save access to this, array could be empty
+			foreach($projektarbeiten as $pa) {
+				$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
+
+				// TODO: save access
+				$pa->email = getData($result)[0]->private_email;
+			}
 		}
+		
 
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN, $uid));
 	}

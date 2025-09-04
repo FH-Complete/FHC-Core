@@ -12,6 +12,7 @@ export const AbgabetoolStudent = {
 		AbgabeDetail,
 		VerticalSplit
 	},
+	inject: ['isMobile'],
 	provide() {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions)
@@ -41,6 +42,8 @@ export const AbgabetoolStudent = {
 			selectedProjektarbeit: null,
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
+			dataProcessedPromise: null,
+			dataProcessedResolve: null,
 			abgabeTableOptions: {
 				minHeight: 250,
 				index: 'projektarbeit_id',
@@ -103,10 +106,18 @@ export const AbgabetoolStudent = {
 				],
 				persistence: false,
 			},
-			abgabeTableEventHandlers: [{
+			abgabeTableEventHandlers: [
+			{
 				event: "tableBuilt",
 				handler: async () => {
 					this.tableBuiltResolve()
+				}
+			},
+			{
+				event: "dataProcessed",
+				handler: async () => {
+					console.log('dataProcessed event')
+					this.dataProcessedResolve()
 				}
 			},
 			{
@@ -218,6 +229,10 @@ export const AbgabetoolStudent = {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
+		dataResolve(resolve) {
+			console.log('dataResolve')
+			this.dataProcessedResolve = resolve
+		},
 		buildMailToLink(projekt) {
 			if(projekt.mitarbeiter_uid) { // standard
 				return 'mailto:' + projekt.mitarbeiter_uid +'@'+ this.domain
@@ -228,7 +243,7 @@ export const AbgabetoolStudent = {
 		buildBetreuer(abgabe) {
 			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
-		setupData(data){
+		async setupData(data){
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			this.student_uid = data[2]
@@ -259,13 +274,23 @@ export const AbgabetoolStudent = {
 				}
 			})
 
-			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
+			// this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.$refs.abgabeTable.tabulator.setData(d);
+			await this.dataProcessedPromise
 
-			Vue.nextTick(()=>{
-				this.$refs.abgabeTable?.tabulator.setColumns(this.$refs.abgabeTable?.tabulator.getColumnDefinitions())
 
-			})
+			// TODO: proper event handling cleanup
+			
+			// todo in general fix this nasty race condition
+			const t = this.$refs.abgabeTable.tabulator;
+			t.on("renderComplete", () => {
+				// only if container width is small enough to trigger collapse
+				if (t.element.offsetWidth < 600 || this.isMobile) {
+					t.setColumns(t.getColumnDefinitions());
+					t.redraw(true)
+				}
+			});
+			
 		},
 		loadProjektarbeiten() {
 			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
@@ -295,8 +320,9 @@ export const AbgabetoolStudent = {
 		},
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
+			this.dataProcessedPromise = new Promise(this.dataResolve)
 			await this.tableBuiltPromise
-			
+			// this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.loadProjektarbeiten()
 			
 
@@ -338,7 +364,7 @@ export const AbgabetoolStudent = {
 		dialogClass="modal-fullscreen">
 		<template v-slot:title>
 			<div>
-				abgabe detail wtb phrasen
+				abgabe detail todo phrasen
 			</div>
 		</template>
 		<template v-slot:default>

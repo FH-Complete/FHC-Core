@@ -233,6 +233,7 @@ const app = Vue.createApp({
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			renderers: Vue.computed(() => this.renderers),
+			isMobile: this.isMobile
 		}	
 	},
 	methods: {
