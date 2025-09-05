@@ -455,19 +455,19 @@ class VertragsbestandteilLib
 	    $result = $this->endDienstverhaeltnis($dv, $enddate);
 	    if ( $result === true)
 	    {
-		if (!$deactivate) return $result;
+			if (!$deactivate) return $result;
 
-		if(!$this->hasOtherActiveDV($dv, $enddate))
-		{
-		    $result = $this->BenutzerModel->update(
-			array('uid' => $dv->getMitarbeiter_uid()),
-			array(
-			    'aktiv' => false,
-			    'updateaktivam' => date('Y-m-d'),
-			    'updateaktivvon' => $this->loggedInUser
-			)
-		    );
-		}
+			if(!$this->hasOtherActiveDV($dv, $enddate))
+			{
+				$result = $this->BenutzerModel->update(
+				array('uid' => $dv->getMitarbeiter_uid()),
+				array(
+					'aktiv' => false,
+					'updateaktivam' => date('Y-m-d'),
+					'updateaktivvon' => $this->loggedInUser
+				)
+				);
+			}
 	    }
 
 	    return $result;
@@ -478,6 +478,10 @@ class VertragsbestandteilLib
 		if( $dv->getBis() !== null && $dv->getBis() < $enddate )
 		{
 			return 'Dienstverhältnis ist bereits beendet.';
+		} 
+		else if ( $dv->getVon() > $enddate )
+		{
+			return 'Dienstverhältnis hat noch nicht begonnen.';
 		}
 
 		$this->CI->db->trans_begin();
