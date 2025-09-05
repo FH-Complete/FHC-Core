@@ -56,9 +56,9 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Bezeichnung", field: "bezeichnung", width: 150},
+					{title: "Bezeichnung", field: "bezeichnung", width: 300},
 					{
-						title: "Betrag", field: "betrag", width: 150,
+						title: "Betrag", field: "betrag", width: 100,
 						formatter: function (cell) {
 							let value = cell.getValue();
 
@@ -69,7 +69,7 @@ export default {
 						}
 					},
 					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125},
-					{title: "Status", field: "status"},
+					{title: "Status", field: "status", width: 100},
 					{
 						title: "Vertragsdatum",
 						field: "vertragsdatum",
@@ -137,9 +137,10 @@ export default {
 				persistence: {
 					sort: true,
 					page: true,
+					columns: true,
 					filter: false //to avoids js errors
 				},
-				persistenceID: 'core-contracts'
+				persistenceID: 'core-contracts-20250905'
 			},
 			tabulatorEvents: [
 				{
@@ -522,10 +523,10 @@ export default {
 	},
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
-	
+
 		<!--	injected print functionality for KU Linz (printHonorarvertrag)  -->
 	   <template v-if="arraySelectedContracts.length >= 2" class="container mt-2">
-		 
+
 		   <div v-for="item in arraySelectedContracts" :key="item[0]">
 			  <input
 				class="form-control"
@@ -536,7 +537,7 @@ export default {
 			  >
 			</div>
 		</template>
-		
+
 		<template v-if="arraySelectedContracts.length >= 2" class="d-flex">
 			<div class="ms-auto mt-2">
 				<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
@@ -544,8 +545,8 @@ export default {
 			</div>
 		</template>
 
-	<hr> 
-		
+	<hr>
+
 <!--	filter: open means no status abgerechnet yet-->
 		<div class="justify-content-end pb-3">
 			<form-input
@@ -557,7 +558,7 @@ export default {
 				>
 			</form-input>
 		</div>
-		
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -570,7 +571,7 @@ export default {
 			@click:new="actionNewContract"
 			>
 		</core-filter-cmpt>
-		
+
 		<div class="row">
 			<div class="col-sm-6">
 				<!-- ContractDetails -->
@@ -587,7 +588,7 @@ export default {
 			</div>
 			<div class="col-sm-6">
 				<!-- ContractStati -->
-				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">      
+				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">
 					<contract-stati
 						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
@@ -603,14 +604,14 @@ export default {
 				</div>
 			</div>
 		</div>
-		
+
 		<!--Modal: contractModal-->
 			<bs-modal ref="contractModal" dialog-class="modal-xl">
 				<template #title>
 					<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('vertrag', 'addVertrag')}}</p>
 					<p v-else class="fw-bold mt-3">{{$p.t('vertrag', 'editVertrag')}}</p>
 				</template>
-				
+
 					<list-unassigned
 						:person_id="person_id"
 						:endpoint="endpoint"
@@ -634,7 +635,7 @@ export default {
 								>
 							</form-input>
 						</div>
-						
+
 						<div class="row mb-3">
 							<form-input
 								type="text"
@@ -699,7 +700,7 @@ export default {
 							</form-input>
 						</div>
 					</core-form>
-				
+
 				<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 					<button type="button" class="btn btn-primary" :disabled="!this.hasSchreibrechte" @click="statusNew ? addNewContract() : updateContract(formData.vertrag_id)">{{$p.t('vertrag', 'vertragErstellen')}}</button>
@@ -708,4 +709,3 @@ export default {
 
 	</div>`
 }
-

@@ -45,33 +45,33 @@ export default {
 		<!-- Navigation component -->
 		<core-navigation-cmpt/>
 
-		<div class="vv">
-				<vertical-split ref="vsplit">
-					<template #top>	
-						<div class="d-flex flex-column" style="height: 100%;">
-							<mitarbeiter-header
-								:endpoint="endpoint"
-								:domain="config.domain"
-								@selectionChanged="handleSelection"
-								/>
-						</div>
-					</template>
-					<template #bottom>
-						<div class="col" v-if="person_id!=null">
-							<fhc-header
-								:person_id="person_id"
-								:mitarbeiter_uid="this.mitarbeiter_uid"
-								typeHeader="mitarbeiter"
-								@redirectToLeitung="redirectToLeitung"
-							></fhc-header>
-							<vertraege-mitarbeiter
-								:endpoint="endpoint"
-								:person_id="this.person_id"
-								:mitarbeiter_uid="this.mitarbeiter_uid"
-								/>
-						</div>
-					</template>
-				</vertical-split>
+		<div id="content">
+			<vertical-split ref="vsplit">
+				<template #top>
+					<div class="d-flex flex-column" style="height: 100%;">
+						<mitarbeiter-header
+							:endpoint="endpoint"
+							:domain="config.domain"
+							@selectionChanged="handleSelection"
+							/>
+					</div>
+				</template>
+				<template #bottom>
+					<div class="col" v-if="person_id!=null">
+						<fhc-header
+							:person_id="person_id"
+							:mitarbeiter_uid="this.mitarbeiter_uid"
+							typeHeader="mitarbeiter"
+							@redirectToLeitung="redirectToLeitung"
+						></fhc-header>
+						<vertraege-mitarbeiter
+							:endpoint="endpoint"
+							:person_id="this.person_id"
+							:mitarbeiter_uid="this.mitarbeiter_uid"
+							/>
+					</div>
+				</template>
+			</vertical-split>
 		</div>
 		`
 }

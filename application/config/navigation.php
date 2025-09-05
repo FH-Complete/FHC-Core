@@ -334,3 +334,14 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 	),
 
 );
+
+$config['navigation_menu']['vertragsverwaltung/*'] = array(
+	'vertragsverwaltung' => array(
+		'link' => site_url('vertragsverwaltung'),
+		'description' => 'Vertragsverwaltung',
+		'icon' => 'home',
+		'sort' => 100,
+		'target' => '_blank',
+		'requiredPermissions' => array('vertrag/mitarbeiter:r')
+	)
+);

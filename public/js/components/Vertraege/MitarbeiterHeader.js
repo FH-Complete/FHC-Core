@@ -61,24 +61,9 @@ export default {
 					{title: "Unternehmen", field: "unternehmen", visible: false, headerFilter: "input"},
 					{title: "Vertragsarten", field: "vertragsarten", visible: true, headerFilter: "input"},
 					{title: "Ids Dienstverträge", field: "ids", visible: true, headerFilter: "input"},
-					{
-						title: "email", field: "email", headerFilter: "input",
-						visible: false,
-						formatter: (cell, formatterParams, onRendered) => {
-
-							let email = cell.getValue() + '@';
-
-							let container = document.createElement('div');
-							container.className = "d-flex";
-							container.append(email);
-							container.append(cell.getData().emailDomain);
-							return container;
-						},
-					},
-					{title: "Filter aktiv/all", field: "aktiv_status", visible:false, headerFilter: "input"}
 				],
 				layout: 'fitColumns',
-				persistenceID: 'core-mitarbeiter_20250901',
+				persistenceID: 'core-mitarbeiter_20250901-2',
 				footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 				selectableRangeMode: 'click',
 				selectable: true,
@@ -91,9 +76,7 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-
 						await this.$p.loadCategory(['person', 'global', 'vertrag']);
-
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('uid').component.updateDefinition({
@@ -144,11 +127,6 @@ export default {
 					handler: (data) => {
 						let el = document.getElementById("total_count");
 						el.innerHTML = data.length;
-
-						this.tabulatorData = data.map(item => {
-							item.emailDomain = document.createElement('div');
-							return item;
-						});
 					}
 				},
 			],
@@ -158,17 +136,19 @@ export default {
 	},
 	methods: {
 		rowSelectionChanged(data) {
-			this.selectedPerson = data[0].person_id;
-			this.selectedUid = data[0].uid;
+				if(typeof data[0] != 'undefined')
+				{
+					this.selectedPerson = data[0].person_id;
+					this.selectedUid = data[0].uid;
 
-			this.$emit('selectionChanged', {
-				person_id: this.selectedPerson,
-				uid: this.selectedUid
-			});
+					this.$emit('selectionChanged', {
+						person_id: this.selectedPerson,
+						uid: this.selectedUid
+					});
+				}
 		},
 	},
 	template: `
-		
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -177,11 +157,5 @@ export default {
 			:side-menu="false"
 			>
 		</core-filter-cmpt>
-
-		<Teleport v-for="data in tabulatorData" :key="data.uid" :to="data.emailDomain">
-			{{domain}}
-		</Teleport>
-
 `
 }
-
