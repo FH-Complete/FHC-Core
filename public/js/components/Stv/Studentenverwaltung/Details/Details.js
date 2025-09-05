@@ -319,16 +319,6 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						v-if="!config.hiddenFields.includes('svnr')"
-						container-class="col-4 stv-details-details-svnr"
-						:label="$p.t('person', 'svnr')"
-						type="text"
-						v-model="data.svnr"
-						name="svnr"
-						maxlength="16"
- 						>
-					</form-input>
-					<form-input
 						v-if="!config.hiddenFields.includes('ersatzkennzeichen')"
 						container-class="col-4 stv-details-details-ersatzkennzeichen"
 						:label="$p.t('person', 'ersatzkennzeichen')"
