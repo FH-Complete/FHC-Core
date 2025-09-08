@@ -51,7 +51,7 @@ class LvMenu extends FHCAPI_Controller
 
 		$this->load->library("PermissionLib", null, 'PermissionLib');
 
-		$this->load->library("PhrasesLib");
+		$this->load->library("PhrasesLib", null, 'PhrasesLib');
 		$this->loadPhrases(array('global', 'lehre'));
 	}
 
