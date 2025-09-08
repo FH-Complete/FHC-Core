@@ -25,6 +25,7 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
+			sdModel: [],
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
@@ -322,17 +323,6 @@ export const AbgabeMitarbeiterDetail = {
 				
 			</template>
 		</bs-modal>
-
-		<SpeedDial
-			@click="openCreateNewAbgabeModal"
-			:model="[]" 
-			direction="up"
-			type="linear"
-			showIcon="pi pi-plus"
-			hideIcon="pi pi-plus" 
-			:visible="true"
-			:style="getSpeedDialStyle"
-		/>
 
 		<div v-if="projektarbeit">
 			
