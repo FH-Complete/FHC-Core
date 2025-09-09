@@ -46,6 +46,9 @@ class Archiv extends FHCAPI_Controller
 		$this->load->model('crm/Akte_model', 'AkteModel');
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
+		// Load libraries
+		$this->load->library('AkteLib');
+
 		// Load language phrases
 		$this->loadPhrases([
 			'archiv'
@@ -74,7 +77,10 @@ class Archiv extends FHCAPI_Controller
 				$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		$result = $this->AkteModel->getArchiv($person_id);
+		$result = $this->aktelib->getByPersonId(
+			$person_id,
+			true // archiv
+		);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -105,53 +111,55 @@ class Archiv extends FHCAPI_Controller
 
 		if (!is_numeric($akte_id)) $this->terminateWithError('akte Id missing');
 
-		$result = $this->AkteModel->load($akte_id);
-
+		$result = $this->aktelib->getByAkteId($akte_id);
 
 		if (!hasData($result)) $this->terminateWithError('Akte not found');
 
-		$data = $this->getDataOrTerminateWithError($result);
+		$data = $this->getDataOrTerminateWithError($result)[0];
 
-		$data = getData($result)[0];
-		//$this->addMeta("daa", $data->inhalt);
-
-		$fileObj = new stdClass();
-		if (isset($data->inhalt) && $data->inhalt != '')
+		// If the file content is from the akte table or from the DMS
+		if (!isEmptyString($data->inhalt) || !isEmptyString($data->filename))
 		{
 			// Define handle to output stream
-			$tmpFilePointer   = fopen("php://output", 'w');
+			$tmpFilePointer = fopen("php://output", 'w');
 			$meta_data = stream_get_meta_data($tmpFilePointer);
 			$filename = $meta_data["uri"];
-			fwrite($tmpFilePointer, $data->inhalt);
+
+			// File content from akte...
+			if (!isEmptyString($data->inhalt))
+			{
+				// Writes into the output buffer
+				fwrite($tmpFilePointer, $data->inhalt);
+			}
+			else //...or from DMS
+			{
+				$this->load->model('content/DmsFS_model', 'DmsFSModel');
+
+				$fileHandleResult = $this->DmsFSModel->openRead($data->filename);
+				if (isError($fileHandleResult) || !hasData($fileHandleResult)) $this->terminateWithError('DMS is not able to load this file');
+
+				// Read blocks from the file and writes them into the output buffer
+				while (hasData($fileData = readBlock($fileHandleResult)))
+				{
+					fwrite($tmpFilePointer, $fileData);
+				}
+			}
+
+			fclose($tmpFilePointer);
 
 			header('Content-Description: File Transfer');
 			header('Content-Type: '. $data->mimetype);
 			header('Expires: 0');
 			header('Cache-Control: must-revalidate');
 			header('Pragma: public');
-			//header('Content-Length: ' . filesize($fileObj->file));
-			//header("Content-type: $data->mimetype");
 			header('Content-Disposition: attachment; filename="'.$data->titel.'"');
 			readfile($filename);
-			//echo base64_decode($data->inhalt);
 			die();
-			//~ $fileObj->file = $data->inhalt;
-			//~ $fileObj->name = $data->titel;
-			//~ $fileObj->mimetype = $data->mimetype;
-			//~ $fileObj->disposition = 'attachment';
 		}
 		else
 		{
-			$this->load->library('AkteLib');
-
-			$result = $this->aktelib->get($akte_id);
+			$this->terminateWithError('This file content is not available');
 		}
-
-	/*	$fileObj->filename
-	 * 	$fileObj->file
-	 * 	$fileObj->name
-	 * 	$fileObj->mimetype
-	 * 	$fileObj->disposition*/
 	}
 
 	/**

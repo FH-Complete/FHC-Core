@@ -20,7 +20,11 @@ class Documents extends Auth_Controller
 			'download' => [self::PERM_LOGGED]
 		]);
 
+		// Load models
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		// Load libraries
+		$this->load->library('AkteLib');
 
 		$this->loadPhrases([
 			'global',
@@ -112,10 +116,12 @@ class Documents extends Auth_Controller
 
 		$selfservice = null;
 		if (!defined('CIS_DOKUMENTE_SELFSERVICE') || CIS_DOKUMENTE_SELFSERVICE) {
-			$this->load->model('crm/Akte_model', 'AkteModel');
 			$selfservice = [];
 			foreach ($person_ids as $person_id) {
-				$result = $this->AkteModel->getArchiv($person_id, null, true);
+				$result = $this->aktelib->getByPersonId(
+					$person_id,
+					true
+				);
 				if (isError($result))
 					return $this->load->view('errors/html/error_db.php', [
 						'heading' => 'Database Error',
@@ -147,14 +153,13 @@ class Documents extends Auth_Controller
 		if (!is_numeric($akte_id))
 			return show_404();
 
-		$this->load->model('crm/Akte_model', 'AkteModel');
-		$result = $this->AkteModel->load($akte_id);
+		$result = $this->aktelib->getByPersonId($akte_id);
 		if (isError($result))
 			return show_error(getError($result));
 		$akte = getData($result);
 		if (!$akte)
 			return show_404();
-		$akte = current($akte);
+		$akte = reset($akte);
 
 		$admin_access = false;
 		if ($uid !== null && $this->permissionlib->isBerechtigt('admin')) {

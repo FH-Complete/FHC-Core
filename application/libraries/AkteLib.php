@@ -121,54 +121,32 @@ class AkteLib
 	 * Gets akte data and associated dms data by akte Id
 	 * Returns success with akte and dms data or error
 	 */
-	public function get($akte_id)
+	public function getByAkteId($akte_id, $archiv = null, $signiert = null, $stud_selfservice = null)
 	{
-		// get Akte data
-		$this->_ci->AkteModel->addSelect('person_id, dokument_kurzbz, mimetype, erstelltam, titel, bezeichnung,
-											gedruckt, uid, dms_id, nachgereicht, nachgereicht_am, anmerkung,
-											ausstellungsnation, formal_geprueft_amum, archiv, signiert,
-											stud_selfservice, akzeptiertamum, insertvon, insertamum, updatevon, updateamum');
-		$this->_ci->AkteModel->load($akte_id);
-		$akteResult = $this->_ci->AkteModel->load($akte_id);
+		return $this->_get(
+			$akte_id,
+			null, // person_id
+			null, // dokument_kurzbz
+			$archiv,
+			$signiert,
+			$stud_selfservice
+		);
+	}
 
-		if (isError($akteResult)) return $akteResult;
-
-		if (!hasData($akteResult)) return error("Akte not found");
-
-		$resultObject = getData($akteResult)[0];
-
-		// set properties with same name in Akte and Dms table
-		$resultObject->akte_mimetype = $resultObject->mimetype;
-
-		// get dms data
-		$dmsResult = $this->_ci->dmslib->getLastVersion($resultObject->dms_id);
-
-		if (isError($dmsResult)) return $dmsResult;
-
-		// properties to retrieve from dms
-		$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte', DmsLib::FILE_CONTENT_PROPERTY);
-
-		// set dms properties
-		if (hasData($dmsResult))
-		{
-			$dmsData = getData($dmsResult);
-
-			foreach ($dmsProperties as $dmsProperty)
-			{
-				$resultObject->{$dmsProperty} = $dmsData->{$dmsProperty};
-			}
-		}
-		else
-		{
-			// set null if no dms result found
-			foreach ($dmsProperties as $dmsProperty)
-			{
-				$resultObject->{$dmsProperty} = null;
-			}
-		}
-
-		// return the object containing akte and dms data
-		return success($resultObject);
+	/**
+	 * Gets Akte data and associated dms data by person Id
+	 * Returns success with result array with akte and dms data or error
+	 */
+	public function getByPersonId($person_id, $archiv = null, $signiert = null, $stud_selfservice = null)
+	{
+		return $this->_get(
+			null, // akte_id
+			$person_id,
+			null, // dokument_kurzbz
+			$archiv,
+			$signiert,
+			$stud_selfservice
+		);
 	}
 
 	/**
@@ -177,34 +155,14 @@ class AkteLib
 	 */
 	public function getByPersonIdAndDocumentType($person_id, $dokument_kurzbz)
 	{
-		// load all Akte entries for given person and dokument_kurzbz
-		$this->_ci->AkteModel->addSelect('akte_id');
-		$akteResult = $this->_ci->AkteModel->loadWhere(
-			array(
-				'person_id' => $person_id,
-				'dokument_kurzbz' => $dokument_kurzbz
-			)
+		return $this->_get(
+			null, // akte_id
+			$person_id,
+			$dokument_kurzbz,
+			$archiv,
+			$signiert,
+			$stud_selfservice
 		);
-
-		if (!hasData($akteResult)) return error("Akte not found");
-
-		$akteData = getData($akteResult);
-
-		$resultArr = array();
-
-		// for each found akte entry
-		foreach ($akteData as $akte)
-		{
-			// get dms and akte data from akte Id
-			$getAkteDmsResult = $this->get($akte->akte_id);
-
-			if (isError($getAkteDmsResult)) return $getAkteDmsResult;
-
-			$resultArr[] = getData($getAkteDmsResult);
-		}
-
-		// return all found entries
-		return success($resultArr);
 	}
 
 	/**
@@ -265,4 +223,99 @@ class AkteLib
 			return $removeAllResult;
 		}
 	}
+
+	/**
+	 *
+	 */
+	private function _get($akte_id = null, $person_id = null, $dokument_kurzbz = null, $archiv = null, $signiert = null, $stud_selfservice = null)
+	{
+		// get Akte data
+		$this->_ci->AkteModel->addSelect('akte_id');
+		$this->_ci->AkteModel->addSelect('person_id');
+		$this->_ci->AkteModel->addSelect('dokument_kurzbz');
+		$this->_ci->AkteModel->addSelect('inhalt');
+		$this->_ci->AkteModel->addSelect('CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden', false);
+		$this->_ci->AkteModel->addSelect('mimetype');
+		$this->_ci->AkteModel->addSelect('erstelltam');
+		$this->_ci->AkteModel->addSelect('gedruckt');
+		$this->_ci->AkteModel->addSelect('titel');
+		$this->_ci->AkteModel->addSelect('bezeichnung');
+		$this->_ci->AkteModel->addSelect('updateamum');
+		$this->_ci->AkteModel->addSelect('updatevon');
+		$this->_ci->AkteModel->addSelect('insertamum');
+		$this->_ci->AkteModel->addSelect('insertvon');
+		$this->_ci->AkteModel->addSelect('uid');
+		$this->_ci->AkteModel->addSelect('dms_id');
+		$this->_ci->AkteModel->addSelect('nachgereicht');
+		$this->_ci->AkteModel->addSelect('anmerkung');
+		$this->_ci->AkteModel->addSelect('titel_intern');
+		$this->_ci->AkteModel->addSelect('anmerkung_intern');
+		$this->_ci->AkteModel->addSelect('nachgereicht_am');
+		$this->_ci->AkteModel->addSelect('ausstellungsnation');
+		$this->_ci->AkteModel->addSelect('formal_geprueft_amum');
+		$this->_ci->AkteModel->addSelect('archiv');
+		$this->_ci->AkteModel->addSelect('signiert');
+		$this->_ci->AkteModel->addSelect('stud_selfservice');
+		$this->_ci->AkteModel->addSelect('akzeptiertamum');
+
+		// Query parameters
+		$paramArray = array();
+
+		// Key to access the table
+		if (is_int($akte_id) || is_array($akte_id)) $paramArray['akte_id'] = $akte_id;
+		if (is_int($person_id) || is_array($person_id)) $paramArray['person_id'] = $person_id;
+		if (!isEmptyString($dokument_kurzbz)) $paramArray['dokument_kurzbz'] = $dokument_kurzbz;
+
+		// If parameters are provided then use them in the query
+		if (is_bool($archiv)) $paramArray['archiv'] = $archiv;
+		if (is_bool($signiert)) $paramArray['signiert'] = $signiert;
+		if (is_bool($stud_selfservice)) $paramArray['stud_selfservice'] = $stud_selfservice;
+
+		// Loads data from DB
+		$akteResult = $this->_ci->AkteModel->loadWhere($paramArray);
+
+		// If error or data not found then exit
+		if (isError($akteResult)) return $akteResult;
+		if (!hasData($akteResult)) return error('Akte not found');
+
+		// For each record from the akte
+		foreach ($resultObject as getData($akteResult))
+		{
+			// get dms data
+			$dmsResult = $this->_ci->dmslib->getLastVersion($resultObject->dms_id);
+
+			if (isError($dmsResult)) return $dmsResult;
+
+			// properties to retrieve from dms
+			$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte', DmsLib::FILE_CONTENT_PROPERTY);
+
+			// set dms properties
+			if (hasData($dmsResult))
+			{
+				$dmsData = getData($dmsResult);
+
+				foreach ($dmsProperties as $dmsProperty)
+				{
+					// If the property is _not_ 'mimetype' _or_
+					// If the mimetype from the akte table is null then overwrite it with the one from the DMS
+					if ($dmsProperty != 'mimetype' || ($dmsProperty == 'mimetype' && $resultObject->{$dmsProperty} == null))
+					{
+						$resultObject->{$dmsProperty} = $dmsData->{$dmsProperty};
+					}
+				}
+			}
+			else
+			{
+				// set null if no dms result found
+				foreach ($dmsProperties as $dmsProperty)
+				{
+					if ($dmsProperty != 'mimetype') $resultObject->{$dmsProperty} = null;
+				}
+			}
+		}
+
+		// return the object containing akte and dms data
+		return success(getData($akteResult));
+	}
 }
+

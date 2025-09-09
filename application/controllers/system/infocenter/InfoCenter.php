@@ -177,6 +177,7 @@ class InfoCenter extends Auth_Controller
 		// Loads libraries
 		$this->load->library('PersonLogLib');
 		$this->load->library('WidgetLib');
+		$this->load->library('AkteLib');
 
 		$this->load->config('infocenter');
 
@@ -441,8 +442,7 @@ class InfoCenter extends Auth_Controller
 
 		if (isset($akte_id) && isset($person_id))
 		{
-			$this->load->library('AkteLib');
-			$akte = $this->aktelib->get($akte_id);
+			$akte = $this->aktelib->getByAkteId($akte_id);
 
 			if (hasData($akte))
 			{
@@ -1158,8 +1158,6 @@ class InfoCenter extends Auth_Controller
 	 */
 	public function outputAkteContent($akte_id)
 	{
-		$this->load->library('DmsLib');
-
 		$akte = $this->AkteModel->load($akte_id);
 
 		if (isError($akte))
@@ -1167,7 +1165,7 @@ class InfoCenter extends Auth_Controller
 			show_error(getError($akte));
 		}
 
-		$aktecontent = $this->dmslib->getAkteContent($akte_id);
+		$aktecontent = $this->aktelib->getByAkteId($akte_id);
 
 		if (isError($aktecontent))
 		{
