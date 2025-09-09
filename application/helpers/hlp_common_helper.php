@@ -425,6 +425,23 @@ function isValidDate($dateString)
 
 
 // ------------------------------------------------------------------------
+// PHP functions that don't exist in older versions
+// ------------------------------------------------------------------------
+
+/**
+ * Returns true if the given array is sequential
+ */
+if (!function_exists('array_is_list')) {
+    function array_is_list(array $arr)
+    {
+        if ($arr === []) {
+            return true;
+        }
+        return array_keys($arr) === range(0, count($arr) - 1);
+    }
+}
+
+// ------------------------------------------------------------------------
 // Collection of utility functions for form validation purposes
 // ------------------------------------------------------------------------
 

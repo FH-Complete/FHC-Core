@@ -8,9 +8,16 @@ export default {
 		CoreFilterCmpt,
 		ListNew
 	},
-	inject: [
-		'lists'
-	],
+	inject: {
+		'lists': {
+			from: 'lists',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		selected: Array,
 		studiengangKz: Number,
@@ -43,7 +50,6 @@ export default {
 					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"SVNR", field:"svnr", headerFilter: true},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
 					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
 						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
@@ -104,11 +110,11 @@ export default {
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
-						row.getElement().classList.add('text-muted');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
 
-				ajaxRequestFunc: (url, params) => {
+				ajaxRequestFunc: (url, config, params) => {
 					if( url === '' ) 
 					{
 						return Promise.resolve({ data: []});
@@ -154,7 +160,9 @@ export default {
 			filterKontoCount0: undefined,
 			filterKontoMissingCounter: undefined,
 			count: 0,
-			filteredcount: 0
+			filteredcount: 0,
+			selectedcount: 0,
+			currentEndpointRawUrl: ''
 		}
 	},
 	methods: {
@@ -165,6 +173,7 @@ export default {
 			this.$refs.new.open();
 		},
 		rowSelectionChanged(data) {
+			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
 		},
@@ -190,12 +199,20 @@ export default {
 
 			if( endpoint === undefined ) 
 			{
-				endpoint = { url: '' };
+				endpoint = {url: this.currentEndpointRawUrl};
 			} 
 			else if( endpoint.url === undefined ) 
 			{
-				endpoint.url = '';
+				endpoint.url = this.currentEndpointRawUrl;
+			} else
+			{
+				this.currentEndpointRawUrl = endpoint.url;
 			}
+
+			endpoint.url = endpoint.url.replace(
+				'CURRENT_SEMESTER',
+				encodeURIComponent(this.currentSemester)
+				);
 
 			const params = {}, filter = {};
 			if (this.filterKontoCount0)
@@ -279,6 +296,19 @@ export default {
 			}
 		}
 	},
+	computed: {
+		countsToHTML: function() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		}
+	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
@@ -286,7 +316,7 @@ export default {
 		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
-				:description="$p.t('global/anzahl') + ': ' + (filteredcount || 0) + ' / ' + (count || 0)"
+				:description="countsToHTML"
 				:tabulator-options="tabulatorOptions"
 				:tabulator-events="tabulatorEvents"
 				table-only

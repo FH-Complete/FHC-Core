@@ -11,14 +11,14 @@
 	margin-inline-start: 0 !important;
 }
 #cms a.btn-outline-primary {
-	color: var(--fhc-cis-primary);
-	border-color: var(--fhc-cis-primary);
+	color: var(--fhc-primary);
+	border-color: var(--fhc-primary);
 }
 #cms a.btn-outline-primary:hover,
 #cms a.btn-outline-primary:focus {
 	color: #fff;
-	background-color: var(--fhc-cis-primary);
-	border-color: var(--fhc-cis-primary);
+	background-color: var(--fhc-primary);
+	border-color: var(--fhc-primary);
 }
 #cms a.btn-primary {
 	color: var(--fhc-cis-menu-lvl-1-color);

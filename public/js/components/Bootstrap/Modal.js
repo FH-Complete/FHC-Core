@@ -3,7 +3,8 @@
 export default {
 	name: 'BootstrapModal',
 	data: () => ({
-		modal: null
+		modal: null,
+		fullscreen: false
 	}),
 	props: {
 		backdrop: {
@@ -23,9 +24,21 @@ export default {
 		},
 		noCloseBtn: Boolean,
 		dialogClass: [String,Array,Object],
+		headerClass: {
+			type: [String,Array,Object],
+			default: ''
+		},
 		bodyClass: {
 			type: [String,Array,Object],
 			default: 'px-4 py-5'
+		},
+		footerClass: {
+			type: [String,Array,Object],
+			default: ''
+		},
+		allowFullscreenExpand: {
+			type: Boolean,
+			default: false
 		}
 	},
 	emits: [
@@ -50,6 +63,9 @@ export default {
 		},
 		toggle() {
 			return this.modal.toggle();
+		},
+		toggleFullscreen() {
+			this.fullscreen = !this.fullscreen
 		}
 	},
 	mounted() {
@@ -114,18 +130,24 @@ export default {
 			});
 		});
 	},
-	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" >
-		<div class="modal-dialog" :class="dialogClass">
+	template: `<div ref="modal" class="bootstrap-modal modal" tabindex="-1" @[\`hide.bs.modal\`]="$emit('hideBsModal')" @[\`hidden.bs.modal\`]="$emit('hiddenBsModal')" @[\`hidePrevented.bs.modal\`]="$emit('hidePreventedBsModal')" @[\`show.bs.modal\`]="$emit('showBsModal')" @[\`shown.bs.modal\`]="$emit('shownBsModal')">
+		<div class="modal-dialog" :class="fullscreen ? 'modal-fullscreen' : dialogClass">
 			<div class="modal-content">
-				<div v-if="$slots.title" class="modal-header">
+				<div v-if="$slots.title" class="modal-header" :class="headerClass">
 					<h5 class="modal-title"><slot name="title"/></h5>
-					<slot name="popoutButton"></slot>
-					<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					<div class="d-flex align-items-center ms-auto">
+						<button type="button" class="btn ms-auto" style="filter: invert(1)" v-if="allowFullscreenExpand" @click="toggleFullscreen">
+						  <i v-if="!fullscreen" class="fa-solid fa-expand"></i>
+						  <i v-else class="fa-solid fa-compress"></i>
+						</button>
+						<button v-if="!noCloseBtn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<slot name="modal-header-content"></slot>
 				</div>
 				<div class="modal-body" :class="bodyClass">
 					<slot></slot>
 				</div>
-				<div v-if="$slots.footer" class="modal-footer">
+				<div v-if="$slots.footer" class="modal-footer" :class="footerClass">
 					<slot name="footer"/>
 				</div>
 			</div>

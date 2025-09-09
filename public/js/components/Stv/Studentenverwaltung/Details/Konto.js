@@ -62,6 +62,25 @@ export default {
 					title: '',
 					frozen: true
 				};
+
+			columns.buchungsdatum = {
+				title: 'buchungsdatum',
+				field: 'buchungsdatum',
+				hozAlign: 'center',
+				width: 180,
+				formatter: (cell) => {
+					const value = cell.getValue();
+					if (!value) return '';
+					const date = new Date(value);
+					return date.toLocaleString("de-DE", {
+						day: "2-digit",
+						month: "2-digit",
+						year: "numeric",
+						hour12: false
+					});
+				},
+			};
+
 			columns.actions.formatter = cell => {
 				let container = document.createElement('div');
 				container.className = "d-flex gap-2";
@@ -113,7 +132,7 @@ export default {
 				index: 'buchungsnr',
 				persistenceID: 'stv-details-konto'
 			};
-		}
+		},
 	},
 	watch: {
 		modelValue() {
@@ -222,12 +241,14 @@ export default {
 				</form-input>
 			</div>
 		</div>
+
 		<core-filter-cmpt
 			ref="table"
 			table-only
 			:side-menu="false"
 			:tabulator-options="tabulatorOptions"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="$p.t('konto/buchung')"
 			:new-btn-disabled="stg_kz === ''"
@@ -240,6 +261,8 @@ export default {
 						v-model="counterdate"
 						input-group
 						:enable-time-picker="false"
+						text-input
+						format="dd.MM.yyyy"
 						auto-apply
 						@cleared="counterdate = new Date()"
 						>

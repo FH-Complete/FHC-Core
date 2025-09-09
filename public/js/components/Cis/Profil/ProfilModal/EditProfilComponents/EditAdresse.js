@@ -152,7 +152,7 @@ export default {
       <label class="form-check-label" for="flexCheckDefault">
       {{$p.t('person','zustelladresse')}}
       </label>
-    </div>  
+    </div>
   </div>
 
   <!-- NATION -->
@@ -162,7 +162,7 @@ export default {
       <select  :value="data.nation" @change="updateValue($event,'nation')" @change="getGemeinde" class="form-select" aria-label="Select Kontakttyp">
         <option selected></option>
         <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>
-      </select> 
+      </select>
     </div>
   </div>
 
@@ -170,7 +170,7 @@ export default {
   <div class=" col-4">
     <div class="form-underline">
       <div class="form-underline-titel">{{$p.t('person','plz')}}*</div>
-      <input class="form-control" :value="data.plz" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
+      <input class="form-control" :value="data.plz" :aria-label="$p.t('person','plz')" :title="$p.t('person','plz')" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
     </div>
   </div>
 
@@ -178,7 +178,7 @@ export default {
   <div class="col-lg-6">
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','gemeinde')}}*</div>
-      <auto-complete class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearchGemeinden" ></auto-complete>
+      <auto-complete :aria-label="$p.t('person','gemeinde')" class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearchGemeinden" ></auto-complete>
     </div>
   </div>
 
@@ -186,7 +186,7 @@ export default {
   <div  class="col-lg-6" >
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','ort')}}*</div>
-      <auto-complete class="w-100" v-model="data.ort" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="ortschaftnamen" @complete="autocompleteSearchOrtschaftsnamen" ></auto-complete>
+      <auto-complete :aria-label="$p.t('person','ort')" class="w-100" v-model="data.ort" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="ortschaftnamen" @complete="autocompleteSearchOrtschaftsnamen" ></auto-complete>
     </div>
   </div>
 
@@ -194,7 +194,7 @@ export default {
   <div  class="col-lg-8">
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','strasse')}}*</div>
-      <input  class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
+      <input :aria-label="$p.t('person','strasse')" class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
     </div>
   </div>
   

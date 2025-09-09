@@ -269,6 +269,8 @@ class LvMenu extends FHCAPI_Controller
 			'lehrfach_id'=>$lehrfach_id,
 			'lektor_der_lv'=>$lektor_der_lv,
 			'lehrfach_oe_kurzbz_arr'=>$lehrfach_oe_kurzbz_arr,
+			'permissionLib' => &$this->PermissionLib,
+			'phrasesLib' => &$this->PhrasesLib
 		];
 		
 		Events::trigger('lvMenuBuild', 
