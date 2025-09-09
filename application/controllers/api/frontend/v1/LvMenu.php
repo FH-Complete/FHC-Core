@@ -452,6 +452,7 @@ class LvMenu extends FHCAPI_Controller
 				'id'=>'core_menu_mailanstudierende',
 				'position'=>'100',
 				'name'=>$this->p->t('lehre', 'mail'),
+				'phrase' => 'lehre/mail',
 				'c4_icon'=>base_url('skin/images/button_feedback.png'),
 				'c4_icon2' => 'fa-regular fa-envelope',
 				'c4_link'=>$mailto,
