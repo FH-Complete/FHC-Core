@@ -279,7 +279,7 @@ class AkteLib
 		if (!hasData($akteResult)) return error('Akte not found');
 
 		// For each record from the akte
-		foreach ($resultObject as getData($akteResult))
+		foreach (getData($akteResult) as $resultObject)
 		{
 			// get dms data
 			$dmsResult = $this->_ci->dmslib->getLastVersion($resultObject->dms_id);
