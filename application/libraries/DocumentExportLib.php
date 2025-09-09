@@ -1,5 +1,5 @@
 <?php
-/* Copyright (C) 2024 fhcomplete.net
+/* Copyright (C) 2025 fhcomplete.net
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -537,12 +537,9 @@ class DocumentExportLib
 
 				if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true) {
 					// Use docsbox
+					require_once('DocsboxLib.php');
 
-					$this->ci->load->library("DocsboxLib");
-
-					$docboxlib = get_class($this->ci->docboxlib);
-
-					$ret = $docboxlib::convert($tempname_zip, $temp_filename, $outputformat);
+					$ret = DocsboxLib::convert($tempname_zip, $temp_filename, $outputformat);
 				} else {
 					// Use unoconv
 
