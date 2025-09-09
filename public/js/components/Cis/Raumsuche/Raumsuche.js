@@ -13,6 +13,8 @@ export const Raumsuche =  {
 	},
 	data() {
 		return {
+			phrasenPromise: null,
+			phrasenResolved: false,
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
@@ -157,6 +159,7 @@ export const Raumsuche =  {
 			return `${hours}:${minutes}`;
 		},
 		async setupMounted() {
+			
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 			
@@ -172,18 +175,6 @@ export const Raumsuche =  {
 			if(this.$refs.raumsucheTable) {
 				this.$refs.raumsucheTable.$refs.table.style.setProperty('height', h+'px')
 			}
-
-			const cols = this.$refs.raumsucheTable.tabulator.getColumns()
-
-			// phrasen race condition bandaid
-			this.raumsucheTableOptions.columns[0].title = await this.$p.t('rauminfo/raum_kurzbz')
-			this.raumsucheTableOptions.columns[1].title = await this.$p.t('global/bezeichnung')
-			this.raumsucheTableOptions.columns[2].title = await this.$p.t('rauminfo/raumnummer')
-			this.raumsucheTableOptions.columns[3].title = await this.$p.t('rauminfo/personcap')
-			this.raumsucheTableOptions.columns[4].title = await this.$p.t('rauminfo/rauminfo')
-			this.raumsucheTableOptions.columns[5].title = await this.$p.t('rauminfo/roomReservations')
-
-			this.$refs.raumsucheTable.tabulator.setColumns(cols)
 			
 		}
 	},
@@ -193,7 +184,8 @@ export const Raumsuche =  {
 		}
 	},
 	created() {
-		
+		this.phrasenPromise = this.$p.loadCategory(['rauminfo', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 	},
 	mounted() {
 		this.setupMounted()
@@ -264,6 +256,7 @@ export const Raumsuche =  {
 	
 
      <core-filter-cmpt 
+     	v-if="phrasenResolved"
 		@uuidDefined="handleUuidDefined"
 		:title="''"  
 		ref="raumsucheTable" 
