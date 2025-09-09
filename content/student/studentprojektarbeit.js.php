@@ -1166,13 +1166,13 @@ function StudentProjektbetreuerDetailReset()
 	if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Diplom')
 	{
 		document.getElementById('student-projektbetreuer-textbox-stunden').value=
-			<?php if (defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER') && FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER) echo FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER; ?>;
+			<?php if (defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER') && FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER) echo FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER; else echo '5'; ?>;
 		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Erstbegutachter';
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Bachelor')
 	{
 		document.getElementById('student-projektbetreuer-textbox-stunden').value=
-			<?php if (defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR') && FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR) echo FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR; ?>;
+			<?php if (defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR') && FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR) echo FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR; else echo '4'; ?>;
 		document.getElementById('student-projektbetreuer-menulist-betreuerart').value='Begutachter';
 	}
 	else if(document.getElementById('student-projektarbeit-menulist-projekttyp').value=='Praktikum')
