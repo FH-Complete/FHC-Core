@@ -103,7 +103,7 @@ class DmsLib
 				return success($resObj);
 			}
 			else
-				return error("error when inserting DMS");
+				return success();
 	}
 
 	/**
@@ -160,7 +160,7 @@ class DmsLib
 			return success($resObj);
 		}
 		else
-			return error("last version not found");
+			return success();
 	}
 
 	/**
@@ -211,7 +211,7 @@ class DmsLib
 			return success($resObj);
 		}
 		else
-			return error("last version not found");
+			return success();
 	}
 
 	/**
@@ -240,7 +240,7 @@ class DmsLib
 			return $this->getVersion($dms_id, $lastDmsVersion);
 		}
 		else
-			return error("Dms last version not found");
+			return success();
 	}
 
 	/**
@@ -261,7 +261,7 @@ class DmsLib
 
 		if (hasData($dmsVersionResult)) return getData($dmsVersionResult)[0];
 
-		return error("Dms version not found");
+		return success();
 	}
 
 	/**

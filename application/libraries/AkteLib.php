@@ -229,50 +229,87 @@ class AkteLib
 	 */
 	private function _get($akte_id = null, $person_id = null, $dokument_kurzbz = null, $archiv = null, $signiert = null, $stud_selfservice = null)
 	{
-		// get Akte data
-		$this->_ci->AkteModel->addSelect('akte_id');
-		$this->_ci->AkteModel->addSelect('person_id');
-		$this->_ci->AkteModel->addSelect('dokument_kurzbz');
-		$this->_ci->AkteModel->addSelect('inhalt');
-		$this->_ci->AkteModel->addSelect('CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden', false);
-		$this->_ci->AkteModel->addSelect('mimetype');
-		$this->_ci->AkteModel->addSelect('erstelltam');
-		$this->_ci->AkteModel->addSelect('gedruckt');
-		$this->_ci->AkteModel->addSelect('titel');
-		$this->_ci->AkteModel->addSelect('bezeichnung');
-		$this->_ci->AkteModel->addSelect('updateamum');
-		$this->_ci->AkteModel->addSelect('updatevon');
-		$this->_ci->AkteModel->addSelect('insertamum');
-		$this->_ci->AkteModel->addSelect('insertvon');
-		$this->_ci->AkteModel->addSelect('uid');
-		$this->_ci->AkteModel->addSelect('dms_id');
-		$this->_ci->AkteModel->addSelect('nachgereicht');
-		$this->_ci->AkteModel->addSelect('anmerkung');
-		$this->_ci->AkteModel->addSelect('titel_intern');
-		$this->_ci->AkteModel->addSelect('anmerkung_intern');
-		$this->_ci->AkteModel->addSelect('nachgereicht_am');
-		$this->_ci->AkteModel->addSelect('ausstellungsnation');
-		$this->_ci->AkteModel->addSelect('formal_geprueft_amum');
-		$this->_ci->AkteModel->addSelect('archiv');
-		$this->_ci->AkteModel->addSelect('signiert');
-		$this->_ci->AkteModel->addSelect('stud_selfservice');
-		$this->_ci->AkteModel->addSelect('akzeptiertamum');
+		$dbModel = new DB_Model();
+
+		$query = 'SELECT akte_id,
+				person_id,
+				dokument_kurzbz,
+				inhalt,
+				CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden,
+				mimetype,
+				erstelltam,
+				gedruckt,
+				titel,
+				bezeichnung,
+				updateamum,
+				updatevon,
+				insertamum,
+				insertvon,
+				uid,
+				dms_id,
+				nachgereicht,
+				anmerkung,
+				titel_intern,
+				anmerkung_intern,
+				nachgereicht_am,
+				ausstellungsnation,
+				formal_geprueft_amum,
+				archiv,
+				signiert,
+				stud_selfservice,
+				akzeptiertamum
+			FROM public.tbl_akte
+			WHERE TRUE';
 
 		// Query parameters
 		$paramArray = array();
 
-		// Key to access the table
-		if (is_int($akte_id) || is_array($akte_id)) $paramArray['akte_id'] = $akte_id;
-		if (is_int($person_id) || is_array($person_id)) $paramArray['person_id'] = $person_id;
-		if (!isEmptyString($dokument_kurzbz)) $paramArray['dokument_kurzbz'] = $dokument_kurzbz;
+		// akte_id
+		if (is_int($akte_id) || is_array($akte_id))
+		{
+			$paramArray[] = $akte_id;
+			if (is_int($akte_id)) $query .= ' AND akte_id = ?';
+			if (is_array($akte_id)) $query .= ' AND akte_id IN ?';
+		}
 
-		// If parameters are provided then use them in the query
-		if (is_bool($archiv)) $paramArray['archiv'] = $archiv;
-		if (is_bool($signiert)) $paramArray['signiert'] = $signiert;
-		if (is_bool($stud_selfservice)) $paramArray['stud_selfservice'] = $stud_selfservice;
+		// person_id
+		if (is_int($person_id) || is_array($person_id))
+		{
+			$paramArray[] = $person_id;
+			if (is_int($person_id)) $query .= ' AND person_id = ?';
+			if (is_array($person_id)) $query .= ' AND person_id IN ?';
+		}
+
+		// dokument_kurzbz
+		if (!isEmptyString($dokument_kurzbz))
+		{
+			$paramArray[] = $dokument_kurzbz;
+			$query .= ' AND dokument_kurzbz = ?';
+		}
+
+		// archiv
+		if (is_bool($archiv))
+		{
+			$paramArray[] = $archiv;
+			$query .= ' AND archiv = ?';
+		}
+
+		// signiert
+		if (is_bool($signiert))
+		{
+			$paramArray[] = $signiert;
+			$query .= ' AND signiert = ?';
+		}
+
+		// stud_selfservice
+		if (is_bool($stud_selfservice))
+		{
+			$paramArray[] = $stud_selfservice;
+			$query .= ' AND stud_selfservice = ?';
+		}
 
 		// Loads data from DB
-		$akteResult = $this->_ci->AkteModel->loadWhere($paramArray);
+		$akteResult = $dbModel->execReadOnlyQuery($query, $paramArray);
 
 		// If error or data not found then exit
 		if (isError($akteResult)) return $akteResult;

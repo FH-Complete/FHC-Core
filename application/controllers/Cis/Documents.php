@@ -153,7 +153,7 @@ class Documents extends Auth_Controller
 		if (!is_numeric($akte_id))
 			return show_404();
 
-		$result = $this->aktelib->getByPersonId($akte_id);
+		$result = $this->aktelib->getByAkteId($akte_id);
 		if (isError($result))
 			return show_error(getError($result));
 		$akte = getData($result);
