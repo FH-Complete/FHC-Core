@@ -25,6 +25,7 @@ onconnect = e => {
 				dragEndCallback();
 				dragEndCallback = null;
 			}
+			break;
 		}
 	};
 };
