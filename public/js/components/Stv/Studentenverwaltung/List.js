@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
 
+import draggable from '../../../directives/draggable.js';
 
 export default {
 	name: "ListPrestudents",
@@ -8,9 +9,16 @@ export default {
 		CoreFilterCmpt,
 		ListNew
 	},
+	directives: {
+		draggable
+	},
 	inject: {
-		'lists': {
+		lists: {
 			from: 'lists',
+			required: true
+		},
+		$reloadList: {
+			from: '$reloadList',
 			required: true
 		},
 		currentSemester: {
@@ -165,6 +173,39 @@ export default {
 			currentEndpointRawUrl: ''
 		}
 	},
+	computed: {
+		countsToHTML: function() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		selectedDragObject() {
+			return this.selected.map(item => {
+				let type, id;
+				if (item.uid) {
+					type = 'student';
+					id = item.uid;
+				} else if (item.prestudent_id) {
+					type = 'prestudent';
+					id = item.prestudent_id;
+				} else if (item.person_id) {
+					type = 'person';
+					id = item.person_id;
+				}
+				return {
+					...item,
+					type,
+					id
+				};
+			});
+		}
+	},
 	methods: {
 		reload() {
 			this.$refs.table.reloadTable();
@@ -172,10 +213,19 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
+
+			// set selected elements draggable
+			const tableEl = this.$refs.table?.$refs?.table;
+			if (tableEl) {
+				const oldDragables = tableEl.querySelectorAll('[draggable]');
+				for (const draggable of oldDragables)
+					draggable.removeAttribute('draggable');
+			}
+			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
 			if (this.lastSelected) {
@@ -294,26 +344,27 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
-		}
-	},
-	computed: {
-		countsToHTML: function() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		dragCleanup(evt) {
+			if (evt.dataTransfer.dropEffect == 'none')
+				return; // aborted or wrong target
+			
+			this.$reloadList();
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
+		<div
+			class="tabulator-container d-flex flex-column h-100"
+			:class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}"
+			tabindex="0"
+			@focusin="onFocus"
+			@keydown="onKeydown"
+			v-draggable:copyLink.capture="selectedDragObject"
+			@dragend="dragCleanup"
+		>
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
