@@ -33846,7 +33846,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Fileuploaddatum',
+				'text' => 'FileUpload-Datum',
 				'description' => '',
 				'insertvon' => 'system'
 			),
