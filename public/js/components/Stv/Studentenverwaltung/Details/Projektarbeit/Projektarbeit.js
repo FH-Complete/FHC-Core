@@ -263,14 +263,17 @@ export default {
 		actionEditProjektarbeit() {
 			this.statusNew = false;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(this.statusNew, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.lehrveranstaltung_id);
+			this.$refs.projektarbeitDetails.getFormData(
+				this.statusNew, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.lehrveranstaltung_id
+			);
 			this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit.projektarbeit_id);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditBetreuer() {
-			this.statusNew = false;
 			this.toggleMenu('betreuer');
-			this.$refs.projektbetreuer.getData(this.editedProjektarbeit.projektarbeit_id, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.projekttyp_kurzbz);
+			this.$refs.projektbetreuer.getData(
+				this.editedProjektarbeit.projektarbeit_id, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.projekttyp_kurzbz
+			);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionDeleteProjektarbeit(projektarbeit_id) {
@@ -310,7 +313,6 @@ export default {
 		projektarbeitSaved() {
 			this.reload();
 			this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-			this.hideModal('projektarbeitModal');
 		},
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.$refs.projektbetreuer.setDefaultStunden(projekttyp_kurzbz);

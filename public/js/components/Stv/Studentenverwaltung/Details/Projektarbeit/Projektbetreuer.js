@@ -193,15 +193,13 @@ export default {
 								betr.betreuerart_kurzbz === betreuerart_kurzbz
 						);
 
-					let betreuer = [];
 					if (idx >= 0) { // if betreuer found
-						betreuer = projektbetreuerListe[idx];
 
-						// set currently edited betreuer
-						this.formData = betreuer;
+						// set currently edited betreuer (deep copy)
+						this.formData = JSON.parse(JSON.stringify(projektbetreuerListe[idx]));
 
 						// set download link
-						if (betreuer.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = betreuer.beurteilungDownloadLink;
+						if (this.formData.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = this.formData.beurteilungDownloadLink;
 
 						// set betreuer for autocomplete field
 						this.autocompleteSelectedBetreuer = {
@@ -244,7 +242,6 @@ export default {
 			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
-			this.resetModes();
 
 			// get other initial data
 			this.$api
@@ -266,7 +263,6 @@ export default {
 				this.getProjektbetreuer();
 			} else {
 				this.$refs.projektbetreuerTable.tabulator.setData([]);
-				this.resetForm();
 			}
 		},
 		getProjektbetreuer() {
@@ -274,7 +270,6 @@ export default {
 				.call(ApiStvProjektbetreuer.getProjektbetreuer(this.projektarbeit_id))
 				.then(result => {
 					this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
-					this.resetForm();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},

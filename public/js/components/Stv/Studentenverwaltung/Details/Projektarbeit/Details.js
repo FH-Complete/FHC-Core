@@ -165,6 +165,7 @@ export default {
 		},
 		loadProjektarbeit(projektarbeit_id) {
 
+			if (this?.formData?.projektarbeit_id == projektarbeit_id) return;
 			this.resetForm();
 			return this.$api
 				.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id))
