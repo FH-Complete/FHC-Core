@@ -50,20 +50,20 @@ function isValidDragObject(value) {
 		return false;
 
 	if (value.type.substr(-11) == '-collection') {
-		if (!value.hasOwnProperty('values'))
+		if (!Object.prototype.hasOwnProperty.call(value, 'values'))
 			return false;
 
 		if (!VALID_TYPES.includes(value.type.substr(0, value.type.length-11)))
 			return false;
 	} else {
-		if (!value.hasOwnProperty('id'))
+		if (!Object.prototype.hasOwnProperty.call(value, 'id'))
 			return false;
 
 		if (!VALID_TYPES.includes(value.type))
 			return false;
 
 		if (TYPE_DEFINITION[value.type].extras) {
-			if (!TYPE_DEFINITION[value.type].extras.every(extra => value.hasOwnProperty(extra)))
+			if (!TYPE_DEFINITION[value.type].extras.every(extra => Object.prototype.hasOwnProperty.call(value, extra)))
 				return false;
 		}
 	}
@@ -99,7 +99,7 @@ function getValidTransferData(event, allowedTypes, strict) {
 				return null;
 			}
 		}
-	} catch(error) {
+	} catch(_error) {
 		return null;
 	}
 
@@ -175,15 +175,15 @@ function convertToValidDragObject(data, strict) {
 		});
 	}
 
-	if (data.hasOwnProperty('type') && isValidDragObject(data)) {
+	if (Object.prototype.hasOwnProperty.call(data, 'type') && isValidDragObject(data)) {
 		return data;
 	}
 
-	const found = Object.entries(TYPE_DEFINITION).find(([type, typedef]) => {
-		if (!data.hasOwnProperty(typedef.id))
+	const found = Object.entries(TYPE_DEFINITION).find(([ , typedef ]) => {
+		if (!Object.prototype.hasOwnProperty.call(data, typedef.id))
 			return false;
 		if (typedef.extras) {
-			if (!typedef.extras.every(extra => data.hasOwnProperty("extra")))
+			if (!typedef.extras.every(extra => Object.prototype.hasOwnProperty.call(data, extra)))
 				return false;
 		}
 		return true;
@@ -199,7 +199,7 @@ function convertToValidDragObject(data, strict) {
 	newData.type = type;
 	newData.id = data[typedef.id];
 	if (typedef.extras)
-		typedef.extras.forEach(extra => newData[extras] = data[extra]);
+		typedef.extras.forEach(extra => newData[extra] = data[extra]);
 
 	return newData;
 }

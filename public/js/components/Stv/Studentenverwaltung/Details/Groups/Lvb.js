@@ -162,7 +162,6 @@ export default {
 			if (this.studiengang_kz === false)
 				return;
 
-			let lvbList;
 			this.$api
 				.call(ApiStvLvb.getTree(this.studiengang_kz))
 				.then(result => this.lvbList = result.data)

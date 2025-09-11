@@ -7,10 +7,8 @@ const EFFECTS = [
 	'none'
 ];
 
-let id = 0;
-		
 export default {
-	mounted(el, binding, vnode) {
+	mounted(el, binding) {
 		const allowedTypes = Object.keys(binding.modifiers);
 		allowedTypes.forEach(type => {
 			if (type.substr(-11) == '-collection') {

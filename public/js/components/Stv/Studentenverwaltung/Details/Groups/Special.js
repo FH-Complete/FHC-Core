@@ -45,7 +45,7 @@ export default {
 				this.hide();
 			}
 		},
-		onEnter(evt) {
+		onEnter() {
 			/**
 			 * NOTE(chris): PrimeVue: AutoComplete: Enter does not submit form #5618
 			 * @see https://github.com/primefaces/primevue/issues/5618

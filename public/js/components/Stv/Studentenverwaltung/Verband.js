@@ -240,7 +240,7 @@ export default {
 				res += ' (' + student.vorname + ' ' + student.nachname + ')';
 			return res;
 		},
-		dropStudents(node, students, evt) {
+		dropStudents(node, students) {
 			const data = node.data;
 			
 			let endpoint;
@@ -335,7 +335,7 @@ export default {
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
-						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students, evt)"
+						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
 					>
 						{{ node.data.name }}
 					</span>

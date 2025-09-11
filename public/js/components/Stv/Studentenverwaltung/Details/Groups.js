@@ -142,13 +142,13 @@ export default {
 			}
 			this.$api
 				.call(endpoint)
-				.then(result => {
+				.then(() => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		addSpecialGroup(params) {
+		addSpecialGroup() {
 			const gruppe_kurzbz = this.$refs.newGroupModal.value.gruppe_kurzbz || this.$refs.newGroupModal.value;
 
 			if (Array.isArray(this.modelValue)) {
@@ -183,7 +183,7 @@ export default {
 			} else {
 				this.$refs.newGroupModal.$refs.form
 					.call(ApiStvGroups.add(this.modelValue.uid, gruppe_kurzbz, this.currentSemester))
-					.then(result => {
+					.then(() => {
 						this.$refs.newGroupModal.hide();
 						this.$fhcAlert.alertSuccess(this.$p.t('gruppenmanagement/groups_added', { n: 1 }));
 						this.$refs.list.reload();

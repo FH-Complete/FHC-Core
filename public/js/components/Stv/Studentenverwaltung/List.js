@@ -59,8 +59,12 @@ export default {
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
-						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
+					{
+						title: "Geburtsdatum",
+						field: "gebdatum",
+						formatter: dateFormatter, 
+						headerFilter: true,
+						headerFilterFunc(headerValue, rowValue) {
 							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
 							let comparestr = headerValue;
 							if(matches !== null) {
@@ -293,11 +297,13 @@ export default {
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
 				return;
+
+			var next;
 			switch (e.code) {
 				case 'Enter':
 				case 'Space':
 					e.preventDefault();
-					const e2 = new Event('click', e);
+					var e2 = new Event('click', e);
 					e2.altKey = e.altKey;
 					e2.ctrlKey = e.ctrlKey;
 					e2.shiftKey = e.shiftKey;
@@ -306,13 +312,13 @@ export default {
 					break;
 				case 'ArrowUp':
 					e.preventDefault();
-					var next = this.focusObj.previousElementSibling;
+					next = this.focusObj.previousElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
-					var next = this.focusObj.nextElementSibling;
+					next = this.focusObj.nextElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;

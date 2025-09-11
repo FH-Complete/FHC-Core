@@ -13,7 +13,7 @@ const EFFECTS = [
 ];
 
 export default {
-	mounted(el, binding, vnode) {
+	mounted(el, binding) {
 		updateValue(el, binding.value);
 		updateEffectAllowed(el, binding.arg);
 
