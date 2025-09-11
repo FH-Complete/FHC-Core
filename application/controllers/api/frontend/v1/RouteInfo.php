@@ -35,7 +35,7 @@ class RouteInfo extends FHCAPI_Controller
 	{
 		$payload = json_decode($this->input->raw_input_stream);
 
-		if (isset($payload->app) && isset($payload->path))
+		if (isset($payload->app) && isset($payload->path) && $this->isValidApp($payload->app) && $this->isValidPath($payload->path))
 		{
 			$this->WebservicelogModel->insert(array(
 				'webservicetyp_kurzbz' => 'content',
@@ -46,5 +46,15 @@ class RouteInfo extends FHCAPI_Controller
 			));
 		}
 		$this->terminateWithSuccess(true);
+	}
+
+	protected function isValidApp($app)
+	{
+		return preg_match("/^[A-Za-z0-9\-_]+$/", $app);
+	}
+
+	protected function isValidPath($path)
+	{
+		return preg_match("/^[\/A-Za-z0-9_.\-~?%=&;]+$/", $path);
 	}
 }
