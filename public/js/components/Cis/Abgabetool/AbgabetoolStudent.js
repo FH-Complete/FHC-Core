@@ -12,7 +12,7 @@ export const AbgabetoolStudent = {
 		AbgabeDetail,
 		VerticalSplit
 	},
-	inject: ['isMobile'],
+	inject: ['isMobile', 'isViewMode'],
 	provide() {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions)

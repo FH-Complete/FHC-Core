@@ -17,7 +17,7 @@ export const AbgabeStudentDetail = {
 		AccordionTab: primevue.accordiontab,
 		VueDatePicker
 	},
-	inject: ['notenOptions', 'isMobile'],
+	inject: ['notenOptions', 'isMobile', 'isViewMode'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -320,10 +320,10 @@ export const AbgabeStudentDetail = {
 							<div class="col-8 col-md-9">
 								<div class="row">
 									<div class="col-4">
-										<Upload :disabled="!termin?.allowedToUpload" accept=".pdf" v-model="termin.file"></Upload>
+										<Upload :disabled="!termin?.allowedToUpload || isViewMode" accept=".pdf" v-model="termin.file"></Upload>
 									</div>
 									<div class="col-4">
-										<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload">
+										<button class="btn btn-primary border-0" @click="upload(termin)" :disabled="!termin.allowedToUpload || isViewMode">
 											{{$p.t('abgabetool/c4upload')}}
 											<i class="fa-solid fa-upload"></i>
 										</button>

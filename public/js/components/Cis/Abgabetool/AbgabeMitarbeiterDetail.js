@@ -30,28 +30,50 @@ export const AbgabeMitarbeiterDetail = {
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
 			speedDialItems: [{
-				label: "Create New",
-				icon: "pi pi-plus",
-				command: this.createNew
+				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
+				icon: "fa fa-plus",
+				command: this.openCreateNewAbgabeModal
+			},
+			{
+				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
+				icon: "fa fa-user-check",
+				command: this.openBenotung
+			},
+			{
+				label: Vue.computed(() => this.$p.t('abgabetool/c4plagiatcheck_link')),
+				icon: "fa fa-clipboard-check",
+				command: this.openPlagiatcheck
+			},
+			{
+				label: Vue.computed(() => this.$p.t('abgabetool/c4student_perspective')),
+				icon: "fa fa-eye",
+				command: this.openStudentPage
 			}],
 			newTermin: null
 		}
 	},
 	methods: {
-		createNew(){
-			console.log('create new')	
-		},
 		openZusatzdatenModal(termin) {
 				
 		},
 		saveTermin(termin) {
 			const paabgabe_id = termin.paabgabe_id
-			
 			termin.note_pk = termin.note?.note ?? null
 			termin.betreuer_person_id = this.projektarbeit.betreuer_person_id
-			this.$api.call(ApiAbgabe.postProjektarbeitAbgabe(termin)).then( (res) => {
+			return this.$api.call(ApiAbgabe.postProjektarbeitAbgabe(termin)).then( (res) => {
 				if(res?.meta?.status == 'success') {
+					
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
+					
+					const newTerminRes = {
+						...res.data
+					}
+					newTerminRes.bezeichnung = {
+						bezeichnung: termin.bezeichnung?.bezeichnung,
+						paabgabetyp_kurzbz: termin.bezeichnung?.paabgabetyp_kurzbz
+					}
+					
+					this.projektarbeit.abgabetermine.push(newTerminRes)
 					
 					// if(paabgabe_id === -1) { // new abgabe has been inserted
 					// 	termin.paabgabe_id = res?.data?.paabgabe_id
@@ -186,21 +208,41 @@ export const AbgabeMitarbeiterDetail = {
 		openCreateNewAbgabeModal() {
 			if(!this.newTermin) {
 				this.newTermin = {
-					// 'paabgabe_id': -1,
-					// 'projektarbeit_id': this.projektarbeit.projektarbeit_id,
-					// 'fixtermin': false,
-					// 'kurzbz': '',
-					// 'datum': new Date().toISOString().split('T')[0],
-					// 'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-					// 'upload_allowed': false,
-					// 'paabgabetyp_kurzbz': '',
-					// 'bezeichnung': '',
-					// 'abgabedatum': null,
-					// 'insertvon': this.viewData?.uid ?? ''
+					'paabgabe_id': -1,
+					'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+					'fixtermin': false,
+					'kurzbz': '',
+					'datum': new Date().toISOString().split('T')[0],
+					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+					'notiz': '',
+					'upload_allowed': false,
+					'paabgabetyp_kurzbz': '',
+					'bezeichnung': '',
+					'abgabedatum': null,
+					'insertvon': this.viewData?.uid ?? ''
 				}
 			}
-			
+			console.log(this.$refs.modalContainerCreateNewAbgabe)
 			this.$refs.modalContainerCreateNewAbgabe.show()
+		},
+		async handleSaveNewAbgabe(termin) {
+			await this.saveTermin(termin)
+			
+			this.$refs.modalContainerCreateNewAbgabe.hide()
+			this.newTermin = {
+				'paabgabe_id': -1,
+				'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+				'fixtermin': false,
+				'kurzbz': '',
+				'datum': new Date().toISOString().split('T')[0],
+				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+				'notiz': '',
+				'upload_allowed': false,
+				'paabgabetyp_kurzbz': '',
+				'bezeichnung': '',
+				'abgabedatum': null,
+				'insertvon': this.viewData?.uid ?? ''
+			}
 		}
 	},
 	computed: {
@@ -230,7 +272,7 @@ export const AbgabeMitarbeiterDetail = {
 			return 'position: relative; min-height: 100vh;'
 		},
 		getSpeedDialStyle() {
-			return 'position: absolute; right: 1rem; bottom: 1rem;'
+			return 'position: static !important;'
 		}
 	},
 	created() {
@@ -240,10 +282,10 @@ export const AbgabeMitarbeiterDetail = {
 
 	},
 	template: `
-		<bs-modal ref="modalContainerCreateNewAbgabe" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal id="innerModalNewAbgabe" ref="modalContainerCreateNewAbgabe" class="bootstrap-prompt" dialogClass="bordered-modal modal-xl" :backdrop="true">
 			<template v-slot:title>
 				<div>
-					{{ $p.t('abgabetool/c4neueAbgabe') }}
+					{{ $p.t('abgabetool/c4newAbgabetermin') }}
 				</div>
 			</template>
 			<template v-slot:default>
@@ -294,7 +336,7 @@ export const AbgabeMitarbeiterDetail = {
 							</Dropdown>
 						</div>
 					</div>
-					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin?.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
+					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>
 						<div class="col-8 col-md-9">
 							<Checkbox
@@ -308,7 +350,7 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGate')}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="newTermin?.notiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="newTermin.notiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
 						</div>
 					</div>
 					<div class="row mt-2">
@@ -320,12 +362,23 @@ export const AbgabeMitarbeiterDetail = {
 				</div>
 			</template>
 			<template v-slot:footer>
-				
+				<button type="button" class="btn btn-primary" @click="handleSaveNewAbgabe(newTermin)">{{ $p.t('global/c4saveNewAbgabetermin') }}</button>
 			</template>
 		</bs-modal>
 
 		<div v-if="projektarbeit">
 			
+			<div style="position: fixed; bottom: 24px; right: 24px; z-index: 9999;">
+				<SpeedDial
+					:style="getSpeedDialStyle"
+					:model="speedDialItems" 
+					direction="up"
+					:radius="80"
+					type="linear"
+					buttonClass="p-button-rounded p-button-lg p-button-primary"
+					:tooltipOptions="{ position: 'left' }"
+				/>
+			</div>
 			
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
 
