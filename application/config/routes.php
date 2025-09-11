@@ -116,20 +116,23 @@ $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT
 
 foreach($subdirs as $subdir)
 {
-	$dirlist = scandir($subdir);
-	if ($dirlist)
+	if(is_dir($subdir))
 	{
-		$files = array_diff($dirlist, array('.','..'));
-
-		foreach ($files as &$item)
+		$dirlist = scandir($subdir);
+		if ($dirlist)
 		{
-			if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
-			{
-				$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+			$files = array_diff($dirlist, array('.','..'));
 
-				if (file_exists($routes_file))
+			foreach ($files as &$item)
+			{
+				if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
 				{
-					require($routes_file);
+					$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+
+					if (file_exists($routes_file))
+					{
+						require($routes_file);
+					}
 				}
 			}
 		}

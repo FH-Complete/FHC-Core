@@ -1051,7 +1051,6 @@ class prestudent extends person
 				//$ps->foto = $row->foto;
 				$ps->anmerkungen = $row->anmerkungen;
 				$ps->homepage = $row->homepage;
-				$ps->svnr = $row->svnr;
 				$ps->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$ps->familienstand = $row->familienstand;
 				$ps->geschlecht = $row->geschlecht;
