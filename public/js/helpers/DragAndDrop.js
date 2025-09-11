@@ -2,8 +2,6 @@
  * TODO(chris): This is only a prototype!!!
  */
 
-const dragendWorker = new SharedWorker(new URL("../sharedworkers/dragend.js", import.meta.url));
-
 const TYPE_DEFINITION = {
 	lehreinheit: {
 		id: "lehreinheit_id",
@@ -119,12 +117,12 @@ function getTransferData(event, strict) {
 	const result = [];
 
 	for (const type of event.dataTransfer.types) {
-		if (type.substr(0, 4) != 'fhc/') {
+		if (type.substr(0, 16) != 'application/fhc-') {
 			if (strict)
 				return null;
 			continue;
 		}
-		let base_type = type.substr(4);
+		let base_type = type.substr(16);
 		let collection = false;
 		if (base_type.substr(-11) == '-collection') {
 			base_type = base_type.substr(0, base_type.length-11);
@@ -251,7 +249,7 @@ function setTransferData(event, validDragObject, setDragImage = false) {
 		return validDragObject.forEach(data => setTransferData(event, data));
 	}
 	
-	event.dataTransfer.setData('fhc/' + validDragObject.type, JSON.stringify(validDragObject));
+	event.dataTransfer.setData('application/fhc-' + validDragObject.type, JSON.stringify(validDragObject));
 }
 
 /**
@@ -266,12 +264,85 @@ function setTransferData(event, validDragObject, setDragImage = false) {
 function eventHasTypes(event, allowedTypes, strict) {
 	if (!allowedTypes || !allowedTypes.length)
 		allowedTypes = VALID_TYPES;
-	allowedTypes = allowedTypes.map(type => 'fhc/' + type);
+	allowedTypes = allowedTypes.map(type => 'application/fhc-' + type);
+
+	const dataTypes = [...event.dataTransfer.types];
+	
+	// NOTE(chris): if dragging across browsers the dataTransfer object is
+	// set to a default one without data. Since we do not support dragging
+	// across browsers (yet) we return false which will disallow dropping.
+	if (!dataTypes.length)
+		return false;
 	
 	if (!strict)
-		return allowedTypes.some(type => event.dataTransfer.types.includes(type));
+		return allowedTypes.some(type => [...event.dataTransfer.types].includes(type));
 	
-	return event.dataTransfer.types.every(type => allowedTypes.includes(type));
+	return [...event.dataTransfer.types].every(type => allowedTypes.includes(type));
+}
+
+function bindDragEnterLeave(el, onEnter, onLeave) {
+	// NOTE(chris): add save dragenter and dragleave events
+	// that won't fire when hovering over child elements
+
+	let skipLeave = false;
+	let skipLeaveParent = true;
+
+	function init(evt) {
+		skipLeave = false;
+		skipLeaveParent = true;
+		// add global listeners
+		window.addEventListener('dragenter', globalDragenter, true);
+		window.addEventListener('dragleave', globalDragleave, true);
+		window.addEventListener('drop', globalDrop, true);
+		// call enter
+		onEnter(evt);
+		// remove self
+		el.removeEventListener('dragenter', init);
+	}
+
+	function cleanup(evt, wasDropped) {
+		// remove global listeners
+		window.removeEventListener('dragenter', globalDragenter, true);
+		window.removeEventListener('dragleave', globalDragleave, true);
+		window.removeEventListener('drop', globalDrop, true);
+		// call leave
+		onLeave(evt, wasDropped);
+		// add init
+		el.addEventListener('dragenter', init);
+	}
+
+	function globalDragenter(evt) {
+		skipLeaveParent = false;
+		if (el != evt.target && !el.contains(evt.target)) {
+			cleanup(evt);
+		} else {
+			skipLeave = true;
+		}
+	}
+	function globalDragleave(evt) {
+		if (el != evt.target && !el.contains(evt.target)) {
+			if (skipLeaveParent) {
+				skipLeaveParent = false;
+				return;
+			}
+		} else {
+			if (skipLeave) {
+				skipLeave = false;
+				return;
+			}
+		}
+		cleanup(evt);
+	}
+	function globalDrop(evt) {
+		cleanup(evt, true);
+	}
+
+	el.addEventListener('dragenter', init);
+
+	return () => {
+		// cleanup
+		el.removeEventListener('dragenter', init);
+	}
 }
 
 export {
@@ -282,7 +353,7 @@ export {
 	convertToValidDragObject,
 	setTransferData,
 	eventHasTypes,
-	dragendWorker
+	bindDragEnterLeave
 };
 export default {
 	...TYPE_CONSTANTS,
@@ -293,5 +364,5 @@ export default {
 	convertToValidDragObject,
 	setTransferData,
 	eventHasTypes,
-	dragendWorker
+	bindDragEnterLeave
 };

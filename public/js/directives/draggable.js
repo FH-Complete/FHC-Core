@@ -1,4 +1,4 @@
-import { setTransferData, convertToValidDragObject, dragendWorker } from '../helpers/DragAndDrop.js';
+import { setTransferData, convertToValidDragObject } from '../helpers/DragAndDrop.js';
 
 const EFFECTS = [
 	'none',
@@ -24,58 +24,62 @@ export default {
 			el.draggable = true;
 		}
 
-		el.addEventListener('dragstart', evt => {
+		const bcc = new BroadcastChannel('fhc-dnd');
+		let blocked = false;
+
+		function onStart(evt) {
 			const value = el.dataset.fhcDraggableValue;
 			if (value) {
 				setTransferData(evt, JSON.parse(value), true);
 				if (el.dataset.fhcEffectAllowed)
 					evt.dataTransfer.effectAllowed = el.dataset.fhcEffectAllowed;
-				blockDragend();
+
+				bcc.onmessage = e => {
+					if (e.data == 'block') {
+						blocked = true;
+					} else if (e.data == 'release') {
+						let evt = null;
+						if (blocked && blocked.evt) {
+							evt = blocked.evt;
+						}
+						blocked = false;
+						if (evt)
+							el.dispatchEvent(evt);
+					}
+				};
 			} else {
 				evt.preventDefault();
 			}
-		}, binding.modifiers.capture);
-
-		let id;
-		let evt = null;
-		let dataTransfer = null;
-		function blockDragend() {
-			id = el.dataset.fhcDraggableValue;
-			dragendWorker.port.postMessage(['init', id]);
-			window.addEventListener('dragend', blockHandler, true);
 		}
-		function unblockDragend(e) {
-			if (e) {
-				evt = e;
-				dataTransfer = e.dataTransfer;
+
+		function onEnd(evt) {
+			if (blocked) {
+				blocked = {
+					evt,
+					dt: evt.dataTransfer
+				};
+				evt.stopPropagation();
+				el.dispatchEvent(new DragEvent("beforedragend", evt));
+			} else {
+				bcc.onmessage = () => {};
 			}
-			window.removeEventListener('dragend', blockHandler, true);
 		}
+		el.addEventListener('dragstart', onStart, binding.modifiers.capture);
 
-		function blockHandler(evt) {
-			if (evt.dataTransfer.dropEffect == 'none')
-				return unblockDragend();
-			unblockDragend(evt);
-			evt.stopPropagation();
-			dragendWorker.port.postMessage(['request']);
-		}
+		el.addEventListener('dragend', onEnd, true);
 
-		dragendWorker.port.onmessage = e => {
-			const [ func, ...args ] = e.data;
-			if (func != 'fire')
-				return;
-			const [ targetId ] = args;
-			if (targetId != id)
-				return;
-			if (evt === null)
-				unblockDragend();
-			else
-				el.dispatchEvent(evt);
-		}
+		el.fhcDraggableCleanup = () => {
+			el.removeEventListener('dragstart', onStart, binding.modifiers.capture);
+			el.removeEventListener('dragend', onEnd, true);
+		};
 	},
 	updated(el, binding) {
 		updateValue(el, binding.value);
 		updateEffectAllowed(el, binding.arg);
+	},
+	beforeUnmount(el) {
+		el.fhcDraggableCleanup();
+		delete el.fhcDraggableCleanup;
 	}
 }
 

@@ -1,4 +1,4 @@
-import { getValidTransferData, eventHasTypes, dragendWorker } from '../helpers/DragAndDrop.js';
+import { getValidTransferData, eventHasTypes, bindDragEnterLeave } from '../helpers/DragAndDrop.js';
 
 const EFFECTS = [
 	'move',
@@ -24,34 +24,56 @@ export default {
 		const arg = binding.arg.replace(/(strict-|-strict)/, '');
 		const effect = EFFECTS.includes(arg) ? arg : null;
 
+		const bcc = new BroadcastChannel('fhc-dnd');
 		let allowed = false;
 
-		el.addEventListener('dragenter', evt => {
+		function onEnter(evt) {
 			allowed = eventHasTypes(evt, allowedTypes, strict);
-			if (allowed)
+			if (allowed) {
 				evt.preventDefault();
-		});
-		el.addEventListener('dragover', evt => {
+				bcc.postMessage('block');
+			}
+		}
+		function onLeave(evt, wasDropped) {
+			if (allowed && !wasDropped) {
+				bcc.postMessage('release');
+			}
+		}
+		function onOver(evt) {
 			if (allowed) {
 				evt.preventDefault();
 				if (effect)
 					evt.dataTransfer.dropEffect = effect;
 			}
-		});
-		el.addEventListener('drop', evt => {
+		}
+		function onDrop(evt) {
 			let result = getValidTransferData(evt, allowedTypes, strict);
 			if (!Array.isArray(result) && !binding.modifiers[result.type] && allowedTypes.includes(result.type + '-collection'))
 				result = [result];
 
 			const res = binding.value(evt, result);
+			
 			if (res instanceof Promise) {
-				const localId = id++;
-				dragendWorker.port.postMessage(['block', localId]);
 				res.then(r => {
-					dragendWorker.port.postMessage(['unblock', localId]);
+					bcc.postMessage('release');
 					return r;
 				});
+			} else {
+				bcc.postMessage('release');
 			}
-		});
+		}
+
+		const cleanupEnterLeave = bindDragEnterLeave(el, onEnter, onLeave);
+		el.addEventListener('dragover', onOver);
+		el.addEventListener('drop', onDrop);
+		el.fhcDropCleanup = () => {
+			cleanupEnterLeave();
+			el.removeEventListener('dragover', onOver);
+			el.removeEventListener('drop', onDrop);
+		};
+	},
+	beforeUnmount(el) {
+		el.fhcDropCleanup();
+		delete el.fhcDropCleanup;
 	}
 }
