@@ -284,6 +284,12 @@ export default {
 			} else
 				this.$refs.table.tabulator.setData(endpoint.url, params);
 		},
+		dragCleanup(evt) {
+			if (evt.dataTransfer.dropEffect == 'none')
+				return; // aborted or wrong target
+			
+			this.$reloadList();
+		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
 				return;
@@ -344,12 +350,6 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
-		},
-		dragCleanup(evt) {
-			if (evt.dataTransfer.dropEffect == 'none')
-				return; // aborted or wrong target
-			
-			this.$reloadList();
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
