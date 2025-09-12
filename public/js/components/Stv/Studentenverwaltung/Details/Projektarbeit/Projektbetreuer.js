@@ -361,7 +361,13 @@ export default {
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.projekttyp_kurzbz = projekttyp_kurzbz;
 			// if form data has not already been modified by user, set the default stunden
-			if (!this.formDataModified()) this.formData.stunden = this.getDefaultStunden(projekttyp_kurzbz);
+			if (!this.formDataModified()) {
+				let defaultStunden = this.getDefaultStunden(projekttyp_kurzbz);
+				// adapt initial form data so it does not count as modified
+				if (this.initialFormData) this.initialFormData.stunden = defaultStunden;
+				// set default Stunden
+				this.formData.stunden = defaultStunden;
+			}
 		},
 		// check if form data has been modified since initial data has been captured
 		formDataModified() {
