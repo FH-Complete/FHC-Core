@@ -82,7 +82,6 @@ export default {
 				},
 			],
 			tabulatorData: [],
-			//lastSelected: null,
 			editedProjektarbeit: null,
 			statusNew: true,
 			studiensemester_kurzbz: null,
@@ -257,23 +256,19 @@ export default {
 	methods: {
 		actionNewProjektarbeit() {
 			this.statusNew = true;
+			this.editedProjektarbeit = null;
+			this.toggleMenu('details');
 			this.$refs.projektarbeitDetails.getFormData(this.statusNew);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditProjektarbeit() {
 			this.statusNew = false;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(
-				this.statusNew, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.lehrveranstaltung_id
-			);
-			this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit.projektarbeit_id);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditBetreuer() {
+			this.statusNew = false;
 			this.toggleMenu('betreuer');
-			this.$refs.projektbetreuer.getData(
-				this.editedProjektarbeit.projektarbeit_id, this.editedProjektarbeit.studiensemester_kurzbz, this.editedProjektarbeit.projekttyp_kurzbz
-			);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionDeleteProjektarbeit(projektarbeit_id) {
@@ -313,6 +308,7 @@ export default {
 		projektarbeitSaved() {
 			this.reload();
 			this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			this.hideModal('projektarbeitModal');
 		},
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.$refs.projektbetreuer.setDefaultStunden(projekttyp_kurzbz);
@@ -325,6 +321,22 @@ export default {
 		},
 		toggleMenu(tabId) {
 			this.activeTab = tabId;
+			if (this.statusNew == false) {
+				switch(tabId) {
+					case 'details':
+						this.$refs.projektarbeitDetails.getFormData(
+							this.statusNew, this.editedProjektarbeit?.studiensemester_kurzbz, this.editedProjektarbeit?.lehrveranstaltung_id
+						);
+						this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit?.projektarbeit_id);
+						break;
+					case 'betreuer':
+						this.$refs.projektbetreuer.getFormData(
+							this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
+						);
+						this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
+						break;
+				}
+			}
 		}
 	},
 	template: `
@@ -352,13 +364,13 @@ export default {
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
 			</template>
 
-			<template #modal-header-content>
+			<template #modal-header-content v-if="!statusNew">
 				<ul class="nav nav-tabs w-100 mt-3 msg_preview" id="pa_tabs" role="tablist">
 					<li class="nav-item" role="presentation">
-						<button class="nav-link" :class="activeTab == 'details' ? 'active' : ''" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true" @click="actionEditProjektarbeit">Details</button>
+						<button class="nav-link" :class="activeTab == 'details' ? 'active' : ''" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true" @click="toggleMenu('details')">Details</button>
 					</li>
 					<li class="nav-item" role="presentation">
-						<button class="nav-link" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer-tab" data-bs-toggle="tab" data-bs-target="#betreuer" type="button" role="tab" aria-controls="betreuer" aria-selected="false" @click="actionEditBetreuer">{{$p.t('projektarbeit', 'betreuerGross')}}</button>
+						<button class="nav-link" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer-tab" data-bs-toggle="tab" data-bs-target="#betreuer" type="button" role="tab" aria-controls="betreuer" aria-selected="false" @click="toggleMenu('betreuer')">{{$p.t('projektarbeit', 'betreuerGross')}}</button>
 					</li>
 				</ul>
 			</template>

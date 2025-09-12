@@ -235,10 +235,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		getData(projektarbeit_id, studiensemester_kurzbz, projekttyp_kurzbz) {
-
-			this.studiensemester_kurzbz = studiensemester_kurzbz;
-
+		getFormData(projekttyp_kurzbz) {
 			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
@@ -257,21 +254,25 @@ export default {
 					this.arrNoten = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-
-			if (projektarbeit_id) {
-				this.projektarbeit_id = projektarbeit_id;
-				this.getProjektbetreuer();
-			} else {
-				this.$refs.projektbetreuerTable.tabulator.setData([]);
-			}
 		},
-		getProjektbetreuer() {
-			this.$api
-				.call(ApiStvProjektbetreuer.getProjektbetreuer(this.projektarbeit_id))
-				.then(result => {
-					this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+		getProjektbetreuer(projektarbeit_id, studiensemester_kurzbz) {
+			if (projektarbeit_id) {
+				// if projektarbeit changed, reset the form to hold new data
+				if (this.projektarbeit_id != projektarbeit_id) {
+					this.resetForm();
+					this.resetModes();
+				}
+				this.projektarbeit_id = projektarbeit_id;
+				this.studiensemester_kurzbz = studiensemester_kurzbz;
+				this.$api
+					.call(ApiStvProjektbetreuer.getProjektbetreuer(this.projektarbeit_id))
+					.then(result => {
+						this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			} else {
+				this.emptyBetreuer();
+			}
 		},
 		saveProjektbetreuer() {
 			this.$refs.formProjektbetreuer.call(
@@ -279,7 +280,7 @@ export default {
 			)
 			.then(result => {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.getProjektbetreuer();
+				this.getProjektbetreuer(this.projektarbeit_id, this.studiensemester_kurzbz);
 				this.resetModes();
 			})
 			.catch(this.$fhcAlert.handleSystemError);
@@ -295,6 +296,9 @@ export default {
 				.then(result => {
 					this.filteredBetreuer = result.data;
 				});
+		},
+		emptyBetreuer() {
+			this.$refs.projektbetreuerTable.tabulator.clearData();
 		},
 		resetForm() {
 			this.formData = this.getDefaultFormData();

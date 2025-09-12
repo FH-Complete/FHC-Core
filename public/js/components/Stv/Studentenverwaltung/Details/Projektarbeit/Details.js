@@ -100,41 +100,7 @@ export default {
 			this.formData.anmerkung = null;
 			this.$refs.formDetails.clearValidation();
 		},
-		getFormData(statusNew, studiensemester_kurzbz, additional_lehrveranstaltung_id/*, successCallback*/) {
-
-			//~ let callArray = [
-				//~ this.$api.call(ApiStvProjektarbeit.getTypenProjektarbeit()),
-				//~ this.$api.call(ApiStvProjektarbeit.getLehrveranstaltungen(
-					//~ this.student.uid,
-					//~ projektarbeit_id ? null : this.student.studiengang_kz,
-					//~ studiensemester_kurzbz ?? this.defaultSemester,
-					//~ additional_lehrveranstaltung_id ?? null
-				//~ )),
-				//~ this.$api.call(ApiStvProjektarbeit.getNoten())
-			//~ ];
-
-			//~ if (projektarbeit_id) callArray.push(this.$api.call(ApiStvProjektarbeit.loadProjektarbeit(projektarbeit_id)));
-
-			//~ // Run when All promises are settled
-			//~ Promise.allSettled(callArray).then((results) => {
-				//~ let hasError = false;
-				//~ let allFormData = [];
-				//~ results.forEach((promise_result) => {
-
-					//~ if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-						//~ allFormData.push(promise_result.value.data);
-					//~ } else {
-						//~ hasError = true;
-						//~ //this.$fhcAlert.handleSystemError(promise_result);
-					//~ }
-					//~ //let data = promise_result.value.data;
-				//~ });
-
-				//~ if (!hasError) {
-					//~ this.setFormData(allFormData[0], allFormData[1], allFormData[2], allFormData[3], allFormData[4] ?? null);
-					//~ if (successCallback) successCallback();
-				//~ }
-			//~ });
+		getFormData(statusNew, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
 
 			this.$api
 				.call(ApiStvProjektarbeit.getTypenProjektarbeit())
@@ -162,6 +128,8 @@ export default {
 					this.arrNoten = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+
+			if (statusNew) this.resetForm();
 		},
 		loadProjektarbeit(projektarbeit_id) {
 
@@ -316,7 +284,7 @@ export default {
 							:key="lv.lehrveranstaltung_id"
 							:value="lv.lehrveranstaltung_id"
 							>
-							{{lv.bezeichnung + ' ' + lv.orgform_kurzbz + ' (' + lv.semester + ' Sem) ID: ' + lv.lehrveranstaltung_id}}
+							{{lv.bezeichnung + (lv.orgform_kurzbz ? ' ' + lv.orgform_kurzbz : '') + ' (' + lv.semester + ' Sem) ID: ' + lv.lehrveranstaltung_id}}
 						</option>
 					</form-input>
 				</div>
