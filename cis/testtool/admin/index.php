@@ -65,7 +65,7 @@ if (isset($_GET['nummer']))
 }
 else
 {
-	$nummer = '';
+	$nummer = '0';
 }
 
 if (isset($_GET['frage_id']))
@@ -102,29 +102,175 @@ echo '<?xml version="1.0" encoding="UTF-8"?>';
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css" />
 <script language="Javascript">
 //Vorschau anzeigen
-function preview()
-{
-	document.getElementById('vorschau').innerHTML = document.getElementById('text').value;
+function preview(input) {
+	const xmlText = document.getElementById('text_'+input).value;
+	const vorschau = document.getElementById('vorschau_'+input);
+
+	// Zurücksetzen der Styles
+	vorschau.style.textAlign = 'center';
+	vorschau.style.backgroundColor = 'initial';
+	vorschau.style.color = 'initial';
+
+	// Prüfen ob überhaupt Inhalt vorhanden ist
+	if (!xmlText.trim()) {
+		vorschau.innerHTML = '';
+		return;
+	}
+
+	// Prüfe ob HTML/XML-Tags vorhanden sind
+	const hatTags = xmlText.indexOf('&lt;') != -1 &amp;&amp; xmlText.indexOf('&gt;') != -1;
+
+	if (!hatTags) {
+		// Kein HTML/XML - zeige als normalen Text
+		vorschau.innerText = xmlText;
+		return;
+	}
+
+	// Versuche HTML/MathML zu rendern
+	try {
+		// Erstelle einen temporären Container für die Validierung
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = xmlText;
+
+		// Prüfe auf MathML-Elemente und stelle sicher, dass sie korrekt sind
+		const mathElements = tempDiv.querySelectorAll('math');
+		let mathmlValid = true;
+
+		// Verwende eine while-Schleife statt for-Schleife um XML-Probleme zu vermeiden
+		let i = 0;
+		while (i &lt; mathElements.length) {
+			const mathEl = mathElements[i];
+			// Prüfe ob das MathML-Element den korrekten Namespace hat
+			if (!mathEl.hasAttribute('xmlns')) {
+				mathEl.setAttribute('xmlns', 'http://www.w3.org/1998/Math/MathML');
+			}
+
+			// Grundlegende MathML-Validierung
+			const mathmlContent = mathEl.innerHTML;
+			if (mathmlContent.trim() === '') {
+				mathmlValid = false;
+				break;
+			}
+			i++;
+		}
+
+		if (mathmlValid) {
+			// Wenn alles ok ist, zeige den Inhalt an
+			vorschau.innerHTML = xmlText;
+
+			// Versuche MathML zu rendern falls MathJax verfügbar ist
+			if (typeof MathJax != 'undefined' &amp;&amp; MathJax.typesetPromise) {
+				MathJax.typesetPromise([vorschau]).catch(function (err) {
+					console.log('MathJax-Fehler:', err.message);
+				});
+			}
+		} else {
+			throw new Error('Ungültiges MathML');
+		}
+
+	} catch (error) {
+		// HTML-Parsing fehlgeschlagen - prüfe ob es sich um reines XML handelt
+		const startetMitTag = xmlText.trim().charAt(0) === '&lt;';
+		const endetMitTag = xmlText.trim().charAt(xmlText.trim().length - 1) === '&gt;';
+		const hatNurTags = xmlText.indexOf('&lt;') === 0 &amp;&amp; xmlText.lastIndexOf('&gt;') === xmlText.length - 1;
+
+		if (startetMitTag &amp;&amp; endetMitTag &amp;&amp; hatNurTags) {
+			// Versuche XML-Parsing
+			try {
+				const parser = new DOMParser();
+				const parsed = parser.parseFromString(xmlText, 'application/xml');
+				const parsererror = parsed.getElementsByTagName('parsererror');
+
+				if (parsererror.length &gt; 0) {
+					let fehlertext = parsererror[0].textContent;
+					const zeileninfoStart = fehlertext.indexOf("Zeile Nr.");
+					if (zeileninfoStart != -1) {
+						const zeileninfo = fehlertext.substring(zeileninfoStart);
+						fehlertext = 'XML-Verarbeitungsfehler:\n' + zeileninfo;
+					}
+					vorschau.innerText = fehlertext;
+					vorschau.style.textAlign = 'left';
+					vorschau.style.backgroundColor = 'lightyellow';
+					vorschau.style.color = 'red';
+					return;
+				} else {
+					// XML ist gültig
+					vorschau.innerText = xmlText;
+					return;
+				}
+			} catch (xmlError) {
+				// XML-Parsing fehlgeschlagen
+				vorschau.innerText = 'XML-Formatfehler: ' + xmlError.message;
+				vorschau.style.textAlign = 'left';
+				vorschau.style.backgroundColor = 'lightyellow';
+				vorschau.style.color = 'red';
+				return;
+			}
+		} else {
+			// Gemischter Inhalt oder HTML mit Fehlern - zeige Fehlermeldung
+			vorschau.innerText = 'HTML/MathML-Formatfehler: ' + error.message;
+			vorschau.style.textAlign = 'left';
+			vorschau.style.backgroundColor = 'lightyellow';
+			vorschau.style.color = 'red';
+		}
+	}
 }
-function previewvorschlag()
-{
-	document.getElementById('vorschauvorschlag').innerHTML = document.getElementById('text_vorschlag').value;
+function previewvorschlag() {
+	const xmlText = document.getElementById('text_vorschlag').value;
+	const vorschau = document.getElementById('vorschauvorschlag');
+	const parser = new DOMParser();
+	const parsed = parser.parseFromString(xmlText, 'application/xml');
+
+	const parsererror = parsed.getElementsByTagName('parsererror');
+
+	if (parsererror.length > 0) {
+		var fehlertext = parsererror[0].textContent;
+		const zeileninfoStart = fehlertext.indexOf("Zeile Nr.");
+
+		if (zeileninfoStart !== -1) {
+		    const zeileninfo = fehlertext.substring(zeileninfoStart);
+			fehlertext = 'XML-Verarbeitungsfehler:\n ' + zeileninfo;
+		} else {
+			fehlertext = fehlertext; // Fallback
+		}
+		vorschau.innerText = fehlertext;
+		vorschau.style.textAlign = 'left';
+		vorschau.style.backgroundColor = 'lightyellow';
+	} else {
+		// Zeige XML als Text (nicht als HTML rendern!)
+		vorschau.innerHTML = xmlText;
+		vorschau.style.textAlign = 'center';
+		vorschau.style.backgroundColor = 'initial';
+	}
 }
 function insertfrage(aTag, eTag)
 {
-	var input = document.forms['formular_frage'].elements['text'];
+	var input = document.forms['formular_frage'].elements['text_frage'];
 	input.focus();
 	/* Einfügen des Formatierungscodes */
 	var start = input.selectionStart;
 	var end = input.selectionEnd;
 	var insText = input.value.substring(start, end);
-	input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+	if (eTag)
+	{
+		input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+	}
+	else
+	{
+		input.value = input.value.substr(0, start) + aTag + input.value.substr(end);
+	}
 	/* Anpassen der Cursorposition */
 	var pos;
 	if (insText.length == 0) {
 		pos = start + aTag.length;
-	} else {
-		pos = start + aTag.length + insText.length + eTag.length;
+	} else
+	{
+		if (eTag) {
+			pos = start + aTag.length + insText.length + eTag.length;
+		}
+		else {
+			pos = start + aTag.length + insText.length;
+		}
 	}
 	input.selectionStart = pos;
 	input.selectionEnd = pos;
@@ -137,13 +283,25 @@ function insertvorschlag(aTag, eTag)
 	var start = input.selectionStart;
 	var end = input.selectionEnd;
 	var insText = input.value.substring(start, end);
-	input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+	if (eTag)
+	{
+		input.value = input.value.substr(0, start) + aTag + insText + eTag + input.value.substr(end);
+	}
+	else
+	{
+		input.value = input.value.substr(0, start) + aTag + input.value.substr(end);
+	}
 	/* Anpassen der Cursorposition */
 	var pos;
 	if (insText.length == 0) {
 		pos = start + aTag.length;
 	} else {
-		pos = start + aTag.length + insText.length + eTag.length;
+		if (eTag) {
+			pos = start + aTag.length + insText.length + eTag.length;
+		}
+		else {
+			pos = start + aTag.length + insText.length;
+		}
 	}
 	input.selectionStart = pos;
 	input.selectionEnd = pos;
@@ -152,6 +310,14 @@ function insertvorschlag(aTag, eTag)
 function confirmDeleteFrage()
 {
 	return confirm('Wollen Sie diese Frage wirklich löschen?');
+}
+
+function increaseMATHML()
+{
+	const mathTags = document.querySelectorAll('math');
+	mathTags.forEach(tag => {
+		tag.style.fontSize = '200%';
+	});
 }
 </script>
 <style type="text/css">
@@ -778,44 +944,83 @@ if (($anzahl !== 0) || ($stg_kz == '-1') && ($stg_kz !== ''))
 					<a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv">
 					<input type="checkbox" name="inaktiv" '.$inaktivchecked.' onclick="window.location.assign(\''.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$nummer.'&amp;filter=aktiv\');"/>inaktiv</a>';
 		}
-		echo '<br/><table class="nummern" style="display: inline-table;"><tbody><tr>
-				<td>Nummer:</td>';
-		foreach ($resultArray AS $key=>$value)
-		{
-			if ($nummer == '')
-				$nummer = $value['nummer'];
+		echo '<br/>';
 
-			$style = '';
-			if ($db->db_parse_bool($value['aktiv']) == false)
-				$style = 'style="color: lightgrey"';
+		$counter = 0;
+		$maxPerTable = 50;
+		$totalItems = count($resultArray);
 
-			$styleSelected = '';
-			if ($nummer == $value['nummer'])
-			{
-				$styleSelected = 'style="background-color: lightblue"';
-			}
+		// Erste Tabelle öffnen
+		echo '<table class="nummern" style="display: inline-table; margin-bottom: 10px;"><tbody><tr>
+		            <td>Nummer:</td>';
 
-			echo '<td class="nummern" '.$styleSelected.'><a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$value['nummer'].'&amp;filter='.$filter.'" '.$style.'>'.$value['nummer'].'</a></td>';
+		foreach ($resultArray AS $key=>$value) {
+		    // Neue Tabelle starten, wenn 50 Einträge erreicht sind
+		    if ($counter > 0 && $counter % $maxPerTable == 0) {
+		        // Aktuelle Tabelle schließen
+		        echo '</tr><tr><td>Level:</td>';
+
+		        // Level-Zeile für die vorherigen Einträge
+		        $startIndex = $counter - $maxPerTable;
+		        $endIndex = $counter;
+		        $tempArray = array_slice($resultArray, $startIndex, $maxPerTable, true);
+
+		        foreach ($tempArray AS $tempKey=>$tempValue) {
+		            $leveltext = '';
+		            if ($tempValue['level'] == '') {
+		                $leveltext = '-';
+		            } else {
+		                $leveltext = $tempValue['level'];
+		                if ($tempValue['demo'] == 't') {
+		                    $leveltext .= '*';
+		                }
+		            }
+		            echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
+		        }
+
+		        echo '</tr></tbody></table><br/>';
+
+		        // Neue Tabelle starten
+		        echo '<table class="nummern" style="display: inline-table; margin-bottom: 10px;"><tbody><tr>
+		                    <td>Nummer:</td>';
+		    }
+
+		    if ($nummer == '')
+		        $nummer = $value['nummer'];
+		    $style = '';
+		    if ($db->db_parse_bool($value['aktiv']) == false)
+		        $style = 'style="color: lightgrey"';
+		    $styleSelected = '';
+		    if ($nummer == $value['nummer']) {
+		        $styleSelected = 'style="background-color: lightblue"';
+		    }
+		    echo '<td class="nummern" '.$styleSelected.'><a href="'.$PHP_SELF.'?gebiet_id='.$gebiet_id.'&amp;stg_kz='.$stg_kz.'&amp;nummer='.$value['nummer'].'&amp;filter='.$filter.'" '.$style.'>'.$value['nummer'].'</a></td>';
+
+		    $counter++;
 		}
-		echo '</tr><tr>
-				<td>Level:</td>';
-		$leveltext = '';
-		foreach ($resultArray AS $key=>$value)
-		{
-			if ($value['level'] == '')
-			{
-				$leveltext = '-';
-			}
-			else
-			{
-				$leveltext = $value['level'];
-				if ($value['demo'] == 't')
-				{
-					$leveltext .= '*';
-				}
-			}
-			echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
+
+		// Letzte Tabelle schließen
+		echo '</tr><tr><td>Level:</td>';
+
+		// Level-Zeile für die letzten Einträge
+		$remainingItems = $counter % $maxPerTable;
+		if ($remainingItems == 0) $remainingItems = $maxPerTable;
+		$startIndex = $counter - $remainingItems;
+		$tempArray = array_slice($resultArray, $startIndex, $remainingItems, true);
+
+		foreach ($tempArray AS $tempKey=>$tempValue) {
+		    $leveltext = '';
+		    if ($tempValue['level'] == '') {
+		        $leveltext = '-';
+		    } else {
+		        $leveltext = $tempValue['level'];
+		        if ($tempValue['demo'] == 't') {
+		            $leveltext .= '*';
+		        }
+		    }
+		    echo '<td class="nummern" style="color: grey">'.$leveltext.'</td>';
 		}
+
 		echo '</tr></tbody></table>';
 		echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;type=neuefrage&amp;filter=$filter' class='Item'>neue Frage hinzufuegen</a>";
 		$frage_obj = new frage();
@@ -931,7 +1136,7 @@ if ($frage_id != '')
 	//Bei Aenderungen im Textfeld werden diese sofort in der Vorschau angezeigt
 	//Wenn beim Speichern der Text kein Gueltiges XML ist, wird der vorige Text erneut angezeigt
 
-	echo "<tr valign='top'><td colspan='2'>\n<textarea name='text' id='text' cols='50' rows='27' oninput='preview()' ".($frage->aktiv == false?'disabled="disabled"':'')."><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td>";
+	echo "<tr valign='top'><td colspan='2'>\n<textarea name='text' id='text_frage' cols='50' rows='27' oninput='preview(\"frage\")' ".($frage->aktiv == false?'disabled="disabled"':'')."><![CDATA[".(isset($frage_error_text)?$frage_error_text:$frage->text)."]]></textarea>\n</td>";
 	echo "<table><tr><td><input type='button' value='br' onclick='insertfrage(\"&lt;br/&gt;\", \"\")' />";
 	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertfrage(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
 	echo "<input type='button' value='K' style='font-style:italic' onclick='insertfrage(\"&lt;i&gt;\", \"&lt;/i&gt;\")' /><br/><br/>";
@@ -948,8 +1153,14 @@ if ($frage_id != '')
 	echo "<input type='button' value='msqrt' onclick='insertfrage(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
 	echo "<input type='button' value='munderover' onclick='insertfrage(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
 	echo "<input type='button' value='mtext' onclick='insertfrage(\"&lt;mtext&gt;\", \"&lt;/mtext&gt;\")' title='Text' /><br/>";
-	echo "Operatoren:<br/>π<br/>·<br/>∑<br/>∫<br/><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a>";
-	echo "</td>";
+	echo "Operatoren:<p>";
+	echo "<button type='button' onclick='insertfrage(\"&lt;mo&gt;π&lt;/mo&gt;\")'>π</button>&nbsp;";
+	echo "<button type='button' onclick='insertfrage(\"&lt;mo&gt;·&lt;/mo&gt;\")'>·</button>&nbsp;";
+	echo "<button type='button' onclick='insertfrage(\"&lt;mo&gt;∑&lt;/mo&gt;\")'>∑</button>&nbsp;";
+	echo "<button type='button' onclick='insertfrage(\"&lt;mo&gt;∫&lt;/mo&gt;\")'>∫</button>";
+	echo "<p><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a></p>";
+	echo "<button type='button' onclick='increaseMATHML()'>MathML größer</button>";
+	echo "</p></td>";
 	echo "</tr></table></tr>";
 	echo "<tr><td>Demo <input type='checkbox' name='demo' ".($frage->demo?'checked="true"':'')." />
 			Level <input type='text' name='level' value='$frage->level' size='1' />
@@ -960,7 +1171,10 @@ if ($frage_id != '')
 	echo "</form>";
 	echo "</td></tr>";
 	//Vorschau fuer das Text-Feld
-	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau' style='border: 1px solid black' align='center'>$frage->text</div></td></tr>";
+	echo "<tr><td style='width: 50%'>Vorschau:<br />
+			<div id='vorschau_frage' style='border: 1px solid black' align='center'>$frage->text</div></td>
+			<td style='width: 50%'>Derzeit:<br /><div id='aktuell' style='border: 1px solid black' align='center'>$frage->text</div>
+			</td></tr>";
 	echo "</table>";
 	echo '</td><td style="border-left: 1px solid black" valign="top">';
 
@@ -1022,7 +1236,7 @@ if ($frage_id != '')
 	echo "<input type='button' value='+1/2' style='background-color:#C5FFBF' onclick='document.getElementById(\"punkte\").value=\"0.5\";' /></td>";
 	echo '</tr>';
 	echo '<tr valign="top">';
-	echo '<td>Text:</td><td><textarea name="text" id="text_vorschlag" rows="25" cols="45" oninput="previewvorschlag()" '.($vorschlag->aktiv == true || is_null($vorschlag->aktiv)?'':'disabled="disabled"').'><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
+	echo '<td>Text:</td><td><textarea name="text" id="text_vorschlag" rows="25" cols="45" oninput="preview(\'vorschlag\')" '.($vorschlag->aktiv == true || is_null($vorschlag->aktiv)?'':'disabled="disabled"').'><![CDATA['.$vorschlag->text."]]></textarea>\n</td>";
 	echo "<td><input type='button' value='br' onclick='insertvorschlag(\"&lt;br/&gt;\", \"\")' />";
 	echo "<input type='button' value='F' style='font-weight:bold' onclick='insertvorschlag(\"&lt;strong&gt;\", \"&lt;/strong&gt;\")' />";
 	echo "<input type='button' value='K' style='font-style:italic' onclick='insertvorschlag(\"&lt;i&gt;\", \"&lt;/i&gt;\")' /><br/><br/>";
@@ -1039,8 +1253,12 @@ if ($frage_id != '')
 	echo "<input type='button' value='msqrt' onclick='insertvorschlag(\"&lt;msqrt&gt;\", \"&lt;/msqrt&gt;\")' title='Wurzel' /><br/>";
 	echo "<input type='button' value='munderover' onclick='insertvorschlag(\"&lt;munderover&gt;&lt;mo movablelimits=\&quot;false\&quot;&gt;Das steht mittig&lt;/mo&gt;&lt;mo&gt;Das steht unten&lt;/mo&gt;&lt;mo&gt;Das steht oben&lt;/mo&gt;&lt;/munderover&gt;\", \"\")' title='Oben und unten' /><br/>";
 	echo "<input type='button' value='mtext' onclick='insertvorschlag(\"&lt;mtext&gt;\", \"&lt;/mtext&gt;\")' title='Text' /><br/>";
-	echo "Operatoren:<br/>π<br/>·<br/>∑<br/>∫<br/><a href='http://de.selfhtml.org/html/referenz/zeichen.htm#benannte_iso8859_1' target='blank'>Weitere</a>";
-	echo "</td>";
+	echo "Operatoren:<p>";
+	echo "<button type='button' onclick='insertvorschlag(\"&lt;mo&gt;π&lt;/mo&gt;\")'>π</button>&nbsp;";
+	echo "<button type='button' onclick='insertvorschlag(\"&lt;mo&gt;·&lt;/mo&gt;\")'>·</button>&nbsp;";
+	echo "<button type='button' onclick='insertvorschlag(\"&lt;mo&gt;∑&lt;/mo&gt;\")'>∑</button>&nbsp;";
+	echo "<button type='button' onclick='insertvorschlag(\"&lt;mo&gt;∫&lt;/mo&gt;\")'>∫</button>";
+	echo "</p></td>";
 	echo '</tr><tr valign="top">';
 	//Upload Feld fuer Bild
 	echo "<td>Bild:</td><td><input type='file' name='bild' /></td>";
@@ -1062,10 +1280,10 @@ if ($frage_id != '')
 	echo "/></td></tr>";
 	echo "<tr><td colspan='2' align='right'><input type='submit' name='submitvorschlag' value='Speichern' />".($vorschlag_id != ''?"<input type='button' value='Abbrechen' onclick=\"document.location.href='$PHP_SELF?gebiet_id=$gebiet_id&amp;stg_kz=$stg_kz&amp;nummer=$nummer&amp;frage_id=$frage->frage_id'\" />":'')."</td></tr>";
 	//Vorschau fuer das Text-Feld
-	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschauvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
+	echo "<tr><td colspan='2'>Vorschau:<br /><div id='vorschau_vorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div>
+			Derzeit:<br /><div id='aktuellvorschlag' style='border: 1px solid black' align='center'>$vorschlag->text</div></td></tr>";
 	echo "</table>";
 	echo "</form>";
-
 	echo '</td></tr></table>';
 
 	$vorschlag = new vorschlag();
@@ -1115,6 +1333,40 @@ if ($frage_id != '')
 		echo '<tr><td><input type="hidden" name="allevorschlaege" value="'.$allevorschlaege.'" />Summe:</td><td align="left">'.number_format(array_sum($a), 2, ".", "").'&nbsp;&nbsp;</td><td></td><td></td><td></td><td></td><td></td><td><input type="submit" value="Speichern"/></td></tr>';
 		echo '</table></form><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>';
 	}
+	echo "<script>
+			document.getElementById('text_vorschlag').addEventListener('keydown', function(e) 
+			{
+				if (e.key === 'Tab') {
+				e.preventDefault();
+		
+				const textarea = e.target;
+				const start = textarea.selectionStart;
+				const end = textarea.selectionEnd;
+		
+				// Tabulator-Zeichen einfügen
+				textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+		
+				// Cursor hinter den Tab setzen
+				textarea.selectionStart = textarea.selectionEnd = start + 1;
+				}
+			});
+			document.getElementById('text_frage').addEventListener('keydown', function(e) 
+			{
+				if (e.key === 'Tab') {
+				e.preventDefault();
+		
+				const textarea = e.target;
+				const start = textarea.selectionStart;
+				const end = textarea.selectionEnd;
+		
+				// Tabulator-Zeichen einfügen
+				textarea.value = textarea.value.substring(0, start) + '\t' + textarea.value.substring(end);
+		
+				// Cursor hinter den Tab setzen
+				textarea.selectionStart = textarea.selectionEnd = start + 1;
+				}
+			});
+		</script>";
 }
 
 

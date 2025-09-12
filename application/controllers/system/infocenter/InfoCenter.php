@@ -337,10 +337,13 @@ class InfoCenter extends Auth_Controller
 		$persondata = $this->_loadPersonData($person_id);
 
 		$checkPerson = $this->PersonModel->checkDuplicate($person_id);
-
 		if (isError($checkPerson)) show_error(getError($checkPerson));
 
-		$duplicate = array('duplicated' => getData($checkPerson));
+		$checkUnruly = $this->PersonModel->checkUnruly($persondata['stammdaten']->vorname, $persondata['stammdaten']->nachname, $persondata['stammdaten']->gebdatum);
+		if (isError($checkUnruly)) show_error(getError($checkUnruly));
+
+		$duplicate = array('duplicate' => getData($checkPerson));
+		$unruly = array('unruly' => getData($checkUnruly));
 
 		$prestudentdata = $this->_loadPrestudentData($person_id);
 
@@ -351,7 +354,8 @@ class InfoCenter extends Auth_Controller
 			$persondata,
 			$prestudentdata,
 			$dokumentdata,
-			$duplicate
+			$duplicate,
+			$unruly
 		);
 
 		$data[self::FHC_CONTROLLER_ID] = $this->getControllerId();
@@ -1271,7 +1275,6 @@ class InfoCenter extends Auth_Controller
 				'nachname' => $this->input->post('nachname'),
 				'titelpost' => isEmptyString($this->input->post('titelpost')) ? null : $this->input->post('titelpost'),
 				'gebdatum' => isEmptyString($this->input->post('gebdatum')) ? null : date("Y-m-d", strtotime($this->input->post('gebdatum'))),
-				'svnr' => isEmptyString($this->input->post('svnr')) ? null : $this->input->post('svnr'),
 				'staatsbuergerschaft' => isEmptyString($this->input->post('buergerschaft')) ? null : $this->input->post('buergerschaft'),
 				'geschlecht' => $this->input->post('geschlecht'),
 				'geburtsnation' => isEmptyString($this->input->post('gebnation')) ? null : $this->input->post('gebnation'),
@@ -1285,67 +1288,28 @@ class InfoCenter extends Auth_Controller
 			$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 
 		$kontakte = $this->input->post('kontakt');
-		foreach ($kontakte as $kontakt)
-		{
-			$kontaktExists = $this->KontaktModel->loadWhere(array(
-				'kontakt_id' => $kontakt['id'],
-				'person_id' => $person_id,
-			));
+		if($kontakte) {
 
-			if (hasData($kontaktExists))
-			{
-				$kontaktExists = getData($kontaktExists)[0];
+			foreach ($kontakte as $kontakt) {
+				$kontaktExists = $this->KontaktModel->loadWhere(array(
+					'kontakt_id' => $kontakt['id'],
+					'person_id' => $person_id,
+				));
 
-				if ($kontaktExists->kontakt === $kontakt['value'])
-					continue;
+				if (hasData($kontaktExists)) {
+					$kontaktExists = getData($kontaktExists)[0];
 
-				$update = $this->KontaktModel->update(
-					array
-					(
-						'kontakt_id' => $kontakt['id']
-					),
-					array
-					(
-						'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
-						'updateamum' => date('Y-m-d H:i:s'),
-						'updatevon' => $this->_uid
-					)
-				);
+					if ($kontaktExists->kontakt === $kontakt['value'])
+						continue;
 
-				if (isError($update))
-					$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
-			}
-		}
-
-		$adressen = $this->input->post('adresse');
-
-		foreach ($adressen as $adresse)
-		{
-			$adresseExists = $this->AdresseModel->loadWhere(array(
-				'adresse_id' => $adresse['id'],
-				'person_id' => $person_id,
-			));
-
-			if (hasData($adresseExists))
-			{
-				$adresse = $adresse['value'];
-				$adresseExists = getData($adresseExists)[0];
-				if ($adresseExists->strasse !== $adresse['strasse'] ||
-					$adresseExists->plz !== $adresse['plz'] ||
-					$adresseExists->ort !== $adresse['ort'] ||
-					$adresseExists->nation !== $adresse['nation'])
-				{
-					$update = $this->AdresseModel->update(
+					$update = $this->KontaktModel->update(
 						array
 						(
-							'adresse_id' => $adresseExists->adresse_id
+							'kontakt_id' => $kontakt['id']
 						),
 						array
 						(
-							'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
-							'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
-							'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
-							'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+							'kontakt' => isEmptyString($kontakt['value']) ? null : $kontakt['value'],
 							'updateamum' => date('Y-m-d H:i:s'),
 							'updatevon' => $this->_uid
 						)
@@ -1354,7 +1318,48 @@ class InfoCenter extends Auth_Controller
 					if (isError($update))
 						$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
 				}
+			}
 
+		}
+
+		$adressen = $this->input->post('adresse');
+
+		if($adressen) {
+
+			foreach ($adressen as $adresse) {
+				$adresseExists = $this->AdresseModel->loadWhere(array(
+					'adresse_id' => $adresse['id'],
+					'person_id' => $person_id,
+				));
+
+				if (hasData($adresseExists)) {
+					$adresse = $adresse['value'];
+					$adresseExists = getData($adresseExists)[0];
+					if ($adresseExists->strasse !== $adresse['strasse'] ||
+						$adresseExists->plz !== $adresse['plz'] ||
+						$adresseExists->ort !== $adresse['ort'] ||
+						$adresseExists->nation !== $adresse['nation']) {
+						$update = $this->AdresseModel->update(
+							array
+							(
+								'adresse_id' => $adresseExists->adresse_id
+							),
+							array
+							(
+								'strasse' => isEmptyString($adresse['strasse']) ? null : $adresse['strasse'],
+								'plz' => isEmptyString($adresse['plz']) ? null : $adresse['plz'],
+								'ort' => isEmptyString($adresse['ort']) ? null : $adresse['ort'],
+								'nation' => isEmptyString($adresse['nation']) ? null : $adresse['nation'],
+								'updateamum' => date('Y-m-d H:i:s'),
+								'updatevon' => $this->_uid
+							)
+						);
+
+						if (isError($update))
+							$this->terminateWithJsonError($this->p->t('ui', 'fehlerBeimSpeichern'));
+					}
+
+				}
 			}
 		}
 
@@ -1810,7 +1815,7 @@ class InfoCenter extends Auth_Controller
 	}
 
 	/**
-	 * Loads all necessary Person data: Stammdaten (name, svnr, contact, ...), Dokumente, Logs and Notizen
+	 * Loads all necessary Person data: Stammdaten (name, contact, ...), Dokumente, Logs and Notizen
 	 * @param $person_id
 	 * @return array
 	 */
@@ -2369,16 +2374,50 @@ class InfoCenter extends Auth_Controller
 		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
 			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
-		foreach($personen as $person)
+		if ($studiengang === 'all' && $abgeschickt === 'all')
 		{
-			$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt);
+			foreach($personen as $person)
+			{
+				$prestudenten = $this->PrestudentModel->getByPersonWithoutLehrgang($person, $studienSemester);
 
-			if (!hasData($prestudent))
-				continue;
+				if (!hasData($prestudenten))
+					continue;
 
-			$prestudentData = getData($prestudent);
+				$prestudentenData = getData($prestudenten);
 
-			$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+				foreach ($prestudentenData as $prestudent)
+				{
+					$this->saveAbsage($prestudent->prestudent_id, $statusgrund);
+				}
+			}
+		}
+		else
+		{
+			$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+			$this->StudienplanModel->addSelect('1');
+			$this->StudienplanModel->addJoin('lehre.tbl_studienordnung so', 'studienordnung_id');
+			$escaped = $this->StudienplanModel->db->escape(strtoupper($studiengang));
+			$this->StudienplanModel->db->where("UPPER(so.studiengangkurzbzlang || ':' || tbl_studienplan.orgform_kurzbz) = $escaped");
+			$this->StudienplanModel->addLimit(1);
+			$studiengangResult = $this->StudienplanModel->load();
+
+			if (hasData($studiengangResult))
+			{
+				foreach($personen as $person)
+				{
+					$prestudent = $this->PrestudentModel->getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt, $abgeschickt === 'all');
+
+					if (!hasData($prestudent))
+						continue;
+
+					$prestudentData = getData($prestudent);
+					$this->saveAbsage($prestudentData[0]->prestudent_id, $statusgrund);
+				}
+			}
+			else
+				$this->terminateWithJsonError("Falschen Studiengang übergeben!");
+
 		}
 
 		$this->outputJsonSuccess("Success");

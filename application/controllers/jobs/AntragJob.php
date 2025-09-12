@@ -29,6 +29,10 @@ class AntragJob extends JOB_Controller
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->loadPhrases([
+			'lehre'
+		]);
 	}
 
 	/**
@@ -91,12 +95,15 @@ class AntragJob extends JOB_Controller
 					continue;
 				}
 
-				$leitung = current(getData($result));
-				if (!isset($stgLeitungen[$leitung->uid]))
+				$leitungen = getData($result);
+				foreach ($leitungen as $leitung)
 				{
-					$stgLeitungen[$leitung->uid] = [ 'Details' => $leitung, 'stgs' => [] ];
+					if (!isset($stgLeitungen[$leitung->uid]))
+					{
+						$stgLeitungen[$leitung->uid] = ['Details' => $leitung, 'stgs' => []];
+					}
+					$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 				}
-				$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 
 				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 				if (isError($result))
@@ -179,8 +186,8 @@ class AntragJob extends JOB_Controller
 				$data,
 				$to,
 				'Anträge - Aktion(en) erforderlich',
-				DEFAULT_SANCHO_HEADER_IMG,
-				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				'',
 				'',
 				$cc
 			))
@@ -417,7 +424,7 @@ class AntragJob extends JOB_Controller
 
 		$this->StudierendenantragModel->db->where_in(
 			'public.get_rolle_prestudent(prestudent_id, studiensemester_kurzbz)',
-			$this->config->item('antrag_prestudentstatus_whitelist')
+			$this->config->item('antrag_prestudentstatus_whitelist_abmeldung')
 		);
 
 		$result = $this->StudierendenantragModel->getWithLastStatusWhere([
@@ -451,11 +458,23 @@ class AntragJob extends JOB_Controller
 					if (isError($result))
 						$this->logError(getError($result));
 
+					$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+					$result = $this->StatusgrundModel->loadWhere(['statusgrund_kurzbz' => 'abbrecherStgl']);
+					if (isError($result)) {
+						$this->logError(getError($result));
+						continue;
+					} elseif (!hasData($result)) {
+						$this->logError($this->p->t('lehre', 'error_noStatusgrund', ['statusgrund_kurzbz' => 'abbrecherStgl']));
+						continue;
+					}
+					
+					$statusgrund = current(getData($result));
+
 					$result = $this->prestudentlib->setAbbrecher(
 	                    $antrag->prestudent_id,
 	                    $antrag->studiensemester_kurzbz,
 	                    'AntragJob',
-	                    'abbrecherStgl',
+	                    $statusgrund->statusgrund_id,
 	                    $antrag->insertamum,
 	                    null,
 	                    $antrag->insertvon ?: $insertvon

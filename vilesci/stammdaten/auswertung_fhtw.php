@@ -1220,6 +1220,7 @@ $reihungstest = isset($_REQUEST['reihungstest']) ? $_REQUEST['reihungstest'] : '
 $studiengang = isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : '';
 $semester = isset($_REQUEST['semester']) ? $_REQUEST['semester'] : '';
 $prestudent_id = isset($_REQUEST['prestudent_id']) ? $_REQUEST['prestudent_id'] : '';
+$prestudent_ids = isset($_REQUEST['prestudent_ids']) ? $_REQUEST['prestudent_ids'] : '';
 $orgform_kurzbz = isset($_REQUEST['orgform_kurzbz']) ? $_REQUEST['orgform_kurzbz'] : '';
 $format = (isset($_REQUEST['format']) ? $_REQUEST['format'] : '');
 $stgtyp = (isset($_REQUEST['stgtyp']) ? $_REQUEST['stgtyp'] : '');
@@ -1259,7 +1260,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '' && $prestudent_ids == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1377,6 +1378,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',', $prestudent_ids)) . ")";
 	}
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
@@ -1610,6 +1615,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	if ($prestudent_id != '')
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
+	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',',$prestudent_ids)) . ")";
 	}
 	if ($orgform_kurzbz != '')
 	{
@@ -2411,12 +2420,13 @@ else
 			});
 		}
 	}
-	function prueflingEntSperren(person_id, name, art)
+	function prueflingEntSperren(element)
 	{
-		if (art === true)
-			var text = "sperren";
-		else if (art === false)
-			var text = "entsperren";
+	 	var person_id = element.getAttribute("data-person-id");
+		var name = element.getAttribute("data-person-name");
+		var art = element.getAttribute("data-art") === "true";
+
+		let text = art ? "sperren" : "entsperren";
 
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
@@ -2890,7 +2900,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
-	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && $prestudent_ids == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -3006,6 +3016,9 @@ else
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo '</td></tr>';
+	echo '<tr><td>';
+	echo 'PrestudentIn (Mehrfachauswahl): <input name="prestudent_ids" disabled type="text" size="50" value="' . $prestudent_ids . '"/><input type="hidden" id="prestudent_ids" name="prestudent_ids" value="' . $prestudent_ids . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
 	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
@@ -3014,6 +3027,7 @@ else
 										&datum_von=' . $datum_von . '
 										&datum_bis=' . $datum_bis . '
 										&prestudent_id=' . $prestudent_id . '
+										&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
 										&stgtyp=' . $stgtyp . '
@@ -3067,6 +3081,7 @@ else
 				datum_von=' . $datum_von . '&
 				datum_bis=' . $datum_bis . '&
 				prestudent_id=' . $prestudent_id . '&
+				&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 				&' . http_build_query(array('reihungstest' => $reihungstest)) . '">
 		<div class="row">';
 	echo '<div class="col-xs-12" id="miscfunctionscol">';
@@ -3279,10 +3294,18 @@ else
 
 
 				echo "<td class='textcentered ".$inaktiv ."'>
-						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='true' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-remove'></span>
 						</a>
-						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' onclick='prueflingEntSperren(" . $erg->person_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='false' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-ok'></span>
 						</a>
 					</td>";

@@ -786,7 +786,6 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-geburtszeit').value='';
 	document.getElementById('student-detail-textbox-anmerkung').value='';
 	document.getElementById('student-detail-textbox-homepage').value='';
-	document.getElementById('student-detail-textbox-svnr').value='';
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value='';
 	document.getElementById('student-detail-menulist-familienstand').value='l';
 	document.getElementById('student-detail-menulist-geschlecht').value='m';
@@ -819,7 +818,6 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-geburtszeit').disabled=val;
 	document.getElementById('student-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('student-detail-textbox-homepage').disabled=val;
-	document.getElementById('student-detail-textbox-svnr').disabled=val;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').disabled=val;
 	document.getElementById('student-detail-menulist-familienstand').disabled=val;
 	document.getElementById('student-detail-menulist-geschlecht').disabled=val;
@@ -860,7 +858,6 @@ function StudentDetailSave()
 	geburtszeit = document.getElementById('student-detail-textbox-geburtszeit').value;
 	anmerkung = document.getElementById('student-detail-textbox-anmerkung').value;
 	homepage = document.getElementById('student-detail-textbox-homepage').value;
-	svnr = document.getElementById('student-detail-textbox-svnr').value;
 	ersatzkennzeichen = document.getElementById('student-detail-textbox-ersatzkennzeichen').value;
 	familienstand = document.getElementById('student-detail-menulist-familienstand').value;
 	geschlecht = document.getElementById('student-detail-menulist-geschlecht').value;
@@ -919,7 +916,6 @@ function StudentDetailSave()
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkung', anmerkung);
 	req.add('homepage', homepage);
-	req.add('svnr', svnr);
 	req.add('ersatzkennzeichen', ersatzkennzeichen);
 	req.add('familienstand', familienstand);
 	req.add('geschlecht', geschlecht);
@@ -1167,7 +1163,6 @@ function StudentAuswahl()
 	geburtszeit=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gebzeit" ));
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungen" ));
 	homepage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#homepage" ));
-	svnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#svnr" ));
 	ersatzkennzeichen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ersatzkennzeichen" ));
 	familienstand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#familienstand" ));
 	geschlecht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geschlecht" ));
@@ -1211,7 +1206,6 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-geburtszeit').value=geburtszeit;
 	document.getElementById('student-detail-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-detail-textbox-homepage').value=homepage;
-	document.getElementById('student-detail-textbox-svnr').value=svnr;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('student-detail-menulist-familienstand').value=familienstand;
 
@@ -3553,6 +3547,15 @@ function StudentZeugnisDokumentArchivieren()
 			xml = 'abschlussdokument_lehrgaenge.xml.php';
 			break;
 
+		case 'microcredentialzertifikat_1':
+		case 'microcredentialzertifikat_2':
+		case 'microcredentialzertifikat_3':
+		case 'microcredential_1':
+		case 'microcredential_2':
+		case 'microcredential_3':
+			xml = 'microcredential.xml.php';
+			break;
+			
 		default:
 			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
@@ -4783,7 +4786,7 @@ function StudentNotenMoveFromAntrag()
 
 	var uid = document.getElementById('student-detail-textbox-uid').value;
 	req.add('student_uid', uid);
-	
+
 	var txt = "?";
 	for(var q in req.parms) {
 		txt = txt+'&'+req.parms[q].name+'='+encodeURIComponent(req.parms[q].value);
@@ -5139,6 +5142,7 @@ function StudentPruefungNeu()
 	document.getElementById('student-pruefung-menulist-note').value='9';
 	document.getElementById('student-pruefung-textbox-datum').value='<?php echo date('d.m.Y');?>';
 	document.getElementById('student-pruefung-textbox-anmerkung').value='';
+	StudentPruefungTypChange();
 }
 
 // ****
@@ -5188,6 +5192,17 @@ function StudentPruefungLVAChange()
 	//Lehreinheiten und Mitarbeiter DropDown Auswahl leeren
 	MADropDown.selectedIndex=-1;
 	LEDropDown.selectedIndex=-1;
+}
+
+// ****
+// * Wenn der Typ der Pruefung geaendert wird, dann wird ein Hinweistext angezeigt.
+// ****
+function StudentPruefungTypChange()
+{
+	var typ = document.getElementById('student-pruefung-menulist-typ').value;
+	var hinweisid = document.getElementById('student-pruefung-textbox-datum-hinweis');
+	if(hinweisid === null) return;
+	hinweisid.hidden = (typ != 'kommPruef' && typ != 'zusKommPruef');
 }
 
 // ****
@@ -5424,6 +5439,7 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 	document.getElementById('student-pruefung-textbox-punkte').value=punkte;
+	StudentPruefungTypChange();
 }
 
 function StudentPruefungFilterStsem()

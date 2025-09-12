@@ -32,11 +32,20 @@ class Geschaeftsjahr_model extends DB_Model
 	 * Gets next Geschaeftsjahr, as determined by its start date
 	 * @return array|null
 	 */
-	public function getNextGeschaeftsjahr()
+	public function getNextGeschaeftsjahr($offsetDays=null)
 	{
 		$query = 'SELECT *
-					FROM public.tbl_geschaeftsjahr
-					WHERE start > now()
+					FROM public.tbl_geschaeftsjahr WHERE ';
+
+		if(!is_null($offsetDays))
+		{
+			$query .= "start > now() - '".$offsetDays." days'::interval";
+		}
+		else
+		{
+			$query .= 'start > now()';
+		}
+		$query .= '
 					ORDER BY start
 					LIMIT 1';
 

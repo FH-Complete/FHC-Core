@@ -3,6 +3,7 @@ import FhcFragment from "../Fragment.js";
 let _uuid = {};
 
 export default {
+	name: "FormInput",
 	inheritAttrs: false,
 	components: {
 		FhcFragment
@@ -24,7 +25,11 @@ export default {
 		inputGroup: Boolean,
 		type: String,
 		name: String,
-		containerClass: [String, Array, Object]
+		containerClass: [String, Array, Object],
+		label: String,
+		// NOTE(chris): remove these from $attrs array to prevent doubled event listeners
+		onInput: [Array, Function],
+		'onUpdate:modelValue': [Array, Function]
 	},
 	data() {
 		return {
@@ -174,7 +179,7 @@ export default {
 			let uuid = this.$attrs.id;
 			if (this.lcType == 'datepicker')
 				uuid = this.$attrs.uid;
-			if (!uuid && this.$attrs.label)
+			if (!uuid && this.label)
 				uuid = 'fhc-form-input';
 			if (!uuid)
 				return undefined;
@@ -216,7 +221,7 @@ export default {
 			if (this.tag == 'VueDatePicker' && !this._.components.VueDatePicker) {
 				this._.components.VueDatePicker = Vue.defineAsyncComponent(() => import("../vueDatepicker.js.php"));
 			} else if (this.tag == 'PvAutocomplete' && !this._.components.PvAutocomplete) {
-				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));
+				this._.components.PvAutocomplete = primevue.autocomplete;
 			} else if (this.tag == 'UploadImage' && !this._.components.UploadImage) {
 				this._.components.UploadImage = Vue.defineAsyncComponent(() => import("./Upload/Image.js"));
 			} else if (this.tag == 'UploadDms' && !this._.components.UploadDms) {
@@ -236,13 +241,12 @@ export default {
 	},
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
-		<label v-if="$attrs.label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{$attrs.label}}</label>
+		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{label}}</label>
 		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
 		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
 			<slot></slot>
 		</select>
-
 		<component
 			v-else-if="tag == 'VueDatePicker'"
 			ref="input"
@@ -315,7 +319,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<label v-if="$attrs.label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{$attrs.label}}</label>
+		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'" v-html="label"></label>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">

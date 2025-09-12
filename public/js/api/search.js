@@ -16,9 +16,13 @@
  */
 
 export default {
-	search(searchsettings) {
+	search(searchsettings, config) {
 		const url = '/api/frontend/v1/searchbar/search';
-		return this.$fhcApi.post(url, searchsettings);
+		return this.$fhcApi.post(url, searchsettings, config);
+	},
+	searchAdvanced(searchsettings, config) {
+		const url = '/api/frontend/v1/searchbar/searchAdvanced';
+		return this.$fhcApi.post(url, searchsettings, config);
 	},
 	searchdummy(searchsettings) {
 		const url = 'public/js/apps/api/dummyapi.php/Search';
