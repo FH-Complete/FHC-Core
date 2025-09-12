@@ -26,7 +26,7 @@ $vater_bildungsstaat = isset($uhstatData->vater_bildungsstaat) ? $uhstatData->va
 $vater_bildungmax = isset($uhstatData->vater_bildungmax) ? $uhstatData->vater_bildungmax : set_value('vater_bildungmax');
 $readOnly = isset($formMetaData['readOnly']);
 $disabled = $readOnly ? ' disabled' : '';
-$editPermission = isset($formMetaData['editPermission']) && $formMetaData['editPermission'] === true;
+$savePermission = isset($formMetaData['savePermission']) && $formMetaData['savePermission'] === true;
 $deletePermission = isset($formMetaData['deletePermission']) && $formMetaData['deletePermission'] === true;
 $saved = isset($saved) && $saved === true;
 ?>
@@ -51,7 +51,7 @@ $saved = isset($saved) && $saved === true;
 			<?php echo $this->p->t('uhstat', 'uhstat1EinleitungSvnrtext') ?>
 		</p>
 		<br>
-		<?php if ($editPermission): ?>
+		<?php if ($savePermission): ?>
 			<?php if (isset($successMessage) && !isEmptyString($successMessage)): ?>
 				<div class="alert alert-success" id="uhstat_success_alert">
 					<button type="button" class="close" data-dismiss="alert">x</button>
@@ -74,16 +74,23 @@ $saved = isset($saved) && $saved === true;
 				<div class="form-group">
 					<label for="mutter_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_geburtsjahr" id="mutter_geburtsjahr" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
-								<option
-									value="<?php echo $jahr ?>"
-									<?php echo $jahr == $mutter_geburtsjahr ? " selected" : "" ?>>
-									<?php echo $jahr ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="input-group">
+							<select type="text" name="mutter_geburtsjahr" id="mutter_geburtsjahr" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['jahre'] as $jahrKey => $jahr): ?>
+									<option
+										value="<?php echo $jahrKey ?>"
+										<?php echo $jahrKey == $mutter_geburtsjahr ? " selected" : "" ?>>
+										<?php echo $jahr ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('mutter_geburtsjahr').value = 9999; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('mutter_geburtsjahr'); ?>
 					</div>
 				</div>
@@ -94,16 +101,23 @@ $saved = isset($saved) && $saved === true;
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_geburtsstaat" id="mutter_geburtsstaat" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['nation'] as $nation): ?>
-								<option
-									value="<?php echo $nation->nation_code ?>"
-									<?php echo $mutter_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
-									<?php echo $nation->nation_text ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="input-group">
+							<select type="text" name="mutter_geburtsstaat" id="mutter_geburtsstaat" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['nation'] as $nation): ?>
+									<option
+										value="<?php echo $nation->nation_code ?>"
+										<?php echo $mutter_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
+										<?php echo $nation->nation_text ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('mutter_geburtsstaat').value = 'XXX'; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('mutter_geburtsstaat'); ?>
 					</div>
 				</div>
@@ -114,16 +128,23 @@ $saved = isset($saved) && $saved === true;
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="mutter_bildungsstaat" id="mutter_bildungsstaat" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['nation'] as $nation): ?>
-								<option
-									value="<?php echo $nation->nation_code ?>"
-									<?php echo $mutter_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
-									<?php echo $nation->nation_text ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="input-group">
+							<select type="text" name="mutter_bildungsstaat" id="mutter_bildungsstaat" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['nation'] as $nation): ?>
+									<option
+										value="<?php echo $nation->nation_code ?>"
+										<?php echo $mutter_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
+										<?php echo $nation->nation_text ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('mutter_bildungsstaat').value = 'XXX'; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('mutter_bildungsstaat'); ?>
 					</div>
 				</div>
@@ -161,16 +182,23 @@ $saved = isset($saved) && $saved === true;
 				<div class="form-group">
 					<label for="vater_geburtsjahr" class="col-sm-3 control-label"><?php echo ucfirst($this->p->t('uhstat', 'geburtsjahr')) ?></label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_geburtsjahr" id="vater_geburtsjahr" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['jahre'] as $jahr): ?>
-								<option
-									value="<?php echo $jahr ?>"
-									<?php echo $vater_geburtsjahr == $jahr ? " selected" : "" ?>>
+						<div class="input-group">
+							<select type="text" name="vater_geburtsjahr" id="vater_geburtsjahr" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['jahre'] as $jahrKey => $jahr): ?>
+									<option
+										value="<?php echo $jahrKey ?>"
+										<?php echo $vater_geburtsjahr == $jahrKey ? " selected" : "" ?>>
 										<?php echo $jahr ?>
 									</option>
-							<?php endforeach; ?>
-						</select>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('vater_geburtsjahr').value = 9999; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('vater_geburtsjahr'); ?>
 					</div>
 				</div>
@@ -181,16 +209,23 @@ $saved = isset($saved) && $saved === true;
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_geburtsstaat" id="vater_geburtsstaat" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['nation'] as $nation): ?>
-								<option
-									value="<?php echo $nation->nation_code ?>"
-									<?php echo $vater_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
-										<?php echo $nation->nation_text ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="input-group">
+							<select type="text" name="vater_geburtsstaat" id="vater_geburtsstaat" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['nation'] as $nation): ?>
+									<option
+										value="<?php echo $nation->nation_code ?>"
+										<?php echo $vater_geburtsstaat == $nation->nation_code ? " selected" : "" ?>>
+											<?php echo $nation->nation_text ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('vater_geburtsstaat').value = 'XXX'; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('vater_geburtsstaat'); ?>
 					</div>
 				</div>
@@ -201,16 +236,23 @@ $saved = isset($saved) && $saved === true;
 						<?php echo '('.ucfirst($this->p->t('uhstat', 'inDenHeutigenGrenzen')).')' ?>
 					</label>
 					<div class="col-sm-9">
-						<select type="text" name="vater_bildungsstaat" id="vater_bildungsstaat" class="form-control" <?php echo $disabled ?>>
-							<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
-							<?php foreach ($formMetaData['nation'] as $nation): ?>
-								<option
-									value="<?php echo $nation->nation_code ?>"
-									<?php echo $vater_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
-										<?php echo $nation->nation_text ?>
-								</option>
-							<?php endforeach; ?>
-						</select>
+						<div class="input-group">
+							<select type="text" name="vater_bildungsstaat" id="vater_bildungsstaat" class="form-control" <?php echo $disabled ?>>
+								<option disabled selected value=""><?php echo $this->p->t('uhstat', 'bitteAuswaehlen') ?></option>
+								<?php foreach ($formMetaData['nation'] as $nation): ?>
+									<option
+										value="<?php echo $nation->nation_code ?>"
+										<?php echo $vater_bildungsstaat == $nation->nation_code ? " selected" : "" ?>>
+											<?php echo $nation->nation_text ?>
+									</option>
+								<?php endforeach; ?>
+							</select>
+							<span class="input-group-btn">
+								<button type="button" class="btn btn-default" onclick="document.getElementById('vater_bildungsstaat').value = 'XXX'; return false;" <?php echo $disabled ?>>
+									<?php echo $this->p->t('uhstat', 'unbekannt') ?>
+								</button>
+							</span>
+						</div>
 						<?php echo form_error('vater_bildungsstaat'); ?>
 					</div>
 				</div>
@@ -246,7 +288,7 @@ $saved = isset($saved) && $saved === true;
 					</div>
 				</div>
 			</fieldset>
-			<?php if ($editPermission && !$readOnly): ?>
+			<?php if ($savePermission && !$readOnly): ?>
 				<br>
 				<fieldset>
 					<div class="form-group">
@@ -271,7 +313,7 @@ $saved = isset($saved) && $saved === true;
 				</div>
 			</form>
 		<?php endif; ?>
-	</div>
-</div>
+	</div> <!-- subcontainer -->
+</div> <!-- container -->
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

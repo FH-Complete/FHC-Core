@@ -1,0 +1,23 @@
+
+:root {
+	--fhc-sprachen-color: var(--fhc-text, white);
+	--fhc-sprachen-background: var(--fhc-primary, #005585);
+	--fhc-sprachen-background-highlight: var(--fhc-primary-highlight, #00649c);
+}
+
+.sprachen-entry{
+	color: var(--fhc-sprachen-color);
+	background-color: var(--fhc-sprachen-background);
+}
+
+.sprachen-entry:hover {
+	background-color: var(--fhc-sprachen-background);
+}
+
+[selected="true"].sprachen-entry {
+	background-color: var(--fhc-sprachen-background-highlight);
+}
+
+.sprachen-entry.btn {
+	border-radius: 0 !important;
+}

@@ -3,6 +3,8 @@ import CoreForm from '../../Form/Form.js';
 import FormValidation from '../../Form/Validation.js';
 import FormInput from '../../Form/Input.js';
 
+import ApiStudstatusAbmeldung from '../../../api/factory/studstatus/abmeldung.js';
+
 var _uuid = 0;
 
 export default {
@@ -43,8 +45,8 @@ export default {
 	},
 	methods: {
 		load() {
-			return this.$fhcApi.factory
-				.studstatus.abmeldung.getDetails(this.studierendenantragId, this.prestudentId)
+			return this.$api
+				.call(ApiStudstatusAbmeldung.getDetails(this.studierendenantragId, this.prestudentId))
 				.then(result => {
 					this.data = result.data;
 					if (this.data.status) {
@@ -70,13 +72,14 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.abmeldung.create(
+			this.$refs.form
+				.call(ApiStudstatusAbmeldung.create(
 					this.data.studiensemester_kurzbz,
 					this.data.prestudent_id,
 					this.formData.grund
-				)
+				))
 				.then(result => {
+
 					if (result.data === true)
 						document.location += "";
 
@@ -110,10 +113,7 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.abmeldung.cancel(
-					this.data.studierendenantrag_id
-				)
+			this.$refs.form.call(ApiStudstatusAbmeldung.cancel(this.data.studierendenantrag_id))
 				.then(result => {
 					if (Number.isInteger(result.data))
 						document.location = document.location.replace(/abmeldung\/([0-9]*)\/[0-9]*[\/]?$/, 'abmeldung/$1') +  "/" + result.data;

@@ -1,11 +1,12 @@
 import LvPopup from '../../../components/Studierendenantrag/Leitung/LvPopup.js';
-import Phrasen from '../../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../../plugins/Phrasen.js';
 
 const app = Vue.createApp({
+	name: 'StudentApp',
 	components: {
 		LvPopup
 	}
 });
 app
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#wrapper');

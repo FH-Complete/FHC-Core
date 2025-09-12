@@ -1,0 +1,100 @@
+.tag {
+	display: inline-block;
+	padding: 5px 10px;
+	margin-right: 5px;
+	border-radius: 3px;
+	color: white;
+	font-size: .75em;
+	font-weight: 700;
+	line-height: 1;
+	text-align: center;
+	white-space: nowrap;
+	vertical-align: baseline;
+}
+
+.tag:hover
+{
+	transform: scale(1.15);
+}
+
+.tag_rot {
+	background-color: #ff0000ff;
+}
+
+.tag_gelb {
+	background-color: #ffff00ff;
+	color: black;
+}
+.tag_gruen {
+	background-color: #008000ff;
+}
+
+.tag_rosa {
+	background-color: #FFC1C1;
+	color: black;
+}
+
+.tag_aprikose {
+	background-color: #4f7596;
+}
+
+.tag_pfirsich {
+	background-color: #a15f95;
+}
+
+.tag_orange {
+	background-color: #ffA500ff;
+}
+
+
+.tag_braun {
+	background-color: #6d4c41;
+}
+
+.tag_blau {
+	background-color: #508498;
+}
+
+.tag_lavendel {
+	background-color: #C7A3FF;
+}
+
+.tag_limette {
+	background-color: #D3FFCE;
+}
+
+.tag_done {
+	text-decoration: line-through;
+}
+
+.display_all {
+	background-color: darkgrey !important;
+	border: none;
+}
+
+.dropdown_list {
+	list-style: none;
+	background-color: white;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	z-index: 1000;
+	position: absolute;
+	padding: 10px 10px 10px;
+	max-width: 200px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	cursor: pointer;
+}
+
+.plus_button_container.disabled {
+	pointer-events: none;
+	opacity: 0.5;
+}
+
+.modificationdate {
+	font-style: italic;
+	font-size: 0.7em;
+	text-align: left;
+}

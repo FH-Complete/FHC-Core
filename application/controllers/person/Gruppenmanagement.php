@@ -29,6 +29,7 @@ class Gruppenmanagement extends Auth_Controller
 		$this->load->model('person/benutzer_model', 'BenutzerModel');
 		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('person/benutzergruppe_model', 'BenutzergruppeModel');
+		$this->load->model('person/gruppe_manager_model', 'GruppemanagerModel');
 		$this->load->model('system/Log_model', 'LogModel');
 
 		$this->load->library('WidgetLib');
@@ -117,6 +118,27 @@ class Gruppenmanagement extends Auth_Controller
 			$result = error('Uid missing');
 		else
 		{
+			$this->GruppemanagerModel->addSelect('1');
+			$isManagerRes = $this->GruppemanagerModel->loadWhere(
+				array(
+					'uid' => $this->_uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz
+				)
+			);
+
+			if (isError($isManagerRes))
+			{
+				$this->outputJsonError(getError($isManagerRes));
+				return;
+			}
+
+			if (!hasData($isManagerRes))
+			{
+				$this->outputJsonError($this->p->t('gruppenmanagement', 'nichtZumEditierenDerGruppeBerechtigt'));
+				return;
+			}
+
+			$this->BenutzergruppeModel->addSelect('1');
 			$benutzerExistsRes = $this->BenutzergruppeModel->loadWhere(
 				array(
 					'uid' => $uid,
@@ -170,6 +192,26 @@ class Gruppenmanagement extends Auth_Controller
 			$result = error('Uid missing');
 		else
 		{
+			$this->GruppemanagerModel->addSelect('1');
+			$isManagerRes = $this->GruppemanagerModel->loadWhere(
+				array(
+					'uid' => $this->_uid,
+					'gruppe_kurzbz' => $gruppe_kurzbz
+				)
+			);
+
+			if (isError($isManagerRes))
+			{
+				$this->outputJsonError(getError($isManagerRes));
+				return;
+			}
+
+			if (!hasData($isManagerRes))
+			{
+				$this->outputJsonError($this->p->t('gruppenmanagement', 'nichtZumEditierenDerGruppeBerechtigt'));
+				return;
+			}
+
 			$result = $this->BenutzergruppeModel->delete(
 				array(
 					'uid' => $uid,

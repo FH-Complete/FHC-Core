@@ -74,7 +74,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 							<?php $hideZugangscode = (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) ? '':' hidden="true"'; ?>
 							<label value="Zugangscode" control="student-detail-zugangscode" <?php echo $hideZugangscode; ?>/>
 							<label id="label-student-detail-link_bewerbungstool" hidden="true" value=""></label>
-							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" <?php echo $hideZugangscode; ?> onclick="window.open(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
+							<label class="text-link" href="#" id="label-student-detail-zugangscode" value="" <?php echo $hideZugangscode; ?> onclick="copyToClipboard(document.getElementById('label-student-detail-link_bewerbungstool').value)"/>
 							<?php $hideBpk = $rechte->isBerechtigt('student/bpk') ? '':' hidden="true"'; ?>
                             <label value="BPK" control="student-detail-textbox-bpk"<?php echo $hideBpk; ?>/>
                             <hbox><textbox id="student-detail-textbox-bpk" disabled="true" maxlength="28" size="50"<?php echo $hideBpk; ?>/></hbox>
@@ -134,8 +134,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 						</row>
 						<row>
-							<label value="SVNR" control="student-detail-textbox-svnr"/>
-							<hbox><textbox id="student-detail-textbox-svnr" disabled="true" maxlength="16" size="10"/></hbox>
+
 							<label value="Ersatzkennzeichen" control="student-detail-textbox-ersatzkennzeichen"/>
 							<hbox><textbox id="student-detail-textbox-ersatzkennzeichen" disabled="true" maxlength="10" size="15"/></hbox>
 							<label value="Geburtszeit" control="student-detail-textbox-geburtszeit" hidden="true"/>

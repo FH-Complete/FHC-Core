@@ -33,7 +33,7 @@ class SearchBarLib
 	const ERROR_NOT_AUTH = 'ERR005';
 
 	// List of allowed types of search
-	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student', 'prestudent', 'document', 'cms'];
+	const ALLOWED_TYPES = ['mitarbeiter', 'mitarbeiter_ohne_zuordnung', 'organisationunit', 'raum', 'person', 'student','studentStv', 'prestudent', 'document', 'cms'];
 
 	const PHOTO_IMG_URL = '/cis/public/bild.php?src=person&person_id=';
 
@@ -115,6 +115,7 @@ class SearchBarLib
 
 		$sql = '
 			SELECT
+				\'employee\' AS renderer,
 				\''.$type.'\' AS type,
 				b.uid AS uid,
 				p.person_id AS person_id,
@@ -178,6 +179,7 @@ class SearchBarLib
 
 	protected function buildSearchClause(DB_Model $dbModel, array $columns, $searchstr)
 	{
+		$searchstr = preg_replace('/[[:punct:]]/', ' ', $searchstr);
 		$document			 = implode(' || \' \' || ', $columns);
 		$query				 = '\'' . implode(':* & ', explode(' ', trim($searchstr))) . ':*\'';
 		$reversequery		 = '\'*:' . implode(' & *:', explode(' ', trim($searchstr))) . '\'';
@@ -204,6 +206,7 @@ EOSC;
 
 		$employees = $dbModel->execReadOnlyQuery('
 			SELECT
+				\'employee\' AS renderer,
 				\''.$type.'\' AS type,
 				b.uid AS uid,
 				p.person_id AS person_id,
@@ -267,6 +270,7 @@ EOSC;
 
 		$ous = $dbModel->execReadOnlyQuery('
 			SELECT
+				\'' . $type . '\' AS renderer,
 				\''.$type.'\' AS type,
 				o.oe_kurzbz AS oe_kurzbz,
 				\'[\' || ot.bezeichnung || \'] \' || o.bezeichnung AS name,
@@ -297,13 +301,15 @@ EOSC;
 				   AND (datum_bis IS NULL OR datum_bis >= NOW())
 				   AND b.aktiv = TRUE
 			) bfLeader ON(bfLeader.oe_kurzbz = o.oe_kurzbz)
-			 WHERE ' .
+			 WHERE 
+				o.aktiv = true
+				AND (' .
 			$this->buildSearchClause(
 				$dbModel, 
 				array('o.oe_kurzbz', 'o.bezeichnung', 'ot.bezeichnung'), 
 				$searchstr
 			) .
-			'
+			') 
 		      GROUP BY type, o.oe_kurzbz, o.bezeichnung, ot.bezeichnung, oParent.oe_kurzbz, oParent.bezeichnung, otParent.bezeichnung
 		');
 
@@ -358,6 +364,93 @@ EOSC;
 	 */
 	private function _student($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+		$gesperrtes_foto = base64_encode(file_get_contents(DOC_ROOT.'skin/images/profilbild_dummy.jpg'));
+		$students = $dbModel->execReadOnlyQuery('
+		SELECT
+			\'' . $type . '\' AS renderer,
+			\''.$type.'\' AS type,
+			s.student_uid AS uid,
+			CONCAT(s.student_uid,\'@'.DOMAIN.'\') AS email,
+			s.matrikelnr,
+			CONCAT(UPPER(stg.typ),UPPER(stg.kurzbz),\'-\',s.semester,s.verband) as verband,
+			stg.bezeichnung AS studiengang,
+			p.person_id AS person_id,
+			p.vorname || \' \' || p.nachname AS name,
+			CASE 
+				when s.student_uid = \''.getAuthUID().'\' then p.foto
+				when p.foto IS NULL then \''.$gesperrtes_foto.'\' 
+				when p.foto_sperre = false then p.foto
+				else \''.$gesperrtes_foto.'\'
+			end as foto,
+			b.aktiv
+			FROM public.tbl_student s
+			JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
+			JOIN public.tbl_person p USING(person_id)
+			LEFT JOIN (
+				SELECT kontakt, person_id
+				FROM public.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+			) as k USING(person_id)
+				WHERE 
+			b.aktiv = TRUE 
+			AND (b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\')
+			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
+				email, p.foto, s.verband, s.semester, stg.bezeichnung, 
+				stg.typ, stg.kurzbz, b.aktiv
+			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
+	');
+
+		// If something has been found then return it
+		if (hasData($students)) return getData($students);
+
+		// Otherwise return an empty array
+		return array();
+	}
+
+	private function _studentStv($searchstr, $type)
+	{
+		$dbModel = new DB_Model();
+
+		$students = $dbModel->execReadOnlyQuery('
+		SELECT
+			\'student\' AS renderer,
+			\''.$type.'\' AS type,
+			s.student_uid AS uid,
+			s.matrikelnr,
+			CONCAT(UPPER(stg.typ),UPPER(stg.kurzbz),\'-\',s.semester,s.verband) as verband,
+			stg.bezeichnung AS studiengang,
+			p.person_id AS person_id,
+			p.vorname || \' \' || p.nachname AS name,
+			k.kontakt AS email,
+			p.foto,
+			b.aktiv
+			FROM public.tbl_student s
+			JOIN public.tbl_studiengang stg USING(studiengang_kz)
+			JOIN public.tbl_benutzer b ON(b.uid = s.student_uid)
+			JOIN public.tbl_person p USING(person_id)
+			LEFT JOIN (
+				SELECT kontakt, person_id
+				FROM public.tbl_kontakt
+					WHERE kontakttyp = \'email\'
+			) as k USING(person_id)
+				WHERE 
+			b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+			GROUP BY type, s.student_uid, s.matrikelnr, p.person_id, name, 
+				k.kontakt, p.foto, s.verband, s.semester, stg.bezeichnung, 
+				stg.typ, stg.kurzbz, b.aktiv
+			ORDER BY b.aktiv DESC, p.nachname ASC, p.vorname ASC
+	');
+
+		// If something has been found then return it
+		if (hasData($students)) return getData($students);
+
+		// Otherwise return an empty array
 		return array();
 	}
 
@@ -366,6 +459,42 @@ EOSC;
 	 */
 	private function _prestudent($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+
+		$prestudent = $dbModel->execReadOnlyQuery('
+		SELECT
+			\'' . $type . '\' AS renderer,
+			\''.$type.'\' AS type,
+			ps.prestudent_id,
+			ps.studiengang_kz,
+			p.person_id AS person_id,
+			b.uid,
+			p.vorname || \' \' || p.nachname AS name,
+			(
+				SELECT kontakt
+				FROM public.tbl_kontakt
+				WHERE kontakttyp = \'email\'
+				AND person_id = p.person_id
+				LIMIT 1
+			) as email,
+			p.foto,
+			sg.bezeichnung
+			FROM public.tbl_prestudent ps
+			LEFT JOIN public.tbl_student s USING (prestudent_id)
+			LEFT JOIN public.tbl_benutzer b ON (b.uid = s.student_uid)
+			JOIN public.tbl_person p ON (p.person_id = ps.person_id)
+			LEFT JOIN public.tbl_studiengang sg ON (sg.studiengang_kz = ps.studiengang_kz)
+			WHERE b.uid ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				OR p.vorname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				OR p.nachname ILIKE \'%'.$dbModel->escapeLike($searchstr).'%\'
+				or cast(ps.prestudent_id as text) ILIKE \'%'.$dbModel->escapeLIKE($searchstr).'%\'
+			GROUP BY type, b.uid, ps.prestudent_id, ps.studiengang_kz, sg.bezeichnung, s.student_uid, s.matrikelnr, p.person_id, name, email, p.foto
+			');
+
+		// If something has been found then return it
+		if (hasData($prestudent)) return getData($prestudent);
+
+		// Otherwise return an empty array
 		return array();
 	}
 
@@ -390,6 +519,81 @@ EOSC;
 	 */
 	private function _raum($searchstr, $type)
 	{
+		$dbModel = new DB_Model();
+
+		$rooms = $dbModel->execReadOnlyQuery('
+			SELECT
+				\'room\' AS renderer,
+				\''.$type.'\' AS type,
+				COALESCE(ort.ort_kurzbz, \'N/A\') as ort_kurzbz,
+				COALESCE(ort.gebteil, \'N/A\') as building,
+				COALESCE(ort.ausstattung, \'N/A\') as austattung,
+				COALESCE(CAST(ort.stockwerk AS VARCHAR), \'N/A\') as floor,
+				COALESCE(CAST(ort.dislozierung AS VARCHAR), \'N/A\') as room_number,
+				COALESCE(CAST(ort.content_id AS VARCHAR), \'N/A\') as content_id,
+				
+				CASE
+					WHEN standort.plz IS NULL OR standort.ort IS NULL THEN 
+						CASE
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN \'N/A\'
+									ELSE CONCAT(ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN standort.strasse
+									ELSE CONCAT(standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+					ELSE 
+						CASE 
+							WHEN standort.strasse IS NULL THEN
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+							ELSE 
+								CASE
+									WHEN ort.stockwerk IS NULL THEN CONCAT(standort.plz,\' \',standort.ort,\' / \',standort.strasse)
+									ELSE CONCAT(standort.plz,\' \',standort.ort,\', \',standort.strasse,\' / \',ort.stockwerk,\' Stockwerk\')
+								END
+						END
+				END as standort,
+				
+				
+				CASE
+					WHEN ort.max_person IS NULL OR ort.arbeitsplaetze IS NULL THEN \'N/A\'
+					ELSE CONCAT(ort.max_person,\', davon \',ort.arbeitsplaetze,\' PC-Plätze\')
+				END as sitzplaetze
+				
+				FROM public.tbl_ort as ort
+				LEFT JOIN (
+					select ort,standort_id,strasse, plz
+					FROM public.tbl_standort
+					LEFT JOIN public.tbl_adresse USING(adresse_id)
+				) standort USING(standort_id)
+			 WHERE 
+				ort.aktiv = true 
+				AND 
+				ort.lehre = true
+				AND (' .
+					$this->buildSearchClause(
+						$dbModel, 
+						array('ort.ort_kurzbz', 'ort.bezeichnung'), 
+						$searchstr
+					) . 
+			')' 
+		);
+
+		// If something has been found
+		if (hasData($rooms))
+		{
+			// Returns the dataset
+			return getData($rooms);
+		}
+
+		// Otherwise return an empty array
 		return array();
 	}
 }

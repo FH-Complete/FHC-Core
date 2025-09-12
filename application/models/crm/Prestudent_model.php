@@ -15,6 +15,39 @@ class Prestudent_model extends DB_Model
 	}
 
 	/**
+	 * Update Data in DB-Table
+	 *
+	 * @param   string $id  PK for DB-Table
+	 * @param   array $data  DataArray for Insert
+	 * @return  array
+	 */
+	public function update($id, $data, $encryptedColumns = null)
+	{
+		if (isset($data['zgvmas_code'])
+			|| isset($data['zgvmanation'])
+			|| isset($data['zgv_code'])
+			|| isset($data['zgvnation'])
+		) {
+			/**
+			 * Falls ZGV vorhanden, setze Ausstellungsstaat (für BIS-Meldung)
+			 * auf Nation der höchsten angegebenen ZGV
+			 */
+			$case = '(CASE 
+				WHEN zgvmas_code IS NOT NULL AND zgvmanation IS NOT NULL THEN zgvmanation 
+				WHEN zgv_code IS NOT NULL AND zgvnation IS NOT NULL THEN zgvnation 
+				ELSE NULL END)';
+			
+			foreach (['zgvmas_code', 'zgvmanation', 'zgv_code', 'zgvnation'] as $key)
+				if (isset($data[$key]))
+					$case = str_replace($key, $this->escape($data[$key]), $case);
+			
+			$this->db->set('ausstellungsstaat', $case, false);
+		}
+
+		return parent::update($id, $data, $encryptedColumns);
+	}
+
+	/**
 	 * getLastStatuses
 	 */
 	public function getLastStatuses($person_id, $studiensemester_kurzbz = null, $studiengang_kz = null, $status_kurzbz = null)
@@ -644,7 +677,7 @@ class Prestudent_model extends DB_Model
 		));
 	}
 
-	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt)
+	public function getPrestudentByStudiengangAndPerson($studiengang, $person, $studienSemester, $abgeschickt, $ignoreAbgeschickt = false)
 	{
 		$query = "SELECT ps.prestudent_id
 					FROM public.tbl_prestudentstatus pss
@@ -654,21 +687,41 @@ class Prestudent_model extends DB_Model
 					JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
 					WHERE ps.person_id = ?
 					AND UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz) = ?
-					AND pss.studiensemester_kurzbz = ?
-					AND";
+					AND pss.studiensemester_kurzbz = ?";
 
-		if ($abgeschickt === 'true')
-			$query .= " EXISTS";
-		else
-			$query .= " NOT EXISTS";
+		if (!$ignoreAbgeschickt)
+		{
+			$query .= "AND";
 
-		$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
+			if ($abgeschickt === 'true')
+				$query .= " EXISTS";
+			else
+				$query .= " NOT EXISTS";
+
+			$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
 					JOIN public.tbl_prestudent sps USING(prestudent_id)
 					WHERE sps.prestudent_id = ps.prestudent_id
 					AND spss.bewerbung_abgeschicktamum IS NOT NULL)";
+		}
 
 		return $this->execQuery($query, array($person, $studiengang, $studienSemester));
 	}
+
+	public function getByPersonWithoutLehrgang($person, $studienSemester)
+	{
+		$query = "SELECT DISTINCT(ps.prestudent_id)
+					FROM public.tbl_prestudentstatus pss
+						JOIN public.tbl_prestudent ps USING(prestudent_id)
+						JOIN public.tbl_studiengang sg USING(studiengang_kz)
+						JOIN lehre.tbl_studienplan sp USING(studienplan_id)
+						JOIN lehre.tbl_studienordnung so USING(studienordnung_id)
+					WHERE ps.person_id = ?
+							AND (sg.typ = 'b' OR sg.typ = 'm')
+						AND pss.studiensemester_kurzbz = ?";
+
+		return $this->execQuery($query, array($person, $studienSemester));
+	}
+
 
 	/**
 	 * Gets förderrelevant flag for a prestudent, from prestudent, or, if not set on prestudent level, from studiengang
@@ -700,4 +753,33 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($prestudent_id));
 	}
 
+	/**
+	 * Gets history of all prestudents, person_id given
+	 * @param int $person_id
+	 * @return object
+	 */
+	public function getHistoryPrestudents($person_id)
+	{
+
+		$query = "
+			SELECT ps.studiensemester_kurzbz, p.priorisierung, p.studiengang_kz, sg.kurzbzlang, ps.orgform_kurzbz, 
+					ps.status_kurzbz, s.student_uid, sp.bezeichnung, ps.ausbildungssemester,
+			       CONCAT(ps.status_kurzbz, ' (', ps.ausbildungssemester, '. Semester)') as status, p.prestudent_id
+			FROM public.tbl_prestudent p
+			JOIN (
+					SELECT DISTINCT ON(prestudent_id) *
+						FROM public.tbl_prestudentstatus
+						WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = ?)
+					ORDER BY prestudent_id, datum desc, insertamum desc
+				) ps USING(prestudent_id)
+			JOIN public.tbl_status USING(status_kurzbz)
+			LEFT JOIN public.tbl_status_grund g USING (statusgrund_id)
+			JOIN public.tbl_studiengang sg USING(studiengang_kz)
+			LEFT JOIN lehre.tbl_studienplan sp USING (studienplan_id)
+			LEFT JOIN public.tbl_student s USING (prestudent_id)
+			ORDER BY p.priorisierung
+		";
+
+		return $this->execQuery($query, array($person_id));
+	}
 }
