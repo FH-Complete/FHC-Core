@@ -139,10 +139,10 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/MyLv`,
+			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
 			component: MylvStudent,
-			props: true
+			props: true,
 		},
 		{
 			path: `/Cis/MyLv/Info/:studien_semester/:lehrveranstaltung_id`,
