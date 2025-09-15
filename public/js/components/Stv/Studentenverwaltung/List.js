@@ -50,7 +50,6 @@ export default {
 					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"SVNR", field:"svnr", headerFilter: true},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
 					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
 						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
