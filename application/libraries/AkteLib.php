@@ -332,6 +332,7 @@ class AkteLib
 	private function _remove($akte_id = null, $person_id = null, $dms_id = null)
 	{
 		// Get dms_id for akte
+		$this->_ci->AkteModel->addSelect('akte_id');
 		$this->_ci->AkteModel->addSelect('dms_id');
 
 		$paramArray = array();
@@ -344,50 +345,17 @@ class AkteLib
 
 		if (isError($akteResult)) return $akteResult;
 
-		if (!hasData($akteResult)) return error("Akte not found");
+		if (!hasData($akteResult)) return error('Akte not found');
 
-		$dms_id = getData($akteResult)[0]->dms_id;
-		$error = null;
+		// Delete Akte
+		$deleteResult = $this->_ci->AkteModel->delete(getData($akteResult)[0]->akte_id);
 
-		// Start DB transaction to avoid deleting only part of the data
-		$this->_ci->db->trans_begin();
+		if (isError($deleteResult)) return $deleteResult;
 
-		// delete Akte
-		$deleteResult = $this->_ci->AkteModel->delete($akte_id);
+		// Remove all dms entry for dms of the akte
+		$removeAllResult = $this->_ci->dmslib->removeAll(getData($akteResult)[0]->dms_id);
 
-		if (isError($deleteResult))
-		{
-			$error = $deleteResult;
-		}
-		else
-		{
-			// remove all dms entry for dms of the akte
-			$removeAllResult = $this->_ci->dmslib->removeAll($dms_id);
-
-			if (isError($removeAllResult)) $error = $removeAllResult;
-		}
-
-		// Transaction complete!
-		$this->_ci->db->trans_complete();
-
-		// Check if everything went ok during the transaction
-		if ($this->_ci->db->trans_status() === false || isset($error))
-		{
-			$this->_ci->db->trans_rollback();
-
-			// return occured error
-			if (isset($error))
-				return $error;
-			else
-				return error("Error occured when deleting, rolled back");
-		}
-		else
-		{
-			$this->_ci->db->trans_commit();
-
-			// return removed dms entry data
-			return $removeAllResult;
-		}
+		return $removeAllResult;
 	}
 }
 

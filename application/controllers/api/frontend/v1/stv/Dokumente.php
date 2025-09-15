@@ -261,7 +261,6 @@ class Dokumente extends FHCAPI_Controller
 			$logdata_dms = "Logdata: " . var_export($logdata_dms, true);
 
 			//delete from dmsLib
-			$this->load->library('DmsLib');
 			$person_id = current($dataAkte)->person_id;
 			$result = $this->aktelib->removeByPersonIdAndDmsId($person_id, $dms_id);
 			$this->getDataOrTerminateWithError($result);
@@ -321,7 +320,6 @@ class Dokumente extends FHCAPI_Controller
 
 	public function uploadDokument()
 	{
-		$this->load->library('DmsLib');
 		$prestudent_id = $this->input->post('prestudent_id');
 		$anmerkung_intern = $this->input->post('anmerkung_intern');
 		$titel_intern = $this->input->post('titel_intern');
