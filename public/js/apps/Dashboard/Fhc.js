@@ -18,6 +18,7 @@ import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.j
 import Studium from "../../components/Cis/Studium/Studium.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
+import ApiRouteInfo from '../../api/factory/routeinfo.js';
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -319,6 +320,7 @@ const app = Vue.createApp({
 
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
+
 app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {
@@ -331,3 +333,7 @@ app.use(PluginsPhrasen);
 app.use(Theme);
 app.directive('contrast', contrast);
 app.mount('#fhccontent');
+
+router.afterEach((to, from, failure) => {
+	app.config.globalProperties.$api.call(ApiRouteInfo.info('cis4', to.fullPath));
+});
