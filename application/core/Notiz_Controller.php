@@ -203,26 +203,39 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		$dms_id_arr = [];
 		foreach ($_FILES as $k => $file)
 		{
-			$dms = array(
-				'kategorie_kurzbz'  => 'notiz',
-				'version'           => 0,
-				'name'              => $file["name"],
-				'mimetype'          => $file["type"],
-				'insertamum'        => date('c'),
-				'insertvon'         => $uid
-			);
-
 			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 			//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 			//Todo define in dms component: readFile, downloadFile
-			$result = $this->dmslib->upload($dms, $k, ['*']);
-			/*			$result = $this->dmslib->upload($dms, $k, ['application/pdf','application/x.fhc-dms+json']);*/
-			if (isError($result))
+			$uploadDataResult = uploadFile($k);
+			if (isError($uploadDataResult))
 			{
 				$this->db->trans_rollback();
-				return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError(getError($uploadDataResult), self::ERROR_TYPE_GENERAL);
 			}
-			$dms_id_arr[] = $result->retval['dms_id'];
+			if (!hasData($uploadDataResult))
+			{
+				$this->db->trans_rollback();
+				$this->terminateWithError('Upload failed', self::ERROR_TYPE_GENERAL);
+			}
+
+			// Add file to the DMS (DB + file system)
+			$addResult = $this->dmslib->add(
+				getData($uploadDataResult)['file_name'],
+				getData($uploadDataResult)['file_type'],
+				fopen(getData($uploadDataResult)['full_path'], 'r'),
+				'notiz', // kategorie_kurzbz
+				null, // dokument_kurzbz
+				null, // beschreibung
+				false, // cis_suche
+				null, // schlagworte
+				getAuthUID() // insertvon
+			);
+
+			// If error occurred
+			if (isError($addResult) || !hasData($addResult))
+				$this->terminateWithError(getError($addResult), self::ERROR_TYPE_GENERAL);
+
+			$dms_id_arr[] = getData($addResult)->dms_id;
 		}
 
 		//save entry in Notizdokument
@@ -334,22 +347,40 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			}
 			else
 			{
-				$dms = array(
-					'kategorie_kurzbz'  => 'notiz',
-					'version'           => 0,
-					'name'              => $file["name"],
-					'mimetype'          => $file["type"],
-					'insertamum'        => date('c'),
-					'insertvon'         => $uid
-				);
-
 				//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 				//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 				//Todo define in dms component: readFile, downloadFile
-				$result = $this->dmslib->upload($dms, $k, array('*'));
+				$uploadDataResult = uploadFile($k);
+				if (isError($uploadDataResult))
+				{
+					$this->db->trans_rollback();
+					$this->terminateWithError(getError($uploadDataResult), self::ERROR_TYPE_GENERAL);
+				}
+				if (!hasData($uploadDataResult))
+				{
+					$this->db->trans_rollback();
+					$this->terminateWithError('Upload failed', self::ERROR_TYPE_GENERAL);
+				}
 
-				$result = $this->getDataOrTerminateWithError($result);
-				$dms_id = $result['dms_id'];
+				// Add file to the DMS (DB + file system)
+				$addResult = $this->dmslib->add(
+					getData($uploadDataResult)['file_name'],
+					getData($uploadDataResult)['file_type'],
+					fopen(getData($uploadDataResult)['full_path'], 'r'),
+					'notiz', // kategorie_kurzbz
+					null, // dokument_kurzbz
+					null, // beschreibung
+					false, // cis_suche
+					null, // schlagworte
+					getAuthUID() // insertvon
+				);
+
+				// If error occurred
+				if (isError($addResult) || !hasData($addResult))
+					$this->terminateWithError(getError($addResult), self::ERROR_TYPE_GENERAL);
+
+				$addResult = $this->getDataOrTerminateWithError($addResult);
+				$dms_id = $addResult['dms_id'];
 
 				$result = $this->NotizdokumentModel->insert(array('notiz_id' => $notiz_id, 'dms_id' => $dms_id));
 

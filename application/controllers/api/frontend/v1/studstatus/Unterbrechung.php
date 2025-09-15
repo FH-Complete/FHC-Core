@@ -158,19 +158,27 @@ class Unterbrechung extends FHCAPI_Controller
 		if (isset($_FILES['attachment']) && (!isset($_FILES['attachment']['error']) || $_FILES['attachment']['error'] != UPLOAD_ERR_NO_FILE)) {
 			$this->load->library('DmsLib');
 
-			$dms = $this->config->item('unterbrechung_dms');
-			if (!count(array_filter($dms, function ($v) {
-				return $v !== null;
-			})))
-				$dms = ['kategorie_kurzbz' => 'Akte'];
-			$dms['version'] = 0;
 
-			$allowed_filetypes = $this->config->item('unterbrechung_dms_filetypes') ?: ['*'];
-			$result = $this->dmslib->upload($dms, 'attachment', $allowed_filetypes);
+			$uploadDataResult = uploadFile('attachment', $this->config->item('unterbrechung_dms_filetypes') ?: array('*'));
 
-			$data = $this->getDataOrTerminateWithError($result);
-			
-			$dms_id = $data['dms_id'];
+			$data = $this->getDataOrTerminateWithError($uploadDataResult);
+
+			// Add file to the DMS (DB + file system)
+			$dms_res = $this->dmslib->add(
+				getData($uploadDataResult)['file_name'],
+				getData($uploadDataResult)['file_type'],
+				fopen(getData($uploadDataResult)['full_path'], 'r'),
+				'studierendenantrag'
+				null, // dokument_kurzbz
+				null, // beschreibung
+				false, // cis_suche
+				null, // schlagworte
+				getAuthUID() // insertvon
+			);
+
+			$dms_data = $this->getDataOrTerminateWithError($dms_res);
+
+			$dms_id = $dms_data->dms_id;
 		}
 
 		$result = $this->antraglib->createUnterbrechung($prestudent_id, $studiensemester, getAuthUID(), $grund, $datum_wiedereinstieg, $dms_id);

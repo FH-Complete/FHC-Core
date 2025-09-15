@@ -147,12 +147,13 @@ abstract class FHC_Controller extends CI_Controller
 		// If the file exists
 		if (isset($fileObj->file) && !isEmptyString($fileObj->file) && file_exists($fileObj->file))
 		{
+			header('Cache-Control: must-revalidate');
 			header('Content-Description: File Transfer');
 			header('Content-Type: '. $fileObj->mimetype);
 			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
 			header('Pragma: public');
 			header('Content-Length: ' . filesize($fileObj->file));
+			header('Content-Transfer-Encoding: binary');
 
 			if (isset($fileObj->disposition)
 				&& ($fileObj->disposition == 'inline' || $fileObj->disposition == 'attachment'))

@@ -83,7 +83,7 @@ class requestAnrechnung extends Auth_Controller
 		$is_expired = $this->_isExpired($studiensemester_kurzbz);
 		
 		// Check if Lehrveranstaltung was already graded with application blocking grades
-		$is_blocked = self::_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
+		$is_blocked = $this->_LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id);
 		
 		// Get Anrechung data
 		$anrechnungData = $this->anrechnunglib->getAnrechnungDataByLv($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id);
@@ -152,27 +152,24 @@ class requestAnrechnung extends Auth_Controller
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
 		// Exit if application already exists
-		if (self::_applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id))
+		if ($this->_applicationExists($lehrveranstaltung_id, $studiensemester_kurzbz, $prestudent_id))
 		{
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragBereitsGestellt'));
 		}
 		
 		// Exit if application is a past ( < actual ) studysemester
-		if (self::_applicationIsPastSS($studiensemester_kurzbz))
+		if ($this->_applicationIsPastSS($studiensemester_kurzbz))
 		{
 			return $this->outputJsonError($this->p->t('anrechnung', 'antragNichtFuerVerganganeSS'));
 		}
 		
 		// Upload document
-		$result = self::_uploadFile();
+		$result = $this->_uploadFile();
 
-		if (isError($result))
-		{
-			return $this->outputJsonError($result->retval);
-		}
+		if (isError($result)) return $this->outputJsonError(getError($result));
 		
 		// Hold just inserted DMS ID
-		$lastInsert_dms_id = $result->retval['dms_id'];
+		$lastInsert_dms_id = getData($result)->dms_id;
 
 		// Save Anrechnung and Anrechnungstatus
 		$result = $this->AnrechnungModel->createAnrechnungsantrag(
@@ -182,8 +179,8 @@ class requestAnrechnung extends Auth_Controller
 			$begruendung_id,
 			$lastInsert_dms_id,
 			$anmerkung,
-            $begruendung_ects,
-            $begruendung_lvinhalt
+			$begruendung_ects,
+			$begruendung_lvinhalt
 		);
 		
 		if (isError($result))
@@ -215,11 +212,11 @@ class requestAnrechnung extends Auth_Controller
 		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 
 		// Get file to be downloaded from DMS
-        $download = $this->dmslib->download($dms_id);
-        if (isError($download)) return $download;
+		$download = $this->dmslib->getOutputFileInfo($dms_id);
+		if (isError($download)) return $download;
 
-        // Download file
-        $this->outputFile(getData($download));
+		// Download file
+		$this->outputFile(getData($download));
 	}
 
 	/**
@@ -367,16 +364,25 @@ class requestAnrechnung extends Auth_Controller
 	 */
 	private function _uploadFile()
 	{
-		$dms = array(
-			'kategorie_kurzbz'  => 'anrechnung',
-			'version'           => 0,
-			'name'              => $_FILES['uploadfile']['name'],
-			'mimetype'          => $_FILES['uploadfile']['type'],
-			'insertamum'        => (new DateTime())->format('Y-m-d H:i:s'),
-			'insertvon'         => $this->_uid
-		);
-
 		// Upload document
-		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
+		$uploadDataResult = uploadFile('uploadfile', array('pdf'));
+
+		// If an error occurred while uploading the file
+		if (isError($uploadDataResult)) return $uploadDataResult;
+		// If an error occurred while uploading the file
+		if (!hasData($uploadDataResult)) return error('Upload failed');
+
+		// Add file to the DMS (DB + file system)
+		return $this->_ci->dmslib->add(
+			getData($uploadDataResult)['file_name'],
+			getData($uploadDataResult)['file_type'],
+			fopen(getData($uploadDataResult)['full_path'], 'r'),
+			'anrechnung'
+			null, // dokument_kurzbz
+			null, // beschreibung
+			false, // cis_suche
+			null, // schlagworte
+			getAuthUID() // insertvon
+		);
 	}
 }

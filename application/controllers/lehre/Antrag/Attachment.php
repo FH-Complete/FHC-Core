@@ -73,7 +73,7 @@ class Attachment extends FHC_Controller
 			}
 		}
 
-		$result = $this->dmslib->download($dms_id);
+		$result = $this->dmslib->getOutputFileInfo($dms_id);
 		if (isError($result))
 			return show_error(getError($result));
 

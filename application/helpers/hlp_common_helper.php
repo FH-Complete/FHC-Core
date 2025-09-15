@@ -423,6 +423,27 @@ function isValidDate($dateString)
 	}
 }
 
+/**
+ * Utility function to upload a file
+ */
+function uploadFile($post_field_name, $allowed_types = array('*'))
+{
+	$ci =& get_instance(); // get CI instance
+	$ci->load->library(
+		'upload',
+		array(
+			'upload_path' => sys_get_temp_dir(),
+			'allowed_types' => $allowed_types,
+			'overwrite' => true
+		)
+	);
+
+	// If the upload was a success then return the uploaded file info
+	if ($ci->upload->do_upload($post_field_name)) return success($ci->upload->data());
+
+	// If an error occurred then return it
+	return error($ci->upload->display_errors('', ''));
+}
 
 // ------------------------------------------------------------------------
 // PHP functions that don't exist in older versions
@@ -434,10 +455,10 @@ function isValidDate($dateString)
 if (!function_exists('array_is_list')) {
     function array_is_list(array $arr)
     {
-        if ($arr === []) {
-            return true;
-        }
-        return array_keys($arr) === range(0, count($arr) - 1);
+	if ($arr === []) {
+	    return true;
+	}
+	return array_keys($arr) === range(0, count($arr) - 1);
     }
 }
 

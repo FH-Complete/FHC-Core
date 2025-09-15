@@ -233,7 +233,7 @@ class ProfilUpdate extends Auth_Controller
 			) {
 				// Get file to be downloaded from DMS
 				$newFilename = $this->uid . "/document_" . $dms_id;
-				$download = $this->dmslib->download($dms_id);
+				$download = $this->dmslib->getOutputFileInfo($dms_id);
 				if (isError($download))
 					return $download;
 
@@ -290,20 +290,26 @@ class ProfilUpdate extends Auth_Controller
 			$_FILES['files']['error'] = $files['error'][$i];
 			$_FILES['files']['size'] = $files['size'][$i];
 
-			$dms = [
-				"kategorie_kurzbz" => "profil_aenderung",
-				"version" => 0,
-				"name" => $_FILES['files']['name'],
-				"mimetype" => $_FILES['files']['type'],
-				"beschreibung" => $this->uid . " Profil Änderung",
-				"insertvon" => $this->uid,
-				"insertamum" => "NOW()",
-			];
+			$uploadDataResult = uploadFile('files', array('jpg', 'png', 'pdf'));
 
-			$tmp_res = $this->dmslib->upload($dms, 'files', array("jpg", "png", "pdf"));
+			if (hasData($uploadDataResult))
+			{
+				// Add file to the DMS (DB + file system)
+				$dms_res = $this->dmslib->add(
+					getData($uploadDataResult)['file_name'],
+					getData($uploadDataResult)['file_type'],
+					fopen(getData($uploadDataResult)['full_path'], 'r'),
+					'profil_aenderung'
+					null, // dokument_kurzbz
+					null, // beschreibung
+					false, // cis_suche
+					null, // schlagworte
+					getAuthUID() // insertvon
+				);
 
-			$tmp_res = hasData($tmp_res) ? getData($tmp_res) : null;
-			array_push($res, $tmp_res);
+				$tmp_res = hasData($dms_res) ? getData($dms_res) : null;
+				array_push($res, $tmp_res);
+			}
 		}
 
 		echo json_encode($res);

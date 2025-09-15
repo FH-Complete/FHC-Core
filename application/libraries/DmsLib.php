@@ -24,12 +24,9 @@ use \stdClass as stdClass;
 
 class DmsLib
 {
-	const FILE_CONTENT_PROPERTY = 'file_content'; // property name for file content
-
-	private $_UPLOAD_PATH; // temporary directory to store the uploaded file
+	const DMS_SYS_NAME = 'DMS System';
 
 	private $_ci; // code igniter instance
-	private $_who; // who added this document
 
 	/**
 	 * Object initialization
@@ -37,13 +34,6 @@ class DmsLib
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance();
-
-		$this->_UPLOAD_PATH = APPPATH.'tmp/';
-
-		// Set the the _who property
-		$this->_who = 'DMS system'; // default
-		// It is possible to set it using the who parameter
-		if (!isEmptyArray($params) && isset($params['who']) && !isEmptyString($params['who'])) $this->_who = $params['who'];
 
 		$this->_ci->load->model('content/Dms_model', 'DmsModel');
 		$this->_ci->load->model('content/DmsVersion_model', 'DmsVersionModel');
@@ -58,69 +48,85 @@ class DmsLib
 	 * Returns success info of added dms entry (dms_id, version, filename) or error
 	 */
 	public function add(
-		$name, $mimetype, $fileHandle, // Required parameters
-		$kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null
+		// Required parameters
+		$name, $mimetype, $fileHandle,
+		// Optional parameters
+		$kategorie_kurzbz = null, $dokument_kurzbz = null, $beschreibung = null, $cis_suche = false, $schlagworte = null, $insertvon = self::DMS_SYS_NAME
 	)
 	{
-			// create unique filename, using original document name to detect file extension
-			$filename = $this->_getUniqueFilename($name);
+		// If the file handle is not valid
+		if ($fileHandle === false) return error('Was not possible to open the given file');
 
-			// copy file from fileHandle to dms folder
-			$copyFileResult = $this->_copyFile($fileHandle, $filename);
+		// Create unique filename, using original document name to detect file extension
+		$filename = $this->_getUniqueFilename($name);
 
-			if (isError($copyFileResult)) return $copyFileResult;
+		// Copy file from fileHandle to dms folder
+		$copyFileResult = $this->_copyFile($fileHandle, $filename);
 
-			// if file written successful, insert dms
-			$dmsResult = $this->_ci->DmsModel->insert(
-				array(
-					'kategorie_kurzbz' => $kategorie_kurzbz,
-					'dokument_kurzbz' => $dokument_kurzbz
-				)
+		// If an error occrured while copying the file
+		if (isError($copyFileResult)) return $copyFileResult;
+
+		// Insert the new DMS
+		$dmsResult = $this->_ci->DmsModel->insert(
+			array(
+				'kategorie_kurzbz' => $kategorie_kurzbz,
+				'dokument_kurzbz' => $dokument_kurzbz
+			)
+		);
+
+		// If an error occurred
+		if (isError($dmsResult)) return $dmsResult;
+
+		// If a DMS in the previous insert returned the new PK value
+		if (hasData($dmsResult))
+		{
+			$dms_id = getData($dmsResult);
+
+			// Insert the DMS version
+			$dmsVersion = array(
+				'dms_id' => $dms_id,
+				'version' => 0,
+				'filename' => $filename,
+				'mimetype' => $mimetype,
+				'name' => $name,
+				'beschreibung' => $beschreibung,
+				'cis_suche' => $cis_suche,
+				'schlagworte' => $schlagworte,
+				'insertvon' => $insertvon,
+				'insertamum' => date('Y-m-d H:i:s')
 			);
 
-			if (isError($dmsResult)) return $dmsResult;
+			$dmsVersionResult = $this->_ci->DmsVersionModel->insert($dmsVersion);
 
-			if (hasData($dmsResult))
-			{
-				$dms_id = getData($dmsResult);
-				$version = 0;
+			// If an error occured
+			if (isError($dmsVersionResult)) return $dmsVersionResult;
 
-				// insert dms version
-				$dmsVersion = array(
-					'dms_id' => $dms_id,
-					'version' => $version,
-					'filename' => $filename,
-					'mimetype' => $mimetype,
-					'name' => $name,
-					'beschreibung' => $beschreibung,
-					'cis_suche' => $cis_suche,
-					'schlagworte' => $schlagworte,
-					'insertvon' => $this->_who,
-					'insertamum' => date('Y-m-d H:i:s')
-				);
+			// Return dms info
+			$resObj = new stdClass();
+			$resObj->dms_id = $dms_id;
+			$resObj->version = 0;
+			$resObj->filename = $filename;
 
-				$dmsVersionResult = $this->_ci->DmsVersionModel->insert($dmsVersion);
-
-				if (isError($dmsVersionResult)) return $dmsVersionResult;
-
-				// return dms info
-				$resObj = new stdClass();
-				$resObj->dms_id = $dms_id;
-				$resObj->version = $version;
-				$resObj->filename = $filename;
-
-				return success($resObj);
-			}
-			else
-				return success();
+			return success($resObj);
+		}
+		else
+			return success();
 	}
 
 	/**
 	 * Writes a new file with content of fileHandle, adds a new dms version (max version number + 1) for the written file
 	 * Returns success with info of added dms version (version, filename) or error
 	 */
-	public function addNewVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
+	public function addNewVersion(
+		// Required parameters
+		$dms_id, $fileHandle,
+		// Optional parameters
+		$name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null, $insertvon = self::DMS_SYS_NAME
+	)
 	{
+		// If the file handle is not valid
+		if ($fileHandle === false) return error('Was not possible to open the given file');
+
 		// get the latest version
 		$lastVersionResult = $this->getLastVersion($dms_id);
 
@@ -153,7 +159,7 @@ class DmsLib
 				'beschreibung' => isset($beschreibung) ? $beschreibung : $lastVersion->beschreibung,
 				'cis_suche' => isset($cis_suche) ? $cis_suche : $lastVersion->cis_suche,
 				'schlagworte' => isset($schlagworte) ? $schlagworte : $lastVersion->schlagworte,
-				'insertvon' => $this->_who,
+				'insertvon' => $insertvon,
 				'insertamum' => date('Y-m-d H:i:s')
 			);
 
@@ -179,6 +185,9 @@ class DmsLib
 	 */
 	public function updateLastVersion($dms_id, $fileHandle, $name = null, $mimetype = null, $beschreibung = null, $cis_suche = false, $schlagworte = null)
 	{
+		// If the file handle is not valid
+		if ($fileHandle === false) return error('Was not possible to open the given file');
+
 		// get the latest version
 		$lastVersionResult = $this->getLastVersion($dms_id);
 
@@ -225,7 +234,7 @@ class DmsLib
 
 	/**
 	 * Gets dms version with highest number
-	 * Returns success with dms data and fileHandle with file content or error
+	 * Returns success with dms data or error
 	 */
 	public function getLastVersion($dms_id)
 	{
@@ -254,7 +263,7 @@ class DmsLib
 
 	/**
 	 * Gets specified dms version
-	 * Returns success with dms data and fileHandle with file content or error
+	 * Returns success with dms data or error
 	 */
 	public function getVersion($dms_id, $version)
 	{
@@ -266,11 +275,7 @@ class DmsLib
 			)
 		);
 
-		if (isError($dmsVersionResult)) return $dmsVersionResult;
-
-		if (hasData($dmsVersionResult)) return getData($dmsVersionResult)[0];
-
-		return success();
+		return $dmsVersionResult;
 	}
 
 	/**
@@ -410,21 +415,6 @@ class DmsLib
 	}
 
 	/**
-	 * Perform an upload of a file spcifically for the DMS and returns the uploaded file info
-	 */
-	public function upload($allowed_types = array('*'))
-	{
-		// Loads the CI upload library
-		$this->_loadUploadLibrary($allowed_types);
-
-		// If the upload was a success then return the uploaded file info
-		if ($this->_ci->upload->do_upload(DmsLib::FILE_CONTENT_PROPERTY)) return success($this->_ci->upload->data());
-
-		// If an error occurred then return it
-		return error($this->_ci->upload->display_errors('', ''));
-	}
-
-	/**
 	 * Get info from the DMS to be provided to the FHC_Controller->outputFile
 	 */
 	public function getOutputFileInfo($dms_id, $file_name = '', $disposition = 'attachment')
@@ -438,7 +428,7 @@ class DmsLib
 		// If has been found
 		if (hasData($lastVersionResult))
 		{
-			$lastVersion = getData(lastVersionResult)[0];
+			$lastVersion = getData($lastVersionResult)[0];
 
 			$fileObj = new stdClass();
 			$fileObj->filename = $lastVersion->filename;
@@ -506,21 +496,6 @@ class DmsLib
 			$uniqueFilename .= '.'.$fileExtension;
 
 		return $uniqueFilename;
-	}
-
-	/**
-	 * Loads the upload library of CI
-	 */
-	private function _loadUploadLibrary($allowed_types)
-	{
-		$this->_ci->load->library(
-			'upload',
-			array(
-				'upload_path' => $this->_UPLOAD_PATH,
-				'allowed_types' => $allowed_types,
-				'overwrite' => true
-			)
-		);
 	}
 }
 

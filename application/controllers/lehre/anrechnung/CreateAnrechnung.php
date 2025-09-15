@@ -150,15 +150,12 @@ class CreateAnrechnung extends Auth_Controller
 		}
 	
 		// Upload document
-		$result = self::_uploadFile();
+		$result = $this->_uploadFile();
 		
-		if (isError($result))
-		{
-			$this->terminateWithJsonError($result->retval);
-		}
+		if (isError($result)) $this->terminateWithJsonError(getError($result));
 		
 		// Hold just inserted DMS ID
-		$lastInsert_dms_id = $result->retval['dms_id'];
+		$lastInsert_dms_id = getData($result)->dms_id;
 		
 		// Save Anrechnung and Anrechnungstatus
 		$result = $this->AnrechnungModel->createAnrechnungsantrag(
@@ -227,17 +224,25 @@ class CreateAnrechnung extends Auth_Controller
 	 */
 	private function _uploadFile()
 	{
-		$dms = array(
-			'kategorie_kurzbz'  => 'anrechnung',
-			'version'           => 0,
-			'name'              => $_FILES['uploadfile']['name'],
-			'mimetype'          => $_FILES['uploadfile']['type'],
-			'insertamum'        => (new DateTime())->format('Y-m-d H:i:s'),
-			'insertvon'         => $this->_uid
-		);
-		
 		// Upload document
-		return $this->dmslib->upload($dms, 'uploadfile', array('pdf'));
+		$uploadDataResult = uploadFile('uploadfile', array('pdf'));
+
+		// If an error occurred while uploading the file
+		if (isError($uploadDataResult)) return $uploadDataResult;
+		if (!hasData($uploadDataResult)) return error('Upload failed');
+
+		// Add file to the DMS (DB + file system)
+		return $this->_ci->dmslib->add(
+			getData($uploadDataResult)['file_name'],
+			getData($uploadDataResult)['file_type'],
+			fopen(getData($uploadDataResult)['full_path'], 'r'),
+			'anrechnung', // kategorie_kurzbz
+			null, // dokument_kurzbz
+			null, // beschreibung
+			false, // cis_suche
+			null, // schlagworte
+			getAuthUID() // insertvon
+		);
 	}
 	
 	private function _LVhasBlockingGrades($studiensemester_kurzbz, $lehrveranstaltung_id, $prestudent_id)

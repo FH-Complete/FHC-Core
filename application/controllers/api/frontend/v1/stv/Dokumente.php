@@ -24,7 +24,8 @@ class Dokumente extends FHCAPI_Controller
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$this->load->library('form_validation');
-		$this->load->library('DmsLib', array('who' => getAuthUID()));
+		$this->load->library('AkteLib');
+		$this->load->library('DmsLib');
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -187,8 +188,6 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
-		$uid = getAuthUID();
-
 		$result = $this->AkteModel->update(
 			[
 				'akte_id' => $this->input->post('akte_id'),
@@ -199,7 +198,7 @@ class Dokumente extends FHCAPI_Controller
 				'titel_intern' => $this->input->post('titel_intern'),
 				'nachgereicht_am' => $this->input->post('nachgereicht_am'),
 				'updateamum' => date('c'),
-				'updatevon' => $uid,
+				'updatevon' => getAuthUID(),
 			]
 		);
 
@@ -216,8 +215,6 @@ class Dokumente extends FHCAPI_Controller
 		if(!$dokument_kurzbz)
 			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Dokument_kurzbz']), self::ERROR_TYPE_GENERAL);
 
-		$uid = getAuthUid();
-
 		//check if more than 1 dokumentkurzbz
 		//if()
 
@@ -225,10 +222,10 @@ class Dokumente extends FHCAPI_Controller
 			[
 				'prestudent_id' => $prestudent_id,
 				'dokument_kurzbz' => $dokument_kurzbz,
-				'mitarbeiter_uid' => $uid,
+				'mitarbeiter_uid' => getAuthUID(),
 				'datum' => date('c'),
 				'insertamum' => date('c'),
-				'insertvon' =>  $uid,
+				'insertvon' =>  getAuthUID(),
 			]
 		);
 
@@ -251,7 +248,6 @@ class Dokumente extends FHCAPI_Controller
 		$nachgereicht = current($dataAkte)->nachgereicht;
 		$inhalt = current($dataAkte)->inhalt;
 		$inhaltVorhanden = $inhalt != '';
-		$uid = getAuthUid();
 
 		$this->db->trans_start();
 
@@ -267,14 +263,14 @@ class Dokumente extends FHCAPI_Controller
 			//delete from dmsLib
 			$this->load->library('DmsLib');
 			$person_id = current($dataAkte)->person_id;
-			$result = $this->dmslib->delete($person_id, $dms_id);
+			$result = $this->aktelib->removeByPersonIdAndDmsId($person_id, $dms_id);
 			$this->getDataOrTerminateWithError($result);
 
 			//LOGGING Dms ID
 			$this->load->model('system/Log_model', 'LogModel');
 			$result = $this->LogModel->insert([
 				'executetime' => date('c'),
-				'mitarbeiter_uid' => $uid,
+				'mitarbeiter_uid' => getAuthUID(),
 				'beschreibung' => "Löschen der DMS_ID ". $dms_id,
 				'sql' => $logdata_dms
 			]);
@@ -291,7 +287,7 @@ class Dokumente extends FHCAPI_Controller
 			//Logging Deletion Akte
 			$result = $this->LogModel->insert([
 				'executetime' => date('c'),
-				'mitarbeiter_uid' => $uid,
+				'mitarbeiter_uid' => getAuthUID(),
 				'beschreibung' => "Löschen der Akte ". $akte_id,
 				'sql' => "DELETE FROM public.tbl_akte WHERE akte_id=" .$akte_id. " LogData: ". $logdata_akte
 			]);
@@ -310,7 +306,7 @@ class Dokumente extends FHCAPI_Controller
 
 			$result = $this->LogModel->insert([
 				'executetime' => date('c'),
-				'mitarbeiter_uid' => $uid,
+				'mitarbeiter_uid' => getAuthUID(),
 				'beschreibung' => "Löschen der Akte ". $akte_id,
 				'sql' => "DELETE FROM public.tbl_akte WHERE akte_id=" .$akte_id. " LogData: ". $logdata_akte
 			]);
@@ -348,34 +344,44 @@ class Dokumente extends FHCAPI_Controller
 		}
 
 		$this->db->trans_start();
-		$uid = getAuthUID();
 
-		$dms = array(
-			'kategorie_kurzbz'  => 'Akte',
-			'version'           => 0,
-			'name'              => $_FILES['anhang']['name'],
-			'mimetype'          => $_FILES['anhang']['type'],
-			'insertamum'        => date('c'),
-			'insertvon'         => $uid
-		);
-
-		$result = $this->dmslib->upload($dms, 'anhang', array("jpg", "png", "pdf"));
-
-		if (isError($result))
+		$uploadDataResult = uploadFile('anhang', array('jpg', 'png', 'pdf'));
+		if (isError($uploadDataResult))
 		{
-			return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+			return $this->terminateWithError(getError($uploadDataResult), self::ERROR_TYPE_GENERAL);
 		}
-		$dms_id = $result->retval['dms_id'];
+
+		// If data exists
+		if (hasData($uploadDataResult))
+		{
+			// Add file to the DMS (DB + file system)
+			$dms_res = $this->dmslib->add(
+				getData($uploadDataResult)['file_name'],
+				getData($uploadDataResult)['file_type'],
+				fopen(getData($uploadDataResult)['full_path'], 'r'),
+				'Akte', // kategorie_kurzbz
+				null, // dokument_kurzbz
+				null, // beschreibung
+				false, // cis_suche
+				null, // schlagworte
+				getAuthUID() // insertvon
+			);
+		}
+
+		// Error occurred or data not found
+		if (isError($dms_res) || !hasData($dms_res)) $this->terminateWithError(getError($dms_res), self::ERROR_TYPE_GENERAL);
+
+		$dms_id = getData($dms_res)->dms_id;
 
 		$person_id = $this->_getPersonId($prestudent_id);
 
-		$result = $this->DokumentModel->load($dokument_kurzbz);
-		$data = $this->getDataOrTerminateWithError($result);
+		$dokumentResult = $this->DokumentModel->load($dokument_kurzbz);
+		$data = $this->getDataOrTerminateWithError($dokumentResult);
 
 		$bezeichnung = current($data)->bezeichnung;
 
-		//save entry in akte
-		if($dms_id)
+		// Save entry in akte
+		if ($dms_id)
 		{
 			$result = $this->AkteModel->insert([
 				'person_id' => $person_id,
@@ -384,7 +390,7 @@ class Dokumente extends FHCAPI_Controller
 				'mimetype' => $_FILES['anhang']['type'],
 				'insertamum' => date('c'),
 				'erstelltam' => date('c'),
-				'insertvon' => $uid,
+				'insertvon' => getAuthUID(),
 				'anmerkung_intern' => $anmerkung_intern,
 				'titel_intern' => $titel_intern,
 				'bezeichnung' => $bezeichnung,
@@ -431,28 +437,26 @@ class Dokumente extends FHCAPI_Controller
 		$filecontentbase64 = $data->inhalt;
 		$filename = $data->titel;
 
-		if(intval($data->dms_id) > 0)
+		if (intval($data->dms_id) > 0)
 		{
-			$dmsdokres = $this->dmslib->read($data->dms_id);
-			if (!hasData($dmsdokres)) $this->terminateWithError('DMS File not found');
-			$dmsdok = getData($dmsdokres)[0];
+			$file = $this->dmslib->getOutputFileInfo($data->dms_id, $filename);
 
-			$mimetype = $dmsdok->mimetype;
-			$filecontentbase64 = $dmsdok->file_content;
-			$filename = $dmsdok->name;
+			$this->terminateWithFileOutput(getData($file)->mimetype, file_get_contents(getData($file)->file), $filename);
 		}
+		else
+		{
+			$filecontent = '';
 
-		$filecontent = '';
+			if (!empty($filecontentbase64)) {
+				$filecontent = base64_decode($filecontentbase64, true);
 
-		if (!empty($filecontentbase64)) {
-			$filecontent = base64_decode($filecontentbase64, true);
-
-			if ($filecontent === false) {
-				$this->terminateWithError('Base64-Dekodierung failed.');
+				if ($filecontent === false) {
+					$this->terminateWithError('Base64-Dekodierung failed.');
+				}
 			}
-		}
 
-		$this->terminateWithFileOutput($mimetype, $filecontent, $filename);
+			$this->terminateWithFileOutput($mimetype, $filecontent, $filename);
+		}
 	}
 
 	private function _getMissingDocuments($studiengang_kz, $prestudent_id)

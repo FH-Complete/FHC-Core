@@ -136,7 +136,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				$this->uid == $profil_update->uid
 			) {
 				// Get file to be downloaded from DMS
-				$download = $this->dmslib->download($dms_id);
+				$download = $this->dmslib->getOutputFileInfo($dms_id);
 				$download = $this->getDataOrTerminateWithError($download);
 				// Download file
 				$this->outputFile($download);
@@ -456,24 +456,28 @@ class ProfilUpdate extends FHCAPI_Controller
 			$_FILES['files']['error'] = $files['error'][$i];
 			$_FILES['files']['size'] = $files['size'][$i];
 
-			$dms = [
-				"kategorie_kurzbz" => "profil_aenderung",
-				"version" => 0,
-				"name" => $_FILES['files']['name'],
-				"mimetype" => $_FILES['files']['type'],
-				"beschreibung" => $this->uid . " Profil Änderung",
-				"insertvon" => $this->uid,
-				"insertamum" => "NOW()",
-			];
+			// File upload
+			$uploadDataResult = uploadFile('files', array('jpg', 'png', 'pdf'));
+			if (isError($uploadDataResult)) $this->addError(getError($uploadDataResult));
+			if (!hasData($uploadDataResult)) $this->addError('Upload failed');
 
-			$tmp_res = $this->dmslib->upload($dms, 'files', array("jpg", "png", "pdf"));
-			
-			if(isError($tmp_res)){
-				$this->addError(getError($tmp_res));
+			if (hasData($uploadDataResult))
+			{
+				// Add file to the DMS (DB + file system)
+				$dms_res = $this->dmslib->add(
+					getData($uploadDataResult)['file_name'],
+                        	        getData($uploadDataResult)['file_type'],
+                        	        fopen(getData($uploadDataResult)['full_path'], 'r'),
+                        	        'profil_aenderung', // kategorie_kurzbz
+                        	        null, // dokument_kurzbz
+                        	        null, // beschreibung
+                        	        false, // cis_suche
+                        	        null, // schlagworte
+                        	        getAuthUID() // insertvon
+				);
+				$dms_res = $this->getDataOrTerminateWithError($dms_res);
+				array_push($res, $dms_res);
 			}
-
-			$tmp_res = $this->getDataOrTerminateWithError($tmp_res);
-			array_push($res, $tmp_res);
 		}
 
 		$this->terminateWithSuccess($res);
