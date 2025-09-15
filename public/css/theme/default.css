@@ -89,7 +89,8 @@
 	--fhc-link: var(--fhc-blue-10);
 
 	/* disabled */
-	--fhc-disabled: var(--fhc-gray-10);
+	--fhc-disabled: var(--fhc-gray-90);
+	--fhc-disabled-background: var(--fhc-gray-30);
 
 	/* status colors */
 	--fhc-danger: var(--fhc-red-10);
@@ -135,6 +136,7 @@
 
 	/* disabled */
 	--fhc-disabled: var(--fhc-gray-10);
+	--fhc-disabled-background: var(--fhc-gray-120);
 
 	/* status colors */
 	--fhc-danger: var(--fhc-red-10);

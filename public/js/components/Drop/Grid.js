@@ -274,8 +274,23 @@ export default {
 		dragging(event){
 			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
-				this.clonedWidget.style.top = `${this.clientY-20}px`;
-				this.clonedWidget.style.left = `${this.clientX-15}px`;
+				
+				const containerRect = this.$refs.container.getBoundingClientRect();
+				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
+				
+				let desiredTop = this.clientY - 20;
+				let desiredLeft = this.clientX - 15;
+				
+				const minTop = 0;
+				const maxTop = containerRect.height - clonedWidgetRect.height;
+				const minLeft = 0;
+				const maxLeft = containerRect.width - clonedWidgetRect.width;
+				
+				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
+				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
+				
+				this.clonedWidget.style.top = `${constrainedTop}px`;
+				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
 		},
 		createNewGrid(items) {
@@ -413,11 +428,14 @@ export default {
 			setTimeout(() => {
 				this.draggedNode = evt.target.closest(".drop-grid-item");
 				//clones the widget for the drag Image
+				
 				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
 
 				clone.style.zIndex = 5;
 				clone.classList.add("widgetClone");
 				this.$refs.container.appendChild(clone);
+				const hiddenWidget = clone.querySelector("[style='display: none;']");
+				hiddenWidget.style.removeProperty("display");
 				this.clonedWidget = clone;
 			}, 0);
 
@@ -434,12 +452,9 @@ export default {
 		},
 		dragOver(evt) {
 			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
-				this.positionUpdates = this.positionUpdates?.filter(item => {
-					return item.widgetid == this.draggedItem.data.widgetid;
-				})
-				this.dragEnd();
 				this.dragCancel();
-			} 
+				
+			}
 			if (!this.active)
 				return this.dragCancel();
 			this.checkPinnedWidgetAnimation();
@@ -454,17 +469,17 @@ export default {
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
-							this.draggedOffset[0] -= x;
+							this.draggedOffset[0] += x;
 							x = 0;
 						} else if (x + this.draggedItem.w > this.cols) {
 							this.draggedOffset[0] += this.cols - this.draggedItem.w - x;
 							x = this.cols - this.draggedItem.w;
 						}
 						if (y < 0) {
-							this.draggedOffset[1] -= y;
+							this.draggedOffset[1] += y;
 							y = 0;
 						}
-						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
+						this.positionUpdates= this.dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
@@ -481,6 +496,7 @@ export default {
 			}
 		},
 		dragCancel() {
+			this.removeWidgetClones();
 			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
@@ -492,8 +508,12 @@ export default {
 			
 		},
 		dragEnd() {
-			if (this.mode == MODE_IDLE)
+			this.removeWidgetClones();
+			this.toggleDraggedItemOverlay(false);
+			
+			if (this.mode == MODE_IDLE){
 				return;
+			}
 			// clean up unused classes
 			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
 			draggedItemNode.classList.remove("border-danger");
@@ -501,19 +521,19 @@ export default {
 				ele.classList.remove("denied-dragging-animation");
 			})
 			
-			let widgetClones = document.getElementsByClassName("widgetClone");
-			for (let i=0; i <widgetClones.length; i++){ 
-				this.$refs.container.removeChild(widgetClones[i]);
-			}
-			
-			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
-				return this.dragCancel();
+			//if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
+				//return this.dragCancel();
+
 			this.mode = MODE_IDLE;
 			let updated = [];
 			this.convertGridResultToUpdate(this.positionUpdates, updated);
 			updated = this._updateFixedPositions(updated);
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
+
+			this.draggedItem = null;
+			this.draggedNode = null;
+			this.$emit('draggedItem', null);
 		},
 		_updateFixedPositions(updated) {
 			updated.forEach((item, index) => {
@@ -597,6 +617,12 @@ export default {
 				draggedItemNode.classList.remove("border-danger");
 			}
 		},
+		removeWidgetClones(){
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
+			}
+		},
 		mouseDown(){
 			this.mode = MODE_MOUSE_DOWN;
 		},
@@ -612,7 +638,7 @@ export default {
 		@touchmove="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
-		@drop="dragEnd"
+		@drop="dragEnd($event)"
 		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
@@ -626,7 +652,7 @@ export default {
 				@mouse-up="mouseUp"
 				@start-resize="startResize"
 				@dragging="dragging"
-				@end-drag="dragCancel"
+				@end-drag="dragEnd"
 				@touch-end="dragEnd();mouseUp();"
 				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
