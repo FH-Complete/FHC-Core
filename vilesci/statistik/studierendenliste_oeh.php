@@ -60,7 +60,6 @@ header( 'Content-Disposition: attachment;filename='.$filename);
 $qry="
 SELECT * FROM (
 SELECT DISTINCT ON (matrikelnr) matrikelnr AS personenkennzeichen,
-	tbl_person.svnr,
 	tbl_person.ersatzkennzeichen,
 	tbl_person.gebdatum,
 	tbl_person.nachname,
