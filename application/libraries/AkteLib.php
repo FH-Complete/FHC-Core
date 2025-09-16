@@ -23,7 +23,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class AkteLib
 {
 	const AKTE_KATEGORIE_KURZBZ = 'Akte'; // kategorie_kurzbz of dms when inserting for akte
-	const FILE_CONTENT_PROPERTY = 'file_content';
 
 	private $_ci; // Code igniter instance
 	private $_who; // who added this document
@@ -131,28 +130,12 @@ class AkteLib
 	 * Gets akte data and associated dms data by akte Id
 	 * Returns success with akte and dms data or error
 	 */
-	public function getByAkteId($akte_id, $archiv = null, $signiert = null, $stud_selfservice = null)
+	public function getByAkteId($akte_id, $dokument_kurzbz = null, $archiv = null, $signiert = null, $stud_selfservice = null)
 	{
 		return $this->_get(
 			$akte_id,
 			null, // person_id
-			null, // dokument_kurzbz
-			$archiv,
-			$signiert,
-			$stud_selfservice
-		);
-	}
-
-	/**
-	 * Gets Akte data and associated dms data by person Id
-	 * Returns success with result array with akte and dms data or error
-	 */
-	public function getByPersonId($person_id, $archiv = null, $signiert = null, $stud_selfservice = null)
-	{
-		return $this->_get(
-			null, // akte_id
-			$person_id,
-			null, // dokument_kurzbz
+			$dokument_kurzbz,
 			$archiv,
 			$signiert,
 			$stud_selfservice
@@ -163,7 +146,7 @@ class AkteLib
 	 * Gets Akte data and associated dms data by person Id and dokument_kurzbz
 	 * Returns success with result array with akte and dms data or error
 	 */
-	public function getByPersonIdAndDocumentType($person_id, $dokument_kurzbz)
+	public function getByPersonId($person_id, $dokument_kurzbz = null, $archiv = null, $signiert = null, $stud_selfservice = null)
 	{
 		return $this->_get(
 			null, // akte_id
@@ -234,18 +217,18 @@ class AkteLib
 		$paramArray = array();
 
 		// akte_id
-		if (is_int($akte_id) || is_array($akte_id))
+		if (is_numeric($akte_id) || is_array($akte_id))
 		{
 			$paramArray[] = $akte_id;
-			if (is_int($akte_id)) $query .= ' AND akte_id = ?';
+			if (is_numeric($akte_id)) $query .= ' AND akte_id = ?';
 			if (is_array($akte_id)) $query .= ' AND akte_id IN ?';
 		}
 
 		// person_id
-		if (is_int($person_id) || is_array($person_id))
+		if (is_numeric($person_id) || is_array($person_id))
 		{
 			$paramArray[] = $person_id;
-			if (is_int($person_id)) $query .= ' AND person_id = ?';
+			if (is_numeric($person_id)) $query .= ' AND person_id = ?';
 			if (is_array($person_id)) $query .= ' AND person_id IN ?';
 		}
 
@@ -277,6 +260,9 @@ class AkteLib
 			$query .= ' AND stud_selfservice = ?';
 		}
 
+		// If no parameters has been provided exit
+		if (isEmptyArray($paramArray)) return error('Called without giving any parameter');
+
 		// Loads data from DB
 		$akteResult = $dbModel->execReadOnlyQuery($query, $paramArray);
 
@@ -293,12 +279,12 @@ class AkteLib
 			if (isError($dmsResult)) return $dmsResult;
 
 			// properties to retrieve from dms
-			$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte', AkteLib::FILE_CONTENT_PROPERTY);
+			$dmsProperties = array('version', 'filename', 'mimetype', 'name', 'beschreibung', 'cis_suche', 'schlagworte');
 
 			// set dms properties
 			if (hasData($dmsResult))
 			{
-				$dmsData = getData($dmsResult);
+				$dmsData = getData($dmsResult)[0];
 
 				foreach ($dmsProperties as $dmsProperty)
 				{
@@ -312,7 +298,7 @@ class AkteLib
 			}
 			else
 			{
-				// set null if no dms result found
+				// Set null if no dms result found
 				foreach ($dmsProperties as $dmsProperty)
 				{
 					if ($dmsProperty != 'mimetype') $resultObject->{$dmsProperty} = null;
@@ -337,9 +323,9 @@ class AkteLib
 
 		$paramArray = array();
 
-		if (is_int($akte_id)) $paramArray['akte_id'] = $akte_id;
-		if (is_int($person_id)) $paramArray['person_id'] = $person_id;
-		if (is_int($dms_id)) $paramArray['dms_id'] = $dms_id;
+		if (is_numeric($akte_id)) $paramArray['akte_id'] = $akte_id;
+		if (is_numeric($person_id)) $paramArray['person_id'] = $person_id;
+		if (is_numeric($dms_id)) $paramArray['dms_id'] = $dms_id;
 
 		$akteResult = $this->_ci->AkteModel->loadWhere($paramArray);
 

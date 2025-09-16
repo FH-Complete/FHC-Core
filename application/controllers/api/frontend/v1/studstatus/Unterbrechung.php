@@ -168,7 +168,7 @@ class Unterbrechung extends FHCAPI_Controller
 				getData($uploadDataResult)['file_name'],
 				getData($uploadDataResult)['file_type'],
 				fopen(getData($uploadDataResult)['full_path'], 'r'),
-				'studierendenantrag'
+				'studierendenantrag',
 				null, // dokument_kurzbz
 				null, // beschreibung
 				false, // cis_suche

@@ -32,8 +32,8 @@ class Akte extends Auth_Controller
 			'download' => ['admin:w', 'assistenz:w'],
 		]);
 
-		// Load models
-		$this->load->model('crm/Akte_model', 'AkteModel');
+		// Load libraries
+		$this->load->library('AkteLib');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -49,22 +49,23 @@ class Akte extends Auth_Controller
 
 		if (!is_numeric($akte_id)) $this->terminateWithError('akte Id missing');
 
-		$result = $this->AkteModel->load($akte_id);
+		$akteResult = $this->aktelib->getByAkteId($akte_id);
 
-		if (!hasData($result)) $this->terminateWithError('Akte not found');
+		if (!hasData($akteResult)) $this->terminateWithError('Akte not found');
 
-		$data = getData($result)[0];
+		$data = getData($akteResult)[0];
 
-		if (isset($data->inhalt) && $data->inhalt != '')
+		if (!isEmptyString($data->inhalt))
 		{
-			header('Content-Description: File Transfer');
-			header('Content-Type: '. $data->mimetype);
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Disposition: attachment; filename="'.$data->titel.'"');
-			echo base64_decode($data->inhalt);
-			die();
+			$fileObj = new stdClass();
+			$fileObj->filename = $data->filename;
+			$fileObj->file_content = base64_decode($data->inhalt);
+			$fileObj->name = $data->titel;
+			$fileObj->mimetype = $data->mimetype;
+			$fileObj->disposition = 'attachment';
+
+			$this->outputFile($fileObj);
 		}
 	}
 }
+

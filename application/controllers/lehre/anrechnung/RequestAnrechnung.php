@@ -377,7 +377,7 @@ class requestAnrechnung extends Auth_Controller
 			getData($uploadDataResult)['file_name'],
 			getData($uploadDataResult)['file_type'],
 			fopen(getData($uploadDataResult)['full_path'], 'r'),
-			'anrechnung'
+			'anrechnung',
 			null, // dokument_kurzbz
 			null, // beschreibung
 			false, // cis_suche

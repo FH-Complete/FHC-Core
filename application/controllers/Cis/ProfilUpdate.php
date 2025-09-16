@@ -217,7 +217,6 @@ class ProfilUpdate extends Auth_Controller
 
 	public function show($dms_id)
 	{
-
 		$profil_update = $this->ProfilUpdateModel->loadWhere(['attachment_id' => $dms_id]);
 		$profil_update = hasData($profil_update) ? getData($profil_update)[0] : null;
 
@@ -239,13 +238,10 @@ class ProfilUpdate extends Auth_Controller
 
 				// Download file
 				$this->outputFile(getData($download));
-
-
 			} else {
 				show_error($this->p->t('profilUpdate', 'profilUpdate_permission_error'));
 				return;
 			}
-
 		} else {
 			show_error($this->p->t('profilUpdate', 'profilUpdate_dms_error'));
 			return;
@@ -299,7 +295,7 @@ class ProfilUpdate extends Auth_Controller
 					getData($uploadDataResult)['file_name'],
 					getData($uploadDataResult)['file_type'],
 					fopen(getData($uploadDataResult)['full_path'], 'r'),
-					'profil_aenderung'
+					'profil_aenderung',
 					null, // dokument_kurzbz
 					null, // beschreibung
 					false, // cis_suche

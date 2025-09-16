@@ -136,38 +136,78 @@ abstract class FHC_Controller extends CI_Controller
 	/**
 	 * To download the given file represented by the fileObj parameter.
 	 * fileObj has the following structure:
-	 * 	$fileObj->filename
-	 * 	$fileObj->file
+	 * 	$fileObj->file_name
+	 * 	$fileObj->file OR $fileObj->file_content
 	 * 	$fileObj->name
 	 * 	$fileObj->mimetype
-	 * 	$fileObj->disposition
+	 * 	$fileObj->disposition (inline OR attachment)
 	 */
 	protected function outputFile($fileObj)
 	{
 		// If the file exists
-		if (isset($fileObj->file) && !isEmptyString($fileObj->file) && file_exists($fileObj->file))
+		if ((isset($fileObj->file) && !isEmptyString($fileObj->file) && file_exists($fileObj->file))
+		|| (isset($fileObj->file_content) && !isEmptyString($fileObj->file_content)))
 		{
-			header('Cache-Control: must-revalidate');
-			header('Content-Description: File Transfer');
-			header('Content-Type: '. $fileObj->mimetype);
-			header('Expires: 0');
-			header('Pragma: public');
-			header('Content-Length: ' . filesize($fileObj->file));
-			header('Content-Transfer-Encoding: binary');
+			$content_length = 0;
 
-			if (isset($fileObj->disposition)
-				&& ($fileObj->disposition == 'inline' || $fileObj->disposition == 'attachment'))
+			// If file content has been provided
+			if (isset($fileObj->file_content) && !isEmptyString($fileObj->file_content))
 			{
-				header('Content-Disposition: '. $fileObj->disposition. '; filename="'. $fileObj->name. '"');
+				$content_length = strlen($fileObj->file_content);
+			}
+			else // otherwise the path + name of the file
+			{
+				$content_length = filesize($fileObj->file);
 			}
 
-			readfile($fileObj->file); // reads the file content to the output buffer
+			header('Content-Description: File Transfer');
+			header('Content-Type: '. $fileObj->mimetype);
+			header('Content-Length: ' . $content_length);
+			header('Content-Transfer-Encoding: binary');
+			header('Content-Disposition: '. $fileObj->disposition. '; file_name="'. $fileObj->name. '"');
+			header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+			header('Expires: ' . date("D, d M Y H:i:s", time()));
+			header('Pragma: public');
+
+			// Clean the output buffer
+			flush();
+
+			// If file content has been provided
+			if (isset($fileObj->file_content) && !isEmptyString($fileObj->file_content))
+			{
+				echo $fileObj->file_content;
+			}
+			else // otherwise get the content from file system
+			{
+				readfile($fileObj->file);
+			}
+
+			// Terminate the execution
+			exit();
 		}
-		else
-		{
-			// Otherwise print an error
-			show_error('The provided file does not exist: '.(isset($fileObj->file) ? $fileObj->file : 'file not given'));
-		}
+
+		// Otherwise return an error
+		show_error('The provided file does not exist or file content is empty');
+	}
+
+	/**
+	 *
+	 */
+	protected function outputImageByContent($mimetype, $file_content)
+	{
+		if (isEmptyString($file_content)) show_error('The provided file content is not valid');
+
+		$this->_outputImage($mimetype, $file_content);
+	}
+
+	/**
+	 *
+	 */
+	protected function outputImageByFile($mimetype, $file_name)
+	{
+		if (!file_exists($file_name)) show_error('The provided file does not exist');
+
+		$this->_outputImage($mimetype, null, $file_name);
 	}
 
 	/**
@@ -193,6 +233,45 @@ abstract class FHC_Controller extends CI_Controller
 		{
 			show_error('This web site cannot work correctly without the HTTPS protocol enabled');
 		}
+	}
+
+	/**
+	 *
+	 */
+	private function _outputImage($mimetype, $file_content = null, $file_name = null)
+	{
+		$content_length = 0;
+
+		// If file content has been provided
+		if ($file_content != null)
+		{
+			$content_length = strlen($file_content);
+		}
+		else // otherwise the path + name of the file
+		{
+			$content_length = filesize($file_name);
+		}
+
+		header('Content-Type: '. $mimetype);
+		header('Content-Length: ' . $content_length);
+		header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+		header('Expires: ' . date("D, d M Y H:i:s", time()));
+
+		// Clean the output buffer
+		flush();
+
+		// If file content has been provided
+		if ($file_content != null)
+		{
+			echo $file_content;
+		}
+		else // otherwise get the content from file system
+		{
+			readfile($file_name);
+		}
+
+		// Terminate the execution
+		exit();
 	}
 }
 
