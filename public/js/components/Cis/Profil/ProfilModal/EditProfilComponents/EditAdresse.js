@@ -94,7 +94,7 @@ export default {
         this.data[bind] = event.target.checked;
 	  } else if(bind === 'files') {
 		  if(this.dmsData.length > 0 && this.dmsData[0].type !== 'application/x.fhc-dms+json') {
-			this.fileschanged = true;
+		    this.fileschanged = true;
 		  }
 		  this.updateFileID(this.dmsData);
       } else {
@@ -241,6 +241,7 @@ export default {
 
 	<div class="row g-2">
 		<div class="col">
+			<div class="form-underline-titel">{{$p.t('profilUpdate','meldebestaetigung')}}*</div>
 			<dms
 				ref="update"
 				id="files"
@@ -251,6 +252,7 @@ export default {
 			></dms>
 		</div>
 		<div class="col-auto">
+			<div>&nbsp;</div>
 			<button
 					@click="deleteDmsData"
 					class="btn btn-danger"
