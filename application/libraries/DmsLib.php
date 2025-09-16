@@ -433,7 +433,7 @@ class DmsLib
 			$fileObj = new stdClass();
 			$fileObj->filename = $lastVersion->filename;
 			$fileObj->file = DMS_PATH.$lastVersion->filename;
-			$fileObj->name = isEmptyString($file_name) ? DMS_PATH.$lastVersion->name : $file_name;
+			$fileObj->name = isEmptyString($file_name) ? $lastVersion->name : $file_name;
 			$fileObj->mimetype = $lastVersion->mimetype;
 			$fileObj->disposition = $disposition;
 
