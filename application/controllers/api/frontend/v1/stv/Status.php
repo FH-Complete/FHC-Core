@@ -114,9 +114,8 @@ class Status extends FHCAPI_Controller
 		$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 
 		$result = $this->BismeldestichtagModel->getLastReachedMeldestichtag();
-		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($data);
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
 	}
 
 	public function isLastStatus($prestudent_id)
