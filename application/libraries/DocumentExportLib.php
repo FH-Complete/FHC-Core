@@ -34,15 +34,11 @@ use SimpleXMLElement as SimpleXMLElement;
  * modifiing said data (sign()/setXMLTag_archivierbar()) or adding
  * images (addImage()) and then call output() and close().
  * Now the create, output and close functions are combined into one function and adding data and images is done via parameters.
- * There are now two functions getContent() and showContent() where showContent() equals to output(false) and getContent equals to output(true)
  * Instead of calling addDataArray, addDataXML or addDataURL just call
  * getDataArray, getDataXML or getDataURL respectevily and use the return
- * value as $xml_data parameter in the showContent and getContent calls.
+ * value as $xml_data parameter in the getContent call.
  * Instead of calling addImages just create an array and pass it as $images
- * parameter to the showContent/getContent function.
- * The old setFilename() function is now a parameter in showContent(). It is
- * not needed in getContent() since that function does not do anything that
- * requires a filename.
+ * parameter to the getContent function.
  * To get/show a signed document just pass a valid uid as $sign_user
  * parameter.
  *
@@ -63,21 +59,10 @@ use SimpleXMLElement as SimpleXMLElement;
  * 	'name' => $imagename,
  * 	'contenttype' => $imagecontenttype
  * ]];
- * $this->documentexportlib->showContent(
- * 	$filename,
- * 	$vorlage,
- * 	$xml_data,
- * 	$oe_kurzbz,
- * 	$version,
- * 	$outputformat,
- * 	null,
- * 	null,
- * 	$images
- * );
  */
 class DocumentExportLib
 {
-	private $unoconv_version;
+	private $_ci;
 
 	/**
 	 * Constructor
@@ -85,33 +70,10 @@ class DocumentExportLib
 	public function __construct()
 	{
 		// Gets CI instance
-		$this->ci =& get_instance();
+		$this->_ci =& get_instance();
 
 		// Load Phrases
-		$this->ci->load->library('PhrasesLib', ['document_export', null], 'documentExportPhrases');
-
-		// Which document converter has to be used
-		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
-		{
-			// Use docsbox!!
-		}
-		else
-		{
-			exec('unoconv --version', $ret_arr);
-
-			if(isset($ret_arr[0]))
-			{
-				$hlp = explode(' ', $ret_arr[0]);
-				if(isset($hlp[1]))
-				{
-					$this->unoconv_version = $hlp[1];
-				}
-				else
-					show_error($this->ci->documentExportPhrases->t("document_export", "error_unoconv_version"));
-			}
-			else
-				show_error($this->ci->documentExportPhrases->t("document_export", "error_unoconv"));
-		}
+		$this->_ci->load->library('DocumentLib', ['document_export', null], 'DocumentExportPhrases');
 	}
 
 	/**
@@ -172,7 +134,7 @@ class DocumentExportLib
 		$xml_data = new DOMDocument;
 
 		if (!$xml_data->load($xml_url))
-			return error($this->ci->documentExportPhrases->t("document_export", "error_xml_load", [
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_xml_load", [
 				"url" => $xml_url,
 				"xml" => $xml,
 				"params" => $params
@@ -236,7 +198,7 @@ class DocumentExportLib
 
 		$outputformat = $this->getDefaultOutputFormat($outputformat, $vorlage->mimetype);
 
-		$result = $this->createAndSignContent(
+		$createResult = $this->createAndSignContent(
 			$temp_folder,
 			$outputformat,
 			$vorlage,
@@ -247,118 +209,26 @@ class DocumentExportLib
 			$sign_user,
 			$sign_profile
 		);
-		if (isError($result)) {
+		if (isError($createResult)) {
 			$this->close($temp_folder, $source_folder);
-			return $result;
+			return $createResult;
 		}
-		$temp_filename = getData($result);
+		$temp_filename = getData($createResult);
 
 		$fsize = filesize($temp_filename);
 		$handle = fopen($temp_filename, 'r');
 		if (!$handle)
-			return error($this->ci->documentExportPhrases->t("document_export", "error_file_load"));
-		$result = fread($handle, $fsize);
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_file_load"));
+		$fileContentResult = fread($handle, $fsize);
 		fclose($handle);
 
 		$this->close($temp_folder, $source_folder);
 
-		return success($result);
+		return success($fileContentResult);
 	}
 
 	/**
-	 * Sets the headers and displays the Document.
-	 * On failure the exit() function will be called
-	 *
-	 * @param string				$filename
-	 * @param stdClass				$vorlage A db entry from tbl_vorlage
-	 * @param DomDocument			$xml_data
-	 * @param string				$oe_kurzbz
-	 * @param integer|null			$version (optional)
-	 * @param string				$outputformat (optional)
-	 * @param string				$sign_user (optional) Must be a valid uid
-	 * @param string				$sign_profile (optional) Signatureprofile for signing
-	 * @param array					$images (optional) Each element should have a property path, name & contenttype which are all strings
-	 *
-	 * @return void
-	 */
-	public function showContent(
-		$filename,
-		$vorlage,
-		$xml_data,
-		$oe_kurzbz,
-		$version = null,
-		$outputformat = null,
-		$sign_user = null,
-		$sign_profile = null,
-		$images = []
-	) {
-		$source_folder = getcwd();
-		$temp_folder = sys_get_temp_dir() . '/fhcunoconv-' . uniqid();
-
-		$outputformat = $this->getDefaultOutputFormat($outputformat, $vorlage->mimetype);
-
-		$result = $this->createAndSignContent(
-			$temp_folder,
-			$outputformat,
-			$vorlage,
-			$oe_kurzbz,
-			$version,
-			$xml_data,
-			$images,
-			$sign_user,
-			$sign_profile
-		);
-		if (isError($result)) {
-			$this->close($temp_folder, $source_folder);
-			exit(getError($result));
-		}
-		$temp_filename = getData($result);
-
-		$fsize = filesize($temp_filename);
-		$handle = fopen($temp_filename, 'r');
-		if (!$handle) {
-			$this->close($temp_folder, $source_folder);
-			exit($this->ci->documentExportPhrases->t("document_export", "error_file_load"));
-		}
-
-		if (headers_sent()) {
-			$this->close($temp_folder, $source_folder);
-			exit($this->ci->documentExportPhrases->t("document_export", "error_headers"));
-		}
-
-		switch ($outputformat) {
-			case 'pdf':
-				header('Content-type: application/pdf');
-				header('Content-Disposition: attachment; filename="' . $filename . '.pdf"');
-				header('Content-Length: ' . $fsize);
-				break;
-
-			case 'doc':
-				header('Content-type: application/vnd.ms-word');
-				header('Content-Disposition: attachment; filename="' . $filename . '.doc"');
-				header('Content-Length: ' . $fsize);
-				break;
-
-			case 'odt':
-				header('Content-type: application/vnd.oasis.opendocument.text');
-				header('Content-Disposition: attachment; filename="' . $filename . '.odt"');
-				header('Content-Length: ' . $fsize);
-				break;
-			default:
-				$this->close($temp_folder, $source_folder);
-				exit($this->ci->documentExportPhrases->t("document_export", "error_outputformat_missing"));
-		}
-
-		while (!feof($handle)) {
-			echo fread($handle, 8192);
-		}
-		fclose($handle);
-
-		$this->close($temp_folder, $source_folder);
-	}
-
-	/**
-	 * Helper function for getContent and showContent.
+	 * Helper function for getContent
 	 * Creates the temp folder and calls create and sign functions.
 	 *
 	 * @param string				$temp_folder
@@ -387,13 +257,13 @@ class DocumentExportLib
 		mkdir($temp_folder);
 		chdir($temp_folder);
 
-		$this->ci->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
+		$this->_ci->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
 
-		$result = $this->ci->VorlagestudiengangModel->getCurrent($vorlage->vorlage_kurzbz, $oe_kurzbz, $version);
+		$result = $this->_ci->VorlagestudiengangModel->getCurrent($vorlage->vorlage_kurzbz, $oe_kurzbz, $version);
 		if (isError($result))
 			return $result;
 		if (!hasData($result))
-			return error($this->ci->documentExportPhrases->t("document_export", "error_template_missing"));
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_template_missing"));
 		$vorlage_stg = current(getData($result));
 		foreach ($vorlage_stg as $k => $v)
 			$vorlage->$k = $v;
@@ -437,7 +307,7 @@ class DocumentExportLib
 	{
 		$content_xsl = new DOMDocument();
 		if (!$content_xsl->loadXML($vorlage->text))
-			return error($this->ci->documentExportPhrases->t("document_export", "error_xsl_load"));
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_xsl_load"));
 
 		$proc = new XSLTProcessor();
 		$proc->importStyleSheet($content_xsl);
@@ -454,7 +324,7 @@ class DocumentExportLib
 		if ($vorlage->style) {
 			$styles_xsl = new DOMDocument();
 			if (!$styles_xsl->loadXML($vorlage->style))
-				return error($this->ci->documentExportPhrases->t("document_export", "error_styles_load"));
+				return error($this->_ci->DocumentExportPhrases->t("document_export", "error_styles_load"));
 			$style_proc = new XSLTProcessor();
 			$style_proc->importStyleSheet($styles_xsl);
 
@@ -482,7 +352,7 @@ class DocumentExportLib
 		$tempname_zip = $temp_folder . '/out.zip';
 
 		if (!copy($zipfile, $tempname_zip))
-			return error($this->ci->documentExportPhrases->t("document_export", "error_file_copy"));
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_file_copy"));
 
 		exec("zip $tempname_zip content.xml");
 		if (!is_null($styles_xsl))
@@ -502,7 +372,7 @@ class DocumentExportLib
 
 			$manifest_xml = new DOMDocument;
 			if (!$manifest_xml->loadXML($manifest))
-				return error($this->ci->documentExportPhrases->t("document_export", "error_manifest"));
+				return error($this->_ci->DocumentExportPhrases->t("document_export", "error_manifest"));
 
 			//root-node holen
 			$root = $manifest_xml->getElementsByTagName('manifest')->item(0);
@@ -557,7 +427,7 @@ class DocumentExportLib
 				}
 
 				if ($ret)
-					return error($this->ci->documentExportPhrases->t("document_export", "error_conv_timeout"));
+					return error($this->_ci->DocumentExportPhrases->t("document_export", "error_conv_timeout"));
 				break;
 			case 'odt':
 			default:
@@ -582,7 +452,7 @@ class DocumentExportLib
 	protected function sign($temp_folder, $temp_filename, $outputformat, $user, $profile)
 	{
 		if ($outputformat != 'pdf')
-			return error($this->ci->documentExportPhrases->t("document_export", "error_sign_pdf"));
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_sign_pdf"));
 
 		// Load the File
 		$file_data = file_get_contents($temp_filename);
@@ -624,7 +494,7 @@ class DocumentExportLib
 		$result = curl_exec($ch);
 		if (curl_errno($ch)) {
 			curl_close($ch);
-			return error($this->ci->documentExportPhrases->t("document_export", "error_sign_timeout"));
+			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_sign_timeout"));
 		}
 		curl_close($ch);
 		$resultdata = json_decode($result);
@@ -637,7 +507,7 @@ class DocumentExportLib
 		}
 
 		// otherwise if it is an error
-		return error($resultdata->retval ?? $this->ci->documentExportPhrases->t("global", "unknown_error", ["error" => $result]));
+		return error($resultdata->retval ?? $this->_ci->DocumentExportPhrases->t("global", "unknown_error", ["error" => $result]));
 	}
 
 	/**
@@ -714,3 +584,4 @@ class DocumentExportLib
 		return 'pdf';
 	}
 }
+

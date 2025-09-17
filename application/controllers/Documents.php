@@ -143,7 +143,7 @@ class Documents extends Auth_Controller
 
 			$result = $this->VorlagestudiengangModel->getCurrent($xsl, $xsl_oe_kurzbz, $version);
 			if (isError($result))
-				return show_error(getError($result));
+				show_error(getError($result));
 			if (!hasData($result))
 				return show_404();
 			
@@ -226,13 +226,13 @@ class Documents extends Auth_Controller
 
 		$result = $this->VorlageModel->load($xsl);
 		if (isError($result))
-			return show_error(getError($result));
+			show_error(getError($result));
 		if (!hasData($result))
 			show_404();
 		
 		$vorlage = current(getData($result));
 		if ($sign_user && !$vorlage->signierbar)
-			return show_error($this->p->t("stv", "grades_error_sign"));
+			show_error($this->p->t("stv", "grades_error_sign"));
 
 		
 		// Filename
@@ -242,7 +242,7 @@ class Documents extends Auth_Controller
 				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 				$result = $this->StudiengangModel->load($this->input->post_get('stg_kz'));
 				if (!isError($result) && hasData($result))
-					$filename .= '_' . sanitizeProblemChars(current(getData($result))->kurzbzlang);
+		/output			$filename .= '_' . sanitizeProblemChars(current(getData($result))->kurzbzlang);
 
 				$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 				$result = $this->StudiensemesterModel->load($this->input->post_get('ss'));
@@ -284,11 +284,23 @@ class Documents extends Auth_Controller
 		// XML Data
 		$result = $this->documentexportlib->getDataURL($xml, $params);
 		if (isError($result))
-			return show_error(getError($result));
+			show_error(getError($result));
 
 		$data = getData($result);
 
-		// Output
-		$this->documentexportlib->showContent($filename, $vorlage, $data, $xsl_oe_kurzbz, $version, $outputformat, $sign_user);
+		// Get the content
+		$contentResult = $this->documentexportlib->getContent($filename, $vorlage, $data, $xsl_oe_kurzbz, $version, $outputformat, $sign_user);
+
+		// If an error occurred
+		if (isError($contentResult)) show_error(getError($contentResult));
+
+		$fileObj = new stdClass();
+		$fileObj->file_content = getData($contentResult);
+		$fileObj->name = $filename,;
+		$fileObj->mimetype = isEmptyString($vorlage->mimetype) ? 'application/pdf' : $vorlage->mimetype;
+		$fileObj->disposition = 'attachment';
+
+		// Download
+		$this->outputFile($fileObj);
 	}
 }

@@ -4,7 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class DocumentLib
 {
-	private $unoconv_version;
+	private $_ci;
+	private $_unoconv_version;
 
 	/**
 	 * Constructor
@@ -12,7 +13,10 @@ class DocumentLib
 	public function __construct()
 	{
 		// Gets CI instance
-		$this->ci =& get_instance();
+		$this->_ci =& get_instance();
+
+		// Load Phrases
+		$this->_ci->load->library('PhrasesLib', ['document_export', null], 'DocumentExportPhrases');
 
 		// Which document converter has to be used
 		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
@@ -28,13 +32,13 @@ class DocumentLib
 				$hlp = explode(' ', $ret_arr[0]);
 				if(isset($hlp[1]))
 				{
-					$this->unoconv_version = $hlp[1];
+					$this->_unoconv_version = $hlp[1];
 				}
 				else
-					show_error('Could not get Unoconv Version');
+					show_error($this->_ci->DocumentExportPhrases->t('document_export', 'error_unoconv_version'));
 			}
 			else
-				show_error('Unoconv not found - Please install Unoconv');
+				show_error($this->_ci->DocumentExportPhrases->t('document_export', 'error_unoconv'));
 		}
 	}
 
@@ -56,7 +60,7 @@ class DocumentLib
 			case 'image/jpeg':
 			case 'image/jpg':
 			case 'image/pjpeg':
-				$this->_jpegtopdf($filename, $outFile);
+				$this->_jpegToPdf($filename, $outFile);
 				return success($outFile);
 			case 'application/vnd.oasis.opendocument.spreadsheet':
 			case 'application/msword':
@@ -72,23 +76,19 @@ class DocumentLib
 				else
 				{
 					// Unoconv Version 0.6 seems to fail on converting TXT Files
-					if ($this->unoconv_version == '0.6')
-						return error();
+					if ($this->_unoconv_version == '0.6') return error('Unoconv Version 0.6 does not convert TXT Files correctly');
 				}
 
+				// Convertion
 				$ret = $this->convert($filename, $outFile, 'pdf');
-				if(isSuccess($ret))
-				{
-					return success($outFile);
-				}
-				else
-				{
-					return error(getError($ret));
-				}
+				if(isSuccess($ret)) return success($outFile);
+
+				// Error
+				return $ret;
 			case 'application/pdf':
 				return success($filename);
 			default:
-				return error('Unknown Mimetype:'.$mimetype);
+				return error('Unknown Mimetype:' . $mimetype);
 		}
 	}
 
@@ -101,20 +101,20 @@ class DocumentLib
 	 */
 	public function mergePDF($files, $outFile)
 	{
-		$cmd = "gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outFile ";
+		$cmd = 'gs -q -dNOPAUSE -dBATCH -sDEVICE=pdfwrite -sOutputFile=$outFile ';
 		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 		// add all pdf files to the command
 		foreach ($files as $f)
 		{
-			$cmd .= $f." ";
+			$cmd .= $f.' ';
 			if (!file_exists($f))
 			{
 				return error("File not found: '$f'");
 			}
-			if (finfo_file($finfo, $f) != "application/pdf")
+			if (finfo_file($finfo, $f) != 'application/pdf')
 			{
-				return error("Wrong format(".finfo_file($finfo, $f)."): '$f'");
+				return error('Wrong format('.finfo_file($finfo, $f)."): '$f'");
 			}
 		}
 
@@ -150,7 +150,7 @@ class DocumentLib
 		}
 		else // otherwise use unoconv
 		{
-			if ($this->unoconv_version == '0.6')
+			if ($this->_unoconv_version == '0.6')
 				$command = 'unoconv -f %1$s  %3$s > %2$s';
 			else
 				$command = 'unoconv -f %s --output %s %s 2>&1';
@@ -175,7 +175,7 @@ class DocumentLib
 	 * @param string $outfile Path to Output (pdf) File.
 	 * @return success or error object
 	 */
-	private function _jpegtopdf($filename, $outfile)
+	private function _jpegToPdf($filename, $outfile)
 	{
 		if (!file_exists($filename))
 			return error('File does not exists');
@@ -230,3 +230,4 @@ class DocumentLib
 		return true;
 	}
 }
+

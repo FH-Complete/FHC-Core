@@ -136,7 +136,6 @@ abstract class FHC_Controller extends CI_Controller
 	/**
 	 * To download the given file represented by the fileObj parameter.
 	 * fileObj has the following structure:
-	 * 	$fileObj->file_name
 	 * 	$fileObj->file OR $fileObj->file_content
 	 * 	$fileObj->name
 	 * 	$fileObj->mimetype

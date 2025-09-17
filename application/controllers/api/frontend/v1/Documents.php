@@ -51,6 +51,8 @@ class Documents extends FHCAPI_Controller
 		$this->loadPhrases([
 			'stv'
 		]);
+
+		$this->load->library('DocumentExportLib');
 	}
 
 	/**
@@ -100,23 +102,11 @@ class Documents extends FHCAPI_Controller
 	{
 		$akteExportData = $this->_getAkteExportData($xml, $xsl, $sign_user);
 
-		$akteData = $akteData['akteData'];
-		$exportData = $akteData['exportData'];
-
-		/**
-		 *				[
-					'vorlage' => $vorlage,
-					'xml_data' => $data,
-					'oe_kurzbz' => $xsl_oe_kurzbz,
-					'version' => $version,
-					'outputformat' => $outputformat,
-					'sign_user' => $sign_user
-				]
-		 */
+		$akteData = $akteExportData['akteData'];
+		$exportData = $akteExportData['exportData'];
 
 		// Output
-		$result = $this->documentexportlib->showContent(
-			$akteData['akteData']['inhalt'],
+		$contentResult = $this->documentexportlib->getContent(
 			$exportData['vorlage'],
 			$exportData['xml_data'],
 			$exportData['oe_kurzbz'],
@@ -125,7 +115,9 @@ class Documents extends FHCAPI_Controller
 			$exportData['sign_user']
 		);
 
-		$this->terminateWithSuccess(true);
+		$content = $this->getDataOrTerminateWithError($contentResult);
+
+		$this->terminateWithFileOutput($akteData['mimetype'], $content, $akteData['titel'] . '.pdf');
 	}
 
 	/**
@@ -458,20 +450,13 @@ class Documents extends FHCAPI_Controller
 		if ($sign_user && !$vorlage->signierbar)
 			$this->terminateWithError($this->p->t("stv", "grades_error_sign"));
 
-
-		$this->load->library('DocumentExportLib');
-
 		// XML Data
 		$result = $this->documentexportlib->getDataURL($xml, $params);
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->documentexportlib->addArchiveToData($data);
 
-		// Output
-		$result = $this->documentexportlib->getContent($vorlage, $data, $xsl_oe_kurzbz, $version, $outputformat, $sign_user);
-
 		$content = $this->getDataOrTerminateWithError($result);
 		$akteData['titel'] .= '.pdf';
-		$akteData['inhalt'] = base64_encode($content);
 
 		return [
 			'akteData' => $akteData,
@@ -487,3 +472,4 @@ class Documents extends FHCAPI_Controller
 		];
 	}
 }
+

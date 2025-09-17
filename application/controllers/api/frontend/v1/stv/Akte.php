@@ -58,9 +58,8 @@ class Akte extends Auth_Controller
 		if (!isEmptyString($data->inhalt))
 		{
 			$fileObj = new stdClass();
-			$fileObj->filename = $data->filename;
 			$fileObj->file_content = base64_decode($data->inhalt);
-			$fileObj->name = $data->titel;
+			$fileObj->name = $data->filename;
 			$fileObj->mimetype = $data->mimetype;
 			$fileObj->disposition = 'attachment';
 
