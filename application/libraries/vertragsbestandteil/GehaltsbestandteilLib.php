@@ -149,7 +149,7 @@ class GehaltsbestandteilLib
 		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 'd', $dv->getOe_kurzbz())) 
 		{
 			// delete Gehaltsabrechnung
-			$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
+			// $ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
 
 			//
 			$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
