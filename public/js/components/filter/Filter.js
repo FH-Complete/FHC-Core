@@ -666,7 +666,7 @@ export const CoreFilterCmpt = {
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
-						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+						<span v-else id="selected-info-text"> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>

@@ -233,6 +233,17 @@ export default {
 							const renderTags = () => {
 								container.innerHTML = '';
 								parsedTags = parsedTags.filter(item => item !== null);
+
+								parsedTags.sort((a, b) => {
+									let adone = a.done ? 1 : 0;
+									let bbone = b.done ? 1 : 0;
+
+									if (adone !== bbone)
+									{
+										return adone - bbone;
+									}
+									return b.id - a.id;
+								});
 								const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
 
 								tagsToShow.forEach(tag => {
