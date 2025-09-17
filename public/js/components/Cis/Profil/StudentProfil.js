@@ -133,11 +133,11 @@ export default {
 				this.$api
 					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
-						if (!request.error && res) {
+						if (!request.error && request.data) {
 							this.data.profilUpdates = request.data;
 							this.data.profilUpdates.sort(this.sortProfilUpdates);
 						} else {
-							console.error("Error when fetching profile updates: " + res.data);
+							console.error("Error when fetching profile updates: " + request);
 						}
 					})
 					.catch((err) => {
