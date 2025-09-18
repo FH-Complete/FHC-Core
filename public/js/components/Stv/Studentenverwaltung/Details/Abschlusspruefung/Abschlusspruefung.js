@@ -260,14 +260,16 @@ export default {
 			arrAkadGrad: [],
 			arrNoten: [],
 			selectedVorsitz: null,
-			listeFilteredMitarbeiter: [],
-			listeAllMitarbeiter: [],
-			listeAllPersons: [],
+			filteredMitarbeiter: [],
+			filteredPersons: [],
 			selectedPruefer1: null,
 			selectedPruefer2: null,
 			selectedPruefer3: null,
-			listeFilteredPersons: [],
-			stgInfo: { typ: '', oe_kurzbz: '' }
+			stgInfo: { typ: '', oe_kurzbz: '' },
+			abortController: {
+				mitarbeiter: null,
+				persons: null
+			},
 		}
 	},
 	watch: {
@@ -307,22 +309,38 @@ export default {
 		actionEditAbschlusspruefung(abschlusspruefung_id) {
 			this.resetForm();
 			this.statusNew = false;
-			this.loadAbschlusspruefung(abschlusspruefung_id).then(() => {
+			this.loadAbschlusspruefung(abschlusspruefung_id).then((result) => {
 				//set selectedData to enable viewing label in primevue autocomplete fields
-				this.selectedVorsitz = this.listeAllMitarbeiter.find(
-					item => item.mitarbeiter_uid === this.formData.vorsitz
-				);
-				this.selectedPruefer1 = this.listeAllPersons.find(
-					item => item.person_id === this.formData.pruefer1
-				);
-				this.selectedPruefer2= this.listeAllPersons.find(
-					item => item.person_id === this.formData.pruefer2
-				);
-				this.selectedPruefer3= this.listeAllPersons.find(
-					item => item.person_id === this.formData.pruefer3
-				);
+				const data = result.data;
+				this.selectedVorsitz = {
+					label: this.getPersonLabel(data.pv_titelpre, data.pv_nachname, data.pv_vorname, data.pv_titelpost, data.pv_uid),
+					person_id: data.pv_person_id,
+					mitarbeiter_uid: data.pv_uid
+				};
+				if (data.p1_person_id) {
+					this.selectedPruefer1 = {
+						label: this.getPersonLabel(data.p1_titelpre, data.p1_nachname, data.p1_vorname, data.p1_titelpost),
+						person_id: data.p1_person_id
+					};
+				}
+				if (data.p2_person_id) {
+					this.selectedPruefer2 = {
+						label: this.getPersonLabel(data.p2_titelpre, data.p2_nachname, data.p2_vorname, data.p2_titelpost),
+						person_id: data.p2_person_id
+					}
+				};
+				if (data.p3_person_id) {
+					this.selectedPruefer3= {
+						label: this.getPersonLabel(data.p3_titelpre, data.p3_nachname, data.p3_vorname, data.p3_titelpost),
+						person_id: data.p3_person_id
+					};
+				}
 			});
 			this.$refs.finalexamModal.show();
+		},
+		getPersonLabel(titelpre, nachname, vorname, titelpost, uid) {
+			return nachname + ' ' + vorname + (titelpre ? ' ' + titelpre : '') + (titelpost ? ' ' + titelpost : '') + (uid ? ' (' + uid + ')' : '');
+				
 		},
 		actionDeleteAbschlusspruefung(abschlusspruefung_id) {
 			this.$fhcAlert
@@ -439,22 +457,61 @@ export default {
 		printDocument(link) {
 			window.open(link, '_blank');
 		},
-		filterMitarbeiter(event){
-			const query = event?.query?.toLowerCase()?.trim() || "";
+		searchMitarbeiter(event) {
+			if (this.abortController.mitarbeiter) {
+				this.abortController.mitarbeiter.abort();
+			}
 
-			this.listeFilteredMitarbeiter = this.listeAllMitarbeiter.filter(item => {
-				const label = (item.label || "").toLowerCase();
-				return label.includes(query);
-			});
+			this.abortController.mitarbeiter = new AbortController();
+
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getMitarbeiter(event.query))
+				.then(result => {
+					this.filteredMitarbeiter = [];
+					for (let mitarbeiter of result.data.retval) {
+						this.filteredMitarbeiter.push(
+							{
+								label: this.getPersonLabel(
+									mitarbeiter.titelpre,
+									mitarbeiter.nachname,
+									mitarbeiter.vorname,
+									mitarbeiter.titelpost,
+									mitarbeiter.mitarbeiter_uid
+								),
+								person_id: mitarbeiter.person_id,
+								mitarbeiter_uid: mitarbeiter.mitarbeiter_uid
+							}
+						);
+					}
+				});
 		},
-		filterPersons(event){
-			const query = event?.query?.toLowerCase()?.trim() || "";
+		searchPerson(event) {
+			if (this.abortController.persons) {
+				this.abortController.persons.abort();
+			}
 
-			this.listeFilteredPersons = this.listeAllPersons.filter(item => {
-				const label = (item.label || "").toLowerCase();
-				return label.includes(query);
-			});
-		}
+			this.abortController.persons = new AbortController();
+
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
+				.then(result => {
+					this.filteredPersons = [];
+					for (let person of result.data.retval) {
+						this.filteredPersons.push(
+							{
+								label: this.getPersonLabel(
+									person.titelpre,
+									person.nachname,
+									person.vorname,
+									person.titelpost,
+									person.person_uid
+								),
+								person_id: person.person_id
+							}
+						);
+					}
+				});
+		},
 	},
 	created() {
 		this.$api
@@ -489,20 +546,6 @@ export default {
 			.call(ApiStvAbschlusspruefung.getAkadGrade(this.student.studiengang_kz))
 			.then(result => {
 				this.arrAkadGrad = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		this.$api
-			.call(ApiStvAbschlusspruefung.getAllMitarbeiter())
-			.then(result => {
-				this.listeAllMitarbeiter = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		this.$api
-			.call(ApiStvAbschlusspruefung.getAllPersons())
-			.then(result => {
-				this.listeAllPersons = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -623,8 +666,8 @@ export default {
 						optionValue="mitarbeiter_uid"
 						dropdown
 						forceSelection
-						:suggestions="listeFilteredMitarbeiter"
-						@complete="filterMitarbeiter"
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
 						:min-length="3"
 					>
 					</form-input>
@@ -636,9 +679,10 @@ export default {
 						v-model="selectedPruefer1"
 						optionLabel="label"
 						optionValue="person_id"
+						dropdown
 						forceSelection
-						:suggestions="listeFilteredPersons"
-						@complete="filterPersons"
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
@@ -669,9 +713,10 @@ export default {
 						v-model="selectedPruefer2"
 						optionLabel="label"
 						optionValue="person_id"
+						dropdown
 						forceSelection
-						:suggestions="listeFilteredPersons" 
-						@complete="filterPersons"
+						:suggestions="filteredPersons" 
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
@@ -701,9 +746,10 @@ export default {
 						v-model="selectedPruefer3"
 						optionLabel="label"
 						optionValue="person_id"
+						dropdown
 						forceSelection
-						:suggestions="listeFilteredPersons" 
-						@complete="filterPersons"
+						:suggestions="filteredPersons" 
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
