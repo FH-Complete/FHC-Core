@@ -1,11 +1,11 @@
 <?php
 
-$config['lvverwaltung_tags'] = [
-	'hinweis_stg_kf' => ['readonly' => false],
-	'hinweis' => ['readonly' => false],
-	'hinweis_assistenz' => ['readonly' => false],
-	'finished_stg' => ['readonly' => false],
+/*It defines which tags are available in LVVerwaltung and whether they are editable
 
-	'finished_kf' => ['readonly' => true],
-	'inwork_kf' => ['readonly' => true],
+$config['lvverwaltung_tags'] = [
+	'tag_1' => ['readonly' => false],
+	'tag_1' => ['readonly' => true]
 ];
+*/
+
+$config['lvverwaltung_tags'] = [];
