@@ -1,5 +1,7 @@
 import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 
+import ApiStvPrestudent from '../../../../../api/factory/stv/prestudent.js';
+
 export default{
 	components: {
 		CoreFilterCmpt
@@ -11,8 +13,8 @@ export default{
 	data() {
 		return {
 			tabulatorOptions: {
-				ajaxURL: 'api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId,
-				ajaxRequestFunc: this.$fhcApi.get,
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -23,7 +25,7 @@ export default{
 					{title:"Studienplan", field:"bezeichnung"},
 					{title:"UID", field:"student_uid"},
 					{title:"Status", field:"status"},
-					{title:"PrestudentId", field:"prestudent_id", visible:false}
+					{title:"Prestudent ID", field:"prestudent_id", visible:false}
 				],
 				rowFormatter: row => {
 					const rowData = row.getData();
@@ -56,6 +58,10 @@ export default{
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('lehre', 'studienplan')
 						});
+
+						cm.getColumnByField('prestudent_id').component.updateDefinition({
+							title: this.$p.t('ui', 'prestudent_id')
+						});
 					}
 				}
 			]
@@ -63,8 +69,8 @@ export default{
 	},
 	watch: {
 		personId() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Prestudent/getHistoryPrestudents/' + this.personId);
-		}
+			this.$refs.table.reloadTable();
+		},
 	},
 	template: `
 	<div class="stv-details-prestudent-history h-100 pt-3">

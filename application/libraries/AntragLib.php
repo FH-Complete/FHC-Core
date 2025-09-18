@@ -77,7 +77,9 @@ class AntragLib
 					'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
 					'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
 				], [
-					'statusgrund_id' => null
+					'statusgrund_id' => null,
+					'updateamum' => date('c'),
+					'updatevon' => $insertvon
 				]);
 			}
 		}
@@ -335,7 +337,10 @@ class AntragLib
 						'status_kurzbz'=>$prestudentstatus->status_kurzbz,
 						'studiensemester_kurzbz'=>$prestudentstatus->studiensemester_kurzbz,
 						'ausbildungssemester'=>$prestudentstatus->ausbildungssemester
-					], []);
+					], [
+						'updateamum' => $insertam,
+						'updatevon' => $insertvon
+					]);
 					if (isError($result))
 					{
 						$errors[] = getError($result);

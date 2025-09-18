@@ -1,7 +1,8 @@
 import LvZuweisung from '../../../components/Studierendenantrag/Lvzuweisung.js';
-import Phrasen from '../../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../../plugins/Phrasen.js';
 
 const app = Vue.createApp({
+	name: 'LvzuweisungApp',
 	components: {
 		LvZuweisung
 	},
@@ -12,5 +13,5 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#wrapper');

@@ -7,9 +7,10 @@ $this->load->view(
         'jqueryui1' => true,
         'jquerycheckboxes1' => true,
         'bootstrap3' => true,
-        'fontawesome4' => true,
+        'fontawesome6' => true,
         'sbadmintemplate3' => true,
-        'tabulator4' => true,
+        'tabulator5' => true,
+        'tabulator5JQuery' => true,
         'momentjs2' => true,
         'ajaxlib' => true,
         'dialoglib' => true,
@@ -95,7 +96,7 @@ $this->load->view(
 );
 ?>
 
-<body>
+
     <?php echo $this->widgetlib->widget('NavigationWidget'); ?>
     <div id="page-wrapper">
         <div class="container-fluid">
@@ -177,7 +178,9 @@ $this->load->view(
         </div>
 
 		<!-- tabulator data table -->
+		<div class="tabulator-initialfontsize">
 		<?php $this->load->view('lehre/lehrauftrag/orderLehrauftragData.php'); ?>
+		</div>
 
 		<!-- filter buttons & bestell-button -->
         <div class="row">
@@ -186,13 +189,14 @@ $this->load->view(
                 <div class="btn-toolbar" role="toolbar">
                     <div class="btn-group" role="group">
                         <button id="show-all" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'alleAnzeigen'); ?>"><i class='fa fa-users'></i></button>
-                        <button id="show-new" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurNeueAnzeigen'); ?>"><i class='fa fa-user-plus'></i></button>
-                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurBestellteAnzeigen'); ?>"></button><!-- png img set in javascript -->
-                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>"></button><!-- png img set in javascript -->
-                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa fa-handshake-o'></i></button>
+                        <button id="show-newAndChanged" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'neuUndGeaenderteAnzeigen'); ?>"><i style="margin-right:10px" class='fa fa-user-plus'></i><i style="margin-right:10px" class="fa fa-ellipsis-vertical"></i>&nbsp;<i class='fa fa-user-pen'></i></button>
                     </div>
                     <div class="btn-group" role="group" style="margin-left: 20px;">
-                        <button id="show-changed" class="btn btn-default btn-lehrauftrag active focus" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurGeaenderteAnzeigen'); ?>"></button><!-- png img set in javascript -->
+                        <button id="show-new" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurNeueAnzeigen'); ?>"><i class='fa fa-user-plus'></i></button>
+                        <button id="show-ordered" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurBestellteAnzeigen'); ?>"><i class='fa fa-user-tag'></i></button>
+                        <button id="show-approved" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurErteilteAnzeigen'); ?>"><i class='fa fa-user-check'></i></button>
+                        <button id="show-accepted" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurAngenommeneAnzeigen'); ?>"><i class='fa-regular fa-handshake'></i></button>
+                        <button id="show-changed" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurGeaenderteAnzeigen'); ?>"><i class='fa fa-user-pen'></i></button></button>
                     </div>
                     <div class="btn-group" role="group" style="margin-left: 20px;">
                         <button id="show-dummies" class="btn btn-default btn-lehrauftrag" type="button" data-toggle="tooltip" data-placement="left" title="<?php echo $this->p->t('ui', 'nurDummiesAnzeigen'); ?>"><i class='fa fa-user-secret'></i></button>
@@ -204,7 +208,6 @@ $this->load->view(
         </div><!-- end container -->
     </div><!-- end page-wrapper -->
 	<br>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>
 

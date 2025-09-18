@@ -142,7 +142,7 @@ class Notiz_model extends DB_Model
 		$this->addSelect('public.tbl_notiz.*');
 		$this->addJoin('public.tbl_notizzuordnung', 'notiz_id');
 
-		return $this->loadWhere(array('person_id' => $person_id));
+		return $this->loadWhere(array('person_id' => $person_id, 'tbl_notiz.typ' => NULL));
 	}
 
 	/**
@@ -154,12 +154,25 @@ class Notiz_model extends DB_Model
 	public function getNotizWithDocEntries($id, $type)
 	{
 			$qry = "
-				SELECT 
-						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
-						TO_CHAR (CASE 
+				SELECT
+						n.*, 
+						  CASE
+							WHEN person_verfasser.vorname IS NOT NULL AND person_verfasser.vorname != ''
+							  OR person_verfasser.nachname IS NOT NULL AND person_verfasser.nachname != ''
+							THEN CONCAT(person_verfasser.vorname, ' ', person_verfasser.nachname)
+							ELSE NULL
+						  END AS verfasser,
+						  CASE
+							WHEN person_bearbeiter.vorname IS NOT NULL AND person_bearbeiter.vorname != ''
+							  OR person_bearbeiter.nachname IS NOT NULL AND person_bearbeiter.nachname != ''
+							THEN CONCAT(person_bearbeiter.vorname, ' ', person_bearbeiter.nachname)
+							ELSE NULL
+						  END AS bearbeiter,
+						count(dms_id) as countDoc, z.notizzuordnung_id,
+						(CASE
 							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
 							ELSE n.insertamum
-						END::timestamp, 'DD.MM.YYYY HH24:MI:SS') AS lastUpdate,
+						END) AS lastUpdate,
 						regexp_replace(n.text, '<[^>]*>', '', 'g') as text_stripped,
 						TO_CHAR(n.start::timestamp, 'DD.MM.YYYY') AS start_format,
 						TO_CHAR(n.ende::timestamp, 'DD.MM.YYYY') AS ende_format,
@@ -173,10 +186,20 @@ class Notiz_model extends DB_Model
 							public.tbl_notiz_dokument dok USING (notiz_id)
 				LEFT JOIN 
 							campus.tbl_dms_version USING (dms_id)
+				LEFT JOIN 
+						      public.tbl_benutzer p_verfasser ON (p_verfasser.uid = n.verfasser_uid)
+  				LEFT JOIN 
+						      public.tbl_person person_verfasser ON (person_verfasser.person_id = p_verfasser.person_id)
+  				LEFT JOIN 
+						      public.tbl_benutzer p_bearbeiter ON (p_bearbeiter.uid = n.bearbeiter_uid)
+				LEFT JOIN 
+						      public.tbl_person person_bearbeiter ON (person_bearbeiter.person_id = p_bearbeiter.person_id)
 				WHERE 
 				   z.$type  = ?
 				GROUP BY 
-					notiz_id, z.notizzuordnung_id
+					notiz_id, z.notizzuordnung_id,
+ 					person_verfasser.vorname, person_verfasser.nachname,
+					person_bearbeiter.vorname, person_bearbeiter.nachname
 			";
 
 		return $this->execQuery($qry, array($type, $id));

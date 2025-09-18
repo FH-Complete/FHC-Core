@@ -4,8 +4,11 @@ import FormUploadImage from '../../../Form/Upload/Image.js';
 
 import CoreUdf from '../../../Udf/Udf.js';
 
+import ApiStvDetails from '../../../../api/factory/stv/details.js';
+
 
 export default {
+	name: "TabDetails",
 	components: {
 		CoreForm,
 		FormInput,
@@ -34,28 +37,28 @@ export default {
 		},
 		lists: {
 			from: 'lists'
+		},
+		$reloadList: {
+			from: '$reloadList',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: {
+			type: Object,
+			default: {}
+		}
 	},
 	data() {
 		return {
-			test: {udf_viaf: 'TEST'},
-			familienstaende: {
-				"": "--keine Auswahl--",
-				"g": "geschieden",
-				"l": "ledig",
-				"v": "verheiratet",
-				"w": "verwitwet"
-			},
 			original: null,
 			data: null,
-			changed: {},
-			udfChanges: false,
-			studentIn: null,
-			gebDatumIsValid: false,
-			gebDatumIsInvalid: false
+			changed: {}
 		}
 	},
 	computed: {
@@ -67,6 +70,15 @@ export default {
 		},
 		noImageSrc() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/profilbild_dummy.jpg';
+		},
+		familienstaende() {
+			return {
+				"": "-- " + this.$p.t('fehlermonitoring', 'keineAuswahl') + " --",
+				"g": this.$p.t('person', 'geschieden'),
+				"l": this.$p.t('person', 'ledig'),
+				"v": this.$p.t('person', 'verheiratet'),
+				"w": this.$p.t('person', 'verwitwet'),
+			};
 		}
 	},
 	watch: {
@@ -74,7 +86,6 @@ export default {
 			this.updateStudent(n);
 		},
 		data: {
-			// TODO(chris): use @input instead?
 			handler(n) {
 				let res = {};
 				for (var k in this.original) {
@@ -82,7 +93,6 @@ export default {
 						if (new Date(this.original[k]).toString() != new Date(n[k]).toString())
 							res[k] = n[k];
 					} else {
-						// TODO(chris): null && ""? should there be an exception for this?
 						if (this.original[k] !== n[k] && !(this.original[k] === null && n[k] === ""))
 							res[k] = n[k];
 					}
@@ -94,9 +104,8 @@ export default {
 	},
 	methods: {
 		updateStudent(n) {
-			// TODO(chris): move to fhcapi.factory
-			this.$fhcApi
-				.get('api/frontend/v1/stv/student/get/' + n.prestudent_id)
+			return this.$api
+				.call(ApiStvDetails.get(n.prestudent_id, this.currentSemester))
 				.then(result => {
 					this.data = result.data;
 					if (!this.data.familienstand)
@@ -110,14 +119,39 @@ export default {
 				return;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form
-				.post('api/frontend/v1/stv/student/save/' + this.modelValue.prestudent_id, this.changed)
+			return this.$refs.form
+				.call(ApiStvDetails.save(
+					this.modelValue.prestudent_id,
+					this.currentSemester,
+					this.changed
+					))
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};
-					this.$refs.form.setFeedback(true, result.data);
+
+					const feedback = result.data;
+
+					//to avoid empty alert for updateam, updatevon
+					const cleanedFeedback = {};
+
+					const formElement = this.$refs.form.$el || this.$refs.form;
+					const inputElements = formElement.querySelectorAll('[name]');
+					const validFieldNames = Array.from(inputElements).map(el => el.getAttribute('name'));
+
+					for (const key in feedback) {
+						if (validFieldNames.includes(key)) {
+							cleanedFeedback[key] = feedback[key];
+						}
+					}
+
+					if (Object.keys(cleanedFeedback).length > 0) {
+						this.$refs.form.setFeedback(true, cleanedFeedback);
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					}
+
+					this.$reloadList();
 				})
-				.catch(this.$fhcAlert.handleSystemError)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		udfsLoaded(udfs) {
 			this.original = {...(this.original || {}), ...udfs};
@@ -129,28 +163,27 @@ export default {
 	created() {
 		this.updateStudent(this.modelValue);
 	},
-	//TODO(chris): Phrasen
-	//TODO(chris): Geburtszeit? Anzahl der Kinder?
 	template: `
 	<core-form ref="form" class="stv-details-details" @submit.prevent="save">
 		<div class="position-sticky top-0 z-1">
-			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">Speichern</button>
+			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">{{$p.t('ui', 'speichern')}}</button>
 		</div>
 		<fieldset class="overflow-hidden">
 			<legend>Person</legend>
 			<template v-if="data">
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Person ID"
+						v-if="!config.hiddenFields.includes('person_id')"
+						container-class="col-4 stv-details-details-person_id"
+						:label="$p.t('person', 'person_id')"
 						type="text"
 						v-model="data.person_id"
 						name="person_id"
 						readonly
 						>
 					</form-input>
-					<div v-if="showZugangscode" class="col-4">
-						<label>Zugangscode</label>
+					<div v-if="showZugangscode && !config.hiddenFields.includes('zugangscode')" class="col-4 stv-details-details-zugangscode">
+						<label>{{$p.t('global', 'zugangscode')}}</label>
 						<div class="align-self-center">
 							<span class="form-text">
 								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat + '&keepEmailUnverified=true'" target="_blank">{{data.zugangscode}}</a>
@@ -158,9 +191,9 @@ export default {
 						</div>
 					</div>
 					<form-input
-						v-if="showBpk"
-						container-class="col-4"
-						label="BPK"
+						v-if="showBpk && !config.hiddenFields.includes('bpk')"
+						container-class="col-4 stv-details-details-bpk"
+						:label="$p.t('person', 'bpk')"
 						type="text"
 						v-model="data.bpk"
 						name="bpk"
@@ -170,8 +203,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Anrede"
+						v-if="!config.hiddenFields.includes('anrede')"
+						container-class="col-4 stv-details-details-anrede"
+						:label="$p.t('person', 'anrede')"
 						type="text"
 						v-model="data.anrede"
 						name="anrede"
@@ -179,8 +213,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Titel Pre"
+						v-if="!config.hiddenFields.includes('titelpre')"
+						container-class="col-4 stv-details-details-titelpre"
+						:label="$p.t('person', 'titelpre')"
 						type="text"
 						v-model="data.titelpre"
 						name="titelpre"
@@ -188,8 +223,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Titel Post"
+						v-if="!config.hiddenFields.includes('titelpost')"
+						container-class="col-4 stv-details-details-titelpost"
+						:label="$p.t('person', 'titelpost')"
 						type="text"
 						v-model="data.titelpost"
 						name="titelpost"
@@ -199,8 +235,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Nachname"
+						v-if="!config.hiddenFields.includes('nachname')"
+						container-class="col-4 stv-details-details-nachname"
+						:label="$p.t('person', 'nachname')"
 						type="text"
 						v-model="data.nachname"
 						name="nachname"
@@ -208,8 +245,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Vorname"
+						v-if="!config.hiddenFields.includes('vorname')"
+						container-class="col-4 stv-details-details-vorname"
+						:label="$p.t('person', 'vorname')"
 						type="text"
 						v-model="data.vorname"
 						name="vorname"
@@ -217,8 +255,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Vornamen"
+						v-if="!config.hiddenFields.includes('vornamen')"
+						container-class="col-4 stv-details-details-vornamen"
+						:label="$p.t('person', 'vornamen')"
 						type="text"
 						v-model="data.vornamen"
 						name="vornamen"
@@ -228,8 +267,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Wahlname"
+						v-if="!config.hiddenFields.includes('wahlname')"
+						container-class="col-4 stv-details-details-wahlname"
+						:label="$p.t('person', 'wahlname')"
 						type="text"
 						v-model="data.wahlname"
 						name="wahlname"
@@ -239,8 +279,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Geburtsdatum"
+						v-if="!config.hiddenFields.includes('gebdatum')"
+						container-class="col-4 stv-details-details-gebdatum"
+						:label="$p.t('person', 'geburtsdatum')"
 						type="DatePicker"
 						v-model="data.gebdatum"
 						name="gebdatum"
@@ -248,14 +289,16 @@ export default {
 						no-today
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						teleport
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Geburtsort"
+						v-if="!config.hiddenFields.includes('gebort')"
+						container-class="col-4 stv-details-details-gebort"
+						:label="$p.t('person', 'geburtsort')"
 						type="text"
 						v-model="data.gebort"
 						name="gebort"
@@ -263,30 +306,22 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Geburtsnation"
+						v-if="!config.hiddenFields.includes('geburtsnation')"
+						container-class="col-4 stv-details-details-geburtsnation"
+						:label="$p.t('person', 'geburtsnation')"
 						type="select"
 						v-model="data.geburtsnation"
 						name="geburtsnation"
  						>
-						<option value="">-- keine Auswahl --</option>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="SVNR"
-						type="text"
-						v-model="data.svnr"
-						name="svnr"
-						maxlength="16"
- 						>
-					</form-input>
-					<form-input
-						container-class="col-4"
-						label="Ersatzkennzeichen"
+						v-if="!config.hiddenFields.includes('ersatzkennzeichen')"
+						container-class="col-4 stv-details-details-ersatzkennzeichen"
+						:label="$p.t('person', 'ersatzkennzeichen')"
 						type="text"
 						v-model="data.ersatzkennzeichen"
 						name="ersatzkennzeichen"
@@ -296,19 +331,20 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Staatsbürgerschaft"
+						v-if="!config.hiddenFields.includes('staatsbuergerschaft')"
+						container-class="col-4 stv-details-details-staatsbuergerschaft"
+						:label="$p.t('person', 'staatsbuergerschaft')"
 						type="select"
 						v-model="data.staatsbuergerschaft"
 						name="staatsbuergerschaft"
  						>
-						<option value="">-- keine Auswahl --</option>
-						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Matrikelnummer"
+						v-if="!config.hiddenFields.includes('matr_nr')"
+						container-class="col-4 stv-details-details-matr_nr"
+						:label="$p.t('person', 'matrikelnummer')"
 						type="text"
 						v-model="data.matr_nr"
 						name="matr_nr"
@@ -316,8 +352,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Sprache"
+						v-if="!config.hiddenFields.includes('sprache')"
+						container-class="col-4 stv-details-details-sprache"
+						:label="$p.t('person', 'sprache')"
 						type="select"
 						v-model="data.sprache"
 						name="sprache"
@@ -327,8 +364,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Geschlecht"
+						v-if="!config.hiddenFields.includes('geschlecht')"
+						container-class="col-4 stv-details-details-geschlecht"
+						:label="$p.t('person', 'geschlecht')"
 						type="select"
 						v-model="data.geschlecht"
 						name="geschlecht"
@@ -336,8 +374,9 @@ export default {
 						<option v-for="geschlecht in lists.geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Familienstand"
+						v-if="!config.hiddenFields.includes('familienstand')"
+						container-class="col-4 stv-details-details-familienstand"
+						:label="$p.t('person', 'familienstand')"
 						type="select"
 						v-model="data.familienstand"
 						name="familienstand"
@@ -347,8 +386,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Foto"
+						v-if="!config.hiddenFields.includes('foto')"
+						container-class="col-4 stv-details-details-foto"
+						:label="$p.t('person', 'foto')"
 						type="UploadImage"
 						v-model="data.foto"
 						name="foto"
@@ -356,8 +396,9 @@ export default {
  						<img alt="No Image" :src="noImageSrc" class="w-100">
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Anmerkung"
+						v-if="!config.hiddenFields.includes('anmerkung')"
+						container-class="col-4 stv-details-details-anmerkung"
+						:label="$p.t('global', 'anmerkung')"
 						type="textarea"
 						v-model="data.anmerkung"
 						name="anmerkung"
@@ -365,8 +406,9 @@ export default {
  						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Homepage"
+						v-if="!config.hiddenFields.includes('homepage')"
+						container-class="col-4 stv-details-details-homepage"
+						:label="$p.t('person', 'homepage')"
 						type="text"
 						v-model="data.homepage"
 						name="homepage"
@@ -376,17 +418,26 @@ export default {
 				</div>
 			</template>
 			<div v-else>
-				Loading...
+				{{$p.t('ui', 'dropdownLoading')}}...
 			</div>
-			<core-udf @load="udfsLoaded" v-model="data" class="row-cols-3 g-3 mb-3" ci-model="person/person" :pk="{person_id:modelValue.person_id}"></core-udf>
+			<core-udf
+				v-if="!config.hideUDFs"
+				@load="udfsLoaded"
+				v-model="data"
+				class="row-cols-3 g-3 mb-3"
+				ci-model="person/person"
+				:pk="{person_id:modelValue.person_id}"
+				>
+			</core-udf>
 		</fieldset>
 		<fieldset v-if="data?.student_uid" class="overflow-hidden">
-			<legend>StudentIn</legend>
+			<legend>{{$p.t('person', 'studentIn')}}</legend>
 			<template v-if="data">
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="UID"
+						v-if="!config.hiddenFields.includes('student_uid')"
+						container-class="col-4 stv-details-details-student_uid"
+						:label="$p.t('person', 'uid')"
 						type="text"
 						v-model="data.student_uid"
 						name="student_uid"
@@ -394,8 +445,9 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Personenkennzeichen"
+						v-if="!config.hiddenFields.includes('matrikelnr')"
+						container-class="col-4 stv-details-details-matrikelnr"
+						:label="$p.t('person', 'personenkennzeichen')"
 						type="text"
 						v-model="data.matrikelnr"
 						name="matrikelnr"
@@ -404,8 +456,9 @@ export default {
 					</form-input>
 					<div class="col-4 pt-4 d-flex align-items-center">
 						<form-input
-							container-class="form-check"
-							label="Aktiv"
+							v-if="!config.hiddenFields.includes('aktiv')"
+							container-class="form-check stv-details-details-aktiv"
+							:label="$p.t('person', 'aktiv')"
 							type="checkbox"
 							v-model="data.aktiv"
 							name="aktiv"
@@ -415,8 +468,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Semester"
+						v-if="!config.hiddenFields.includes('semester')"
+						container-class="col-4 stv-details-details-semester"
+						:label="$p.t('lehre', 'semester')"
 						type="text"
 						v-model="data.semester"
 						name="semester"
@@ -424,8 +478,9 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Verband"
+						v-if="!config.hiddenFields.includes('verband')"
+						container-class="col-4 stv-details-details-verband"
+						:label="$p.t('lehre', 'verband')"
 						type="text"
 						v-model="data.verband"
 						name="verband"
@@ -433,8 +488,9 @@ export default {
 						>
 					</form-input>
 					<form-input
-						container-class="col-4"
-						label="Gruppe"
+						v-if="!config.hiddenFields.includes('gruppe')"
+						container-class="col-4 stv-details-details-gruppe"
+						:label="$p.t('lehre', 'gruppe')"
 						type="text"
 						v-model="data.gruppe"
 						name="gruppe"
@@ -444,8 +500,9 @@ export default {
 				</div>
 				<div class="row mb-3">
 					<form-input
-						container-class="col-4"
-						label="Alias"
+						v-if="!config.hiddenFields.includes('alias')"
+						container-class="col-4 stv-details-details-alias"
+						:label="$p.t('person', 'alias')"
 						type="text"
 						v-model="data.alias"
 						name="alias"
@@ -455,7 +512,7 @@ export default {
 				</div>
 			</template>
 			<div v-else>
-				Loading...
+				{{$p.t('ui', 'dropdownLoading')}}...
 			</div>
 		</fieldset>
 	</core-form>`

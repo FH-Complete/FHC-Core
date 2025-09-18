@@ -20,19 +20,54 @@ import phrasen from "./phrasen.js";
 import navigation from "./navigation.js";
 import filter from "./filter.js";
 import studstatus from "./studstatus.js";
+import profil from "./profil.js";
+import profilUpdate from "./profilUpdate.js";
+import lvPlan from "./lvPlan.js";
+import bookmark from "./bookmark.js";
 import stv from "./stv.js";
 import notiz from "./notiz.js";
 import betriebsmittel from "./betriebsmittel.js";
 import checkperson from "./checkperson.js";
+import ampeln from "./ampeln.js";
+import ort from "./ort.js";
+import cms from "./cms.js";
+import lehre from "./lehre.js";
+import addons from "./addons.js";
+import messages from "./messages.js";
+import vorlagen from "./vorlagen.js";
+import studiengang from "./studiengang.js";
+import menu from "./menu.js";
+import dashboard from "./dashboard.js";
+import authinfo from "./authinfo.js";
+import studium from "./studium.js";
+import language from "./language.js";
 
 export default {
     search,
     phrasen,
     navigation,
+    dashboard,
     filter,
     studstatus,
+    profil,
+    profilUpdate,
+    lvPlan,
+    bookmark,
     stv,
     notiz,
     betriebsmittel,
-    checkperson
+    checkperson,
+    ampeln,
+    ort,
+    cms,
+    lehre,
+    addons,
+    messages,
+    vorlagen,
+    addons,
+	studiengang,
+	menu,
+	authinfo,
+	studium,
+    language
 };

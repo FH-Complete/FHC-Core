@@ -171,12 +171,30 @@ class Studiensemester_model extends DB_Model
 	}
 
 	/**
+	 * Gets a Studiensemester for a date
+	 * @param $date
+	 * @return string
+	 */
+	public function getByDate($date)
+	{
+		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		$query = "
+			SELECT  studiensemester_kurzbz, start, ende
+			FROM	public.tbl_studiensemester
+			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '-45 days'::interval AND start <= ?::date + '-45 days'::interval )
+			ORDER BY start DESC
+			LIMIT 1";
+
+		return $this->execQuery($query, array($date,$date,$date,$date));
+	}
+
+	/**
 	 * Gets all Studiensemester between two dates
 	 * @param $from
 	 * @param $to
 	 * @return array|null
 	 */
-	public function getByDate($from, $to)
+	public function getByDateRange($from, $to)
 	{
 		if (date_format(date_create($from), 'Y-m-d') > (date_format(date_create($to), 'Y-m-d')))
 			return success(array());
@@ -203,6 +221,25 @@ class Studiensemester_model extends DB_Model
 				ORDER BY delta, start LIMIT 1";
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
+	}
+
+	/**
+	 * @param string		$student_uid
+	 *
+	 * @return StdClass
+	 */
+	public function getWhereStudentHasLvs($student_uid)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+
+		// TODO(chris): Potentielle Anpassung "Eine UID"
+		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'studiensemester_kurzbz');
+		$this->db->where("v.lehreverzeichnis<>''");
+
+		$this->addOrder($this->dbTable . '.start');
+
+		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
 	}
 
 	public function getAktAndFutureSemester()
@@ -252,5 +289,62 @@ class Studiensemester_model extends DB_Model
 		$studienjahrNumber = mb_substr($studiensemester_kurzbz, 4, 2);
 		if (is_numeric($studienjahrNumber) && mb_substr($studiensemester_kurzbz, 0, 2) == 'SS') (int)$studienjahrNumber -= 1;
 		return $studienjahrNumber;
+	}
+
+	/**
+	 * Get Studienjahr by Studiensemester.
+	 *
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass
+	 */
+	public function getStudienjahrByStudiensemester($studiensemester_kurzbz)
+	{
+		$studienjahrObj = null;
+
+		if (!is_numeric($studiensemester_kurzbz))
+		{
+			$this->StudiensemesterModel->addSelect('studienjahr_kurzbz');
+			$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz =' => $studiensemester_kurzbz));
+		}
+
+		if (hasData($result))
+		{
+			$studienjahr = getData($result)[0]->studienjahr_kurzbz;
+			$startstudienjahr = substr($studienjahr, 0, 4);
+			$endstudienjahr = substr($studienjahr, 0, 2) . substr($studienjahr, -2);
+
+			$studienjahrObj = new StdClass();
+
+			$studienjahrObj->studienjahr_kurzbz = $studienjahr;
+			$studienjahrObj->startstudienjahr = $startstudienjahr;
+			$studienjahrObj->endstudienjahr= $endstudienjahr;
+		}
+
+		if (isError($result)) {
+			return error(getError($result));
+		}
+
+		return success($studienjahrObj);
+	}
+
+	/**
+	 * Holt Start und Ende des Studiensemester_kurzbz
+	 * @param studiensemester_kurzbz
+	 * @return stdClass
+	 */
+	public function getStartEndeFromStudiensemester($studiensemester_kurzbz)
+	{
+		return $this->execReadOnlyQuery("
+		SELECT
+		start, ende
+		FROM public.tbl_studiensemester
+		WHERE studiensemester_kurzbz = ?",[$studiensemester_kurzbz]);
+
+	}
+
+	public function isValidStudiensemester($studiensemester_kurzbz)
+	{
+		$result = $this->load($studiensemester_kurzbz);
+		return hasData($result);
 	}
 }

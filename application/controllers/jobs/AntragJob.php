@@ -95,12 +95,15 @@ class AntragJob extends JOB_Controller
 					continue;
 				}
 
-				$leitung = current(getData($result));
-				if (!isset($stgLeitungen[$leitung->uid]))
+				$leitungen = getData($result);
+				foreach ($leitungen as $leitung)
 				{
-					$stgLeitungen[$leitung->uid] = [ 'Details' => $leitung, 'stgs' => [] ];
+					if (!isset($stgLeitungen[$leitung->uid]))
+					{
+						$stgLeitungen[$leitung->uid] = ['Details' => $leitung, 'stgs' => []];
+					}
+					$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 				}
-				$stgLeitungen[$leitung->uid]['stgs'][] = $antrag->studiengang_kz;
 
 				$result = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
 				if (isError($result))
@@ -183,8 +186,8 @@ class AntragJob extends JOB_Controller
 				$data,
 				$to,
 				'Anträge - Aktion(en) erforderlich',
-				DEFAULT_SANCHO_HEADER_IMG,
-				DEFAULT_SANCHO_FOOTER_IMG,
+				'',
+				'',
 				'',
 				$cc
 			))

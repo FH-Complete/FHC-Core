@@ -33,12 +33,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
-				<td>
-					<div class='stammdaten' id="svnr"><?php echo $stammdaten->svnr ?></div>
-				</td>
-			</tr>
-			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','staatsbuergerschaft')) ?></strong></td>
 				<td>
 					<select id="buergerschaft" disabled>

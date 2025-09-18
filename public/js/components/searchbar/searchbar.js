@@ -1,95 +1,294 @@
-import person from "./person.js";
-import raum from "./raum.js";
-import employee from "./employee.js";
-import organisationunit from "./organisationunit.js";
-import student from "./student.js";
-import prestudent from "./prestudent.js";
+import person from "./result/person.js";
+import room from "./result/room.js";
+import employee from "./result/employee.js";
+import organisationunit from "./result/organisationunit.js";
+import student from "./result/student.js";
+import prestudent from "./result/prestudent.js";
+import dms from "./result/dms.js";
+import cms from "./result/cms.js";
+import mergedStudent from "./result/mergedstudent.js";
+import mergedPerson from "./result/mergedperson.js";
 
 export default {
+	name: "FhcSearchbar",
+	components: {
+		person,
+		room,
+		employee,
+		organisationunit,
+		student,
+		prestudent,
+		dms,
+		cms,
+		mergedStudent,
+		mergedPerson
+	},
     props: [ "searchoptions", "searchfunction" ],
+    provide() {
+        return {
+            query: Vue.computed(() => this.lastQuery)
+        };
+    },
     data: function() {
       return {
         searchtimer: null,
         hidetimer: null,
-        showsettings: false,
         searchsettings: {
-            searchstr: '',
-            types: []
+            searchstr: this.getSearchStr(),
+            types: this.getInitiallySelectedTypes(),
         },
-        showresult: false,        
         searchresult: [],
+        searchmode: '',
+        showresult: false,  
         searching: false,
-        error: null
+        error: null,
+            abortController: null,
+			settingsDropdown: null,
+            lastQuery: ''
       };
     },
-    components: {
-      person: person,
-      raum: raum,
-      employee: employee,
-      organisationunit: organisationunit,
-      student: student,
-      prestudent: prestudent
-    },
-    template: `
-          <form ref="searchform" class="d-flex me-3 position-relative" action="javascript:void(0);" 
-            @focusin="this.searchfocusin" @focusout="this.searchfocusout">
-            <div class="input-group me-2 bg-white">
-                <input ref="searchbox" @keyup="this.search" @focus="this.showsearchresult" 
-                    v-model="this.searchsettings.searchstr" class="form-control"
-                    type="search" placeholder="Suche..." aria-label="Search">
-                <button ref="settingsbutton" @click="this.togglesettings" class="btn btn-light border-start" type="button" id="search-filter"><i class="fas fa-cog"></i></button>
-            </div>            
-        
-            <div v-show="this.showresult" ref="result" 
+	computed: {
+		searchTypesPlaceholder() {
+			if (!this.searchsettings.types.length) {
+				return Object.values(this.typeLabels).join(' / ');
+			}
+			return this.searchsettings.types.map(type => this.typeLabels[type]).join(' / ');
+		},
+		types() {
+			if (!this.searchoptions.types)
+				return [];
+			if (Array.isArray(this.searchoptions.types))
+				return this.searchoptions.types;
+			return Object.keys(this.searchoptions.types);
+		},
+		typeLabels() {
+			if (!this.searchoptions.types)
+				return {};
+			if (Array.isArray(this.searchoptions.types)) {
+				return this.searchoptions.types.reduce((res, type) => {
+					res[type] = type;
+					return res
+				}, {});
+			}
+			return this.searchoptions.types;
+		}
+	},
+	template: /*html*/`
+		<form
+			ref="searchform"
+			class="d-flex me-3"
+			:class="searchoptions.cssclass"
+			action="javascript:void(0);"
+			@focusin="searchfocusin"
+			@focusout="searchfocusout"
+		>
+			<div
+				ref="searchbox"
+				class="h-100 input-group me-2 searchbar_searchbox"
+				:class="showresult ? 'open' : 'closed'"
+			>
+				<span class="input-group-text">
+					<i class="fa-solid fa-magnifying-glass"></i>
+				</span>
+                <input
+                	ref="input"
+                    @keyup="search"
+                    @focus="showsearchresult"
+                    v-model="searchsettings.searchstr"
+                    class="form-control searchbar_input"
+                    type="search"
+                    :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+                    :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+                >
+				<button
+					v-if="searchsettings.searchstr"
+					class="searchbar_input_clear btn btn-outline-secondary"
+					@click="clearInput"
+				>
+					<i class="fas fa-close"></i>
+				</button>
+                <button
+                    data-bs-toggle="collapse"
+                    data-bs-target="#searchSettings"
+                    aria-expanded="false"
+                    aria-controls="searchSettings"
+                    ref="settingsbutton"
+                    class="searchbar_setting_btn btn btn-secondary"
+                    type="button"
+                    :title="$p.t('search/button_filter_label')"
+                    :aria-label="$p.t('search/button_filter_label')"
+                >
+                    <i class="fas fa-cog"></i>
+                </button>
+            </div>
+
+            <div v-show="showresult"
                  class="searchbar_results" tabindex="-1">
-              <div v-if="this.searching">
-                <i class="fas fa-spinner fa-spin fa-2x"></i>
+              <div class="searchbar_results_scroller" ref="result">
+                <div class="searchbar_results_wrapper" ref="results">
+                  <div v-if="searching">
+                    <i class="fas fa-spinner fa-spin fa-2x"></i>
+                  </div>
+                  <div v-else-if="this.error !== null">{{ error }}</div>
+                  <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
+                  <template v-else v-for="res in searchresult">
+                    <component
+                        v-if="isValidRenderer(res.renderer)"
+                        :is="res.renderer"
+                        :mode="searchmode"
+                        :res="res"
+                        :actions="getActions(res)"
+                        @actionexecuted="hideresult"
+                    ></component>
+                    <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
+                  </template>
+                </div>
               </div>
-              <div v-else-if="this.error !== null">{{ this.error }}</div>
-              <div v-else-if="this.searchresult.length < 1">Es wurden keine Ergebnisse gefunden.</div>
-              <template v-else="" v-for="res in this.searchresult">
-                <person v-if="res.type === 'person'" :res="res" :actions="this.searchoptions.actions.person" @actionexecuted="this.hideresult"></person>
-                <student v-else-if="res.type === 'student'" :res="res" :actions="this.searchoptions.actions.student" @actionexecuted="this.hideresult"></student>
-                <prestudent v-else-if="res.type === 'prestudent'" :res="res" :actions="this.searchoptions.actions.prestudent" @actionexecuted="this.hideresult"></prestudent>
-                <employee v-else-if="res.type === 'mitarbeiter'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
-                <employee v-else-if="res.type === 'mitarbeiter_ohne_zuordnung'" :res="res" :actions="this.searchoptions.actions.employee" @actionexecuted="this.hideresult"></employee>
-                <organisationunit v-else-if="res.type === 'organisationunit'" :res="res" :actions="this.searchoptions.actions.organisationunit" @actionexecuted="this.hideresult"></organisationunit>
-                <raum v-else-if="res.type === 'raum'" :res="res" :actions="this.searchoptions.actions.raum" @actionexecuted="this.hideresult"></raum>
-                <div v-else="">Unbekannter Ergebnistyp: '{{ res.type }}'.</div>
-              </template>
             </div>
-            <div v-show="this.showsettings" ref="settings" 
-                 class="searchbar_settings" tabindex="-1">
-              <div class="btn-group" v-if="this.searchoptions.types.length > 0">
-                <template v-for="(type, index) in this.searchoptions.types" :key="type">
-                  <input type="checkbox" class="btn-check" :id="this.$.uid + 'search_type_' + index" :value="type" v-model="this.searchsettings.types"/>
-                  <label class="btn btn-outline-secondary" :for="this.$.uid + 'search_type_' + index">{{ type }}</label>
-                </template>
-              </div>
-              <div class="mb-2"></div>
-              <button ref="settingsrefreshsearch" @click="this.refreshsearch" class="btn btn-primary" type="button">Übernehmen</button>
+
+			<div
+				id="searchSettings"
+				ref="settings"
+				@[\`shown.bs.collapse\`]="handleShowSettings"
+				@[\`hide.bs.collapse\`]="handleHideSettings"
+				class="top-100 end-0 searchbar_settings text-white collapse"
+				tabindex="-1"
+			>
+				<div
+					v-if="types.length > 0"
+					class="d-flex flex-column m-3"
+				>
+					<span class="fw-light mb-2">
+						{{ $p.t('search/applyfilter_label') }}
+					</span>
+					<template
+						v-for="(label, value) in typeLabels"
+						:key="value"
+					>
+						<div class="form-check form-switch">
+							<input
+								class="fhc-switches form-check-input"
+								type="checkbox"
+								role="switch"
+								:id="$.uid + 'search_type_' + value"
+								:value="value"
+								v-model="searchsettings.types"
+							>
+							<label
+								class="ps-2 form-check-label non-selectable"
+								:for="$.uid + 'search_type_' + value"
+							>
+								{{ label }}
+							</label>
+						</div>
+					</template>
+				</div>
             </div>
-        
-          </form>
+		</form>
     `,
-    beforeMount: function() {
-        this.updateSearchOptions();
+    watch:{
+		'searchsettings.searchstr': function (newSearchValue) {
+			if(this.searchoptions.origin){
+				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+			}
+		},
+		'searchsettings.types'(newValue) {
+			if (Array.isArray(newValue) && newValue.length === 0) {
+				this.searchsettings.types = [...this.types];
+			}
+			// stores the search types in the localstorage, only if the newValue is also an array
+			if (Array.isArray(newValue) && this.searchoptions.origin) {
+				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
+			}
+			this.search();
+		}
     },
+	mounted(){
+		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
+			toggle: false
+		});
+
+		if (!this.searchoptions.origin){
+			console.warn("No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.");
+		}
+	},
+	updated() {
+		if(this.showresult) {
+			Vue.nextTick(() => {
+				this.calcSearchResultHeight();
+			});
+		}
+	},
     methods: {
-        updateSearchOptions: function() {
-            this.searchsettings.types = [];
-            for( const idx in this.searchoptions.types ) {
-                this.searchsettings.types.push(this.searchoptions.types[idx]);
-            }
-        },
+    	clearInput() {
+    		this.searchsettings.searchstr = "";
+    		this.hideresult();
+    		this.$refs.input.focus()
+    	},
+		getInitiallySelectedTypes() {
+			let result = false;
+			if (this.searchoptions.origin) {
+				let localStorageValue = localStorage.getItem(`${this.searchoptions.origin}_searchtypes`);
+				if (localStorageValue) {
+					result = JSON.parse(localStorageValue);
+				}
+			}
+			if (result)
+				return result;
+			if (!this.searchoptions.types)
+				return [];
+			if (Array.isArray(this.searchoptions.types))
+				return [...this.searchoptions.types];
+			return Object.keys(this.searchoptions.types);
+		},
+		getSearchStr: function(){
+			if (!this.searchoptions.origin)
+				return '';
+			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
+		},
+		checkSettingsVisibility: function(event) {
+			// hides the settings collapsible if the user clicks somewhere else
+			if (!this.$refs.settings.contains(event.target))
+			{
+				this.settingsDropdown.hide();
+			}
+		},
+		handleShowSettings: function() {
+			// adds the event listener checkSettingsVisibility only when the collapsible is shown
+			document.addEventListener("click", this.checkSettingsVisibility);
+		},
+		handleHideSettings: function () {
+			// removes the event listener checkSettingsVisibility when the collapsible is hidden
+			document.removeEventListener("click", this.checkSettingsVisibility);
+		},
+		calcSearchResultHeight: function() {
+			const rect = this.$refs.results.getBoundingClientRect();
+			if( rect.height > 0 && rect.height < (window.innerHeight * 0.8) ) {
+				this.$refs.result.style.height = Math.ceil(rect.height + 16) + 'px';
+			} else {
+				this.$refs.result.style.height = Math.floor(window.innerHeight * 0.8) + 'px';
+			}
+		},
         calcSearchResultExtent: function() {
-            var rect = this.$refs.searchbox.getBoundingClientRect();
-            //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
-             this.$refs.result.style.height = Math.floor(window.innerHeight * 0.80) + 'px';
+			if(!this.showresult) {
+				return;
+			}
+			if(this.searchoptions?.calcheightonly === undefined 
+				|| this.searchoptions.calcheightonly === false) {
+				var rect = this.$refs.searchbox.getBoundingClientRect();
+				this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
+				this.$refs.result.style.right = Math.floor(rect.right) + 'px';
+				this.$refs.result.style.width = Math.floor(rect.width) + 'px';
+			}
+            this.calcSearchResultHeight();
         },
         search: function() {
             if( this.searchtimer !== null ) {
                 clearTimeout(this.searchtimer);
+            }
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
             }
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
@@ -101,52 +300,102 @@ export default {
                 this.showresult = false;
             }
         },
-        callsearchapi: function() {            
-            var that = this;
+        callsearchapi: function() {
             this.error = null;
-            this.searchresult = [];
+            this.searchresult.splice(0, this.searchresult.length);
             this.searching = true;
-            this.showsearchresult();            
-            this.searchfunction(this.searchsettings)
-            .then(function(response) {
-                if( response.data?.error === 1 ) {
-                    that.error = 'Bei der Suche ist ein Fehler aufgetreten.';
+            this.showsearchresult();
+            if(this.searchsettings.types.length === 0) {
+                this.error = this.$p.t('search/error_missing_type');
+                this.searching = false;
+                return;
+            }
+
+            if (this.abortController)
+                this.abortController.abort();
+            this.abortController = new AbortController();
+
+            this.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
+            .then(response=>{
+                if (!response.data) {
+                    this.error = this.$p.t('search/error_general');
                 } else {
-                    that.searchresult = response.data.data;
+                    let res = response.data.map(el => el.data ? {...el, ...JSON.parse(el.data)} : el);
+                    this.lastQuery = response.meta.searchstring;
+                    if (this.searchoptions.mergeResults) {
+                        let counter = 0;
+                        let mergeTypes = [];
+                        let mergedType = 'merged-';
+                        let mergeKey = '';
+
+                        switch (this.searchoptions.mergeResults) {
+                        case 'student':
+                            mergeTypes = ['student', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'uid';
+                            break;
+                        case 'person':
+                            mergeTypes = ['person', 'employee', 'student', 'prestudent'];
+                            mergedType += this.searchoptions.mergeResults;
+                            mergeKey = 'person_id';
+                            break;
+                        }
+
+                        if (mergeTypes.length) {
+                            res = Object.values(res.reduce((a, c) => {
+                                if (!mergeTypes.includes(c.renderer)) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (c[mergeKey] === null) {
+                                    a['nomerge' + counter++] = c;
+                                } else if (a[c[mergeKey]] === undefined) {
+                                    a[c[mergeKey]] = {
+                                        rank: c.rank,
+                                        renderer: mergedType,
+                                        type: mergedType,
+                                        list: [c]
+                                    };
+                                } else {
+                                    a[c[mergeKey]].list.push(c);
+                                    if (c.rank > a[c[mergeKey]].rank)
+                                        a[c[mergeKey]].rank = c.rank;
+                                }
+                                return a;
+                            }, {})).sort((a, b) => b.rank - a.rank);
+                        }
+                    }
+                    this.searchresult = res;
+                    this.searchmode = response.meta.mode;
                 }
+                this.searching = false;
+                this.retry = 0;
             })
-            .catch(function(error) {
-                that.error = 'Bei der Suche ist ein Fehler aufgetreten.' 
-                    + ' ' + error.message;
-            })
-            .finally(function() {
-                that.searching = false;
+            .catch(error=> {
+                if (error.code == "ERR_CANCELED") {
+                    return this.retry = 0;
+                }
+                if (error.code == "ECONNABORTED" && this.retry) {
+                    this.retry--;
+                    return this.callsearchapi();
+                }
+
+                this.error = this.$p.t('search/error_general', error);
+                this.searching = false;
+                this.retry = 0;
             });
         },
         refreshsearch: function() {
           this.search();
           this.togglesettings();
         },
-        calcSearchSettingsExtent: function() {
-            var rect = this.$refs.settingsbutton.getBoundingClientRect();
-            //console.log(window.innerWidth + ' ' + window.innerHeight + ' ' + JSON.stringify(rect));
-            this.$refs.settings.style.top = Math.floor(rect.bottom + 3) + 'px';
-            this.$refs.settings.style.right = Math.floor(window.innerWidth - rect.right) + 'px';
-            this.$refs.settings.style.width = Math.floor(window.innerWidth * 0.5) + 'px';
-            //this.$refs.settings.style.height = Math.floor(window.innerHeight * 0.5) + 'px';  
-        },
-        togglesettings: function() {
-            this.showsettings = !this.showsettings;
-            this.calcSearchSettingsExtent();
-        },
         hideresult: function() {
             this.showresult = false;
             window.removeEventListener('resize', this.calcSearchResultExtent);
         },
         showsearchresult: function() {
-            if( this.searchsettings.searchstr.length >= 3 ) {
+            if( this.searchsettings.searchstr.length >= 2 ) {
                 this.showresult = true;
                 window.addEventListener('resize', this.calcSearchResultExtent);
+				this.calcSearchResultExtent();
             }
         },
         searchfocusin: function(e) {
@@ -155,6 +404,10 @@ export default {
             if( this.hidetimer !== null ) {
                 clearTimeout(this.hidetimer);
             }
+			if (this.searchsettings.searchstr.length >= 2
+				&& this.searchresult.length === 0) {
+				this.search();
+			}
         },
         searchfocusout: function(e) {
             e.preventDefault();
@@ -163,6 +416,20 @@ export default {
                 this.hideresult,
                 100
             );
-        }
+        },
+        dash2camelCase(string) {
+            return string.replace(/-([a-z])/g, g => g[1].toUpperCase());
+        },
+        isValidRenderer(renderer) {
+            const camelCaseRenderer = this.dash2camelCase(renderer);
+            return Object.keys(this.$.components).includes(camelCaseRenderer);
+        },
+		getActions(res) {
+			let actions = this.searchoptions.actions[this.dash2camelCase(res.renderer)];
+			if (actions) {
+				return actions;
+			}
+			return this.searchoptions.actions[res.type];
+		}
     }
 };
