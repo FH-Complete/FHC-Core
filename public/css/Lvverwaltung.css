@@ -28,3 +28,13 @@ textarea[name="anmerkung"] {
 	content: '\f073';
 	color: #f3c541;
 }
+
+
+.modal-dialog.modal-xxl {
+	max-width: 95% !important;
+}
+
+.tabulator-menu .tabulator-menu-item.tabulator-menu-item-submenu:after
+{
+	border-color: black;
+}

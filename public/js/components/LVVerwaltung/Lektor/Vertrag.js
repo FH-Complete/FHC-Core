@@ -88,8 +88,14 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 
-		cancelVertrag()
+		async cancelVertrag()
 		{
+
+			if (await this.$fhcAlert.confirm({
+				message: this.$p.t('lehre', 'vertragConfirm'),
+				acceptLabel: this.$p.t('ui', 'ja').charAt(0).toUpperCase() + this.$p.t('ui', 'ja').slice(1),
+				acceptClass: 'btn btn-danger'}) === false)
+				return;
 			let needUpdate = {
 				vertrag_id: this.data.vertrag.vertrag_id,
 				mitarbeiter_uid: this.mitarbeiter_uid,
@@ -126,6 +132,7 @@ export default{
 								type="button" 
 								class="btn btn-outline-secondary w-100"
 								@click="cancelVertrag"
+								:title="$p.t('lehre', 'cancelvertrag')"
 							>
 								<i class="fa-solid fa-ban"></i>
 							</button>

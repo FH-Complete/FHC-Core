@@ -88,10 +88,12 @@ export default {
 			},
 			selectedStudiengang: '',
 			searchbaroptions: {
+				origin: 'lvverwaltung',
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
-					"mitarbeiter"
+					"mitarbeiter",
+					"mitarbeiter_ohne_zuordnung"
 				],
 				actions: {
 					employee: {

@@ -670,19 +670,19 @@ export default {
 			<slot name="filterzuruecksetzen"></slot>
 		</template>
 	</core-filter-cmpt>
-		<bs-modal ref="lehreinheitModal" dialogClass="modal-lg">
-			<template #title>
-				<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
-			</template>
+	<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
+		<template #title>
+			<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
+		</template>
 			
-			<template v-if="lv_info">
-				<details-form :data="lv_info"/>
-			</template>
+		<template v-if="lv_info">
+			<details-form :data="lv_info"/>
+		</template>
 			
-			<template #footer>
-				<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
-			</template>
-		</bs-modal>
+		<template #footer>
+			<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
+		</template>
+	</bs-modal>
 
 `
 };

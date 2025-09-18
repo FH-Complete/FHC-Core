@@ -121,9 +121,9 @@ export default{
 			}
 			this.$refs.form.call(ApiLektor.update(updatedData))
 				.then(result => {
-					let error = result.data?.error;
-					if (error)
-						this.$fhcAlert.alertWarning(error)
+					let warning = result.data?.retval?.warning;
+					if (warning)
+						this.$fhcAlert.alertWarning(warning)
 					this.original = {...this.data};
 
 					if (this.changed.mitarbeiter_uid)
@@ -192,6 +192,7 @@ export default{
 						container-class="col-3"
 						dropdown
 						@complete="searchLektor"
+						name="lektorautocomplete"
 					></form-input>
 					
 					<form-input
@@ -207,7 +208,9 @@ export default{
 				<div class="row mb-3">
 					<form-input
 						:label="$p.t('lehre', 'las')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"
 						v-model="data.semesterstunden"
@@ -217,7 +220,9 @@ export default{
 					
 					<form-input
 						:label="$p.t('lehre', 'planstunden')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						v-model="data.planstunden"
 						name="planstunden"
@@ -231,7 +236,9 @@ export default{
 						:label="data.default_stundensatz !== null 
 							? $p.t('lehre', 'stundensatz') + ' (' + $p.t('lehre', 'default') + ': ' + data.default_stundensatz + ')'
 							: $p.t('lehre', 'stundensatz')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						v-model="data.stundensatz"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"
