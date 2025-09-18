@@ -418,6 +418,10 @@ class Messages extends FHCAPI_Controller
 		}
 
 		$data = $this->getDataOrTerminateWithError($result);
+		if (count($data) < 1)
+		{
+			$this->terminateWithError('Error: Messages API no person_id found.');
+		}
 		$person = current($data);
 
 		return $person->person_id;
@@ -432,8 +436,12 @@ class Messages extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
+		if (count($data) < 1)
+		{
+			$this->terminateWithError('Error: Messages API no prestudent_id found.');
+		}
 		$student = current($data);
-	//	$this->terminateWithError($student->prestudent_id, self::ERROR_TYPE_GENERAL);
+
 		return $student->prestudent_id;
 	}
 

@@ -28,6 +28,11 @@ class Lehreinheit_model extends DB_Model
 	{
 		$lehreinheiten = array();
 
+		$this->addSelect(
+			'lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, lehrform_kurzbz,
+			stundenblockung, wochenrythmus, start_kw, raumtyp, raumtypalternativ,
+			sprache, lehre, unr, lvnr, lehrfach_id, gewicht'
+		);
 		$this->addOrder('lehreinheit_id');
 		$les = $this->loadWhere(
 			array('lehrveranstaltung_id' => $lehrveranstaltung_id,
