@@ -72,8 +72,12 @@ class DocumentExportLib
 		// Gets CI instance
 		$this->_ci =& get_instance();
 
-		// Load Phrases
-		$this->_ci->load->library('DocumentLib', ['document_export', null], 'DocumentExportPhrases');
+		// Load phrases
+		$this->_ci->load->library('PhrasesLib', ['document_export', null], 'DocumentExportPhrases');
+
+		// Load libraries
+		$this->_ci->load->library('DocumentLib');
+		$this->_ci->load->library('SignatureLib');
 	}
 
 	/**
@@ -402,32 +406,10 @@ class DocumentExportLib
 		switch ($outputformat) {
 			case 'pdf':
 			case 'doc':
-				$ret = 0;
-				$temp_filename = $temp_folder . '/out.' . $outputformat;
+				$converResult = $this->documentlib->convert($tempname_zip, $temp_filename, $outputformat);
 
-				if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true) {
-					// Use docsbox
-					require_once('DocsboxLib.php');
-
-					$ret = DocsboxLib::convert($tempname_zip, $temp_filename, $outputformat);
-				} else {
-					// Use unoconv
-
-					// Unoconv Version 0.6 hat eine Bug wodurch die Berechtigungen des PDF/Doc nicht korrekt gesetzt
-					// werden. Deshalb wird dies hier speziell behandelt.
-					// Die 2. Variante hat den Vorteil dass hier eine bessere Fehlerbehandlung moeglich ist
-					if ($this->unoconv_version == '0.6')
-						$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $outputformat . '  %2$s > %1$s';
-					else
-						$command = 'unoconv -e IsSkipEmptyPages=false -f ' . $outputformat . ' --output %s %s 2>&1';
-
-					$command = sprintf($command, $temp_filename, $tempname_zip);
-
-					exec($command, $out, $ret);
-				}
-
-				if ($ret)
-					return error($this->_ci->DocumentExportPhrases->t("document_export", "error_conv_timeout"));
+				if (isError($converResult))
+					return error($this->_ci->DocumentExportPhrases->t('document_export', 'error_conv_timeout'));
 				break;
 			case 'odt':
 			default:
@@ -451,63 +433,15 @@ class DocumentExportLib
 	 */
 	protected function sign($temp_folder, $temp_filename, $outputformat, $user, $profile)
 	{
-		if ($outputformat != 'pdf')
-			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_sign_pdf"));
+		if ($outputformat != 'pdf') return error($this->_ci->DocumentExportPhrases->t('document_export', 'error_sign_pdf'));
 
-		// Load the File
-		$file_data = file_get_contents($temp_filename);
+		$signed_filename = $this->_ci->signaturelib->sign($temp_filename, $user, $profile);
 
-		$data = new stdClass();
-		$data->document = base64_encode($file_data);
+		// If fine then return it
+		if (isSuccess($signed_filename)) return $signed_filename;
 
-		// Signatur Profil
-		if (!is_null($profile))
-			$data->profile = $profile;
-		else
-			$data->profile = SIGNATUR_DEFAULT_PROFILE;
-
-		// Username des Endusers der die Signatur angefordert hat
-		$data->user = $user;
-
-		$ch = curl_init();
-
-		curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL . '/' . SIGNATUR_SIGN_API);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
-		curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
-
-		// SSL Zertifikatsprüfung deaktivieren
-		// Besser ist es das Zertifikat am Server zu installieren!
-		//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-
-		$data_string = json_encode($data, JSON_FORCE_OBJECT);
-
-		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, [
-			'Content-Type: application/json',
-			'Content-Length:' . mb_strlen($data_string),
-			'Authorization: Basic ' . base64_encode(SIGNATUR_USER . ":" . SIGNATUR_PASSWORD)
-		]);
-
-		$result = curl_exec($ch);
-		if (curl_errno($ch)) {
-			curl_close($ch);
-			return error($this->_ci->DocumentExportPhrases->t("document_export", "error_sign_timeout"));
-		}
-		curl_close($ch);
-		$resultdata = json_decode($result);
-
-		// If it is success
-		if (isset($resultdata->error) && $resultdata->error == 0) {
-			$signed_filename = $temp_folder . '/signed.pdf';
-			file_put_contents($signed_filename, base64_decode($resultdata->retval));
-			return success($signed_filename);
-		}
-
-		// otherwise if it is an error
-		return error($resultdata->retval ?? $this->_ci->DocumentExportPhrases->t("global", "unknown_error", ["error" => $result]));
+		// Otherwise it is an error
+		return error($this->_ci->DocumentExportPhrases->t('global', 'unknown_error', ['error' => $result]));
 	}
 
 	/**

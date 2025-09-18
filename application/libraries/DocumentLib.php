@@ -15,7 +15,7 @@ class DocumentLib
 		// Gets CI instance
 		$this->_ci =& get_instance();
 
-		// Load Phrases
+		// Load phrases
 		$this->_ci->load->library('PhrasesLib', ['document_export', null], 'DocumentExportPhrases');
 
 		// Which document converter has to be used

@@ -36,15 +36,7 @@ class SignatureLib
 		try
 		{
 			// Dont send Document if it is bigger than 30 MB (Limit of Signature Server)
-			if (filesize($inputFileName) > 30000000)
-			{
-				$returnObject = new stdClass();
-				$returnObject->code = 1;
-				$returnObject->error = 1;
-				$returnObject->retval = 'File to big';
-
-				return $returnObject;
-			}
+			if (filesize($inputFileName) > 30000000) return $this->_returnObject(1, 1, 'File too big');
 
 			// Get the content of the given file
 			$inputFileContent = file_get_contents($inputFileName);
@@ -82,4 +74,79 @@ class SignatureLib
 		// Otherwise return a null as error
 		return null;
 	}
+
+	/**
+	 * 
+	 */
+	public static function sign($inputFileName, $user, $profile)
+	{
+		// Load the File
+                $file_data = file_get_contents($inputFileName);
+
+                $data = new stdClass();
+                $data->document = base64_encode($file_data);
+
+                // Signatur Profil
+                if (!is_null($profile))
+                        $data->profile = $profile;
+                else
+                        $data->profile = SIGNATUR_DEFAULT_PROFILE;
+
+                // Username des Endusers der die Signatur angefordert hat
+                $data->user = $user;
+
+                $ch = curl_init();    
+                
+                curl_setopt($ch, CURLOPT_URL, SIGNATUR_URL . '/' . SIGNATUR_SIGN_API);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 7);
+                curl_setopt($ch, CURLOPT_USERAGENT, "FH-Complete");
+
+                // SSL Zertifikatsprüfung deaktivieren
+                // Besser ist es das Zertifikat am Server zu installieren!
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+                //curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+                $data_string = json_encode($data, JSON_FORCE_OBJECT);
+
+                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_HTTPHEADER, [
+                        'Content-Type: application/json',
+                        'Content-Length:' . mb_strlen($data_string),
+                        'Authorization: Basic ' . base64_encode(SIGNATUR_USER . ':' . SIGNATUR_PASSWORD)
+                ]);
+
+                $result = curl_exec($ch);
+                if (curl_errno($ch)) {
+                        curl_close($ch);
+                        return $this->_returnObject(1, 1, 'CURL error');
+                }
+                curl_close($ch);
+		$resultdata = json_decode($result);
+
+		// If it is success
+                if (isset($resultdata->error) && $resultdata->error == 0) {
+                        $signed_filename = $temp_folder . '/signed.pdf';
+                        file_put_contents($signed_filename, base64_decode($resultdata->retval));
+                        return $this->_returnObject(0, 0, $signed_filename);
+                }
+
+                // Otherwise it is an error
+                return $this->_returnObject(1, 1, 'Error while signing the given document');
+	}
+
+	/**
+	 *
+	 */
+	private function _returnObject($code, $error, $retval)
+	{
+		$returnObject = new stdClass();
+		$returnObject->code = $code;
+		$returnObject->error = $error;
+		$returnObject->retval = $retval;
+		
+		return $returnObject;
+	}
 }
+
