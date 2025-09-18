@@ -15,11 +15,29 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import person from "./notiz/person.js";
-import lehreinheit from "./notiz/lehreinheit.js";
-
-
 export default {
-	person,
-	lehreinheit
+	get(path) {
+		let url = 'api/frontend/v1/lv/StgTree';
+		if (path)
+			url += '/' + path;
+		return {
+			method: 'get',
+			url
+		};
+	},
+	favorites: {
+		get() {
+			return {
+				method: 'get',
+				url: 'api/frontend/v1/lv/favorites'
+			};
+		},
+		set(favorites) {
+			return {
+				method: 'post',
+				url: 'api/frontend/v1/lv/favorites/set',
+				params: { favorites }
+			};
+		}
+	}
 };

@@ -15,11 +15,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import person from "./notiz/person.js";
-import lehreinheit from "./notiz/lehreinheit.js";
-
+import Person from './person.js';
 
 export default {
-	person,
-	lehreinheit
+
+	...Person,
+	getNotizen(id, type) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/notiz/notizLehreinheit/getNotizen/' + encodeURIComponent(id) + '/' + encodeURIComponent(type)
+		};
+	},
 };
