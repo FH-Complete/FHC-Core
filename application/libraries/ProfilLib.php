@@ -303,10 +303,22 @@ class ProfilLib{
 	private function getBenutzerFunktion($uid)
 	{
 		$this->ci->load->model("person/Benutzerfunktion_model","BenutzerfunktionModel");
-		$this->ci->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung", "tbl_organisationseinheit.bezeichnung as Organisationseinheit", "datum_von as Gültig_von", "datum_bis as Gültig_bis", "wochenstunden as Wochenstunden"]);
+		$this->ci->BenutzerfunktionModel->addSelect([
+			"tbl_funktion.beschreibung as Bezeichnung",
+			"tbl_organisationseinheit.bezeichnung as Organisationseinheit",
+			"datum_von as Gültig_von",
+			"datum_bis as Gültig_bis",
+			"COALESCE(wochenstunden, '0'::numeric(5,2)) AS \"Wochenstunden\""
+		]);
+		$this->ci->BenutzerfunktionModel->addJoin("tbl_funktion", "funktion_kurzbz");
 		$this->ci->BenutzerfunktionModel->addJoin("tbl_organisationseinheit", "oe_kurzbz");
 
-		$benutzer_funktion_res = $this->ci->BenutzerfunktionModel->loadWhere(array('uid' => $uid));
+		$benutzer_funktion_res = $this->ci->BenutzerfunktionModel->loadWhere(
+			array(
+				'uid' => $uid,
+				'NOW()::date BETWEEN COALESCE(datum_von, \'1970-01-01\'::date) AND COALESCE(datum_bis, \'2170-12-01\'::date)' => null
+			)
+		);
 		if(isError($benutzer_funktion_res)){
 			return error(getData($benutzer_funktion_res));
 		}
