@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
 
+import draggable from '../../../directives/draggable.js';
 
 export default {
 	name: "ListPrestudents",
@@ -8,9 +9,16 @@ export default {
 		CoreFilterCmpt,
 		ListNew
 	},
+	directives: {
+		draggable
+	},
 	inject: {
-		'lists': {
+		lists: {
 			from: 'lists',
+			required: true
+		},
+		$reloadList: {
+			from: '$reloadList',
 			required: true
 		},
 		currentSemester: {
@@ -51,8 +59,12 @@ export default {
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
-						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
+					{
+						title: "Geburtsdatum",
+						field: "gebdatum",
+						formatter: dateFormatter, 
+						headerFilter: true,
+						headerFilterFunc(headerValue, rowValue) {
 							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
 							let comparestr = headerValue;
 							if(matches !== null) {
@@ -165,6 +177,39 @@ export default {
 			currentEndpointRawUrl: ''
 		}
 	},
+	computed: {
+		countsToHTML: function() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		selectedDragObject() {
+			return this.selected.map(item => {
+				let type, id;
+				if (item.uid) {
+					type = 'student';
+					id = item.uid;
+				} else if (item.prestudent_id) {
+					type = 'prestudent';
+					id = item.prestudent_id;
+				} else if (item.person_id) {
+					type = 'person';
+					id = item.person_id;
+				}
+				return {
+					...item,
+					type,
+					id
+				};
+			});
+		}
+	},
 	methods: {
 		reload() {
 			this.$refs.table.reloadTable();
@@ -172,10 +217,19 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
+
+			// set selected elements draggable
+			const tableEl = this.$refs.table?.$refs?.table;
+			if (tableEl) {
+				const oldDragables = tableEl.querySelectorAll('[draggable]');
+				for (const draggable of oldDragables)
+					draggable.removeAttribute('draggable');
+			}
+			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
 			if (this.lastSelected) {
@@ -234,14 +288,22 @@ export default {
 			} else
 				this.$refs.table.tabulator.setData(endpoint.url, params);
 		},
+		dragCleanup(evt) {
+			if (evt.dataTransfer.dropEffect == 'none')
+				return; // aborted or wrong target
+			
+			this.$reloadList();
+		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
 				return;
+
+			var next;
 			switch (e.code) {
 				case 'Enter':
 				case 'Space':
 					e.preventDefault();
-					const e2 = new Event('click', e);
+					var e2 = new Event('click', e);
 					e2.altKey = e.altKey;
 					e2.ctrlKey = e.ctrlKey;
 					e2.shiftKey = e.shiftKey;
@@ -250,13 +312,13 @@ export default {
 					break;
 				case 'ArrowUp':
 					e.preventDefault();
-					var next = this.focusObj.previousElementSibling;
+					next = this.focusObj.previousElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
-					var next = this.focusObj.nextElementSibling;
+					next = this.focusObj.nextElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
@@ -296,24 +358,19 @@ export default {
 			}
 		}
 	},
-	computed: {
-		countsToHTML: function() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
-		}
-	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
+		<div
+			class="tabulator-container d-flex flex-column h-100"
+			:class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}"
+			tabindex="0"
+			@focusin="onFocus"
+			@keydown="onKeydown"
+			v-draggable:copyLink.capture="selectedDragObject"
+			@dragend="dragCleanup"
+		>
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"

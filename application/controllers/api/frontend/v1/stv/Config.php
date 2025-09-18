@@ -110,7 +110,7 @@ class Config extends FHCAPI_Controller
 		];
 		$result['groups'] = [
 			'title' => $this->p->t('stv', 'tab_groups'),
-			'component' => './Stv/Studentenverwaltung/Details/Gruppen.js'
+			'component' => './Stv/Studentenverwaltung/Details/Groups.js'
 		];
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
@@ -204,6 +204,10 @@ class Config extends FHCAPI_Controller
 				'columns' => $this->kontoColumnsMultiPerson(),
 				'additionalCols' => []
 			]
+		];
+		$result['groups'] = [
+			'title' => $this->p->t('stv', 'tab_groups'),
+			'component' => './Stv/Studentenverwaltung/Details/Groups.js'
 		];
 		$result['status'] = [
 			'title' => 'Status',
