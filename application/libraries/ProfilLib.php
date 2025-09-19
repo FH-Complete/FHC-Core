@@ -304,7 +304,7 @@ class ProfilLib{
 	{
 		$this->ci->load->model("person/Benutzerfunktion_model","BenutzerfunktionModel");
 		$this->ci->BenutzerfunktionModel->addSelect([
-			"tbl_funktion.beschreibung as Bezeichnung",
+			"CASE WHEN (tbl_benutzerfunktion.bezeichnung IS NOT NULL AND tbl_benutzerfunktion.bezeichnung <> '' AND tbl_benutzerfunktion.bezeichnung <> tbl_funktion.beschreibung) THEN tbl_funktion.beschreibung || ' - ' || tbl_benutzerfunktion.bezeichnung ELSE tbl_funktion.beschreibung END as \"Bezeichnung\"",
 			"tbl_organisationseinheit.bezeichnung as Organisationseinheit",
 			"datum_von as Gültig_von",
 			"datum_bis as Gültig_bis",
