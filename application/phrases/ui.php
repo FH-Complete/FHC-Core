@@ -2145,5 +2145,2621 @@ $phrases = array(
 			)
 		)
 	)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'loading',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Lädt...',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Loading...',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'n_errors',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{n} Fehler',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{n} Error(s)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'toggle_nav',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Navigation ein-/ausblenden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Toggle navigation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'geloescht',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Gel&ouml;scht',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Deleted',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldWriteAccess',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie haben keine Schreibrechte für dieses Feld',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You do not have writing rights for this field',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldMustBeArray',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das {field} Feld muss ein Array sein',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The {field} field must be an array',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'filterdelete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Filter löschen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Clear filter',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'neuUndGeaenderteAnzeigen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Neue und geänderte anzeigen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Show new and changed',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_invalid_date',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The date format is invalid or out of range.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'all_semester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Alle Semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'All semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'current_semester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Aktuelles Semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Current semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'textUebernehmen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Text &uuml;bernehmen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Use this text',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteBegruendungVervollstaendigen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte vervollständigen Sie die Begründung.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please complete the reason.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorStartdatumNichtInStudiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Startdatum liegt außerhalb des gewählten Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The startdate is not within the selected study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorEndedatumNichtInStudiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Endedatum liegt außerhalb des gewählten Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The enddate is not within the selected study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorStartdatumNachEndedatum',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Startdatum muss VOR dem Endedatum liegen.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The startdate must be BEFORE the enddate.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'frageSicherLoeschen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sicher löschen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Definitely delete?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bearbeitetVon',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'bearbeitet von',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edited by',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bearbeitetAm',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'bearbeitet am',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edited on',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'fehlendeMinZeichen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Fehlende min. Zeichen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Missing min. Characters',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'schliessen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Schließen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Close',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'keinen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Keinen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'None',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'suche',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Suche',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Search',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'skip',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Überspringen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Skip',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'select_studiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Studiensemester auswählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Select a semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'keineBerechtigung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Keine Berechtigung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No authority',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'verfasser_uid',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Verfasser*in UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'author UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bearbeiter_uid',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bearbeiter*in UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'editor UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldRequired',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} ist erforderlich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Input Field {field} is required',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNotInteger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss eine Ganzzahl enthalten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Field {field} must contain an integer',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNotNumeric',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Field {Field} must contain only numbers.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNoValidEmail',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The field {field} must contain a valid email address.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'lehrauftrag',
+  'category' => 'ui',
+  'phrase' => 'hinweistextLehrauftrag',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'existiertBereits',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Existiert bereits',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Already exists',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'datumEndeVorDatumStart',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Datumende vor Datumstart',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Enddate after startdate',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'ui',
+  'phrase' => 'existiertBereitsInKombinationMitDerVersion',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Existiert bereits in Kombination mit der Version',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Already exists in combination with the Version',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'softwarebereitstellung',
+  'category' => 'ui',
+  'phrase' => 'nichtGleichzeitigUntergeordnetUndUebergeordnet',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Software kann einer anderen Software nicht gleichzeitig untergeordnet und übergeordnet sein',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Software cannot be both subordinate and superior to other software at the same time',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_missingId',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Id {id} nicht gefunden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Missing Id {id}',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'btn_statusVorruecken',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status vorrücken',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'advance status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'btn_confirmStatus',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status bestätigen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'confirm status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'btn_editStatus',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edit status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'btn_deleteStatus',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status löschen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'delete status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successSave',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Speichern erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Successfully saved',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successDelete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Löschen erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Delete successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successAdvance',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Vorrückung Status erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Advance status successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successConfirm',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bestätigung Status erfolgreich',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Confirmation status successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Resources',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel_delete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel löschen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'delete operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel_confirm_delete',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel wirklich löschen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Really delete operating resource?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'add_betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel anlegen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'create operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'edit_betriebsmittel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'edit operating resource',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successNewStatus',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{countSuccess} erfolgreiche Statusänderung(en) auf {status}, {countError} Fehler',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{countSuccess} successful status changes to {status}, {countError} errors',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'genericDeleted',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{0} gelöscht',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{0} deleted',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_location_combination',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Ort, Gemeinde und Postleitzahl passen nicht zusammen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'City, municipality and postcode do not match',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bittePlzWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte gültige PLZ wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select valid postcode',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteGemeindeWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte gültige Gemeinde wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select valid municipality',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteStandortWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte Standort wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select location',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'student_uid',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Student UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'student UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorConfigFehlt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Config-Eintrag fehlt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Missing config entry',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorUnbekannteUrl',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Unbekannte URL. Seite bzw. Link kann nicht geöffnet werden.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Unknown URL. Cannot open to site or link',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'pep',
+  'category' => 'ui',
+  'phrase' => 'maprojohneoe',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Employee and project are not assigned to the organizational unit.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'pep',
+  'category' => 'ui',
+  'phrase' => 'infoandepl/kfl',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Info an DepL/KFL',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Info to DepL/KFL:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'firma_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Firma ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Company ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'adresse_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Adresse ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Address ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'kontakt_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kontakt ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Contact ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'standort_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Standort ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Location ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bankverbindung_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bankverbindung ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Bankdetails ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'studienplan_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Studienplan ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Studyplan ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'prestudent_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'PrestudentIn ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Prestudent ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'notiz_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Notiz ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Notes ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'notizzuordnung_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Notizzuordnung ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Noteassignment ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'extension_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Extension ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Extension ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'type_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Type ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Type ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittel_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittel ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Ressource ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'betriebsmittelperson_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Betriebsmittelperson ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Ressourceperson ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'dropdownLoading',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Daten werden geladen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Loading',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_noInteger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nur Eingabe von ganzen Zahlen erlaubt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Error: Only input of whole numbers allowed',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_maxSem',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Ausbildungssemester nicht zulässig: größer als Höchstsemester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Error: Semester not allowed: higher than max Semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_entryExisting',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Eintrag bereits vorhanden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Entry already existing',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'expand_all',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'alle ausklappen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'expand all',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'collapse_all',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'alle einklappen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'collapse all',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successSent',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nachricht erfolgreich versandt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Message sent successfully',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'btnAktualisieren',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Aktualisieren',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Update',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'reset',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Zurücksetzen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reset',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'uploadDokument',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument hochladen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Upload document',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'deleteDokument',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument löschen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Delete document',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'editDokument',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Edit document',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'successUpload',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument erfolgreich hochgeladen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Dokumentupload successful',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'downloadDok',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument herunterladen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Download Document',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'errorMissingValue',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{value} fehlt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{value} missing',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_valueNotNumeric',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{value} darf nur Ziffern enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '{value} must contain only numbers.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'anrechnung_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnung ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Exemption ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'export',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Exportieren',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Export',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'dateFrom',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'von',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'from',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'dateTo',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'bis',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'to',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'filterOnlyFutureActive',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Filter \'Nur zukünftige Reihungstest anzeigen\' aktiv',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Filter \'Only show future placement tests\' active',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'reihungstest_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Reihungstest ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Placementtest ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'reihungstest_person_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'RtPerson ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'PtPerson ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'saveAsCopy',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Als Kopie speichern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Save as copy',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldMustBePositiveInteger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} darf nur positive Ganzzahlen enthalten.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The input field {field} may only contain positive integers',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'bitteUnternehmenWaehlen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Vor Änderung der Organisationseinheit bitte Unternehmen wählen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Before changing the organizational unit, please select company',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_keineBerechtigungStg',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie haben keine Berechtigung, für diesen Studiengang Daten zu ändern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You do not have permission to change data for this study program',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'chooseStudent',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte StudentIn auswählen!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please select a student!',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'notizHinzufuegen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Notiz hinzufügen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Add note',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'mitarbeiter_uid',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mitarbeiter UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Employee UID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'pruefung_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Prüfung ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Examination ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldInvalidAlias',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Alias ist ungültig',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Alias is invalid',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldLessThan1000',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss kleiner als 1000 sein.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Field {Field} must contain a number less then 10000.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'error_fieldNoValidNumber',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Das Eingabefeld {field} muss eine gültige Zahl sein',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The Input Field {field} has to be a valid number',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

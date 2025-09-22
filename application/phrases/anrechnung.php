@@ -1672,5 +1672,761 @@ $phrases = array(
 			)
 		)
 	)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'antragStellenWegenHochschulzeugnis',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'eines Hochschulzeugnisses (vgl. § 4 Abs. 8 Satzung „Studienrechtliche Bestimmungen / Prüfungsordnung)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'a university certificate (see § 4 para. 8, Statute on Studies Act Provisions / Examination Regulations of the UASTW)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'bisherAngerechneteEcts',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bisher angerechnete ECTS',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'All previous recognized ECTS',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungEctsTooltipText',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anzeige der Summe der bisher angerechneten ECTS. Für Quereinsteiger in ein höheres Semester werden die ECTS der angerechneten Semester berücksichtigt.<br><br>Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische und berufliche Qualifikationen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Sum of previous recognized ECTS. Lateral Entries are considered with ECTS of the recognized semester.<br><br>Maximum ECTS limits are applied since Octobre 2021:<br><br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungEctsTooltipTextBeiUeberschreitung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Seit Oktober 2021 gelten Höchstgrenzen für Anrechnungen:<br>max. 60 ECTS für schulische Zeugnisse (anrechenbar sind nur BHS- und AHS-Zeugnisse!)<br>max. 60 ECTS für berufliche Qualifikationen<br>max. 90 ECTS INSGESAMT für schulische Zeugnisse und berufliche Qualifikationen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Maximum ECTS limits are applied since Octobre 2021:<br>max. 60 ECTS school qualification (BHS and AHS only)<br>max. 60 ECTS professional qualification<br>max. 90 ECTS OVERALL for school and professional qualification',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungEctsTextBeiUeberschreitung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.<span class="fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '<br>Exceedance of maximum limit for exemption (see § 12 para. 3, Regulations of the UASTW).<br><b>Former ECTS + ECTS of this course: Total: {0} [ School  qualification: {1} | Professional qualification: {2} ]</b> ',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'textUebernehmenOderEigenenBegruendungstext',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Begründungstext aus Liste übernehmen oder eigene Begründung angeben',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Copy reason from list above or write your own reason',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'begruendungEcts',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Erläutern Sie die Gleichwertigkeit der ECTS',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Explain ECTS equivalencies',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'begruendungLvinhalt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Erläutern Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Explain the equivalence of course content',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungBegruendungEctsTooltipText',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Hinsichtlich des Umfangs der LV, die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum Ihr Zeugnis bzw. Ihre berufliche Praxis mit dem Umfang der LV gleichwertig ist.<br><br>Referenzbeispiele für die ECTS-Berechnung finden Sie rechts in der Infobox.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Regarding the scope of the course you want to have credited: Please explain why your certificate or your professional practice is equivalent to the scope of the course.<br><br>Reference examples for the ECTS calculation can be found in the info box on the right.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungBegruendungLvinhaltTooltipText',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Hinsichtlich der Lernergebnisse der LV (vgl. CIS), die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum die von Ihnen erworbenen Kompetenzen mit diesen Lernergebnissen gleichwertig sind.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'With regard to the learning outcomes of the course (cf. CIS) for which you want to receive credit: Please explain why the competences you have acquired are equivalent to these learning outcomes.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'requestAnrechnungInfoEctsBerechnungTitle',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Referenzbeispiele ECTS-Berechnung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reference examples of ECTS calculation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'requestAnrechnungInfoEctsBerechnungBody',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '<b>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden.</b>
+					<br><br><u>Schulisches Zeugnis:</u>
+					<br>Bitte die Unterrichtsstunden nachvollziehbar in ECTS umrechnen (ein Schuljahr besteht aus ca. 40 Wochen; d.h., eine Unterrichtsstunde pro Woche sind insgesamt ca. 40 Stunden Jahresaufwand.)
+					<br><br><u>Hochschulzeugnis:</u>
+					<br>Bitte die ECTS angeben.
+					<br><br><u>Berufliche Praxis:</u>
+					<br>Bitte die Dauer der einschlägigen beruflichen Praxis nachvollziehbar in ECTS umrechnen (1,5 ECTS sind ungefähr eine Arbeitswoche im Umfang von 37,5 Stunden).',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '<br>1 ECTS at the FH Technikum Wien corresponds to a workload of 25 hours.</b>
+					<br><br><u>School certificate:</u>
+					<br>Please convert the teaching hours into ECTS in a comprehensible way (a school year consists of approx. 40 weeks; i.e. one teaching hour per week is a total of approx. 40 hours of annual work).
+					<br><br><u>University certificate:</u>
+					<br>Please indicate the ECTS.
+					<br><br><u>Professional practice:</u>
+					<br>Please convert the duration of the relevant professional practice into ECTS in a comprehensible way (1.5 ECTS are approximately one working week of 37.5 hours).',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'begruendungEctsLabel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Begründung Gleichwertigkeit ECTS',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reason Equivalency of ECTS',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'begruendungLvinhaltLabel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Begründung Gleichwertigkeit LV-Inhalt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reason Equivalency of Course content',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeil',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte Begründung ergänzen.]</span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please add reason.]</span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeilHinweis',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeil',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte ergänzen oder Empfehlungstext des Lektors übernehmen und ggf. redigieren.]</span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please complete or adopt the text of the lectors recommendation and edit it if necessary]</span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'genehmigungNegativEctsHoechstgrenzeUeberschritten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnung wird nicht genehmigt aufgrund einer Überschreitung der Höchstgrenzen für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Recognition and exemption is rejected because of exceedance of maximum limit for exemption (see § 12 para. 3, Regulations of the UASTW).',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungenVerwalten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungen verwalten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Administration of applications.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungszeitraumFestlegen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungszeitraum festlegen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Set appplication period',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungszeitraumHinzufuegen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungszeitraum hinzufügen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Add appplication period',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungszeitraumSpeichern',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungszeitraum speichern',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Save application period',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungszeitraumStart',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungszeitraum Start',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Startdate application',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'anrechnungszeitraumEnde',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnungszeitraum Ende',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Enddate application',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'antragNichtFuerVerganganeSS',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der Antrag kann nicht für vergangene Semester gestellt werden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You can not apply for the past study semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'genehmigtVon',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'genehmigt von',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'approved by',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'editAnrechnung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Anrechnung bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Edit Exemption',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'existingNotes',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => ' Notiz(en)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => ' note(s)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'lehrveranstaltung_id_kompatibel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'LV kompatibel ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Course compatible ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'anrechnung',
+  'phrase' => 'lehrveranstaltung_bez_kompatibel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'LV kompatibel',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Course compatible',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

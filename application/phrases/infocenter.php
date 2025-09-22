@@ -1148,5 +1148,938 @@ However, the placement test result is yet to be entered manually!',
 			)
 		)
 	)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'rueckstellgrund',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Rückstellgrund',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'onHold reason',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'kaution',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kaution',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Deposit',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'rechnungsnummer',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Rechnungsnummer',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Invoice Number',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faelligam',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Fällig am',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Due on',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'gesamtbetrag',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Gesamtbetrag',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Total amount',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'rechnungsempfaenger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Rechnungsempfänger',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Invoice recipient',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'studiensemester',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Semester',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'bezeichnung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bezeichnung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Title',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'zahlungsbestaetigung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Zahlungsbestätigung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Payment confirmation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'rechnungserklaerung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Wir möchten Sie darauf aufmerksam machen, dass bei der Überweisung *immer* die Rechnungsnummer als Zahlungsreferenz anzuführen ist.
+						Andernfalls erfolgt keine automatische Zahlungszuordnung und es kann zu einer Verzögerung der Darstellung des aktuellen Zahlungsstatus
+						der Rechnung im Campus Informations-System kommen.
+						<br/>
+						<br/>
+						Im Falle dass der Betrag an ein falsches Konto überwiesen wurde, bitten wir Sie höflichst sich an Ihre Bank zu wenden.
+						<br/>
+						<br/>
+						Jede Rechnung gilt als "Bezahlt", wenn der Gesamtbetrag vollständig auf unser Konto eingelangt ist.
+						<br/>
+						<br/>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'We would like to draw your attention to the fact that the invoice number must *always* be quoted as the payment reference when making a bank transfer.
+							Otherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in Campus Informations-System.
+							<br />
+							<br />
+							In the event that the amount has been transferred to an incorrect account, we kindly ask you to contact your bank.
+							<br />
+							<br />
+							Each invoice is considered "paid" when the total amount has been credited to our account in full.
+							<br />
+							<br />',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'kontoinfotitle',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kontoinformationen der FHTW',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'FHTW account information',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'kontoinfobody',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sämtliche Zahlungen sind an die nachstehende Kontonummer zu leisten und die Rechnungsnummer muss als Zahlungsreferenz eingegeben werden.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'All payments must be made to the following account number and the invoice number must be entered as the payment reference.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'kontoinfoausland',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Auslandsüberweisungen:
+											<br/>
+											Bei Auslandsüberweisungen sind die Spesenkosten von den
+											<br/>
+											Zahlenden zusätzlich zu den Rechnungsbeträgen zu zahlen.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Foreign bank transfers:
+											<br />
+											In the case of foreign bank transfers, the charges are to be paid by
+											<br />
+											the payer in addition to the invoice amounts.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'rechnungtitle',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Rechnungen & Zahlungsbestätigungen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Invoices & payment confirmations',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq0frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Warum ist die Einzahlung trotz Einzahlung noch offen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Why is the deposit still outstanding despite payment?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq0antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der häufigste Grund für diesen Fall ist, dass bei der Überweisung nicht die Rechnungsnummer als Zahlungsreferenz eingegeben wird.
+Wir bitten Sie höflichst in diesem Fall eine Mail an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> mit Zahlungsbestätigung zu senden.
+Die Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage dauern.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The most common reason for this is that the invoice number is not entered as the payment reference in the bank transfer.
+In this case, we kindly ask you to send an e-mail to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> with a payment confirmation.
+The transaction and processing of the payment can take up to six working days.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq1frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Ich habe keine Rechnung erhalten, was tun?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'I have not received an invoice, what should I do?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq1antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'In diesem Fall ist der Spam-Ordner zu kontrollieren. Falls die Rechnung nicht übermittelt wurde ersuchen wir um Information an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechnung ist der Betrag zu überweisen</strong></u>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'In this case, please check your spam folder. If the invoice has not been sent, please inform us at <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+The invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice!</strong></u>',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq2frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Refundierung des Studienbeitrags',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Refund of the tuition fee',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq2antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der Studienbeitrag wird nicht rückerstattet, wenn…
+-Anfänger*innen, die ihren Studienplatz nach Semesterbeginn (1. September / 16. Februar) nicht in Anspruch nehmen
+-Studierende, die ihr Studium nach Semesterbeginn (1. September / 16. Februar) abbrechen.
+
+-Unterbrechung vor dem 15.10. bzw. 15.3.: Studienbeitrag wird rückerstattet
+-Unterbrechung nach dem 15.10. bzw. 15.3.: Studienbeitrag wird nicht rückerstattet
+-in den Folgesemestern der Unterbrechung sind keine Studienbeiträge zu zahlen; der ÖHBeitrag ist jedoch in jedem Semester der Unterbrechung zu zahlen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The tuition fee will not be refunded if...
+-Freshmen who do not take up their study place after the start of the semester (September 1 / February 16)
+-Students who discontinue their studies after the start of the semester (September 1 / February 16).
+
+-Interruption before 15.10. or 15.3.: tuition fees will be refunded
+-Interruption after 15.10. or 15.3.: Tuition fee will not be refunded
+-No tuition fees are payable in the semesters following the interruption; however, the ÖH fee must be paid in each semester of the interruption',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq3frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sie sind vom Studienbeitrag befreit und haben eine Rechnung für den Studienbeitrag bekommen?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'You are exempt from paying tuition fees and have received an invoice for tuition fees?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq3antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Treten Sie bitte in Kontakt mit Ihrer Studiengangsassistenz. Die offene Rechnung wird storniert.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please contact your degree program assistant. The outstanding invoice will be canceled.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq4frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mir ist ein Fehler bei der Überweisung unterlaufen, was tun?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'I made a mistake with the transfer, what should I do?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq4antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte den Fehler an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> melden.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please report the error to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq5frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Eine Rechnung wurde zwei Mal überwiesen, was tun?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'An invoice has been transferred twice, what should I do?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq5antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Falls eine Rechnung doppelt überwiesen wurde, bitten wir Sie dies an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> zu melden. Wir werden Ihnen eine Zahlung refundieren.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'If an invoice has been transferred twice, please report this to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>. We will refund you one payment.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq6frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Es stehen mehrere Positionen auf der Rechnung – soll für jede Position eine Überweisung durchgeführt werden?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'There are several items on the invoice - should a transfer be made for each item?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq6antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Nein, es ist immer der auf der Rechnung ausgewiesene Gesamtbetrag zu überweisen.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No, the total amount shown on the invoice must always be transferred.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq7frage',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Wann kann der Betrag überwiesen werden?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'When can the amount be transferred?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'faq7antwort',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Wir möchten Sie darauf hinweisen, dass Überweisungen erst bei Erhalt der Rechnung durchzuführen sind. Bitte um Angabe der Rechnungsnummer als Zahlungsreferenz.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'We would like to point out that bank transfers should only be made on receipt of the invoice. Please state the invoice number as the payment reference.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'zahlungsempfaenger',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Fachhochschule Technikum Wien',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'University of Applied Sciences Technikum Wien',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'unrulyPersonFound',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Person mit Markierung „unruly“ gefunden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Person flagged as "unruly" detected',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'stammdatenFeldFehlt',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte Nachname, Geschlecht und Geburtsdatum ausfüllen.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please fill out the last name, gender and date of birth.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'statusSetzen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status setzen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Set state',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'abgewiesenam',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Abgewiesen am',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Rejected on',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'statusAuswahl',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status ausw&auml;hlen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Select status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'infocenter',
+  'category' => 'infocenter',
+  'phrase' => 'statusZuruecksetzen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status zur&uuml;cksetzen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reset status',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

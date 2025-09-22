@@ -863,5 +863,317 @@ $phrases = array(
 			)
 		)
 	)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'pruefer1',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'PrüferIn 1',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'examiner 1',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'pruefer2',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'PrüferIn 2',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'examiner 2',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'pruefer3',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'PrüferIn 3',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'examiner 3',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'freigabe',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Freigabe',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Approval',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'sponsion',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sponsion',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Graduation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'abschlusspruefung_id',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Abschlussprüfung ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Final Examination ID',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'vorsitz_header',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Vorsitz',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Chair',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'zurBeurteilung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Zur Beurteilung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'To the assessment',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'akadGrad',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Akademischer Grad',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Academic degree',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'error_studentOhneFinalExam',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Keine Abschlussprüfungen für Student_uid(s) {id} gefunden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No final exams found for Student_uid(s) {id}',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'notekommpruefung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Note komm. Prüfung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Grade committee exam',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'abschluessPruefungAnlegen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Abschlussprüfung anlegen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'New Final Exam',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'abschlusspruefung',
+  'phrase' => 'abschluessPruefungBearbeiten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Abschlussprüfung bearbeiten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Edit Final Exam',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

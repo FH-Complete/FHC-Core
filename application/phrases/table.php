@@ -239,5 +239,77 @@ $phrases = array(
 			)
 		)
 	)
+,
+array (
+  'app' => 'core',
+  'category' => 'table',
+  'phrase' => 'download',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Download',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Download',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'table',
+  'phrase' => 'reload',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Tabelle neu laden',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Reload table',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'table',
+  'phrase' => 'with_selected',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mit {count} ausgewählten: ',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'With {count} selected: ',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

@@ -317,7 +317,7 @@ class PhrasesLib
 			{
 				// If found then append the new phrase to the current line
 				// and replace the end of the array
-				$line = str_replace(');', "\n".var_export($phrase, true).','."\n".');', $line);
+				$line = str_replace(');', ",\n".var_export($phrase, true)."\n".');', $line);
 			}
 
 			// In any case copy the line to the temp file
