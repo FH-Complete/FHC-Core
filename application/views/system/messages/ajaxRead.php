@@ -12,14 +12,13 @@
 			'tabulator4' => true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
-			'tinymce4' => true,
+			'tinymce5' => true,
 			'phrases' => array('global', 'ui'),
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/read.js')
 		)
 	);
 ?>
-	<body>
 
 		<fieldset>
 
@@ -56,6 +55,5 @@
 
 		<div id="readMessagePanel"></div>
 
-	</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

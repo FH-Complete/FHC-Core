@@ -30,7 +30,7 @@ class Anrechnung_model extends DB_Model
 	 */
 	public function createAnrechnungsantrag(
 		$prestudent_id, $studiensemester_kurzbz, $lehrveranstaltung_id,
-		$begruendung_id, $dms_id, $anmerkung_student = null
+		$begruendung_id, $dms_id, $anmerkung_student = null, $begruendung_ects = null, $begruendung_lvinhalt = null
 	)
 	{
 		// Start DB transaction
@@ -44,6 +44,8 @@ class Anrechnung_model extends DB_Model
 			'dms_id' => $dms_id,
 			'studiensemester_kurzbz' => $studiensemester_kurzbz,
 			'anmerkung_student' => $anmerkung_student,
+			'begruendung_ects' => $begruendung_ects,
+			'begruendung_lvinhalt' => $begruendung_lvinhalt,
 			'insertvon' => $this->_uid
 		));
 		
@@ -199,5 +201,67 @@ class Anrechnung_model extends DB_Model
 		}
 		return success();
 		
+	}
+
+	/**
+	 * Get Anrechnungsdata for Table Anrechnungen
+	 *
+	 * @param $prestudent_id
+	 * @return array
+	 */
+	public function getAnrechnungsData($prestudent_id)
+	{
+		$qry = '
+			SELECT
+			  lehre.tbl_anrechnung.anrechnung_id,
+			  lehre.tbl_anrechnung.prestudent_id,
+			  lehre.tbl_anrechnung.lehrveranstaltung_id,
+			  lehre.tbl_lehrveranstaltung.bezeichnung AS bez_lehrveranstaltung,
+			  lehre.tbl_anrechnung_begruendung.bezeichnung AS begruendung,
+			  lehre.tbl_anrechnung_anrechnungstatus.status_kurzbz AS status,
+			  genehmigt_von,
+			  lehre.tbl_anrechnung.insertamum,
+			  lehre.tbl_anrechnung.insertvon,
+			  lehre.tbl_anrechnung.updateamum,
+			  lehre.tbl_anrechnung.updatevon,
+			  lehrveranstaltung_id_kompatibel,
+			  lv_comp.bezeichnung as lehrveranstaltung_bez_kompatibel,
+			  count(nz.notizzuordnung_id) AS notizen_anzahl
+			FROM
+			  lehre.tbl_anrechnung
+			  	JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung lv_comp ON (lehre.tbl_anrechnung.lehrveranstaltung_id_kompatibel = lv_comp.lehrveranstaltung_id)
+			  	JOIN lehre.tbl_anrechnung_begruendung USING (begruendung_id)
+			  	LEFT JOIN lehre.tbl_anrechnung_anrechnungstatus ON (lehre.tbl_anrechnung_anrechnungstatus.anrechnung_id = lehre.tbl_anrechnung.anrechnung_id)
+				AND lehre.tbl_anrechnung_anrechnungstatus.insertamum = (
+					SELECT MAX(insertamum) 
+					FROM lehre.tbl_anrechnung_anrechnungstatus 
+					WHERE anrechnung_id = lehre.tbl_anrechnung.anrechnung_id
+				)
+				LEFT JOIN lehre.tbl_anrechnungstatus USING (status_kurzbz)
+				LEFT JOIN public.tbl_notizzuordnung nz ON (nz.anrechnung_id = lehre.tbl_anrechnung.anrechnung_id)
+			WHERE
+				lehre.tbl_anrechnung.prestudent_id = ?
+			GROUP BY 
+			      nz.anrechnung_id,
+				  lehre.tbl_anrechnung.anrechnung_id,
+				  lehre.tbl_anrechnung.prestudent_id,
+				  lehre.tbl_anrechnung.lehrveranstaltung_id,
+				  bez_lehrveranstaltung,
+				  begruendung,
+				  status,
+				  genehmigt_von,
+				  lehre.tbl_anrechnung.insertamum,
+				  lehre.tbl_anrechnung.insertvon,
+				  lehre.tbl_anrechnung.updateamum,
+				  lehre.tbl_anrechnung.updatevon,
+				  lehrveranstaltung_id_kompatibel,
+				  lehrveranstaltung_bez_kompatibel
+			ORDER BY
+			  	lehre.tbl_anrechnung.updateamum ASC
+		';
+
+		return $this->execQuery($qry, array($prestudent_id));
+
 	}
 }

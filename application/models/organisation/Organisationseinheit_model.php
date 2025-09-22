@@ -188,4 +188,29 @@ class Organisationseinheit_model extends DB_Model
         }
         return $this->loadWhere($condition);
     }
+
+    /**
+     * @param string $oe_kurzbz
+     *
+     * @return stdClass
+     */
+    public function getWithType($oe_kurzbz)
+    {
+    	$this->addSelect($this->dbTable . '.*, t.bezeichnung AS organisationseinheittyp');
+    	$this->addJoin('public.tbl_organisationseinheittyp t', 'organisationseinheittyp_kurzbz');
+
+    	return $this->load($oe_kurzbz);
+    }
+
+	/**
+	 * get highest organisation units
+	 */
+	public function getHeads()
+	{
+		$this->addSelect('*');
+		$this->addSelect('oe_kurzbz as head');
+		$result = $this->loadWhere(array('oe_parent_kurzbz' => null, 'aktiv' => true));
+
+		return $result;
+	}
 }

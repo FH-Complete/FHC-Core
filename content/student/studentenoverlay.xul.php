@@ -208,7 +208,9 @@ else
 								<menupopup id="student-filter-menu-popup" >
 									<menuitem id="student-toolbar-filter-dokumente" label="fehlende Dokumente" oncommand="InteressentDokumenteFilter()" disabled="false" tooltiptext="Liste aller Studenten mit Fehlenden Dokumenten"/>
 									<menuitem id="student-toolbar-filter-offenebuchungen" label="offene Buchungen" oncommand="StudentKontoFilterStudenten('konto')" disabled="false" tooltiptext="Liste aller Studenten mit offenen Buchungen"/>
-									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit Studienbebuehr belastet wurden" />
+									<menuitem id="student-toolbar-filter-ueberfaelligebuchungen" label="überfällige Buchungen" oncommand="StudentKontoFilterStudenten('ueberfaelligebuchungen')" disabled="false" tooltiptext="Liste aller Studenten mit überfälligen Buchungen"/>
+									<menuitem id="student-toolbar-filter-studiengebuehr" label="nicht gebuchte Studiengebuehr" oncommand="StudentKontoFilterStudenten('studiengebuehr')" disabled="false" tooltiptext="Liste aller Studenten die noch nicht mit der Studiengebühr belastet wurden" />
+									<menuitem id="student-toolbar-filter-erhoehte-studiengebuehr" label="erhöhten Studienbeitrag" oncommand="StudentKontoFilterStudenten('StudiengebuehrErhoeht')" disabled="false" tooltiptext="Liste aller Studenten denen der erhöhte Studienbeitrag eingebucht wurde" />
 									<menuitem id="student-toolbar-filter-zgvohnedatum" label="ZGV eingetragen ohne Datum" oncommand="StudentKontoFilterStudenten('zgvohnedatum')" disabled="false" tooltiptext="Liste aller Studenten die ZGV eingetragen haben bei denen aber kein ZGV Datum gesetzt ist" />
 									<menu label="nach Statusgrund">
 									    <menupopup id="student-filter-statusgrund-menu-popup">
@@ -281,10 +283,6 @@ else
 	    				<treecol id="student-treecol-titelpost" label="TitelPost" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
 	    					sort="rdf:http://www.technikum-wien.at/student/rdf#titelpost" onclick="StudentTreeSort()"/>
-	    				<splitter class="tree-splitter"/>
-	    				<treecol id="student-treecol-svnr" label="SVNR" flex="1" hidden="false" persist="hidden, width, ordinal"
-	    					class="sortDirectionIndicator"
-	    					sort="rdf:http://www.technikum-wien.at/student/rdf#svnr" onclick="StudentTreeSort()"/>
 	    				<splitter class="tree-splitter"/>
 	    				<treecol id="student-treecol-ersatzkennzeichen" label="Ersatzkennzeichen" flex="1" hidden="false" persist="hidden, width, ordinal"
 	    					class="sortDirectionIndicator"
@@ -443,7 +441,6 @@ else
 													<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#wahlname" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#vornamen" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#titelpost" />
-	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#svnr" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#ersatzkennzeichen" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#geburtsdatum" />
 	           							<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/student/rdf#aktiv" label="rdf:http://www.technikum-wien.at/student/rdf#geschlecht" />

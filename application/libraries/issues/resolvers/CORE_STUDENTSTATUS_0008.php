@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
- * Incoming shouldn't have austrian home address.
+ * Studienplan should be valid in current Ausbildungssemester of prestudent.
  */
 class CORE_STUDENTSTATUS_0008 implements IIssueResolvedChecker
 {
@@ -17,10 +17,10 @@ class CORE_STUDENTSTATUS_0008 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/StudienplanUngueltig');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getStudienplanUngueltig($params['studiensemester_kurzbz'], null, $params['prestudent_id']);
+		$checkRes = $this->_ci->studienplanungueltig->getStudienplanUngueltig($params['studiensemester_kurzbz'], null, $params['prestudent_id']);
 
 		if (isError($checkRes)) return $checkRes;
 

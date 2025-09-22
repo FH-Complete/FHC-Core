@@ -191,6 +191,46 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'global',
+		'phrase' => 'raum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Room',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'feiertag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ferien / Feiertag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Holidays',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
 		'phrase' => 'vollstaendig',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -243,6 +283,106 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'subject',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'collapseMenu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Menu einklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Collapse menu',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'extendMenu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Menu ausklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Extend menu',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'sender',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sender',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'sender',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'collapseMenu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Menu einklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Collapse menu',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'extendMenu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Menu ausklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Extend menu',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1133,7 +1273,248 @@ $phrases = array(
 		)
 	),
 
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'insertvon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstellt von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Inserted by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'insertamum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstellt am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Inserted on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'updatevon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geändert von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Updated by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'updateamum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geändert am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Updated on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'speichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'create',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'loeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'actions',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Actions',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'unknown_error',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ein unbekannter Fehler ist aufgetreten: {error}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An unknown error occurred: {error}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	//*******************************		CORE/ui
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'loading',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lädt...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Loading...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'n_errors',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{n} Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{n} Error(s)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'toggle_nav',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Navigation ein-/ausblenden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Toggle navigation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -1168,7 +1549,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Break',
+				'text' => 'Cancel',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -1575,6 +1956,66 @@ $phrases = array(
         )
     ),
 	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldWriteAccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben keine Schreibrechte für dieses Feld',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have writing rights for this field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldMustBeArray',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das {field} Feld muss ein Array sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The {field} field must be an array',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'filterdelete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Clear filter',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
 	'app' => 'core',
 	'category' => 'anrechnung',
 	'phrase' => 'benotungDerLV',
@@ -1704,6 +2145,26 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
+		'phrase' => 'person_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
 		'phrase' => 'student',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -1795,7 +2256,7 @@ $phrases = array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Address',
+				'text' => 'Salutation',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2084,6 +2545,166 @@ $phrases = array(
 	array(
 		'app' => 'core',
 		'category' => 'person',
+		'phrase' => 'adressen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adressen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'addresses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankverbindungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'rechnungsadresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsadresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'billing address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'heimatadresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Heimatadresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'home address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'co_name',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abweichender Empfänger',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'c/o',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'gemeinde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'municipality',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'gemeinde_waehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte gültige Gemeinde wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a valid municipality',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'plz_waehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte gültige PLZ wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a valid zip code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
 		'phrase' => 'nation',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -2136,6 +2757,46 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Post code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'plz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PLZ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'zip',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'zustellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zustellung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delivery',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2221,8 +2882,108 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'error_uidNotInPerson',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die angegebene UID passt nicht zu der angegebenen Person',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Given UID is not assigned to the given Person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'error_noBenutzer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Benutzer gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No User found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************	CORE/lehre
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvOptions',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungsoptionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course options',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'noGrades',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unbewertet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not Graded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
@@ -2238,6 +2999,46 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'cancelvertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrag stornieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancel Contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'vertragConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Möchten Sie den Vertrag wirklich stornieren?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to cancel the contract?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -2319,6 +3120,26 @@ $phrases = array(
 				'sprache' => 'English',
 				'text' => 'group',
 				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'weitereLektoren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '...und {0} weitere Lektoren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'group',
+				'description' => '...and {0} more lecturers',
 				'insertvon' => 'system'
 			)
 		)
@@ -2558,6 +3379,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrveranstaltung_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltung ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course ID',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3747,8 +4588,8 @@ $phrases = array(
 		)
 	),
 	array(
-		'app' => 'core',
-		'category' => 'global',
+		'app' => 'infocenter',
+		'category' => 'infocenter',
 		'phrase' => 'rueckstelldatum',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -3761,6 +4602,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'onHold date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rueckstellgrund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rückstellgrund',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'onHold reason',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -4114,6 +4975,752 @@ When on hold, the date is only a reminder.',
             )
         )
     ),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kaution',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kaution',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deposit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungsnummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faelligam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fällig am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Due on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'gesamtbetrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtbetrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Total amount',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungsempfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsempfänger',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice recipient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungsempfänger',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoice',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'bezeichnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'datum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zahlungsbestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zahlungsbestätigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Payment confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'bewerbung',
+		'phrase' => 'erklaerungInvoices',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ablauf und Zahlungsbedingungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Procedure and terms of payment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungserklaerung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wir möchten Sie darauf aufmerksam machen, dass bei der Überweisung *immer* die Rechnungsnummer als Zahlungsreferenz anzuführen ist.
+						Andernfalls erfolgt keine automatische Zahlungszuordnung und es kann zu einer Verzögerung der Darstellung des aktuellen Zahlungsstatus
+						der Rechnung im Campus Informations-System kommen.
+						<br/>
+						<br/>
+						Im Falle dass der Betrag an ein falsches Konto überwiesen wurde, bitten wir Sie höflichst sich an Ihre Bank zu wenden.
+						<br/>
+						<br/>
+						Jede Rechnung gilt als "Bezahlt", wenn der Gesamtbetrag vollständig auf unser Konto eingelangt ist.
+						<br/>
+						<br/>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'We would like to draw your attention to the fact that the invoice number must *always* be quoted as the payment reference when making a bank transfer.
+							Otherwise, no automatic payment allocation will take place and there may be a delay in displaying the current payment status of the invoice in Campus Informations-System.
+							<br />
+							<br />
+							In the event that the amount has been transferred to an incorrect account, we kindly ask you to contact your bank.
+							<br />
+							<br />
+							Each invoice is considered "paid" when the total amount has been credited to our account in full.
+							<br />
+							<br />',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfotitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontoinformationen der FHTW',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'FHTW account information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfobody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sämtliche Zahlungen sind an die nachstehende Kontonummer zu leisten und die Rechnungsnummer muss als Zahlungsreferenz eingegeben werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All payments must be made to the following account number and the invoice number must be entered as the payment reference.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'kontoinfoausland',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auslandsüberweisungen:
+											<br/>
+											Bei Auslandsüberweisungen sind die Spesenkosten von den
+											<br/>
+											Zahlenden zusätzlich zu den Rechnungsbeträgen zu zahlen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Foreign bank transfers:
+											<br />
+											In the case of foreign bank transfers, the charges are to be paid by
+											<br />
+											the payer in addition to the invoice amounts.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'rechnungtitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rechnungen & Zahlungsbestätigungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invoices & payment confirmations',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq0frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Warum ist die Einzahlung trotz Einzahlung noch offen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Why is the deposit still outstanding despite payment?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq0antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der häufigste Grund für diesen Fall ist, dass bei der Überweisung nicht die Rechnungsnummer als Zahlungsreferenz eingegeben wird.
+Wir bitten Sie höflichst in diesem Fall eine Mail an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> mit Zahlungsbestätigung zu senden.
+Die Transaktion und die Bearbeitung der Zahlung, kann bis zu sechs Werktage dauern.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The most common reason for this is that the invoice number is not entered as the payment reference in the bank transfer.
+In this case, we kindly ask you to send an e-mail to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> with a payment confirmation.
+The transaction and processing of the payment can take up to six working days.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq1frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich habe keine Rechnung erhalten, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I have not received an invoice, what should I do?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq1antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In diesem Fall ist der Spam-Ordner zu kontrollieren. Falls die Rechnung nicht übermittelt wurde ersuchen wir um Information an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+Die Rechnung wird Ihnen erneut zugesendet. <u><strong>Erst nach Erhalt der Rechnung ist der Betrag zu überweisen</strong></u>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'In this case, please check your spam folder. If the invoice has not been sent, please inform us at <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.
+The invoice will be sent to you again. <u><strong>The amount is only to be transferred after receipt of the invoice!</strong></u>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq2frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Refundierung des Studienbeitrags',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Refund of the tuition fee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq2antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Studienbeitrag wird nicht rückerstattet, wenn…
+-Anfänger*innen, die ihren Studienplatz nach Semesterbeginn (1. September / 16. Februar) nicht in Anspruch nehmen
+-Studierende, die ihr Studium nach Semesterbeginn (1. September / 16. Februar) abbrechen.
+
+-Unterbrechung vor dem 15.10. bzw. 15.3.: Studienbeitrag wird rückerstattet
+-Unterbrechung nach dem 15.10. bzw. 15.3.: Studienbeitrag wird nicht rückerstattet
+-in den Folgesemestern der Unterbrechung sind keine Studienbeiträge zu zahlen; der ÖHBeitrag ist jedoch in jedem Semester der Unterbrechung zu zahlen',
+			'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The tuition fee will not be refunded if...
+-Freshmen who do not take up their study place after the start of the semester (September 1 / February 16)
+-Students who discontinue their studies after the start of the semester (September 1 / February 16).
+
+-Interruption before 15.10. or 15.3.: tuition fees will be refunded
+-Interruption after 15.10. or 15.3.: Tuition fee will not be refunded
+-No tuition fees are payable in the semesters following the interruption; however, the ÖH fee must be paid in each semester of the interruption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq3frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind vom Studienbeitrag befreit und haben eine Rechnung für den Studienbeitrag bekommen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are exempt from paying tuition fees and have received an invoice for tuition fees?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq3antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Treten Sie bitte in Kontakt mit Ihrer Studiengangsassistenz. Die offene Rechnung wird storniert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please contact your degree program assistant. The outstanding invoice will be canceled.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq4frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mir ist ein Fehler bei der Überweisung unterlaufen, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I made a mistake with the transfer, what should I do?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq4antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte den Fehler an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> melden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please report the error to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq5frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Rechnung wurde zwei Mal überwiesen, was tun?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An invoice has been transferred twice, what should I do?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq5antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls eine Rechnung doppelt überwiesen wurde, bitten wir Sie dies an <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a> zu melden. Wir werden Ihnen eine Zahlung refundieren.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If an invoice has been transferred twice, please report this to <a href="mailto:billing@technikum-wien.at">billing@technikum-wien.at</a>. We will refund you one payment.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq6frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es stehen mehrere Positionen auf der Rechnung – soll für jede Position eine Überweisung durchgeführt werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There are several items on the invoice - should a transfer be made for each item?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq6antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nein, es ist immer der auf der Rechnung ausgewiesene Gesamtbetrag zu überweisen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No, the total amount shown on the invoice must always be transferred.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq7frage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wann kann der Betrag überwiesen werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'When can the amount be transferred?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'faq7antwort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wir möchten Sie darauf hinweisen, dass Überweisungen erst bei Erhalt der Rechnung durchzuführen sind. Bitte um Angabe der Rechnungsnummer als Zahlungsreferenz.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'We would like to point out that bank transfers should only be made on receipt of the invoice. Please state the invoice number as the payment reference.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'zahlungsempfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fachhochschule Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'University of Applied Sciences Technikum Wien',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'unrulyPersonFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person mit Markierung „unruly“ gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person flagged as "unruly" detected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'password',
@@ -5117,6 +6724,26 @@ When on hold, the date is only a reminder.',
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'neuUndGeaenderteAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue und geänderte anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show new and changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'nurNeueAnzeigen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -5729,6 +7356,26 @@ When on hold, the date is only a reminder.',
 			array(
 				'sprache' => 'English',
 				'text' => 'No data available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_invalid_date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Datumsformat ist ungültig oder liegt außerhalb des gültigen Bereichs.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The date format is invalid or out of range.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -8272,6 +9919,46 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'all_semester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'current_semester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktuelles Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Current semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'heute',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -8760,13 +10447,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 18 Abs. 2 und 3).',
+				'text' => 'Der Plagiatscheck wurde durchgeführt und bestätigt, dass der zentrale Inhalt der Arbeit im erforderlichen Ausmaß eigenständig verfasst wurde (vgl. Satzungsteil Studienrechtliche Bestimmungen / Prüfungsordnung, § 20 Abs. 2 und 3).',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The plagiarism check has been carried out and confirms that the central content of the thesis has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 18 Para. 2 and 3).',
+				'text' => 'The plagiarism check has been carried out and confirms that the central content of the thesis has been written independently to the required extent (cf. part of the Statutes on Studies Act Provisions / Examination Regulations, § 20 Para. 2 and 3).',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -10056,6 +11743,7 @@ Any unusual occurrences
 		'app' => 'projektarbeitsbeurteilung',
 		'category' => 'projektarbeitsbeurteilung',
 		'phrase' => 'kommissionellePruefungHinweis',
+		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
@@ -10592,6 +12280,26 @@ Any unusual occurrences
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
+		'phrase' => 'anrechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exemption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
 		'phrase' => 'antragStellen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -10837,7 +12545,7 @@ Any unusual occurrences
         'phrases' => array(
             array(
                 'sprache' => 'German',
-                'text' => '<br>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.<br><b>Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</b> ',
+                'text' => 'Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.<span class="fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>',
                 'description' => '',
                 'insertvon' => 'system'
             ),
@@ -10869,6 +12577,178 @@ Any unusual occurrences
             )
         )
     ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungEcts',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der ECTS',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Explain ECTS equivalencies',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'begruendungLvinhalt',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Erläutern Sie die Gleichwertigkeit der Lehrveranstaltungsinhalte',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Explain the equivalence of course content',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungEctsTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich des Umfangs der LV, die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum Ihr Zeugnis bzw. Ihre berufliche Praxis mit dem Umfang der LV gleichwertig ist.<br><br>Referenzbeispiele für die ECTS-Berechnung finden Sie rechts in der Infobox.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Regarding the scope of the course you want to have credited: Please explain why your certificate or your professional practice is equivalent to the scope of the course.<br><br>Reference examples for the ECTS calculation can be found in the info box on the right.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'anrechnungBegruendungLvinhaltTooltipText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinsichtlich der Lernergebnisse der LV (vgl. CIS), die Sie anrechnen lassen wollen: Bitte erläutern Sie, warum die von Ihnen erworbenen Kompetenzen mit diesen Lernergebnissen gleichwertig sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'With regard to the learning outcomes of the course (cf. CIS) for which you want to receive credit: Please explain why the competences you have acquired are equivalent to these learning outcomes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoEctsBerechnungTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Referenzbeispiele ECTS-Berechnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reference examples of ECTS calculation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'requestAnrechnungInfoEctsBerechnungBody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "<b>1 ECTS an der FH Technikum Wien entspricht einem Arbeitsaufwand von 25 Stunden.</b>
+					<br><br><u>Schulisches Zeugnis:</u>
+					<br>Bitte die Unterrichtsstunden nachvollziehbar in ECTS umrechnen (ein Schuljahr besteht aus ca. 40 Wochen; d.h., eine Unterrichtsstunde pro Woche sind insgesamt ca. 40 Stunden Jahresaufwand.)
+					<br><br><u>Hochschulzeugnis:</u>
+					<br>Bitte die ECTS angeben.
+					<br><br><u>Berufliche Praxis:</u>
+					<br>Bitte die Dauer der einschlägigen beruflichen Praxis nachvollziehbar in ECTS umrechnen (1,5 ECTS sind ungefähr eine Arbeitswoche im Umfang von 37,5 Stunden).",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "<br>1 ECTS at the FH Technikum Wien corresponds to a workload of 25 hours.</b>
+					<br><br><u>School certificate:</u>
+					<br>Please convert the teaching hours into ECTS in a comprehensible way (a school year consists of approx. 40 weeks; i.e. one teaching hour per week is a total of approx. 40 hours of annual work).
+					<br><br><u>University certificate:</u>
+					<br>Please indicate the ECTS.
+					<br><br><u>Professional practice:</u>
+					<br>Please convert the duration of the relevant professional practice into ECTS in a comprehensible way (1.5 ECTS are approximately one working week of 37.5 hours).",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendungEctsLabel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung Gleichwertigkeit ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason Equivalency of ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendungLvinhaltLabel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung Gleichwertigkeit LV-Inhalt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason Equivalency of Course content',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -11529,6 +13409,86 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeil',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte Begründung ergänzen.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please add reason.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'empfehlungNegativKenntnisseNichtGleichwertigWeilHinweis',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeil',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil<span id="helpTxtBegruendungErgaenzen">...[Erläuterung: Bitte ergänzen oder Empfehlungstext des Lektors übernehmen und ggf. redigieren.]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of<span id="helpTxtBegruendungErgaenzen">...[Explanation: Please complete or adopt the text of the lectors recommendation and edit it if necessary]</span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'genehmigungNegativKenntnisseNichtGleichwertigWeilHinweis',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Die anzurechnenden Kenntnisse sind umfangmäßig und/oder inhaltlich nicht gleichwertig, weil... <span class="text-danger"><b>Bei einer Ablehnung ist eine individuelle Begründung erforderlich. Dies kann nur über die Detailseite erfolgen.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The equivalence in terms of learning objectives and the length of the course can not be determined because of... <span class="text-danger"><b>If the application is rejected, an individual reason is required. This can only be done from the detail page.</b></span>',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -11589,6 +13549,26 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bitteBegruendungVervollstaendigen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Bitte vervollständigen Sie die Begründung.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Please complete the reason.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -11617,13 +13597,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Andere Begr&uuml;ndung. Bitte im Notizfeld kurz angeben.',
+				'text' => 'Andere Begründung. Bitte im Notizfeld angeben.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Other reasons. Please briefly state the reasons in the field for comments.',
+				'text' => 'Other reasons. Please state the reasons in the field for comments.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12129,6 +14109,206 @@ Any unusual occurrences
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungenVerwalten',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungen verwalten',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Administration of applications.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungszeitraumFestlegen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungszeitraum festlegen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Set appplication period',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungszeitraumHinzufuegen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungszeitraum hinzufügen',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Add appplication period',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungszeitraumSpeichern',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungszeitraum speichern',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Save application period',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungszeitraumStart',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungszeitraum Start',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Startdate application',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'anrechnung',
+        'phrase' => 'anrechnungszeitraumEnde',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Anrechnungszeitraum Ende',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'Enddate application',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'errorStartdatumNichtInStudiensemester',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Das Startdatum liegt außerhalb des gewählten Studiensemesters.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The startdate is not within the selected study semester.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'errorEndedatumNichtInStudiensemester',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Das Endedatum liegt außerhalb des gewählten Studiensemesters.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The enddate is not within the selected study semester.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'errorStartdatumNachEndedatum',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => 'Das Startdatum muss VOR dem Endedatum liegen.',
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => 'The startdate must be BEFORE the enddate.',
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'frageSicherLoeschen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Sicher löschen?",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Definitely delete?",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -13107,6 +15287,26 @@ array(
 	),
 	array(
 		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'antragNichtFuerVerganganeSS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Der Antrag kann nicht für vergangene Semester gestellt werden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "You can not apply for the past study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'neu',
 		'insertvon' => 'system',
@@ -13145,6 +15345,46 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bearbeitetVon',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "bearbeitet von",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "edited by",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'bearbeitetAm',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "bearbeitet am",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "edited on",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'global',
@@ -13193,13 +15433,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Empfehlungstext des Lektors als Begr&uuml;ndung &uuml;bernehmen.",
+				'text' => "Empfehlungstext des Lektors als Begründung übernehmen und ggf. redigieren.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Copy the lectors recommendation text as reason for the rejection.",
+				'text' => "Copy the lectors recommendation text as reason for the rejection and edit if necessary",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -13220,6 +15460,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Missing data.<br>Please fill in all form fields",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'felderFehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte füllen Sie alle Formularfelder aus",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Please fill in all form fields",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -13365,6 +15625,26 @@ array(
 			)
 		)
 	),
+    array(
+        'app' => 'core',
+        'category' => 'ui',
+        'phrase' => 'fehlendeMinZeichen',
+        'insertvon' => 'system',
+        'phrases' => array(
+            array(
+                'sprache' => 'German',
+                'text' => "Fehlende min. Zeichen",
+                'description' => '',
+                'insertvon' => 'system'
+            ),
+            array(
+                'sprache' => 'English',
+                'text' => "Missing min. Characters",
+                'description' => '',
+                'insertvon' => 'system'
+            )
+        )
+    ),
 	array(
 		'app' => 'core',
 		'category' => 'anrechnung',
@@ -14061,6 +16341,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Edit",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'schliessen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Schließen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Close",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16331,6 +18631,66 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'internationalCredits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'International Credits',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'International Credits',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'studentstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'alledurchgefuehrten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle durchgeführten anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show all performed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'bestaetigungHochladen',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -16437,11 +18797,11 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => 'Ab dem Studienjahr 2022/23 ist der Erwerb von internationalen und interkulturellen Kompetenzen Teil des Curriculums. <br />
-							Auf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen ECTS-Punkten hinterlegt sind. <br />
-							In Summe müssen 5 ECTS erworben werden, die im 6. Semester wirksam werden. <br/>
+							Auf der Grundlage der vorliegenden Maßnahmen absolvieren Sie im Laufe ihres Studiums Internationalisierungsaktivitäten, die mit unterschiedlichen International Credits hinterlegt sind. <br />
+							In Summe müssen 5 International Credits erworben werden, die im 6. Semester wirksam werden. <br/>
 							Das Modul „International skills“ wird mit der Beurteilung „Mit Erfolg teilgenommen“ abgeschlossen. <br />
 							Bitte wählen Sie die für Sie in Frage kommenden Maßnahmen aus und planen Sie das entsprechende Semester. <br />
-							Sobald die 5 ECTS erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />
+							Sobald die 5 International Credits erreicht wurden, überprüft der Studiengang die von Ihnen hochgeladenen Dokumente. <br /><br />
 							Fragen zum Status Ihrer Maßnahme u.ä. richten Sie bitte an den Studiengang. <br />
 							Bei allen weiteren Fragen zum Thema Organisation und Finanzierung des Auslandsaufenthalts und/oder Sprachkurs gibt Ihnen das International Office der FH Technikum Wien unter <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a> gerne Auskunft.',
 				'description' => '',
@@ -16450,11 +18810,11 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Starting with the study year 2022/23, the acquisition of international and intercultural competencies is part of the curriculum.<br />
-							On the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different ECTS credits.<br />
-							In total, 5 ECTS must be acquired, which become effective in the 6th semester.<br />
+							On the basis of the measures at-hand, you will complete internationalization activities during the course of your studies, which are assigned different International Credits.<br />
+							In total, 5 International Credits must be acquired, which become effective in the 6th semester.<br />
 							The module “International skills” is completed with the assessment "Successfully participated". <br />
 							Please select the measures that apply to you and schedule the appropriate semester. <br />
-							Once the 5 ECTS have been achieved, the degree program will review the documents you have uploaded. <br /><br />
+							Once the 5 International Credits have been achieved, the degree program will review the documents you have uploaded. <br /><br />
 							Please direct questions regarding the status of your measure and the like should be directed to the study program. <br />
 							For all further questions regarding the organization and financing of your stay abroad and/or language course, please contact the International Office of the UAS Technikum Wien at <a href="mailto:international.office@technikum-wien.at">international.office@technikum-wien.at</a>.
 							',
@@ -16706,6 +19066,26 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
+		'phrase' => 'alleGeplantenMarkieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle geplanten markieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mark all planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
 		'phrase' => 'alleMassnahmenJetzt',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -16791,13 +19171,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS bestätigt',
+				'text' => 'International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS confirmed',
+				'text' => 'International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16811,13 +19191,373 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS - Maßnahme',
+				'text' => 'International Credits - Maßnahme',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS - Measures',
+				'text' => 'International Credits - Measures',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusGeplant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'geplant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusGeplantDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierende hat die Maßnahme geplant.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The student has planned the measure.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusAkzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusAkzeptiertDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die geplante Maßnahme wurde akzeptiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The planned measure has been accepted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusDurchgefuehrt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'durchgeführt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'performed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusDurchgefuehrtDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Bestätigung wurde hochgeladen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'A confirmation has been uploaded.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusBestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusBestaetigtDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die hochgeladene Bestätigung wurde akzeptiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The uploaded confirmation has been accepted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusAbgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'declined',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'statusAbgelehntDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Maßnahme wurde abgelehnt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The measure was rejected.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ampelRed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es wurden keine Maßnahmen geplant oder alle wurden abgelehnt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No measures have been planned, or all have been rejected.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ampelYellow',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mindestens eine Maßnahme wurde akzeptiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'At least one measure has been accepted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ampelOrange',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt mindestens eine geplante oder durchgeführte Maßnahme.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There is at least one planned or performed measure.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ampelGreenyellow',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur bestätigte Maßnahmen vorhanden, aber weniger als 5 International Credits.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only confirmed measures, but fewer than 5 International Credits.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'ampelGreen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es wurden 5 International Credits erreicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '5 International Credits have been achieved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'mailMeldungzuviele',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Anzahl der Empfänger überschreitet 50. Bitte verwenden Sie einen Filter (z.B. Semester), um die Empfängeranzahl zu reduzieren.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The number of recipients exceeds 50. Please use a filter (e.g., semester) to reduce the number of recipients.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'mailMeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Studierenden ohne geplante Maßnahmen gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No students without planned measures were found.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'mailButton',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'E-Mail nur an Studierende, die keine Maßnahmen geplant haben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send email only to students who have no planned measures.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16831,13 +19571,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - geplant',
+				'text' => 'Maßnahme - geplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - planned',
+				'text' => 'Measure - planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'geplanteMassnahmenDesc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Maßhname wurde geplant.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The measure was planned.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16866,18 +19626,38 @@ array(
 	array(
 		'app' => 'international',
 		'category' => 'international',
-		'phrase' => 'durchgefuehrteMassnahmen',
+		'phrase' => 'mailversenden',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - durchgeführt',
+				'text' => 'Mail versenden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - performed',
+				'text' => 'Send mail',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'durchgefuehrteMassnahmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Maßnahme - durchgeführt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Measure - performed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16891,13 +19671,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ECTS - bestätigt',
+				'text' => 'International Credits - bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'ECTS - confirmed',
+				'text' => 'International Credits - confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -16911,13 +19691,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Maßnahmen - abgelehnt',
+				'text' => 'Maßnahme - abgelehnt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Measures - declined',
+				'text' => 'Measure - declined',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17011,13 +19791,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Anmerkung - Studiengangsleitung',
+				'text' => 'Begründung - Studiengangsleitung',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Note - Study course Director',
+				'text' => 'Reason - Study course Director',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17031,13 +19811,33 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '>=5 ECTS verplant',
+				'text' => '>=5 International Credits verplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '>=5 ECTS planned',
+				'text' => '>=5 international credits planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'international',
+		'category' => 'international',
+		'phrase' => 'stgtodo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur offene Massnahmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'only open measures',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17051,13 +19851,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<5 ECTS verplant',
+				'text' => '<5 International Credits verplant',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<5 ECTS planned',
+				'text' => '<5 International Credits planned',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17071,13 +19871,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '>=5 ECTS bestätigt',
+				'text' => '>=5 International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '>=5 ECTS confirmed',
+				'text' => '>=5 International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17091,13 +19891,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '<5 ECTS bestätigt',
+				'text' => '<5 International Credits bestätigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => '<5 ECTS confirmed',
+				'text' => '<5 International Credits confirmed',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17363,21 +20163,81 @@ array(
 			)
 		)
 	),
-    array(
-		'app' => 'core',
-		'category' => 'extensions',
-		'phrase' => 'title',
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusSetzen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Extensions manager',
+				'text' => 'Status setzen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Extensions manager',
+				'text' => 'Set state',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'abgewiesenam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgewiesen am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Rejected on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusAuswahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status ausw&auml;hlen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'infocenter',
+		'category' => 'infocenter',
+		'phrase' => 'statusZuruecksetzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status zur&uuml;cksetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reset status',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17385,19 +20245,19 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'extensions',
-		'phrase' => 'uploadExtension',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'fehlerFehlerKonfigurationLaden',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Upload extension',
+				'text' => 'Fehler beim Laden der Fehlerkonfiguration',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Upload extension',
+				'text' => 'Error when loading error configuration',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17405,19 +20265,19 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'extensions',
-		'phrase' => 'performSql',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'fehlerFehlerLaden',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Do not perform SQL',
+				'text' => 'Fehler beim Laden der Fehler',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Do not perform SQL',
+				'text' => 'Error when loading errors',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17425,19 +20285,19 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'extensions',
-		'phrase' => 'changeSuccess',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'ungueltigerKonfigurationstyp',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'The extension have been correctly changed',
+				'text' => 'Ungültiger Konfigurationstyp',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The extension have been correctly changed',
+				'text' => 'Invalid configuration type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -17445,25 +20305,29016 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'extensions',
-		'phrase' => 'changeError',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'ungueltigerKonfigurationswert',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'An error occurred while changing the extension',
+				'text' => 'Ungültiger Konfigurationswert für Datentyp {0}, Sonderzeichen nicht erlaubt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'An error occurred while changing the extension',
+				'text' => 'Invalid configuration value for data type {0}, special characters not allowed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'fehlerKonfiguration',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler Konfiguration',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationstyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationstyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'configuration type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationswert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationswert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'configuration value',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationswertPlatzhalter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'wert1;wert2;wert3',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'value1;value2;value3',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationswertZuweisen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationswert(e) zuweisen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assign configuration value(s)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationsbeschreibung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationsbeschreibung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Configuration description',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationsdatentyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationsdatentyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Configuration data type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfiguration gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Configuration saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationGespeichertFehler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern der Konfiguration',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when saving configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfiguration gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deleted configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationGeloeschtFehler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen der Konfiguration',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when deleting configuration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'fehlermonitoring',
+		'phrase' => 'konfigurationswertLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konfigurationswert(e) löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete configuration value(s)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'angabeFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angabe fehlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Value is missing',
+
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'lehrveranstaltungsinformationen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lehrveranstaltungsinformationen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Course Information",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'Moodleinformationen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Moodle Informationen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Moodle Information",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'actionname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Aktion",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Action",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'overdue',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "überfällig",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "overdue",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'overdueEvent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Event ist überfällig",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Event is overdue",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lvinfo',
+		'phrase' => 'moodleLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Moodle Link",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Moodle link",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'raum_kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Raum Kurzbezeichnung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Room Shortname",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'rauminfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Raum Informationen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Room Information",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'roomSearch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Räume Suchen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Search Rooms",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'minCapacity',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Mindestpersonenkapazität",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Minimum person capacity",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'roomReservations',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Raum Reservierungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Room Reservations",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'personcap',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Personen Kapazität",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Person Capacity",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'raumnummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Raumnummer",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Room Number",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'rauminfo',
+		'phrase' => 'keineRaumReservierung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Keine Raum Reservierungen gefunden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Room Reservations found",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'keinLektorZugeordnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "ENG Aktuell ist dieser Lehrveranstaltung noch kein Lektor zugeordnet",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'incomingplaetze',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Incomingplätze",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Places Available for Incoming Students",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrbeauftragter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lehrbeauftragte*r",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Lecturer(s)",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvleitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "LV-Leiter*in",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Head of Course",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'noLvFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Keine Lehrveranstaltungen gefunden",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No LVs found",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'leitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Leitung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Head",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'koordination',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Koordination",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Coordination",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'sprache',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Sprache",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Language",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'englisch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Englisch",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "English",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'deutsch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Deutsch",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "German",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verfuegbareSprachen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Verfügbare Sprachen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Available languages",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'dokumente',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumente',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'dokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'erstelldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Creation date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'bestaetigungenZeugnisse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigungen/Zeugnisse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Certificates/Transcripts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'inskriptionsbestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbestätigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enrollment Confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienbeitragFuerSSBezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbeitrag für das %1$s bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'tuition fee for semester %1$s paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienbeitragFuerSSNochNichtBezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbeitrag für das %1$s noch nicht bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'tuition fee for semester %1$s not yet paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienbeitragFuerStgNochNichtBezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbeitrag für %1$s noch nicht bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'tuition fee for %1$s not yet paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienbeitragNochNichtBezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbeitrag noch nicht bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'tuition fee not yet paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienerfolgsbestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienerfolgsbestätigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student progress report',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studiensemesterAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte wählen Sie das entsprechende Studiensemester aus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select the corresponding semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'vorlageWohnsitzfinanzamt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'zur Vorlage beim Wohnsitzfinanzamt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'for submission to local tax office',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'studienbuchblatt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienbuchblatt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student Record', //Noch zu übersetzen
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'alleStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Studiensemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'abschlussdokumente',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussdokumente/Zeugnisse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final documents/Transcripts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'nochKeineAbschlussdokumenteVorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noch keine Abschlussdokumente vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No final documents available yet',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'keinStatusImStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Für das übergebene Studiensemester %1$s existiert kein Status. Bitte wählen Sie ein gültiges Studiensemester aus dem DropDown.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found for %1$s. Please select a valid semester from the dropdown.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'tools',
+		'phrase' => 'warnungDruckDigitaleSignatur',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<b>Hinweis!</b> Digital signierte Dokumente werden in manchen Browsern und PDF-Readern nicht korrekt angezeigt. <br/>Bitte verwenden Sie den <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a>, wenn Sie das Dokument ausdrucken möchten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<b>Note!</b> Digitally signed documents are not displayed correctly in some browsers and PDF readers. <br/>Please use the <a href="https://get.adobe.com/de/reader/" target="_blank">Adobe Acrobat Reader</a> if you want to print the document.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'ausbildungBildungsstaatUebereinstimmung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Höchster Abschluss (unterteilt in Österreich oder im Ausland/unbekannt) passt nicht zum Staat des höchsten Abschlusses.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Highest completed level of education (divided into those acquired in Austria and those abroad/unknown) does not match country of the highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erfolgreichGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erfolgreich gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'fehlerBeimSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when saving',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1AnmeldungUeberschrift',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erhebung bei der Anmeldung zu einem Studium oder bei Studienbeginn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Survey when applying for a study or at the start of studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'rechtsbelehrung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gemäß § 18 Absätzen 6 und 7 Bildungsdokumentationsgesetz 2020, BGBl. I  Nr. 20/2021, in der gültigen Fassung, sowie § 141 Absatz 3 Universitätsgesetz 2002, BGBl. I  Nr. 120/2002, in der gültigen Fassung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'according to section 18 subsections 6 and 7 of the Bildungsdokumentationsgesetz 2020, Federal Law Gazette I  No. 20/2021, in the current version, and section 141 subsection 3 of the Universitätsgesetz 2002, Federal Law Gazette I  No. 120/2002, in the current version.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1AnmeldungEinleitungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Senden der Daten ist nur möglich, wenn die Sozialversicherungsnummer (bzw. das Ersatzkennzeichen) gültig ist und alle Fragen beantwortet worden sind. Wenn Sie etwas nicht wissen, wählen Sie die Antwortmöglichkeit „unbekannt“, aber beantworten Sie bitte alle Fragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sending the data is only possible if the social security number (or the substitute code) is valid and all questions have been answered. If you don\'t know something, choose the answer option “unknown”, but please answer all questions.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1EinleitungSvnrtext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Laut Bildungsdokumentationsgesetz sind wir verpflichtet die Sozialversicherungsnummer zu erheben bzw. zu registrieren. Falls Sie über keine Sozialversicherungsnummer verfügen, fordert die FH Technikum Wien in Ihrem Namen ein Ersatzkenneichen an.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'According to the General Social Insurance Act, we are obliged to collect and register your national insurance number. If you do not have a national insurance number, UAS Technikum Wien will request a social insurance substitute code on your behalf.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'angabenErziehungsberechtigte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angaben zu Ihren Erziehungsberechtigten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Information about your legal guardians',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'angabenErziehungsberechtigteEinleitungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die folgenden Fragen beziehen sich auf Personen, welche für Sie erziehungsberechtigt waren oder sind (Eltern oder jene Personen, die für Sie eine entsprechende Rolle übernommen haben, wie z.B. Stief- oder Pflegeeltern).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The following issues refer to your legal guardians (parents or persons who were in the role of the parents, e.g. stepparents or foster parents).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'bitteAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte auswählen...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'please select...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erziehungsberechtigtePersonEins',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erziehungsberechtigte Person 1/Mutter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Legal guardian 1/mother',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'geburtsjahr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geburtsjahr',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'year of birth',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'geburtsstaat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Geburtsstaat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'country of birth',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'inDenHeutigenGrenzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'in den heutigen Grenzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'in today\'s borders',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'hoechsterAbschlussStaat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Staat des höchsten Abschlusses',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Country of the highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'hoechsterAbschluss',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Höchster Abschluss',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Highest completed level of education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'wennAbschlussInOesterreich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls der höchste Bildungsabschluss in Österreich erworben wurde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If the highest level of education was completed in Austria:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'wennAbschlussNichtInOesterreich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls das Land des höchsten erworbenen Bildungsabschlusses unbekannt oder nicht Österreich ist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If the country of the highest completed level of education is unknown or not Austria:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erziehungsberechtigtePersonZwei',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erziehungsberechtigte Person 2/Vater',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Legal guardian 2/father',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'pruefenUndSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfen und Speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check and submit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'datenLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'erfolgreichGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erfolgreich gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deleted successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'datenLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'infotext_Wiederholung_0',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemäß § 16 Abs. 1 FHG steht Studierenden einmalig das Recht auf Wiederholung eines Studienjahres in Folge einer negativ beurteilten kommissionellen Prüfung zu.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'According to § 16 paragraph 1 FHG, students have the right to repeat an academic year as a result of a negative examination before a committee.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'infotext_Wiederholung_1',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Wiederholung ist bei der Studiengangsleitung binnen eines Monats ab Mitteilung des negativen Prüfungsergebnisses bekannt zu geben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The head of the degree program must be notified of the repetition within one month of notification of the negative examination result.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'infotext_Wiederholung_2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Infolge der Weiterentwicklung der Qualität des Studienganges kann es zu Änderungen der Studienbedingungen im Zuge der Wiederholung eines Studienjahres kommen (z.B. Studienplan, Prüfungsordnung etc.).',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'As a result of the further development of the quality of the course, there may be changes to the study conditions in the course of repeating an academic year (e.g. study plan, examination regulations, etc.).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'infotext_Wiederholung_3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Studiengangsleitung legt Prüfungen und Lehrveranstaltungen für die Wiederholung des Studienjahres fest.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The head of the degree program determines examinations and courses for the repetition of the academic year.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'infotext_Wiederholung_4',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht bestandene Prüfungen und Lehrveranstaltungen sind jedenfalls, bestandene Prüfungen und Lehrveranstaltungen nur, sofern es der Zweck des Studiums erforderlich macht, zu wiederholen oder erneut zu besuchen. Wird eine Lehrveranstaltung nach der letzten Wiederholungsmöglichkeit negativ beurteilt, darf dieder Studierende an keiner kommissionellen Wiederholungsprüfung im Semester der negativ beurteilen Lehrveranstaltung und im Folgesemester mehr teilnehmen (nicht-kommissionelle Wiederholungsprüfungen können wahrgenommen werden)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'In any case, failed examinations and courses are to be repeated or attended again only if the purpose of the course makes it necessary. If a course is assessed negatively after the last opportunity to repeat it, the student may no longer take part in a board re-examination in the semester in which the course was assessed as negative and in the following semester (non-board re-examinations can be taken).',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+/*
+	// es kann fuer jede Kombination Typ und Status eine Phrase der Form info_<Typ>_<Status
+	// erstellt werden, die dann in der Studierendenansicht in einer infobox angezeigt werden
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'info_Wiederholung_Erstellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Info für Wiederholung Erstellt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Info for Wiederholung Erstellt',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+*/
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_Wiederholung_pruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Negativ beurteilte kommissionelle Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Negative assessment by a committee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_Wiederholung_pruefung_date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum der Beurteilung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'date of assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_Wiederholung_button_yes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich gebe hiermit die Wiederholung des Studienjahres bekannt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I hereby announce the repetition of the academic year',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_Wiederholung_button_no',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich werde das Studienjahr nicht wiederholen und Abbrechen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I will not repeat the academic year and will drop out',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_header',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verwaltung des Studierendenstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Management of student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neu Anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create new',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'cancel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abbrechen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancel',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'ok',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ok',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ok',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'suche',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Suche',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_create',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_create_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vom Studium abmelden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deregister from your studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_create_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Studium unterbrechen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Interrupt your studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_cancel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe zurückziehen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancel announcement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'filter_all',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'show all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'filter_todo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'nur offene anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'only show open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'warning_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ihr CIS-Account ist noch 21 Tage aktiv. Wir bitten Sie, alle benötigten Dateien (Zeugnisse, Studienerfolgsbestätigungen, Studienbestätigungen, etc.) innerhalb dieses Zeitraums herunterzuladen. Für die Ausstellung von Duplikaten fallen nach Inaktivsetzung des CIS-Accounts Kosten an.' . "<br>\n" .
+					'Bitte retournieren Sie baldmöglichst entlehnte Bücher an die Bibliothek.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Your CIS account is still active for 21 days. We ask you to download all required files (certificates, confirmations of academic success, confirmation of studies, etc.) within this period. There is a charge for issuing duplicates after the CIS account has been deactivated.' . "<br>\n" .
+					'Please return borrowed books to the library as soon as possible.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'warning_AbmeldungStgl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte beachten Sie die Einspruchsfrist von 2 Wochen nach Bestätigung durch die Studiengangsleitung!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please note the objection period of 2 weeks after confirmation by the head of the degree program!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'De-registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_AbmeldungStgl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'De-registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Interruption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_new_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New de-registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_typ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Typ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_status',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiensemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_erstelldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Createdate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'studierendenantraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierendenanträge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Applications',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_datum_wiedereinstieg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiedereinstieg',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Re-Entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_grund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Grund',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_unruly_updated',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unruly Person Status wurde aktualisiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unruly person status has been updated.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_dateianhaenge',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dateianhänge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attachments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_anhang',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anhang',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attachment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_typ_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deregistration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_typ_AbmeldungStgl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung (durch Studiengangsleitung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancellation (by course director)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_typ_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Break',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'antrag_typ_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_show_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LVs anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show LVs',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_reopen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erneut Freischalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reopen',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_pause',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pausieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Pause',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_unpause',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fortsetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resume',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_object',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beeinspruchen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Object',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_objection_deny',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einspruch abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Objection rejected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_objection_approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einspruch stattgegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Objection granted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_lvzuweisen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LVs zuweisen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assign Lvs',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirm',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_reject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ablehnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reject',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'skip',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Überspringen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Skip',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'select_studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiensemester auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select a semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'keineBerechtigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No authority',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_save_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuweisungen speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save assignments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'btn_download_antrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PDF herunterladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download PDF',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'download',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'reload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Tabelle neu laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reload table',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind derzeit in keinem Studium',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are currently not enrolled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_student_for_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Student gefunden für Prestudent #{prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No student found for prestudent #{prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_student_no_failed_exam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind derzeit in keinem Studium oder haben keine negativ beurteilte kommissionelle Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not currently studying or have not passed a board examination with negative reasons',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'no_attachments',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Dateianhänge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Attachments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudent',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prestudent',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studienjahr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienjahr',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Academic year',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_lvzuweisen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungen zuweisen für {name}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assign Courses for {name}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_lv_nicht_zugelassen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angabe aller Lehrveranstaltungen, zu denen die Person nicht zugelassen ist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Details of all courses to which the person is not admitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_lv_wiederholen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angabe aller zu wiederholenden bzw. erneut zu besuchenden Lehrveranstaltungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Specification of all courses to be repeated or attended again',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_show_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungen für {name}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Courses for {name}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'my_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meine Lehrveranstaltungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'My Courses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'table',
+		'phrase' => 'with_selected',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mit {count} ausgewählten: ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'With {count} selected: ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'lv_nicht_zulassen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht zulassen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Don\'t allow ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'lv_wiederholen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repeat',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_history',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Statusverlauf für #{id} ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'History for #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'anmerkung_tooltip',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Spalte Anmerkung kann verwendet werden, um Besonderheiten z.B. bei einem Studienplanwechsel zu dokumentieren (Änderung von LV-Titel, ECTS…) ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Comment column can be used to document special features, e.g. when changing the curriculum (change of course title, ECTS...)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'fuer_alle_uebernehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'für alle übernehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'apply for all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'fuer_x_uebernehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Auswahl für {count} weitere(n) Wiederholungsanträge übernehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Adopt selection for {count} further repeat applications',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'title_grund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Grund für Ablehnung von #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for rejection of #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Lehrveranstaltungen zugewiesen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No courses assigned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_x',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<b>Status:</b> {status}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<b>Status:</b> {status}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_saving',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten werden gespeichert...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saving...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_error',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_open',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_created',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstellt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Created',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_cancelling',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurückziehen...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancelling...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_cancelled',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurückgezogen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cancelled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_unpaused',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fortgesetzt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resumed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'status_stop',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gestoppt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Stopped',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_stg_blacklist',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Für diesen Studiengang sind keine Bekanntgaben möglich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No announcements are accepted for this course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_antrag_exists',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There is already an existing announcement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_antrag_pending',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt bereits eine bestehende Bekanntgabe vom Typ {typ}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There is already an existing announcement of type {typ}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_antrag_found',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Bekanntgabe mit Id {id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No announcement found with Id {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_antrag_found_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine {typ} Bekanntgabe gefunden für Prestudent {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No {typ} announcement found for prestudent {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_and_sem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang und Ausbildungssemester gefunden für Bekanntgabe mit Id {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studiengang and ausbildungssemester found for announcement with id: {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang gefunden: {studiengang_kz}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studiengang found: {studiengang_kz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_antrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang gefunden für Bekanntgabe #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studiengang found for announcement #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_email',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Studiengang-Email gefunden für Bekanntgabe #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studiengang-email found for announcement #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_studienplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studienplan gefunden für Studiengang: {studiengang_kz}, Studiensemester: {studiensemester_kurzbz}, Ausbildungssemester: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studienplan found for stg: {studiengang_kz}, studiensemester: {studiensemester_kurzbz}, ausbildungssemester: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_antragstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status für Bekanntgabe #{id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found announcement #{id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_multiple_studienplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mehrere Studienpläne gefunden für Studiengang: {studiengang_kz}, Studiensemester: {studiensemester_kurzbz}, Ausbildungssemester: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Multiple studienplans found for stg: {studiengang_kz}, studiensemester: {studiensemester_kurzbz}, ausbildungssemester: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_sem_after',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiensemester nach {semester} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No studiensemester found after: {semester}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stdsem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Studiensemester {studiensemester_kurzbz} existiert nicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester {studiensemester_kurzbz} does not exist',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_status_in_prev_sem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status im letzten Semester gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found in previous semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_antrag_locked',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Bekanntgabe ist gesperrt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This request is locked',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_lv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Lehrveranstaltung ausgewählt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No course selected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_lv_in_application',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Lehrveranstaltung in Bekanntgabe gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No course found in announcement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_right',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No authorization to edit the announcement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_objection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung, die Bekanntgabe zu beeinspruchen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No authorization to object the announcement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_objected',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe ist nicht beeinsprucht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement is not objected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_approved',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bakanntgabe ist nicht bestätigt worden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement is not approved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_pausable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe mit Id {id} kann nicht pausiert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement with Id {id} cannot be not paused',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_not_paused',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bekanntgabe mit Id {id} ist nicht pausiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Announcement with Id {id} is not paused',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_stg_last_semester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Studiengang hat nicht genügend Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The course does not have enough semesters',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_person',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Person gefunden mit id {person_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Person found with id {person_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_person_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Person gefunden für Prestudent #{prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Person found for prestudent #{prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_email',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Email kontakt gefunden für Person mit id {person_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No email contact found for Person with id {person_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Prestudent gefunden: {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Prestudent found: {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_prestudent_in_sem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status für Prestudent #{prestudent_id} in Semester {studiensemester_kurzbz} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found for prestudent #{prestudent_id} in semester {studiensemester_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_stg_for_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studiengang für Prestudent #{prestudent_id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No course found for prestudent #{prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_no_prestudentstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status gefunden für Prestudent: {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status found for Prestudent: {prestudent_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_mail_to',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Email an {email} konnte nicht versandt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Failed to send email to {email}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_mail',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Email wurde nicht an den Studenten versendet<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mail to student not sent<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_name',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Name des Studenten nicht gefunden<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Name of student not found<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_mail_and_name',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Email wurde nicht an den Studenten versendet da kein Name gefunden wurde<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mail to student not sent and student name not found<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'studentIn',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn ({prestudent_id})',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student ({prestudent_id})',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_U_Approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung mit id {studierendenantrag_id} konnte nicht genehmigt werden.<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Could not approve Unterbrechung for studierendenantrag_id: {studierendenantrag_id}<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'error_U_Reject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung mit id {studierendenantrag_id} konnte nicht abgelehnt werden.<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Could not reject Unterbrechung for studierendenantrag_id: {studierendenantrag_id}<br>Details:<br>{message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_Approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unsubscribe released',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_Student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unsubscribe released',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_Stgl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmeldung durch Studiengangsleitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'De-registration by the course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_A_ObjectionDenied',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ihr Einspruch wurde Abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Your objection was denied',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_U_Approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Interruption enabled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_U_Reject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrechung abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Interruption rejected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_W_New',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue*r Wiederholer*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Repeater',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_W_Approve',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung von Studiengangsleitung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition approved by course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_subject_W_Student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholung von Studiengangsleitung freigegeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repetition approved by course director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_table',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<table><tr><th>{stg_bezeichnung} ({stg_orgform_kurzbz})</th></tr>{rows}</table>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue Abmeldung(en)</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new De-registration(s)</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue(r) Antrag/Anträge auf Unterbrechung</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new application(s) for Interruption</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_x_new_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<tr><td>{count} neue LV Zuweisung(en) für Wiederholer</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<tr><td>{count} new LV assignment(s) for repeaters</td></tr>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_grund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<h4>Grund:</h4><p>{grund}</p>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<h4>Reason:</h4><p>{grund}</p>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mail_part_error_no_lvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Lehrveranstaltungen gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No courses found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Abmeldung vom Studium kann hier durchgeführt werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can deregister from your studies here.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Unterbrechung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Unterbrechung des Studiums ist hier zu beantragen. Die Gründe der Unterbrechung und die beabsichtigte Fortsetzung des Studiums sind nachzuweisen oder glaubhaft zu machen. In der Entscheidung über den Antrag sind zwingende persönliche, gesundheitliche oder berufliche Gründe zu berücksichtigen. Während der Unterbrechung können keine Prüfungen abgelegt werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can apply for an interruption of your studies here. The reasons for the interruption and the intended continuation of the course must be proven or made credible. Compelling personal, health or professional reasons must be taken into account when deciding on the application. No exams can be taken during the interruption.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'calltoaction_Wiederholung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studierenden steht einmalig das Recht auf Wiederholung eines Studienjahres in Folge einer negativ beurteilten kommissionellen Prüfung zu. Die Wiederholung ist bei der Studiengangsleitung binnen eines Monats ab Mitteilung des Prüfungsergebnisses bekannt zu geben. Die Studiengangsleitung hat Prüfungen und Lehrveranstaltungen für die Wiederholung des Studienjahres festzulegen, wobei nicht bestandene Prüfungen und Lehrveranstaltungen jedenfalls, bestandene Prüfungen und Lehrveranstaltungen nur, sofern es der Zweck des Studiums erforderlich macht, zu wiederholen oder erneut zu besuchen sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students have the one-time right to repeat an academic year as a result of a negative examination by a committee. The head of the degree program must be notified of the repetition within one month of notification of the examination result. The head of the degree program must determine examinations and courses for the repetition of the academic year, whereby failed examinations and courses are to be repeated or attended again, in any case, passed examinations and courses only if the purpose of the course makes it necessary.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_studentNichtGezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichterfüllung finanzieller Verpflichtungen trotz Mahnung (Studienbeitrag)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to meet financial obligations despite a reminder (tuition fees)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_studentNichtAnwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): mehrmalig unentschuldigtes Verletzen der Anwesenheitspflicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): multiple unexcused breaches of attendance requirements',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_PruefunstermineNichtEingehalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): wiederholtes Nichteinhalten von Prüfungsterminen bzw Abgabeterminen für Seminararbeiten bzw. Projektarbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): repeated non-compliance with examination dates or deadlines for seminar papers or project work',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_plageat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Plagiieren im Rahmen wissenschaftlicher Arbeiten bzw. unerlaubte Verwendung KI generierter Hilfsmittel bzw. Quellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Plagiarism in the context of scientific work or unauthorized use of AI-generated tools or sources',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_ungenuegendeLeistung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): nicht genügende Leistung im Sinne der Prüfungsordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): insufficient performance in terms of the examination regulations',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_NichtantrittStudium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausschlußgrund gemäß Ausbildungsvertrag (Punkt 7.4): Nichtantritt des Studiums zu Beginn des Studienjahres (=Unbegründetes Nichterscheinen zur ersten Studienveranstaltung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason for exclusion according to the training contract (point 7.4): Failure to start the course at the beginning of the academic year (= unjustified non-attendance to the first course event)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'textLong_unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person ist unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person is unruly',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_nichtGezahlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat nicht bezahlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has not paid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_nichtAnwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in war mehrmals unentschuldigt abwesend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student was absent without excuse several times',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_PruefunstermineNichtEingehalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat Prüfunstermine nicht eingehalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student failed to meet exam dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_plageat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student*in hat plagiiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student failed to meet exam dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_ungenuegendeLeistung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Leistung ungenügend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'performance insufficient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_NichtantrittStudium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nichtantritt des Studiums',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'non-commencement of the course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_MissingZgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzung BA (bzw. MA) nicht erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry requirements BA (resp. MA) not fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_bitteWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bitte auswählen, sofern zutreffend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'please select if applicable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'grund_Wiederholung_deadline',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'negative kommissionelle Beurteilung und keine fristgerechte Bekanntgabe der Wiederholung des Studienjahres',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'negative assessment by the committee and no timely announcement of the repetition of the academic year',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'dropdown_unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person ist unruly.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person is unruly.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'mark_person_as_unruly',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person ist unruly.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person is unruly.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'document',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anhänge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attachments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Notiz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'notiz_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'verfasser',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfasser*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'author',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'bearbeiter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiter*in',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'editor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'verfasser_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfasser*in UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'author UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bearbeiter_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiter*in UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'editor UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'erledigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'erledigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'letzte_aenderung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Letzte Änderung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Last updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldRequired',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} ist erforderlich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Input Field {field} is required',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNotInteger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine Ganzzahl enthalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Field {field} must contain an integer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'tag_rueckgaengig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rückgängig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Undo',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'tag_erledigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erledigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Done',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'tag_verfasser',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'angelegt von {0} am {1}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Created by {0} on {1}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'notiz',
+		'phrase' => 'tag_bearbeiter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bearbeitet von {0} am {1}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edited by {0} on {1}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNotNumeric',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} darf nur Zahlen enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Field {Field} must contain only numbers.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNoValidEmail',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine gültige Email-Adresse enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The field {field} must contain a valid email address.',
+				'description' => '',
+				'insertvon' => 'system'
+				)
+		)
+	),
+	// Personalverwaltung begin
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'warnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Warnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Warning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'vornamen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vornamen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'middle names',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'maennlich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Männlich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Male',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'weiblich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weiblich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Female',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'sprache',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sprache',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'language',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'gemeinde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'municipality',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'heimatadresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Heimatadresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'home address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'zustelladresse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zustelladresse',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'postal address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontaktinformation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktinformation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'contact information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'zustellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zustellung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delivery',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'abweichenderEmpfaenger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abweich.Empf. (c/o)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'dissenting recipient (c/o)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stammdatenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stammdaten gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Master data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stammdatenNochNichtGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stammdaten schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close master data? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontaktdatenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontaktdatenGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact data deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bankdatenGeaendert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankdaten schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close banking data? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bankdatenGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankdaten gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Banking data deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bankdatenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankdaten gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Banking data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bank',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bank',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bank',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'anschrift',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anschrift',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bic',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BIC',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'BIC',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'iban',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'IBAN',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'IBAN',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'blz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BLZ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bank no',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontonr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontonr',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'account no',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bankverbindung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'verrechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verrechnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'billing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'mitarbeiterdaten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiterdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee Data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kontaktdaten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontaktdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact Data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bankdaten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Banking Data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stundensaetze',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundensätze',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hourly Rates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'sachaufwand',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sachaufwand',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Material Expenses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'sachaufwandGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sachaufwand gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Material expenses saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'sachaufwandGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sachaufwand gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Material expenses deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Job function saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Job function deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'sachaufwandNochNichtGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sachaufwand schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close material expenses? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionNochNichtGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close job function? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stundensatzGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundensatz gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hourly rate saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stundensatzGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'stundensatz gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hourly rate deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stundensatzNochNichtGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundensätze schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close hourly rates? Changes will be lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'stundensatzWirklichLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundensatz mit dem Typ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete hourly rate of type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'wirklichLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => ' wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'core',
+		'phrase' => 'unternehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unternehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'dv_unternehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'DV/Unternehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ec/company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'mitarbeiterdatenGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiterdaten gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee data saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'adresseGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Address saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'adresseGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Address deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'kannNichtGeloeschtWerden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'kann nicht gelöscht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'cannot be deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'wirklichLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'wirklich löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'alias',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alias',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Alias',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'telefonklappe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Telefonklappe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Phone Ext.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'ausbildung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausbildung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Higher Education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'buero',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Büro',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Office',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'standort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Site',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'bismelden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bismelden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'report BIS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'mitarbeiterdatenGeandert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiterdaten schließen? Geänderte Daten gehen verloren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Close employee data? Changes will bei lost!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'fixangestellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fixangestellt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'permanent employment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'habilitation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Habilitation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'job function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'funktionen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'job functions',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'fachbereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fachbereich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'specialist field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'hrrelevant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'HR relevant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'HR-relevant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'vertragsrelevant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsrelevant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract relevant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'zuordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attribution',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'zuordnung_taetigkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuordnung/Tätigkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attribution/Job Title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'wochenstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wochenstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'working hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'abteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abteilung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Department',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'vbform',
+		'phrase' => 'oder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'oder',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'or',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'ok',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'OK',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'OK',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'abwesenheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abwesenheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'off time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'zeiterfassung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeiterfassung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'time recording',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'vertretung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertretung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'stand-in',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'erreichbarkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erreichbarkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'off time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
+		'phrase' => 'grund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Grund',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'zeitaufzeichnung',
+		'phrase' => 'id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'frist',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Frist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'todo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'To Do',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To Do',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'fristStatusGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status gespeichert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status saved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'fristGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Frist gespeichert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline saved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'fristGeloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Frist gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline deleted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'fristenAktualisiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fristen aktualisiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadlines updated.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'termin_frist',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Termin/Frist',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date/Deadline',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'ereignis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ereignis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Event',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'status',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'fristenmanagement',
+		'phrase' => 'mitarbeiterin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'MitarbeiterIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Gehaltsband
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gehaltsband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gehaltsband',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Salary Range',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gueltig_von',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gültig von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Valid from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gueltig_bis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gültig bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Valid to',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'betrag_von',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betrag von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Amount from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'betrag_bis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gültig bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Valid to',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gehaltsband_gespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gehaltsband gespeichert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Salary range saved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gehaltsband_erstellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gehaltsband hinzugefügt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Salary range created.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'gehaltsband',
+		'phrase' => 'gehaltsband_geloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gehaltsband gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Salary range deleted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Personalverwaltung end
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtagHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add report target date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtageVerwalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BIS-Meldestichtage verwalten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Manage report target dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'stichtagLoeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete report target date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+		array(
+			'app' => 'lehrauftrag',
+			'category' => 'ui',
+			'phrase' => 'hinweistextLehrauftrag',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => '<strong>Hinweis:</strong> Das Akzeptieren von Lehraufträgen ersetzt alle vorhergehenden Lehraufträge dieses Studiensemesters.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => '<strong>Note:</strong> Accepting teaching assignments replaces all previous teaching assignments for this study semester.',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		//Profil Phrasen start
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'NOTFALLKONTAKT',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Notfallkontakt',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Emergency contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'fotoSperren',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profilbild sperren',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'lock profile picture',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'fotoEntsperren',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profilbild entsperren',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'unlock profile picture',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'fotoHochladen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profilbild hochladen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'upload profile picture',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'profil',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profile',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'gruppenLink',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Gruppen Link',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'group link',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'verbandLink',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Verband Link',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Verband link',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+			array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'verbandLink',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Verband Link',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Verband link',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'semesterLink',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Semester Link',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Semester link',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'TELEFON',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Telefon',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Telephone',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'MOBIL',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobiltelefonnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cell phone number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'EMAIL',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'E-Mail',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'E-Mail',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'personenInformationen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Personen Informationen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Person Information',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'postnomen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Postnomen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'post-nominals',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Username',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Benutzername',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Username',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Anrede',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Anrede',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Salutation',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Titel',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Titel',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Title',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Postnomen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Postnomen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Postnominal',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Geburtsdatum',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Geburtsdatum',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Birthdate',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Geburtsort',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Geburtsort',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Birthplace',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Büro',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Büro',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Office',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Kurzzeichen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Kurzzeichen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Abbreviation',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Telefon',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Telefon',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Telephone',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'telefon',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Telefon',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Telephone',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'intern',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Intern',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Internal',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'alias',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Alias',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Alias',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'email',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'E-Mail',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'E-Mail',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Anmerkung',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Anmerkung',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Remark',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'notfallkontakt',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Notfallkontakt',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Emergency contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Straße',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Straße',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Street',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Strasse',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Straße',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Street',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'PLZ',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'PLZ',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'PLZ',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Ort',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ort',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Locality',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'Typ',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Typ',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Type',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'privateKontakte',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Private Kontakte',
+					'description' => 'Profil Kategorie in der die ganzen privaten Kontakte einer Person aufgelistet werden',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Private Contacts',
+					'description' => 'Profile category in which all private contacts of a person are listed',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'privateAdressen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Private Adressen',
+					'description' => 'Profil Kategorie in der die ganzen privaten Adressen einer Person aufgelistet werden',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Private Addresses',
+					'description' => 'Profile category in which all private addresses of a person are listed',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'profilBearbeiten',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil bearbeiten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'edit profil',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'mitarbeiterIn',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'MitarbeiterIn',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Employee',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'entlehnteBetriebsmittel',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Entlehnte Betriebsmittel',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Borrowed Company Resources',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'mitarbeiterInformation',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Mitarbeiter Information',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Employee Information',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'studentIn',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'StudentIn',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Student',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'studentInformation',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Student Information',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Student Information',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'zutrittsGruppen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Zutrittsgruppen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Access groups',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'fhAusweisStatus',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Der FH Ausweis ist am {0} ausgegeben worden.',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'The FH ID card was issued on {0}',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'mailverteiler',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Mailverteiler',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Mailing list',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'mailverteilerMitglied',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Sie sind Mitglied in folgenden Mailverteilern:',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'You are a member of the following mailing lists:',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'quickLinks',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Quick Links',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Quick Links',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'zeitwuensche',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Zeitwünsche',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Time wishes',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'lehrveranstaltungen',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Lehrveranstaltungen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Courses',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'zeitsperren',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Zeitsperren',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Time locks',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profil',
+			'phrase' => 'inventarnummer',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Inventarnummer',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'inventory number',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'ausgabedatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausgabedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'issue date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'wochenstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wochenstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'working hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//Profil Phrasen ende
+	// LvPlan Phrasen start
+	array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'previousWeek',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Vorherige Woche',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Previous week',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'previousYear',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Vorheriges Jahr',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Previous year',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'previousMonth',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Vorheriges Monat',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Previous month',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'previousDay',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Vorheriger Tag',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Previous day',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'nextDay',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nächster Tag',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Next day',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'nextWeek',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nächste Woche',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Next week',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'nextMonth',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nächster Monat',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Next month',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'nextYear',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nächstes Jahr',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Next year',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'modeDay',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Tages Ansicht',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Daily view',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'modeWeek',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Wochen Ansicht',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Week view',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'modeMonth',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Monats Ansicht',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Month view',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		// LvPlan Phrasen ende
+		//ProfilUpdate Phrasen start
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilBild',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profilbild',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profile picture',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deleteAttachment',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Anhang löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete attachment',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'documentUpload',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Dokument hochladen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Upload document',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdates',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil Updates',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profile Updates',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'topic',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Thema',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'topic',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'zustell_adressen_warning',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Einer ihrer Adressen wird bereits zur Zustellung verwendet, möchten sie diese Adressen als Zustellungsadresse übernehmen?',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'One of your addresses is already used as a contact address, would you like to use this address as your new contact address?',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'zustell_kontakte_warning',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Einer ihrer Kontakte wird bereits zur Zustellung verwendet, möchten sie diesen Kontakt als Zustellungskontakt übernehmen?',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'One of your contacts is already used as a communication mean, would you like to use this contact as your new communication mean?',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'kontaktTyp',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Kontakttyp',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'contact type',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'nebenwohnsitz',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nebenwohnsitz',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'secondary residence',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'hauptwohnsitz',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Hauptwohnsitz',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'main residence',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'homeoffice',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Homeoffice',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Homeoffice',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'rechnungsadresse',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Rechnungsadresse',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Billing address',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'notfallkontakt',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Notfallkontakt',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Emergency contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'mobiltelefonnummer',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Mobiltelefonnummer',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Cell phone number',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'homepage',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Homepage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Homepage',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'faxnummer',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Faxnummer',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Fax number',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'zustellungsKontakt',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Zustellungs Kontakt',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delivery contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'statusMessage',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Status Mitteilung',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Status message',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdateInformationMessage',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Aktualisieren Sie ihren {0} und laden Sie die passenden Nachweisdokumente hoch',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Please update your {0} and upload the corresponding Document of proof',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilBildUpdateMessage',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Bitte laden Sie ihr {0} hoch',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Please upload your {0}',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdateRequest',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil Änderungs Anfrage',
+					'description' => 'Eine Änderungs Anfrage',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profil Update Request',
+					'description' => 'One profil update request',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdateRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Profil Änderungs Anfragen',
+					'description' => 'Mehrere Änderungs Anfragen',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Profil Update Requests',
+					'description' => 'Multiple update requests',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'statusDate',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Status Datum',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Date of Status',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'userID',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'UserID',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'UserID',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'anfrageThema',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Thema der Anfrage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Topic of Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'anfrageDatum',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Datum der Anfrage',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Date of Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'update',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Aktualisierung',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'update',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'accept',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Annehmen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'accept',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deny',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ablehnen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'deny',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'UID',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Benutzer',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'User',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'pendingRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ausstehende Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Pending Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'acceptedRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Angenommene Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Accepted Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'rejectedRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Abgelehnte Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Rejected Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'allRequests',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Alle Anfragen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'All Requests',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deleteContact',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Kontakt löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deleteItem',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Item löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete item',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'addItem',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Item hinzufügen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Add item',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'deleteAddress',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Adresse löschen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Delete address',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'addContact',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Kontakt hinzufügen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Add contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'addContact',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Adresse hinzufügen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Add address',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'vorname',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Vorname',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'First name',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'nachname',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nachname',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Last name',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'title',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Titel',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Title',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'pending',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ausstehend',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Pending',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'accepted',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Akzeptiert',
+					'description' => 'Profil Änderungen die akzeptiert wurden',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Accepted',
+					'description' => 'Profil updates that were accepted',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'rejected',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Abgelehnt',
+					'description' => 'Profil Änderungen die abgelehnt wurden',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Rejected',
+					'description' => 'Profil updates that were rejected',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUdate_address_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Nicht möglich adressenID {0} für profil Änderung {1} hinzuzufügen',
+					'description' => 'Fehlermeldung wenn die AdressenID bereits in einer Profil Änderung verwendet wurde',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'was not able to add addressID {0} to profilRequest {1}',
+					'description' => 'Error message when the addressID was already used for another profil update',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_permission_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Notwendinge Berechtigungen fehlen',
+					'description' => 'Fehlermeldung wenn notwendige Berechtigungen für Aktionen fehlen',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Missing necessary permission',
+					'description' => 'Error message if necessary permissions are missing',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_dms_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Das angeforderte Dokument ist kein Anhang einer Profil Änderung',
+					'description' => 'Fehlermeldung wenn ein Dokument angefordert wird, das nicht im zusammenhang mit einer Profil Änderung ist',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'The requested document is not an attachment for any profil update',
+					'description' => 'Error message if a document is requested that is not connected with a profil update',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_email_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten beim sender der Email',
+					'description' => 'Fehlermeldung wenn ein Fehler beim senden einer Email auftritt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred when sending an email',
+					'description' => 'Error message if an error occurred while sending emails',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_studentCheck_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten beim Überprüfen ob die Person ein Student ist',
+					'description' => 'Fehlermeldung wenn ein Fehler beim überprüfen eines Studenten auftritt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while checking if the person is a student',
+					'description' => 'Error message if an error occurred when checking if a person is a student',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_mitarbeiterCheck_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, es wurde kein Mitarbeiter mit der gleichen uid gefunden',
+					'description' => 'Fehlermeldung wenn ein Fehler beim überprüfen eines Mitarbeiter auftritt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while checking if the person is a mitarbeiter',
+					'description' => 'Error message if an error occurred when checking if a person is a mitarbeiter',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_loading_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler beim laden der Profil Änderung ist aufgetreten',
+					'description' => 'Fehlermeldung wenn ein Fehler beim laden einer Profil Änderung auftritt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while loading the profil update',
+					'description' => 'Error message if an error occurred when loading a profil update',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_dmsVersion_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler beim laden der Dms Version ist aufgetreten',
+					'description' => 'Fehlermeldung wenn ein Fehler beim laden einer Dms Version auftritt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while loading the dms version',
+					'description' => 'Error message if an error occurred when loading a dms version',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_deleteZustellung_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetretten, man kann keine Zustellung löschen',
+					'description' => 'Fehlermeldung wenn versucht wird eine Zustellungsresource zu löschen',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, it is not possible to delete a resource marked as zustellung',
+					'description' => 'Error message if someone tried to delete a resource that is marked as zustellung',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_changeTwice_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetretten, man kann die gleiche Profil Information nicht zweimal ändern',
+					'description' => 'Fehlermeldung wenn versucht wird eine Information zweimal zu ändern',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, it is not possible to change the same profil information twice',
+					'description' => 'Error message if someone tried to change the same profil information twice',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_changeTopicTwice_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Eine Anfrage {0} ist bereits geöffnet worden',
+					'description' => 'Wenn die Profil Änderung nicht über Kontakte oder Adressen ist dann darf das Topic nur einmalig verändert werden',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'A request to change {0} is already open',
+					'description' => 'if the profil update is not about contacts or addresses then the topic has to be unique',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_loadingOE_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler beim laden der oe_einheit ist aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, when loading the oe_einheit',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_requiredInformation_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, notwendige Informationen fehlen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, required informations are missing',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_insert_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist beim hinzufügen der Profil Änderung aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred during the insertion of the profil update',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_insertKontakt_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist beim hinzufügen des Kontaktes aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred during the insertion of the contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_insertAdresse_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist beim hinzufügen der Adresse aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred during the insertion of the address',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_updateKontakt_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist beim ändern eines Kontaktes aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while updating a profil update contact',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_updateAdresse_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist beim ändern einer Adresse aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred while updating a profil update address',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_loadingZustellkontakte_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist während dem laden der Zustellkontakte aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred when querying zustellkontakte',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_loadingZustellAdressen_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist während dem laden der Zustelladressen aufgetreten',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred when querying zustelladressen',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'acceptUpdate',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Änderung annehmen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Accept Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'denyUpdate',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Änderung ablehnen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Deny Request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'showRequest',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Änderung anzeigen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Show request',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_status_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, der Status "{0}" ist unbekannt',
+					'description' => 'Fehler der auftritt wenn es den Status nicht in der Datenbank gibt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, the status "{0}" is not known',
+					'description' => 'error that occurrs when the used status is not present in the database',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_topic_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, das Topic "{0}" existiert nicht',
+					'description' => 'Fehler der auftritt wenn es das Topic nicht in der Datenbank gibt',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, the topic "{0}" is not known',
+					'description' => 'error that occurrs when the used topic is not present in the database',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_address_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, Es war nicht möglich die Adresse mit ID {0} in der Datenbank anzulegen',
+					'description' => 'Fehler der auftritt wenn es nicht möglich war eine neue Adresse anzulegen',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, it wasn\'t possible to add new address with ID {0} to the database',
+					'description' => 'error that occurrs when it wasn\'t possible to add new address in db',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'profilUpdate_kontakt_error',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Ein Fehler ist aufgetreten, Es war nicht möglich den Kontakt mit ID {0} in der Datenbank anzulegen',
+					'description' => 'Fehler der auftritt wenn es nicht möglich war einen neuen Kontakt anzulegen',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'An error occurred, it wasn\'t possible to add new contact with ID {0} to the database',
+					'description' => 'error that occurrs when it wasn\'t possible to add new contact in db',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'Name',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Name',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Name',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'Topic',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Thema',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Topic',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'insertamum',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Einfüge Datum',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Insert Date',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'actions',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Aktionen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Actions',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'profilUpdate',
+			'phrase' => 'Status',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Status',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Status',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+
+		//ProfilUpdate Phrasen ende
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'geloescht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'previous',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'vorherige',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'previous',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'next',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'nächste',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'next',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'switchTheme',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zum {0} Theme wechseln',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Switch to {0} theme',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'aenderungGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Änderung gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved changes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'fhctemplate',
+		'category' => 'global',
+		'phrase' => 'datensatz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datensatz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dataset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'fhctemplate',
+		'category' => 'global',
+		'phrase' => 'datensatzGenehmigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datensatz genehmigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approve dataset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'fhctemplate',
+		'category' => 'global',
+		'phrase' => 'datensatzAblehnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datensatz ablehnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reject dataset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'fhctemplate',
+		'category' => 'global',
+		'phrase' => 'datensatzAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datensatz anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add dataset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'fhctemplate',
+		'category' => 'global',
+		'phrase' => 'datensatzBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datensatz bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit dataset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'alleGenehmigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle genehmigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'alleAbgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All rejected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'dokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'aktionen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Actions',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//
+	// DIGITALE ANWESENHEITEN PHRASEN BEGIN
+	//
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'anwesend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'attending',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'abwesend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abwesend',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'absent',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'entschuldigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excused',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigtLegendeBlau',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student ist am gewählten Datum bestätigt entschuldigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student is confirmed excused on the selected date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigtLegendeTuerkis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student hat eine offene Entschuldigung am gewählten Datum.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has an open excuse on the selected date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungAbgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excuse note declined',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'abgelehnt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgelehnt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'declined',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungAkzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excuse note accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'akzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungOffen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung offen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excuse note status open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'hochgeladen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hochgeladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'uploaded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwesenheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse Notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'codeEingeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Code eingeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enter Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'codeSenden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Code senden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwesenheitenverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitenverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'bitteZugangscodeEingeben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte Zugangscode eingeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter an access code.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'code',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangscode',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleOhneQR',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten ohne QR-Code einfügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Insert attendances without QR-Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'eintragErfolgreich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eintrag erfolgreich!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry successful!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'wurdeRegistriert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'wurde registriert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'has been registered.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'neueAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Anwesenheitskontrolle starten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Start a new attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'offen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'endAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle beenden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'end attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungsmanagement',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigungsmanagement',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'digitalesAnwManagement',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Digitales Anwesenheitsmanagement',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Digital attendance management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entFullEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Entschuldigung zur Befreiung der Anwesenheitspflicht: Neues Dokument wurde hochgeladen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Excuse note for digital attendances - a new document has been uploaded.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entNewEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Entschuldigung zur Befreiung der Anwesenheitspflicht: Dokument wird nachgereicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Excuse note for digital attendances - Document will be submitted later',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entEditEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung zur Befreiung der Anwesenheitspflicht: Dokument wurde eingereicht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note for digital attendances - Document has been submitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entDeletedEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung zur Befreiung der Anwesenheitspflicht wurde gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note for digital attendances has been deleted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungStatusUpdateAutoEmailBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung Status Update.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note status update.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungAkzeptieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung akzeptieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungAblehnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung ablehnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Decline excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungLöschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungHochladen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungLöschenErfolg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung erfolgreich gelöscht!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Successfully deleted excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'foto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Foto',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Picture',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'summe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Summe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sum',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorStartAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim dem Versuch eine neue Anwesenheitskontrolle zu starten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when trying to start a new attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorAnwStartAndEndSet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Beginn und Ende der Anwesenheitskontrolle müssen gesetzt sein!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The start and end of the attendance check must be set!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleBeendet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle erfolgreich beendet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance check successfully finished',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteQRCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch den QR Code zu löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Something went wrong with deleting the QR Code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'deleteAnwKontrolleConfirmation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle erfolgreich gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance check successfully deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'deleteAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noAnwKontrolleFoundToDelete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Anwesenheitskontrolle gefunden zu löschen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance check found to delete!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeletingAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen der Anwesenheitskontrolle!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error deleting an attendance check!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorValidateTimes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Enddatum muss nach dem Startdatum liegen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The end date must be after the start date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zugangscode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangscode',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access code',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwUserDeleteSuccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitseinträge erfolgreich gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances deleted successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorAnwUserDelete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch Anwesenheitseinträge zu löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error deleting Attendances',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwUserUpdateSuccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitseinträge erfolgreich aktualisiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances updated successfully.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorAnwUserUpdate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch Anwesenheitseinträge zu aktualisieren.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error updating Attendances',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorLoadingAnwesenheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch Anwesenheitsdaten zu laden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error loading attendancy data.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'warningEnterVonZeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte von Zeit eingeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter a from time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'warningEnterBisZeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte bis Zeit eingeben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please enter a by time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'warningChooseFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte Datei auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please choose a file',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungUploaded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung hochgeladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note uploaded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorEntschuldigungUpload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch eine Entschuldigung hochzuladen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error uploading an excuse note!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'addEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noDataAvailable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Daten verfügbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No data available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noExistingKontrolleFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Anwesenheitskontrolle gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No existing attendance check found.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDegeneratingQRCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim degenerieren des QRCode',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error degenerating QRCode',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorSavingNewQRCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim anlegen eines neuen QRCode',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error saving a new QRCode',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteKontrolleKeineLEAnDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Anwesenheitskontrolle gefunden für LV-Teil {le_id} am {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance check found for teaching unit {le_id} on {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteUserAnwEntriesAnDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen der User Anwesenheiten für LV-Teil {le_id} am {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error deleting User Anwesenheiten for teaching unit {le_id} on {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteKontrolleEntryAnDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen der Anwesenheitskontrolle für LV-Teil {le_id} am {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error deleting attendance check for teaching unit {le_id} on {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'successDeleteKontrolleEntryAnDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschen der Anwesenheitskontrolle für LV-Teil {le_id} am {day}.{month}.{year} erfolgreich.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Success deleting attendance check for teaching unit {le_id} on {day}.{month}.{year}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'wrongParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falsche Parameterübergabe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Wrong parameters transferred',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'missingParameters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unvollständige Parameterübergabe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parameters are missing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorInvalidCode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiger Zugangscode eingegeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Wrong access code entered.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeLinkedToInvalidKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangscode hat eine fehlerhafte Anwesenheitskontrolle hinterlegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access code is linked to an invalid attendance check.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeLinkedToInvalidLE',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangscode hat einen fehlerhaften LV-Teil hinterlegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access code is linked to an invalid teaching unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorLEhasNoStudentsAttending',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teil des Zugangscodes hat keine Teilnehmer hinterlegt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching unit linked to access code has no participants.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorNotParticipantOfLE',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind nicht als Teilnehmer des LV-Teil eingetragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not registered as a participant in the teaching unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorNoUserEntriesForAttendanceCheckFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Anwesenheitseinträge gefunden für den LV-Teil an diesem Datum.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance entries found for the teaching unit on this date.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorUpdateUserEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eintrag der Anwesenheit fehlgeschlagen, bitte wenden Sie sich an den Unterrichtenden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance entry failed, please contact the instructor.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorPersonStudentIDMismatch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehlerhafte Verbindung von Person und Student ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Person und Student ID Mismatch.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'successDeleteEnschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung erfolgreich gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Successfully deleted excuse note.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCalculatingAnwQuota',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei der Berechnung der Anwesenheitenquote.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error calculating attendancy quota.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteSingleAnwUserEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch den Anwesenheitseintrag zu löschen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error trying to delete the attendancy entry.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorDeleteMultipleAnwUserEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch die Anwesenheitseinträge zu löschen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error trying to delete the attendancy entries.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorNoSTGassigned',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Studiengänge zugewiesen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No study programs assigned.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anteilAnw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anteil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Percentage',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorUpdateEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei dem Versuch Entschuldigungsstatus zu verändern.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error when trying to change excuse note status.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'successUpdateEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigungsstatus erfolgreich aktualisiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note status successfully updated.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'lehreinheitConfig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teil auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Configurate teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'keineAnwkontrolleMöglichWeilLEFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Anwesenheitskontrolle möglich weil ihnen im System keine LV-Teile für diese Lehrveranstaltung zugewiesen sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance check possible because no teaching units are assigned to you in the system for this course.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwByLva',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten für {lva}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendancies for {lva}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwByStg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten für {stg}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendancies for {stg}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwByLe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheiten für {le}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendancies for {le}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'leLaden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Teil laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Load teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeSentInTimeOutsideKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Zugangscode wurde außerhalb der Kontrollzeiten gesendet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The access code has been sent outside the time of the attendance check.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorNoRightsToChangeData',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehlende Berechtigung um den Datenstand zu verändern.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Missing authorization rights to change data.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Zugangscode ist zeitlich abgelaufen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The access code has expired.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorCodeTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Zugangscode ist zeitlich abgelaufen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The access code has expired.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'profil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Profil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'profile',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'admin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigungsmanagement',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'excuse note management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'allowed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktuell prüfbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'allowed to test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentLaden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student laden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Load Student.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'students',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studenten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termineV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht laut LV-Plan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson as per Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termineLautStundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht laut LV-Plan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lessons as per Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'unterrichtDauer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht Dauer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson Duration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungNotizAblehnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung Ablehnen Begründung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse note rejection reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'reject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ablehnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reject',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'begruendungAnw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noStudentsFoundV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine zugeteilten Studenten für Mitarbeiter {0} in dem gewählten LV-Teil {1} gefunden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No assigned students for employee {0} in the selected teaching unit {1} found!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolldatumV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Check Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrollen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrollen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Checks',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'showAllKontrollen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Kontrollen anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show All Attendance Checks',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'deletableKontrollen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschbare Anwesenheitskontrollen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deletable Attendance Checks',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwInfoKeineKontrollenGefunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Kontrollen zum LV-Teil gefunden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No digital attendance checks found for teaching unit!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'digiAnw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Digitale Anwesenheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Digital Attendances',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwNotizUpdated',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz wurde erfolgreich bearbeitet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note has been edited sucessfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'errorInvalidFiletype',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiges Dateiformat!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid Filetype!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwCountTermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesend am gewählten Termin',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attending at date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'minuten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Minuten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'minutes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'einheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Einheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'prestudentID',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudent ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prestudent ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'allowedEntschuldigungFileTypes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erlaubte Dateitypen sind .pdf, .png und .jpg.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Allowed file types are .pdf, .png und .jpg.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'notAuthorizedForLva',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung für die Lehrveranstaltung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Authorization for that Course.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'notAuthorizedForLe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung für die Lehreinheit.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Authorization for that Teaching Unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noAuthorization',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Berechtigung.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Authorization.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrollDauerUnterMindestwert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrolle muss für eine Unterrichtsdauer von mindestens {0} Minuten gelten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance check must apply for a lesson duration of at least {0} minutes.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zeitNichtAusStundenplanBeginnV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtbeginn entspricht keinem Unterrichtstermin laut LV-Plan.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lecture Begin Time does not match a lesson as per timetable.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'zeitNichtAusStundenplanEndeV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtende entspricht keinem Unterrichtstermin laut LV-Plan.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lecture End Time does not match a lesson as per timetable.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'datumNichtAusStundenplanV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum entspricht keinem LV-Plan Termin.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date does not match a lesson as per timetable.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleTimeOverlap',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontrollzeiten überlappen mit Kontrolle von {0} bis {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Times overlap with attendance check from {0} to {1}.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'keineKontrollenAnDatumFallback',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Kontrollen an {0} gefunden, es werden alle Kontrollen angezeigt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No attendance checks found on {0}, all attendance checks are being shown.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'noLePreselectTermineTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine intelligente LV-Teil Vorauswahl möglich, da sämtliche Termine außerhalb des erlaubten Kontrollzeitraums liegen. Bitte wählen Sie sorgfältig den gewünschten LV-Teil aus.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No intelligent pre-selection of teaching unit is possible, as all dates fall outside the permitted control period. Please carefully select the desired teaching unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipStudentEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie können eine Entschuldigung für einen Zeitraum von bis zu {0} Tagen in die Vergangenheit und bis zum Ende des aktuellen Semesters hochladen. Die erlaubten Dateitypen für das Dokument sind .pdf, .png und .jpg.
+
+				Sobald Sie eine Entschuldigung hochladen wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde können Sie den Eintrag nichtmehr löschen.
+
+				Bei einer akzeptierten Entschuldigung werden sämtliche digitalen Anwesenheiten in diesem Zeitraum als positiv gewertet. Eine abgelehnte Entschuldigung hat keine Auswirkungen auf ihre Anwesenheitsquote.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You can upload an excuse for a period of up to {0} days in the past and up to the end of the current semester. The permitted file types for the document are .pdf, .png and .jpg.
+
+				As soon as you upload an excuse, the relevant study program assistant will be informed and your request will be reviewed. As long as your excuse has not yet received an accepted or rejected status, you are free to delete this file including it. Once it has either been accepted or rejected, you can no longer delete the entry.
+
+				If an excuse is accepted, all digital attendance during this period is counted as positive. A rejected excuse has no effect on your attendance rate.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipStudentAnwesenheit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hier sehen Sie sämtliche digitale Anwesenheiten zugeordnet nach Lehrveranstaltung. Sie können eine positive Anwesenheit erreichen, indem Sie den während einer laufenden Anwesenheitskontrolle gültigen Zugangscode eintragen. Sie können hierfür den angezeigten QR Code scannen, welcher Sie entsprechend weiterleitet oder Sie können den Code manuell eingeben.
+
+				Sollte es Ihnen technisch nicht möglich sein einen Zugangscode einzugeben, können Sie die unterrichtende Person bitten Ihre digitale Anwesenheit zu setzen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Here you can see all digital attendances assigned to the course. You can achieve positive attendance by entering the access code that is valid during an ongoing attendance check. You can do this by scanning the QR code displayed, which will redirect you accordingly, or you can enter the code manually.
+
+				If it is not technically possible for you to enter an access code, you can ask the person teaching you to set your digital attendance.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipAssistenzV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Im Entschuldigungsmanagement können Sie als Studiengangsassistenz beziehungsweise als Administrator die von Studenten hochgeladenen Entschuldigungsdokumente überprüfen und den Status entsprechend vergeben.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'In the excuse management, you as a course assistant or administrator can check the excuse documents uploaded by students and assign the status accordingly.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipLektorDeleteKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sollten Sie eine Anwesenheitskontrolle fälschlicherweise gestartet haben, können Sie diese löschen wenn sie nicht älter als {0} Tage ist. Dabei werden sämtliche mit dieser Kontrolle verknüpfte Anwesenheitseinträge Ihrer Studenten ebenfalls gelöscht und Ihre Anwesenheitsquoten neu berechnet.
+
+				Sollten Sie eine Kontrolle, welche älter als {0} Tage ist, löschen wollen, wenden Sie sich an einen Administrator.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If you have started an attendance check by mistake, you can delete it if it is not older than {0} days. All attendance entries of your students linked to this check will also be deleted and your attendance rates will be recalculated.
+
+				If you want to delete a check that is older than {0} days, contact an administrator.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipLektorStartKontrolleV4',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Um eine Anwesenheitskontrolle für Ihre ausgewählte Unterrichtsgruppe durchzuführen, wählen Sie bitte einen Termin aus dem LV-Plan aus oder geben händisch die gewünschte Gültigkeitkeitsdauer der Kontrolle an.
+
+				Die Gültigkeitsdauer bestimmt die Gewichtung der Anwesenheit in Relation zum Gesamtausmaß, sie können diese aber nach eigenem Ermessen anpassen und müssen sich nicht streng an die Termine im LV-Plan halten.
+
+				Sie können pro Datum und Unterrichtsgruppe mehrere Anwesenheitskontrollen am Tag durchführen, solange sich diese nicht in Ihren Zeiten überschneiden und eine Mindestlänge von {0} Minuten beträgt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To carry out an attendance check for your selected class group, please select a date from the timetable or manually enter the desired validity period of the check.
+
+				The validity period determines the weighting of attendance in relation to the overall extent, but you can adjust this at your own discretion and do not have to stick strictly to the dates in the timetable.
+
+				You can conduct multiple attendance checks per day per date and lesson group, as long as they do not overlap in your times and are at least {0} minutes long.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipStudentByLva',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In dieser Detailansicht können Sie einzelne Anwesenheiten eines Studenten bearbeiten, falls ein anwesender Student aus technischen Gründen den Zugangscode nicht eingeben kann. Ebenso steht es Ihnen frei Studenten auszutragen, welche nicht anwesend sind aber den Zugangscode mit Hilfe von anwesenden Studenten erhalten haben.
+
+				Falls eine Anwesenheit durch eine akzeptierte Entschuldigung entstanden ist, können Sie den Status nicht verändern.
+
+				Es steht Ihnen frei die Anwesenheitseinträge mit Notiztexten zu versehen, welche dem Studenten nicht zugänglich sind.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'In this detailed view, you can edit individual attendances of a student if a student who is present cannot enter the access code for technical reasons. You are also free to remove students who are not present but have received the access code with the help of students who are present.
+
+				If an attendance was made due to an accepted excuse, you cannot change the status.
+
+				You are free to add notes to the attendance entries that are not accessible to the student.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipStudentTestphase',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis: Es handelt sich um einen nicht repräsentativen Testbetrieb und die Ergebnisse werden nicht für die Benotung herangezogen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note: This is a non-representative test operation and the results are not used for grading.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'digiAnwEval',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Digitale Anwesenheiten Auswertung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Digital Attendances Evaluation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwTimelineV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Digitale Anwesenheiten Timeline EXPERIMENTELL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Digital Attendances Timeline EXPERIMENTAL',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentenInLVTeil',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studenten in LV-Teil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Students in teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungEdit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Excuse Note Edit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'file',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'excuseUploadNoFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument wird nachgereicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document will be submitted later',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'entschuldigungEditieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Excuse Note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'missingEntschuldigungFile',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehlendes Dokument!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Missing Document!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwKontrolleBis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson until',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'termineAusStundenplanV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterricht Termine laut LV-Plan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson dates according to timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipUnterrichtZeitCustomV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeiten werden aus dem LV-Plan geladen, überschreiben Sie diese nur falls Ihre tatsächliche Unterrichtszeiten davon abweichen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson times are loaded from the timetable, only overwrite them if your actual lesson times differ!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipUnterrichtDatumCustomV2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtsdaten werden aus dem LV-Plan geladen, überschreiben Sie dieses nur falls Ihr tatsächliches Unterrichtsdatum abweicht!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Class dates are loaded from the timetable, only overwrite this if your actual class date differs!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'unterrichtzeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lesson Times',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'statusLegende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status Legende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status Legend',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'download',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herunterladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'upload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'providedDateTooOld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angegebenes Datum ist älter als erlaubt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Provided date is older than allowed date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleDatumOutOfRange',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum liegt außerhalb der erlaubten Kontrollspanne!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date is outside the permitted control range!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'alertBetreuungSelected',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der ausgewählte LV-Teil hat die Lehrform Betreuung! Bitte überprüfen sie die korrekte Auswahl des LV-Teils um fehlerhafte Kontrollen zu vermeiden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The selected course component is taught in a supervised format! Please check that you have selected the correct course component to avoid incorrect assessments!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'editEntschuldigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entschuldigung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Excuse note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwUserEntry',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitseintrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance Entry',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'antragsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Antragsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Application date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'fileuploaddatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'FileUpload-Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'File upload date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'highlightsettings',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datumsmarkierung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Date Highlighting',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'editAnwKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheitskontrolle bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Attendance Checks',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipAnwTimeline',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die "Digitale Anwesenheiten Timeline" ist ein experimentelles feature, welches eine zeitliche Visualisierung von Entschuldigungszeiträumen und Kontrollzeiträumen im Kontext eines Studenten anzeigt.
+
+					Wenn Sie auf eine aufgelistete Entschuldigung oder Kontrolle klicken, versucht die Timeline diese zu finden, falls diese im angegebenen Zeitraum liegt, welcher standardmäßig das gesamte aktuelle Jahr beträgt. Sie können diese Grenzen manuell anpassen.
+
+					Wenn man innerhalb der Timeline scrollt, ändert sich der visuelle Abstand zwischen einzelnen Tagen.
+
+					Bei Klick auf eine gerenderte Datumsreichweite in der Timeline, listet sich oben rechts eine Liste von zugehörigen Attributen auf, welche Administratoren und Entwicklern in Fehlerfällen helfen sollen den Zustand der digitalen Amwesenheiten im Kontext eines Studierenden nachzuvollziehen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The "Digital Attendance Timeline" is an experimental feature that displays a temporal visualization of excuse periods and check-in periods in the context of a student.
+
+					When you click on a listed excuse or check-in period, the timeline attempts to find it if it falls within the specified period, which by default is the entire current year. You can adjust these boundaries manually.
+
+					Scrolling within the timeline changes the visual spacing between individual days.
+
+					Clicking on a rendered date range in the timeline displays a list of associated attributes in the upper right corner. These attributes are intended to help administrators and developers understand the status of digital attendance in the context of a student in case of errors.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolleRestart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Kontrolle wiederholen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Restart attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipLegende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Status Legende für das Digitales Anwesenheiten und Entschuldigungsmanagement anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show status legend for the digital attendance and excuse note management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipCsv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Tabelle als CSV Datei exportiern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Export table as CSV file',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipEdit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheitskontrollen bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit attendance checks',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipSaveChanges',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Manuell veränderte Anwesenheiten speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save manually edited attendance entries',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipRestartKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Bestehende Anwesenheitskontrolle neu starten. Studierende, welche bereits gültig registriert sind, gelten weiterhin als anwesend!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Restart existing attendance check. Students who are already validly registered will continue to be considered present!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipDeleteKontrolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheitskontrolle löschen. Die dazugehörigen Statuseinträge der Studierenden werden auch gelöscht!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete attendance checks. The corresponding student status entries will also be deleted!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipEditKontrollzeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Zeitgrenzen einer Kontrolle bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit time limits of an attendance check',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'anwesenheit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipAssistenzVonDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Untere Datumsgrenze für das Laden von Entschuldigungsdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lower date limit for the data loading of excuse notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'tooltipAssistenzBisDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Obere Datumsgrenze für das Laden von Entschuldigungsdaten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upper date limit for the data loading of excuse notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//
+	// DIGITALE ANWESENHEITEN PHRASEN END
+	//
+	// BOOKMARK PHRASEN ----------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'newLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuer Link',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'saveLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'editLink',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkDeleted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkAdded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link hinzugefügt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link added',
 				'description' => '',
 				'insertvon' => 'system'
 			)
 		)
 	)
+	,array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkAdded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link hinzugefügt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link added',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
+	,array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'bookmarkUpdated',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Link geändert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Link updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'myBookmarks',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meine Urls',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'My Urls',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'emptyBookmarks',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Du hast noch keine Bookmarks gesetzt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You have not set any bookmarks yet',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'invalidUrl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiger Link',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid link',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'invalidTitel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültiger Titel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareUndLizenzManagement',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software- und Lizenzmanagement',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software- and License Management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'raumzuordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raumzuordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Location Assignment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'raum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'statusSetzen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status setzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Set status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'hierarchieAnsicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hierarchie-Ansicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hierarchy view',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'aufgeklappt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'aufgeklappt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'unfolded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zugeklappt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'zugeklappt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'folded',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserver',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserver',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License server',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareZuordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software-Zuordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software assignment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'zuordnungUeberSoftware',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuordnung über Software',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assignment via Software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'zuordnungUeberImage',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zuordnung über Image',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assignment via Image',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verfuegbarkeitBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfügbarkeit bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit availability',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareimageUndZugeordneteRaeumeKopieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareimage und zugeordnete Räume kopieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Copy software image and assigned rooms',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareimageAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareimage anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add Softwareimage',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'imageAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Image auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select image',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareimageBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareimage bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Softwareimage',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'raumZuImageAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raum zu Image anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add location to image',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'raumZuImageBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raum zu Image bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit location assigned to image',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserverAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserver anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add license server',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserverBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserver bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit license server',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'bezeichnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'betriebssystem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebssystem',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Operating System',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verfuegbarkeitStart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfügbarkeit Start',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Availability start',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verfuegbarkeitEnde',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verfügbarkeit Ende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Availability end',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwaretyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwaretyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Softwaretype',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwaretypKurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwaretyp Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Softwaretype short',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareKurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'hersteller',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hersteller',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Producer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verantwortliche',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verantwortliche',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Responsible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'uebergeordneteSoftware',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übergeordnete Software',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parent Software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ansprechpartner',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ansprechpartner',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ansprechpartnerIntern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ansprechpartner intern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact person internal',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ansprechpartnerExtern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ansprechpartner extern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact person external',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'anmerkungIntern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anmerkung intern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Internal note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'zugeordneteImages',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugeordnete Images',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assigned images',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Art',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserverKurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserver-Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Licenseserver',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserverPort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserver Port',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License server port',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'raumSwZuordnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raum-/SW-Zuordnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Location-/SW Assignment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzAnzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Anzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzLaufzeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Laufzeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License term',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'kostentraegerOe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kostenträger-OE',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Cost unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzKosten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Kosten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License costs',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'euroProJahr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '€/Jahr',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '€/year',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'alleWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software Management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'imageverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Imageverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Image Management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzserververwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenzserververwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Licenseserver Management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'sucheNachRaum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Suche nach Raum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search by location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'existiertBereits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Existiert bereits',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Already exists',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'datumEndeVorDatumStart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datumende vor Datumstart',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Enddate after startdate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'ui',
+		'phrase' => 'existiertBereitsInKombinationMitDerVersion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Existiert bereits in Kombination mit der Version',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Already exists in combination with the Version',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'ui',
+		'phrase' => 'nichtGleichzeitigUntergeordnetUndUebergeordnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software kann einer anderen Software nicht gleichzeitig untergeordnet und übergeordnet sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software cannot be both subordinate and superior to other software at the same time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'imageverwaltungImageCopySuccessText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Falls vorhanden, wurden zugeordnete Räume mitkopiert. Nicht jedoch zugeordnete Software. Diese muss dem neuen Image über die Softwareverwaltungstabelle zugeordnet werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If available, assigned rooms were also copied. However, not associated software. This must be assigned to the new image via the software management table.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'loeschenNichtMoeglichSoftwareBereitsZugeordnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschen nicht möglich, da bereits Software zugeordnet wurde.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deletion not possible because software has already been assigned.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'zeilenAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeilen auswählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select rows',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'statusErfolgreichUebertragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status erfolgreich übertragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status successfully transferred',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'statusUebertragenMsg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Status {status} wurde erfolgreich von der übergeordneten Software mit ID {parentSoftware} auch auf die untergeordnete Software übertragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status {status} has been successfully transferred from the parent software with ID {parentSoftware} to the child software.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareliste',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareliste',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Softwarelist',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'raumverfuegbarkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raumverfügbarkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Room Availability',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'firma_zusatz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Firmenzusatz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'add.company info',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'firma',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Firma',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresse_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'create address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresse_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresse_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete address',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'adresse_confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Adresse wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete address?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontakt_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontakt anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'create contact data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontakt_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontakt bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit contact data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontakt_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontakt löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete contact data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'kontakt_confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontakt wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete contact data?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'privatkonto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Privatkonto',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Private account',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'firmenkonto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Firmenkonto',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Company Account',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankvb_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'create bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankvb_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankvb_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete bank details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bankvb_confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bankverbindung wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete bank details?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//Status
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_rolle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Rolle',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'role',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuen Status hinzufügen ({vorname} {nachname})',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'add new status ({vorname} {nachname})',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bearbeiten ({vorname} {nachname})',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit status ({vorname} {nachname})',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bestaetigt_am',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigt am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirmed on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bestaetigt_von',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigt von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirmed by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'insert_am',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InsertAmUm',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inserted on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'insert_von',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InsertVon',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inserted by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bewerbung_abgeschickt_am',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bewerbung abgeschickt am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'application sent on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'aufnahmestufe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufnahmestufe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'entrance level',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'meldestichtag_erreicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag erreicht - Bearbeiten nicht mehr möglich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'report target date reached - editing no longer possible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'status_confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudentstatus wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete prestudent status?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+			'app' => 'core',
+			'category' => 'lehre',
+			'phrase' => 'last_status_confirm_delete',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Das Löschen der letzten Rolle löscht auch den gesamten Prestudent-Datensatz! Möchten Sie fortfahren?',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Deleting the last role also deletes the entire Prestudent record! Do you want to continue?',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_askAusbildungssem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In welches Ausbildungssemester soll dieser {status} verschoben werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To which education semester should this {status} be moved?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_askAusbildungssemPlural',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'In welches Semester sollen diese {count} PrestudentInnen ({status})verschoben werden?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To which education semester should these {count} prestudents ({status}) be moved?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//Prestudent
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'title_zgv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zugangsvoraussetzungen für ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access requirements for ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMaster',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterOrt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Ort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master place',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterNation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master Nation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvMasterErfuellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Master erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV master fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorOrt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Ort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor place',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorDatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Datum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorNation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor Nation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'zgvDoktorErfuellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZGV Doktor erfüllt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ZGV doctor fulfilled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'aufmerksamDurch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufmerksam durch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'been brought to attention by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'berufstaetigkeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Berufstätigkeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'professional activity',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'facheinschlaegigBerufstaetig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Facheinschlägig berufstätig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'employed in a relevant field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'bisstandort',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bisstandort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'bis location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'studientyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studientyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'study type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'dual',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Duales Studium',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'dual study',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'foerderrelevant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'förderrelevant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'relevant for funding',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'prioritaet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Priorität',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'priority',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'title_history',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamthistorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overall history',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keineSchreibrechte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben keine Schreibrechte für diesen Studiengang!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have writing rights for this course!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+			'app' => 'core',
+			'category' => 'lehre',
+			'phrase' => 'error_rolleBereitsVorhanden',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Diese Rolle ist bereits vorhanden!',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'This role already exists!',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_rolleBereitsVorhandenMitNamen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Diese Rolle ist bereits vorhanden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: This role already exists!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_personBereitsStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Diese Person ist bereits Student!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: This person already is student!',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinReihungstestverfahren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Person das Reihungstestverfahren abgeschlossen haben!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant the person must have completed the ranking test process!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_ZGVNichtEingetragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung eingetragen sein!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant, the entry requirements must be entered!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_ZGVMasterNichtEingetragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name}: Um einen Interessenten zum Bewerber zu machen, muss die Zugangsvoraussetzung Master eingetragen sein!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name}: In order to turn an interested party into an applicant, the entry requirements for master studies must be entered!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinBewerber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name} muss zuerst zum Bewerber gemacht werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name} must be made an applicant first!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_keinAufgenommener',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{name} muss zuerst Aufgenommener sein, um zum Studenten gemacht werden zu können!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{name} must first be admitted in order to be made a student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_lastBewerberAndAufgenommenerSemesters',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Studiensemester oder Ausbildungsemester des Berwerberstatus und des Aufgenommenenstatus passen nicht überein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The study semester or training semester of the applicant status and the accepted status do not match',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStudstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ein Studentenstatus kann hier nur hinzugefuegt werden wenn die Person bereits Student ist. Um einen Bewerber zum Studenten zu machen waehlen Sie bitte unter "Status aendern" den Punkt "Student"',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status can only be added here if the person is already a student. To turn an applicant into a student, please select "Student" under "Change status".',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_dataVorMeldestichtag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentstatus mit Datum oder Semesterende vor erreichtem Meldestichtag kann nicht hinzugefügt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student status with a date or end of semester before the reporting deadline cannot be added',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_duringInsertUpdateLehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Ermitteln bzw Aktualisieren des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert or update of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_duringDeleteLehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Löschen des Lehrverbands: es wurden keine Änderungen in der Datenbank gespeichert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during deletion of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_onlyAdminDeleteRolleStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studentenrolle kann nur durch den Administrator geloescht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert or update of Lehrverband: no changes were saved in the database',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_onlyAdminDeleteLastStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die letzte Rolle kann nur durch den Administrator geloescht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The last role can only be deleted by the administrator',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStatusFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler: Status nicht gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Status not found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_statusConfirmedYet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der Status ist bereits bestätigt!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The status is already confirmed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_bewerbungNochNichtAbgeschickt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Bewerbung wurde noch nicht abgeschickt und kann deshalb nicht bestaetigt werden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The application has not yet been sent and therefore cannot be confirmed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_missingId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Id {id} nicht gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Missing Id {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'error_deleteHomeAdress',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Heimatadressen dürfen nicht gelöscht werden, da diese für die BIS-Meldung relevant sind. Um die Adresse dennoch zu löschen, entfernen sie das Häkchen bei Heimatadresse!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Home addresses may not be deleted as they are relevant for the BIS report. To delete the address anyway, uncheck the home address box!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_statusVorruecken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status vorrücken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'advance status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_confirmStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bestätigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'confirm status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_editStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btn_deleteStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	// Betriebsmittel begin
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successSave',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Speichern erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Successfully saved',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successDelete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschen erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successAdvance',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorrückung Status erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Advance status successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successConfirm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bestätigung Status erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirmation status successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resources',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'betriebsmittel_confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really delete operating resource?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'add_betriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'create operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'edit_betriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'edit operating resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'inventarnummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Inventarnummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'inventory number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'nummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'ausgegebenam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausgegeben am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'issued on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'retouram',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Retour am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'returned on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'retourdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Retourdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'return date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'ausgabedatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausgabedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'issue date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'error_zutrittskarteOhneNummer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eine Zutrittskarte muss eine Nummer haben. Um die Zuordnung zu dieser Karte zu löschen entfernen Sie bitte den ganzen Datensatz!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An access card must have a number. To delete the assignment to this card, please remove the entire data record!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'error_bmZutrittskarteOccupied',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Zutrittskarte ist bereits ausgegeben an: {vorname} {nachname} ({uid})',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This access card has already been issued to: {vorname} {nachname} ({uid})',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'error_inventarWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte wählen Sie das entsprechende Inventar aus dem Drop Down Menü Inventarnummer aus!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select the appropriate inventory from the inventory number drop down menu!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'wawi',
+		'phrase' => 'error_retourdatumVorAusgabe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Retourdatum darf nicht vor Datum der Ausgabe liegen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The return date must not be before the issue date!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Betriebsmittel end
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareanforderung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareanforderung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software Request',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwarebereitstellungSubtitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwarebereitstellung für die Lehre',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software delivery for Education',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungenUndLizenen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Softwareanforderungen & Lizenzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software Requirements & Licenses',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachSw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Software',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Software',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachLv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach LV',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swNichtGefundenHierBestellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software nicht gefunden?<br>Hier bei IT-Services bestellen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software not found?<br>Order here from IT Services",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'bereitsAngefordert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bereits angefordert",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Requested already",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'mindEineZuorndungExistiertBereits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Mindestens eine Zuordnung existiert bereits.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "At least one assignment already exists.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swFuerLvAnfordern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software für LV anfordern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Request software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swWurdeBereitsAngefordert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software wurde bereits angefordert",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software has already been requested",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungUeberAuswahlVonSw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung über die Auswahl von Software",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements based on the Selection of Software",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungUeberAuswahlVonLvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung über die Auswahl von Lehrveranstaltungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements based on the Selection of Courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzAnzahlNeu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lizenz-Anzahl NEU",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "License Number NEW",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzanzahlAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Lizenzanzahl ändern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Change Number of Licenses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'eingabeFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Eingabe fehlt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Input missing",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'unveraendert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Unverändert",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Unchanged",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungenVorruecken',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Anforderungen vorrücken",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Take over Requirements",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'vorrueckenInStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Vorrücken in Studiensemester",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Take over to semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anteiligInProzent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Anteilig in %",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Percentage share",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'verwalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Verwalten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Administrate",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvTemplatesVerwalten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "LV Templates verwalten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Administrate Course Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvTemplatesUebersicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "LV Templates Übersicht",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Course Templates Overview",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 CORE/konto
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'buchung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'buchungsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchungsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'buchungstext',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchungstext',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking text',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'betrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Amount',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'buchungstyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchungstyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'buchungsnr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchungs Nummer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'mahnspanne',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mahnspanne',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dunning margin',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'credit_points',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Credit Points',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Credit Points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'reference',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zahlungsreferenz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Payment reference',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'confirm_overwrite',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es ist bereits eine Buchung vorhanden:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'A booking already exists:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'confirm_overwrite_1_add_pers',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'und einer weiteren Person.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'and one additional person.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'confirm_overwrite_x_add_pers',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'und {x} weiteren Personen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'and {x} additional persons.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'confirm_overwrite_proceed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Trotzdem fortfahren?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Proceed anyway?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'error_missing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchung #{buchungsnr} existiert nicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Booking #{buchungsnr} does not exist',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'error_counter_level',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gegenbuchungen koennen nur auf die obersten Buchungen getaetigt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Offsetting bookings can only be made on the top bookings',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'konto',
+		'phrase' => 'error_delete_level',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte zuerst die zugeordneten Buchungen löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please delete the assigned bookings first',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 CORE/stv
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'action_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'InteressentIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Candidate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'warn_removed_favs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zu viele Favoriten! Die folgenden Einträge wurden entfernt: {items}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Too many favorites! The following entries were removed: {items}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_details',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Details',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_notes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notizen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_contact',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kontakt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contact',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PreStudentIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prestudent',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_status',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'State',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_banking',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Konto',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Banking',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_resources',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Resources',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_grades',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grades',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_exam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// konto
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_title_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Buchung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Booking',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_title_new_multi',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Buchung ({x} Studenten)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Booking ({x} Students)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_title_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchung #{buchungsnr} bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Booking #{buchungsnr}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_counter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gegenbuchen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Counter-book',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_payment_confirmation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zahlungsbestaetigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Payment confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_filter_count_0',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Liste filtern auf nicht belastet:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter list to not charged:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_filter_missing_counter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Liste filtern auf fehlende Gegenbuchungen:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter the list for missing offsetting entries:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_all_types',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle Buchungstypen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'all booking types',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_filter_open',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur offene anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Display only open',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'konto_filter_current_stg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur aktuellen Studiengang anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Display only current Degree Program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// status
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'status_confirm_popup',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diesen Status bestaetigen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirm this status?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// document
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'document_certificate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zertifikat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Certificate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'document_coursecertificate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV Zeugnis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course certificate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'document_download',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'document_archive',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Archivieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Archive',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'document_signed_and_archived',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument signiert und archiviert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document signed and archived',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// grades
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_zeugnis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeugnis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Certificate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_takeoverdate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übernahmedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Takeover date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_gradingdate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Benotungsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grading date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_approvaldate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Freigabedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approval date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_numericgrade',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note (Numerisch)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade (numeric)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_studiengang_lv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengang (Lehrveranstaltung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Degree-program (Course)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_studiengang_kz_lv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangskennzahl (Lehrveranstaltung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study program number (Course)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_semester_lv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Semester (Lehrveranstaltung)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester (Course)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_points',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Punkte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_lehrveranstaltung_bezeichnung_english',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungsname Englisch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Coursename english',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_setgrade',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note setzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Set grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_updated',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note gesetzt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade set',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_title_zeugnis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeugnis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Certificate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_title_teacher',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LektorIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lector',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_title_repeater',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wiederholer',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Repeater',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_action_copy',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übernehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Transfer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_sign',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Diese Vorlage darf nicht signiert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This template must not be signed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_archive',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieses Dokument ist nicht archivierbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This document cannot be archived',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_overwrite',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht überschreibbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not overwritable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_lehreinheit_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Ermitteln der Lehreinheit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error determining the Teaching Unit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'grades_error_prestudentstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn hat keinen Status in diesem Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has no status this semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	//****************************	 CORE/document_export
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_unoconv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unoconv nicht gefunden - Bitte installieren sie Unoconv',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unoconv not found - Please install Unoconv',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_unoconv_version',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unoconv Version konnte nicht ermittelt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Could not get Unoconv Version',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_conv_timeout',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumentenkonvertierung ist derzeit nicht möglich. Bitte versuchen Sie es in einer Minute erneut oder kontaktieren Sie einen Administrator',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document conversion is currently not possible. Please try again in a minute or contact an administrator',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_sign_timeout',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Signaturserver ist derzeit nicht erreichbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Signature server is currently unavailable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_sign_pdf',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Derzeit können nur PDFs signiert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Currently only PDFs can be signed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_outputformat_missing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausgabeformat fehlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Outputformat is not defined',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_template_missing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Vorlage gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No template found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_headers',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Header wurden bereits gesendet -> Abbruch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Header already sent -> Abort',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_file_copy',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kopieren fehlgeschlagen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Copy failed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_file_load',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datei konnte nicht geladen werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unable to load file',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_xml_load',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'XML konnte nicht geladen werden: {url} XML: {xml} PARAMETER: {params}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unable to load xml: {url} XML: {xml} PARAMS: {params}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_xsl_load',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'XSL konnte nicht geladen werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unable to load xsl',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_styles_load',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Styles XSL konnte nicht geladen werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unable to load styles xsl',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'document_export',
+		'phrase' => 'error_manifest',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Manifest ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Manifest file invalid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	//****************************	 CORE/calendar
+	array(
+		'app' => 'core',
+		'category' => 'calendar',
+		'phrase' => 'kw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'W',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'W',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'calendar',
+		'phrase' => 'year_kw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{year} KW {week}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{year} W {week}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'calendar',
+		'phrase' => 'today',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Heute',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'today',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	//****************************	 FHC-Core-SAP
+	array(
+		'app' => 'core',
+		'category' => 'sap',
+		'phrase' => 'error_noBuchung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Buchungsnr #{buchungsnr} is ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Buchungnr #{buchungsnr} is not valid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'sap',
+		'phrase' => 'error_buchungLocked',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Buchung wurde bereits übertragen und darf nicht geändert werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Buchung was already submitted and can not be changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'sap',
+		'phrase' => 'msg_buchung_deleted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Buchungszuordnung SAP geloescht: SalesOrder: {sap_sales_order_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Buchungszuordnung SAP deleted: SalesOrder: {sap_sales_order_id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 FHC-Core-Status
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successNewStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{countSuccess} erfolgreiche Statusänderung(en) auf {status}, {countError} Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{countSuccess} successful status changes to {status}, {countError} errors',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_updateLehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Aktualisierung Lehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert/update lehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noLehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Lehrverband vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: no existing Lehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_updateStudentlehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler bei Aktualisierung Studentlehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error during insert/update Studentlehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStudentlehrverband',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Studentlehrverband vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: no existing Studentlehrverband',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_statuseintrag_zeitabfolge',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ungültige Zeitabfolge der Statuseinträge (Statusdatum oder Semester)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Invalid date order of statuses (date or semester)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_endstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nach Abbrecher- und Absolventenstatus darf kein anderer Status mehr eingetragen werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: No other status may be entered after the dropout and graduate status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_consecutiveUnterbrecher',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufeinanderfolgende Unterbrecher müssen gleiches Ausbildungssemester haben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Successive interrupters must have the same education semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_consecutiveUnterbrecherAbbrecher',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterbrecher und folgender Abbrecher müssen gleiches Ausbildungssemester haben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: interrupter and following dropout must have the same education semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_consecutiveDiplomandStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nach Diplomandenstatus darf kein Studentenstatus mehr eingetragen werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Student status may not be entered after graduate status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Eintrag für Studiensemester vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: no entry for study semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anzahl_existingRoles',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{anzahl} Rollen vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{anzahl} existing roles',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_entryInPast',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Datum eines neuen Statuseintrags darf nicht in der Vergangenheit liegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: The date of a new status entry cannot be in the past',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'btn_statusAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'neuerTerminBachelorMasterbetreuung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Neuer Termin Bachelor-/Masterarbeitsbetreuung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "New date for Bachelor/Master thesis supervision",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'neueTerminserie',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Terminserie anlegen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Create recurring deadline",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'serienTerminEmailSentInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Email über neuen Abgabetermin versendet an: {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Email about new deadline sent to: {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'serienTerminGespeichert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Serientermin wurde erfolgreich eingetragen!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Series dates were successfully entered!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'errorSerienterminSpeichern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fehler beim speichern des Serientermins!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Error saving Series dates!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeMitarbeiterbereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokumentabgabe - Mitarbeiterbereich",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "File submission - Employee area",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'abgabe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abgabe",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submission',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'genericDeleted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{0} gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{0} deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_lastRole',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die letzte Rolle kann nur durch den Administrator gelöscht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: The last role can only be deleted by the administrator',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'info_MeldestichtagStatusgrund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund möglich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reporting deadline reached - only editing status reason possible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'bismeldestichtag',
+		'phrase' => 'info_MeldestichtagStatusgrundSemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldestichtag erreicht - Bearbeiten Ausbildungssemester und Statusgrund möglich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit education semester and status reason possible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_location_combination',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ort, Gemeinde und Postleitzahl passen nicht zusammen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'City, municipality and postcode do not match',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bittePlzWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte gültige PLZ wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select valid postcode',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bitteGemeindeWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte gültige Gemeinde wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select valid municipality',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bitteStandortWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte Standort wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_wrongStatusOrderBeforeStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vor dem Studentenstatus müssen folgende Status eingetragen werden: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Following status should be present before student status: {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_personenkennzeichenPasstNichtZuStudiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personenkennzeichen passt nicht zu Studiensemester des ersten Studentstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: Personenkennzeichen does not fit with semester of first student status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_bewerberOrgformUngleichStudentOrgform',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erster Studentstatus muss gleiche Organisationsform haben wie Bewerberstatus (Studienplan Orgform)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: first student status should have same organisational form as bewerber status (Studienplan)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_benutzerBereitsVorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Benutzer für uid {uid} bereits vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error: User for uid {uid} already exists',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'error_noStatusgrund',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Statusgrund {statusgrundkurzbz} nicht gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Statusgrund {statusgrundkurzbz} not found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_StatusactionSingle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Den Status dieser Person wirklich auf {status} setzen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really set this person\'s status to {status}?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'modal_StatusactionPlural',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Den Status dieser {count} Personen wirklich auf {status} setzen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Really set the status of these {count} people to {status}?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahlAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'userAnzahlNeu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'User-Anzahl NEU',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'NEW User Number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'standardLvTemplate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standard LV-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Standard Course Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachStandardLvTemplate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Standard LV-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Standard Course Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungUeberAuswahlVonStandardisiertenLvTemplates',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung über die Auswahl von standardisierten LV-Templates (Quellkurse)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements based on the Selection of Standardized Course-Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swFuerLvAnfordern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software für LV anfordern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Request software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Betriebsmittel end
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'add_pruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'edit_pruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'delete_pruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'newFromOld_pruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungskopie für neue Prüfung erstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Copy exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'hinweis_kommPrfg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'When creating a new examination before a committee, please enter the date of the grade entry (usually today) to ensure that the deadline for repeating the exam is met correctly.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'keineAuswahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "keine Auswahl",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "no selection",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'hinweis_changeAfterExamDate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ACHTUNG! Diese Prüfungsnote wurde nicht ins Zeugnis übernommen da die Zeugnisnote nach dem Prüfungsdatum verändert wurde',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ATTENTION! This exam grade was not included in the certificate because the certificate grade was changed after the exam date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'bitteLvteilWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte Lv_Teil wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'punkte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Punkte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'exam',
+		'phrase' => 'filter_currentSem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur aktuelles Studiensemester anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Display only current Semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'student_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_printUebernahmebestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übernahmebestätigung drucken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Print acceptance confirmation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_editBetriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'betriebsmittel',
+		'phrase' => 'btn_deleteBetriebsmittel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betriebsmittel löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Resource',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// Betriebsmittel end
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'unbekannt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'unbekannt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'unknown',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorConfigFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Config-Eintrag fehlt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Missing config entry",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorUnbekannteUrl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Unbekannte URL. Seite bzw. Link kann nicht geöffnet werden.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Unknown URL. Cannot open to site or link",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'zuordnungExistiertBereits',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zuordnung existiert bereits.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Assignment already exists.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swFuerLvAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Software für LV ändern",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Change Software for courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'anforderungNachQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anforderung nach Quellkurs',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Request by Course-Template',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerQuellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für Quellkurse",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for Course-Templates",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAnforderungFuerEinzelneLvs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwareanforderung für einzelne Lehrveranstaltungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Requirements for individual Courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwarebereitstellung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Softwarebereitstellung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Software Delivery",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// AMPELN PHRASEN -----------------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'newestAmpeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neueste Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Newest Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'allAmpeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'overdue',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Überfällig: {count}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overdue: {count}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'ampelnDeadline',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stichtag: {value}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline: {value}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'noOpenAmpeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine offenen Ampeln.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No open Ampeln.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'openAmpeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Offene Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Open Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'allMyAmpeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle meine Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All my Ampeln',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'mandatory',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pflicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mandatory',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'ampelBestaetigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ampel bestätigt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Ampel confirmed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+    array(
+		'app' => 'core',
+		'category' => 'ampeln',
+		'phrase' => 'super',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Super!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Super!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// NEWS PHRASEN ---------------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'news',
+		'phrase' => 'allNews',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle News',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All News',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'news',
+		'phrase' => 'topNews',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Top Nachrichten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Top News',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'news',
+		'phrase' => 'noSubject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Betreff vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Subject available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+// CIS4 phrases from legacy code begin
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'studiengangsleitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studiengangsleitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Program Director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'stellvertreter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stellvertretung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deputy Program Director',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'sekretariat',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sekretariat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Administrative Assistant',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'hochschulvertretung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hochschulvertretung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'UAS Representative',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'studentenvertreter',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienvertretung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Degree Program Representative',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'allgemeinerdownload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Allgemeiner Download',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Global Download',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'nichtAngemeldet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie sind nicht angemeldet. Es wurde keine Benutzer UID gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not logged in. No UID found',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lvInfoBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrveranstaltungsinformation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungsinformation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrveranstaltungsmenue',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltungsmenü',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Menu',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrveranstaltungsmenueUnavailable',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Lehrveranstaltungsmenü verfügbar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Course Menu available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'gesamtnote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtnote',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final Grade',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'noteneingabedeaktiviert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Noteneingabe deaktiviert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grading disabled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'keinMailverteiler',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Für die Gruppe(n) {nomail} existiert kein Verteiler! Die Studierenden in diesen Gruppen bekommen kein Mail.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There is no e-mail distribution list for the group(s) {nomail}! The students in these groups will not receive an e-mail.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'mail',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'E-Mail an Studierende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'E-Mail to students',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'abmelden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abmelden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unsubscribe',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anrechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exemption',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anrechnungen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exemptions',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'stundenplan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Plan',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timetable',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'personalGreeting',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "{0}'s persönliches Dashboard",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "{0}'s personal Dashboard",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'myLV',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Meine Lehrveranstaltungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "My Courses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'previousStudSemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Vorheriges Studiensemester",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Previous study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'nextStudSemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nächstes Studiensemester",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Next study semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'abgabetoolTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bachelor-/Masterarbeiten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Bachelor's/Master's theses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4details',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Details",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "details",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Semester",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "semester",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4stg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studiengang",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "degree program",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4kontakt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kontakt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "contact",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4betreuer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Betreuer",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Assessor",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4projekttyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Projekttyp",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "project type",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4titel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Titel",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "title",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeStudentenbereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Dokumentabgabe - Studentenbereich",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "File submission - Student area",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4fixtermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fix",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Fixed",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zieldatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zieldatum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "target date",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabetyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abgabetyp",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Type of document submitted",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabekurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kurzbeschreibung der Abgabe",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Short description of the submitted file",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabedatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abgabedatum",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "submission date",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4aeltereParbeitBenoten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Projektarbeit für älteres Semester, bitte <a href="{0}" target="_blank">Word-Formular zur Benotung</a> verwenden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Thesis handed in for older semester, please <a href="{0}" target="_blank">use word form for assessment</a>!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4fileupload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Fileupload PDF max. 30 MB",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Fileupload PDF max. 30 MB",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4allowedFileTypes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Upload-File ist kein PDF!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Upload-File is not a PDF!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4enduploadZusatzdaten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Endupload Zusatzdaten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Final submission additional data",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4beurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Beurteilung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Evaluation",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4schlagwoerterGer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Deutsche Schlagwörter",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "German Keywords",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4schlagwoerterEng',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Englische Schlagwörter",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "English Keywords",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abstractGer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abstract max 5000 Zeichen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Abstract max 5000 characters",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abstractEng',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Abstract englisch max 5000 Zeichen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Abstract english max 5000 characters",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4seitenanzahl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Seitenanzahl",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Number of pages",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'deadlinesTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Terminübersicht",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Deadline Overview",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4yes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Ja",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Yes",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4no',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nein",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4gelesenUndAkzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Gelesen und akzeptiert",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Read and accepted",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4personenkennzeichen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Personenkennzeichen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Personal identity number",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4vorname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Vorname",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "First Name",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4nachname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nachname",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Last Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'currentlySaving',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Speichern... ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saving... ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'currentlyLoading',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Laden... ",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Loading... ',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4betreuerart',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Betreuerart",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Supervisor type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'showAll',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Alle anzeigen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show All',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'showDeadlines',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Deadlines anzeigen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4eidesstattlicheErklaerung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ich räume der Fachhochschule Technikum Wien das Recht ein, sämtliche übermittelte Dokumente elektronisch zu speichern und zum Zwecke der Langzeitarchivierung unter Beachtung der Bewahrung des Inhalts in andere Formate zu konvertieren.
+					<br><br>
+					Im Falle einer Masterarbeit räume ich der FH Technikum Wien das Recht ein, sie in Datennetzen öffentlich zugänglich zu machen und stimme den bezughabenden <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=284975">Nutzungsbedingungen des Publikationsservers ePub</a> zu.
+					<br><br>
+					Ich bestätige hiermit, dass ich die eidesstattliche Erklärung mittels digitaler Signatur unterzeichnet habe.
+					<a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=214779">Link zum Leitfaden Digitale Signatur</a>.
+					<br><br>
+					Hiermit willige ich ein, dass meine Bachelor- oder Masterarbeit im Zuge der Beurteilung auch mittels (Online)-Tools auf die unerlaubte Verwendung von KI geprüft wird.
+					',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'I grant UAS Technikum Wien the right to store all submitted documents electronically and to convert them into other formats for the purpose of long-term archiving, taking into account the preservation of the content.
+					<br><br>
+					In the case of a Master\'s thesis, I grant UAS Technikum Wien the right to make it publicly accessible in data networks and agree to the related <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=284976">Terms of use for the publication server ePub</a>.
+					<br><br>
+					I hereby confirm that I have signed the affidavit using a digital signature. <a target="_blank" href="https://cis.technikum-wien.at/cms/dms.php?id=215614">Link to the Digital Signature Guide</a>.
+					<br><br>
+					I hereby agree that my bachelor\'s or master\'s thesis will also be checked for unauthorized use of AI using (online) tools as part of the assessment.
+					',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'fachbereich',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Institut',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Institute',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrtyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrtyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+
+	// ### STUDIENGANG_INFORMATIONEN PHRASEN START
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'assistenz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studiengangsassistenz",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "degree program assistant",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'geschaeftsfuehrende_leitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Geschäftsführende Leitung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Managing director",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'stellvertretende_leitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Stellvertretende Leitung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Representative director",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'geschaeftsfuehrende_stellvertretende_leitung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Geschäftsführende / Stellvertretende Leitung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Managing / Representative director",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'Jahrgangsvertretung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Jahrgangsvertretung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Study year representative",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'Studienvertretung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Studienvertretung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Study representative",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studiengangInformation',
+		'phrase' => 'Hochschulvertretung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hochschulvertretung",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "University representative",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### STUDIENGANG_INFORMATIONEN PHRASEN ENDE
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'general',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Allgemein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'General',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'addLine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weitere Zeile hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add another line',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'custom',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Benutzerdefiniert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Custom',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'dashboardGeneralSectionDescription',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hier befinden sich die vordefinierten Widgets',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Here are the predefined widgets',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'dashboardCustomSectionDescription',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hier befinden sich die Widgets Ihrer persönlichen Anpassungen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Here are the widgets of your personal cutomizations',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'dashboardSectionDescription',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hier befinden sich die Widgets der {0} Funktion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Here are the widgets of the {0} function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+// CIS4 phrases from legacy code end
+// FHC4 Phrases Abschlusspruefung
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_finalexam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschlussbeurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussbeurteilung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefer1',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PrüferIn 1',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'examiner 1',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefer2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PrüferIn 2',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'examiner 2',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'pruefer3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'PrüferIn 3',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'examiner 3',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'uhrzeit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Uhrzeit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'time',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'freigabe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Freigabe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Approval',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'sponsion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sponsion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Graduation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschlusspruefung_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Final Examination ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'loeschen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'vorsitz_header',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorsitz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Chair',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'zurBeurteilung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zur Beurteilung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'To the assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'akadGrad',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akademischer Grad',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Academic degree',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'error_studentOhneFinalExam',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Abschlussprüfungen für Student_uid(s) {id} gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No final exams found for Student_uid(s) {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'notekommpruefung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Note komm. Prüfung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade committee exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschluessPruefungAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Final Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abschlusspruefung',
+		'phrase' => 'abschluessPruefungBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abschlussprüfung bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Final Exam',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 Phrases Abschlusspruefung End
+	array(
+		'app' => 'core',
+		'category' => 'gruppenmanagement',
+		'phrase' => 'nichtZumEditierenDerGruppeBerechtigt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Nicht zum Editieren der Gruppe berechtigt",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No authorization for editing the group",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'maprojohneoe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter und Projekt sind der Organisationseinheit nicht zugeordnet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee and project are not assigned to the organizational unit.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lehrauftrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrauftrag',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching lectureship',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'kategorie',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kategorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Category',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'project',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kategorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Category',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lventwicklung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Weiterentwicklung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Development',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'infoandepl/kfl',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Info an DepL/KFL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Info to DepL/KFL:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//////////// FHC4 Phrases Gruppen Start ////////////
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_groups',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Groups',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'gruppenmanagement',
+		'phrase' => 'gruppe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Group',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'gruppenmanagement',
+		'phrase' => 'automatisch_generiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'automatisch generiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'automatically generated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'gruppenmanagement',
+		'phrase' => 'error_deleteGeneratedGroups',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Automatisch generierte Gruppenzuordnungen können nicht gelöscht werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Automatically generated group assignments cannot be deleted.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//////////// FHC4 Phrases Gruppen End ////////////
+
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'wahlname',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Wahlname',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'elective name',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'familienstand',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Familienstand',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'marital status',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'foto',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Foto',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'photo',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'homepage',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Homepage',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'homepage',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'verband',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Verband',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'verband',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'aktiv',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Aktiv',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'active',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'error_no_person',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Keine Person gefunden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'No Person found',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'lehre',
+	'phrase' => 'error_no_student',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Kein/e Student/in gefunden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'No Student found',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'geschieden',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'geschieden',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'divorced',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'ledig',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'ledig',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'single',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'verheiratet',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'verheiratet',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'married',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'person',
+	'phrase' => 'verwitwet',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'verwitwet',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'widowed',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'firma_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Firma ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Company ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'adresse_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Adresse ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Address ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'kontakt_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Kontakt ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Contact ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'standort_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Standort ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Location ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'bankverbindung_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Bankverbindung ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Bankdetails ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'studienplan_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Studienplan ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Studyplan ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'prestudent_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'PrestudentIn ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Prestudent ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'notiz_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Notiz ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Notes ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'notizzuordnung_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Notizzuordnung ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Noteassignment ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'extension_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Extension ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Extension ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'type_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Type ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Type ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'betriebsmittel_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Betriebsmittel ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Ressource ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'betriebsmittelperson_id',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Betriebsmittelperson ID',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Ressourceperson ID',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'dropdownLoading',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Daten werden geladen',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Loading',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'error_noInteger',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Nur Eingabe von ganzen Zahlen erlaubt',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Error: Only input of whole numbers allowed',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+array(
+	'app' => 'core',
+	'category' => 'ui',
+	'phrase' => 'error_maxSem',
+	'insertvon' => 'system',
+	'phrases' => array(
+		array(
+			'sprache' => 'German',
+			'text' => 'Ausbildungssemester nicht zulässig: größer als Höchstsemester',
+			'description' => '',
+			'insertvon' => 'system'
+		),
+		array(
+			'sprache' => 'English',
+			'text' => 'Error: Semester not allowed: higher than max Semester',
+			'description' => '',
+			'insertvon' => 'system'
+		)
+	)
+),
+// FHC4 Phrases CleanUpTasks End
+	// FHC4 Phrases Mobility Start
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_mobility',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'mobilitaetsprogramm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilitätsprogramm',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mobility program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'gastnation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gastnation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Host nation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'herkunftsland',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Herkunftsland',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Country of origin',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'universitaet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Universität',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'University',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'ects_erworben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erworbene ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS acquired',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'ects_angerechnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Angerechnete ECTS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'ECTS credited',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'zweck',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zweck',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Purpose',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'aufenthalt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufenthalt Förderung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Residency funding',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'zweck_neu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilitätszweck anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create motivation for mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'foerderung_neu',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Förderung für Aufenthalt anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create funding for mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'kurzbz_program',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Programmkurzbezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Program short description',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'bisio_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bisio ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Bisio ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_dokument_archivieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument archivieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Archive document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_archive',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Archiv',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Archive',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_description',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Description',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_creation_date',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erstelldatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Creation date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_accepted_on_at',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'AkzeptiertAmUm',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'AcceptionOnAt',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_gedruckt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gedruckt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Printed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_signiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Signiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Signed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_title_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akte aktualisieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_akte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_new_file',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Datei',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New file',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_akte_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akte ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'archiv_signed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Signiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Signed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kurzbezeichnung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Short Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_entryExisting',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eintrag bereits vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Entry already existing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'error_existingEntryInExtension',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieser Datensatz wird von der Mobility Extension verwendet und muss zuerst dort gelöscht werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This record is used by the Mobility Extension and must first be deleted there.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'mobility_anlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'mobility',
+		'phrase' => 'mobility_bearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit mobility',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 Phrases Mobility End
+	// feature-55614 begin
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'lvdev_uebersichten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Weiterentwicklung Übersichten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Development Overviews',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'kompetenzfeld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kompetenzfeld',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'competence field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'expand_all',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle ausklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'expand all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'collapse_all',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alle einklappen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'collapse all',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'quellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Quellkurs',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Source Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// feature-55614 end
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'swAendern',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'SW ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Change SW',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'quellkurs',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Quellkurs',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Source Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'softwareAbbestellt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Software wurde abbestellt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Software was cancelled',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzkategorie',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Kategorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License category',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzkategorieKurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Kategorie Kurzbz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License category short',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'softwarebereitstellung',
+		'category' => 'global',
+		'phrase' => 'lizenzkategorie',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lizenz-Kategorie',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'License category',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// PROJEKTARBEITSBEURTEILUNG SS2025 PHRASEN ---------------------------------------------------------------------------
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'maxPunkte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Max. Punkte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Max. points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'bewertung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Erfüllungsgrad (Prozent) zum Ausfüllen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Degree of Fulfilment (Percentage) to Fill In',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'details',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Details (angemessener und korrekter Einsatz von
+Werkzeugen und Technologien in jedem Schritt)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Details
+(appropriate and correct use of tools and technologies at each step)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'problemstellungZieldefinition',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Problemstellung und Zieldefinition',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Problem Definition and Objective Setting',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'problemstellungZieldefinitionText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Problemstellung ist klar und präzise definiert und in einen wissenschaftlichen Kontext eingebettet.
+Die Zielsetzung sowie eventuelle Messgrößen sind eindeutig formuliert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The problem is clearly and precisely defined and embedded in a scientific context.
+The objective, along with any potential metrics, is clearly formulated.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'methodikLoesungsansatz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Methodik und Lösungsansatz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Methodology and Approach',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'methodikLoesungsansatzText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das methodische Vorgehen ist logisch und nachvollziehbar strukturiert, passend zur Zielsetzung,
+und die angewandten Methoden sind korrekt und fundiert umgesetzt.
+Die Methodik ist fachspezifisch angemessen, literaturbasiert begründet und wissenschaftlich vertretbar.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The methodological approach is logically and comprehensively structured,
+aligned with the objective, and the applied methods are implemented correctly and soundly.
+The methodology is appropriate to the field, justified based on literature, and scientifically valid.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'ergebnisseDiskussion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ergebnisse und Diskussion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Results and Discussion',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'ergebnisseDiskussionText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Qualität der Lösung ist bezogen auf die Zielsetzung ausreichend.
+				Die Ergebnisse werden fundiert analysiert und in Bezug auf die Zielsetzung schlüssig interpretiert.
+				Die Diskussion reflektiert die Relevanz und Grenzen der Ergebnisse kritisch und ist logisch strukturiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The quality of the solution sufficiently meets the objective.
+The results are thoroughly analyzed and coherently interpreted with respect to the objective.
+The discussion critically reflects on the relevance and limitations of the results and is logically structured.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'strukturAufbau',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Struktur und Aufbau',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Structure and Organization',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'strukturAufbauText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die Arbeit folgt einer logischen, klaren Gliederung und einem konsistenten roten Faden.
+Verzeichnisse, Grafiken, Tabellen und der Text sind gemäß den aktuell gültigen wissenschaftlichen Richtlinien der FH Technikum Wien aufbereitet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The work follows a logical and clear outline with a consistent narrative thread.
+Directories, graphics, tables, and text are prepared in accordance with the currently valid scientific guidelines of FH Technikum Wien.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'stilAusdruck',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stil und Ausdruck',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Style and Expression',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'stilAusdruckText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Der sprachliche Ausdruck ist präzise,
+fachlich korrekt und erfüllt die Anforderungen an gendergerechte Sprache gemäß den geltenden Richtlinien der FH Technikum Wien.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The linguistic expression is precise, professionally accurate,
+and meets the requirements of gender-sensitive language as per the applicable guidelines of FH Technikum Wien.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zitierregelnQuellenangaben',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zitierregeln und Quellenangaben',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Citation Rules and References',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'zitierregelnQuellenangabenText',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Umfang, Qualität und Aktualität der verarbeiteten Quellen sind angemessen
+und repräsentieren den aktuellen Stand der Forschung zum Thema. Die Zitierregeln (IEEE oder Harvard) werden konsequent und korrekt angewendet.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The scope, quality, and timeliness of the sources processed are appropriate
+and represent the current state of research on the topic. The prescribed citation rules are consistently and correctly applied.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'notenschluesselHinweisGewichtungEinzeln',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Jedes Kriterium muss mit mind. 50% bewertet werden, sonst ist die gesamte Arbeit negativ.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Each criterion must receive a minimum score of 50%; otherwise, the entire work is rated negatively.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'gesamtkommentar',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtkommentar',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overall comment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'gesamtkommentarVerpflichtend',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtkommentar verpflichtend auszufüllen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An overall comment is mandatory and must be completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'eingabefeld',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Eingabefeld',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Input field',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'universitaetLogo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Universitätslogo',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'University logo',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'projektarbeitsbeurteilung',
+		'category' => 'projektarbeitsbeurteilung',
+		'phrase' => 'textEingabefeldBewertung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Text-Eingabefeld zur Bewertung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Text inut field for assessment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// PROJEKTARBEITSBEURTEILUNG SS2025 ENDE ---------------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'gewicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gewicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Weight',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'newlehreinheit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuer LV-Teil',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New teaching unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bezeichnungeng',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bezeichnung Englisch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title english',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'detailanmerkung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Info an LV-Planung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Info to LV Planning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'unr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'UNR',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'UNR',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'las',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrauftragsstunden (LAS)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching hours (LAS)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehre',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'raumtyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raumtyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Room',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'raumtypalternativ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Raumtyp Alternativ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Room Alternative',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'startkw',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Start KW',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Start CW',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'stundenblockung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stunden Block',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hours Block',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'wochenrhythmus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Wochenrhythmus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Weekly rhythm',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrfunktion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrfunktion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'anmerkung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Info an DepL/KFL',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Info to DepL/KFL',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'planstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV-Plan Stunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course-Plan Hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'leplanstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Planstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Plan Hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'default',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Default',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Default',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'stundensatz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundensatz',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Hourly Rate',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'bismelden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'BIS-Melden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Report BIS',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'gesamtkosten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtkosten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Total costs',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'daten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Daten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Data',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehreinheit_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehreinheit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Unit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'verplant',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Verplant',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Planned',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'addLektor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LektorIn hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add lector',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'gruppen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Groups',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'addGroup',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppe hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add group',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'assignPerson',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Person zuordnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Assign person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'assignedPersons',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Direkt zugeordnete Personen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Directly assigned persons',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'geaendert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<b>Geändert</b>',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<b>Changed</b>',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'vertragurfassung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsdetails lt. Urfassung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract details as per original version',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'vertragsdetails',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsdetails',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'semesterstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Semesterstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Semester hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'vertragsstatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'auslvplanentfernen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stunden aus LV-Plan entfernen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Remove hours from course plan',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'lehrfach',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrfach',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	/////////// FHC4 Phrases Messages START ///////////
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_messages',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachrichten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Messages',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'unread',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ungelesen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'unread',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'read',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gelesen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'read',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'archived',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'archiviert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'archived',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'deleted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gelöscht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'deleted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'body',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachrichtentext',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Body',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'message_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Message ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Message ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'sender',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'SenderIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sender',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'recipient',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'EmpfängerIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recipient',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'senderId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'SenderIn ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sender ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'recipientId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'EmpfängerIn ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Recipient ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successSent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachricht erfolgreich versandt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Message sent successfully',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'btnAktualisieren',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aktualisieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Update',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'neueNachricht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neue Nachricht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'New Message',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'messages',
+		'phrase' => 'meineFelder',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meine Felder',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'My fields',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'reset',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zurücksetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reset',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	/////////// FHC4 Phrases Messages END ///////////
+
+	// FHC4 Studierendenverwaltung Dokumente START
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_documents',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumente',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'uploadDokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument hochladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Upload document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'deleteDokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'editDokument',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'title',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Titel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'title',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokTyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumententyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'nachreichungAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachreichung am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submission on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokDetails',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumentendetails',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Document Details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'anmerkung_person',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anmerkung der Person',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Notes of the Person',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successUpload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument erfolgreich hochgeladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dokumentupload successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokumentAccept',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accept',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokumentUnaccept',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entakzeptieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Unaccept',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'accepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'unaccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht Akzeptiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not Accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'err_deleteDokHere',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieses Dokument darf hier nicht gelöscht werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This document may not be deleted here',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'err_updateNotAllowed',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es können nur Eintraege geändert werden zu denen Dokumente hochgeladen wurden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only entries to which documents have been uploaded can be changed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'downloadDok',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument herunterladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'successAccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptieren erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Successfully set to accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'successUnaccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entakzeptieren erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Successfully set to unaccepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'successCountUnaccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Entakzeptieren von {count} Dokument(en) erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{count} Document(s) successfully set to unaccepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'successCountAccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptieren von {count} Dokument(en) erfolgreich',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{count} Document(s) successfully set to accepted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'errorUnaccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Entakzeptieren von Dokument {dokument_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error unaccepting document {dokument_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'errorAccepted',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Akzeptieren von Dokument {dokument_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error Accepting document {dokument_kurzbz}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorMissingValue',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{value} fehlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{value} missing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_valueNotNumeric',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{value} darf nur Ziffern enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{value} must contain only numbers.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'nachgereicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachgereicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submitted later',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'vorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Available',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'akte_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akte ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'File ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'nachgereicht_am',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachgereicht am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submitted on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'datumAkzeptiert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptiertdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepted on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'akzeptiertVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptiert von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepted by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'dms_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'DMS ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'DMS ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'error_fileMissing',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte eine Datei anhängen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please attach a file',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'error_fileType',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur Dateitypen JPEG, PNG oder PDF sind erlaubt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Only JPEG, PNG, or PDF files are allowed.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'error_duplicateDokument_kurzbz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Akzeptieren / Entakzeptieren von mehr als einem Dokument pro Dokumenttyp nicht zulässig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Accepting / unaccepting more than one document per document type is not permitted',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 Studierendenverwaltung Dokumente END
+	// FHC4 Phrases Anrechnungen Start
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'begruendung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Begründung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Reason',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'genehmigtVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'genehmigt von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'approved by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'editAnrechnung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Anrechnung bearbeiten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Edit Exemption",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'existingNotes',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => " Notiz(en)",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => " note(s)",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'anrechnung_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anrechnung ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Exemption ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'lehrveranstaltung_id_kompatibel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV kompatibel ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course compatible ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'anrechnung',
+		'phrase' => 'lehrveranstaltung_bez_kompatibel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV kompatibel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course compatible',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 Phrases Anrechnungen End
+	// FHC4 JOINT STUDIES START ----------------------------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_jointstudies',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'GS',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Joint Studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'jointstudies',
+		'phrase' => 'gemeinsamesStudium',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinsames Studium',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Joint Study',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'jointstudies',
+		'phrase' => 'gemeinsameStudien',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinsame Studien',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Joint Studies',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'jointstudies',
+		'phrase' => 'studienprogramm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienprogramm',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study Program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'jointstudies',
+		'phrase' => 'neuAnlegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinsames Studium anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add Joint Study',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'jointstudies',
+		'phrase' => 'edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gemeinsames Studium bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit Joint Study',
+				'description' => '',
+				'insertvon' => 'system',
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'mobilitaet_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mobilität ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mobility Id',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 JOINT STUDIES END   ----------------------------------------------------------------------------------------
+	// FHC 4 Lehrveranstaltungstermine START ---------------------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_courseDates',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'LV Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'export',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Exportieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Export',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'stundenplanDev',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stundenplan DEV',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timetable DEV',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehreinheit_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehreinheit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Unit ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'dateFrom',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'from',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'dateTo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'bis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'to',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gruppen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'groups',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ortLocation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'location',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'lehrfach',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrfach',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'subject',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'termine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC 4 Lehrveranstaltungstermine ENDE ---------------------------------------------------------------------------
+	// FHC4 STUDIERENDENVERWALTUNG AUFNAHMETERMINE START ---------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_admissionDates',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufnahmetermine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Admission Dates',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'reihungstest',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Placement Test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'admission_edit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufnahmetermin bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit appointment for participation placement test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'admission_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Aufnahmetermin Löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete Admission Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'admission_new',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Termin für Teilnahme am Reihungstest anlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create appointment for participation placement test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'anmeldundRtAm',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anmeldung zum Reihungstest am',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Registration for the ranking test on',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'rtAngetreten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zum Reihungstest angetreten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Participated in the ranking test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'rtAbsolviert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstestverfahren absolviert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Placement test procedure completed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'gesamtpunkte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtpunkte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Total Points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'gesamtpunkteBerechnen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gesamtpunkte berechnen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Calculate total points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'allgemein',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Allgemein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Generally',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'headerRTVerwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zur Reihungstestverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Administration Placement Test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'loadZukuenftigeRT',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur zukünftige Reihungstests laden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show future placement tests only',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'getRTErgebnis',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstestergebnis holen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Get placement test result',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'filterOnlyFutureActive',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter \'Nur zukünftige Reihungstest anzeigen\' aktiv',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter \'Only show future placement tests\' active',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'reihungstest_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstest ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Placementtest ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'reihungstest_person_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'RtPerson ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'PtPerson ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'stufe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Stufe',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'level',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'anmeldedatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anmeldedatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Registration Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'teilgenommen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'teilgenommen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'participated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'admission',
+		'phrase' => 'stg_kurz',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kürzel',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'shorthand',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 STUDIERENDENVERWALTUNG AUFNAHMETERMINE ENDE	 ---------------------------------------------------------------
+	// FHC4 STUDIERENDENVERWALTUNG ANZAHL START	 ---------------------------------------------------------------
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'ausgewaehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ausgewählt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'selected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gefiltert',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gefiltert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'filtered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'gesamt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'gesamt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'total',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC4 STUDIERENDENVERWALTUNG ANZAHL ENDE	 ---------------------------------------------------------------
+	// FHC-4 Studierendenverwaltung FUNCTIONS START
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_functions',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktionen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Functions',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'funktion',
+		'phrase' => 'filter_active',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur aktive anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Display only active',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'funktion',
+		'phrase' => 'addFunktion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'funktion',
+		'phrase' => 'editFunktion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Funktion bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'saveAsCopy',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Als Kopie speichern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Save as copy',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldMustBePositiveInteger',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} darf nur positive Ganzzahlen enthalten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The input field {field} may only contain positive integers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'bitteUnternehmenWaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vor Änderung der Organisationseinheit bitte Unternehmen wählen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Before changing the organizational unit, please select company',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC-4 Studierendenverwaltung FUNCTIONS END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_keineBerechtigungStg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie haben keine Berechtigung, für diesen Studiengang Daten zu ändern',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You do not have permission to change data for this study program',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC-4 Studierendenverwaltung FHC-ALERTS START
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'attention',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Achtung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attention',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Möchten Sie wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'attention',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Achtung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attention',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'systemerror',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Systemfehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'System Error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'chooseStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte StudentIn auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC-4 Studierendenverwaltung FHC-ALERTS END
+	// FHC-4 Finetuning START
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'notizHinzufuegen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notiz hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add note',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'mitarbeiter_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'pruefung_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfung ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Examination ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldInvalidAlias',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alias ist ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Alias is invalid',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldLessThan1000',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss kleiner als 1000 sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Field {Field} must contain a number less then 10000.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNoValidNumber',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} muss eine gültige Zahl sein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The Input Field {field} has to be a valid number',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// FHC-4 Finetuning END
+
+	//****************************	 CORE/search
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'input_search_label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Suche: {types}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search: {types}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_employee',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'employees',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_student',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studenten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'students',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_prestudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudenten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'prestudents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_room',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Räume',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'rooms',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_organisationunit',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Organisationseinheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'organisation units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_cms',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Inhalte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'sites',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'type_dms',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokumente',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'button_filter_label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'applyfilter_label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Suche filtern nach:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Filter search for:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'action_default_label',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standard Aktion',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Default Action',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_student_uid',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student UID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_prestudent_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prestudent ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Prestudent ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_emails',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Emails',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Emails',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_group_emails',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gruppen-Email',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Group-Email',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_employee',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'MitarbeiterIn',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Employee',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_stdkst',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standard-Kostenstelle',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Standard cost center',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_stdkst_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'keine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'none',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_parent_oe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übergeordnete OE',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Parent OU',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_oe_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'keine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'none',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_room_address',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Standort',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Site',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_address_floor',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{floor} Stockwerk',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{floor} floor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_address_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'N/A',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'N/A',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_workplaces',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sitzplätze',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Seats',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_workplaces_pc',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{max_person}, davon {workplaces} PC-Plätze',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '{max_person}, of which {workplaces} PC-Workstations',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_workplaces_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'N/A',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'N/A',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_building',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gebäude',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Building',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_equipment',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zusatz Informationen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Additional information',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_leader',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Leiter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Leader',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_leader_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'N.N.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'N/A',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_number_of_employees',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mitarbeiter-Anzahl',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Number of employees',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_dms_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'DMS ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'DMS ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_version',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Version',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Version',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_keywords',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Schlagwörter',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Keywords',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'result_content_none',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Inhalt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Content',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_missing_type',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No result type selected. Please select at least one result type.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_no_results',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es wurden keine Ergebnisse gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No results were found.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_unknown_type',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Unbekannter Ergebnistyp: '{type}'.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Unknown resulttype: '{type}'.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_general',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bei der Suche ist ein Fehler aufgetreten. {message}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An error occurred while searching. {message}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_missing_config',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Such-Konfiguration $config["{type}"] nicht gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search config $config["{type}"] not found.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_invalid_config',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Such-Konfiguration für $config["{type}"] ist ungültig: Feld "{field}" fehlt, ist leer oder hat einen ungültigen Typ.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search config for $config["{type}"] is invalid: field {field} is missing, empty or has an invalid type.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'search',
+		'phrase' => 'error_invalid_config_searchfield',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Such-Konfiguration ' .
+					'$config["{type}"]["searchfields"]["{searchfield}"] ' .
+					'ist ungültig: Feld "{field}" fehlt oder ist unglültig.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Search config $config["{type}"]["searchfields"]["{searchfield}"] is invalid: field {field} is missing or invalid.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 CORE/search end
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'termineImLvPlan',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Termine dieser LV',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Dates in schedule',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profilUpdate',
+		'phrase' => 'meldebestaetigung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldebestätigung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirmation of registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profilUpdate',
+		'phrase' => 'nachweisdokumente',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nachweisdokumente',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Confirmation documents',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
+
 
 //*****		CHECK PHRASES & PHRASENTEXTE in German and English.
 //*****		INSERT into phrase_tbl if new app + category + phrase found in phrasen-array.

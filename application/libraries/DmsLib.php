@@ -595,6 +595,8 @@ class DmsLib
 		if (isError($insDmsResult)) return $insDmsResult;
 
 		$upload_data['dms_id'] = getData($insDmsResult);
+		if(isset($upload_data['file_type']) && !isset($dms['mimetype']))
+			$dms['mimetype'] = $upload_data['file_type'];
 
 		// Insert DMS version
 		$insVersionResult = $this->_ci->DmsVersionModel->insert(
@@ -668,7 +670,7 @@ class DmsLib
 			$fileObj = new stdClass();
 			$fileObj->filename = getData($result)[0]->filename;
 			$fileObj->file = DMS_PATH.getData($result)[0]->filename;
-			$fileObj->name = DMS_PATH.getData($result)[0]->name;   // original user filename
+			$fileObj->name = getData($result)[0]->name;   // original user filename
 			$fileObj->mimetype = getData($result)[0]->mimetype;
 
 			return success($fileObj);

@@ -220,6 +220,7 @@ $(document).ready(function () {
 		statusbar: false,
 		readonly: 1,
 		autoresize_min_height: 300,
+		max_height: 600,
 		autoresize_bottom_margin: 0
 	});
 

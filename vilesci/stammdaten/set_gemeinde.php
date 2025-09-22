@@ -47,17 +47,23 @@ $tmp_gemeinde_ar = array();
 if (isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0)
 {
 
-	$rows = array_map('str_getcsv', file( $_FILES['parsefile']['tmp_name'] ));
-	$header = array_shift($rows);
+	$rows = file( $_FILES['parsefile']['tmp_name'] );
+	 // all entries of csv
+	$header = explode(";",array_shift($rows)); // first row
+	
+	$header = array_map('trim',$header);
+	
 	$data = array();
+
 	foreach ($rows as $row)
 	{
-		$data[] = array_combine($header, $row);
+		$data[] = array_combine(preg_replace('/\xEF\xBB\xBF/','',$header), explode(";",$row));
 	}
-
+		
+		
+		
 	foreach ($data as $gemeinde_details)
 	{
-
 		//Wenn nicht gültig dann überspringen
 		if ($gemeinde_details['Gültig'] == 'Nein')  continue;
 
@@ -65,17 +71,16 @@ if (isset($_FILES['parsefile']) && $_FILES['parsefile']['error'] == 0)
 		$plzs = explode(' ', trim($gemeinde_details['PLZ']));
 
 		foreach ($plzs as $plz)
-		{
-			$tmp_obj_gemeinde = null;
+		{			
 			$tmp_obj_gemeinde = new gemeinde();
 			$tmp_obj_gemeinde->plz = $plz;
+			$tmp_obj_gemeinde->kennziffer = $gemeinde_details["Gemeindekennziffer"];
 			$tmp_obj_gemeinde->name = $gemeinde_details['Gemeindename'];
 			$tmp_obj_gemeinde->ortschaftskennziffer = $gemeinde_details['Ortschaftskennziffer'];
 			$tmp_obj_gemeinde->ortschaftsname = $gemeinde_details['Ortschaftsname'];
 			$tmp_obj_gemeinde->bulacode = $gemeinde_details['BULA_Code'];
 			$tmp_obj_gemeinde->bulabez = $gemeinde_details['BULA_Bez'];
-			$tmp_obj_gemeinde->kennziffer = $gemeinde_details['Gemeindekennziffer'];
-
+			
 			$tmp_obj_gemeinde->save();
 			$tmp_gemeinde_ar[] = $tmp_obj_gemeinde;
 		}

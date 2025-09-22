@@ -149,6 +149,30 @@ echo '
 		return true;
 	}
 
+	$(document).ready(function () {
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
+
+	});
+
 	//]]>
 	</script>
 </head>
@@ -161,7 +185,7 @@ if(!isset($_SESSION['pruefling_id']))
 $pruefling = new pruefling();
 $pruefling->load($_SESSION['pruefling_id']);
 
-if ($pruefling->gesperrt === 't')
+if ($pruefling->isGesperrt($_SESSION['pruefling_id']))
 	die("<script>document.location.href='prueflinggesperrt.php';</script>");
 
 if (!in_array($gebiet_id, $_SESSION['alleGebiete']))
@@ -598,7 +622,7 @@ if($frage->frage_id!='')
 
 	$display_well = $frage->nummer == 0 ? '' : 'well'; // don't style frage 0 because this is always the introduction to gebiet
 	echo '
-		<div class="row">
+		<div class="row frage">
 			<div class="col-xs-offset-1 col-xs-10 col-sm-offset-2 col-sm-8">
 				<div class="'. $display_well. ' text-center">'. $frage->text. '</div>
 			</div>
@@ -693,7 +717,7 @@ if($frage->frage_id!='')
 
 	if(!$demo)
 	{
-		echo '<input style="width:180px; white-space:normal" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
+		echo '<input style="width:180px; white-space:normal; margin-bottom: 130px;" class="btn btn-default btn-testtool" type="submit" name="submitantwort" value="'.$p->t('testtool/speichernUndWeiter').'" />';
 	}
 	else
 	{

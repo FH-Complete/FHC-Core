@@ -37,6 +37,7 @@ require_once('../../../include/phrasen.class.php');
 require_once('../../../include/projektarbeit.class.php');
 require_once('../../../include/projektbetreuer.class.php');
 require_once('../../../include/sancho.inc.php');
+require_once('../../../application/libraries/SignatureLib.php');
 
 if (!$db = new basis_db())
 	$db=false;
@@ -124,7 +125,7 @@ $projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
 // paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
 $paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
 
-if(!is_numeric($paIsCurrent) || $paIsCurrent < 0)
+if(!is_bool($paIsCurrent))
 {
 	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 }
@@ -165,7 +166,7 @@ if(in_array($betreuerart, array('Erstbegutachter', 'Senatsvorsitz')))
 		}
 
 		// Mail mit Token an Zweitbegutachter senden
-		if (count($zweitbetreuerArr) > 0 && $paIsCurrent >= 1 && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
+		if (count($zweitbetreuerArr) > 0 && $paIsCurrent === true && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
 		{
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
 			if(!$result_std=$db->db_query($qry_std))
@@ -481,7 +482,7 @@ $htmlstr .= "<table id='beurteilungheadertable' width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
 $htmlstr .= "<td width=10% align=center>";
 
-$semester_benotbar = $paIsCurrent >= 1;
+$semester_benotbar = $paIsCurrent === true;
 $endupload_vorhanden = $num_rows_endupload >= 1;
 
 if ($semester_benotbar && $endupload_vorhanden)
@@ -494,7 +495,8 @@ if ($semester_benotbar && $endupload_vorhanden)
 }
 else
 {
-	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenotenQuickInfo') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$info_text = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
 	$htmlstr .= "<form action='javascript:void(0);'>";
 	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$quick_info."'
 					alt='".$quick_info."' disabled>";
@@ -515,7 +517,7 @@ else
 }
 $htmlstr .= "<tr>
 					<td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td>
-					<td align='center' class='warningtext'>".(isset($quick_info) ? $quick_info : '')."</td>
+					<td align='center' class='warningtext'>".(isset($info_text) ? $info_text : '')."</td>
 					<td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 
@@ -543,7 +545,7 @@ if (isset($zweitbetreuerArr) && is_array($zweitbetreuerArr)) // wenn es Zweitbet
 			$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
 
 		// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
-		if (isset($zweitbetreuer->email) && !isset($zweitbetreuer->uid) && $paIsCurrent >= 1)
+		if (isset($zweitbetreuer->email) && !isset($zweitbetreuer->uid) && $paIsCurrent === true)
 		{
 			$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
 			$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";
@@ -590,7 +592,9 @@ while ($row=@$db->db_fetch_object($result))
 	$htmlstr .= "<input type='hidden' name='betreuerart' value='".$betreuerart."'>\n";
 	$htmlstr .= "<input type='hidden' name='command' value='update'>\n";
 	$htmlstr .= "<tr id='".$row->projektarbeit_id."'>\n";
-	if(!$row->abgabedatum)
+
+	$uploadedDocumentSigned = null;
+	if (!$row->abgabedatum)
 	{
 		if ($row->datum<date('Y-m-d'))
 		{
@@ -626,8 +630,7 @@ while ($row=@$db->db_fetch_object($result))
 			$fcol='#000000';
 		}
 	}
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked=\"checked\"':'')." >";
-	//$htmlstr .= "<td><input type='checkbox' name='fixtermin' ".($row->fixtermin=='t'?'checked="checked" style="background-color:#FF0000;"':'')." disabled>";
+
 	if($row->fixtermin=='t')
 	{
 		$htmlstr .= "<td><img src='../../../skin/images/bullet_red.png' alt='J' title='".$p->t('abgabetool/fixerAbgabetermin')."' border=0></td>";
@@ -659,11 +662,12 @@ while ($row=@$db->db_fetch_object($result))
 	$htmlstr .= "		</select></td>\n";
 	$htmlstr .= "		<td><input type='text' name='kurzbz' value='".htmlspecialchars($row->kurzbz,ENT_QUOTES)."' size='60' maxlegth='256'></td>\n";
 	$htmlstr .= "		<td>".($row->abgabedatum==''?'&nbsp;':$datum_obj->formatDatum($row->abgabedatum,'d.m.Y'))."</td>\n";
-	if($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
+
+	if ($user==$row->insertvon && $betreuerart!="Zweitbegutachter")
 	{
 		$htmlstr .= "		<td><input type='submit' name='schick' value='".$p->t('global/speichern')."' title='".$p->t('abgabetool/terminaenderungSpeichern')."'></td>";
 
-		if(!$row->abgabedatum)
+		if (!$row->abgabedatum)
 		{
 			$htmlstr .= "		<td><input type='submit' name='del' value='".$p->t('global/loeschen')."' onclick='return confdel()' title='".$p->t('abgabetool/terminLoeschen')."'></td>";
 		}
@@ -692,6 +696,60 @@ while ($row=@$db->db_fetch_object($result))
 	{
 		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
 	}
+
+	if (file_exists(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf'))
+	{
+		$signaturVorhanden = false;
+		if ($row->paabgabetyp_kurzbz == 'end')
+		{
+			if(defined('ABGABETOOL_CHECK_SIGNATURE') && ABGABETOOL_CHECK_SIGNATURE)
+			{
+				// Check if the document is signed
+				$signList = SignatureLib::list(PAABGABE_PATH.$row->paabgabe_id.'_'.$uid.'.pdf');
+				if (is_array($signList) && count($signList) > 0)
+				{
+					$signaturVorhanden = true;
+					// The document is signed
+				}
+				elseif (isset($signList->code) && $signList->code == 1)
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploaddDocumentToBigForSignature');
+				}
+				elseif ($signList === null)
+				{
+					$uploadedDocumentSigned = 'WARNING: signature server error';
+				}
+				else
+				{
+					$uploadedDocumentSigned = $p->t('abgabetool/uploadedDocumentNotSigned');
+				}
+			}
+		}
+		if ($uploadedDocumentSigned != null)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #8a6d3b; background-color: #fcf8e3; border-color: #faebcc; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$uploadedDocumentSigned.'</b>
+						</div>
+					</td>';
+		}
+		elseif($signaturVorhanden)
+		{
+			$htmlstr .= '
+					<td>
+						<div style="color: #198754; background-color: #d1e7dd; border-color: #a3cfbb; padding: 5px; border: 1px solid; border-radius: 4px; ">
+							<b>'.$p->t('abgabetool/uploadedDocumentSigned').'</b>
+						</div>
+					</td>';
+		}
+	}
+	else
+	{
+		$htmlstr .= "		<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>";
+	}
+
+
 	$htmlstr .= "	</tr>\n";
 
 
@@ -710,7 +768,7 @@ $htmlstr .= '<tr id="'.$db->convert_html_chars($projektarbeit_id).'">'."\n";
 //$htmlstr .= "<td><input type='checkbox' name='fixtermin'></td>";
 $htmlstr .= "<td>&nbsp;&nbsp;</td>";
 
-$htmlstr .= "		<td><input  type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
+$htmlstr .= "		<td><input type='text' name='datum' size='10' maxlegth='10' style='font-weight:bold;' ></td>\n";
 
 $htmlstr .= "		<td><select name='paabgabetyp_kurzbz'>\n";
 $qry_typ = "SELECT * FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz!='end' AND paabgabetyp_kurzbz!='enda' AND paabgabetyp_kurzbz!='note'";

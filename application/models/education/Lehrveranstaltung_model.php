@@ -16,6 +16,192 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Get all Templates and its assigned Lehrveranstaltungen of given Studiensemester and Oes.
+	 * Lvs are queried via actual Studienordnung and Studienplan.
+	 *
+	 * @param null|string $studiensemester_kurzbz
+	 * @param null|array $oes
+	 * @param null $lehrveranstaltung_id Queries certain LV only
+	 * @return array|stdClass|null
+	 */
+	public function getTemplateLvTree($studiensemester_kurzbz = null, $oes = null, $studienjahr_kurzbz = null){
+
+		if (is_string($studiensemester_kurzbz) && is_string($studienjahr_kurzbz))
+		{
+			return error('Query not possible for both studiensemester and studienjahr');
+		}
+
+		$params = [];
+		$qry = '
+		WITH 	
+			-- All Lvs that are assigned to a template in given Studiensemester for given Oes
+			-- joining via actual Studienplan
+			standardisierteLvs AS (
+				SELECT
+					lv.*,
+					stpl.studienplan_id::text as studienplan_id,
+					stpl.bezeichnung AS studienplan_bezeichnung,
+					stplsem.studiensemester_kurzbz
+				FROM
+					lehre.tbl_studienplan 							stpl
+					JOIN lehre.tbl_studienordnung 					sto USING (studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester 			stplsem USING (studienplan_id)
+					JOIN lehre.tbl_studienplan_lehrveranstaltung 	stpllv ON (stpllv.studienplan_id = stpl.studienplan_id AND stpllv.semester = stplsem.semester)
+					JOIN lehre.tbl_lehrveranstaltung 				lv USING (lehrveranstaltung_id)
+					JOIN public.tbl_organisationseinheit 			oe USING (oe_kurzbz)
+					JOIN public.tbl_studiengang          			stg ON stg.studiengang_kz = sto.studiengang_kz
+					JOIN public.tbl_studiengangstyp 				stgtyp ON stgtyp.typ = stg.typ
+				WHERE 
+					-- filter type lv
+				  	lehrtyp_kurzbz = \'lv\'
+				  	-- filter lvs assigned to template (= standardisierte lv)
+					AND lehrveranstaltung_template_id IS NOT NULL';
+
+					if (is_string($studiensemester_kurzbz))
+					{
+						/* filter by studiensemester */
+						$params[]= $studiensemester_kurzbz;
+						$qry.= ' AND stplsem.studiensemester_kurzbz = ? ';
+
+					}
+
+					if (is_string($studienjahr_kurzbz)) {
+						/* filter by studiensemester */
+						$params[] = $studienjahr_kurzbz;
+						$qry .= ' 
+							AND stplsem.studiensemester_kurzbz IN (
+								SELECT studiensemester_kurzbz
+								FROM public.tbl_studiensemester
+								WHERE studienjahr_kurzbz = ?
+							  )';
+					}
+
+					if (is_array($oes))
+					{
+						/* filter by organisationseinheit */
+						$params[]= $oes;
+						$qry.= ' AND lv.oe_kurzbz IN ? ';
+					}
+		$qry.= '
+			),
+			-- All templates
+			templateLvs AS (
+				SELECT 
+					lv.*,
+					NULL AS studienplan_id,
+					(
+						SELECT string_agg(stpl_bezeichnung, \', \')
+						FROM
+						(
+							SELECT stlv.studienplan_bezeichnung AS stpl_bezeichnung
+							FROM standardisierteLvs stlv
+							WHERE stlv.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
+						) AS studienplaene
+					) AS studienplan_bezeichnung,
+					NULL AS studiensemester_kurzbz
+				FROM 
+					lehre.tbl_lehrveranstaltung lv
+				WHERE 
+					-- filter type template
+					lehrtyp_kurzbz = \'tpl\'
+					-- filter semester that were retrieved by standardisierte lvs semester for selected studiensemester
+					AND EXISTS (
+						SELECT 1
+						FROM standardisierteLvs std
+						WHERE std.lehrveranstaltung_template_id = lv.lehrveranstaltung_id
+					)';
+
+		if (is_array($oes))
+		{
+			/* filter by organisationseinheit */
+			$params[]= $oes;
+			$qry.= ' AND lv.oe_kurzbz IN ? ';
+		}
+		$qry.= '
+			)	
+		';
+
+		$qry.= '
+			SELECT 
+				lv.lehrveranstaltung_id,
+				lv.kurzbz,
+			    lv.lehrtyp_kurzbz,
+				lv.bezeichnung AS lv_bezeichnung, 
+				lv.bezeichnung_english,
+				lv.studiengang_kz,
+				lv.semester,
+				lv.oe_kurzbz,
+				lv.ects,
+				lv.lehrform_kurzbz,
+				lv.orgform_kurzbz,
+				lv.sprache, 
+				lv.aktiv,
+				lv.lehrveranstaltung_template_id,
+				lv.studienplan_id,
+			    lv.studienplan_bezeichnung,
+			    lv.studiensemester_kurzbz,
+			    upper(stg.typ || stg.kurzbz) AS "stg_typ_kurzbz",    
+				stg.bezeichnung AS "stg_bezeichnung",
+				stgtyp.bezeichnung AS "stg_typ_bezeichnung",
+				CASE
+   			 		WHEN oe.organisationseinheittyp_kurzbz = \'Kompetenzfeld\' THEN (\'KF \' || oe.bezeichnung)
+                    WHEN oe.organisationseinheittyp_kurzbz = \'Department\' THEN (\'DEP \' || oe.bezeichnung)
+                    ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
+                END AS "lv_oe_bezeichnung",
+			   (
+				    -- comma seperated string of all lehreinheitgruppen
+					SELECT string_agg(bezeichnung, \', \') AS lehreinheitgruppe_bezeichnung
+					FROM(
+					    -- distinct bezeichnung, as may come multiple times from different lehreinheiten
+						SELECT DISTINCT ON (studiengang_kz, bezeichnung) studiengang_kz, bezeichnung FROM
+						(
+							-- distinct lehreinheitgruppe, as may come multiple times from different lehrform
+							SELECT DISTINCT ON (legr.lehreinheitgruppe_id) legr.studiengang_kz,
+								-- get Spezialgruppe or Lehrverbandgruppe 
+								COALESCE(
+									legr.gruppe_kurzbz,
+									CONCAT( UPPER(stg1.typ), UPPER(stg1.kurzbz), \'-\', legr.semester, legr.verband, legr.gruppe )
+								) as bezeichnung
+							FROM lehre.tbl_lehreinheitgruppe 	legr
+							JOIN lehre.tbl_lehreinheit 			le USING (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung 	lv1 USING (lehrveranstaltung_id)
+							JOIN public.tbl_studiengang 		stg1 ON stg1.studiengang_kz = legr.studiengang_kz
+							WHERE lv1.lehrveranstaltung_id 		= lv.lehrveranstaltung_id
+							AND le.studiensemester_kurzbz 		= lv.studiensemester_kurzbz
+						) AS lehreinheitgruppen
+					    GROUP BY studiengang_kz, bezeichnung
+						ORDER BY studiengang_kz DESC
+					) AS uniqueLehreinheitgruppen_bezeichnung
+				) AS lehreinheitgruppen_bezeichnung
+			FROM (
+				SELECT 
+					* 
+				FROM 
+				     standardisierteLvs 
+				UNION
+				SELECT 
+				   * 
+				FROM templateLvs 
+			) AS lv
+				JOIN public.tbl_studiengang          	stg ON stg.studiengang_kz = lv.studiengang_kz
+				JOIN public.tbl_studiengangstyp 		stgtyp ON stgtyp.typ = stg.typ
+				JOIN public.tbl_organisationseinheit 	oe ON oe.oe_kurzbz = lv.oe_kurzbz
+		ORDER BY
+		 	-- Sort by lv.bezeichnung
+			lv.bezeichnung,
+			-- Within each group, ensure templates appear first
+			CASE 
+				WHEN lv.lehrtyp_kurzbz = \'tpl\' THEN 0
+				ELSE 1
+			END,
+			-- Ensure assigend lvs follow their template, grouped by lehrveranstaltung_template_id
+			COALESCE(lv.lehrveranstaltung_template_id, lv.lehrveranstaltung_id)
+		';
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
 	 * Gets unique Groupstrings for Lehrveranstaltungen, e.g. WS2018_BIF_1_PRJM_VZ_LV12345
 	 * @param string $studiensemester_kurzbz
 	 * @param string $ausbildungssemester
@@ -200,35 +386,163 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
+	/**
+	 * Gets all Leiter of Lehrveranstaltungsorganisationseinheit
+	 * @param $lehrveranstaltung_id
+	 * @return array|null
+	 */
+	public function getLeitungOfLvOe($lehrveranstaltung_id)
+	{
+		$query = "select distinct vorname, nachname, uid
+				FROM
+				lehre.tbl_lehrveranstaltung lv
+				JOIN public.tbl_organisationseinheit og using (oe_kurzbz)
+				JOIN public.tbl_benutzerfunktion bf using (oe_kurzbz)	
+				join public.tbl_benutzer b using (uid)
+				join public.tbl_person p using (person_id)
+				where
+				bf.datum_von <= now()::date
+				and (bf.datum_bis >= now()::date or bf.datum_bis is null)
+				and bf.funktion_kurzbz = 'Leitung' -- Leitung of LV-OE
+				and lehrveranstaltung_id = ?";
+
+		return $this->execQuery($query, array($lehrveranstaltung_id));
+	}
 
 	/**
 	 * Gets Lehrveranstaltungen of a student
 	 * @param $student_uid
-	 * @param null $studiensemester_kurzbz
+	 * @param $studiensemester_kurzbz
 	 * @return array|null
 	 */
 	public function getLvsByStudent($student_uid, $studiensemester_kurzbz = null)
 	{
 		$params = array($student_uid);
-
 		$qry = "SELECT * FROM lehre.tbl_lehrveranstaltung
-				WHERE lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
-											  WHERE uid=?";
+				WHERE lehrveranstaltung_id IN(
+					SELECT lehrveranstaltung_id FROM campus.vw_student_lehrveranstaltung
+						WHERE uid=?";
+
 		if (isset($studiensemester_kurzbz))
 		{
-			$qry .= " AND studiensemester_kurzbz=?";
 			$params[] = $studiensemester_kurzbz;
+			$qry .= " AND studiensemester_kurzbz=?";
 		}
-		$qry .= ") OR lehrveranstaltung_id IN(SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote WHERE student_uid=?";
+		$qry .= ")";
+
+		$qry .= " OR lehrveranstaltung_id IN(
+			SELECT lehrveranstaltung_id FROM lehre.tbl_zeugnisnote 
+			WHERE student_uid=?";
 		$params[] = $student_uid;
-		if (isset($studiensemester_kurzbz))
-		{
-			$qry .= " AND studiensemester_kurzbz=?";
-			$params[] = $studiensemester_kurzbz;
-		}
+
 		$qry .= ") ORDER BY semester, bezeichnung";
 
 		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * Gets Lehrveranstaltungen of a student with grades if available
+	 * 
+	 * @param string		$student_uid
+	 * @param string		$studiensemester_kurzbz
+	 * @param string|null	$sprache
+	 * @param number|null	$lvid - returns only information about that single lv if the parameter is set
+	 * 
+	 * @return stdClass
+	 */
+	public function getLvsByStudentWithGrades($student_uid, $studiensemester_kurzbz, $sprache = null, $lvid=null)
+	{
+
+		$this->addDistinct();
+		// TODO(chris): selects
+		/*
+		semester (?)
+		module
+		bezeichnung
+		sg_bezeichnung
+		studiengang_kuerzel
+		lvnote
+		znote
+		studiengang_kz
+		lehrveranstaltung_id
+		benotung
+		lvinfo
+		farbe
+
+		sprache (?)
+		ects (?)
+		incoming (?)
+		orgform_kurzbz (?)
+		*/
+		// TODO(chris): module or kf
+		#$this->addSelect($this->dbTable . '.*');
+		#$this->addSelect('v.*');
+		$this->addSelect($this->dbTable . '.benotung');
+		$this->addSelect($this->dbTable . '.lvinfo');
+		$this->addSelect($this->dbTable . '.farbe');
+		$this->addSelect($this->dbTable . '.incoming');
+		$this->addSelect($this->dbTable . '.orgform_kurzbz');
+		$this->addSelect('v.studiengang_kz');
+		$this->addSelect('v.lehrveranstaltung_id');
+		$this->addSelect('v.semester');
+		
+		$this->addSelect('v.sprache');
+		$this->addSelect('v.ects');
+		$this->addSelect('znn.positiv');
+
+		#$this->addSelect('splv.module');
+		$this->addSelect('v.bezeichnung AS bezeichnung');
+		$this->addSelect('v.bezeichnung_english AS bezeichnung_eng');
+		$this->addSelect('sg.bezeichnung AS sg_bezeichnung');
+		$this->addSelect('sg.english AS sg_bezeichnung_eng');
+		$this->addSelect('UPPER(sg.typ::VARCHAR(1) || sg.kurzbz) AS studiengang_kuerzel');
+		
+		//also adds returns the index of the grade
+		//TODO: ist zeugnissnote immer gleich wie die lvgesamtnote
+		$this->addSelect('COALESCE(zn.note::numeric,gn.note::numeric) as note_index');
+		$this->addSelect('COALESCE(znn.positiv,gnn.positiv) as positiv');
+		$this->addSelect('gnn.bezeichnung_mehrsprachig AS lvnotebez');
+		$this->addSelect('gnn.note AS lvnote');
+		$this->addSelect('znn.bezeichnung_mehrsprachig AS znotebez');
+		$this->addSelect('znn.note AS znote');
+
+		// TODO(chris): Potentielle Anpassung "Eine UID"
+		$this->addJoin('campus.vw_student_lehrveranstaltung v', 'lehrveranstaltung_id');
+		$this->addJoin('public.tbl_studiengang sg', $this->dbTable . '.studiengang_kz = sg.studiengang_kz');
+		$this->db->where("v.lehreverzeichnis<>''");
+		if(isset($lvid))
+		{
+			$this->db->where("v.lehrveranstaltung_id", $lvid);	
+		}
+
+		$this->addJoin('campus.tbl_lvgesamtnote gn', 'gn.lehrveranstaltung_id=v.lehrveranstaltung_id AND gn.student_uid=v.uid AND gn.studiensemester_kurzbz=v.studiensemester_kurzbz', 'LEFT');
+		$this->addJoin('lehre.tbl_note gnn', 'gn.note=gnn.note', 'LEFT');
+
+		$this->addJoin('lehre.tbl_zeugnisnote zn', 'zn.lehrveranstaltung_id=v.lehrveranstaltung_id AND zn.student_uid=v.uid AND zn.studiensemester_kurzbz=v.studiensemester_kurzbz', 'LEFT');
+		$this->addJoin('lehre.tbl_note znn', 'zn.note=znn.note', 'LEFT');
+
+		$this->addOrder('bezeichnung');
+
+		/*if (!defined("CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN") || !CIS_PROFIL_STUDIENPLAN_MODULE_AUSBLENDEN) {
+			$modulebezeichnung = str_replace('v.', 'm.', $lvbezeichnung);
+			$modulesql = '
+				LEFT JOIN lehre.tbl_studienplan_lehrveranstaltung p ON(lv.studienplan_lehrveranstaltung_id_parent=p.studienplan_lehrveranstaltung_id)
+				LEFT JOIN lehre.tbl_lehrveranstaltung m ON(m.lehrveranstaltung_id = p.lehrveranstaltung_id)';
+		} else {
+			$modulebezeichnung = 'NULL';
+			$modulesql = '';
+		}
+
+		$this->addJoin('(
+			SELECT lv.lehrveranstaltung_id, sps.studiensemester_kurzbz, so.studiengang_kz, lv.semester, ' . $modulebezeichnung . ' AS module
+			FROM lehre.tbl_studienplan_lehrveranstaltung lv
+			LEFT JOIN lehre.tbl_studienplan sp ON(sp.studienplan_id=lv.studienplan_id)
+			JOIN lehre.tbl_studienplan_semester sps ON(sp.studienplan_id=sps.studienplan_id AND sps.semester=lv.semester)
+			JOIN lehre.tbl_studienordnung so ON(so.studienordnung_id=sp.studienordnung_id)
+			' . $modulesql . '
+		) splv', 'splv.lehrveranstaltung_id=v.lehrveranstaltung_id AND splv.studiensemester_kurzbz=v.studiensemester_kurzbz AND splv.studiengang_kz=v.studiengang_kz', 'LEFT');*/
+
+		return $this->loadWhere(['v.uid' => $student_uid, 'v.lehre' => true, 'v.studiensemester_kurzbz' => $studiensemester_kurzbz]);
 	}
 
 	/**
@@ -311,6 +625,37 @@ class Lehrveranstaltung_model extends DB_Model
 	}
 
 	/**
+	 * Get Lehreinheit.
+	 *
+	 * @param string				$student_uid
+	 * @param string				$studiensemester_kurzbz
+	 * @param integer				$lehrveranstaltung_id
+	 *
+	 * @return stdClass
+	 */
+	public function getLeByStudent($student_uid, $studiensemester_kurzbz, $lehrveranstaltung_id)
+	{
+		$this->addSelect("lehreinheit_id");
+
+		$this->addOrder("lehreinheit_id", "ASC");
+
+		$this->addLimit(1);
+
+		$tmp = $this->dbTable;
+		$this->dbTable = "campus.vw_student_lehrveranstaltung";
+		
+		$result = $this->loadWhere([
+			"uid" => $student_uid,
+			"lehrveranstaltung_id" => $lehrveranstaltung_id,
+			"studiensemester_kurzbz" => $studiensemester_kurzbz
+		]);
+		
+		$this->dbTable = $tmp;
+		
+		return $result;
+	}
+
+	/**
 	 * Sucht nach LV Templates und gibt Id und Label ("bezeichnung [kurzbz]") aus
 	 * Diese funktion ist für autocomplete gedacht
 	 *
@@ -355,6 +700,28 @@ class Lehrveranstaltung_model extends DB_Model
 		return $this->execQuery($qry);
 	}
 
+	/**
+	 * Check if given LV is a template (Quellkurs)
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @return array|stdClass|void
+	 */
+	public function checkIsTemplate($lehrveranstaltung_id)
+	{
+		$this->addSelect('lehrtyp_kurzbz, lehrveranstaltung_template_id');
+		$result = $this->load($lehrveranstaltung_id);
+
+		if (isError($result))
+			return error(getError($result));
+
+		if (hasData($result))
+		{
+			return success(
+				getData($result)[0]->lehrtyp_kurzbz === 'tpl' &&
+				getData($result)[0]->lehrveranstaltung_template_id === null
+			);
+		}
+	}
 
     /**
      * Get ECTS Summe pro angerechnetes Quereinstiegssemester.
@@ -471,4 +838,185 @@ class Lehrveranstaltung_model extends DB_Model
 
         return $this->execQuery($qry, array($student_uid));
     }
+
+    /**
+     * @param integer		$lehrveranstaltung_id
+     * @param string		$studiensemester_kurzbz
+     * 
+     * @return stdClass
+     */
+    public function getKoordinator($lehrveranstaltung_id, $studiensemester_kurzbz = null)
+    {
+		$binds = [
+			$lehrveranstaltung_id,
+			$lehrveranstaltung_id,
+			$lehrveranstaltung_id,
+			$lehrveranstaltung_id
+		];
+    	$qry = "
+			SELECT 
+				a.uid, vorname, nachname, titelpre, titelpost
+			FROM (
+				SELECT
+					koordinator as uid
+				FROM
+					lehre.tbl_lehrveranstaltung
+				WHERE
+					lehrveranstaltung_id = ?
+				UNION
+				SELECT
+					uid
+				FROM
+					lehre.tbl_lehreinheit
+					JOIN lehre.tbl_lehrveranstaltung AS lehrfach ON(tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id)
+					JOIN public.tbl_fachbereich ON(lehrfach.oe_kurzbz=tbl_fachbereich.oe_kurzbz)
+					JOIN public.tbl_benutzerfunktion ON(tbl_fachbereich.fachbereich_kurzbz=tbl_benutzerfunktion.fachbereich_kurzbz)
+				WHERE
+					tbl_benutzerfunktion.funktion_kurzbz='fbk'
+				AND (tbl_benutzerfunktion.datum_von IS null OR tbl_benutzerfunktion.datum_von <= now())
+				AND (tbl_benutzerfunktion.datum_bis IS null OR tbl_benutzerfunktion.datum_bis >= now())
+				AND tbl_lehreinheit.lehrveranstaltung_id = ?
+				AND tbl_benutzerfunktion.oe_kurzbz = (
+					SELECT
+						tbl_studiengang.oe_kurzbz
+					FROM
+						lehre.tbl_lehrveranstaltung
+						JOIN public.tbl_studiengang USING(studiengang_kz)
+					WHERE lehrveranstaltung_id = ?
+				)
+				AND EXISTS (
+					SELECT
+						lehrveranstaltung_id
+					FROM
+						lehre.tbl_lehrveranstaltung
+					WHERE
+						lehrveranstaltung_id = ?
+						AND koordinator IS null
+				)
+		";
+
+		if ($studiensemester_kurzbz !== null)
+		{
+			$qry .= " AND tbl_lehreinheit.studiensemester_kurzbz = ?";
+			$binds[] = $studiensemester_kurzbz;
+		}
+		
+		$qry .= "
+			) AS a
+			JOIN campus.vw_mitarbeiter ON(a.uid=vw_mitarbeiter.uid)
+			WHERE vw_mitarbeiter.aktiv
+		";
+
+		return $this->execQuery($qry, $binds);
+	}
+
+    public function getStg($lehrveranstaltung_id)
+    {
+    	$this->addSelect('stg.*');
+    	$this->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
+    	return $this->load($lehrveranstaltung_id);
+    }
+    
+    //Berechtigungen auf Fachbereichsebene
+    public function getBerechtigungenAufFachberechsebene($lvid, $angezeigtes_stsem)
+    {
+	    $query = "
+		SELECT
+		    DISTINCT lehrfach.oe_kurzbz
+		FROM
+		    lehre.tbl_lehrveranstaltung
+		JOIN 
+		    lehre.tbl_lehreinheit USING(lehrveranstaltung_id)
+		JOIN 
+		    lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+		WHERE 
+		    tbl_lehrveranstaltung.lehrveranstaltung_id = " . $this->escape(intval($lvid));
+
+	    if(isset($angezeigtes_stsem) && $angezeigtes_stsem != ''){
+		$query .= " AND studiensemester_kurzbz = " . $this->escape($angezeigtes_stsem);
+	    }
+
+	    $res = $this->execReadOnlyQuery($query);
+	    return $res;
+    }
+    
+    public function getStudentEMail($lvid, $angezeigtes_stsem)
+    {
+		$query = "
+			SELECT
+				DISTINCT vw_lehreinheit.stg_kurzbz, vw_lehreinheit.stg_typ, 
+				vw_lehreinheit.semester, COALESCE(vw_lehreinheit.verband,'') as verband, 
+				COALESCE(vw_lehreinheit.gruppe,'') as gruppe, 
+				vw_lehreinheit.gruppe_kurzbz, tbl_gruppe.mailgrp
+			FROM
+				campus.vw_lehreinheit
+			LEFT JOIN 
+				public.tbl_gruppe USING(gruppe_kurzbz)
+			WHERE
+				lehrveranstaltung_id = " . $this->escape(intval($lvid)) . "
+				AND studiensemester_kurzbz = " . $this->escape($angezeigtes_stsem);
+
+		$res = $this->execReadOnlyQuery($query);
+		return $res;
+    }
+
+	/**
+	 * Gets lehrveranstaltungen of a studiengang
+	 * @param integer $studiengang_kz
+	 * @return array|null
+	 */
+	public function getLvsByStudiengangkz($studiengang_kz)
+	{
+		$params = array($studiengang_kz);
+
+		$qry = "SELECT
+    				* 
+				FROM 
+				    lehre.tbl_lehrveranstaltung
+				WHERE lehrveranstaltung_id IN
+				      (SELECT lehrveranstaltung_id 
+				       FROM campus.vw_student_lehrveranstaltung 
+					WHERE studiengang_kz = ?";
+
+		$qry .= ") ORDER BY semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * Gets lehrveranstaltungen of Studienplan
+	 * @param $studienplan_id ID des Studienplans
+	 * @param $semester Semester optional
+	 * @return array|null
+	 */
+	public function getLvsByStudienplanId($studienplan_id, $semester = null)
+	{
+		$params = array($studienplan_id);
+
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+			tbl_studienplan_lehrveranstaltung.curriculum,
+			tbl_studienplan_lehrveranstaltung.export,
+			tbl_studienplan_lehrveranstaltung.genehmigung
+		FROM lehre.tbl_lehrveranstaltung
+		JOIN lehre.tbl_studienplan_lehrveranstaltung
+		USING(lehrveranstaltung_id)
+		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ?
+		";
+
+		if ($semester !== null)
+		{
+			$qry.= " AND tbl_studienplan_lehrveranstaltung.semester = ?";
+			$params[] = $semester;
+		}
+
+		$qry .= " ORDER BY stpllv_sort, semester, sort";
+
+		return $this->execQuery($qry, $params);
+	}
 }

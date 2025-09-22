@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Submission tool';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Thesis handed in for older semester, please use word form for assessment!';
+$this->phrasen['abgabetool/aeltereParbeitBenotenQuickInfo']='Thesis handed in for older semester, please use word form for assessment!';
 $this->phrasen['abgabetool/keinEnduploadErfolgt']='Final version not uploaded yet';
 $this->phrasen['abgabetool/typ']='Type';
 $this->phrasen['abgabetool/titel']='Title';
@@ -91,5 +92,10 @@ $this->phrasen['abgabetool/projektbeurteilungDownload']='Thesis-Assessment downl
 $this->phrasen['abgabetool/projektbeurteilungErstDownload']='First-/Assessor';
 $this->phrasen['abgabetool/projektbeurteilungZweitDownload']='Second Assessor';
 $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Error when getting endupload of project work';
+$this->phrasen['abgabetool/uploadedDocumentNotSignedStudent']='The document does not contain an electronic signature. Please inform your Dregree Programm to verify the upload';
+$this->phrasen['abgabetool/uploadedDocumentNotSigned']='Signature not found';
+$this->phrasen['abgabetool/uploadedDocumentSigned']='Signature found';
+$this->phrasen['abgabetool/uploaddDocumentToBigForSignature']='File to big for Signaturecheck';
 $this->phrasen['abgabetool/senatsMitglied']='Examiner';
+$this->phrasen['abgabetool/abgegeben']='handed in, in assessment';
 ?>

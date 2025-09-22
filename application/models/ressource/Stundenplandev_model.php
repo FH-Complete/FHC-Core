@@ -12,6 +12,8 @@ class Stundenplandev_model extends DB_Model
 		$this->pk = 'stundenplandev_id';
 	}
 
+	
+
 	public function getMissingDirectGroups($studiensemester_kurzbz = null)
 	{
 		$qry = "

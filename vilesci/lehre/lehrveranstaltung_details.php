@@ -402,7 +402,12 @@
 					$selected='selected';
 				else
 					$selected='';
-				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</option>';
+				
+				$inaktiv = '';
+				if (!$db->db_parse_bool($row->aktiv))
+					$inaktiv = 'disabled';
+
+				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.' '. $inaktiv . '>'.$row->raumtyp_kurzbz.'</option>';
 			}
 		}//#'.$lv->farbe.'
 		$htmlstr .= '</select></td>

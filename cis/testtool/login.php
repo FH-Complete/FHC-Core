@@ -29,6 +29,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studienplan.class.php');
+require_once('../../include/studienordnung.class.php');
 require_once('../../include/ablauf.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/sprache.class.php');
@@ -126,10 +127,6 @@ if (isset($_REQUEST['prestudent']))
 			$rt->getReihungstestPerson($ps->person_id);
 			if (isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
-			else
-			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-			}
 		}
 		else
 		{
@@ -138,10 +135,6 @@ if (isset($_REQUEST['prestudent']))
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
-				else
-				{
-					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-				}
 			}
 			else
 			{
@@ -362,6 +355,8 @@ if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
 		$pruefling->idnachweis = '';
 		$pruefling->registriert = date('Y-m-d H:i:s');
 		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
+		$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
+
 		if ($pruefling->save())
 		{
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -385,6 +380,7 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
 	$pruefling->semester = $_POST['semester'];
+	$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
 	if ($pruefling->save())
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -431,6 +427,26 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				});';
 		?>
 
+		$(document).bind('cut copy paste', function(e)
+		{
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
 		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
 		// show message to use Mozilla Firefox
 		var ua = navigator.userAgent;
@@ -599,13 +615,26 @@ elseif (isset($prestudent_id))
 			{
 				echo '<tr>';
 				$stg = new Studiengang($ps_obj->studiengang_kz);
+				$sto = new Studienordnung();
+				$sto->getStudienordnungFromStudienplan($ps_obj->studienplan_id);
+				// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
+				$stg_name = $sto->studiengangbezeichnung;
+				$stg_name_eng = $sto->studiengangbezeichnung_englisch;
+				if ($stg_name == '')
+				{
+					$stg_name = $stg->bezeichnung;
+				}
+				if ($stg_name_eng == '')
+				{
+					$stg_name_eng = $stg->english;
+				}
 
 				if ($ps_obj->lastStatus == "Interessent"
 					|| $ps_obj->lastStatus == "Bewerber"
 					|| $ps_obj->lastStatus == "Wartender"
 					|| $ps_obj->lastStatus == "Aufgenommener")
 				{
-					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
+					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
 					if ($ps_obj->ausbildungssemester == '1')
 					{
 						echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
@@ -619,7 +648,7 @@ elseif (isset($prestudent_id))
 				elseif ($ps_obj->lastStatus == "Abgewiesener")
 				{
 					echo '
-						<td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>
+						<td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). '</td>
 						<td class="text-muted">'. $ps_obj->status_mehrsprachig[$sprache_user]. '</td>
 					';
 				}
@@ -633,7 +662,20 @@ elseif (isset($prestudent_id))
 		// Letzten Status für des Prestudenten einholen
 		$ps_master = new Prestudent();
 		$ps_master->getLastStatus($prestudent_id);
-		echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
+		$sto = new Studienordnung();
+		$sto->getStudienordnungFromStudienplan($ps_master->studienplan_id);
+		// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
+		$stg_name = $sto->studiengangbezeichnung;
+		$stg_name_eng = $sto->studiengangbezeichnung_englisch;
+		if ($stg_name == '')
+		{
+			$stg_name = $stg->bezeichnung;
+		}
+		if ($stg_name_eng == '')
+		{
+			$stg_name_eng = $stg->english;
+		}
+		echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_name_eng : $stg_name).'</td>';
 		echo '<td>'. $ps_master->status_mehrsprachig[$sprache_user]. '</td>';
 	}
 
