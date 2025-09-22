@@ -254,7 +254,6 @@ class Student extends FHCAPI_Controller
 			'gebdatum',
 			'gebort',
 			'geburtsnation',
-			'svnr',
 			'ersatzkennzeichen',
 			'staatsbuergerschaft',
 			'matr_nr',

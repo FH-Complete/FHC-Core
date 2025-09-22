@@ -63,6 +63,7 @@ $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
+$route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 
 // Studierendenverwaltung List Routes
 $route['api/frontend/v1/stv/[sS]tudents/inout'] = 'api/frontend/v1/stv/Students/index';
@@ -116,20 +117,23 @@ $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT
 
 foreach($subdirs as $subdir)
 {
-	$dirlist = scandir($subdir);
-	if ($dirlist)
+	if(is_dir($subdir))
 	{
-		$files = array_diff($dirlist, array('.','..'));
-
-		foreach ($files as &$item)
+		$dirlist = scandir($subdir);
+		if ($dirlist)
 		{
-			if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
-			{
-				$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+			$files = array_diff($dirlist, array('.','..'));
 
-				if (file_exists($routes_file))
+			foreach ($files as &$item)
+			{
+				if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
 				{
-					require($routes_file);
+					$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+
+					if (file_exists($routes_file))
+					{
+						require($routes_file);
+					}
 				}
 			}
 		}
