@@ -460,8 +460,6 @@ class Student extends FHCAPI_Controller
 			$_POST['ausbildungssemester'] = 0;
 		}
 
-		$this->addMeta('test', $_POST['personOnly']);
-
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules('nachname', 'Nachname', 'callback_requiredIfNotPersonId', [
