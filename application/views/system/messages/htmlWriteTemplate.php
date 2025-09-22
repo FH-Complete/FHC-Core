@@ -3,13 +3,13 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Write a new message or reply using templates',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'bootstrap3' => true,
 			'ajaxlib' => true,
-			'fontawesome' => true,
-			'tinymce' => true,
-			'sbadmintemplate' => true,
+			'fontawesome4' => true,
+			'tinymce5' => true,
+			'sbadmintemplate3' => true,
 			'dialoglib' => true,
 			'widgets' => true,
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
@@ -17,7 +17,6 @@
 		)
 	);
 ?>
-<body>
 	<div id="wrapper">
 		<div id="page-wrapper">
 			<div class="container-fluid">
@@ -160,7 +159,10 @@
 										<?php
 											echo $this->widgetlib->widget(
 												'Dropdown_widget',
-												array('elements' => success($recipientsArray), 'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'),
+												array(
+													'elements' => success($recipientsArray),
+													'emptyElement' => ucfirst($this->p->t('global', 'empfaenger')).'...'
+												),
 												array(
 													'name' => 'recipients[]',
 													'id' => 'recipients'
@@ -188,6 +190,5 @@
 			</div>
 		</div>
 	</div>
-</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

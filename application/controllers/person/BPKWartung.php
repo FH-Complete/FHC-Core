@@ -7,8 +7,6 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  */
 class BPKWartung extends Auth_Controller
 {
-	private $_uid; // contains the UID of the logged user
-
 	/**
 	 * Constructor
 	 */
@@ -46,7 +44,7 @@ class BPKWartung extends Auth_Controller
 	// Public methods
 
 	/**
-	 * Main page of the InfoCenter tool
+	 * Main page of the bPK Wartung.
 	 */
 	public function index()
 	{
@@ -56,9 +54,7 @@ class BPKWartung extends Auth_Controller
 	}
 
 	/**
-	 * Personal details page of the InfoCenter tool
-	 * Initialization function, gets person and prestudent data and loads the view with the data
-	 * @param $person_id
+	 * bPK Details initialization function, gets person data and loads the view with the data.
 	 */
 	public function showDetails()
 	{
@@ -85,8 +81,7 @@ class BPKWartung extends Auth_Controller
 	}
 
 	/**
-	 * Saves a ZGV for a prestudent, includes Ort, Datum, Nation for bachelor and master
-	 * @param $prestudent_id
+	 * Saves a bPK for a person.
 	 */
 	public function saveBPK()
 	{
@@ -112,7 +107,7 @@ class BPKWartung extends Auth_Controller
 	// Private methods
 
 	/**
-	 * Loads all necessary Person data: Stammdaten (name, svnr, contact, ...), Dokumente, Logs and Notizen
+	 * Loads all necessary Person data.
 	 * @param $person_id
 	 * @return array
 	 */

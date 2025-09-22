@@ -3,15 +3,15 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'InfocenterZgvDetails',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'jqueryui' => true,
+			'jquery3' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'jqueryui1' => true,
 			'dialoglib' => true,
 			'ajaxlib' => true,
-			'tablesorter' => true,
-			'tinymce' => true,
-			'sbadmintemplate' => true,
+			'tablesorter2' => true,
+			'tinymce5' => true,
+			'sbadmintemplate3' => true,
 			'addons' => true,
 			'navigationwidget' => true,
 			'udfs' => true,
@@ -26,6 +26,7 @@
 				'public/js/tablesort/tablesort.js',
 				'public/js/infocenter/messageList.js',
 				'public/js/infocenter/infocenterDetails.js',
+				'public/js/infocenter/rueckstellung.js',
 				'public/js/infocenter/zgvUeberpruefung.js'
 			),
 			'phrases' => array(
@@ -51,7 +52,6 @@
 		)
 	);
 ?>
-<body>
 <div id="wrapper">
 
 	<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -129,15 +129,15 @@
 								<button type="button" class="btn btn-default zgvAblehnen" id="zgvAblehnen_<?php echo $prestudent_id ?>">
 									<?php echo $this->p->t('infocenter', 'zgvNichtErfuellt') ?>
 								</button>
-								<?php
-								if ($studiengang_typ === 'm') :
-								?>
-									<button type="button" class="btn btn-default zgvAkzeptierenPruefung" id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>">
+								<?php if ($studiengang_typ === 'm') : ?>
+									<button
+										type="button"
+										class="btn btn-default zgvAkzeptierenPruefung"
+										id="zgvAkzeptierenPruefung_<?php echo $prestudent_id ?>"
+									>
 										<?php echo $this->p->t('infocenter', 'zgvErfuelltPruefung') ?>
 									</button>
-								<?php
-								endif;
-								?>
+								<?php endif; ?>
 								<span class="zgvStatusText" id="zgvStatusText_<?php echo $prestudent_id ?>" data-info="need">
 								</span>
 							</div>
@@ -240,6 +240,5 @@
 	</div> <!-- ./page-wrapper-->
 </div> <!-- ./wrapper -->
 <button id="scrollToTop" title="Go to top"><i class="fa fa-chevron-up"></i></button>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

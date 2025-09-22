@@ -55,4 +55,104 @@ class Betriebsmittelperson_model extends DB_Model
 		
 		return $this->loadWhere($condition);
 	}
+
+	public function getBetriebsmittelZuordnung($cardIdentifier, $typ = 'Zutrittskarte', $ausgegeben = true)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$where = 'wawi.tbl_betriebsmittel.nummer2 = \'' . $cardIdentifier . '\'
+					AND wawi.tbl_betriebsmittel.betriebsmitteltyp = \''. $typ .'\'
+					AND (retouram >= now() OR retouram IS NULL)
+					';
+
+		if ($ausgegeben)
+			$where .= 'AND ausgegebenam <= now()';
+		else
+			$where .= 'AND (ausgegebenam <= now() OR ausgegebenam IS NULL)';
+
+		return $this->loadWhere($where);
+	}
+
+	public function getBetriebsmittelByUid($uid, $betriebsmitteltyp = null, $isRetourniert = false)
+	{
+		$this->addJoin('wawi.tbl_betriebsmittel', 'betriebsmittel_id');
+
+		$condition = ' wawi.tbl_betriebsmittelperson.uid = '. $this->escape($uid);
+
+		if (is_string($betriebsmitteltyp))
+		{
+			$condition .= ' AND betriebsmitteltyp = ' . $this->escape($betriebsmitteltyp);
+		}
+
+		if ($isRetourniert === true) {
+			$condition .= ' AND retouram IS NOT NULL';
+		}
+		elseif ($isRetourniert === false)
+		{
+			$condition .= ' AND retouram IS NULL';
+		}
+
+		$this->addOrder('ausgegebenam', 'DESC');
+
+		return $this->loadWhere($condition);
+	}
+
+	public function getBetriebsmittelData($id, $type_id, $betriesmitteltypes = null)
+	{
+		switch ($type_id) {
+			case 'person_id':
+				$cond = 'bmp.person_id';
+				break;
+			case 'uid':
+				$cond = 'bmp.uid';
+				break;
+			case 'betriebsmittelperson_id':
+				$cond = 'bmp.betriebsmittelperson_id';
+				break;
+			default: 
+				return error("ID nicht gültig");
+		}
+
+		$cond .= " = ? ";
+		$params[] = $id;
+
+		if ($betriesmitteltypes && !isEmptyArray($betriesmitteltypes))
+		{
+			$cond .= " AND bm.betriebsmitteltyp IN ?";
+			$params[] = $betriesmitteltypes;
+		}
+
+		$query = "
+			SELECT 
+			bm.nummer, bmp.person_id, bm.betriebsmitteltyp, bmp.anmerkung as anmerkung,
+				bmp.retouram,
+				bmp.ausgegebenam,
+				bm.beschreibung, bmp.uid, bmp.kaution,
+				bm.betriebsmittel_id, bmp.betriebsmittelperson_id,
+				bm.inventarnummer, bm.nummer2
+			FROM 
+				wawi.tbl_betriebsmittelperson bmp
+			JOIN 
+				wawi.tbl_betriebsmittel bm ON (bmp.betriebsmittel_id = bm.betriebsmittel_id)
+			WHERE 
+				" . $cond;
+
+		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * Perform a loadWhere on the vw_betriebsmittelperson DB View
+	 *
+	 * @param array $where
+	 *
+	 * @return stdClass
+	 */
+	public function loadViewWhere($where)
+	{
+		$table = $this->dbTable;
+		$this->dbTable = 'public.vw_betriebsmittelperson';
+		$result = $this->loadWhere($where);
+		$this->dbTable = $table;
+		return $result;
+	}
 }

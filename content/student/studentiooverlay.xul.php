@@ -172,6 +172,20 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menulist>
 									</row>
 									<row>
+										<label value="Herkunftsland" control="student-io-menulist-herkunftsland"/>
+										<menulist id="student-io-menulist-herkunftsland" disabled="true"
+												  datasources="<?php echo APP_ROOT ?>rdf/nation.rdf.php" flex="1"
+												  ref="http://www.technikum-wien.at/nation/liste" >
+											<template>
+												<menupopup>
+													<menuitem value="rdf:http://www.technikum-wien.at/nation/rdf#nation_code"
+															  label="rdf:http://www.technikum-wien.at/nation/rdf#kurztext"
+															  uri="rdf:*"/>
+													</menupopup>
+											</template>
+										</menulist>
+									</row>
+									<row>
 										<label value="Zweck" control="student-io-menulist-zweck"/>
 										<vbox>
 											<tree id="student-io-tree-zweck" seltype="single" hidecolumnpicker="false" flex="1"
@@ -247,7 +261,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										</menulist>
 									</row>
 									<row>
-										<label value="Lehreinheit" control="student-io-menulist-lehreinheit"/>
+										<label value="LV-Teil" control="student-io-menulist-lehreinheit"/>
 										<menulist id="student-io-menulist-lehreinheit" disabled="true"
 												  datasources="rdf:null" flex="1"
 												  ref="http://www.technikum-wien.at/lehreinheit/liste" >

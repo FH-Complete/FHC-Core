@@ -45,7 +45,7 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 	<link rel="stylesheet" href="../skin/style.css.php" type="text/css">
 	<link rel="stylesheet" href="../skin/tablesort.css" type="text/css"/>
 	<link rel="stylesheet" type="text/css" href="../skin/jquery-ui-1.9.2.custom.min.css">
-	<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 	<script type="text/javascript" src="../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 	<script type="text/javascript" src="../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>

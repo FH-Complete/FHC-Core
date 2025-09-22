@@ -537,5 +537,101 @@ class zeitsperre extends basis_db
 		return $this->bisdatum;
 	}
 
+
+	/**
+	 * Liefert die Zeitsperren eines Users innerhalb einer bestimmten Zeitspanne.
+	 * Einschränkung nach Zeitsperrentyp möglich.
+	 *
+	 * @param $uid
+	 * @param $von string Datum im Format YYYY-MM-DD
+	 * @param $bis string Datum im Format YYYY-MM-DD
+	 * @param null $zeitsperretyp_kurzbz
+	 * @return bool
+	 */
+	public function getVonBis($uid, $von, $bis, $zeitsperretyp_kurzbz = null)
+	{
+		$qry = '
+			SELECT
+				zeitsperre_id, zeitsperretyp_kurzbz, vondatum, vonstunde, bisdatum, bisstunde
+			FROM
+				campus.tbl_zeitsperre
+				LEFT JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz)
+			WHERE
+				mitarbeiter_uid = '. $this->db_add_param($uid). '
+				AND (
+					(vondatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
+					OR
+					(bisdatum BETWEEN '.$this->db_add_param($von).' AND '.$this->db_add_param($bis).')
+				)';
+
+		if (!is_null($zeitsperretyp_kurzbz))
+		{
+			$qry.= '
+				 AND zeitsperretyp_kurzbz = '. $this->db_add_param($zeitsperretyp_kurzbz);
+		}
+
+		if (!$this->db_query($qry))
+		{
+			$this->errormsg=$this->db_last_error();
+			return false;
+		}
+		else
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$obj = new stdClass();
+				$obj->zeitsperre_id = $row->zeitsperre_id;
+				$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+				$obj->vondatum = $row->vondatum;
+				$obj->vonstunde = $row->vonstunde;
+				$obj->bisdatum = $row->bisdatum;
+				$obj->bisstunde = $row->bisstunde;
+
+				$this->result[]= $obj;
+			}
+			return true;
+		}
+	}
+
+	/**
+	 * Laedt einen Zeitsperretyp.
+	 *
+	 * @param $zeitsperretyp_kurzbz
+	 * @return Gibt Zeitsperretyp als Objekt zurück. True wenn ok, false im Fehlerfall.
+	 */
+	public function loadZeitsperretyp($zeitsperretyp_kurzbz)
+	{
+		if(!is_string($zeitsperretyp_kurzbz))
+		{
+			$this->errormsg = 'zeitsperretyp muß ein String sein';
+			return false;
+		}
+
+		$qry = "SELECT * FROM campus.tbl_zeitsperretyp WHERE zeitsperretyp_kurzbz = ". $this->db_add_param($zeitsperretyp_kurzbz);
+
+		if(!$this->db_query($qry))
+		{
+			$this->errormsg = 'Fehler beim Laden des Datensatzes';
+			return false;
+		}
+
+		if($row = $this->db_fetch_object())
+		{
+			$obj = new StdClass();
+			$obj->zeitsperretyp_kurzbz = $row->zeitsperretyp_kurzbz;
+			$obj->beschreibung = $row->beschreibung;
+			$obj->farbe = $row->farbe;
+
+			$this->result[]= $obj;
+		}
+		else
+		{
+			$this->errormsg = 'Zeitsperretyp konnte nicht geladen werden';
+			return false;
+		}
+
+		return true;
+	}
+
 }
 ?>

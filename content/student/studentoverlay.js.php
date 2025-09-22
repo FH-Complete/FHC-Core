@@ -47,6 +47,8 @@ var StudentNotenTreeDatasource; //Datasource des Noten Trees
 var StudentNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var StudentLvGesamtNotenTreeDatasource; //Datasource des Noten Trees
 var StudentLvGesamtNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
+var StudentAntragNotenTreeDatasource; //Datasource des Noten Trees
+var StudentAntragNotenSelectLehrveranstaltungID=null; //LehreinheitID des Noten Eintrages der nach dem Refresh markiert werden soll
 var StudentPruefungTreeDatasource; //Datasource des Pruefung Trees
 var StudentPruefungSelectID=null; //ID der Pruefung die nach dem Refresh markiert werden soll
 var StudentAnrechnungTreeDatasource; //Datasource des Anrechnung Trees
@@ -56,6 +58,7 @@ var StudentAkteTreeDatasource=null;
 var doublerebuildkonto='false';
 var StudentNotenTreeloaded=false;
 var StudentGesamtNotenTreeloaded=false;
+var StudentAntragNotenTreeloaded=false;
 // ********** Observer und Listener ************* //
 
 // ****
@@ -339,6 +342,54 @@ var StudentLvGesamtNotenTreeListener =
   	  //ohne dem setTimeout
   	  StudentGesamtNotenTreeloaded=true;
       window.setTimeout(StudentLvGesamtNotenTreeSelectID,10);
+  }
+};
+
+// ****
+// * Observer fuer LvGesamtNoten Tree
+// * startet Rebuild nachdem das Refresh
+// * der datasource fertig ist
+// ****
+var StudentAntragNotenTreeSinkObserver =
+{
+	onBeginLoad : function(pSink) {},
+	onInterrupt : function(pSink) {},
+	onResume : function(pSink) {},
+	onError : function(pSink, pStatus, pError) {},
+	onEndLoad : function(pSink)
+	{
+		StudentAntragNotenTreeloaded=false;
+		netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+		var dsResources = StudentAntragNotenTreeDatasource.GetAllResources();
+		if (dsResources.hasMoreElements()) {
+			document.getElementById('student-antragnoten-tree').hidden = false;
+			document.getElementById('student-antragnoten-tree-label').hidden = false;
+			document.getElementById('student-note-copy-antrag').hidden = false;
+			document.getElementById('student-note-copy-antrag-spacer').hidden = false;
+		} else {
+			document.getElementById('student-antragnoten-tree').hidden = true;
+			document.getElementById('student-antragnoten-tree-label').hidden = true;
+			document.getElementById('student-note-copy-antrag').hidden = true;
+			document.getElementById('student-note-copy-antrag-spacer').hidden = true;
+		}
+		document.getElementById('student-antragnoten-tree').builder.rebuild();
+	}
+};
+
+// ****
+// * Nach dem Rebuild wird der Eintrag wieder
+// * markiert
+// ****
+var StudentAntragNotenTreeListener =
+{
+  willRebuild : function(builder) {  },
+  didRebuild : function(builder)
+  {
+  	  //timeout nur bei Mozilla notwendig da sonst die rows
+  	  //noch keine values haben. Ab Seamonkey funktionierts auch
+  	  //ohne dem setTimeout
+  	  StudentAntragNotenTreeloaded=true;
+      window.setTimeout(StudentAntragNotenTreeSelectID,10);
   }
 };
 
@@ -727,6 +778,7 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-titelpre').value='';
 	document.getElementById('student-detail-textbox-titelpost').value='';
 	document.getElementById('student-detail-textbox-vorname').value='';
+	document.getElementById('student-detail-textbox-wahlname').value='';
 	document.getElementById('student-detail-textbox-vornamen').value='';
 	document.getElementById('student-detail-textbox-nachname').value='';
 	document.getElementById('student-detail-textbox-geburtsdatum').value='';
@@ -734,7 +786,6 @@ function StudentDetailReset()
 	document.getElementById('student-detail-textbox-geburtszeit').value='';
 	document.getElementById('student-detail-textbox-anmerkung').value='';
 	document.getElementById('student-detail-textbox-homepage').value='';
-	document.getElementById('student-detail-textbox-svnr').value='';
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value='';
 	document.getElementById('student-detail-menulist-familienstand').value='l';
 	document.getElementById('student-detail-menulist-geschlecht').value='m';
@@ -759,6 +810,7 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-titelpre').disabled=val;
 	document.getElementById('student-detail-textbox-titelpost').disabled=val;
 	document.getElementById('student-detail-textbox-vorname').disabled=val;
+	document.getElementById('student-detail-textbox-wahlname').disabled=val;
 	document.getElementById('student-detail-textbox-vornamen').disabled=val;
 	document.getElementById('student-detail-textbox-nachname').disabled=val;
 	document.getElementById('student-detail-textbox-geburtsdatum').disabled=val;
@@ -766,7 +818,6 @@ function StudentDetailDisableFields(val)
 	document.getElementById('student-detail-textbox-geburtszeit').disabled=val;
 	document.getElementById('student-detail-textbox-anmerkung').disabled=val;
 	document.getElementById('student-detail-textbox-homepage').disabled=val;
-	document.getElementById('student-detail-textbox-svnr').disabled=val;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').disabled=val;
 	document.getElementById('student-detail-menulist-familienstand').disabled=val;
 	document.getElementById('student-detail-menulist-geschlecht').disabled=val;
@@ -799,6 +850,7 @@ function StudentDetailSave()
 	titelpre = document.getElementById('student-detail-textbox-titelpre').value;
 	titelpost = document.getElementById('student-detail-textbox-titelpost').value;
 	vorname = document.getElementById('student-detail-textbox-vorname').value;
+	wahlname = document.getElementById('student-detail-textbox-wahlname').value;
 	vornamen = document.getElementById('student-detail-textbox-vornamen').value;
 	nachname = document.getElementById('student-detail-textbox-nachname').value;
 	geburtsdatum = document.getElementById('student-detail-textbox-geburtsdatum').value;
@@ -806,7 +858,6 @@ function StudentDetailSave()
 	geburtszeit = document.getElementById('student-detail-textbox-geburtszeit').value;
 	anmerkung = document.getElementById('student-detail-textbox-anmerkung').value;
 	homepage = document.getElementById('student-detail-textbox-homepage').value;
-	svnr = document.getElementById('student-detail-textbox-svnr').value;
 	ersatzkennzeichen = document.getElementById('student-detail-textbox-ersatzkennzeichen').value;
 	familienstand = document.getElementById('student-detail-menulist-familienstand').value;
 	geschlecht = document.getElementById('student-detail-menulist-geschlecht').value;
@@ -857,6 +908,7 @@ function StudentDetailSave()
 	req.add('titelpre', titelpre);
 	req.add('titelpost', titelpost);
 	req.add('vorname', vorname);
+	req.add('wahlname', wahlname);
 	req.add('vornamen', vornamen);
 	req.add('nachname', nachname);
 	req.add('geburtsdatum', ConvertDateToISO(geburtsdatum));
@@ -864,7 +916,6 @@ function StudentDetailSave()
 	req.add('geburtszeit', geburtszeit);
 	req.add('anmerkung', anmerkung);
 	req.add('homepage', homepage);
-	req.add('svnr', svnr);
 	req.add('ersatzkennzeichen', ersatzkennzeichen);
 	req.add('familienstand', familienstand);
 	req.add('geschlecht', geschlecht);
@@ -1025,7 +1076,10 @@ function StudentCount()
 // ****
 function StudentAuswahl()
 {
-	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount();
+	var tree=document.getElementById('student-tree');
+	var items = tree.view.rowCount; //Anzahl der Zeilen ermitteln
+
+	document.getElementById('student-toolbar-label-anzahl').value = 'Anzahl: ' + StudentCount() + '/' + items;
 
 	if(!StudentTreeLoadDataOnSelect)
 	{
@@ -1079,7 +1133,7 @@ function StudentAuswahl()
 	StudentGesamtNotenTreeloaded=false;
 
 	stsem = getStudiensemester();
-	
+
 	var url = buildStudentRDFURI({
 	  'prestudent_id': prestudent_id,
 	  'studiensemester_kurzbz': stsem
@@ -1101,6 +1155,7 @@ function StudentAuswahl()
 	titelpre=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpre" ));
 	titelpost=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#titelpost" ));
 	vorname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vorname" ));
+	wahlname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#wahlname" ));
 	vornamen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#vornamen" ));
 	nachname=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nachname" ));
 	geburtsdatum=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geburtsdatum" ));
@@ -1108,7 +1163,6 @@ function StudentAuswahl()
 	geburtszeit=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#gebzeit" ));
 	anmerkung=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#anmerkungen" ));
 	homepage=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#homepage" ));
-	svnr=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#svnr" ));
 	ersatzkennzeichen=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#ersatzkennzeichen" ));
 	familienstand=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#familienstand" ));
 	geschlecht=getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#geschlecht" ));
@@ -1144,6 +1198,7 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-titelpre').value=titelpre;
 	document.getElementById('student-detail-textbox-titelpost').value=titelpost;
 	document.getElementById('student-detail-textbox-vorname').value=vorname;
+	document.getElementById('student-detail-textbox-wahlname').value=wahlname;
 	document.getElementById('student-detail-textbox-vornamen').value=vornamen;
 	document.getElementById('student-detail-textbox-nachname').value=nachname;
 	document.getElementById('student-detail-textbox-geburtsdatum').value=geburtsdatum;
@@ -1151,7 +1206,6 @@ function StudentAuswahl()
 	document.getElementById('student-detail-textbox-geburtszeit').value=geburtszeit;
 	document.getElementById('student-detail-textbox-anmerkung').value=anmerkung;
 	document.getElementById('student-detail-textbox-homepage').value=homepage;
-	document.getElementById('student-detail-textbox-svnr').value=svnr;
 	document.getElementById('student-detail-textbox-ersatzkennzeichen').value=ersatzkennzeichen;
 	document.getElementById('student-detail-menulist-familienstand').value=familienstand;
 
@@ -1188,18 +1242,18 @@ function StudentAuswahl()
 	zgvort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvort" ));
 	zgvnation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvnation" ));
 	zgvdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdatum" ));
-	zgv_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_erfuellt" ));											   
+	zgv_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgv_erfuellt" ));
 	zgvmaster_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_code" ));
 	zgvmasterort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmaort" ));
 	zgvmasternation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmanation" ));
-	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" )); 
+	zgvmasterdatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmadatum" ));
 	zgvmas_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvmas_erfuellt" ));
 	zgvdoktor_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_code" ));
 	zgvdoktorort = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktorort" ));
 	zgvdoktornation = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktornation" ));
 	zgvdoktordatum = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktordatum" ));
 	zgvdoktor_erfuellt = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zgvdoktor_erfuellt" ));
-									  
+
 	aufnahmeschluessel = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#aufnahmeschluessel" ));
 	facheinschlberuf = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#facheinschlberuf" ));
 	bismelden = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bismelden" ));
@@ -1221,7 +1275,7 @@ function StudentAuswahl()
 	if(zgv_erfuellt=='t')
 		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=true;
 	else
-		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=false;									  
+		document.getElementById('student-prestudent-checkbox-zgverfuellt').checked=false;
 	document.getElementById('student-prestudent-menulist-zgvmastercode').value=zgvmaster_code;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').value=zgvmasterort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvmasternation', zgvmasternation);
@@ -1229,7 +1283,7 @@ function StudentAuswahl()
 	if(zgvmas_erfuellt=='t')
 		document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=true;
 	else
-	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=false; 
+	document.getElementById('student-prestudent-checkbox-zgvmaserfuellt').checked=false;
 	document.getElementById('student-prestudent-menulist-zgvdoktorcode').value=zgvdoktor_code;
 	document.getElementById('student-prestudent-textbox-zgvdoktorort').value=zgvdoktorort;
     MenulistSelectItemOnValue('student-prestudent-menulist-zgvdoktornation', zgvdoktornation);
@@ -1595,10 +1649,39 @@ function StudentAuswahl()
 		lvgesamtnotentree.database.AddDataSource(StudentLvGesamtNotenTreeDatasource);
 		StudentLvGesamtNotenTreeDatasource.addXMLSinkObserver(StudentLvGesamtNotenTreeSinkObserver);
 		lvgesamtnotentree.builder.addListener(StudentLvGesamtNotenTreeListener);
+
+		var antragnotentree = document.getElementById('student-antragnoten-tree');
+
+		url='<?php echo APP_ROOT;?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/getLvs/'+prestudent_id+"?"+gettimestamp();
+
+		try
+		{
+			StudentAntragNotenTreeDatasource.removeXMLSinkObserver(StudentAntragNotenTreeSinkObserver);
+			antragnotentree.builder.removeListener(StudentAntragNotenTreeListener);
+		}
+		catch(e)
+		{}
+
+		//Alte DS entfernen
+		var oldDatasources = antragnotentree.database.GetDataSources();
+		while(oldDatasources.hasMoreElements())
+		{
+			antragnotentree.database.RemoveDataSource(oldDatasources.getNext());
+		}
+		//Refresh damit die entfernten DS auch wirklich entfernt werden
+		antragnotentree.builder.rebuild();
+
+		var rdfService = Components.classes["@mozilla.org/rdf/rdf-service;1"].getService(Components.interfaces.nsIRDFService);
+		StudentAntragNotenTreeDatasource = rdfService.GetDataSource(url);
+		StudentAntragNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFRemoteDataSource);
+		StudentAntragNotenTreeDatasource.QueryInterface(Components.interfaces.nsIRDFXMLSink);
+		antragnotentree.database.AddDataSource(StudentAntragNotenTreeDatasource);
+		StudentAntragNotenTreeDatasource.addXMLSinkObserver(StudentAntragNotenTreeSinkObserver);
+		antragnotentree.builder.addListener(StudentAntragNotenTreeListener);
 	}
 
 	// ***** KONTAKTE *****
-	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id);
+	document.getElementById('student-kontakt').setAttribute('src','kontakt.xul.php?person_id='+person_id+'&'+gettimestamp());
 
 	// ***** Betriebsmittel *****
 	document.getElementById('student-betriebsmittel').setAttribute('src','betriebsmitteloverlay.xul.php?person_id='+person_id+'&uid='+uid);
@@ -1773,7 +1856,7 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-textbox-zgvort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvnation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvdatum').disabled=val;
-	document.getElementById('student-prestudent-checkbox-zgverfuellt').disabled=val;											   
+	document.getElementById('student-prestudent-checkbox-zgverfuellt').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvmasterort').disabled=val;
 	document.getElementById('student-prestudent-menulist-zgvmasternation').disabled=val;
@@ -1784,10 +1867,9 @@ function StudentPrestudentDisableFields(val)
 	document.getElementById('student-prestudent-menulist-zgvdoktornation').disabled=val;
 	document.getElementById('student-prestudent-textbox-zgvdoktordatum').disabled=val;
 	document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').disabled=val;
-			   
+
 	document.getElementById('student-prestudent-menulist-aufnahmeschluessel').disabled=val;
 	document.getElementById('student-prestudent-checkbox-facheinschlberuf').disabled=val;
-	document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
 	document.getElementById('student-prestudent-menulist-foerderrelevant').disabled=val;
 	document.getElementById('student-prestudent-checkbox-dual').disabled=val;
 	document.getElementById('student-prestudent-button-save').disabled=val;
@@ -1818,6 +1900,34 @@ function StudentPrestudentDisableFields(val)
 	else
 	{
 		document.getElementById('student-prestudent-menulist-zgvcode').disabled=true;
+	}
+
+	<?php
+	$studiengaengeMaster = $rechte->getStgKz('student/editMakkZgv');
+	// Anlegen eines Arrays mit allen berechtigten Stg-Kz
+	echo ' var berechtigte_master_studiengaenge = ['.implode(',',$studiengaengeMaster).'];';
+	?>
+	if (berechtigte_master_studiengaenge.indexOf(studiengang_kz) >= 0)
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-menulist-zgvmastercode').disabled=true;
+	}
+
+	// bismelden checkbox deaktivieren wenn Recht nicht vorhanden ist
+	<?php
+		$editBismelden = $rechte->isBerechtigt('student/editBismelden') ? 'true' : 'false';
+		echo ' var editBismelden = '.$editBismelden.';';
+	?>
+	if (editBismelden == true)
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=val;
+	}
+	else
+	{
+		document.getElementById('student-prestudent-checkbox-bismelden').disabled=true;
 	}
 
 	//Status Tree leeren
@@ -1852,7 +1962,7 @@ function StudentPrestudentSave()
 	zgvort = document.getElementById('student-prestudent-textbox-zgvort').value;
 	zgvnation = document.getElementById('student-prestudent-menulist-zgvnation').value;
 	zgvdatum = document.getElementById('student-prestudent-textbox-zgvdatum').value;
-	zgv_erfuellt = document.getElementById('student-prestudent-checkbox-zgverfuellt').checked;											   
+	zgv_erfuellt = document.getElementById('student-prestudent-checkbox-zgverfuellt').checked;
 	zgvmaster_code = document.getElementById('student-prestudent-menulist-zgvmastercode').value;
 	zgvmasterort = document.getElementById('student-prestudent-textbox-zgvmasterort').value;
 	zgvmasternation = document.getElementById('student-prestudent-menulist-zgvmasternation').value;
@@ -1863,7 +1973,7 @@ function StudentPrestudentSave()
 	zgvdoktornation = document.getElementById('student-prestudent-menulist-zgvdoktornation').value;
 	zgvdoktordatum = document.getElementById('student-prestudent-textbox-zgvdoktordatum').value;
 	zgvdoktor_erfuellt = document.getElementById('student-prestudent-checkbox-zgvdoktorerfuellt').checked;
-							  
+
 	aufnahmeschluessel = document.getElementById('student-prestudent-menulist-aufnahmeschluessel').value;
 	facheinschlberuf = document.getElementById('student-prestudent-checkbox-facheinschlberuf').checked;
 	bismelden = document.getElementById('student-prestudent-checkbox-bismelden').checked;
@@ -1912,7 +2022,7 @@ function StudentPrestudentSave()
 	req.add('zgvort', zgvort);
 	req.add('zgvnation', zgvnation);
 	req.add('zgvdatum', ConvertDateToISO(zgvdatum));
-	req.add('zgv_erfuellt', zgv_erfuellt);											   
+	req.add('zgv_erfuellt', zgv_erfuellt);
 	req.add('zgvmas_code', zgvmaster_code);
 	req.add('zgvmaort', zgvmasterort);
 	req.add('zgvmanation', zgvmasternation);
@@ -1923,7 +2033,7 @@ function StudentPrestudentSave()
 	req.add('zgvdoktornation', zgvdoktornation);
 	req.add('zgvdoktordatum', ConvertDateToISO(zgvdoktordatum));
 	req.add('zgvdoktor_erfuellt', zgvdoktor_erfuellt);
-							  
+
 	req.add('aufnahmeschluessel', aufnahmeschluessel);
 	req.add('facheinschlberuf', facheinschlberuf);
 	req.add('bismelden', bismelden);
@@ -1977,6 +2087,7 @@ function StudentPrestudentRolleDelete()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
 	studiengang_kz = document.getElementById('student-prestudent-menulist-studiengang_kz').value;
 	if(confirm('Diese Rolle wirklich loeschen?'))
@@ -2005,6 +2116,7 @@ function StudentPrestudentRolleDelete()
 				req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 				req.add('ausbildungssemester', ausbildungssemester);
 				req.add('studiengang_kz', studiengang_kz);
+				req.add('datum', datum);
 
 				var response = req.executePOST();
 
@@ -2036,6 +2148,7 @@ function StudentPrestudentRolleDelete()
 			req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 			req.add('ausbildungssemester', ausbildungssemester);
 			req.add('studiengang_kz', studiengang_kz);
+			req.add('datum', datum);
 
 			var response = req.executePOST();
 
@@ -2128,8 +2241,9 @@ function StudentRolleBearbeiten()
 	var studiensemester_kurzbz = getTreeCellText(tree, 'student-prestudent-tree-rolle-studiensemester_kurzbz', tree.currentIndex);
 	var prestudent_id = getTreeCellText(tree, 'student-prestudent-tree-rolle-prestudent_id', tree.currentIndex);
 	var ausbildungssemester = getTreeCellText(tree, 'student-prestudent-tree-rolle-ausbildungssemester', tree.currentIndex);
+	var datum = getTreeCellText(tree, 'student-prestudent-tree-rolle-datum', tree.currentIndex);
 
-	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester,"Status","status=no, width=500, height=450, centerscreen, resizable");
+	window.open('<?php echo APP_ROOT?>content/student/studentrolledialog.xul.php?prestudent_id='+prestudent_id+'&status_kurzbz='+status_kurzbz+'&studiensemester_kurzbz='+studiensemester_kurzbz+'&ausbildungssemester='+ausbildungssemester+'&datum='+datum,"Status","status=no, width=500, height=450, centerscreen, resizable");
 }
 
 // ****
@@ -2168,14 +2282,26 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 	// Convert bewerbung_abgeschicktamum to ISO-Date
 	if(bewerbung_abgeschicktamum != '')
 	{
-		if(bewerbung_abgeschicktamum.length != 19)
+		if(bewerbung_abgeschicktamum.length < 10)
 		{
-			bewerbung_abgeschicktamum = '';
+			alert('Abgeschicktdatum ist ungueltig');
+			return false;
 		}
 		else
 		{
 			datepart = bewerbung_abgeschicktamum.substring(0, 10);
 			timepart = bewerbung_abgeschicktamum.substring(11);
+
+			timepart_arr = timepart.split(':');
+
+			for (i = 0; i <= 2; i++)
+			{
+				if (typeof timepart_arr[i] === 'undefined' || timepart_arr[i].length !== 2)
+				{
+					timepart_arr[i] = '00';
+				}
+			}
+
 			arr = datepart.split('.');
 
 			if(arr[0].length==1)
@@ -2184,7 +2310,7 @@ function StudentRolleSpeichern(dialog, studiensemester_old, ausbildungssemester_
 			if(arr[1].length==1)
 				arr[1]='0'+arr[1];
 
-			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart;
+			bewerbung_abgeschicktamum = arr[2]+'-'+arr[1]+'-'+arr[0]+' '+timepart_arr.join(":");
 		}
 	}
 
@@ -2350,7 +2476,7 @@ function StudentAddRolle(rolle, semester, studiensemester, statusgrund_id)
 // ****
 // * Druckt die Instkriptionsbestaetigung
 // ****
-function StudentPrintInskriptionsbestaetigung(event)
+function StudentPrintInskriptionsbestaetigung(event, xsl)
 {
 	tree = document.getElementById('student-tree');
 	//Alle markierten Studenten holen
@@ -2387,7 +2513,7 @@ function StudentPrintInskriptionsbestaetigung(event)
 		var output='pdf';
 
 	if(anzahl>0)
-		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl=Inskription&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+		window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=student.rdf.php&xsl='+ xsl +'&stg_kz='+stg_kz+'&uid='+paramList+'&ss='+stsem+'&output='+output,'Inskriptionsbestaetigung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 	else
 		alert('Bitte einen Studenten auswaehlen');
 }
@@ -2680,10 +2806,10 @@ function StudentKontoFilter()
 // ****
 // * Generiert eine student.rdf URI
 // ****
-function buildStudentRDFURI(queryparams, tree) 
+function buildStudentRDFURI(queryparams, tree)
 {
   var baseurl = "<?php echo APP_ROOT; ?>rdf/student.rdf.php";
-  if ( typeof tree !== "undefined" ) 
+  if ( typeof tree !== "undefined" )
   {
     var col = tree.columns ? tree.columns["tree-verband-col-orgform"] : "tree-verband-col-orgform";
     queryparams.orgform = tree.view.getCellText(tree.currentIndex,col);
@@ -2694,19 +2820,19 @@ function buildStudentRDFURI(queryparams, tree)
 // ****
 // * Generiert aus einer BasisURL und einem Dictionary von Parametern eine URI
 // ****
-function _buildURI(baseurl, queryparams) 
+function _buildURI(baseurl, queryparams)
 {
     var str = [];
     var url = baseurl;
-    for (var p in queryparams) 
+    for (var p in queryparams)
     {
-      if ( queryparams.hasOwnProperty(p) && queryparams[p].length > 0 ) 
+      if ( queryparams.hasOwnProperty(p) && queryparams[p].length > 0 )
       {
 	str.push(encodeURIComponent(p) + "=" + encodeURIComponent(queryparams[p]));
       }
     }
     var querystring = str.join("&");
-    if ( querystring.length > 0 ) 
+    if ( querystring.length > 0 )
     {
       url = url + '?' + querystring + '&' + gettimestamp();
     }
@@ -2741,12 +2867,12 @@ function StudentKontoFilterStudenten(filter)
 	var gruppe = getTreeCellText(tree, 'gruppe', tree.currentIndex);
 	var typ = getTreeCellText(tree, 'typ', tree.currentIndex);
 	var stsem = getTreeCellText(tree, 'stsem', tree.currentIndex);
-	
+
 	if(stsem=='')
 		stsem = getStudiensemester();
 	if(typ=='')
 		typ='student';
-	      
+
 	var url = buildStudentRDFURI({
 	  'studiengang_kz': stg_kz,
 	  'semester': sem,
@@ -2758,9 +2884,9 @@ function StudentKontoFilterStudenten(filter)
 	  'filter2': filter,
 	  'buchungstyp': buchungstyp
 	}, tree);
-	
+
 	console.log(url);
-	
+
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -2831,7 +2957,7 @@ function StudentKontoFilterBuchungstyp()
 	  'typ': typ,
 	  'filter2': 'buchungstyp;' + filter
 	}, tree);
-	
+
 	var treeStudent=document.getElementById('student-tree');
 
 	try
@@ -3093,12 +3219,12 @@ function StudentKontoNeuSpeichern(dialog, person_ids, studiengang_kz)
 	{
 		exists = StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kurzbz, studiengang_kz);
 	}
-	if (exists)
+	if (exists.dbdml_return)
 	{
-		if(!confirm('Die Buchung ist bereits vorhanden. Trotzdem fortfahren?'))
+		if(!confirm(exists.dbdml_data))
 			return false;
 	}
-	
+
 	req.add('type', 'neuebuchung');
 
 	req.add('person_ids', person_ids);
@@ -3149,8 +3275,8 @@ function StudentCheckBuchung(person_ids, studiensemester_kurzbz, buchungstyp_kur
 	var response = req.executePOST();
 
 	var val =  new ParseReturnValue(response);
-	
-	return(val.dbdml_return);
+
+	return val;
 }
 
 // *****
@@ -3417,6 +3543,19 @@ function StudentZeugnisDokumentArchivieren()
 			xml = 'ausbildungsvertrag.xml.php';
 			break;
 
+		case 'AbschlussdokumentLehrgaenge':
+			xml = 'abschlussdokument_lehrgaenge.xml.php';
+			break;
+
+		case 'microcredentialzertifikat_1':
+		case 'microcredentialzertifikat_2':
+		case 'microcredentialzertifikat_3':
+		case 'microcredential_1':
+		case 'microcredential_2':
+		case 'microcredential_3':
+			xml = 'microcredential.xml.php';
+			break;
+			
 		default:
 			alert('Das Archivieren fuer diesen Dokumenttyp wird derzeit nicht unterstuetzt');
 			return
@@ -3502,6 +3641,7 @@ function StudentIOAuswahl()
 
 	mobilitaetsprogramm_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#mobilitaetsprogramm_code" ));
 	nation_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#nation_code" ));
+	herkunftsland_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#herkunftsland_code" ));
 	von = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#von" ));
 	bis = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#bis" ));
 	zweck_code = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#zweck_code" ));
@@ -3576,6 +3716,7 @@ function StudentIOAuswahl()
 
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value=mobilitaetsprogramm_code;
 	document.getElementById('student-io-menulist-nation').value=nation_code;
+	document.getElementById('student-io-menulist-herkunftsland').value=herkunftsland_code;
 	document.getElementById('student-io-textbox-von').value=von;
 	document.getElementById('student-io-textbox-bis').value=bis;
 	document.getElementById('student-io-detail-textbox-uid').value=student_uid;
@@ -3810,6 +3951,7 @@ function StudentIODetailDisableFields(val)
 	document.getElementById('student-io-textbox-bis').disabled=val;
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').disabled=val;
 	document.getElementById('student-io-menulist-nation').disabled=val;
+	document.getElementById('student-io-menulist-herkunftsland').disabled=val;
 	document.getElementById('student-io-menulist-zweck').disabled=val;
 	document.getElementById('student-io-button-speichern').disabled=val;
 	document.getElementById('student-io-menulist-lehrveranstaltung').disabled=val;
@@ -3835,6 +3977,7 @@ function StudentIOResetFileds()
 	document.getElementById('student-io-menulist-mobilitaetsprogramm').value='7';
 	document.getElementById('student-io-menulist-zweck').value='2';
 	document.getElementById('student-io-menulist-nation').value='A';
+	document.getElementById('student-io-menulist-herkunftsland').value='A';
 	document.getElementById('student-io-textbox-ort').value='';
 	document.getElementById('student-io-textbox-universitaet').value='';
 	document.getElementById('student-io-textbox-ects_angerechnet').value='';
@@ -3852,6 +3995,7 @@ function StudentIODetailSpeichern()
 	bis = document.getElementById('student-io-textbox-bis').value;
 	mobilitaetsprogramm = document.getElementById('student-io-menulist-mobilitaetsprogramm').value;
 	nation_code = document.getElementById('student-io-menulist-nation').value;
+	herkunftsland_code = document.getElementById('student-io-menulist-herkunftsland').value;
 	zweck_code = document.getElementById('student-io-menulist-zweck').value;
 	uid = document.getElementById('student-io-detail-textbox-uid').value;
 	neu = document.getElementById('student-io-detail-checkbox-neu').checked;
@@ -3889,6 +4033,7 @@ function StudentIODetailSpeichern()
 	req.add('bis', ConvertDateToISO(bis));
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', nation_code);
+	req.add('herkunftsland_code', herkunftsland_code);
 	req.add('zweck_code', zweck_code);
 	req.add('student_uid', uid);
 	req.add('studiengang_kz', studiengang_kz);
@@ -4026,6 +4171,7 @@ function StudentIONeu()
 	req.add('bis', ConvertDateToISO(defaultdatum));
 	req.add('mobilitaetsprogramm_code', mobilitaetsprogramm);
 	req.add('nation_code', 'A');
+	req.add('herkunftsland_code', 'A');
 	req.add('student_uid', uid);
 	req.add('studiengang_kz', stg_kz);
 	req.add('lehreinheit_id', '');
@@ -4338,6 +4484,77 @@ function StudentNotenTreeSelectDifferent()
 }
 
 // ****
+// * Selectiert die Noten im AntragNoteTree welche nicht gleich denen
+// * im ZeugnisNoteTree sind
+// ****
+function StudentAntragNotenTreeSelectDifferent()
+{
+	var zeugnistree = document.getElementById("student-noten-tree");
+	var antragnotentree = document.getElementById("student-antragnoten-tree");
+	//bestehende markierung entfernen
+	antragnotentree.view.selection.clearSelection();
+
+	if(StudentNotenTreeloaded && StudentAntragNotenTreeloaded)
+	{
+		if(antragnotentree.view)
+			var antragitems = antragnotentree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+
+		if(zeugnistree.view)
+			var zeugnisitems = zeugnistree.view.rowCount; //Anzahl der Zeilen ermitteln
+		else
+			return false;
+
+		for(var i=0;i<antragitems;i++)
+		{
+			//Daten aus AntragNotenTree holen
+			col = antragnotentree.columns ? antragnotentree.columns["student-antragnoten-tree-lehrveranstaltung_id"] : "student-antragnoten-tree-lehrveranstaltung_id";
+			var antraglehrveranstaltung_id=antragnotentree.view.getCellText(i,col);
+			col = antragnotentree.columns ? antragnotentree.columns["student-antragnoten-tree-note"] : "student-antragnoten-tree-note";
+			var antragnote=antragnotentree.view.getCellText(i,col);
+			col = antragnotentree.columns ? antragnotentree.columns["student-antragnoten-tree-benotungsdatum-iso"] : "student-antragnoten-tree-benotungsdatum-iso";
+			var antragbenotungsdatum=antragnotentree.view.getCellText(i,col);
+
+			found=false;
+			//Schauen ob die gleiche Zeile im Zeugnisnoten Tree vorkommt
+			for(var j=0;j<zeugnisitems;j++)
+			{
+				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-lehrveranstaltung_id"] : "student-noten-tree-lehrveranstaltung_id";
+				var zeugnislehrveranstaltung_id=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-note"] : "student-noten-tree-note";
+				var zeugnisnote=zeugnistree.view.getCellText(j,col);
+				col = zeugnistree.columns ? zeugnistree.columns["student-noten-tree-benotungsdatum-iso"] : "student-noten-tree-benotungsdatum-iso";
+				var zeugnisbenotungsdatum=zeugnistree.view.getCellText(j,col);
+
+				if(zeugnislehrveranstaltung_id==antraglehrveranstaltung_id && zeugnisnote==antragnote && zeugnisbenotungsdatum==antragbenotungsdatum)
+				{
+					found=true;
+					break;
+				}
+
+				//Wenn das benotungsdatum im Zeugnis
+				//nach dem benotungsdatum des antrags liegt, dann wird die zeile auch nicht markiert.
+				//damit wird verhindert, dass pruefungsnoten die nur von der assistenz eingetragen wurden,
+				//durch den alten eintrag des antrags wieder ueberschrieben werden
+				if(zeugnislehrveranstaltung_id==antraglehrveranstaltung_id
+					&& zeugnisbenotungsdatum>antragbenotungsdatum)
+				{
+					found=true;
+					break;
+				}
+			}
+
+			if(!found)
+			{
+				//Zeile markieren
+				antragnotentree.view.selection.rangedSelect(i,i,true);
+			}
+		}
+	}
+}
+
+// ****
 // * Selectiert den Noten Eintrag nachdem der Tree
 // * rebuildet wurde.
 // ****
@@ -4347,11 +4564,12 @@ function StudentLvGesamtNotenTreeSelectID()
 }
 
 // ***
-// * Disabled/Enabled die Nodenfelder
+// * Disabled/Enabled die Notenfelder
 // ***
 function StudentNoteDisableFields(val)
 {
 	document.getElementById('student-note-copy').disabled=val;
+	document.getElementById('student-note-copy-antrag').disabled=val;
 }
 
 // ***
@@ -4511,6 +4729,68 @@ function StudentNotenMove()
 		}
 	}
 	req.add('anzahl', i);
+
+	var response = req.executePOST();
+
+	var val =  new ParseReturnValue(response)
+
+	if (!val.dbdml_return)
+	{
+		if(val.dbdml_errormsg=='')
+			alert(response);
+		else
+			alert(val.dbdml_errormsg);
+
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentNoteDetailDisableFields(true);
+	}
+	else
+	{
+		StudentNotenTreeDatasource.Refresh(false); //non blocking
+		SetStatusBarText('Daten wurden gespeichert');
+		StudentNoteDetailDisableFields(true);
+	}
+}
+
+// ****
+// * Uebernimmt die Noten der Antraege fuer die Zeugnisnote
+// ****
+function StudentNotenMoveFromAntrag()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-antragnoten-tree');
+
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var paramList= '';
+	var i = 0;
+
+	var url = '<?php echo APP_ROOT ?>index.ci.php/api/frontend/fas/studstatus/Wiederholung/moveLvsToZeugnis';
+	var req = new phpRequest(url,'','');
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			col = tree.columns ? tree.columns["student-antragnoten-tree-studierendenantrag_lehrveranstaltung_id"] : "student-antragnoten-tree-studierendenantrag_lehrveranstaltung_id";
+			studierendenantrag_lehrveranstaltung_id = tree.view.getCellText(v,col);
+
+			req.add('studierendenantrag_lehrveranstaltung_id_'+i, studierendenantrag_lehrveranstaltung_id);
+			i++;
+		}
+	}
+	req.add('anzahl', i);
+
+	var uid = document.getElementById('student-detail-textbox-uid').value;
+	req.add('student_uid', uid);
+
+	var txt = "?";
+	for(var q in req.parms) {
+		txt = txt+'&'+req.parms[q].name+'='+encodeURIComponent(req.parms[q].value);
+	}
 
 	var response = req.executePOST();
 
@@ -4862,6 +5142,7 @@ function StudentPruefungNeu()
 	document.getElementById('student-pruefung-menulist-note').value='9';
 	document.getElementById('student-pruefung-textbox-datum').value='<?php echo date('d.m.Y');?>';
 	document.getElementById('student-pruefung-textbox-anmerkung').value='';
+	StudentPruefungTypChange();
 }
 
 // ****
@@ -4911,6 +5192,17 @@ function StudentPruefungLVAChange()
 	//Lehreinheiten und Mitarbeiter DropDown Auswahl leeren
 	MADropDown.selectedIndex=-1;
 	LEDropDown.selectedIndex=-1;
+}
+
+// ****
+// * Wenn der Typ der Pruefung geaendert wird, dann wird ein Hinweistext angezeigt.
+// ****
+function StudentPruefungTypChange()
+{
+	var typ = document.getElementById('student-pruefung-menulist-typ').value;
+	var hinweisid = document.getElementById('student-pruefung-textbox-datum-hinweis');
+	if(hinweisid === null) return;
+	hinweisid.hidden = (typ != 'kommPruef' && typ != 'zusKommPruef');
 }
 
 // ****
@@ -5147,6 +5439,7 @@ function StudentPruefungAuswahl()
 	document.getElementById('student-pruefung-checkbox-neu').checked=false;
 	document.getElementById('student-pruefung-textbox-pruefung_id').value=pruefung_id;
 	document.getElementById('student-pruefung-textbox-punkte').value=punkte;
+	StudentPruefungTypChange();
 }
 
 function StudentPruefungFilterStsem()
@@ -5653,7 +5946,7 @@ function StudentSuche()
 		var url = buildStudentRDFURI({
 		  'filter': filter
 		});
-	
+
 		var treeStudent=document.getElementById('student-tree');
 
 		try
@@ -5898,6 +6191,198 @@ function StudentCreateDiplSupplement(event)
 	}
 	//PDF erzeugen
 	window.open('<?php echo APP_ROOT; ?>content/pdfExport.php?xml=diplomasupplement.xml.php&output='+output+'&xsl=DiplSupplement&xsl_stg_kz='+stg_kz+'&uid='+paramList,'DiplomaSupplement', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragAbmeldung(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragAbmeldungStgl(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragAbmeldung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragUnterbrechung(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
+}
+
+function StudentPrintAntragWiederholung(event)
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	var tree = document.getElementById('student-tree');
+
+
+	if (tree.currentIndex==-1)
+		return alert('Bitte eine/n Studierende/n auswaehlen');
+
+	//Uids aller markierten Studenten holen
+	var start = new Object();
+	var end = new Object();
+	var numRanges = tree.view.selection.getRangeCount();
+	var prestudent_id= '';
+	var student_uid= '';
+
+	for (var t = 0; t < numRanges; t++)
+	{
+		tree.view.selection.getRangeAt(t,start,end);
+		for (var v = start.value; v <= end.value; v++)
+		{
+			var col = tree.columns ? tree.columns["student-treecol-prestudent_id"] : "student-treecol-prestudent_id";
+			var prestudentId=tree.view.getCellText(v,col);
+			prestudent_id += ';'+prestudentId;
+
+			col = tree.columns ? tree.columns["student-treecol-uid"] : "student-treecol-uid";
+			var uid=tree.view.getCellText(v,col);
+			student_uid += ';'+uid;
+
+		}
+	}
+
+	if (event.shiftKey)
+	{
+		var output='odt';
+	}
+	else if (event.ctrlKey)
+	{
+		var output='doc';
+	}
+	else
+	{
+		var output='pdf';
+	}
+
+	window.open('<?php echo APP_ROOT; ?>/content/pdfExport.php?xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&uid='+student_uid+'&prestudent_id='+prestudent_id+'&output='+output,'AntragUnterbrechung', 'height=200,width=350,left=0,top=0,hotkeys=0,resizable=yes,status=no,scrollbars=yes,toolbar=no,location=no,menubar=no,dependent=yes');
 }
 
 // ****
@@ -6326,6 +6811,13 @@ function StudentLVGesamtNotenTreeSort()
 	// Nach dem Sortieren der Noten die Unterschiede erneut markieren
 	// da sonst nach dem sortieren falsche Eintraege markiert sind
 	window.setTimeout(StudentNotenTreeSelectDifferent,20);
+}
+
+function StudentAntragNotenTreeSort()
+{
+	// Nach dem Sortieren der Noten die Unterschiede erneut markieren
+	// da sonst nach dem sortieren falsche Eintraege markiert sind
+	window.setTimeout(StudentAntragNotenTreeSelectDifferent,20);
 }
 
 //****

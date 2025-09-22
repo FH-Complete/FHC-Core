@@ -34,10 +34,9 @@ var InfocenterPersonDataset = {
 
 		var auswahlStudienart =
 			'<select class="form-control auswahlStudienArt" style="width:auto;">' +
-				'<option data-id="all"> Alle </option>' +
-				'<option data-id="master"> Master </option>' +
-				'<option data-id="bachelor"> Bachelor </option>' +
 			'</select>';
+
+		InfocenterPersonDataset.getStudienartData(infocenter_studiengangstyp);
 
 		var auswahlAbsageToggle =
 			'<a class="absageToggle">Erweiterte Einstellungen</a>';
@@ -51,12 +50,21 @@ var InfocenterPersonDataset = {
 			'</select>' +
 			'<select class="form-control auswahlAbsageAbgeschickt" style="width:auto; float:left;">' +
 			'<option value="null" selected="selected"> Bewerbung abgeschickt? </option>' +
+			'<option value="all"> Beide </option>' +
 			'<option value="true"> Ja </option>' +
 			'<option value="false"> Nein </option>' +
 			'</select>' +
 			'<button class="btn btn-default auswahlAbsageBtn" style="float:left"> Absage </button>';
 
+		let rueckstellung = '<br />' +
+			'<select id="rueckstellungtype" class="form-control" style="width:auto; float:left;">' +
+			'<option disabled value="null" selected>' + FHC_PhrasesLib.t('infocenter', 'statusAuswahl') + '</option>' +
+			'</select>' +
+			'<input id="rueckstellungdate" type="text" class="form-control"  style="width:auto; float:left;" placeholder="Parkdatum">' +
+			'<button class="form-control btn btn-default rueckstellBtn" style="width:auto; float:left"> Zurückstellen </button>';
+
 		InfocenterPersonDataset.getAbsageData();
+		Rueckstellung.getStatus()
 
 		var studienSemesterHtml = '<button class="btn btn-default btn-xs decStudiensemester">' +
 			'<i class="fa fa-chevron-left"></i>' +
@@ -90,21 +98,31 @@ var InfocenterPersonDataset = {
 			"<div class='h-divider'></div><hr class='studiensemesterline'>"
 		);
 
-		InfocenterPersonDataset.selectStudiengangTyp(infocenter_studiengangstyp)
-
 		$('.auswahlStudienArt').change(function()
 		{
-			InfocenterPersonDataset.changeStudengangsTyp($(this).find('option:selected').attr('data-id'));
+			InfocenterPersonDataset.changeStudengangsTyp($(this).find('option:selected').val());
 		});
 
 		$("#datasetActionsBottom").append(
 			"<div class='row'>"+
 				"<div class='col-xs-12'>"+auswahlAbsageToggle+"</div>"+
 				"<div class='col-xs-12' id='absagePunkte' style='display:none'>"+auswahlAbsage+"</div>"+
+				"<div class='col-xs-12' id='rueckstellung' style='display:none'>"+rueckstellung+"</div>"+
 			"</div>" +
 			"<div class='h-divider'></div>" +
 			"<hr class='studiensemesterline'>"
 		)
+
+		let rueckstelldate = new Date();
+
+		rueckstelldate.setDate(rueckstelldate.getDate() + 14);
+		$('#rueckstellungdate').attr("value", $.datepicker.formatDate("dd.mm.yy", rueckstelldate));
+
+		$("#rueckstellungdate").datepicker({
+			"dateFormat": "dd.mm.yy",
+			"minDate": 1
+		});
+
 		$("button.incStudiensemester").click(function() {
 			InfocenterPersonDataset.changeStudiensemesterUservar(1);
 		});
@@ -126,6 +144,29 @@ var InfocenterPersonDataset = {
 			$(".absageModalForAll").modal("show");
 		});
 
+		$('button.rueckstellBtn').click(function()
+		{
+			let idsel = $("#filterTableDataset input:checked[name=PersonId\\[\\]]");
+
+			if(idsel.length <= 0)
+				return FHC_DialogLib.alertInfo("Bitte wählen Sie die Personen aus.");
+
+			let type = $('#rueckstellungtype').val()
+
+			if (type === null)
+				return FHC_DialogLib.alertInfo("Bitte ein Rückstellgrund auswählen.");
+
+			let personen = [];
+
+			for (let i = 0; i < idsel.length; i++)
+			{
+				personen.push($(idsel[i]).val());
+			}
+
+			let date = $("#rueckstellungdate").val();
+			Rueckstellung.setForPersons(personen, type, date)
+		});
+
 		$('#saveAbsageForAll').click(function()
 		{
 			InfocenterPersonDataset.saveAbsageForAll();
@@ -134,6 +175,7 @@ var InfocenterPersonDataset = {
 		$('a.absageToggle').click(function()
 		{
 			$('#absagePunkte').toggle();
+			$('#rueckstellung').toggle();
 		})
 
 		var personcount = 0;
@@ -181,22 +223,6 @@ var InfocenterPersonDataset = {
 				}
 			}
 		);
-	},
-
-	selectStudiengangTyp: function(typ)
-	{
-		switch (typ)
-		{
-			case 'b, m' :
-				$('.auswahlStudienArt [data-id="all"]').attr('selected', 'selected');
-				break;
-			case 'b' :
-				$('.auswahlStudienArt [data-id="bachelor"]').attr('selected', 'selected');
-				break;
-			case 'm' :
-				$('.auswahlStudienArt [data-id="master"]').attr('selected', 'selected');
-				break;
-		}
 	},
 
 	/**
@@ -257,20 +283,12 @@ var InfocenterPersonDataset = {
 		});
 	},
 
-	changeStudengangsTyp: function($typ)
+	changeStudengangsTyp: function(typ)
 	{
-		switch ($typ)
-		{
-			case 'all' :
-				var change = 'b\', \'m';
-				break;
-			case 'bachelor' :
-				var change = 'b';
-				break;
-			case 'master' :
-				var change = 'm';
-				break;
-		}
+		let change = typ;
+
+		if (typ === 'all')
+			change = change = 'b\', \'m\', \'l';
 
 		FHC_AjaxClient.showVeil();
 
@@ -372,7 +390,8 @@ var InfocenterPersonDataset = {
 			'system/infocenter/InfoCenter/getAbsageData',
 			{},
 			{
-				successCallback: function(data, textStatus, jqXHR) {
+				successCallback: function(data, textStatus, jqXHR)
+				{
 					if (FHC_AjaxClient.hasData(data))
 					{
 						data = FHC_AjaxClient.getData(data);
@@ -382,6 +401,11 @@ var InfocenterPersonDataset = {
 									text: value.bezeichnung_mehrsprachig[0]
 							}))
 						})
+
+						$('.auswahlAbsageStg').append($("<option/>", {
+							value: 'all',
+							text: 'Alle'
+						}))
 						$.each(data.studiengaenge, function(key, value){
 							$('.auswahlAbsageStg').append($("<option/>", {
 									value: value.studiengang,
@@ -389,6 +413,42 @@ var InfocenterPersonDataset = {
 							}))
 						})
 
+					}
+				},
+				errorCallback: function(jqXHR, textStatus, errorThrown) {
+					FHC_DialogLib.alertError(textStatus);
+				}
+			}
+		);
+	},
+	getStudienartData: function(infocenter_studiengangstyp)
+	{
+		FHC_AjaxClient.ajaxCallGet(
+			'system/infocenter/InfoCenter/getStudienartData',
+			{},
+			{
+				successCallback: function(data, textStatus, jqXHR)
+				{
+					if (FHC_AjaxClient.hasData(data))
+					{
+						data = FHC_AjaxClient.getData(data);
+
+						let all = data.map(item => item.typ).join('\',\'');
+						$('.auswahlStudienArt').append($("<option/>")
+							.val(all)
+							.text('Alle')
+						);
+
+						$.each(data, function(key, value)
+						{
+							let isSelected;
+							isSelected = (infocenter_studiengangstyp === value.typ && all.length !== 1) ? 'selected' : false;
+							$('.auswahlStudienArt').append($("<option/>")
+								.val(value.typ)
+								.text(value.bezeichnung)
+								.attr('selected', isSelected)
+							)
+						});
 					}
 				},
 				errorCallback: function(jqXHR, textStatus, errorThrown) {

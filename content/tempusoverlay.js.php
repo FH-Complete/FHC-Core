@@ -334,6 +334,29 @@ function onLektorSelect(event)
 	}
 }
 
+function LektorFunktionLoadZeitwunschAdminUrl(){
+
+    var treeLektor = document.getElementById('tree-lektor');
+    var col = treeLektor.columns ? treeLektor.columns["uid"] : "uid";
+    try
+    {
+        var uid = treeLektor.view.getCellText(treeLektor.currentIndex,col);
+    }
+    catch(e)
+    {
+    }
+
+    if (uid == '' || uid == undefined)
+    {
+        alert('LektorIn auswählen, um Zeitwünsche einsehen zu können.');
+        return;
+    }
+    else
+    {
+        window.open('<?php echo APP_ROOT ?>vilesci/personen/zeitwunsch.php?uid=' + uid);
+    }
+}
+
 function loadURL(event)
 {
         var contentFrame = document.getElementById('contentFrame');

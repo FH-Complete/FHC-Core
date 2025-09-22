@@ -40,6 +40,8 @@ require_once('../include/mitarbeiter.class.php');
 require_once('../include/zeitaufzeichnung_gd.class.php');
 require_once('../include/lehreinheitmitarbeiter.class.php');
 require_once('../include/vertrag.class.php');
+require_once('../include/studiensemester.class.php');
+require_once('../include/zeitsperre.class.php');
 
 $uid=get_uid();
 $error_msg='';
@@ -63,7 +65,7 @@ if (isset($_GET['sem']))
 else
 	$sem=0;
 if (isset($_GET['lektor']))
-	$lektor=$_GET['lektor'];
+    $lektor=$_GET['lektor'];
 else
 	$lektor=$uid;
 if (isset($_GET['ver']))
@@ -136,6 +138,14 @@ if (!$error_msg)
 		die ('Fehler bei Methode getLehreinheitLVPL(): '.$lehreinheit->errormsg);
 $lva=$lehreinheit->lehreinheiten;
 $rdf_url='http://www.technikum-wien.at/lehreinheit-lvplan/';
+
+// Positive Zeitsperre 'Zeitverfuegbarkeit' holen
+$ss = new Studiensemester($studiensemester);
+
+$zeitsperre = new Zeitsperre();
+$zeitsperre->getVonBis($lektor, $ss->start, $ss->ende, 'ZVerfueg');
+
+$zeitverfuegbarkeit = count($zeitsperre->result) > 0 ? 'Zeit verfügbar' : '';
 ?>
 
 <RDF:RDF
@@ -395,6 +405,7 @@ if ($anz>0)
 					<LVA:anzahl_notizen>'.$anzahl_notizen.'</LVA:anzahl_notizen>
 					<LVA:lehreinheit_id>'.$l->lehreinheit_id[0].'</LVA:lehreinheit_id>
 					<LVA:vertragsstatus>'.$vertragsstatus.'</LVA:vertragsstatus>
+					<LVA:zeitverfuegbarkeit>'. $zeitverfuegbarkeit. '</LVA:zeitverfuegbarkeit>
 				</RDF:Description>
 			</RDF:li>';
 	}

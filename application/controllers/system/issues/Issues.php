@@ -6,7 +6,6 @@ class Issues extends Auth_Controller
 {
 	private $_uid;
 
-	const FUNKTION_KURZBZ = 'ass'; // // user having this funktion can see issues for oes assigned with this funktion
 	const BERECHTIGUNG_KURZBZ = 'system/issues_verwalten'; // user having this permission can see issues for oes assigned with this permission
 
 	public function __construct()
@@ -26,6 +25,10 @@ class Issues extends Auth_Controller
 		// Load models
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+
+		// load config
+		$this->load->config('issueList');
 
 		$this->loadPhrases(
 			array(
@@ -39,15 +42,19 @@ class Issues extends Auth_Controller
 		);
 
 		$this->_setAuthUID(); // sets property uid
+		$this->setControllerId(); // sets the controller id
 	}
 
 	public function index()
 	{
 		$oes_for_issues = $this->_getOesForIssues();
+		$language_index = $this->_getLanguageIndex();
+		$apps = $this->config->item('issues_list_apps');
+		$status = $this->config->item('issues_list_status');
 
 		$this->load->view(
 			'system/issues/issues',
-			$oes_for_issues
+			array_merge($oes_for_issues, array('language_index' => $language_index, 'apps' => $apps, 'status' => $status))
 		);
 	}
 
@@ -80,7 +87,7 @@ class Issues extends Auth_Controller
 			}
 
 			if (isEmptyString($changeIssueMethod))
-				$errors[] = error("Invalid issue status given");
+				$errors[] = "Invalid issue status given";
 			else
 			{
 				$issueRes = $this->issueslib->{$changeIssueMethod}($issue_id, $user);
@@ -118,6 +125,8 @@ class Issues extends Auth_Controller
 		$oe_kurzbz_for_funktion = array();
 		$benutzerfunktionRes = $this->BenutzerfunktionModel->getBenutzerFunktionByUid($this->_uid, null, date('Y-m-d'), date('Y-m-d'));
 
+		$functions = $this->config->item('issues_list_functions');
+
 		if (isError($benutzerfunktionRes))
 			show_error(getError($benutzerfunktionRes));
 
@@ -127,8 +136,8 @@ class Issues extends Auth_Controller
 			{
 				$all_funktionen_oe_kurzbz[$benutzerfunktion->oe_kurzbz][] = $benutzerfunktion->funktion_kurzbz;
 
-				// separate oes for the funktion needed for displaying issues
-				if ($benutzerfunktion->funktion_kurzbz == self::FUNKTION_KURZBZ)
+				// separate oes for the additional functions which enables displaying issues
+				if (in_array($benutzerfunktion->funktion_kurzbz, $functions))
 				{
 					$oe_kurzbz_for_funktion[] = $benutzerfunktion->oe_kurzbz;
 
@@ -153,7 +162,9 @@ class Issues extends Auth_Controller
 		}
 
 		// add oes for which there is the "manage issues" Berechtigung
-		if (!$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ))
+		$oe_kurzbz_berechtigt = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ);
+
+		if (!$oe_kurzbz_berechtigt)
 			show_error('No permission or error when checking permissions');
 
 		$all_oe_kurzbz_berechtigt = array_unique(array_merge($oe_kurzbz_for_funktion, $oe_kurzbz_berechtigt));
@@ -162,5 +173,29 @@ class Issues extends Auth_Controller
 			'all_funktionen_oe_kurzbz' => $all_funktionen_oe_kurzbz,
 			'all_oe_kurzbz_berechtigt' => $all_oe_kurzbz_berechtigt
 		);
+	}
+
+	/**
+	 * Gets language index of currently logged in user.
+	 * @return object int (the index, start at 1)
+	 */
+	private function _getLanguageIndex()
+	{
+		$idx = 1;
+		$this->SpracheModel->addSelect('sprache, index');
+		$langRes = $this->SpracheModel->load();
+
+		if (hasData($langRes))
+		{
+			$userLang = getUserLanguage();
+			$lang = getData($langRes);
+
+			foreach ($lang as $l)
+			{
+				if ($l->sprache == $userLang) $idx = $l->index;
+			}
+		}
+
+		return $idx;
 	}
 }

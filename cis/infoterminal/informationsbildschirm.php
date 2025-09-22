@@ -169,21 +169,22 @@ echo '
 echo '<!-- Last content:'.$lastinfoscreencontent.' ID:'.$infoscreen_id.' IP:'.$ip.'-->';
 if($infoscreen_id!='' && isset($content[$aktuellerContentIdx]))
 {
-
 	echo '<center style="height: 100%"><iframe id="content" src="../../cms/content.php?content_id='.$content[$aktuellerContentIdx].'" ></iframe></center>';
 }
 else
 {
-	echo '<br><br><br>
-		<center>
-		<h1>Informationsbildschirm - '.CAMPUS_NAME.'</h1>
-		<br><br><br>
-		Dieser Informationsbildschirm wurde noch nicht registriert
-		<br><br>
-		IP-Adresse:'.$ip.'
-		</center>';
+	echo '	<table style="width: 100%; height: 100%">
+				<tr>
+					<td style="height: 80%; vertical-align: center; text-align: center">
+						<img style="height: 900px" src="../../skin/styles/'.EXT_FKT_PATH.'/logo_200x400.png" />
+					</td>
+				</tr>
+				<tr>
+					<td style="height: 20%; vertical-align: bottom; text-align: right; color: #CCCCCC; padding: 50px">'.$ip.'</td>
+				</tr>
+			</table>
+';
 }
-
 echo '
 </body>
 </html>';

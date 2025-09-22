@@ -45,13 +45,14 @@ $datum_obj = new datum();
 	<title>Ampel - Details</title>
 	<link rel="stylesheet" href="../../skin/fhcomplete.css" type="text/css">
 	<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
-	<link rel="stylesheet" href="../../vendor/components/font-awesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../../vendor/fortawesome/font-awesome4/css/font-awesome.min.css">
 	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css">
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
-		<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
-	<script type="text/javascript" src="../../vendor/twbs/bootstrap/dist/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
+	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>
+	<script type="text/javascript" src="../../include/tiny_mce/tiny_mce.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function()
 			{
@@ -61,6 +62,29 @@ $datum_obj = new datum();
 					 dateFormat: 'dd.mm.yy',
 					 });
 			});
+		tinyMCE.init({
+			mode: 'specific_textareas',
+			editor_selector: "mceEditor",
+			theme: "advanced",
+			language: "de",
+			file_browser_callback: "FHCFileBrowser",
+			plugins: "spellchecker,pagebreak,style,layer,table,advhr,advimage,advlink,inlinepopups,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking",
+			// Theme options
+			theme_advanced_buttons1: "code, bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,|,formatselect,fontsizeselect",
+			theme_advanced_buttons2 : "bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,image,cleanup,|,forecolor,backcolor",
+			theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,fullscreen",
+			//theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,|,forecolor,backcolor",
+			//theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,|,print,|,ltr,rtl,|,fullscreen",
+			theme_advanced_toolbar_location: "top",
+			theme_advanced_toolbar_align: "center",
+			theme_advanced_statusbar_location: "bottom",
+			theme_advanced_resizing: true,
+			force_br_newlines: true,
+			force_p_newlines: false,
+			forced_root_block: '',
+			editor_deselector: "mceNoEditor",
+			relative_urls: false
+		});
 	</script>
 	<style>
 		/*remove input type="date" arrows*/ 
@@ -168,6 +192,15 @@ $datum_obj = new datum();
 			die('Invalid Action');
 			break;
 	}
+	if(isset($ampel_id) && $ampel->benutzer_select != '')
+	{
+		$anzahlUser = $ampel->getAnzahlUserAmpel($ampel_id);
+	}
+	else
+	{
+		$anzahlUser = 0;
+	}
+
 
 	echo '<form action="'.$_SERVER['PHP_SELF'].'?action=save" method="POST">
 		<input type="hidden" name="new" value="'.htmlspecialchars($new).'">
@@ -183,8 +216,11 @@ $datum_obj = new datum();
 				<td><input type="text" class="datepicker_datum" name="deadline" size="10" maxlength="10" value="'.htmlspecialchars($datum_obj->formatDatum($ampel->deadline,'Y-m-d')).'" required></td>
 			</tr>
 			<tr valign="top">
-				<td rowspan="3">Benutzer Select</td>
-				<td rowspan="3"><textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea></td>
+				<td rowspan="3">Benutzer*innen Select</td>
+				<td rowspan="3">
+					<textarea name="benutzer_select" cols="60" rows="5" required>'.htmlspecialchars($ampel->benutzer_select).'</textarea>
+					<br>Anzahl Benutzer*innen: '.$anzahlUser.'
+				</td>
 				<td></td>
 				<td valign="middle">Vorlaufzeit (in Tagen)&nbsp
 					<i class="fa fa-info-circle fa-lg" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Anzahl der Tage VOR der Deadline, an denen die Ampel gezeigt werden soll.&#013Wenn keine Angabe, dann wird die Ampel gleich nach ihrer Erstellung angezeigt."></i>
@@ -232,7 +268,7 @@ $datum_obj = new datum();
 			echo '
 				<tr valign="top">
 					<td>'.$lang->sprache.'</td>
-					<td><textarea name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
+					<td><textarea class="mceEditor" name="beschreibung'.$lang->sprache.'" cols="60" rows="5">'.htmlspecialchars((isset($ampel->beschreibung[$lang->sprache])?$ampel->beschreibung[$lang->sprache]:'')).'</textarea></td>
 					<td></td>
 					<td colspan="2"><input size="70" maxlength="64" name="buttontext'.$lang->sprache.'" value="'.htmlspecialchars((isset($ampel->buttontext[$lang->sprache])?$ampel->buttontext[$lang->sprache]:'')).'"></td>
 				</tr>';

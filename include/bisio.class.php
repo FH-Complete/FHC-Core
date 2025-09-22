@@ -49,6 +49,7 @@ class bisio extends basis_db
 	public $lehreinheit_id;				// integer
 	public $ects_erworben;				// numeric(5,2)
 	public $ects_angerechnet;			// numeric(5,2)
+	public $herkunftsland_code;			// varchar(3)
 
 	public $aufenthaltfoerderung_code;	// integer
 	public $bezeichnung;				// varchar(64)
@@ -100,6 +101,7 @@ class bisio extends basis_db
 				$this->lehreinheit_id = $row->lehreinheit_id;
 				$this->ects_angerechnet = $row->ects_angerechnet;
 				$this->ects_erworben = $row->ects_erworben;
+				$this->herkunftsland_code = $row->herkunftsland_code;
 
 				return true;
 			}
@@ -202,7 +204,7 @@ class bisio extends basis_db
 
 			$qry='BEGIN;INSERT INTO bis.tbl_bisio (mobilitaetsprogramm_code, nation_code, von, bis,
 				student_uid, updateamum, updatevon, insertamum, insertvon, ort, universitaet, lehreinheit_id,
-				ects_angerechnet, ects_erworben) VALUES('.
+				ects_angerechnet, ects_erworben, herkunftsland_code) VALUES('.
 			     $this->db_add_param($this->mobilitaetsprogramm_code, FHC_INTEGER).', '.
 			     $this->db_add_param($this->nation_code).', '.
 			     $this->db_add_param($this->von).', '.
@@ -216,7 +218,8 @@ class bisio extends basis_db
 			     $this->db_add_param($this->universitaet).', '.
 			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).','.
 			     $this->db_add_param($this->ects_angerechnet).', '.
-			     $this->db_add_param($this->ects_erworben).');';
+			     $this->db_add_param($this->ects_erworben).', '.
+			     $this->db_add_param($this->herkunftsland_code).');';
 		}
 		else
 		{
@@ -233,7 +236,8 @@ class bisio extends basis_db
 				   ' universitaet='.$this->db_add_param($this->universitaet).','.
 				   ' lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
 				   ' ects_angerechnet='.$this->db_add_param($this->ects_angerechnet).', '.
-				   ' ects_erworben='.$this->db_add_param($this->ects_erworben).
+				   ' ects_erworben='.$this->db_add_param($this->ects_erworben).', '.
+				   ' herkunftsland_code='.$this->db_add_param($this->herkunftsland_code).
 				   " WHERE bisio_id=".$this->db_add_param($this->bisio_id, FHC_INTEGER).";";
 		}
 
@@ -337,6 +341,7 @@ class bisio extends basis_db
 				$io->lehreinheit_id = $row->lehreinheit_id;
 				$io->ects_angerechnet = $row->ects_angerechnet;
 				$io->ects_erworben = $row->ects_erworben;
+				$io->herkunftsland_code = $row->herkunftsland_code;
 
 				$this->result[] = $io;
 			}
@@ -395,6 +400,7 @@ class bisio extends basis_db
 				$io->lehreinheit_id = $row->lehreinheit_id;
 				$io->ects_angerechnet = $row->ects_angerechnet;
 				$io->ects_erworben = $row->ects_erworben;
+				$io->herkunftsland_code = $row->herkunftsland_code;
 
 				$this->result[] = $io;
 			}

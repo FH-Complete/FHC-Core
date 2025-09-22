@@ -28,6 +28,9 @@ class reviewAnrechnungDetail extends Auth_Controller
 			)
 		);
 
+		// Load configs
+		$this->load->config('anrechnung');
+
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
 		$this->load->model('education/Anrechnungstatus_model', 'AnrechnungstatusModel');
@@ -84,16 +87,21 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$antragData = $this->anrechnunglib->getAntragData(
 			$anrechnungData->prestudent_id,
 			$anrechnungData->studiensemester_kurzbz,
-			$anrechnungData->lehrveranstaltung_id
+			$anrechnungData->lehrveranstaltung_id,
+            $anrechnungData->anrechnung_id
 		);
 
 		// Get Empfehlung data
 		$empfehlungData = $this->anrechnunglib->getEmpfehlungData($anrechnung_id);
 
+        // False if LV-Leitung is present and user is not LV-Leitung. Otherwise always true.
+        $isEmpfehlungsberechtigt = $this->anrechnunglib->isEmpfehlungsberechtigt($anrechnung_id);
+
 		$viewData = array(
 			'antragData' => $antragData,
 			'anrechnungData' => $anrechnungData,
-			'empfehlungData' => $empfehlungData
+			'empfehlungData' => $empfehlungData,
+            'isEmpfehlungsberechtigt' => $isEmpfehlungsberechtigt
 		);
 
 		$this->load->view('lehre/anrechnung/reviewAnrechnungDetail.php', $viewData);
@@ -140,10 +148,13 @@ class reviewAnrechnungDetail extends Auth_Controller
 			 * Send mails to STGL (if not present STGL, send to STGL assistance)
 			 * NOTE: mails are sent at the end to ensure sending only one mail to each STGL
 			 * */
-			if (!$this->_sendSanchoMails($json, true))
-			{
-				return $this->outputJsonError('Failed sending emails');
-			}
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                if (!$this->_sendSanchoMails($json, true))
+                {
+                    return $this->outputJsonError('Failed sending emails');
+                }
+            }
 
 			return $this->outputJsonSuccess($json);
 		}
@@ -191,10 +202,13 @@ class reviewAnrechnungDetail extends Auth_Controller
 		if (isset($json) && !isEmptyArray($json))
 		{
 			// Send mails to STGL (if not present STGL, send to STGL assistance)
-			if (!$this->_sendSanchoMails($json, false))
-			{
-				return $this->outputJsonError('Failed sending emails');
-			}
+            if ($this->config->item('send_mail') === TRUE)
+            {
+                if (!$this->_sendSanchoMails($json, false))
+                {
+                    return $this->outputJsonError('Failed sending emails');
+                }
+            }
 
 			return $this->outputJsonSuccess($json);
 		}
@@ -217,15 +231,18 @@ class reviewAnrechnungDetail extends Auth_Controller
 		}
 
 		// Check if user is entitled to read dms doc
-		self::_checkIfEntitledToReadDMSDoc($dms_id);
+		$this->_checkIfEntitledToReadDMSDoc($dms_id);
 
 		// Set filename to be used on downlaod
 		$filename = $this->anrechnunglib->setFilenameOnDownload($dms_id);
 
-		// Download file
-		$this->dmslib->download($dms_id, $filename);
-	}
+		// Get file to be downloaded from DMS
+		$download = $this->dmslib->download($dms_id, $filename);
+		if (isError($download)) return $download;
 
+		// Download file
+		$this->outputFile(getData($download));
+	}
 
 	/**
 	 * Retrieve the UID of the logged user and checks if it is valid
@@ -250,8 +267,14 @@ class reviewAnrechnungDetail extends Auth_Controller
 			show_error('Failed retrieving Anrechnung');
 		}
 
-		$result = $this->LehrveranstaltungModel
-			->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+		if($this->config->item('fbl') === TRUE)
+        {
+            $result = $this->LehrveranstaltungModel->getLeitungOfLvOe($result->lehrveranstaltung_id);
+        }
+		else
+        {
+            $result = $this->LehrveranstaltungModel->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+        }
 
 		if($result = getData($result))
 		{
@@ -279,14 +302,20 @@ class reviewAnrechnungDetail extends Auth_Controller
 			show_error('Failed retrieving Anrechnung');
 		}
 
-		$result = $this->LehrveranstaltungModel
-			->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+		if($this->config->item('fbl') === TRUE)
+        {
+			$result = $this->LehrveranstaltungModel->getLeitungOfLvOe($result->lehrveranstaltung_id);
+        }
+		else
+        {
+			$result = $this->LehrveranstaltungModel->getLecturersByLv($result->studiensemester_kurzbz, $result->lehrveranstaltung_id);
+        }
 
 		if($result = getData($result))
 		{
-			$entitled_lector_arr = array_column($result, 'uid');
+			$entitled_uid_arr = array_column($result, 'uid');
 
-			if (in_array($this->_uid, $entitled_lector_arr))
+			if (in_array($this->_uid, $entitled_uid_arr))
 			{
 				return;
 			}
@@ -319,20 +348,10 @@ class reviewAnrechnungDetail extends Auth_Controller
 		// Send mail to STGL of each studiengang
 		foreach ($studiengang_kz_arr as $studiengang_kz)
 		{
-			// Get STGL mail address, if available, otherwise get assistance mail address
-			$stgmail = $this->_getSTGLMailAddress($studiengang_kz);
-
-			if(isSuccess($stgmail) && hasData($stgmail))
-				list ($to, $vorname) = getData($stgmail)[0];
-			else
-				show_error ('Failed retrieving DegreeProgram Mail');
-
 			// Get full name of lector
 			$this->load->model('person/Person_model', 'PersonModel');
-			if (!$lector_name = getData($this->PersonModel->getFullName($this->_uid)))
-			{
-				show_error ('Failed retrieving person');
-			}
+			$result = $this->PersonModel->getFullName($this->_uid);
+			$lector_name = hasData($result) ? getData($result) : 'Ein Lektor';
 
 			// Link to Antrag genehmigen
 			$url =
@@ -340,22 +359,26 @@ class reviewAnrechnungDetail extends Auth_Controller
 				CIS_ROOT. 'cis/menu.php?content_id=&content='.
 				CIS_ROOT. index_page(). self::APPROVE_ANRECHNUNG_URI;
 
-			// Prepare mail content
-			$body_fields = array(
-				'vorname'                       => $vorname,
-				'lektor_name'                   => $lector_name,
-				'empfehlung'                    => $empfehlung ? 'positive' : 'negative',
-				'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
-			);
+            // Get STGL mail address, if available, otherwise get assistance mail address
+            if( !$result = $this->_getSTGLMailAddress($studiengang_kz)) return false;
+            foreach ($result as $stgl)
+            {
+                // Prepare mail content
+                $body_fields = array(
+                    'vorname'                       => $stgl['vorname'],
+                    'lektor_name'                   => $lector_name,
+                    'empfehlung'                    => $empfehlung ? 'positive' : 'negative',
+                    'link'		                    => anchor($url, 'Anrechnungsanträge Übersicht')
+                );
 
-			sendSanchoMail(
-				'AnrechnungEmpfehlungAbgeben',
-				$body_fields,
-				$to,
-				'Anerkennung nachgewiesener Kenntnisse: Empfehlung wurde abgegeben'
-			);
+                sendSanchoMail(
+                    'AnrechnungEmpfehlungAbgeben',
+                    $body_fields,
+                    $stgl['to'],
+                    'Anerkennung nachgewiesener Kenntnisse: Empfehlung wurde abgegeben'
+                );
+            }
 		}
-
 		return true;
 	}
 
@@ -366,28 +389,33 @@ class reviewAnrechnungDetail extends Auth_Controller
 		$result = $this->StudiengangModel->getLeitung($stg_kz);
 
 		// Get STGL mail address, if available
-		if (isSuccess($result) && hasData($result))
-		{
-			return success(array(
-				$result->retval[0]->uid. '@'. DOMAIN,
-				$result->retval[0]->vorname
-			));
-		}
+        if (hasData($result))
+        {
+            foreach (getData($result) as $stgl)
+            {
+                $stglMailAdress_arr[]= array(
+                    'to' => $stgl->uid. '@'. DOMAIN,
+                    'vorname' => $stgl->vorname
+                );
+            }
+
+            return $stglMailAdress_arr;
+        }
 		// ...otherwise get assistance mail address
 		else
 		{
 			$result = $this->StudiengangModel->load($stg_kz);
 
-			if (isSuccess($result) && hasData($result))
+			if (hasData($result))
 			{
-				return success(array(
+				return array(
 					$result->retval[0]->email,
 					''
-				));
+				);
 			}
 			else
 			{
-				return error('Keine E-Mail für diesen Stg gefunden');
+				return false;
 			}
 		}
 	}

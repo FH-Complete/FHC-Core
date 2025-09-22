@@ -98,7 +98,7 @@ if ($getPersonData)
 <head>
 	<meta charset="utf-8"/>
 	<title>Datenverbund-Client</title>
-	<script type="text/javascript" src="../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+	<script type="text/javascript" src="../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 </head>
 <script type="text/javascript">
 	$(function () {
@@ -230,7 +230,7 @@ if ($getPersonData)
 		printrow('matrikelnummer', 'Matrikelnummer', $matrikelnr);
 		printrow('nachname', 'Nachname', $nachname, '', 255);
 		printrow('vorname', 'Vorname', $vorname, '', 30);
-		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYYMMDD', 10);
+		printrow('geburtsdatum', 'Geburtsdatum', $geburtsdatum, 'Format: YYYY-MM-DD', 10);
 		printrow('geschlecht', 'Geschlecht', $geschlecht, 'Format: M | W', 1);
 		printrow('postleitzahl', 'Postleitzahl', $postleitzahl, '', 10);
     }

@@ -21,6 +21,7 @@ $this->phrasen['lvplan/lehrverbaende']='Teaching Groups';
 $this->phrasen['lvplan/uebersichtDerLehrverbaende']='Overview of Teaching Groups';
 $this->phrasen['lvplan/fehlerUndFeedback']='Send Feedback';
 $this->phrasen['lvplan/lvKoordinationsstelle']='Course-Coordination Office';
+$this->phrasen['lvplan/lvPlanung']='Course-Planning Office';
 $this->phrasen['lvplan/reservierungen']='Reservations';
 $this->phrasen['lvplan/reservierungWurdeGeloescht'] = 'Reservation successfully deleted';
 $this->phrasen['lvplan/alleReservierungen']='All reservations';
@@ -99,4 +100,5 @@ $this->phrasen['lvplan/folgendeAenderungen']='There have been the following chan
 $this->phrasen['lvplan/reserviertInDev']='not<br>available';
 $this->phrasen['lvplan/raumNichtReservierbar']='Reservation is disabled for this room.';
 $this->phrasen['lvplan/reserviertVon']='Reserved by';
+$this->phrasen['lvplan/FragenZuLvPlan']='For questions about your personal schedule, please contact the <a class="Item" href="mailto:%s">Course-Coordination Office</a>';
 ?>

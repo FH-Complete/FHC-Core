@@ -186,6 +186,8 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-semester-overlay.xu
 <vbox id="vbox-main">
 <popupset>
 		<menupopup id="fasoverlay-lektor-tree-popup">
+            <menuitem label="Zeitwünsche einsehen" oncommand="LektorFunktionLoadZeitwunschAdminUrl();" />
+            <menuseparator />
 			<menuitem label="Mail senden" oncommand="LektorFunktionMail();" />
 			<menuseparator />
 			<menuitem label="Entfernen" oncommand="LektorFunktionDel();" />

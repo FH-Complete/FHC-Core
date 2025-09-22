@@ -3,17 +3,16 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Reply to a message',
-			'jquery' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'tinymce' => true,
-			'sbadmintemplate' => true,
+			'jquery3' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'tinymce5' => true,
+			'sbadmintemplate3' => true,
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/messageWriteReply.js')
 		)
 	);
 ?>
-	<body>
 		<div id="wrapper">
 			<div id="page-wrapper">
 				<div class="container-fluid">
@@ -88,6 +87,5 @@
 				</div>
 			</div>
 		</div>
-	</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

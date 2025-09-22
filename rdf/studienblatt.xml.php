@@ -105,9 +105,6 @@ foreach($uid_arr as $uid)
 			$staatsbuergerschaft = new nation();
 			$staatsbuergerschaft->load($student->staatsbuergerschaft);
 
-
-			$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr;
-
 			$geschlecht_obj = new geschlecht();
 			$geschlecht_obj->load($student->geschlecht);
 
@@ -143,7 +140,6 @@ foreach($uid_arr as $uid)
 			echo "\t\t<gebdatum><![CDATA[".$gebdatum."]]></gebdatum>\n";
 			echo "\t\t<gebort><![CDATA[".$student->gebort."]]></gebort>\n";
 			echo "\t\t<staatsbuergerschaft><![CDATA[".$staatsbuergerschaft->langtext."]]></staatsbuergerschaft>\n";
-			echo "\t\t<svnr><![CDATA[".$svnr."]]></svnr>\n";
 			echo "\t\t<matr_nr><![CDATA[".trim($student->matr_nr)."]]></matr_nr>\n";
 			echo "\t\t<matrikelnr><![CDATA[".trim($student->matrikelnr)."]]></matrikelnr>\n";
 			echo "\t\t<studiengang><![CDATA[".$studienordnung->studiengangbezeichnung."]]></studiengang>\n";
@@ -269,11 +265,23 @@ foreach($uid_arr as $uid)
 			echo "\t\t<studienplan_sprache><![CDATA[".$studienplan->sprache."]]></studienplan_sprache>\n";
 			echo "\t\t<regelstudiendauer><![CDATA[".$studienplan->regelstudiendauer."]]></regelstudiendauer>\n";
 
-			$akadgrad = new akadgrad();
-			$akadgrad->getAkadgradStudent($student->uid);
+			// Abschlussgrad ermitteln
+			// Erst aus Studienordnung, wenn nicht gesetzt aus akadgrad-Tabelle
 
-			echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
-			echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			if ($studienordnung->akadgrad_id != '')
+			{
+				$akadgrad = new akadgrad($studienordnung->akadgrad_id);
+				echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
+				echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			}
+			else
+			{
+				$akadgrad = new akadgrad();
+				$akadgrad->getAkadgradStudent($student->uid);
+
+				echo "\t\t<akadgrad><![CDATA[".$akadgrad->titel."]]></akadgrad>\n";
+				echo "\t\t<akadgrad_kurzbz><![CDATA[".$akadgrad->akadgrad_kurzbz."]]></akadgrad_kurzbz>\n";
+			}
 
 			//für ao. Studierende wird die StgKz der Lehrveranstaltungen benötigt, die sie besuchen
 			$lv_studiengang_kz='';

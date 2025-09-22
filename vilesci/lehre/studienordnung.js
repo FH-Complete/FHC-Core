@@ -1180,6 +1180,7 @@ function saveJsondataFromTree(nodeId, studienplan_id, studienplan_lehrveranstalt
 	{
 		if(d.error!==undefined && d.error=='false')
 		{
+			node.attr("lvid", d.result[0].lehrveranstaltung_id);
 			node.attr("studienplan_lehrveranstaltung_id", d.result[0].studienplan_lehrveranstaltung_id);
 			node.attr("id", d.result[0].studienplan_lehrveranstaltung_id);
 			$("#jsonData").html(d);

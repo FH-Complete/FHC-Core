@@ -172,7 +172,7 @@ var LeLvbgrpDDObserver=
 
 	    if(lehreinheit_id=='')
 	    {
-	    	alert('Eine Gruppe kann nur zu einer Lehreinheit hinzugefügt werden. Nicht aber zu einer Lehrveranstaltung');
+	    	alert('Eine Gruppe kann nur zu einem LV-Teil hinzugefügt werden, nicht aber zu einer Lehrveranstaltung');
 	    	return false;
 	    }
 
@@ -385,6 +385,7 @@ var LeLektorDDObserver=
 
 		req.add('lehreinheit_id', lehreinheit_id);
 		req.add('mitarbeiter_uid', uid);
+		req.add('studiensemester_kurzbz', getStudiensemester());
 
 		var response = req.executePOST();
 

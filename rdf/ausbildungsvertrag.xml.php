@@ -123,8 +123,6 @@ foreach($uid_arr as $uid)
 		$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
 		$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
 
-		$svnr = ($student->svnr == '')?'Ersatzkennzeichen: '.$student->ersatzkennzeichen:$student->svnr;
-
 		//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 		if ($studiengang->studiengang_kz<0)
 		{
@@ -146,7 +144,6 @@ foreach($uid_arr as $uid)
 		echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
 		echo "\t\t<gebort>".$student->gebort."</gebort>\n";
 		echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
-		echo "\t\t<svnr>".$svnr."</svnr>\n";
 		echo "\t\t<matrikelnr>".trim($student->matrikelnr)."</matrikelnr>\n";
 		echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
 		echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
@@ -287,7 +284,7 @@ if($prestudent_help->load($prest_id))
 			$titel_kurzbz = '';
 	}
 
-	if ($prestudent_help->getLastStatus($prest_id, null, 'Student'))
+	if ($prestudent_help->getLastStatus($prest_id, null))
 	{
 		$studienplan_id = $prestudent_help->studienplan_id;
 		$studienordnung = new studienordnung();
@@ -327,7 +324,7 @@ foreach($prestudent_arr as $prest_id)
 				$lehrgangstyp = new studiengang();
 				$lehrgangstyp->loadLehrgangstyp($studiengang->lgartcode);
 
-				if ($prestudent->getLastStatus($prestudent->prestudent_id, null, 'Student'))
+				if ($prestudent->getLastStatus($prestudent->prestudent_id, null))
 				{
 					$studienplan_id = $prestudent->studienplan_id;
 					$studienordnung = new studienordnung();
@@ -339,8 +336,6 @@ foreach($prestudent_arr as $prest_id)
 				}
 				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
 				$studiengang_bezeichnung_englisch = empty($studiengangbezeichnung_englisch) ? $studiengang->english : $studiengangbezeichnung_englisch;
-
-				$svnr = ($person->svnr == '')?($person->ersatzkennzeichen != ''?'Ersatzkennzeichen: '.$person->ersatzkennzeichen:''):$person->svnr;
 
 				//Wenn Lehrgang, dann Erhalter-KZ vor die Studiengangs-Kz hängen
 				if ($studiengang->studiengang_kz<0)
@@ -363,7 +358,6 @@ foreach($prestudent_arr as $prest_id)
 					echo "\t\t<gebdatum>".$gebdatum."</gebdatum>\n";
 					echo "\t\t<gebort>".$person->gebort."</gebort>\n";
 					echo "\t\t<staatsbuergerschaft>".$staatsbuergerschaft->langtext."</staatsbuergerschaft>\n";
-					echo "\t\t<svnr>".$svnr."</svnr>\n";
 					echo "\t\t<studiengang>".$db->convert_html_chars($studiengang_bezeichnung)."</studiengang>\n";
 					echo "\t\t<studiengang_englisch>".$db->convert_html_chars($studiengang_bezeichnung_englisch)."</studiengang_englisch>\n";
 					echo "\t\t<studiengang_kurzbz>".$studiengang->kurzbzlang."</studiengang_kurzbz>\n";

@@ -16,8 +16,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
+ *		  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
+ *		  Rudolf Hangl <rudolf.hangl@technikum-wien.at>.
  */
 /**
  * Klasse projektarbeit
@@ -27,7 +27,7 @@ require_once(dirname(__FILE__).'/basis_db.class.php');
 
 class projektarbeit extends basis_db
 {
-	public $new;       		// boolean
+	public $new;	   		// boolean
 	public $result = array(); 	// adresse Objekt
 
 	//Tabellenspalten
@@ -59,6 +59,37 @@ class projektarbeit extends basis_db
 
 	public $abgabedatum;
 
+	// Welche Version der Projektarbeit wird ab welchem Semester verwendet
+	private $_versions = array(
+		'Diplom' => array(
+			'SS2025' => 3,
+			'SS2023' => 2,
+			'SS2022' => 1
+		),
+		'Others' => array(
+			'SS2025' => 2,
+			'SS2022' => 1
+		)
+	);
+
+	// welche Vorlagen werden ab welcher Projekarbeitsversion verwendet (0 - erste "default" Vorlage)
+	private $_projektarbeitVorlageMappings = array(
+		'Begutachter' => array(
+			2 => 'ProjektBeurteilungBAProzent',
+			0 => 'ProjektBeurteilungBA'
+		),
+		'Senatsvorsitz' => array(
+			2 => 'ProjektBeurteilungBAProzent',
+			0 => 'ProjektBeurteilungBA'
+		),
+		'Erstbegutachter' => array(
+			3 => 'ProjektBeurteilungMAProzent',
+			0 => 'ProjektBeurteilungMAErst'
+		),
+		'Zweitbegutachter' => array(
+			0 => 'ProjektBeurteilungMAZweit'
+		)
+	);
 
 	/**
 	 * Konstruktor
@@ -233,25 +264,25 @@ class projektarbeit extends basis_db
 			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte,
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,
 				insertamum, insertvon, updateamum, updatevon, titel_english, final) VALUES('.
-			     $this->db_add_param($this->projekttyp_kurzbz).', '.
-			     $this->db_add_param($this->titel).', '.
-			     $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
-			     $this->db_add_param($this->student_uid).', '.
-			     $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
-			     $this->db_add_param($this->note).', '.
-			     $this->db_add_param($this->punkte).', '.
-			     $this->db_add_param($this->beginn).', '.
-			     $this->db_add_param($this->ende).', '.
-			     $this->db_add_param($this->faktor).', '.
-			     $this->db_add_param($this->freigegeben, FHC_BOOLEAN).', '.
-			     $this->db_add_param($this->gesperrtbis).', '.
-			     $this->db_add_param($this->stundensatz).', '.
-			     $this->db_add_param($this->gesamtstunden).', '.
-			     $this->db_add_param($this->themenbereich).', '.
-			     $this->db_add_param($this->anmerkung).', now(), '.
-			     $this->db_add_param($this->insertvon).', now(), '.
-			     $this->db_add_param($this->updatevon).','.
-			     $this->db_add_param($this->titel_english).','.
+				 $this->db_add_param($this->projekttyp_kurzbz).', '.
+				 $this->db_add_param($this->titel).', '.
+				 $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->student_uid).', '.
+				 $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->note).', '.
+				 $this->db_add_param($this->punkte).', '.
+				 $this->db_add_param($this->beginn).', '.
+				 $this->db_add_param($this->ende).', '.
+				 $this->db_add_param($this->faktor).', '.
+				 $this->db_add_param($this->freigegeben, FHC_BOOLEAN).', '.
+				 $this->db_add_param($this->gesperrtbis).', '.
+				 $this->db_add_param($this->stundensatz).', '.
+				 $this->db_add_param($this->gesamtstunden).', '.
+				 $this->db_add_param($this->themenbereich).', '.
+				 $this->db_add_param($this->anmerkung).', now(), '.
+				 $this->db_add_param($this->insertvon).', now(), '.
+				 $this->db_add_param($this->updatevon).','.
+				 $this->db_add_param($this->titel_english).','.
 				 $this->db_add_param($this->final, FHC_BOOLEAN).');';
 		}
 		else
@@ -468,6 +499,147 @@ class projektarbeit extends basis_db
 			$this->errormsg = 'Fehler beim Laden der Daten';
 			return false;
 		}
+	}
+
+	/**
+	 * Prüft ob Projektarbeit aktuell ist (also zurzeit online bewertet wird).
+	 * @param $projektarbeit_id
+	 * @return boolean
+	 */
+	public function projektarbeitIsCurrent($projektarbeit_id)
+	{
+		$version = $this->getVersion($projektarbeit_id);
+		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
+		return $version === null ? null : $version->isCurrent;
+	}
+
+	/**
+	 * Holt sich Version der Projektarbeit.
+	 * Liefert auch mit, ob die Version die aktuellste ist.
+	 * z.B.: Masterarbeiten waren ab der Änderung zur Gewichtung der Punkte aktuell,
+	 * Bachelorarbeiten waren ab dem Umstieg auf das Online Beurteilungsformular aktuell.
+	 * @param $projektarbeit_id
+	 * @return objekt mit Versionsinfo, null im Fehlerfall
+	 */
+	public function getVersion($projektarbeit_id)
+	{
+		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
+		$qry="
+			SELECT
+				CASE
+					WHEN semesters_diplom.studiensemester_kurzbz IS NOT NULL
+					THEN semesters_diplom.studiensemester_kurzbz
+					ELSE semesters.studiensemester_kurzbz 
+				END AS version_studiensemester_kurzbz,
+				pa.projekttyp_kurzbz
+			FROM
+				lehre.tbl_projektarbeit pa
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				JOIN public.tbl_studiensemester sem USING(studiensemester_kurzbz)
+				LEFT JOIN (
+					SELECT
+						start, studiensemester_kurzbz
+					FROM
+						public.tbl_studiensemester
+					WHERE
+						studiensemester_kurzbz IN (".$this->db_implode4SQL(array_keys($this->_versions['Others'])).")
+				) semesters ON sem.start >= semesters.start AND pa.projekttyp_kurzbz <> 'Diplom'
+				LEFT JOIN (
+					SELECT
+						start, studiensemester_kurzbz
+					FROM
+						public.tbl_studiensemester
+					WHERE
+						studiensemester_kurzbz IN (".$this->db_implode4SQL(array_keys($this->_versions['Diplom'])).")
+				) semesters_diplom ON sem.start >= semesters_diplom.start AND pa.projekttyp_kurzbz = 'Diplom'
+			WHERE
+				projektarbeit_id=".$this->db_add_param($projektarbeit_id, FHC_INTEGER)."
+			ORDER BY
+				semesters.start DESC, semesters_diplom.start DESC
+			LIMIT 1";
+
+		$errormsg = "Fehler beim Ermitteln der Projektarbeit Version";
+
+		if ($this->db_query($qry))
+		{
+			if ($row = $this->db_fetch_object())
+			{
+				// known project types
+				if (isset($this->_versions[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz]))
+				{
+					$row->versionNumber = $this->_versions[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz];
+					$row->isCurrent =
+						$this->_versions[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz]
+						== max($this->_versions[$row->projekttyp_kurzbz]);
+					
+				}
+				elseif (isset($this->_versions['Others'][$row->version_studiensemester_kurzbz]))
+				{
+					$row->versionNumber = $this->_versions['Others'][$row->version_studiensemester_kurzbz];
+					$row->isCurrent =
+						$this->_versions['Others'][$row->version_studiensemester_kurzbz]
+						== max($this->_versions['Others']);
+				}
+				else
+				{
+					$row->isCurrent = false;
+					$row->versionNumber = 0;
+				}
+				return $row;
+			}
+			else
+			{
+				$this->errormsg = $errormsg;
+				return null;
+			}
+		}
+		else
+		{
+			$this->errormsg = $errormsg;
+			return null;
+		}
+	}
+
+	/**
+	 * Holt Version einer Projektarbeit für eine Betreuerart.
+	 * @param $projektarbeit_id
+	 * @param $betreuerart_kurzbz
+	 * @return string Vorlagenname
+	 */
+	public function getVorlage($projektarbeit_id, $betreuerart_kurzbz)
+	{
+		$version = $this->getVersion($projektarbeit_id);
+
+		if ($version == null) return null;
+
+		$key = 0;
+		if (isset($this->_projektarbeitVorlageMappings[$betreuerart_kurzbz]))
+		{
+			foreach ($this->_projektarbeitVorlageMappings[$betreuerart_kurzbz] as $versionNumber => $vorlage)
+			{
+				if ($versionNumber <= $version->versionNumber && $versionNumber > $key) $key = $versionNumber;
+			}
+		}
+
+		return
+			isset($this->_projektarbeitVorlageMappings[$betreuerart_kurzbz][$key])
+			? $this->_projektarbeitVorlageMappings[$betreuerart_kurzbz][$key]
+			: '';
+	}
+
+	/**
+	 * Holt alle möglichen, jemals verwendeten Projektarbeits-Vorlagen
+	 * @return array mit Vorlagennamen
+	 */
+	public function getAllVorlagen()
+	{
+		$vorlagen = array();
+		foreach ($this->_projektarbeitVorlageMappings as $mappings)
+		{
+			$vorlagen = array_unique(array_merge($vorlagen, $mappings));
+		}
+
+		return $vorlagen;
 	}
 }
 ?>

@@ -4,6 +4,8 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 class ZGVUeberpruefung extends Auth_Controller
 {
+	const BERECHTIGUNG_KURZBZ = 'lehre/zgvpruefung';
+
 	/**
 	 * Constructor
 	 */
@@ -12,14 +14,15 @@ class ZGVUeberpruefung extends Auth_Controller
 		// Set required permissions
 		parent::__construct(
 			array(
-				'index' => 'lehre/zgvpruefung:r',
-				'getZgvStatusByPrestudent' => 'lehre/zgvpruefung:r'
+				'index' => self::BERECHTIGUNG_KURZBZ.':r',
+				'getZgvStatusByPrestudent' => self::BERECHTIGUNG_KURZBZ.':r'
 			)
 		);
 		$this->load->model('crm/ZGVPruefungStatus_model', 'ZGVPruefungStatusModel');
 		$this->load->model('crm/ZGVPruefung_model', 'ZGVPruefungModel');
 
 		$this->load->library('WidgetLib');
+		$this->load->library('PermissionLib');
 
 		$this->setControllerId();
 		$this->loadPhrases(
@@ -31,7 +34,14 @@ class ZGVUeberpruefung extends Auth_Controller
 
 	public function index()
 	{
-		$this->load->view('system/infocenter/infocenterZgvUeberpruefung.php');
+		$oeKurzbz = $this->permissionlib->getOE_isEntitledFor(self::BERECHTIGUNG_KURZBZ);
+
+		if (!$oeKurzbz)
+			show_error('Keine Berechtigung.');
+
+		$data['oeKurz'] = $oeKurzbz;
+
+		$this->load->view('system/infocenter/infocenterZgvUeberpruefung.php', $data);
 	}
 
 	public function getZgvStatusByPrestudent()

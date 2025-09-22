@@ -125,8 +125,8 @@ $worksheet->write($zeile, ++$i, "PERSONENKENNZEICHEN", $format_bold);
 $maxlength[$i] = 19;
 $worksheet->write($zeile, ++$i, "STAATSBÜRGERSCHAFT", $format_bold);
 $maxlength[$i] = 16;
-$worksheet->write($zeile, ++$i, "SVNR", $format_bold);
-$maxlength[$i] = 4;
+$worksheet->write($zeile, ++$i, "PERSON_ID", $format_bold);
+$maxlength[$i] = 6;
 $worksheet->write($zeile, ++$i, "ERSATZKENNZEICHEN", $format_bold);
 $maxlength[$i] = 17;
 $worksheet->write($zeile, ++$i, "GESCHLECHT", $format_bold);
@@ -179,6 +179,8 @@ $worksheet->write($zeile, ++$i, "RT_PUNKTE2", $format_bold);
 $maxlength[$i] = 10;
 $worksheet->write($zeile, ++$i, "RT_GESAMTPUNKTE", $format_bold);
 $maxlength[$i] = 18;
+$worksheet->write($zeile,++$i,"ANMERKUNG", $format_bold);
+$maxlength[$i]=30;
 $worksheet->write($zeile, ++$i, "PRIORITÄT", $format_bold);
 $maxlength[$i] = 8;
 
@@ -392,10 +394,11 @@ function draw_content($row)
 	$worksheet->write($zeile, $i, $row->staatsbuergerschaft);
 	$i++;
 
-	//SVNR
-	if (mb_strlen($row->svnr) > $maxlength[$i])
-		$maxlength[$i] = mb_strlen($row->svnr);
-	$worksheet->write($zeile, $i, $row->svnr);
+
+	//Person_id
+	if (mb_strlen($row->person_id) > $maxlength[$i])
+		$maxlength[$i] = mb_strlen($row->person_id);
+	$worksheet->write($zeile, $i, $row->person_id);
 	$i++;
 
 	//Ersatzkennzeichen
@@ -659,7 +662,21 @@ function draw_content($row)
 		$maxlength[$i] = mb_strlen($row->rt_gesamtpunkte);
 	$worksheet->write($zeile, $i, $row->rt_gesamtpunkte);
 	$i++;
-	
+
+	//Anmerkung
+	$qry_1 = "SELECT anmerkung FROM public.tbl_prestudent WHERE prestudent_id=".$db->db_add_param($row->prestudent_id)." LIMIT 1";
+
+		if($db->db_query($qry_1))
+		{
+			if($row_1 = $db->db_fetch_object())
+			{
+				if(mb_strlen($row_1->anmerkung)>$maxlength[$i])
+					$maxlength[$i]=mb_strlen($row_1->anmerkung);
+
+				$worksheet->write($zeile,$i, $row_1->anmerkung);
+			}
+		}
+		$i++;
 	//Priorisierung
 	$prio = $prio_relativ.' ('.$row->priorisierung.')';
 	if (mb_strlen($prio) > $maxlength[$i])

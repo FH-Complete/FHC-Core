@@ -2,6 +2,8 @@ documents/
 vendor/
 
 /nbproject/
+.vscode
+composer.phar
 /.idea/
 .settings
 .project
@@ -24,6 +26,7 @@ application/logs/
 application/models/extensions/
 application/views/extensions/
 application/widgets/extensions/
+application/components/extensions/
 
 public/extensions/
 

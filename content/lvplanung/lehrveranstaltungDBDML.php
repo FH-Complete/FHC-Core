@@ -54,6 +54,7 @@ require_once('../../include/datum.class.php');
 require_once('../../include/vertrag.class.php');
 require_once('../../include/benutzergruppe.class.php');
 require_once('../../include/bisverwendung.class.php');
+require_once('../../include/stundensatz.class.php');
 
 $user = get_uid();
 $db = new basis_db();
@@ -64,6 +65,13 @@ $errormsg = 'unknown';
 $data = '';
 $error = false;
 $warnung = false;
+
+//Default BA1Codes für echte Dienstverträge aus Config Laden
+$arrEchterDV = [103];
+if (defined('DEFAULT_ECHTER_DIENSTVERTRAG') && DEFAULT_ECHTER_DIENSTVERTRAG != '')
+{
+	$arrEchterDV = DEFAULT_ECHTER_DIENSTVERTRAG;
+}
 
 loadVariables($user);
 
@@ -216,14 +224,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -347,7 +355,8 @@ if(!$error)
 									WHERE
 										mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 										studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-										bismelden";
+										bismelden AND
+										lower(mitarbeiter_uid) NOT LIKE '_dummy%'";
 
 							if(count($oe_arr)>0)
 								$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
@@ -507,14 +516,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -536,48 +545,60 @@ if(!$error)
 				$lem->new=true;
 
 				$fixangestellt=false;
-				//Stundensatz aus tbl_mitarbeiter holen
-				$mitarbeiter = new mitarbeiter();
-				if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
+				//"lehre" Stundensatz aus hr.tbl_stundensatz holen
+				
+				$studiensemester = new studiensemester();
+				if (!$studiensemester->load($_POST['studiensemester_kurzbz']))
 				{
-					$fixangestellt = $mitarbeiter->fixangestellt;
-					$lem->stundensatz = $mitarbeiter->stundensatz;
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Laden des Studiensemesters';
+				}
 
-					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+				if (!$error)
+				{
+					$mitarbeiter = new mitarbeiter();
+					if ($mitarbeiter->load($_POST['mitarbeiter_uid']))
 					{
-						$stsem = new studiensemester();
-						$stsem->load($semester_aktuell);
-						$bisverwendung = new bisverwendung();
-						$data = $mitarbeiter->stundensatz;
-						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+						$fixangestellt = $mitarbeiter->fixangestellt;
+						
+						$stundensatz = new stundensatz();
+						$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
+						$lem->stundensatz = $stundensatz->stundensatz;
+						
+						if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+							&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 						{
-							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-							$bisverwendung->result[] = $bisverwendung;
-						}
-
-						foreach($bisverwendung->result as $row_verwendung)
-						{
-							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-							// geliefert da dies im Vertrag inkludiert ist.
-							if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+							$stsem = new studiensemester();
+							$stsem->load($semester_aktuell);
+							$bisverwendung = new bisverwendung();
+							
+							if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
 							{
-								$fixangestellt = true;
-								$lem->stundensatz = '';
-								break;
+								$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+								$bisverwendung->result[] = $bisverwendung;
+							}
+							
+							foreach($bisverwendung->result as $row_verwendung)
+							{
+								// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+								// geliefert da dies im Vertrag inkludiert ist.
+								
+								if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+								{
+									$fixangestellt = true;
+									$lem->stundensatz = '';
+									break;
+								}
 							}
 						}
 					}
 					else
 					{
-						$lem->stundensatz = $mitarbeiter->stundensatz;
+						$error=true;
+						$return=false;
+						$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 					}
-				}
-				else
-				{
-					$error=true;
-					$return=false;
-					$errormsg='Mitarbeiter '.$db->convert_html_chars($_POST['mitarbeiter_uid']).' wurde nicht gefunden';
 				}
 
 				$maxstunden=9999;
@@ -613,6 +634,7 @@ if(!$error)
 								JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+								lower(mitarbeiter_uid) NOT LIKE '_dummy%' AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 								bismelden";
 
@@ -731,14 +753,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -838,14 +860,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -954,14 +976,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		// Wenn nur noch dieser Lektor im LVPlan verplant ist, dann wird das loeschen verhindert
@@ -1055,14 +1077,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		// Wenn nur noch diese eine Gruppe im LVPlan verplant ist, dann wird das loeschen verhindert
@@ -1180,14 +1202,14 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
@@ -1234,7 +1256,7 @@ if(!$error)
 			else
 			{
 				$return = false;
-				$errormsg = 'Bitte zuerst eine Lehreinheit auswaehlen';
+				$errormsg = 'Bitte zuerst einen LV-Teil auswaehlen';
 			}
 		}
 	}
@@ -1265,19 +1287,19 @@ if(!$error)
 			{
 				$error = true;
 				$return = false;
-				$errormsg = 'Lehreinheit wurde nicht gefunden';
+				$errormsg = 'LV-Teil wurde nicht gefunden';
 			}
 		}
 		else
 		{
 			$error = true;
 			$return = false;
-			$errormsg = 'Lehreinheit wurde nicht gefunden';
+			$errormsg = 'LV-Teil wurde nicht gefunden';
 		}
 
 		if(!$error)
 		{
-			$leDAO=new lehreinheit();
+			$leDAO = new lehreinheit();
 			if ($_POST['do']=='create' || ($_POST['do']=='update'))
 			{
 				if($_POST['do']=='update')
@@ -1286,7 +1308,7 @@ if(!$error)
 					{
 						$return = false;
 						$error = true;
-						$errormsg = 'Fehler beim Laden der Lehreinheit';
+						$errormsg = 'Fehler beim Laden des LV-Teils';
 					}
 
 					if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
@@ -1388,6 +1410,118 @@ if(!$error)
 					}
 				}
 			}
+			else if ($_POST['do']=='copy')
+			{
+				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'sui')
+					&& !$rechte->isBerechtigtMultipleOe('assistenz', $lva->getAllOe(), 'sui')
+					&& !$rechte->isBerechtigtMultipleOe('lv-plan', $lva->getAllOe(), 'sui'))
+				{
+					$error = true;
+					$return = false;
+					$errormsg = 'Keine Berechtigung';
+				}
+
+				if(!$leDAO->load($_POST['lehreinheit_id']))
+				{
+					$return = false;
+					$error = true;
+					$errormsg = 'Fehler beim Laden des LV-Teils';
+				}
+
+				if(!$error)
+				{
+					// Neue Lehreinheit anlegen
+					$leDAO->new = true;
+					$leDAO->unr = '';
+					$leDAO->updateamum = date('Y-m-d H:i:s');
+					$leDAO->updatevon = $user;
+					$leDAO->insertamum = date('Y-m-d H:i:s');
+					$leDAO->insertvon = $user;
+
+					if ($leDAO->save())
+					{
+						// Wenn Art "alle" oder "gruppen" ist, werden auch alle Lehreinheitgruppe kopiert
+						if(isset($_POST['art']) && ($_POST['art'] == 'alle' || $_POST['art'] == 'gruppen'))
+						{
+							$legruppe = new lehreinheitgruppe();
+							$legruppe->getLehreinheitgruppe($_POST['lehreinheit_id']);
+
+							if (count($legruppe->lehreinheitgruppe) > 0)
+							{
+								foreach ($legruppe->lehreinheitgruppe as $row)
+								{
+									$legruppe_new = new lehreinheitgruppe();
+									$legruppe_new->lehreinheit_id = $leDAO->lehreinheit_id;
+									$legruppe_new->studiengang_kz = $row->studiengang_kz;
+									$legruppe_new->semester = $row->semester;
+									$legruppe_new->verband = $row->verband;
+									$legruppe_new->gruppe = $row->gruppe;
+									$legruppe_new->gruppe_kurzbz = $row->gruppe_kurzbz;
+									$legruppe_new->updateamum =  date('Y-m-d H:i:s');
+									$legruppe_new->updatevon = $user;
+									$legruppe_new->insertamum =  date('Y-m-d H:i:s');
+									$legruppe_new->insertvon = $user;
+
+									if (!$legruppe_new->save(true))
+									{
+										$errormsg = 'Fehler beim Kopieren der Gruppe: '.$legruppe_new->errormsg;
+										$return = false;
+									}
+									else
+									{
+										$return = true;
+									}
+								}
+							}
+						}
+						// Wenn Art "alle" oder "lektoren" ist, werden auch alle Lehreinheitmitarbeiter kopiert
+						if(isset($_POST['art']) && ($_POST['art'] == 'alle' || $_POST['art'] == 'lektoren'))
+						{
+							$lema = new lehreinheitmitarbeiter();
+							$lema->getLehreinheitmitarbeiter($_POST['lehreinheit_id']);
+
+							if (count($lema->lehreinheitmitarbeiter) > 0)
+							{
+								foreach ($lema->lehreinheitmitarbeiter as $row)
+								{
+									$lema_new = new lehreinheitmitarbeiter();
+									$lema_new->lehreinheit_id = $leDAO->lehreinheit_id;
+									$lema_new->mitarbeiter_uid = $row->mitarbeiter_uid;
+									$lema_new->lehrfunktion_kurzbz = $row->lehrfunktion_kurzbz;
+									$lema_new->semesterstunden = $row->semesterstunden;
+									$lema_new->planstunden = $row->planstunden;
+									$lema_new->stundensatz = $row->stundensatz;
+									$lema_new->faktor = $row->faktor;
+									$lema_new->anmerkung = $row->anmerkung;
+									$lema_new->bismelden = $row->bismelden;
+									$lema_new->updateamum = date('Y-m-d H:i:s');
+									$lema_new->updatevon = $user;
+									$lema_new->insertamum = date('Y-m-d H:i:s');
+									$lema_new->insertvon = $user;
+									$lema_new->ext_id = $row->ext_id;
+									$lema_new->vertrag_id = '';
+
+									if (!$lema_new->save(true))
+									{
+										$errormsg = 'Fehler beim Kopieren der MitarbeiterInnen: '.$lema_new->errormsg;
+										$return = false;
+									}
+									else
+									{
+										$return = true;
+									}
+								}
+							}
+						}
+						$return = true;
+					}
+					else
+					{
+						$return = false;
+						$errormsg = $leDAO->errormsg;
+					}
+				}
+			}
 			else if ($_POST['do']=='delete') //Lehreinheit loeschen
 			{
 				if(!$rechte->isBerechtigtMultipleOe('admin', $lva->getAllOe(), 'suid') &&
@@ -1409,7 +1543,7 @@ if(!$error)
 						if($db->db_num_rows()>0)
 						{
 							$return = false;
-							$errormsg = 'Diese Lehreinheit ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
+							$errormsg = 'Dieser LV-Teil ist bereits im LV-Plan verplant und kann daher nicht geloescht werden!';
 						}
 						else
 						{
@@ -1420,7 +1554,7 @@ if(!$error)
 							else
 							{
 								$return = false;
-								$errormsg = 'Fehler beim Loeschen der Lehreinheit '.$leDAO->errormsg;
+								$errormsg = 'Fehler beim Loeschen des LV-Teils '.$leDAO->errormsg;
 							}
 						}
 					}
@@ -1435,48 +1569,61 @@ if(!$error)
 	}
 	elseif(isset($_POST['type']) && $_POST['type']=='getstundensatz')
 	{
-		if(isset($_POST['mitarbeiter_uid']))
+		if(isset($_POST['mitarbeiter_uid']) && isset($_POST['studiensemester_kurzbz']))
 		{
-			$mitarbeiter = new mitarbeiter();
-			if($mitarbeiter->load($_POST['mitarbeiter_uid']))
+			$studiensemester = new studiensemester();
+			if (!$studiensemester->load($_POST['studiensemester_kurzbz']))
 			{
-				if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
-					&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
+				$return = false;
+				$error = true;
+				$errormsg = 'Fehler beim Laden des Studiensemesters';
+			}
+			
+			if (!$error)
+			{
+				$mitarbeiter = new mitarbeiter();
+				if($mitarbeiter->load($_POST['mitarbeiter_uid']))
 				{
-					$stsem = new studiensemester();
-					$stsem->load($semester_aktuell);
-					$bisverwendung = new bisverwendung();
-					$data = $mitarbeiter->stundensatz;
-					if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
+					$stundensatz = new stundensatz();
+					$stundensatz->getStundensatzDatum($mitarbeiter->uid, $studiensemester->start, $studiensemester->ende, 'lehre');
+					$data = $stundensatz->stundensatz;
+					
+					if (defined('FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ')
+						&& !FAS_LV_LEKTORINNENZUTEILUNG_FIXANGESTELLT_STUNDENSATZ)
 					{
-						$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
-						$bisverwendung->result[] = $bisverwendung;
-					}
-
-					foreach($bisverwendung->result as $row_verwendung)
-					{
-						// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
-						// geliefert da dies im Vertrag inkludiert ist.
-						if ($row_verwendung->ba1code == 103 && $row_verwendung->inkludierte_lehre == -1)
+						$stsem = new studiensemester();
+						$stsem->load($semester_aktuell);
+						$bisverwendung = new bisverwendung();
+						if(!$bisverwendung->getVerwendungRange($mitarbeiter->uid, $stsem->start, $stsem->ende))
 						{
-							$data = '';
-							break;
+							$bisverwendung->getLastAktVerwendung($mitarbeiter->uid);
+							$bisverwendung->result[] = $bisverwendung;
+						}
+						
+						foreach($bisverwendung->result as $row_verwendung)
+						{
+							
+							// Bei echten Dienstvertraegen mit voller inkludierter Lehre wird kein Stundensatz
+							// geliefert da dies im Vertrag inkludiert ist.
+							if ((in_array($row_verwendung->ba1code, $arrEchterDV)) && $row_verwendung->inkludierte_lehre == -1)
+							{
+								$data = '';
+								break;
+							}
 						}
 					}
+					$return = true;
 				}
 				else
-					$data = $mitarbeiter->stundensatz;
-				$return = true;
-			}
-			else
-			{
-				$errormsg = 'Fehler beim Laden des Mitarbeitenden';
-				$return = false;
+				{
+					$errormsg = 'Fehler beim Laden des Mitarbeitenden';
+					$return = false;
+				}
 			}
 		}
 		else
 		{
-			$errormsg = 'MitarbeitendeUID muss uebergeben werden';
+			$errormsg = 'MitarbeitendeUID und Studiensemester muessen uebergeben werden';
 			$return = false;
 		}
 	}
@@ -1795,13 +1942,13 @@ if(!$error)
 				}
 				else
 				{
-					$errormsg = 'Gruppe passt nicht zur Lehreinheit';
+					$errormsg = 'Gruppe passt nicht zum LV-Teil';
 					$return = false;
 				}
 			}
 			else
 			{
-				$errormsg = 'Gruppe passt nicht zur Lehreinheit';
+				$errormsg = 'Gruppe passt nicht zum LV-Teil';
 				$return = false;
 			}
 		}

@@ -34,11 +34,14 @@ require_once(dirname(__FILE__).'/variable.class.php');
 
 class lehrstunde extends basis_db
 {
+	public $result = array();
+
 	public $stundenplan_id;	/// @brief ID in der Datenbank
 	public $lehreinheit_id;	/// @brief id der Lehreinheit in der DB
 	public $unr;			// @brief Unterrichtsnummer
 	public $lektor_uid;		// @brief UID des Lektors
 	public $lektor_kurzbz; 	// @brief Kurzbezeichnung des Lektors
+	public $mitarbeiter_kurzbz; 	    // @brief Kurzbezeichnung
 	public $datum;			// @brief Datum
 	public $stunde;			// @brief Unterrichts-Stunde des Tages
 	public $ort_kurzbz;		// @brief Ort in dem der Unterricht stattfindet
@@ -114,6 +117,7 @@ class lehrstunde extends basis_db
 			$this->unr=$row->unr;
 			$this->lektor_uid=$row->uid;
 			$this->lektor_kurzbz=$row->lektor;
+			$this->mitarbeiter_kurzbz=$row->mitarbeiter_kurzbz;
 			$this->datum=$row->datum;
 			$this->stunde=$row->stunde;
 			$this->ort_kurzbz=$row->ort_kurzbz;
@@ -588,6 +592,7 @@ class lehrstunde extends basis_db
 			$stunde->unr=$row->unr;
 			$stunde->lektor_uid=$row->uid;
 			$stunde->lektor_kurzbz=$row->lektor;
+			$stunde->mitarbeiter_kurzbz=$row->mitarbeiter_kurzbz;
 			$stunde->datum=$row->datum;
 			$stunde->stunde=$row->stunde;
 			$stunde->ort_kurzbz=$row->ort_kurzbz;
@@ -658,7 +663,10 @@ class lehrstunde extends basis_db
 				$stunde->titel=$row->titel;
 				$stunde->anmerkung=$row->beschreibung;
 				$stunde->anmerkung_lehreinheit=$row->beschreibung;
+				$stunde->updateamum=$row->insertamum;
+				$stunde->updatevon=$row->insertvon;
 				$stunde->farbe='';
+				$stunde->mitarbeiter_kurzbz = $row->mitarbeiter_kurzbz;
 				$this->lehrstunden[]=$stunde;
 			}
 		}
@@ -876,8 +884,12 @@ class lehrstunde extends basis_db
 		if ($anz_zs!=0)
 		{
 			$row = $this->db_fetch_object($erg_zs);
-			$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
-			return true;
+
+			if ($row->zeitsperretyp_kurzbz != 'ZVerfueg')
+			{
+				$this->errormsg="Kollision (Zeitsperre): $row->zeitsperre_id|$row->lektor|$row->zeitsperretyp_kurzbz - $row->vondatum/$row->vonstunde|$row->bisdatum/$row->bisstunde";
+				return true;
+			}
 		}
 		return false;
 	}
@@ -1060,7 +1072,19 @@ class lehrstunde extends basis_db
 		return $result;
 	}
 
-	public function getStundenplanData($db_stpl_table, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null)
+	/**
+	 * Holt Stundenplandaten.
+	 *
+	 * @param $db_stpl_table
+	 * @param null $lehrveranstaltung_id
+	 * @param null $studiensemester_kurzbz
+	 * @param null $lehreinheit_id
+	 * @param null $mitarbeiter_uid
+	 * @param null $student_uid
+	 * @param false $nurBevorstehende Wenn true, dann werden nur bevorstehende LVs abgefragt.
+	 * @return bool
+	 */
+	public function getStundenplanData($db_stpl_table, $lehrveranstaltung_id=null, $studiensemester_kurzbz=null, $lehreinheit_id=null, $mitarbeiter_uid=null, $student_uid=null, $nurBevorstehende = false)
 	{
 
 		$qry = "SELECT
@@ -1101,16 +1125,70 @@ class lehrstunde extends basis_db
 		}
 		elseif($student_uid!='')
 		{
-			$qry.=" lehreinheit_id in (
-				SELECT
-					lehreinheit_id
-				FROM
-					campus.vw_student_lehrveranstaltung
-				WHERE
-					uid=".$this->db_add_param($student_uid)." AND studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz).")";
+			$qry.=" tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					-- if student is assigned to lehreinheit through lehreinheitgruppe.
+					AND (
+					 lehreinheit_id IN (
+						SELECT tbl_lehreinheit.lehreinheit_id
+						FROM lehre.tbl_lehreinheitgruppe,
+							tbl_benutzergruppe,
+							lehre.tbl_lehreinheit,
+							lehre.tbl_lehrveranstaltung
+						WHERE tbl_lehreinheitgruppe.gruppe_kurzbz::text = tbl_benutzergruppe.gruppe_kurzbz::text
+							AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+							AND tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+							AND tbl_lehreinheit.studiensemester_kurzbz::text = tbl_benutzergruppe.studiensemester_kurzbz::text
+							AND uid=".$this->db_add_param($student_uid)."
+							AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+						UNION
+						SELECT tbl_lehreinheit.lehreinheit_id
+						FROM lehre.tbl_lehreinheitgruppe,
+							tbl_studentlehrverband,
+							lehre.tbl_lehreinheit,
+							lehre.tbl_lehrveranstaltung
+						WHERE tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+							AND tbl_lehreinheit.studiensemester_kurzbz = tbl_studentlehrverband.studiensemester_kurzbz
+							AND tbl_lehrveranstaltung.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id
+							AND tbl_studentlehrverband.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
+							AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester
+							AND
+						(
+							(
+								(
+									btrim(tbl_studentlehrverband.verband::text) = btrim(tbl_lehreinheitgruppe.verband::text)
+									OR (tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = '')
+									AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
+								)
+								AND (
+									btrim(tbl_studentlehrverband.gruppe::text) = btrim(tbl_lehreinheitgruppe.gruppe::text)
+									OR (tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = '')
+									AND tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL
+								)
+							)
+							-- add also lehreinheiten directly from Stundenplan
+							OR EXISTS (
+								SELECT 1 FROM lehre.tbl_stundenplan
+								WHERE
+								lehreinheit_id = tbl_lehreinheit.lehreinheit_id
+								AND studiengang_kz = tbl_studentlehrverband.studiengang_kz
+								AND (semester = tbl_studentlehrverband.semester OR semester IS NULL)
+								AND (verband = tbl_studentlehrverband.verband OR verband IS NULL OR verband ='0' OR verband = '')
+								AND (gruppe = tbl_studentlehrverband.gruppe OR gruppe IS NULL OR gruppe ='0' OR gruppe = '')
+								AND gruppe_kurzbz IS NULL
+							)
+						)
+						AND student_uid=".$this->db_add_param($student_uid)."
+						AND tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz)."
+					)
+				)";
 		}
 		else
 			return false;
+
+		if($nurBevorstehende)
+		{
+			$qry.= " AND datum >= NOW()::date ";
+		}
 
 		$qry.="GROUP BY stpl.datum, stpl.unr, stpl.lehreinheit_id, lehrfach.bezeichnung
 					ORDER BY stpl.datum,  min(stpl.stunde), stpl.unr, stpl.lehreinheit_id";
@@ -1136,7 +1214,10 @@ class lehrstunde extends basis_db
 			return true;
 		}
 		else
+		{
+			$this->errormsg = 'Fehler beim Einholen der Stundenplandaten';
 			return false;
+		}
 	}
 }
 

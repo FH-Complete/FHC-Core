@@ -98,6 +98,7 @@ if(!$result_ort)
   	die("ort not found!");
 $num_rows_ort=$db->db_num_rows($result_ort);
 
+
 /*$sql_query="SELECT student_uid FROM public.tbl_student ORDER BY student_uid";
 $result_lektor=$db->db_query($sql_query);
 if(!$result_lektor)
@@ -114,7 +115,7 @@ $num_rows_lektor=$db->db_num_rows($result_lektor);*/
 <title>Lehrveranstaltungsplan</title>
 <link href="../../../skin/style.css.php" rel="stylesheet" type="text/css">
 <link href="../../../skin/jquery-ui-1.9.2.custom.min.css" rel="stylesheet" type="text/css">
-<script type="text/javascript" src="../../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../../include/js/jquery.ui.datepicker.translation.js"></script>
@@ -531,7 +532,6 @@ if(!defined('CIS_LVPLAN_ZUSATZMENUE_ANZEIGEN') || CIS_LVPLAN_ZUSATZMENUE_ANZEIGE
 	echo '
 	<td class="menubox">
 	<p><a href="raumsuche.php">'.$p->t('lvplan/raumsuche').'</a></p>
-	<p><a class="Item" href="mailto:'.MAIL_LVPLAN.'">'.$p->t('lvplan/fehlerUndFeedback').'</a></p>
 	<p><a href="../../../cms/content.php?content_id='.$p->t('dms_link/lvPlanFAQ').'" class="hilfe" target="_blank">'.$p->t('global/hilfe').'</a></p>
 	</td>';
 }

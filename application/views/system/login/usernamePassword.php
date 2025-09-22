@@ -3,11 +3,11 @@
 		'templates/FHC-Header',
 		array(
 			'title' => 'Login',
-			'jquery' => true,
-			'jqueryui' => true,
-			'bootstrap' => true,
-			'fontawesome' => true,
-			'sbadmintemplate' => true,
+			'jquery3' => true,
+			'jqueryui1' => true,
+			'bootstrap3' => true,
+			'fontawesome4' => true,
+			'sbadmintemplate3' => true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
 			'customCSSs' => 'public/css/Login.css',
@@ -16,7 +16,7 @@
 	);
 ?>
 
-<body>
+
 	<div class="login-form">
 
 		<p class="text-center">
@@ -40,6 +40,5 @@
 		<p class="text-center"><a href="#">Forgot Password?</a></p>
 
 	</div>
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

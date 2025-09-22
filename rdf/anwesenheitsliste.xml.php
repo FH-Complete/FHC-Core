@@ -89,7 +89,7 @@ if($db->db_query($qry))
 	{
 		if(empty($row))
 			die("Lehreinheit $lehreinheit am $von nicht gefunden");
-		
+
 		$data[$row->lehreinheit_id]['tage'][$row->datum][] = $row;
 	}
 }
@@ -97,7 +97,7 @@ if($db->db_query($qry))
 foreach($data as $key => $value)
 {
 	$currentDay = key($value['tage']);
-    
+
     // Daten der Vortragenden ermitteln
 	$qry = "SELECT vorname, nachname, titelpre, titelpost "
 		. "FROM lehre.tbl_lehreinheitmitarbeiter lema "
@@ -114,7 +114,7 @@ foreach($data as $key => $value)
 	}
 
 	// Daten der Studenten ermitteln
-	$qry = "SELECT pe.person_id, vorname, nachname, titelpre, titelpost, note, "
+	$qry = "SELECT pe.person_id, vorname, nachname, wahlname, titelpre, titelpost, note, "
 		. "get_rolle_prestudent(tbl_student.prestudent_id, " . $db->db_add_param($studiensemester) . ") AS laststatus "
 		. "FROM campus.vw_student_lehrveranstaltung stlv "
 		. "JOIN public.tbl_benutzer be ON be.uid = stlv.uid "

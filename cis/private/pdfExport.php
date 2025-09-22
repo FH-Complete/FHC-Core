@@ -65,6 +65,11 @@ $xsl_stg_kz = 0;
 
 $sign = false;
 
+/* Signing on CIS disabled
+if(isset($_GET['sign']))
+	$sign = true;
+*/
+
 // Direkte uebergabe des Studienganges dessen Vorlage verwendet werden soll
 if (isset($_GET['xsl_stg_kz']))
 	$xsl_stg_kz = $_GET['xsl_stg_kz'];
@@ -144,20 +149,22 @@ if (isset($_GET['projektarbeit_id']))
 	$params .= '&projektarbeit_id='. $_GET['projektarbeit_id'];
 if (isset($_GET['betreuerart_kurzbz']))
 	$params .= '&betreuerart_kurzbz='. $_GET['betreuerart_kurzbz'];
+if (isset($_GET['id']))
+	$params .= '&id='. $_GET['id'];
 
 
 // Logeintrag bei Download von Zahlungsbestaetigungen
 if (isset($_GET['xsl']) && $_GET['xsl'] == 'Zahlung')
 {
 	$requestdata = $_SERVER['QUERY_STRING'];
-	
+
 	$log = new Webservicelog();
 	$log->webservicetyp_kurzbz = 'content';
 	$log->request_id = isset($_GET['buchungsnummern']) && !empty($_GET['buchungsnummern']) ? $_GET['buchungsnummern'] : NULL;
 	$log->beschreibung = 'Zahlungsbestaetigungsdownload';
 	$log->request_data = $requestdata;
 	$log->execute_user = get_uid();
-	
+
 	$log->save(true);
 }
 
@@ -189,40 +196,35 @@ if (isset($_GET['output']) && $_GET['output'] != 'pdf')
 else
 	$output = 'pdf';
 
-if (isset($_GET['xsl']) && ($_GET['xsl'] === 'Projektbeurteilung'))
+// Berechtigungprüfung Projektarbeit
+if (isset($_GET['projektarbeit_id']))
 {
-	if (!isset($_GET['betreuerart_kurzbz']) || !isset($_GET['person_id']) || !isset($_GET['projektarbeit_id']))
-		die('Fehlerhafte Parameteruebergabe');
+	$projektarbeitVorlage = new projektarbeit();
+	$allePaVorlagen = $projektarbeitVorlage->getAllVorlagen();
 
-	$projektarbeit = new projektarbeit();
-	$projektarbeit->load($_GET['projektarbeit_id']);
+	if (!is_array($allePaVorlagen))
+		die("<html><body><h3>Fehler beim Holen der Projektarbeit Vorlagen</h3></body></html>");
 
-	$betreuer = new person();
-	$betreuer->getPersonFromBenutzer($user);
-
-	//Überprüft ob es der Betreuer oder der Student ist
-	if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
-		die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
-
-	switch ($_GET['betreuerart_kurzbz'])
+	if (in_array($xsl, $allePaVorlagen))
 	{
-		case 'Begutachter' :
-			$xsl = 'ProjektBeurteilungBA';
-			break;
-		case 'Erstbegutachter' :
-			$xsl = 'ProjektBeurteilungMAErst';
-			break;
-		case 'Zweitbegutachter' :
-			$xsl = 'ProjektBeurteilungMAZweit';
-			break;
-	}
+		$rechte = new benutzerberechtigung();
+		$rechte->getBerechtigungen($user);
 
-	$allowed = true;
+		$projektarbeit = new projektarbeit();
+		$projektarbeit->load($_GET['projektarbeit_id']);
+
+		$betreuer = new person();
+		$betreuer->getPersonFromBenutzer($user);
+
+		//Überprüft ob es der Betreuer oder der Student ist
+		if ($betreuer->person_id !== $_GET['person_id'] && $projektarbeit->student_uid !== $user && !$rechte->isBerechtigt('assistenz'))
+			die("<html><body><h3>Sie haben keine Berechtigung für diese Aktion.</h3></body></html>");
+		$paBerechtigt = true;
+	}
 }
 
-
 $konto = new konto();
-if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin')) || (isset($allowed) && $allowed === true))
+if (((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('admin') || (isset($paBerechtigt) && $paBerechtigt === true))
 {
 	$buchungstypen = array();
 	if (defined("CIS_DOKUMENTE_STUDIENBEITRAG_TYPEN"))
@@ -233,7 +235,7 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 	if (isset($_GET['ss']))
 		$stsem_zahlung = $konto->getLastStSemBuchungstypen($user, $buchungstypen, $_GET['ss']);
 
-	if ((($xsl=='Inskription') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
+	if ((($xsl == 'Inskription') || ($xsl == 'InskriptionEng') || ($xsl == 'Studienblatt')) && ($_GET["ss"] != $stsem_zahlung))
 	{
 		die('Der Studienbeitrag wurde noch nicht bezahlt');
 	}
@@ -295,22 +297,18 @@ if ((((isset($_GET["uid"]) && $user == $_GET["uid"])) || $rechte->isBerechtigt('
 
 	$dokument->setFilename($filename);
 
-	if (!$dokument->create($output))
-		die($dokument->errormsg);
-
 	if ($sign === true)
 	{
-		if ($dokument->sign($user))
-		{
-			$dokument->output();
-		}
-		else
+		if (!$dokument->sign($user))
 		{
 			echo $dokument->errormsg;
 		}
 	}
-	else
-		$dokument->output();
+
+	if (!$dokument->create($output))
+		die($dokument->errormsg);
+
+	$dokument->output();
 	$dokument->close();
 }
 else

@@ -28,7 +28,7 @@ require_once('../version.php');
 require_once('../include/benutzerberechtigung.class.php');
 
 // Datenbank Verbindung
-$db = new basis_db();
+	$db = new basis_db();
 echo '<html>
 <head>
 	<title>CheckSystem</title>
@@ -128,6 +128,7 @@ $berechtigungen = array(
 	array('basis/tempus','Tempus zugriff'),
 	array('basis/testtool','Administrationseite, Gebiete löschen/zurücksetzen'),
 	array('basis/variable','Variablenverwaltung'),
+	array('basis/variable_persoenlich','Verwaltung eigener Variablen'),
 	array('basis/vilesci','Grundrecht, um in VileSci irgendwelche Menüpunkte zu sehen'),
 	array('basis/servicezeitaufzeichnung','Erlaubt Erfassung von servicebezogenen (Service, OE, Kunde) Daten in der Zeitaufzeichnung'),
 	array('buchung/typen','Verwaltung von Buchungstypen'),
@@ -193,6 +194,7 @@ $berechtigungen = array(
 	array('student/anwesenheit','Anwesenheiten im FAS'),
 	array('student/dokumente','Wenn SUID dann dürfen Dokumente auch wieder entfernt werden'),
 	array('student/editBakkZgv','Bearbeiten der Bachelor ZGV eines PreStudenten'),
+	array('student/editMakkZgv','Bearbeiten der Master ZGV eines PreStudenten'),
 	array('student/noten','Notenverwaltung'),
 	array('student/stammdaten','Stammdaten der Studenten'),
 	array('student/vorrueckung','Studentenvorrückung'),

@@ -44,14 +44,17 @@ define('PAABGABE_PATH','/var/fhcomplete/documents/paabgabe/');
 // Pfad zu den Rauminfos
 define('RAUMINFO_PATH','/var/www/html/build/rauminfos/');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
+
 // URL zu RDF Verzeichnis
-define('XML_ROOT','http://www.fhcomplete.org/build/rdf/');
+define('XML_ROOT','http://www.fhcomplete.org'.BASE_LOCATION.'rdf/');
 // URL zu Application Root
-define('APP_ROOT','http://www.fhcomplete.org/build/');
+define('APP_ROOT','http://www.fhcomplete.org/'.BASE_LOCATION);
 // Pfad zu Document Root
 define('DOC_ROOT','/var/www/html/build/');
 // URL zu Vilesci Root
-define('VILESCI_ROOT','http://www.fhcomplete.org/build/');
+define('VILESCI_ROOT','http://www.fhcomplete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH','tw');
@@ -83,6 +86,7 @@ define("AUTH_NAME","FH-Complete");
  * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
+ * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
  */
 define('LDAP_SERVER','ldap://ldap.example.com');
 define('LDAP_PORT',389);
@@ -91,6 +95,7 @@ define('LDAP_BASE_DN','ou=People,dc=example,dc=com');
 define('LDAP_BIND_USER',null);
 define('LDAP_BIND_PASSWORD',null);
 define('LDAP_USER_SEARCH_FILTER','uid');
+define('LDAP_SERVICEPING',true);
 
 // 2. LDAP Server (zB wenn Mitarbeiter und Studierende auf 2 getrennten Servern liegen)
 /*
@@ -123,6 +128,8 @@ define('MAILVERTEILER_SPERRE', true);
 
 // Bezeichnung des Campus
 define('CAMPUS_NAME','FH Technikum Wien');
+
+define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
 
 // Anzahl der Tag die eine Nachricht am Pinboard angezeigt wird.
 define("MAXNEWSALTER",60);
@@ -204,6 +211,26 @@ define('TABLE_ID','_id');
 define('TABLE_BEGIN','tbl_');
 define('VIEW_BEGIN','vw_');
 
+/**
+ * Signatur
+ * DEFAULT: https://signatur.example.com/api/sign
+ */
+// Generic URL
+define('SIGNATUR_URL', 'https://signatur.dev.technikum-wien.at/api');
+// Sign API
+define('SIGNATUR_SIGN_API', 'sign');
+// List API
+define('SIGNATUR_LIST_API', 'list');
+// User für Zugriff auf Signaturserver
+define('SIGNATUR_USER', 'fhcomplete');
+// Passwort für Zugriff auf Signaturserver
+define('SIGNATUR_PASSWORD', 'supersecretpassword');
+// Signaturprofil das verwendet werden soll
+define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
+
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
+
 //Gibt an, ob das Studienbuchblatt im CIS gedruckt werden kann
 define('CIS_DOKUMENTE_STUDIENBUCHLBATT_DRUCKEN',true);
 
@@ -256,4 +283,19 @@ define('CIS_ZEITWUNSCH_GD', false);
 
 // Covid-Status anzeigen
 define('CIS_SHOW_COVID_STATUS', false);
+
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
+
+//Vertrag Allin
+define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
+
+// Weiterleiten zu CIS neu (wenn Rechte vorhanden)
+define('CIS_REDIRECT_TO_CIS4', false);
 ?>

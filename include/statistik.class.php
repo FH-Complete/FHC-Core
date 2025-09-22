@@ -52,6 +52,7 @@ class statistik extends basis_db
 	// Daten der Statistik
 	public $data; // DB ressource
 	public $html;
+	public $countRows;
 	public $csv;
 	public $json;
 
@@ -510,7 +511,11 @@ class statistik extends basis_db
 		$this->html='';
 		$this->csv='';
 		$this->json=array();
-		set_time_limit(120);
+		$this->countRows=0;
+		set_time_limit(600);
+
+		// In case a decryption function is used then perform password substitution
+		$this->sql = $this->replaceSQLDecryptionPassword($this->sql);
 
 		if($this->sql!='')
 		{
@@ -522,8 +527,17 @@ class statistik extends basis_db
 				$uid = get_uid();
 				$sql = str_replace('$user',$this->db_add_param($uid),$sql);
 			}
+
 			foreach($_REQUEST as $name=>$value)
 			{
+				// Inputs, die in eckigen Klammern stehen, werden als Array interpretiert
+				if (is_string($value) && substr($value, 0, 1) == '[' && substr($value, -1) == ']')
+				{
+					//Eckige Klammern entfernen und String aufsplitten
+					$value = substr($value, 1);
+					$value = substr($value, 0, -1);
+					$value = explode(',', $value);
+				}
 				if (is_array($value))
 				{
 					$in = $this->db_implode4SQL($value);
@@ -532,7 +546,6 @@ class statistik extends basis_db
 				else
 					$sql = str_replace('$'.$name,$this->db_add_param($value),$sql);
 			}
-
 			if($this->data = $this->db_query($sql))
 			{
 				$this->html.= '<thead><tr>';
@@ -565,6 +578,7 @@ class statistik extends basis_db
 					$this->json[] = $row;
 					$this->html.= '</tr>';
 					$this->csv=substr($this->csv,0,-1)."\n";
+					$this->countRows++;
 				}
 				$this->html.= '</tbody>';
 			}
@@ -579,8 +593,7 @@ class statistik extends basis_db
 
 	function getHtmlTable($id, $class='')
 	{
-
-		return '<table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
+		return '<p>'.$this->countRows.' Zeilen</p><table class="'.$class.'" id="'.$id.'">'.$this->html.'</table>';
 	}
 
 	function getCSV()

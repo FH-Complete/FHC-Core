@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2025 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,6 +120,7 @@ class PhrasesLib
 								$tmpText = substr($tmpText, 0, strlen($tmpText) - 4);
 							}
 						}
+						$tmpText = str_replace(['<span class="caps">', '</span>'], '', $tmpText);
 
 						$result->retval[$i]->text = $tmpText;
 					}
@@ -273,6 +274,17 @@ class PhrasesLib
 				$this->_ci->eprintflib->printInfo('-------------------------------------------');
 			}
 		}
+	}
+
+	/*
+	 * Workaround to reload the phrases array on an already constructed library.
+	 * @parameters -> look for _setPhrases docs
+	 */
+	public function setPhrases($categories, $language)
+	{
+		if (count($categories) > 0) $this->_setPhrases($categories, $language);
+
+		return $this->_phrases;
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

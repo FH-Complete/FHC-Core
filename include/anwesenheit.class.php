@@ -479,52 +479,107 @@ class anwesenheit extends basis_db
 	 */
 	public function loadAnwesenheitStudiensemester($studiensemester_kurzbz, $student_uid=null, $lehrveranstaltung_id=null)
 	{
-		$qry = "SELECT lehrveranstaltung_id, bezeichnung, vorname, nachname, uid, sum(anwesend) as anwesend, sum(nichtanwesend) as nichtanwesend, sum(gesamtstunden) as gesamtstunden FROM (
-				SELECT
-					lehrveranstaltung_id, bezeichnung, vorname, nachname, uid,
-					(
-					SELECT
-						sum(einheiten)
-					FROM
-						campus.tbl_anwesenheit
-					WHERE
-						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-						AND uid=vw_student_lehrveranstaltung.uid
-						AND anwesend
-					) as anwesend,
-					(
-					SELECT
-						sum(einheiten)
-					FROM
-						campus.tbl_anwesenheit
-					WHERE
-						lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-						AND uid=vw_student_lehrveranstaltung.uid
-						AND NOT anwesend
-					) as nichtanwesend,
-					(
-					SELECT count(*) anzahl FROM
-						(SELECT datum, stunde FROM campus.vw_stundenplan
-						WHERE lehreinheit_id=vw_student_lehrveranstaltung.lehreinheit_id
-						AND (vw_stundenplan.titel not like '%Nebenprüfung%' OR vw_stundenplan.titel is null) GROUP BY datum, stunde) as a
-					) as gesamtstunden
+		$qry = "SELECT
+					lehrveranstaltung_id, vorname, nachname, wahlname, student_uid as uid, bezeichnung,
+					gesamt as gesamtstunden, anwesend, nichtanwesend, trunc(100-(nichtanwesend/gesamt)*100,2) as prozent
 				FROM
-					campus.vw_student_lehrveranstaltung
-					JOIN public.tbl_benutzer USING(uid)
-					JOIN public.tbl_person USING(person_id)
-				WHERE
-					studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+				(
+					SELECT
+						vorname, nachname, wahlname, lehrveranstaltung_id, bezeichnung, gruppe, student_uid,
+						count(stundenplan_id) as gesamt,
+						case when anwesend.summe is null then 0 else anwesend.summe end as anwesend,
+						case when nichtanwesend.summe is null then 0 else nichtanwesend.summe end as nichtanwesend
+					FROM
+					(
+						SELECT
+							sum(stundenplan_id) as stundenplan_id, datum, stunde, lehrveranstaltung_id,
+							bezeichnung, studiensemester_kurzbz, studiengang_kz,
+							TRIM(
+								CASE WHEN stp.gruppe_kurzbz is not null then stp.gruppe_kurzbz
+								else stp.semester||(case when verband is null then '' else stp.verband end)||(case when stp.gruppe is null then '' else stp.gruppe end) end) as gruppe
+						FROM
+							lehre.tbl_lehrveranstaltung lv
+							JOIN lehre.tbl_lehreinheit le using (lehrveranstaltung_id)
+							JOIN lehre.tbl_stundenplan stp using (lehreinheit_id,studiengang_kz)
+						WHERE
+							studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+							AND (titel not like '%Nebenprüfung%' OR titel is null)
 
+						group by datum, stunde, lehrveranstaltung_id, bezeichnung, studiensemester_kurzbz, studiengang_kz, stp.gruppe_kurzbz, stp.semester, stp.verband, stp.gruppe
+					)x
+					JOIN (
+						SELECT semester::text  as gruppe, public.tbl_studentlehrverband.studiensemester_kurzbz, student_uid, studiengang_kz
+						FROM
+							public.tbl_studentlehrverband
+						WHERE studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+
+						UNION
+
+						SELECT  semester||verband  as gruppe, public.tbl_studentlehrverband.studiensemester_kurzbz, student_uid, studiengang_kz
+						FROM
+							public.tbl_studentlehrverband
+						WHERE
+							studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+
+						UNION
+
+						SELECT  semester||verband||gruppe as gruppe, public.tbl_studentlehrverband.studiensemester_kurzbz, student_uid, studiengang_kz
+						FROM
+							public.tbl_studentlehrverband
+						WHERE
+							studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+
+						UNION
+
+						SELECT gruppe_kurzbz as gruppe, public.tbl_benutzergruppe.studiensemester_kurzbz, uid as student_uid, studiengang_kz
+						FROM
+							public.tbl_benutzergruppe
+						JOIN
+							public.tbl_gruppe using (gruppe_kurzbz)
+						WHERE studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+
+					)a using (gruppe, studiensemester_kurzbz, studiengang_kz)
+					JOIN public.tbl_benutzer b on b.uid = student_uid
+					JOIN public.tbl_person p using(person_id)
+					LEFT JOIN(
+						SELECT
+							lehrveranstaltung_id, studiensemester_kurzbz, uid as student_uid, sum(einheiten) as summe
+						FROM
+							campus.tbl_anwesenheit a
+							JOIN lehre.tbl_lehreinheit le using (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+						WHERE
+							anwesend = true AND studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+						GROUP BY
+							lehrveranstaltung_id, bezeichnung, uid, studiensemester_kurzbz
+					)anwesend using(lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
+					LEFT JOIN(
+						SELECT lehrveranstaltung_id, studiensemester_kurzbz, uid as student_uid, sum(einheiten) as summe
+						FROM
+							campus.tbl_anwesenheit a
+							JOIN lehre.tbl_lehreinheit le using (lehreinheit_id)
+							JOIN lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
+						WHERE
+							anwesend = false AND studiensemester_kurzbz = ".$this->db_add_param($studiensemester_kurzbz)."
+						GROUP BY
+							lehrveranstaltung_id, bezeichnung, uid, studiensemester_kurzbz
+					)nichtanwesend using(lehrveranstaltung_id, student_uid, studiensemester_kurzbz)
+					WHERE
+						lehrveranstaltung_id > 0
+			";
+
+			if(!is_null($student_uid))
+				$qry.=" AND student_uid=".$this->db_add_param($student_uid);
 			if(!is_null($lehrveranstaltung_id))
 				$qry.="	AND lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id);
-			if(!is_null($student_uid))
-				$qry.=" AND uid=".$this->db_add_param($student_uid);
 
-			$qry.=") as b GROUP BY lehrveranstaltung_id, bezeichnung, vorname, nachname, uid";
+			$qry.="group by
+					vorname, nachname, wahlname, lehrveranstaltung_id, bezeichnung, gruppe, student_uid, anwesend.summe, nichtanwesend.summe
+				)m";
 
-			if($lehrveranstaltung_id!='')
+			if($lehrveranstaltung_id != '')
 				$qry.=" order by nachname, vorname ";
-			elseif($student_uid!='')
+			elseif($student_uid != '')
 				$qry.=" order by bezeichnung";
 
 		if($result = $this->db_query($qry))
@@ -543,6 +598,7 @@ class anwesenheit extends basis_db
 				else
 					$obj->prozent = number_format(100-(100/$obj->gesamtstunden*$row->nichtanwesend),2);
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->nachname = $row->nachname;
 				$obj->uid = $row->uid;
 				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;

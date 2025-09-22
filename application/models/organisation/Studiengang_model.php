@@ -457,7 +457,7 @@ class Studiengang_model extends DB_Model
 	 */
 	public function getLeitung($studiengang_kz = null)
 	{
-		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email');
+		$this->addSelect('uid, studiengang_kz, oe_kurzbz, vorname, nachname, email, titelpre, titelpost, alias');
 		$this->addJoin('public.tbl_benutzerfunktion', 'oe_kurzbz');
 		$this->addJoin('public.tbl_benutzer', 'uid');
 		$this->addJoin('public.tbl_person', 'person_id');
@@ -493,6 +493,53 @@ class Studiengang_model extends DB_Model
 		return $this->loadWhere($condition);
 	}
 
+	/**
+	 * Get Studiengangsleitung/en of Studiengang/Studiengaenge. With Details
+	 *
+	 * @param null $studiengang_kz Numeric or Array
+	 * @return array
+	 */
+	public function getLeitungDetailed($studiengang_kz = null)
+	{
+		$this->addSelect('studiengang_kz, email, f.oe_kurzbz, b.uid, b.alias, b.aktiv, p.vorname, p.nachname, p.titelpre, p.titelpost, m.telefonklappe, k.kontakt, o.planbezeichnung');
+		$this->addJoin('public.tbl_benutzerfunktion f', 'oe_kurzbz');
+		$this->addJoin('public.tbl_benutzer b', 'uid');
+		$this->addJoin('public.tbl_person p', 'person_id');
+		$this->addJoin('public.tbl_mitarbeiter m', 'mitarbeiter_uid=uid', 'LEFT');
+		$this->addJoin('public.tbl_kontakt k', 'k.standort_id=m.standort_id AND kontakttyp=\'telefon\'', 'LEFT');
+		$this->addJoin('public.tbl_ort o', 'ort_kurzbz', 'LEFT');
+
+		if (!is_numeric($studiengang_kz) && !is_array($studiengang_kz))
+		{
+			return error('Studiengangskennzahl ungültig');
+		}
+
+		if (is_null($studiengang_kz))
+		{
+			$condition = '
+			funktion_kurzbz = \'Leitung\'
+			AND ( datum_von <= NOW() OR datum_von IS NULL )
+			AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+			';
+		}
+		elseif (is_numeric($studiengang_kz) || is_array($studiengang_kz))
+		{
+			if (is_array($studiengang_kz))
+			{
+				$studiengang_kz = array_map(array($this,'escape'), $studiengang_kz);
+				$studiengang_kz = implode(', ', $studiengang_kz);
+			}
+			$condition =  '
+			funktion_kurzbz = \'Leitung\'
+			AND ( datum_von <= NOW() OR datum_von IS NULL )
+			AND ( datum_bis >= NOW() OR datum_bis IS NULL )
+			AND studiengang_kz IN (' . $studiengang_kz. ')';
+			;
+		}
+
+		return $this->loadWhere($condition);
+	}
+
 	public function getStudiengaengeWithOrgForm($typ, $semester)
 	{
 		$query = "SELECT DISTINCT (UPPER(so.studiengangkurzbzlang || ':' || sp.orgform_kurzbz)) AS Studiengang
@@ -506,5 +553,252 @@ class Studiengang_model extends DB_Model
 					ORDER BY Studiengang";
 
 		return $this->execQuery($query, array($typ, $semester));
+	}
+
+	public function getStudiengangTyp($studiengang_kz, $typ = null)
+	{
+		$query = "SELECT DISTINCT(sgt.*)
+					FROM tbl_studiengangstyp sgt JOIN tbl_studiengang sg on sgt.typ = sg.typ
+					WHERE studiengang_kz IN ?";
+
+		$params = [$studiengang_kz];
+
+		if (!is_null($typ))
+		{
+			$query .= " AND sgt.typ IN ?";
+			$params[] = $typ;
+		}
+
+		return $this->execQuery($query, $params);
+	}
+
+	/**
+	 * @param array		$studiengang_kzs
+	 * @param array		$not_antrag_typ		(optional) If the prestudent has an antrag with one of the specified types it will be excluded from the result
+	 * @param array		$prestudent_stati	(optional)
+	 *
+	 * @return stdClass
+	 */
+	public function getAktivePrestudenten($studiengang_kzs, $not_antrag_typ = null, $query = null)
+	{
+		$this->load->config('studierendenantrag');
+
+		$sql = "SELECT index FROM public.tbl_sprache WHERE sprache='" . getUserLanguage() . "' LIMIT 1";
+
+		$this->addSelect($this->dbTable . '.studiengang_kz');
+		$this->addSelect($this->dbTable . '.bezeichnung');
+		$this->addSelect('o.orgform_kurzbz');
+		$this->addSelect('o.bezeichnung_mehrsprachig[(' . $sql . ')] AS orgform', false);
+		$this->addSelect('ps.ausbildungssemester AS semester');
+		$this->addSelect('ps.studiensemester_kurzbz');
+		$this->addSelect('p.prestudent_id');
+		$this->addSelect('pers.vorname');
+		$this->addSelect('pers.nachname');
+		$this->addSelect("CONCAT(UPPER(pers.nachname), ' ', pers.vorname, ' (', " . $this->dbTable . ".bezeichnung, ')') AS name");
+
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin(
+			'public.tbl_prestudentstatus ps',
+			'ps.prestudent_id=p.prestudent_id
+				AND ps.studiensemester_kurzbz=get_stdsem_prestudent(p.prestudent_id, NULL)
+				AND ps.ausbildungssemester=get_absem_prestudent(p.prestudent_id, NULL)
+				AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, NULL)'
+		);
+		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id');
+		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin('public.tbl_person pers', 'person_id');
+		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
+
+		$this->db->where_in($this->dbTable . '.studiengang_kz', $studiengang_kzs);
+		$this->db->where_in('ps.status_kurzbz', $this->config->item('antrag_prestudentstatus_whitelist_abmeldung'));
+		$this->db->where($this->dbTable . ".aktiv", true);
+
+		if ($not_antrag_typ !== null && is_array($not_antrag_typ)) {
+			foreach($not_antrag_typ as $k => $v)
+				$not_antrag_typ[$k] = $this->db->escape($v);
+			$this->addJoin(
+				'campus.tbl_studierendenantrag a',
+				'a.prestudent_id=p.prestudent_id and a.typ in ('.
+				implode(',', $not_antrag_typ).
+				") AND campus.get_status_studierendenantrag (a.studierendenantrag_id)<>'" .
+				Studierendenantragstatus_model::STATUS_CANCELLED . "'",
+				'LEFT'
+			);
+			$this->db->where('a.typ IS NULL');
+		}
+
+		if ($query) {
+			$query = explode(' ', $query);
+			$this->db->group_start();
+			foreach ($query as $q) {
+				$this->db->group_start();
+					$this->db->where('pers.vorname ILIKE', "%" . $q . "%");
+					$this->db->or_where('pers.nachname ILIKE', "%" . $q . "%");
+					$this->db->or_where('stud.student_uid ILIKE', "%" . $q . "%");
+					$this->db->or_where($this->dbTable . '.bezeichnung ILIKE', "%" . $q . "%");
+					if (is_numeric($q))
+						$this->db->or_where('p.prestudent_id', $q);
+				$this->db->group_end();
+			}
+			$this->db->group_end();
+		}
+
+		$this->addOrder('name');
+
+		return $this->load();
+	}
+
+	/**
+	 * @return stdClass
+	 */
+	public function getStudiengangInfoForNews()
+	{
+
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+
+		$addEmailProperty= function(&$benutzerfunktionen){
+			if(count($benutzerfunktionen) && defined('DOMAIN'))
+			{
+				$benutzerfunktionen = array_map(function($benutzer)
+				{
+					$benutzer->email = $benutzer->alias."@".DOMAIN;
+					return $benutzer;
+				},$benutzerfunktionen) ;
+			}
+
+		};
+		$addFotoProperty= function(&$collection){
+			$collection = array_map(function($item){
+				$person_id = $this->PersonModel->getByUid($item->uid);
+				if(isError($person_id))
+					return error($person_id);
+				$person_id = current(getData($person_id))->person_id;
+				$this->PersonModel->addSelect('foto');
+				$foto = $this->PersonModel->loadWhere(array('person_id'=>$person_id));
+				if(isError($foto))
+					return error($foto);	
+				$foto = current(getData($foto))->foto;
+				$item->foto = $foto;
+				return $item;
+			},$collection);
+		};
+		
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+
+		$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
+		if (isError($student))
+			return error($student);
+		if (getData($student)) {
+			$student = current(getData($student));
+			$studiengang_kz = $student->studiengang_kz;
+			$semester = $student->semester;
+		}
+		
+		$stg_obj = $this->load($studiengang_kz);
+		if(isError($stg_obj))
+			return error($stg_obj);
+		if(getData($stg_obj))
+		{
+			$stg_obj = current(getData($stg_obj));
+		}		
+
+		$stg_ltg = $this->getLeitungDetailed($stg_obj->studiengang_kz);
+		if (isError($stg_ltg))
+			return $stg_ltg;
+		$stg_ltg = getData($stg_ltg) ?: [];
+		$stg_ltg = array_values(array_filter($stg_ltg, function($stg_leitung){
+			return $stg_leitung->aktiv;
+		}));
+		$addFotoProperty($stg_ltg);
+
+		$gf_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('gLtg', $stg_obj->oe_kurzbz);
+		if (isError($gf_ltg))
+			return $gf_ltg;
+		$gf_ltg = getData($gf_ltg) ?: [];
+		$gf_ltg = array_values(array_filter($gf_ltg, function($gf_leitung){
+			return $gf_leitung->aktiv;
+		}));
+		$addEmailProperty($gf_ltg);
+		$addFotoProperty($gf_ltg);
+
+		$stv_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stvLtg', $stg_obj->oe_kurzbz);
+		if (isError($stv_ltg))
+			return $stv_ltg;
+		$stv_ltg = getData($stv_ltg) ?: [];
+		$stv_ltg = array_values(array_filter($stv_ltg, function($stv_leitung){
+			return $stv_leitung->aktiv;
+		}));
+		$addEmailProperty($stv_ltg);
+		$addFotoProperty($stv_ltg);
+
+		$ass = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
+		if (isError($ass))
+			return $ass;
+		$ass = getData($ass) ?: [];
+		$ass = array_values(array_filter($ass, function($assistenz){
+			return $assistenz->aktiv;
+		}));
+		$addEmailProperty($ass);
+		$addFotoProperty($ass);
+
+		$hochschulvertr = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('hsv');
+		if (isError($hochschulvertr))
+			return $hochschulvertr;
+		$hochschulvertr = getData($hochschulvertr) ?: [];
+		$hochschulvertr = array_values(array_filter($hochschulvertr, function($hochschul_vertreter){
+			return $hochschul_vertreter->aktiv;
+		}));
+		$addEmailProperty($hochschulvertr);
+
+
+		$stdv = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stdv', $stg_obj->oe_kurzbz);
+		if (isError($stdv))
+			return $stdv;
+		$stdv = getData($stdv) ?: [];
+		$stdv = array_values(array_filter($stdv, function($std_vertreter){
+			return $std_vertreter->aktiv;
+		}));
+		$addEmailProperty($stdv);
+
+
+		$jahrgangsvertr = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('jgv', $stg_obj->oe_kurzbz, $semester);
+		if (isError($jahrgangsvertr))
+			return $jahrgangsvertr;
+		$jahrgangsvertr = getData($jahrgangsvertr) ?: [];
+		$jahrgangsvertr = array_values(array_filter($jahrgangsvertr, function($jahrgang_vertreter){
+			return $jahrgang_vertreter->aktiv;
+		}));
+		$addEmailProperty($jahrgangsvertr);
+
+
+		$result_object = new stdClass();
+		$result_object->studiengang = $stg_obj;
+		$result_object->semester = $semester;
+		$result_object->stg_ltg = $stg_ltg;
+		$result_object->gf_ltg = $gf_ltg;
+		$result_object->stv_ltg = $stv_ltg;
+		$result_object->ass = $ass;
+		$result_object->hochschulvertr = $hochschulvertr;
+		$result_object->stdv = $stdv;
+		$result_object->jahrgangsvertr = $jahrgangsvertr;
+
+		return success($result_object);
+	}
+	
+	public function getLvaForStudiengangInStudiensemester($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz) {
+		$qry = '
+		SELECT DISTINCT ON (lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
+			kurzbz, bezeichnung, semester,
+			lehre.tbl_lehrveranstaltung.sprache, orgform_kurzbz,
+			lehre.tbl_lehrveranstaltung.lehrform_kurzbz)
+			lehre.tbl_lehrveranstaltung.lehrveranstaltung_id, kurzbz, bezeichnung,
+			semester, lehre.tbl_lehrveranstaltung.sprache, orgform_kurzbz, lehre.tbl_lehrveranstaltung.lehrform_kurzbz
+		FROM lehre.tbl_lehrveranstaltung JOIN lehre.tbl_lehreinheit USING(lehrveranstaltung_id) JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+		WHERE aktiv = TRUE AND studiengang_kz = ? AND orgform_kurzbz = ? AND tbl_lehreinheit.studiensemester_kurzbz IN ?';
+
+		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
 	}
 }

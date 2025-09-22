@@ -4,12 +4,8 @@ $APP = '\'infocenter\'';
 $INTERESSENT_STATUS = '\'Interessent\'';
 $TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 $LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'New application\'';
-
-$uid = get_uid();
-$rechte = new benutzerberechtigung();
-$rechte->getBerechtigungen($uid);
-$oeKurz = $rechte->getOEkurzbz('lehre/zgvpruefung');
 $oeKurz = '\''. implode('\',\'', $oeKurz) . '\'';
+$ABGEWIESENER_STATUS = '\'Abgewiesener\'';
 
 $query = '
 		SELECT
@@ -27,6 +23,7 @@ $query = '
 		AND zgvstatus.datum IN (
 		    SELECT MAX(zgvstatus.datum) 
 		    FROM public.tbl_zgvpruefungstatus_status zgvstatus GROUP BY zgvstatus.zgvpruefung_id)
+		AND get_rolle_prestudent(prestudent_id, NULL) != '. $ABGEWIESENER_STATUS .'
 	    ORDER BY ps.prestudent_id
 	';
 

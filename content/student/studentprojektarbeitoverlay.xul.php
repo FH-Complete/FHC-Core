@@ -152,16 +152,14 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 			</template>
 		</tree>
 		<vbox>
-			<button id="student-projektarbeit-button-neu" label="Neu" oncommand="StudentProjektarbeitNeu();" disabled="true"/>
-			<button id="student-projektarbeit-button-loeschen" label="Loeschen" oncommand="StudentProjektarbeitLoeschen();" disabled="true"/>
+			<button id="student-projektarbeit-button-neu" label="Neue PA" oncommand="StudentProjektarbeitNeu();" disabled="true"/>
+			<button id="student-projektarbeit-button-loeschen" label="PA Loeschen" oncommand="StudentProjektarbeitLoeschen();" disabled="true"/>
 		</vbox>
 	</hbox>
 	<hbox>
 		<vbox hidden="true">
 			<label value="Neu"/>
 			<checkbox id="student-projektarbeit-checkbox-neu" checked="true" />
-	  		<label value="Projektarbeit ID"/>
-	  		<textbox id="student-projektarbeit-textbox-projektarbeit_id" disabled="true"/>
 		</vbox>
 		<groupbox flex="1">
 		<caption label="Details"/>
@@ -171,6 +169,14 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 						<column flex="5"/>
 					</columns>
 					<rows>
+						<row>
+							<label value="Projektarbeit ID" control="student-projektarbeit-textbox-projektarbeit_id"/>
+							<hbox>
+								<textbox id="student-projektarbeit-textbox-projektarbeit_id" readonly="true" maxlength="16" size="16"/>
+								<textbox id="student-projektarbeit-textbox-lehreinheit_stsem" hidden="true" readonly="true" maxlength="32" size="32"/>
+							</hbox>
+
+						</row>
 						<row>
 							<label value="Titel" control="student-projektarbeit-textbox-titel"/>
 							<textbox id="student-projektarbeit-textbox-titel" disabled="true" maxlength="1024" />
@@ -244,7 +250,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</menulist>
 						</row>
 						<row>
-							<label value="Lehreinheit" control="student-projektarbeit-menulist-lehreinheit"/>
+							<label value="LV-Teil" control="student-projektarbeit-menulist-lehreinheit"/>
 							<menulist id="student-projektarbeit-menulist-lehreinheit" disabled="true"
 							          datasources="rdf:null" flex="1"
 									  style="max-width: 600px"
@@ -277,14 +283,24 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</hbox>
 							<label value="Gesamtnote" control="student-projektarbeit-menulist-note"/>
 							<menulist id="student-projektarbeit-menulist-note" disabled="true"
-							          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
-							          ref="http://www.technikum-wien.at/note/liste" >
+										xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+										datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
+										ref="http://www.technikum-wien.at/note/liste" >
 								<template>
-									<menupopup>
-										<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-							        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-										  		  uri="rdf:*"/>
-									</menupopup>
+									<rule NOTE:aktiv='false'>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+														label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+														uri="rdf:*" style="text-decoration:line-through;"/>
+										</menupopup>
+									</rule>
+									<rule>
+										<menupopup>
+											<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+														label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+														uri="rdf:*"/>
+										</menupopup>
+									</rule>
 								</template>
 							</menulist>
 						</row>
@@ -310,7 +326,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							<spacer />
 							<hbox>
 								<spacer flex="1" />
-								<button id="student-projektarbeit-button-speichern" oncommand="StudentProjektarbeitSpeichern()" label="Speichern" disabled="true"/>
+								<button id="student-projektarbeit-button-speichern" oncommand="StudentProjektarbeitSpeichern()" label="PA Speichern" disabled="true"/>
 							</hbox>
 						</row>
 					</rows>
@@ -416,8 +432,8 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							</template>
 						</tree>
 						<vbox>
-							<button id="student-projektbetreuer-button-neu" label="Neu" oncommand="StudentProjektbetreuerNeu();" disabled="true"/>
-							<button id="student-projektbetreuer-button-loeschen" label="Loeschen" oncommand="StudentProjektbetreuerLoeschen();" disabled="true"/>
+							<button id="student-projektbetreuer-button-neu" label="Neue Betreuung" oncommand="StudentProjektbetreuerNeu();" disabled="true"/>
+							<button id="student-projektbetreuer-button-loeschen" label="Betreuung Loeschen" oncommand="StudentProjektbetreuerLoeschen();" disabled="true"/>
 						</vbox>
 					</hbox>
 					<vbox hidden="true">
@@ -481,18 +497,28 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 							<row>
 								<label value="Note" control="student-projektbetreuer-menulist-note"/>
 								<menulist id="student-projektbetreuer-menulist-note" disabled="true"
-								          datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
-								          ref="http://www.technikum-wien.at/note/liste" >
+											xmlns:NOTE="http://www.technikum-wien.at/note/rdf#"
+											datasources="<?php echo APP_ROOT ?>rdf/note.rdf.php?optional=true" flex="1"
+											ref="http://www.technikum-wien.at/note/liste" >
 									<template>
-										<menupopup>
-											<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
-								        		      label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
-											  		  uri="rdf:*"/>
-										</menupopup>
+										<rule NOTE:aktiv='false'>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+															label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+															uri="rdf:*" style="text-decoration:line-through;"/>
+											</menupopup>
+										</rule>
+										<rule>
+											<menupopup>
+												<menuitem value="rdf:http://www.technikum-wien.at/note/rdf#note"
+															label="rdf:http://www.technikum-wien.at/note/rdf#bezeichnung"
+															uri="rdf:*"/>
+											</menupopup>
+										</rule>
 									</template>
 								</menulist>
 							</row>
-							<row>
+							<row id="student-projektbetreuer-textbox-punkte-row">
 								<label value="Punkte" control="student-projektbetreuer-textbox-punkte"/>
 								<textbox id="student-projektbetreuer-textbox-punkte" disabled="true" maxlength="6"/>
 							</row>
@@ -501,7 +527,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<textbox id="student-projektbetreuer-textbox-stunden" disabled="true" maxlength="8"/>
 							</row>
 							<row>
-								<label value="Stundensatz" control="student-projektbetreuer-textbox-stundensatz"/>
+								<label id="student-projektbetreuer-label-stundensatz" value="Stundensatz: " control="student-projektbetreuer-textbox-stundensatz"/>
 								<textbox id="student-projektbetreuer-textbox-stundensatz" disabled="true" maxlength="5"/>
 							</row>
 							<row hidden="true"><!-- Faktor wird nicht mehr benoetigt -->
@@ -512,7 +538,7 @@ $is_hidden = (!defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN')
 								<spacer />
 								<hbox>
 									<spacer flex="1" />
-									<button id="student-projektbetreuer-button-speichern" label="Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
+									<button id="student-projektbetreuer-button-speichern" label="Betreuung Speichern" oncommand="StudentProjektbetreuerSpeichern()" />
 								</hbox>
 							</row>
 						</rows>

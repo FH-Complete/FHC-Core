@@ -317,9 +317,9 @@ class mitarbeiter extends benutzer
 	 * gibt array mit allen Mitarbeitern zurueck
 	 * @return array mit Mitarbeitern
 	 */
-	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null)
+	public function getMitarbeiter($lektor=true,$fixangestellt=null,$stg_kz=null, $aktiv=null)
 	{
-		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
+		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.uid, titelpre, titelpost, vorname, vornamen, wahlname, nachname, gebdatum, gebort, gebzeit, anmerkung, aktiv,
 					homepage, campus.vw_mitarbeiter.updateamum, campus.vw_mitarbeiter.updatevon, personalnummer, kurzbz, lektor, fixangestellt, standort_id, telefonklappe FROM campus.vw_mitarbeiter
 					LEFT OUTER JOIN public.tbl_benutzerfunktion USING (uid)
 					WHERE TRUE';
@@ -346,6 +346,14 @@ class mitarbeiter extends benutzer
 			$sql_query.=" AND oe_kurzbz=".$this->db_add_param($stg->oe_kurzbz);
 		}
 
+		if(!is_null($aktiv))
+		{
+			$sql_query.=' AND';
+			if (!$aktiv)
+				$sql_query.=' NOT';
+			$sql_query.=' aktiv';
+		}
+
 		$sql_query.=' ORDER BY nachname, vornamen, kurzbz;';
 
 		if(!$this->db_query($sql_query))
@@ -364,6 +372,7 @@ class mitarbeiter extends benutzer
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vorname=$row->vorname;
+			$l->wahlname=$row->wahlname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
 			$l->gebdatum=$row->gebdatum;
@@ -475,6 +484,7 @@ class mitarbeiter extends benutzer
 			$l->titelpre=$row->titelpre;
 			$l->titelpost=$row->titelpost;
 			$l->vorname=$row->vorname;
+			$l->wahlname=$row->wahlname;
 			$l->vornamen=$row->vornamen;
 			$l->nachname=$row->nachname;
 			$l->gebdatum=$row->gebdatum;
@@ -601,7 +611,7 @@ class mitarbeiter extends benutzer
 			return false;
 		}
 
-		$qry = "SELECT uid, vorname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
+		$qry = "SELECT uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz FROM lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
 				WHERE lehrveranstaltung_id=".$this->db_add_param($lehrveranstaltung_id, FHC_INTEGER)." AND mitarbeiter_uid=uid AND tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		if($this->db_query($qry))
@@ -616,6 +626,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 
 				$this->result[] = $obj;
@@ -752,6 +763,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -833,7 +845,12 @@ class mitarbeiter extends benutzer
 	 */
 	public function getMitarbeiterFilter($filter)
 	{
-		$qry = "SELECT * FROM campus.vw_mitarbeiter WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).") OR uid ~* ".$this->db_add_param($filter);
+		$qry = "SELECT * FROM campus.vw_mitarbeiter
+		WHERE lower(nachname) ~* lower(".$this->db_add_param($filter).")
+		OR lower(wahlname) ~* lower(".$this->db_add_param($filter).")
+		--OR lower(wahlname || ' ' || nachname) like lower(".$this->db_add_param($filter).")
+		--OR lower(nachname || ' ' || wahlname) like lower(".$this->db_add_param($filter).")
+		OR uid ~* ".$this->db_add_param($filter);
 		$qry .= " ORDER BY nachname, vorname, kurzbz;";
 
 		if($this->db_query($qry))
@@ -849,6 +866,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->wahlname = $row->wahlname;
 				$obj->aktiv =$this->db_parse_bool($row->aktiv);
 				$obj->fixangestellt = $this->db_parse_bool($row->fixangestellt);
 
@@ -871,14 +889,17 @@ class mitarbeiter extends benutzer
 	 */
 	public function search($filter, $limit=null, $aktiv=true, $positivePersonalnr=false)
 	{
-		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, uid
+		$qry = "SELECT vorname, nachname, titelpre, titelpost, kurzbz, vornamen, wahlname, uid
 			FROM campus.vw_mitarbeiter
 			WHERE
 				lower(nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(uid) like lower('%".$this->db_escape($filter)."%')
 				OR lower(vorname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(wahlname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(vorname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
 				OR lower(nachname || ' ' || vorname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(wahlname || ' ' || nachname) like lower('%".$this->db_escape($filter)."%')
+				OR lower(nachname || ' ' || wahlname) like lower('%".$this->db_escape($filter)."%')
 			ORDER BY nachname, vorname";
 
 		if(!is_null($limit) && is_numeric($limit))
@@ -897,6 +918,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpost = $row->titelpost;
 				$obj->kurzbz = $row->kurzbz;
 				$obj->vornamen = $row->vornamen;
+				$obj->wahlname = $row->wahlname;
 
 				$this->result[] = $obj;
 			}
@@ -931,6 +953,8 @@ class mitarbeiter extends benutzer
 					JOIN public.tbl_person USING(person_id)
 				WHERE lower(COALESCE(nachname,'') ||' '|| COALESCE(vorname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      lower(COALESCE(vorname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+							lower(COALESCE(wahlname,'') ||' '|| COALESCE(nachname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
+							lower(COALESCE(nachname,'') ||' '|| COALESCE(wahlname,'')) ~* lower(".$this->db_add_param($searchItems_string).") OR
 				      uid ~* ".$this->db_add_param($filter)." ";
 		if(is_numeric($filter))
 			$qry.="OR personalnummer = ".$this->db_add_param($filter)." OR svnr = ".$this->db_add_param($filter).";";
@@ -950,6 +974,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -1050,10 +1075,12 @@ class mitarbeiter extends benutzer
 	}
 
 	/**
-	 * Gibt ein Array mit den UIDs der Vorgesetzten zurück
+	 * Gibt ein Array mit den UIDs der aktuellen Vorgesetzten zurück
+	 * @param null $uid
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
 	 * @return uid
 	 */
-	public function getVorgesetzte($uid=null)
+	public function getVorgesetzte($uid=null, $limit = null)
 	{
 		$return=false;
 		if (is_null($uid))
@@ -1067,14 +1094,242 @@ class mitarbeiter extends benutzer
 					funktion_kurzbz='Leitung' AND
 					(datum_von is null OR datum_von<=now()) AND
 					(datum_bis is null OR datum_bis>=now()) AND
-					oe_kurzbz in (SELECT oe_kurzbz
-								  FROM public.tbl_benutzerfunktion
-								  WHERE
+					oe_kurzbz in (
+								SELECT
+									oe_kurzbz
+								FROM
+									public.tbl_benutzerfunktion
+								WHERE
 									funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
 									(datum_von is null OR datum_von<=now()) AND
 									(datum_bis is null OR datum_bis>=now())
-								  );";
+								ORDER BY
+										(
+											SELECT
+												1
+											FROM
+												hr.tbl_vertragsbestandteil_funktion
+												JOIN hr.tbl_vertragsbestandteil vbsfkt USING(vertragsbestandteil_id)
+												JOIN hr.tbl_vertragsbestandteil vbskarenz USING(dienstverhaeltnis_id)
+											WHERE
+												tbl_vertragsbestandteil_funktion.benutzerfunktion_id=tbl_benutzerfunktion.benutzerfunktion_id
+												AND vbskarenz.vertragsbestandteiltyp_kurzbz='karenz'
+												AND
+												(
+													now()::date BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
+													OR
+													now()::date BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
+												)
+										) NULLS FIRST LIMIT 1
+								  )
+				  ORDER BY datum_von DESC ";
 
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit, FHC_INTEGER);
+		}
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				if ($row->vorgesetzter!='')
+				{
+					$this->vorgesetzte[]=$row->vorgesetzter;
+					$return=true;
+				}
+			}
+
+			$this->vorgesetzte = array_unique($this->vorgesetzte);
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+		}
+		return $return;
+	}
+
+	/**
+	 * Prueft ob eine Person im angegebenen Zeitraum Vorgesetzter von einem Mitarbeiter ist
+	 * @param $leiter UID der zu pruefenden Leitungsposition
+	 * @param $mitarbeiter UID der zu pruefenden Leitungsposition
+	 * @param $datumvon Von Datum des zu pruefenden Zeitraums
+	 * @param $datumbis BIS Datum des zu pruefenden Zeitraums
+	 */
+	public function isVorgesetzterByDate($leiter, $mitarbeiter, $datumvon, $datumbis)
+	{
+		// Alle OEs der zu pruefenden Leitungsposition holen (oes_leitung)
+		// Alle OEs des zu pruefenden Mitarbeiters holen (oes_mitarbeiter)
+		// OE-Ueberschneidungen pruefen
+
+		$qry = "
+			WITH RECURSIVE
+				oes_leitung (oe_kurzbz, oe_parent_kurzbz, level) AS
+				(
+					SELECT
+						oe_kurzbz,
+						oe_parent_kurzbz,
+						1 as level
+					FROM
+						public.tbl_organisationseinheit
+					WHERE
+						oe_kurzbz IN (
+
+						-- Leitung im Zeitraum X
+						SELECT oe_kurzbz FROM public.tbl_benutzerfunktion
+						WHERE
+							funktion_kurzbz='Leitung'
+							AND uid=".$this->db_add_param($leiter)."
+							AND
+							(
+							".$this->db_add_param($datumvon)." BETWEEN COALESCE(tbl_benutzerfunktion.datum_von, '1970-01-01') AND COALESCE(tbl_benutzerfunktion.datum_bis, '2170-12-31')
+							OR
+							".$this->db_add_param($datumbis)." BETWEEN COALESCE(tbl_benutzerfunktion.datum_von, '1970-01-01') AND COALESCE(tbl_benutzerfunktion.datum_bis, '2170-12-31')
+							)
+
+						)
+
+					UNION ALL
+
+					SELECT
+						o.oe_kurzbz,
+						o.oe_parent_kurzbz,
+						oes_leitung.level + 1 as level
+					FROM
+						public.tbl_organisationseinheit o, oes_leitung
+					WHERE
+						o.oe_parent_kurzbz = oes_leitung.oe_kurzbz
+				),
+				oes_mitarbeiter (oe_kurzbz, oe_parent_kurzbz, level) AS
+				(
+					SELECT
+						oe_kurzbz,
+						oe_parent_kurzbz,
+						1 as level
+					FROM
+						public.tbl_organisationseinheit
+					WHERE
+						oe_kurzbz IN (
+
+						-- OEZuordnung im Zeitraum X - bevorzugt nicht karenziert
+						SELECT oe_kurzbz FROM public.tbl_benutzerfunktion
+						WHERE
+							funktion_kurzbz='oezuordnung'
+							AND uid=".$this->db_add_param($mitarbeiter)."
+							AND (
+								".$this->db_add_param($datumvon)." BETWEEN COALESCE(tbl_benutzerfunktion.datum_von, '1970-01-01') AND COALESCE(tbl_benutzerfunktion.datum_bis, '2170-12-31')
+								OR
+								".$this->db_add_param($datumbis)." BETWEEN COALESCE(tbl_benutzerfunktion.datum_von, '1970-01-01') AND COALESCE(tbl_benutzerfunktion.datum_bis, '2170-12-31')
+							)
+						ORDER BY
+							(
+								SELECT
+									1
+								FROM
+									hr.tbl_vertragsbestandteil_funktion
+									JOIN hr.tbl_vertragsbestandteil vbsfkt USING(vertragsbestandteil_id)
+									JOIN hr.tbl_vertragsbestandteil vbskarenz USING(dienstverhaeltnis_id)
+								WHERE
+									tbl_vertragsbestandteil_funktion.benutzerfunktion_id=tbl_benutzerfunktion.benutzerfunktion_id
+									AND vbskarenz.vertragsbestandteiltyp_kurzbz='karenz'
+									AND
+									(
+										".$this->db_add_param($datumvon)." BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
+										OR
+										".$this->db_add_param($datumbis)." BETWEEN COALESCE(vbskarenz.von, '1970-01-01') AND COALESCE(vbskarenz.bis, '2170-12-31')
+									) LIMIT 1
+							) NULLS FIRST LIMIT 1
+
+						)
+
+					UNION ALL
+
+					SELECT
+						o.oe_kurzbz,
+						o.oe_parent_kurzbz,
+						oes_mitarbeiter.level + 1 as level
+					FROM
+						public.tbl_organisationseinheit o, oes_mitarbeiter
+					WHERE
+						o.oe_kurzbz = oes_mitarbeiter.oe_parent_kurzbz
+				)
+			SELECT
+				oe_kurzbz, level
+			FROM
+				oes_leitung
+			WHERE
+				oe_kurzbz in (SELECT oe_kurzbz FROM oes_mitarbeiter)
+			ORDER BY
+				oe_kurzbz, level
+		";
+
+		if($result = $this->db_query($qry))
+		{
+			if($this->db_num_rows($result) > 0)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Gibt ein Array mit den UIDs der Vorgesetzten zum Zeitpunkt des korrespondierenden Timesheets zurück
+	 * @param $uid
+	 * @param $date
+	 * @param null $limit LIMIT = 1 liefert bei mehreren Vorgesetzten den letzten (aktuellsten) zurück.
+	 * @return uid
+	 */
+	public function getVorgesetzteByDate($uid, $date, $limit = null)
+	{
+		$return=false;
+
+		$qry = "SELECT
+					uid  as vorgesetzter
+				FROM
+					public.tbl_benutzerfunktion
+				WHERE
+					funktion_kurzbz='Leitung' AND
+					(datum_von is null OR datum_von<=".$this->db_add_param($date).") AND
+					(datum_bis is null OR datum_bis>=".$this->db_add_param($date).") AND
+					oe_kurzbz in (
+						SELECT
+							oe_kurzbz
+						FROM
+							public.tbl_benutzerfunktion
+						WHERE
+							funktion_kurzbz='oezuordnung' AND uid=".$this->db_add_param($uid)." AND
+							(datum_von is null OR (datum_von<= ".$this->db_add_param($date).")) AND
+							(datum_bis is null OR (datum_bis>=".$this->db_add_param($date)."))
+						ORDER BY
+						(
+							SELECT
+								1
+							FROM
+								hr.tbl_vertragsbestandteil_funktion
+								JOIN hr.tbl_vertragsbestandteil vbsfkt USING(vertragsbestandteil_id)
+								JOIN hr.tbl_vertragsbestandteil vbskarenz USING(dienstverhaeltnis_id)
+							WHERE
+								tbl_vertragsbestandteil_funktion.benutzerfunktion_id=tbl_benutzerfunktion.benutzerfunktion_id
+								AND vbskarenz.vertragsbestandteiltyp_kurzbz='karenz'
+								AND (vbskarenz.von <= ".$this->db_add_param($date)." OR vbskarenz.von is null)
+								AND (vbskarenz.bis >= ".$this->db_add_param($date)." OR vbskarenz.bis is null)
+						) NULLS FIRST LIMIT 1
+					)
+				ORDER BY datum_von DESC ";
+
+		if (is_numeric($limit))
+		{
+			$qry .= 'LIMIT '. $this->db_add_param($limit);
+		}
 
 		if($this->db_query($qry))
 		{
@@ -1143,16 +1398,16 @@ class mitarbeiter extends benutzer
 		return $return;
 	}
 
-
-
 	/**
 	 * Gibt ein Array mit den UIDs der aktiv beschäftigten Untergebenen zurueck
 	 * @param string $uid	UID.
 	 * @param boolean $include_OE_childs	Wenn true, dann werden auch alle aktiv
 	 * beschäftigten Untergebenen der Kind-OEs des Leiters zurückgegeben.
+	 * @param bool $fixangestellte_only
+	 * @param bool $include_ImLetztenMonatBeendete Inkludiert Mitarbeiter, deren Benutzerfunktion im letzten Monat bereits endete
 	 * @return boolean
 	 */
-	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true)
+	public function getUntergebene($uid=null, $include_OE_childs = false, $fixangestellte_only = true, $include_ImLetztenMonatBeendete = false)
 	{
 		if (is_null($uid))
 			$uid=$this->uid;
@@ -1259,11 +1514,18 @@ class mitarbeiter extends benutzer
 
 		$qry.= ")
 			AND
-				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())
-			AND
-				(tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis>=now())
-			AND
-				tbl_benutzer.aktiv = 'true'";
+				(tbl_benutzerfunktion.datum_von is null OR tbl_benutzerfunktion.datum_von<=now())";
+			if ($include_ImLetztenMonatBeendete)
+			{
+				// hier kein check auf aktiv = 'true', da hier auch DV abgefragt werden, die im letzten Monat beendet wurden
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= (DATE_TRUNC('MONTH', NOW()) - INTERVAL '1 month'))";
+			}
+			else {
+
+				$qry .= " AND (tbl_benutzerfunktion.datum_bis is null OR tbl_benutzerfunktion.datum_bis >= now())";
+				$qry .= " AND tbl_benutzer.aktiv = 'true'";
+			}
+
 			if ($fixangestellte_only)
 				$qry .= " AND tbl_mitarbeiter.fixangestellt";
 			$qry .= ";";
@@ -1509,6 +1771,7 @@ class mitarbeiter extends benutzer
 				$obj->titelpre = $row->titelpre;
 				$obj->nachname = $row->nachname;
 				$obj->vorname = $row->vorname;
+				$obj->wahlname = $row->wahlname;
 				$obj->vornamen = $row->vornamen;
 				$obj->gebdatum = $row->gebdatum;
 				$obj->gebort = $row->gebort;
@@ -1555,28 +1818,6 @@ class mitarbeiter extends benutzer
 		}
 	}
 
-	/** Check if uid is a supervisor
- *
- * @param string $uid
- * @param string $employee_uid
- * @return boolean True if $uid is direct leader of $employee_uid.
- */
-	function check_isVorgesetzter($uid, $employee_uid)
-	{
-		$this->getUntergebene($uid);
-		$untergebenen_arr = $this->untergebene;
-
-		// Check, if uid is an employee of supervisor
-		if (!empty($untergebenen_arr) &&
-			in_array($employee_uid, $untergebenen_arr))
-		{
-			 return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
 	/** Check if uid is a supervisor on higher oe level
 	 *
 	 * @param string $uid
@@ -1655,5 +1896,104 @@ class mitarbeiter extends benutzer
 		return false;
 	}
 
+
+	/**
+	 * Liefert alle Mitarbeiter*innen
+	 *
+	 * @param $filter
+	 * @return boolean
+	 */
+	public function getAll()
+	{
+		$qry = '
+			SELECT
+				ma.mitarbeiter_uid, p.nachname, p.vorname, b.alias
+			FROM
+				public.tbl_mitarbeiter ma
+				JOIN public.tbl_benutzer b ON (mitarbeiter_uid=uid)
+				JOIN public.tbl_person p  USING(person_id)
+			ORDER BY p.nachname
+		';
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$ma_obj = new mitarbeiter();
+
+				$ma_obj->nachname = $row->nachname;
+				$ma_obj->vorname = $row->vorname;
+				$ma_obj->mitarbeiter_uid = $row->mitarbeiter_uid;
+				$ma_obj->alias = $row->alias;
+
+				$this->maData[] = $ma_obj;
+			}
+			return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
+	 * Generiert nächste freie Personalnummer anhand der sequence tbl_mitarbeiter_personalnummer_seq
+	 * @return string $personalnummer
+	 */
+	public function getNextPersonalnummer()
+	{
+		$qry = "SELECT nextval('tbl_mitarbeiter_personalnummer_seq') ";
+
+		if ($result = $this->db_query($qry))
+		{
+			while ($row = $this->db_fetch_object())
+			{
+				if ($row->nextval != '')
+				{
+					$personalnummer = $row->nextval;
+					return $personalnummer;
+				}
+				else
+				{
+					$this->errormsg = 'Fehler bei einer Datenbankabfrage!';
+					$return = false;
+				}
+			}
+		}
+		else
+		{
+				$this->errormsg = "Fehler bei der Abfrage aufgetreten";
+				return false;
+		}
+	}
+
+	public function getMitarbeiterKostenstelle($von, $bis, $uid = null)
+	{
+		if (is_null($uid))
+			$uid = $this->uid;
+
+		$qry = "
+			SELECT o.oe_kurzbz AS standardkostenstelle, o.bezeichnung
+			FROM public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit o USING(oe_kurzbz)
+				WHERE bf.funktion_kurzbz = 'kstzuordnung'
+				AND (bf.datum_bis IS NULL OR datum_bis >= ". $this->db_add_param($von). ")
+				AND (bf.datum_von IS NULL OR datum_von <= ". $this->db_add_param($bis). ")
+					AND bf.uid = ". $this->db_add_param($uid);
+
+		if ($result = $this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new StdClass();
+				$obj->oekurzbz = $row->standardkostenstelle;
+				$obj->bezeichnung = $row->bezeichnung;
+
+				$this->result []= $obj;
+			}
+			return true;
+		}
+	}
 }
 ?>

@@ -32,6 +32,7 @@ require_once('../../include/organisationsform.class.php');
 require_once('../../include/addon.class.php');
 require_once('../../include/sprache.class.php');
 require_once('../../include/lehrmodus.class.php');
+require_once('../../include/lehrveranstaltung_faktor.class.php');
 
 if (!$db = new basis_db())
 	die('Es konnte keine Verbindung zum Server aufgebaut werden.');
@@ -123,6 +124,13 @@ if (isset($_REQUEST['lehrveranstaltung_name']))
 }
 else
 	$lehrveranstaltung_name = '';
+
+if (isset($_REQUEST['lehrveranstaltung_kurzbz']))
+{
+	$lehrveranstaltung_kurzbz = trim($_REQUEST['lehrveranstaltung_kurzbz']);
+}
+else
+	$lehrveranstaltung_kurzbz = '';
 
 //Wenn kein Fachbereich und kein Studiengang gewaehlt wurde
 //dann wird der Studiengang auf 0 gesetzt da sonst die zu ladende liste zu lang wird
@@ -542,11 +550,18 @@ if($orgform_kurzbz != -1)
 
 if($lehrveranstaltung_id != '')
 	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($lehrveranstaltung_id, FHC_INTEGER);
+elseif(isset($_GET['delete_lvid']))
+	$sql_query.= " AND tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param(intval($_GET['delete_lvid']), FHC_INTEGER);
 
 if($lehrveranstaltung_name != '')
 {
 	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.bezeichnung) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")";
 	$sql_query.= " OR UPPER(tbl_lehrveranstaltung.bezeichnung_english) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_name.'%', FHC_STRING).")) ";
+}
+
+if($lehrveranstaltung_kurzbz != '')
+{
+	$sql_query.= " AND (UPPER(tbl_lehrveranstaltung.kurzbz) LIKE UPPER(".$db->db_add_param('%'.$lehrveranstaltung_kurzbz.'%', FHC_STRING).")) ";
 }
 
 //Wenn nicht admin, werden erst nur die aktiven angezeigt, es koennen aber auch die inaktiven eingeblendet werden
@@ -611,7 +626,7 @@ for ($i=0;$i<=$s[$stg_kz]->max_sem;$i++)
 $outp.='</SELECT>';
 
 //Orgform DropDown
-$outp.= ' Orgform <SELECT name="orgform"><option value="-1">--Alle--</option>';
+$outp.= ' Orgform <SELECT name="orgform" id="select_orgform"><option value="-1">--Alle--</option>';
 $outp.= '<OPTION value="none" '.($orgform_kurzbz=='none'?'selected':'').'>Ohne Orgform</OPTION>';
 $orgform = new organisationsform();
 $orgform->getOrgformLV();
@@ -660,7 +675,11 @@ $outp .= '</hr><details id="detailTag" style="margin-top: 10px;"><summary style=
 	$outp .= '</select>';
 
 	//Lehrveranstaltung ID Input
-	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 100px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+	$outp.= ' ID <input type="text" name="lehrveranstaltung_id" style="width: 70px" id="lehrveranstaltung_id" value="'.$lehrveranstaltung_id.'">';
+
+	//Lehrveranstaltung Suche Kurzbezeichnung
+	$outp.= ' Kurzbz <input type="text" name="lehrveranstaltung_kurzbz" style="width: 80px" id="lehrveranstaltung_kurzbz" 
+					maxlength="16" value="'.$lehrveranstaltung_kurzbz.'" title="">';
 
 	//Lehrveranstaltung Suche Bezeichnung
 	$outp.= ' Name <input type="text" name="lehrveranstaltung_name" style="width: 450px" id="lehrveranstaltung_name"
@@ -727,9 +746,9 @@ echo '
 								16: {sorter: false, filter: false},
 								19: {sorter: false, filter: false},
 								20: {sorter: false, filter: false},
-								21: {sorter: false, filter: false},
 								22: {sorter: false, filter: false},
-								23: {sorter: false, filter: false}},
+								23: {sorter: false, filter: false},
+								24: {sorter: false, filter: false}},
 					widgetOptions : {filter_functions : {
 										// Add select menu to this column
 										12 : {
@@ -757,12 +776,13 @@ echo '
 			function checksubmit()
 			{
 				if(document.getElementById("select_stg_kz").value==\'\'
-				&& document.getElementById("select_fachbereich_kurzbz").value==\'\'
+				&& document.getElementById("select_orgform").value==\'-1\'
 				&& document.getElementById("select_oe_kurzbz").value==\'\'
 				&& document.getElementById("lehrveranstaltung_id").value==\'\'
-				&& document.getElementById("lehrveranstaltung_name").value==\'\')
+				&& document.getElementById("lehrveranstaltung_name").value==\'\'
+				&& document.getElementById("lehrveranstaltung_kurzbz").value==\'\')
 				{
-					alert("Die Felder Studiengang, Institut, Organisationseinheit, ID und Name dürfen nicht gleichzeitig auf \'Alle\' gesetzt, bzw. leer sein");
+					alert("Die Felder Studiengang, Orgform, Organisationseinheit, ID, Kurzbz und Name dürfen nicht gleichzeitig auf \'Alle\' gesetzt, bzw. leer sein");
 					return false;
 				}
 				else if(document.getElementById("lehrveranstaltung_name").value !=\'\')
@@ -994,7 +1014,8 @@ echo '
 				var details = document.getElementById("detailTag");
 				if(document.getElementById("lehrveranstaltung_name").value!=""
 								|| document.getElementById("select_oe_kurzbz").value!=""
-								|| document.getElementById("lehrveranstaltung_id").value!="")
+								|| document.getElementById("lehrveranstaltung_id").value!=""
+								|| document.getElementById("lehrveranstaltung_kurzbz").value!="")
 				{
 					details.open = true;
 					return false;
@@ -1083,13 +1104,15 @@ if ($result_lv!=0)
 		  <th>Zeugnis</th>
 		  <th title='Soll diese Lehrveranstaltung bei Diplom-/Bachelorarbeit ausgewaehlt werden koennen?'>BA/DA</th>
 		  <th>Koordinator</th>
-		  <th class=\"lvinfo\" >LV-Info</th>\n";
+		  <th class=\"lvinfo\" >LV-Info</th>
+		  <th>Template</th>\n";
 
 		  if($write_admin)
 		  {
 			  echo "<th>LV-Angebot</th>
 			  <th>kompatible LV</th>
-			  <th>Aktion</th>";
+			  <th>Aktion</th>
+			  <th>Faktor</th>";
 		  }
 
 	echo "</tr></thead>";
@@ -1295,6 +1318,10 @@ if ($result_lv!=0)
 		else
 			echo 'vorhanden';
 		echo '</td>';
+		//Template
+		echo "<td align='right'>";
+		echo $db->convert_html_chars($row->lehrveranstaltung_template_id);
+		echo '</td>';
 		if($write_admin)
 		{
 			echo '
@@ -1303,7 +1330,19 @@ if ($result_lv!=0)
 				</td>';
 
 			echo '<td><a href="lehrveranstaltung_kompatibel.php?lehrveranstaltung_id='.$row->lehrveranstaltung_id.'&type=edit" target="lv_detail">Kompatible LV</a></td>';
-			echo '<td><a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a></td>';
+			echo '<td>
+						<a href="'.$_SERVER['PHP_SELF'].'?delete_lvid='.$row->lehrveranstaltung_id.'&stg_kz='.$stg_kz.'&semester='.$semester.'&fachbereich_kurzbz='.$oe_fachbereich.'&isaktiv='.$isaktiv.'&oe_kurzbz='.$oe_kurzbz.'&orgform='.$orgform_kurzbz.'" onclick="return conf_del()">löschen</a>
+						';
+			echo '</td>';
+			echo '
+				<td nowrap>';
+
+			$lv_faktor = new lehrveranstaltung_faktor();
+			$lv_faktor->getAkt($row->lehrveranstaltung_id);
+
+			if (in_array($row->lehrtyp_kurzbz, array("tpl", "lv")))
+				echo '<a href="lehrveranstaltung_faktor.php?lehrveranstaltung_id='.$db->convert_html_chars($row->lehrveranstaltung_id).'" target="lv_detail">Bearbeiten</a>';
+			echo '</td>';
 			echo "</tr>\n";
 		}
 	}

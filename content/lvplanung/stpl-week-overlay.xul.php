@@ -247,6 +247,10 @@ echo '<?xul-overlay href="'.APP_ROOT.'content/lvplanung/stpl-details-overlay.xul
 	       				/>
 
 	    			</row>
+                    <row>
+                        <label value="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#zeitverfuegbarkeit"
+                               tooltiptext="rdf:http://www.technikum-wien.at/lehreinheit-lvplan/rdf#lektor hat in diesem Studiensemester verfügbare Zeiten" class="tempus_lektor_verfuegbarezeit"/>
+                    </row>
 	    		</rows>
 	    	</grid>
 

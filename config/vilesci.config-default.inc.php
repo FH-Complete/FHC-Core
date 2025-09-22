@@ -33,14 +33,16 @@ define('INFOSCREEN_PASSWORD', '');
 // Name des Servers (benoetigt fuer Cronjobs
 define('SERVER_NAME', 'localhost');
 
+// Pfad zu Applikation
+define('BASE_LOCATION','/');
 // URL zu FHComplete Root
-define('APP_ROOT', 'http://www.fhcomlete.org/build/');
+define('APP_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION);
 // URL zu RDF Verzeichnis
-define('XML_ROOT', 'http://www.fhcomlete.org/build/rdf/');
+define('XML_ROOT', 'http://www.fhcomlete.org'.BASE_LOCATION.'rdf/');
 // Pfad zu Document Root
 define('DOC_ROOT', '/var/www/html/build/');
 // URL zu CIS
-define('CIS_ROOT', 'http://www.fhcomlete.org/build/');
+define('CIS_ROOT', 'http://www.fhcomlete.org/');
 
 // Externe Funktionen - Unterordner im Include-Verzeichnis
 define('EXT_FKT_PATH', 'tw');
@@ -73,6 +75,7 @@ define('AUTH_NAME', 'FH Complete');
  * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
+ * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
  */
 define('LDAP_SERVER', 'ldap://ldap.example.com');
 define('LDAP_PORT', 389);
@@ -81,6 +84,7 @@ define('LDAP_BASE_DN', 'ou=People,dc=example,dc=com');
 define('LDAP_BIND_USER', null);
 define('LDAP_BIND_PASSWORD', null);
 define('LDAP_USER_SEARCH_FILTER', 'uid');
+define('LDAP_SERVICEPING',true);
 
 // 2. LDAP Server (zB wenn Mitarbeiter und Studierende auf 2 getrennten Servern liegen)
 /*
@@ -186,13 +190,21 @@ define('FHC_REST_PASSWORD', 'password');
  * Signatur
  * DEFAULT: https://signatur.example.com/api/sign
  */
-define('SIGNATUR_URL', 'https://signatur.example.com/api/sign');
+// Generic URL
+define('SIGNATUR_URL', 'https://signatur.dev.technikum-wien.at/api');
+// Sign API
+define('SIGNATUR_SIGN_API', 'sign');
+// List API
+define('SIGNATUR_LIST_API', 'list');
 // User für Zugriff auf Signaturserver
-define('SIGNATUR_USER', 'username');
+define('SIGNATUR_USER', 'fhcomplete');
 // Passwort für Zugriff auf Signaturserver
-define('SIGNATUR_PASSWORD', 'password');
+define('SIGNATUR_PASSWORD', 'supersecretpassword');
 // Signaturprofil das verwendet werden soll
 define('SIGNATUR_DEFAULT_PROFILE', 'FHC_AMT_GROSS_DE');
+
+// Signaturpruefung im Abgabetool aktivieren
+define('ABGABETOOL_CHECK_SIGNATURE',false);
 
 /**
  * Datenverbund Anbindung
@@ -249,18 +261,53 @@ define('BIS_FUNKTIONSCODE_6_ARR', array(
 	'Team'
 ));
 
-// Standortcode fuer Lehrgaenge
-define('BIS_STANDORTCODE_LEHRGAENGE', '0');
+// Standortcode fuer Lehrgaenge - Obsolete da Standort nun aus DB geholt wird
+//define('BIS_STANDORTCODE_LEHRGAENGE', '0');
 
 // bPk Abfrage
 define('BPK_FUER_ALLE_BENUTZER_ABFRAGEN', false);
+// bPk Typen in Form 'BEREICH' => 'kennzeichenTyp'
+define('VBPK_TYPES', array('AS' => 'vbpkAs', 'BF' => 'vbpkBf', 'ZP-TD' => 'vbpkTd'));
+
+// Docsbox configs
+define('DOCSBOX_SERVER', 'http://docconverter.technikum-wien.at/');
+define('DOCSBOX_PATH_API', 'api/v1/');
+define('DOCSBOX_CONVERSION_TIMEOUT', 30); // seconds
+define('DOCSBOX_WAITING_SLEEP_TIME', 1);
 
 // Bei folgenden Buchungstypen wird ein Anlegen geprüft ob bereits ein Eintrag für diesen Typ vorhanden ist im selben
 // Semester und ggf ein Hinweis ausgegeben
 define('FAS_DOPPELTE_BUCHUNGSTYPEN_CHECK', serialize(
-        array('StudiengebuehrAnzahlung', 'Studiengebuehr', 'StudiengebuehrRestzahlung', 'OEH')
-));
+	array(
+			'Studiengebuehr' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrErhoeht' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung', 'StudiengebuehrRestzahlung'),
+			'StudiengebuehrAnzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrAnzahlung'),
+			'StudiengebuehrRestzahlung' => array('StudiengebuehrErhoeht', 'Studiengebuehr', 'StudiengebuehrRestzahlung'),
+			'OEH' => array('OEH')
+	))
+);
 
 // Spezialnoten die am Zeunigs und Diplomasupplement ignoriert werden
 define('ZEUGNISNOTE_NICHT_ANZEIGEN',serialize(array('iar', 'nz')));
+
+//Default Lehrmodus
+define ('DEFAULT_LEHRMODUS','regulaer');
+
+
+//Echter Dienstvertrag
+define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,110]);
+
+//Buchungstypen die fix auf eine bestimmte Kostenstelle gebucht werden sollen
+//Buchungstyp => Studiengang_kz
+define('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE', serialize(
+	array(
+		'Test_1' => 0,
+		'Test_2' => 2
+	)
+));
+
+//Studierende mit diesen Noten werden von der AnzahlStudenten im Tempus abgezogen 
+define('NICHT_ZUGELASSENE',serialize(array(6)));
+
+
 ?>

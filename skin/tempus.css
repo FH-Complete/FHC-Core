@@ -20,6 +20,12 @@ label.tempus_vertrag_info
 	font-size: x-small
 }
 
+label.tempus_lektor_verfuegbarezeit
+{
+	font-weight: bold;
+	color: green;
+}
+
 label.kalenderwoche
 {
 	font-size: medium;
@@ -227,4 +233,20 @@ treechildren::-moz-tree-row(makeItMarked)
 .timetablefilter-vertrag .toolbarbutton-icon {
    width: 25px;
    height:25px;
+}
+
+treechildren::-moz-tree-cell(stichtagsinaktiv)
+{
+	background-color: #e6e6e6;
+}
+
+treechildren::-moz-tree-cell(erstes_stichtagsinaktiv)
+{
+	background-color: #e6e6e6;
+	border-top: 1px solid grey;
+}
+
+label.warning
+{
+	font-weight: bold;
 }

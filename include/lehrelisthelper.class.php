@@ -200,15 +200,17 @@ class LehreListHelper
 		//Studierende der LV laden und in ein Array schreiben
 
 		$qry = 'SELECT
-					distinct on(nachname, vorname, person_id) vorname, nachname, matrikelnr, public.tbl_student.student_uid,
+					distinct on(nachname, vorname, public.tbl_benutzer.person_id) vorname, nachname, wahlname, matrikelnr, public.tbl_student.student_uid,
 					tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 					(SELECT status_kurzbz FROM public.tbl_prestudentstatus
 					WHERE prestudent_id=tbl_student.prestudent_id
 					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 					tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
-					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_studiengang.kurzbzlang,
+					tbl_note.lkt_ueberschreibbar, tbl_note.anmerkung, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_person.geschlecht, tbl_studiengang.kurzbzlang,
 					tbl_mobilitaet.mobilitaetstyp_kurzbz, tbl_zeugnisnote.note,
-					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree
+					(CASE WHEN bis.tbl_mobilitaet.studiensemester_kurzbz = vw_student_lehrveranstaltung.studiensemester_kurzbz THEN 1 ELSE 0 END) as doubledegree,
+					(tbl_bisio.bis::timestamp - tbl_bisio.von::timestamp) as daysout,
+					public.tbl_prestudent.gsstudientyp_kurzbz as ddtype
 				FROM
 					campus.vw_student_lehrveranstaltung
 					JOIN public.tbl_benutzer USING(uid)
@@ -222,6 +224,7 @@ class LehreListHelper
 					LEFT JOIN bis.tbl_bisio ON(uid=tbl_bisio.student_uid)
 					LEFT JOIN public.tbl_studiengang ON(tbl_student.studiengang_kz=tbl_studiengang.studiengang_kz)
 					LEFT JOIN bis.tbl_mobilitaet USING(prestudent_id)
+					LEFT JOIN public.tbl_prestudent USING(prestudent_id)
 				WHERE
 					vw_student_lehrveranstaltung.lehrveranstaltung_id='.$this->db->db_add_param($this->lvid, FHC_INTEGER).'	AND
 					vw_student_lehrveranstaltung.studiensemester_kurzbz='.$this->db->db_add_param($this->studiensemester);
@@ -230,10 +233,11 @@ class LehreListHelper
 		if($this->lehreinheit!='')
 			$qry.=' AND vw_student_lehrveranstaltung.lehreinheit_id='.$this->db->db_add_param($this->lehreinheit, FHC_INTEGER);
 
-		$qry.=' ORDER BY nachname, vorname, person_id, tbl_bisio.bis, doubledegree DESC';
+		$qry.=' ORDER BY nachname, vorname, public.tbl_benutzer.person_id, daysout DESC, doubledegree DESC';
 
 		$stsem_obj = new studiensemester();
 		$stsem_obj->load($this->studiensemester);
+
 		$stsemdatumvon = $stsem_obj->start;
 		$stsemdatumbis = $stsem_obj->ende;
 
@@ -261,8 +265,13 @@ class LehreListHelper
 
 					//Outgoing
 					if($row->bisio_id != '' && $row->status != 'Incoming' && ($row->bis > $stsemdatumvon || $row->bis == '')
-					&& $row->von < $stsemdatumbis && (anzahlTage($row->von, $row->bis) >= 30))
+					&& $row->von < $stsemdatumbis && (anzahlTage($row->von, $row->bis) >= 30)) {
 						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
+					} else if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->von > $stsemdatumvon || $row->von == '')) {
+						// if bis datum is not yet known but von is available already
+						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
+					}
+						
 
 					if($row->lkt_ueberschreibbar == 'f') // angerechnet / intern angerechnet / nicht zugelassen
 						$zusatz.= '('. $row->anmerkung. ')';
@@ -273,14 +282,34 @@ class LehreListHelper
 					if($row->stg_kz_student==$a_o_kz) //Außerordentliche Studierende
 						$zusatz.='(a.o.)';
 
-					if(($row->mobilitaetstyp_kurzbz != '') && ($row->doubledegree == 1)) //Double Degree Student
-						$zusatz .= '(d.d.)';
+					if(($row->mobilitaetstyp_kurzbz != '') && ($row->doubledegree == 1)) {
+						//Double Degree Student
+						$zusatz .= '(d.d.';
+						if($row->ddtype == 'Intern') $zusatz .= 'i.)';
+						else if ($row->ddtype == 'Extern') $zusatz .='o.)';
+						else $zusatz .= ')';
+					}
+
+					if(($row->wahlname != ''))
+					{
+						//als Zusatz speichern
+						//$zusatz .= '(Wahlname: ' . $row->wahlname . ')';
+
+						//wenn vorhanden statt Vornamen anzeigen
+						$vorname = $row->wahlname;
+					}
+					else
+					{
+						$vorname = $row->vorname;
+					}
+
 
 					$this->studentuids[] = $row->student_uid;
 					$this->data[]=array('student'=>array(
 									'uid' => $row->student_uid,
-									'vorname'=>$row->vorname,
+									'vorname'=>$vorname,
 									'nachname'=>$row->nachname,
+									'geschlecht'=>$row->geschlecht,
 									'personenkennzeichen'=>trim($row->matrikelnr),
 									'matr_nr'=>$row->matr_nr,
 									'semester'=>$row->semester,

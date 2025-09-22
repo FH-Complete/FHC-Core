@@ -21,6 +21,7 @@ $this->phrasen['lvplan/lehrverbaende']='Lehrverbände';
 $this->phrasen['lvplan/uebersichtDerLehrverbaende']='Übersicht der Lehrverbände';
 $this->phrasen['lvplan/fehlerUndFeedback']='Feedback geben';
 $this->phrasen['lvplan/lvKoordinationsstelle']='LV-Koordinationsstelle';
+$this->phrasen['lvplan/lvPlanung']='LV-Planung';
 $this->phrasen['lvplan/reservierungen']='Reservierungen';
 $this->phrasen['lvplan/reservierungWurdeGeloescht']='Reservierung wurde geloescht';
 $this->phrasen['lvplan/alleReservierungen']='Alle Reservierungen';
@@ -100,4 +101,5 @@ $this->phrasen['lvplan/folgendeAenderungen']='Es haben sich folgende Aenderungen
 $this->phrasen['lvplan/reserviertInDev']='reserviert<br>für<br>lehre';
 $this->phrasen['lvplan/raumNichtReservierbar']='Die Möglichkeit der Reservierung ist für diesen Raum deaktiviert.';
 $this->phrasen['lvplan/reserviertVon']='Reserviert von';
+$this->phrasen['lvplan/FragenZuLvPlan']='Für Fragen zu Ihrem LV-Plan wenden Sie sich bitte an Ihre <a class="Item" href="mailto:%s">LV-Koordinationsstelle</a>';
 ?>

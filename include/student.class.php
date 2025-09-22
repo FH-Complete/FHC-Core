@@ -294,7 +294,6 @@ class student extends benutzer
 			$l->gebort=$row->gebort;
 			$l->gebzeit=$row->gebzeit;
 			$l->familienstand = $row->familienstand;
-			$l->svnr=$row->svnr;
 			$l->foto=$row->foto;
 			$l->anmerkungen=$row->anmerkung;
 			$l->aktiv=$this->db_parse_bool($row->aktiv);
@@ -532,6 +531,33 @@ class student extends benutzer
 	}
 
 	/**
+	 * Check, ob inputparameter gültige studenten_id ist
+	 * @param matrikelnummer oder student_uid
+	 * @return ok, wenn gültige Id, sonst false
+	 */
+	public function checkIfValidStudentUID($uid)
+	{
+		$qry = "SELECT student_uid FROM public.tbl_student WHERE student_uid=".$this->db_add_param($uid);
+
+		if($this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler beim Laden der Daten';
+			return false;
+		}
+	}
+
+	/**
 	 * Laedt die UID anhand der Matrikelnummer
 	 * @param matrikelnummer
 	 * @return uid wenn ok, false wenn Fehler
@@ -622,7 +648,7 @@ class student extends benutzer
 	{
 		$sql_query = "SELECT
 						person_id, staatsbuergerschaft, geburtsnation, sprache, anrede, titelpost, titelpre,
-						nachname, vorname, vornamen, gebdatum, gebort, gebzeit, anmerkung, homepage, svnr,
+						nachname, vorname, vornamen, gebdatum, gebort, gebzeit, anmerkung, homepage,
 						ersatzkennzeichen, familienstand, geschlecht, anzahlkinder, tbl_person.aktiv, kurzbeschreibung,
 						tbl_benutzer.aktiv as bnaktiv, tbl_student.studiengang_kz, tbl_student.semester, tbl_student.verband,
 						tbl_student.gruppe, tbl_student.prestudent_id, tbl_benutzer.uid
@@ -664,7 +690,6 @@ class student extends benutzer
 				$l->gebzeit = $row->gebzeit;
 				$l->anmerkungen = $row->anmerkung;
 				$l->homepage = $row->homepage;
-				$l->svnr = $row->svnr;
 				$l->ersatzkennzeichen = $row->ersatzkennzeichen;
 				$l->familienstand = $row->familienstand;
 				$l->geschlecht = $row->geschlecht;

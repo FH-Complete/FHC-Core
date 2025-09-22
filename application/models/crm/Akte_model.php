@@ -92,7 +92,7 @@ class Akte_model extends DB_Model
 						 a.anmerkung,
 						 a.nachgereicht,
 						 a.nachgereicht_am,
-						 CASE WHEN MAX(dp.dokument_kurzbz) IS NOT NULL THEN TRUE ELSE FALSE END AS accepted
+						 CASE WHEN MAX(dp.dokument_kurzbz) IS NOT NULL THEN TRUE ELSE FALSE END AS accepted,
 					FROM public.tbl_akte a
 			  INNER JOIN public.tbl_prestudent p USING(person_id)
 			   LEFT JOIN public.tbl_dokumentprestudent dp USING(prestudent_id, dokument_kurzbz)
@@ -107,6 +107,61 @@ class Akte_model extends DB_Model
 		}
 
 		$query .= ' GROUP BY a.akte_id ORDER BY a.erstelltam';
+
+		return $this->execQuery($query, $parametersArray);
+	}
+
+	/**
+	 * getAktenAccepted FAS
+	 */
+	public function getAktenFAS($person_id, $dokument_kurzbz = null, $stg_kz = null, $prestudent_id = null, $returnInhalt = false)
+	{
+		$query = 'SELECT
+    				a.akte_id,
+    				a.bezeichnung,
+    				a.dokument_kurzbz,
+					a.titel_intern,
+					a.anmerkung_intern,
+					a.insertamum as hochgeladenamum,
+					a.updatevon, a.insertvon, a.uid,
+					a.dms_id, a.anmerkung as infotext,
+					a.nachgereicht,
+					CASE
+						WHEN inhalt IS NOT NULL OR a.dms_id IS NOT NULL
+						    THEN true
+						ELSE false
+					END AS vorhanden,
+    				a.nachgereicht_am,
+					ausstellungsnation, formal_geprueft_amum, archiv,
+					signiert, stud_selfservice, akzeptiertamum, inhalt
+					FROM public.tbl_akte a
+					WHERE a.person_id = ?';
+
+		$parametersArray = array($person_id);
+
+		if (!isEmptyString($dokument_kurzbz))
+		{
+			$query .= " AND dokument_kurzbz = ?
+			AND dokument_kurzbz NOT IN ('Zeugnis','DiplSupp','Bescheid')";
+			array_push($parametersArray, $dokument_kurzbz);
+		}
+
+		if($stg_kz != null && $prestudent_id != null)
+		{
+			$query.= " AND dokument_kurzbz not in (
+				SELECT dokument_kurzbz
+					FROM public.tbl_dokument
+					JOIN public.tbl_dokumentstudiengang USING(dokument_kurzbz)
+				WHERE studiengang_kz= ?
+ 				AND dokument_kurzbz NOT IN(
+ 					SELECT dokument_kurzbz FROM public.tbl_dokumentprestudent
+				JOIN public.tbl_dokument USING(dokument_kurzbz)
+				WHERE prestudent_id=?))";
+			array_push($parametersArray, $stg_kz);
+			array_push($parametersArray, $prestudent_id);
+		}
+
+		$query .= ' ORDER BY erstelltam';
 
 		return $this->execQuery($query, $parametersArray);
 	}
@@ -171,7 +226,7 @@ class Akte_model extends DB_Model
 	 * @param bool $nachgereicht if true, retrieves only nachgereichte Dokumente. if false, only not nachgereichte. default: null, all Dokumente
 	 * @return array
 	 */
-	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null)
+	public function getAktenWithDokInfo($person_id, $dokument_kurzbz = null, $nachgereicht = null, $archiv = null)
 	{
 		$this->addSelect('public.tbl_akte.*, bezeichnung_mehrsprachig, dokumentbeschreibung_mehrsprachig, public.tbl_dokument.bezeichnung as dokument_bezeichnung, bis.tbl_nation.*, ausstellungsdetails');
 		$this->addJoin('public.tbl_dokument', 'dokument_kurzbz');
@@ -184,10 +239,69 @@ class Akte_model extends DB_Model
 		if(is_bool($nachgereicht))
 			$where['nachgereicht'] = $nachgereicht;
 
+		if (is_bool($archiv))
+			$where['archiv'] = $archiv;
+
 		$dokumente = $this->loadWhere($where);
 
 		if($dokumente->error) return $dokumente;
 
 		return success($dokumente->retval);
+	}
+
+	/**
+	 * Liefert die Archivdokumente einer Person/mehrerer Personen
+	 *
+	 * @param integer/array				$person_id
+	 * @param boolean|null			$signiert			Wenn true werden nur Dokumente geliefert die digital signiert wurden.
+	 * @param boolean|null			$stud_selfservice	Wenn true werden nur Dokumente geliefert die Studierende selbst herunterladen duerfen.
+	 *
+	 * @return stdClass
+	 */
+	public function getArchiv($person_id, $signiert = null, $stud_selfservice = null)
+	{
+		$this->addSelect('akte_id');
+		$this->addSelect('person_id');
+		$this->addSelect('dokument_kurzbz');
+		$this->addSelect('mimetype');
+		$this->addSelect('erstelltam');
+		$this->addSelect('gedruckt');
+		$this->addSelect('titel_intern');
+		$this->addSelect('anmerkung_intern');
+		$this->addSelect('titel');
+		$this->addSelect('bezeichnung');
+		$this->addSelect('updateamum');
+		$this->addSelect('insertamum');
+		$this->addSelect('updatevon');
+		$this->addSelect('insertvon');
+		$this->addSelect('uid');
+		$this->addSelect('dms_id');
+		$this->addSelect('anmerkung');
+		$this->addSelect('nachgereicht');
+		$this->addSelect('CASE WHEN inhalt is not null THEN true ELSE false END as inhalt_vorhanden', false);
+		$this->addSelect('nachgereicht_am');
+		$this->addSelect('ausstellungsnation');
+		$this->addSelect('formal_geprueft_amum');
+		$this->addSelect('archiv');
+		$this->addSelect('signiert');
+		$this->addSelect('stud_selfservice');
+		$this->addSelect('akzeptiertamum');
+
+		if ($signiert !== null)
+			$this->db->where('signiert', (boolean)$signiert);
+		if ($stud_selfservice !== null)
+			$this->db->where('stud_selfservice', (boolean)$stud_selfservice);
+
+		if (is_array($person_id))
+			$this->db->where_in('person_id', $person_id);
+		else
+			$this->db->where('person_id', $person_id);
+
+		$this->addOrder('erstelltam', 'DESC');
+		$this->addOrder('akte_id', 'DESC');
+
+		return $this->loadWhere([
+			'archiv' => true
+		]);
 	}
 }

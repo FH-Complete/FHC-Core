@@ -149,11 +149,7 @@ else
 					LEFT JOIN PUBLIC.tbl_benutzer ON (PUBLIC.tbl_benutzer.person_id = PUBLIC.tbl_person.person_id)
 					LEFT JOIN PUBLIC.tbl_mitarbeiter ON (PUBLIC.tbl_benutzer.uid = PUBLIC.tbl_mitarbeiter.mitarbeiter_uid)
 					WHERE projektarbeit_id = ".$db->db_add_param($row->projektarbeit_id, FHC_INTEGER)."
-						AND (
-							tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter'
-							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Betreuer'
-							OR tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter'
-							)
+						AND tbl_projektbetreuer.betreuerart_kurzbz IN ('Erstbegutachter', 'Betreuer', 'Begutachter', 'Senatsvorsitz')
 
 					UNION
 
@@ -331,7 +327,7 @@ else
 <link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 <link rel="stylesheet" href="../../skin/tablesort.css" type="text/css"/>
 <link rel="stylesheet" type="text/css" href="../../skin/jquery-ui-1.9.2.custom.min.css">
-<script type="text/javascript" src="../../vendor/jquery/jqueryV1/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../vendor/jquery/jquery1/jquery-1.12.4.min.js"></script>
 <script type="text/javascript" src="../../vendor/christianbach/tablesorter/jquery.tablesorter.min.js"></script>
 <script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 <script type="text/javascript" src="../../include/js/jquery.ui.datepicker.translation.js"></script>

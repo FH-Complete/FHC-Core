@@ -1,0 +1,55 @@
+
+:root{
+	--fhc-profil-border: var(--fhc-background-highlight, gray);
+	--fhc-profil-tabulator-shadow: var(--fhc-shadow-20, rgba(0,0,0,0.1));
+}
+
+.image-lock{
+  height:22px; 
+  width:21px; 
+  background-color:var(--fhc-profil-border); 
+  position:absolute;
+  top:1px; 
+  right:12px; 
+  display:flex; 
+  align-items:center;
+  justify-content:center;
+  border-radius:3px;
+}
+
+.image-upload {
+	height: 22px;
+	width: 21px;
+	background-color: var(--fhc-profil-border);
+	position: absolute;
+	bottom: 4.5px;
+	left: 14.5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 3px 3px 3px 0;
+}
+
+.tabulator-collapsed-row{
+    padding:15px;
+    background-color: var(--fhc-profil-tabulator-shadow);
+
+}
+
+.tabulator-col{
+  justify-content:center !important;
+}
+
+.tabulator-responsive-collapse{
+  padding:0 !important;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  padding: 6px 0px;
+  border-radius: 15px;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.42857;
+}
