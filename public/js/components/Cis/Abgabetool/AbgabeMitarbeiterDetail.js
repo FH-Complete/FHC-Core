@@ -25,6 +25,7 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
+			showAutomagicModalPhrase: false,
 			sdModel: [],
 			eidAkzeptiert: false,
 			enduploadTermin: null,
@@ -73,7 +74,46 @@ export const AbgabeMitarbeiterDetail = {
 						paabgabetyp_kurzbz: termin.bezeichnung?.paabgabetyp_kurzbz
 					}
 					
-					this.projektarbeit.abgabetermine.push(newTerminRes)
+					// only insert new abgabe if we actually created a new one, not when saving/editing existing
+					if(!this.projektarbeit.abgabetermine.find(abgabe => abgabe.paabgabe_id == newTerminRes.paabgabe_id)){
+						this.projektarbeit.abgabetermine.push(newTerminRes)
+					}
+					
+					
+					
+					// negative abgabe -> automagically open new termin modal
+					// really bad feature idea by management people that think
+					// they know better lmao that will be so annoying to deal with
+					
+					// TODO fix the note changed check
+					// check if the abgabe existed beforehand and thus if the note even changed -> dont spam modal open
+					// when editing text of negative abgabe
+					// const savedExistingTermin = termin.paabgabe_id == newTerminRes.paabgabe_id
+					// const noteChanged = savedExistingTermin && termin.note_pk !== newTerminRes.note
+					const newTerminResNoteOpt = this.allowedNotenOptions.find(opt => opt.note == newTerminRes.note)
+					if(newTerminResNoteOpt && !newTerminResNoteOpt.positiv) {
+
+						this.newTermin = {
+							'paabgabe_id': -1,
+							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+							'fixtermin': false,
+							'kurzbz': '',
+							'datum': new Date().toISOString().split('T')[0],
+							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+							'notiz': '',
+							'upload_allowed': false,
+							'paabgabetyp_kurzbz': '',
+							'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === newTerminRes.paabgabetyp_kurzbz),
+							'abgabedatum': null,
+							'insertvon': this.viewData?.uid ?? ''
+						}
+						
+						this.showAutomagicModalPhrase = true
+						
+						this.$refs.modalContainerCreateNewAbgabe.show()
+					}
+					
+					
 					
 					// if(paabgabe_id === -1) { // new abgabe has been inserted
 					// 	termin.paabgabe_id = res?.data?.paabgabe_id
@@ -282,13 +322,21 @@ export const AbgabeMitarbeiterDetail = {
 
 	},
 	template: `
-		<bs-modal id="innerModalNewAbgabe" ref="modalContainerCreateNewAbgabe" class="bootstrap-prompt" dialogClass="bordered-modal modal-xl" :backdrop="true">
+		<bs-modal 
+			id="innerModalNewAbgabe" 
+			ref="modalContainerCreateNewAbgabe" 
+			class="bootstrap-prompt" 
+			dialogClass="bordered-modal modal-xl" 
+			:backdrop="true"
+			@hideBsModal="console.log('hideBsModal'); showAutomagicModalPhrase=false;"
+		>
 			<template v-slot:title>
 				<div>
 					{{ $p.t('abgabetool/c4newAbgabetermin') }}
 				</div>
 			</template>
 			<template v-slot:default>
+				<div v-if="showAutomagicModalPhrase" class="text-center"><p>{{$p.t('abgabetool/c4abgabeQualGateNegativAddNewAutomagisch')}}</p></div>
 				<div v-if="newTermin">
 					<div class="row">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>

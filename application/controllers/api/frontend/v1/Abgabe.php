@@ -36,16 +36,16 @@ class Abgabe extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getConfig' => self::PERM_LOGGED,
-			'getStudentProjektarbeiten' => self::PERM_LOGGED, // TODO: abgabetool berechtigung?
-			'getStudentProjektabgaben' => self::PERM_LOGGED,
-			'postStudentProjektarbeitZwischenabgabe' => self::PERM_LOGGED,
-			'postStudentProjektarbeitEndupload' => self::PERM_LOGGED,
-			'getMitarbeiterProjektarbeiten' => self::PERM_LOGGED,
-			'postProjektarbeitAbgabe' => self::PERM_LOGGED,
-			'deleteProjektarbeitAbgabe' => self::PERM_LOGGED,
-			'postSerientermin' => self::PERM_LOGGED,
-			'fetchDeadlines' => self::PERM_LOGGED, // TODO: mitarbeiter recht prüfen
+			'getConfig' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'getStudentProjektarbeiten' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
+			'getStudentProjektabgaben' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
+			'postStudentProjektarbeitZwischenabgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
+			'postStudentProjektarbeitEndupload' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
+			'getMitarbeiterProjektarbeiten' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'postProjektarbeitAbgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'deleteProjektarbeitAbgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'postSerientermin' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'fetchDeadlines' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'getPaAbgabetypen' => self::PERM_LOGGED,
 			'getNoten' => self::PERM_LOGGED
 		]);
@@ -88,7 +88,7 @@ class Abgabe extends FHCAPI_Controller
 	}
 	
 	/**
-	 * fetches all projektabgabetermine for a given projektarbeit_id used in cis4 student abgabetool
+	 * fetches all projektabgabetermine for a given projektarbeit_id used in cis4 student abgabetool & lektor abgabetool
 	 */
 	public function getStudentProjektabgaben() {
 		$projektarbeit_id = $this->input->get("projektarbeit_id",TRUE);
@@ -467,8 +467,6 @@ class Abgabe extends FHCAPI_Controller
 			$showAllBool = true;
 		} elseif (in_array($boolParamStrLower, $falseStrings, true)) {
 			$showAllBool = false;
-		} else {
-//			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
 		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
@@ -498,6 +496,7 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
+		$existingPaabgabe = null; 
 		if($paabgabe_id == -1) {
 			$result = $this->PaabgabeModel->insert(
 				array(
@@ -513,9 +512,15 @@ class Abgabe extends FHCAPI_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
-
-			
 		} else {
+			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
+			// only notiz has changed.
+			
+			// TODO: what if paabgabe is a qualgate1, is benotet negativ and then its type is changed to gate2?
+			
+			$existingResult = $this->PaabgabeModel->load($paabgabe_id);
+			$existingPaabgabe = getData($existingResult);
+			
 			$result = $this->PaabgabeModel->update(
 				$paabgabe_id,
 				array(
@@ -529,7 +534,6 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				)
 			);
-			
 		}
 		
 		// check if $paaabgabe is a qual gate and its note is deemed negative
@@ -539,7 +543,7 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->PaabgabeModel->load($paabgabe_id);
 		$paabgabeArr = $this->getDataOrTerminateWithError($result);
 		$paabgabe = $paabgabeArr[0];
-		$this->addMeta('paabgabe', $paabgabeArr);
+//		$this->addMeta('paabgabe', $paabgabeArr);
 
 		// check if abgabe even has note
 		if($paabgabe->note) {
@@ -548,13 +552,30 @@ class Abgabe extends FHCAPI_Controller
 			$noteArr = $this->getDataOrTerminateWithError($result);
 			$note = $noteArr[0];
 			if($note->positiv === false) {
-				$this->addMeta('noteNegativ', true);
+//				$this->addMeta('noteNegativ', true);
+				// TODO: somewhere in here check if there has been an existingPaabgabe and if that existing abgabe was
+				// already negativ -> dont send mail
+				
+				
+				if($existingPaabgabe && $existingPaabgabe->note) {
+					$result = $this->NoteModel->load($paabgabe->note);
+					$noteArr = $this->getDataOrTerminateWithError($result);
+					$note = $noteArr[0];
+					if($note->positiv === false) {
+						// do nothing since this means $notiz change or smth else
+					} else { // benotung legitimately changed -> email
+						$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
+					}
 					
-				$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
+				} else { // nothing existing previously -> send that mail
+					$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
+				}
+				
+				
 			}
 		}
 		
-		$this->terminateWithSuccess($paabgabe);
+		$this->terminateWithSuccess([$paabgabe, $existingPaabgabe]);
 	}
 
 	public function deleteProjektarbeitAbgabe() {

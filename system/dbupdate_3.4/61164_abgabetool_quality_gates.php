@@ -74,3 +74,45 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table
 			echo "<br>paabgabe column notiz default '' hinzugefuegt";
 	}
 }
+
+if($result = $db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'basis/abgabe_student'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung)
+				SELECT 'basis/abgabe_student', 'Recht um Abgabetool für Studenten zu bedienen'";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_berechtigung insert basis/abgabe_student hinzugefuegt";
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'basis/abgabe_lektor'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung)
+				SELECT 'basis/abgabe_lektor', 'Recht um Abgabetool für Lektoren zu bedienen'";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_berechtigung insert basis/abgabe_lektor hinzugefuegt";
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'basis/abgabe_assistenz'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung)
+				SELECT 'basis/abgabe_assistenz', 'Recht um Abgabetool für Assistenzen zu bedienen'";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_berechtigung insert basis/abgabe_assistenz hinzugefuegt";
+	}
+}

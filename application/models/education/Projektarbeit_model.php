@@ -97,8 +97,7 @@ class Projektarbeit_model extends DB_Model
 	 */
 	public function getStudentProjektarbeitenWithBetreuer($studentUID)
 	{
-		$betreuerQuery = "
-		SELECT 
+		$betreuerQuery = "SELECT DISTINCT ON(projektarbeit_id)
 			vorname as bvorname,
 			nachname as bnachname,
 			titelpre as btitelpre,
@@ -106,19 +105,19 @@ class Projektarbeit_model extends DB_Model
 			titelpost AS btitelpost,
 			tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
 		
-			(SELECT person_id 
-			 FROM lehre.tbl_projektbetreuer 
+			(SELECT person_id
+			 FROM lehre.tbl_projektbetreuer
 			 WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
-			 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
-			(SELECT betreuerart_kurzbz 
-			 FROM lehre.tbl_projektbetreuer 
+			   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_person_id,
+			(SELECT betreuerart_kurzbz
+			 FROM lehre.tbl_projektbetreuer
 			 WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
-			AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
-			(SELECT tbl_betreuerart.beschreibung 
-			 FROM lehre.tbl_projektbetreuer JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz) 
+			   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_betreuerart_kurzbz,
+			(SELECT tbl_betreuerart.beschreibung
+			 FROM lehre.tbl_projektbetreuer JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz)
 			 WHERE projektarbeit_id=tbl_projektarbeit.projektarbeit_id
-			 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied') LIMIT 1) AS zweitbetreuer_betreuerart_beschreibung,
-			
+			   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied') LIMIT 1) AS zweitbetreuer_betreuerart_beschreibung,
+		
 			tbl_betreuerart.betreuerart_kurzbz,
 			person_id as bperson_id,
 			projektarbeit_id,
@@ -135,7 +134,7 @@ class Projektarbeit_model extends DB_Model
 			lehre.tbl_projektarbeit.schlagwoerter as schlagwoerter,
 			lehre.tbl_projektarbeit.schlagwoerter_en as schlagwoerter_en,
 			lehre.tbl_projektarbeit.abstract as abstract,
-			lehre.tbl_projektarbeit.abstract_en as abstract_en, 
+			lehre.tbl_projektarbeit.abstract_en as abstract_en,
 			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuer_person_id = tbl_projektbetreuer.person_id) AS babgeschickt,
 			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_abgeschickt,
 			(SELECT datum FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz = 'end' AND abgabedatum IS NOT NULL AND projektarbeit_id = tbl_projektarbeit.projektarbeit_id LIMIT 1) AS abgegeben
@@ -146,15 +145,15 @@ class Projektarbeit_model extends DB_Model
 				 LEFT JOIN public.tbl_benutzer USING(person_id)
 				 LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 				 LEFT JOIN lehre.tbl_betreuerart USING(betreuerart_kurzbz)
-				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-		LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_mitarbeiter.mitarbeiter_uid = public.tbl_benutzer.uid)
-		LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
-		WHERE 
-			tbl_projektarbeit.student_uid = ? AND
+				 LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				 LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				 LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_mitarbeiter.mitarbeiter_uid = public.tbl_benutzer.uid)
+				 LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+		WHERE
+			tbl_projektarbeit.student_uid = ? AND mitarbeiter_uid IS NOT NULL AND
 			(projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-  		AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')";
-		
+		  AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')";
+				
 		return $this->execReadOnlyQuery($betreuerQuery, array($studentUID));
 	}
 

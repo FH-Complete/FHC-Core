@@ -42759,6 +42759,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeQualGateNegativAddNewAutomagisch',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Sie haben eine Abgabe vom Typ Quality Gate negativ benotet, bitte legen Sie zeitnah einen Nachfolgetermin an!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You have graded a submission of type Quality Gate negative, please schedule a follow-up appointment promptly!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4saveNewAbgabetermin',
 		'insertvon' => 'system',
 		'phrases' => array(
