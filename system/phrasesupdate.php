@@ -49801,7 +49801,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Projektbetreuer ungültig',
+				'text' => 'ProjektbetreuerIn ungültig',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -49821,7 +49821,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen nicht möglich, Projektbetreuer hat bereits einen Vertrag',
+				'text' => 'Löschen nicht möglich, ProjektbetreuerIn hat bereits einen Vertrag',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -50261,7 +50261,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer bearbeiten',
+				'text' => 'BetreuerIn bearbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -50281,7 +50281,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Betreuer speichern',
+				'text' => 'BetreuerIn speichern',
 				'description' => '',
 				'insertvon' => 'system'
 			),

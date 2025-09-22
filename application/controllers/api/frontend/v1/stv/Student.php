@@ -513,7 +513,9 @@ class Student extends FHCAPI_Controller
 		if ($this->db->trans_status() === FALSE)
 			$this->terminateWithError('TODO(chris): TEXT', self::ERROR_TYPE_GENERAL);
 
-		$this->terminateWithSuccess($result);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	protected function addInteressent()
@@ -695,7 +697,7 @@ class Student extends FHCAPI_Controller
 				//Studentendatensatz anlegen
 				//StudentLehrverband anlegen
 			}
-
+		}
 		// TODO(chris): DEBUG
 		/*$result = $this->PrestudentModel->loadWhere([
 			'pestudent_id' => 1
@@ -704,7 +706,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		return success(true);
+		return success($person_id);
 	}
 
 	public function requiredIfNotPersonId($value)

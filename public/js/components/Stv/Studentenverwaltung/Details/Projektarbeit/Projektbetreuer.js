@@ -391,7 +391,7 @@ export default {
 		// stuff to do after new person has been saved
 		personSaved(result) {
 			this.$api
-				.call(ApiStvProjektbetreuer.getPerson(result.person_id))
+				.call(ApiStvProjektbetreuer.getPerson(result))
 				.then(response => {
 					// set the new person in Betreuer autocomplete field
 					this.autocompleteSelectedBetreuer = response.data;
