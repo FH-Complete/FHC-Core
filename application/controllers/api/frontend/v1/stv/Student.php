@@ -106,6 +106,7 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
 		$this->PrestudentModel->addSelect('p.matr_nr');
 		$this->PrestudentModel->addSelect('p.anrede');
+		$this->PrestudentModel->addSelect('p.zugangscode');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -253,7 +254,6 @@ class Student extends FHCAPI_Controller
 			'gebdatum',
 			'gebort',
 			'geburtsnation',
-			'svnr',
 			'ersatzkennzeichen',
 			'staatsbuergerschaft',
 			'matr_nr',
@@ -698,16 +698,15 @@ class Student extends FHCAPI_Controller
 				//StudentLehrverband anlegen
 			}
 
-			// TODO(chris): DEBUG
-			/*$result = $this->PrestudentModel->loadWhere([
-				'pestudent_id' => 1
-			]);
-			if (isError($result)) {
-				return $result;
-			}*/
-		}
+		// TODO(chris): DEBUG
+		/*$result = $this->PrestudentModel->loadWhere([
+			'pestudent_id' => 1
+		]);
+		if (isError($result)) {
+			return $result;
+		}*/
 
-		return ['person_id' => $person_id ?? null, 'prestudent_id' => $prestudent_id ?? null];
+		return success(true);
 	}
 
 	public function requiredIfNotPersonId($value)
@@ -729,5 +728,10 @@ class Student extends FHCAPI_Controller
 		if ($_POST['personOnly'])
 			return true;
 		return !!$value;
+	}
+
+	public function isValidDate($value)
+	{
+		return isValidDate($value);
 	}
 }

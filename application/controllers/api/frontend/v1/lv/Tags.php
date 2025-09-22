@@ -20,5 +20,31 @@ class Tags extends Tag_Controller
 			'doneLehre' => self::BERECHTIGUNG_KURZBZ,
 			'deleteLehre' => self::BERECHTIGUNG_KURZBZ,
 		]);
+
+		$this->config->load('lvverwaltung');
+	}
+	public function getTag($readonly_tags = null)
+	{
+		parent::getTag($this->config->item('lvverwaltung_tags'));
+	}
+	public function getTags($tags = null)
+	{
+		parent::getTags($this->config->item('lvverwaltung_tags'));
+	}
+	public function addTag($withZuordnung = true, $updatable_tags = null)
+	{
+		parent::addTag(true, $this->config->item('lvverwaltung_tags'));
+	}
+	public function updateTag($updatable_tags = null)
+	{
+		parent::updateTag($this->config->item('lvverwaltung_tags'));
+	}
+	public function deleteTag($withZuordnung = true, $updatable_tags = null)
+	{
+		parent::deleteTag(true, $this->config->item('lvverwaltung_tags'));
+	}
+	public function doneTag($updatable_tags = null)
+	{
+		parent::doneTag($this->config->item('lvverwaltung_tags'));
 	}
 }

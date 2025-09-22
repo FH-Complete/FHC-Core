@@ -23,14 +23,6 @@ export default {
 				this.$p.t('person/ort'),
 				this.event.ort_kurzbz
 			].join(": "));
-
-			this.event.lektor = [
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-			];
 			
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {

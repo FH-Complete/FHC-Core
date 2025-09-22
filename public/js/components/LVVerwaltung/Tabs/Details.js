@@ -111,23 +111,14 @@ export default {
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">{{$p.t('ui', 'speichern')}}</button>
 		</div>
 		<fieldset class="overflow-hidden">
-			<legend>{{this.$p.t('lehre', 'lehreinheit')}}</legend>
+			<div class="core-header d-flex flex-column w-100 overflow-auto pb-3 gap-0">
+				<legend>{{ this.$p.t('lehre', 'lehreinheit') }}</legend>
+				<small v-if="data" v-html="data.lehreinheit_id" class="text-muted"></small>
+			</div>
 			<template v-if="data">
 				<details-form :data="data"/>
 			</template>
 		</fieldset>	
 	</core-form>
-	<fieldset class="overflow-hidden">
-		<div class="row">
-			<div class="col-6">
-				<legend>{{this.$p.t('lehre', 'gruppen')}}</legend>
-				<gruppen-table ref="gruppen_table" :lehreinheit_id="modelValue.lehreinheit_id"></gruppen-table>
-			</div>
-			<div class="col-6">
-				<legend>{{this.$p.t('lehre', 'assignedPersons')}}</legend>
-				<gruppen-direkt-table ref="gruppen_direkt_table" :lehreinheit_id="modelValue.lehreinheit_id"></gruppen-direkt-table>
-			</div>
-		</div>
-		
-	</fieldset>`
+	`
 };

@@ -38,33 +38,6 @@ export default {
 	},
 	template: `
 	<div>
-		<div class="row align-items-start mb-3">
-			<form-input
-				v-if="showLVID"
-				:label="$p.t('lehre', 'lehrveranstaltung_id')"
-				type="text"
-				container-class="col-3"
-				v-model="data.lehrveranstaltung_id"
-				name="lehrveranstaltung_id"
-			 />
-			<form-input
-				v-if="showGewichtung"
-				:label="$p.t('lehre', 'gewicht')"
-				type="text"
-				container-class="col-3"
-				v-model="data.gewicht"
-				name="gewicht"
-			/>
-			<form-input
-				:label="$p.t('lehre', 'detailanmerkung')"
-				type="textarea"
-				container-class="col-3"
-				v-model="formattedAnmerkung"
-				name="anmerkung"
-				id="anmerkung"
-				rows="4"
-			/>
-		</div>
 		<div class="row mb-3">
 			<form-input
 				:label="$p.t('lehre', 'lehrfach')"
@@ -96,55 +69,15 @@ export default {
 				{{ lehrform.bez_kurz }} {{ lehrform.bez }}
 				</option>
 			</form-input>
-		</div>
-	
-		<div class="row mb-3">
+			
 			<form-input
-				:label="$p.t('global', 'sprache')"
-				type="select"
+				:label="$p.t('lehre', 'detailanmerkung')"
+				type="textarea"
 				container-class="col-3"
-				v-model="data.sprache"
-				name="sprache"
-			>
-				<option
-				v-for="sprache in dropdowns.sprachen_array"
-				:key="sprache.sprache"
-				:value="sprache.sprache"
-				>
-				{{ sprache.sprache }}
-				</option>
-			</form-input>
-			<form-input
-				:label="$p.t('lehre', 'unr')"
-				type="text"
-				container-class="col-3"
-				v-model="data.unr"
-				name="unr"
-			/>
-		</div>
-	
-		<div class="row mb-3">
-			<form-input
-				:label="$p.t('lehre', 'studiensemester')"
-				type="select"
-				container-class="col-3"
-				v-model="data.studiensemester_kurzbz"
-				name="studiensemester_kurzbz"
-			>
-				<option
-				v-for="semester in dropdowns.studiensemester_array"
-				:key="semester.studiensemester_kurzbz"
-				:value="semester.studiensemester_kurzbz"
-				>
-				{{ semester.studiensemester_kurzbz }}
-				</option>
-			</form-input>
-			<form-input
-				:label="$p.t('lehre', 'lehre')"
-				type="checkbox"
-				container-class="col-3"
-				v-model="data.lehre"
-				name="lehre"
+				v-model="formattedAnmerkung"
+				name="anmerkung"
+				id="anmerkung"
+				rows="10"
 			/>
 		</div>
 	
@@ -179,29 +112,108 @@ export default {
 				{{ raumtyp.raumtyp_kurzbz }} {{ raumtyp.beschreibung }}
 				</option>
 			</form-input>
+			
+			
+		</div>
+	
+	
+		<div class="row mb-3">
+			<form-input
+				:label="$p.t('global', 'sprache')"
+				type="select"
+				container-class="col-3"
+				v-model="data.sprache"
+				name="sprache"
+			>
+				<option
+				v-for="sprache in dropdowns.sprachen_array"
+				:key="sprache.sprache"
+				:value="sprache.sprache"
+				>
+				{{ sprache.sprache }}
+				</option>
+			</form-input>
+			
+			<form-input
+				:label="$p.t('lehre', 'studiensemester')"
+				type="select"
+				container-class="col-3"
+				v-model="data.studiensemester_kurzbz"
+				name="studiensemester_kurzbz"
+			>
+				<option
+				v-for="semester in dropdowns.studiensemester_array"
+				:key="semester.studiensemester_kurzbz"
+				:value="semester.studiensemester_kurzbz"
+				>
+				{{ semester.studiensemester_kurzbz }}
+				</option>
+			</form-input>
+			
+			
+			
 		</div>
 	
 		<div class="row mb-3">
 			<form-input
 				:label="$p.t('lehre', 'startkw')"
 				type="number"
-				container-class="col-2"
+				min="0"
+				container-class="col-1"
 				v-model="data.start_kw"
 				name="start_kw"
 			/>
 			<form-input
 				:label="$p.t('lehre', 'stundenblockung')"
 				type="number"
-				container-class="col-2"
+				min="0"
+				container-class="col-1"
 				v-model="data.stundenblockung"
 				name="stundenblockung"
 			/>
 			<form-input
 				:label="$p.t('lehre', 'wochenrhythmus')"
 				type="number"
-				container-class="col-2"
+				min="0"
+				container-class="col-1"
 				v-model="data.wochenrythmus"
 				name="wochenrythmus"
+			/>
+			
+			 <div class="col-3 d-flex align-items-end">
+				<form-input
+					:label="$p.t('lehre', 'lehre')"
+					type="checkbox"
+					v-model="data.lehre"
+					name="lehre"
+				/>
+			</div>
+		
+		</div>
+		
+		<div class="row mb-3">
+			<form-input
+				v-if="showLVID"
+				:label="$p.t('lehre', 'lehrveranstaltung_id')"
+				type="text"
+				container-class="col-2"
+				v-model="data.lehrveranstaltung_id"
+				name="lehrveranstaltung_id"
+			 />
+			<form-input
+				:label="$p.t('lehre', 'unr')"
+				type="text"
+				container-class="col-1"
+				v-model="data.unr"
+				name="unr"
+			/>
+			<form-input
+				v-if="showGewichtung"
+				:label="$p.t('lehre', 'gewicht')"
+				type="text"
+				container-class="col-1"
+				v-model="data.gewicht"
+				name="gewicht"
 			/>
 		</div>
 	</div>

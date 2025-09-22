@@ -146,14 +146,25 @@ export default {
 			this.addStudent({status_kurzbz: 'student', statusgrund_id});
 		},
 		addStudent(data) {
-			Promise
-				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$api.call(
-						ApiStvStatus.addStudent(prestudent_id, data),
-						{ errorHeader: prestudent_id }
-					))
-				)
-				.then(res => this.showFeedback(res, data.status_kurzbz));
+			this.$api.call(this.prestudentIds.map(prestudent_id => [
+				prestudent_id,
+				ApiStvStatus.addStudent(prestudent_id, data),
+				{ errorHeader: prestudent_id }
+			]))
+			.then(result => {
+				const messagesSuccessful = result.filter(res => res.status == 'fulfilled');
+				if (messagesSuccessful.length) {
+					this.$fhcAlert.alertDefault(
+						'info',
+						'Feedback',
+						messagesSuccessful.length + " erfolgreiche Statusänderung(en) durchgeführt", // TODO(chris): translate
+						false,
+						true
+					);
+				}
+				this.$emit('reloadTable');
+				this.$reloadList();
+			});
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
 			this
@@ -247,31 +258,15 @@ export default {
 		},
 		changeStatus(data) {
 			data.currentSemester = this.currentSemester;
-			Promise
-				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$api.call(
-						ApiStvStatus.changeStatus(prestudent_id, data),
-						{ errorHeader: prestudent_id }
-					))
-				)
-				.then(res => this.showFeedback(res, data.status_kurzbz));
-		},
-		showFeedback(results, status_kurzbz) {
-			const countSuccess = results.filter(result => result.status == "fulfilled").length;
-			const countError = results.length - countSuccess;
-			
-			//Feedback Success als infoalert
-			this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-				countSuccess,
-				status: status_kurzbz,
-				countError
-			}));
-
-			if(results.length == 1 && countSuccess > 0){
+			this.$api.call(this.prestudentIds.map(prestudent_id => [
+				prestudent_id,
+				ApiStvStatus.changeStatus(prestudent_id, data)
+			]))
+			.then(() => {
 				this.$emit('reloadTable');
-			}
-			this.$reloadList();
-		}
+				this.$reloadList();
+			});
+		},
 	},
 	created() {
 		this.$api

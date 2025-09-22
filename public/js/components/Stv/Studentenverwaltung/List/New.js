@@ -228,7 +228,7 @@ export default {
 	},
 	template: `
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
-		<bs-modal ref="modal" dialog-class="modal-lg modal-scrollable" @hidden-bs-modal="reset">
+		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" @hidden-bs-modal="reset">
 			<template #title>
 				{{ personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}
 			</template>

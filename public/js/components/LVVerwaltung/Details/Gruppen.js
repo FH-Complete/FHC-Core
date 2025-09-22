@@ -50,7 +50,7 @@ export default{
 							let button = document.createElement('button');
 							container.className = "d-flex gap-1";
 
-							button.className = 'btn btn-outline-secondary btn-action';
+							button.className = 'btn btn-outline-secondary';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
 							button.addEventListener('click', (event) => {
@@ -63,7 +63,7 @@ export default{
 							{
 								button = document.createElement('button');
 								container.className = "d-flex gap-2";
-								button.className = 'btn btn-outline-secondary btn-action';
+								button.className = 'btn btn-outline-secondary';
 								button.innerHTML = '<i class="fa fa-calendar-xmark"></i>';
 								button.title = this.$p.t('lehre', 'auslvplanentfernen');
 								button.disabled = !cell.getData().verplant;

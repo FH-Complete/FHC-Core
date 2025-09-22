@@ -56,7 +56,13 @@ export default {
 				}
 			},
 			deep: true,
-
+		},
+		currentSemester: {
+			handler(newVal)
+			{
+				this.lv_info_default.studiensemester_kurzbz = newVal
+				this.lv_info = false;
+			}
 		}
 	},
 	data() {
@@ -137,6 +143,8 @@ export default {
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
 
+					if (e.getData()?.lehreinheit_id === undefined)
+						return;
 					return [
 						{
 							label: "LV-Teil kopieren",
@@ -159,7 +167,7 @@ export default {
 									label: "Nur mit Gruppen",
 									action: (e, row) =>
 									{
-										this.copyLehreinheit(row, "halb");
+										this.copyLehreinheit(row, "gruppen");
 									},
 								},
 								{
@@ -233,6 +241,17 @@ export default {
 							const renderTags = () => {
 								container.innerHTML = '';
 								parsedTags = parsedTags.filter(item => item !== null);
+
+								parsedTags.sort((a, b) => {
+									let adone = a.done ? 1 : 0;
+									let bbone = b.done ? 1 : 0;
+
+									if (adone !== bbone)
+									{
+										return adone - bbone;
+									}
+									return b.id - a.id;
+								});
 								const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
 
 								tagsToShow.forEach(tag => {
@@ -445,7 +464,7 @@ export default {
 							if (!tagExists)
 							{
 								addedTag.id = tag.id;
-								tags.push({ ...addedTag });
+								tags.unshift({ ...addedTag });
 								targetRow.update({ tags: JSON.stringify(tags) });
 								targetRow.reformat();
 							}
@@ -659,19 +678,19 @@ export default {
 			<slot name="filterzuruecksetzen"></slot>
 		</template>
 	</core-filter-cmpt>
-		<bs-modal ref="lehreinheitModal" dialogClass="modal-lg">
-			<template #title>
-				<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
-			</template>
+	<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
+		<template #title>
+			<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
+		</template>
 			
-			<template v-if="lv_info">
-				<details-form :data="lv_info"/>
-			</template>
+		<template v-if="lv_info">
+			<details-form :data="lv_info"/>
+		</template>
 			
-			<template #footer>
-				<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
-			</template>
-		</bs-modal>
+		<template #footer>
+			<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
+		</template>
+	</bs-modal>
 
 `
 };

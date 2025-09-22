@@ -50,7 +50,6 @@ export default {
 					:modelValue="lv[0]"
 					:config="configLVTabs"
 					:default="$route.params.tab"
-					style="flex: 1 1 0%; height: 0%"
 					@changed="reload"
 				/>
 			</div>

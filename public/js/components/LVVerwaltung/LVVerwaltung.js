@@ -32,13 +32,7 @@ export default {
 		studiensemester_kurzbz: { type: String, required: false, default: null },
 		emp: { type: String, required: false, default: null }
 	},
-	computed: {
-		selectedStudiensemester() {
-			return this.studiensemester_kurzbz != null
-				? this.studiensemester_kurzbz
-				: this.defaultSemester;
-		}
-	},
+
 	provide() {
 		return {
 			currentSemester: Vue.computed(() => this.selectedStudiensemester),
@@ -70,12 +64,16 @@ export default {
 		emp() {
 			this.updateFilter();
 		},
+		studiensemester_kurzbz(newVal) {
+			this.selectedStudiensemester = newVal ?? this.defaultSemester;
+		}
 	},
 	data() {
 		return {
 			selected: [],
 			studiengang: "",
 			filter: {},
+			selectedStudiensemester: this.studiensemester_kurzbz ?? this.defaultSemester,
 			endpoint: ApiStudiengangTree,
 			dropdowns: {
 				studiensemester_array: [],
@@ -88,10 +86,12 @@ export default {
 			},
 			selectedStudiengang: '',
 			searchbaroptions: {
+				origin: 'lvverwaltung',
 				cssclass: "position-relative",
 				calcheightonly: true,
 				types: [
-					"mitarbeiter"
+					"mitarbeiter",
+					"mitarbeiter_ohne_zuordnung"
 				],
 				actions: {
 					employee: {

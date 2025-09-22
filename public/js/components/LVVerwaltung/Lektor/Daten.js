@@ -121,9 +121,9 @@ export default{
 			}
 			this.$refs.form.call(ApiLektor.update(updatedData))
 				.then(result => {
-					let error = result.data?.error;
-					if (error)
-						this.$fhcAlert.alertWarning(error)
+					let warning = result.data?.retval?.warning;
+					if (warning)
+						this.$fhcAlert.alertWarning(warning)
 					this.original = {...this.data};
 
 					if (this.changed.mitarbeiter_uid)
@@ -192,12 +192,13 @@ export default{
 						container-class="col-3"
 						dropdown
 						@complete="searchLektor"
+						name="lektorautocomplete"
 					></form-input>
 					
 					<form-input
 						:label="$p.t('lehre', 'anmerkung')"
 						type="text"
-						container-class="col-3"
+						container-class="col-6"
 						v-model="data.anmerkung"
 						name="anmerkung"
 						>
@@ -207,7 +208,9 @@ export default{
 				<div class="row mb-3">
 					<form-input
 						:label="$p.t('lehre', 'las')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"
 						v-model="data.semesterstunden"
@@ -217,7 +220,9 @@ export default{
 					
 					<form-input
 						:label="$p.t('lehre', 'planstunden')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						v-model="data.planstunden"
 						name="planstunden"
@@ -225,13 +230,15 @@ export default{
 					</form-input>
 
 				</div>
-				<div class="row mb-3">
+				<div class="row mb-3 d-flex align-items-end">
 					
 					<form-input
 						:label="data.default_stundensatz !== null 
 							? $p.t('lehre', 'stundensatz') + ' (' + $p.t('lehre', 'default') + ': ' + data.default_stundensatz + ')'
 							: $p.t('lehre', 'stundensatz')"
-						type="text"
+						type="number"
+						min="0"
+						step="0.01"
 						container-class="col-3"
 						v-model="data.stundensatz"
 						:disabled="data.vertrag?.vertragsstatus_kurzbz === 'akzeptiert'"

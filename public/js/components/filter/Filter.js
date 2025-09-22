@@ -95,7 +95,6 @@ export const CoreFilterCmpt = {
 			dataset: null,
 			datasetMetadata: null,
 			selectedFields: null,
-			notSelectedFields: null,
 			filterFields: null,
 
 			availableFilters: null,
@@ -106,6 +105,8 @@ export const CoreFilterCmpt = {
 			fetchCmptApiFunction: null,
 			fetchCmptApiFunctionParams: null,
 			fetchCmptDataFetched: null,
+
+			fetchResult: null,
 
 			tabulator: null,
 			tableBuilt: false,
@@ -122,6 +123,11 @@ export const CoreFilterCmpt = {
 		};
 	},
 	computed: {
+		notSelectedFields() {
+			if (!this.fields || !this.selectedFields)
+				return null;
+			return this.fields.filter(x => this.selectedFields.indexOf(x) === -1)
+		},
 		filteredData() {
 			if (!this.dataset)
 				return [];
@@ -219,6 +225,32 @@ export const CoreFilterCmpt = {
 				await this.$p.loadCategory('ui');
 				placeholder = this.$p.t('ui/keineDatenVorhanden');
 			}
+
+			if (!this.tableOnly) {
+				// prefetch data to get fields & selectedFields for filteredColumns & filteredData
+				await new Promise(resolve => {
+					const filterId = window.location.hash ? window.location.hash.slice(1) : null;
+
+					const resolvePromiseFunc = data => {
+						this.setRenderData(data);
+						resolve();
+					};
+					// get the filter data
+					if (filterId === null)
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+							null,
+							resolvePromiseFunc
+						);
+					else
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
+							{ filterId },
+							resolvePromiseFunc
+						);
+				});
+			}
+
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 					layout: "fitDataStretchFrozen",
@@ -240,6 +272,11 @@ export const CoreFilterCmpt = {
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
 				tabulatorOptions.columns = this.filteredColumns;
+			} else {
+				tabulatorOptions.columns.forEach(col => {
+					if (col.visible === undefined)
+						col.visible = true;
+				});
 			}
 
 			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
@@ -359,18 +396,14 @@ export const CoreFilterCmpt = {
 					this.render
 				);
 		},
-		/**
-		 *
-		 */
-		render(response) {
-			let data = response;
+		setRenderData(data) {
+			this.fetchResult = data;
 			this.filterName = data.filterName;
 			this.dataset = data.dataset;
 			this.datasetMetadata = data.datasetMetadata;
 
 			this.fields = data.fields;
 			this.selectedFields = data.selectedFields;
-			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 			this.filterFields = [];
 
 			for (let i = 0; i < data.datasetMetadata.length; i++)
@@ -387,6 +420,14 @@ export const CoreFilterCmpt = {
 					}
 				}
 			}
+		},
+		/**
+		 *
+		 */
+		render(response) {
+			let data = response;
+
+			this.setRenderData(data);
 
 			// If the side menu is active
 			if (this.sideMenu === true)
@@ -627,11 +668,10 @@ export const CoreFilterCmpt = {
 		this.$emit('uuidDefined', this.uuid)
 	},
 	mounted() {
-
 		this.initTabulator().then(() => {
 			if (!this.tableOnly) {
 				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
-				this.getFilter(); // get the filter data
+				this.render(this.fetchResult);
 			}
 		});
 
@@ -666,7 +706,7 @@ export const CoreFilterCmpt = {
 					</button>
 					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
-						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+						<span v-else id="selected-info-text"> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>

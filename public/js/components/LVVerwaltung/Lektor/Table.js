@@ -85,7 +85,7 @@ export default{
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-calendar-xmark"></i>';
 							button.disabled = !cell.getData().verplant;
-							button.title = this.$p.t('ui', 'auslvplanentfernen');
+							button.title = this.$p.t('lehre', 'auslvplanentfernen');
 							button.addEventListener('click', (event) => {
 								event.stopPropagation();
 								this.deleteLVPlan(cell.getData().mitarbeiter_uid, cell.getData().lehreinheit_id)
@@ -199,7 +199,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
-			:new-btn-label="$p.t('lehre', 'addlektor')"
+			:new-btn-label="$p.t('lehre', 'addLektor')"
 			new-btn-show
 			@click:new="showAutocomplete = !showAutocomplete"
 			>
