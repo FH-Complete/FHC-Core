@@ -77,6 +77,7 @@ require_once('dbupdate_3.4/55614_perm_verwaltetoe.php');
 require_once('dbupdate_3.4/25999_C4_dashboard.php');
 require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
 require_once('dbupdate_3.4/40128_search.php');
+require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
