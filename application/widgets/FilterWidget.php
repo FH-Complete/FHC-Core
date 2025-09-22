@@ -438,7 +438,6 @@ class FilterWidget extends Widget
 
 		// Read the all session for this filter widget
 		$session = $this->filterwidgetlib->getSession();
-
 		// If session is NOT empty -> a filter was already loaded
 		if ($session != null)
 		{
@@ -522,7 +521,8 @@ class FilterWidget extends Widget
 							FilterWidgetLib::DATASET_NAME => $this->_datasetName, // the carrent dataset name
 							FilterWidgetLib::SESSION_FILTER_NAME => $filterName, // the current filter name
 							FilterWidgetLib::SESSION_FIELDS => $this->FiltersModel->getExecutedQueryListFields(), // all the fields of the dataset
-							FilterWidgetLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns), // all the selected fields
+							// All the selected fields
+							FilterWidgetLib::SESSION_SELECTED_FIELDS => $this->_getColumnsNames($parsedFilterJson->columns),
 							FilterWidgetLib::SESSION_COLUMNS_ALIASES => $this->_columnsAliases, // all the fields aliases
 							FilterWidgetLib::SESSION_ADDITIONAL_COLUMNS => $this->_additionalColumns, // additional columns
 							FilterWidgetLib::SESSION_ENCRYPTED_COLUMNS => $this->_encryptedColumns, // encrypted columns
@@ -532,12 +532,19 @@ class FilterWidget extends Widget
 							FilterWidgetLib::SESSION_ROW_NUMBER => count($dataset->retval), // the number of loaded rows by this filter
 							FilterWidgetLib::SESSION_DATASET => $dataset->retval, // the entire dataset
 							FilterWidgetLib::SESSION_DATASET_RELOAD => false, // if the dataset must be reloaded, not needed the first time
-							FilterWidgetLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation, // the choosen dataset representation
-							FilterWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions, // the choosen dataset representation options
-							FilterWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs // the choosen dataset representation record fields definition
+							// The choosen dataset representation
+							FilterWidgetLib::SESSION_DATASET_REPRESENTATION => $this->_datasetRepresentation,
+							// The choosen dataset representation options
+							FilterWidgetLib::SESSION_DATASET_REP_OPTIONS => $this->_datasetRepresentationOptions,
+							// The choosen dataset representation record fields definition
+							FilterWidgetLib::SESSION_DATASET_REP_FIELDS_DEFS => $this->_datasetRepFieldsDefs
 						)
 					);
 				}
+			}
+			else
+			{
+				show_error('The JSON contained within the database filter definition is not valid');
 			}
 		}
 

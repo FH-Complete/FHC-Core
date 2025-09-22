@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2013 FH Technikum-Wien
+ * Copyright (C) 2025 FH Technikum-Wien
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -1649,3 +1649,4 @@ for ($filtersCounter = 0; $filtersCounter < count($filters); $filtersCounter++)
 		}
 	}
 }
+

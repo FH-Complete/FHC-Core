@@ -225,8 +225,7 @@ $menu=array
 		'name'=>'Admin', 'opener'=>'true', 'hide'=>'true', 'permissions'=>array('basis/cronjob'), 'image'=>'vilesci_admin.png',
 		'link'=>'left.php?categorie=Admin', 'target'=>'nav',
 		'Cronjobs'=>array('name'=>'Cronjobs', 'link'=>'stammdaten/cronjobverwaltung.php', 'target'=>'main','permissions'=>array('basis/cronjob')),
-		'Vorlagen'=>array('name'=>'Vorlagen', 'link'=>'../index.ci.php/system/Vorlage', 'target'=>'main','permissions'=>array('basis/cronjob')),
-		'Phrasen'=>array('name'=>'Phrasen', 'link'=>'../index.ci.php/system/Phrases', 'target'=>'main','permissions'=>array('basis/cronjob'))
+		'Vorlagen'=>array('name'=>'Vorlagen', 'link'=>'../index.ci.php/system/Vorlage', 'target'=>'main','permissions'=>array('basis/cronjob'))
 	)
 );
 
@@ -234,7 +233,6 @@ require_once(dirname(__FILE__).'/../statistik.class.php');
 $statistik = new statistik();
 $statistik = $statistik->getMenueArray(1);
 $menu['Auswertung']=array_merge($menu['Auswertung'],$statistik);
-//var_dump($menu['Auswertung']);
 
 require_once(dirname(__FILE__).'/../addon.class.php');
 $addon_obj = new addon();

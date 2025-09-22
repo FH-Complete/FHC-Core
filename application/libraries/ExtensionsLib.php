@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2022 fhcomplete.org
+ * Copyright (C) 2025 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \stdClass as stdClass;
+use \PharData as PharData;
 
 /**
  * Library to manage core extensions
@@ -32,6 +33,8 @@ class ExtensionsLib
 
 	const EXTENSION_JSON_NAME = 'extension.json'; // file that contains extension data
 	const EXTENSIONS_DIR_NAME = 'extensions'; // name of the directories where will be created the symlinks
+
+        const PHRASES_DIRECTORY = 'phrases/'; // directory name where phrases files are
 
 	private $_ci;
 
@@ -55,6 +58,7 @@ class ExtensionsLib
 	{
 		$this->UPLOAD_PATH = APPPATH.'tmp/';
 		$this->EXTENSIONS_PATH = APPPATH.'extensions/';
+
 		// Get code igniter instance
 		$this->_ci =& get_instance();
 
@@ -63,6 +67,8 @@ class ExtensionsLib
 
 		// Loads EPrintfLib
 		$this->_ci->load->library('EPrintfLib');
+		// Loads PhrasesLib
+		$this->_ci->load->library('PhrasesLib');
 
 		// Loading models
 		$this->_ci->load->model('system/Extensions_model', 'ExtensionsModel');
@@ -134,7 +140,7 @@ class ExtensionsLib
 
 				if (!$this->_errorOccurred) // if no error occurred
 				{
-					// Loads and executes neede SQL scripts
+					// Loads and executes the needed SQL scripts
 					$this->_loadSQLs(
 						$this->UPLOAD_PATH.$extensionJson->name.'/'.ExtensionsLib::SQL_DIRECTORY,
 						$extensionJson
@@ -151,6 +157,12 @@ class ExtensionsLib
 				{
 					// Create the symlinks to the installed extension
 					$this->_createSymLinks($extensionJson->name);
+				}
+
+				if (!$this->_errorOccurred) // if no error occurred
+				{
+					// Create the symlinks to the installed extension
+					$this->_installPhrases($extensionJson->name);
 				}
 			}
 			else
@@ -402,6 +414,7 @@ class ExtensionsLib
 	 */
 	private function _chkExtensionJson($extensionName, $extensionDB)
 	{
+		$fhcomplete_version = 0;
 		$this->_printStart('Parsing and checking extension.json');
 
 		// Decodes extension.json
@@ -606,7 +619,10 @@ class ExtensionsLib
 		// Loops through the versions
 		for ($sqlDir = $startVersion; $sqlDir <= $extensionJson->version; $sqlDir++)
 		{
-			// If a directory with the same value of the version is present in the sql scripts directory
+			// Search for a directory with the same value of the version in the sql scripts directory
+			$files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION);
+
+			// If found
 			$files = glob($pkgSQLsPath.'/'.$sqlDir.'/*'.ExtensionsLib::SQL_FILE_EXTENSION);
 			if ($files != false)
 			{
@@ -931,4 +947,13 @@ class ExtensionsLib
 	{
 		$this->_printInfo('------------------------------------------------------------------------------------------');
 	}
+
+	/**
+	 * Install the phrases from the given extension
+	 */
+	private function _installPhrases($extensionName)
+	{
+		$this->_ci->phraseslib->installFrom($this->EXTENSIONS_PATH.$extensionName.'/'.self::PHRASES_DIRECTORY);
+	}
 }
+

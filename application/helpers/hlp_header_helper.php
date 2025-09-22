@@ -1,20 +1,20 @@
 <?php
-
 /**
- * FH-Complete
+ * Copyright (C) 2025 FH Technikum-Wien
  *
- * @package		FHC-Helper
- * @author		FHC-Team
- * @copyright	Copyright (c) 2016 fhcomplete.org
- * @license		GPLv3
- * @since		Version 1.0.0
- */
-
-/**
- * FHC Helper
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 2 of the
+ * License, or (at your option) any later version.
  *
- * @subpackage	Helpers
- * @category	Helpers
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  */
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
@@ -136,7 +136,7 @@ function generateJSPhrasesStorageObject($phrases)
 	$toPrint = "\n";
 	$toPrint .= '<script type="text/javascript">';
 	$toPrint .= "\n";
-	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->getJSON().';';
+	$toPrint .= '	var FHC_JS_PHRASES_STORAGE_OBJECT = '.$ci->pj->toJSON().';';
 	$toPrint .= "\n";
 	$toPrint .= '</script>';
 	$toPrint .= "\n\n";
@@ -246,3 +246,4 @@ function generateSkipLink($skipID)
 	$toPrint.='" class="fhcSkipLink" aria-label="Skip to main content"></a>';
 	echo $toPrint;
 }
+
