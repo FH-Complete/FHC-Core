@@ -56,7 +56,13 @@ export default {
 				}
 			},
 			deep: true,
-
+		},
+		currentSemester: {
+			handler(newVal)
+			{
+				this.lv_info_default.studiensemester_kurzbz = newVal
+				this.lv_info = false;
+			}
 		}
 	},
 	data() {
@@ -137,6 +143,8 @@ export default {
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
 
+					if (e.getData()?.lehreinheit_id === undefined)
+						return;
 					return [
 						{
 							label: "LV-Teil kopieren",
@@ -159,7 +167,7 @@ export default {
 									label: "Nur mit Gruppen",
 									action: (e, row) =>
 									{
-										this.copyLehreinheit(row, "halb");
+										this.copyLehreinheit(row, "gruppen");
 									},
 								},
 								{

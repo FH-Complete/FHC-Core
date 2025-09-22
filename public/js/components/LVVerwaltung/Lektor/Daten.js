@@ -198,7 +198,7 @@ export default{
 					<form-input
 						:label="$p.t('lehre', 'anmerkung')"
 						type="text"
-						container-class="col-3"
+						container-class="col-6"
 						v-model="data.anmerkung"
 						name="anmerkung"
 						>
@@ -230,7 +230,7 @@ export default{
 					</form-input>
 
 				</div>
-				<div class="row mb-3">
+				<div class="row mb-3 d-flex align-items-end">
 					
 					<form-input
 						:label="data.default_stundensatz !== null 

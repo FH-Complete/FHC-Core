@@ -109,7 +109,6 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 	},
-	// language=HTML
 	template: `
 		<core-form ref="form">
 			<fieldset class="overflow-hidden" v-if="showVertragsdetails">
