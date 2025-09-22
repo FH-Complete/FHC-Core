@@ -11,8 +11,8 @@ class Manager extends Auth_Controller
 	 *
 	 */
 	public function __construct()
-    {
-        parent::__construct(
+	{
+		parent::__construct(
 			array(
 				'index' => 'system/extensions:r',
 				'toggleExtension' => 'system/extensions:rw',
@@ -21,11 +21,22 @@ class Manager extends Auth_Controller
 			)
 		);
 
-		// Load helpers to upload files
+		// Loads the form helper
 		$this->load->helper('form');
+
+		// Loads WidgetLib
+		$this->load->library('WidgetLib');
 
 		// Loads the extensions library
 		$this->load->library('ExtensionsLib');
+
+		$this->loadPhrases(
+			array(
+				'extensions',
+				'table',
+				'ui'
+			)
+		);
 	}
 
 	/**
@@ -45,23 +56,16 @@ class Manager extends Auth_Controller
 	 */
 	public function toggleExtension()
 	{
-		$toggleExtension = false;
-
 		$extension_id = $this->input->post('extension_id');
 		$enabled = $this->input->post('enabled');
 
-		if ($enabled === 'true')
-		{
-			$toggleExtension = $this->extensionslib->enableExtension($extension_id);
-		}
-		else
-		{
-			$toggleExtension = $this->extensionslib->disableExtension($extension_id);
-		}
+		// Clean the parameter
+		$enabled = $enabled == 'true' ? true : false;
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($toggleExtension));
+		// Output the enable/disable of the extension
+		$this->outputJsonSuccess(
+			$this->extensionslib->toggleExtension($extension_id, $enabled)
+		);
 	}
 
 	/**
@@ -69,15 +73,11 @@ class Manager extends Auth_Controller
 	 */
 	public function delExtension()
 	{
-		$delExtension = false;
-
 		$extension_id = $this->input->post('extension_id');
 
 		$delExtension = $this->extensionslib->delExtension($extension_id);
 
-		$this->output
-			->set_content_type('application/json')
-			->set_output(json_encode($delExtension));
+		$this->outputJsonSuccess($delExtension);
 	}
 
 	/**
@@ -87,9 +87,16 @@ class Manager extends Auth_Controller
 	 * die Commandline ohne Upload durchzufuehren.
 	 * @param $extensioName string Name der Extension
 	 * @param $filename Url Encoded Pfad zum tgz File der Extension
+	 * @param $perform_sql boolean ob die SQL Befehle ausgeführt werden
 	 */
-	public function uploadExtension($extensionName = null, $filename = null)
+	public function uploadExtension()
 	{
-		$this->extensionslib->installExtension($extensionName, urldecode($filename));
+		$notPerformSql = $this->input->post('notPerformSql');
+
+		// It converts the notPerformSql parameter from the checkbox value to a boolean one
+		if ($notPerformSql == 'on') $notPerformSql = true;
+		if ($notPerformSql !== true) $notPerformSql = false;
+
+		$this->extensionslib->installExtension(null, null, !$notPerformSql);
 	}
 }
