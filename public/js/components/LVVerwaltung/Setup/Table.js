@@ -663,6 +663,8 @@ export default {
 		@click:new="showLehreinheitModal">
 		
 		<template #actions>
+			<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
+			<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 			<core-tag ref="tagComponent"
 				:endpoint="tagEndpoint"
 				:values="selectedColumnValues"
@@ -671,8 +673,6 @@ export default {
 				@updated="updatedTag"
 				zuordnung_typ="lehreinheit_id"
 			></core-tag>
-			<button @click="expandTree" class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-maximize"></i></button>
-			<button @click="resetTree" class="btn btn-outline-secondary" type="button"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 		</template>
 		<template #search>
 			<slot name="filterzuruecksetzen"></slot>

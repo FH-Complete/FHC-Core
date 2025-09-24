@@ -3,7 +3,6 @@ import FormForm from '../../Form/Form.js';
 import FormInput from '../../Form/Input.js';
 import ApiLektor from "../../../api/lehrveranstaltung/lektor.js";
 
-
 export default{
 	name: "LVLektorTable",
 	components: {
@@ -36,7 +35,8 @@ export default{
 			],
 			showAutocomplete: false,
 			filteredLektor: [],
-			selectedLektor: ''
+			selectedLektor: '',
+			abortController: null
 		}
 	},
 	computed: {
@@ -163,17 +163,37 @@ export default{
 
 				})
 		},
-		searchLektor(event)
+		async searchLektor(event)
 		{
-			const query = event.query.toLowerCase().trim();
-			this.filteredLektor = this.dropdowns.lektor_array.filter(lektor => {
-				const fullName = `${lektor.vorname.toLowerCase()} ${lektor.nachname.toLowerCase()}`;
-				const reverseFullName = `${lektor.nachname.toLowerCase()} ${lektor.vorname.toLowerCase()}`;
-				return fullName.includes(query) || reverseFullName.includes(query) || lektor.uid.toLowerCase().includes(query);
-			}).map(lektor => ({
-				label: `${lektor.nachname} ${lektor.vorname} (${lektor.uid})`,
-				uid: lektor.uid
-			}));
+			const query = event.query.trim();
+
+			if (!query)
+			{
+				this.filteredLektor = [];
+				return;
+			}
+
+			if (query.length < 2)
+			{
+				return;
+			}
+
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.$api.call(ApiLektor.getLektorenSearch(query), { signal })
+				.then(result => {
+					this.filteredLektor = result.data.map(lektor => ({
+							label: `${lektor.nachname} ${lektor.vorname} (${lektor.uid})`,
+							uid: lektor.uid
+						})
+					)})
+				.catch(this.$fhcAlert.handleSystemError)
 		},
 		addLektor()
 		{

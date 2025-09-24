@@ -8,12 +8,11 @@ export default {
 		};
 	},
 
-
-	getLektoren()
+	getLektorenSearch(query)
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/lektor/getLektoren/'
+			url: '/api/frontend/v1/lv/lektor/getLektorenSearch/' + encodeURIComponent(query)
 		};
 	},
 

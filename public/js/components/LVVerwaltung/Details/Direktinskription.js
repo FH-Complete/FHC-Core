@@ -2,6 +2,7 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
 import FormInput from '../../Form/Input.js';
 import ApiDirektGruppe from "../../../api/lehrveranstaltung/direktgruppe.js";
+import ApiGruppe from "../../../api/lehrveranstaltung/gruppe.js";
 export default{
 	name: "LVDirektGruppen",
 	components: {
@@ -65,7 +66,6 @@ export default{
 			selectedUser: null,
 			filteredUsers: [],
 			abortController: null,
-			searchTimeout: null,
 		}
 	},
 	watch: {
@@ -97,18 +97,36 @@ export default{
 		},
 		searchUser(event)
 		{
-			const query = event.query.toLowerCase().trim();
-			this.filteredUsers = this.dropdowns.benutzer_array.filter(user => {
+			const query = event.query.trim();
+			if (!query)
+			{
+				this.filteredUsers = [];
+				return;
+			}
 
-				const fullName = `${user.vorname.toLowerCase()} ${user.nachname.toLowerCase()}`;
-				const reverseFullName = `${user.nachname.toLowerCase()} ${user.vorname.toLowerCase()}`;
-				return fullName.includes(query) || reverseFullName.includes(query) || user.uid.toLowerCase().includes(query) || user.studiengang.toLowerCase().includes(query);
-			}).map(user => ({
-				label: user.studiengang
-					? `${user.nachname} ${user.vorname} ${user.uid} ${user.studiengang} ${user.semester}`
-					: `${user.nachname} ${user.vorname} ${user.uid}`,
-				uid: user.uid
-			}));
+			if (query.length < 2)
+			{
+				return;
+			}
+
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.$api.call(ApiGruppe.getBenutzerSearch(query), { signal })
+				.then(result => {
+					this.filteredUsers = result.data.map(user => ({
+						label: user.studiengang
+							? `${user.nachname} ${user.vorname} ${user.uid} ${user.studiengang} ${user.semester}`
+							: `${user.nachname} ${user.vorname} ${user.uid}`,
+						uid: user.uid
+						})
+					)})
+				.catch(this.$fhcAlert.handleSystemError)
 		},
 		addUser()
 		{
@@ -144,7 +162,7 @@ export default{
 					:placeholder="$p.t('lehre', 'assignPerson')"
 					v-model="selectedUser"
 					field="label"
-					:minLength="3"
+					:minLength="2"
 					@item-select="addUser"
 					@complete="searchUser"
 				></form-input>

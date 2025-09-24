@@ -37,20 +37,20 @@ export default {
 
 
 /*------------- details -------- */
-	getAll()
+	getBenutzerSearch(query)
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/gruppe/getAll/'
+			url: '/api/frontend/v1/lv/gruppe/getBenutzerSearch/' + encodeURIComponent(query)
 		};
 	},
 
-	getBenutzer()
+	getAllSearch(query)
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/gruppe/getBenutzer/'
+			url: '/api/frontend/v1/lv/gruppe/getAllSearch/'  + encodeURIComponent(query)
 		};
-	}
+	},
 
 }

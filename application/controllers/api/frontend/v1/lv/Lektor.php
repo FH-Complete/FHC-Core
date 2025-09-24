@@ -15,7 +15,7 @@ class Lektor extends FHCAPI_Controller
 			'deleteLVPlan' => ['admin:rw', 'assistenz:rw'],
 			'deletePerson' => ['admin:rw', 'assistenz:rw'],
 			'getLehrfunktionen' => ['admin:r', 'assistenz:r'],
-			'getLektoren' => ['admin:r', 'assistenz:r'],
+			'getLektorenSearch' => ['admin:r', 'assistenz:r'],
 			'getLektorenByLE' => ['admin:r', 'assistenz:r'],
 			'getLektorDaten' => ['admin:r', 'assistenz:r'],
 			'getLektorVertrag' => ['admin:r', 'assistenz:r'],
@@ -208,12 +208,32 @@ class Lektor extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($this->_ci->LehrfunktionModel->load()));
 	}
 
-	public function getLektoren()
+	public function getLektorenSearch($query = null)
 	{
+		if (is_null($query))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+		$query_words = explode(' ', urldecode($query));
+
 		$this->_ci->MitarbeiterModel->addSelect('uid, person_id, vorname, nachname');
 		$this->_ci->MitarbeiterModel->addJoin('public.tbl_benutzer', 'uid = mitarbeiter_uid');
 		$this->_ci->MitarbeiterModel->addJoin('public.tbl_person', 'person_id');
-		$this->terminateWithSuccess(getData($this->_ci->MitarbeiterModel->loadWhere(array('public.tbl_benutzer.aktiv' => true))));
+
+		$this->_ci->MitarbeiterModel->db->where('public.tbl_benutzer.aktiv', true);
+
+		$this->_ci->MitarbeiterModel->db->group_start();
+		foreach ($query_words as $word)
+		{
+			$this->_ci->MitarbeiterModel->db->group_start();
+			$this->_ci->MitarbeiterModel->db->where('tbl_person.vorname ILIKE', "%" . $word . "%");
+			$this->_ci->MitarbeiterModel->db->or_where('tbl_person.nachname ILIKE', "%" . $word . "%");
+			$this->_ci->MitarbeiterModel->db->or_where('uid ILIKE', "%" . $word . "%");
+			$this->_ci->MitarbeiterModel->db->group_end();
+		}
+		$this->_ci->MitarbeiterModel->db->group_end();
+		$this->_ci->MitarbeiterModel->addOrder('nachname');
+		$this->_ci->MitarbeiterModel->addOrder('vorname');
+		$result = $this->_ci->MitarbeiterModel->load();
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
 	}
 
 	private function checkLehreinheit($lehreinheit_id)

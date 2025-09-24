@@ -90,7 +90,8 @@ export default{
 			tabulatorEvents: [],
 			showAutocomplete: false,
 			filteredGroups: [],
-			selectedGroup: null
+			selectedGroup: null,
+			abortController: null
 		}
 	},
 	watch: {
@@ -99,19 +100,42 @@ export default{
 		}
 	},
 	methods:{
-		searchGroup(event)
+
+		async searchGroup(event)
 		{
-			const query = event.query.toLowerCase().trim();
-			this.filteredGroups = this.dropdowns.gruppen_array.filter(gruppe => {
-				return gruppe.gruppe_kurzbz.toLowerCase().includes(query) || gruppe?.bezeichnung?.toLowerCase().includes(query);
-			}).map(gruppe => ({
-				label: gruppe.bezeichnung
-					? `${gruppe.gruppe_kurzbz.trim()} (${gruppe.bezeichnung})`
-					: gruppe.gruppe_kurzbz.trim(),
-				gid: gruppe.gid,
-				gruppe_kurzbz: gruppe.gruppe_kurzbz.trim(),
-				lehrverband: gruppe.lehrverband,
-			}));
+			const query = event.query.trim();
+
+			if (!query)
+			{
+				this.filteredLektor = [];
+				return;
+			}
+
+			if (query.length < 2)
+			{
+				return;
+			}
+
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.$api.call(ApiGruppe.getAllSearch(query), { signal })
+				.then(result => {
+					this.filteredGroups = result.data.map(gruppe => ({
+						label: gruppe.bezeichnung
+							? `${gruppe.gruppe_kurzbz.trim()} (${gruppe.bezeichnung})`
+							: gruppe.gruppe_kurzbz.trim(),
+						gid: gruppe.gid,
+						gruppe_kurzbz: gruppe.gruppe_kurzbz.trim(),
+						lehrverband: gruppe.lehrverband,
+						})
+					)})
+				.catch(this.$fhcAlert.handleSystemError)
 		},
 		reload() {
 			this.$refs.table.reloadTable();
