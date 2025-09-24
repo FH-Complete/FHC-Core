@@ -168,6 +168,21 @@ class entwicklungsteam extends basis_db
 			$this->errormsg = 'Endedatum darf nicht vor Anfangsdatum liegen';
 			return false;
 		}
+
+		$beginnParts = explode('-', $this->beginn);
+		if (!checkdate((int)$beginnParts[1], (int)$beginnParts[2], (int)$beginnParts[0]))
+		{
+			$this->errormsg = 'Anfangsdatum ist ungültig';
+			return false;
+		}
+
+		$endeParts = explode('-', $this->ende);
+		if (!checkdate((int)$endeParts[1], (int)$endeParts[2], (int)$endeParts[0]))
+		{
+			$this->errormsg = 'Endedatum ist ungültig';
+			return false;
+		}
+
 		return true;
 	}
 
