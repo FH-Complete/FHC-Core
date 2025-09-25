@@ -57,7 +57,7 @@ $xslt_xhtml_c4= <<<EOD
 EOD;
 
 
-if ($result = @$db->db_query("SELECT * FROM campus.tbl_template WHERE template_kurzbz='iframe2'"))
+if ($result = @$db->db_query("SELECT * FROM campus.tbl_template WHERE template_kurzbz='iframe'"))
 {
 	if ($db->db_num_rows($result) == 0)
 	{
