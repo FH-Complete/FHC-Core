@@ -39,6 +39,7 @@ export default {
 		},
 		redirectToLeitung(leitung){
 			this.person_id = leitung.person_id;
+			this.mitarbeiter_uid = leitung.uid;
 		}
 	},
 	template: `

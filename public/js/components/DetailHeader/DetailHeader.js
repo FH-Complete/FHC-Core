@@ -68,18 +68,6 @@ export default {
 			},
 			deep: true,
 		},
-/*		person_id: {
-			handler(newVal) {
-				if (newVal) {
-					this.getHeader(this.person_id);
-					this.loadDepartmentData(this.person_id).
-					then(() => {
-						this.getLeitungOrg(this.departmentData.oe_kurzbz);
-					});
-				}
-			},
-			deep: true,
-		},*/
 	},
 	data(){
 		return{
@@ -116,7 +104,9 @@ export default {
 		},
 		redirectToLeitung(){
 			this.$emit('redirectToLeitung', {
-				person_id: this.leitungData.person_id});
+				person_id: this.leitungData.person_id,
+				uid: this.leitungData.uid
+			});
 		}
 	},
 	template: `
