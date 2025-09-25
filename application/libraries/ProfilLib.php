@@ -214,7 +214,7 @@ class ProfilLib{
 	 * @param  integer $uid the userID used to get the kontakt information
 	 * @return array all the kontakt information corresponding to a userID
 	 */
-	private function getKontaktInfo($pid)
+	private function getKontaktInfo($pid, $includehidden=false)
 	{
 		$this->ci->load->model("person/Kontakt_model","KontaktModel");
 		$this->ci->KontaktModel->addSelect(['kontakttyp', 'kontakt_id', 'kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung']);
@@ -222,7 +222,13 @@ class ProfilLib{
 		$this->ci->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
 		$this->ci->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
 
-		$kontakte_res = $this->ci->KontaktModel->loadWhere(['person_id' => $pid]);
+		$params = array('person_id' => $pid);
+		if(!$includehidden)
+		{
+			$params['kontakttyp <>'] = 'hidden';
+		}
+
+		$kontakte_res = $this->ci->KontaktModel->loadWhere($params);
 		if(isError($kontakte_res)){
 			return error(getData($kontakte_res));
 		}
