@@ -102,6 +102,13 @@ export default {
 		redirectToLeitung(){
 			this.$emit('redirectToLeitung', {
 				person_id: this.leitungData.person_id});
+		},
+		getFotoSrc(foto) {
+			if(foto === null) {
+				return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/profilbild_dummy.jpg';
+			} else {
+				return 'data:image/jpeg;base64,' + foto;
+			}
 		}
 	},
 	template: `
@@ -116,7 +123,7 @@ export default {
 						<img
 						  class="d-block h-100 rounded"
 						  alt="Profilbild"
-						  :src="'data:image/jpeg;base64,' + person.foto"
+						  :src="getFotoSrc(person.foto)"
 						/>
 
 						<template v-if="person.foto_sperre">
