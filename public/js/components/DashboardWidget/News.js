@@ -106,7 +106,7 @@ export default {
 		setPrev() {
 			const thisIndex = this.allNewsList.findIndex(n=>n.news_id == this.selected.news_id)
 			const prevIndex = thisIndex ? thisIndex - 1 : this.allNewsList.length - 1
-			
+
 			this.setSelected(this.allNewsList[prevIndex])
 			this.updateNewsContentClasses();
 		},
@@ -118,14 +118,14 @@ export default {
 			return classString
 		},
 		async setSelected(news) {
-			let clickedElement = document.getElementById('card-'+news.news_id);
-			let clickedElementIndex = this.allNewsList.indexOf(news);
-			let oldElementIndex = this.allNewsList.indexOf(this.selected);
+			const clickedElement = document.getElementById('card-'+news.news_id);
+			const clickedElementIndex = this.allNewsList.indexOf(news);
+			const oldElementIndex = this.allNewsList.indexOf(this.selected);
 			
 			//if the clicked element is already active, do nothing
 			if(clickedElementIndex === oldElementIndex) return;
 			//add prev/next class to the clicked element
-			if(clickedElementIndex > oldElementIndex){
+			if(clickedElementIndex > oldElementIndex) {
 				clickedElement.classList.add('carousel-item-next');
 			}else{
 				clickedElement.classList.add('carousel-item-prev');
