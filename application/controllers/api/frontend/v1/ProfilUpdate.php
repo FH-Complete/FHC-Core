@@ -44,6 +44,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			'updateProfilRequest' => self::PERM_LOGGED,
 			'deleteProfilRequest' => self::PERM_LOGGED,
 			'insertFile' => self::PERM_LOGGED,
+			'updateProfilbild' => self::PERM_LOGGED,
 			'show' => self::PERM_LOGGED,
 			]);
 
@@ -478,12 +479,101 @@ class ProfilUpdate extends FHCAPI_Controller
 		$this->terminateWithSuccess($res);
 	}
 
+	public function updateProfilbild()
+	{
+
+		$resize = function($filename, $width, $height){
+			// Hoehe und Breite neu berechnen
+			list($width_orig, $height_orig) = getimagesize($filename);
+			
+			if ($width && ($width_orig < $height_orig))
+			{
+				$width = ($height / $height_orig) * $width_orig;
+			}
+			else
+			{
+				$height = ($width / $width_orig) * $height_orig;
+			}
+
+			$image_p = imagecreatetruecolor($width, $height);
+
+			$image = imagecreatefromjpeg($filename);
+
+			//Bild nur verkleinern aber nicht vergroessern
+			if($width_orig>$width || $height_orig>$height)
+				imagecopyresampled($image_p, $image, 0, 0, 0, 0, $width, $height, $width_orig, $height_orig);
+			else
+				$image_p = $image;
+
+			imagejpeg($image_p, $filename, 80);
+
+			@imagedestroy($image_p);
+			@imagedestroy($image);
+		};
+		
+		if (!count($_FILES)) {
+			$this->terminateWithError("No file available for upload");
+		}
+
+		$files = $_FILES['files'];
+		
+		$_FILES['files']['name'] = current($files['name']);
+		$_FILES['files']['type'] = current($files['type']);
+		$_FILES['files']['tmp_name'] = current($files['tmp_name']);
+		$_FILES['files']['error'] = current($files['error']);
+		$_FILES['files']['size'] = current($files['size']);
+		$_FILES['files']['tmp_name'] = current($files['tmp_name']);
+
+		$filename = $_FILES['files']['tmp_name'];
+
+		$ext = substr(current($files['name']), strrpos(current($files['name']), '.') + 1);
+		if($ext!='jpg' && $ext!='jpeg'){
+			$this->terminateWithError("Only jpg and jpeg files are allowed for profilbild upload");
+		}
+		
+		// resize
+		$resize($filename, 827, 1063);
+
+		//akte
+		$fp = fopen($filename,'r');
+		//auslesen
+		$content = fread($fp, filesize($filename));
+		$base64_content = base64_encode($content);
+		$this->load->library('AkteLib');
+		$aktenInsertResult = $this->aktelib->add($this->pid,'Lichtbil',"Lichtbild_".$this->pid.".jpg","image/jpg",$fp,"Lichtbild gross");
+		fclose($fp);
+		if (isError($aktenInsertResult)) {
+			$this->terminateWithError(getError($aktenInsertResult));
+		}
+
+		// in person abspeichern
+		$resize($filename, 101, 130);
+		$fp = fopen($filename,'r');
+		$content = fread($fp, filesize($filename));
+		fclose($fp);
+		$base64_content = base64_encode($content);
+		$this->load->model('person/Person_model','PersonModel');
+		$personUpdate = $this->PersonModel->update($this->pid, ["foto"=>$base64_content]);
+		if(isError($personUpdate)){
+			$this->terminateWithError(getError($personUpdate));
+		}
+
+
+		// update foto status
+		$this->load->model('person/Fotostatusperson_model','FotostatusModel');
+		$fotoInsert = $this->FotostatusModel->insert(["person_id"=>$this->pid,"fotostatus_kurzbz"=>"hochgeladen","datum"=>date('Y-m-d'),"insertamum"=>date('Y-m-d H:i:s'),"insertvon"=>$this->uid,"updateamum"=>date('Y-m-d H:i:s'),"updatevon"=>$this->uid]);
+		if(isError($fotoInsert)){
+			$this->terminateWithError(getError($fotoInsert));
+		}
+		
+		$this->terminateWithSuccess();
+	}
+
 	public function getProfilUpdateWithPermission($status = null)
 	{
 		// early return if no status has been passed as argument
 		if (!isset($status)) {
-			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());
-			return;
+			$this->terminateWithSuccess($this->ProfilUpdateModel->getProfilUpdateWithPermission());
 		}
 
 		// get the sprache of the user
@@ -496,7 +586,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$status = hasData($status) ? getData($status)[0]->status_kurzbz : null;
 			$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status) ? ['status' => $status] : null);
 
-			echo json_encode($res);
+			$this->terminateWithSuccess($res);
 		}
 	}
 
@@ -550,6 +640,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
 				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
 				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+				$this->StudentModel->addGroupBy(["public.tbl_studiengang.email"]);
 				//* check if the benutzer itself is active
 				//* check if the student status is Student or Diplomand (active students)
 				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz", ['Student', 'Diplomand']);
@@ -566,8 +657,10 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		$mail_res = [];
 		//? sending email
-		foreach ($emails as $email) {
-			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => APP_ROOT . 'Cis/ProfilUpdate/id/' . $profil_update_id], $email, ("Profil Änderung von " . $uid)));
+		foreach ($emails as $email)
+		{
+			$href = $this->config->item('cis_vilesci_base_url') . $this->config->item('cis_vilesci_index_page') . '/Cis/ProfilUpdate/id/' . $profil_update_id;
+			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => $href], $email, ("Profil Änderung von " . $uid)));
 		}
 		foreach ($mail_res as $m_res) {
 			if (!$m_res) {
@@ -590,21 +683,21 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		function languageQuery($language)
 		{
-			return "select index from public.tbl_sprache where sprache = '" + $language + "'";
+			return "select index from public.tbl_sprache where sprache = '" . $language . "'";
 		}
 
 		$this->ProfilUpdateStatusModel->addSelect(["bezeichnung_mehrsprachig[(" . languageQuery('German') . ")] as status_de", "bezeichnung_mehrsprachig[(" . languageQuery('English') . ")] as status_en"]);
 		
 		$status_translation = $this->ProfilUpdateStatusModel->loadWhere(["status_kurzbz" => $status]);
-		
 		if (isError($status_translation)) {
 			$this->terminateWithError($this->p->t('profilUpdate', 'ProfilUpdateStatusTranslationError'));
 		}
 
 		$status_translation = hasData($status_translation) ? getData($status_translation)[0] : null;
-
-		if (isset($status_translation)) {
-			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => APP_ROOT . 'Cis/Profil'], $email, ("Profil Änderung " . $this->p->t('profilUpdate', 'pending')));
+		if (isset($status_translation))
+		{
+			$href = $this->config->item('cis_base_url') . $this->config->item('cis_index_page') . '/Cis/Profil';
+			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => $href], $email, ("Profil Änderung " . $status_translation->status_de . ' / Profile Update ' . $status_translation->status_en));
 			if (!$mail_res) {
 				$this->addError($this->p->t('profilUpdate', 'profilUpdate_email_error'));
 			}

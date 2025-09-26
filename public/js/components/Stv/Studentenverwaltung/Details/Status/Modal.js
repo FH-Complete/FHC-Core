@@ -3,6 +3,8 @@ import CoreForm from '../../../../Form/Form.js';
 import FormValidation from '../../../../Form/Validation.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvStatus from '../../../../../api/factory/stv/status.js';
+
 export default{
 	components: {
 		BsModal,
@@ -11,8 +13,8 @@ export default{
 		FormInput
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
+		currentSemester: {
+			from: 'currentSemester',
 		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
@@ -104,7 +106,7 @@ export default{
 				this.statusId = prestudent.prestudent_id;
 				this.formData = {
 					status_kurzbz: 'Interessent',
-					studiensemester_kurzbz: this.defaultSemester,
+					studiensemester_kurzbz: this.currentSemester,
 					ausbildungssemester: 1,
 					datum: new Date(),
 					bestaetigtam: new Date(),
@@ -128,7 +130,8 @@ export default{
 					ausbildungssemester
 				};
 
-				this.$fhcApi.factory.stv.status.loadStatus(this.statusId)
+				this.$api
+					.call(ApiStvStatus.loadStatus(this.statusId))
 					.then(result => {
 						this.statusNew = false;
 						this.formData = result.data;
@@ -142,7 +145,8 @@ export default{
 			}
 		},
 		insertStatus() {
-			this.$fhcApi.factory.stv.status.insertStatus(this.$refs.form, this.statusId, this.formData)
+			this.$refs.form
+				.call(ApiStvStatus.insertStatus(this.statusId, this.formData))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -152,7 +156,8 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		editStatus() {
-			this.$fhcApi.factory.stv.status.updateStatus(this.$refs.form, this.statusId, this.formData)
+			this.$refs.form
+				.call(ApiStvStatus.updateStatus(this.statusId, this.formData))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -167,19 +172,22 @@ export default{
 			if (old_id == prestudent.prestudent_id)
 				return Promise.resolve();
 
-			return this.$fhcApi.factory.stv.status.getStudienplaene(prestudent.prestudent_id)
+			return this.$api
+				.call(ApiStvStatus.getStudienplaene(prestudent.prestudent_id))
 				.then(result => this.studienplaene = result.data)
-				.then(() => this.$fhcApi.factory.stv.status.getStudiengang(prestudent.prestudent_id))
+				.then(() => this.$api.call(ApiStvStatus.getStudiengang(prestudent.prestudent_id)))
 				.then(result => this.mischform = result.data.mischform);
 		}
 	},
 	created() {
-		this.$fhcApi.factory.stv.status.getStatusgruende()
+		this.$api
+			.call(ApiStvStatus.getStatusgruende())
 			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 
 		//TODO(Manu) check why it is/was hard coded
-		this.$fhcApi.factory.stv.status.getStati()
+		this.$api
+			.call(ApiStvStatus.getStati())
 			.then(result => this.stati = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 /*		this.stati = [
@@ -286,6 +294,7 @@ export default{
 				:label="$p.t('global/datum')"
 				auto-apply
 				:enable-time-picker="false"
+				text-input
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
@@ -300,6 +309,7 @@ export default{
 				:label="$p.t('lehre/bestaetigt_am')"
 				auto-apply
 				:enable-time-picker="false"
+				text-input
 				format="dd.MM.yyyy"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
@@ -315,6 +325,7 @@ export default{
 				auto-apply
 				:enable-time-picker="false"
 				format="dd.MM.yyyy"
+				text-input
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
 				:disabled="bisLocked || !hasPrestudentstatusPermission"

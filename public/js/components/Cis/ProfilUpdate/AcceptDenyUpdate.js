@@ -3,6 +3,8 @@ import Alert from "../../Bootstrap/Alert.js";
 import Kontakt from "../Profil/ProfilComponents/Kontakt.js";
 import Adresse from "../Profil/ProfilComponents/Adresse.js";
 
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 export default {
   components: {
     BsModal,
@@ -62,11 +64,12 @@ export default {
     handleRequest: function (type) {
       this.loading = true;
       this.setLoading(true);
-      this.$fhcApi.factory.profilUpdate[
-        type.toLowerCase() == "accept"
-          ? "acceptProfilRequest"
-          : "denyProfilRequest"
-      ](this.data)
+      this.$api
+        .call(ApiProfilUpdate[
+          type.toLowerCase() == "accept"
+            ? "acceptProfilRequest"
+            : "denyProfilRequest"
+        ](this.data))
         .then((res) => {
           this.result = true;
         })
@@ -93,11 +96,13 @@ export default {
   created() {
     // only fetching the profilUpdate Attachemnts if the profilUpdate actually has attachments
     if (this.value.attachment_id) {
-      this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(
-        this.data.profil_update_id
-      ).then((res) => {
-        this.files = res.data;
-      });
+      this.$api
+        .call(ApiProfilUpdate.getProfilRequestFiles(
+          this.data.profil_update_id
+        ))
+        .then((res) => {
+          this.files = res.data;
+        });
     }
   },
   mounted() {
@@ -183,16 +188,21 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div v-if="files?.length" class="ms-2">
-    
-    <a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
-    </div>
     </template>
 
 
     <component v-else :is="getComponentView" :withZustelladresse="getComponentView==='adresse'?true:false" :data="data.requested_change"></component>
+
     </div>
     </div>
+
+		<div  v-if="files?.length" class="card mt-3">
+			<div class="card-header">{{$p.t('profilUpdate','nachweisdokumente')}}</div>
+			<div class="card-body">
+				<a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
+			</div>
+		</div>
+
     </div>
     </div>
     

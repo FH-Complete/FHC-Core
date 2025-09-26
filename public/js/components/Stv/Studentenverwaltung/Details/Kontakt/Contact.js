@@ -4,7 +4,11 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvContact from '../../../../../api/factory/stv/kontakt/contact.js';
+import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
+
 export default{
+	name: 'ContactComponent',
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,
@@ -19,15 +23,10 @@ export default{
 		return{
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getKontakte,
-				ajaxParams: () => {
-					return {
-						id: this.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
-					{title:"Typ", field:"kontakttyp"},
+					{title:"Typ", field:"kontakttypbeschreibung"},
 					{title:"Kontakt", field:"kontakt"},
 					{
 						title:"Zustellung",
@@ -95,10 +94,7 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
-				selectable:	true,
 				index: 'kontakt_id',
 				persistenceID: 'stv-details-kontakt-contact'
 			},
@@ -110,7 +106,7 @@ export default{
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('kontakttyp').component.updateDefinition({
+						cm.getColumnByField('kontakttypbeschreibung').component.updateDefinition({
 							title: this.$p.t('global', 'typ')
 						});
 						cm.getColumnByField('kontakt').component.updateDefinition({
@@ -167,7 +163,7 @@ export default{
 	},
 	watch: {
 		uid() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getKontakte/' + this.uid);
+			this.reload();
 		},
 		contactData: {
 			handler(newVal) {
@@ -200,31 +196,34 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewContact(formData) {
-			return this.$fhcApi.factory.stv.kontakt.addNewContact(this.$refs.contactData, this.uid, this.contactData)
+			return this.$refs.contactData
+				.call(ApiStvContact.add(this.uid, this.contactData))
 				.then(response => {
-						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-						this.hideModal("contactModal");
-						this.resetModal();
-				}).catch(this.$fhcAlert.handleSystemError)
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal("contactModal");
+					this.resetModal();
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
-		loadContact(kontakt_id){
+		loadContact(kontakt_id) {
 			this.statusNew = false;
 			if(this.contactData.firma_id)
 				this.loadStandorte(this.contactData.firma_id);
-			return this.$fhcApi.factory.stv.kontakt.loadContact(kontakt_id)
-				.then(
-					result => {
-						this.contactData = result.data;
-						return result;
-					})
+			return this.$api
+				.call(ApiStvContact.load(kontakt_id))
+				.then(result => {
+					this.contactData = result.data;
+					return result;
+				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		deleteContact(kontakt_id){
-			return this.$fhcApi.factory.stv.kontakt.deleteContact(kontakt_id)
+		deleteContact(kontakt_id) {
+			return this.$api
+				.call(ApiStvContact.delete(kontakt_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -233,27 +232,28 @@ export default{
 					window.scrollTo(0, 0);
 					this.resetModal();
 					this.reload();
-			});
+				});
 		},
-		updateContact(kontakt_id){
-			return this.$fhcApi.factory.stv.kontakt.updateContact(this.$refs.contactData, kontakt_id,
-				this.contactData)
+		updateContact(kontakt_id) {
+			return this.$refs.contactData
+				.call(ApiStvContact.update(kontakt_id, this.contactData))
 				.then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.hideModal('contactModal');
-				this.resetModal();
-				this.reload();
-			}).catch(this.$fhcAlert.handleSystemError)
-			.finally(()=> {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('contactModal');
+					this.resetModal();
+					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
 
-		hideModal(modalRef){
+		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
 		},
-		reload(){
+		reload() {
 			this.$refs.table.reloadTable();
 		},
 		searchFirma(event) {
@@ -263,7 +263,8 @@ export default{
 
 			this.abortController.firmen = new AbortController();
 
-			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
+			return this.$api
+				.call(ApiStvCompany.get(event.query))
 				.then(result => {
 					this.filteredFirmen = result.data.retval;
 				});
@@ -275,12 +276,13 @@ export default{
 
 			this.abortController.standorte = new AbortController();
 
-			return this.$fhcApi.factory.stv.kontakt.getStandorteByFirma(firmen_id)
+			return this.$api
+				.call(ApiStvContact.getStandorteByFirma(firmen_id))
 				.then(result => {
 					this.filteredOrte = result.data;
 				});
 		},
-		resetModal(){
+		resetModal() {
 			this.contactData = {};
 			this.contactData.zustellung = true;
 			this.contactData.kontakttyp = 'email';
@@ -294,10 +296,12 @@ export default{
 			this.statusNew = true;
 		},
 	},
-	created(){
-		this.$fhcApi.factory.stv.kontakt.getKontakttypen()
+	created() {
+		this.$api
+			.call(ApiStvContact.getTypes())
 			.then(result => {
-				this.kontakttypen = result.data;
+				//this.kontakttypen = result.data;
+				this.kontakttypen = result.data.filter(item => item.kontakttyp !== 'hidden');
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -444,6 +448,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'kontakt')"
 			@click:new="actionNewContact"

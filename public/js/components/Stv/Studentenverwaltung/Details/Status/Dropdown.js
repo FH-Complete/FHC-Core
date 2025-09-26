@@ -3,6 +3,8 @@ import BsConfirm from "../../../../Bootstrap/Confirm.js";
 import BsPrompt from "../../../../Bootstrap/Prompt.js";
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvStatus from '../../../../../api/factory/stv/status.js';
+
 export default {
 	components: {
 		BsModal,
@@ -11,6 +13,10 @@ export default {
 	inject: {
 		$reloadList: {
 			from: '$reloadList',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
 			required: true
 		}
 	},
@@ -140,10 +146,25 @@ export default {
 			this.addStudent({status_kurzbz: 'student', statusgrund_id});
 		},
 		addStudent(data) {
-			Promise
-				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.addStudent(prestudent_id, data)))
-				.then(res => this.showFeedback(res, data.status_kurzbz));
+			this.$api.call(this.prestudentIds.map(prestudent_id => [
+				prestudent_id,
+				ApiStvStatus.addStudent(prestudent_id, data),
+				{ errorHeader: prestudent_id }
+			]))
+			.then(result => {
+				const messagesSuccessful = result.filter(res => res.status == 'fulfilled');
+				if (messagesSuccessful.length) {
+					this.$fhcAlert.alertDefault(
+						'info',
+						'Feedback',
+						messagesSuccessful.length + " erfolgreiche Statusänderung(en) durchgeführt", // TODO(chris): translate
+						false,
+						true
+					);
+				}
+				this.$emit('reloadTable');
+				this.$reloadList();
+			});
 		},
 		changeStatusToAbbrecher(statusgrund_id) {
 			this
@@ -236,30 +257,20 @@ export default {
 			return askForSemester();
 		},
 		changeStatus(data) {
-			Promise
-				.allSettled(
-					this.prestudentIds.map(prestudent_id => this.$fhcApi.factory.stv.status.changeStatus(prestudent_id, data)))
-				.then(res => this.showFeedback(res, data.status_kurzbz));
-		},
-		showFeedback(results, status_kurzbz) {
-			const countSuccess = results.filter(result => result.status == "fulfilled").length;
-			const countError = results.length - countSuccess;
-			
-			//Feedback Success als infoalert
-			this.$fhcAlert.alertInfo(this.$p.t('ui', 'successNewStatus', {
-				countSuccess,
-				status: status_kurzbz,
-				countError
-			}));
-
-			if(results.length == 1 && countSuccess > 0){
+			data.currentSemester = this.currentSemester;
+			this.$api.call(this.prestudentIds.map(prestudent_id => [
+				prestudent_id,
+				ApiStvStatus.changeStatus(prestudent_id, data)
+			]))
+			.then(() => {
 				this.$emit('reloadTable');
-			}
-			this.$reloadList();
-		}
+				this.$reloadList();
+			});
+		},
 	},
 	created() {
-		this.$fhcApi.factory.stv.status.getStatusarray()
+		this.$api
+			.call(ApiStvStatus.getStatusarray())
 			.then(result => result.data)
 			.then(result => {
 				this.listDataToolbar = result;

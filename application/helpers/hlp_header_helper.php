@@ -88,12 +88,16 @@ function generateCSSsInclude($CSSs)
 function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 {
 	$ci =& get_instance();
+	$ci->load->config('theme');
 	$ci->load->model('system/Sprache_model','SpracheModel');
 	$server_language = getData($ci->SpracheModel->loadWhere(['content' => true]));
 	$server_language = array_map(function($language){
 		return ['sprache'=>$language->sprache, 'LC_Time'=>$language->locale, 'bezeichnung'=>$language->bezeichnung[$language->index-1]];
 	}, $server_language);
 	$user_language = getUserLanguage();
+
+	$ci->load->config('javascript');
+	$systemerror_mailto = $ci->config->item('systemerror_mailto');
 
 	$FHC_JS_DATA_STORAGE_OBJECT = array(
 		'app_root' => APP_ROOT,
@@ -103,6 +107,11 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 		'server_languages' => $server_language,
 		'user_language' => $user_language,
 		'timezone' => date_default_timezone_get(),
+		'systemerror_mailto' => $systemerror_mailto,
+		'theme' => [
+			'name'=>$ci->config->item('theme_name'),
+			'modes'=>$ci->config->item('theme_modes'),
+		]
 	);
 
 	$toPrint = "\n";
@@ -227,3 +236,13 @@ function generateBackwardCompatibleJSMsIe($js)
 	echo "<![endif]-->\n";
 }
 
+/**
+ * Constructs an accessibility skipLink https://www.w3schools.com/accessibility/accessibility_skip_links.php
+ */
+function generateSkipLink($skipID)
+{
+	$toPrint = '<a id="skiplink" href="';
+	$toPrint.=$skipID;
+	$toPrint.='" class="fhcSkipLink" aria-label="Skip to main content"></a>';
+	echo $toPrint;
+}

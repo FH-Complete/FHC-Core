@@ -10,7 +10,7 @@ export default {
 			if(this.allActiveLanguages.some(l => l.sprache === lang))
 			{
 				const isReload = document.querySelector('[cis4Reload]')
-				this.$p.setLanguage(lang, this.$fhcApi)
+				this.$p.setLanguage(lang)
 				.then(res => res.data)
 				.then(data =>
 				{
@@ -23,7 +23,7 @@ export default {
 	template:/*html*/`
 	<div class="container">
 		<div class="row justify-content-center align-items-center flex-nowrap overflow-hidden">
-			<button v-for="lang in allActiveLanguages" @click.prevent="changeLanguage(lang.sprache)" class="col text-white sprachen-entry btn text-center w-100" :selected="$p.user_language.value==lang.sprache">{{lang.bezeichnung}}</button>
+			<button v-for="lang in allActiveLanguages" @click.prevent="changeLanguage(lang.sprache)" class="col fhc-text-light sprachen-entry btn text-center w-100" :selected="$p.user_language.value==lang.sprache">{{lang.bezeichnung}}</button>
 		</div>
 	</div>
 	`,

@@ -177,6 +177,9 @@ if(isset($_REQUEST['AuswahlGebiet']))
 			WHERE gebiet_id=".$db->db_add_param($gebiet_id)."
 			ORDER BY studiengang";
 	$result = $db->db_query($qry);
+
+	$qry_anz_fragen = "SELECT count(*) FROM testtool.tbl_frage WHERE gebiet_id=".$db->db_add_param($gebiet_id)." AND demo=false";
+	$result_anz_fragen = $db->db_fetch_object($db->db_query($qry_anz_fragen));
 	
 	if ($gebietdetails)
 	{
@@ -214,6 +217,10 @@ if(isset($_REQUEST['AuswahlGebiet']))
 		<tr>
 			<td align="right">Multipleresponse:</td>
 			<td>'.($gebietdetails->multipleresponse==true?'Ja':'Nein').'</td>
+		</tr>
+		<tr>
+			<td align="right">Fragen im Gebiet:</td>
+			<td>'.$result_anz_fragen->count.'</td>
 		</tr>
 		<tr>
 			<td align="right">Gestellte Fragen:</td>

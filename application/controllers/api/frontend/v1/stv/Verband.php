@@ -188,6 +188,7 @@ class Verband extends FHCAPI_Controller
 		array_unshift($list, [
 			'name' => 'PreStudent',
 			'link' => $link . 'prestudent',
+			'stg_kz' => (int)$studiengang_kz,
 			'children' => $this->getStdSem($link . 'prestudent/', $studiengang_kz)
 		]);
 
@@ -355,7 +356,11 @@ class Verband extends FHCAPI_Controller
 		$this->load->model('system/Variable_model', 'VariableModel');
 		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
 		$data = $this->getDataOrTerminateWithError($result);
-		$number_displayed_past_studiensemester = $data['number_displayed_past_studiensemester'] ?? null;
+
+		$this->load->config('stv');
+		$number_displayed_past_studiensemester_default = $this->config->item('number_displayed_past_studiensemester_default');
+
+		$number_displayed_past_studiensemester = $data['number_displayed_past_studiensemester'] ?? $number_displayed_past_studiensemester_default;
 
 		$this->StudiensemesterModel->addPlusMinus(null, $number_displayed_past_studiensemester);
 		$this->StudiensemesterModel->addOrder('ende');

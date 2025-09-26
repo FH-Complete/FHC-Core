@@ -156,12 +156,12 @@ export default {
                             <component :is="item.listview" v-bind="item"></component>
                         </div>
                     </button>
-                    <button v-if="item.listview" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle"><i class="fa fa-trash"></i>
+                    <button v-if="item.listview" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle" :aria-label="$p.t('profilUpdate','deleteItem')" :title="$p.t('profilUpdate','deleteItem')" ><i class="fa fa-trash" aria-hide="true"></i></button>
                 </div>
             </template>
         </div>
         <div v-if="Array.isArray(data)" class="mt-4 d-flex justify-content-center">
-          <button @click="addItem" type="button" class="btn btn-primary btn-circle"><i class="fa fa-plus"></i>
+          <button @click="addItem" type="button" class="btn btn-primary btn-circle" :aria-label="$p.t('profilUpdate','addItem')" :title="$p.t('profilUpdate','addItem')"><i class="fa fa-plus" aria-hide="true"></i></button>
         </div>
     </template>
     <template v-else>

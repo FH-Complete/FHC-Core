@@ -1,6 +1,11 @@
+import Dms from "../../../../Form/Upload/Dms.js";
+
+import ApiProfil from '../../../../../api/factory/profil.js';
+
 export default {
   components: {
     AutoComplete: primevue.autocomplete,
+	Dms: Dms
   },
 
   props: {
@@ -9,9 +14,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    files: {
+      type: Array,
+      default: []
+    },
   },
 
-  inject: ["getZustelladressenCount"],
+  inject: ["getZustelladressenCount", "updateFileID"],
 
   data() {
     return {
@@ -21,6 +30,8 @@ export default {
       nationenList: [],
       originalValue: null,
       zustellAdressenCount: null,
+	  dmsData: [],
+	  fileschanged: false
     };
   },
 
@@ -52,8 +63,8 @@ export default {
         this.data.plz > 999 &&
         this.data.plz < 32000
       ) {
-        this.$fhcApi.factory.profil
-          .getGemeinden(this.data.nation, this.data.plz)
+        this.$api
+          .call(ApiProfil.getGemeinden(this.data.nation, this.data.plz))
           .then((res) => {
             if (res.data.length) {
               this.gemeinden = [
@@ -81,6 +92,11 @@ export default {
       //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
       if (bind === "zustelladresse") {
         this.data[bind] = event.target.checked;
+	  } else if(bind === 'files') {
+		  if(this.dmsData.length > 0 && this.dmsData[0].type !== 'application/x.fhc-dms+json') {
+		    this.fileschanged = true;
+		  }
+		  this.updateFileID(this.dmsData);
       } else {
         this.data[bind] = event.target.value === "" ? null : event.target.value;
       }
@@ -89,6 +105,11 @@ export default {
       // update the zustellAdressen count
       this.zustellAdressenCount = this.getZustelladressenCount();
     },
+
+	deleteDmsData: function() {
+		this.dmsData = [];
+		this.updateValue(null, 'files');
+	}
   },
 
   computed: {
@@ -109,24 +130,34 @@ export default {
         !this.data.strasse ||
         !this.data.plz ||
         !this.data.ort ||
-        !this.data.typ
+        !this.data.typ ||
+        this.dmsData.length === 0
       ) {
         return false;
       }
 
-      return this.originalValue !== JSON.stringify(this.data);
+      const datachanged = this.originalValue !== JSON.stringify(this.data);
+      return datachanged || this.fileschanged;
     },
   },
 
   created() {
     // get all available nationen
-    this.$fhcApi.factory.profil.getAllNationen().then((res)=>{
-      this.nationenList = res.data;
-      this.getGemeinde();
-    })
+    this.$api
+      .call(ApiProfil.getAllNationen())
+      .then(res => {
+        this.nationenList = res.data;
+        this.getGemeinde();
+      });
    
     this.originalValue = JSON.stringify(this.data);
     this.zustellAdressenCount = this.getZustelladressenCount();
+  },
+
+  mounted() {
+    if (this.files) {
+      this.dmsData = this.files;
+    }
   },
 
   template: /*html*/ `
@@ -148,7 +179,7 @@ export default {
       <label class="form-check-label" for="flexCheckDefault">
       {{$p.t('person','zustelladresse')}}
       </label>
-    </div>  
+    </div>
   </div>
 
   <!-- NATION -->
@@ -158,7 +189,7 @@ export default {
       <select  :value="data.nation" @change="updateValue($event,'nation')" @change="getGemeinde" class="form-select" aria-label="Select Kontakttyp">
         <option selected></option>
         <option :value="nation.code" v-for="nation in nationenList">{{nation.langtext}}</option>
-      </select> 
+      </select>
     </div>
   </div>
 
@@ -166,7 +197,7 @@ export default {
   <div class=" col-4">
     <div class="form-underline">
       <div class="form-underline-titel">{{$p.t('person','plz')}}*</div>
-      <input class="form-control" :value="data.plz" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
+      <input class="form-control" :value="data.plz" :aria-label="$p.t('person','plz')" :title="$p.t('person','plz')" @input="updateValue($event,'plz')" @input="getGemeinde" :placeholder="data.plz">
     </div>
   </div>
 
@@ -174,7 +205,7 @@ export default {
   <div class="col-lg-6">
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','gemeinde')}}*</div>
-      <auto-complete class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearchGemeinden" ></auto-complete>
+      <auto-complete :aria-label="$p.t('person','gemeinde')" class="w-100" v-model="data.gemeinde" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="gemeinden" @complete="autocompleteSearchGemeinden" ></auto-complete>
     </div>
   </div>
 
@@ -182,7 +213,7 @@ export default {
   <div  class="col-lg-6" >
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','ort')}}*</div>
-      <auto-complete class="w-100" v-model="data.ort" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="ortschaftnamen" @complete="autocompleteSearchOrtschaftsnamen" ></auto-complete>
+      <auto-complete :aria-label="$p.t('person','ort')" class="w-100" v-model="data.ort" dropdown :forceSelection="data.nation ==='A'?true:false" :suggestions="ortschaftnamen" @complete="autocompleteSearchOrtschaftsnamen" ></auto-complete>
     </div>
   </div>
 
@@ -190,7 +221,7 @@ export default {
   <div  class="col-lg-8">
     <div class="form-underline ">
       <div class="form-underline-titel">{{$p.t('person','strasse')}}*</div>
-      <input  class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
+      <input :aria-label="$p.t('person','strasse')" class="form-control" :value="data.strasse" @input="updateValue($event,'strasse')" :placeholder="data.strasse">
     </div>
   </div>
   
@@ -208,9 +239,28 @@ export default {
     </div>
   </div>
 
-
-  
-
+	<div class="row g-2">
+		<div class="col">
+			<div class="form-underline-titel">{{$p.t('profilUpdate','meldebestaetigung')}}*</div>
+			<dms
+				ref="update"
+				id="files"
+				name="files"
+				:multiple="false"
+				v-model="dmsData"
+				@update:model-value="updateValue($event,'files')"
+			></dms>
+		</div>
+		<div class="col-auto">
+			<div>&nbsp;</div>
+			<button
+					@click="deleteDmsData"
+					class="btn btn-danger"
+					:aria-label="$p.t('profilUpdate','deleteAttachment')"
+					:title="$p.t('profilUpdate','deleteAttachment')"
+			><i style="color:white" class="fa fa-trash" aria-hidden="true"></i></button>
+		</div>
+	</div>
 
 </div>
     `,

@@ -4,6 +4,9 @@ import ViewStudentProfil from "./StudentViewProfil.js";
 import ViewMitarbeiterProfil from "./MitarbeiterViewProfil.js";
 import Loading from "../../Loader.js";
 
+import ApiProfil from '../../../api/factory/profil.js';
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 Vue.$collapseFormatter = function (data) {
 	//data - an array of objects containing the column title and value for each cell
 	var container = document.createElement("div");
@@ -43,7 +46,10 @@ export const Profil = {
 	props: {
 		uid: {
 			type: String,
-			default: 'Profil'
+			required:false,
+		},
+		viewData: {
+			type: Object,
 		}
 	},
 	data() {
@@ -56,10 +62,12 @@ export const Profil = {
 			data: null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
 			notFoundUID: null,
+			isEditable: this.viewData.editable ?? false,
 		};
 	},
 	provide() {
 		return {
+			isEditable: Vue.computed(()=>this.isEditable),
 			profilUpdateStates: Vue.computed(() =>
 				this.profilUpdateStates ? this.profilUpdateStates : false
 			),
@@ -132,7 +140,8 @@ export const Profil = {
 	methods: {
 		async load() {
 			// fetch profilUpdateStates to provide them to children components
-			await this.$fhcApi.factory.profilUpdate.getStatus()
+			await this.$api
+				.call(ApiProfilUpdate.getStatus())
 				.then((response) => {
 					this.profilUpdateStates = response.data;
 				})
@@ -140,7 +149,8 @@ export const Profil = {
 					console.error(error);
 				});
 
-			this.$fhcApi.factory.profilUpdate.getTopic()
+			this.$api
+				.call(ApiProfilUpdate.getTopic())
 				.then((response) => {
 					this.profilUpdateTopic = response.data;
 				})
@@ -148,16 +158,19 @@ export const Profil = {
 					console.error(error);
 				});
 			
-			let uid = this.uid ?? location.pathname.split("/").pop();
-
-			this.$fhcApi.factory.profil.getView(uid).then((res) => {
-				if (!res.data) {
-					this.notFoundUID = uid;
-				} else {
-					this.view = res.data?.view;
-					this.data = res.data?.data;
-				}
-			});	
+			
+			this.$api
+				.call(ApiProfil.profilViewData(this.$route.params.uid??null))
+				.then((response) => response.data).then(data=>{
+					this.view = data?.profil_data.view;
+					this.data = data?.profil_data.data;
+					this.isEditable = data?.editable ?? false;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -247,6 +260,7 @@ export const Profil = {
 		},
 	},
 	computed: {
+		
 		filteredEditData() {
 			if (!this.data) {
 				return;
@@ -358,7 +372,7 @@ export const Profil = {
 			this.load()
 		}
 	},
-	async created() {
+	created() {
 		this.load()
 	},
 	template: `

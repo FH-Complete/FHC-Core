@@ -1,4 +1,6 @@
+console.warn('plugin/Phrasen.js is DEPRECATED! Use plugins/Phrasen.js instead.');
 import FhcApi from './FhcApi.js';
+import ApiPhrasen from '../api/factory/phrasen.js';
 
 const categories = Vue.reactive({});
 const loadingModules = {};
@@ -27,26 +29,32 @@ function getValueForLoadedPhrase(category, phrase, params) {
 const phrasen = {
 	user_language,
 	user_locale,
-	setLanguage(language, api) {
+	setLanguage(language) {
 		const catArray = Object.keys(categories)
-		return api.factory.phrasen.setLanguage(catArray, language).then(res => {
-			res.data.forEach(row => {
-				categories[row.category][row.phrase] = row.text
+		return this.config.globalProperties.$api
+			.call(ApiPhrasen.setLanguage(catArray, language))
+			.then(res => {
+				res.data.forEach(row => {
+					categories[row.category][row.phrase] = row.text
+				})
+
+				// update the reactive data that holds the current active user_language
+				user_language.value = language;
+
+				return res
 			})
-
-			// update the reactive data that holds the current active user_language
-			user_language.value = language;
-
-			return res
-		})
 	},
 	loadCategory(category) {
 		if (Array.isArray(category))
 			return Promise.all(category.map(this.config.globalProperties
 				.$p.loadCategory));
+		const $fhcApi = this.config.globalProperties.$fhcApi;
+		const $fhcApiFactory = this.config.globalProperties.$fhcApiFactory;
 		if (!loadingModules[category])
-			loadingModules[category] = this.config.globalProperties
-				.$fhcApi.factory.phrasen.loadCategory(category)
+			loadingModules[category] = this.config.globalProperties.$api
+				.call(
+					ApiPhrasen.loadCategory(category)
+				)
 				.then(res => res?.data ? extractCategory(res.data, category) : {})
 				.then(res => {
 					categories[category] = res;
@@ -86,7 +94,7 @@ export default {
 		app.config.globalProperties.$p = {
 			t: phrasen.t,
 			loadCategory: cat => phrasen.loadCategory.call(app, cat),
-			setLanguage: phrasen.setLanguage,
+			setLanguage: lang => phrasen.setLanguage.call(app, lang),
 			user_language: user_language,
 			user_locale,
 			t_ref: phrasen.t_ref

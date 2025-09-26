@@ -5,6 +5,7 @@ import FormInput from '../../../../Form/Input.js';
 import MobilityPurpose from './List/Purpose.js';
 import MobilitySupport from './List/Support.js';
 
+import ApiStvMobility from '../../../../../api/factory/stv/mobility.js';
 
 export default {
 	components: {
@@ -26,6 +27,10 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 		},
+		hasAssistenzPermissionForStgs: {
+			from: 'hasAssistenzPermissionForStgs',
+			default: false
+		},
 	},
 	props: {
 		student: Object
@@ -34,12 +39,9 @@ export default {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.mobility.getMobilitaeten,
-				ajaxParams: () => {
-					return {
-						id: this.student.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvMobility.getMobilitaeten(this.student.uid)
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
@@ -111,7 +113,6 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
-				selectable: true,
 				index: 'bisio_id',
 				persistenceID: 'stv-details-table_mobiliy'
 			},
@@ -162,8 +163,8 @@ export default {
 				bisio_id: null,
 				localPurposes: [],
 				localSupports: [],
-				lehrveranstaltung_id: '',
-				lehreinheit_id: ''
+				lehrveranstaltung_id: null,
+				lehreinheit_id: null
 			},
 			statusNew: true,
 			programsMobility: [],
@@ -186,6 +187,10 @@ export default {
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
 		},
+		isBerechtigtForStudiengang(){
+			const currentKz = this.student.studiengang_kz.toString();
+			return this.hasAssistenzPermissionForStgs.includes(currentKz);
+		}
 	},
 	methods: {
 		actionNewMobility() {
@@ -213,7 +218,8 @@ export default {
 				uid: this.student.uid,
 				formData: this.formData
 			};
-			return this.$fhcApi.factory.stv.mobility.addNewMobility(this.$refs.formMobility, dataToSend)
+			return this.$refs.formMobility
+				.call(ApiStvMobility.addNewMobility(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal("mobilityModal");
@@ -240,14 +246,15 @@ export default {
 			this.loadItems();
 		},
 		resetLehreinheit(){
-			this.formData.lehreinheit_id = '';
+			this.formData.lehreinheit_id = null;
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
 				lv_id: lv_id,
 				studiensemester_kurzbz: studiensemester_kurzbz
 			};
-			return this.$fhcApi.factory.stv.mobility.getAllLehreinheiten(data)
+			return this.$api
+				.call(ApiStvMobility.getAllLehreinheiten(data))
 				.then(response => {
 					this.listLes = response.data;
 				})
@@ -260,15 +267,11 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		loadMobility(bisio_id) {
-			return this.$fhcApi.factory.stv.mobility.loadMobility(bisio_id)
+			return this.$api
+				.call(ApiStvMobility.loadMobility(bisio_id))
 				.then(result => {
 					this.formData = result.data;
-					if(this.formData.lehrveranstaltung_id === null) {
-						this.formData.lehrveranstaltung_id = '';
-					}
-					if(this.formData.lehreinheit_id === null) {
-						this.formData.lehreinheit_id = '';
-					}
+
 					if(this.formData.lehrveranstaltung_id > 0 ) {
 						this.loadItems();
 					}
@@ -280,7 +283,8 @@ export default {
 				formData: this.formData,
 				uid: this.student.uid,
 			};
-			this.$fhcApi.factory.stv.mobility.updateMobility(this.$refs.formMobility, dataToSend)
+			this.$refs.formMobility
+				.call(ApiStvMobility.updateMobility(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal("mobilityModal");
@@ -289,10 +293,13 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					this.reload();
+					this.$refs.purposes.resetLocalData();
+					this.$refs.supports.resetLocalData();
 				});
 		},
 		deleteMobility(bisio_id) {
-			return this.$fhcApi.factory.stv.mobility.deleteMobility(bisio_id)
+			return this.$api
+				.call(ApiStvMobility.deleteMobility(bisio_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})
@@ -311,8 +318,8 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
-			this.formData.lehrveranstaltung_id = '',
-			this.formData.lehreinheit_id = '',
+			this.formData.lehrveranstaltung_id = null,
+			this.formData.lehreinheit_id = null,
 			this.statusNew = true;
 			this.listLes = [];
 		},
@@ -322,7 +329,8 @@ export default {
 				bisio_id : bisio_id,
 				zweck_code: zweck_code
 			};
-			return this.$fhcApi.factory.stv.mobility.addMobilityPurpose(params)
+			return this.$api
+				.call(ApiStvMobility.addMobilityPurpose(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
@@ -335,7 +343,8 @@ export default {
 				bisio_id : bisio_id,
 				zweck_code: zweck_code
 			};
-			return this.$fhcApi.factory.stv.mobility.deleteMobilityPurpose(params)
+			return this.$api
+				.call(ApiStvMobility.deleteMobilityPurpose(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
@@ -352,7 +361,8 @@ export default {
 				bisio_id : bisio_id,
 				aufenthaltfoerderung_code: aufenthaltfoerderung_code
 			};
-			return this.$fhcApi.factory.stv.mobility.addMobilitySupport(params)
+			return this.$api
+				.call(ApiStvMobility.addMobilitySupport(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
@@ -365,7 +375,8 @@ export default {
 				bisio_id : bisio_id,
 				aufenthaltfoerderung_code: aufenthaltfoerderung_code
 			};
-			return this.$fhcApi.factory.stv.mobility.deleteMobilitySupport(params)
+			return this.$api
+				.call(ApiStvMobility.deleteMobilitySupport(params))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
@@ -378,27 +389,36 @@ export default {
 		},
 	},
 	created() {
-		this.$fhcApi.factory.stv.mobility.getProgramsMobility()
+		this.$api
+			.call(ApiStvMobility.getProgramsMobility())
 			.then(result => {
 				this.programsMobility = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.mobility.getLVList(this.student.studiengang_kz)
+
+		this.$api
+			.call(ApiStvMobility.getLVList(this.student.studiengang_kz))
 			.then(result => {
 				this.listLvs = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.mobility.getListPurposes()
+
+		this.$api
+			.call(ApiStvMobility.getListPurposes())
 			.then(result => {
 				this.listPurposes = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.mobility.getListSupports()
+
+		this.$api
+			.call(ApiStvMobility.getListSupports())
 			.then(result => {
 				this.listSupports = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.mobility.getLvsandLesByStudent(this.student.uid)
+
+		this.$api
+			.call(ApiStvMobility.getLvsandLesByStudent(this.student.uid))
 			.then(result => {
 				this.listLvsAndLes = result.data;
 			})
@@ -415,6 +435,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_mobility')"
 			@click:new="actionNewMobility"
@@ -428,14 +449,13 @@ export default {
 				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
 			</template>
 
-
 			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
 				<div class="row my-3">
 					<legend class="col-6">BIS</legend>
 					<legend class="col-6">Outgoing</legend>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						container-class="col-6 stv-details-mobility-von"
@@ -444,6 +464,7 @@ export default {
 						v-model="formData.von"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="von"
 						:teleport="true"
@@ -458,7 +479,7 @@ export default {
 						name="lehrveranstaltung_id"
 						@change="handleLVchanged"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="lv in listLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -477,6 +498,7 @@ export default {
 						v-model="formData.bis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="bis"
 						:teleport="true"
@@ -487,12 +509,11 @@ export default {
 						type="select"
 						container-class="col-6 stv-details-mobility-typ"
 						:label="$p.t('lehre', 'lehreinheit')"
-						type="select"
 						v-model="formData.lehreinheit_id"
 						name="lehreinheit_id"
 						:disabled="listLes.length > 0 ? false : true"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="le in listLes"
 							:key="le.lehreinheit_id"

@@ -2,6 +2,7 @@ import {CoreFetchCmpt} from '../../Fetch.js';
 import CoreForm from '../../Form/Form.js';
 import FormValidation from '../../Form/Validation.js';
 
+import ApiStudstatusWiederholung from '../../../api/factory/studstatus/wiederholung.js';
 
 export default {
 	components: {
@@ -49,10 +50,10 @@ export default {
 	},
 	methods: {
 		load() {
-			return this.$fhcApi.factory
-				.studstatus.wiederholung.getDetails(
+			return this.$api
+				.call(ApiStudstatusWiederholung.getDetails(
 					this.prestudentId
-				)
+				))
 				.then(result => {
 					this.data = result.data;
 					if (!this.data.status || this.data.status == 'ErsteAufforderungVersandt' || this.data.status == 'ZweiteAufforderungVersandt') {
@@ -87,11 +88,11 @@ export default {
 			});
 			this.saving = true;
 
-			this.$refs.form.factory
-				.studstatus.wiederholung[func](
+			this.$refs.form
+				.call(ApiStudstatusWiederholung[func](
 					this.data.prestudent_id,
 					this.data.studiensemester_kurzbz
-				)
+				))
 				.then(result => {
 					if (result.data === true)
 						document.location += "";
