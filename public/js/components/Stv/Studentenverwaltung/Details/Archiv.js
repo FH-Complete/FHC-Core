@@ -4,7 +4,7 @@ import AkteEdit from "./Archiv/Edit.js";
 
 import ApiStvArchiv from '../../../../api/factory/stv/archiv.js';
 import ApiStvDocuments from '../../../../api/factory/stv/documents.js';
-import DocumentDropdown from "../Details/Archiv/DocumentDropdown";
+import DocumentDropdown from "../Details/Archiv/DocumentDropdown.js";
 
 
 export default {

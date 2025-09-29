@@ -38,12 +38,11 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-document-dropdown">
-		<div class="btn-group">
+		<div class="stv-document-dropdown btn-group">
 			<button
 				ref="toolbarButton"
 				type="button"
-				class="btn btn-secondary dropdown-toggle px-5 ms-4"
+				class="btn btn-secondary dropdown-toggle px-5 ms-5"
 				data-bs-toggle="dropdown"
 				data-bs-auto-close="outside"
 				aria-expanded="false"
@@ -94,8 +93,7 @@ export default {
 				</template>
 		  </ul>
 
-	</div>
-</div>`
+	</div>`
 };
 
 
