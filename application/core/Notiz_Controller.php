@@ -206,7 +206,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 			//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 			//Todo define in dms component: readFile, downloadFile
-			$uploadDataResult = uploadFile($k);
+			$uploadDataResult = $this->uploadFile($k);
 			if (isError($uploadDataResult))
 			{
 				$this->db->trans_rollback();
@@ -350,7 +350,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 				//Todo(manu) check if filetypes weiter eingeschränkt werden sollen
 				//Todo(manu)check name files: nicht gleiches file 2mal hochladen
 				//Todo define in dms component: readFile, downloadFile
-				$uploadDataResult = uploadFile($k);
+				$uploadDataResult = $this->uploadFile($k);
 				if (isError($uploadDataResult))
 				{
 					$this->db->trans_rollback();

@@ -218,6 +218,29 @@ abstract class FHC_Controller extends CI_Controller
 		return json_decode($this->input->raw_input_stream);
 	}
 
+	/**
+	 * Utility function to upload a file
+	 * - post_field_name: the name of the field in the HTTP POST payload, this is also the index in the super global $_FILES array
+	 * - allowed_types: a list of file extensions that are allowed to be uploaded (ex. array('pdf', 'odt') or array('jpg', 'jpeg', 'gif')
+	 */
+	protected function uploadFile($post_field_name, $allowed_types = array('*'))
+	{
+		$this->load->library(
+			'upload',
+			array(
+				'upload_path' => sys_get_temp_dir(),
+				'allowed_types' => $allowed_types,
+				'overwrite' => true
+			)
+		);
+
+		// If the upload was a success then return the uploaded file info
+		if ($this->upload->do_upload($post_field_name)) return success($this->upload->data());
+
+		// If an error occurred then return it without tags
+		return error($this->upload->display_errors('', ''));
+	}
+
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 
