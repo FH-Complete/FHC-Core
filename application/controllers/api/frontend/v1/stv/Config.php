@@ -45,7 +45,8 @@ class Config extends FHCAPI_Controller
 			'lehre',
 			'stv',
 			'konto',
-			'abschlusspruefung'
+			'abschlusspruefung',
+			'projektarbeit'
 		]);
 
 		// Load Config
@@ -145,6 +146,16 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
+		];
+
+		$result['projektarbeit'] = [
+			'title' => $this->p->t('stv', 'tab_projektarbeit'),
+			'component' => './Stv/Studentenverwaltung/Details/Projektarbeit.js',
+			'config' => array_merge(
+				$config['projektarbeit'],
+				['showVertragsdetails' =>
+					defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN]
+			)
 		];
 
 		$result['mobility'] = [
