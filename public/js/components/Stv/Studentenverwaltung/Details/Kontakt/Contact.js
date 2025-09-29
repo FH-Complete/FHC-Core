@@ -300,8 +300,7 @@ export default{
 		this.$api
 			.call(ApiStvContact.getTypes())
 			.then(result => {
-				//this.kontakttypen = result.data;
-				this.kontakttypen = result.data.filter(item => item.kontakttyp !== 'hidden');
+				this.kontakttypen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},

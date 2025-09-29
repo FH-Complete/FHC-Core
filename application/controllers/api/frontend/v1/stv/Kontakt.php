@@ -434,7 +434,10 @@ class Kontakt extends FHCAPI_Controller
 		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 		$this->KontakttypModel->addJoin('public.tbl_kontakttyp kt', 'ON (public.tbl_kontakt.kontakttyp = kt.kontakttyp)');
 		$result = $this->KontaktModel->loadWhere(
-			array('person_id' => $person_id)
+			array(
+				'person_id' => $person_id,
+				'public.tbl_kontakt.kontakttyp !=' => 'hidden'
+			)
 		);
 
 		if (isError($result))
@@ -448,15 +451,12 @@ class Kontakt extends FHCAPI_Controller
 	public function getKontakttypen()
 	{
 		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
-
-		$result = $this->KontakttypModel->load();
+		$this->KontakttypModel->addOrder('beschreibung', 'ASC');
+		$result = $this->KontakttypModel->loadWhere(array('kontakttyp !=' => 'hidden'));
 
 		$data = $this->getDataOrTerminateWithError($result);
 
-		$filteredData = array_filter($data, function ($item) {
-			return $item->kontakttyp !== "hidden";
-		});
-		$this->terminateWithSuccess($filteredData);
+		$this->terminateWithSuccess($data);
 	}
 
 	public function loadContact()
