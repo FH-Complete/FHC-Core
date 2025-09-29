@@ -102,6 +102,7 @@ $config['student_tab_order'] = [
 	'grades',
 	'exam',
 	'exemptions',
+	'projektarbeit',
 	'finalexam',
 	'mobility',
 	'jointstudies',
