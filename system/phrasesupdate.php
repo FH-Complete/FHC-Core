@@ -49474,6 +49474,28 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	// ###  	DOKUMENTE ERSTELLEN PHRASEN 		START 		###
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokument_erstellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument erstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### 		DOKUMENTE ERSTELLEN PHRASEN 		END 		###
 );
 
 
