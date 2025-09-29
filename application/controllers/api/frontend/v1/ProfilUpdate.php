@@ -457,7 +457,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$_FILES['files']['size'] = $files['size'][$i];
 
 			// File upload
-			$uploadDataResult = uploadFile('files', array('jpg', 'png', 'pdf'));
+			$uploadDataResult = $this->uploadFile('files', array('jpg', 'png', 'pdf'));
 			if (isError($uploadDataResult)) $this->addError(getError($uploadDataResult));
 			if (!hasData($uploadDataResult)) $this->addError('Upload failed');
 

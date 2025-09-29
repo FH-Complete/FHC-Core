@@ -159,7 +159,7 @@ class Unterbrechung extends FHCAPI_Controller
 			$this->load->library('DmsLib');
 
 
-			$uploadDataResult = uploadFile('attachment', $this->config->item('unterbrechung_dms_filetypes') ?: array('*'));
+			$uploadDataResult = $this->uploadFile('attachment', $this->config->item('unterbrechung_dms_filetypes') ?: array('*'));
 
 			$data = $this->getDataOrTerminateWithError($uploadDataResult);
 

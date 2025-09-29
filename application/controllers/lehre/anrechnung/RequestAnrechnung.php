@@ -365,7 +365,7 @@ class requestAnrechnung extends Auth_Controller
 	private function _uploadFile()
 	{
 		// Upload document
-		$uploadDataResult = uploadFile('uploadfile', array('pdf'));
+		$uploadDataResult = $this->uploadFile('uploadfile', array('pdf'));
 
 		// If an error occurred while uploading the file
 		if (isError($uploadDataResult)) return $uploadDataResult;

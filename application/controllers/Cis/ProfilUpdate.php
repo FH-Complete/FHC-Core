@@ -286,7 +286,7 @@ class ProfilUpdate extends Auth_Controller
 			$_FILES['files']['error'] = $files['error'][$i];
 			$_FILES['files']['size'] = $files['size'][$i];
 
-			$uploadDataResult = uploadFile('files', array('jpg', 'png', 'pdf'));
+			$uploadDataResult = $this->uploadFile('files', array('jpg', 'png', 'pdf'));
 
 			if (hasData($uploadDataResult))
 			{

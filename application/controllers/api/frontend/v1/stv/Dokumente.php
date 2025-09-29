@@ -343,7 +343,7 @@ class Dokumente extends FHCAPI_Controller
 
 		$this->db->trans_start();
 
-		$uploadDataResult = uploadFile('anhang', array('jpg', 'png', 'pdf'));
+		$uploadDataResult = $this->uploadFile('anhang', array('jpg', 'png', 'pdf'));
 		if (isError($uploadDataResult))
 		{
 			return $this->terminateWithError(getError($uploadDataResult), self::ERROR_TYPE_GENERAL);
