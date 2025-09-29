@@ -11,6 +11,7 @@ import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 export default {
 	components: {
@@ -39,7 +40,7 @@ export default {
 				persistence: {
 					columns: false
 				},
-				height: 200,
+				minHeight: 200,
 				layout: "fitColumns",
 				columns: [{
 					title: Vue.computed(() => this.preloadedPhrasen.zutrittsGruppenPhrase),
@@ -51,7 +52,7 @@ export default {
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
@@ -85,9 +86,12 @@ export default {
 					{
 						title: Vue.computed(() =>this.preloadedPhrasen.ausgabedatum) ,
 						field: "Ausgegeben_am",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 				],
 			},
@@ -133,11 +137,11 @@ export default {
 				this.$api
 					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
-						if (!request.error && res) {
+						if (!request.error && request.data) {
 							this.data.profilUpdates = request.data;
 							this.data.profilUpdates.sort(this.sortProfilUpdates);
 						} else {
-							console.error("Error when fetching profile updates: " + res.data);
+							console.error("Error when fetching profile updates: " + request);
 						}
 					})
 					.catch((err) => {
@@ -160,6 +164,15 @@ export default {
 				this.$refs.editModal.show();
 			});
 		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
+		}
 	},
 
 	computed: {
