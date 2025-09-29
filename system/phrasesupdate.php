@@ -30689,6 +30689,26 @@ array(
 	array(
 		'app' => 'anwesenheiten',
 		'category' => 'global',
+		'phrase' => 'jetztStarten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Jetzt Starten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Start Now',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
 		'phrase' => 'abwesend',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -42551,6 +42571,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Show Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabeStgSpezifischeRichtlinienBeachten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bitte beachten Sie gegebenenfalls existierende studiengangsspezifische Richtlinien und informieren Sie sich diesbezüglich. Vielen Dank.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please note any existing program-specific guidelines and inform yourself about them. Thank you.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
