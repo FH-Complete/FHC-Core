@@ -86,6 +86,7 @@ export default {
 			this.tagData.updateamum = this.formatDateTime(item.updateamum)
 			this.tagData.bearbeiter = item.bearbeiter;
 			this.tagData.verfasser = item.verfasser;
+			this.tagData.readonly = item.readonly;
 
 			if (item && item.notiz_id)
 			{
@@ -154,7 +155,8 @@ export default {
 
 			let postData = {
 				id: this.selectedTagId,
-				done: !this.tagData.done
+				done: !this.tagData.done,
+				notiz: this.tagData.notiz,
 			}
 			this.$api.call(this.endpoint.doneTag(postData))
 			this.$emit("updated", this.tagData);
@@ -182,7 +184,8 @@ export default {
 				verfasser: "",
 				updateamum: "",
 				bearbeiter: "",
-				response: ""
+				response: "",
+				readonly: false
 			};
 			this.selectedTagId = null;
 			this.mode = "create";
@@ -230,6 +233,7 @@ export default {
 						v-model="tagData.notiz"
 						type="textarea"
 						field="notiz"
+						:readonly="tagData.readonly"
 						placeholder="Notiz..."
 					></form-input>
 					<div class="modificationdate">
@@ -243,7 +247,7 @@ export default {
 					</div>
 				</div>
 			</template>
-			<template #footer>
+			<template #footer v-if="!tagData.readonly">
 				<div class="d-flex justify-content-between w-100">
 					<div>
 						<button 

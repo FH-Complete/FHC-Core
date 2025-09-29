@@ -107,7 +107,8 @@ class Lektor extends FHCAPI_Controller
 						$this->form_validation->set_rules($field, 'Planstunden', 'integer|greater_than_equal_to[0]');
 						break;
 					case 'stundensatz':
-						$this->form_validation->set_rules($field, 'Stundensatz', 'numeric|greater_than_equal_to[0]');
+						$formData['stundensatz'] = str_replace(',', '.', $formData['stundensatz']);
+						$this->form_validation->set_rules($field, 'Stundensatz', 'callback__check_stundensatz');
 						break;
 					case 'faktor':
 						$this->form_validation->set_rules($field, 'Faktor', 'numeric|greater_than_equal_to[0]');
@@ -119,6 +120,7 @@ class Lektor extends FHCAPI_Controller
 						$this->form_validation->set_rules($field, 'Bis Melden', 'trim');
 						break;
 					case 'semesterstunden':
+						$formData['semesterstunden'] = str_replace(',', '.', $formData['semesterstunden']);
 						$this->form_validation->set_rules($field, 'Semesterstunden', 'callback__check_semesterstunden');
 						break;
 					case 'mitarbeiter_uid':
@@ -129,7 +131,7 @@ class Lektor extends FHCAPI_Controller
 		}
 		if (!$this->form_validation->run())
 		{
-			$this->terminateWithError($this->form_validation->error_array());
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 		}
 
 		if (isset($formData['semesterstunden']) && (!is_numeric($formData['semesterstunden']) || $formData['semesterstunden'] === ''))
@@ -145,9 +147,26 @@ class Lektor extends FHCAPI_Controller
 		$result = $this->_ci->lektorlib->updateLektorFromLehreinheit($lehreinheit_id, $mitarbeiter_uid, $formData);
 
 		if (isError($result)) $this->terminateWithError(getError($result));
-		$this->terminateWithSuccess("Erfolgreich geupdated");
+		$this->terminateWithSuccess($result);
 	}
 
+	public function _check_stundensatz($value)
+	{
+		$value = str_replace(',', '.', $value);
+
+		if (!is_numeric($value))
+		{
+			$this->form_validation->set_message('_check_decimal', 'Das Feld {field} muss eine Zahl sein.');
+			return false;
+		}
+
+		if ($value < 0 || $value >= 10000) {
+			$this->form_validation->set_message('_check_decimal', 'Das Feld {field} muss zwischen 0 und 10000 liegen.');
+			return false;
+		}
+
+		return true;
+	}
 	public function _check_semesterstunden($value)
 	{
 		if ($value === null || $value === '') {
@@ -168,6 +187,14 @@ class Lektor extends FHCAPI_Controller
 			$this->form_validation->set_message(
 				'_check_semesterstunden',
 				'Das Feld {field} muss eine Zahl größer oder gleich 0 sein.'
+			);
+			return false;
+		}
+		if ($value > 999.99)
+		{
+			$this->form_validation->set_message(
+				'_check_semesterstunden',
+				'Das Feld {field} darf maximal 999,99 betragen.'
 			);
 			return false;
 		}

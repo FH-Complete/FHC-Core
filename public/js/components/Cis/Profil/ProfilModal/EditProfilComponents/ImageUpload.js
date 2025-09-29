@@ -16,7 +16,7 @@ export default {
 	mixins: [BsModal],
 	props: {
 		titel: {
-			type: Object,
+			type: String,
 		},
 		files: {
 			type: Array,
@@ -57,7 +57,7 @@ export default {
 	},
 	template: /*html*/`
 
-	<bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
+	<bs-modal ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false">
 		<template #title>
 			<p style="opacity:0.8" class="ms-2" v-if="!updateID">{{$p.t('profilUpdate','profilBildUpdateMessage',[titel])}}</p>
 		</template>

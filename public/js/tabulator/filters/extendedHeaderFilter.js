@@ -146,12 +146,13 @@ export function tagHeaderFilter(headerValue, rowValue, rowData, filterParams)
 	if (Array.isArray(data))
 	{
 		combinedText = data
+			.filter(item => item?.done === false)
 			.map(item => `${item?.beschreibung} ${item?.notiz}`)
 			.join(' ');
 	}
 	else if (typeof data === 'object' && data !== null)
 	{
-		combinedText = `${data?.beschreibung} ${data?.notiz}`;
+		combinedText = data?.erledigt === false ? `${data?.beschreibung} ${data?.notiz}` : '';
 	}
 	else
 	{

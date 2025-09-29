@@ -176,11 +176,11 @@ class LektorLib
 					if (!$echter_dv && (!$this->_ci->permissionlib->isBerechtigt('admin')))
 					{
 						if (!$this->LehrauftragAufFirma(isset($formData['mitarbeiter_uid']) ? $formData['mitarbeiter_uid'] : $mitarbeiter_uid))
-							return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\n Daten wurden NICHT gespeichert!\n\n");
+							return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden NICHT gespeichert!\n\n");
 					}
 					else
 					{
-						$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\n Daten wurden gespeichert!\n\n";
+						$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden gespeichert!\n\n";
 					}
 
 					$stunden_limit_result = $this->getStundenInstitut($mitarbeiter_uid, $lehreinheit->studiensemester_kurzbz, $oe_array);
@@ -190,7 +190,7 @@ class LektorLib
 						$stunden_limit_array = getData($stunden_limit_result);
 						foreach ($stunden_limit_array as $stunden_limit)
 						{
-							$warning .= $stunden_limit->summe . ' Stunden' . $stunden_limit->bezeichnung;
+							$warning .= $stunden_limit->summe . ' Stunden ' . $stunden_limit->bezeichnung . "\n";
 						}
 					}
 				}
@@ -206,7 +206,7 @@ class LektorLib
 		$benutzer_aktiv = getData($benutzer_result)[0]->aktiv;
 
 		if (!$benutzer_aktiv)
-			$warning .= "Achtung: Der/Die Benutzer*in ist inaktiv!\nBitte informieren Sie die Personalbteilung.\n\nDaten wurden gespeichert.\n\n";
+			$warning .= "Achtung: Der/Die Benutzer*in ist inaktiv!\nBitte informieren Sie die Personalbteilung.\nDaten wurden gespeichert.\n\n";
 
 		$updatableFields = array(
 			'semesterstunden',
@@ -236,9 +236,9 @@ class LektorLib
 
 		if (isError($result)) return $result;
 
-		if ($warning !== '') return error($warning);
+		if ($warning !== '') return success(['warning' => $warning]);
 
-		return success('Successfully updated Lehreinheit');
+		return success('Erfolgreich geupdated');
 	}
 
 	private function getMaxStunden($mitarbeiter_uid, $studiensemester_kurzbz, $studiengang_kz, $echter_dv)
@@ -280,7 +280,7 @@ class LektorLib
 
 					foreach ($stunden_limit_array as $stunden_limit)
 					{
-						$error .= $stunden_limit->summe . ' Stunden' . $stunden_limit->bezeichnung;
+						$error .= $stunden_limit->summe . ' Stunden ' . $stunden_limit->bezeichnung . "\n";
 					}
 				}
 				return error($error);

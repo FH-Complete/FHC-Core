@@ -116,7 +116,7 @@ class Gruppe extends FHCAPI_Controller
 											bezeichnung,
 											gid,
 											\'false\' as lehrverband');
-		$gruppen_result = $this->_ci->GruppeModel->loadWhere(array('sichtbar' => true, 'aktiv' => true, 'lehre' => true, 'direktinskription' => false));
+		$gruppen_result = $this->_ci->GruppeModel->loadWhere(array('sichtbar' => true, 'aktiv' => true, 'lehre' => true, 'direktinskription' => false, 'semester IS NOT NULL' => null));
 
 		$gruppen_array = array();
 

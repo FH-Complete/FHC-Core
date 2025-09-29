@@ -50,6 +50,11 @@ class Setup extends FHCAPI_Controller
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Details.js',
 			'config' => []
 		);
+		$tabs['gruppen'] = array (
+			'title' =>  'Gruppen',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Gruppen.js',
+			'config' => []
+		);
 		$tabs['lektor'] = array (
 			'title' =>  'LektorInnenzuteilung',
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Lektor.js',
