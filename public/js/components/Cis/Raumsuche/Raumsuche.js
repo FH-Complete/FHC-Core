@@ -1,6 +1,6 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import VueDatePicker from '../../vueDatepicker.js.php';
-
+import ApiOrt from '../../../api/factory/ort.js'
 export const Raumsuche =  {
 	name: "Raumsuche",
 	props: {
@@ -13,6 +13,8 @@ export const Raumsuche =  {
 	},
 	data() {
 		return {
+			phrasenPromise: null,
+			phrasenResolved: false,
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
@@ -54,8 +56,8 @@ export const Raumsuche =  {
 				columns: [
 					{title: Vue.computed(() => this.$p.t('rauminfo/raum_kurzbz')), field: 'ort_kurzbz', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('global/nummer')), field: 'nummer', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('global/personen')), field: 'personen', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/raumnummer')), field: 'nummer', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('rauminfo/personcap')), field: 'personen', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/rauminfo')),
 						field: 'linkInfo', formatter: this.linkFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('rauminfo/roomReservations')), 
@@ -67,17 +69,6 @@ export const Raumsuche =  {
 				event: "tableBuilt",
 				handler: async () => {
 					this.tableBuiltResolve()
-				}
-			},
-			{
-				event: "cellClick",
-				handler: async (e, cell) => {
-
-					if((cell.column.field === 'linkInfo' || cell.column.field === 'linkRes') && cell.value){
-						window.open(cell.value, '_blank');
-						e.stopPropagation();
-					}
-					
 				}
 			}
 			]};
@@ -132,7 +123,8 @@ export const Raumsuche =  {
 			this.$refs.raumsucheTable.tabulator.setData(d);
 		},
 		loadRoomTypes() {
-			this.$fhcApi.factory.ort.getRoomTypes().then(res => {
+			this.$api.call(ApiOrt.getRoomTypes())
+				.then(res => {
 				res?.data?.forEach(type => {
 					type.beschreibung = type.beschreibung.replace('&amp;', '&')
 				})
@@ -141,7 +133,7 @@ export const Raumsuche =  {
 			})
 		},
 		loadRooms() {
-			this.$fhcApi.factory.ort.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl)
+			this.$api.call(ApiOrt.getRooms(this.datum.toISOString(), this.getTimeString(this.von), this.getTimeString(this.bis), this.selectedType?.raumtyp_kurzbz ?? '', this.anzahl))
 				.then(res => {
 					if(res?.data?.retval) this.setupData(res.data.retval)
 			})
@@ -167,6 +159,7 @@ export const Raumsuche =  {
 			return `${hours}:${minutes}`;
 		},
 		async setupMounted() {
+			
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 			
@@ -182,7 +175,7 @@ export const Raumsuche =  {
 			if(this.$refs.raumsucheTable) {
 				this.$refs.raumsucheTable.$refs.table.style.setProperty('height', h+'px')
 			}
-
+			
 		}
 	},
 	computed: {
@@ -191,7 +184,8 @@ export const Raumsuche =  {
 		}
 	},
 	created() {
-		
+		this.phrasenPromise = this.$p.loadCategory(['rauminfo', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 	},
 	mounted() {
 		this.setupMounted()
@@ -239,7 +233,7 @@ export const Raumsuche =  {
 			</VueDatePicker>
 		</div>
 		
-		<div class="col-lg-auto">
+		<div class="col-12 col-lg-3">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
@@ -248,16 +242,21 @@ export const Raumsuche =  {
 		</div>
 		
 
-		<div class="col-4 col-lg-2">
-			<InputNumber v-model="anzahl" :prefix="$p.t('rauminfo/anzahlPersonen') + ': '" inputId="anzahlInput" :min="1" :max="100" />
+		<div class="col-12 col-lg-3">
+			<InputNumber v-model="anzahl" 
+			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
+			inputId="anzahlInput" :min="1" :max="1000" 
+			:style="{'width': '100%'}"
+			/>
 		</div>
-		<div class="col-8 col-lg-2 d-flex justify-content-center align-items-center">
+		<div class="col-12 col-lg-2">
 			<button class="btn btn-primary border-0" @click="search">{{ $p.t('rauminfo/roomSearch') }} <i class="fa fa-magnifying-glass"></i></button>
 		</div>
 	</div>
 	
 
      <core-filter-cmpt 
+     	v-if="phrasenResolved"
 		@uuidDefined="handleUuidDefined"
 		:title="''"  
 		ref="raumsucheTable" 

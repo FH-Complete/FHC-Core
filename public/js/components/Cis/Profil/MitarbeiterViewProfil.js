@@ -5,6 +5,8 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -24,7 +26,7 @@ export default {
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
@@ -60,18 +62,24 @@ export default {
 					{
 						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
 						field: "Gültig_von",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
 						field: "Gültig_bis",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
@@ -91,6 +99,15 @@ export default {
 		funktionenTableBuilt: function () {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
+		}
 	},
 	watch: {
 		'data.funktionen'(newVal) {
