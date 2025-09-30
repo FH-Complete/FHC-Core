@@ -188,6 +188,7 @@ class Verband extends FHCAPI_Controller
 		array_unshift($list, [
 			'name' => 'PreStudent',
 			'link' => $link . 'prestudent',
+			'stg_kz' => (int)$studiengang_kz,
 			'children' => $this->getStdSem($link . 'prestudent/', $studiengang_kz)
 		]);
 

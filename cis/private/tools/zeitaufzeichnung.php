@@ -45,6 +45,7 @@ require_once('../../../include/benutzerberechtigung.class.php');
 require_once('../../../include/zeitaufzeichnung_import_csv.class.php');
 require_once('../../../include/zeitaufzeichnung_import_post.class.php');
 require_once('../../../include/vertragsbestandteil.class.php');
+require_once('../../../include/benutzerfunktion.class.php');
 
 $sprache = getSprache();
 $p=new phrasen($sprache);
@@ -110,6 +111,13 @@ else
 {
 	$za_simple = 1;
 	$activities = array('Admin', 'FuE','FuEallg','Lehre', 'Pause', 'Arztbesuch', 'DienstreiseMT', 'Behoerde', 'Ersatzruhe', 'Weiterbildung', 'LVEntwicklung');
+}
+
+// Wenn die Funktion Lehrling zugeteilt ist, kann zusaetzlich Berufsschule als Aktivitaet gewaehlt werden
+$benutzerfunktion = new benutzerfunktion();
+if ($benutzerfunktion->benutzerfunktion_exists($user, 'lehrling', true))
+{
+	$activities[] = 'Berufsschule';
 }
 
 $activities_str = "'".implode("','", $activities)."'";
@@ -690,7 +698,7 @@ echo '
 		function checkPausenblock()
 		{
 			var sel = $("#aktivitaet").val();
-			var activities = ["Admin", "Lehre", "FuE", "Operativ", "Betrieb", "Design", "LVEntwicklung", "Weiterbildung", "FuEallg"];
+			var activities = ["Admin", "Lehre", "FuE", "Operativ", "Betrieb", "Design", "LVEntwicklung", "Weiterbildung", "FuEallg", "Berufsschule"];
 			if (activities.includes(sel))
 				showPausenblock();
 			else

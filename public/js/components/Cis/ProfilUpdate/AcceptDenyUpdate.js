@@ -188,16 +188,21 @@ export default {
 
       <span  class="form-underline-content" >{{data.requested_change.value}}</span>
     </div>
-    <div v-if="files?.length" class="ms-2">
-    
-    <a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
-    </div>
     </template>
 
 
     <component v-else :is="getComponentView" :withZustelladresse="getComponentView==='adresse'?true:false" :data="data.requested_change"></component>
+
     </div>
     </div>
+
+		<div  v-if="files?.length" class="card mt-3">
+			<div class="card-header">{{$p.t('profilUpdate','nachweisdokumente')}}</div>
+			<div class="card-body">
+				<a  v-for="file in files" target="_blank" :href="getDocumentLink(file.dms_id)" >{{file.name}}</a>
+			</div>
+		</div>
+
     </div>
     </div>
     

@@ -31,10 +31,10 @@ export default {
     Loading,
     AcceptDenyUpdate,
   },
-  inject: ["profilUpdateTopic", "profilUpdateStates"],
+  inject: ["profilUpdateStates"],
   props: {
     id: {
-      type: Number,
+      type: String,
     },
   },
   data() {
@@ -44,51 +44,53 @@ export default {
       modalData: null,
       loading: false,
       filter: "Pending",
-      events: [],
       profil_update_id: Number(this.id),
 
   };
   },
-  computed:{
-    profilUpdateOptions: function(){
-      return {
-        ajaxURL:
-          FHC_JS_DATA_STORAGE_OBJECT.app_root +
-          FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-          `/Cis/ProfilUpdate/`,
-
-        ajaxURLGenerator: (url, config, params) => {
-          //? this function needs to be an array function in order to access the this properties of the Vue component
-
-          switch (this.filter) {
-            case this.profilUpdateStates["Pending"]:
-              return (
-                url +
-                `getProfilUpdateWithPermission/${this.profilUpdateStates["Pending"]}`
-              );
-            case this.profilUpdateStates["Accepted"]:
-              return (
-                url +
-                `getProfilUpdateWithPermission/${this.profilUpdateStates["Accepted"]}`
-              );
-            case this.profilUpdateStates["Rejected"]:
-              return (
-                url +
-                `getProfilUpdateWithPermission/${this.profilUpdateStates["Rejected"]}`
-              );
-            default:
-              return url + `getProfilUpdateWithPermission`;
-          }
-        },
+	computed: {
+		profilUpdateEvents: function () {
+			return [
+				{
+					"event": "dataProcessed",
+					"handler": this.handleDataProcessed
+				}
+			];
+		},
+		profilUpdateOptions: function () {
+			return {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: (url, config, params) => {
+					return this.$api.call(ApiProfilUpdate.getProfilUpdateWithPermission(params.filter));
+				},
+				ajaxParams: () => {
+					let filter = '';
+					switch (this.filter) {
+						case this.profilUpdateStates["Pending"]:
+							filter = this.profilUpdateStates["Pending"];
+							break;
+						case this.profilUpdateStates["Accepted"]:
+							filter = this.profilUpdateStates["Accepted"];
+							break;
+						case this.profilUpdateStates["Rejected"]:
+							filter = this.profilUpdateStates["Rejected"];
+							break;
+						default:
+							filter = '';
+					}
+					return {
+						"filter": filter
+					};
+				},
         ajaxResponse: (url, params, response) => {
           //url - the URL of the request
           //params - the parameters passed with the request
           //response - the JSON object returned in the body of the response.
           //? sorts the response data from the backend
-          if (response)
-            response.sort((ele1, ele2) => sortProfilUpdates(ele1, ele2, this));
+					if (response?.data)
+						response.data.sort((ele1, ele2) => sortProfilUpdates(ele1, ele2, this));
 
-          return response;
+					return response.data;
         },
         //? adds tooltip with the status message of a profil update request if its status is not pending
         columnDefaults: {
@@ -356,7 +358,19 @@ export default {
       this.$refs.UpdatesTable.tabulator.setData();
       //? store the selected view in the session storage of the browser
       sessionStorage.setItem("filter", event.target.value);
-    },
+		},
+		handleDataProcessed: function () {
+			if (this.profil_update_id) {
+				const arrayRowData = this.$refs.UpdatesTable.tabulator
+					.getData()
+					.filter((row) => {
+						return row.profil_update_id === this.profil_update_id;
+					});
+				if (arrayRowData.length) {
+					this.showAcceptDenyModal(arrayRowData[0]);
+				}
+			}
+		}
   },
   watch: {
     loading: function (newValue, oldValue) {
@@ -374,20 +388,7 @@ export default {
   },
 
   mounted() {
-    //? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
-    if (this.profil_update_id) {
-      this.$refs.UpdatesTable.tabulator.on("dataProcessed", () => {
-        const arrayRowData = this.$refs.UpdatesTable.tabulator
-          .getData()
-          .filter((row) => {
-            return row.profil_update_id === this.profil_update_id;
-          });
-        if (arrayRowData.length) {
-          this.showAcceptDenyModal(arrayRowData[0]);
-        }
-      });
-    }
-
+		//? opens the AcceptDenyUpdate Modal if a preselected profil_update_id was passed to the component (used for email links)
     if (sessionStorage.getItem("filter")) {
       this.filter = sessionStorage.getItem("filter");
     }
@@ -409,7 +410,7 @@ export default {
     </div>
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="events" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
+    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="profilUpdateEvents" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
 
     </div>`,
 };

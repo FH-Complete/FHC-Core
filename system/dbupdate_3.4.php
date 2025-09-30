@@ -78,6 +78,9 @@ require_once('dbupdate_3.4/25999_C4_dashboard.php');
 require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
 require_once('dbupdate_3.4/40128_search.php');
 require_once('dbupdate_3.4/63394_Variablenbeschraenkung.php');
+require_once('dbupdate_3.4/63436_cis4_iframe_component.php');
+require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
+require_once('dbupdate_3.4/66982_berufsschule.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
