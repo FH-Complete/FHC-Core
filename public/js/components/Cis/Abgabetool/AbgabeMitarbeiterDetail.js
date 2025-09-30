@@ -63,36 +63,41 @@ export const AbgabeMitarbeiterDetail = {
 			termin.betreuer_person_id = this.projektarbeit.betreuer_person_id
 			return this.$api.call(ApiAbgabe.postProjektarbeitAbgabe(termin)).then( (res) => {
 				if(res?.meta?.status == 'success') {
-					
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
 					
+					const noteOpt = this.allowedNotenOptions.find(opt => opt.note == res.data[0].note)
 					const newTerminRes = {
-						...res.data
+						'allowedToSave': true,
+						'allowedToDelete': true,
+						...res.data[0]
 					}
+					if(newTerminRes.note) newTerminRes.note = noteOpt
+					const existingTerminRes = res.data[1]
 					newTerminRes.bezeichnung = {
 						bezeichnung: termin.bezeichnung?.bezeichnung,
 						paabgabetyp_kurzbz: termin.bezeichnung?.paabgabetyp_kurzbz
 					}
 					
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
-					if(!this.projektarbeit.abgabetermine.find(abgabe => abgabe.paabgabe_id == newTerminRes.paabgabe_id)){
+					if(!existingTerminRes){
 						this.projektarbeit.abgabetermine.push(newTerminRes)
+						this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
+					} else {
+						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
+						existingTerminRes.note = noteOptExisting
 					}
 					
-					
-					
 					// negative abgabe -> automagically open new termin modal
-					// really bad feature idea by management people that think
-					// they know better lmao that will be so annoying to deal with
+					// really bad feature imo that will be annoying to deal with
 					
-					// TODO fix the note changed check
-					// check if the abgabe existed beforehand and thus if the note even changed -> dont spam modal open
-					// when editing text of negative abgabe
-					// const savedExistingTermin = termin.paabgabe_id == newTerminRes.paabgabe_id
-					// const noteChanged = savedExistingTermin && termin.note_pk !== newTerminRes.note
-					const newTerminResNoteOpt = this.allowedNotenOptions.find(opt => opt.note == newTerminRes.note)
-					if(newTerminResNoteOpt && !newTerminResNoteOpt.positiv) {
+					// termin is completely new and has negative note
+					const savedNewWithNegative = !existingTerminRes && !newTerminRes.note?.positiv
 
+					// termin existed previously + oldTermin had different note/positive note or no note at all
+					const savedExistingNoteAsNegativeAndWasNotNegativeBefore = existingTerminRes && !newTerminRes.note?.positiv && (existingTerminRes.note?.positiv || existingTerminRes.note === undefined)
+
+					const openModalDueToNegativeBeurteilung = savedNewWithNegative || savedExistingNoteAsNegativeAndWasNotNegativeBefore
+					if(openModalDueToNegativeBeurteilung) {
 						this.newTermin = {
 							'paabgabe_id': -1,
 							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
@@ -100,7 +105,7 @@ export const AbgabeMitarbeiterDetail = {
 							'kurzbz': '',
 							'datum': new Date().toISOString().split('T')[0],
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-							'notiz': '',
+							'beurteilungsnotiz': '',
 							'upload_allowed': false,
 							'paabgabetyp_kurzbz': '',
 							'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === newTerminRes.paabgabetyp_kurzbz),
@@ -109,31 +114,7 @@ export const AbgabeMitarbeiterDetail = {
 						}
 						
 						this.showAutomagicModalPhrase = true
-						
-						this.$refs.modalContainerCreateNewAbgabe.show()
 					}
-					
-					
-					
-					// if(paabgabe_id === -1) { // new abgabe has been inserted
-					// 	termin.paabgabe_id = res?.data?.paabgabe_id
-					// 	this.projektarbeit.abgabetermine.push({ // new abgatermin row
-					// 		'paabgabe_id': -1,
-					// 		'projektarbeit_id': this.projektarbeit.projektarbeit_id,
-					// 		'fixtermin': false,
-					// 		'kurzbz': '',
-					// 		'datum': new Date().toISOString().split('T')[0],
-					// 		'paabgabetyp_kurzbz': termin.paabgabetyp_kurzbz,
-					// 		'note': this.allowedNotenOptions.find(opt => opt.note == termin.note?.note),
-					// 		'upload_allowed': termin.upload_allowed,
-					// 		'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz),
-					// 		'abgabedatum': null,
-					// 		'insertvon': this.viewData?.uid ?? '',
-					// 		'allowedToSave': true,
-					// 		'allowedToDelete': true
-					// 	})
-					// }
-					
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
@@ -254,10 +235,10 @@ export const AbgabeMitarbeiterDetail = {
 					'kurzbz': '',
 					'datum': new Date().toISOString().split('T')[0],
 					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-					'notiz': '',
+					'beurteilungsnotiz': '',
 					'upload_allowed': false,
 					'paabgabetyp_kurzbz': '',
-					'bezeichnung': '',
+					'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen'),
 					'abgabedatum': null,
 					'insertvon': this.viewData?.uid ?? ''
 				}
@@ -266,24 +247,39 @@ export const AbgabeMitarbeiterDetail = {
 			this.$refs.modalContainerCreateNewAbgabe.show()
 		},
 		async handleSaveNewAbgabe(termin) {
+			// TODO: validate termin type & date
+			
 			await this.saveTermin(termin)
 			
-			this.$refs.modalContainerCreateNewAbgabe.hide()
-			this.newTermin = {
-				'paabgabe_id': -1,
-				'projektarbeit_id': this.projektarbeit.projektarbeit_id,
-				'fixtermin': false,
-				'kurzbz': '',
-				'datum': new Date().toISOString().split('T')[0],
-				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-				'notiz': '',
-				'upload_allowed': false,
-				'paabgabetyp_kurzbz': '',
-				'bezeichnung': '',
-				'abgabedatum': null,
-				'insertvon': this.viewData?.uid ?? ''
+			// determined inside saveTermin api.then()
+			if(this.showAutomagicModalPhrase) {
+				this.$refs.modalContainerCreateNewAbgabe.show()
+			} else {
+				this.$refs.modalContainerCreateNewAbgabe.hide()
+				this.newTermin = {
+					'paabgabe_id': -1,
+					'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+					'fixtermin': false,
+					'kurzbz': '',
+					'datum': new Date().toISOString().split('T')[0],
+					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+					'beurteilungsnotiz': '',
+					'upload_allowed': false,
+					'paabgabetyp_kurzbz': '',
+					'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen'),
+					'abgabedatum': null,
+					'insertvon': this.viewData?.uid ?? ''
+				}
+			}
+		},
+		handleChangeAbgabetyp(termin) {
+			// if paabgabetype qualgate is selected, fill out kurzbz textfield with bezeichnung of quality gate so users
+			// are possibly less confused, which is a pursuit in vain
+			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2') {
+				termin.kurzbz = termin.bezeichnung.bezeichnung
 			}
 		}
+			
 	},
 	computed: {
 		getEid() {
@@ -337,18 +333,20 @@ export const AbgabeMitarbeiterDetail = {
 			</template>
 			<template v-slot:default>
 				<div v-if="showAutomagicModalPhrase" class="text-center"><p>{{$p.t('abgabetool/c4abgabeQualGateNegativAddNewAutomagisch')}}</p></div>
-				<div v-if="newTermin">
-					<div class="row">
-						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
-						<div class="col-8 col-md-9">
-							<Checkbox 
-								v-model="newTermin.fixtermin"
-								:binary="true" 
-								:pt="{ root: { class: 'ml-auto' }}"
-							>
-							</Checkbox>
-						</div>
-					</div>
+<!--				minheight to avoid z-index magic for the datepicker inside the modal inside the modal...-->
+				<div v-if="newTermin" style="min-height: 600px">
+<!--				fixtermin is not an option for lektors-->
+<!--					<div class="row">-->
+<!--						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>-->
+<!--						<div class="col-8 col-md-9">-->
+<!--							<Checkbox -->
+<!--								v-model="newTermin.fixtermin"-->
+<!--								:binary="true" -->
+<!--								:pt="{ root: { class: 'ml-auto' }}"-->
+<!--							>-->
+<!--							</Checkbox>-->
+<!--						</div>-->
+<!--					</div>-->
 					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
 						<div class="col-8 col-md-9">
@@ -368,6 +366,7 @@ export const AbgabeMitarbeiterDetail = {
 							<Dropdown
 								:style="{'width': '100%'}"
 								v-model="newTermin.bezeichnung"
+								@change="handleChangeAbgabetyp(newTermin)"
 								:options="abgabeTypeOptions"
 								:optionLabel="getOptionLabelAbgabetyp">
 							</Dropdown>
@@ -398,7 +397,7 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGate')}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="newTermin.notiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="newTermin.beurteilungsnotiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
 						</div>
 					</div>
 					<div class="row mt-2">
@@ -477,8 +476,10 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="row">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
 							<div class="col-8 col-md-9">
+<!--								always keep fixtermin checkbox disabled for mitarbeiter tool -->
 								<Checkbox 
 									v-model="termin.fixtermin"
+									disabled
 									:binary="true" 
 									:pt="{ root: { class: 'ml-auto' }}"
 								>
@@ -506,6 +507,7 @@ export const AbgabeMitarbeiterDetail = {
 									:style="{'width': '100%'}"
 									:disabled="!termin.allowedToSave"
 									v-model="termin.bezeichnung"
+									@change="handleChangeAbgabetyp(termin)"
 									:options="abgabeTypeOptions"
 									:optionLabel="getOptionLabelAbgabetyp">
 								</Dropdown>
@@ -536,7 +538,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGate')}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.notiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
 							</div>
 						</div>
 						<div class="row mt-2">

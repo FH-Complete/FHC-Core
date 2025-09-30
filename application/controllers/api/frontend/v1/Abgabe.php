@@ -146,7 +146,11 @@ class Abgabe extends FHCAPI_Controller
 				$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
 
 				// TODO: save access
-				$pa->email = getData($result)[0]->private_email;
+				$data = getData($result);
+				if(count($data) > 0) {
+					$pa->email = $data[0]->private_email;
+				}
+				
 			}
 		}
 		
@@ -330,7 +334,7 @@ class Abgabe extends FHCAPI_Controller
 
 		if( null === $num_rows_sem || false === $num_rows_sem )
 		{
-			$this->terminateWithError($this->p->t('abgabetool','fehlerAktualitaetProjektarbeit'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
 		}
 
 		foreach($resBetr->retval as $betreuerRow) {
@@ -483,7 +487,7 @@ class Abgabe extends FHCAPI_Controller
 		$fixtermin = $_POST['fixtermin'];
 		$kurzbz = $_POST['kurzbz'];
 		$note = $_POST['note'];
-		$notiz = $_POST['notiz'];
+		$beurteilungsnotiz = $_POST['beurteilungsnotiz'];
 		$upload_allowed = $_POST['upload_allowed'];
 		$betreuer_person_id = $_POST['betreuer_person_id'];
 
@@ -506,7 +510,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
-					'notiz' => $notiz,
+					'beurteilungsnotiz' => $beurteilungsnotiz,
 					'upload_allowed' => $upload_allowed,
 					'insertvon' => getAuthUID(),
 					'insertamum' => date('Y-m-d H:i:s')
@@ -519,7 +523,8 @@ class Abgabe extends FHCAPI_Controller
 			// TODO: what if paabgabe is a qualgate1, is benotet negativ and then its type is changed to gate2?
 			
 			$existingResult = $this->PaabgabeModel->load($paabgabe_id);
-			$existingPaabgabe = getData($existingResult);
+			$existingPaabgabeArr = getData($existingResult);
+			if(count($existingPaabgabeArr) > 0) $existingPaabgabe = $existingPaabgabeArr[0];
 			
 			$result = $this->PaabgabeModel->update(
 				$paabgabe_id,
@@ -528,7 +533,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
-					'notiz' => $notiz,
+					'beurteilungsnotiz' => $beurteilungsnotiz,
 					'upload_allowed' => $upload_allowed,
 					'updatevon' => getAuthUID(),
 					'updateamum' => date('Y-m-d H:i:s')
@@ -562,7 +567,7 @@ class Abgabe extends FHCAPI_Controller
 					$noteArr = $this->getDataOrTerminateWithError($result);
 					$note = $noteArr[0];
 					if($note->positiv === false) {
-						// do nothing since this means $notiz change or smth else
+						// do nothing since this means $beurteilungsnotiz change or smth else
 					} else { // benotung legitimately changed -> email
 						$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
 					}

@@ -12,10 +12,11 @@ export const AbgabetoolStudent = {
 		AbgabeDetail,
 		VerticalSplit
 	},
-	inject: ['isMobile', 'isViewMode'],
+	inject: ['isMobile'],
 	provide() {
 		return {
-			notenOptions: Vue.computed(() => this.notenOptions)
+			notenOptions: Vue.computed(() => this.notenOptions),
+			isViewMode: Vue.computed(() => this.isViewMode)
 		}
 	},
 	props: {
@@ -315,7 +316,7 @@ export const AbgabetoolStudent = {
 		dialogClass="modal-fullscreen">
 		<template v-slot:title>
 			<div>
-				abgabe detail todo phrasen
+				{{$p.t('abgabetool/c4abgabeStudentDetailTitle')}}
 			</div>
 		</template>
 		<template v-slot:default>
@@ -328,12 +329,12 @@ export const AbgabetoolStudent = {
 	<hr>
 	
 	<div v-if="projektarbeiten === null || projektarbeiten === []">
-		Keine Projektarbeiten gefunden!
+		{{$p.t('abgabetool/c4abgabeStudentNoProjectsFound')}}
 	</div>
 	
 	<Accordion :multiple="true" :activeIndex="[0]">
 		<template v-for="projektarbeit in projektarbeiten">
-			<AccordionTab :header="getAccTabHeaderForProjektarbeit(projektarbeit)" style="padding: 0px;">
+			<AccordionTab :header="getAccTabHeaderForProjektarbeit(projektarbeit)">
 					
 				<div class="row">
 					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4details')}}</div>

@@ -59,7 +59,7 @@ export default {
 				datum: termin.datum,
 				note: termin.note_pk,
 				upload_allowed: !!termin.upload_allowed,
-				notiz: termin.notiz ?? '',
+				beurteilungsnotiz: termin.beurteilungsnotiz ?? '',
 				fixtermin: termin.fixtermin,
 				insertvon: termin.insertvon,
 				kurzbz: termin.kurzbz,

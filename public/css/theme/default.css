@@ -38,10 +38,33 @@
 	--fhc-blue-primary: #006095;
 	--fhc-blue-primary-highlight: #0086CB;
 
-	--fhc-red-10: #842029;
-	--fhc-red-20: #800000;
+	/* --- Green --- */
+	--fhc-green-10: #dff4df;
+	--fhc-green-20: #a8e0a2;
+	--fhc-green-30: #008000;
+	--fhc-green-40: #006600;
+	--fhc-green-50: #004d00;
 
-	--fhc-green-10: #008000;
+	/* --- Red --- */
+	--fhc-red-10: #fde6e8;
+	--fhc-red-20: #f5a3a8;
+	--fhc-red-30: #842029;
+	--fhc-red-40: #600018;
+	--fhc-red-50: #400010;
+
+	/* --- Yellow --- */
+	--fhc-yellow-10: #fff9e6;
+	--fhc-yellow-20: #fff0b3;
+	--fhc-yellow-30: #ffeb3b;
+	--fhc-yellow-40: #f5d600;
+	--fhc-yellow-50: #c8aa00;
+
+	/* --- Pink --- */
+	--fhc-pink-10: #ffe6f0;
+	--fhc-pink-20: #f8c1d6;
+	--fhc-pink-30: #e91e63;
+	--fhc-pink-40: #c2185b;
+	--fhc-pink-50: #8b1050;
 
 	--fhc-beige-10: rgba(245, 233, 215, 0.5);
 	--fhc-beige-20: rgba(172, 153, 125, 0.5);

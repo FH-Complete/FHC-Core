@@ -447,7 +447,7 @@ export const AbgabetoolMitarbeiter = {
 			dialogClass="modal-fullscreen">
 			<template v-slot:title>
 				<div>
-					abgabe detail wtb phrasen
+					{{$p.t('abgabetool/c4abgabeMitarbeiterDetailTitle')}}
 				</div>
 			</template>
 			<template v-slot:default>
