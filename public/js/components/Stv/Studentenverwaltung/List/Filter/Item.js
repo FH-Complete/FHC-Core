@@ -50,7 +50,7 @@ export default {
 	},
 	methods: {
 		update() {
-			this.value = this.value;
+			this.$emit('update:modelValue', this.value);
 		}
 	},
 	template: /* html */`
