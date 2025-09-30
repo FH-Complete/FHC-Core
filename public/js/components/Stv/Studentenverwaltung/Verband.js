@@ -130,26 +130,14 @@ export default {
 
 			return cp;
 		},
-		async filterFav() {
+		filterFav() {
 			this.favorites.on = !this.favorites.on;
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(',\n');
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
-		async markFav(key) {
+		markFav(key) {
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
@@ -161,19 +149,7 @@ export default {
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = "\n" + result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(",\n");
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
