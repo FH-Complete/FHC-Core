@@ -111,19 +111,8 @@ const helperApp = Vue.createApp({
 	methods: {
 		mailToUrl(slotProps) {
 			let mailTo = FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto;
-			let subject = 'Meldung%20Systemfehler';
-			let body = `
-				Danke, dass Sie uns den Fehler melden. %0D%0A %0D%0A
-				Bitte beschreiben Sie uns ausführlich das Problem.%0D%0A
-				Bsp: Ich habe X ausgewählt und Y angelegt. Beim Speichern erhielt ich die Fehlermeldung. [Optional: Ich habe den Browser Z verwendet.]%0D%0A
-				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
-				PROBLEM: ... %0D%0A %0D%0A %0D%0A
-
-				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
-				Fehler URL: ` + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' + FHC_JS_DATA_STORAGE_OBJECT.called_method + `%0D%0A
-				Fehler Meldung: ` + slotProps.message.detail + `%0D%0A
-				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A %0D%0A
-				Wir kümmern uns um eine rasche Behebung des Problems!`
+			let subject = slotProps.message.mailsubject;
+			let body = slotProps.message.mailbody;
 
 			return "mailto:" + mailTo + "?subject=" + subject + "&body=" + body;
 		},
@@ -155,7 +144,7 @@ const helperApp = Vue.createApp({
 			<i class="fa fa-circle-exclamation fa-2xl mt-3"></i>
 			<div class="p-toast-message-text">
 				<span class="p-toast-summary">{{slotProps.message.summary}}</span>
-				<div class="p-toast-detail my-3">Sorry! Ein interner technischer Fehler ist aufgetreten.</div>
+				<div class="p-toast-detail my-3">{{slotProps.message.subtitle}}</div>
 				<div class="d-flex justify-content-between align-items-center">
 					<a
 						class="align-bottom flex-fill me-2"
@@ -166,7 +155,7 @@ const helperApp = Vue.createApp({
 						:aria-controls="'fhcAlertCollapseMessageCard' + slotProps.message.id"
 						@click="openMessagecard"
 						>
-						Fehler anzeigen
+						{{slotProps.message.showbutton}}
 					</a>
 					<a
 						v-if="showmaillink"
@@ -174,7 +163,7 @@ const helperApp = Vue.createApp({
 						target="_blank"
 						:href="mailToUrl(slotProps)"
 						>
-						Fehler melden
+						{{slotProps.message.mailbutton}}
 					</a>
 				</div>
 				<div ref="messageCard" :id="'fhcAlertCollapseMessageCard' + slotProps.message.id" class="collapse mt-3">
@@ -216,23 +205,29 @@ export default {
 			alertWarning(message) {
 				if (Array.isArray(message))
 					return message.forEach(this.alertWarning);
-				helperAppInstance.$refs.toast.add({ severity: 'warn', summary: 'Achtung', detail: message});
+				helperAppInstance.$refs.toast.add({ severity: 'warn', summary: Vue.computed(() => app.config.globalProperties.$p.t('alert/attention')), detail: message});
 			},
 			alertError(message) {
 				if (Array.isArray(message))
 					return message.forEach(this.alertError);
-				helperAppInstance.$refs.toast.add({ severity: 'error', summary: 'Achtung', detail: message });
+				helperAppInstance.$refs.toast.add({ severity: 'error', summary: Vue.computed(() => app.config.globalProperties.$p.t('alert/attention')), detail: message });
 			},
 			alertSystemError(message) {
 				//TODO(Manu) for translation of content of template: restructure in data
 				//and update definitions with  translations
-
 				if (Array.isArray(message))
 					return message.forEach(this.alertSystemError);
 				helperAppInstance.$refs.alert.add({
 					severity: 'error',
 					summary: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerror')),
-					detail: message});
+					detail: message,
+					subtitle: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerrorsubtitle')),
+					showbutton: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerroranzeigen')),
+					mailbutton: Vue.computed(() => app.config.globalProperties.$p.t('alert/systemerrormelden')),
+					mailbody: Vue.computed(() => app.config.globalProperties.$p.t('alert', 'mailbody', {0: (FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' + FHC_JS_DATA_STORAGE_OBJECT.called_method), 1: message})),
+					mailsubject: Vue.computed(() => app.config.globalProperties.$p.t('alert', 'mailsubject')),
+
+				});
 			},
 			confirmDelete() {
 				return new Promise((resolve, reject) => {
@@ -288,7 +283,7 @@ export default {
 				}
 				return false;
 			},
-			handleSystemError(error) {
+			async handleSystemError(error) {
 				// don't show an error message to the user if the error was an aborted request
 				if(error.hasOwnProperty('name') && error.name.toLowerCase() === "AbortError".toLowerCase())
 					return;
@@ -304,36 +299,37 @@ export default {
 				// Error has been handled already
 				if (error.hasOwnProperty('handled') && error.handled)
 					return;
-				
+
+				await app.config.globalProperties.$p.loadCategory('alert');
 				// Error is object
 				if (typeof error === 'object' && error !== null) {
 					let errMsg = '';
 
 
 					if (error.hasOwnProperty('response') && error.response?.data?.retval)
-						errMsg += 'Error Message: ' + (error.response.data.retval.message || error.response.data.retval) + '\r\n';
+						errMsg += app.config.globalProperties.$p.t('alert/systemerrormsg') + ': ' + (error.response.data.retval.message || error.response.data.retval) + '\r\n';
 					else if (error.hasOwnProperty('message'))
-						errMsg += 'Error Message: ' + error.message.toUpperCase() + '\r\n';
+						errMsg += app.config.globalProperties.$p.t('alert/systemerrormsg') + ': ' + error.message.toUpperCase() + '\r\n';
 
 					if (error.hasOwnProperty('config') && error.config.hasOwnProperty('url'))
-						errMsg += 'Error ConfigURL: ' + error.config.url + '\r\n';
+						errMsg += app.config.globalProperties.$p.t('alert/error') + ' ConfigURL: ' + error.config.url + '\r\n';
 
 					if (error.hasOwnProperty('stack'))
-						errMsg += 'Error Stack: ' + error.stack + '\r\n';
+						errMsg += app.config.globalProperties.$p.t('alert/error') + ' Stack: ' + error.stack + '\r\n';
 					
 					// Fallback object error message
 					if (errMsg == '')
-						errMsg = 'Error Message: ' + JSON.stringify(error) + '\r\n';
+						errMsg = app.config.globalProperties.$p.t('alert/systemerrormsg') + ': ' + JSON.stringify(error) + '\r\n';
 
-					errMsg += 'Error Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' + FHC_JS_DATA_STORAGE_OBJECT.called_method;
+					errMsg += app.config.globalProperties.$p.t('alert/error') + ' Controller ' + app.config.globalProperties.$p.t('alert/path') + ': ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' + FHC_JS_DATA_STORAGE_OBJECT.called_method;
 
 					return $fhcAlert.alertSystemError(errMsg);
 				}
 
 				// Fallback
-				$fhcAlert.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' + FHC_JS_DATA_STORAGE_OBJECT.called_method);
+				$fhcAlert.alertSystemError(app.config.globalProperties.$p.t('alert/errorfallback') + '\r\n'+ app.config.globalProperties.$p.t('alert/error') + ' Controller '+ app.config.globalProperties.$p.t('alert/path') +': ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
 			},
-			handleSystemMessage(message) {
+			async handleSystemMessage(message) {
 				// Message is string
 				if (typeof message === 'string')
 					return $fhcAlert.alertWarning(message);
@@ -367,8 +363,9 @@ export default {
 					return;
 				}
 
+				await app.config.globalProperties.$p.loadCategory('alert');
 				// Fallback
-				$fhcAlert.alertSystemError('alertSystemError throws Generic Error\r\nError Controller Path: ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
+				$fhcAlert.alertSystemError(app.config.globalProperties.$p.t('alert/errorfallback') + '\r\n'+ app.config.globalProperties.$p.t('alert/error') + ' Controller '+ app.config.globalProperties.$p.t('alert/path') +': ' + FHC_JS_DATA_STORAGE_OBJECT.called_path + '/' +  FHC_JS_DATA_STORAGE_OBJECT.called_method);
 			},
 			resetFormValidation(form) {
 				const event = new Event('fhc-form-reset');

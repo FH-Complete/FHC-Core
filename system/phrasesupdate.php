@@ -48267,6 +48267,206 @@ and represent the current state of research on the topic. The prescribed citatio
 	),
 	array(
 		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'systemerrorsubtitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sorry! Ein interner technischer Fehler ist aufgetreten.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sorry! An internal technical error occurred.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'systemerroranzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'systemerrormelden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler melden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Report error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'systemerrormsg',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehlermeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error Message',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'error',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'path',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pfad',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Path',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'errorfallback',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'alertSystemError wirft generischen Fehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'alertSystemError throws Generic Error',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'mailsubject',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Meldung%20Systemfehler',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'System%20Error%20Message',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'alert',
+		'phrase' => 'mailbody',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Danke, dass Sie uns den Fehler melden. %0D%0A %0D%0A
+				Bitte beschreiben Sie uns ausführlich das Problem.%0D%0A
+				Bsp: Ich habe X ausgewählt und Y angelegt. Beim Speichern erhielt ich die Fehlermeldung. [Optional: Ich habe den Browser Z verwendet.]%0D%0A
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
+				PROBLEM: ... %0D%0A %0D%0A %0D%0A
+
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
+				Fehler URL: {0} %0D%0A
+				Fehler Meldung: {1} %0D%0A
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A %0D%0A
+				Wir kümmern uns um eine rasche Behebung des Problems!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Thank you for reporting this error. %0D%0A %0D%0A
+				Please describe the problem in detail.%0D%0A
+				Example: I selected X and created Y. When saving, I received the error message. [Optional: I used browser Z.]%0D%0A
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
+				PROBLEM: ... %0D%0A %0D%0A %0D%0A
+
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A
+				Error URL: {0} %0D%0A
+				Error Message: {1} %0D%0A
+				-----------------------------------------------------------------------------------------------------------------------------------%0D%0A %0D%0A
+				We will make sure the problem is resolved quickly!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
 		'category' => 'ui',
 		'phrase' => 'chooseStudent',
 		'insertvon' => 'system',
