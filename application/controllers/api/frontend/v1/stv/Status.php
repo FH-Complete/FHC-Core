@@ -733,8 +733,9 @@ class Status extends FHCAPI_Controller
 				);
 
 			$result = $this->prestudentstatuschecklib->checkIfMeldestichtagErreicht($oldstatus->datum);
+			$isMeldestichtagErreicht = $this->getDataOrTerminateWithError($result);
 
-			if (!$this->getDataOrTerminateWithError($result))
+			if ($isMeldestichtagErreicht)
 				$this->terminateWithError(
 					$this->p->t('lehre', 'error_dataVorMeldestichtag'),
 					self::ERROR_TYPE_GENERAL,
