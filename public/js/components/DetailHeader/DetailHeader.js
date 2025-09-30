@@ -1,7 +1,12 @@
 import ApiDetailHeader from "../../api/factory/detailHeader.js";
+import ApiHandleFoto from "../../api/factory/fotoHandling.js";
+import ModalUploadFoto from "./Modal/UploadFoto.js";
 
 export default {
 	name: 'DetailHeader',
+	components: {
+		ModalUploadFoto
+	},
 	inject: {
 		domain: {
 			from: 'configDomain',
@@ -20,6 +25,11 @@ export default {
 		mitarbeiter_uid: {
 			type: String,
 			required: false
+		},
+		fotoEditable: {
+			type: Boolean,
+			required: false,
+			default: false
 		},
 		typeHeader: {
 			type: String,
@@ -44,26 +54,14 @@ export default {
 	},
 	created(){
 		if(this.person_id) {
-			this.getHeader(this.person_id);
-			this.loadDepartmentData(this.mitarbeiter_uid)
-				.then(() => {
-					// Call getLeitungOrg only after departmentData is loaded
-					this.getLeitungOrg(this.departmentData.oe_kurzbz);
-				})
-				.catch((error) => {
-					console.error("Error loading department data: ", error);
-				});
+			this.loadHeaderData();
 		}
 	},
 	watch: {
 		person_id: {
 			handler(newVal) {
 				if (newVal) {
-					this.getHeader(this.person_id);
-					this.loadDepartmentData(this.mitarbeiter_uid).
-					then(() => {
-						this.getLeitungOrg(this.departmentData.oe_kurzbz);
-					});
+					this.loadHeaderData();
 				}
 			},
 			deep: true,
@@ -74,9 +72,21 @@ export default {
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
+			isFetchingIssues: false
 		};
 	},
 	methods: {
+		loadHeaderData(){
+			this.getHeader(this.person_id);
+			this.loadDepartmentData(this.mitarbeiter_uid)
+				.then(() => {
+					// Call getLeitungOrg only after departmentData is loaded
+					this.getLeitungOrg(this.departmentData.oe_kurzbz);
+				})
+				.catch((error) => {
+					console.error("Error loading header data: ", error);
+				});
+		},
 		getHeader(person_id) {
 			return this.$api
 				.call(ApiDetailHeader.getHeader(person_id))
@@ -107,17 +117,63 @@ export default {
 				person_id: this.leitungData.person_id,
 				uid: this.leitungData.uid
 			});
-		}
+		},
+		showModal(person_id){
+			this.$refs.modalFoto.open(person_id);
+		},
+		showDeleteModal(person_id){
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? person_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteFoto)
+				.catch(this.$fhcAlert.handleSystemError);
+			},
+		deleteFoto(person_id){
+			return this.$api
+				.call(ApiHandleFoto.deleteFoto(person_id))
+				.then(result => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					this.reload();
+				});
+		},
+		reload() {
+			if(this.person_id) {
+				this.loadHeaderData();
+			}
+			else {
+				this.$emit('reload');
+			}
+		},
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
+
+			<modal-upload-foto
+				v-if="person_id"
+				ref="modalFoto"
+				:person_id="person_id"
+				@reload="reload"
+			>
+			</modal-upload-foto>
+			<modal-upload-foto
+				v-else
+				ref="modalFoto"
+				:person_id="headerData[0].person_id"
+				@reload="reload"
+			>
+			</modal-upload-foto>
 
 			<template v-if="typeHeader==='student'">
 
 				<div
 					v-for="person in headerData"
 					:key="person.person_id"
-					class="d-flex flex-column align-items-center h-100 position-relative d-inline-block"
+					class="foto-container d-flex flex-column align-items-center h-100 position-relative d-inline-block"
 				>
 					<img
 					  class="d-block h-100 rounded"
@@ -130,6 +186,22 @@ export default {
 						  class=" fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
 						  style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
 						></i>
+					</template>
+					<template v-if="fotoEditable">
+						<button
+							type="button"
+							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
+							style="z-index: 4; font-size: 1rem; width: 1.5rem; height: 1.5rem; opacity:0; transition: opacity 0.2s; top:20%; left:2rem;"
+							@click="showDeleteModal(headerData[0].person_id)">
+							<i class="fa fa-xmark"></i>
+						</button>
+						<button
+							type="button"
+							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
+							style="z-index: 4; font-size: 1rem; width: 1.5rem; height: 1.5rem; opacity:0; transition: opacity 0.2s; top:20%; right:2rem;"
+							@click="showModal(headerData[0].person_id)">
+							<i class="fa fa-pen"></i>
+						</button>
 					</template>
 					<small class="text-muted">{{person.uid}}</small>
 				</div>
@@ -171,8 +243,8 @@ export default {
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
-
-				<div class="col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
+		
+				<div class="foto-container col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
 					  class="d-block w-100 h-100 rounded"
 					  alt="Profilbild"
@@ -184,6 +256,22 @@ export default {
 						  class=" fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
 						  style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
 						></i>
+					</template>
+					<template v-if="fotoEditable">
+						<button
+							type="button"
+							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
+							style="z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
+							@click="showDeleteModal(person_id)">
+							<i class="fa fa-xmark"></i>
+						</button>
+						<button
+							type="button"
+							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
+							style="z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
+							@click="showModal(person_id)">
+							<i class="fa fa-pen"></i>
+						</button>
 					</template>
 				</div>
 
@@ -213,6 +301,11 @@ export default {
 
 				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
 					<div class="d-flex py-1">
+					<!--  TODO slots for Issue Tracking and Tags
+						<class="px-2">
+							<h4 class="mb-1">Issues<a class="refresh-issues" title="checkIssues Person" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
+							<h6 v-if="!isFetchingIssues" class="text-muted">122</h6>
+						</div> -->
 						<div class="px-2">
 							<h4 class="mb-1">PNr</h4>
 							<h6 class="text-muted">{{ headerDataMa?.person_id }}</h6>

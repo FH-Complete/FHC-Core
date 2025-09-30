@@ -18,3 +18,7 @@ html {
 .vv {
 	margin-left: 0 !important;
 }
+
+.foto-container:hover .fotoedit {
+    opacity: 1 !important;
+}

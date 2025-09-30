@@ -371,7 +371,7 @@ export default {
 							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
 						</template>
 						<template #bottom>
-							<stv-details ref="details" :students="selected"></stv-details>
+							<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
 						</template>
 					</vertical-split>
 				</main>

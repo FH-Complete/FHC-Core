@@ -41,7 +41,10 @@ export default {
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
-		}
+		},
+		reloadList() {
+			this.$emit('reload');
+		},
 	},
 	created() {
 		this.$api
@@ -67,6 +70,7 @@ export default {
 			<fhc-header
 				:headerData="students"
 				typeHeader="student"
+				@reload="reloadList"
 			>
 			</fhc-header>
 			<fhc-tabs

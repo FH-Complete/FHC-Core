@@ -159,3 +159,7 @@ html {
 .tiny-90 div.tox.tox-tinymce {
 	height: 90% !important;
 }
+
+.foto-container:hover .fotoedit {
+    opacity: 1 !important;
+}

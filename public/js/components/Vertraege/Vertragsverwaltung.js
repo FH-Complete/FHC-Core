@@ -63,6 +63,7 @@ export default {
 							:person_id="person_id"
 							:mitarbeiter_uid="this.mitarbeiter_uid"
 							typeHeader="mitarbeiter"
+							fotoEditable
 							@redirectToLeitung="redirectToLeitung"
 						></fhc-header>
 						<vertraege-mitarbeiter
