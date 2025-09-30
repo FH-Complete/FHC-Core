@@ -44,7 +44,6 @@ class Students extends FHCAPI_Controller
 		}
 
 		// Load Libraries
-		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 		$this->load->library('PhrasesLib');
 		$this->loadPhrases(
 			array(
@@ -854,40 +853,20 @@ class Students extends FHCAPI_Controller
 	 */
 	protected function addFilter($studiensemester_kurzbz)
 	{
-		$filter = json_decode($this->input->get('filter'), true);
+		$filter = $this->input->post('filter');
+		
 		if (!is_array($filter))
 		{
-			$this->addMeta('addfilter', 'invalid filter: ' . $this->input->get('filter'));
+			$this->addMeta('addfilter', 'invalid filter: ' . json_encode($this->input->post('filter')));
 			return;
 		}
-		if (isset($filter['konto_count_0'])) {
-			$bt = $this->PrestudentModel->escape($filter['konto_count_0']);
-			$stdsem = $this->PrestudentModel->escape($studiensemester_kurzbz);
-
-			$this->PrestudentModel->db->where('(
-				SELECT count(*) 
-				FROM public.tbl_konto 
-				WHERE person_id=tbl_prestudent.person_id 
-				AND buchungstyp_kurzbz=' . $bt . ' 
-				AND studiensemester_kurzbz=' . $stdsem . '
-			) =', 0);
-			$this->PrestudentModel->db->where('get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) !=', 'Incoming');
-		}
-		if (isset($filter['konto_missing_counter'])) {
-			$bt = $this->PrestudentModel->escape($filter['konto_missing_counter']);
-			$stg = '';
-			if ($this->variablelib->getVar('kontofilterstg') == 'true')
-				$stg = ' AND studiengang_kz=tbl_prestudent.studiengang_kz';
-
-			$bt = $bt == 'alle' ? '' : ' AND buchungstyp_kurzbz=' . $bt;
-
-			$this->PrestudentModel->db->where('(
-				SELECT sum(betrag) 
-				FROM public.tbl_konto 
-				WHERE person_id=tbl_prestudent.person_id' .
-				$bt .
-				$stg . '
-			) !=', 0);
+		foreach ($filter as $item) {
+			if (isset($item['usestdsem']) && $item['usestdsem'])
+				$item['studiensemester_kurzbz'] = $studiensemester_kurzbz;
+			if (!$this->PrestudentModel->addFilter($item)) {
+				$this->addMeta('addfilter', 'invalid filter: ' . json_encode($item));
+				return;
+			}
 		}
 	}
 }
