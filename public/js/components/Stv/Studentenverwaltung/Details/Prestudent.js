@@ -318,6 +318,7 @@ export default {
 						name="zgvnation"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -380,6 +381,7 @@ export default {
 						name="zgvmanation"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -443,6 +445,7 @@ export default {
 						name="zgvdoktornation"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -504,6 +507,7 @@ export default {
 						v-model="data.berufstaetigkeit_code"
 						name="berufstaetigkeit_code"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="beruf in listBerufe" :key="beruf.berufstaetigkeit_code" :value="beruf.berufstaetigkeit_code">{{beruf.berufstaetigkeit_bez}} </option>
 					</form-input>
 					<form-input
@@ -514,6 +518,7 @@ export default {
 						v-model="data.ausbildungcode"
 						name="ausbildungcode"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="ausbld in listAusbildung" :key="ausbld.ausbildungcode" :value="ausbld.ausbildungcode">{{ausbld.ausbildungbez}} </option>
 					</form-input>
 				</div>
