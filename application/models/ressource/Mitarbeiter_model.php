@@ -430,4 +430,18 @@ class Mitarbeiter_model extends DB_Model
 
 		return $this->execQuery($qry, $parametersArray);
 	}
+
+	public function isLehrauftragFirma($mitarbeiter_uid)
+	{
+		$this->addSelect('firma_id');
+		$this->addJoin('public.tbl_benutzer', 'uid = mitarbeiter_uid');
+		$this->addJoin('public.tbl_person', 'person_id');
+		$this->addJoin('public.tbl_adresse', 'person_id', 'LEFT');
+		$this->addOrder('zustelladresse', 'DESC');
+		$this->addOrder('firma_id');
+		$this->addLimit(1);
+		$firma_result = $this->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid));
+		$firma = getData($firma_result)[0]->firma_id;
+		return !is_null($firma);
+	}
 }

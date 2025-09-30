@@ -106,6 +106,7 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
 		$this->PrestudentModel->addSelect('p.matr_nr');
 		$this->PrestudentModel->addSelect('p.anrede');
+		$this->PrestudentModel->addSelect('p.zugangscode');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -253,7 +254,6 @@ class Student extends FHCAPI_Controller
 			'gebdatum',
 			'gebort',
 			'geburtsnation',
-			'svnr',
 			'ersatzkennzeichen',
 			'staatsbuergerschaft',
 			'matr_nr',
@@ -276,7 +276,17 @@ class Student extends FHCAPI_Controller
 		$update_person = array();
 		foreach ($array_allowed_props_person as $prop) {
 			$val = $this->input->post($prop);
-			if ($val !== null) {
+			if ($val === null)
+			{
+				continue;
+			}
+			if($prop == 'foto')
+			{
+				$fotoval = ($val == '') ? null : str_replace('data:image/jpeg;base64,', '', $val);
+				$update_person[$prop] = $fotoval;
+			}
+			else
+			{
 				$update_person[$prop] = $val;
 			}
 		}
@@ -693,7 +703,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		$this->terminateWithSuccess(true);
+		return success(true);
 	}
 
 	public function requiredIfNotPersonId($value)
@@ -708,5 +718,10 @@ class Student extends FHCAPI_Controller
 		if (!$_POST['address']['func'])
 			return true;
 		return !!$value;
+	}
+
+	public function isValidDate($value)
+	{
+		return isValidDate($value);
 	}
 }

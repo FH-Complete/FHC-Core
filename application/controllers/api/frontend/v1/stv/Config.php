@@ -62,10 +62,15 @@ class Config extends FHCAPI_Controller
 			'component' => './Stv/Studentenverwaltung/Details/Details.js',
 			'config' => $config['details']
 		];
+
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
-			'component' => './Stv/Studentenverwaltung/Details/Notizen.js'
+			'component' => './Stv/Studentenverwaltung/Details/Notizen.js',
+			'config'	=> $config['notes'],
+			'showSuffix' => ($config['notes']['showCountNotes'] ?? false),
+			'suffixhelper' => APP_ROOT . 'public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js'
 		];
+
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
 			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',
@@ -179,7 +184,9 @@ class Config extends FHCAPI_Controller
 			return $result;
 		});
 
-		$this->terminateWithSuccess($result);
+		$sortConfig = $this->config->item('student_tab_order');
+
+		$this->terminateWithSuccess($this->sortTabList($result, $sortConfig));
 	}
 
 	public function students()
@@ -226,7 +233,9 @@ class Config extends FHCAPI_Controller
 			return $result;
 		});
 
-		$this->terminateWithSuccess($result);
+		$sortConfig = $this->config->item('students_tab_order');
+
+		$this->terminateWithSuccess($this->sortTabList($result, $sortConfig));
 	}
 
 	protected function kontoColumns()
@@ -501,5 +510,35 @@ class Config extends FHCAPI_Controller
 		];
 
 		return $list;
+	}
+
+	/**
+	 * Sort tab list
+	 *
+	 * @param array		$input
+	 * @param array		$config
+	 *
+	 * @return array
+	 */
+	protected function sortTabList($input, $config)
+	{
+		// prepare config
+		if (!$config || !is_array($config))
+			$config = [];
+		else
+			$config = array_flip($config);
+
+		// fill missing items in config
+		foreach (array_keys($input) as $key) {
+			if (!isset($config[$key]))
+				$config[$key] = count($config);
+		}
+
+		// do the sorting
+		uksort($input, function ($a, $b) use ($config) {
+			return $config[$a] - $config[$b];
+		});
+		
+		return $input;
 	}
 }

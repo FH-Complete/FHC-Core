@@ -159,7 +159,7 @@ export default {
 		// this.$emit('setConfig', true); -> use this to enable widget config mode if needed
 	},
 	template: /*html*/ `
-    <div class="widgets-url w-100 h-100 overflow-scroll" style="padding: 1rem 1rem;">
+    <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
         	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 

@@ -44,11 +44,16 @@ export default {
 	},
 	watch: {
 		currentDate() {
-			this.rangeOffset = this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days;
-			if (this.rangeOffset) {
-				this.$refs.view.$refs.grid.disableAutoScroll();
+			if (this.currentDate.locale != this.focusDate.locale) {
+				this.focusDate = this.currentDate;
 				this.$emit('update:range', this.range);
-				this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+			} else {
+				this.rangeOffset = this.currentDate.startOf('day').diff(this.focusDate.startOf('day'), 'days').days;
+				if (this.rangeOffset) {
+					this.$refs.view.$refs.grid.disableAutoScroll();
+					this.$emit('update:range', this.range);
+					this.$refs.slider.slidePages(this.rangeOffset).then(this.updatePage);
+				}
 			}
 		}
 	},

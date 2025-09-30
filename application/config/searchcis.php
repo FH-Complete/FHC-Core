@@ -27,7 +27,7 @@ $config['student']['resultfields'] = [
 	"(p.vorname || ' ' || p.nachname) AS name",
 	"ARRAY[s.student_uid || '@' || '" . DOMAIN . "'] AS email",
 	"CASE
-		WHEN p.foto IS NOT NULL THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
+		WHEN (p.foto_sperre = false AND p.foto IS NOT NULL) THEN 'data:image/jpeg' || CONVERT_FROM(DECODE('3b','hex'), 'UTF8') || 'base64,' || p.foto
 		ELSE NULL END
 		AS photo_url",
 	"b.aktiv"
