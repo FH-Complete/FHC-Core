@@ -205,7 +205,8 @@ class Config extends FHCAPI_Controller
 		];
 		$result['groups'] = [
 			'title' => $this->p->t('stv', 'tab_groups'),
-			'component' => './Stv/Studentenverwaltung/Details/Groups.js'
+			'component' => './Stv/Studentenverwaltung/Details/Groups.js',
+			'showOnlyWithUid' => true
 		];
 		$result['status'] = [
 			'title' => 'Status',
