@@ -386,6 +386,37 @@ class Lehrveranstaltung_model extends DB_Model
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
 	}
+
+	/**
+	 * Get LV-Leitung of given Lehrveranstaltung ID and Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester
+	 * @return array|stdClass|null
+	 */
+	public function getLvLeitung($lehrveranstaltung_id, $studiensemester)
+	{
+		$params = [$lehrveranstaltung_id, $studiensemester];
+
+		$qry = "
+			SELECT
+				vorname, nachname, mitarbeiter_uid, lehrfunktion_kurzbz
+			FROM
+				lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				JOIN public.tbl_benutzer b ON b.uid = lema.mitarbeiter_uid
+				JOIN public.tbl_person p using (person_id) 
+			WHERE
+				tbl_lehreinheit.lehrveranstaltung_id= ?
+				AND tbl_lehreinheit.studiensemester_kurzbz = ?
+				AND lehrfunktion_kurzbz = 'LV-Leitung'
+            ORDER BY 
+                lema.insertamum DESC
+			LIMIT 1
+		";
+
+		return $this->execQuery($qry, $params);
+	}
 	/**
 	 * Gets all Leiter of Lehrveranstaltungsorganisationseinheit
 	 * @param $lehrveranstaltung_id
