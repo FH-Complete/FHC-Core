@@ -242,7 +242,7 @@ class Documents extends Auth_Controller
 				$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 				$result = $this->StudiengangModel->load($this->input->post_get('stg_kz'));
 				if (!isError($result) && hasData($result))
-				$filename .= '_' . sanitizeProblemChars(current(getData($result))->kurzbzlang);
+					$filename .= '_' . sanitizeProblemChars(current(getData($result))->kurzbzlang);
 
 				$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 				$result = $this->StudiensemesterModel->load($this->input->post_get('ss'));
