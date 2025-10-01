@@ -19,10 +19,24 @@ export default {
 			if (this.action.type === 'function')
 				this.action.action(this.res);
 			this.$emit('actionexecuted');
+		},
+		renderif: function() {
+			if(this.action?.renderif === undefined) {
+				return true;
+			}
+
+			return this.action.renderif(this.res);
 		}
 	},
 	template: `
+	<template v-if="this.renderif()">
 	<a class="searchbar-result-template-action" :href="actionHref" @click="actionFunc">
 		<slot>{{ $p.t('search/action_default_label') }}</slot>
-	</a>`
+	</a>
+	</template>
+	<template v-else>
+	<div class="searchbar-result-template-action">
+		<slot>{{ $p.t('search/action_default_label') }}</slot>
+	</div>
+	</template>`
 };
