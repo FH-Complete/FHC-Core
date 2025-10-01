@@ -33,6 +33,7 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
+			'filter' => ['admin:r', 'assistenz:r'],
 			'student' => ['admin:r', 'assistenz:r'],
 			'students' => ['admin:r', 'assistenz:r']
 		]);
@@ -51,6 +52,158 @@ class Config extends FHCAPI_Controller
 
 		// Load Config
 		$this->load->config('stv');
+	}
+
+	/**
+	 * Get the config for the student filters
+	 *
+	 * @return void
+	 */
+	public function filter()
+	{
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+
+		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
+
+		$this->BuchungstypModel->addOrder('beschreibung');
+		
+		$result = $this->BuchungstypModel->load();
+
+		$buchungstyp_kurzbz = $this->getDataOrTerminateWithError($result);
+		$buchungstyp_kurzbz_plus_all = array_merge([[
+			'buchungstyp_kurzbz' => 'all',
+			'beschreibung' => $this->p->t('stv', 'konto_all_types')
+		]], $buchungstyp_kurzbz);
+
+		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+
+		$result = $this->StatusgrundModel->getAktiveGruende();
+		
+		$statusgruende = $this->getDataOrTerminateWithError($result);
+
+		$result = [];
+
+		$result[] = [
+			'id' => 'filter_konto_count_0',
+			'label' => $this->p->t('stv', 'filter_konto_count_0'),
+			'type' => 'konto',
+			'fixed' => [
+				'missing' => true,
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_counter',
+			'label' => $this->p->t('stv', 'filter_konto_missing_counter'),
+			'type' => 'konto_counter',
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz_plus_all,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				],
+				'samestg' => [
+					'type' => 'bool',
+					'label' => $this->p->t('stv', 'filter_konto_samestg'),
+					'default' => $this->variablelib->getVar('kontofilterstg') == 'true'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_documents',
+			'label' => $this->p->t('stv', 'filter_documents'),
+			'type' => 'documents'
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_counter_past',
+			'label' => $this->p->t('stv', 'filter_konto_missing_counter_past'),
+			'type' => 'konto_counter',
+			'fixed' => [
+				'past' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz_plus_all,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				],
+				'samestg' => [
+					'type' => 'bool',
+					'label' => $this->p->t('stv', 'filter_konto_samestg'),
+					'default' => $this->variablelib->getVar('kontofilterstg') == 'true'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_studiengebuehr',
+			'label' => $this->p->t('stv', 'filter_konto_missing_studiengebuehr'),
+			'type' => 'konto',
+			'fixed' => [
+				'missing' => true,
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_studiengebuehrerhoeht',
+			'label' => $this->p->t('stv', 'filter_konto_studiengebuehrerhoeht'),
+			'type' => 'konto',
+			'fixed' => [
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_zgv_without_date',
+			'label' => $this->p->t('stv', 'filter_zgv_without_date'),
+			'type' => 'zgv'
+		];
+		$result[] = [
+			'id' => 'filter_statusgrund',
+			'label' => $this->p->t('stv', 'filter_statusgrund'),
+			'type' => 'statusgrund',
+			'fixed' => [
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'statusgrund_id' => [
+					'type' => 'select',
+					'values' => $statusgruende,
+					'value_key' => 'statusgrund_id',
+					'label_key' => 'bezeichnung'
+				]
+			]
+		];
+
+		Events::trigger('stv_conf_filter', function & () use (&$result) {
+			return $result;
+		});
+
+		$this->terminateWithSuccess($result);
 	}
 
 	public function student()
