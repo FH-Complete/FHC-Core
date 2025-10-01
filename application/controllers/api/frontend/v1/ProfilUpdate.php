@@ -577,8 +577,7 @@ class ProfilUpdate extends FHCAPI_Controller
 	{
 		// early return if no status has been passed as argument
 		if (!isset($status)) {
-			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());
-			return;
+			$this->terminateWithSuccess($this->ProfilUpdateModel->getProfilUpdateWithPermission());
 		}
 
 		// get the sprache of the user
@@ -591,7 +590,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$status = hasData($status) ? getData($status)[0]->status_kurzbz : null;
 			$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status) ? ['status' => $status] : null);
 
-			echo json_encode($res);
+			$this->terminateWithSuccess($res);
 		}
 	}
 
@@ -645,6 +644,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
 				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
 				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+				$this->StudentModel->addGroupBy(["public.tbl_studiengang.email"]);
 				//* check if the benutzer itself is active
 				//* check if the student status is Student or Diplomand (active students)
 				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz", ['Student', 'Diplomand']);
@@ -661,8 +661,10 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		$mail_res = [];
 		//? sending email
-		foreach ($emails as $email) {
-			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => APP_ROOT . 'Cis/ProfilUpdate/id/' . $profil_update_id], $email, ("Profil Änderung von " . $uid)));
+		foreach ($emails as $email)
+		{
+			$href = $this->config->item('cis_vilesci_base_url') . $this->config->item('cis_vilesci_index_page') . '/Cis/ProfilUpdate/id/' . $profil_update_id;
+			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => $href], $email, ("Profil Änderung von " . $uid)));
 		}
 		foreach ($mail_res as $m_res) {
 			if (!$m_res) {
@@ -685,21 +687,21 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		function languageQuery($language)
 		{
-			return "select index from public.tbl_sprache where sprache = '" + $language + "'";
+			return "select index from public.tbl_sprache where sprache = '" . $language . "'";
 		}
 
 		$this->ProfilUpdateStatusModel->addSelect(["bezeichnung_mehrsprachig[(" . languageQuery('German') . ")] as status_de", "bezeichnung_mehrsprachig[(" . languageQuery('English') . ")] as status_en"]);
 		
 		$status_translation = $this->ProfilUpdateStatusModel->loadWhere(["status_kurzbz" => $status]);
-		
 		if (isError($status_translation)) {
 			$this->terminateWithError($this->p->t('profilUpdate', 'ProfilUpdateStatusTranslationError'));
 		}
 
 		$status_translation = hasData($status_translation) ? getData($status_translation)[0] : null;
-
-		if (isset($status_translation)) {
-			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => APP_ROOT . 'Cis/Profil'], $email, ("Profil Änderung " . $this->p->t('profilUpdate', 'pending')));
+		if (isset($status_translation))
+		{
+			$href = $this->config->item('cis_base_url') . $this->config->item('cis_index_page') . '/Cis/Profil';
+			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => $href], $email, ("Profil Änderung " . $status_translation->status_de . ' / Profile Update ' . $status_translation->status_en));
 			if (!$mail_res) {
 				$this->addError($this->p->t('profilUpdate', 'profilUpdate_email_error'));
 			}

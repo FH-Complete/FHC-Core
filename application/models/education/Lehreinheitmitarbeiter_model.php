@@ -10,6 +10,14 @@ class Lehreinheitmitarbeiter_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_lehreinheitmitarbeiter';
 		$this->pk = array('mitarbeiter_uid', 'lehreinheit_id');
+		$this->hasSequence = false;
+
+		$this->load->model('accounting/Vertrag_model', 'VertragModel');
+		$this->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+		$this->load->model('ressource/stundenplan_model', 'StundenplanModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 	}
 
     /**
@@ -74,5 +82,68 @@ class Lehreinheitmitarbeiter_model extends DB_Model
             'studiensemester_kurzbz' => $studiensemester_kurzbz
         ]);
     }
+
+	public function getLektorenByLe($lehreinheit_id)
+	{
+		$this->addSelect('vorname, nachname, tbl_lehreinheitmitarbeiter.*, stundenplan.verplant');
+		$this->addJoin('tbl_benutzer', 'uid = mitarbeiter_uid');
+		$this->addJoin('tbl_person', 'person_id');
+
+		$this->addJoin('(
+			SELECT 1 as verplant, lehreinheit_id, mitarbeiter_uid
+			FROM lehre.tbl_stundenplandev
+			GROUP BY lehreinheit_id, mitarbeiter_uid
+			
+		) stundenplan', 'stundenplan.mitarbeiter_uid = tbl_lehreinheitmitarbeiter.mitarbeiter_uid AND stundenplan.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id', 'LEFT');
+
+		return $this->loadWhere(array('tbl_lehreinheitmitarbeiter.lehreinheit_id' => $lehreinheit_id));
+	}
+
+	public function getByLeLektor($lehreinheit_id, $mitarbeiter_uid)
+	{
+		$this->addSelect('vorname, nachname, tbl_lehreinheitmitarbeiter.*');
+		$this->addJoin('tbl_benutzer', 'uid = mitarbeiter_uid');
+		$this->addJoin('tbl_person', 'person_id');
+		return $this->loadWhere(array('tbl_lehreinheitmitarbeiter.lehreinheit_id' => $lehreinheit_id, 'tbl_lehreinheitmitarbeiter.mitarbeiter_uid' => $mitarbeiter_uid));
+	}
+
+	public function deleteLektorFromLe($lehreinheit_id, $mitarbeiter_uid)
+	{
+		if (defined('FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN') && FAS_LV_LEKTORINNENZUTEILUNG_VERTRAGSDETAILS_ANZEIGEN)
+		{
+			$vertrag_result = $this->VertragModel->getVertrag($mitarbeiter_uid, $lehreinheit_id);
+
+			if (hasData($vertrag_result))
+				return error("Loeschen nur nach Stornierung des Vertrags möglich");
+		}
+
+		$stundenplandev_result = $this->StundenplandevModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+		$stundenplan_result = $this->StundenplanModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+
+		if (hasData($stundenplandev_result) || hasData($stundenplan_result))
+			return error("Diese/r LektorIn kann nicht gelöscht werden da er schon verplant ist");
+
+		$result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+
+		if (hasData($result))
+		{
+			$le_mitarbeiter_array = getData($result)[0];
+
+			if ($le_mitarbeiter_array->vertrag_id !== null)
+			{
+				$vertrag_result = $this->VertragModel->deleteVertrag($le_mitarbeiter_array->vertrag_id);
+				if (isError($vertrag_result))
+					return $vertrag_result;
+			}
+
+			$delete_result = $this->delete(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+
+			if (isError($delete_result))
+				return $delete_result;
+
+			return success($delete_result);
+		}
+	}
+
 
 }

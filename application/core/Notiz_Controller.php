@@ -424,10 +424,10 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		foreach ($result as $doc) {
 			$res = $this->dmslib->removeAll($doc->dms_id);
-			if (isError($result))
+			if (isError($res))
 			{
 				$this->db->trans_rollback();
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError(getError($res), self::ERROR_TYPE_GENERAL);
 			}
 		}
 

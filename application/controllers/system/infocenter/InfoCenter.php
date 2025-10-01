@@ -363,6 +363,8 @@ class InfoCenter extends Auth_Controller
 		$data[self::ORIGIN_PAGE] = $origin_page;
 		$data[self::PREV_FILTER_ID] = $this->input->get(self::PREV_FILTER_ID);
 
+		$data['studiensemester'] = $this->variablelib->getVar('infocenter_studiensemester');
+
 		$this->load->view('system/infocenter/infocenterDetails.php', $data);
 	}
 
