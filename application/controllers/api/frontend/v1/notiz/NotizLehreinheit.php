@@ -25,6 +25,11 @@ class NotizLehreinheit extends Notiz_Controller
 		// Load Libraries
 		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
 
+		//Permission checks for allowed Oes
+/*		$allowedOes = $this->permissionlib->getOE_isEntitledFor('assistenz') ?: [];
+
+		$this->terminateWithSuccess($allowedOes);*/
+
 		// Load language phrases
 		$this->loadPhrases([
 			'ui'
