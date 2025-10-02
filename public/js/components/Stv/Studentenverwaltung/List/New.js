@@ -6,6 +6,7 @@ import FormInput from '../../../Form/Input.js';
 import accessibility from '../../../../directives/accessibility.js';
 
 import ApiStvStudents from '../../../../api/factory/stv/students.js';
+import ApiStvAddress from '../../../../api/factory/stv/kontakt/address.js';
 
 var _uuid = 0;
 const FORMDATA_DEFAULT = {
@@ -35,7 +36,7 @@ export default {
 	],
 	emits: ['saved'],
 	props: {
-		personOnly: Boolean, 
+		personOnly: Boolean,
 		studiengangKz: Number,
 		studiensemesterKurzbz: String
 	},
@@ -112,7 +113,7 @@ export default {
 			this.abortController.suggestions = new AbortController();
 
 			this.$api
-				.call(ApiStvStudents.check({
+				.call(ApiStvStudents.getPerson({
 					vorname: this.formData.vorname,
 					nachname: this.formData.nachname,
 					gebdatum: this.formData.gebdatum
@@ -138,23 +139,22 @@ export default {
 				return;
 
 			this.abortController.places = new AbortController();
-			this.$refs.form
-				.get(
-					'api/frontend/v1/stv/address/getPlaces/' + this.formData.address.plz,
-					undefined,
-					{
-						signal: this.abortController.places.signal
-					}
-				)
-				.then(result => {
-					this.places = result.data
-				})
-				.catch(error => {
-					if (error.code != "ERR_CANCELED")
-						window.setTimeout(this.loadPlaces, 100);
-					else
-						this.$fhcAlert.handleSystemError(error);
-				});
+			this.$refs.form.call(
+				ApiStvAddress.getPlaces(this.formData.address.plz)
+				//~ undefined,
+				//~ {
+					//~ signal: this.abortController.places.signal
+				//~ }
+			)
+			.then(result => {
+				this.places = result.data
+			})
+			.catch(error => {
+				if (error.code != "ERR_CANCELED")
+					window.setTimeout(this.loadPlaces, 100);
+				else
+					this.$fhcAlert.handleSystemError(error);
+			});
 		},
 		loadStudienplaene() {
 			if (this.formDataStg)
@@ -228,13 +228,11 @@ export default {
 	},
 	template: `
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
-		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" @hidden-bs-modal="reset">
+		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" style="min-height: 500px" @hidden-bs-modal="reset">
 			<template #title>
 				{{ personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}
 			</template>
 			<template #default>
-
-				<form-validation></form-validation>
 
 				<template v-if="person === null">
 					<div class="row">
@@ -275,7 +273,7 @@ export default {
 								@update:model-value="loadSuggestions"
 								text-input
 								auto-apply
-								no-today 
+								no-today
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
 								>
@@ -418,7 +416,7 @@ export default {
 							</form-input>
 						</div>
 					</div>
-					
+
 					<div class="row">
 						<div class="col-sm-6 mb-3">
 							<form-input
@@ -433,7 +431,7 @@ export default {
 							</form-input>
 						</div>
 					</div>
-					
+
 					<fieldset v-if="formData['address']['func'] != 0">
 						<legend>Adresse</legend>
 						<div class="row">
