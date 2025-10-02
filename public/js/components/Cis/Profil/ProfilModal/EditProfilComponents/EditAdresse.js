@@ -1,8 +1,11 @@
+import Dms from "../../../../Form/Upload/Dms.js";
+
 import ApiProfil from '../../../../../api/factory/profil.js';
 
 export default {
   components: {
     AutoComplete: primevue.autocomplete,
+	Dms: Dms
   },
 
   props: {
@@ -11,9 +14,13 @@ export default {
       type: Boolean,
       default: false,
     },
+    files: {
+      type: Array,
+      default: []
+    },
   },
 
-  inject: ["getZustelladressenCount"],
+  inject: ["getZustelladressenCount", "updateFileID"],
 
   data() {
     return {
@@ -23,6 +30,8 @@ export default {
       nationenList: [],
       originalValue: null,
       zustellAdressenCount: null,
+	  dmsData: [],
+	  fileschanged: false
     };
   },
 
@@ -83,6 +92,11 @@ export default {
       //? sets the value of a property to null when an empty string is entered to keep the isChanged function valid
       if (bind === "zustelladresse") {
         this.data[bind] = event.target.checked;
+	  } else if(bind === 'files') {
+		  if(this.dmsData.length > 0 && this.dmsData[0].type !== 'application/x.fhc-dms+json') {
+		    this.fileschanged = true;
+		  }
+		  this.updateFileID(this.dmsData);
       } else {
         this.data[bind] = event.target.value === "" ? null : event.target.value;
       }
@@ -91,6 +105,11 @@ export default {
       // update the zustellAdressen count
       this.zustellAdressenCount = this.getZustelladressenCount();
     },
+
+	deleteDmsData: function() {
+		this.dmsData = [];
+		this.updateValue(null, 'files');
+	}
   },
 
   computed: {
@@ -111,12 +130,14 @@ export default {
         !this.data.strasse ||
         !this.data.plz ||
         !this.data.ort ||
-        !this.data.typ
+        !this.data.typ ||
+        this.dmsData.length === 0
       ) {
         return false;
       }
 
-      return this.originalValue !== JSON.stringify(this.data);
+      const datachanged = this.originalValue !== JSON.stringify(this.data);
+      return datachanged || this.fileschanged;
     },
   },
 
@@ -131,6 +152,12 @@ export default {
    
     this.originalValue = JSON.stringify(this.data);
     this.zustellAdressenCount = this.getZustelladressenCount();
+  },
+
+  mounted() {
+    if (this.files) {
+      this.dmsData = this.files;
+    }
   },
 
   template: /*html*/ `
@@ -212,9 +239,28 @@ export default {
     </div>
   </div>
 
-
-  
-
+	<div class="row g-2">
+		<div class="col">
+			<div class="form-underline-titel">{{$p.t('profilUpdate','meldebestaetigung')}}*</div>
+			<dms
+				ref="update"
+				id="files"
+				name="files"
+				:multiple="false"
+				v-model="dmsData"
+				@update:model-value="updateValue($event,'files')"
+			></dms>
+		</div>
+		<div class="col-auto">
+			<div>&nbsp;</div>
+			<button
+					@click="deleteDmsData"
+					class="btn btn-danger"
+					:aria-label="$p.t('profilUpdate','deleteAttachment')"
+					:title="$p.t('profilUpdate','deleteAttachment')"
+			><i style="color:white" class="fa fa-trash" aria-hidden="true"></i></button>
+		</div>
+	</div>
 
 </div>
     `,

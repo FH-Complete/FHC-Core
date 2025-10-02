@@ -12,7 +12,7 @@ export default {
           required:true,
       },
 	  content_id:{
-		type:Number,
+		type: [Number, String],
 	  }
     },
 	methods: {
@@ -129,7 +129,7 @@ export default {
     template: /*html*/ `
       <!-- div that contains the content -->
 <!--       TODO: test with more img content from cms-->
-      <div v-if="imgContent"><img v-bind="imgContent"></img></div>
+      <div v-if="imgContent"><img v-bind="imgContent"/></div>
       <div v-html="content" v-else-if="content" ></div>
       <p v-else>Content was not found</p>
       `,

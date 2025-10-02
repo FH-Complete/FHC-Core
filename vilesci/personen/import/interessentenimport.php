@@ -1167,8 +1167,7 @@ if ($where != '')
 				}
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
-
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->wahlname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->wahlname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>".((strpos($status, 'Mitarbeiter') !== false) ? $row->svnr : '')."</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
 			if ($result_adr = $db->db_query($qry_adr))
 				while ($row_adr = $db->db_fetch_object($result_adr))
