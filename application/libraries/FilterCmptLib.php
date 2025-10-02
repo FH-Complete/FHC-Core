@@ -177,7 +177,7 @@ class FilterCmptLib
 		$session = $this->getSession();
 
 		// If session is NOT empty -> a filter was already loaded
-		if ($session != null)
+		if (!isError($session) && $session != null)
 		{
 			// Retrieve the filterId stored in the session
 			$sessionFilterId = $this->_getSessionElement(FilterCmptLib::FILTER_ID);
@@ -219,9 +219,7 @@ class FilterCmptLib
 				}
 			}
 		}
-
-		// If the session is empty -> first time that this filter is loaded
-		if ($session == null)
+		else
 		{
 			// Load filter definition data from DB
 			$definition = $this->_loadDefinition(
@@ -602,7 +600,7 @@ class FilterCmptLib
 	{
 		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
 
-		if (isset($session[$name]))
+		if (!isError($session) && isset($session[$name]))
 		{
 			return $session[$name];
 		}
@@ -623,7 +621,7 @@ class FilterCmptLib
 
 		if (!$this->_ci->permissionlib->hasAtLeastOne($this->_requiredPermissions, self::PERMISSION_FILTER_METHOD, self::PERMISSION_TYPE))
 		{
-			$this->_setSession(error('The required permission is not help by the logged user'));
+			$this->_setSession(error('The required permission is not held by the logged user'));
 			return false;
 		}
 
@@ -951,9 +949,11 @@ class FilterCmptLib
 	{
 		$session = getSessionElement(self::SESSION_NAME, $this->_filterUniqueId);
 
-		$session[$name] = $value;
-
-		setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
+		if (!isError($session) && $session != null)
+		{
+			$session[$name] = $value;
+			setSessionElement(self::SESSION_NAME, $this->_filterUniqueId, $session); // stores the single value
+		}
 	}
 
 	/**
