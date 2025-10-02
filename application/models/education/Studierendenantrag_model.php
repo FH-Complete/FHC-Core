@@ -65,7 +65,7 @@ class Studierendenantrag_model extends DB_Model
 			'LEFT'
 		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=public.get_orgform_prestudent(p.prestudent_id, ss.studiensemester_kurzbz)');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status as s',
 			'campus.get_status_id_studierendenantrag('. $this->dbTable .'.studierendenantrag_id) = studierendenantrag_status_id'
@@ -197,7 +197,7 @@ class Studierendenantrag_model extends DB_Model
 		$this->addSelect('stg.bezeichnung');
 		$this->addSelect('s.ausbildungssemester');
 		$this->addSelect('plan.sprache');
-		$this->addSelect('COALESCE(plan.orgform_kurzbz, s.orgform_kurzbz, stg.orgform_kurzbz) AS orgform_kurzbz');
+		$this->addSelect('public.get_orgform_prestudent(s.prestudent_id, s.studiensemester_kurzbz) AS orgform_kurzbz');
 
 		$this->addJoin(
 			'public.tbl_prestudentstatus s',
@@ -288,7 +288,7 @@ class Studierendenantrag_model extends DB_Model
 			'LEFT'
 		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, stg.orgform_kurzbz)');
+		$this->addJoin('bis.tbl_orgform of', 'of.orgform_kurzbz=public.get_orgform_prestudent(p.prestudent_id, ps.studiensemester_kurzbz)');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag_status s',
 			'campus.get_status_id_studierendenantrag(' . $this->dbTable . '.studierendenantrag_id)=s.studierendenantrag_status_id',

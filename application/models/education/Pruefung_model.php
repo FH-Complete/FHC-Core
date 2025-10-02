@@ -124,7 +124,7 @@ class Pruefung_model extends DB_Model
         	'LEFT'
         );
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin('bis.tbl_orgform o', 'public.get_orgform_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)=o.orgform_kurzbz');
 		$this->db->join('campus.tbl_studierendenantrag a', 'ps.prestudent_id=a.prestudent_id and a.typ = ?', 'LEFT', false);
 
         $this->db->where("n.positiv", false);
@@ -221,7 +221,7 @@ class Pruefung_model extends DB_Model
 			'LEFT'
 		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin('bis.tbl_orgform o', 'public.get_orgform_prestudent(ps.prestudent_id, le.studiensemester_kurzbz)=o.orgform_kurzbz');
 		$this->addJoin(
 			'campus.tbl_studierendenantrag a',
 			'ps.prestudent_id=a.prestudent_id and a.typ=' . $this->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG),

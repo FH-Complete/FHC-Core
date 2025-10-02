@@ -328,17 +328,7 @@ $config['prestudent'] = [
 			WHERE status_kurzbz = public.get_rolle_prestudent(ps.prestudent_id, NULL)
 			LIMIT 1
 		) AS status",
-		"COALESCE(
-			(
-				SELECT COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz)
-				FROM public.tbl_prestudentstatus pss
-				LEFT JOIN lehre.tbl_studienplan plan USING (studienplan_id)
-				WHERE pss.prestudent_id=ps.prestudent_id
-				ORDER BY pss.datum DESC, pss.insertamum DESC, pss.ext_id DESC
-				LIMIT 1
-			),
-			sg.orgform_kurzbz
-		) AS orgform",
+		"public.get_orgform_prestudent(ps.prestudent_id, NULL) AS orgform",
 		"b.aktiv",
 		"array_position(" . $prestudent_sort_array . ", public.get_rolle_prestudent(ps.prestudent_id, NULL)) AS sort"
 	],

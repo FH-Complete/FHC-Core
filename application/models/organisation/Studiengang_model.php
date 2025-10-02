@@ -605,7 +605,7 @@ class Studiengang_model extends DB_Model
 				AND ps.status_kurzbz=get_rolle_prestudent(p.prestudent_id, NULL)'
 		);
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id');
-		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, ps.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin('bis.tbl_orgform o', 'public.get_orgform_prestudent(p.prestudent_id, NULL)=o.orgform_kurzbz');
 		$this->addJoin('public.tbl_person pers', 'person_id');
 		$this->addJoin('public.tbl_student stud', 'p.prestudent_id=stud.prestudent_id', 'LEFT');
 

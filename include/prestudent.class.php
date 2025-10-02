@@ -1861,7 +1861,7 @@ class prestudent extends person
 					tbl_prestudentstatus.studiensemester_kurzbz,
 					tbl_prestudent.studiengang_kz,
 					tbl_prestudentstatus.ausbildungssemester,
-					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+					public.get_orgform_prestudent(tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.studiensemester_kurzbz) as orgform_kurzbz
 				FROM
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
@@ -1924,7 +1924,7 @@ class prestudent extends person
 					tbl_prestudentstatus.studiensemester_kurzbz,
 					tbl_prestudent.studiengang_kz,
 					tbl_prestudentstatus.ausbildungssemester,
-					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+					public.get_orgform_prestudent(tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.studiensemester_kurzbz) as orgform_kurzbz
 				FROM
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
@@ -1981,7 +1981,7 @@ class prestudent extends person
 					tbl_prestudentstatus.studiensemester_kurzbz,
 					tbl_prestudent.studiengang_kz,
 					tbl_prestudentstatus.ausbildungssemester,
-					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+					public.get_orgform_prestudent(tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.studiensemester_kurzbz) as orgform_kurzbz
 				FROM
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)
@@ -2038,7 +2038,7 @@ class prestudent extends person
 					tbl_prestudentstatus.studiensemester_kurzbz,
 					tbl_prestudent.studiengang_kz,
 					tbl_prestudentstatus.ausbildungssemester,
-					COALESCE(tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as orgform_kurzbz
+					public.get_orgform_prestudent(tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.studiensemester_kurzbz) as orgform_kurzbz
 				FROM
 					public.tbl_prestudent
 					JOIN public.tbl_prestudentstatus USING(prestudent_id)

@@ -46,7 +46,7 @@ $query = "
 	JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
 	LEFT JOIN public.tbl_prestudentstatus pss ON (pss.prestudent_id = a.prestudent_id AND pss.studiensemester_kurzbz=a.studiensemester_kurzbz AND pss.status_kurzbz=get_rolle_prestudent(a.prestudent_id, a.studiensemester_kurzbz))
 	LEFT JOIN lehre.tbl_studienplan plan USING (studienplan_id)
-	JOIN bis.tbl_orgform ON (tbl_orgform.orgform_kurzbz = COALESCE(plan.orgform_kurzbz, pss.orgform_kurzbz, stg.orgform_kurzbz))" . $where;
+	JOIN bis.tbl_orgform ON (tbl_orgform.orgform_kurzbz = public.get_orgform_prestudent(a.prestudent_id, a.studiensemester_kurzbz))" . $where;
 
 
 if (!$db->db_query($query) || !$db->db_num_rows())

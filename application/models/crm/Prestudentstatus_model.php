@@ -330,7 +330,14 @@ class Prestudentstatus_model extends DB_Model
 		$this->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_status', 'tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz');
 		$this->addJoin('public.tbl_status_grund', 'statusgrund_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform', 'COALESCE(tbl_studienplan.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) = tbl_orgform.orgform_kurzbz', 'LEFT');
+		$this->addJoin(
+			'bis.tbl_orgform',
+			'public.get_orgform_prestudent(
+				' . $this->dbTable . '.prestudent_id, 
+				' . $this->dbTable . '.studiensemester_kurzbz
+			) = tbl_orgform.orgform_kurzbz',
+			'LEFT'
+		);
 		$this->db->where('tbl_status.status_kurzbz = tbl_prestudentstatus.status_kurzbz');
 
 		$where = array('prestudent_id' => $prestudent_id);
@@ -377,7 +384,10 @@ class Prestudentstatus_model extends DB_Model
 		$this->addJoin('public.tbl_person pers', 'person_id');
 		$this->addJoin('public.tbl_studiengang g', 'p.studiengang_kz=g.studiengang_kz');
 		$this->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
-		$this->addJoin('bis.tbl_orgform o', 'COALESCE(plan.orgform_kurzbz, ' . $this->dbTable . '.orgform_kurzbz, g.orgform_kurzbz)=o.orgform_kurzbz');
+		$this->addJoin(
+			'bis.tbl_orgform o',
+			'public.get_orgform_prestudent(' . $this->dbTable . '.prestudent_id, ' . $this->dbTable . '.studiensemester_kurzbz) = o.orgform_kurzbz'
+		);
 
 		$this->addOrder($this->dbTable . '.datum', 'DESC');
 		$this->addOrder($this->dbTable . '.insertamum', 'DESC');
