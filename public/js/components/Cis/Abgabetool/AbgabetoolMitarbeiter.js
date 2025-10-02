@@ -65,10 +65,11 @@ export const AbgabetoolMitarbeiter = {
 			abgabeTableOptions: {
 				minHeight: 250,
 				index: 'projektarbeit_id',
-				layout: 'fitColumns',
+				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
+				rowHeight: 80,
 				columns: [
 					{
 						formatter: 'rowSelection',
@@ -82,14 +83,14 @@ export const AbgabetoolMitarbeiter = {
 						width: 70
 					},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4personenkennzeichen')), field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4personenkennzeichen')), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4vorname')), field: 'vorname', formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4nachname')), field: 'nachname', formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4vorname')), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4nachname')), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'studiensemester_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4betreuerart')), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 1}
 				],
 				persistence: false,
@@ -441,7 +442,6 @@ export const AbgabetoolMitarbeiter = {
 				<button type="button" class="btn btn-primary" @click="addSeries">{{ $p.t('global/speichern') }}</button>
 			</template>
 		</bs-modal>	
-		
 		
 		<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 			dialogClass="modal-fullscreen">

@@ -97,11 +97,10 @@ class Projektarbeit_model extends DB_Model
 	 */
 	public function getStudentProjektarbeitenWithBetreuer($studentUID)
 	{
-		$betreuerQuery = "SELECT DISTINCT ON(projektarbeit_id)
+		$betreuerQuery = "SELECT * FROM (SELECT DISTINCT ON(projektarbeit_id)
 			vorname as bvorname,
 			nachname as bnachname,
 			titelpre as btitelpre,
-			titelpost AS btitelpost,
 			titelpost AS btitelpost,
 			tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
 		
@@ -125,7 +124,8 @@ class Projektarbeit_model extends DB_Model
 			lehre.tbl_lehreinheit.studiensemester_kurzbz,
 			lehre.tbl_lehrveranstaltung.studiengang_kz,
 			public.tbl_studiengang.kurzbzlang,
-			lehre.tbl_projektbetreuer.note as note,
+			lehre.tbl_projektarbeit.note as note,
+			lehre.tbl_note.bezeichnung as note_bezeichnung,
 			public.tbl_mitarbeiter.mitarbeiter_uid,
 			lehre.tbl_projektarbeit.titel as titel,
 			lehre.tbl_projektarbeit.sprache as sprache,
@@ -135,6 +135,7 @@ class Projektarbeit_model extends DB_Model
 			lehre.tbl_projektarbeit.schlagwoerter_en as schlagwoerter_en,
 			lehre.tbl_projektarbeit.abstract as abstract,
 			lehre.tbl_projektarbeit.abstract_en as abstract_en,
+			lehre.tbl_projektarbeit.insertamum as insertamum,
 			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuer_person_id = tbl_projektbetreuer.person_id) AS babgeschickt,
 			(SELECT abgeschicktvon FROM extension.tbl_projektarbeitsbeurteilung WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter') LIMIT 1) AS zweitbetreuer_abgeschickt,
 			(SELECT datum FROM campus.tbl_paabgabe WHERE paabgabetyp_kurzbz = 'end' AND abgabedatum IS NOT NULL AND projektarbeit_id = tbl_projektarbeit.projektarbeit_id LIMIT 1) AS abgegeben
@@ -149,10 +150,12 @@ class Projektarbeit_model extends DB_Model
 				 LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 				 LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_mitarbeiter.mitarbeiter_uid = public.tbl_benutzer.uid)
 				 LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+				 LEFT JOIN lehre.tbl_note ON(lehre.tbl_projektarbeit.note = lehre.tbl_note.note)
 		WHERE
 			tbl_projektarbeit.student_uid = ? AND mitarbeiter_uid IS NOT NULL AND
 			(projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-		  AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')";
+		  AND betreuerart_kurzbz IN ('Betreuer', 'Begutachter', 'Erstbegutachter', 'Senatsvorsitz')) as base
+		ORDER BY insertamum DESC";
 				
 		return $this->execReadOnlyQuery($betreuerQuery, array($studentUID));
 	}
@@ -283,5 +286,122 @@ class Projektarbeit_model extends DB_Model
 					WHERE projektarbeit_id = ? )";
 		
 		return $this->execReadOnlyQuery($qry, array($projektarbeit_id));
+	}
+
+	/**
+	 * Prüft ob Projektarbeit aktuell ist (also zurzeit online bewertet wird).
+	 * @param $projektarbeit_id
+	 * @return boolean
+	 */
+	public function projektarbeitIsCurrent($projektarbeit_id) {
+		$version = $this->getVersion($projektarbeit_id);
+		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
+		return $version === null ? null : $version->isCurrent;
+	}
+
+	/**
+	 * Holt sich Version der Projektarbeit.
+	 * Liefert auch mit, ob die Version die aktuellste ist.
+	 * z.B.: Masterarbeiten waren ab der Änderung zur Gewichtung der Punkte aktuell,
+	 * Bachelorarbeiten waren ab dem Umstieg auf das Online Beurteilungsformular aktuell.
+	 * @param $projektarbeit_id
+	 * @return objekt mit Versionsinfo, null im Fehlerfall
+	 */
+	private function getVersion($projektarbeit_id) {
+		$_versions_query = array(
+			'Diplom' => array(
+				'SS2025',
+				'SS2023',
+				'SS2022'
+			),
+			'Others' => array(
+				'SS2025',
+				'SS2022',
+			)
+		);
+
+		$_versions_check = array(
+			'Diplom' => array(
+				'SS2025' => 3,
+				'SS2023' => 2,
+				'SS2022' => 1
+			),
+			'Others' => array(
+				'SS2025' => 2,
+				'SS2022' => 1
+			)
+		);
+		
+		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
+		$qry="
+			SELECT
+				CASE
+					WHEN semesters_diplom.studiensemester_kurzbz IS NOT NULL
+					THEN semesters_diplom.studiensemester_kurzbz
+					ELSE semesters.studiensemester_kurzbz 
+				END AS version_studiensemester_kurzbz,
+				pa.projekttyp_kurzbz
+			FROM
+				lehre.tbl_projektarbeit pa
+				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+				JOIN public.tbl_studiensemester sem USING(studiensemester_kurzbz)
+				LEFT JOIN (
+					SELECT
+						start, studiensemester_kurzbz
+					FROM
+						public.tbl_studiensemester
+					WHERE
+						studiensemester_kurzbz IN ?
+				) semesters ON sem.start >= semesters.start AND pa.projekttyp_kurzbz <> 'Diplom'
+				LEFT JOIN (
+					SELECT
+						start, studiensemester_kurzbz
+					FROM
+						public.tbl_studiensemester
+					WHERE
+						studiensemester_kurzbz IN ?
+				) semesters_diplom ON sem.start >= semesters_diplom.start AND pa.projekttyp_kurzbz = 'Diplom'
+			WHERE
+				projektarbeit_id = ?
+			ORDER BY
+				semesters.start DESC, semesters_diplom.start DESC
+			LIMIT 1";
+
+		$resultociniBambini = $this->execReadOnlyQuery($qry, array($_versions_query['Others'], $_versions_query['Diplom'], $projektarbeit_id));
+		
+		if(hasData($resultociniBambini)) {
+			$data =	getData($resultociniBambini);
+			if(count($data) > 0) {
+				$row = $data[0];
+				
+				// known project types
+				if (isset($_versions_check[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz]))
+				{
+					$row->versionNumber = $_versions_check[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz];
+					$row->isCurrent =
+						$_versions_check[$row->projekttyp_kurzbz][$row->version_studiensemester_kurzbz]
+						== max($_versions_check[$row->projekttyp_kurzbz]);
+
+				}
+				elseif (isset($_versions_check['Others'][$row->version_studiensemester_kurzbz]))
+				{
+					$row->versionNumber = $_versions_check['Others'][$row->version_studiensemester_kurzbz];
+					$row->isCurrent =
+						$_versions_check['Others'][$row->version_studiensemester_kurzbz]
+						== max($_versions_check['Others']);
+				}
+				else
+				{
+					$row->isCurrent = false;
+					$row->versionNumber = 0;
+				}
+				return $row;
+				
+			} else {
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 }

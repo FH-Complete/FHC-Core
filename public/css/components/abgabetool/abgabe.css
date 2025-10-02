@@ -1,6 +1,6 @@
 /* Base Header */
 .verpasst-header {
-	background-color: var(--fhc-red-40);
+	background-color: var(--fhc-red-70);
 	font-weight: 600;
 	border-radius: 6px;
 	padding: 0px 0px 0px 32px;
@@ -10,7 +10,7 @@
 
 /* Hover State */
 .verpasst-header:hover {
-	background-color: var(--fhc-red-30);
+	background-color: var(--fhc-red-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
@@ -22,13 +22,13 @@
 
 /* Hover State Active*/
 .p-accordion-tab-active > .verpasst-header:hover {
-	background-color: var(--fhc-red-40);
+	background-color: var(--fhc-red-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 /* Base Header */
 .abzugeben-header {
-	background-color: var(--fhc-yellow-40);
+	background-color: var(--fhc-yellow-70);
 	font-weight: 600;
 	border-radius: 6px;
 	padding: 0px 0px 0px 32px;
@@ -38,7 +38,7 @@
 
 /* Hover State */
 .abzugeben-header:hover {
-	background-color: var(--fhc-yellow-30);
+	background-color: var(--fhc-yellow-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
@@ -50,13 +50,13 @@
 
 /* Hover State Active*/
 .p-accordion-tab-active > .abzugeben-header:hover {
-	background-color: var(--fhc-yellow-40);
+	background-color: var(--fhc-yellow-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 /* Base Header */
 .verspaetet-header {
-	background-color: var(--fhc-pink-40);
+	background-color: var(--fhc-pink-70);
 	font-weight: 600;
 	border-radius: 6px;
 	padding: 0px 0px 0px 32px;
@@ -66,7 +66,7 @@
 
 /* Hover State */
 .verspaetet-header:hover {
-	background-color: var(--fhc-pink-30);
+	background-color: var(--fhc-pink-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
@@ -78,13 +78,13 @@
 
 /* Hover State Active*/
 .p-accordion-tab-active > .verspaetet-header:hover {
-	background-color: var(--fhc-pink-40);
+	background-color: var(--fhc-pink-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
 /* Base Header */
 .abgegeben-header {
-	background-color: var(--fhc-green-40);
+	background-color: var(--fhc-green-70);
 	font-weight: 600;
 	border-radius: 6px;
 	padding: 0px 0px 0px 32px;
@@ -94,7 +94,7 @@
 
 /* Hover State */
 .abgegeben-header:hover {
-	background-color: var(--fhc-green-30);
+	background-color: var(--fhc-green-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
@@ -106,8 +106,35 @@
 
 /* Hover State Active*/
 .p-accordion-tab-active > .abgegeben-header:hover {
-	background-color: var(--fhc-green-40);
+	background-color: var(--fhc-green-60);
 	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
 }
 
+/* Base Header */
+.standard-header {
+	background-color: var(--fhc-white-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 32px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.standard-header:hover {
+	background-color: var(--fhc-white-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .standard-header {
+	background-color: var(--fhc-white-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .standard-header:hover {
+	background-color: var(--fhc-white-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
 

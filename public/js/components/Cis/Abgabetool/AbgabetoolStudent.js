@@ -39,108 +39,7 @@ export const AbgabetoolStudent = {
 			student_uid: null,
 			detail: null,
 			projektarbeiten: null,
-			selectedProjektarbeit: null,
-			// abgabeTableOptions: {
-			// 	minHeight: 250,
-			// 	index: 'projektarbeit_id',
-			// 	layout: 'fitColumns',
-			// 	responsiveLayout: "collapse",
-			// 	placeholder: this.$p.t('global/noDataAvailable'),
-			// 	columns: [
-			// 		{
-			// 			formatter:"responsiveCollapse",
-			// 			width:30, minWidth:30, hozAlign:"center", resizable:false, headerSort:false
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4details')), field: 'details',
-			// 			formatter: this.detailFormatter,
-			// 			widthGrow: 1, tooltip: false
-			// 			, responsive: 0, minWidth: 80
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4beurteilung')), field: 'beurteilung',
-			// 			formatter: this.beurteilungFormatter,
-			// 			widthGrow: 1, tooltip: false
-			// 			, responsive: 0, minWidth: 80
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'sem',
-			// 			formatter: this.centeredTextFormatter,
-			// 			widthGrow: 1
-			// 			, responsive: 5, minWidth: 120
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg',
-			// 			formatter: this.centeredTextFormatter,
-			// 			widthGrow: 1
-			// 			, responsive: 6, minWidth: 120
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4kontakt')), field: 'mail',
-			// 			formatter: this.mailFormatter,
-			// 			widthGrow: 1
-			// 			, responsive: 0, minWidth: 80
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4betreuer')), field: 'betreuer',
-			// 			formatter: this.centeredTextFormatter,
-			// 			widthGrow: 2
-			// 			, responsive: 7, minWidth: 300
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'typ',
-			// 			formatter: this.centeredTextFormatter,
-			// 			widthGrow: 1
-			// 			, responsive: 8, minWidth: 200
-			// 		},
-			// 		{
-			// 			title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel', 
-			// 			formatter: this.centeredTextFormatter,
-			// 			widthGrow: 8
-			// 			, responsive: 1, minWidth: 420
-			// 		}
-			// 	],
-			// 	persistence: false,
-			// },
-			// abgabeTableEventHandlers: [
-			// {
-			// 	event: "tableBuilt",
-			// 	handler: async () => {
-			// 		this.tableBuiltResolve()
-			// 	}
-			// },
-			// {
-			// 	event: "dataProcessed",
-			// 	handler: async () => {
-			// 		console.log('dataProcessed event')
-			// 		this.dataProcessedResolve()
-			// 	}
-			// },
-			// {
-			// 	event: "cellClick",
-			// 	handler: async (e, cell) => {
-			//		
-			// 		if(cell.getColumn().getField() === "details") {
-			// 			const val = cell.getValue()
-			//			
-			// 			if(val.mode === 'detailTermine') {
-			// 				this.setDetailComponent(cell.getValue())
-			// 			} else if (val.mode === 'beurteilungDownload') {
-			// 				const pdfExportLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
-			// 				// const pdfExportLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/lehre/projektbeurteilungDocumentExport.php?betreuerart_kurzbz='+val.betreuerart_kurzbz+'&projektarbeit_id='+val.projektarbeit_id+'&person_id=' + val.betreuer_person_id
-			// 				window.open(pdfExportLink, '_blank')
-			// 			}
-			//
-			// 		} else if (cell.getColumn().getField() === "beurteilung") {
-			// 			const val = cell.getValue()
-			//			
-			// 			if(val != '-') window.open(val, '_blank')
-			// 		} 
-			// 		e.stopPropagation()
-			//
-			// 	}
-			// }
-			// ]
+			selectedProjektarbeit: null
 		};
 	},
 	methods: {
@@ -236,7 +135,9 @@ export const AbgabetoolStudent = {
 			// this.projektarbeiten = data[0]
 			this.domain = data[1]
 			this.student_uid = data[2]
-			this.projektarbeiten = data[0]?.map(projekt => {
+			this.projektarbeiten = data[0] ?? null
+			if(!this.projektarbeiten) return
+			this.projektarbeiten = this.projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
@@ -288,6 +189,19 @@ export const AbgabetoolStudent = {
 			title += projektarbeit.titel
 			
 			return title
+		},
+		getMailLink(projektarbeit) {
+			if(projektarbeit.email) {
+				return 'mailto:'+projektarbeit.email
+			} else return ''
+		},
+		getNoteBezeichnung(projektarbeit) {
+			if(projektarbeit.note) {
+				const noteOpt = this.notenOptions.find(opt => opt.note == projektarbeit.note)
+				return noteOpt?.bezeichnung
+			} else {
+				return ''
+			}
 		}
 	},
 	watch: {
@@ -328,19 +242,30 @@ export const AbgabetoolStudent = {
 	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
 	<hr>
 	
-	<div v-if="projektarbeiten === null || projektarbeiten === []">
+	<div v-if="projektarbeiten === null">
 		{{$p.t('abgabetool/c4abgabeStudentNoProjectsFound')}}
 	</div>
 	
 	<Accordion :multiple="true" :activeIndex="[0]">
 		<template v-for="projektarbeit in projektarbeiten">
-			<AccordionTab :header="getAccTabHeaderForProjektarbeit(projektarbeit)">
-					
+			<AccordionTab>
+				
+				<template #header>
+					<div class="d-flex row w-100">
+						<div class="col-6 text-start">
+							<span>{{getAccTabHeaderForProjektarbeit(projektarbeit)}}</span>
+						</div>
+						<div class="col-6 text-end">
+							<span>{{getNoteBezeichnung(projektarbeit)}}</span>
+						</div>
+					</div>
+				</template>
+				
 				<div class="row">
 					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4details')}}</div>
 					<div class="col-8 col-md-9">
 						<button @click="setDetailComponent(projektarbeit.details)" class="btn btn-primary">
-							Projektdetails öffnen <a><i class="fa fa-folder-open"></i></a>
+							{{$p.t('abgabetool/c4projektdetailsOeffnen')}} <a><i class="fa fa-folder-open"></i></a>
 						</button>
 					</div>
 				</div>
@@ -348,7 +273,7 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4beurteilung')}}</div>
 					<div class="col-8 col-md-9">
 						<a v-if="projektarbeit.beurteilung"><i class="fa fa-file-pdf" style="color:#00649C"></i></a>
-						<a v-else>Keine Beurteilung vorhanden</a>
+						<a v-else>{{$p.t('abgabetool/c4nobeurteilungVorhanden')}}</a>
 					</div>
 				</div>
 				<div class="row mt-2">
@@ -369,6 +294,18 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuer')}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.betreuer }}
+					</div>
+				</div>
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuerEmailKontakt')}}</div>
+					<div class="col-8 col-md-9">
+						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
+					</div>
+				</div>
+				<div v-if="projektarbeit.zweitbetreuer" class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz}}</div>
+					<div class="col-8 col-md-9">
+						{{ projektarbeit.zweitbetreuer_betreuerart_beschreibung}}: {{ projektarbeit.zweitbetreuer?.first }}
 					</div>
 				</div>
 				<div class="row mt-2">

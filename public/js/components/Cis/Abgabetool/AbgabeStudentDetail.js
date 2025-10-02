@@ -182,45 +182,20 @@ export const AbgabeStudentDetail = {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 			
-			// todo: rework styling but keep the color pattern logic
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			let color = 'white'
-			let fontColor = 'black'
-			let icon = '';
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
 					return 'verpasst-header'
-					
-					// color = 'red'
-					// fontColor = 'white'
-					// icon = 'fa-triangle-exclamation'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
 					return 'abzugeben-header'
-					
-					// color = 'yellow'
-					// icon = 'fa-circle-exclamation'
+				} else {
+					return 'standard-header'
 				}
 			} else if(abgabedatum > datum) {
 				return 'verspaetet-header'
-				
-				// color = 'pink' // aka "hellrot"
-				// fontColor = 'white'
-				// icon = 'fa-circle-question'
 			} else {
 				return 'abgegeben-header'
-				
-				// color = 'green'
-				// icon = 'fa-square-check'
 			}
-			
-			// return 'background-color: ' + color;
-			//
-			// //return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
-			// if(  typeof mode !== 'undefined' || mode === 'icon') {
-			// 	return icon;
-			// } else {
-			// 	return 'abgabe-zieldatum-border-' + color;
-			// }
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -308,6 +283,7 @@ export const AbgabeStudentDetail = {
 <!--								<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>-->
 							</div>
 						</div>
+						
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
 							<div class="col-8 col-md-9">
@@ -323,12 +299,14 @@ export const AbgabeStudentDetail = {
 <!--								<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>-->
 							</div>
 						</div>
+						
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
 							<div class="col-8 col-md-9">
 								{{ termin.bezeichnung }}
 							</div>
 						</div>
+						
 						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
 							<div class="col-8 col-md-9">
@@ -337,12 +315,14 @@ export const AbgabeStudentDetail = {
 								</div>
 							</div>
 						</div>
+						
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90" :disabled="true"></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
 							</div>
 						</div>
+						
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 							<div class="col-8 col-md-9">
@@ -352,6 +332,7 @@ export const AbgabeStudentDetail = {
 								</a>
 							</div>
 						</div>
+						
 						<div class="row mt-2" v-if="termin.upload_allowed">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fileupload')}}</div>
 							<div class="col-8 col-md-9">
@@ -375,7 +356,6 @@ export const AbgabeStudentDetail = {
 									</div>
 								</div>
 							</div>
-						</div>
 						</div>
 					</AccordionTab>
 				</template>

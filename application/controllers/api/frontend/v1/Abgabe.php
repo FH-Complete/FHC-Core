@@ -18,15 +18,6 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-//require_once('../../../include/studiengang.class.php');
-//require_once('../../../include/student.class.php');
-//require_once('../../../include/datum.class.php');
-//require_once('../../../include/mail.class.php');
-//require_once('../../../include/benutzerberechtigung.class.php');
-//require_once('../../../include/phrasen.class.php');
-//require_once('../../../include/projektarbeit.class.php');
-//require_once('../../../include/projektbetreuer.class.php');
-
 class Abgabe extends FHCAPI_Controller
 {
 
@@ -61,11 +52,6 @@ class Abgabe extends FHCAPI_Controller
 		);
 
 		$this->load->helper('hlp_sancho_helper');
-
-		require_once(FHCPATH . 'include/studiengang.class.php');
-		require_once(FHCPATH . 'include/student.class.php');
-		require_once(FHCPATH . 'include/projektarbeit.class.php');
-		require_once(FHCPATH . 'include/projektbetreuer.class.php');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -92,25 +78,23 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function getStudentProjektabgaben() {
 		$projektarbeit_id = $this->input->get("projektarbeit_id",TRUE);
-
-		// TODO: error messages
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
 		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 
-		$projektarbeit_obj = new projektarbeit();
-		if($projektarbeit_id==-1)
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
 
-		if(!$projektarbeit_obj->load($projektarbeit_id))
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		if(count($projektarbeitArr) > 0) {
+			$projektarbeit = $projektarbeitArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+		}
+		
+		$paIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
 
-		$paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
-
-		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
-
-		// TODO: fetch zweitbetreuer
 
 		$this->terminateWithSuccess(array($ret, $paIsCurrent));
 	}
@@ -141,15 +125,26 @@ class Abgabe extends FHCAPI_Controller
 		$projektarbeiten = getData($result);
 		
 		if(count($projektarbeiten)) {
-			// TODO: save access to this, array could be empty
 			foreach($projektarbeiten as $pa) {
 				$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
-
-				// TODO: save access
+				
 				$data = getData($result);
 				if(count($data) > 0) {
 					$pa->email = $data[0]->private_email;
 				}
+				if($pa->zweitbetreuer_person_id !== null) {
+					// zweitbetreuer info since the 'getStudentProjektarbeitenWithBetreuer' query got quiete large,
+					// enjoy optimizing that one in 2038. we need this to render a string like
+					// Zweitbegutachter: FH-Prof. PD DI Dr. techn. Vorname Nachname MBA
+
+					$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->zweitbetreuer_person_id);
+
+					$data = getData($result);
+					if(count($data) > 0) {
+						$pa->zweitbetreuer = $data[0];
+					}
+				}
+				
 				
 			}
 		}
@@ -225,10 +220,11 @@ class Abgabe extends FHCAPI_Controller
 		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
 			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
 			|| !isset($student_uid) || isEmptyString($student_uid)
-			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz)
+			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
+			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
+			|| !isset($seitenanzahl))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-
-		// TODO: maybe check for other params aswell?
 
 		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
 			move_uploaded_file($_FILES['file']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf');
@@ -261,8 +257,7 @@ class Abgabe extends FHCAPI_Controller
 				{
 					$this->signaturFehltEmail($student_uid);
 				}
-
-				// TODO error handle get data has data the updates
+				
 				// update projektarbeit cols
 				$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 				$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
@@ -291,15 +286,26 @@ class Abgabe extends FHCAPI_Controller
 	}
 
 	private function signaturFehltEmail($student_uid) {
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('education/Studiengang_model', 'StudiengangModel');
 		
-		// Mail an Studiengang wenn keine Signatur gefunden wurde
-		$student = new student();
-		if(!$student->load($student_uid))
+		$result = $this->StudentModel->load($student_uid);
+		$studentArr = $this->getDataOrTerminateWithError($result);
+		
+		if(count($studentArr) > 0) {
+			$student = $studentArr[0];
+		} else {
 			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
+		}
 
-		$stg_obj = new studiengang();
-		if(!$stg_obj->load($student->studiengang_kz))
+		$result = $this->Studiengang_model->load($student->studiengang_kz);
+		$studiengangArr = $this->getDataOrTerminateWithError($result);
+
+		if(count($studiengangArr) > 0) {
+			$stg_obj = $studiengangArr[0];
+		} else {
 			$this->terminateWithError($this->p->t('global','fehlerBeimLesenAusDatenbank'), 'general');
+		}
 
 		$subject = 'Abgabe ohne Signatur';
 		$tomail = $stg_obj->email;
@@ -325,15 +331,19 @@ class Abgabe extends FHCAPI_Controller
 
 		$resBetr = $this->ProjektarbeitModel->getProjektbetreuerAnrede($bperson_id);
 
-		$projektarbeit_obj = new projektarbeit();
 
-		if(!$projektarbeit_obj->load($projektarbeit_id))
-			$this->terminateWithError('Ungueltiger Eintrag');
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
 
-		$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+		if(count($projektarbeitArr) > 0) {
+			$projektarbeit = $projektarbeitArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+		}
 
-		if( null === $num_rows_sem || false === $num_rows_sem )
-		{
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
+		if(!$projektarbeitIsCurrent) {
 			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
 		}
 
@@ -341,14 +351,12 @@ class Abgabe extends FHCAPI_Controller
 
 			// query student benutzer view for every betreuer row
 			$studentUser = $this->ProjektarbeitModel->getProjektarbeitBenutzer($student_uid)->retval[0];
-
-			// TODO: hasdata, getData etc
-
+			
 			// 1. Begutachter mail ohne Token
 			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 			$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
-			$projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
-			$subject = $projektarbeit_obj->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
+			$projekttyp_kurzbz = $projektarbeit->projekttyp_kurzbz;
+			$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
 			$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
 
 			$maildata = array();
@@ -359,7 +367,7 @@ class Abgabe extends FHCAPI_Controller
 			$maildata['student_voller_name'] = trim($studentUser->titelpre." ".$studentUser->vorname." ".$studentUser->nachname." ".$studentUser->titelpost);
 			$maildata['abgabetyp'] = $abgabetyp;
 			$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
-			$maildata['bewertunglink'] = $num_rows_sem >= 1 && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
+			$maildata['bewertunglink'] = $projektarbeitIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 			$maildata['token'] = "";
 			
 			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
@@ -384,12 +392,14 @@ class Abgabe extends FHCAPI_Controller
 			if ($paabgabetyp_kurzbz == 'end')
 			{
 				// Zweitbegutachter holen
-				$zweitbegutachter = new projektbetreuer();
-				$zweitbegutachterRes = $zweitbegutachter->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid);
-
+				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
+				$zweitbegutachterRes = $this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid);
+				
+				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRes);
+				
 				if ($zweitbegutachterRes)
 				{
-					$zweitbegutachterResults = $zweitbegutachter->result;
+					$zweitbegutachterResults = $zweitbegutachterRes->retval;
 
 					foreach ($zweitbegutachterResults as $begutachter)
 					{
@@ -400,10 +410,9 @@ class Abgabe extends FHCAPI_Controller
 						{
 							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
 						}
-
-						// Zweitbegutachter (evtl. mit Token) holen
-						$zweitbegutachterMitToken = new projektbetreuer();
-						$begutachterMitTokenRes = $zweitbegutachterMitToken->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id);
+						
+						$begutachterMitTokenRes = $this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id);
+//						$begutachterMitTokenRes = $zweitbegutachterMitToken->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id);
 
 						if (!$begutachterMitTokenRes)
 						{
@@ -429,8 +438,8 @@ class Abgabe extends FHCAPI_Controller
 							$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
 							$zweitbetmaildata['abgabetyp'] = $abgabetyp;
 							$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-							$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-							$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+							$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+							$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
 							
 
 							$mailres = sendSanchoMail(
@@ -558,9 +567,6 @@ class Abgabe extends FHCAPI_Controller
 			$note = $noteArr[0];
 			if($note->positiv === false) {
 //				$this->addMeta('noteNegativ', true);
-				// TODO: somewhere in here check if there has been an existingPaabgabe and if that existing abgabe was
-				// already negativ -> dont send mail
-				
 				
 				if($existingPaabgabe && $existingPaabgabe->note) {
 					$result = $this->NoteModel->load($paabgabe->note);
@@ -596,8 +602,7 @@ class Abgabe extends FHCAPI_Controller
 
 		if(count($result) == 0)
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-
-		// TODO: berechtigung?
+		
 		if($result[0]->insertvon === getAuthUID()) {
 			$result = $this->PaabgabeModel->delete($paabgabe_id);
 			$result = $this->getDataOrTerminateWithError($result);
@@ -636,7 +641,7 @@ class Abgabe extends FHCAPI_Controller
 		// old script afterwards again queries if user is not the zweitbetreuer of any id - this is blocked in the ui
 		// and should never unintentionally happen
 
-		// TODO: check berechtigung &/|| zuordnung?
+		// TODO: maybe check for betreuer zuordnung?
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
@@ -768,24 +773,29 @@ class Abgabe extends FHCAPI_Controller
 		$paabgabetyp_kurzbz = $paabgabetyp_kurzbzArr[0];
 		
 		// Mail an Student wenn Qualgate negativ beurteilt wurde
-		$student = new student();
-		if(!$student->load($student_uid))
-			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->load($paabgabe->paabgabetyp_kurzbz);
+		$studentArr = $this->getDataOrTerminateWithError($result);
+		$student = $studentArr[0];
 
-		// TODO: frasen
-		$subject = 'Quality Gate Negativ';
+		if(!$student) {
+			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
+		}
+		
+		$subject = $this->p->t('abgabetool', 'c4qualgateNegativEmailSubject');
 		$tomail = $student_uid.'@'.DOMAIN;
 		
+		$datetime = new DateTime($paabgabe->datum);
+		$dateEmailFormatted = $datetime->format('d.m.Y');
 		
-		// TODO: datum format 
 		$data = array(
 			'betreuerfullname' => $anrede->first,
 			'qualgatebezeichnung' => $paabgabetyp_kurzbz->bezeichnung,
-			'datum' => $paabgabe->datum,
+			'datum' => $dateEmailFormatted,
 			'projektarbeitname' => $projektarbeit->titel
 		);
 
-		$this->addMeta('$emaildata', $data);
+//		$this->addMeta('$emaildata', $data);
 		
 		$mailres = sendSanchoMail(
 			'QualGateNegativ',

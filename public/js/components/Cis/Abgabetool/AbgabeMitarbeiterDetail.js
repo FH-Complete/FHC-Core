@@ -102,7 +102,7 @@ export const AbgabeMitarbeiterDetail = {
 							'paabgabe_id': -1,
 							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
 							'fixtermin': false,
-							'kurzbz': '',
+							'kurzbz': '', // todo kurzbz textfield value vorschlag für qualgates
 							'datum': new Date().toISOString().split('T')[0],
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 							'beurteilungsnotiz': '',
@@ -114,11 +114,26 @@ export const AbgabeMitarbeiterDetail = {
 						}
 						
 						this.showAutomagicModalPhrase = true
+					} else {
+						this.showAutomagicModalPhrase = false	
 					}
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
 			})
+		},
+		async handleDeleteTermin(termin){
+			if(await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirm_delete'),
+				acceptLabel: 'Löschen',
+				acceptClass: 'btn btn-danger',
+				rejectLabel: 'Zurück',
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			} else {
+				this.deleteTermin(termin)
+			}
 		},
 		deleteTermin(termin) {
 			this.$api.call(ApiAbgabe.deleteProjektarbeitAbgabe(termin.paabgabe_id)).then( (res) => {
@@ -151,34 +166,19 @@ export const AbgabeMitarbeiterDetail = {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
-			// todo: rework styling but keep the color pattern logic
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			let color = 'white'
-			let fontColor = 'black'
-			let icon = '';
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
-					color = 'red'
-					fontColor = 'white'
-					icon = 'fa-triangle-exclamation'
+					return 'verpasst-header'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					color = 'yellow'
-					icon = 'fa-circle-exclamation'
-				}
+					return 'abzugeben-header'
+				} else {
+					return 'standard-header'
+				} 
 			} else if(abgabedatum > datum) {
-				color = 'pink' // aka "hellrot"
-				fontColor = 'white'
-				icon = 'fa-circle-question'
+				return 'verspaetet-header'
 			} else {
-				color = 'green'
-				icon = 'fa-square-check'
-			}
-
-			//return `font-color: ${fontColor} ; background-color: ${color}; border-radius: 50%;`
-			if(  typeof mode !== 'undefined' || mode === 'icon') {
-				return icon;
-			} else {
-				return 'abgabe-zieldatum-border-' + color;
+				return 'abgegeben-header'
 			}
 		},
 		openBeurteilungLink(link) {
@@ -246,8 +246,18 @@ export const AbgabeMitarbeiterDetail = {
 			console.log(this.$refs.modalContainerCreateNewAbgabe)
 			this.$refs.modalContainerCreateNewAbgabe.show()
 		},
+		validateTermin(termin) {
+			// compare new termin to existing ones to block illegal termin constellations, if they exist
+			
+			return true
+		},
 		async handleSaveNewAbgabe(termin) {
-			// TODO: validate termin type & date
+			
+			if(!this.validateTermin(termin)) {
+				this.$fhcAlert.alertWarning('invalid termin')
+				
+				return false
+			}
 			
 			await this.saveTermin(termin)
 			
@@ -368,7 +378,8 @@ export const AbgabeMitarbeiterDetail = {
 								v-model="newTermin.bezeichnung"
 								@change="handleChangeAbgabetyp(newTermin)"
 								:options="abgabeTypeOptions"
-								:optionLabel="getOptionLabelAbgabetyp">
+								:optionLabel="getOptionLabelAbgabetyp"
+								scrollHeight="300px">
 							</Dropdown>
 						</div>
 					</div>
@@ -430,53 +441,21 @@ export const AbgabeMitarbeiterDetail = {
 			<h5>{{$p.t('abgabetool/c4abgabeMitarbeiterbereich')}}</h5>
 
 			<div class="row">
-				<div class="col-8">
+				<div class="col-6">
 					<p> {{projektarbeit?.student}}</p>
 					<p> {{projektarbeit?.titel}}</p>
 					<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
-				</div>
-				<div class="col-4 d-flex">
-					<div class="col">
-						<div class="row">
-							<button :disabled="!getSemesterBenotbar || !endUploadVorhanden" class="btn btn-secondary border-0" @click="openBenotung" style="width: 80%;">
-								{{ $p.t('abgabetool/c4benoten') }}
-								<i class="fa-solid fa-user-check"></i>
-							</button>
-						</div>
-						<div class="row" style="width: 90%;">
-							<span v-if="!getSemesterBenotbar" v-html="$p.t('abgabetool/c4aeltereParbeitBenoten', oldPaBeurteilungLink)"></span>
-							<span v-else-if="!endUploadVorhanden">{{ $p.t('abgabetool/c4noEnduploadFound') }}</span>
-						</div>
-					</div>
-					<div class="col">
-						<div class="row">
-							<button v-if="projektarbeit?.betreuerart_kurzbz !== 'Zweitbegutachter'" class="btn btn-secondary border-0" @click="openPlagiatcheck" style="width: 80%;">
-								{{ $p.t('abgabetool/c4plagiatcheck_link')}}
-								<i class="fa-solid fa-user-check"></i>
-							</button>
-						</div>
-						
-					</div>
-					<div class="col">
-						<div class="row">
-							<button class="btn btn-secondary border-0" @click="openStudentPage" style="width: 80%;">
-								{{ $p.t('abgabetool/c4student_perspective')}}
-								<i class="fa-solid fa-eye"></i>
-							</button>
-						</div>
-						
-					</div>
 				</div>
 			</div>
 			
 			<Accordion :multiple="true" :activeIndex="[0]">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
-					<AccordionTab :header="getAccTabHeaderForTermin(termin)">
+					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
 							
 						<div class="row">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
 							<div class="col-8 col-md-9">
-<!--								always keep fixtermin checkbox disabled for mitarbeiter tool -->
+<!--							always keep fixtermin checkbox disabled for mitarbeiter tool -->
 								<Checkbox 
 									v-model="termin.fixtermin"
 									disabled
@@ -569,7 +548,7 @@ export const AbgabeMitarbeiterDetail = {
 										</button>
 									</div>
 									<div class="col-4">
-										<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" style="max-height: 40px;" class="btn btn-primary border-0" @click="deleteTermin(termin)">
+										<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" style="max-height: 40px;" class="btn btn-danger border-0" @click="handleDeleteTermin(termin)">
 											{{ $p.t('abgabetool/c4delete') }}
 											<i class="fa-solid fa-trash"></i>
 										</button>
@@ -580,94 +559,6 @@ export const AbgabeMitarbeiterDetail = {
 					</AccordionTab>
 				</template>
 			</Accordion>
-			
-<!--			<div id="uploadWrapper">-->
-<!--				<div class="row" style="margin-bottom: 12px;">-->
-<!--					<div class="fw-bold" style="width: 100px">{{$p.t('abgabetool/c4fixtermin')}}</div>-->
-<!--					<div class="row" style="max-width: calc(100% - 100px)">-->
-<!--						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>-->
-<!--						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>-->
-<!--						<div v-show="qualityGateTerminAvailable" class="col-2 fw-bold">{{$p.t('abgabetool/c4note')}}</div>-->
-<!--						<div v-show="qualityGateTerminAvailable" class="col-1 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>-->
-<!--						<div class="col-2 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>-->
-<!--						<div class="col-1 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>-->
-<!--						<div class="col">-->
-<!--							-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
-<!--				<div v-if="!projektarbeit?.abgabetermine?.length">keine Termine gefunden!</div>-->
-<!--				<div class="row" v-for="termin in projektarbeit.abgabetermine">-->
-<!--					<div style="width: 100px" class="d-flex justify-content-center align-items-center">-->
-<!--						<i v-if="termin.fixtermin" class="fa-solid fa-2x fa-circle-check fhc-bullet-red"></i>-->
-<!--						<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>-->
-<!--&lt;!&ndash;						<p class="fhc-bullet" :class="{ 'fhc-bullet-red': termin.fixtermin, 'fhc-bullet-green': !termin.fixtermin }"></p>&ndash;&gt;-->
-<!--					</div>-->
-<!--					<div class="row" style="max-width: calc(100% - 100px)">-->
-<!--						<div class="col-2 d-flex justify-content-center align-items-center">-->
-<!--							<div class="position-relative" :class="getDateStyle(termin)">-->
-<!--								<VueDatePicker-->
-<!--									style="width: 95%;"-->
-<!--									v-model="termin.datum"-->
-<!--									:clearable="false"-->
-<!--									:disabled="!termin.allowedToSave"-->
-<!--									:enable-time-picker="false"-->
-<!--									:format="formatDate"-->
-<!--									:text-input="true"-->
-<!--									auto-apply>-->
-<!--								</VueDatePicker>-->
-<!--								<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>-->
-<!--							</div>				-->
-<!--						</div>-->
-<!--						<div class="col-2 d-flex justify-content-center align-items-center">-->
-<!--							<Dropdown -->
-<!--								:style="{'width': '100%'}"-->
-<!--								:disabled="!termin.allowedToSave"-->
-<!--								v-model="termin.bezeichnung"-->
-<!--								:options="abgabeTypeOptions"-->
-<!--								:optionLabel="getOptionLabelAbgabetyp">-->
-<!--							</Dropdown>-->
-<!--						</div>-->
-<!--						<div v-if="qualityGateTerminAvailable || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'" class="col-2 d-flex justify-content-center align-items-center">-->
-<!--							<Dropdown -->
-<!--								v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"-->
-<!--								:style="{'width': '100%'}"-->
-<!--								v-model="termin.note"-->
-<!--								:options="allowedNotenOptions"-->
-<!--								:optionLabel="getNotenOptionLabel">-->
-<!--							</Dropdown>-->
-<!--						</div>-->
-<!--						<div v-if="qualityGateTerminAvailable || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'" class="col-1 d-flex justify-content-center align-items-center">-->
-<!--							<Checkbox -->
-<!--								v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'"-->
-<!--								v-model="termin.upload_allowed"-->
-<!--								:binary="true" -->
-<!--								:pt="{ root: { class: 'ml-auto' }}"-->
-<!--							>-->
-<!--							</Checkbox>-->
-<!--						</div>-->
-<!--						<div class="col-2 d-flex justify-content-center align-items-center">-->
-<!--							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" cols="20" :disabled="!termin.allowedToSave"></Textarea>-->
-<!--						</div>-->
-<!--						<div class="col-1 d-flex justify-content-center align-items-center">-->
-<!--							{{ termin.abgabedatum?.split("-").reverse().join(".") }}-->
-<!--							<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">-->
-<!--								<i class="fa-solid fa-2x fa-file-pdf"></i>-->
-<!--							</a>-->
-<!--						</div>-->
-<!--						<div class="col-2 align-content-center">-->
-<!--							<button v-if="termin.allowedToSave" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">-->
-<!--								{{ $p.t('abgabetool/c4save') }}-->
-<!--								<i class="fa-solid fa-floppy-disk"></i>-->
-<!--							</button>-->
-<!--							<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" style="max-height: 40px;" class="btn btn-primary border-0" @click="deleteTermin(termin)">-->
-<!--								{{ $p.t('abgabetool/c4delete') }}-->
-<!--								<i class="fa-solid fa-trash"></i>-->
-<!--							</button>-->
-<!--						</div>-->
-<!--					</div>-->
-<!--				</div>-->
-<!--			</div>-->
 		 </div>
 `,
 };
