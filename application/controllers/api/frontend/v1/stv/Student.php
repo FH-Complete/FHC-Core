@@ -666,30 +666,31 @@ class Student extends FHCAPI_Controller
 
 		$prestudent_id = getData($result);
 
-		// Prestudent Rolle Anlegen
-		$this->prestudentlib->setFirstStatus(
-			$prestudent_id,
-			$incoming ? 'Incoming' : 'Interessent',
-			$studiensemester_kurzbz,
-			$this->input->post('ausbildungssemester'),
-			$this->input->post('orgform_kurzbz'),
-			$this->input->post('studienplan_id')
-		);
-		if (!hasData($result)) return error('error when adding status');
-		if (isError($result)) return $result;
-
+		// wenn Incoming, Incoming Daten hinzufügen
 		if ($incoming)
 		{
-			$result = $this->prestudentlib->setIncoming($prestudent_id, $studiengang_kz, $studiensemester_kurzbz);
-			if (isError($result)) return $result;
+			$statusResult = $this->prestudentlib->setFirstIncoming(
+				$prestudent_id,
+				$studiengang_kz,
+				$studiensemester_kurzbz,
+				$this->input->post('orgform_kurzbz'),
+				$this->input->post('studienplan_id')
+			);
 		}
-		// TODO(chris): DEBUG
-		/*$result = $this->PrestudentModel->loadWhere([
-			'pestudent_id' => 1
-		]);
-		if (isError($result)) {
-			return $result;
-		}*/
+		else
+		{
+			// Prestudent Rolle Anlegen
+			$statusResult = $this->prestudentlib->setFirstStatus(
+				$prestudent_id,
+				$this->PrestudentstatusModel::STATUS_INTERESSENT,
+				$studiensemester_kurzbz,
+				$this->input->post('ausbildungssemester'),
+				$this->input->post('orgform_kurzbz'),
+				$this->input->post('studienplan_id')
+			);
+		}
+		if (!hasData($statusResult)) return error('error when adding status');
+		if (isError($statusResult)) return $statusResult;
 
 		return success($prestudent_id);
 	}

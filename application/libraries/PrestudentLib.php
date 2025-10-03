@@ -977,7 +977,7 @@ class PrestudentLib
 	 * @param $studiensemester_kurzbz start semester for incoming
 	 * @return object success if incoming successfully saved, or error
 	 */
-	public function setIncoming($prestudent_id, $studiengang_kz, $studiensemester_kurzbz)
+	public function setFirstIncoming($prestudent_id, $studiengang_kz, $studiensemester_kurzbz, $orgform_kurzbz, $studienplan_id)
 	{
 		// Verband and Ausbildungssemester for incoming
 		$authUID = getAuthUID();
@@ -993,6 +993,17 @@ class PrestudentLib
 		if (!hasData($result)) return error('No prestudent');
 
 		$student_data = getData($result)[0];
+
+		$result = $this->setFirstStatus(
+			$prestudent_id,
+			$this->_ci->PrestudentstatusModel::STATUS_INCOMING,
+			$studiensemester_kurzbz,
+			$incomingAusbildungssemester,
+			$orgform_kurzbz,
+			$studienplan_id
+		);
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error('Error when adding prestudentstatus');
 
 		// generate Personenkennzeichen
 		$result = $this->_ci->StudentModel->generateMatrikelnummer2($studiengang_kz, $studiensemester_kurzbz);
@@ -1061,18 +1072,23 @@ class PrestudentLib
 			'gruppe' => ' '
 		];
 
-		// Add Lehrverband if it does not exist
-		$result = $this->_ci->LehrverbandModel->load([' ', ' ', $incomingAusbildungssemester, $student_data->studiengang_kz]);
+		$result = $this->_ci->LehrverbandModel->loadWhere([
+				'studiengang_kz' => $student['studiengang_kz'],
+				'semester' => $student['semester'],
+				'verband' => $student['verband'],
+				'gruppe' => $student['gruppe']
+			]);
 
 		if (isError($result)) return $result;
 
 		if (!hasData($result))
 		{
+			// Add Lehrverband if it does not exist
 			$result = $this->_ci->LehrverbandModel->insert([
 				'studiengang_kz' => $student_data->studiengang_kz,
-				'semester' => $incomingAusbildungssemester,
-				'verband' => $incomingVerband,
-				'gruppe' => $student_data->gruppe,
+				'semester' => $student['semester'],
+				'verband' => $student['verband'],
+				'gruppe' => $student['gruppe'],
 				'bezeichnung' => 'Incoming',
 				'aktiv' => true
 			]);
