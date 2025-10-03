@@ -12,7 +12,7 @@ define('ENVIRONMENT', isset($_SERVER['CI_ENV']) ? $_SERVER['CI_ENV'] : 'developm
 
 // Get BASEPATH Var
 $system_path = dirname(__FILE__).'/../vendor/codeigniter/framework/system';
-if (($_temp = realpath($system_path)) !== FALSE)
+if (($_temp = realpath($system_path)) !== false)
 	$system_path = $_temp.'/';
 else
 	$system_path = rtrim($system_path, '/').'/';
@@ -21,12 +21,12 @@ define('BASEPATH', str_replace('\\', '/', $system_path));
 // Get APPPATH Var
 $application_folder = dirname(__FILE__).'/../application';
 if (is_dir($application_folder)) {
-	if (($_temp = realpath($application_folder)) !== FALSE)
+	if (($_temp = realpath($application_folder)) !== false)
 		$application_folder = $_temp;
 	define('APPPATH', $application_folder.DIRECTORY_SEPARATOR);
 } else {
 	if (!is_dir(BASEPATH.$application_folder.DIRECTORY_SEPARATOR)) {
-		header('HTTP/1.1 503 Service Unavailable.', TRUE, 503);
+		header('HTTP/1.1 503 Service Unavailable.', true, 503);
 		echo 'Your application folder path does not appear to be set correctly. Please open the following file and correct this: '.SELF;
 		exit(3); // EXIT_CONFIG
 	}
@@ -45,7 +45,6 @@ $db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-
 	if(isset($_GET['id'])) {
 		$id = $_GET['id'];
 
@@ -77,7 +76,22 @@ if ($config['note_blacklist_wiederholung']) {
 
 
 $query = "
-	SELECT stg.bezeichnung, tbl_orgform.bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, (
+	SELECT 
+		stg.bezeichnung, 
+		tbl_orgform.bezeichnung_mehrsprachig[(
+			SELECT index 
+			FROM public.tbl_sprache 
+			WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . "
+		)], 
+		studierendenantrag_id, 
+		matrikelnr, 
+		studienjahr_kurzbz, 
+		a.studiensemester_kurzbz, 
+		vorname, 
+		nachname, 
+		studiengang_kz, 
+		pss.ausbildungssemester AS semester, 
+		(
 			SELECT
 				insertamum::date
 			FROM
@@ -87,7 +101,15 @@ $query = "
 			ORDER BY
 				insertamum DESC
 			LIMIT 1
-		) AS abmeldedatum, (SELECT pt.text FROM system.tbl_phrase p JOIN system.tbl_phrasentext pt USING(phrase_id) WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1) AS grund
+		) AS abmeldedatum, 
+		(
+			SELECT pt.text 
+			FROM system.tbl_phrase p 
+			JOIN system.tbl_phrasentext pt USING(phrase_id) 
+			WHERE p.category=" . $db->db_add_param('studierendenantrag', FHC_STRING) . " 
+			AND p.phrase=" . $db->db_add_param('grund_Wiederholung_deadline', FHC_STRING) . " 
+			AND pt.sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . " LIMIT 1
+		) AS grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)
@@ -95,7 +117,11 @@ $query = "
 	JOIN public.tbl_person USING (person_id)
 	JOIN public.tbl_studiengang stg USING (studiengang_kz)
 	JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
-	LEFT JOIN public.tbl_prestudentstatus pss ON (pss.prestudent_id = a.prestudent_id AND pss.studiensemester_kurzbz=a.studiensemester_kurzbz AND pss.status_kurzbz=get_rolle_prestudent(a.prestudent_id, a.studiensemester_kurzbz))
+	LEFT JOIN public.tbl_prestudentstatus pss ON (
+		pss.prestudent_id = a.prestudent_id AND 
+		pss.studiensemester_kurzbz=a.studiensemester_kurzbz AND 
+		pss.status_kurzbz=get_rolle_prestudent(a.prestudent_id, a.studiensemester_kurzbz)
+	)
 	LEFT JOIN lehre.tbl_studienplan plan USING (studienplan_id)
 	JOIN bis.tbl_orgform ON (tbl_orgform.orgform_kurzbz = public.get_orgform_prestudent(a.prestudent_id, a.studiensemester_kurzbz))" . $where;
 

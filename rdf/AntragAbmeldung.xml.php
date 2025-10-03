@@ -9,7 +9,6 @@ $db = new basis_db();
 
 if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 {
-
 	if(isset($_GET['id'])) {
 		$id = $_GET['id'];
 
@@ -36,7 +35,19 @@ else
 
 
 $query = "
-	SELECT stg.bezeichnung, bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], studierendenantrag_id, matrikelnr, studienjahr_kurzbz, a.studiensemester_kurzbz, vorname, nachname, studiengang_kz, pss.ausbildungssemester AS semester, pss.datum, a.grund
+	SELECT 
+		stg.bezeichnung, 
+		bezeichnung_mehrsprachig[(SELECT index FROM public.tbl_sprache WHERE sprache=" . $db->db_add_param(getSprache(), FHC_STRING) . ")], 
+		studierendenantrag_id, 
+		matrikelnr, 
+		studienjahr_kurzbz, 
+		a.studiensemester_kurzbz, 
+		vorname, 
+		nachname, 
+		studiengang_kz, 
+		pss.ausbildungssemester AS semester, 
+		pss.datum, 
+		a.grund
 	FROM
 	campus.tbl_studierendenantrag a
 	JOIN public.tbl_student USING (prestudent_id)
@@ -44,7 +55,11 @@ $query = "
 	JOIN public.tbl_person USING (person_id)
 	JOIN public.tbl_studiengang stg USING (studiengang_kz)
 	JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
-	LEFT JOIN public.tbl_prestudentstatus pss ON (pss.prestudent_id = a.prestudent_id AND pss.studiensemester_kurzbz=a.studiensemester_kurzbz AND pss.status_kurzbz=get_rolle_prestudent(a.prestudent_id, a.studiensemester_kurzbz))
+	LEFT JOIN public.tbl_prestudentstatus pss ON (
+		pss.prestudent_id = a.prestudent_id AND 
+		pss.studiensemester_kurzbz=a.studiensemester_kurzbz AND 
+		pss.status_kurzbz=get_rolle_prestudent(a.prestudent_id, a.studiensemester_kurzbz)
+	)
 	LEFT JOIN lehre.tbl_studienplan plan USING (studienplan_id)
 	JOIN bis.tbl_orgform ON (tbl_orgform.orgform_kurzbz = public.get_orgform_prestudent(a.prestudent_id, a.studiensemester_kurzbz))" . $where;
 
