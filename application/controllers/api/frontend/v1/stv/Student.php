@@ -483,7 +483,7 @@ class Student extends FHCAPI_Controller
 			if (isError($result)) $errors[] = getError($result);
 			$result = $this->_addKontakt($person_id);
 			if (isError($result)) $errors[] = getError($result);
-			if (!$this->input->post('personOnly')) $result = $this->_addInteressent($person_id);
+			if (!$this->input->post('personOnly')) $result = $this->_addFirstPrestudentstatus($person_id);
 			if (isError($result)) $errors[] = getError($result);
 		}
 
@@ -635,7 +635,7 @@ class Student extends FHCAPI_Controller
 		return success(null);
 	}
 
-	private function _addInteressent($person_id)
+	private function _addFirstPrestudentstatus($person_id)
 	{
 		// Prestudent anlegen
 
