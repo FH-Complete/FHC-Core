@@ -267,6 +267,7 @@ export default {
 			editor: null,
 			notizData: {
 				typeId: this.typeId,
+				id: this.id,
 				titel: null,
 				statusNew: true,
 				text: '',
@@ -344,6 +345,7 @@ export default {
 		},
 		addNewNotiz() {
 			const formData = new FormData();
+			this.notizData.id = this.id;
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
@@ -1171,6 +1173,7 @@ export default {
 									container-class="col-6"
 									:label="$p.t('notiz', 'bearbeiter')"
 									v-model="notizData.bearbeiter_uid"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>
@@ -1184,6 +1187,7 @@ export default {
 									:suggestions="filteredMitarbeiter" 
 									@complete="search" 
 									optionLabel="mitarbeiter"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>	

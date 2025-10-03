@@ -112,7 +112,6 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		$notiz_id = $this->input->post('notiz_id');
 
-		//$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->NotizModel->addJoin('public.tbl_notiz_dokument', 'notiz_id', 'LEFT');
 		$this->NotizModel->addSelect('*');
 		$this->NotizModel->addSelect("TO_CHAR(CASE WHEN public.tbl_notiz.updateamum >= public.tbl_notiz.insertamum 
@@ -239,6 +238,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 	public function updateNotiz()
 	{
+
 		$this->load->library('form_validation');
 		$this->load->library('DmsLib');
 
