@@ -1055,8 +1055,6 @@ class PrestudentLib
 		$benutzer['insertamum'] = date('Y-m-d H:i:s');
 		$benutzer['insertvon'] = $authUID;
 
-		$this->_ci->addMeta('benutzer', $benutzer);
-
 		$result = $this->_ci->BenutzerModel->insert($benutzer);
 
 		if (isError($result)) return $result;
