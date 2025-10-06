@@ -112,26 +112,14 @@ export default {
 
 			return cp;
 		},
-		async filterFav() {
+		filterFav() {
 			this.favorites.on = !this.favorites.on;
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(',\n');
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
-		async markFav(key) {
+		markFav(key) {
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
@@ -143,19 +131,7 @@ export default {
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = "\n" + result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(",\n");
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -189,6 +165,24 @@ export default {
 
 			if (!currentNode)
 				return;
+
+			const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
+			if (currentSelectedKey) {
+				if (currentSelectedKey == currentKey)
+					return;
+				/**
+				 * Do not select a new entry if the current is a child of the new one.
+				 * This happens if a child entry of a new stg is selected and the router
+				 * tries to select the stg root entry (because subtrees do not have
+				 * routes yet)
+				 */
+				const isChild = this.findNodeByKey(
+					currentSelectedKey,
+					currentNode.children
+				);
+				if (isChild)
+					return;
+			}
 
 			for (let i = 1; i < parts.length; i++)
 			{

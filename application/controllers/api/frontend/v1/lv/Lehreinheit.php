@@ -350,7 +350,7 @@ class Lehreinheit extends FHCAPI_Controller
 						$this->form_validation->set_rules($field, 'Start KW', 'integer|greater_than[0]|less_than_equal_to[53]');
 						break;
 					case 'gewicht':
-						$this->form_validation->set_rules($field, 'Gewicht', 'numeric');
+						$this->form_validation->set_rules($field, 'Gewicht', 'numeric|greater_than_equal_to[0]');
 						break;
 					case 'raumtyp':
 						$this->form_validation->set_rules($field, 'Raumtyp', 'required|max_length[16]');
@@ -365,7 +365,7 @@ class Lehreinheit extends FHCAPI_Controller
 						$this->form_validation->set_rules($field, 'LVNR', 'integer');
 						break;
 					case 'unr':
-						$this->form_validation->set_rules($field, 'UNR', 'integer');
+						$this->form_validation->set_rules($field, 'UNR', 'integer|greater_than_equal_to[0]');
 						break;
 					case 'lehre':
 						$this->form_validation->set_rules($field, 'Lehre', 'trim');
