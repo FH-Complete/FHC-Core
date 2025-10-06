@@ -7,6 +7,8 @@ import accessibility from '../../../../directives/accessibility.js';
 
 import ApiStvStudents from '../../../../api/factory/stv/students.js';
 import ApiStvAddress from '../../../../api/factory/stv/kontakt/address.js';
+import ApiStudiensemester from '../../../../api/factory/studiensemester.js';
+import ApiStudienplan from '../../../../api/factory/studienplan.js';
 
 var _uuid = 0;
 const FORMDATA_DEFAULT = {
@@ -157,15 +159,15 @@ export default {
 			});
 		},
 		loadStudienplaene() {
-			if (this.formDataStg)
-				CoreRESTClient
-					.post('components/stv/studienplan/get', {
-						studiengang_kz: this.formDataStg,
-						studiensemester_kurzbz: this.formDataSem,
-						ausbildungssemester: this.formData.ausbildungssemester,
-						orgform_kurzbz: this.formData.orgform_kurzbz
-					})
-					.then(result => CoreRESTClient.getData(result.data) || [])
+			if (this.formDataStg) {
+				this.$api
+					.call(ApiStudienplan.getStudienplaeneBySemester(
+						this.formDataStg,
+						this.formDataSem,
+						this.formData.ausbildungssemester,
+						this.formData.orgform_kurzbz
+					))
+					.then(result => result.data || [])
 					.then(result => {
 						this.studienplaene = result;
 						if (this.formData.studienplan_id !== '' && !this.studienplaene.filter(plan => plan.studienplan_id == this.formData.studienplan_id).length)
@@ -179,6 +181,7 @@ export default {
 						if (error.code != "ERR_CANCELED")
 							window.setTimeout(this.loadStudienplaene, 100);
 					})
+			}
 		},
 		changeAddressNation(e) {
 			if (this.formData['geburtsnation'] == this.formData['address']['nation'])
@@ -218,13 +221,12 @@ export default {
 	},
 	created() {
 		this.uuid = _uuid++;
-		CoreRESTClient
-			.get('components/stv/Studiensemester')
-			.then(result => CoreRESTClient.getData(result.data) || [])
-			.then(result => {
-				this.semester = result;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+		this.$api.call(ApiStudiensemester.getAll())
+		.then(result => result.data || [])
+		.then(result => {
+			this.semester = result;
+		})
+		.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
@@ -642,7 +644,7 @@ export default {
 									name="ausbildungssemester"
 									v-model="formData['ausbildungssemester']"
 									:disabled="formData['incoming']"
-									@input="loadStudienplaene"
+									@change="loadStudienplaene"
 									>
 									<option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
 								</form-input>
@@ -656,7 +658,7 @@ export default {
 									id="stv-list-new-orgform_kurzbz"
 									name="orgform_kurzbz"
 									v-model="formData['orgform_kurzbz']"
-									@input="loadStudienplaene"
+									@change="loadStudienplaene"
 									>
 									<option value="">-- keine Auswahl --</option>
 									<option v-for="orgform in lists.orgforms" :key="orgform.orgform_kurzbz" :value="orgform.orgform_kurzbz">{{orgform.bezeichnung}}</option>
