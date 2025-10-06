@@ -109,11 +109,14 @@ class Gruppe extends FHCAPI_Controller
 	}
 
 
-	public function getAllSearch($query = null)
+	public function getAllSearch()
 	{
+		$query = $this->input->get('query');
+
 		if (is_null($query))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-		$query_words = explode(' ', urldecode($query));
+
+		$query_words = explode(' ', $query);
 
 		$this->_ci->GruppeModel->addSelect('gruppe_kurzbz,
 											studiengang_kz,
@@ -177,12 +180,14 @@ class Gruppe extends FHCAPI_Controller
 		$this->terminateWithSuccess($all_gruppen);
 	}
 
-	public function getBenutzerSearch($query = null)
+	public function getBenutzerSearch()
 	{
+		$query = $this->input->get('query');
+
 		if (is_null($query))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-		$query_words = explode(' ', urldecode($query));
+		$query_words = explode(' ', $query);
 
 		$this->_ci->PersonModel->addSelect('vorname, nachname, uid, semester, UPPER(CONCAT(tbl_studiengang.typ, tbl_studiengang.kurzbz)) as studiengang');
 		$this->_ci->PersonModel->addJoin('public.tbl_benutzer', 'person_id');

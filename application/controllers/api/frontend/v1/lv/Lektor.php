@@ -208,11 +208,14 @@ class Lektor extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($this->_ci->LehrfunktionModel->load()));
 	}
 
-	public function getLektorenSearch($query = null)
+	public function getLektorenSearch()
 	{
+		$query = $this->input->get('query');
+
 		if (is_null($query))
 			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
-		$query_words = explode(' ', urldecode($query));
+
+		$query_words = explode(' ', $query);
 
 		$this->_ci->MitarbeiterModel->addSelect('uid, person_id, vorname, nachname');
 		$this->_ci->MitarbeiterModel->addJoin('public.tbl_benutzer', 'uid = mitarbeiter_uid');

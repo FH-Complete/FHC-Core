@@ -41,7 +41,7 @@ export default {
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/gruppe/getBenutzerSearch/' + encodeURIComponent(query)
+			url: `/api/frontend/v1/lv/gruppe/getBenutzerSearch?query=${encodeURIComponent(query)}`
 		};
 	},
 
@@ -49,7 +49,7 @@ export default {
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/gruppe/getAllSearch/'  + encodeURIComponent(query)
+			url: `/api/frontend/v1/lv/gruppe/getAllSearch?query=${encodeURIComponent(query)}`
 		};
 	},
 

@@ -12,7 +12,7 @@ export default {
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/lektor/getLektorenSearch/' + encodeURIComponent(query)
+			url: `/api/frontend/v1/lv/lektor/getLektorenSearch?query=${encodeURIComponent(query)}`
 		};
 	},
 
