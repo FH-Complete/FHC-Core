@@ -1,12 +1,17 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
+import CoreTag from '../../Tag/Tag.js';
+import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import { extendedHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import ApiTag from "../../../api/factory/stv/tag.js";
 
 
 export default {
 	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
-		ListNew
+		ListNew,
+		CoreTag
 	},
 	inject: {
 		'lists': {
@@ -45,6 +50,81 @@ export default {
 				columns:[
 					{title:"UID", field:"uid", headerFilter: true},
 					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{
+						title: 'Tags',
+						field: 'tags',
+						tooltip: false,
+						headerFilter: "input",
+						headerFilterFunc: tagHeaderFilter,
+						headerFilterFuncParams: {field: 'tags'},
+						formatter: (cell) => {
+							let tags = cell.getValue();
+							if (!tags) return;
+
+							let container = document.createElement('div');
+							container.className = "d-flex gap-1";
+
+							let parsedTags = JSON.parse(tags);
+							let maxVisibleTags = 2;
+
+							const rowData = cell.getRow().getData();
+							if (rowData._tagExpanded === undefined) {
+								rowData._tagExpanded = false;
+							}
+
+							const renderTags = () => {
+								container.innerHTML = '';
+								parsedTags = parsedTags.filter(item => item !== null);
+
+								parsedTags.sort((a, b) => {
+									let adone = a.done ? 1 : 0;
+									let bbone = b.done ? 1 : 0;
+
+									if (adone !== bbone)
+									{
+										return adone - bbone;
+									}
+									return b.id - a.id;
+								});
+								const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
+
+								tagsToShow.forEach(tag => {
+									if (!tag) return;
+									let tagElement = document.createElement('span');
+									tagElement.innerText = tag.beschreibung;
+									tagElement.title = tag.notiz;
+									tagElement.className = "tag " + tag.style;
+									if (tag.done) tagElement.className += " tag_done";
+
+									tagElement.addEventListener('click', (event) => {
+										event.stopPropagation();
+										event.preventDefault();
+										this.$refs.tagComponent.editTag(tag.id);
+									});
+
+									container.appendChild(tagElement);
+								});
+
+								if (parsedTags.length > maxVisibleTags) {
+									let toggle = document.createElement('button');
+									toggle.innerText = (rowData._tagExpanded ? '- ' : '+ ') + (parsedTags.length - maxVisibleTags);
+									toggle.className = "display_all";
+									toggle.title = rowData._tagExpanded ? "Tags ausblenden" : "Tags einblenden";
+
+									toggle.addEventListener('click', () => {
+										rowData._tagExpanded = !rowData._tagExpanded;
+										renderTags();
+									});
+
+									container.appendChild(toggle);
+								}
+							};
+
+							renderTags();
+							return container;
+						},
+						width: 150,
+					},
 					{title:"Nachname", field:"nachname", headerFilter: true},
 					{title:"Vorname", field:"vorname", headerFilter: true},
 					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
@@ -131,7 +211,7 @@ export default {
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'prestudent_id',
-				persistenceID: 'stv-list'
+				persistenceID: 'stv-list',
 			},
 			tabulatorEvents: [
 				{
@@ -140,7 +220,11 @@ export default {
 				},
 				{
 					event: 'dataProcessed',
-					handler: this.autoSelectRows
+					//handler: this.autoSelectRows TODO(Manu) combine
+					handler: (data) => {
+						this.reexpandRows()
+						this.$emit('update:selected', {})
+					}
 				},
 				{
 					event: 'dataLoaded',
@@ -153,6 +237,18 @@ export default {
 				{
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
+				},
+				{
+					event: 'dataTreeRowExpanded',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: 'dataTreeRowCollapsed',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
@@ -162,7 +258,11 @@ export default {
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
-			currentEndpointRawUrl: ''
+			currentEndpointRawUrl: '',
+			//tags
+			expanded: [],
+			selectedColumnValues: [],
+			tagEndpoint: ApiTag
 		}
 	},
 	methods: {
@@ -175,6 +275,11 @@ export default {
 		rowSelectionChanged(data) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
+
+			//for tags
+			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().uid !== undefined && row.getData().uid).map(row => row.getData().uid);
+
 			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
@@ -294,7 +399,194 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
-		}
+		},
+		//methods tags
+		addedTag(addedTag)
+		{
+			console.log("addedTag");
+			const table = this.$refs.table.tabulator;
+
+			this.selectedRows.forEach(row =>
+			{
+				if (Array.isArray(addedTag.response))
+				{
+					addedTag.response.forEach(tag => {
+						const targetRow = this.allRows.find(row => row.getData().uid === tag.uid);
+						if (targetRow)
+						{
+							const rowData = targetRow.getData();
+							let tags = [];
+							try {
+								tags = JSON.parse(rowData.tags || '[]');
+							} catch (e) {}
+
+							const tagExists = tags.some((t) => t.id === tag.id);
+							if (!tagExists)
+							{
+								addedTag.id = tag.id;
+								tags.unshift({ ...addedTag });
+								targetRow.update({ tags: JSON.stringify(tags) });
+								targetRow.reformat();
+							}
+						}
+					});
+				}
+			});
+		},
+		deletedTag(deletedTag) {
+			console.log("deletedTag");
+			const targetRow = this.allRows.find(row => {
+				const rowData = row.getData();
+
+				let tags = [];
+				try {
+					tags = JSON.parse(rowData.tags || '[]');
+				} catch (e) {}
+
+				return tags.some(tag => tag.id === deletedTag);
+			});
+
+			if (targetRow) {
+				const rowData = targetRow.getData();
+				let tags = [];
+
+				try {
+					tags = JSON.parse(rowData.tags || '[]');
+				} catch (e) {}
+
+				const filteredTags = tags.filter(t => t.id !== deletedTag);
+				const updatedTags = JSON.stringify(filteredTags);
+
+				if (updatedTags !== rowData.tags) {
+					targetRow.update({
+						tags: updatedTags
+					});
+
+					targetRow.reformat();
+				}
+			}
+		},
+		updatedTag(updatedTag) {
+			console.log("updatedTag");
+			const targetRow = this.allRows.find(row => {
+				const rowData = row.getData();
+				let tags = [];
+
+				try {
+					tags = JSON.parse(rowData.tags || '[]');
+				} catch (e) {}
+
+				return tags.some(t => t?.id === updatedTag.id);
+			});
+
+			if (targetRow)
+			{
+				const rowData = targetRow.getData();
+				let tags = [];
+				try {
+					tags = JSON.parse(rowData.tags || '[]');
+				} catch (e) {}
+
+				let changed = false;
+
+				const tagIndex = tags.findIndex(tag => tag?.id === updatedTag.id);
+				if (tagIndex !== -1) {
+					tags[tagIndex] = { ...updatedTag };
+					changed = true;
+				}
+
+				if (changed)
+				{
+					targetRow.update({
+						tags: JSON.stringify(tags),
+					});
+					targetRow.reformat();
+				}
+			}
+		},
+		resetTree() {
+			console.log("reset tree");
+			this.allRows.forEach(row => {
+				row._row.modules.dataTree.open = false;
+			});
+
+			let rootRows = this.$refs.table.tabulator.getRows(true);
+			var lastRow = rootRows[rootRows.length - 1];
+			lastRow?.treeCollapse(true)
+
+			this.currentTreeLevel = 0;
+		},
+		expandTree()
+		{
+			console.log("expandTree");
+			this.currentTreeLevel = (this.currentTreeLevel || 0) + 1;
+
+			let lastMatchingRow = null;
+
+			this.allRows.forEach(row => {
+				const level = row._row.modules.dataTree?.index ?? 0;
+
+				if (level === this.currentTreeLevel - 1 )
+				{
+					row._row.modules.dataTree.open = true;
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
+				}
+			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+			}
+			this.$refs.table.tabulator.redraw();
+		},
+		getAllRows(rows)
+		{
+			let result = [];
+			rows.forEach(row =>
+			{
+				result.push(row);
+				let children = row.getTreeChildren();
+				if(children && children.length > 0)
+				{
+					result = result.concat(this.getAllRows(children));
+				}
+			});
+			return result;
+		},
+		async getExpandedRows() {
+			this.expanded = [];
+
+			this.allRows.forEach(row => {
+				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
+				{
+					this.expanded.push(row.getData().uniqueindex);
+				}
+			});
+		},
+		reexpandRows() {
+			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
+
+			const matchingRows = this.allRows.filter(row =>
+				this.expanded.includes(row.getData().uniqueindex)
+			);
+
+			if (matchingRows.length === 0)
+				this.currentTreeLevel = 0;
+
+			matchingRows.forEach((row, index) => {
+				row._row.modules.dataTree.open = true;
+
+				if (index === matchingRows.length - 1)
+				{
+					row.treeExpand();
+				}
+			});
+		},
+
 	},
 	computed: {
 		countsToHTML: function() {
@@ -313,6 +605,7 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
+	test manu {{selectedColumnValues}}
 		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
@@ -328,6 +621,20 @@ export default {
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 			>
+
+			<template #actions>
+				<core-tag ref="tagComponent"
+					:endpoint="tagEndpoint"
+					:values="selectedColumnValues"
+					@added="addedTag"
+					@deleted="deletedTag"
+					@updated="updatedTag"
+					zuordnung_typ="uid"
+				></core-tag>
+				<button @click="expandTree" class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-maximize"></i></button>
+				<button @click="resetTree" class="btn btn-outline-secondary" type="button"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
+			</template>
+
 			<template #filter>
 				<div class="card">
 					<div class="card-body">

@@ -113,3 +113,10 @@ $config['students_tab_order'] = [
 	'finalexam',
 	'archive',
 ];
+
+$config['stv_prestudent_tags'] = [
+	'tag_1' => ['readonly' => false],
+	'tag_2' => ['readonly' => true],
+	'tag_3' => ['readonly' => false],
+	'tag_4' => ['readonly' => true]
+];
