@@ -27,6 +27,7 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
+//require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
 require_once('dbupdate_3.4/dbupdate_dashboard.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
@@ -77,8 +78,11 @@ require_once('dbupdate_3.4/55614_perm_verwaltetoe.php');
 require_once('dbupdate_3.4/25999_C4_dashboard.php');
 require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
 require_once('dbupdate_3.4/40128_search.php');
+require_once('dbupdate_3.4/63394_Variablenbeschraenkung.php');
+require_once('dbupdate_3.4/63436_cis4_iframe_component.php');
 require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
+require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
