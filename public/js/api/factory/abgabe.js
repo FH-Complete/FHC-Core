@@ -36,11 +36,9 @@ export default {
 		};
 	},
 	getStudentProjektarbeitAbgabeFile(paabgabe_id, student_uid) {
-		// TODO: check if this is fine with new api scheme
-		
 		const url = `/Cis/Abgabetool/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
 
-		window.location = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url
+		window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 	},
 	getMitarbeiterProjektarbeiten(all) {
 		return {

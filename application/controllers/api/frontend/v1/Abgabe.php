@@ -287,18 +287,24 @@ class Abgabe extends FHCAPI_Controller
 
 	private function signaturFehltEmail($student_uid) {
 		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('education/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+		$this->StudentModel->addJoin('public.tbl_benutzer', 'ON (public.tbl_benutzer.uid = public.tbl_student.student_uid)');
+		$this->StudentModel->addJoin('public.tbl_person', 'person_id');
+
+//		$this->StudentModel->load($student_uid); -> this loads all students for some reason
+		$result = $this->StudentModel->loadWhere(array('student_uid' => $student_uid));
+		$this->StudentModel->resetQuery();
 		
-		$result = $this->StudentModel->load($student_uid);
 		$studentArr = $this->getDataOrTerminateWithError($result);
-		
+
 		if(count($studentArr) > 0) {
 			$student = $studentArr[0];
 		} else {
 			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
 		}
-
-		$result = $this->Studiengang_model->load($student->studiengang_kz);
+		
+		$result = $this->StudiengangModel->load($student->studiengang_kz);
 		$studiengangArr = $this->getDataOrTerminateWithError($result);
 
 		if(count($studiengangArr) > 0) {
@@ -341,7 +347,6 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
 		}
 
-		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
 		if(!$projektarbeitIsCurrent) {
 			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');

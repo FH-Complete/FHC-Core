@@ -52,21 +52,54 @@ export const AbgabeStudentDetail = {
 				return false
 			}
 			
-			// TODO: refine these
+			// TODO: define these
 			if(endupload) {
-				// check these input fields for length of entry ? standard fallback '' anyways
-
-				// this.form['abstract']
-				// this.form['abstract_en']
-				// this.form['schlagwoerter']
-				// this.form['schlagwoerter_en']
-				// this.form['seitenanzahl']
-
-				if(this.form['abstract'].length < 10 && await this.$fhcAlert.confirm({
-					message: 'Abstract is very short, wirklich speichern?',
-					acceptLabel: 'Verstanden und Fortfahren',
+				// check these input fields for length of entry
+				if(this.form['abstract'].length < 100 && await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/warningShortAbstract'),
+					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
 					acceptClass: 'btn btn-danger',
-					rejectLabel: 'Zurück',
+					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				if(this.form['abstract_en'].length < 100 && await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/warningShortAbstractEn'),
+					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				if(this.form['schlagwoerter'].length < 50 && await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/warningShortSchlagwoerter'),
+					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				if(this.form['schlagwoerter_en'].length < 50 && await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/warningShortSchlagwoerterEn'),
+					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				if(this.form['seitenanzahl'] <= 5 && await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/warningSmallSeitenanzahl'),
+					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
 					rejectClass: 'btn btn-outline-secondary'
 				}) === false) {
 					return false
@@ -159,13 +192,13 @@ export const AbgabeStudentDetail = {
 		},
 		handleUploadRes(res, termin) {
 			if(res.meta.status == "success") {
-				this.$fhcAlert.alertSuccess('File erfolgreich hochgeladen')
+				this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4fileUploadSuccess'))
 
 				// update 'abgabedatum' for successful upload -> shows the pdf icon and date once set
 				termin.abgabedatum = new Date().toISOString().split('T')[0];
 				
 			} else {
-				this.$fhcAlert.alertError('File upload error')
+				this.$fhcAlert.alertError(this.$p.t('abgabetool/c4fileUploadError'))
 			}
 			
 			if(res.meta.signaturInfo) {
@@ -316,7 +349,7 @@ export const AbgabeStudentDetail = {
 							</div>
 						</div>
 						
-						<div class="row mt-2">
+						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 							<div class="col-8 col-md-9">
 								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
@@ -327,9 +360,9 @@ export const AbgabeStudentDetail = {
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 							<div class="col-8 col-md-9">
 								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
-									<i class="fa-solid fa-2x fa-file-pdf"></i>
-								</a>
+								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+									<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+								</button>
 							</div>
 						</div>
 						

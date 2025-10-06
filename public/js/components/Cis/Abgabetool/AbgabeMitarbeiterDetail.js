@@ -420,7 +420,7 @@ export const AbgabeMitarbeiterDetail = {
 				</div>
 			</template>
 			<template v-slot:footer>
-				<button type="button" class="btn btn-primary" @click="handleSaveNewAbgabe(newTermin)">{{ $p.t('global/c4saveNewAbgabetermin') }}</button>
+				<button type="button" class="btn btn-primary" @click="handleSaveNewAbgabe(newTermin)">{{ $p.t('abgabetool/c4saveNewAbgabetermin') }}</button>
 			</template>
 		</bs-modal>
 
@@ -530,9 +530,9 @@ export const AbgabeMitarbeiterDetail = {
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 							<div class="col-8 col-md-9">
 								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<a v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" style="margin-left:4px; cursor: pointer;">
-									<i class="fa-solid fa-2x fa-file-pdf"></i>
-								</a>
+								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+									<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+								</button>
 							</div>
 						</div>
 						<div class="row mt-2">

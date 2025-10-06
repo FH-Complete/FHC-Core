@@ -48,7 +48,7 @@ export const AbgabetoolStudent = {
 			let qgate2Passed = false
 			
 			termine.forEach(t => {
-				const noteOption = this.notenOptions.find(opt => opt.note == t.note)
+				const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
 				if(noteOption && noteOption.positiv) {
 					if(t.paabgabetyp_kurzbz == 'qualgate1') {
 						qgate1Passed = true
@@ -196,12 +196,15 @@ export const AbgabetoolStudent = {
 			} else return ''
 		},
 		getNoteBezeichnung(projektarbeit) {
-			if(projektarbeit.note) {
+			if(projektarbeit.note && this.notenOptions) {
 				const noteOpt = this.notenOptions.find(opt => opt.note == projektarbeit.note)
 				return noteOpt?.bezeichnung
 			} else {
 				return ''
 			}
+		},
+		handleDownloadBeurteilung(projektarbeit) {
+			window.open(projektarbeit.beurteilung)
 		}
 	},
 	watch: {
@@ -212,9 +215,10 @@ export const AbgabetoolStudent = {
 			return this.student_uid !== this.viewData.uid
 		}
 	},
-	created() {
+	async created() {
+		this.loading = true
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
-		this.$api.call(ApiAbgabe.getNoten()).then(res => {
+		await this.$api.call(ApiAbgabe.getNoten()).then(res => {
 			this.notenOptions = res.data
 		}).catch(e => {
 			this.loading = false
@@ -272,7 +276,9 @@ export const AbgabetoolStudent = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4beurteilung')}}</div>
 					<div class="col-8 col-md-9">
-						<a v-if="projektarbeit.beurteilung"><i class="fa fa-file-pdf" style="color:#00649C"></i></a>
+						<button v-if="projektarbeit.beurteilung" @click="handleDownloadBeurteilung(projektarbeit)" class="btn btn-primary">
+							<a> {{$p.t('abgabetool/c4downloadBeurteilung')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+						</button>
 						<a v-else>{{$p.t('abgabetool/c4nobeurteilungVorhanden')}}</a>
 					</div>
 				</div>

@@ -391,6 +391,10 @@ export const AbgabetoolMitarbeiter = {
 		this.setupMounted()
 	},
 	template: `
+		<div id="loadingOverlay" v-show="loading || saving" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
+			<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
+		</div>
+
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
 			dialogClass="modal-lg">
 			<template v-slot:title>
@@ -486,13 +490,6 @@ export const AbgabetoolMitarbeiter = {
 						<i class="fa fa-hourglass-end"></i>
 						{{ $p.t('abgabetool/showDeadlines') }}
 					</button>
-					
-					<div v-show="saving">
-						{{ $p.t('abgabetool/currentlySaving') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-					</div>
-					<div v-show="loading">
-						{{ $p.t('abgabetool/currentlyLoading') }} <i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-					</div>
 					
 				</template>
 			</core-filter-cmpt>
