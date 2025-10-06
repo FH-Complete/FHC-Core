@@ -10,17 +10,13 @@ export default {
 
   props: {
     data: Object,
-    isMitarbeiter: {
-      type: Boolean,
-      default: false,
-    },
     files: {
       type: Array,
       default: []
     },
   },
 
-  inject: ["getZustelladressenCount", "updateFileID"],
+  inject: ["getZustelladressenCount", "updateFileID", "isMitarbeiter"],
 
   data() {
     return {

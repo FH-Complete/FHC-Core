@@ -196,7 +196,7 @@ class ProfilLib{
 	private function getAdressenInfo($pid)
 	{
 		$this->ci->load->model("person/Adresse_model","AdresseModel");
-		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "zustelladresse", "gemeinde", "nation"]);
+		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "heimatadresse", "zustelladresse", "gemeinde", "nation"]);
 		$adresse_res = $this->ci->AdresseModel->addOrder("zustelladresse", "DESC");
 		$adresse_res = $this->ci->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz");
 

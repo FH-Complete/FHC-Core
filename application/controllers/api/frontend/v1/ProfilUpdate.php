@@ -825,12 +825,33 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		//! UPDATE
 		else {
-			$requested_change['updateamum'] = "NOW()";
-			$requested_change['updatevon'] = getAuthUID();
-			$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
-			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
-			$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id, $personID);
+			$curadresse_res = $this->AdresseModel->load($adresse_id);
+			$curadresse = ($this->getDataOrTerminateWithError($curadresse_res))[0];
 
+			if($curadresse->heimatadresse)
+			{
+				$tmpadresse = array_merge((array) $curadresse, $requested_change);
+				unset($tmpadresse["adresse_id"]);
+				$tmpadresse['insertamum'] = "NOW()";
+				$tmpadresse['insertvon'] = getAuthUID();
+				$tmpadresse['person_id'] = $personID;
+				unset($tmpadresse["heimatadresse"]);
+				unset($tmpadresse["updateamum"]);
+				unset($tmpadresse["updatevon"]);
+
+				$tmpadresse_res = $this->AdresseModel->insert($tmpadresse);
+				$tmpadresse_id = $this->getDataOrTerminateWithError($tmpadresse_res, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $tmpadresse_id, $personID);
+			}
+			else
+			{
+				$requested_change['updateamum'] = "NOW()";
+				$requested_change['updatevon'] = getAuthUID();
+
+				$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
+				$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id, $personID);
+			}
 		}
 		return $insertID ?? null;
 	}
