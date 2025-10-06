@@ -50312,7 +50312,7 @@ and represent the current state of research on the topic. The prescribed citatio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
 	// FHC-4 Projektarbeiten & Vertraege ENDE
 	//****************************	 FHC-Core-ElectronicOnboarding
 	array(
