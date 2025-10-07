@@ -314,6 +314,28 @@ EOSQL;
 		return $this->execQuery($query, $params);
 	}
 
+	public function getAllLehreinheitenForLvaAndMaUid($lva_id, $ma_uid, $sem_kurzbz)
+	{
+		$query = "SELECT DISTINCT tbl_lehreinheitmitarbeiter.lehreinheit_id, tbl_lehreinheit.lehrveranstaltung_id, tbl_lehreinheit.lehrform_kurzbz,
+						tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
+						tbl_lehreinheitgruppe.semester,
+						tbl_lehreinheitgruppe.verband,
+						tbl_lehreinheitgruppe.gruppe,
+						tbl_lehreinheitgruppe.gruppe_kurzbz,
+						tbl_lehrveranstaltung.kurzbz,
+			 			tbl_studiengang.kurzbzlang,
+			 			(SELECT COUNT(DISTINCT datum) FROM campus.vw_stundenplan WHERE lehreinheit_id = lehre.tbl_lehreinheit.lehreinheit_id) as termincount,
+						(SELECT COUNT(*) FROM campus.vw_student_lehrveranstaltung WHERE lehreinheit_id = lehre.tbl_lehreinheit.lehreinheit_id) as studentcount
+		FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+			JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id)
+			JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+			JOIN public.tbl_studiengang ON (tbl_lehreinheitgruppe.studiengang_kz = tbl_studiengang.studiengang_kz)
+		WHERE lehrveranstaltung_id = ? AND studiensemester_kurzbz = ? AND mitarbeiter_uid = ?
+		ORDER BY tbl_lehreinheitgruppe.gruppe_kurzbz";
+
+		return $this->execQuery($query, [$lva_id, $sem_kurzbz, $ma_uid]);
+	}
+
 
 	public function getOes($lehreinheit_id)
 	{

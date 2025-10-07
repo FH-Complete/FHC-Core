@@ -317,7 +317,9 @@ class Lehrveranstaltung_model extends DB_Model
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
 			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_benutzer.uid,
 			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung,
-			tbl_student.prestudent_id
+			tbl_student.prestudent_id,
+			campus.vw_student_lehrveranstaltung.lehreinheit_id
+
 		FROM
 			campus.vw_student_lehrveranstaltung
 			JOIN public.tbl_benutzer USING(uid)
@@ -1049,6 +1051,26 @@ class Lehrveranstaltung_model extends DB_Model
 		$qry .= " ORDER BY stpllv_sort, semester, sort";
 
 		return $this->execQuery($qry, $params);
+	}
+
+	public function getLvForLektorInSemester($sem_kurzbz, $uid) {
+		$qry = "SELECT DISTINCT (tbl_lehrveranstaltung.lehrveranstaltung_id),
+				UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as stg_kurzbz,
+				tbl_lehrveranstaltung.semester as lv_semester,
+				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
+				(SELECT kurzbz FROM public.tbl_mitarbeiter
+				 WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
+			FROM
+				lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+									  JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+									  JOIN public.tbl_studiengang USING(studiengang_kz)
+									  JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+			WHERE
+				tbl_lehreinheit.studiensemester_kurzbz = ?
+			  AND mitarbeiter_uid = ?
+			ORDER BY stg_kurzbz,lv_semester,lv_bezeichnung";
+
+		return $this->execReadOnlyQuery($qry, array($sem_kurzbz, $uid));
 	}
 
 	public function getLvsByOrganization($oe_kurzbz)

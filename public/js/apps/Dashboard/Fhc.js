@@ -19,6 +19,7 @@ import Studium from "../../components/Cis/Studium/Studium.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
+import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -65,6 +66,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',
 			component: Raumsuche,
+			props: true
+		},
+		{
+			path: `/Cis/Benotungstool/:lv_id/:sem_kurzbz`,
+			name: 'Benotungstool',
+			component: Benotungstool,
 			props: true
 		},
 		// Redirect old links to new format

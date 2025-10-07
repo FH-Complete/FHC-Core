@@ -306,4 +306,5 @@ class Pruefung_model extends DB_Model
 
 		return $this->loadWhereCommitteeExamsFailed();
 	}
+	
 }

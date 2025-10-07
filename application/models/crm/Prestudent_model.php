@@ -782,4 +782,8 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
+	
+	public function getMobilityPrestudent(){
+		
+	}
 }

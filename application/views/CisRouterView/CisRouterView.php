@@ -11,6 +11,7 @@ $includesArray = array(
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
+		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
@@ -30,10 +31,13 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
-		'vendor/moment/luxonjs/luxon.min.js'
+		'vendor/moment/luxonjs/luxon.min.js',
+		'vendor/npm-asset/primevue/password/password.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js'
+		'public/js/apps/Dashboard/Fhc.js',
+		'vendor/olifolkerd/tabulator5/src/js/modules/ColumnCalcs/ColumnCalcs.js'
 	),
 
 );
