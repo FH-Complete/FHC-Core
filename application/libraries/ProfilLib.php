@@ -183,7 +183,10 @@ class ProfilLib{
 		$zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam ? current($zutrittskarte_ausgegebenam)->ausgegebenam : null;
 		
 		//? formats date from 01-01-2000 to 01.01.2000
-		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
+		if ($zutrittskarte_ausgegebenam !== NULL)
+		{
+			$zutrittskarte_ausgegebenam = (new DateTime($zutrittskarte_ausgegebenam))->format('d.m.Y');
+		}
 		return $zutrittskarte_ausgegebenam;
 	}
 
