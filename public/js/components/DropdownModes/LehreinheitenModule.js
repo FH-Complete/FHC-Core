@@ -31,7 +31,7 @@ async function fetchLehreinheiten(lv_id, sem_kurzbz) {
 			if (existing) {
 				// supplement info
 				existing.infoString += ', '
-				if (entry.gruppe_kurzbz !== null) {
+				if (entry.gruppe_kurzbz !== null && entry.direktinskription == false) {
 					existing.infoString += entry.gruppe_kurzbz
 				} else {
 					existing.infoString += entry.kurzbzlang + '-' + entry.semester
@@ -42,7 +42,7 @@ async function fetchLehreinheiten(lv_id, sem_kurzbz) {
 				// entries are supposed to be fetched ordered by non null gruppe_kurzbz first
 				// so a new entry will always start with those groups, others are appended afterwards
 				entry.infoString = entry.kurzbz + ' - ' + entry.lehrform_kurzbz + ' - '
-				if (entry.gruppe_kurzbz !== null) {
+				if (entry.gruppe_kurzbz !== null && entry.direktinskription == false) {
 					entry.infoString += entry.gruppe_kurzbz
 				} else {
 					entry.infoString += entry.kurzbzlang + '-' + entry.semester

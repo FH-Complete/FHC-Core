@@ -531,13 +531,33 @@ class Noten extends FHCAPI_Controller
 	 */
 	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum) 
 	{
+
+		$status = [];
+		
+		// send $grades reference to moodle addon
+		Events::trigger(
+			'getEntschuldigungsStatusForStudentOnDate',
+			function & () use (&$status)
+			{
+				return $status;
+			},
+			[
+				'student_uid' => $student_uid,
+				'datum' => $datum
+			]
+		);
+		
+		if(count($status) > 0 && $status[0] == true) {
+			$note = 17; //entschuldigt
+		}
+		
 		$jetzt = date("Y-m-d H:i:s");
 		
 		$pruefungenChanged = [];
 		
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		
-		if($typ == "Termin2") 
+		if($typ == "Termin2" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) 
 		{
 			
 			// Wenn eine Nachprüfung angelegt wird, wird zuerst eine Pruefung mit 1. Termin angelegt welche für die ursprüngliche Note
@@ -640,7 +660,7 @@ class Noten extends FHCAPI_Controller
 				}
 			}
 
-		} else if($typ == "Termin3") 
+		} else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) 
 		{
 
 			$result3 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin3", $lva_id, $stsem);

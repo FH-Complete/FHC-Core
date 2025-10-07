@@ -855,3 +855,20 @@ html {
 	background-color: var(--fhc-secondary);
 	
 }
+
+/* styling for editable dropdown column of notenvorschläge in benotungstool*/
+#notentable .tabulator-tableholder .tabulator-editable {
+	position: relative;
+	background-color: rgba(255, 255, 157, 0.73);
+	cursor: pointer;
+}
+
+#notentable .tabulator-tableholder .tabulator-editable::after {
+	content: "▾";
+	position: absolute;
+	right: 6px;
+	color: rgba(176, 176, 106, 0.73);;
+	font-size: x-large;
+	bottom: 6px;
+	pointer-events: none;
+}

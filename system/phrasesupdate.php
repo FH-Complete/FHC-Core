@@ -48267,12 +48267,12 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'prueflingSelection',
+		'phrase' => 'prueflingSelectionv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüflinge',
+				'text' => 'Studierende',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48372,7 +48372,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüfung für Student {0} gespeichert',
+				'text' => 'Prüfung für Studierenden {0} gespeichert',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48472,7 +48472,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Prüfung für Student {0} konnte nicht bearbeitet werden, {1} ist keine gültiger Prüfungstyp.',
+				'text' => 'Prüfung für Studierenden {0} konnte nicht bearbeitet werden, {1} ist keine gültiger Prüfungstyp.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48499,6 +48499,98 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => 'Grades Approval',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'notenfreigabeHinweistextv3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Notenfreigabe
+					<br><br>
+					Wenn alle einzutragenden Noten vermerkt sind (Nachtragung jederzeit möglich) können diese per Klick auf Freigabe für die Studiengangsassistenz freigegeben werden.
+					<br><br>
+					Aus Gründen der erhöhten Sicherheit ist bei der Freigabe der Noten die Eingabe Ihres Passwortes erforderlich.
+					<br><br>
+					Zulässige Noten: 1-5, Nicht beurteilt (nb), Noch nicht eingetragen (), Bestanden (b), Mit Erfolg teilgenommen (met), entschuldigt (en), unentschuldigt (ue)
+					<br><br>
+					Bei der Freigabe wird ein Info-Email an Sie und die zuständige Studiengangsassistenz geschickt. Enthalten sind Mat.Nr., Vor- und Zuname sowie die Note der neuen oder geänderten Einträge.
+					<br><br>
+					Freigegebene Einträge sind mit einem grün hinterlegten Häkchen gekennzeichnet.
+					<br><br>
+					Wenn Sie bereits freigegebene Noten verändern, werden diese mit einem grau hinterlegten Häkchen markiert (als Hinweis für Sie, dass die Assistenz bislang darüber noch nicht per Mail informiert wurde. Sie sieht allerdings diese neue Note sofort in ihrer Oberfläche)
+					<br><br>
+					Freigegebene Noten kann die Assistenz nun als Zeugnisnote übernehmen (wird im nächsten Feld für Sie zur Kontrolle angezeigt)
+					<br><br>
+					Wenn sich die Zeugnisnote von der von Ihnen freigegebenen Note unterscheidet wird erstere rot umrandet markiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Grade Release
+					<br><br>
+					Once all grades to be entered have been recorded (additions are possible at any time), they can be released to the program assistant by clicking on "Release."
+					<br><br>
+					For increased security reasons, you will be required to enter your password when releasing grades.2)
+					<br><br>
+					Permissible grades: 1-5, Not Assessed (nb), Not Yet Entered (), Passed (b), Successfully Participated (met), Excused (en), Unexcused (ue)
+					<br><br>
+					When the grade is released, an information email will be sent to you and the responsible program assistant. This email contains the student ID number, first and last name, and the grade for the new or changed entries.
+					<br><br>
+					Released entries are marked with a green check mark.
+					<br><br>
+					If you change grades that have already been approved, they will be marked with a gray checkmark (indicating that the assistant has not yet been notified by email. However, they will immediately see this new grade in their interface).
+					<br><br>
+					The assistant can now adopt approved grades as the grade on their report card (this will be displayed in the next field for your review).
+					<br><br>
+					If the report card grade differs from the grade you approved, the former will be highlighted with a red border.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'notenimportHinweistextv3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Laden Sie sich die Notenliste im Excel-Format unter CIS → Lehrveranstaltungen → Anwesenheits- und Notenlisten → Notenliste herunter.
+					<br><br>
+					Tragen Sie die Noten in das Dokument und speichern Sie dieses.
+					<br><br>
+					Markieren Sie im Excel-Dokument die Inhalte der Spalten Personenkennzeichen und Note für jene Studierende, deren Noten Sie importieren möchten (ohne Überschrift !)
+					<br><br>
+					Kopieren Sie die markierten Inhalte mittels strg + c oder Bearbeiten → Kopieren in die Zwischenablage
+					<br><br>
+					Einfügen der Inhalte mittels strg + v oder Bearbeiten → Einfügen
+					<br><br>
+					Mit einem Klick auf Import werden die Noten übernommen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download the grade list in Excel format from CIS → Courses → Attendance and Grade Lists → Grade List.
+					<br><br>
+					Enter the grades into the document and save it.
+					<br><br>
+					In the Excel document, select the contents of the Person ID and Grade columns for the students whose grades you want to import (without headings!).
+					<br><br>
+					Copy the selected content to the clipboard using Ctrl + c or Edit → Copy.
+					<br><br>
+					Paste the content using Ctrl + v or Edit → Paste.
+					<br><br>
+					Click Import to import the grades.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -423,6 +423,7 @@ export const Benotungstool = {
 		},
 		getNotenTableOptions() {
 			return {
+				rowHeight: 40,
 				height: 700,
 				index: 'uid',
 				layout: 'fitDataStretch',
@@ -488,8 +489,8 @@ export const Benotungstool = {
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCount')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
 				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname',  tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', widthGrow: 1},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', headerFilter: true, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4note')), field: 'note_vorschlag',
 					editor: 'list',
@@ -608,7 +609,7 @@ export const Benotungstool = {
 		},
 		terminCalcFormatter(cell) {
 			const cellval = cell.getValue()
-			return this.$p.t('benotungstool/prueflingSelection')+': ' + cellval
+			return this.$p.t('benotungstool/prueflingSelectionv2')+': ' + cellval
 		},
 		negativeNotenCalcFormatter(cell) {
 			const cellval = cell.getValue()
@@ -903,7 +904,7 @@ export const Benotungstool = {
 			
 			// can save a notenvorschlag -> colored
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<i class="fa fa-arrow-right" style="color:#00649C"></i></div>'
+				'<i class="fa fa-arrow-right fa-2xl" style="color:#00649C"></i></div>'
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
@@ -1215,10 +1216,10 @@ export const Benotungstool = {
 			// const pOffset = this.pruefung === null && this.pruefungStudent.pruefungen.length === 0 ? 2 : 1
 
 			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : this.getPruefungstypForStudentByAntritt(this.pruefungStudent)
-			
+			const note = this.selectedPruefungNote?.note ?? 9 // noch nicht eingetragen
 			this.$api.call(ApiNoten.saveStudentPruefung(
 				this.pruefungStudent.uid,
-				this.selectedPruefungNote.note,
+				note,
 				this.pruefung?.punkte ?? '',
 				dateStr,
 				this.lv_id,
@@ -1388,13 +1389,12 @@ export const Benotungstool = {
 			
 			// filter students that already have a pruefung on datum
 			
-			// TODO: save new pruefungs entry for all selected students on selected date with default note "noch nicht eingetragen" aka 9
-
 			const year = this.selectedPruefungDate.getFullYear();
 			const month = String(this.selectedPruefungDate.getMonth() + 1).padStart(2, '0'); // Months are 0-based
 			const day = String(this.selectedPruefungDate.getDate()).padStart(2, '0');
-			const dateStr = `${year}-${month}-${day}`;
-
+			const dateStrDb = `${year}-${month}-${day}`;
+			const dateStrFront = `${day}.${month}.${year}`;
+			
 			const uids = this.selectedUids.map(student => {
 				return {
 					uid: student.uid,
@@ -1405,13 +1405,13 @@ export const Benotungstool = {
 			
 			this.loading = true;
 			this.$api.call(ApiNoten.createPruefungen(
-				uids, 
-				dateStr, 
+				uids,
+				dateStrDb, 
 				this.lv_id,
 				this.sem_kurzbz,
 			)).then(res => {
 				if(res.meta.status === "success") {
-					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungAngelegtAn', [dateStr]))
+					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungAngelegtAn', [dateStrFront]))
 					
 					
 					this.handleAddNewPruefungenResponse(res, uids)
@@ -1532,6 +1532,12 @@ export const Benotungstool = {
 			}, []) : []
 			return cs
 		},
+		getNotenfreigabeHinweistext() {
+			return this.$p.t('benotungstool/notenfreigabeHinweistextv3')
+		},
+		getNotenimportHinweistext() {
+			return this.$p.t('benotungstool/notenimportHinweistextv3')
+		}
 	},
 	created() {
 		this.setupCreated()
@@ -1540,15 +1546,20 @@ export const Benotungstool = {
 		this.setupMounted()
 	},
 	unmounted() {
-		this.headerEl.removeEventlistener(this.handleSidebar)
-		this.headerEl.removeEventlistener(this.handleSidebar)
+		if(this.headerEl) {
+			this.headerEl.removeEventListener("shown.bs.collapse", this.handleSidebar)
+			this.headerEl.removeEventListener("hidden.bs.collapse", this.handleSidebar)
+			this.headerEl = null
+		}
 	},
 	template: `
 
 		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{$p.t('benotungstool/c4notenImportieren')}}</template>
 			<template v-slot:default>
-				
+				<div class="row mt-4 justify-content-center">
+					<div v-html="getNotenimportHinweistext"></div>
+				</div>
 				<div class="row mt-4 justify-content-center">
 					<Textarea v-model="importString" rows="5"></Textarea>
 				</div>
@@ -1567,7 +1578,7 @@ export const Benotungstool = {
 			<template v-slot:default>
 				<div class="row justify-content-center">
 
-					<div class="col-auto text-center">{{$p.t('benotungstool/c4date')}}:</div>
+					<div class="col-3 text-center">{{$p.t('benotungstool/c4date')}}:</div>
 					<div class="col-6">
 						<datepicker
 							v-model="selectedPruefungDate"
@@ -1581,7 +1592,7 @@ export const Benotungstool = {
 				</div>
 				
 				<div class="row mt-4 justify-content-center">
-					<div class="col-auto text-center">{{$p.t('benotungstool/prueflingSelection')}}:</div>
+					<div class="col-3 text-center">{{$p.t('benotungstool/prueflingSelectionv2')}}:</div>
 					<div class="col-6">
 						<Multiselect 
 							v-model="selectedUids" 
@@ -1603,7 +1614,10 @@ export const Benotungstool = {
 		<bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{ $p.t('benotungstool/noteneingabeSpeichern') }}</template>
 			<template v-slot:default>
-				<div class="row justify-content-center">
+				<div class="row mt-4 justify-content-center">
+					 <div v-html="getNotenfreigabeHinweistext"> </div>
+				</div>
+				<div class="row mt-4 justify-content-center">
 					<div class="col-auto">
 						<Password v-model="password" :feedback="false" showIcon="fa fa-eye" :toggleMask="true" :promptLabel="$p.t('benotungstool/passwort')"></Password>
 					</div>
@@ -1629,7 +1643,6 @@ export const Benotungstool = {
 							:auto-apply="true">
 						</datepicker>
 					</div>
-				
 				</div>
 				<div class="row justify-content-center mt-4">
 					<div class="col-1 text-center">{{$p.t('lehre/note')}}:</div>
@@ -1699,7 +1712,7 @@ export const Benotungstool = {
 		</div>
 		<hr>
 		
-		<div class="row" :style="'overflow-x: auto; max-width: calc(98vw - ' + offsetLeft + 'px);'">
+		<div id="notentable" class="row" :style="'overflow-x: auto; max-width: calc(98vw - ' + offsetLeft + 'px);'">
 			<core-filter-cmpt
 				v-if="tabulatorCanBeBuilt"
 				@uuidDefined="handleUuidDefined"
