@@ -902,7 +902,7 @@ class FilterCmptLib
 		$filterCmptsSession = getSession(self::SESSION_NAME);
 
 		// If something is present in session
-		if ($filterCmptsSession != null)
+		if (!isError($filterCmptsSession) && $filterCmptsSession != null)
 		{
 			// Loops in the session for all the filter components
 			foreach ($filterCmptsSession as $filterCmpt => $filterCmptData)
@@ -965,7 +965,7 @@ class FilterCmptLib
 		$filterCmptsSession = getSession(self::SESSION_NAME);
 
 		// If something is present in session
-		if ($filterCmptsSession != null)
+		if (!isError($filterCmptsSession) && $filterCmptsSession != null)
 		{
 			// Loops in the session for all the filter components
 			foreach ($filterCmptsSession as $filterCmpt => $filterCmptData)
@@ -1174,3 +1174,4 @@ class FilterCmptLib
 		return $filterName;
 	}
 }
+
