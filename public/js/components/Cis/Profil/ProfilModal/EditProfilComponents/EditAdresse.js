@@ -10,17 +10,13 @@ export default {
 
   props: {
     data: Object,
-    isMitarbeiter: {
-      type: Boolean,
-      default: false,
-    },
     files: {
       type: Array,
       default: []
     },
   },
 
-  inject: ["getZustelladressenCount", "updateFileID"],
+  inject: ["getZustelladressenCount", "updateFileID", "isMitarbeiter"],
 
   data() {
     return {
@@ -164,10 +160,8 @@ export default {
 <div class="gy-3 row justify-content-center align-items-center">
   <!-- warning message for too many zustellungs Adressen -->
   <div v-if="showZustellAdressenWarning" class="col-12 ">
-    <div class="card bg-danger mx-2">
-      <div class="card-body text-white ">
+    <div class="alert alert-warning mx-2">
 	  <span>{{$p.t('profilUpdate','zustell_adressen_warning')}}</span>
-      </div>
     </div>
   </div>
   <!-- End of warning -->
@@ -177,7 +171,7 @@ export default {
     <div class="form-check mb-2">
       <input class="form-check-input" type="checkbox" @change="updateValue($event,'zustelladresse')" :checked="data.zustelladresse" id="flexCheckDefault">
       <label class="form-check-label" for="flexCheckDefault">
-      {{$p.t('person','zustelladresse')}}
+      {{$p.t('person','zustelladresse')}} {{$p.t('profilUpdate','infoZustelladresse')}}
       </label>
     </div>
   </div>
