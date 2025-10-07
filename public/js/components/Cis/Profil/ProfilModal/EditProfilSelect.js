@@ -148,16 +148,32 @@ export default {
     <template v-if="!view">
         <div  class="list-group">
             <template v-for="item in data">
-                <div v-if="!(this.isMitarbeiter === false && item.listview === 'Adresse' && item.data.heimatadresse === true)" class="d-flex flex-row align-items-center">
-                    <button style="position:relative" type="button" class=" list-group-item list-group-item-action" @click="updateOptions($event,item)" >
+                <div class="d-flex flex-row align-items-center">
+                    <button
+						style="position:relative"
+						type="button" class="list-group-item list-group-item-action"
+						@click="updateOptions($event,item)"
+						:disabled="(this.isMitarbeiter === false && item.listview === 'Adresse' && item.data.heimatadresse === true)"
+					>
                         <!-- render title of options -->
                         <p v-if="item.title" class="my-1"   >{{item.title}}</p>
                         <!-- else render list view of items -->
                         <div v-else class="my-2 me-4" >
                             <component :is="item.listview" v-bind="item"></component>
+							<div
+								v-if="(this.isMitarbeiter === false && item.listview === 'Adresse' && item.data.heimatadresse === true)"
+								class="gy-2 row justify-content-center align-items-center"
+							>
+								<div class="col-1">&nbsp;</div>
+								<div class="col-11">
+									<div class="alert alert-info mt-4" role="alert">
+										{{ $p.t('profilUpdate','infoHeimatadresse') }}
+									</div>
+								</div>
+							</div>
                         </div>
                     </button>
-                    <button v-if="item.listview && !(item.listview === 'Adresse' && item.data.heimatadresse === true)" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle" :aria-label="$p.t('profilUpdate','deleteItem')" :title="$p.t('profilUpdate','deleteItem')" ><i class="fa fa-trash" aria-hide="true"></i></button>
+                    <button v-if="item.listview" :disabled="(this.isMitarbeiter === false && item.listview === 'Adresse' && item.data.heimatadresse === true)" @click="deleteItem(item)" type="button" class="mx-3 btn btn-danger btn-circle" :aria-label="$p.t('profilUpdate','deleteItem')" :title="$p.t('profilUpdate','deleteItem')" ><i class="fa fa-trash" aria-hide="true"></i></button>
                 </div>
             </template>
         </div>

@@ -120,10 +120,10 @@ export const Profil = {
 			},
 			sortProfilUpdates: (ele1, ele2) => {
 				let result = 0;
-				if (ele1.status === "pending") {
+				if (ele1.status.toLowerCase() === "pending") {
 					result = -1;
-				} else if (ele1.status === "accepted") {
-					result = ele2.status === "rejected" ? -1 : 1;
+				} else if (ele1.status.toLowerCase() === "accepted") {
+					result = ele2.status.toLowerCase() === "rejected" ? -1 : 1;
 				} else {
 					result = 1;
 				}
@@ -226,10 +226,13 @@ export const Profil = {
 				kontakteArray = kontakteArray.concat(
 					this.data.profilUpdates
 						.filter((update) => {
-							return update.requested_change.zustellung;
+							return update.status === 'Pending' && update.requested_change.zustellung;
 						})
 						.map((kontant) => {
-							return kontant.requested_change.kontakt_id;
+							return {
+										kontakt_id: kontant.requested_change.kontakt_id,
+										kontakttyp: kontant.requested_change.kontakttyp
+								};
 						})
 				);
 			}
@@ -241,7 +244,7 @@ export const Profil = {
 					.every((kontakt) =>
 						this.data.profilUpdates.some(
 							(update) =>
-								update.requested_change.kontakt_id == kontakt.kontakt_id
+								update.status === 'Pending' && update.requested_change.kontakt_id == kontakt.kontakt_id
 						)
 					)
 			) {
@@ -251,7 +254,10 @@ export const Profil = {
 							return kontakt.zustellung;
 						})
 						.map((kon) => {
-							return kon.kontakt_id;
+							return {
+										kontakt_id: kon.kontakt_id,
+										kontakttyp: kon.kontakttyp
+								};
 						})
 				);
 			}

@@ -63,6 +63,7 @@ class Profil_update_model extends DB_Model
 		$this->addSelect(["public.tbl_profil_update.*", "public.tbl_person.vorname"]);
 		$this->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_profil_update.uid");
 		$this->addJoin("public.tbl_person", "public.tbl_person.person_id = public.tbl_benutzer.person_id");
+		$this->db->order_by('COALESCE(public.tbl_profil_update.updateamum, public.tbl_profil_update.insertamum)', 'DESC', false);
 		$res = $this->loadWhere($whereClause);
 		if (isError($res)) {
 			return $res;

@@ -873,7 +873,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$insert_kontakt_id = $insertID;
 			$insert_kontakt_id = $this->getDataOrTerminateWithError($insert_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_insertKontakt_error'));
 			if ($insert_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id, $personID);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		//! DELETE
@@ -890,7 +890,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$update_kontakt_id = $this->KontaktModel->update($kontakt_id, $requested_change);
 			$update_kontakt_id = $this->getDataOrTerminateWithError($update_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_updateKontakt_error'));
 			if ($update_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id, $personID);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		return isset($insertID) ? $insertID : null;
@@ -925,12 +925,16 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 	}
 
-	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id, $person_id)
+	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id, $kontakttyp, $person_id)
 	{
 		if ($zustellung) {
 			$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
 			$this->PersonModel->addJoin("public.tbl_kontakt", "public.tbl_kontakt.person_id = public.tbl_person.person_id");
-			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $person_id, "zustellung" => TRUE]);
+			$zustellKontakteArray = $this->PersonModel->loadWhere([
+				"public.tbl_person.person_id" => $person_id,
+				"zustellung" => TRUE,
+				"kontakttyp" => $kontakttyp
+			]);
 			if (!isSuccess($zustellKontakteArray)) {
 				return error($this->p->t('profilUpdate', 'profilUpdate_loadingZustellkontakte_error'));
 			}
