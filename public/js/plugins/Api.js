@@ -328,6 +328,7 @@ export default {
 						url: error.request.responseURL
 					}];
 				} else {
+					if (error.response.data.errors == undefined) return [];
 					return error.response.data.errors;
 				}
 			} else if (error.request) {
@@ -346,6 +347,9 @@ export default {
 		function popHandleableErrors(errorHandling, errors) {
 			const result = {};
 			const copy = [];
+
+			if (errors == undefined) return {};
+
 			while (errors.length)
 				copy.push(errors.pop());
 			for (var error of copy) {

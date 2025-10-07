@@ -183,7 +183,10 @@ class ProfilLib{
 		$zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam ? current($zutrittskarte_ausgegebenam)->ausgegebenam : null;
 		
 		//? formats date from 01-01-2000 to 01.01.2000
-		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
+		if ($zutrittskarte_ausgegebenam !== NULL)
+		{
+			$zutrittskarte_ausgegebenam = (new DateTime($zutrittskarte_ausgegebenam))->format('d.m.Y');
+		}
 		return $zutrittskarte_ausgegebenam;
 	}
 
@@ -196,7 +199,7 @@ class ProfilLib{
 	private function getAdressenInfo($pid)
 	{
 		$this->ci->load->model("person/Adresse_model","AdresseModel");
-		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "zustelladresse", "gemeinde", "nation"]);
+		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "heimatadresse", "zustelladresse", "gemeinde", "nation"]);
 		$adresse_res = $this->ci->AdresseModel->addOrder("zustelladresse", "DESC");
 		$adresse_res = $this->ci->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz");
 
