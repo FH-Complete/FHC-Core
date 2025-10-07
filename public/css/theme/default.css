@@ -38,11 +38,54 @@
 	--fhc-blue-primary: #006095;
 	--fhc-blue-primary-highlight: #0086CB;
 
-	--fhc-red-10: #842029;
-	--fhc-red-20: #800000;
+	/* --- Green --- */
+	--fhc-green-5:  rgb(240, 250, 240);
+	--fhc-green-10: rgb(220, 245, 220);
+	--fhc-green-20: rgb(190, 235, 190);
+	--fhc-green-30: rgb(150, 220, 150);
+	--fhc-green-40: rgb(110, 200, 110);
+	--fhc-green-50: rgb(70, 170, 70);
+	--fhc-green-60: rgb(50, 145, 50);
+	--fhc-green-70: rgb(35, 120, 35);
+	--fhc-green-80: rgb(25, 95, 25);
+	--fhc-green-90: rgb(15, 70, 15);
 
-	--fhc-green-10: #008000;
+	/* --- Red --- */
+	--fhc-red-5:  rgb(255, 245, 246);
+	--fhc-red-10: rgb(255, 225, 228);
+	--fhc-red-20: rgb(250, 190, 195);
+	--fhc-red-30: rgb(240, 150, 160);
+	--fhc-red-40: rgb(225, 110, 120);
+	--fhc-red-50: rgb(200, 70, 85);
+	--fhc-red-60: rgb(170, 50, 65);
+	--fhc-red-70: rgb(140, 35, 50);
+	--fhc-red-80: rgb(110, 20, 35);
+	--fhc-red-90: rgb(85, 10, 25);
 
+	/* --- Yellow --- */
+	--fhc-yellow-5:  rgb(255, 255, 240);
+	--fhc-yellow-10: rgb(255, 250, 210);
+	--fhc-yellow-20: rgb(255, 240, 160);
+	--fhc-yellow-30: rgb(255, 225, 100);
+	--fhc-yellow-40: rgb(250, 210, 50);
+	--fhc-yellow-50: rgb(240, 190, 0);
+	--fhc-yellow-60: rgb(220, 165, 0);
+	--fhc-yellow-70: rgb(190, 135, 0);
+	--fhc-yellow-80: rgb(160, 105, 0);
+	--fhc-yellow-90: rgb(120, 75, 0);
+
+	/* --- Pink --- */
+	--fhc-pink-5:  rgb(255, 245, 250);
+	--fhc-pink-10: rgb(255, 225, 235);
+	--fhc-pink-20: rgb(250, 195, 215);
+	--fhc-pink-30: rgb(245, 160, 190);
+	--fhc-pink-40: rgb(235, 120, 160);
+	--fhc-pink-50: rgb(220, 80, 130);
+	--fhc-pink-60: rgb(190, 60, 110);
+	--fhc-pink-70: rgb(160, 40, 90);
+	--fhc-pink-80: rgb(130, 25, 70);
+	--fhc-pink-90: rgb(100, 15, 50);
+	
 	--fhc-beige-10: rgba(245, 233, 215, 0.5);
 	--fhc-beige-20: rgba(172, 153, 125, 0.5);
 

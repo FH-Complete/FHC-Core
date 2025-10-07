@@ -14,7 +14,7 @@ class Abgabetool extends Auth_Controller
 	{
 		parent::__construct([
 			'index' => self::PERM_LOGGED,
-			'getStudentProjektarbeitAbgabeFile' => self::PERM_LOGGED,
+			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
 			'Mitarbeiter' => self::PERM_LOGGED,
 			'Student' => self::PERM_LOGGED,
 			'Deadlines' => self::PERM_LOGGED

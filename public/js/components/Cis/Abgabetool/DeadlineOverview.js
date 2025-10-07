@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 export const DeadlineOverview = {
 	name: "DeadlineOverview",
@@ -84,7 +85,7 @@ export const DeadlineOverview = {
 			this.tableBuiltResolve = resolve
 		},
 		loadDeadlines() {
-			this.$fhcApi.factory.lehre.fetchDeadlines(this.person_uid_prop ??  null)
+			this.$api.call(ApiAbgabe.fetchDeadlines(this.person_uid_prop ??  null))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
@@ -109,7 +110,7 @@ export const DeadlineOverview = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.deadlineTableOptions.height = window.visualViewport.height - rect.top
+			this.deadlineTableOptions.height = window.visualViewport.height - rect.top - 30
 			this.$refs.deadlineTable.tabulator.setHeight(this.deadlineTableOptions.height)
 		},
 		async setupMounted() {
