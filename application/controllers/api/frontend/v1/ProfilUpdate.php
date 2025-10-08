@@ -716,13 +716,12 @@ class ProfilUpdate extends FHCAPI_Controller
 	
 	private function deleteOldVersionFile($dms_id)
 	{
+		if (!isset($dms_id)) {
+			return true;
+		}
+
 		// starting the transaction
 		$this->db->trans_start();
-		
-		
-		if (!isset($dms_id)) {
-			return;
-		}
 
 		//? delete the file from the profilUpdate first
 		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
