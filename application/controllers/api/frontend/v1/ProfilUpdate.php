@@ -356,6 +356,7 @@ class ProfilUpdate extends FHCAPI_Controller
 
 
 		//? check if the permissions are set correctly
+		$this->addMeta('bhstudoe', $this->getOE_from_student($uid));
 		if (
 			$is_student && $this->permissionlib->isBerechtigt('student/stammdaten', "suid", $this->getOE_from_student($uid)) ||
 			$is_mitarbeiter && $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', "suid") 
@@ -776,13 +777,8 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
 		$res = $this->getDataOrTerminateWithError($res, $this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));	
-		$res = array_map(
-			function ($item) {
-				return $item->oe_kurzbz;
-			},
-			$res
-		);
-		return $res;
+		$oe = ($res[0])->oe_kurzbz;
+		return $oe;
 	}
 
 	private function handleAdresse($requested_change, $personID)
