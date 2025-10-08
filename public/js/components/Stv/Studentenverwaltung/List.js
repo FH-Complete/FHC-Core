@@ -200,6 +200,9 @@ export default {
 						return Promise.resolve({ data: []});
 					}
 					return this.$api.call({url, params});
+					//version with Tags
+					return this.$api.call({url, params});
+
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -238,7 +241,7 @@ export default {
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
 				},
-				{
+/*				{
 					event: 'dataTreeRowExpanded',
 					handler: (data) => {
 						this.getExpandedRows()
@@ -249,7 +252,7 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}
+				}*/
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
@@ -278,7 +281,7 @@ export default {
 
 			//for tags
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
-			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().uid !== undefined && row.getData().uid).map(row => row.getData().uid);
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
 
 			this.$emit('update:selected', data);
 		},
@@ -403,7 +406,6 @@ export default {
 		//methods tags
 		addedTag(addedTag)
 		{
-			console.log("addedTag");
 			const table = this.$refs.table.tabulator;
 
 			this.selectedRows.forEach(row =>
@@ -411,7 +413,7 @@ export default {
 				if (Array.isArray(addedTag.response))
 				{
 					addedTag.response.forEach(tag => {
-						const targetRow = this.allRows.find(row => row.getData().uid === tag.uid);
+						const targetRow = this.allRows.find(row => row.getData().prestudent_id === tag.prestudent_id);
 						if (targetRow)
 						{
 							const rowData = targetRow.getData();
@@ -434,7 +436,6 @@ export default {
 			});
 		},
 		deletedTag(deletedTag) {
-			console.log("deletedTag");
 			const targetRow = this.allRows.find(row => {
 				const rowData = row.getData();
 
@@ -467,7 +468,6 @@ export default {
 			}
 		},
 		updatedTag(updatedTag) {
-			console.log("updatedTag");
 			const targetRow = this.allRows.find(row => {
 				const rowData = row.getData();
 				let tags = [];
@@ -504,45 +504,6 @@ export default {
 				}
 			}
 		},
-		resetTree() {
-			console.log("reset tree");
-			this.allRows.forEach(row => {
-				row._row.modules.dataTree.open = false;
-			});
-
-			let rootRows = this.$refs.table.tabulator.getRows(true);
-			var lastRow = rootRows[rootRows.length - 1];
-			lastRow?.treeCollapse(true)
-
-			this.currentTreeLevel = 0;
-		},
-		expandTree()
-		{
-			console.log("expandTree");
-			this.currentTreeLevel = (this.currentTreeLevel || 0) + 1;
-
-			let lastMatchingRow = null;
-
-			this.allRows.forEach(row => {
-				const level = row._row.modules.dataTree?.index ?? 0;
-
-				if (level === this.currentTreeLevel - 1 )
-				{
-					row._row.modules.dataTree.open = true;
-
-					if (row._row.data._children?.length > 0)
-					{
-						lastMatchingRow = row;
-					}
-				}
-			});
-
-			if (lastMatchingRow)
-			{
-				lastMatchingRow.treeExpand();
-			}
-			this.$refs.table.tabulator.redraw();
-		},
 		getAllRows(rows)
 		{
 			let result = [];
@@ -556,16 +517,6 @@ export default {
 				}
 			});
 			return result;
-		},
-		async getExpandedRows() {
-			this.expanded = [];
-
-			this.allRows.forEach(row => {
-				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
-				{
-					this.expanded.push(row.getData().uniqueindex);
-				}
-			});
 		},
 		reexpandRows() {
 			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
@@ -605,7 +556,6 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-	test manu {{selectedColumnValues}}
 		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
 			<core-filter-cmpt
 				ref="table"
@@ -629,10 +579,8 @@ export default {
 					@added="addedTag"
 					@deleted="deletedTag"
 					@updated="updatedTag"
-					zuordnung_typ="uid"
+					zuordnung_typ="prestudent_id"
 				></core-tag>
-				<button @click="expandTree" class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-maximize"></i></button>
-				<button @click="resetTree" class="btn btn-outline-secondary" type="button"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 			</template>
 
 			<template #filter>

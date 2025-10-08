@@ -430,7 +430,7 @@ class Students extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	protected function fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null)
+	protected function fetchStudentsWithoutTagsPrestudent($studiensemester_kurzbz, $studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null)
 	{
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
@@ -496,7 +496,7 @@ class Students extends FHCAPI_Controller
 			if (!$verband && !$gruppe && $orgform_kurzbz !== null) {
 				$this->PrestudentModel->db->where(
 					"(
-						SELECT orgform_kurzbz 
+						SELECT orgform_kurzbz
 						FROM public.tbl_prestudentstatus 
 						WHERE prestudent_id=tbl_prestudent.prestudent_id 
 						AND studiensemester_kurzbz=" . $this->PrestudentModel->escape($studiensemester_kurzbz) . " 
@@ -517,6 +517,23 @@ class Students extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($data);
 	}
+
+	protected function fetchStudents($studiensemester_kurzbz, $studiengang_kz, $semester = null, $verband = null, $gruppe = null, $gruppe_kurzbz = null, $orgform_kurzbz = null){
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
+		$allowedStg = $this->allowedStgs;
+		$result = $this->PrestudentModel->fetchStudents($studiensemester_kurzbz, $studiengang_kz, $allowedStg, $semester, $verband, $gruppe, $gruppe_kurzbz, $orgform_kurzbz);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
 
 	/**
 	 * @param string		$prestudent_id
