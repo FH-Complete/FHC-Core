@@ -17,8 +17,8 @@
 			'public/css/Lvverwaltung.css'
 
 		],
-		'customJSModules' => [
-			'public/js/apps/LVVerwaltung.js'
+		'fhcApps' => [
+			'LVVerwaltung'
 		]
 	);
 
