@@ -12,10 +12,12 @@ require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilKarenz.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 require_once __DIR__ . '/OverlapChecker.php';
+require_once __DIR__ . '/NoPermissionException.php';
 
 use vertragsbestandteil\Dienstverhaeltnis;
 use vertragsbestandteil\Vertragsbestandteil;
 use vertragsbestandteil\VertragsbestandteilFactory;
+use vertragsbestandteil\NoPermissionException;
 
 /**
  * Description of VertragsbestandteilLib
@@ -251,8 +253,12 @@ class VertragsbestandteilLib
 				throw new Exception("Transaction failed");
 			}
 			$this->CI->db->trans_commit();
-		}
-		catch (Exception $ex)
+		} catch (NoPermissionException $e) {   
+			log_message('debug', "Transaction rolled back. " . $e->getMessage());
+			$this->CI->db->trans_rollback();
+			// rethrow and let GUIHandler catch it to display error message
+			throw $e;  
+		} catch (Exception $ex)
 		{
 			log_message('debug', "Transaction rolled back. " . $ex->getMessage());
 			$this->CI->db->trans_rollback();
@@ -337,7 +343,7 @@ class VertragsbestandteilLib
 
 		if (!$hasGehaltsPermission && $vbHasGehaltsbestandteile)
 		{
-			throw new Exception('delete Gehaltsbestandteil permission denied');
+			throw new NoPermissionException('delete Gehaltsbestandteil permission denied');
 		}
 
 		$specialisedModel = VertragsbestandteilFactory::getVertragsbestandteilDBModel(
