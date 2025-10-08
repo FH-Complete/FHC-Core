@@ -356,7 +356,6 @@ class ProfilUpdate extends FHCAPI_Controller
 
 
 		//? check if the permissions are set correctly
-		$this->addMeta('bhstudoe', $this->getOE_from_student($uid));
 		if (
 			$is_student && $this->permissionlib->isBerechtigt('student/stammdaten', "suid", $this->getOE_from_student($uid)) ||
 			$is_mitarbeiter && $this->permissionlib->isBerechtigt('mitarbeiter/stammdaten', "suid") 
