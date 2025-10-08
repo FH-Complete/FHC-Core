@@ -115,8 +115,14 @@ $config['students_tab_order'] = [
 ];
 
 $config['stv_prestudent_tags'] = [
-	'tag_1' => ['readonly' => false],
-	'tag_2' => ['readonly' => true],
-	'tag_3' => ['readonly' => false],
-	'tag_4' => ['readonly' => true]
+	'prioone' => ['readonly' => false],
+	'priotwo' => ['readonly' => true],
+	'hinweis' => ['readonly' => false],
+	'hinweis_assistenz' => ['readonly' => true],
+	'hinweis_kf' => ['readonly' => true],
+	'hinweis_lehrende' => ['readonly' => false],
+	'hinweis_stg_kf' => ['readonly' => true],
+	'finished_stg' => ['readonly' => true],
+	'finished_kf' => ['readonly' => true],
+	'inwork_kf' => ['readonly' => true],
 ];

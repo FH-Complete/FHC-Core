@@ -295,7 +295,7 @@ export default {
 
 				if (selected.length)
 					this.$refs.table.tabulator.selectRow(selected);
-			} else if(this.lastSelected === undefined) {
+			} else if(data && this.lastSelected === undefined) {
 				// NOTE(chris): select row if it's the only one (preferably only on startup)
 				if (data.length == 1) {
 					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
