@@ -563,28 +563,36 @@ export default {
 			this.allRows.forEach(row => {
 				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
 				{
-					this.expanded.push(row.getData().uniqueindex);
+					this.expanded.push(row.getData().lv_bezeichnung);
 				}
 			});
 		},
 		reexpandRows() {
 			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
 
-			const matchingRows = this.allRows.filter(row =>
-				this.expanded.includes(row.getData().uniqueindex)
-			);
+			let lastMatchingRow = null;
 
-			if (matchingRows.length === 0)
-				this.currentTreeLevel = 0;
-
-			matchingRows.forEach((row, index) => {
-				row._row.modules.dataTree.open = true;
-
-				if (index === matchingRows.length - 1)
+			this.allRows.forEach(row => {
+				if (this.expanded.includes(row.getData().lv_bezeichnung))
 				{
-					row.treeExpand();
+					if (row._row.modules.dataTree)
+					{
+						row._row.modules.dataTree.open = true;
+					}
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
 				}
 			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+			}
+
+			this.$refs.table.tabulator.redraw();
 		},
 		deleteLehreinheit(row)
 		{
@@ -624,7 +632,7 @@ export default {
 		},
 		expandTree()
 		{
-			this.currentTreeLevel = (this.currentTreeLevel || 0) + 1;
+			this.currentTreeLevel = (this.currentTreeLevel || 1);
 
 			let lastMatchingRow = null;
 
@@ -645,6 +653,7 @@ export default {
 			if (lastMatchingRow)
 			{
 				lastMatchingRow.treeExpand();
+				this.currentTreeLevel++;
 			}
 			this.$refs.table.tabulator.redraw();
 		},
