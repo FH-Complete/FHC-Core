@@ -110,7 +110,7 @@ export const AbgabeStudentDetail = {
 		},
 		async triggerEndupload() {
 			
-			if (!await this.validate(this.enduploadTermin))
+			if (!await this.validate(this.enduploadTermin, true))
 			{
 				return false;
 			}
@@ -192,13 +192,13 @@ export const AbgabeStudentDetail = {
 		},
 		handleUploadRes(res, termin) {
 			if(res.meta.status == "success") {
-				this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4fileUploadSuccess'))
+				this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4fileUploadSuccessv3'))
 
 				// update 'abgabedatum' for successful upload -> shows the pdf icon and date once set
 				termin.abgabedatum = new Date().toISOString().split('T')[0];
 				
 			} else {
-				this.$fhcAlert.alertError(this.$p.t('abgabetool/c4fileUploadError'))
+				this.$fhcAlert.alertError(this.$p.t('abgabetool/c4fileUploadErrorv3'))
 			}
 			
 			if(res.meta.signaturInfo) {
@@ -303,7 +303,7 @@ export const AbgabeStudentDetail = {
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
 					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
 						<div class="row">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
+							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
 							<div class="col-8 col-md-9">
 								<Checkbox 
 									disabled
@@ -349,10 +349,17 @@ export const AbgabeStudentDetail = {
 							</div>
 						</div>
 						
+						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
+							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGatev2')}}</div>
+							<div class="col-8 col-md-9">
+								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" :cols=" isMobile ? 30 : 90" disabled></Textarea>
+							</div>
+						</div>
+						
 						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
 							</div>
 						</div>
 						

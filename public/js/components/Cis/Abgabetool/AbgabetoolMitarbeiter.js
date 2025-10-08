@@ -437,7 +437,7 @@ export const AbgabetoolMitarbeiter = {
 						</Dropdown>
 					</div>
 					<div class="col-6 d-flex justify-content-center align-items-center">
-						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="3" cols="40"></Textarea>
+						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" cols="40"></Textarea>
 					</div>
 				</div>
 				

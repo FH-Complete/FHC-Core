@@ -251,16 +251,7 @@ export const AbgabeMitarbeiterDetail = {
 			
 			return true
 		},
-		async handleSaveNewAbgabe(termin) {
-			
-			if(!this.validateTermin(termin)) {
-				this.$fhcAlert.alertWarning('invalid termin')
-				
-				return false
-			}
-			
-			await this.saveTermin(termin)
-			
+		handleModalClose() {
 			// determined inside saveTermin api.then()
 			if(this.showAutomagicModalPhrase) {
 				this.$refs.modalContainerCreateNewAbgabe.show()
@@ -280,7 +271,20 @@ export const AbgabeMitarbeiterDetail = {
 					'abgabedatum': null,
 					'insertvon': this.viewData?.uid ?? ''
 				}
+			}	
+		},
+		async handleSaveNewAbgabe(termin) {
+			
+			if(!this.validateTermin(termin)) {
+				this.$fhcAlert.alertWarning('invalid termin')
+				
+				return false
 			}
+			
+			await this.saveTermin(termin)
+			
+			this.handleModalClose()
+			
 		},
 		handleChangeAbgabetyp(termin) {
 			// if paabgabetype qualgate is selected, fill out kurzbz textfield with bezeichnung of quality gate so users
@@ -321,6 +325,15 @@ export const AbgabeMitarbeiterDetail = {
 			return 'position: static !important;'
 		}
 	},
+	watch: {
+		'newTermin.bezeichnung'(newVal) {
+			console.log('\'newTermin.bezeichnung\' watcher', newVal)
+
+			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
+				this.newTermin.kurzbz = newVal.bezeichnung
+			}
+		}	
+	},
 	created() {
 
 	},
@@ -344,7 +357,7 @@ export const AbgabeMitarbeiterDetail = {
 			<template v-slot:default>
 				<div v-if="showAutomagicModalPhrase" class="text-center"><p>{{$p.t('abgabetool/c4abgabeQualGateNegativAddNewAutomagisch')}}</p></div>
 <!--				minheight to avoid z-index magic for the datepicker inside the modal inside the modal...-->
-				<div v-if="newTermin" style="min-height: 600px">
+				<div v-if="newTermin">
 <!--				fixtermin is not an option for lektors-->
 <!--					<div class="row">-->
 <!--						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>-->
@@ -376,21 +389,9 @@ export const AbgabeMitarbeiterDetail = {
 							<Dropdown
 								:style="{'width': '100%'}"
 								v-model="newTermin.bezeichnung"
-								@change="handleChangeAbgabetyp(newTermin)"
 								:options="abgabeTypeOptions"
 								:optionLabel="getOptionLabelAbgabetyp"
 								scrollHeight="300px">
-							</Dropdown>
-						</div>
-					</div>
-					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
-						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
-						<div class="col-8 col-md-9">
-							<Dropdown
-								:style="{'width': '100%'}"
-								v-model="newTermin.note"
-								:options="allowedNotenOptions"
-								:optionLabel="getNotenOptionLabel">
 							</Dropdown>
 						</div>
 					</div>
@@ -405,16 +406,10 @@ export const AbgabeMitarbeiterDetail = {
 							</Checkbox>
 						</div>
 					</div>
-					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
-						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGate')}}</div>
-						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="newTermin.beurteilungsnotiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
-						</div>
-					</div>
 					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" :cols=" isMobile ? 30 : 90"></Textarea>
 						</div>
 					</div>	
 				</div>
@@ -453,7 +448,7 @@ export const AbgabeMitarbeiterDetail = {
 					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
 							
 						<div class="row">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
+							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
 							<div class="col-8 col-md-9">
 <!--							always keep fixtermin checkbox disabled for mitarbeiter tool -->
 								<Checkbox 
@@ -493,17 +488,6 @@ export const AbgabeMitarbeiterDetail = {
 							</div>
 						</div>
 						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
-							<div class="col-8 col-md-9">
-								<Dropdown
-									:style="{'width': '100%'}"
-									v-model="termin.note"
-									:options="allowedNotenOptions"
-									:optionLabel="getNotenOptionLabel">
-								</Dropdown>
-							</div>
-						</div>
-						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>
 							<div class="col-8 col-md-9">
 								<Checkbox
@@ -515,15 +499,27 @@ export const AbgabeMitarbeiterDetail = {
 							</div>
 						</div>
 						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGate')}}</div>
+							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+								<Dropdown
+									:style="{'width': '100%'}"
+									v-model="termin.note"
+									:options="allowedNotenOptions"
+									:optionLabel="getNotenOptionLabel">
+								</Dropdown>
 							</div>
 						</div>
+						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
+							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGatev2')}}</div>
+							<div class="col-8 col-md-9">
+								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+							</div>
+						</div>
+						
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
 							</div>
 						</div>
 						<div class="row mt-2">

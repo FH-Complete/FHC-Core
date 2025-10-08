@@ -109,8 +109,9 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-		if (!isset($uid) || isEmptyString($uid))
-			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		if (!isset($uid) || isEmptyString($uid)) {
+			$uid = getAuthUID();
+		}
 
 		$isZugeteilterBetreuer = count($this->ProjektarbeitModel->checkZuordnung($uid, getAuthUID())->retval) > 0;
 		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
@@ -779,7 +780,7 @@ class Abgabe extends FHCAPI_Controller
 		
 		// Mail an Student wenn Qualgate negativ beurteilt wurde
 		$this->load->model('crm/Student_model', 'StudentModel');
-		$result = $this->StudentModel->load($paabgabe->paabgabetyp_kurzbz);
+		$result = $this->StudentModel->load([$student_uid]);
 		$studentArr = $this->getDataOrTerminateWithError($result);
 		$student = $studentArr[0];
 

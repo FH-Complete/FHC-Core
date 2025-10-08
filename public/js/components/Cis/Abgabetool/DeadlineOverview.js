@@ -33,7 +33,7 @@ export const DeadlineOverview = {
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4zieldatum')), field: 'datum', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4fixtermin')), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4fixterminv2')), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'typ_bezeichnung', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabekurzbz')), field: 'kurzbz', formatter: this.centeredTextFormatter, widthGrow: 3},
 					{title: Vue.computed(() => this.$p.t('person/studentIn')), field: 'student', formatter: this.centeredTextFormatter, widthGrow: 2},

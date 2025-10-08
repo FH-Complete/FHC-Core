@@ -34,17 +34,27 @@ class Abgabetool extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+		if(defined('CIS4') && CIS4) {
+			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'Abgabetool']);
+		} else {
+			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'Abgabetool']);
+		}
 	}
 
-	public function Student()
+	public function Student($student_uid_prop = '')
 	{
 
 		$viewData = array(
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolStudent']);
+		
+		
+		if(defined('CIS4') && CIS4) {
+			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolStudent']);
+		} else {
+			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolStudent', 'student_uid_prop' => $student_uid_prop]);
+		}
 	}
 
 	public function Mitarbeiter()
@@ -54,7 +64,11 @@ class Abgabetool extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolMitarbeiter']);
+		if(defined('CIS4') && CIS4) {
+			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolMitarbeiter']);
+		} else {
+			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolMitarbeiter']);
+		}
 	}
 
 	public function Deadlines()
@@ -64,7 +78,11 @@ class Abgabetool extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'DeadlinesOverview']);
+		if(defined('CIS4') && CIS4) {
+			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'DeadlinesOverview']);
+		} else {
+			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'DeadlinesOverview']);
+		}
 	}
 
 

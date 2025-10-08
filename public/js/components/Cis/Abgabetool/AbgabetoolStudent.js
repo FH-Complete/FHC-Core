@@ -72,11 +72,13 @@ export const AbgabetoolStudent = {
 					termin.allowedToUpload = false
 					// termin.datum = '2025-10-16'
 					// TODO: fixtermin logic?
-					if(termin.paabgabetyp_kurzbz == 'enda') {
+					if(termin.paabgabetyp_kurzbz == 'end') {
 						
 						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
 					} else if(termin.paabgabetyp_kurzbz == 'qualgate1' || termin.paabgabetyp_kurzbz == 'qualgate2') {
 						termin.allowedToUpload = termin.upload_allowed
+					} else if(termin.fixtermin) {
+						termin.allowedToUpload = !this.isPastDate(termin.datum)
 					} else {
 						termin.allowedToUpload = true
 					}
