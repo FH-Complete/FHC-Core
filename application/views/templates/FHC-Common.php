@@ -48,3 +48,60 @@
 	$udfs = isset($udfs) ? $udfs : false;
 	$widgets = isset($widgets) ? $widgets : false;
 	$tags = isset($tags) ? $tags : false;
+
+// VueJs App magic
+if (isset($fhcApps)) {
+	if (!isset($customJSs))
+		$customJSs = ['public/js/FhcApps.js'];
+	elseif (!is_array($customJSs))
+		$customJSs = [$customJSs, 'public/js/FhcApps.js'];
+	else
+		array_push($customJSs, 'public/js/FhcApps.js');
+
+	if (!isset($customJSModules))
+		$customJSModules = [];
+	elseif (!is_array($customJSModules))
+		$customJSModules = [$customJSModules];
+
+	if (!isset($customCSSs))
+		$customCSSs = [];
+	elseif (!is_array($customCSSs))
+		$customCSSs = [$customCSSs];
+
+	$ext_path = 'public/extensions/';
+	$ext_realpath = str_replace('/', DIRECTORY_SEPARATOR, $ext_path);
+
+	foreach ($fhcApps as $app) {
+		if (!strstr($app, ':')) {
+			$app_js_path = 'public/js/apps/' . $app . '.js';
+			$app_css_path = 'public/css/apps/' . $app . '.css';
+			$app_js_ext_path = '/js/extend_app/' . $app . '.js';
+			$app_css_ext_path = '/css/extend_app/' . $app . '.css';
+		} else {
+			list($ext_name, $app_path) = explode(':', $app);
+			$app_js_path = 'public/extensions/' . $ext_name . '/js/apps/' . $app_path . '.js';
+			$app_css_path = 'public/extensions/' . $ext_name . '/css/apps/' . $app_path . '.css';
+			$app_js_ext_path = '/js/extend_app/extensions/' . $ext_name . '/' . $app_path . '.js';
+			$app_css_ext_path = '/css/extend_app/extensions/' . $ext_name . '/' . $app_path . '.css';
+		}
+
+		if (file_exists(FHCPATH . str_replace('/', DIRECTORY_SEPARATOR, $app_css_path)))
+			array_push($customCSSs, $app_css_path);
+
+		foreach (scandir(FHCPATH . $ext_realpath) as $extension_name) {
+			if ($extension_name[0] == '.')
+				continue;
+			
+			$app_js_ext_realpath = str_replace('/', DIRECTORY_SEPARATOR, $app_js_ext_path);
+			if (file_exists(FHCPATH . $ext_realpath . $extension_name . $app_js_ext_realpath)) {
+				array_push($customJSModules, $ext_path . $extension_name . $app_js_ext_path);
+			}
+			$app_css_ext_realpath = str_replace('/', DIRECTORY_SEPARATOR, $app_css_ext_path);
+			if (file_exists(FHCPATH . $ext_realpath . $extension_name . $app_css_ext_realpath)) {
+				array_push($customCSSs, $ext_path . $extension_name . $app_css_ext_path);
+			}
+		}
+		
+		array_push($customJSModules, $app_js_path);
+	}
+}
