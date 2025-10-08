@@ -223,9 +223,9 @@ export default {
 				},
 				{
 					event: 'dataProcessed',
-					//handler: this.autoSelectRows TODO(Manu) combine
 					handler: (data) => {
 						this.reexpandRows()
+						this.autoSelectRows()
 						this.$emit('update:selected', {})
 					}
 				},
@@ -241,7 +241,7 @@ export default {
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
 				},
-/*				{
+				{
 					event: 'dataTreeRowExpanded',
 					handler: (data) => {
 						this.getExpandedRows()
@@ -252,7 +252,7 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}*/
+				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
@@ -286,7 +286,7 @@ export default {
 			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
-			if (this.lastSelected) {
+			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
 				// NOTE(chris): reselect rows on refresh
 				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
 				// TODO(chris): unselect current item if it's no longer in the table?
