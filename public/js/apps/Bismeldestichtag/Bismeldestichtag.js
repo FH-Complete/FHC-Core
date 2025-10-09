@@ -237,4 +237,6 @@ const bismeldestichtagApp = Vue.createApp({
 	}
 });
 
+FhcApps.makeExtendable(bismeldestichtagApp);
+
 bismeldestichtagApp.use(PluginsPhrasen).mount('#main');
