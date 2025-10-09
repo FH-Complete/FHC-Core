@@ -6,8 +6,8 @@ $includesArray = array(
     'fontawesome6'=> true,
     'axios027' => true,
     'tabulator5' => true,
-    'customJSModules' => array(
-	'public/js/apps/Cis/ProfilUpdateRequests.js'
+    'fhcApps' => array(
+		'Cis/ProfilUpdateRequests'
     ),
     'customCSSs' => array(
 	'public/css/components/FilterComponent.css','public/css/components/FormUnderline.css'
