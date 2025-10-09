@@ -8,7 +8,7 @@ $sitesettings = array(
 	'fontawesome6' => true,
 	'phrases' => array(
 	),
-	'customJSModules' => array('public/js/apps/lehre/Antrag.js'),
+	'fhcApps' => array('lehre/Antrag'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',

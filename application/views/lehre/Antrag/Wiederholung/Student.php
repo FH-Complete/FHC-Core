@@ -12,7 +12,7 @@ $sitesettings = array(
 		'lehre',
 		'global'
 	),
-	'customJSModules' => array('public/js/apps/lehre/Antrag/Lvzuweisung.js'),
+	'fhcApps' => array('lehre/Antrag/Lvzuweisung'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',

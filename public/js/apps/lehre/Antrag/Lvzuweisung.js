@@ -12,6 +12,9 @@ const app = Vue.createApp({
 		}
 	}
 });
+
+FhcApps.makeExtendable(app);
+
 app
 	.use(PluginsPhrasen)
 	.mount('#wrapper');

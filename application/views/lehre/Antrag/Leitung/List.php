@@ -18,7 +18,7 @@ $sitesettings = array(
 		'lehre',
 		'person',
 	),
-	'customJSModules' => array('public/js/apps/lehre/Antrag/Leitung.js'),
+	'fhcApps' => array('lehre/Antrag/Leitung'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',
