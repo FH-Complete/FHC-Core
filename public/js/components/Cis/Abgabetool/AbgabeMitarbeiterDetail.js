@@ -114,6 +114,8 @@ export const AbgabeMitarbeiterDetail = {
 						}
 						
 						this.showAutomagicModalPhrase = true
+
+						this.$refs.modalContainerCreateNewAbgabe.show()
 					} else {
 						this.showAutomagicModalPhrase = false	
 					}
@@ -251,28 +253,6 @@ export const AbgabeMitarbeiterDetail = {
 			
 			return true
 		},
-		handleModalClose() {
-			// determined inside saveTermin api.then()
-			if(this.showAutomagicModalPhrase) {
-				this.$refs.modalContainerCreateNewAbgabe.show()
-			} else {
-				this.$refs.modalContainerCreateNewAbgabe.hide()
-				this.newTermin = {
-					'paabgabe_id': -1,
-					'projektarbeit_id': this.projektarbeit.projektarbeit_id,
-					'fixtermin': false,
-					'kurzbz': '',
-					'datum': new Date().toISOString().split('T')[0],
-					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-					'beurteilungsnotiz': '',
-					'upload_allowed': false,
-					'paabgabetyp_kurzbz': '',
-					'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen'),
-					'abgabedatum': null,
-					'insertvon': this.viewData?.uid ?? ''
-				}
-			}	
-		},
 		async handleSaveNewAbgabe(termin) {
 			
 			if(!this.validateTermin(termin)) {
@@ -283,7 +263,21 @@ export const AbgabeMitarbeiterDetail = {
 			
 			await this.saveTermin(termin)
 			
-			this.handleModalClose()
+			this.$refs.modalContainerCreateNewAbgabe.hide()
+			this.newTermin = {
+				'paabgabe_id': -1,
+				'projektarbeit_id': this.projektarbeit.projektarbeit_id,
+				'fixtermin': false,
+				'kurzbz': '',
+				'datum': new Date().toISOString().split('T')[0],
+				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+				'beurteilungsnotiz': '',
+				'upload_allowed': false,
+				'paabgabetyp_kurzbz': '',
+				'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen'),
+				'abgabedatum': null,
+				'insertvon': this.viewData?.uid ?? ''
+			}
 			
 		},
 		handleChangeAbgabetyp(termin) {
