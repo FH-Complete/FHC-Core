@@ -7,9 +7,9 @@ $includesArray = array(
 	'fontawesome6' => true,
 	'axios027' => true,
 	'primevue3' => true,
-	'customJSModules' => array_merge([
-		'public/js/apps/Cis.js'
-	], $customJSModules ?? []),
+	'fhcApps' => array_merge([
+		'Cis'
+	], $fhcApps ?? []),
 	'customCSSs' => array_merge([
 		'public/css/Cis4/Cis.css',
 		$this->config->item('theme_css'),
