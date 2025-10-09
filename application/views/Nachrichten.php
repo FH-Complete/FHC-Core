@@ -22,7 +22,7 @@ $includesArray = array(
 		#'vendor/npm-asset/primevue/toast/toast.min.js'
 	],
 	'customJSModules' => [
-		'public/js/apps/Nachrichten.js'
+		'public/js/apps/Messages/NewMessage.js'
 	]
 );
 

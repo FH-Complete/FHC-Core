@@ -16,6 +16,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details-messages h-100 pb-3 overflow-hidden">
+	stv: {{endpoint}}
 	
 	<template v-if="modelValue.prestudent_id">
 		<core-messages
@@ -24,7 +25,7 @@ export default {
 			type-id="prestudent_id"
 			:id="modelValue.prestudent_id"
 			messageLayout="twoColumnsTableLeft"
-			open-mode="modal"
+			open-mode="newTab"
 			show-table
 			>
 		</core-messages>
