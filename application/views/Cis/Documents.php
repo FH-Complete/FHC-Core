@@ -2,7 +2,7 @@
 $includesArray = array(
 	'title' => 'Documents',
 	'tabulator5' => true,
-	'customJSModules' => ['public/js/apps/Cis/Documents.js']
+	'fhcApps' => ['Cis/Documents']
 );
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
