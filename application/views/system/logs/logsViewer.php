@@ -13,7 +13,7 @@
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js'),
+		'fhcApps' => array('LogsViewer/LogsViewer'),
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
