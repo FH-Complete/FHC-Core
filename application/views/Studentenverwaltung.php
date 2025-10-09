@@ -26,8 +26,8 @@
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
-		'customJSModules' => [
-			'public/js/apps/Studentenverwaltung.js'
+		'fhcApps' => [
+			'Studentenverwaltung'
 		]
 	);
 

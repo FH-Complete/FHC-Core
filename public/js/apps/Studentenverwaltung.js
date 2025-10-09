@@ -168,9 +168,13 @@ router.afterEach((to, from, failure) => {
 	document.title = title;
 });
 
+FhcApps.router.makeExtendable(router);
+
 const app = Vue.createApp({
 	name: 'StudentenverwaltungApp'
 });
+
+FhcApps.makeExtendable(app);
 
 app
 	.use(router)
