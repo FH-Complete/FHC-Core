@@ -9,7 +9,7 @@ $includesArray = array(
 	'primevue3' => true,
 	'navigationcomponent' => true,
 	'filtercomponent' => true,
-	'customJSModules' => array('public/js/apps/lehre/lvplanung/LvTemplates.js'),
+	'fhcApps' => array('lehre/lvplanung/LvTemplates'),
 	'customCSSs' => array(
 	    'public/css/Fhc.css',
 	    'public/css/lvTemplateUebersicht.css'
