@@ -517,7 +517,7 @@ class Students extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($data);
 	}
-	
+
 	/**
 	 * @param string		$prestudent_id
 	 *

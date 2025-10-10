@@ -15,10 +15,7 @@ class Tags extends Tag_Controller
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
-			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
-/*			'updateLehre' => self::BERECHTIGUNG_KURZBZ,
-			'doneLehre' => self::BERECHTIGUNG_KURZBZ,
-			'deleteLehre' => self::BERECHTIGUNG_KURZBZ,*/
+			'deleteTag' => self::BERECHTIGUNG_KURZBZ
 		]);
 
 	$this->config->load('stv');
@@ -26,12 +23,10 @@ class Tags extends Tag_Controller
 
 	public function getTag($readonly_tags = null)
 	{
-	//	console.log("in this endpoint. getTags");
 		parent::getTag($this->config->item('stv_prestudent_tags'));
 	}
 	public function getTags($tags = null)
 	{
-	//	$this->terminateWithError(" IN TAGS.PHP ", self::ERROR_TYPE_GENERAL);
 		parent::getTags($this->config->item('stv_prestudent_tags'));
 	}
 	public function addTag($withZuordnung = true, $updatable_tags = null)
