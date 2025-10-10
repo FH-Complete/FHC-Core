@@ -59,13 +59,13 @@ class Config extends FHCAPI_Controller
 
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
-			'component' => './Stv/Studentenverwaltung/Details/Details.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Details.js',
 			'config' => $config['details']
 		];
 
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
-			'component' => './Stv/Studentenverwaltung/Details/Notizen.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Notizen.js',
 			'config'	=> $config['notes'],
 			'showSuffix' => ($config['notes']['showCountNotes'] ?? false),
 			'suffixhelper' => APP_ROOT . 'public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js'
@@ -73,7 +73,7 @@ class Config extends FHCAPI_Controller
 
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
-			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Kontakt.js',
 			'config' => [
 				'showBankaccount' => $this->permissionlib->isBerechtigt('mitarbeiter/bankdaten')
 					|| $this->permissionlib->isBerechtigt('student/bankdaten')
@@ -81,20 +81,20 @@ class Config extends FHCAPI_Controller
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
-			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Prestudent.js',
 			'config' => $config['prestudent']
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'
 		];
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
-			'component' => './Stv/Studentenverwaltung/Details/Dokumente.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Dokumente.js'
 		];
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
-			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Konto.js',
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
 				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
@@ -106,20 +106,20 @@ class Config extends FHCAPI_Controller
 		];
 		$result['resources'] = [
 			'title' => $this->p->t('stv', 'tab_resources'),
-			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Betriebsmittel.js'
 		];
 		$result['groups'] = [
 			'title' => $this->p->t('stv', 'tab_groups'),
-			'component' => './Stv/Studentenverwaltung/Details/Gruppen.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Gruppen.js'
 		];
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
-			'component' => './Stv/Studentenverwaltung/Details/Messages.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Messages.js'
 		];
 
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Noten.js',
 			'showOnlyWithUid' => true,
 			'config' => [
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
@@ -132,29 +132,29 @@ class Config extends FHCAPI_Controller
 
 		$result['exam'] = [
 			'title' => $this->p->t('stv', 'tab_exam'),
-			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Pruefung.js'
 		];
 
 		$result['exemptions'] = [
 			'title' => $this->p->t('lehre', 'anrechnungen'),
-			'component' => './Stv/Studentenverwaltung/Details/Anrechnungen.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Anrechnungen.js',
 			'config' => $config['exemptions']
 		];
 
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
-			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
 		];
 
 		$result['mobility'] = [
 			'title' => $this->p->t('stv', 'tab_mobility'),
-			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Mobility.js'
 		];
 
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Archiv.js',
 			'config' => [
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
@@ -162,22 +162,22 @@ class Config extends FHCAPI_Controller
 
 		$result['jointstudies'] = [
 			'title' => $this->p->t('stv', 'tab_jointstudies'),
-			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/JointStudies.js'
 		];
 
 		$result['coursedates'] = [
 			'title' => $this->p->t('stv', 'tab_courseDates'),
-			'component' => './Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js'
 		];
 
 		$result['admissionDates'] = [
 			'title' => $this->p->t('stv', 'tab_admissionDates'),
-			'component' => './Stv/Studentenverwaltung/Details/Aufnahmetermine.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Aufnahmetermine.js'
 		];
 
 		$result['functions'] = [
 			'title' => $this->p->t('stv', 'tab_functions'),
-			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Funktionen.js'
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -195,7 +195,7 @@ class Config extends FHCAPI_Controller
 		$config = $this->config->item('tabs');
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
-			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Konto.js',
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
 				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
@@ -207,7 +207,7 @@ class Config extends FHCAPI_Controller
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js',
 			'config' => [
 				'changeStatusToAbbrecherStgl' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbbrecherStud' => $this->permissionlib->isBerechtigt('admin'),
@@ -218,12 +218,12 @@ class Config extends FHCAPI_Controller
 		];
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
-			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
 			'config' => $config['finalexam']
 		];
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'component' => APP_ROOT . 'public/js/components/Stv/Studentenverwaltung/Details/Archiv.js',
 			'config' => [
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
