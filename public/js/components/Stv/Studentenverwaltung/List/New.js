@@ -13,9 +13,11 @@ import ApiStudienplan from '../../../../api/factory/studienplan.js';
 var _uuid = 0;
 const FORMDATA_DEFAULT = {
 	address: {
-		func: 1,
+		checked: true,
 		nation: 'A'
 	},
+	vorname: '',
+	nachname: '',
 	geburtsnation: 'A',
 	staatsbuergerschaft: 'A',
 	ausbildungssemester: 1,
@@ -45,7 +47,7 @@ export default {
 	data() {
 		return {
 			places: [],
-			formData: FORMDATA_DEFAULT,
+			formData: null,
 			suggestions: {},
 			person: null,
 			semester: [],
@@ -63,7 +65,7 @@ export default {
 			return this.formData;
 		},
 		orte() {
-			return this.places.filter(ort => ort.name == this.formData.address.gemeinde);
+			return this.places.filter(ort => ort.name == this.formData?.address.gemeinde);
 		},
 		gemeinden() {
 			return Object.values(this.places.reduce((res,place) => {
@@ -73,7 +75,7 @@ export default {
 		},
 		formDataStg: {
 			get() {
-				return this.formData.studiengang_kz !== undefined ? this.formData.studiengang_kz : this.studiengangKz;
+				return this.formData?.studiengang_kz !== undefined ? this.formData?.studiengang_kz : this.studiengangKz;
 			},
 			set(v) {
 				this.formData.studiengang_kz = v;
@@ -81,7 +83,7 @@ export default {
 		},
 		formDataSem: {
 			get() {
-				return this.formData.studiensemester_kurzbz !== undefined ? this.formData.studiensemester_kurzbz : this.studiensemesterKurzbz;
+				return this.formData?.studiensemester_kurzbz !== undefined ? this.formData?.studiensemester_kurzbz : this.studiensemesterKurzbz;
 			},
 			set(v) {
 				this.formData.studiensemester_kurzbz = v;
@@ -101,10 +103,10 @@ export default {
 			this.$refs.modal.show();
 		},
 		reset() {
-			this.formData = FORMDATA_DEFAULT;
+			this.formData = JSON.parse(JSON.stringify(FORMDATA_DEFAULT));
 			this.person = null;
 			this.suggestions = [];
-			this.$refs.form.clearValidation();
+			if (this.$refs.form) this.$refs.form.clearValidation();
 		},
 		loadSuggestions() {
 			if (this.abortController.suggestions)
@@ -116,9 +118,9 @@ export default {
 
 			this.$api
 				.call(ApiStvStudents.getPerson({
-					vorname: this.formData.vorname,
-					nachname: this.formData.nachname,
-					gebdatum: this.formData.gebdatum
+					vorname: this.formData?.vorname,
+					nachname: this.formData?.nachname,
+					gebdatum: this.formData?.gebdatum
 				}), {
 					signal: this.abortController.suggestions.signal
 				})
@@ -137,12 +139,12 @@ export default {
 		loadPlaces() {
 			if (this.abortController.places)
 				this.abortController.places.abort();
-			if (this.formData.address.nation != 'A' || !this.formData.address.plz)
+			if (this.formData?.address?.nation != 'A' || !this?.formData?.address?.plz)
 				return;
 
 			this.abortController.places = new AbortController();
 			this.$refs.form.call(
-				ApiStvAddress.getPlaces(this.formData.address.plz)
+				ApiStvAddress.getPlaces(this.formData?.address.plz)
 				//~ undefined,
 				//~ {
 					//~ signal: this.abortController.places.signal
@@ -164,13 +166,13 @@ export default {
 					.call(ApiStudienplan.getStudienplaeneBySemester(
 						this.formDataStg,
 						this.formDataSem,
-						this.formData.ausbildungssemester,
-						this.formData.orgform_kurzbz
+						this.formData?.ausbildungssemester,
+						this.formData?.orgform_kurzbz
 					))
 					.then(result => result.data || [])
 					.then(result => {
 						this.studienplaene = result;
-						if (this.formData.studienplan_id !== '' && !this.studienplaene.filter(plan => plan.studienplan_id == this.formData.studienplan_id).length)
+						if (this.formData?.studienplan_id !== '' && !this.studienplaene.filter(plan => plan.studienplan_id == this.formData?.studienplan_id).length)
 							this.formData.studienplan_id = '';
 					})
 					.catch(error => {
@@ -184,10 +186,10 @@ export default {
 			}
 		},
 		changeAddressNation(e) {
-			if (this.formData['geburtsnation'] == this.formData['address']['nation'])
-				this.formData['geburtsnation'] = e.target.value;
-			if (this.formData['staatsbuergerschaft'] == this.formData['address']['nation'])
-				this.formData['staatsbuergerschaft'] = e.target.value;
+			if (this.formData.geburtsnation == this.formData?.address.nation)
+				this.formData.geburtsnation = e.target.value;
+			if (this.formData.staatsbuergerschaft == this.formData?.address.nation)
+				this.formData.staatsbuergerschaft = e.target.value;
 			this.loadPlaces();
 		},
 		send(e) {
@@ -216,11 +218,23 @@ export default {
 		setPerson(suggestion)
 		{
 			this.person = suggestion;
-			this.formData.address.func = -1;
+			this.formData.address.checked = false;
+		},
+		dateFormatter(val)
+		{
+			if (!val)
+				return '';
+			let date = new Date(val);
+			return date.toLocaleDateString('de-AT', {
+				"day": "2-digit",
+				"month": "2-digit",
+				"year": "numeric"
+			});
 		}
 	},
 	created() {
 		this.uuid = _uuid++;
+		this.reset();
 		this.$api.call(ApiStudiensemester.getAll())
 		.then(result => result.data || [])
 		.then(result => {
@@ -282,9 +296,17 @@ export default {
 							</form-input>
 						</div>
 					</div>
-					<!-- TODO(chris): more details -->
-					<table class="table caption-top table-striped table-hover">
+					<table class="table caption-top table-striped table-hover" >
 						<caption>{{ $p.t('person', 'personExistiertPruefung') }}</caption>
+						<thead v-if="suggestions?.length">
+							<th>{{ $p.t('person', 'nachname') }}</th>
+							<th>{{ $p.t('person', 'vorname') }}</th>
+							<th>{{ $p.t('person', 'weitereVornamen') }}</th>
+							<th>{{ $p.t('person', 'geburtsdatum') }}</th>
+							<th>{{ $p.t('person', 'geschlecht') }}</th>
+							<th>{{ $p.t('person', 'adresse') }}</th>
+							<th>Status</th>
+						</thead>
 						<tbody>
 							<tr
 								v-for="(suggestion, index) in suggestions"
@@ -293,8 +315,21 @@ export default {
 								@click="(index == 2) ? suggestions.shift() : setPerson(suggestion)"
 								v-accessibility:tab.vertical
 								>
-								<td>{{suggestion.vorname + ' ' + suggestion.nachname}}</td>
-								<td></td>
+								<td>{{ suggestion.nachname }}</td>
+								<td>{{ suggestion.vorname }}</td>
+								<td>{{ suggestion.vornamen }}</td>
+								<td>{{ dateFormatter(suggestion.gebdatum) }}</td>
+								<td>{{ suggestion.geschlecht_bezeichnung }}</td>
+								<td>
+									<div v-for="adresse in suggestion.adressen">
+										{{ (adresse.plz ?? '') + (adresse.plz && adresse.ort ? ' ' : '') + (adresse.ort ?? '') + (adresse.ort && adresse.strasse ? ', ' : '') + (adresse.strasse ?? '') }}
+									</div>
+								</td>
+								<td>
+									<div v-for="status in suggestion.status">
+										{{ status.status_kurzbz + " " + status.studiengang_kuerzel }}
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -422,19 +457,18 @@ export default {
 					<div class="row">
 						<div class="col-sm-6 mb-3">
 							<form-input
-								type="select"
-								id="stv-list-new-address-func"
-								name="address[func]"
-								v-model="formData['address']['func']"
+								:label="$p.t('person', 'adresseHinzufuegen')"
+								type="checkbox"
+								id="stv-new-adresse"
+								name="adresseChecked"
+								v-model="formData['address']['checked']"
+								value="true"
 								>
-								<option value="-1" v-if="person">{{ $p.t('person', 'bestehendeAdresseUeberschreiben') }}</option>
-								<option value="1">{{ $p.t('person', 'adresseHinzufuegen') }}</option>
-								<option value="0">{{ $p.t('person', 'adresseNichtAnlegen') }}</option>
 							</form-input>
 						</div>
 					</div>
-
-					<fieldset v-if="formData['address']['func'] != 0">
+					<fieldset v-if="formData['address']['checked']">
+					<hr>
 						<legend>Adresse</legend>
 						<div class="row">
 							<div class="col-sm-4 mb-3">
@@ -519,6 +553,7 @@ export default {
 								</form-input>
 							</div>
 						</div>
+					<hr>
 					</fieldset>
 
 					<div class="row">
@@ -679,7 +714,7 @@ export default {
 						</div>
 						<div class="row">
 							<div class="col-10 mb-3">
-								<div class="form-check">
+								<div>
 									<form-input
 										label="Incoming"
 										type="checkbox"
@@ -696,7 +731,7 @@ export default {
 				</template>
 			</template>
 			<template #footer>
-				<button v-if="person !== null" type="button" class="btn btn-secondary" @click="person = null; formData.address.func = 1;"><i class="fa fa-chevron-left"></i>{{ $p.t('ui', 'zurueck') }}</button>
+				<button v-if="person !== null" type="button" class="btn btn-secondary" @click="person = null; formData.address.checked = true;"><i class="fa fa-chevron-left"></i>{{ $p.t('ui', 'zurueck') }}</button>
 				<button type="submit" class="btn btn-primary">{{ person === null || personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}</button>
 			</template>
 		</bs-modal>

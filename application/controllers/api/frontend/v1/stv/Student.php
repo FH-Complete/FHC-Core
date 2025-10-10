@@ -441,6 +441,13 @@ class Student extends FHCAPI_Controller
 
 		$this->load->model('person/Person_model', 'PersonModel');
 
+		$this->PersonModel->addSelect(
+			'person_id, vorname, nachname, vornamen, wahlname, gebdatum, staatsbuergerschaft, geburtsnation, sprache, anrede,
+			titelpost, titelpre, gebort, gebzeit, homepage, geschlecht, matr_nr,
+			aktiv, unruly, tbl_geschlecht.bezeichnung_mehrsprachig AS geschlecht_bezeichnung'
+		);
+		$this->PersonModel->addJoin('public.tbl_geschlecht', 'geschlecht');
+
 		if ($gebdatum)
 			$this->PersonModel->db->where('gebdatum', (new DateTime($gebdatum))->format('Y-m-d'));
 		if ($vorname && $nachname) {
@@ -455,6 +462,33 @@ class Student extends FHCAPI_Controller
 		$result = $this->PersonModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->load->model('person/Adresse_model', 'AdresseModel');
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		foreach ($data as $person)
+		{
+			// get adresses
+			$langIdx = $this->_getLanguageIndex() - 1;
+			$person->geschlecht_bezeichnung = isset($person->geschlecht_bezeichnung[$langIdx]) ? $person->geschlecht_bezeichnung[$langIdx] : '';
+
+			// get Adresse
+			$this->AdresseModel->addOrder('heimatadresse', 'DESC');
+			$this->AdresseModel->addOrder('zustelladresse', 'DESC');
+			$this->AdresseModel->addOrder('adresse_id', 'DESC');
+			$result = $this->AdresseModel->loadWhere(['person_id' => $person->person_id]);
+
+			$adressen = $this->getDataOrTerminateWithError($result);
+
+			$person->adressen = $adressen;
+
+			// get status
+			$result = $this->PrestudentstatusModel->getLastStatusPerson($person->person_id);
+
+			$status = $this->getDataOrTerminateWithError($result);
+
+			$person->status = $status;
+		}
 
 		$this->terminateWithSuccess($data);
 	}
@@ -471,7 +505,6 @@ class Student extends FHCAPI_Controller
 
 		$this->_validate();
 
-		// TODO(chris): This should be in a library
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
@@ -486,6 +519,8 @@ class Student extends FHCAPI_Controller
 		$this->db->trans_begin();
 
 		$result = $this->_addPerson();
+		if (isError($result)) $errors[] = getError($result);
+
 		if (hasData($result))
 		{
 			$person_id = getData($result);
@@ -536,7 +571,7 @@ class Student extends FHCAPI_Controller
 			if ($this->input->post('geschlecht'))
 				$data['geschlecht'] = $this->input->post('geschlecht');
 			if ($this->input->post('gebdatum'))
-				$data['gebdatum'] = (new DateTime($this->input->post('datum_obj')))->format('Y-m-d');
+				$data['gebdatum'] = (new DateTime($this->input->post('gebdatum')))->format('Y-m-d');
 			if ($this->input->post('geburtsnation'))
 				$data['geburtsnation'] = $this->input->post('geburtsnation');
 			if ($this->input->post('staatsbuergerschaft'))
@@ -551,8 +586,8 @@ class Student extends FHCAPI_Controller
 	private function _addAdresse($person_id)
 	{
 		// Addresse anlegen?
-		$anlegen = $this->input->post('address[func]');
-		if ($anlegen)
+		$anlegen = $this->input->post('address[checked]');
+		if ($anlegen === true)
 		{
 			// Adresse laden
 			$this->load->model('person/Adresse_model', 'AdresseModel');
@@ -567,46 +602,21 @@ class Student extends FHCAPI_Controller
 				'zustelladresse' => true,
 			];
 
-			if ($anlegen < 0) // Adresse überschreiben
-			{
 				$this->AdresseModel->addSelect('adresse_id');
-				$this->AdresseModel->addJoin('public.tbl_adressentyp', 'typ = adressentyp_kurzbz');
-				$this->AdresseModel->addOrder('zustelladresse', 'DESC');
-				$this->AdresseModel->addOrder('sort');
 				$result = $this->AdresseModel->loadWhere([
 					'person_id' => $person_id
 				]);
 
 				if (isError($result)) return $result;
 
-				if (hasData($result))
-				{
-					$address = getData($result)[0];
+				// wenn neue Adresse, heimatadresse setzen
+				if (!hasData($result)) $data['heimatadresse'] = true;
 
-					$data['updateamum'] = date('c');
-					$data['updatevon'] = getAuthUID();
-
-					return $this->AdresseModel->update($address->adresse_id, $data);
-				}
-				else {
-					//Wenn keine Adrese vorhanden ist dann eine neue Anlegen
-					$anlegen = 1;
-					$data['heimatadresse'] = true;
-				}
-			}
-
-			if ($anlegen > 0) // Adresse hinzufügen
-			{
 				$data['person_id'] = $person_id;
 				$data['insertamum'] = date('c');
 				$data['insertvon'] = getAuthUID();
 
-				// Wenn die Person neu angelegt wird, dann ist die neue Adresse die Heimatadresse
-				if (!isset($data['heimatadresse']))
-					$data['heimatadresse'] = !$this->input->post('person_id');
-
 				return $this->AdresseModel->insert($data);
-			}
 		}
 
 		return success(null);
@@ -714,7 +724,7 @@ class Student extends FHCAPI_Controller
 	
 	public function requiredIfAddressFunc($value)
 	{
-		if (!$_POST['address']['func'] || $_POST['address']['func'] == 0)
+		if (!isset($_POST['address']['checked']) || !$_POST['address']['checked'])
 			return true;
 		return !!$value;
 	}
@@ -733,11 +743,6 @@ class Student extends FHCAPI_Controller
 		return !!$value;
 	}
 
-	public function isValidDate($value)
-	{
-		return isValidDate($value);
-	}
-
 	/**
 	 * Validates input data. Terminates with validation errors, if invalid.
 	 */
@@ -754,7 +759,7 @@ class Student extends FHCAPI_Controller
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', ['isValidDate', function($value) { return isValidDate($value); }], [
 			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
 		]);
-		$this->form_validation->set_rules('address[func]', 'Address', 'required|integer|less_than[2]|greater_than[-2]');
+		//$this->form_validation->set_rules('address[checked]', 'Address', 'required');
 		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
 			'requiredIfAddressFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'plz')])
 		]);
@@ -788,5 +793,15 @@ class Student extends FHCAPI_Controller
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
+	}
+
+	private function _getLanguageIndex()
+	{
+		$this->load->model('system/Sprache_model', 'SpracheModel');
+		$this->SpracheModel->addSelect('index');
+		$result = $this->SpracheModel->loadWhere(array('sprache' => getUserLanguage()));
+		$this->addMeta('lang', getUserLanguage());
+
+		return hasData($result) ? getData($result)[0]->index : 1;
 	}
 }
