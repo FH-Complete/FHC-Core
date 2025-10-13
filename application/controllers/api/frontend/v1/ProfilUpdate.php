@@ -706,7 +706,13 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message)
 	{
-		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+		return $this->ProfilUpdateModel->update([$id], [
+			"status" => $status,
+			"status_timestamp" => "NOW()",
+			"status_message" => $status_message,
+			"updateamum" => "NOW()",
+			"updatevon" => getAuthUID()
+		]);
 	}
 	
 	private function updateRequestedChange($id, $requested_change)
