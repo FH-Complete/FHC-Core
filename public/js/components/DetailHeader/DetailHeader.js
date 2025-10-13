@@ -7,12 +7,12 @@ export default {
 	components: {
 		ModalUploadFoto
 	},
-	inject: {
+/*	inject: {
 		domain: {
 			from: 'configDomain',
 			default: 'fhcomplete.info'
 		},
-	},
+	},*/
 	props: {
 		headerData: {
 			type: Object,
@@ -30,6 +30,10 @@ export default {
 			type: Boolean,
 			required: false,
 			default: false
+		},
+		domain: {
+			type: String,
+			required: true
 		},
 		typeHeader: {
 			type: String,
@@ -54,14 +58,14 @@ export default {
 	},
 	created(){
 		if(this.person_id) {
-			this.loadHeaderData();
+			this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
 		}
 	},
 	watch: {
 		person_id: {
 			handler(newVal) {
 				if (newVal) {
-					this.loadHeaderData();
+					this.loadHeaderData(newVal, this.mitarbeiter_uid);
 				}
 			},
 			deep: true,
@@ -76,9 +80,9 @@ export default {
 		};
 	},
 	methods: {
-		loadHeaderData(){
-			this.getHeader(this.person_id);
-			this.loadDepartmentData(this.mitarbeiter_uid)
+		loadHeaderData(person_id, mitarbeiter_uid){
+			this.getHeader(person_id);
+			this.loadDepartmentData(mitarbeiter_uid)
 				.then(() => {
 					// Call getLeitungOrg only after departmentData is loaded
 					this.getLeitungOrg(this.departmentData.oe_kurzbz);
@@ -112,11 +116,8 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		redirectToLeitung(){
-			this.$emit('redirectToLeitung', {
-				person_id: this.leitungData.person_id,
-				uid: this.leitungData.uid
-			});
+		async goToLeitung() {
+			this.loadHeaderData(this.leitungData.person_id, this.leitungData.uid);
 		},
 		showModal(person_id){
 			this.$refs.modalFoto.open(person_id);
@@ -143,11 +144,11 @@ export default {
 		},
 		reload() {
 			if(this.person_id) {
-				this.loadHeaderData();
+				this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
 			}
-			else {
+/*			else {
 				this.$emit('reload');
-			}
+			}*/
 		},
 	},
 	template: `
@@ -282,7 +283,7 @@ export default {
 						{{departmentData.bezeichnung}}
 					<span v-if="leitungData.uid"> | </span>
 					<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
-					<a href="#" @click.prevent="redirectToLeitung" >
+					<a href="#" @click.prevent="goToLeitung" >
 						{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
 					</a>
 					<p>
@@ -297,25 +298,24 @@ export default {
 						</span>
 						<span v-if="headerDataMa?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerDataMa?.telefonklappe}}</span>
 					</p>
+					<slot name="tag"></slot>
 				</div>
 
 				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
 					<div class="d-flex py-1">
-					<!--  TODO slots for Issue Tracking and Tags
-						<class="px-2">
-							<h4 class="mb-1">Issues<a class="refresh-issues" title="checkIssues Person" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
-							<h6 v-if="!isFetchingIssues" class="text-muted">122</h6>
-						</div> -->
-						<div class="px-2">
-							<h4 class="mb-1">PNr</h4>
-							<h6 class="text-muted">{{ headerDataMa?.person_id }}</h6>
-						</div>
-						<div class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1">UID</h4>
-							<h6 class="text-muted">{{ mitarbeiter_uid }}</h6>
-						</div>
+					<div class="px-2" style="min-width: 100px;">
+						<slot name="card"></slot>
+					</div>
+					<div class="px-2">
+						<h4 class="mb-1">PNr</h4>
+						<h6 class="text-muted">{{ headerDataMa?.personalnummer }}</h6>
+					</div>
+					<div class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1">UID</h4>
+						<h6 class="text-muted">{{ headerDataMa?.mitarbeiter_uid }}</h6>
 					</div>
 				</div>
+			</div>
 
 		</template>
 	</div>

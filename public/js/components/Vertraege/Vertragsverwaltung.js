@@ -37,10 +37,6 @@ export default {
 			this.mitarbeiter_uid = selection.uid;
 			this.person_id = selection.person_id;
 		},
-		redirectToLeitung(leitung){
-			this.person_id = leitung.person_id;
-			this.mitarbeiter_uid = leitung.uid;
-		}
 	},
 	template: `
 		<!-- Navigation component -->
@@ -60,11 +56,12 @@ export default {
 				<template #bottom>
 					<div class="col" v-if="person_id!=null">
 						<fhc-header
+							ref="CoreDetailsHeaderRef"
 							:person_id="person_id"
 							:mitarbeiter_uid="this.mitarbeiter_uid"
 							typeHeader="mitarbeiter"
+							:domain="config.domain"
 							fotoEditable
-							@redirectToLeitung="redirectToLeitung"
 						></fhc-header>
 						<vertraege-mitarbeiter
 							:endpoint="endpoint"

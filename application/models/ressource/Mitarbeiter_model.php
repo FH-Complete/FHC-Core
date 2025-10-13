@@ -209,7 +209,7 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
 			SELECT
-			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe
+			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe, personalnummer, mitarbeiter_uid
 			FROM
 				public.tbl_person
 				JOIN public.tbl_benutzer b USING(person_id)
