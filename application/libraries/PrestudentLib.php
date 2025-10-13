@@ -56,7 +56,9 @@ class PrestudentLib
 			'anmerkung' => $anmerkung,
 			'reihungstestangetreten' => false,
 			'bismelden' => true,
-			'foerderrelevant' => $foerderrelevant
+			'foerderrelevant' => $foerderrelevant,
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
 		];
 
 		// Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
