@@ -118,6 +118,13 @@ export default {
 		},
 		async goToLeitung() {
 			this.loadHeaderData(this.leitungData.person_id, this.leitungData.uid);
+			this.redirectToLeitung();
+		},
+		redirectToLeitung() {
+			this.$emit('redirect', {
+				person_id: this.leitungData.person_id,
+				uid: this.leitungData.uid
+			});
 		},
 		showModal(person_id){
 			this.$refs.modalFoto.open(person_id);
