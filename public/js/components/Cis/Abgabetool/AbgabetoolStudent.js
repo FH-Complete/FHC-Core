@@ -233,7 +233,7 @@ export const AbgabetoolStudent = {
 	template: `
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
-		dialogClass="modal-fullscreen">
+		dialogClass="modal-xl" :allowFullscreenExpand="true">
 		<template v-slot:title>
 			<div>
 				{{$p.t('abgabetool/c4abgabeStudentDetailTitle')}}

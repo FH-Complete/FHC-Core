@@ -43,6 +43,20 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->load->library('PhrasesLib');
 
+		// Loads LogLib with different debug trace levels to get data of the job that extends this class
+		// It also specify parameters to set database fields
+		$this->load->library('LogLib', array(
+			'classIndex' => 5,
+			'functionIndex' => 5,
+			'lineIndex' => 4,
+			'dbLogType' => 'API', // required
+			'dbExecuteUser' => 'RESTful API',
+			'requestId' => 'API',
+			'requestDataFormatter' => function ($data) {
+				return json_encode($data);
+			}
+		), 'logLib');
+		
 		$this->loadPhrases(
 			array(
 				'global',
@@ -150,7 +164,6 @@ class Abgabe extends FHCAPI_Controller
 			}
 		}
 		
-
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN, $uid));
 	}
 
@@ -161,7 +174,6 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function postStudentProjektarbeitZwischenabgabe()
 	{
-
 		$projektarbeit_id = $_POST['projektarbeit_id'];
 		$paabgabe_id = $_POST['paabgabe_id'];
 		$student_uid = $_POST['student_uid'];
@@ -189,6 +201,13 @@ class Abgabe extends FHCAPI_Controller
 				));
 
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
+
+				$this->logLib->logInfoDB(array('zwischenupload',$res, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				), getAuthUID(), getAuthPersonId(), $student_uid));
+				
 				$this->terminateWithSuccess($res);
 			} else {
 				$this->terminateWithError('Error moving File');
@@ -197,7 +216,6 @@ class Abgabe extends FHCAPI_Controller
 		} else {
 			$this->terminateWithError('File missing');
 		}
-
 	}
 
 	/**
@@ -275,6 +293,13 @@ class Abgabe extends FHCAPI_Controller
 
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
+				$this->logLib->logInfoDB(array('endupload',$res, array(
+					'abgabedatum' => date('Y-m-d'),
+					'updatevon' => getAuthUID(),
+					'updateamum' => date('Y-m-d H:i:s')
+				), getAuthUID(), getAuthPersonId(), array($projektarbeit_id,$sprache,$abstract,$abstract_en
+				,$schlagwoerter, $schlagwoerter_en, $seitenanzahl)));
+				
 				$this->terminateWithSuccess($res);
 			} else {
 				$this->terminateWithError('Error moving File');
@@ -531,6 +556,8 @@ class Abgabe extends FHCAPI_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
+
+			$this->logLib->logInfoDB(array('paabgabe created',$result, getAuthUID(), getAuthPersonId()));
 		} else {
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
 			// only notiz has changed.
@@ -554,6 +581,17 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				)
 			);
+
+			$this->logLib->logInfoDB(array('paabgabe updated',$result, array(
+				'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+				'datum' => $datum,
+				'kurzbz' => $kurzbz,
+				'note' => $note,
+				'beurteilungsnotiz' => $beurteilungsnotiz,
+				'upload_allowed' => $upload_allowed,
+				'updatevon' => getAuthUID(),
+				'updateamum' => date('Y-m-d H:i:s')
+			), getAuthUID(), getAuthPersonId()));
 		}
 		
 		// check if $paaabgabe is a qual gate and its note is deemed negative
@@ -583,11 +621,9 @@ class Abgabe extends FHCAPI_Controller
 					} else { // benotung legitimately changed -> email
 						$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
 					}
-					
 				} else { // nothing existing previously -> send that mail
 					$this->sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe);
 				}
-				
 				
 			}
 		}
@@ -603,15 +639,17 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
-		$result = $this->PaabgabeModel->load($paabgabe_id);
-		$result = $this->getDataOrTerminateWithError($result);
+		$paabgabeResult = $this->PaabgabeModel->load($paabgabe_id);
+		$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult);
 
-		if(count($result) == 0)
+		if(count($paabgabeArr) == 0)
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		
-		if($result[0]->insertvon === getAuthUID()) {
+		if($paabgabeArr[0]->insertvon === getAuthUID()) {
 			$result = $this->PaabgabeModel->delete($paabgabe_id);
 			$result = $this->getDataOrTerminateWithError($result);
+
+			$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
 			$this->terminateWithSuccess($result);
 		}
 
@@ -705,6 +743,8 @@ class Abgabe extends FHCAPI_Controller
 			);
 		}
 
+		$this->logLib->logInfoDB(array('serientermin angelegt',$res, getAuthUID(), getAuthPersonId()));
+
 		$this->terminateWithSuccess($res);
 
 	}
@@ -725,7 +765,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$result = $this->PaabgabeModel->getDeadlines($person_id);
 		$data = $this->getDataOrTerminateWithError($result);
-
+		
 		$this->terminateWithSuccess($data);
 	}
 

@@ -1,12 +1,59 @@
 <?php
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
-// add campus.tbl_paabgabetyp options for Quality Gates
+
+if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabetyp' AND column_name = 'aktiv'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+
+		$qry = "ALTER TABLE campus.tbl_paabgabetyp
+				ADD COLUMN IF NOT EXISTS aktiv BOOLEAN DEFAULT true;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp column aktiv default true hinzugefuegt';
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabetyp' AND column_name = 'upload_allowed_default'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+
+		$qry = "ALTER TABLE campus.tbl_paabgabetyp
+				ADD COLUMN IF NOT EXISTS upload_allowed_default BOOLEAN DEFAULT true;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp column upload_allowed_default default true hinzugefuegt';
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table_schema = 'campus' AND table_name = 'tbl_paabgabetyp' AND column_name = 'benotbar'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+
+		$qry = "ALTER TABLE campus.tbl_paabgabetyp
+				ADD COLUMN IF NOT EXISTS benotbar BOOLEAN DEFAULT true;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp column benotbar default true hinzugefuegt';
+	}
+}
+
+// TODO DEFINE ACTUAL VALUES BENOTBAR / UPLOAD_ALLOWED_DEFAULT / AKTIV FOR EACH PAABGABETYPE - DEVLOPER DEFAULTS BELOW
 if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate1'"))
 {
 	if($db->db_num_rows($result) === 0)
 	{
-		$qry = "INSERT INTO campus.tbl_paabgabetyp (paabgabetyp_kurzbz, bezeichnung) VALUES('qualgate1', 'Quality Gate 1');";
+		$qry = "INSERT INTO campus.tbl_paabgabetyp (paabgabetyp_kurzbz, bezeichnung, benotbar, upload_allowed_default, aktiv)
+					VALUES('qualgate1', 'Quality Gate 1', true, true, true);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
@@ -15,11 +62,102 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 	}
 }
 
+// set new cols for zwischenabgabe
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='zwischen'"))
+{
+	if($db->db_num_rows($result) === 1)
+	{
+		$qry = "UPDATE campus.tbl_paabgabetyp 
+				SET benotbar = false,
+				    upload_allowed_default = true,
+				    aktiv = true
+				WHERE paabgabetyp_kurzbz='zwischen';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp zwischen updated benotbar = false, upload_allowed_default = true, aktiv = true';
+	}
+}
+
+// set new cols for note
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='note'"))
+{
+	if($db->db_num_rows($result) === 1)
+	{
+		$qry = "UPDATE campus.tbl_paabgabetyp 
+				SET benotbar = false,
+				    upload_allowed_default = false,
+				    aktiv = false
+				WHERE paabgabetyp_kurzbz='note';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp note updated benotbar = false, upload_allowed_default = false, aktiv = false';
+	}
+}
+
+// set new cols for abstract / entwurf
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='abstract'"))
+{
+	if($db->db_num_rows($result) === 1)
+	{
+		$qry = "UPDATE campus.tbl_paabgabetyp 
+				SET benotbar = false,
+				    upload_allowed_default = true,
+				    aktiv = true
+				WHERE paabgabetyp_kurzbz='abstract';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp abstract updated benotbar = false, upload_allowed_default = true, aktiv = true';
+	}
+}
+
+// set new cols for endabgabe / end
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='end'"))
+{
+	if($db->db_num_rows($result) === 1)
+	{
+		$qry = "UPDATE campus.tbl_paabgabetyp 
+				SET benotbar = false,
+				    upload_allowed_default = true,
+				    aktiv = true
+				WHERE paabgabetyp_kurzbz='end';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp end updated benotbar = false, upload_allowed_default = true, aktiv = true';
+	}
+}
+
+// set new cols for endabgabe im sekretariat / enda
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='enda'"))
+{
+	if($db->db_num_rows($result) === 1)
+	{
+		$qry = "UPDATE campus.tbl_paabgabetyp 
+				SET benotbar = false,
+				    upload_allowed_default = false,
+				    aktiv = false
+				WHERE paabgabetyp_kurzbz='enda';";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>paabgabetyp enda updated benotbar = false, upload_allowed_default = false, aktiv = false';
+	}
+}
+
 if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
 	if($db->db_num_rows($result) === 0)
 	{
-		$qry = "INSERT INTO campus.tbl_paabgabetyp (paabgabetyp_kurzbz, bezeichnung) VALUES('qualgate2', 'Quality Gate 2');";
+		$qry = "INSERT INTO campus.tbl_paabgabetyp (paabgabetyp_kurzbz, bezeichnung, benotbar, upload_allowed_default, aktiv)
+					VALUES('qualgate2', 'Quality Gate 2', true, true, true);";
 
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_paabgabetyp: '.$db->db_last_error().'</strong><br>';
@@ -34,7 +172,7 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.columns WHERE table
 	{
 
 		$qry = "ALTER TABLE campus.tbl_paabgabe
-				ADD COLUMN note SMALLINT DEFAULT NULL,
+				ADD COLUMN IF NOT EXISTS note SMALLINT DEFAULT NULL,
 				ADD CONSTRAINT tbl_paabgabe_note_fkey
 					FOREIGN KEY (note)
 					REFERENCES lehre.tbl_note(note)

@@ -146,7 +146,7 @@ export const AbgabeStudentDetail = {
 		downloadAbgabe(termin) {
 			this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
-		formatDate(dateParam) {
+		formatDate(dateParam, showTime = true) {
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -155,7 +155,7 @@ export const AbgabeStudentDetail = {
 			const day = padZero(date.getDate());
 			const year = date.getFullYear();
 
-			return `${day}.${month}.${year}`;
+			return `${day}.${month}.${year}` + (showTime ? ' 23:59' : '');
 		},
 		async upload(termin) {
 
@@ -211,23 +211,23 @@ export const AbgabeStudentDetail = {
 			const oneDayMs = 1000 * 60 * 60 * 24
 			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
 		},
-		getDateStyle(termin, mode) {
+		getDateStyleClass(termin, mode) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 			
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
-					return 'verpasst-header'
+					return 'verpasst'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					return 'abzugeben-header'
+					return 'abzugeben'
 				} else {
-					return 'standard-header'
+					return 'standard'
 				}
 			} else if(abgabedatum > datum) {
-				return 'verspaetet-header'
+				return 'verspaetet'
 			} else {
-				return 'abgegeben-header'
+				return 'abgegeben'
 			}
 		},
 		openBeurteilungLink(link) {
@@ -243,7 +243,7 @@ export const AbgabeStudentDetail = {
 		getAccTabHeaderForTermin(termin) {
 			let tabTitle = ''
 
-			const datumFormatted = this.formatDate(termin.datum)
+			const datumFormatted = this.formatDate(termin.datum, false)
 			tabTitle += termin.bezeichnung + ' ' + datumFormatted
 			
 			return tabTitle
@@ -277,6 +277,36 @@ export const AbgabeStudentDetail = {
 				}
 			})
 			return qgatefound
+		},
+		getTooltipVerspaetet() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipVerspaetet'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipVerpasst() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipVerpasst'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbzugeben() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipAbzugeben'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipStandard() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipStandard'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbgegeben() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipAbgegeben'),
+				class: "custom-tooltip"
+			}
 		}
 	},
 	created() {
@@ -301,7 +331,21 @@ export const AbgabeStudentDetail = {
 			
 			<Accordion :multiple="true" :activeIndex="[0]">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
-					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
+					<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
+						<template #header>
+							<div class="d-flex row w-100">
+								<div class="col-auto" style="transform: translateX(-62px)">
+									<i v-if="getDateStyleClass(termin) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+								</div>
+								<div class="col-6 text-start">
+									<span>{{getAccTabHeaderForTermin(termin)}}</span>
+								</div>
+							</div>				
+						</template>
 						<div class="row">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
 							<div class="col-8 col-md-9">
@@ -312,8 +356,6 @@ export const AbgabeStudentDetail = {
 									:pt="{ root: { class: 'ml-auto' }}"
 								>
 								</Checkbox>
-<!--								<i v-if="termin.fixtermin" class="fa-solid fa-2x fa-circle-check fhc-bullet-red"></i>-->
-<!--								<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>-->
 							</div>
 						</div>
 						
@@ -329,7 +371,6 @@ export const AbgabeStudentDetail = {
 									:text-input="true"
 									auto-apply>
 								</VueDatePicker>
-<!--								<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>-->
 							</div>
 						</div>
 						
@@ -366,10 +407,15 @@ export const AbgabeStudentDetail = {
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 							<div class="col-8 col-md-9">
-								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
-									<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
-								</button>
+								<template v-if="termin?.abgabedatum">
+									{{ termin.abgabedatum?.split("-").reverse().join(".") }}
+									<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+										<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+									</button>							
+								</template>
+								<template v-else>
+									{{ $p.t('abgabetool/c4nochNichtsAbgegeben') }}
+								</template>
 							</div>
 						</div>
 						

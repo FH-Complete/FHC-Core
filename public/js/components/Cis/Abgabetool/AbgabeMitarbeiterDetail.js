@@ -16,7 +16,13 @@ export const AbgabeMitarbeiterDetail = {
 		AccordionTab: primevue.accordiontab,
 		VueDatePicker
 	},
-	inject: ['abgabeTypeOptions', 'allowedNotenOptions', 'turnitin_link', 'old_abgabe_beurteilung_link', 'isMobile'],
+	inject: [
+		'abgabeTypeOptions',
+		'allowedNotenOptions',
+		'turnitin_link',
+		'old_abgabe_beurteilung_link',
+		'isMobile'
+	],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -164,23 +170,23 @@ export const AbgabeMitarbeiterDetail = {
 			const oneDayMs = 1000 * 60 * 60 * 24
 			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
 		},
-		getDateStyle(termin, mode) {
+		getDateStyleClass(termin, mode) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
 			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
 			if (termin.abgabedatum === null) {
 				if(datum < today) {
-					return 'verpasst-header'
+					return 'verpasst'
 				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					return 'abzugeben-header'
+					return 'abzugeben'
 				} else {
-					return 'standard-header'
+					return 'standard'
 				} 
 			} else if(abgabedatum > datum) {
-				return 'verspaetet-header'
+				return 'verspaetet'
 			} else {
-				return 'abgegeben-header'
+				return 'abgegeben'
 			}
 		},
 		openBeurteilungLink(link) {
@@ -209,7 +215,7 @@ export const AbgabeMitarbeiterDetail = {
 			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/' + path
 			window.open(link, '_blank')
 		},
-		formatDate(dateParam) {
+		formatDate(dateParam, showTime = true) {
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -217,19 +223,21 @@ export const AbgabeMitarbeiterDetail = {
 			const month = padZero(date.getMonth() + 1); // Months are zero-based
 			const day = padZero(date.getDate());
 			const year = date.getFullYear();
-
-			return `${day}.${month}.${year}`;
+			
+			// abgabedatum should SHOW abgabezeit which should always be last minute of the day
+			return `${day}.${month}.${year}` + (showTime ? ' 23:59' : ''); 
 		},
 		getAccTabHeaderForTermin(termin) {
 			let tabTitle = ''
 			
-			const datumFormatted = this.formatDate(termin.datum)
+			const datumFormatted = this.formatDate(termin.datum, false)
 			tabTitle += termin.bezeichnung?.bezeichnung + ' ' + datumFormatted
 
 			return tabTitle
 		},
 		openCreateNewAbgabeModal() {
 			if(!this.newTermin) {
+				const typ = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
 				this.newTermin = {
 					'paabgabe_id': -1,
 					'projektarbeit_id': this.projektarbeit.projektarbeit_id,
@@ -238,9 +246,9 @@ export const AbgabeMitarbeiterDetail = {
 					'datum': new Date().toISOString().split('T')[0],
 					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 					'beurteilungsnotiz': '',
-					'upload_allowed': false,
+					'upload_allowed': typ.upload_allowed_default,
 					'paabgabetyp_kurzbz': '',
-					'bezeichnung': this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen'),
+					'bezeichnung': typ,
 					'abgabedatum': null,
 					'insertvon': this.viewData?.uid ?? ''
 				}
@@ -290,6 +298,9 @@ export const AbgabeMitarbeiterDetail = {
 			
 	},
 	computed: {
+		activeAbgabeTypeOptions() {
+			return this.abgabeTypeOptions?.filter(opt => opt.aktiv === true)
+		},
 		getEid() {
 			return this.$p.t('abgabetool/c4eidesstattlicheErklaerung')
 		},
@@ -317,6 +328,36 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		getSpeedDialStyle() {
 			return 'position: static !important;'
+		},
+		getTooltipVerspaetet() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipVerspaetet'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipVerpasst() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipVerpasst'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbzugeben() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipAbzugeben'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipStandard() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipStandard'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbgegeben() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipAbgegeben'),
+				class: "custom-tooltip"
+			}
 		}
 	},
 	watch: {
@@ -326,6 +367,8 @@ export const AbgabeMitarbeiterDetail = {
 			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
 				this.newTermin.kurzbz = newVal.bezeichnung
 			}
+			
+			this.newTermin.upload_allowed = newVal.upload_allowed_default
 		}	
 	},
 	created() {
@@ -339,7 +382,7 @@ export const AbgabeMitarbeiterDetail = {
 			id="innerModalNewAbgabe" 
 			ref="modalContainerCreateNewAbgabe" 
 			class="bootstrap-prompt" 
-			dialogClass="bordered-modal modal-xl" 
+			dialogClass="bordered-modal modal-lg" 
 			:backdrop="true"
 			@hideBsModal="console.log('hideBsModal'); showAutomagicModalPhrase=false;"
 		>
@@ -383,13 +426,13 @@ export const AbgabeMitarbeiterDetail = {
 							<Dropdown
 								:style="{'width': '100%'}"
 								v-model="newTermin.bezeichnung"
-								:options="abgabeTypeOptions"
+								:options="activeAbgabeTypeOptions"
 								:optionLabel="getOptionLabelAbgabetyp"
 								scrollHeight="300px">
 							</Dropdown>
 						</div>
 					</div>
-					<div class="row mt-2" v-if="newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || newTermin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
+					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4upload_allowed')}}</div>
 						<div class="col-8 col-md-9">
 							<Checkbox
@@ -403,7 +446,7 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" :cols=" isMobile ? 30 : 90"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" :cols=" isMobile ? 30 : 60"></Textarea>
 						</div>
 					</div>	
 				</div>
@@ -439,8 +482,21 @@ export const AbgabeMitarbeiterDetail = {
 			
 			<Accordion :multiple="true" :activeIndex="[0]">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
-					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
-							
+					<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
+						<template #header>
+							<div class="d-flex row w-100">
+								<div class="col-auto" style="transform: translateX(-62px)">
+									<i v-if="getDateStyleClass(termin) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
+									<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+								</div>
+								<div class="col-6 text-start">
+									<span>{{getAccTabHeaderForTermin(termin)}}</span>
+								</div>
+							</div>				
+						</template>
 						<div class="row">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
 							<div class="col-8 col-md-9">
@@ -476,7 +532,7 @@ export const AbgabeMitarbeiterDetail = {
 									:disabled="!termin.allowedToSave"
 									v-model="termin.bezeichnung"
 									@change="handleChangeAbgabetyp(termin)"
-									:options="abgabeTypeOptions"
+									:options="activeAbgabeTypeOptions"
 									:optionLabel="getOptionLabelAbgabetyp">
 								</Dropdown>
 							</div>
@@ -492,7 +548,7 @@ export const AbgabeMitarbeiterDetail = {
 								</Checkbox>
 							</div>
 						</div>
-						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
+						<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
 							<div class="col-8 col-md-9">
 								<Dropdown
@@ -503,7 +559,7 @@ export const AbgabeMitarbeiterDetail = {
 								</Dropdown>
 							</div>
 						</div>
-						<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
+						<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4notizQualGatev2')}}</div>
 							<div class="col-8 col-md-9">
 								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
@@ -519,10 +575,15 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
 							<div class="col-8 col-md-9">
-								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
-									<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
-								</button>
+								<template v-if="termin?.abgabedatum">
+									{{ termin.abgabedatum?.split("-").reverse().join(".") }}
+									<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+										<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+									</button>							
+								</template>
+								<template v-else>
+									{{ $p.t('abgabetool/c4nochNichtsAbgegeben') }}
+								</template>
 							</div>
 						</div>
 						<div class="row mt-2">
@@ -531,13 +592,13 @@ export const AbgabeMitarbeiterDetail = {
 							</div>
 							<div class="col-8 col-md-9">
 								<div class="row">
-									<div class="col-4">
+									<div class="col-auto">
 										<button v-if="termin.allowedToSave" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
 											{{ $p.t('abgabetool/c4save') }}
 											<i class="fa-solid fa-floppy-disk"></i>
 										</button>
 									</div>
-									<div class="col-4">
+									<div class="col-auto">
 										<button v-if="termin.allowedToDelete && termin.paabgabe_id > 0" style="max-height: 40px;" class="btn btn-danger border-0" @click="handleDeleteTermin(termin)">
 											{{ $p.t('abgabetool/c4delete') }}
 											<i class="fa-solid fa-trash"></i>

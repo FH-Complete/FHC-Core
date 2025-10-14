@@ -229,10 +229,8 @@ export const AbgabetoolMitarbeiter = {
 					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
 					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
 					
-					termin.bezeichnung = {
-						bezeichnung: termin.bezeichnung,
-						paabgabetyp_kurzbz: termin.paabgabetyp_kurzbz
-					}
+					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
+
 				})
 				pa.student_uid = details.student_uid
 				pa.student = `${pa.vorname} ${pa.nachname}`
@@ -355,7 +353,7 @@ export const AbgabetoolMitarbeiter = {
 
 	},
 	computed: {
-
+		
 	},
 	created() {
 		// fetch config to avoid hard coded links
@@ -448,7 +446,7 @@ export const AbgabetoolMitarbeiter = {
 		</bs-modal>	
 		
 		<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
-			dialogClass="modal-fullscreen">
+			dialogClass="modal-xl" :allowFullscreenExpand="true">
 			<template v-slot:title>
 				<div>
 					{{$p.t('abgabetool/c4abgabeMitarbeiterDetailTitle')}}
