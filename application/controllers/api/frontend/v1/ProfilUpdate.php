@@ -706,7 +706,13 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message)
 	{
-		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+		return $this->ProfilUpdateModel->update([$id], [
+			"status" => $status,
+			"status_timestamp" => "NOW()",
+			"status_message" => $status_message,
+			"updateamum" => "NOW()",
+			"updatevon" => getAuthUID()
+		]);
 	}
 	
 	private function updateRequestedChange($id, $requested_change)
@@ -716,13 +722,12 @@ class ProfilUpdate extends FHCAPI_Controller
 	
 	private function deleteOldVersionFile($dms_id)
 	{
+		if (!isset($dms_id)) {
+			return true;
+		}
+
 		// starting the transaction
 		$this->db->trans_start();
-		
-		
-		if (!isset($dms_id)) {
-			return;
-		}
 
 		//? delete the file from the profilUpdate first
 		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
@@ -777,13 +782,8 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
 		$res = $this->getDataOrTerminateWithError($res, $this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));	
-		$res = array_map(
-			function ($item) {
-				return $item->oe_kurzbz;
-			},
-			$res
-		);
-		return $res;
+		$oe = ($res[0])->oe_kurzbz;
+		return $oe;
 	}
 
 	private function handleAdresse($requested_change, $personID)
@@ -813,7 +813,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$insert_adresse_id = $insertID;
 			$insert_adresse_id = $this->getDataOrTerminateWithError($insert_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
 			if ($insert_adresse_id) {
-				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id);
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id, $personID);
 			}
 		}
 		//! DELETE
@@ -825,12 +825,33 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		//! UPDATE
 		else {
-			$requested_change['updateamum'] = "NOW()";
-			$requested_change['updatevon'] = getAuthUID();
-			$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
-			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
-			$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id);
+			$curadresse_res = $this->AdresseModel->load($adresse_id);
+			$curadresse = ($this->getDataOrTerminateWithError($curadresse_res))[0];
 
+			if($curadresse->heimatadresse)
+			{
+				$tmpadresse = array_merge((array) $curadresse, $requested_change);
+				unset($tmpadresse["adresse_id"]);
+				$tmpadresse['insertamum'] = "NOW()";
+				$tmpadresse['insertvon'] = getAuthUID();
+				$tmpadresse['person_id'] = $personID;
+				unset($tmpadresse["heimatadresse"]);
+				unset($tmpadresse["updateamum"]);
+				unset($tmpadresse["updatevon"]);
+
+				$tmpadresse_res = $this->AdresseModel->insert($tmpadresse);
+				$tmpadresse_id = $this->getDataOrTerminateWithError($tmpadresse_res, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $tmpadresse_id, $personID);
+			}
+			else
+			{
+				$requested_change['updateamum'] = "NOW()";
+				$requested_change['updatevon'] = getAuthUID();
+
+				$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
+				$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id, $personID);
+			}
 		}
 		return $insertID ?? null;
 	}
@@ -852,7 +873,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$insert_kontakt_id = $insertID;
 			$insert_kontakt_id = $this->getDataOrTerminateWithError($insert_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_insertKontakt_error'));
 			if ($insert_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		//! DELETE
@@ -869,18 +890,18 @@ class ProfilUpdate extends FHCAPI_Controller
 			$update_kontakt_id = $this->KontaktModel->update($kontakt_id, $requested_change);
 			$update_kontakt_id = $this->getDataOrTerminateWithError($update_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_updateKontakt_error'));
 			if ($update_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		return isset($insertID) ? $insertID : null;
 	}
 
-	private function handleDupplicateZustellAdressen($zustellung, $adresse_id)
+	private function handleDupplicateZustellAdressen($zustellung, $adresse_id, $person_id)
 	{
 		if ($zustellung) {
 			$this->PersonModel->addSelect("public.tbl_adresse.adresse_id");
 			$this->PersonModel->addJoin("public.tbl_adresse", "public.tbl_adresse.person_id = public.tbl_person.person_id");
-			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustelladresse" => TRUE]);
+			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $person_id, "zustelladresse" => TRUE]);
 			if (isError($zustellAdressenArray)) {
 				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loadingZustellAdressen_error'));
 			}
@@ -893,6 +914,8 @@ class ProfilUpdate extends FHCAPI_Controller
 					return $adresse->adresse_id != $adresse_id;
 				});
 	
+				$this->addMeta('bhzustelladressen', $zustellAdressenArray);
+
 				// remove the zustelladresse from all other zustelladressen
 				foreach ($zustellAdressenArray as $adresse) {
 					$this->AdresseModel->update($adresse->adresse_id, ["zustelladresse" => FALSE]);
@@ -902,12 +925,16 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 	}
 
-	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id)
+	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id, $kontakttyp, $person_id)
 	{
 		if ($zustellung) {
 			$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
 			$this->PersonModel->addJoin("public.tbl_kontakt", "public.tbl_kontakt.person_id = public.tbl_person.person_id");
-			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustellung" => TRUE]);
+			$zustellKontakteArray = $this->PersonModel->loadWhere([
+				"public.tbl_person.person_id" => $person_id,
+				"zustellung" => TRUE,
+				"kontakttyp" => $kontakttyp
+			]);
 			if (!isSuccess($zustellKontakteArray)) {
 				return error($this->p->t('profilUpdate', 'profilUpdate_loadingZustellkontakte_error'));
 			}
