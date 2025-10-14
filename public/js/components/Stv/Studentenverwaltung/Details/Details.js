@@ -186,7 +186,7 @@ export default {
 						<label>{{$p.t('global', 'zugangscode')}}</label>
 						<div class="align-self-center">
 							<span class="form-text">
-								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
+								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat + '&keepEmailUnverified=true'" target="_blank">{{data.zugangscode}}</a>
 							</span>
 						</div>
 					</div>
