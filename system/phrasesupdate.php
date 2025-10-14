@@ -49663,8 +49663,9 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'German',
 				'text' => '
-					<p>Ihr Feedback dient den Lehrenden zur Selbstevaluierung und Ihre Jahrgangsvertretungen werden von der Studiengangsleitung zum Jour-Fixe eingeladen, um die Ergebnisse zu besprechen.</p>
-					<p>Ihr Feedback dient der kontinuierlichen Weiterentwicklung der Lehrveranstaltung. Mehr Details dazu finden Sie hier: 
+					<p>Danke, dass Sie sich Zeit für das Feedback genommen haben! Ihre ehrliche und konstruktive Rückmeldung ist essenziell, damit Ihre Lehrenden und Ihre Studiengangsleitung die Lehrveranstaltung immer weiter verbessern und anpassen können!</p>
+					<p>Und was passiert jetzt mit Ihrem Feedback? Die Studiengangsleitung wird die Ergebnisse &amp; Maßnahmen zusammen mit Ihrer Jahrgangsvertretung besprechen. So tragen Sie aktiv dazu bei, die Lehrveranstaltung für zukünftige Semester noch spannender &amp; lehrreicher zu machen!</p>
+					<p>Gemeinsam für mehr Qualität in der Lehre!</p>
 				',
 				'description' => '',
 				'insertvon' => 'system'
@@ -49672,8 +49673,9 @@ and represent the current state of research on the topic. The prescribed citatio
 			array(
 				'sprache' => 'English',
 				'text' => '
-					<p>Your feedback is used by the lecturers for self-evaluation and your year representatives are invited to the Jour-Fixe by the head of degree program to discuss the results.</p>
-					<p>Your feedback is used for the continuous further development of the course. You can find more details here: 
+					<p>Thank you for taking the time to provide feedback! Your honest and constructive input is essential for your lecturers and degree program director to continuously improve and adapt the course.</p>
+					<p>What happens with your feedback? The degree program director will discuss the results and potential measures together with your academic year representatives. You have thus actively contributed to making the course even more engaging and educational for future semesters!</p>
+					<p>Working together for higher quality in teaching!</p>
 				',
 				'description' => '',
 				'insertvon' => 'system'
