@@ -888,9 +888,10 @@ class dokument extends basis_db
 	 * Akzeptiert ein bestimmtes Dokument
 	 * @param char $dokument_kurzbz Bezeichner Dokument.
 	 * @param int $person_id Personenkennzeichen.
+	 * @param array $studiengang_typen einschränken nach Studiengang Typ.
 	 * @return boolean true wenn akzeptiert bzw geprüft ohne Akzeptieren, false wenn Fehler
 	 */
-	public function akzeptiereDokument($dokument_kurzbz, $person_id)
+	public function akzeptiereDokument($dokument_kurzbz, $person_id, $studiengang_typen = null)
 	{
 		$db = new basis_db();
 		$arrayDoksZuAkzeptieren = array();
@@ -902,13 +903,17 @@ class dokument extends basis_db
 					tbl_prestudent ps, tbl_studiengang sg
 				WHERE
 					ps.studiengang_kz = sg.studiengang_kz
-				AND sg.typ = 'm'
 				AND person_id = ".$this->db_add_param($person_id)."
 				AND not exists(
 					SELECT *
 					from tbl_dokumentprestudent dok
 					where dok.prestudent_id = ps.prestudent_id
 					and dokument_kurzbz = ".$this->db_add_param($dokument_kurzbz).")";
+
+		if (isset($studiengang_typen) && is_array($studiengang_typen) && !empty($studiengang_typen))
+		{
+			$qry .= ' AND sg.typ IN ('. $db->db_implode4SQL($studiengang_typen).')';
+		}
 
 		//gibt ein Array von zu akzeptierenden Dokumenten zurück
 		if ($db->db_query($qry))
@@ -923,11 +928,14 @@ class dokument extends basis_db
 				}
 
 				//für alle prestudent_ids das Dokument akzeptieren
-				$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id) VALUES";
+				$qry = "INSERT INTO public.tbl_dokumentprestudent(dokument_kurzbz, prestudent_id, datum, insertamum) VALUES";
 
 				foreach ($arrayDoksZuAkzeptieren as $prestudent_id)
 				{
-					$qry .= "(".$this->db_add_param($dokument_kurzbz). ",". $prestudent_id. ")";
+					$qry .= "(".$this->db_add_param($dokument_kurzbz).
+						",".$this->db_add_param($prestudent_id, FHC_INTEGER).
+						",".$this->db_add_param(date('Y-m-d')).
+						",".$this->db_add_param(strftime('%Y-%m-%d %H:%M')). ")";
 
 					if (next($arrayDoksZuAkzeptieren) == true)
 					{
