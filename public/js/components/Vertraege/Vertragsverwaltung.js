@@ -62,7 +62,11 @@ export default {
 							typeHeader="mitarbeiter"
 							:domain="config.domain"
 							fotoEditable
-						></fhc-header>
+						>
+							<template #uid>{{mitarbeiter_uid}}</template>
+							<template #titleAlphaTile>pID</template>
+							<template #valueAlphaTile>{{person_id}}</template>
+						</fhc-header>
 						<vertraege-mitarbeiter
 							:endpoint="endpoint"
 							:person_id="this.person_id"

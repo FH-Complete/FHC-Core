@@ -54,7 +54,20 @@ export default {
 			if (this.typeHeader === 'student') return this.headerData;
 			if (this.typeHeader === 'mitarbeiter') return this.person_id;
 			return null;
-		}
+		},
+		hasTileAlphaSlot() {
+			return !!this.$slots.titleAlphaTile
+		},
+		hasTileBetaSlot() {
+			return !!this.$slots.titleBetaTile
+		},
+		hasTileGammaSlot() {
+			return !!this.$slots.titleGammaTile
+		},
+		hasTileUIDSlot() {
+			return !!this.$slots.uid
+		},
+
 	},
 	created(){
 		if(this.person_id) {
@@ -310,19 +323,27 @@ export default {
 
 				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
 					<div class="d-flex py-1">
-					<div class="px-2" style="min-width: 100px;">
-						<slot name="card"></slot>
-					</div>
-					<div class="px-2">
-						<h4 class="mb-1">PNr</h4>
-						<h6 class="text-muted">{{ headerDataMa?.personalnummer }}</h6>
-					</div>
-					<div class="px-2" style="border-left: 1px solid #EEE">
-						<h4 class="mb-1">UID</h4>
-						<h6 class="text-muted">{{ headerDataMa?.mitarbeiter_uid }}</h6>
+						<div class="px-2" style="min-width: 100px;">
+							<slot name="issues"></slot>
+						</div>
+						<div v-if="hasTileGammaSlot" class="px-2">
+							<h4 class="mb-1"><slot name="titleGammaTile" :titleGammaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueGammaTile" :valueGammaTile="valueGammaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileBetaSlot" class="px-2">
+							<h4 class="mb-1"><slot name="titleBetaTile" :titleBetaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileAlphaSlot" class="px-2">
+							<h4 class="mb-1"><slot name="titleAlphaTile" :titleAlphaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueAlphaTile" :valueAlphaTile="valueAlphaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1">UID</h4>
+							<h6 class="text-muted"><slot name="uid"></slot></h6>
+						</div>
 					</div>
 				</div>
-			</div>
 
 		</template>
 	</div>
