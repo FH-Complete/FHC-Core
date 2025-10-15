@@ -1,3 +1,8 @@
 .foto-container:hover .fotoedit {
     opacity: 1 !important;
 }
+
+.bg-unruly {
+    background-color: #ad1010 !important;
+    color: white;
+}

@@ -805,6 +805,7 @@ class Students extends FHCAPI_Controller
 
 		$this->PrestudentModel->addSelect('mentor');
 		$this->PrestudentModel->addSelect('b.aktiv AS bnaktiv');
+		$this->PrestudentModel->addSelect('unruly');
 
 		/*$this->PrestudentModel->addSelect('tbl_prestudent.reihungstest_id');
 		$this->PrestudentModel->addSelect('tbl_prestudent.anmeldungreihungstest');

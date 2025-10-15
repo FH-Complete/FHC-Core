@@ -107,6 +107,7 @@ export default {
 							"tristate":true, elementAttributes:{"value":"true"}
 						}, headerFilterEmptyCheck:function(value){return value === null}
 					},
+					{title:"Unruly", field:"unruly", visible:false},
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {

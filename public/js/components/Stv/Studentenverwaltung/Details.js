@@ -72,6 +72,12 @@ export default {
 				typeHeader="student"
 				@reload="reloadList"
 			>
+				<template #titleAlphaTile>P_ID</template>
+				<template #valueAlphaTile>{{students[0].person_id}}</template>
+				<template #titleBetaTile>MatrNr</template>
+				<template #valueBetaTile>{{students[0].matr_nr}}</template>
+				<template #titleGammaTile>PersKz</template>
+				<template #valueGammaTile>{{students[0].matrikelnr}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"

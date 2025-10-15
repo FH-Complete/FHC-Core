@@ -228,18 +228,19 @@ export default {
 				</div>
 
 					<div v-if="headerData.length == 1">
-						<h2 class="h4">
-							{{headerData[0].titelpre}}
-							{{headerData[0].vorname}}
-							{{headerData[0].nachname}}
-							<span v-if="headerData[0].titelpost">, </span>
-							{{headerData[0].titelpost}}
-						</h2>
+						<div class="d-flex align-items-center gap-3">
+							<h2 class="h4">
+								{{headerData[0].titelpre}}
+								{{headerData[0].vorname}}
+								{{headerData[0].nachname}}
+								<span v-if="headerData[0].titelpost">, </span>
+								{{headerData[0].titelpost}}
+							</h2>
+							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
+						</div>
 
 					<h5 class="h6">
-					 <strong class="text-muted">Person ID </strong>
-						{{headerData[0].person_id}}
-						<strong class="text-muted">| {{$p.t('lehre', 'studiengang')}} </strong>
+						<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
 						 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
 						<strong v-if="headerData[0].semester" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
 						  {{headerData[0].semester}}
@@ -256,11 +257,33 @@ export default {
 						</span>
 						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
 						 {{headerData[0].statusofsemester}}
-						<strong class="text-muted"> | {{$p.t('person', 'matrikelnummer')}} </strong>
-						  {{headerData[0].matr_nr}}
 					  </h5>
 
 				</div>
+				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
+					<div class="d-flex py-1">
+						<div class="px-2" style="min-width: 100px;">
+							<slot name="issues"></slot>
+						</div>
+						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1"><slot name="titleGammaTile" :titleGammaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueGammaTile" :valueGammaTile="valueGammaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1"><slot name="titleBetaTile" :titleBetaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1"><slot name="titleAlphaTile" :titleAlphaTile="title"></slot></h4>
+							<h6 class="text-muted"><slot name="valueAlphaTile" :valueAlphaTile="valueAlphaTile"></slot></h6>
+						</div>
+						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
+							<h4 class="mb-1">UID</h4>
+							<h6 class="text-muted"><slot name="uid"></slot></h6>
+						</div>
+					</div>
+				</div>
+
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
@@ -326,15 +349,15 @@ export default {
 						<div class="px-2" style="min-width: 100px;">
 							<slot name="issues"></slot>
 						</div>
-						<div v-if="hasTileGammaSlot" class="px-2">
+						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1"><slot name="titleGammaTile" :titleGammaTile="title"></slot></h4>
 							<h6 class="text-muted"><slot name="valueGammaTile" :valueGammaTile="valueGammaTile"></slot></h6>
 						</div>
-						<div v-if="hasTileBetaSlot" class="px-2">
+						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1"><slot name="titleBetaTile" :titleBetaTile="title"></slot></h4>
 							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
 						</div>
-						<div v-if="hasTileAlphaSlot" class="px-2">
+						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1"><slot name="titleAlphaTile" :titleAlphaTile="title"></slot></h4>
 							<h6 class="text-muted"><slot name="valueAlphaTile" :valueAlphaTile="valueAlphaTile"></slot></h6>
 						</div>
