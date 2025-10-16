@@ -73,7 +73,14 @@ export default {
 					},
 					{title: "Beschreibung", field: "beschreibung"},
 					{title: "UID", field: "uid", width: 87},
-					{title: "Kaution", field: "kaution", visible: false},
+					{title: "Kaution", field: "kaution", visible: false,
+						formatter: "money",
+						formatterParams: {
+							decimal: ",",
+							thousand: ".",
+							precision: 2,
+						}
+					},
 					{
 						title: "Ausgabedatum",
 						field: "ausgegebenam",
@@ -275,6 +282,9 @@ export default {
 				.call(this.endpoint.loadBetriebsmittel(betriebsmittelperson_id))
 				.then(result => {
 					this.formData = result.data;
+						if (this.formData.kaution) {
+							this.formData.kaution = this.formData.kaution.replace('.', ',');
+						}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
