@@ -307,6 +307,23 @@ export default {
 				+ ' | '
 				+ this.$p.t('global/gesamt')
 				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		downloadConfig() {
+			return {
+				csv: {
+					formatter: 'csv',
+					file: this.fileString,
+					options: {
+						delimiter: ';',
+						bom: true,
+					}
+				}
+			};
+		},
+		fileString() {
+			let today = new Date().toLocaleDateString('en-GB')
+				.replace(/\//g, '_');
+			return "StudentList_" + today + ".csv";
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
@@ -322,6 +339,7 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
+				:download="downloadConfig"
 				` + /* TODO(chris): Ausgeblendet für Testing
 				new-btn-show
 				*/`
