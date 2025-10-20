@@ -1,44 +1,39 @@
 <?php
-	$this->load->view(
-		'templates/FHC-Header',
-		array(
-			'title' => 'Login',
-			'jquery3' => true,
-			'jqueryui1' => true,
-			'bootstrap3' => true,
-			'fontawesome4' => true,
-			'sbadmintemplate3' => true,
-			'ajaxlib' => true,
-			'dialoglib' => true,
-			'customCSSs' => 'public/css/Login.css',
-			'customJSs' => 'public/js/Login.js'
-		)
-	);
+/**
+ * Copyright (C) 2025 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+$includesArray = array(
+	'title' => 'Login',
+	'axios027' => true,
+	'bootstrap5' => true,
+	'fontawesome6' => true,
+	'vue3' => true,
+	'filtercomponent' => true,
+	'navigationcomponent' => true,
+	'tabulator5' => true,
+	'primevue3' => true,
+	'phrases' => array('uid', 'global'),
+	'customJSModules' => array('public/js/Login.js'),
+);
+
+$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
+	<div id="main"></div>
 
-	<div class="login-form">
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
 
-		<p class="text-center">
-			<img src="<?php echo base_url('public/images/logo-300x160.png'); ?>" >
-		</p>
-
-		<br>
-
-		<div class="form-group">
-			<input id="username" type="text" class="form-control" placeholder="Username" required="required">
-		</div>
-
-		<div class="form-group">
-			<input id="password" type="password" class="form-control" placeholder="Password" required="required">
-		</div>
-
-		<div class="form-group">
-			<button id="btnLogin" ype="submit" class="btn btn-primary btn-block">Log in</button>
-		</div>
-
-		<p class="text-center"><a href="#">Forgot Password?</a></p>
-
-	</div>
-
-<?php $this->load->view('templates/FHC-Footer'); ?>

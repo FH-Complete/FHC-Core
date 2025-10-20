@@ -1,4 +1,3 @@
-<?php
 /**
  * Copyright (C) 2025 fhcomplete.org
  *
@@ -16,37 +15,45 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
-
-/**
- * NOTE: extends the FHC_Controller instead of the Auth_Controller because we want to login ;) otherwise loooooop!
- */
-class Login extends FHC_Controller
-{
-	/**
-	 * Object initialization
-	 */
-	public function __construct()
-	{
-		parent::__construct(array(
-			'loginAs' => 'admin:rw'
-		));
+export default {
+	loginLDAP(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Login/loginLDAP',
+			params
+		};
+	},
+	loginASByUid(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Login/loginASByUid',
+			params
+		};
+	},
+	loginASByPersonId(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Login/loginASByPersonId',
+			params
+		};
+	},
+	whoAmI() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Login/whoAmI'
+		};
+	},
+	logout() {
+		return {
+			method: 'get',
+			url: '/system/Logout'
+		};
+	},
+	searchUser(query) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Login/searchUser?query=' + encodeURIComponent(query)
+		};
 	}
-
-	/**
-	 * Displays a login page with username and password
-	 */
-	public function usernamePassword()
-	{
-		$this->load->view('system/login/usernamePassword');
-	}
-
-	/**
-	 * Displays a login page with username and password
-	 */
-	public function loginAs()
-	{
-		$this->load->view('system/login/loginAs');
-	}
-}
+};
 

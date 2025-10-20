@@ -1,11 +1,27 @@
 <?php
-// Header menu
+/**
+ * Copyright (C) 2025 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
-if(defined('CIS4') && CIS4) {
-	$root = APP_ROOT;
-} else {
-	$root = CIS_ROOT;
-}
+$root = CIS_ROOT;
+
+if (defined('CIS4') && CIS4) $root = APP_ROOT;
+
+// --------------------------------------------------------------------------------------------------------------------
+// Head menu
 
 $config['navigation_header'] = array(
 	'*' => array(
@@ -195,13 +211,20 @@ $config['navigation_header'] = array(
 					'sort' => 20,
 					'requiredPermissions' => 'system/developer:r'
 				),
-                'anrechnungen' => array(
-                    'link' => site_url('lehre/anrechnung/AdminAnrechnung'),
-                    'description' => 'Anrechnungen',
-                    'expand' => true,
-                    'sort' => 30,
-                    'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
-                )
+				'anrechnungen' => array(
+					'link' => site_url('lehre/anrechnung/AdminAnrechnung'),
+					'description' => 'Anrechnungen',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
+				),
+				'loginas' => array(
+					'link' => site_url('system/Login/loginAs'),
+					'description' => 'Login as',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'admin:rw'
+				)
 			)
 		)
 	)
@@ -222,12 +245,12 @@ $config['navigation_menu']['Vilesci/index'] = array(
 );
 
 $config['navigation_menu']['Vilesci/index'] = array(
-    'dashboard' => array(
-        'link' => '#',
-        'description' => 'Dashboard',
-        'icon' => 'dashboard',
-        'sort' => 1
-    )
+	'dashboard' => array(
+		'link' => '#',
+		'description' => 'Dashboard',
+		'icon' => 'dashboard',
+		'sort' => 1
+	 )
 );
 
 $config['navigation_menu']['organisation/Reihungstest/index'] = array(
@@ -336,3 +359,4 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
+

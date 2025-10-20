@@ -16,37 +16,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (!defined('BASEPATH')) exit('No direct script access allowed');
+$includesArray = array(
+	'title' => 'Login',
+	'axios027' => true,
+	'bootstrap5' => true,
+	'fontawesome6' => true,
+	'vue3' => true,
+	'filtercomponent' => true,
+	'navigationcomponent' => true,
+	'tabulator5' => true,
+	'primevue3' => true,
+	'phrases' => array('uid', 'global'),
+	'customJSModules' => array('public/js/LoginAs.js'),
+);
 
-/**
- * NOTE: extends the FHC_Controller instead of the Auth_Controller because we want to login ;) otherwise loooooop!
- */
-class Login extends FHC_Controller
-{
-	/**
-	 * Object initialization
-	 */
-	public function __construct()
-	{
-		parent::__construct(array(
-			'loginAs' => 'admin:rw'
-		));
-	}
+$this->load->view('templates/FHC-Header', $includesArray);
+?>
 
-	/**
-	 * Displays a login page with username and password
-	 */
-	public function usernamePassword()
-	{
-		$this->load->view('system/login/usernamePassword');
-	}
+	<div id="main"></div>
 
-	/**
-	 * Displays a login page with username and password
-	 */
-	public function loginAs()
-	{
-		$this->load->view('system/login/loginAs');
-	}
-}
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
 
