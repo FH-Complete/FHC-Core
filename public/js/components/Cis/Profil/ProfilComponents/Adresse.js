@@ -4,7 +4,7 @@ export default {
         view:String,
         withZustelladresse:{
             type:Boolean,
-            default:false,
+            default:true,
         },
     },
     data(){
