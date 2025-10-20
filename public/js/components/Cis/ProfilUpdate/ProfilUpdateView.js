@@ -46,7 +46,6 @@ export default {
       loading: false,
       filter: "Pending",
       profil_update_id: Number(this.id),
-
   };
   },
 	computed: {
@@ -205,7 +204,7 @@ export default {
             //responsive:0,
           },
           {
-            title: this.$p.t("lehre", "studiengang") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            title: this.$p.t("profil", "stg_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
             field: "studiengang",
             minWidth: 50,
             resizable: true,
@@ -214,7 +213,7 @@ export default {
             //responsive:0,
           },
           {
-            title: this.$p.t("lehre", "organisationsform") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            title: this.$p.t("profil", "orgform_short") + ' (' + this.$p.t("profil", "studentIn") + ')',
             field: "orgform",
             minWidth: 50,
             resizable: true,
@@ -278,6 +277,12 @@ export default {
             minWidth: 200,
             //responsive:0,
           },
+		  {
+		   title: this.$p.t("lehre", "ausbildungssemester"),
+		   field: "semester",
+		   headerFilter: "list",
+		   headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}
+		  },
           {
             title: this.$p.t("profilUpdate", "actions"),
             headerSort: false,
@@ -415,7 +420,7 @@ export default {
   },
   template: /*html*/ `
     <div>
-   
+
     <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
     <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
