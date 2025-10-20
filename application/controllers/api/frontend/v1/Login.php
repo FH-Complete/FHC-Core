@@ -118,13 +118,15 @@ class Login extends FHCAPI_Controller
 				b.uid,
 				p.nachname,
 				p.vorname,
-				b.uid || \' - \' || p.nachname || \' \' || p.vorname AS label
+				b.uid,
+				p.person_id || \' - \' || b.uid || \' - \' || p.nachname || \' \' || p.vorname AS label
 			  FROM public.tbl_person p
 		     LEFT JOIN public.tbl_benutzer b ON(b.person_id = p.person_id)
 			 WHERE b.aktiv = TRUE
-			   AND (p.nachname LIKE ? OR p.vorname = ? OR b.uid LIKE ?)
-			',
-			array($query, $query, $query)
+			   AND (p.nachname ILIKE ? OR p.vorname ILIKE ? OR b.uid ILIKE ? OR p.person_id::text LIKE ?)
+		      ORDER BY p.nachname, p.vorname
+		',
+			array($query, $query, $query, $query)
 		);
 
 		if (isError($dataset)) $this->terminateWithError(getError($dataset));
