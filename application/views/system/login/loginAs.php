@@ -22,11 +22,9 @@ $includesArray = array(
 	'bootstrap5' => true,
 	'fontawesome6' => true,
 	'vue3' => true,
-	'filtercomponent' => true,
-	'navigationcomponent' => true,
-	'tabulator5' => true,
 	'primevue3' => true,
 	'phrases' => array('uid', 'global'),
+	'navigationcomponent' => true,
 	'customJSModules' => array('public/js/LoginAs.js'),
 );
 

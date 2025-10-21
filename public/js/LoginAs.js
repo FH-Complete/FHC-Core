@@ -49,7 +49,7 @@ const loginAsApp = Vue.createApp({
 						location.reload();
 					})
 					.catch((error) => {
-					        console.error(error);
+						console.error(error);
 					});
 			}
 		},
@@ -60,19 +60,19 @@ const loginAsApp = Vue.createApp({
 					location.reload();
 				})
 				.catch((error) => {
-				        console.error(error);
+					console.error(error);
 				});
 		},
 		searchUser: function(event) {
 			if (event.query.length >= 3)
 			{
 				this.$api
-                        		.call(ApiLogin.searchUser(event.query))
-                        		.then(result => {
-                        	        	this.filteredUsers = result.data.retval;
-                        		})
+					.call(ApiLogin.searchUser(event.query))
+					.then(result => {
+						this.filteredUsers = result.data.retval;
+					})
 					.catch((error) => {
-					        console.error(error);
+						console.error(error);
 					});
 			}
 		}
@@ -81,9 +81,9 @@ const loginAsApp = Vue.createApp({
 		this.$api
 			.call(ApiLogin.whoAmI())
 			.then((response) => {
-			        // If property data exists
-			        if (Object.hasOwn(response, 'data'))
-			        {
+				// If property data exists
+				if (Object.hasOwn(response, 'data'))
+				{
 					if (response.data != null && Object.hasOwn(response.data, 'person_id'))
 					{
 						this.person_id = response.data.person_id;
@@ -94,48 +94,48 @@ const loginAsApp = Vue.createApp({
 					else
 					{
 						this.person_id = 'Not logged';
-                                                this.username = 'Not logged';
-                                                this.surname = 'Not logged';
-                                                this.name = 'Not logged';
+						this.username = 'Not logged';
+						this.surname = 'Not logged';
+						this.name = 'Not logged';
 					}
-			        }
+				}
 			})
 			.catch((error) => {
-			        console.error(error);
+				console.error(error);
 			});
 	},
 	template: `
 		<!-- Navigation component -->
 		<core-navigation-cmpt v-bind:add-side-menu-entries="appSideMenuEntries"></core-navigation-cmpt>
-		<div style="width: 500px !important">
+		<div style="width: 700px !important">
 			<div class="card" style="padding: 20px;">
 				<div class="mb-3">
 					Who am I?
 				</div>
 				<div class="mb-3">
 					<div class="d-inline-flex align-items-center">
-                			        <label for="person_id" class="form-label" style="min-width: 100px !important">Person ID</label>
-                			        <input type="text" disabled="disabled" class="form-control" id="person_id" v-model="person_id">
-                			</div>
-                		</div>
+						<label for="person_id" class="form-label" style="width: 150px !important">Person ID</label>
+						<input type="text" style="width: 400px !important" disabled="disabled" class="form-control" id="person_id" v-model="person_id">
+					</div>
+				</div>
 				<div class="mb-3">
 					<div class="d-inline-flex align-items-center">
-                			        <label for="username" class="form-label" style="min-width: 100px !important">UID</label>
-                			        <input type="text" disabled="disabled" class="form-control" id="username" v-model="username">
-                			</div>
-                		</div>
+						<label for="username" class="form-label" style="width: 150px !important">UID</label>
+						<input type="text" style="width: 400px !important" disabled="disabled" class="form-control" id="username" v-model="username">
+					</div>
+				</div>
 				<div class="mb-3">
 					<div class="d-inline-flex align-items-center">
-                			        <label for="surname" class="form-label" style="min-width: 100px !important">Surname</label>
-                			        <input type="text" disabled="disabled" class="form-control" id="surname" v-model="surname">
-                			</div>
-                		</div>
+						<label for="surname" class="form-label" style="width: 150px !important">Surname</label>
+						<input type="text" style="width: 400px !important" disabled="disabled" class="form-control" id="surname" v-model="surname">
+					</div>
+				</div>
 				<div class="mb-3">
 					<div class="d-inline-flex align-items-center">
-                			        <label for="name" class="form-label" style="min-width: 100px !important">Name</label>
-                			        <input type="text" disabled="disabled" class="form-control" id="name" v-model="name">
-                			</div>
-                		</div>
+						<label for="name" class="form-label" style="width: 150px !important">Name</label>
+						<input type="text" style="width: 400px !important" disabled="disabled" class="form-control" id="name" v-model="name">
+					</div>
+				</div>
 				<div class="d-flex align-items-center justify-content-center">
 					<button type="button" class="btn btn-primary" @click="logout">Logout</button>
 				</div>
@@ -146,9 +146,9 @@ const loginAsApp = Vue.createApp({
 				</div>
 				<div class="mb-3">
 					<div class="d-inline-flex align-items-center">
-						<PvAutoComplete v-model="selectedUser" optionLabel="label" :suggestions="filteredUsers" @complete="searchUser" placeholder="Search user..." />
-                			</div>
-                		</div>
+						<PvAutoComplete inputStyle="width: 600px;" v-model="selectedUser" optionLabel="label" :suggestions="filteredUsers" @complete="searchUser" placeholder="Search user..." />
+					</div>
+				</div>
 				<div class="d-flex align-items-center justify-content-center">
 					<button type="button" class="btn btn-primary" @click="loginAs">Login as</button>
 				</div>
@@ -161,8 +161,8 @@ loginAsApp.
 	use(PluginsPhrasen).
 	use(primevue.config.default, {
 		zIndex: {
-                        overlay: 1100
-                }
+			overlay: 1100
+		}
 	}).
 	mount('#main');
 
