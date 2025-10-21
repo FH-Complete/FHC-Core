@@ -76,7 +76,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		width: 850px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
-		border: 1px solid #dddddd;
+		/*border: 1px solid #dddddd;*/
 		/*box-shadow: 0em 0em 2em 0.5em #888888 inset;*/
 		}
 
@@ -95,7 +95,7 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		#prfWrapper {
 		position: absolute;
 		height: 70%;
-		width: 300px;
+		width: 40%;
 		top: 180px;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
@@ -117,9 +117,9 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 		#anmWrapper {
 		position: absolute;
 		/*top: 45px;*/
-		left: 350px;
+		left: 45%;
 		top: 180px;
-		width: 500px;
+		width: 40%;
 		height: 70%;
 		padding: 1.8em 1.5em 1.8em 1em;
 		/*border-radius: 25px;*/
@@ -228,7 +228,6 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 	<script>
 		$(document).ready(function()
 		{
-			loadStudiengaenge();
 			$("#filter_studiensemester").css("visibility","visible");
 
 			$("#raumDialog").dialog({
@@ -236,17 +235,66 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 				autoOpen: false,
 				width: "400px"
 			});
+
+			$("#kommentarDialog").dialog({
+				modal: true,
+				autoOpen: false,
+				width: "400px",
+				buttons: {
+					Ok: function() {
+						$(this).dialog('close');
+					}
+				}
+			});
+
+			$("#table4").tablesorter({
+				widgets: ["zebra"],
+				headers: {
+					0: { sorter: false },
+					3: { sorter: 'shortDate',
+						dateFormat: 'ddmmyyyy' },
+					4: { sorter: 'time' },
+					5: { sorter: 'time' }
+				}
+			});
+
+
+			$('#zusammenlegen').on('click', function() {
+				let ausgewaehlte_termine = $('.termin-checkbox:checked');
+
+				if (ausgewaehlte_termine.length === 0)
+					return;
+
+				let erster_termin = ausgewaehlte_termine.first();
+				let erstes_datum = erster_termin.data('datum');
+				let erste_lvid = erster_termin.data('lv-id');
+
+				let termine = [];
+				ausgewaehlte_termine.each(function() {{
+					let termin = $(this);
+					let datum = termin.data('datum');
+					let lv_id = termin.data('lv-id');
+
+					if (erstes_datum !== datum)
+						return alert("Die ausgewählten Termine liegen nicht am selben Tag und können daher nicht zusammengelegt werden.")
+					if (erste_lvid !== lv_id)
+						return alert("Bei den ausgewählten Terminen handelt es sich um unterschiedliche Lehrveranstaltungen, die daher nicht zusammengelegt werden können.")
+
+					termine.push(termin.data('termin-id'));
+				}})
+
+				if (termine.length > 0)
+				{
+					terminezusammenlegen(termine, erste_lvid);
+				}
+			})
+
+			loadPruefungStudiengang();
 		});
 	</script>
 	<h1><?php echo $p->t('pruefung/anmeldungenVerwalten'); ?></h1>
 	<div id='stgWrapper'>
-		<div id='studiengaenge'>
-		<div>
-			<h2><?php echo $p->t('global/studiengang'); ?></h2>
-			<div id='stgListe'>
 
-			</div>
-		</div>
 		<div>
 			<h2><?php echo $p->t('global/studiensemester'); ?></h2>
 			<?php
@@ -255,7 +303,6 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 			$studiensemester->getPlusMinus(null, 5);
 			foreach($studiensemester->studiensemester as $sem)
 			{
-				/*@var $sem studiensemester */
 				if ($aktuellesSemester == $sem->studiensemester_kurzbz)
 				{
 				echo '<option selected value="'.$sem->studiensemester_kurzbz.'">'.$sem->bezeichnung.'</option>';
@@ -273,9 +320,21 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 	<div id='prfWrapper'>
 		<div id='pruefungen'>
 		<h2><?php echo $p->t('pruefung/pruefungPruefungenTitle'); ?></h2>
-		<ul id="pruefungenListe">
-
-		</ul>
+		<button id="zusammenlegen">Termine zusammenlegen</button>
+		<table id="table4" class="tablesorter" style="display:none">
+			<thead>
+				<tr>
+					<th></th>
+					<th><?php echo $p->t('global/studiengang'); ?></th>
+					<th><?php echo $p->t('global/lehrveranstaltung'); ?></th>
+					<th><?php echo $p->t('global/datum'); ?></th>
+					<th><?php echo $p->t('global/von'); ?></th>
+					<th><?php echo $p->t('global/bis'); ?></th>
+					<th><?php echo $p->t('pruefung/pruefungsbewertungAnmeldungen'); ?></th>
+				</tr>
+			</thead>
+			<tbody id="pruefungenListe"></tbody>
+		</table>
 		</div>
 	</div>
 	<div id='anmWrapper'>
@@ -310,6 +369,9 @@ if (empty($pruefung->result) && !$rechte->isBerechtigt('lehre/pruefungsanmeldung
 
 			</div>
 		</div>
+		</div>
+		<div id="kommentarDialog" title="<?php echo $p->t('pruefung/anmerkungDesStudenten'); ?>" style="display:none;">
+			<div id="kommentarimDialog"></div>
 		</div>
 	</div>
 

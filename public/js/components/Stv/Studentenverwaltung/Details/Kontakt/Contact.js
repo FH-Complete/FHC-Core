@@ -300,8 +300,7 @@ export default{
 		this.$api
 			.call(ApiStvContact.getTypes())
 			.then(result => {
-				//this.kontakttypen = result.data;
-				this.kontakttypen = result.data.filter(item => item.kontakttyp !== 'hidden');
+				this.kontakttypen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -326,7 +325,7 @@ export default{
 						v-model="contactData.kontakttyp">
 					>
 						<option value="">keine Auswahl</option>
-						<option v-for="typ in kontakttypen" :key="typ.kontakttyp_kurzbz" :value="typ.kontakttyp" >{{typ.beschreibung}}</option>
+						<option v-for="typ in kontakttypen" :key="typ.kontakttyp" :value="typ.kontakttyp">{{typ.beschreibung}}</option>
 					</form-input>
 				</div>
 				
