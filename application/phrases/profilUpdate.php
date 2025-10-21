@@ -1681,4 +1681,52 @@ array (
     ),
   ),
 ),
+,
+array (
+  'app' => 'core',
+  'category' => 'profilUpdate',
+  'phrase' => 'infoHeimatadresse',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Die initiale Meldeadresse kann aufgrund von Berichtspflichten nicht verändert oder gelöscht werden.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'The initial official address can not be changed or deleted due to reporting obligations.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'profilUpdate',
+  'phrase' => 'infoZustelladresse',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '(Soll etwaige Post an diese Adresse geschickt werden?)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => '(Should any paper mail be sent to this address?)',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

@@ -1048,4 +1048,28 @@ array (
     ),
   ),
 ),
+,
+array (
+  'app' => 'core',
+  'category' => 'abgabetool',
+  'phrase' => 'c4abgabeStgSpezifischeRichtlinienBeachten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Bitte beachten Sie gegebenenfalls existierende studiengangsspezifische Richtlinien und informieren Sie sich diesbezüglich. Vielen Dank.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Please note any existing program-specific guidelines and inform yourself about them. Thank you.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
