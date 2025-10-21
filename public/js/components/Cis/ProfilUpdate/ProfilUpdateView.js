@@ -4,6 +4,7 @@ import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
@@ -184,13 +185,13 @@ export default {
         },
 
         height: 600,
-        layout: "fitColumns",
+        layout: "fitDataStretchFrozen",
 
         columns: [
           {
             title: this.$p.t("profilUpdate", "UID"),
             field: "uid",
-            minWidth: 200,
+            minWidth: 100,
             resizable: true,
             headerFilter: true,
             //responsive:0,
@@ -204,26 +205,58 @@ export default {
             //responsive:0,
           },
           {
+            title: this.$p.t("lehre", "studiengang") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            field: "studiengang",
+            minWidth: 50,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+          {
+            title: this.$p.t("lehre", "organisationsform") + ' (' + this.$p.t("profil", "studentIn") + ')',
+            field: "orgform",
+            minWidth: 50,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+          {
+            title: this.$p.t("lehre", "organisationseinheit") + ' (' + this.$p.t("profil", "mitarbeiterIn") + ')',
+            field: "oezuordnung",
+            minWidth: 200,
+            resizable: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
+            //responsive:0,
+          },
+          {
             title: this.$p.t("profilUpdate", "Topic"),
             field: "topic",
             resizable: true,
             minWidth: 200,
-            headerFilter: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             //responsive:0,
           },
           {
             title: this.$p.t("profilUpdate", "insertamum"),
-            field: "insertamum",
+            field: "insertamum_iso",
             resizable: true,
-            headerFilter: true,
+			headerFilterFunc: 'dates',
+			headerFilter: dateFilter,
             minWidth: 200,
+			formatter:"datetime",
+			formatterParams: this.datetimeFormatterParams(),
             //responsive:0,
           },
           {
             title: this.$p.t("profilUpdate", "Status"),
             field: "status_translated",
             hozAlign: "center",
-            headerFilter: true,
+            headerFilter: "list",
+            headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"},
             formatter: (cell, para) => {
               let iconClasses = "";
               let status = cell.getRow().getData().status;
@@ -248,20 +281,11 @@ export default {
           {
             title: this.$p.t("profilUpdate", "actions"),
             headerSort: false,
+			frozen: true,
             formatter: (cell, params) => {
-              let STATUS_PENDING =
-                cell.getRow().getData().status ==
-                this.profilUpdateStates["Pending"];
-
+              let details = this.$p.t('global', 'details');
               let html = `<div class="d-flex justify-content-evenly align-items-center">
-                <button class="btn border-primary border-2" id="showButton"><i class="fa-solid fa-eye fhc-primary-color"></i></button>
-                ${
-                  STATUS_PENDING ?
-                  `<button class="btn border-success border-2" id="acceptButton"><i class='fa fa-lg fa-circle-check text-success'></i></button>
-                  <button class="btn border-danger border-2" id="denyButton"><i class=' fa fa-lg fa-circle-xmark text-danger'></i></button>`
-                  :
-                  ``
-                }
+                <button class="btn btn-secondary" id="showButton">${details}</button>
               </div>`;
 
               // Convert the HTML string to an HTML node
@@ -275,19 +299,6 @@ export default {
                 .addEventListener("click", () => {
                   this.showAcceptDenyModal(cell.getRow().getData());
                 });
-
-              if (STATUS_PENDING) {
-                node
-                  .querySelector("#acceptButton")
-                  .addEventListener("click", () => {
-                    this.acceptProfilUpdate(cell.getRow().getData());
-                  });
-                node
-                  .querySelector("#denyButton")
-                  .addEventListener("click", () => {
-                    this.denyProfilUpdate(cell.getRow().getData());
-                  });
-              }
 
               return node;
             },
@@ -370,6 +381,15 @@ export default {
 					this.showAcceptDenyModal(arrayRowData[0]);
 				}
 			}
+		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
 		}
   },
   watch: {
@@ -382,7 +402,7 @@ export default {
     },
   },
   created() {
-    this.$p.loadCategory("profilUpdate").then(() => {
+    this.$p.loadCategory(["profilUpdate", "lehre", "profil", "global"]).then(() => {
       this.categoryLoaded = true;
     });
   },
