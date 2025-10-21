@@ -64,7 +64,7 @@ $config['navigation_header'] = array(
 				'lehrveranstaltungen' => array(
 					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
 					'icon' => '',
-					'description' => 'Lehrveranstaltungen',
+					'description' => 'Lehrveranstaltungen Templates',
 					'sort' => 15
 				),
 				'reihungstest' => array(
@@ -80,6 +80,16 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
+				),
+				'lvverwaltung' => array(
+					'link' => site_url('LVVerwaltung'),
+					'icon' => '',
+					'description' => 'LV Verwaltung',
+					'requiredPermissions' => array(
+						'admin:r',
+						'assistenz:r'
+					),
+					'sort' => 35
 				),
 				'lehrauftrag' => array(
 					'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),

@@ -8731,5 +8731,29 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'anwesenheiten',
+  'category' => 'global',
+  'phrase' => 'jetztStarten',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Jetzt Starten',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Start Now',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

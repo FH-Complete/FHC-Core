@@ -10,8 +10,6 @@ export default {
 		if (!app.config.globalProperties.$fhcAlert)
 			app.use(FhcAlert);
 
-		const $fhcAlert = app.config.globalProperties.$fhcAlert;
-
 		function _send_array_or_object(errors, func) {
 			if (Array.isArray(errors))
 				errors.forEach(func);
@@ -115,7 +113,7 @@ export default {
 					await $p.loadCategory('ui');
 					const n_errors = $p.t('ui/n_errors', { n: counter });
 
-					$fhcAlert.alertDefault(
+					app.config.globalProperties.$fhcAlert.alertDefault(
 						'error',
 						n_errors,
 						'<dl>' + msgs.join('') + '</dl>',
@@ -146,7 +144,7 @@ export default {
 									title += ': PHP ' + error.severity;
 								else
 									title = 'PHP ' + error.severity;
-								$fhcAlert.alertDefault('warn', title, message, true);
+								app.config.globalProperties.$fhcAlert.alertDefault('warn', title, message, true);
 								break;
 							case 'Notice':
 							case 'User Notice':
@@ -155,13 +153,13 @@ export default {
 									title += ': PHP ' + error.severity;
 								else
 									title = 'PHP ' + error.severity;
-								$fhcAlert.alertDefault('info', title, message, true);
+								app.config.globalProperties.$fhcAlert.alertDefault('info', title, message, true);
 								break;
 							default:
 								message = 'Type: PHP ' + error.severity + '\n\n' + message;
 								if (title)
 									message = title + '\n\n' + message;
-								$fhcAlert.alertSystemError(message);
+								app.config.globalProperties.$fhcAlert.alertSystemError(message);
 								break;
 						}
 					});
@@ -183,7 +181,7 @@ export default {
 								message += '\tFunction: ' + err.function + '\n';
 							});
 						}
-						$fhcAlert.alertSystemError(message);
+						app.config.globalProperties.$fhcAlert.alertSystemError(message);
 					});
 				},
 				db(errors) {
@@ -206,7 +204,7 @@ export default {
 						if (error.line !== undefined)
 							message += 'Line Number: ' + error.line + '\n';
 
-						$fhcAlert.alertSystemError(message);
+						app.config.globalProperties.$fhcAlert.alertSystemError(message);
 					});
 				},
 				auth(errors) {
@@ -221,7 +219,7 @@ export default {
 						message += 'Method name: ' + error.method + '\n';
 						message += 'Required permissions: ' + error.required_permissions;
 
-						$fhcAlert.alertDefault(
+						app.config.globalProperties.$fhcAlert.alertDefault(
 							'error',
 							title,
 							message,
@@ -328,6 +326,7 @@ export default {
 						url: error.request.responseURL
 					}];
 				} else {
+					if (error.response.data.errors == undefined) return [];
 					return error.response.data.errors;
 				}
 			} else if (error.request) {
@@ -346,6 +345,9 @@ export default {
 		function popHandleableErrors(errorHandling, errors) {
 			const result = {};
 			const copy = [];
+
+			if (errors == undefined) return {};
+
 			while (errors.length)
 				copy.push(errors.pop());
 			for (var error of copy) {

@@ -229,9 +229,10 @@ class StundenplanLib
 		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
 		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter(getAuthUID()));
-		
-		if ($is_mitarbeiter) {
-			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date, $ort_kurzbz);
+
+		if ($is_mitarbeiter && empty($ort_kurzbz)) {
+			// request for personal lvplan show only reservations of logged in user
+			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date);
 		} else {
 			// querying the reservierungen
 			$reservierungen = $this->_ci->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
