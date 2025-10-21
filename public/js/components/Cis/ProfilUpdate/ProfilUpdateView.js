@@ -417,25 +417,105 @@ export default {
     if (sessionStorage.getItem("filter")) {
       this.filter = sessionStorage.getItem("filter");
     }
-  },
-  template: /*html*/ `
-    <div>
 
-    <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
-    <div  class="form-underline flex-fill ">
+	/*
+	    <div  class="form-underline flex-fill ">
       <div class="form-underline-titel">{{$p.t('ui','anzeigen')}} </div>
-      
+
       <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
         <option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
         <option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
         <option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
         <option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
       </select>
-  
+
     </div>
+
+
+	:title="$p.t('profilUpdate','profilUpdateRequests')"
+
+	    <h3>{{$p.t('profilUpdate', 'profilUpdateRequests')}}</h3>
+
+
+    			<div class="col-auto row row-cols-lg-auto d-flex justify-content-end">
+					<div class="col-12">
+					  <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
+						<option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+						<option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+						<option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+						<option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
+					  </select>
+					  </div>
+				</div>
+
+
+				//Version mit filter rechts in eigener zeile
+				    		<template #filter>
+    			<div class="col-auto row row-cols-lg-auto g-3 d-flex justify-content-end">
+					<div class="col-12">
+					  <select class="mb-4 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
+						<option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+						<option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+						<option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+						<option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
+					  </select>
+					  </div>
+				</div>
+			</template>
+
+
+			<div class="justify-content-end pb-3">
+
+			</div>
+
+			<div class="col-auto row row-cols-lg-auto g-3 d-flex justify-content-end">
+
+	//backendfilter not working: no parameters provided
+	    <core-filter-cmpt
+    	v-if="profilUpdateStates && categoryLoaded"
+    	ref="UpdatesTable"
+    	:tabulatorEvents="profilUpdateEvents"
+    	:tabulator-options="profilUpdateOptions"
+    	filter-type="Profileupdate"
+    	:sideMenu="false">
+    </core-filter-cmpt>
+
+	*/
+
+
+
+
+  },
+  template: /*html*/ `
+    <div>
+
+    <accept-deny-update :title="$p.t('profilUpdate','profilUpdateRequest')" v-if="showModal" ref="AcceptDenyModal" @hideBsModal="hideAcceptDenyModal" :value="JSON.parse(JSON.stringify(modalData))" :setLoading="setLoading" ></accept-deny-update>
+
+     <h3>{{$p.t('profilUpdate', 'profilUpdateRequests')}}</h3>
+     
     <loading ref="loadingModalRef" :timeout="0"></loading>
     
-    <core-filter-cmpt v-if="profilUpdateStates && categoryLoaded" :title="$p.t('profilUpdate','profilUpdateRequests')"  ref="UpdatesTable" :tabulatorEvents="profilUpdateEvents" :tabulator-options="profilUpdateOptions" tableOnly :sideMenu="false" />
+    			<div class="col-auto row row-cols-lg-auto g-3 d-flex justify-content-end">
+    			
+					<div class="col-12">
+					  <select class="mb-0 form-select" v-model="filter" @change="updateData" aria-label="Profil updates display selection">
+						<option :selected="true" :value="profilUpdateStates['Pending']" >{{$p.t('profilUpdate','pendingRequests')}}</option>
+						<option :value="profilUpdateStates['Accepted']">{{$p.t('profilUpdate','acceptedRequests')}}</option>
+						<option :value="profilUpdateStates['Rejected']">{{$p.t('profilUpdate','rejectedRequests')}}</option>
+						<option :value="'Alle'">{{$p.t('profilUpdate','allRequests')}}</option>
+					  </select>
+					</div>
+				</div>
+
+    
+    <core-filter-cmpt 
+    	v-if="profilUpdateStates && categoryLoaded" 
+    	ref="UpdatesTable" 
+    	:tabulatorEvents="profilUpdateEvents" 
+    	:tabulator-options="profilUpdateOptions" 
+    	table-only
+    	:sideMenu="false">
+    </core-filter-cmpt>
 
     </div>`,
 };

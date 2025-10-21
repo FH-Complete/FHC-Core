@@ -1558,6 +1558,63 @@ $filters = array(
 			}',
 		'oe_kurzbz' => null,
 	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'profileupdate',
+		'filter_kurzbz' => 'ProfilupdatePending',
+		'description' => '{Ausstehende Anfragen}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Ausstehende Anfragen",
+				"columns": [
+					{"name": "uid"},
+					{"name": "name"},					
+					{"name": "studiengang"},
+					{"name": "orgform"},					
+					{"name": "oezuordnung"},
+					{"name": "status_translated"},
+					{"name": "topic"},
+					{"name": "insertamum_iso"},
+					{"name": "semester"}
+				],
+				"filters": [
+					{
+						"name": "status_translated",
+						"option": "",
+						"operation": "equal",
+						"condition": "true"
+					}
+					]
+			}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'profileupdate',
+		'filter_kurzbz' => 'ProfilupdateAlle',
+		'description' => '{Alle Anfragen}',
+		'sort' => 1,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle Anfragen",
+				"columns": [
+					{"name": "uid"},
+					{"name": "name"},					
+					{"name": "studiengang"},
+					{"name": "orgform"},					
+					{"name": "oezuordnung"},
+					{"name": "status_translated"},
+					{"name": "topic"},
+					{"name": "insertamum_iso"},
+					{"name": "semester"}
+				],
+				"filters": []
+			}',
+		'oe_kurzbz' => null,
+	),
 
 );
 
