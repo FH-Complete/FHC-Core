@@ -49982,7 +49982,27 @@ I have been informed that I am under no obligation to consent to the transmissio
 				'insertvon' => 'system'
 			)
 		)
-	)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'tab_combine_people',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Personen zusammenlegen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Combine People',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

@@ -111,5 +111,6 @@ $config['students_tab_order'] = [
 	'status',
 	'groups',
 	'finalexam',
+	'combinePeople',
 	'archive',
 ];

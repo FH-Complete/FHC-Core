@@ -228,6 +228,10 @@ class Config extends FHCAPI_Controller
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
 		];
+		$result['combinePeople'] = [
+			'title' => $this->p->t('stv', 'tab_combine_people'),
+			'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
 			return $result;
