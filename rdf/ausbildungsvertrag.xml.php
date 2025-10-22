@@ -332,6 +332,13 @@ foreach($prestudent_arr as $prest_id)
 					{
 						$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
 						$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+						$akadgrad = new akadgrad();
+						if ($akadgrad->load($studienordnung->__get('akadgrad_id')))
+						{
+							// TODO - geschlechterneutral? m/w/d
+							$akadgrad_titel = $akadgrad->titel;
+							$akadgrad_kurzbz = $akadgrad->akadgrad_kurzbz;
+						}
 					}
 				}
 				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
@@ -428,25 +435,30 @@ foreach($prestudent_arr as $prest_id)
 
 					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
 					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
+
+					// TODO: where to get semester duration for master Legrgaenge?
+					//if ($lehrgangstyp->lgartcode == 1) $student_maxsemester += 2;
 					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
 					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
-
-					//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
-
-					$akadgrad_titel = '';
-					$akadgrad_kurzbz = '';
-
-					$qry = "SELECT * FROM lehre.tbl_akadgrad
-							WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)."
-							AND (geschlecht=".$db->db_add_param($person->geschlecht, FHC_STRING)." OR geschlecht IS NULL)
-							LIMIT 1";
-
-					if($db->db_query($qry))
+					if (!isset($akadgrad_titel) || $akadgrad_titel == '')
 					{
-						if($row = $db->db_fetch_object())
+						//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
+
+						$akadgrad_titel = '';
+						$akadgrad_kurzbz = '';
+
+						$qry = "SELECT * FROM lehre.tbl_akadgrad
+								WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)."
+								AND (geschlecht=".$db->db_add_param($person->geschlecht, FHC_STRING)." OR geschlecht IS NULL)
+								LIMIT 1";
+
+						if($db->db_query($qry))
 						{
-							$akadgrad_titel = $row->titel;
-							$akadgrad_kurzbz = $row->akadgrad_kurzbz;
+							if($row = $db->db_fetch_object())
+							{
+								$akadgrad_titel = $row->titel;
+								$akadgrad_kurzbz = $row->akadgrad_kurzbz;
+							}
 						}
 					}
 
