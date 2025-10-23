@@ -13,20 +13,40 @@ import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 
 const fhcbasepath = import.meta.dirname;
+let apps = {};
+let curapp = null;
 
 function FhcResolver () {
   return {
     name: 'fhc-resolver', // this name will show up in logs and errors
+    buildStart (options) {
+      //console.log('options: ' + JSON.stringify(options));
+      //console.log('apps: ' + JSON.stringify(apps));
+      curapp = apps[options.input[0]];
+      //console.log('curapp: ' + curapp);
+    },
     resolveId ( source, importer, options ) {
+      //console.log('options: ' + JSON.stringify(options));
       //console.log('BH-FHC-BASEPATH: ' + fhcbasepath);
       if( source.includes('vueDatepicker.js.php') ) {
 	return {id: 'vueDatepicker.js.php', external: 'relative'};
       }
       if( source.includes('index.ci.php') ) {
-	return { id: '../' + source, external: 'relative'};
+        //console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
+	let source_abs = fhcbasepath + '/' + source.replace(/(\.\.\/)+/, '');
+	let source_rel = path.relative(path.dirname(curapp), source_abs);
+	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+	return { id: source_rel, external: 'relative'};
       }
-      if( source.includes('.php') ) {
-	return false;
+      if( source.includes('.php')) {
+        console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
+	let source_abs = path.resolve(path.dirname(importer), source);
+	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
+	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
+	}
+	let source_rel = path.relative(path.dirname(curapp), source_abs);
+	console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+	return { id: source_rel, external: 'relative'};
       }
       //console.log('source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
       if(importer === undefined) {
@@ -108,6 +128,7 @@ export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: f
 			//console.log('BHTEST: ' + tmp);
 			const basepath = tmp.replace(/\/public\/js\/.*/, '/public/js/');
 			const outputfile = tmp.replace(/public\//, 'public/dist/');
+			apps[tmp] = outputfile;
 			//console.log('OUTFILE: ' + outputfile);
 			let cssfile = path.basename(tmp.replace(/\.js/, '.css'));
 			//console.log('cssfile: ' + cssfile);
