@@ -336,3 +336,19 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
+
+// TODO(chris): phrases?
+$config['navigation_menu']['apps'] = [
+	'stv' => [
+		'link' => site_url('studentenverwaltung'),
+		'description' => 'Studierenden Verwaltung',
+		#'icon' => 'users',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lvv' => [
+		'link' => site_url('lVVerwaltung'),
+		'description' => 'LV Verwaltung',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	]
+];
