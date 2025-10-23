@@ -15,11 +15,10 @@ export default {
 		}
 	},
 	computed: {
-		personIds(){
-			if (this.modelValue.person_id) {
-				return [this.modelValue.person_id];
-			}
-			return this.modelValue.map(e => e.person_id);
+		personIds() {
+			return Array.isArray(this.modelValue)
+				? this.modelValue.map(e => e.person_id)
+				: [this.modelValue.person_id];
 		},
 		detailStringPerson1(){
 			let person1 = this.modelValue[0];
@@ -38,15 +37,10 @@ export default {
 			let person2_id = this.personIds[1];
 
 			if(person1_id == person2_id) {
-				//TODO(Manu) Phrase
-				return this.$fhcAlert.alertError("gleiche Person, keine Zusammenlegung möglich");
+				return this.$fhcAlert.alertError(this.$p.t('stv', 'error_combinePeople_samePerson'));
 			}
 
-		//	let linkCombinePeople = this.cisRoot + 'vilesci/stammdaten/personen_wartung.php?person_id_1=' + person1_id + '&person_id_2='+ person2_id;
-			let linkCombinePeople = 'https://c3p0.ma0068.technikum-wien.at/fhcomplete/vilesci/stammdaten/personen_wartung.php?person_id_1=' + person1_id + '&person_id_2='+ person2_id;
-
-			console.log(linkCombinePeople);
-			//window.open(linkCombinePeople, '_blank');
+			let linkCombinePeople = this.cisRoot + 'vilesci/stammdaten/personen_wartung.php?person_id_1=' + person1_id + '&person_id_2='+ person2_id;
 			this.openLink(linkCombinePeople);
 		},
 		openLink(url) {
@@ -64,8 +58,7 @@ export default {
 				<h4>Personen zusammenlegen</h4>
 				<div v-if="this.modelValue.length">
 					<div v-if="this.modelValue.length == 2">
-					<!-- TODO(Manu) Phrases-->
-						<p>Die Personen <strong> {{detailStringPerson1}} und {{detailStringPerson2}} </strong> zusammenlegen? </p>
+						<p>{{$p.t('stv', 'question_combine_people', { person1: detailStringPerson1, person2: detailStringPerson2 })}}</p>
 						<button class="btn btn-primary" @click="combinePeople">{{$p.t('ui', 'ok')}}</button>
 					</div>
 					<div v-else>
