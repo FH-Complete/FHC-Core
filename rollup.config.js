@@ -12,10 +12,13 @@ import { existsSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 
+const fhcbasepath = import.meta.dirname;
+
 function FhcResolver () {
   return {
     name: 'fhc-resolver', // this name will show up in logs and errors
     resolveId ( source, importer, options ) {
+      //console.log('BH-FHC-BASEPATH: ' + fhcbasepath);
       if( source.includes('vueDatepicker.js.php') ) {
 	return {id: 'vueDatepicker.js.php', external: 'relative'};
       }
@@ -26,16 +29,27 @@ function FhcResolver () {
 	return false;
       }
       //console.log('source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
-      if(importer !== undefined && !options.isEntry && !path.isAbsolute(source)) {
+      if(importer === undefined) {
+        return null;
+      }
+      if(!path.isAbsolute(source)) {
         let tmp = path.dirname(importer);
 	if( importer.includes('/application/') ) {
 	  tmp = tmp.replace(/public\/js\//, 'js/').replace(/\/application\//, '/public/');
 	}
+	else if( importer.includes('/FHC-Core-') ) {
+      	  //console.log('RELATIV: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
+	  tmp = fhcbasepath + tmp.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
+	  //console.log('BHTMP: ' + tmp);
+	}
       	const resolved = path.resolve(tmp, source);
-	//console.log(resolved);
+	//console.log('BHRESOLVED: ' + resolved);
 	if( existsSync(resolved) ) {
 	  return resolved
 	}
+      } else {
+      	//console.log('ABSOLUT: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
+	return source;
       }
       return null; // other ids should be handled as usually
     }
@@ -82,15 +96,21 @@ const useplugins = [
 	terser()
 ];
 
-export default globSync('public/**/js/apps/**/*.js', {follow: true, realpath: true}).map(file => { 
+export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: false}).map(file => { 
 			if( path.dirname(file).includes('/dist/') || path.dirname(file).includes('/apps/vbform') ) {
 				return null;
 			}
-			const tmp = fileURLToPath(new URL(file, import.meta.url));
+
+			//console.log('RAWFILE: ' + file);
+
+			const rel_app_path = (file.replace(/\/public/, '')).replace(/^\.\.\//, 'public/extensions/');
+			const tmp = fileURLToPath(new URL(rel_app_path, import.meta.url));
+			//console.log('BHTEST: ' + tmp);
 			const basepath = tmp.replace(/\/public\/js\/.*/, '/public/js/');
 			const outputfile = tmp.replace(/public\//, 'public/dist/');
+			//console.log('OUTFILE: ' + outputfile);
 			let cssfile = path.basename(tmp.replace(/\.js/, '.css'));
-			console.log('cssfile: ' + cssfile);
+			//console.log('cssfile: ' + cssfile);
 			let cssplugin = [
 			  postcss({
 				extract: cssfile,
@@ -99,7 +119,7 @@ export default globSync('public/**/js/apps/**/*.js', {follow: true, realpath: tr
 			  })
 			];
 			const vuedatepicker = path.relative(path.dirname(outputfile), basepath + 'components/vueDatepicker.js.php');
-			console.log(vuedatepicker);
+			//console.log(vuedatepicker);
 			return {
 				input: tmp,
 				plugins: [...useplugins, ...cssplugin],
