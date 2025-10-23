@@ -231,6 +231,7 @@ class Config extends FHCAPI_Controller
 		$result['combinePeople'] = [
 			'title' => $this->p->t('stv', 'tab_combine_people'),
 			'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+			'config' => $config['combinePeople']
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {
