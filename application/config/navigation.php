@@ -337,11 +337,10 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 	),
 );
 
-// TODO(chris): phrases?
 $config['navigation_menu']['apps'] = [
 	'stv' => [
 		'link' => site_url('studentenverwaltung'),
-		'description' => 'Studierenden Verwaltung',
+		'description' => 'Studierendenverwaltung',
 		#'icon' => 'users',
 		'requiredPermissions' => array('admin:r', 'assistenz:r')
 	],
