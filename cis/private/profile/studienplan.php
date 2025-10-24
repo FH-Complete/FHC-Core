@@ -129,7 +129,7 @@ if(isset($_GET['getAnmeldung']))
 					}
 				}
 
-				if (!$semesterlock || $regelerfuellt)
+				if (!$semesterlock && $regelerfuellt)
 				{
 					$anzahl++;
 					// LV wird angeboten und Anmeldefenster ist offen
