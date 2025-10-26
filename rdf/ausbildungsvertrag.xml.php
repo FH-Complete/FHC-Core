@@ -335,9 +335,8 @@ foreach($prestudent_arr as $prest_id)
 						$akadgrad = new akadgrad();
 						if ($akadgrad->load($studienordnung->__get('akadgrad_id')))
 						{
-							// TODO - geschlechterneutral? m/w/d
-							$akadgrad_titel = $akadgrad->titel;
-							$akadgrad_kurzbz = $akadgrad->akadgrad_kurzbz;
+							$akadgrad_titel_studienordnung = $akadgrad->titel;
+							$akadgrad_kurzbz_studienordnung = $akadgrad->akadgrad_kurzbz;
 						}
 					}
 				}
@@ -436,34 +435,33 @@ foreach($prestudent_arr as $prest_id)
 					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
 					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
 
-					// TODO: where to get semester duration for master Legrgaenge?
-					//if ($lehrgangstyp->lgartcode == 1) $student_maxsemester += 2;
+					// TODO: where to get semester duration for master Lehrgaenge?
 					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
 					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
-					if (!isset($akadgrad_titel) || $akadgrad_titel == '')
+
+					//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
+
+					$akadgrad_titel = '';
+					$akadgrad_kurzbz = '';
+
+					$qry = "SELECT * FROM lehre.tbl_akadgrad
+							WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)."
+							AND (geschlecht=".$db->db_add_param($person->geschlecht, FHC_STRING)." OR geschlecht IS NULL)
+							LIMIT 1";
+
+					if($db->db_query($qry))
 					{
-						//Bis die Akadgrad-Tabelle an die Studienordnung angepasst ist, wird der Akadgrad hier ermittelt
-
-						$akadgrad_titel = '';
-						$akadgrad_kurzbz = '';
-
-						$qry = "SELECT * FROM lehre.tbl_akadgrad
-								WHERE studiengang_kz=".$db->db_add_param($studiengang->studiengang_kz, FHC_INTEGER)."
-								AND (geschlecht=".$db->db_add_param($person->geschlecht, FHC_STRING)." OR geschlecht IS NULL)
-								LIMIT 1";
-
-						if($db->db_query($qry))
+						if($row = $db->db_fetch_object())
 						{
-							if($row = $db->db_fetch_object())
-							{
-								$akadgrad_titel = $row->titel;
-								$akadgrad_kurzbz = $row->akadgrad_kurzbz;
-							}
+							$akadgrad_titel = $row->titel;
+							$akadgrad_kurzbz = $row->akadgrad_kurzbz;
 						}
 					}
 
 					echo "\t\t<akadgrad>".$akadgrad_titel."</akadgrad>\n";
 					echo "\t\t<akadgrad_kurzbz>".$akadgrad_kurzbz."</akadgrad_kurzbz>\n";
+					echo "\t\t<akadgrad_studienordnung>".($akadgrad_titel_studienordnung ?? '')."</akadgrad_studienordnung>\n";
+					echo "\t\t<akadgrad_kurzbz_studienordnung>".($akadgrad_kurzbz_studienordnung ?? '')."</akadgrad_kurzbz_studienordnung>\n";
 
 					echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
 
