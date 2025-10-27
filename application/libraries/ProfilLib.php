@@ -183,7 +183,10 @@ class ProfilLib{
 		$zutrittskarte_ausgegebenam = $zutrittskarte_ausgegebenam ? current($zutrittskarte_ausgegebenam)->ausgegebenam : null;
 		
 		//? formats date from 01-01-2000 to 01.01.2000
-		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
+		if ($zutrittskarte_ausgegebenam !== NULL)
+		{
+			$zutrittskarte_ausgegebenam = (new DateTime($zutrittskarte_ausgegebenam))->format('d.m.Y');
+		}
 		return $zutrittskarte_ausgegebenam;
 	}
 
@@ -196,7 +199,7 @@ class ProfilLib{
 	private function getAdressenInfo($pid)
 	{
 		$this->ci->load->model("person/Adresse_model","AdresseModel");
-		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "zustelladresse", "gemeinde", "nation"]);
+		$adresse_res = $this->ci->AdresseModel->addSelect(["adresse_id", "strasse", "tbl_adressentyp.bezeichnung as typ", "plz", "ort", "heimatadresse", "zustelladresse", "gemeinde", "nation"]);
 		$adresse_res = $this->ci->AdresseModel->addOrder("zustelladresse", "DESC");
 		$adresse_res = $this->ci->AdresseModel->addJoin("tbl_adressentyp", "typ=adressentyp_kurzbz");
 
@@ -214,7 +217,7 @@ class ProfilLib{
 	 * @param  integer $uid the userID used to get the kontakt information
 	 * @return array all the kontakt information corresponding to a userID
 	 */
-	private function getKontaktInfo($pid)
+	private function getKontaktInfo($pid, $includehidden=false)
 	{
 		$this->ci->load->model("person/Kontakt_model","KontaktModel");
 		$this->ci->KontaktModel->addSelect(['kontakttyp', 'kontakt_id', 'kontakt', 'tbl_kontakt.anmerkung', 'tbl_kontakt.zustellung']);
@@ -222,7 +225,13 @@ class ProfilLib{
 		$this->ci->KontaktModel->addJoin('public.tbl_firma', 'firma_id', 'LEFT');
 		$this->ci->KontaktModel->addOrder('kontakttyp, kontakt, tbl_kontakt.updateamum, tbl_kontakt.insertamum');
 
-		$kontakte_res = $this->ci->KontaktModel->loadWhere(['person_id' => $pid]);
+		$params = array('person_id' => $pid);
+		if(!$includehidden)
+		{
+			$params['kontakttyp <>'] = 'hidden';
+		}
+
+		$kontakte_res = $this->ci->KontaktModel->loadWhere($params);
 		if(isError($kontakte_res)){
 			return error(getData($kontakte_res));
 		}
@@ -303,10 +312,22 @@ class ProfilLib{
 	private function getBenutzerFunktion($uid)
 	{
 		$this->ci->load->model("person/Benutzerfunktion_model","BenutzerfunktionModel");
-		$this->ci->BenutzerfunktionModel->addSelect(["tbl_benutzerfunktion.bezeichnung as Bezeichnung", "tbl_organisationseinheit.bezeichnung as Organisationseinheit", "datum_von as Gültig_von", "datum_bis as Gültig_bis", "wochenstunden as Wochenstunden"]);
+		$this->ci->BenutzerfunktionModel->addSelect([
+			"CASE WHEN (tbl_benutzerfunktion.bezeichnung IS NOT NULL AND tbl_benutzerfunktion.bezeichnung <> '' AND tbl_benutzerfunktion.bezeichnung <> tbl_funktion.beschreibung) THEN tbl_funktion.beschreibung || ' - ' || tbl_benutzerfunktion.bezeichnung ELSE tbl_funktion.beschreibung END as \"Bezeichnung\"",
+			"tbl_organisationseinheit.bezeichnung as Organisationseinheit",
+			"datum_von as Gültig_von",
+			"datum_bis as Gültig_bis",
+			"COALESCE(wochenstunden, '0'::numeric(5,2)) AS \"Wochenstunden\""
+		]);
+		$this->ci->BenutzerfunktionModel->addJoin("tbl_funktion", "funktion_kurzbz");
 		$this->ci->BenutzerfunktionModel->addJoin("tbl_organisationseinheit", "oe_kurzbz");
 
-		$benutzer_funktion_res = $this->ci->BenutzerfunktionModel->loadWhere(array('uid' => $uid));
+		$benutzer_funktion_res = $this->ci->BenutzerfunktionModel->loadWhere(
+			array(
+				'uid' => $uid,
+				'NOW()::date BETWEEN COALESCE(datum_von, \'1970-01-01\'::date) AND COALESCE(datum_bis, \'2170-12-01\'::date)' => null
+			)
+		);
 		if(isError($benutzer_funktion_res)){
 			return error(getData($benutzer_funktion_res));
 		}

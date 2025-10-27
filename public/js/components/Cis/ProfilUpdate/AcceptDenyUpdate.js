@@ -113,7 +113,17 @@ export default {
   },
   template: /*html*/ `
 
-  <bs-modal v-show="!loading" ref="modalContainer" v-bind="$props" body-class="" dialog-class="modal-lg" class="bootstrap-alert" :backdrop="false" >
+  <bs-modal
+		v-show="!loading"
+		ref="modalContainer"
+		v-bind="$props"
+		header-class="bg-light"
+		footer-class="bg-light"
+		body-class=""
+		dialog-class="modal-lg"
+		class="bootstrap-alert"
+		:backdrop="false"
+	>
     
     <template v-slot:title>
       {{title}}  
@@ -210,8 +220,8 @@ export default {
     
 
     <template v-if="data.status === profilUpdateStates['Pending']"  v-slot:footer>
-    <div  class="form-underline flex-fill">
-      <div class="form-underline-titel">{{$p.t('global','nachricht')}}</div>
+    <div  class="flex-fill">
+      <div>{{$p.t('global','nachricht')}}</div>
 
       <div class="d-flex flex-row gap-2">
         <input  class="form-control " v-model="data.status_message"  />
