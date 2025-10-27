@@ -6,3 +6,59 @@
     background-color: #ad1010 !important;
     color: white;
 }
+
+/*.fotosperre {
+    z-index: 1;
+    font-size: 1rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}*/
+
+.foto-container .fotoedit {
+    opacity: 0;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+}
+
+.fotoedit {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    z-index: 4;
+    font-size: 1rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    opacity:0;
+    transition: opacity 0.2s;
+    top:20%;
+}
+
+/* fotoeditMa {
+    background-color: rgba(0, 0, 0, 0.4);
+    color: white;
+    border: none;
+    z-index: 4;
+    font-size: 1rem;
+    opacity:0;
+    transition: opacity 0.2s;
+    top:20%;
+}*/
+
+.buttonleft {
+    margin-left: 1rem;
+}
+
+.buttonright {
+    margin-right: 1rem;
+}
+
+/*.fotoEditMa {
+    z-index: 104;
+    font-size: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    opacity:0;
+    transition: opacity 0.2s;
+    top:13%;"
+    z-index: 104; font-size: 1rem; width: 2.5rem; height: 2.5rem; opacity:0; transition: opacity 0.2s; top:13%;"
+}*/

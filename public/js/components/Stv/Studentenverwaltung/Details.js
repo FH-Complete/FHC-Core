@@ -71,6 +71,7 @@ export default {
 				:headerData="students"
 				typeHeader="student"
 				@reload="reloadList"
+				fotoEditable
 			>
 				<template #titleAlphaTile>P_ID</template>
 				<template #valueAlphaTile>{{students[0].person_id}}</template>

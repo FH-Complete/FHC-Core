@@ -7,12 +7,6 @@ export default {
 	components: {
 		ModalUploadFoto
 	},
-/*	inject: {
-		domain: {
-			from: 'configDomain',
-			default: 'fhcomplete.info'
-		},
-	},*/
 	props: {
 		headerData: {
 			type: Object,
@@ -203,23 +197,21 @@ export default {
 					/>
 
 					<template v-if="person.foto_sperre">
-						<i
-						  class=" fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
-						  style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
-						></i>
+						<i class="fa fa-lock text-secondary bg-light rounded d-flex justify-content-center align-items-center position-absolute top-0 end-0"
+						style="z-index: 1; font-size: 1rem; width: 1.25rem; height: 1.25rem;"
+						>
+						</i>
 					</template>
 					<template v-if="fotoEditable">
 						<button
 							type="button"
-							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
-							style="z-index: 4; font-size: 1rem; width: 1.5rem; height: 1.5rem; opacity:0; transition: opacity 0.2s; top:20%; left:2rem;"
+							class="fotoedit buttonleft btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute start-0"
 							@click="showDeleteModal(headerData[0].person_id)">
 							<i class="fa fa-xmark"></i>
 						</button>
 						<button
 							type="button"
-							class="fotoedit btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
-							style="z-index: 4; font-size: 1rem; width: 1.5rem; height: 1.5rem; opacity:0; transition: opacity 0.2s; top:20%; right:2rem;"
+							class="fotoedit buttonright btn btn-outline-dark btn-sm d-flex justify-content-center align-items-center position-absolute end-0"
 							@click="showModal(headerData[0].person_id)">
 							<i class="fa fa-pen"></i>
 						</button>

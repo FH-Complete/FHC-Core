@@ -19,11 +19,9 @@ export default {
 	},
 	data(){
 		return{
-			formData: {
-				file: null,
-				preview: null,
-				base64Image: null,
-			},
+			base64Image: null,
+			file: null,
+			preview: null,
 		}
 	},
 	methods:{
@@ -36,6 +34,7 @@ export default {
 
 			// convert File in base64
 			const reader = new FileReader();
+
 			reader.onload = (event) => {
 				this.base64Image = event.target.result;
 				this.preview = this.base64Image;
@@ -51,19 +50,23 @@ export default {
 
 			return this.$api
 				.call(ApiHandleFoto.uploadFoto(person_id, {
-						image: this.base64Image,    // Base64 String
-						filename: this.file.name    // Original name of file
+						image: this.base64Image,
+						filename: this.file.name
 							}))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successFotoUpload'));
-					this.resetModal();
-					this.$refs.modalUploadFoto.hide();
+					this.closeModal();
 					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		resetModal(){
-			this.formData.foto = [];
+			this.base64Image = [];
+			this.file = null;
+		},
+		closeModal(){
+			this.resetModal();
+			this.$refs.modalUploadFoto.hide();
 		}
 	},
 	template: `
@@ -78,18 +81,19 @@ export default {
 				<form-form
 					ref="formUploadFoto"
 					>
-
 					  <div>
-						<input type="file" @change="onFileChange" accept="image/*" />
-						<div v-if="preview">
-						  <p>Preview:</p>
-						  <img :src="preview" width="200" />
+						<input class="form-control" type="file" @change="onFileChange" accept="image/*" />
+						<div class="mt-3">
+						   <div>
+						   	<img :src="base64Image" style="width:100px"/>
+						  </div>
 						</div>
 					  </div>
 				</form-form>
 
 				<template #footer>
 					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+					    <button class="btn btn-secondary" @click="closeModal()">{{$p.t('ui', 'cancel')}}</button>
 						<button type="button" class="btn btn-primary" @click="uploadImage(person_id)">{{$p.t('ui', 'hochladen')}}</button>
 					</div>
 				</template>
