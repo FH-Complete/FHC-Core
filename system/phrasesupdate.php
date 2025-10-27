@@ -42059,18 +42059,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgabetyp',
+		'phrase' => 'c4abgabetypv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Abgabetyp",
+				'text' => "Projektfrist",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Type of document submitted",
+				'text' => "Type of project deadline",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42919,6 +42919,78 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4tooltipFixtermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Für den gesamten Studiengang verbindlicher Termin.  
+				
+				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich, 
+				haben Studierende bei der Studiengangsassistenz um eine Korrektur dieses Termins anzusuchen.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This deadline is binding for the entire program. If a deadline is in the past,
+				nothing can be uploaded. If it is still necessary,
+				students must request a correction of this deadline from the program assistant.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4notAllowedToEditAbgabeTermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+					'text' => "Sie sind nicht berechtigt diesen Abgabetermin zu bearbeiten.
+					 Es muss entweder eine Benotung vorgesehen sein oder sich um einen individuellen Termin handeln,
+					 welcher von Ihrem Benutzerkonto angelegt wurde.",
+					'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not authorized to edit this deadline.
+					It must either be scheduled for grading or be a custom due date
+					created by your user account.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4notAllowedToDeleteAbgabeTermin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Sie sind nicht berechtigt diesen Abgabetermin zu löschen.
+					 Sie benötigen mindestens die Berechtigung den Termin zu bearbeiten und es darf noch keine
+					 Dateiabgabe vorhanden sein.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not authorized to delete this deadline.
+					You need at least the permission to edit the deadline, and no file submissions must yet exist.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4abgabeStudentNoProjectsFound',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -42931,6 +43003,50 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'No projects found!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4studentAbgabeNotAllowedInViewMode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Projektabgabe im Ansichtsmodus ist nicht erlaubt!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Project submission in view mode is not allowed!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4studentAbgabeNotAllowedRegular',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
+				
+				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Late project submissions are not permitted for deadlines set by the program assistant for the entire program!
+
+				To be able to complete a final upload, you must have successfully completed Quality Gate 1 and Quality Gate 2 for the relevant project work.',
 				'description' => '',
 				'insertvon' => 'system'
 			)

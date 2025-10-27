@@ -34,6 +34,9 @@ export const AbgabetoolStudent = {
 	},
 	data() {
 		return {
+			phrasenPromise: null,
+			phrasenResolved: false,
+			loading: false,
 			notenOptions: null,
 			domain: '',
 			student_uid: null,
@@ -64,6 +67,7 @@ export const AbgabetoolStudent = {
 			return new Date(date) < new Date(Date.now())	
 		},
 		setDetailComponent(details){
+			this.loading = true
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
@@ -71,16 +75,15 @@ export const AbgabetoolStudent = {
 					termin.file = []
 					termin.allowedToUpload = false
 					// termin.datum = '2025-10-16'
-					// TODO: fixtermin logic?
+					// TODO: change this and corresponding tooltips every time FH decides QG work different now
 					if(termin.paabgabetyp_kurzbz == 'end') {
-						
 						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
-					} else if(termin.paabgabetyp_kurzbz == 'qualgate1' || termin.paabgabetyp_kurzbz == 'qualgate2') {
-						termin.allowedToUpload = termin.upload_allowed
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)
 					} else {
-						termin.allowedToUpload = true
+						// TODO: this will confuse people so much, by requirement we should NOT show people this flag
+						// but it still should have an effect?
+						termin.allowedToUpload = termin.upload_allowed 
 					}
 
 				})
@@ -92,7 +95,7 @@ export const AbgabetoolStudent = {
 				this.$refs.modalContainerAbgabeDetail.show()
 				// this.$refs.verticalsplit.showBoth()
 				
-			})
+			}).finally(()=>{this.loading=false})
 		},
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()
@@ -137,9 +140,9 @@ export const AbgabetoolStudent = {
 			// this.projektarbeiten = data[0]
 			this.domain = data[1]
 			this.student_uid = data[2]
-			this.projektarbeiten = data[0] ?? null
-			if(!this.projektarbeiten) return
-			this.projektarbeiten = this.projektarbeiten.map(projekt => {
+			const projektarbeiten = data[0] ?? null
+			if(!projektarbeiten) return
+			this.projektarbeiten = projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
@@ -166,7 +169,7 @@ export const AbgabetoolStudent = {
 					titel: projekt.titel
 				}
 			})
-			
+
 		},
 		loadProjektarbeiten() {
 			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
@@ -218,11 +221,14 @@ export const AbgabetoolStudent = {
 		}
 	},
 	async created() {
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
+		
 		this.loading = true
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		await this.$api.call(ApiAbgabe.getNoten()).then(res => {
 			this.notenOptions = res.data
-		}).catch(e => {
+		}).finally(() => {
 			this.loading = false
 		})
 
@@ -231,12 +237,16 @@ export const AbgabetoolStudent = {
 		this.setupMounted()
 	},
 	template: `
+<template v-if="phrasenResolved">
+	<div id="loadingOverlay" v-show="loading || saving" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
+		<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
+	</div>
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 		dialogClass="modal-xl" :allowFullscreenExpand="true">
 		<template v-slot:title>
 			<div>
-				{{$p.t('abgabetool/c4abgabeStudentDetailTitle')}}
+				{{$capitalize( $p.t('abgabetool/c4abgabeStudentDetailTitle') )}}
 			</div>
 		</template>
 		<template v-slot:default>
@@ -245,11 +255,11 @@ export const AbgabetoolStudent = {
 		</template>
 	</bs-modal>
 	
-	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+	<h2>{{$capitalize( $p.t('abgabetool/abgabetoolTitle') )}}</h2>
 	<hr>
 	
 	<div v-if="projektarbeiten === null">
-		{{$p.t('abgabetool/c4abgabeStudentNoProjectsFound')}}
+		{{$capitalize( $p.t('abgabetool/c4abgabeStudentNoProjectsFound') )}}
 	</div>
 	
 	<Accordion :multiple="true" :activeIndex="[0]">
@@ -268,30 +278,30 @@ export const AbgabetoolStudent = {
 				</template>
 				
 				<div class="row">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4details')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4details') )}}</div>
 					<div class="col-8 col-md-9">
 						<button @click="setDetailComponent(projektarbeit.details)" class="btn btn-primary">
-							{{$p.t('abgabetool/c4projektdetailsOeffnen')}} <a><i class="fa fa-folder-open"></i></a>
+							{{$capitalize( $p.t('abgabetool/c4projektdetailsOeffnen') )}} <a><i class="fa fa-folder-open"></i></a>
 						</button>
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4beurteilung')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
 						<button v-if="projektarbeit.beurteilung" @click="handleDownloadBeurteilung(projektarbeit)" class="btn btn-primary">
-							<a> {{$p.t('abgabetool/c4downloadBeurteilung')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilung') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
-						<a v-else>{{$p.t('abgabetool/c4nobeurteilungVorhanden')}}</a>
+						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4sem')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4sem') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.sem }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4stg')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4stg') )}}</div>
 					<div class="col-8 col-md-9">
 						<div class="col-1 d-flex justify-content-start align-items-start">
 							{{ projektarbeit.stg }}
@@ -299,31 +309,31 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuer')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuer') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.betreuer }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuerEmailKontakt')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontakt') )}}</div>
 					<div class="col-8 col-md-9">
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>
 				</div>
-				<div v-if="projektarbeit.zweitbetreuer" class="row mt-2">
+				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.zweitbetreuer_betreuerart_beschreibung}}: {{ projektarbeit.zweitbetreuer?.first }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4projekttyp')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4projekttyp') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.projekttypbezeichnung }}					
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4titel')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4titel') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.titel }}	
 					</div>
@@ -331,7 +341,7 @@ export const AbgabetoolStudent = {
 			</AccordionTab>
 		</template>
 	</Accordion>
-	
+</template>
     `,
 };
 

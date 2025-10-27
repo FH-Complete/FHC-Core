@@ -38,7 +38,8 @@ class Abgabe extends FHCAPI_Controller
 			'postSerientermin' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'fetchDeadlines' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'getPaAbgabetypen' => self::PERM_LOGGED,
-			'getNoten' => self::PERM_LOGGED
+			'getNoten' => self::PERM_LOGGED,
+			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw')
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -148,6 +149,9 @@ class Abgabe extends FHCAPI_Controller
 					$pa->email = $data[0]->private_email;
 				}
 				if($pa->zweitbetreuer_person_id !== null) {
+					
+					// TODO: dont have to wait for 2038, see assistenz query in projektarbeit_model
+					
 					// zweitbetreuer info since the 'getStudentProjektarbeitenWithBetreuer' query got quiete large,
 					// enjoy optimizing that one in 2038. we need this to render a string like
 					// Zweitbegutachter: FH-Prof. PD DI Dr. techn. Vorname Nachname MBA
@@ -849,5 +853,42 @@ class Abgabe extends FHCAPI_Controller
 			$tomail,
 			$subject
 		);
+	}
+	
+	public function getProjektarbeitenForStudiengang() {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		
+		$studiengang_kz = $this->input->get("studiengang_kz",TRUE);
+
+		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		
+		// TODO revert arr return new/old
+//		$arr = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
+//		$result = $arr[0];
+		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
+		$projektarbeiten = $this->getDataOrTerminateWithError($result);
+
+		$mapFunc = function($projektarbeit) {
+			return $projektarbeit->projektarbeit_id;
+		};
+		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten);
+		
+		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+		$projektabgaben = $this->getDataOrTerminateWithError($ret);
+		
+		// map the abgaben into projektarbeiten
+		
+		foreach($projektarbeiten as $projektarbeit) {
+			$filterFunc = function($projektabgabe) use ($projektarbeit) {
+				return $projektabgabe->projektarbeit_id == $projektarbeit->projektarbeit_id;
+			};
+
+			
+			$projektarbeit->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
+			
+		}
+		
+		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 }

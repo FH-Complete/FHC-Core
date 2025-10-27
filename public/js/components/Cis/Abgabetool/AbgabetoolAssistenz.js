@@ -5,8 +5,8 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 
-export const AbgabetoolMitarbeiter = {
-	name: "AbgabetoolMitarbeiter",
+export const AbgabetoolAssistenz = {
+	name: "AbgabetoolAssistenz",
 	components: {
 		BsModal,
 		CoreFilterCmpt,
@@ -37,6 +37,7 @@ export const AbgabetoolMitarbeiter = {
 	data() {
 		return {
 			detailIsFullscreen: false,
+			showZweitbetreuerCol: false,
 			phrasenPromise: null,
 			phrasenResolved: false,
 			turnitin_link: null,
@@ -87,14 +88,17 @@ export const AbgabetoolMitarbeiter = {
 					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
+					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, tooltip: false}
+					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', formatter: this.abgabterminFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerart'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 1}
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', formatter: this.centeredTextFormatter, widthGrow: 1, visible: this.showZweitbetreuerCol}
 				],
 				persistence: false,
 			},
@@ -104,23 +108,23 @@ export const AbgabetoolMitarbeiter = {
 					this.tableBuiltResolve()
 				}
 			},
-			{
-				event: "cellClick",
-				handler: async (e, cell) => {
-					if(cell.getColumn().getField() === "details") {
-						this.setDetailComponent(cell.getValue())
-						this.undoSelection(cell)
-					} else if (cell.getColumn().getField() === "mail") {
-						this.undoSelection(cell)
+				{
+					event: "cellClick",
+					handler: async (e, cell) => {
+						if(cell.getColumn().getField() === "details") {
+							this.setDetailComponent(cell.getValue())
+							this.undoSelection(cell)
+						} else if (cell.getColumn().getField() === "mail") {
+							this.undoSelection(cell)
+						}
+					}
+				},
+				{
+					event: "rowSelectionChanged",
+					handler: async(data) => {
+						this.selectedData = data
 					}
 				}
-			},
-			{
-				event: "rowSelectionChanged",
-				handler: async(data) => {
-					this.selectedData = data
-				}
-			}
 			]};
 	},
 	methods: {
@@ -196,63 +200,46 @@ export const AbgabetoolMitarbeiter = {
 		},
 		createInfoString(data) {
 			let str = '';
-			
+
 			data.forEach(name => {
 				str += name
 				str += '; '
 			})
-			
+
 			return str
 		},
 		isPastDate(date) {
 			return new Date(date) < new Date(Date.now())
 		},
 		setDetailComponent(details){
-			this.loading=true
-			this.loadAbgaben(details).then((res)=> {
-				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
-				pa.abgabetermine = res.data[0].retval
-				pa.isCurrent = res.data[1]
-				
-				// pa.abgabetermine.push({ // new abgatermin row
-				//
-				// 	'paabgabe_id': -1,
-				// 	'projektarbeit_id': pa.projektarbeit_id,
-				// 	'fixtermin': false,
-				// 	'kurzbz': '',
-				// 	'datum': new Date().toISOString().split('T')[0],
-				// 	'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-				// 	'upload_allowed': false,
-				// 	'paabgabetyp_kurzbz': '',
-				// 	'bezeichnung': '',
-				// 	'abgabedatum': null,
-				// 	'insertvon': this.viewData?.uid ?? ''
-				//	
-				// })
-				
-				pa.abgabetermine.forEach(termin => {
-					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
-					termin.file = []
-					
-					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
-					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
-					
-					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
-
-				})
-				pa.student_uid = details.student_uid
-				pa.student = `${pa.vorname} ${pa.nachname}`
-				
-				this.selectedProjektarbeit = pa
-				
-				this.$refs.modalContainerAbgabeDetail.show()
 			
-			}).finally(()=>{this.loading = false})
+			const pa = this.projektarbeiten.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
+
+			// pa.isCurrent = res.data[1]
+
+			pa.abgabetermine.forEach(termin => {
+				termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				termin.file = []
+
+				termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
+				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
+
+				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
+
+			})
+			pa.student_uid = details.student_uid
+			pa.student = `${pa.vorname} ${pa.nachname}`
+
+			this.selectedProjektarbeit = pa
+
+			this.$refs.modalContainerAbgabeDetail.show()
+
+			
 		},
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()
 			if(!val) return
-			
+
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 				'<p style="max-width: 100%; width: 100%; overflow-wrap: break-word; word-break: break-word; white-space: normal; margin: 0px; text-align: center">'+val+'</p></div>'
 		},
@@ -278,27 +265,51 @@ export const AbgabetoolMitarbeiter = {
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 				'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</p></div>'
 		},
+		abgabterminFormatter(termin) {
+			
+		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
 		buildMailToLink(abgabe) {
-			return 'mailto:' + abgabe.uid +'@'+ this.domain
+			return 'mailto:' + abgabe.student_uid +'@'+ this.domain
 		},
 		buildPKZ(projekt) {
-			return `${projekt.uid} / ${projekt.matrikelnr}`
+			return `${projekt.student_uid} / ${projekt.matrikelnr}`
 		},
 		buildStg(projekt) {
-			return (projekt.typ + projekt.kurzbz)?.toUpperCase()	
+			return (projekt.typ + projekt.kurzbz)?.toUpperCase()
+		},
+		buildErstbetreuer(projekt) {
+			return projekt.betreuer_vorname + ' ' + projekt.betreuer_nachname + ' - ' + projekt.betreuerart + '(' + projekt.betreuer_benutzer_uid + ')'
+		},
+		buildZweitbetreuer(projekt) {
+			return projekt.zweitbetreuer_full_name ?? ''
 		},
 		setupData(data){
 			this.projektarbeiten = data[0]
-			this.domain = data[1]
+			this.domain = data[1]			
 			
-			const d = data[0]?.retval?.map(projekt => {
+			const d = data[0].map(projekt => {
 				let mode = 'detailTermine'
 
+				// only show 2tbetreuer col if any projektarbeit has one
+				if(projekt.zweitbetreuer_full_name) this.showZweitbetreuerCol = true
+				
+				// first Abgabetermin in the past
+				projekt.abgabetermine.forEach(termin => {
+					const date = luxon.DateTime.fromISO(termin.datum)
+					termin.diff = date.diffNow('milliseconds')
+					
+					// console.log(termin.diff)
+				})
+				
+				// console.log('\n\n')
+					
+					
 				return {
 					...projekt,
+					abgabetermine: projekt.abgabetermine,
 					details: {
 						student_uid: projekt.uid,
 						projektarbeit_id: projekt.projektarbeit_id,
@@ -308,6 +319,8 @@ export const AbgabetoolMitarbeiter = {
 					sem: projekt.studiensemester_kurzbz,
 					stg: this.buildStg(projekt),
 					mail: this.buildMailToLink(projekt),
+					erstbetreuer: this.buildErstbetreuer(projekt),
+					zweitbetreuer: this.buildZweitbetreuer(projekt),
 					typ: projekt.projekttyp_kurzbz,
 					titel: projekt.titel
 				}
@@ -317,14 +330,17 @@ export const AbgabetoolMitarbeiter = {
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},
 		loadProjektarbeiten(all = false, callback) {
-			this.$api.call(ApiAbgabe.getMitarbeiterProjektarbeiten(all))
+			this.loading = true
+			this.$api.call(ApiAbgabe.getProjektarbeitenForStudiengang(this.getCurrentStudiengang))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				}).finally(() => {
-					if(callback) {
-						callback()
-					}
-				})
+				if(callback) {
+					callback()
+				}
+			}).finally(()=>{
+				this.loading=false
+			})
 		},
 		loadAbgaben(details) {
 			return new Promise((resolve) => {
@@ -354,14 +370,25 @@ export const AbgabetoolMitarbeiter = {
 
 			// this.$refs.verticalsplit.collapseBottom()
 			this.calcMaxTableHeight()
-			
+
+		},
+		sendEmailBegutachter() {
+			// TODO: implement
+		},
+		sendEmailStudierende() {
+			// TODO: implement
 		}
+		
 	},
 	watch: {
 
 	},
 	computed: {
-		
+		getCurrentStudiengang() {
+			// TODO: sophisticated logic pulling from default value by viewData or dropdown select
+			
+			return 257
+		}
 	},
 	created() {
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
@@ -374,20 +401,20 @@ export const AbgabetoolMitarbeiter = {
 			console.log(e)
 			this.loading = false
 		})
-		
+
 		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		this.$api.call(ApiAbgabe.getNoten()).then(res => {
 			this.notenOptions = res.data
 			// TODO: more sophisticated way to filter for these two, in essence it is still hardcoded
 			this.allowedNotenOptions = this.notenOptions.filter(
-				opt => opt.bezeichnung === 'Bestanden' 
+				opt => opt.bezeichnung === 'Bestanden'
 					|| opt.bezeichnung === 'Nicht bestanden'
 			)
 		}).catch(e => {
 			this.loading = false
 		})
-		
+
 		// fetch abgabetypen options
 		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
 			this.abgabeTypeOptions = res.data
@@ -472,7 +499,6 @@ export const AbgabetoolMitarbeiter = {
 		
 		<!-- low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways -->
 		<div style="max-height:40vw;">
-		
 			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
 			<hr>
 			<core-filter-cmpt
@@ -490,23 +516,19 @@ export const AbgabetoolMitarbeiter = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-					<button @click="toggleShowAll(!showAll)" role="button" class="btn btn-secondary ml-2">
-						<i v-show="!showAll" class="fa fa-eye"></i>
-						<i v-show="showAll" class="fa fa-eye-slash"></i>
-						{{ $p.t('abgabetool/showAll') }}
+					<button @click="sendEmailStudierende" role="button" class="btn btn-secondary ml-2">
+						{{ $p.t('abgabetool/sendEmailStudierende') }}
 					</button>
 					
-					<button @click="showDeadlines" role="button" class="btn btn-secondary ml-2">
-						<i class="fa fa-hourglass-end"></i>
-						{{ $p.t('abgabetool/showDeadlines') }}
+					<button @click="sendEmailBegutachter" role="button" class="btn btn-secondary ml-2">
+						{{ $p.t('abgabetool/sendEmailBegutachter') }}
 					</button>
 					
 				</template>
 			</core-filter-cmpt>
-		
 		</div>
 	</template>
     `,
 };
 
-export default AbgabetoolMitarbeiter;
+export default AbgabetoolAssistenz;

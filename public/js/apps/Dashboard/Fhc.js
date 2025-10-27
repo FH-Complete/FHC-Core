@@ -14,11 +14,13 @@ import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
+import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
+import {capitalize} from "../../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -53,6 +55,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Abgabetool/Mitarbeiter`,
 			name: 'AbgabetoolMitarbeiter',
 			component: AbgabetoolMitarbeiter,
+			props: true
+		},
+		{
+			path: `/Cis/Abgabetool/Assistenz`,
+			name: 'AbgabetoolAssistenz',
+			component: AbgabetoolAssistenz,
 			props: true
 		},
 		{
@@ -275,6 +283,7 @@ const app = Vue.createApp({
 		}
 	},
 	async created(){
+		
 		await this.$api
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)
@@ -315,6 +324,7 @@ const app = Vue.createApp({
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);
+		
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);
@@ -323,7 +333,7 @@ const app = Vue.createApp({
 
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
-
+app.config.globalProperties.$capitalize = capitalize;
 app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {

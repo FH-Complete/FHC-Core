@@ -24,6 +24,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/speeddial/speeddial.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
+		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Abgabetool/Abgabetool.js',

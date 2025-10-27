@@ -2,6 +2,7 @@ import PluginsPhrasen from '../../plugins/Phrasen.js';
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
+import {capitalize} from "../../helpers/StringHelpers.js";
 
 const app = Vue.createApp({
 	name: 'AbgabetoolApp',
@@ -51,6 +52,7 @@ const app = Vue.createApp({
 		</template>
 	`
 });
+app.config.globalProperties.$capitalize = capitalize;
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

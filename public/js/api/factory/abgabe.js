@@ -100,4 +100,11 @@ export default {
 			url: '/api/frontend/v1/Abgabe/getNoten'
 		};
 	},
+	getProjektarbeitenForStudiengang(studiengang_kz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getProjektarbeitenForStudiengang',
+			params: { studiengang_kz }
+		};
+	}
 };

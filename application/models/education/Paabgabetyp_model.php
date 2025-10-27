@@ -13,7 +13,7 @@ class Paabgabetyp_model extends DB_Model
 	}
 	
 	public function getAll() {
-		$qry = "SELECT * FROM campus.tbl_paabgabetyp";
+		$qry = "SELECT * FROM campus.tbl_paabgabetyp ORDER BY bezeichnung";
 
 		return $this->execReadOnlyQuery($qry);
 	}

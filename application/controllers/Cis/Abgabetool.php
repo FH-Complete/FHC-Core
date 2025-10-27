@@ -15,9 +15,10 @@ class Abgabetool extends Auth_Controller
 		parent::__construct([
 			'index' => self::PERM_LOGGED,
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'Mitarbeiter' => self::PERM_LOGGED,
-			'Student' => self::PERM_LOGGED,
-			'Deadlines' => self::PERM_LOGGED
+			'Mitarbeiter' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'Assistenz' => array('basis/abgabe_assistenz:rw'),
+			'Student' =>  array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'Deadlines' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
 		]);
 	}
 
@@ -29,6 +30,7 @@ class Abgabetool extends Auth_Controller
 	 */
 	public function index()
 	{
+		// TODO: do we even need this?
 
 		$viewData = array(
 			'uid'=>getAuthUID(),
@@ -71,6 +73,20 @@ class Abgabetool extends Auth_Controller
 		}
 	}
 
+	public function Assistenz()
+	{
+
+		$viewData = array(
+			'uid'=>getAuthUID(),
+		);
+
+		if(defined('CIS4') && CIS4) {
+			$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'AbgabetoolAssistenz']);
+		} else {
+			$this->load->view('Cis/Abgabetool.php', ['uid' => getAuthUID(), 'route' => 'AbgabetoolAssistenz']);
+		}
+	}
+	
 	public function Deadlines()
 	{
 
