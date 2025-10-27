@@ -160,9 +160,9 @@ export default {
 			if(this.person_id) {
 				this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
 			}
-/*			else {
+			else {
 				this.$emit('reload');
-			}*/
+			}
 		},
 	},
 	template: `
