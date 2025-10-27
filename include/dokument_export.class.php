@@ -287,6 +287,7 @@ class dokument_export
 		{
 			case 'pdf':
 			case 'doc':
+			case 'docx':
 				$ret = 0;
 				$this->temp_filename = $this->temp_folder . '/out.' . $this->outputformat;
 
@@ -367,6 +368,11 @@ class dokument_export
 				case 'doc':
 					header('Content-type: application/vnd.ms-word');
 					header('Content-Disposition: attachment; filename="'.$this->filename.'.doc"');
+					header('Content-Length: '.$fsize);
+					break;
+				case 'docx':
+					header('Content-type: application/vnd.ms-word');
+					header('Content-Disposition: attachment; filename="'.$this->filename.'.docx"');
 					header('Content-Length: '.$fsize);
 					break;
 
