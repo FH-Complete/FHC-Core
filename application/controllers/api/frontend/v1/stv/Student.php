@@ -55,7 +55,7 @@ class Student extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui', 'lehre'
 		]);
 	}
 
@@ -68,13 +68,28 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function get($prestudent_id)
+	public function get($prestudent_id, $studiensemester_kurzbz)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
 
-		$this->PrestudentModel->addSelect('p.*');
+		$this->PrestudentModel->addSelect('p.person_id');
+		$this->PrestudentModel->addSelect('p.titelpre');
+		$this->PrestudentModel->addSelect('p.nachname');
+		$this->PrestudentModel->addSelect('p.vorname');
+		$this->PrestudentModel->addSelect('p.wahlname');
+		$this->PrestudentModel->addSelect('p.vornamen');
+		$this->PrestudentModel->addSelect('p.titelpost');
+		$this->PrestudentModel->addSelect('p.svnr');
+		$this->PrestudentModel->addSelect('p.ersatzkennzeichen');
+		$this->PrestudentModel->addSelect('p.gebdatum');
+		$this->PrestudentModel->addSelect('p.geschlecht');
+		$this->PrestudentModel->addSelect('p.foto');
+		$this->PrestudentModel->addSelect('p.foto_sperre');
 		$this->PrestudentModel->addSelect('s.student_uid');
 		$this->PrestudentModel->addSelect('matrikelnr');
 		$this->PrestudentModel->addSelect('b.aktiv');
@@ -82,6 +97,16 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect('b.alias');
+		$this->PrestudentModel->addSelect('p.geburtsnation');
+		$this->PrestudentModel->addSelect('p.sprache');
+		$this->PrestudentModel->addSelect('p.gebort');
+		$this->PrestudentModel->addSelect('p.homepage');
+		$this->PrestudentModel->addSelect('p.anmerkung');
+		$this->PrestudentModel->addSelect('p.familienstand');
+		$this->PrestudentModel->addSelect('p.staatsbuergerschaft');
+		$this->PrestudentModel->addSelect('p.matr_nr');
+		$this->PrestudentModel->addSelect('p.anrede');
+		$this->PrestudentModel->addSelect('p.zugangscode');
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -97,6 +122,16 @@ class Student extends FHCAPI_Controller
 				false
 			);
 		}
+		$this->PrestudentModel->addSelect(
+			"(
+				SELECT status_kurzbz
+				FROM public.tbl_prestudentstatus pss
+				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
+				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
+				LIMIT 1
+				) AS statusofsemester"
+		);
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');
@@ -106,15 +141,32 @@ class Student extends FHCAPI_Controller
 			'LEFT'
 		);
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'p.person_id = tbl_prestudent.person_id');
+/*		$this->PrestudentModel->addJoin('public.tbl_prestudentstatus pss', 'pss.prestudent_id = tbl_prestudent.prestudent_id
+										AND pss.studiensemester_kurzbz = ' . $this->PrestudentModel->escape($studiensemester_kurzbz),
+										'LEFT');*/
 
-		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+		$result = $this->PrestudentModel->loadWhere(['tbl_prestudent.prestudent_id' => $prestudent_id]);
 		
 		$student = $this->getDataOrTerminateWithError($result);
 		
 		if (!$student)
 			return show_404();
 
+
 		$this->terminateWithSuccess(current($student));
+	}
+
+	protected function isLaufendesSemester($selectedSemester)
+	{
+		$laufendesStudiensemester = '';
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
+		if(hasData($result)) {
+			$laufendesStudiensemester = (getData($result))[0]->studiensemester_kurzbz;
+		}
+
+		$islaufendesSemester = $selectedSemester === $laufendesStudiensemester;
+		return $islaufendesSemester;
 	}
 
 	/**
@@ -123,26 +175,42 @@ class Student extends FHCAPI_Controller
 	 * @param string			$prestudent_id
 	 * @return void
 	 */
-	public function save($prestudent_id)
+	public function save($prestudent_id, $studiensemester_kurzbz)
 	{
-		$studiensemester_kurzbz = $this->variablelib->getVar('semester_aktuell');
-
 		$this->load->model('person/Person_model', 'PersonModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentlehrverbandModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		$this->load->library('form_validation');
 
+		if (!$this->StudiensemesterModel->isValidStudiensemester($studiensemester_kurzbz))
+		{
+			$this->terminateWithError($studiensemester_kurzbz . ' - ' . $this->p->t('lehre', 'error_noStudiensemester'));
+		}
+
+		$authuid = getAuthUID();
+		$now = date('c');
+
 		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date');
 
-		$this->form_validation->set_rules('semester', 'Semester', 'integer');
+		$this->form_validation->set_rules('semester', 'Semester', 'integer', [
+				'integer' => $this->p->t('ui', 'error_fieldNotInteger')
+			]
+		);
+
+		$this->form_validation->set_rules('alias', 'Alias', 'regex_match[/^[-a-z0-9\_\.]*[a-z0-9]{1,}\.[-a-z0-9\_]{1,}$/]',
+		[
+			'regex_match' => $this->p->t('ui', 'error_fieldInvalidAlias')
+		]);
 
 		$this->load->library('UDFLib');
 		
 		$result = $this->udflib->getCiValidations($this->PersonModel, $this->input->post());
 
-		//TODO(Manu) check with Chris: input number not allowed
 		$udf_field_validations = $this->getDataOrTerminateWithError($result);
 
 		$this->form_validation->set_rules($udf_field_validations);
@@ -155,6 +223,8 @@ class Student extends FHCAPI_Controller
 		$student = $this->getDataOrTerminateWithError($result);
 
 		$uid = $student ? current($student)->student_uid : null;
+
+		$studiengang_kz = $student ? current($student)->studiengang_kz : null;
 
 		$result = $this->PrestudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
@@ -184,7 +254,6 @@ class Student extends FHCAPI_Controller
 			'gebdatum',
 			'gebort',
 			'geburtsnation',
-			'svnr',
 			'ersatzkennzeichen',
 			'staatsbuergerschaft',
 			'matr_nr',
@@ -195,7 +264,7 @@ class Student extends FHCAPI_Controller
 			'anmerkung',
 			'homepage'
 		];
-		
+
 		// add UDFs
 		$result = $this->udflib->getDefinitionForModel($this->PersonModel);
 
@@ -207,12 +276,26 @@ class Student extends FHCAPI_Controller
 		$update_person = array();
 		foreach ($array_allowed_props_person as $prop) {
 			$val = $this->input->post($prop);
-			if ($val !== null) {
+			if ($val === null)
+			{
+				continue;
+			}
+			if($prop == 'foto')
+			{
+				$fotoval = ($val == '') ? null : str_replace('data:image/jpeg;base64,', '', $val);
+				$update_person[$prop] = $fotoval;
+			}
+			else
+			{
 				$update_person[$prop] = $val;
 			}
 		}
 
 		$array_allowed_props_student = ['matrikelnr'];
+		if($this->isLaufendesSemester($studiensemester_kurzbz)) 
+		{
+			$array_allowed_props_student = ['matrikelnr', 'verband', 'semester', 'gruppe'];
+		}
 		$update_student = array();
 		foreach ($array_allowed_props_student as $prop) {
 			$val = $this->input->post($prop);
@@ -221,26 +304,85 @@ class Student extends FHCAPI_Controller
 			}
 		}
 
+		$array_allowed_props_benutzer = ['aktiv', 'alias'];
+		$update_benutzer = array();
+		foreach ($array_allowed_props_benutzer as $prop) {
+			$val = $this->input->post($prop);
+			if ($val !== null) {
+				$update_benutzer[$prop] = $val;
+			}
+		}
+
 		// Check PKs
 		if (count($update_lehrverband) + count($update_student) && $uid === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Kein/e StudentIn vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 		if (count($update_person) && $person_id === null) {
-			// TODO(chris): phrase
-			$this->terminateWithValidationErrors(['' => "Keine Person vorhanden!"]);
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_person')]);
+		}
+		if (count($update_benutzer) && $uid === null) {
+			$this->terminateWithValidationErrors(['' => $this->p->t('lehre', 'error_no_student')]);
 		}
 
 		// Do Updates
 		if (count($update_lehrverband)) {
-			$result = $this->StudentlehrverbandModel->update([
+
+			$curstudlvb = $this->StudentlehrverbandModel->load([
 				'studiensemester_kurzbz' => $studiensemester_kurzbz,
 				'student_uid' => $uid
-			], $update_lehrverband);
+			]);
+
+			$data = $this->getDataOrTerminateWithError($curstudlvb);
+			$data = current($data);
+
+			$verbandCurrent = $data->verband;
+			$studiengang_kz = $data->studiengang_kz;
+			$semesterCurrent = $data->semester;
+			$gruppeCurrent = $data->gruppe;
+
+			$verband = isset($update_lehrverband['verband']) ? $update_lehrverband['verband'] : $verbandCurrent;
+			$gruppe = isset($update_lehrverband['gruppe']) ? $update_lehrverband['gruppe'] : $gruppeCurrent;
+			$semester = isset($update_lehrverband['semester']) ? $update_lehrverband['semester'] : $semesterCurrent;
+
+			//check if existing Lehrverband of new data to avoid Error
+			$result = $this->LehrverbandModel->loadWhere([
+				'verband' => $verband,
+				'gruppe' => $gruppe,
+				'semester' => $semester,
+				'studiengang_kz' => $studiengang_kz,
+			]);
+
+			if(!hasData($result))
+			{
+				$this->terminateWithError($this->p->t('lehre', 'error_noLehrverband'), self::ERROR_TYPE_GENERAL);
+			}
+
+			if(hasData($curstudlvb) && count(getData($curstudlvb)) > 0 )
+			{
+				$update_lehrverband['updatevon'] = $authuid;
+				$update_lehrverband['updateamum'] = $now;
+				$result = $this->StudentlehrverbandModel->update([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid
+				], $update_lehrverband);
+			}
+			else
+			{
+				$update_lehrverband['insertvon'] = $authuid;
+				$update_lehrverband['insertamum'] = $now;
+				$result = $this->StudentlehrverbandModel->insert(array_merge([
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'student_uid' => $uid,
+					'studiengang_kz' => $studiengang_kz
+				], $update_lehrverband));
+			}
+
 			$this->getDataOrTerminateWithError($result);
 		}
 
 		if (count($update_person)) {
+			$update_person['updatevon'] = $authuid;
+			$update_person['updateamum'] = $now;
 			$result = $this->PersonModel->update(
 				$person_id,
 				$update_person
@@ -250,6 +392,8 @@ class Student extends FHCAPI_Controller
 
 
 		if (count($update_student)) {
+			$update_student['updatevon'] = $authuid;
+			$update_student['updateamum'] = $now;
 			$result = $this->StudentModel->update(
 				[$uid],
 				$update_student
@@ -257,10 +401,26 @@ class Student extends FHCAPI_Controller
 			$this->getDataOrTerminateWithError($result);
 		}
 
+		if (count($update_benutzer)) {
+			$update_benutzer['updatevon'] = $authuid;
+			$update_benutzer['updateamum'] = $now;
+			if (array_key_exists("aktiv", $update_benutzer))
+			{
+				$update_benutzer['updateaktivvon'] = $authuid;
+				$update_benutzer['updateaktivam'] = $now;
+			}
+			$result = $this->BenutzerModel->update(
+				[$uid],
+				$update_benutzer
+			);
+			$this->getDataOrTerminateWithError($result);
+		}
+
 		$this->terminateWithSuccess(array_fill_keys(array_merge(
 			array_keys($update_lehrverband),
 			array_keys($update_person),
-			array_keys($update_student)
+			array_keys($update_student),
+			array_keys($update_benutzer)
 		), ''));
 	}
 
@@ -543,7 +703,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		$this->terminateWithSuccess(true);
+		return success(true);
 	}
 
 	public function requiredIfNotPersonId($value)
@@ -558,5 +718,10 @@ class Student extends FHCAPI_Controller
 		if (!$_POST['address']['func'])
 			return true;
 		return !!$value;
+	}
+
+	public function isValidDate($value)
+	{
+		return isValidDate($value);
 	}
 }

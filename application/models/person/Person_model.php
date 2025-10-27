@@ -290,74 +290,77 @@ class Person_model extends DB_Model
 		return success($result->vorname. ' '. $result->nachname);
 	}
 
+	/**
+	 * Get first name of given uid. (Vorname Nachname)
+	 * @param $uid
+	 * @return array
+	 */
+	public function getFirstName($uid)
+	{
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result) {
+			show_error('Failed loading person');
+		}
+
+		return success($result->vorname);
+	}
+
 	public function checkDuplicate($person_id)
 	{
-		$qry = "SELECT person_id
-				FROM public.tbl_prestudent p
-				JOIN
-				(
-					SELECT DISTINCT ON(prestudent_id) *
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id IN
-						(
-							SELECT prestudent_id
-							FROM public.tbl_prestudent
-							WHERE person_id IN
-							(
-								SELECT p2.person_id
-								FROM public.tbl_person p
-								JOIN public.tbl_person p2
-								ON lower(p.vorname) = lower(p2.vorname)
-								AND lower(p.nachname) = lower(p2.nachname)
-								AND p.gebdatum = p2.gebdatum
-								AND p.person_id = ?
-							)
-						)
-					ORDER BY prestudent_id, datum DESC, insertamum DESC
-				) ps USING(prestudent_id)
-				JOIN public.tbl_status USING(status_kurzbz)
+		$qry = "
+			WITH person AS (
+				SELECT *
+				FROM public.tbl_person
+				WHERE person_id = ?
+			),
+			allePersonen AS (
+				SELECT p.person_id
+				FROM public.tbl_person p
+					JOIN person
+						ON lower(p.vorname) = lower(person.vorname)
+						AND lower(p.nachname) = lower(person.nachname)
+						AND p.gebdatum = person.gebdatum
+			),
+			lastStatus AS (
+				SELECT DISTINCT ON (tbl_prestudentstatus.prestudent_id)
+					tbl_prestudentstatus.prestudent_id,
+					tbl_prestudentstatus.status_kurzbz,
+					tbl_prestudent.studiengang_kz,
+					tbl_prestudent.person_id
+				FROM public.tbl_prestudentstatus
+				JOIN public.tbl_prestudent USING (prestudent_id)
+				WHERE tbl_prestudent.person_id IN (SELECT person_id FROM allePersonen)
+				ORDER BY tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.datum DESC, tbl_prestudentstatus.insertamum DESC
+			),
+			interessenten AS (
+				SELECT *
+				FROM lastStatus
 				WHERE status_kurzbz = 'Interessent'
-				AND studiengang_kz IN
-				(
-					SELECT studiengang_kz
-					FROM public.tbl_prestudent p
-					JOIN
-					(
-						SELECT DISTINCT ON(prestudent_id) *
-						FROM public.tbl_prestudentstatus
-						WHERE prestudent_id IN
-						(
-							SELECT prestudent_id
-							FROM public.tbl_prestudent
-							WHERE person_id IN
-							(
-								SELECT p2.person_id
-								FROM public.tbl_person p
-								JOIN public.tbl_person p2
-								ON lower(p.vorname) = lower(p2.vorname)
-								AND lower(p.nachname) = lower(p2.nachname)
-								AND p.gebdatum = p2.gebdatum
-								AND p.person_id = ?
-							)
-						)
-						ORDER BY prestudent_id, datum DESC, insertamum DESC
-					) ps USING(prestudent_id)
-					JOIN public.tbl_status USING(status_kurzbz)
-					WHERE status_kurzbz = 'Abbrecher'
-				)
-
-				UNION
-
+			),
+			keineInteressenten AS (
+				SELECT *
+				FROM lastStatus
+				WHERE status_kurzbz != 'Interessent'
+			),
+			doppeltePerson AS (
 				SELECT p2.person_id
-				FROM tbl_person p1
-				JOIN tbl_prestudent ps ON p1.person_id = ps.person_id
-				INNER JOIN (
-					SELECT vorname, nachname, gebdatum, person.person_id
-					FROM tbl_person person
-					JOIN tbl_prestudent sps ON person.person_id = sps.person_id
-				) p2
-					ON (lower(p1.vorname) = lower(p2.vorname) AND lower(p1.nachname) = lower(p2.nachname) AND p1.gebdatum = p2.gebdatum)
-				WHERE p1.person_id != p2.person_id AND (p1.person_id = ?)";
+				FROM public.tbl_person p1
+				JOIN public.tbl_prestudent ps1 ON ps1.person_id = p1.person_id
+				JOIN public.tbl_person p2
+						ON  lower(p1.vorname) = lower(p2.vorname)
+						AND lower(p1.nachname) = lower(p2.nachname)
+						AND p1.gebdatum = p2.gebdatum
+				WHERE p1.person_id = ?
+				  AND p1.person_id <> p2.person_id
+			)
+			SELECT DISTINCT(interessenten.person_id)
+			FROM interessenten
+				JOIN keineInteressenten
+					ON interessenten.studiengang_kz = keineInteressenten.studiengang_kz
+			WHERE interessenten.person_id = ?
+			UNION
+			SELECT DISTINCT person_id
+			FROM doppeltePerson";
 
 		return $this->execQuery($qry, array($person_id, $person_id, $person_id));
 	}

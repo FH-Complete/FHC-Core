@@ -340,6 +340,34 @@ class Konto_model extends DB_Model
 	}
 
 	/**
+	 * @param integer		$prestudent_id
+	 * @param string		$stsem
+	 * @param array			$buchungstypen
+	 * 
+	 * @return stdClass
+	 */
+	public function checkStudienbeitragFromPrestudent($prestudent_id, $stsem, $buchungstypen)
+	{
+		$this->addSelect($this->dbTable . '.buchungsnr');
+		$this->addSelect($this->dbTable . '.buchungsdatum');
+
+		$this->addJoin('public.tbl_prestudent s', $this->dbTable . '.person_id=s.person_id AND ' . $this->dbTable . '.studiengang_kz=s.studiengang_kz');
+
+		$this->db->where_in('buchungstyp_kurzbz', $buchungstypen);
+		$this->db->where('0 >= (
+			SELECT sum(betrag)
+			FROM ' . $this->dbTable . ' skonto
+			WHERE skonto.buchungsnr = ' . $this->dbTable . '.buchungsnr_verweis
+			OR skonto.buchungsnr_verweis = ' . $this->dbTable . '.buchungsnr_verweis
+		)', null, false);
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id,
+			'studiensemester_kurzbz' => $stsem
+		]);
+	}
+
+	/*
 	 * check if student has paid studienbeitrag for certain semester
 	 *
 	 * @param $person_id person_id

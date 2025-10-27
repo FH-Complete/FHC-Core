@@ -19,6 +19,7 @@ class Prestudent extends FHCAPI_Controller
 			'getAufmerksamdurch' => ['admin:r', 'assistenz:r'],
 			'getBerufstaetigkeit' => ['admin:r', 'assistenz:r'],
 			'getTypenStg' => ['admin:r', 'assistenz:r'],
+			'getBisstandort' => ['admin:r', 'assistenz:r'],
 			'getStudienplaene' => ['admin:r', 'assistenz:r'],
 			'getStudiengang' => ['admin:r', 'assistenz:r']
 		]);
@@ -135,9 +136,31 @@ class Prestudent extends FHCAPI_Controller
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
 		{
-			$val = $this->input->post($prop);
-			if ($val !== null || $prop == 'foerderrelevant') {
+			$val = $this->input->post($prop, true);
+
+			if ($val !== null) {
+				if(in_array($prop, ['dual', 'bismelden', 'foerderrelevant']))
+				{
+					$val = boolval($val);
+				}
+				elseif (
+					$val === ''
+					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode'])
+				)
+				{
+					$val = null;
+				}
 				$update_prestudent[$prop] = $val;
+			}
+
+			// allowed to be null, but has to be in postparameter
+			if (
+				in_array($prop, ['foerderrelevant', 'zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code'])
+				&& !isset($update_prestudent[$prop])
+				&& array_key_exists($prop, $_POST)
+			)
+			{
+				$update_prestudent[$prop] = null;
 			}
 		}
 
@@ -173,7 +196,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
-		$this->ZgvModel->addOrder('zgv_code');
+		$this->ZgvModel->addSelect('zgv_code');
+		$this->ZgvModel->addSelect('zgv_bez');
+		$this->ZgvModel->addSelect('aktiv');
+		$this->ZgvModel->addSelect('zgv_bez as label');
+		$this->ZgvModel->addOrder('zgv_bez');
 
 		$result = $this->ZgvModel->load();
 		if (isError($result))
@@ -187,7 +214,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvdoktor_model', 'ZgvdoktorModel');
 
-		$this->ZgvdoktorModel->addOrder('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez');
+		$this->ZgvdoktorModel->addSelect('aktiv');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez as label');
+		$this->ZgvdoktorModel->addOrder('zgvdoktor_bez');
 
 		$result = $this->ZgvdoktorModel->load();
 		if (isError($result))
@@ -201,7 +232,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 
-		$this->ZgvmasterModel->addOrder('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez');
+		$this->ZgvmasterModel->addSelect('aktiv');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez as label');
+		$this->ZgvmasterModel->addOrder('zgvmas_bez');
 
 		$result = $this->ZgvmasterModel->load();
 		if (isError($result))
@@ -259,6 +294,17 @@ class Prestudent extends FHCAPI_Controller
 		$this->GsstudientypModel->addOrder('gsstudientyp_kurzbz');
 
 		$result = $this->GsstudientypModel->load();
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+		return $this->terminateWithSuccess(getData($result) ?: []);
+	}
+
+	public function getBisstandort()
+	{
+		$this->load->model('codex/Bisstandort_model', 'BisstandortModel');
+
+		$result = $this->BisstandortModel->load();
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}

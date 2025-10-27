@@ -1,5 +1,7 @@
 import StudierendenantragStatus from './Status.js';
 
+import ApiStudstatusWiederholung from '../../api/factory/studstatus/wiederholung.js';
+
 export default {
 	components: {
 		StudierendenantragStatus
@@ -56,8 +58,11 @@ export default {
 				anmerkung: lv.antrag_anmerkung || "",
 				studiensemester_kurzbz: this.lvs2sem
 			}));
-			this.$fhcApi.factory
-				.studstatus.wiederholung.saveLvs(forbiddenLvs, mandatoryLvs)
+			this.$api
+				.call(ApiStudstatusWiederholung.saveLvs(
+					forbiddenLvs,
+					mandatoryLvs
+				))
 				.then(response => {
 					this.$fhcAlert.alertSuccess('Speichern erfolgreich');
 					this.statusCode = response.data[0].studierendenantrag_statustyp_kurzbz;
@@ -78,8 +83,9 @@ export default {
 	mounted() {
 		this.$p
 			.loadCategory(['ui', 'lehre', 'studierendenantrag', 'global'])
-			.then(() => this.antragId)
-			.then(this.$fhcApi.factory.studstatus.wiederholung.getLvs)
+			.then(() => this.$api.call(
+				ApiStudstatusWiederholung.getLvs(this.antragId)
+			))
 			.then(result => {
 				let res = {};
 				for (var k in result.data) {

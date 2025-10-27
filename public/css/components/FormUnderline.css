@@ -1,0 +1,44 @@
+/* FORM UNDERLINE
+*/
+:root {
+	--fhc-formunderline-border: var(--fhc-border, #dee2e6);
+	--fhc-formunderline-link: var(--fhc-link, initial);
+	--fhc-formunderline-titel-color: var(--fhc-text,gray);
+}
+
+.form-underline{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: space-between;
+  
+  }
+  
+  a.form-underline-content{
+	color: var(--fhc-formunderline-link);
+  }
+  
+  .form-underline .form-underline-content{
+    border-width: 1px;
+    border-color: transparent transparent var(--fhc-formunderline-border) transparent;
+    border-style: solid;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+  
+    /*optional not wrapping text that is horizontally scrollable and does not display a scrollbar */
+    white-space: nowrap;
+    overflow: auto;
+    scrollbar-width: none;
+  
+  }
+  
+  .form-underline .form-underline-content::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .form-underline .form-underline-titel{
+    opacity: 0.65;
+    font-size: .85rem;
+    padding-left: 0.5rem;
+	color: var(--fhc-formunderline-titel-color) !important;
+  }

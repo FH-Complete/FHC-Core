@@ -1,6 +1,12 @@
 <?php
 // Header menu
 
+if(defined('CIS4') && CIS4) {
+	$root = APP_ROOT;
+} else {
+	$root = CIS_ROOT;
+}
+
 $config['navigation_header'] = array(
 	'*' => array(
 		'fhcomplete' => array(
@@ -50,7 +56,7 @@ $config['navigation_header'] = array(
 			'requiredPermissions' => 'basis/vilesci:r',
 			'children' => array(
 				'cis' => array(
-					'link' => CIS_ROOT,
+					'link' => $root,
 					'icon' => '',
 					'description' => 'CIS',
 					'sort' => 10
@@ -58,7 +64,7 @@ $config['navigation_header'] = array(
 				'lehrveranstaltungen' => array(
 					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
 					'icon' => '',
-					'description' => 'Lehrveranstaltungen',
+					'description' => 'Lehrveranstaltungen Templates',
 					'sort' => 15
 				),
 				'reihungstest' => array(
@@ -75,6 +81,16 @@ $config['navigation_header'] = array(
 					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
 				),
+				'lvverwaltung' => array(
+					'link' => site_url('LVVerwaltung'),
+					'icon' => '',
+					'description' => 'LV Verwaltung',
+					'requiredPermissions' => array(
+						'admin:r',
+						'assistenz:r'
+					),
+					'sort' => 35
+				),
 				'lehrauftrag' => array(
 					'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
 					'description' => 'Lehrauftrag',
@@ -87,7 +103,7 @@ $config['navigation_header'] = array(
 				),
 				'zverfueg' => array(
 					'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
-					'description' => 'Zeitverf&uuml;gbarkeit',
+					'description' => 'Zeitverfügbarkeit',
 					'expand' => true,
 					'sort' => 45,
 					'requiredPermissions' => array(
@@ -223,7 +239,7 @@ $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 		'target' => '_blank'
 	),
 	'auswertung' => array(
-		'link' => CIS_ROOT.'/cis/testtool/admin/auswertung.php',
+		'link' => $root.'/cis/testtool/admin/auswertung.php',
 		'description' => 'Auswertung',
 		'icon' => 'list-alt',
 		'sort' => 1,
@@ -320,4 +336,3 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
-

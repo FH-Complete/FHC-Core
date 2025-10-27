@@ -1,9 +1,10 @@
 import StudierendenantragAntrag from "../../components/Studierendenantrag/Antrag.js";
 import StudierendenantragStatus from "../../components/Studierendenantrag/Status.js";
 import StudierendenantragInfoblock from "../../components/Studierendenantrag/Infoblock.js";
-import Phrasen from '../../plugin/Phrasen.js';
+import PluginsPhrasen from '../../plugins/Phrasen.js';
 
 const app = Vue.createApp({
+	name: 'AntragApp',
 	components: {
 		StudierendenantragAntrag,
 		StudierendenantragStatus,
@@ -20,5 +21,5 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(Phrasen)
+	.use(PluginsPhrasen)
 	.mount('#wrapper');

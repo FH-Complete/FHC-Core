@@ -116,6 +116,8 @@ class Konto extends FHCAPI_Controller
 	{
 		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
 
+		$this->BuchungstypModel->addOrder('beschreibung');
+		
 		$result = $this->BuchungstypModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
@@ -350,7 +352,7 @@ class Konto extends FHCAPI_Controller
 				continue;
 			}
 
-
+			
 			$result = $this->KontoModel->insert([
 				'person_id' => $buchung['person_id'],
 				'studiengang_kz' => $buchung['studiengang_kz'],
@@ -359,7 +361,7 @@ class Konto extends FHCAPI_Controller
 				'buchungstyp_kurzbz' => $buchung['buchungstyp_kurzbz'],
 				'credit_points' => $buchung['credit_points'],
 				'zahlungsreferenz' => $buchung['zahlungsreferenz'],
-				'betrag' => $betrag,
+				'betrag' => number_format($betrag, 2, '.', ''),
 				'buchungsdatum' => $buchungsdatum,
 				'mahnspanne' => '0',
 				'buchungsnr_verweis' => $buchung['buchungsnr'],

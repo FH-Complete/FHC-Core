@@ -19,12 +19,17 @@ class Vertragsbestandteil_model extends DB_Model
 
 	protected function getVertragsbestandteilSQL()
 	{
+		$sapInstalled = $this->_checkIfSAPSyncTableExists();
+
+		$oe_kurzbz_sap = $sapInstalled ? 'sap.oe_kurzbz_sap' : 'NULL AS oe_kurzbz_sap';
+		$sap_join = $sapInstalled ? 'LEFT JOIN sync.tbl_sap_organisationsstruktur sap USING(oe_kurzbz)' : '';
+
 		$sql = <<<EOSQL
 		SELECT
 				v.*,
-				bf.funktion_kurzbz, bf.uid AS mitarbeiter_uid, 
-				funktion.beschreibung AS funktion_bezeichnung, 			    
-				oe.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung, sap.oe_kurzbz_sap,
+				bf.funktion_kurzbz, bf.uid AS mitarbeiter_uid,
+				funktion.beschreibung AS funktion_bezeichnung,
+				oe.oe_kurzbz, oe.bezeichnung AS oe_bezeichnung, {$oe_kurzbz_sap},
 				oet.organisationseinheittyp_kurzbz AS oe_typ_kurzbz, oet.bezeichnung AS oe_typ_bezeichnung,
 				ft.freitexttyp_kurzbz, ft.titel, ft.anmerkung,
 				f.benutzerfunktion_id,
@@ -39,7 +44,7 @@ class Vertragsbestandteil_model extends DB_Model
 				hr.tbl_vertragsbestandteil_freitext ft USING(vertragsbestandteil_id)
 			LEFT JOIN
 				hr.tbl_vertragsbestandteil_funktion f USING(vertragsbestandteil_id)
-			LEFT JOIN 
+			LEFT JOIN
 				public.tbl_benutzerfunktion bf USING(benutzerfunktion_id)
 			LEFT JOIN
 				public.tbl_funktion funktion USING(funktion_kurzbz)
@@ -47,8 +52,7 @@ class Vertragsbestandteil_model extends DB_Model
 				public.tbl_organisationseinheit oe USING(oe_kurzbz)
 			LEFT JOIN
 				public.tbl_organisationseinheittyp oet USING(organisationseinheittyp_kurzbz)
-			LEFT JOIN
-				sync.tbl_sap_organisationsstruktur sap USING(oe_kurzbz)
+			{$sap_join}
 			LEFT JOIN
 				hr.tbl_vertragsbestandteil_karenz k USING(vertragsbestandteil_id)
 			LEFT JOIN
@@ -177,5 +181,71 @@ EOSQL;
 		}
 		
 		return $vbcount[0]->overlappingvbs;
+	}
+
+	public function getLastVertragsbestanteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id)
+	{
+		$sql = <<<EOATZSQL
+			select 
+				* 
+			from
+				hr.tbl_vertragsbestandteil vb
+			join 
+				hr.tbl_vertragsbestandteil_stunden vbs USING(vertragsbestandteil_id)
+			where
+				vb.dienstverhaeltnis_id = ? 
+				and (
+					vbs.teilzeittyp_kurzbz != 'altersteilzeit'
+					or
+					vbs.teilzeittyp_kurzbz is NULL
+				)
+			order by 
+				vb.bis desc
+			limit 1
+EOATZSQL;
+		$query = $this->execReadOnlyQuery($sql, array($dienstverhaeltnis_id));
+		$data = getData($query);
+
+		if ($data == null)
+		{
+			return null;
+		}
+
+		$vertragsbestandteil = null;
+		try
+		{
+			$vertragsbestandteil = VertragsbestandteilFactory::getVertragsbestandteil($data[0], true);
+		}
+		catch (Exception $ex)
+		{
+			echo $ex->getMessage() . "\n";
+		}
+		return $vertragsbestandteil;
+	}
+
+	/**
+	 * Checks if sap sync table exists.
+	 * @return bool
+	 */
+	private function _checkIfSAPSyncTableExists()
+	{
+		$params = array(
+			DB_NAME,
+			'sync',
+			'tbl_sap_organisationsstruktur'
+		);
+
+		$sql = "SELECT
+				1 AS exists
+			FROM
+				information_schema.tables
+			WHERE
+				table_catalog = ? AND
+				table_schema = ? AND
+				table_name = ?";
+
+		$res = $this->execReadOnlyQuery($sql, $params);
+
+		return hasData($res);
 	}
 }

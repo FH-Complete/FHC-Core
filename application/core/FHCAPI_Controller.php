@@ -81,8 +81,11 @@ class FHCAPI_Controller extends Auth_Controller
 		
 		// For JSON Requests (as opposed to multipart/form-data) get the $_POST variable from the input stream instead
 		if ($this->input->get_request_header('Content-Type', true) == 'application/json')
-			$_POST = json_decode($this->security->xss_clean($this->input->raw_input_stream), true);
-		elseif (isset($_POST['_jsondata'])) {
+		{
+			$_POST = json_decode($this->input->raw_input_stream, true);
+		}
+		elseif (isset($_POST['_jsondata']))
+		{
 			$_POST = array_merge($_POST, json_decode($_POST['_jsondata'], true));
 			unset($_POST['_jsondata']);
 		}
@@ -106,10 +109,15 @@ class FHCAPI_Controller extends Auth_Controller
 		$error = [];
 		
 		if (is_array($data)) {
-			if ($type == self::ERROR_TYPE_VALIDATION)
+			if ($type == self::ERROR_TYPE_VALIDATION) {
 				$error['messages'] = $data;
-			else
+			} elseif (array_is_list($data)) {
+				foreach ($data as $d)
+					$this->addError($d, $type);
+				return;
+			} else {
 				$error = $data;
+			}
 		} elseif (is_object($data)) {
 			$error = (array)$data;
 		} else {
@@ -144,6 +152,19 @@ class FHCAPI_Controller extends Auth_Controller
 		if (!isset($this->returnObj['meta']))
 			$this->returnObj['meta'] = [];
 		$this->returnObj['meta'][$key] = $value;
+	}
+
+	/**
+	 * @param string				$key
+	 * @return mixed
+	 */
+	public function getMeta($key)
+	{
+		if (!isset($this->returnObj['meta']))
+			return null;
+		if (!isset($this->returnObj['meta'][$key]))
+			return null;
+		return $this->returnObj['meta'][$key];
 	}
 
 	/**
@@ -184,7 +205,7 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	/**
-	 * @param array					$error
+	 * @param string|array|object					$error
 	 * @param string				$type (optional)
 	 * @param integer				$status (optional)
 	 * @return void
@@ -200,7 +221,7 @@ class FHCAPI_Controller extends Auth_Controller
 	/**
 	 * @param stdclass				$result
 	 * @param string				$errortype
-	 * @return void
+	 * @return mixed
 	 */
 	protected function getDataOrTerminateWithError($result, $errortype = self::ERROR_TYPE_GENERAL)
 	{
@@ -210,6 +231,39 @@ class FHCAPI_Controller extends Auth_Controller
 		return $result->retval;
 	}
 
+	protected function terminateWithFileOutput($contenttype, $content, $filename=null)
+	{
+		$this->clearOutputBuffering();
+		$this->output->set_status_header(200)
+			->set_content_type($contenttype)
+			->set_header('Expires: 0')
+			->set_header('Cache-Control: no-store, no-cache, must-revalidate')
+			->set_header('Pragma: public')
+			->set_header('Content-Length: ' . strlen($content));
+
+		if($filename)
+		{
+			$cleanedfilename = preg_replace('/[^a-zA-Z0-9\-_.]/', '_', $filename);
+			$this->output->set_header('Content-Disposition: attachment; filename="'
+				. $cleanedfilename . '"');
+		}
+		else
+		{
+			$this->output->set_header('Content-Disposition: inline');
+		}
+
+		$this->output->set_output($content)
+			->_display();
+		exit();
+	}
+
+	private function clearOutputBuffering()
+	{
+		while(ob_get_level() > 0)
+		{
+			ob_end_clean();
+		}
+	}
 
 	// ---------------------------------------------------------------
 	// Security

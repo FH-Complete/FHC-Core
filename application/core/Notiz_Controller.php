@@ -21,6 +21,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			'loadDokumente' => self::DEFAULT_PERMISSION_R,
 			'getMitarbeiter' => self::DEFAULT_PERMISSION_R,
 			'isBerechtigt' => self::DEFAULT_PERMISSION_R,
+			'getCountNotes' => self::DEFAULT_PERMISSION_R,
 		];
 		
 		if(!is_array($permissions))
@@ -309,6 +310,7 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 		}
 
 		//update(1) loading all dms-entries with this notiz_id
+		$dms_id_arr = [];
 		$this->load->model('person/Notizdokument_model', 'NotizdokumentModel');
 		$this->NotizdokumentModel->addJoin('campus.tbl_dms_version', 'dms_id');
 
@@ -391,10 +393,10 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 
 		foreach ($result as $doc) {
 			$res = $this->dmslib->removeAll($doc->dms_id);
-			if (isError($result))
+			if (isError($res))
 			{
 				$this->db->trans_rollback();
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError(getError($res), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
@@ -456,6 +458,22 @@ abstract class Notiz_Controller extends FHCAPI_Controller
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 		return $this->terminateWithSuccess($result);
+	}
+
+	public function getCountNotes($person_id)
+	{
+		$this->NotizzuordnungModel->addSelect('COUNT(*) AS anzahl', false);
+
+		$result = $this->NotizzuordnungModel->loadWhere(
+			array('person_id' => $person_id)
+		);
+
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+
+		$anzahl = current(getData($result));
+		return $this->terminateWithSuccess($anzahl->anzahl ?: 0);
 	}
 
 }

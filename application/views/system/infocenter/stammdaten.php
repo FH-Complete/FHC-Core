@@ -33,12 +33,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
-				<td>
-					<div class='stammdaten' id="svnr"><?php echo $stammdaten->svnr ?></div>
-				</td>
-			</tr>
-			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','staatsbuergerschaft')) ?></strong></td>
 				<td>
 					<select id="buergerschaft" disabled>
@@ -188,7 +182,7 @@
 			</div>
 			<?php if (isset($stammdaten->zugangscode)): ?>
 				<div class="col-xs-6 text-right">
-					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress ?>"
+					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress.'&keepEmailUnverified=true' ?>"
 					   target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;<?php echo  $this->p->t('infocenter','zugangBewerbung') ?></a>
 				</div>
 			<?php endif; ?>

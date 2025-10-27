@@ -1,9 +1,10 @@
 @import './Fhc.css';
-@import './components/searchbar.css';
+@import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
+@import './components/Messages.css';
 
 html {
   font-size: .875em;
@@ -50,6 +51,36 @@ html {
 /* Dropdown Toolbar Interessent, submenu */
 .dropend .dropdown-toggle.d-flex::after {
 	height: 0;
+}
+
+/* Dropdown AbschlusspruefungList.js */
+.stv-details-abschlusspruefung .tabulator-row {
+	overflow: visible !important;
+}
+
+/* to avoid interference with Notiz.css and overflow for textfield */
+.stv-details-abschlusspruefung .tabulator-cell {
+	overflow: visible !important;
+}
+
+.p-dropdown-item{
+	z-index: 1201 !important;
+}
+
+.l-dropdown-item{
+	z-index: 1301 !important;
+}
+
+.tabulator-row .dropdown-menu {
+	position: absolute;
+	z-index: 1204; /* Ensure it's above other elements */
+}
+.tabulator-table {
+	overflow: visible !important;
+}
+
+.highlight-row {
+	background-color: #e5aeae !important;
 }
 
 @media (min-width: 768px) {
@@ -112,4 +143,19 @@ html {
 
 .has-filter .fa-filter {
 	color: var(--bs-success);
+}
+.override_filtercmpt_actions_style div.d-flex.align-items-baseline {
+	align-items: end !important;
+}
+
+.stv-details-details-foto img {
+	max-width: 150px;
+}
+
+.msg_preview {
+	margin-bottom: -1px;
+}
+
+.tiny-90 div.tox.tox-tinymce {
+	height: 90% !important;
 }
