@@ -27,7 +27,7 @@ export default {
 		},
 		domain: {
 			type: String,
-			required: true
+			required: false
 		},
 		typeHeader: {
 			type: String,
@@ -64,7 +64,16 @@ export default {
 
 	},
 	created(){
-		if(this.person_id) {
+		if (this.typeHeader === 'student') {
+			if (!this.headerData) {
+				throw new Error('[DetailHeader] "headerData" is required.')
+			}
+		} else if (this.typeHeader === 'mitarbeiter') {
+			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
+				throw new Error(
+					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are requried.'
+				)
+			}
 			this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
 		}
 	},
@@ -258,16 +267,16 @@ export default {
 							<slot name="issues"></slot>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleGammaTile" :titleGammaTile="title"></slot></h4>
-							<h6 class="text-muted"><slot name="valueGammaTile" :valueGammaTile="valueGammaTile"></slot></h6>
+							<h4 class="mb-1"><slot name="titleGammaTile"></slot></h4>
+							<h6 class="text-muted"><slot name="valueGammaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleBetaTile" :titleBetaTile="title"></slot></h4>
-							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+							<h4 class="mb-1"><slot name="titleBetaTile"></slot></h4>
+							<h6 class="text-muted"><slot name="valueBetaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleAlphaTile" :titleAlphaTile="title"></slot></h4>
-							<h6 class="text-muted"><slot name="valueAlphaTile" :valueAlphaTile="valueAlphaTile"></slot></h6>
+							<h4 class="mb-1"><slot name="titleAlphaTile"></slot></h4>
+							<h6 class="text-muted"><slot name="valueAlphaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1">UID</h4>
@@ -279,7 +288,7 @@ export default {
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
-		
+
 				<div class="foto-container col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
 					  class="d-block w-100 h-100 rounded"
@@ -342,16 +351,16 @@ export default {
 							<slot name="issues"></slot>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleGammaTile" :titleGammaTile="title"></slot></h4>
-							<h6 class="text-muted"><slot name="valueGammaTile" :valueGammaTile="valueGammaTile"></slot></h6>
+							<h4 class="mb-1"><slot name="titleGammaTile"></slot></h4>
+							<h6 class="text-muted"><slot name="valueGammaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleBetaTile" :titleBetaTile="title"></slot></h4>
+							<h4 class="mb-1"><slot name="titleBetaTile"></slot></h4>
 							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleAlphaTile" :titleAlphaTile="title"></slot></h4>
-							<h6 class="text-muted"><slot name="valueAlphaTile" :valueAlphaTile="valueAlphaTile"></slot></h6>
+							<h4 class="mb-1"><slot name="titleAlphaTile"></slot></h4>
+							<h6 class="text-muted"><slot name="valueAlphaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1">UID</h4>
