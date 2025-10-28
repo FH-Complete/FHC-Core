@@ -1048,7 +1048,6 @@ array (
     ),
   ),
 ),
-,
 array (
   'app' => 'core',
   'category' => 'abgabetool',
