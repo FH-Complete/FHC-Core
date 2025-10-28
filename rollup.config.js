@@ -28,6 +28,12 @@ function FhcResolver () {
     resolveId ( source, importer, options ) {
       //console.log('options: ' + JSON.stringify(options));
       //console.log('BH-FHC-BASEPATH: ' + fhcbasepath);
+/*      
+      if(source.includes('vbsharedstate.js'))
+      {
+        console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);	
+      }
+*/
       if( source.includes('vueDatepicker.js.php') ) {
 	return {id: 'vueDatepicker.js.php', external: 'relative'};
       }
@@ -38,14 +44,16 @@ function FhcResolver () {
 	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 	return { id: source_rel, external: 'relative'};
       }
-      if( source.includes('.php')) {
-        console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
+      if( source.includes('.php') 
+//      	  || source.includes('vbsharedstate.js') 
+	) {
+        //console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
 	let source_abs = path.resolve(path.dirname(importer), source);
 	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
 	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
 	let source_rel = path.relative(path.dirname(curapp), source_abs);
-	console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 	return { id: source_rel, external: 'relative'};
       }
       //console.log('source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
@@ -57,19 +65,40 @@ function FhcResolver () {
 	if( importer.includes('/application/') ) {
 	  tmp = tmp.replace(/public\/js\//, 'js/').replace(/\/application\//, '/public/');
 	}
-	else if( importer.includes('/FHC-Core-') ) {
+	else if( importer.includes('/FHC-Core-') && !importer.includes('/extensions/') ) {
       	  //console.log('RELATIV: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
 	  tmp = fhcbasepath + tmp.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	  //console.log('BHTMP: ' + tmp);
 	}
       	const resolved = path.resolve(tmp, source);
 	//console.log('BHRESOLVED: ' + resolved);
+/*	
+      	if(source.includes('vbsharedstate.js'))
+      	{
+	  console.log('BHRESOLVED: ' + resolved);
+      	}
+*/	
 	if( existsSync(resolved) ) {
-	  return resolved
+	  return resolved;
+	}
+	else 
+	{
+	  console.log('not existsSync: ' + resolved + ' source: ' + source + ' importer: ' + importer);
 	}
       } else {
       	//console.log('ABSOLUT: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
-	return source;
+	let absresolved = source;
+	if( source.includes('/FHC-Core-') && !source.includes('/extensions/') ) 
+	{
+	  absresolved = fhcbasepath + source.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
+	}
+/*
+      	if(source.includes('vbsharedstate.js'))
+      	{
+	  console.log('BHABSOLUT: ' + absresolved);
+      	}
+*/
+	return absresolved;
       }
       return null; // other ids should be handled as usually
     }
@@ -113,7 +142,7 @@ const useplugins = [
 		use: ['sass'],
 	}),
 */
-	terser()
+//	terser()
 ];
 
 export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: false}).map(file => { 
