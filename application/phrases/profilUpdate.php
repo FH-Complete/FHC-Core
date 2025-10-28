@@ -1681,7 +1681,6 @@ array (
     ),
   ),
 ),
-,
 array (
   'app' => 'core',
   'category' => 'profilUpdate',
