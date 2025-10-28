@@ -12,6 +12,7 @@ import { existsSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 
+const buildtimestamp = new Date().toISOString().replace(/[-T:]/g, '').substr(0,14);
 const fhcbasepath = import.meta.dirname;
 let apps = {};
 let curapp = null;
@@ -40,7 +41,7 @@ function FhcResolver () {
       if( source.includes('index.ci.php') ) {
         //console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
 	let source_abs = fhcbasepath + '/' + source.replace(/(\.\.\/)+/, '');
-	let source_rel = path.relative(path.dirname(curapp), source_abs);
+	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
 	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 	return { id: source_rel, external: 'relative'};
       }
@@ -52,7 +53,7 @@ function FhcResolver () {
 	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
 	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
-	let source_rel = path.relative(path.dirname(curapp), source_abs);
+	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
 	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 	return { id: source_rel, external: 'relative'};
       }
@@ -168,7 +169,7 @@ export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: f
 				sourceMap: true
 			  })
 			];
-			const vuedatepicker = path.relative(path.dirname(outputfile), basepath + 'components/vueDatepicker.js.php');
+			const vuedatepicker = path.relative(path.dirname(outputfile), basepath + 'components/vueDatepicker.js.php?' + buildtimestamp);
 			//console.log(vuedatepicker);
 			return {
 				input: tmp,
