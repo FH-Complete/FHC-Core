@@ -171,34 +171,37 @@ var FHC_TableWidget = {
 	_onTableBuilt: function (tableWidgetDiv, data) {
 		var options = FHC_TableWidget._getRepresentationOptions(data);
 
-		tableWidgetDiv
-			.find("#tableWidgetTabulator")
-			.tabulator("on", "tableBuilt", () => {
-			if (
-				typeof options.tableWidgetHeader == "undefined" ||
-				(typeof options.tableWidgetHeader != "undefined" &&
-				options.tableWidgetHeader != false)
-			) {
-				// renders the table headers
-				var tabulatorHeaderCollapseHTML =
-					_renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
-				tableWidgetDiv
-					.find("#tableWidgetHeader")
-					.after(tabulatorHeaderCollapseHTML);
-			}
+		if (typeof tableWidgetDiv.find("#tableWidgetTabulator").tabulator.on == 'function')
+		{
+			tableWidgetDiv
+				.find("#tableWidgetTabulator")
+				.tabulator("on", "tableBuilt", () => {
+				if (
+					typeof options.tableWidgetHeader == "undefined" ||
+					(typeof options.tableWidgetHeader != "undefined" &&
+					options.tableWidgetHeader != false)
+				) {
+					// renders the table headers
+					var tabulatorHeaderCollapseHTML =
+						_renderTabulatorHeaderCollapseHTML(tableWidgetDiv);
+					tableWidgetDiv
+						.find("#tableWidgetHeader")
+						.after(tabulatorHeaderCollapseHTML);
+				}
 
-			// makes the table headers toggle visibility when clicking on them
-			tableWidgetDiv.find(".btn-select-col").on("click", function () {
-				var selected = this.value;
+				// makes the table headers toggle visibility when clicking on them
+				tableWidgetDiv.find(".btn-select-col").on("click", function () {
+					var selected = this.value;
 
-				tableWidgetDiv
-					.find("#tableWidgetTabulator")
-					.tabulator("toggleColumn", selected);
+					tableWidgetDiv
+						.find("#tableWidgetTabulator")
+						.tabulator("toggleColumn", selected);
 
-				// toggle class to color button as selected / deselected
-				$(this).toggleClass("btn-select-col-selected").blur(); // blur removes automatic focus
+					// toggle class to color button as selected / deselected
+					$(this).toggleClass("btn-select-col-selected").blur(); // blur removes automatic focus
+				});
 			});
-		});
+		}
 	},
 
 	/**
@@ -601,16 +604,19 @@ var FHC_TableWidget = {
 				tableWidgetDiv.find("#tableWidgetTabulator").tabulator(options);
 
 				//! callbacks that need to be attached after the table has built in tabulator version 5+
-				tableWidgetDiv
-					.find("#tableWidgetTabulator")
-					.tabulator("on", "rowSelectionChanged", _func_rowSelectionChanged);
-				tableWidgetDiv
-					.find("#tableWidgetTabulator")
-					.tabulator(
-						"on",
-						"columnVisibilityChanged",
-						_func_columnVisibilityChanged
-				);
+				if (typeof tableWidgetDiv.find("#tableWidgetTabulator").tabulator.on == 'function')
+				{
+					tableWidgetDiv
+						.find("#tableWidgetTabulator")
+						.tabulator("on", "rowSelectionChanged", _func_rowSelectionChanged);
+					tableWidgetDiv
+						.find("#tableWidgetTabulator")
+						.tabulator(
+							"on",
+							"columnVisibilityChanged",
+							_func_columnVisibilityChanged
+					);
+				}
 			}
 		}
 
