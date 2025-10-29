@@ -17,6 +17,7 @@
 
 import CoreSearchbar from "../searchbar/searchbar.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import AppMenu from "../AppMenu.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
@@ -32,6 +33,7 @@ export default {
 	components: {
 		CoreSearchbar,
 		VerticalSplit,
+		AppMenu,
 		StvVerband,
 		StvList,
 		StvDetails,
@@ -345,11 +347,39 @@ export default {
 		//FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto = 'ma0068@technikum-wien.at';this.$fhcAlert.handleSystemError(1);
 		this.handlePersonUrl();
 	},
-	template: `
+	template: /* html */`
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow" style="background-color: green !important;">
-			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot"><span style="font-size: 10px; line-height: 1; display: block; width: 100%; text-wrap: wrap; text-align: left;">DEMO Datenstand 29.09.2025</span>StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}</a>
-			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
+			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
+				<button
+					class="btn btn-outline-secondary border-0 m-1 collapsed"
+					type="button"
+					data-bs-toggle="offcanvas"
+					data-bs-target="#appMenu"
+					aria-controls="appMenu"
+					aria-expanded="false"
+					:aria-label="$p.t('ui/toggle_nav')"
+				>
+					<span class="svg-icon svg-icon-apps"></span>
+				</button>
+				<a class="navbar-brand me-0" :href="stvRoot">
+					<span style="font-size: 10px; line-height: 1; display: block; width: 100%; text-wrap: wrap; text-align: left;">
+						DEMO Datenstand 29.09.2025
+					</span>
+					StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}
+				</a>
+			</div>
+			<button
+				class="btn btn-outline-secondary border-0 d-md-none m-1 collapsed"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#sidebarMenu"
+				aria-controls="sidebarMenu"
+				aria-expanded="false"
+				:aria-label="$p.t('ui/toggle_nav')"
+			>
+				<span class="fa-solid fa-table-list"></span>
+			</button>
 			<core-searchbar
 				:searchoptions="searchbaroptions"
 				:searchfunction="searchfunction"
@@ -358,6 +388,15 @@ export default {
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
+				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+					<div class="offcanvas-header">
+						StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+					</div>
+					<div class="offcanvas-body">
+						<app-menu app-identifier="stv" />
+					</div>
+				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
