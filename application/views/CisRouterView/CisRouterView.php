@@ -22,7 +22,7 @@ $includesArray = array(
 		'public/css/components/Profil.css',
 		'public/css/components/FormUnderline.css',
 		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css',
+		'public/css/Cis4/Studium.css'
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
@@ -30,6 +30,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
+		'vendor/npm-asset/primevue/chips/chips.min.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
