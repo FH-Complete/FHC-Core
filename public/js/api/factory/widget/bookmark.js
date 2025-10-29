@@ -35,11 +35,17 @@ export default {
 			params: { url, title }
 		};
 	},
-	insert({ url, title, tag }) {
+	insert({ url, title, tag, sort }) {
 		return {
 			method: 'post',
 			url: `/api/frontend/v1/Bookmark/insert`,
-			params: { url, title, tag }
+			params: { url, title, tag, sort }
 		}; 
+	},
+	changeOrder(bookmark_id1, bookmark_id2) {
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/Bookmark/changeOrder/${bookmark_id1}/${bookmark_id2}`,
+		};
 	}
 };

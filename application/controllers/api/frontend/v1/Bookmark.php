@@ -31,6 +31,7 @@ class Bookmark extends FHCAPI_Controller
             'delete' => self::PERM_LOGGED,
             'insert' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
+			'changeOrder' => self::PERM_LOGGED,
         ]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -51,7 +52,7 @@ class Bookmark extends FHCAPI_Controller
 	 */
 	public function getBookmarks()
 	{
-        $this->BookmarkModel->addOrder("bookmark_id");
+        $this->BookmarkModel->addOrder("sort");
 		$bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
 
         $bookmarks = $this->getDataOrTerminateWithError($bookmarks);
@@ -99,8 +100,9 @@ class Bookmark extends FHCAPI_Controller
         $url = $this->input->post('url',true);
         $title = $this->input->post('title',true);
         $tag = $this->input->post('tag', true);
+		$sort = $this->input->post('sort', true);
 
-        $insert_into_result = $this->BookmarkModel->insert(['uid'=>$this->uid, 'url'=>$url, 'title'=>$title,'tag'=>$tag, 'insertvon'=>$this->uid, 'updateamum'=>NULL, 'updatevon'=>NULL]);
+        $insert_into_result = $this->BookmarkModel->insert(['uid'=>$this->uid, 'url'=>$url, 'title'=>$title,'tag'=>$tag, 'insertvon'=>$this->uid, 'updateamum'=>NULL, 'updatevon'=>NULL, 'sort'=>$sort,]);
 
         $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 
@@ -133,6 +135,33 @@ class Bookmark extends FHCAPI_Controller
 
         $this->terminateWithSuccess($update_result);
 
+    }
+
+	/**
+	 * changes sort of two bookmarks in the bookmark table
+	 * @access public
+	 * @return void
+	 */
+    public function changeOrder($bookmark_id1, $bookmark_id2)
+	{
+
+		$result1 = $this->BookmarkModel->load($bookmark_id1);
+		$data1 = $this->getDataOrTerminateWithError($result1);
+		$sort1 = current($data1)->sort;
+
+		$result2 = $this->BookmarkModel->load(["bookmark_id"=>$bookmark_id2]);
+		$data2 = $this->getDataOrTerminateWithError($result2);
+		$sort2 = current($data2)->sort;
+
+        $update_result1 = $this->BookmarkModel->update($bookmark_id1,['sort'=>$sort2,]);
+        $update_result[] = $this->getDataOrTerminateWithError($update_result1);
+
+		$update_result2 = $this->BookmarkModel->update($bookmark_id2,['sort'=>$sort1,]);
+        $update_result[] = $this->getDataOrTerminateWithError($update_result2);
+
+
+
+        $this->terminateWithSuccess($update_result);
     }
 }
 

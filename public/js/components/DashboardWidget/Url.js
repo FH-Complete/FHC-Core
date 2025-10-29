@@ -23,6 +23,7 @@ export default {
 		bookmark_id: null,
 		title_input: "",
 		url_input: "",
+		sort: null,
 		validation: {
 			invalidURL: false,
 			invalidTitel: false,
@@ -42,6 +43,25 @@ export default {
 
 			return false;
 		},
+		newSort(){
+			if(this.shared.length == 0)
+				return 1;
+			else
+				return Math.max(...this.shared.map(b => b.sort)) + 1;
+		},
+		maxSort(){
+			if(this.shared.length == 0)
+				return 0;
+			else
+				return Math.max(...this.shared.map(b => b.sort));
+		},
+		minSort(){
+			if(this.shared.length == 0)
+				return 0;
+			else
+				return Math.min(...this.shared.map(b => b.sort));
+		},
+
 	},
 	methods: {
 		stopDrag(event){
@@ -94,11 +114,15 @@ export default {
 			// early return if validation failed
 			if (!this.isValidationSuccessfull()) return;
 
+			// get highest Sort
+			this.sort = this.newSort;
+
 			this.$api
 				.call(ApiBookmark.insert({
 					tag: this.config.tag,
 					title: this.title_input,
 					url: this.url_input,
+					sort: this.sort
 				}))
 				.then((res) => res.data)
 				.then((result) => {
@@ -150,6 +174,42 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		sortDown(bookmark_id){
+			const current = this.shared.find(b => b.bookmark_id === bookmark_id);
+
+			const next = this.shared
+				.filter(b => b.sort > current.sort)
+				.sort((a, b) => a.sort - b.sort)[0];
+
+			if (!next) {
+				console.log("lowest sort item, no change");
+				return;
+			}
+			this.changeOrder(current.bookmark_id, next.bookmark_id);
+		},
+		sortUp(bookmark_id){
+			const current = this.shared.find(b => b.bookmark_id === bookmark_id);
+
+			const next = this.shared
+				.filter(b => b.sort < current.sort)
+				.sort((a, b) => a.sort + b.sort)[0];
+
+			if (!next) {
+				console.log("highest sort item, no change");
+				return;
+			}
+			this.changeOrder(current.bookmark_id, next.bookmark_id);
+		},
+		changeOrder(bookmark_id_1, bookmark_id_2){
+			this.$api
+				.call(ApiBookmark.changeOrder(bookmark_id_1, bookmark_id_2))
+				.then((res) => res.data)
+				.then((result) => {
+					// refetch the bookmarks to see the updates
+					this.fetchBookmarks();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	async mounted() {
 		await this.fetchBookmarks();
@@ -162,6 +222,7 @@ export default {
     <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
         <div class="d-flex flex-column justify-content-between">
         	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+
 
             <template v-if="shared">
 
@@ -179,6 +240,29 @@ export default {
 							<!--DELETE BOOKMARK-->
 							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" v-tooltip="{showDelay:1000,value:'delete bookmark'}" @click.prevent="removeLink(link.bookmark_id)">
 								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
+							</a>
+							<!--SORT BOOKMARKS-->
+							<a
+								v-if="shared.length > 1"
+								type="button"
+								id="downsortBookmark"
+								href="#"
+								aria-label="sortdown bookmark"
+								v-tooltip="{showDelay:1000,value:'sort down bookmark'}"
+								@click.prevent="sortDown(link.bookmark_id)"
+								>
+								<i :class="[ 'fa', 'fa-arrow-down', 'me-1', link.sort === maxSort ? 'text-light pointer-events-none' : '' ]"></i>
+							</a>
+							<a
+								v-if="shared.length > 1"
+								type="button"
+								id="upsortBookmark"
+								href="#"
+								aria-label="sortup bookmark"
+								v-tooltip="{showDelay:1000,value:'sort up bookmark'}"
+								@click.prevent="sortUp(link.bookmark_id)"
+								>
+								<i :class="[ 'fa', 'fa-arrow-up', 'me-1', link.sort === minSort ? 'text-light pointer-events-none' : '' ]"></i>
 							</a>
 						</div>
 					</div>
