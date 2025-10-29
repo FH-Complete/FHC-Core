@@ -12,8 +12,11 @@ import { existsSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 
+const debug = false;
+
 const buildtimestamp = new Date().toISOString().replace(/[-T:]/g, '').substr(0,14);
 const fhcbasepath = import.meta.dirname;
+
 let apps = {};
 let curapp = null;
 
@@ -21,108 +24,78 @@ function FhcResolver () {
   return {
     name: 'fhc-resolver', // this name will show up in logs and errors
     buildStart (options) {
-      //console.log('options: ' + JSON.stringify(options));
-      //console.log('apps: ' + JSON.stringify(apps));
       curapp = apps[options.input[0]];
-      //console.log('curapp: ' + curapp);
+
+      if(debug)
+      {
+	console.log('--------------------------------');
+	console.log('fhc-resolver buildStart');
+        console.log('options: ' + JSON.stringify(options, null, "\t"));
+        console.log('apps: ' + JSON.stringify(apps, null, "\t"));
+        console.log('curapp: ' + curapp);
+	console.log('--------------------------------');
+      }
     },
     resolveId ( source, importer, options ) {
-      //console.log('options: ' + JSON.stringify(options));
-      //console.log('BH-FHC-BASEPATH: ' + fhcbasepath);
-/*      
-      if(source.includes('vbsharedstate.js'))
-      {
-        console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);	
+      debug && console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
+
+      if(importer === undefined) {
+        return null;
       }
-*/
-      if( source.includes('vueDatepicker.js.php') ) {
-	return {id: 'vueDatepicker.js.php', external: 'relative'};
-      }
+
       if( source.includes('index.ci.php') ) {
-        //console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
 	let source_abs = fhcbasepath + '/' + source.replace(/(\.\.\/)+/, '');
 	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
-	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+
+	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+
 	return { id: source_rel, external: 'relative'};
       }
-      if( source.includes('.php') 
-//      	  || source.includes('vbsharedstate.js') 
-	) {
-        //console.log('source: ' + source + ' curapp: ' + curapp + ' importer: ' + importer);
+
+      if( source.includes('.php') ) {
 	let source_abs = path.resolve(path.dirname(importer), source);
 	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
 	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
 	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
-	//console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+
+	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
+
 	return { id: source_rel, external: 'relative'};
       }
-      //console.log('source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
-      if(importer === undefined) {
-        return null;
-      }
+
+      let resolved = null;
+
       if(!path.isAbsolute(source)) {
         let tmp = path.dirname(importer);
+
 	if( importer.includes('/application/') ) {
 	  tmp = tmp.replace(/public\/js\//, 'js/').replace(/\/application\//, '/public/');
 	}
 	else if( importer.includes('/FHC-Core-') && !importer.includes('/extensions/') ) {
-      	  //console.log('RELATIV: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
 	  tmp = fhcbasepath + tmp.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
-	  //console.log('BHTMP: ' + tmp);
 	}
-      	const resolved = path.resolve(tmp, source);
-	//console.log('BHRESOLVED: ' + resolved);
-/*	
-      	if(source.includes('vbsharedstate.js'))
-      	{
-	  console.log('BHRESOLVED: ' + resolved);
-      	}
-*/	
-	if( existsSync(resolved) ) {
-	  return resolved;
-	}
-	else 
-	{
-	  console.log('not existsSync: ' + resolved + ' source: ' + source + ' importer: ' + importer);
-	}
+
+	resolved = path.resolve(tmp, source);
       } else {
-      	//console.log('ABSOLUT: source: ' + source + ' options.isEntry: ' + options.isEntry + ' importer: ' + importer);
-	let absresolved = source;
+	resolved = source;
+
 	if( source.includes('/FHC-Core-') && !source.includes('/extensions/') ) 
 	{
-	  absresolved = fhcbasepath + source.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
+	  resolved = fhcbasepath + source.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
-/*
-      	if(source.includes('vbsharedstate.js'))
-      	{
-	  console.log('BHABSOLUT: ' + absresolved);
-      	}
-*/
-	return absresolved;
       }
-      return null; // other ids should be handled as usually
+
+      if( resolved !== null && !existsSync(resolved) ) {
+        console.log('not existsSync: ' + resolved + ' source: ' + source + ' importer: ' + importer);
+      }
+
+      return resolved;
     }
   };
 }
 
 const useplugins = [
-    	alias({
-		entries: {
-			vue: 'vue/dist/vue.esm-bundler.js',
-		}
-	}),
-	commonjs(),
-	nodeResolve({
-		module: true,
-		jsnext: true,
-		preferBuiltins: true,
-		browser: true,
-		moduleDirectories: ['node_modules'],
-		modulePaths: globSync('application/extensions/*/node_modules', {follow: true, realpath: true}).map(file => 
-			fileURLToPath(new URL(file, import.meta.url))
-		),
-	}),
 	json({
 		compact: true
 	}),
@@ -136,43 +109,45 @@ const useplugins = [
 		babelHelpers: 'bundled',
 		plugins: ['transform-class-properties'],
 	}),
-/*
-	postcss({
-		extract: false,
-		modules: true,
-		use: ['sass'],
-	}),
-*/
 //	terser()
 ];
 
 export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: false}).map(file => { 
-			if( path.dirname(file).includes('/dist/') || path.dirname(file).includes('/apps/vbform') ) {
+			if( path.dirname(file).includes('/dist/') 
+			 || path.dirname(file).includes('/apps/vbform') 
+			 || path.dirname(file).includes('/apps/api')
+			 || path.basename(file) === 'common.js'
+			) {
 				return null;
 			}
 
-			//console.log('RAWFILE: ' + file);
+			const inputfile = fhcbasepath + '/' + file;
+			const outputfile = inputfile.replace(/public\//, 'public/dist/');
+			const cssfile = path.basename(inputfile.replace(/\.js/, '.css'));
 
-			const rel_app_path = (file.replace(/\/public/, '')).replace(/^\.\.\//, 'public/extensions/');
-			const tmp = fileURLToPath(new URL(rel_app_path, import.meta.url));
-			//console.log('BHTEST: ' + tmp);
-			const basepath = tmp.replace(/\/public\/js\/.*/, '/public/js/');
-			const outputfile = tmp.replace(/public\//, 'public/dist/');
-			apps[tmp] = outputfile;
-			//console.log('OUTFILE: ' + outputfile);
-			let cssfile = path.basename(tmp.replace(/\.js/, '.css'));
-			//console.log('cssfile: ' + cssfile);
-			let cssplugin = [
+			apps[inputfile] = outputfile;
+
+			if(debug)
+			{
+			  console.log('--------------------------------');
+			  console.log('fhcbasepath: ' + fhcbasepath);
+			  console.log('file: ' + file);
+			  console.log('inputfile: ' + inputfile);
+			  console.log('outputfile: ' + outputfile);
+			  console.log('cssfile: ' + cssfile);
+			  console.log('--------------------------------');
+			}
+
+			const cssplugin = [
 			  postcss({
 				extract: cssfile,
 				minimize: true,
 				sourceMap: true
 			  })
 			];
-			const vuedatepicker = path.relative(path.dirname(outputfile), basepath + 'components/vueDatepicker.js.php?' + buildtimestamp);
-			//console.log(vuedatepicker);
+
 			return {
-				input: tmp,
+				input: inputfile,
 				plugins: [...useplugins, ...cssplugin],
 				watch: {
 					buildDelay: 500
@@ -183,9 +158,6 @@ export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: f
 					sourcemap: true,
 					format: 'es',
 					file: outputfile,
-					paths: {
-						"vueDatepicker.js.php": vuedatepicker
-					}
 				}
 			}
 		}).filter(Boolean);
