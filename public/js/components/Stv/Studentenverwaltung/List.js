@@ -119,7 +119,7 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({url, params});
+					return this.$api.call({...config, url, params});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -214,7 +214,12 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {}, filter = {};
+			let params = {}, filter = {}, method = 'get';
+			if (endpoint.params)
+				params = endpoint.params;
+			if (endpoint.method)
+				method = endpoint.method;
+
 			if (this.filterKontoCount0)
 				filter.konto_count_0 = this.filterKontoCount0;
 			if (this.filterKontoMissingCounter)
@@ -227,12 +232,13 @@ export default {
 				if (!this.$refs.table.tabulator) {
 					this.tabulatorOptions.ajaxURL = endpoint.url;
 					this.tabulatorOptions.ajaxParams = params;
+					this.tabulatorOptions.ajaxConfig = method;
 				} else
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(endpoint.url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params, method);
 					});
 			} else
-				this.$refs.table.tabulator.setData(endpoint.url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
