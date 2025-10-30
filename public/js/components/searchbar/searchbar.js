@@ -284,13 +284,7 @@ export default {
             this.calcSearchResultHeight();
         },
         search: function() {
-            if( this.searchtimer !== null ) {
-                clearTimeout(this.searchtimer);
-            }
-            if (this.abortController) {
-                this.abortController.abort();
-                this.abortController = null;
-            }
+            this.abort();
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
@@ -300,6 +294,16 @@ export default {
             } else {                
                 this.showresult = false;
             }
+        },
+        abort() {
+            if (this.searchtimer !== null) {
+                clearTimeout(this.searchtimer);
+            }
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
+            }
+            this.searchresult = [];
         },
         callsearchapi: function() {
             this.error = null;
