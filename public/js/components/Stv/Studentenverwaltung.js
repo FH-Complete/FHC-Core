@@ -157,7 +157,7 @@ export default {
 			}
 		},
 		buildPrestudentSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/prestudent/'
@@ -165,7 +165,7 @@ export default {
 				);
 		},
 		buildStudentSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/student/'
@@ -173,7 +173,7 @@ export default {
 				);
 		},
 		buildPersonSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/person/'
