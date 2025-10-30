@@ -42,7 +42,7 @@ class ExtensionsLib
 	// Directories that are part of the extension archive
 	private $SOFTLINK_TARGET_DIRECTORIES = array(
 		APPPATH => array('config', 'components', 'controllers', 'helpers', 'hooks', 'libraries', 'models', 'views', 'widgets'),
-		DOC_ROOT => array('public')
+		DOC_ROOT => array('public', 'public/dist')
 	);
 
 	private $_errorOccurred; // boolean, true if an error occurred while installing an extension
