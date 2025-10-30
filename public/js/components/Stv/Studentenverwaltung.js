@@ -267,6 +267,17 @@ export default {
 					});
 				}
 			}
+		},
+		onSearch(e) {
+			const searchsettings = this.$refs.searchbar.searchsettings;
+			if (searchsettings.searchstr.length >= 2) {
+				this.$refs.stvList.updateUrl(
+					ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
+				);
+				this.$refs.searchbar.$refs.input.blur();
+				this.$refs.searchbar.abort();
+				this.$refs.searchbar.hideresult();
+			}
 		}
 	},
 	created() {
@@ -345,15 +356,17 @@ export default {
 		//FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto = 'ma0068@technikum-wien.at';this.$fhcAlert.handleSystemError(1);
 		this.handlePersonUrl();
 	},
-	template: `
+	template: /* html */`
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3" :href="stvRoot">StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}</a>
 			<button class="navbar-toggler d-md-none m-1 collapsed" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" :aria-label="$p.t('ui/toggle_nav')"><span class="navbar-toggler-icon"></span></button>
 			<core-searchbar
+				ref="searchbar"
 				:searchoptions="searchbaroptions"
 				:searchfunction="searchfunction"
 				class="searchbar position-relative w-100"
+				@submit.prevent="onSearch"
 			></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
