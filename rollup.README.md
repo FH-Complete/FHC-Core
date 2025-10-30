@@ -20,6 +20,10 @@ einmalig:
 
 npm run build
 
+mit debug ausgaben:
+
+DEBUG=true npm run build
+
 als watch bei Änderungen:
 
 npm run watch

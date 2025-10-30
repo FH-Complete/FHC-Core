@@ -1,24 +1,22 @@
+import fhcBuildConfig from './rollup.fhcbuildconfig.js';
 import babel from '@rollup/plugin-babel';
-import nodeResolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import vue from "rollup-plugin-vue";
 import { globSync } from 'glob';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import postcss from 'rollup-plugin-postcss';
 import replace from '@rollup/plugin-replace';
-import alias from '@rollup/plugin-alias';
 import { existsSync } from 'node:fs';
 import terser from '@rollup/plugin-terser';
 import json from '@rollup/plugin-json';
 
-const debug = false;
+const debug = (process.env.DEBUG !== undefined) && (process.env.DEBUG === "true");
 
-const buildtimestamp = new Date().toISOString().replace(/[-T:]/g, '').substr(0,14);
+const buildversion = fhcBuildConfig.fhcBuildVersion;
 const fhcbasepath = import.meta.dirname;
 
 let apps = {};
 let curapp = null;
+
+console.log(process.env.DEBUG + ' ' + debug);
 
 function FhcResolver () {
   return {
@@ -45,7 +43,7 @@ function FhcResolver () {
 
       if( source.includes('index.ci.php') ) {
 	let source_abs = fhcbasepath + '/' + source.replace(/(\.\.\/)+/, '');
-	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
+	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildversion;
 
 	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 
@@ -57,7 +55,7 @@ function FhcResolver () {
 	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
 	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
-	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildtimestamp;
+	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildversion;
 
 	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 
@@ -104,12 +102,11 @@ const useplugins = [
 		preventAssignment: true,
 		'process.env.NODE_ENV': JSON.stringify( 'production' ),
 	}),
-	vue(),
 	babel({
 		babelHelpers: 'bundled',
 		plugins: ['transform-class-properties'],
 	}),
-//	terser()
+	terser()
 ];
 
 export default globSync('public/**/js/apps/**/*.js', {follow: false, realpath: false}).map(file => { 
