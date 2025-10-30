@@ -102,6 +102,7 @@ export default {
                 >
 				<button
 					v-if="searchsettings.searchstr"
+					type="button"
 					class="searchbar_input_clear btn btn-outline-secondary"
 					@click="clearInput"
 				>
