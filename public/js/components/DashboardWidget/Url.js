@@ -19,7 +19,7 @@ export default {
 		FormInput,
 		BsModal,
 		PvChips: primevue.chips,
-		PvAutoComplete: primevue.autocomplete
+		PvMultiSelect: primevue.multiselect
 	},
 	data: () => ({
 		bookmark_id: null,
@@ -30,8 +30,11 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
+		tagsArray: [
+		],
+		selectedTags: [],
+		newTag: null,
 	}),
-
 	computed: {
 		tagName() {
 			return this.config.tag !== undefined && this.config.tag.length > 0
@@ -63,6 +66,9 @@ export default {
 			else
 				return Math.min(...this.shared.map(b => b.sort));
 		},
+		tagsInput(){
+			return this.selectedTags.map(item => item.tag);
+		},
 
 	},
 	methods: {
@@ -71,7 +77,8 @@ export default {
 		},
 		clearInputs(){
 			this.title_input = "";
-			this.url_input = "";	
+			this.url_input = "";
+			this.selectedTags = [];
 		},
 		openCreateModal() {
 			this.$refs.createModal.show()
@@ -80,23 +87,27 @@ export default {
 			this.title_input = bookmark.title;
 			this.url_input = bookmark.url;
 			this.bookmark_id = bookmark.bookmark_id;
-			this.$refs.editModal.show()
+			this.selectedTags = this.prepareTag(bookmark.tag);
+
+			this.$refs.editModal.show();
 		},
 		editBookmark(event){
 			event.preventDefault();
 			if(!this.bookmark_id || !this.url_input || !this.title_input) return;
-			
+
 			this.$api
 				.call(ApiBookmark.update({
 					bookmark_id: this.bookmark_id,
 					title: this.title_input,
 					url: this.url_input,
+					tag: this.tagsInput,
 				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
 					// refetch the bookmarks to see the updates
 					this.fetchBookmarks();
+					this.getAllBookmarkTags();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 					this.$refs.editModal.hide();
@@ -121,7 +132,8 @@ export default {
 
 			this.$api
 				.call(ApiBookmark.insert({
-					tag: this.config.tag,
+					//tag: this.config.tag,
+					tag: this.tagsInput,
 					title: this.title_input,
 					url: this.url_input,
 					sort: this.sort
@@ -131,6 +143,7 @@ export default {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
 					// refetch the bookmarks to see the updates
 					this.fetchBookmarks();
+					this.getAllBookmarkTags();
 					this.$refs.createModal.hide();
 					// reset the values for the title and url inputs
 					this.clearInputs();
@@ -202,6 +215,15 @@ export default {
 			}
 			this.changeOrder(current.bookmark_id, next.bookmark_id);
 		},
+		addNewTag(){
+			if(this.newTag != null && this.newTag.length) {
+				this.tagsArray.push({tag: this.newTag, code: this.newTag});
+				this.selectedTags.push({tag: this.newTag, code: this.newTag});
+				this.newTag = null;
+			}
+			else
+				this.$fhcAlert.alertError("Eingabe eines Zeichens erforderlich!");
+		},
 		changeOrder(bookmark_id_1, bookmark_id_2){
 			this.$api
 				.call(ApiBookmark.changeOrder(bookmark_id_1, bookmark_id_2))
@@ -211,10 +233,46 @@ export default {
 					this.fetchBookmarks();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		hasTags(link) {
+			if (!link || !link.tag) return false;
+
+			let tags = link.tag;
+			if (typeof tags === 'string') {
+				try {
+					tags = JSON.parse(tags)
+				} catch {
+					return false;
+				}
+			}
+			return Array.isArray(tags) && tags.length > 0;
+		},
+		prepareTag(bookmarkArr){
+			// parse if string
+			const parsedArr = Array.isArray(bookmarkArr)
+				? bookmarkArr
+				: JSON.parse(bookmarkArr);
+
+			const result = parsedArr.map(tag => ({
+				tag,
+				code: tag
+			}));
+
+			return result;
+		},
+		getAllBookmarkTags(){
+			this.$api
+				.call(ApiBookmark.getAllBookmarkTags())
+				.then((res) => res.data)
+				.then((result) => {
+					this.tagsArray = this.prepareTag(result.data);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	async mounted() {
 		await this.fetchBookmarks();
+		this.getAllBookmarkTags();
 	},
 	created() {
 		// 
@@ -224,17 +282,24 @@ export default {
 
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
+    
+
         <div class="d-flex flex-column justify-content-between">
         	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
-        	
-			<PvChips></PvChips>
-            <template v-if="shared">
 
+            <template v-if="shared">
                 <template v-if="!emptyBookmarks">
 					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
-						<a target="_blank" :href="link.url">
+						<a target="_blank" :href="link.url" class="me-1">
 							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
 						</a>
+						<span
+							v-if="hasTags(link)"
+							 :title="link.tag"
+							 style="color: silver;"
+							>
+								<i class="fa fa-solid fa-tag text-gray-500" aria-hidden="true"></i>
+							</span>
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
@@ -292,8 +357,36 @@ export default {
 				<h2>{{$p.t('bookmark','editLink')}}</h2>
 			</template>
 			<template #default>
+
 				<form-input  :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
 				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
+
+				<label class="mt-2">Tags</label>
+				<div class="mt-2 row">
+					<div class="col-6">
+					  <form-input
+						v-model="newTag"
+						placeholder="Add new tag"
+						@keyup.enter="addNewTag"
+						class="w-full"
+					  />
+					</div>
+					<div class="col-2">
+				  		<button class="btn btn-secondary" @click="addNewTag">+</button>
+				  	</div>
+				</div>
+				<div class="mt-2">
+					<PvMultiSelect
+						v-model="selectedTags"
+						id="tagUrl"
+						:options="tagsArray"
+						optionLabel="tag"
+						display="chip"
+						placeholder="Selected Tags for URL"
+						:maxSelectedLabels="3"
+						class="w-full md:w-20rem mt-1"
+						/>
+				</div>
 			</template>
 			<template #footer>
 				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
@@ -307,8 +400,37 @@ export default {
 				<h2>{{$p.t('bookmark','newLink')}}</h2>
 			</template>
 			<template #default>
+
 				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
 				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
+
+				<label class="mt-2">Tags</label>
+				<div class="mt-2 row">
+					<div class="col-6">
+					  <form-input
+						v-model="newTag"
+						placeholder="Add new tag"
+						@keyup.enter="addNewTag"
+						class="w-full"
+					  />
+					</div>
+					<div class="col-2">
+				  		<button class="btn btn-secondary" @click="addNewTag">+</button>
+				  	</div>
+				</div>
+				<div class="mt-2">
+					<PvMultiSelect 
+						v-model="selectedTags"
+						id="tagUrl"
+						:options="tagsArray"
+						optionLabel="tag"
+						display="chip"
+						placeholder="Selected Tags for URL"
+						:maxSelectedLabels="3"
+						class="w-full md:w-20rem mt-1"
+						/>
+				</div>
+
 			</template>
 			<template #footer>
 				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
@@ -317,6 +439,7 @@ export default {
 	</teleport>
 	`,
 };
+
 
 /*
 Link JSON structure:

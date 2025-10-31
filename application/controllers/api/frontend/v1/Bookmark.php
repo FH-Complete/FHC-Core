@@ -29,10 +29,11 @@ class Bookmark extends FHCAPI_Controller
 		parent::__construct([
 			'getBookmarks' => self::PERM_LOGGED,
             'delete' => self::PERM_LOGGED,
-            'insert' => self::PERM_LOGGED,
+			'insert' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
 			'changeOrder' => self::PERM_LOGGED,
-        ]);
+			'getAllBookmarkTags' => self::PERM_LOGGED,
+		]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
 
@@ -100,6 +101,9 @@ class Bookmark extends FHCAPI_Controller
         $url = $this->input->post('url',true);
         $title = $this->input->post('title',true);
         $tag = $this->input->post('tag', true);
+		if (is_array($tag)) {
+			$tag = json_encode($tag); // convert PHP array to JSON string
+		}
 		$sort = $this->input->post('sort', true);
 
         $insert_into_result = $this->BookmarkModel->insert(['uid'=>$this->uid, 'url'=>$url, 'title'=>$title,'tag'=>$tag, 'insertvon'=>$this->uid, 'updateamum'=>NULL, 'updatevon'=>NULL, 'sort'=>$sort,]);
@@ -125,11 +129,15 @@ class Bookmark extends FHCAPI_Controller
 
         $url = $this->input->post('url',true);
         $title = $this->input->post('title',true);
+		$tag = $this->input->post('tag', true);
+		if (is_array($tag)) {
+			$tag = json_encode($tag);
+		}
 
 		$now = new DateTime();
 		$now = $now->format('Y-m-d H:i:s');
 
-        $update_result = $this->BookmarkModel->update($bookmark_id,['url'=>$url, 'title'=>$title,'updateamum'=>$now]);
+        $update_result = $this->BookmarkModel->update($bookmark_id,['url'=>$url, 'title'=>$title, 'tag'=>$tag, 'updateamum'=>$now]);
 
         $update_result = $this->getDataOrTerminateWithError($update_result);
 
@@ -159,9 +167,22 @@ class Bookmark extends FHCAPI_Controller
 		$update_result2 = $this->BookmarkModel->update($bookmark_id2,['sort'=>$sort1,]);
         $update_result[] = $this->getDataOrTerminateWithError($update_result2);
 
-
-
         $this->terminateWithSuccess($update_result);
     }
+
+	/**
+	 * get all the bookmark tags associated to a user
+	 * @access public
+	 * @return void
+	 */
+	public function getAllBookmarkTags()
+	{
+		$this->BookmarkModel->addOrder("sort");
+		$result = $this->BookmarkModel->getAllBookmarkTags($this->uid);
+
+		$bookmarks = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(current($bookmarks));
+	}
 }
 

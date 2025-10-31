@@ -31,6 +31,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
 		'vendor/npm-asset/primevue/chips/chips.min.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.min.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(

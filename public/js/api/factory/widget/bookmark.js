@@ -28,11 +28,11 @@ export default {
 			url: `/api/frontend/v1/Bookmark/delete/${bookmark_id}`
 		};
 	},
-	update({ bookmark_id, url, title, tag=null }) {
+	update({ bookmark_id, url, title, tag }) {
 		return {
 			method: 'post',
 			url: `/api/frontend/v1/Bookmark/update/${bookmark_id}`,
-			params: { url, title }
+			params: { url, title, tag }
 		};
 	},
 	insert({ url, title, tag, sort }) {
@@ -47,5 +47,11 @@ export default {
 			method: 'post',
 			url: `/api/frontend/v1/Bookmark/changeOrder/${bookmark_id1}/${bookmark_id2}`,
 		};
-	}
+	},
+	getAllBookmarkTags() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Bookmark/getAllBookmarkTags'
+		};
+	},
 };
