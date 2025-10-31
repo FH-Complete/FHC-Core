@@ -254,3 +254,37 @@ if($result = $db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechti
 			echo "<br>system.tbl_berechtigung insert basis/abgabe_assistenz hinzugefuegt";
 	}
 }
+
+if($result = $db->db_query("SELECT 1 FROM information_schema.routines WHERE routine_schema = 'campus' AND routine_name = 'get_betreuer_details'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "CREATE OR REPLACE FUNCTION campus.get_betreuer_details(b_person_id INT)
+					RETURNS TABLE (
+						full_name TEXT
+					)
+				LANGUAGE sql
+				AS $$
+					SELECT DISTINCT 
+						trim(
+							COALESCE(titelpre,'') || ' ' ||
+							COALESCE(vorname,'') || ' ' ||
+							COALESCE(nachname,'') || ' ' ||
+							COALESCE(titelpost,'')
+						) AS full_name
+					FROM public.tbl_person
+					JOIN lehre.tbl_projektbetreuer 
+						ON lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id
+					LEFT JOIN public.tbl_benutzer 
+						ON public.tbl_benutzer.person_id = public.tbl_person.person_id
+					LEFT JOIN public.tbl_mitarbeiter 
+						ON public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid
+					WHERE public.tbl_person.person_id = b_person_id;
+				$$;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>campus.get_betreuer_details: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>campus.get_betreuer_details function hinzugefuegt";
+	}
+}

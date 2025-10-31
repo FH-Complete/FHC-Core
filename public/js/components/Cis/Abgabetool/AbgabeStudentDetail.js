@@ -377,7 +377,7 @@ export const AbgabeStudentDetail = {
 									<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
 									<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
 								</div>
-								<div class="col-auto text-start" style="min-width: max(150px, 15%); max-width: min(300px, 30%); transform: translateX(-30px)">
+								<div class="col-auto text-start" style="min-width: max(150px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
 									<span>{{ termin?.bezeichnung }}</span>
 								</div>
 								<div class="col-auto text-start" style="min-width: 100px; transform: translateX(-30px)">

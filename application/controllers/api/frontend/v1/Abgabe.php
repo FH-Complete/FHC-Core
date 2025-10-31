@@ -39,7 +39,9 @@ class Abgabe extends FHCAPI_Controller
 			'fetchDeadlines' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
 			'getPaAbgabetypen' => self::PERM_LOGGED,
 			'getNoten' => self::PERM_LOGGED,
-			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw')
+			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
+			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
+			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -869,6 +871,10 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
 
+		if(count($projektarbeiten) == 0) { // avoid further abgabetermin queries if the are no projektarbeiten
+			$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
+		}
+		
 		$mapFunc = function($projektarbeit) {
 			return $projektarbeit->projektarbeit_id;
 		};
@@ -891,4 +897,60 @@ class Abgabe extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
+	
+	public function getStudiengaenge() {
+		$this->load->library('PermissionLib');
+		
+		$stg_allowed = $this->permissionlib->getSTG_isEntitledFor('basis/abgabe_assistenz:rw');
+		
+		if($stg_allowed == false) {
+			$this->terminateWithError($this->p->t('global', 'keineBerechtigung'), 'general');
+		}
+
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		
+		$result = $this->StudiengangModel->getStudiengaengeFiltered($stg_allowed);
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getStudentProjektarbeitAbgabeFile()
+	{
+		$this->load->helper('download');
+
+		$paabgabe_id = $this->input->get('paabgabe_id');
+		$student_uid = $this->input->get('student_uid');
+
+		if (!isset($paabgabe_id) || isEmptyString($paabgabe_id) || !isset($student_uid) || isEmptyString($student_uid))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		$isZugeteilterBetreuer = count($this->ProjektarbeitModel->checkZuordnung($student_uid, getAuthUID())->retval) > 0;
+		$isAssistenz = $this->permissionlib->isBerechtigt('extension/abgabe_assistenz');
+		
+		if(getAuthUID() == $student_uid || $isZugeteilterBetreuer || $isAssistenz) {
+			$file_path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
+			if(file_exists($file_path)) {
+
+				header('Content-Description: File Transfer');
+				header('Content-Type: application/octet-stream');
+				header('Expires: 0');
+				header('Cache-Control: must-revalidate');
+				header('Pragma: public');
+				header('Content-Disposition: attachment; filename="'.basename($file_path).'"');
+				header('Content-Length: ' . filesize($file_path));
+
+				flush(); // send headers first just in case
+				readfile($file_path); // read file content to output buffer
+
+			} else {
+				$this->terminateWithError('File not found');
+			}
+		} else {
+			$this->terminateWithError('Keine Zuordnung!');
+		}
+	}
+	
 }

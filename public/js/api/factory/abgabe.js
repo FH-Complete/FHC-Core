@@ -36,7 +36,7 @@ export default {
 		};
 	},
 	getStudentProjektarbeitAbgabeFile(paabgabe_id, student_uid) {
-		const url = `/Cis/Abgabetool/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
+		const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
 
 		window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 	},
@@ -105,6 +105,13 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Abgabe/getProjektarbeitenForStudiengang',
 			params: { studiengang_kz }
+		};
+	},
+	// TODO: this could also very well be generic info api :^)
+	getStudiengaenge() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getStudiengaenge'
 		};
 	}
 };

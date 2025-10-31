@@ -801,4 +801,21 @@ class Studiengang_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
 	}
+	
+	public function getStudiengaengeFiltered($allowed_stg) {
+		$query ="SELECT DISTINCT
+					public.tbl_studiengang.studiengang_kz,
+					public.tbl_studiengang.bezeichnung,
+					public.tbl_studiengang.kurzbzlang,
+					public.tbl_studiengang.orgform_kurzbz
+				FROM public.tbl_studiengang JOIN lehre.tbl_studienordnung USING(studiengang_kz)
+					JOIN lehre.tbl_studienplan USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+				WHERE public.tbl_studiengang.aktiv = true
+				
+				AND public.tbl_studiengang.studiengang_kz IN ?
+				ORDER BY public.tbl_studiengang.kurzbzlang";
+
+		return $this->execReadOnlyQuery($query, [$allowed_stg]);
+	}
 }

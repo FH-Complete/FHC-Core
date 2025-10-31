@@ -320,107 +320,85 @@ class Projektarbeit_model extends DB_Model
 	}
 	
 	public function getProjektarbeitenForStudiengang($studiengang_kz) {
-		
-		// TODO: select less fields, a lot of useless data over here
-		
-		$old_qry = "SELECT *,
-				   (SELECT orgform_kurzbz
-					FROM tbl_prestudentstatus
-					WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
-					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
-				   ) as organisationsform
-			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit
-						  LEFT JOIN public.tbl_benutzer on(uid=student_uid)
-						  LEFT JOIN public.tbl_person on(tbl_benutzer.person_id=tbl_person.person_id)
-						  LEFT JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
-						  LEFT JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
-						  LEFT JOIN public.tbl_studiengang using(studiengang_kz)
-						  LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
-				  WHERE (projekttyp_kurzbz='Bachelor' OR projekttyp_kurzbz='Diplom')
-					AND public.tbl_benutzer.aktiv
-					AND lehre.tbl_projektarbeit.note IS NULL
-					AND public.tbl_studiengang.studiengang_kz = ?
-				  ORDER BY tbl_projektarbeit.projektarbeit_id desc) as xy
-			ORDER BY nachname";
-		
-		
-		$new_qry = "
-		SELECT
-		DISTINCT ON(tbl_projektarbeit.projektarbeit_id)
-			tbl_projektarbeit.projekttyp_kurzbz,
-			tbl_projektarbeit.titel,
-			tbl_projektarbeit.projektarbeit_id,
-			tbl_studiengang.typ, tbl_studiengang.kurzbz,
-			student_benutzer.uid as student_uid,
-			student_person.vorname as student_vorname,
-			student_person.nachname as student_nachname,
-			tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz,
-			betreuer_benutzer.uid as betreuer_benutzer_uid,
-			betreuer_person.vorname as betreuer_vorname,
-			betreuer_person.nachname as betreuer_nachname,
-			lehre.tbl_projektbetreuer.betreuerart_kurzbz as betreuerart,
-			lehre.tbl_projektbetreuer.person_id as betreuer_person_id,
-			lehre.tbl_projektarbeit.sprache               as sprache,
-			lehre.tbl_projektarbeit.seitenanzahl          as seitenanzahl,
-			lehre.tbl_projektarbeit.kontrollschlagwoerter as kontrollschlagwoerter,
-			lehre.tbl_projektarbeit.schlagwoerter         as schlagwoerter,
-			lehre.tbl_projektarbeit.schlagwoerter_en      as schlagwoerter_en,
-			lehre.tbl_projektarbeit.abstract              as abstract,
-			lehre.tbl_projektarbeit.abstract_en           as abstract_en,
-			lehre.tbl_projektarbeit.insertamum            as insertamum,
-			(
-			SELECT orgform_kurzbz
-			 FROM tbl_prestudentstatus
-			 WHERE prestudent_id = (SELECT prestudent_id
-									FROM tbl_student
-									WHERE student_uid = student_benutzer.uid
-									LIMIT 1)
-			 ORDER BY datum DESC, insertamum DESC, ext_id DESC
-			 LIMIT 1
-			 )
-				as organisationsform,
-			(
-				SELECT person_id
-				 FROM lehre.tbl_projektbetreuer
-				 WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-				   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
-				 LIMIT 1
-			 )
-				AS zweitbetreuer_person_id,
-			(
-				SELECT betreuerart_kurzbz
-				 FROM lehre.tbl_projektbetreuer
-				 WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-				   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
-				 LIMIT 1
-			 )                                     
-				AS zweitbetreuer_betreuerart_kurzbz,
-			(
-				SELECT tbl_betreuerart.beschreibung
-				 FROM lehre.tbl_projektbetreuer
-						  JOIN lehre.tbl_betreuerart USING (betreuerart_kurzbz)
-				 WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-				   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
-				 LIMIT 1
-			 )                                     
-				AS zweitbetreuer_betreuerart_beschreibung,
-			(
-				SELECT trim(COALESCE(titelpre, '') || ' ' || COALESCE(vorname, '') || ' ' || COALESCE(nachname, '') || ' ' ||
-							 COALESCE(titelpost, ''))
-				 FROM public.tbl_person
-						  JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
-						  LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
-						  LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
-				 WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-				   AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
-				 LIMIT 1
-			 )                                    
-				as zweitbetreuer_full_name
+		$new_qry = "SELECT DISTINCT ON(tmp.projektarbeit_id) *, campus.get_betreuer_details(tmp.zweitbetreuer_person_id) as zweitbetreuer_full_name, campus.get_betreuer_details(tmp.betreuer_person_id) as erstbetreuer_full_name
+       		FROM(
+			   SELECT
+				   DISTINCT ON(tbl_projektarbeit.projektarbeit_id)
+				   tbl_projektarbeit.projekttyp_kurzbz,
+				   tbl_projektarbeit.titel,
+				   tbl_projektarbeit.projektarbeit_id,
+				   tbl_studiengang.typ, tbl_studiengang.kurzbz,
+				   student_benutzer.uid as student_uid,
+				   student_person.vorname as student_vorname,
+				   student_person.nachname as student_nachname,
+				   tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz,
+				   betreuer_benutzer.uid as betreuer_benutzer_uid,
+				   betreuer_person.vorname as betreuer_vorname,
+				   betreuer_person.nachname as betreuer_nachname,
+				   lehre.tbl_projektbetreuer.betreuerart_kurzbz as betreuerart,
+				   lehre.tbl_projektbetreuer.person_id as betreuer_person_id,
+				   lehre.tbl_projektarbeit.sprache               as sprache,
+				   lehre.tbl_projektarbeit.seitenanzahl          as seitenanzahl,
+				   lehre.tbl_projektarbeit.kontrollschlagwoerter as kontrollschlagwoerter,
+				   lehre.tbl_projektarbeit.schlagwoerter         as schlagwoerter,
+				   lehre.tbl_projektarbeit.schlagwoerter_en      as schlagwoerter_en,
+				   lehre.tbl_projektarbeit.abstract              as abstract,
+				   lehre.tbl_projektarbeit.abstract_en           as abstract_en,
+				   lehre.tbl_projektarbeit.insertamum            as insertamum,
+				   lehre.tbl_projektarbeit.note					 as note,
+				   (
+					   SELECT orgform_kurzbz
+					   FROM tbl_prestudentstatus
+					   WHERE prestudent_id = (SELECT prestudent_id
+											  FROM tbl_student
+											  WHERE student_uid = student_benutzer.uid
+											  LIMIT 1)
+					   ORDER BY datum DESC, insertamum DESC, ext_id DESC
+					   LIMIT 1
+				   )
+					   as organisationsform,
+				   (
+					   SELECT person_id
+					   FROM lehre.tbl_projektbetreuer
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+					   LIMIT 1
+				   )
+					   AS zweitbetreuer_person_id,
+				   (
+					   SELECT betreuerart_kurzbz
+					   FROM lehre.tbl_projektbetreuer
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+					   LIMIT 1
+				   )
+					   AS zweitbetreuer_betreuerart_kurzbz,
+				   (
+					   SELECT tbl_betreuerart.beschreibung
+					   FROM lehre.tbl_projektbetreuer
+								JOIN lehre.tbl_betreuerart USING (betreuerart_kurzbz)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
+					   LIMIT 1
+				   )
+					   AS zweitbetreuer_betreuerart_beschreibung,
+				   (
+					   SELECT trim(COALESCE(titelpre, '') || ' ' || COALESCE(vorname, '') || ' ' || COALESCE(nachname, '') || ' ' ||
+								   COALESCE(titelpost, ''))
+					   FROM public.tbl_person
+								JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+					   LIMIT 1
+				   )
+					   as zweitbetreuer_full_name
 			   FROM lehre.tbl_projektarbeit
 						LEFT JOIN public.tbl_benutzer student_benutzer ON (student_benutzer.uid = lehre.tbl_projektarbeit.student_uid)
 						LEFT JOIN public.tbl_person student_person ON (student_benutzer.person_id = student_person.person_id)
-						LEFT JOIN public.tbl_student on(student_benutzer.uid = public.tbl_student.student_uid)	
-			       		LEFT JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+						LEFT JOIN public.tbl_student on(student_benutzer.uid = public.tbl_student.student_uid)
+						LEFT JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 						LEFT JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 						LEFT JOIN public.tbl_studiengang ON (public.tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 						LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
@@ -429,14 +407,11 @@ class Projektarbeit_model extends DB_Model
 						LEFT JOIN public.tbl_benutzer betreuer_benutzer ON (betreuer_person.person_id = betreuer_benutzer.person_id)
 			   WHERE (projekttyp_kurzbz = 'Bachelor' OR projekttyp_kurzbz = 'Diplom')
 				 AND student_benutzer.aktiv AND (lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter' OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')
-		--   AND lehre.tbl_projektarbeit.note IS NULL
-		--   AND public.tbl_studiengang.studiengang_kz= 257
+				 --   AND lehre.tbl_projektarbeit.note IS NULL
+				 --   AND public.tbl_studiengang.studiengang_kz= 257
 				 AND public.tbl_studiengang.studiengang_kz = ?
-			   ORDER BY tbl_projektarbeit.projektarbeit_id DESC, student_person.nachname ASC
-		";
-//		$oldres = $this->execReadOnlyQuery($old_qry, array($studiengang_kz));
-//		$newres = $this->execReadOnlyQuery($new_qry, array($studiengang_kz));
-//		return array($newres, $oldres);
+			   ORDER BY tbl_projektarbeit.projektarbeit_id DESC, student_person.nachname ASC           
+		   ) as tmp";
 		
 		return $this->execReadOnlyQuery($new_qry, array($studiengang_kz));
 	}

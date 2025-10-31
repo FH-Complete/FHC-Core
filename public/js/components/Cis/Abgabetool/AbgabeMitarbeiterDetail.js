@@ -31,6 +31,10 @@ export const AbgabeMitarbeiterDetail = {
 		isFullscreen: {
 			type: Boolean,
 			default: false
+		},
+		assistenzMode: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -173,7 +177,7 @@ export const AbgabeMitarbeiterDetail = {
 			const oneDayMs = 1000 * 60 * 60 * 24
 			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
 		},
-		getDateStyleClass(termin, mode) {
+		getDateStyleClass(termin) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
@@ -305,9 +309,9 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	computed: {
 		getActiveIndexTabArray() {
-			// here we try to do mind reading logic by assuming which abgabetermine are the most relevant to the current user
+			// here we try to assume which abgabetermine are the most relevant to the current user
 
-			// lets try to take the termin with nearest date and watch who complains and why
+			// lets try to take the termin with nearest date
 			let closestIndex = -1;
 			let minDiff = Infinity;
 			const today = new Date();
@@ -401,6 +405,17 @@ export const AbgabeMitarbeiterDetail = {
 				value: this.$p.t('abgabetool/c4notAllowedToDeleteAbgabeTermin'),
 				class: "custom-tooltip"
 			}
+		},
+		getProjektarbeitTitel() {
+			if(this.projektarbeit?.titel) return this.projektarbeit.titel
+			
+			return ''
+		},
+		getProjektarbeitStudent(){
+
+			if(this.projektarbeit?.student) return this.projektarbeit.student
+
+			return ''
 		}
 	},
 	watch: {
@@ -500,7 +515,6 @@ export const AbgabeMitarbeiterDetail = {
 	</bs-modal>
 
 	<div v-if="projektarbeit">
-		
 		<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">
 			<SpeedDial
 				:style="getSpeedDialStyle"
@@ -517,8 +531,8 @@ export const AbgabeMitarbeiterDetail = {
 
 		<div class="row">
 			<div class="col-6">
-				<p> {{projektarbeit?.student}}</p>
-				<p> {{projektarbeit?.titel}}</p>
+				<p> {{getProjektarbeitStudent}}</p>
+				<p> {{getProjektarbeitTitel}}</p>
 				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 			</div>
 			<div v-if="!isMobile" class="col-3"></div>
@@ -533,7 +547,6 @@ export const AbgabeMitarbeiterDetail = {
 				/>
 			</div>
 		</div>
-		
 		<Accordion :multiple="true" :activeIndex="getActiveIndexTabArray">
 			<template v-for="termin in this.projektarbeit?.abgabetermine">
 				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
@@ -546,7 +559,7 @@ export const AbgabeMitarbeiterDetail = {
 								<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
 							</div>
-							<div class="col-auto text-start" style="min-width: max(150px, 15%); max-width: min(300px, 30%); transform: translateX(-30px)">
+							<div class="col-auto text-start" style="min-width: max(150px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
 								<span>{{ termin?.bezeichnung?.bezeichnung }}</span>
 							</div>
 							<div class="col-auto text-start" style="min-width: 100px; transform: translateX(-30px)">
@@ -557,18 +570,17 @@ export const AbgabeMitarbeiterDetail = {
 							</div>
 						</div>				
 					</template>
-<!--						<div class="row">-->
-<!--							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>-->
-<!--							<div class="col-8 col-md-9">-->
-<!--								<Checkbox -->
-<!--									v-model="termin.fixtermin"-->
-<!--									disabled-->
-<!--									:binary="true" -->
-<!--									:pt="{ root: { class: 'ml-auto' }}"-->
-<!--								>-->
-<!--								</Checkbox>-->
-<!--							</div>-->
-<!--						</div>-->
+					<div class="row mt-2" v-if="assistenzMode">
+						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
+						<div class="col-8 col-md-9">
+							<Checkbox 
+								v-model="termin.fixtermin"
+								:binary="true" 
+								:pt="{ root: { class: 'ml-auto' }}"
+							>
+							</Checkbox>
+						</div>
+					</div>
 					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 						<div class="col-8 col-md-9">
@@ -584,7 +596,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabetypv2') )}}</div>
+						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 						<div class="col-8 col-md-9">
 							<Dropdown
 								:style="{'width': '100%'}"
@@ -637,10 +649,22 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
 						<div class="col-8 col-md-9">
 							<template v-if="termin?.abgabedatum">
-								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
-									<a> {{$capitalize( $p.t('abgabetool/c4downloadAbgabe') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
-								</button>							
+								<div class="row">
+									<div style="width:250px">
+										<VueDatePicker
+											v-model="termin.abgabedatum"
+											:clearable="false"
+											:disabled="true"
+											:format="formatDate">
+										</VueDatePicker>
+									</div>
+
+									<div class="col-auto">
+										<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+											<a> {{$capitalize( $p.t('abgabetool/c4downloadAbgabe') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+										</button>	
+									</div>
+								</div>						
 							</template>
 							<template v-else>
 								{{ $capitalize( $p.t('abgabetool/c4nochNichtsAbgegeben') )}}
@@ -683,6 +707,11 @@ export const AbgabeMitarbeiterDetail = {
 				</AccordionTab>
 			</template>
 		</Accordion>
+		
+		<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
+			<h3>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h3>
+		</div>
+</div>
 	 </div>
 `,
 };

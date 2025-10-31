@@ -234,7 +234,10 @@ export const AbgabetoolMitarbeiter = {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
 					
+					// lektoren are only allowed to edit their own deadline entries
 					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
+					
+					// lektoren are not allowed to delete deadlines with existing submissions
 					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
 					
 					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
