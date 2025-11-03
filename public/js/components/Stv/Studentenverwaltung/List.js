@@ -119,7 +119,12 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({...config, url, params});
+					/**
+					 * NOTE(chris): Because of a bug in Tabulator
+					 * we need to get the params from elsewhere.
+					 * @see https://github.com/olifolkerd/tabulator/issues/4318
+					 */
+					return this.$api.call({...config, url, params: this.tabulatorOptions.ajaxParams});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -214,9 +219,9 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			let params = {}, filter = {}, method = 'get';
+			var params = {}, filter = {}, method = 'get';
 			if (endpoint.params)
-				params = endpoint.params;
+				params = { ...endpoint.params };
 			if (endpoint.method)
 				method = endpoint.method;
 
@@ -228,15 +233,15 @@ export default {
 			if (filter.konto_count_0 || filter.konto_missing_counter)
 				params.filter = filter;
 
+			this.tabulatorOptions.ajaxURL = endpoint.url;
+			this.tabulatorOptions.ajaxParams = { ...params };
+			this.tabulatorOptions.ajaxConfig = method;
 			if (!this.$refs.table.tableBuilt) {
-				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = endpoint.url;
-					this.tabulatorOptions.ajaxParams = params;
-					this.tabulatorOptions.ajaxConfig = method;
-				} else
+				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
 						this.$refs.table.tabulator.setData(endpoint.url, params, method);
 					});
+				}
 			} else
 				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
