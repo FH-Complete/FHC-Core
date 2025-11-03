@@ -403,6 +403,7 @@ export default {
 				:searchoptions="searchbaroptions"
 				:searchfunction="searchfunction"
 				class="searchbar position-relative w-100"
+				show-btn-submit
 				@submit.prevent="onSearch"
 			></core-searchbar>
 		</header>
