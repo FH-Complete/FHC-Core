@@ -37,6 +37,14 @@ export default {
 		},
 		lists: {
 			from: 'lists'
+		},
+		$reloadList: {
+			from: '$reloadList',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	props: {
@@ -97,7 +105,7 @@ export default {
 	methods: {
 		updateStudent(n) {
 			return this.$api
-				.call(ApiStvDetails.get(n.prestudent_id))
+				.call(ApiStvDetails.get(n.prestudent_id, this.currentSemester))
 				.then(result => {
 					this.data = result.data;
 					if (!this.data.familienstand)
@@ -112,11 +120,36 @@ export default {
 
 			this.$refs.form.clearValidation();
 			return this.$refs.form
-				.call(ApiStvDetails.save(this.modelValue.prestudent_id, this.changed))
+				.call(ApiStvDetails.save(
+					this.modelValue.prestudent_id,
+					this.currentSemester,
+					this.changed
+					))
 				.then(result => {
 					this.original = {...this.data};
 					this.changed = {};
-					this.$refs.form.setFeedback(true, result.data);
+
+					const feedback = result.data;
+
+					//to avoid empty alert for updateam, updatevon
+					const cleanedFeedback = {};
+
+					const formElement = this.$refs.form.$el || this.$refs.form;
+					const inputElements = formElement.querySelectorAll('[name]');
+					const validFieldNames = Array.from(inputElements).map(el => el.getAttribute('name'));
+
+					for (const key in feedback) {
+						if (validFieldNames.includes(key)) {
+							cleanedFeedback[key] = feedback[key];
+						}
+					}
+
+					if (Object.keys(cleanedFeedback).length > 0) {
+						this.$refs.form.setFeedback(true, cleanedFeedback);
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					}
+
+					this.$reloadList();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -153,7 +186,7 @@ export default {
 						<label>{{$p.t('global', 'zugangscode')}}</label>
 						<div class="align-self-center">
 							<span class="form-text">
-								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
+								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat + '&keepEmailUnverified=true'" target="_blank">{{data.zugangscode}}</a>
 							</span>
 						</div>
 					</div>
@@ -256,6 +289,7 @@ export default {
 						no-today
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						teleport
@@ -284,16 +318,6 @@ export default {
 					</form-input>
 				</div>
 				<div class="row mb-3">
-					<form-input
-						v-if="!config.hiddenFields.includes('svnr')"
-						container-class="col-4 stv-details-details-svnr"
-						:label="$p.t('person', 'svnr')"
-						type="text"
-						v-model="data.svnr"
-						name="svnr"
-						maxlength="16"
- 						>
-					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('ersatzkennzeichen')"
 						container-class="col-4 stv-details-details-ersatzkennzeichen"

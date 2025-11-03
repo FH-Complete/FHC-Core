@@ -193,7 +193,7 @@ export default {
 
 			// TODO(chris): move to fhcapi.factory
 			this.$refs.form
-				.send('api/frontend/v1/stv/student/add', data)
+				.post('api/frontend/v1/stv/student/add', data)
 				.then(result => {
 					this.$fhcAlert.alertSuccess('Gespeichert');
 					this.$refs.modal.hide();
@@ -213,7 +213,7 @@ export default {
 	},
 	template: `
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
-		<bs-modal ref="modal" dialog-class="modal-lg modal-scrollable" @hidden-bs-modal="reset">
+		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" @hidden-bs-modal="reset">
 			<template #title>
 				InteressentIn anlegen
 			</template>

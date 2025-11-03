@@ -151,11 +151,24 @@ class Notiz_model extends DB_Model
 	 *         bestellung_id, lehreinheit_id, anrechnung_id, uid)
 	 * @param $id the corresponding id, part of public.tbl_notizzuordnung
 	 */
-	public function getNotizWithDocEntries($id, $type)
+	public function getNotizWithDocEntries($id, $type, $withoutTags = true)
 	{
 			$qry = "
-				SELECT 
-						n.*, count(dms_id) as countDoc, z.notizzuordnung_id,
+				SELECT
+						n.*, 
+						  CASE
+							WHEN person_verfasser.vorname IS NOT NULL AND person_verfasser.vorname != ''
+							  OR person_verfasser.nachname IS NOT NULL AND person_verfasser.nachname != ''
+							THEN CONCAT(person_verfasser.vorname, ' ', person_verfasser.nachname)
+							ELSE NULL
+						  END AS verfasser,
+						  CASE
+							WHEN person_bearbeiter.vorname IS NOT NULL AND person_bearbeiter.vorname != ''
+							  OR person_bearbeiter.nachname IS NOT NULL AND person_bearbeiter.nachname != ''
+							THEN CONCAT(person_bearbeiter.vorname, ' ', person_bearbeiter.nachname)
+							ELSE NULL
+						  END AS bearbeiter,
+						count(dms_id) as countDoc, z.notizzuordnung_id,
 						(CASE
 							WHEN n.updateamum >= n.insertamum THEN n.updateamum 
 							ELSE n.insertamum
@@ -173,10 +186,24 @@ class Notiz_model extends DB_Model
 							public.tbl_notiz_dokument dok USING (notiz_id)
 				LEFT JOIN 
 							campus.tbl_dms_version USING (dms_id)
+				LEFT JOIN 
+						      public.tbl_benutzer p_verfasser ON (p_verfasser.uid = n.verfasser_uid)
+  				LEFT JOIN 
+						      public.tbl_person person_verfasser ON (person_verfasser.person_id = p_verfasser.person_id)
+  				LEFT JOIN 
+						      public.tbl_benutzer p_bearbeiter ON (p_bearbeiter.uid = n.bearbeiter_uid)
+				LEFT JOIN 
+						      public.tbl_person person_bearbeiter ON (person_bearbeiter.person_id = p_bearbeiter.person_id)
 				WHERE 
-				   z.$type  = ?
-				GROUP BY 
-					notiz_id, z.notizzuordnung_id
+				   z.$type  = ?";
+
+		if ($withoutTags)
+			$qry .= " AND n.typ IS NULL ";
+
+			$qry .= "GROUP BY 
+					notiz_id, z.notizzuordnung_id,
+ 					person_verfasser.vorname, person_verfasser.nachname,
+					person_bearbeiter.vorname, person_bearbeiter.nachname
 			";
 
 		return $this->execQuery($qry, array($type, $id));

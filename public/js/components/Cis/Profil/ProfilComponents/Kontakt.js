@@ -12,9 +12,10 @@ export default{
 
     }, 
     template:/*html*/`
+	<template v-if="data.kontakt">
     <div class="gy-2 row align-items-center justify-content-center">
         <div class="col-1 text-center" >
-            <i class="fa-solid " :class="{...(data.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" style="color:rgb(0, 100, 156)"></i>
+            <i class="fa-solid fhc-link-color" :class="{...(data.kontakt.includes('@')?{'fa-envelope':true}:{'fa-phone':true})}" ></i>
         </div>
         <div :class="{...(data.anmerkung? {'col-11':true, 'col-md-6':true, 'col-xl-11':true, 'col-xxl-6':true} : {'col-10':true, 'col-xl-9':true, 'col-xxl-10':true})}">
             <!-- rendering KONTAKT emails -->
@@ -35,5 +36,6 @@ export default{
             <i v-else="data.zustellung" class="fa-solid fa-xmark"></i>
         </div>
     </div>
+	</template>
 `,
 };

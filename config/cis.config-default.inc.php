@@ -249,6 +249,9 @@ define('CIS_INFOSCREEN_NEWS_ANZEIGEN',false);
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 
+//Gibt an, ob die Studierenden bei der Anmeldung zu einer Prüfung den Ausmas an ECTS angeben können
+define('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE', false);
+
 // Anmeldefristen für Prüfungen in Tagen;
 // Wenn nicht definiert: 3
 //define('CIS_PRUEFUNGSANMELDUNG_FRIST',3);
@@ -296,4 +299,6 @@ define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
 
+// Weiterleiten zu CIS neu (wenn Rechte vorhanden)
+define('CIS_REDIRECT_TO_CIS4', false);
 ?>

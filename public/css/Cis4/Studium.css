@@ -1,0 +1,60 @@
+.lvUebersicht{
+	display:grid;
+	gap: 1rem;
+}
+
+@media (min-width: 1440px) {
+	.lvUebersicht {
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+}
+
+@media (max-width: 1439px){
+	.lvUebersicht{
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 576px){
+	.lvUebersicht{
+		grid-template-columns: 1fr;
+	}
+}
+
+.lvOptions {
+	display: grid;
+	gap: 1rem;
+}
+
+.lvOptions > div {
+	flex-basis: auto;
+	flex-grow: 1;
+	flex-shrink: 1;
+
+}
+
+.lvOptions button {
+	flex-shrink: 0;
+
+}
+
+@media (min-width: 1440px) {
+	.lvOptions {
+		grid-template-columns: 1fr 1fr 1fr 1fr;
+	}
+}
+
+@media (max-width: 1439px) {
+	.lvOptions {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+@media (max-width: 576px) {
+	.lvOptions {
+		grid-template-columns: 1fr;
+	}
+}
+
+
+

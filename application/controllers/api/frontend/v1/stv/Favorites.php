@@ -35,8 +35,6 @@ class Favorites extends FHCAPI_Controller
 
 		// Load models
 		$this->load->model('system/Variable_model', 'VariableModel');
-
-		// TODO(chris): variable table might be to small to store favorites!
 	}
 
 	public function index()

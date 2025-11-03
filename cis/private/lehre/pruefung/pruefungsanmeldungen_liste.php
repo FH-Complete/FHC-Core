@@ -235,12 +235,18 @@ $rechte->getBerechtigungen($uid);
 			<th><?php echo $p->t('global/datum'); ?></th>
 			<th><?php echo $p->t('benotungstool/note'); ?></th>
 			<th><?php echo $p->t('global/anmerkung'); ?></th>
+
+			<?php
+				if (defined('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE') && (CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE === true)):
+			?>
+				<th><?php echo $p->t('pruefung/ects'); ?></th>
+			<?php endif; ?>
+
 			</tr>
 		</thead>
 		<tbody>
 			<?php
 			$count = 0;
-			/*@var $anmeldung pruefungsanmeldung */
 			foreach($anmeldungen as $anmeldung)
 			{
 				$student = new student($anmeldung->uid);
@@ -269,6 +275,8 @@ $rechte->getBerechtigungen($uid);
 				echo '<td>'.$date.'</td>';
 				echo '<td></td>';
 				echo '<td></td>';
+				if (defined('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE') && (CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE === true))
+					echo '<td>'. $anmeldung->ects .'</td>';
 				echo '</tr>';
 			}
 			?>
