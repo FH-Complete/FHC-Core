@@ -309,12 +309,6 @@ export default {
 						}
 					});
 				}
-				/*this.$nextTick(() => {console.log(searchsettings);
-					this.$refs.stvList.updateUrl(
-						ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
-					);
-					
-				});*/
 			}
 		},
 		blurSearchbar() {
