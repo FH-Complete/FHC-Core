@@ -1,7 +1,6 @@
 <?php
 
 $phrases = array(
-,
 array (
   'app' => 'core',
   'category' => 'extensions',
