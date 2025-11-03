@@ -64,6 +64,13 @@ if ($result = $db->db_query("SELECT 0 FROM pg_class WHERE relname = 'tbl_kennzei
 			echo '<strong>public.tbl_kennzeichen_id_seq '.$db->db_last_error().'</strong><br>';
 		else
 			echo '<br>Granted privileges to <strong>fhcomplete</strong> on public.tbl_kennzeichen_id_seq';
+
+		// GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kennzeichen_id_seq TO web;
+		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kennzeichen_id_seq TO web;';
+		if (!$db->db_query($qry))
+			echo '<strong>public.tbl_kennzeichen_id_seq '.$db->db_last_error().'</strong><br>';
+		else
+			echo '<br>Granted privileges to <strong>web</strong> on public.tbl_kennzeichen_id_seq';
 	}
 }
 
