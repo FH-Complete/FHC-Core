@@ -1,0 +1,309 @@
+import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import VueDatePicker from '../../vueDatepicker.js.php';
+import ApiPaabgabe from '../../../api/factory/paabgabeUebersicht.js'
+import Loader from "../../Loader.js";
+
+export const ProjektabgabeUebersicht =  {
+	name: "ProjektabgabeUebersicht",
+	props: {
+		viewData: Object // NOTE: this is inherited from router-view
+	},
+	components: {
+		VueDatePicker,
+		CoreFilterCmpt,
+		Loader
+	},
+	data() {
+		return {
+			phrasenPromise: null,
+			phrasenResolved: false,
+			tabulatorUuid: Vue.ref(0),
+			tableBuiltResolve: null,
+			tableBuiltPromise: null,
+			studiengaenge: null,
+			abgabetypen: null,
+			termine: null,
+			abgaben: null,
+			defaultStudiengang: {
+				studiengang_kz: null,
+				kuerzel: Vue.computed(() => this.$p.t('abgabetool/studiengangWaehlen'))
+			},
+			defaultTyp: {
+				paabgabetyp_kurzbz: null,
+				bezeichnung: Vue.computed(() => this.$p.t('abgabetool/abgabetypWaehlen'))
+			},
+			defaultTermin: {
+				termin: null,
+				termin_anzeige: Vue.computed(() => this.$p.t('abgabetool/terminWaehlen'))
+			},
+			selectedStudiengang: null,
+			selectedAbgabetyp: null,
+			selectedTermin: null,
+			personSearchString: null,
+			paabgabeTableOptions: {
+				height: Vue.ref(400),
+				index: 'paabgabe_id',
+				layout: 'fitColumns',
+				//~ placeholder: this.$p.t('global/noDataAvailable'),
+				columns: [
+					{
+						title: Vue.computed(() => this.$p.t('global/aktionen')), field: 'actions',
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let downloadButton = document.createElement('button');
+							downloadButton.className = 'btn btn-outline-secondary';
+							downloadButton.innerHTML = '<i class="fa fa-download"></i>';
+							downloadButton.title = this.$p.t('ui', 'downloadDok');
+							downloadButton.addEventListener('click', evt => {
+								evt.stopPropagation();
+								this.actionDownload(cell.getData().paabgabe_id);
+							});
+							container.append(downloadButton);
+
+							if (this.viewData.showEdit)
+							{
+								let editButton = document.createElement('button');
+								editButton.className = 'btn btn-outline-secondary';
+								editButton.innerHTML = '<i class="fa fa-edit"></i>';
+								editButton.addEventListener('click', () =>
+									this.$refs.edit.open(cell.getData())
+								);
+								container.append(editButton);
+							}
+
+							return container;
+						}
+					},
+					{title: Vue.computed(() => this.$p.t('abgabetool/paabgabeid')), field: 'paabgabe_id', widthGrow: 1, visible: false},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/termin')),
+						field: "termin",
+						widthGrow: 1,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'paabgabetyp_bezeichnung', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('person/uid')), field: 'uid', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('person/vorname')), field: 'vorname', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('person/nachname')), field: 'nachname', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/typ')), field: 'projekttyp_kurzbz', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/titel')), field: 'titel', widthGrow: 1}
+				],
+				persistence: false,
+			},
+			paabgabeTableEventHandlers: [{
+					event: "tableBuilt",
+					handler: async () => {
+						this.tableBuiltResolve()
+					}
+				}
+			]};
+	},
+	methods: {
+		tableResolve(resolve) {
+			this.tableBuiltResolve = resolve
+		},
+		setupData(data){
+			//~ const d = data.map(paabgabe => {
+				//~ return {
+					//~ ort_kurzbz: paabgabe.ort_kurzbz,
+					//~ bezeichnung: paabgabe.bezeichnung.replace('&amp;', '&'),
+					//~ nummer: paabgabe.planbezeichnung,
+					//~ personen: paabgabe.max_person
+				//~ }
+			//~ })
+
+			this.$refs.paabgabeTable.tabulator.setData(data);
+		},
+		setNoDataPlaceholder() {
+			this.$refs.paabgabeTable.tabulatorOptions.placeholder = this.$p.t('global/noDataAvailable');
+		},
+		loadStudiengaenge() {
+			this.$api.call(ApiPaabgabe.getStudiengaenge())
+				.then(res => {
+					this.studiengaenge = res?.data ?? []
+				})
+		},
+		loadPaabgabeTypes() {
+			this.$api.call(ApiPaabgabe.getPaAbgabetypen())
+				.then(res => {
+					this.abgabetypen = res?.data ?? []
+				})
+		},
+		loadTermine() {
+			this.$api.call(ApiPaabgabe.getTermine(this.selectedStudiengang, this.selectedAbgabetyp))
+				.then(res => {
+					this.termine = res?.data ?? []
+			})
+		},
+		loadPaAbgaben() {
+			this.$refs.loader.show();
+			//~ const func =
+				//~ this.personSearchString && this.personSearchString != ''
+				//~ ? ApiPaabgabe.searchPaAbgabenByPerson(this.personSearchString)
+				//~ : ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin);
+
+			this.$api.call(
+				ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin, this.personSearchString)
+			)
+			.then(res => {
+				this.$refs.loader.hide();
+				this.setupData(res?.data ?? []);
+			});
+		},
+		handleUuidDefined(uuid) {
+			this.tabulatorUuid = uuid
+		},
+		searchPaAbgabenByPerson(){
+			this.$api.call(ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin))
+				.then(res => {
+					this.setupData(res?.data ?? []);
+					//this.abgaben = res?.data ?? []
+			});
+		},
+		//~ setRoute(val) {
+			//~ // TODO: router push
+		//~ },
+		async setupMounted() {
+			this.tableBuiltPromise = new Promise(this.tableResolve);
+			await this.tableBuiltPromise;
+
+			this.setNoDataPlaceholder();
+			this.loadStudiengaenge();
+			this.loadPaabgabeTypes();
+			this.loadTermine();
+			//this.loadPaAbgaben();
+
+
+			//~ const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
+			//~ const tableDataSet = document.getElementById('filterTableDataset' + tableID);
+			//~ if(!tableDataSet) return
+			//~ const rect = tableDataSet.getBoundingClientRect();
+
+			//~ const h = window.visualViewport.height - rect.top - 100
+			//~ if(this.$refs.raumsucheTable) {
+				//~ this.$refs.raumsucheTable.$refs.table.style.setProperty('height', h+'px')
+			//~ }
+
+		},
+		actionDownload(paabgabe_id) {
+			//~ window.open(
+				//~ FHC_JS_DATA_STORAGE_OBJECT.app_root
+				//~ + FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				//~ +'/api/frontend/v1/education/paabgabe/downloadProjektarbeit?paabgabe_id=' + encodeURIComponent(paabgabe_id),
+				//~ '_blank'
+			//~ );
+		}
+	},
+	computed: {
+		isDarkMode(){
+			return this.$theme.theme_name.value == 'dark';
+		},
+		personSearchEnabled() {
+			this.loadTermine();
+			return this.selectedStudiengang == null && this.selectedTermin == null && this.selectedAbgabetyp == null;
+		},
+		abgabeSearchEnabled() {
+			return this.personSearchString == '' || this.personSearchString == null;
+		}
+	},
+	created() {
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global', 'person', 'ui']);
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true});
+	},
+	mounted() {
+		this.setupMounted();
+	},
+	template: `
+	<h1 class="h3">{{$p.t('abgabetool/projektabgabeUebersicht')}}</h1>
+	<hr>
+	<div class="row">
+
+		<div class="col-12 col-lg-2">
+			<select
+				ref="studiengang"
+				id="studiengangSelect"
+				v-model="selectedStudiengang"
+				class="form-select"
+				:aria-label="$p.t('abgabetool/studiengang_auswaehlen')"
+				:disabled="!abgabeSearchEnabled"
+				@change="loadTermine();"
+			>
+				<option :key="defaultStudiengang.studiengang_kz" selected :value="defaultStudiengang.studiengang_kz">{{defaultStudiengang.kuerzel}}</option>
+				<option v-for="stg in studiengaenge" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
+			</select>
+		</div>
+
+		<div class="col-12 col-lg-2">
+			<select
+				ref="abgabetyp"
+				id="abgabetypSelect"
+				v-model="selectedAbgabetyp"
+				class="form-select"
+				:aria-label="$p.t('abgabetool/termin_auswaehlen')"
+				:disabled="!abgabeSearchEnabled"
+				@change="loadTermine();"
+			>
+				<option :key="defaultTyp.paabgabetyp_kurzbz" selected :value="defaultTyp.paabgabetyp_kurzbz">{{defaultTyp.bezeichnung}}</option>
+				<option v-for="typ in abgabetypen" :key="typ.paabgabetyp_kurzbz" :value="typ.paabgabetyp_kurzbz">{{typ.bezeichnung}}</option>
+			</select>
+		</div>
+
+		<div class="col-12 col-lg-2">
+			<select
+				ref="termin"
+				id="terminSelect"
+				v-model="selectedTermin"
+				class="form-select"
+				:aria-label="$p.t('abgabetool/abgabetyp_auswaehlen')"
+				:disabled="!abgabeSearchEnabled"
+			>
+				<option :key="defaultTermin.termin" selected :value="defaultTermin.termin">{{defaultTermin.termin_anzeige}}</option>
+				<option v-for="termin in termine" :key="termin.termin" :value="termin.termin">{{termin.termin_anzeige}}</option>
+			</select>
+		</div>
+
+		<div class="col-12 col-lg-2">
+			<input
+				type="text"
+				name="person-search"
+				class="form-control"
+				:placeholder="$p.t('abgabetool/nach_person_suchen')"
+				:disabled="!personSearchEnabled"
+				v-on:keyup.enter="loadPaAbgaben"
+				v-model="personSearchString"
+			/>
+		</div>
+
+		<div class="col-12 col-lg-2">
+			<button class="btn btn-primary border-0" @click="loadPaAbgaben">{{ $p.t('abgabetool/anzeigen') }}</button>
+		</div>
+	</div>
+
+	<core-filter-cmpt
+		v-if="phrasenResolved"
+		@uuidDefined="handleUuidDefined"
+		ref="paabgabeTable"
+		:tabulator-options="paabgabeTableOptions"
+		:tabulator-events="paabgabeTableEventHandlers"
+		tableOnly
+		:sideMenu="false"
+	 />
+
+	 <loader ref="loader" :timeout="0"></loader>
+	`
+};
+
+export default ProjektabgabeUebersicht;
