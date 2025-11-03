@@ -312,12 +312,15 @@ class PhrasesLib
 			// If an error occurred then exit
 			if ($line === false && !feof($srcFileHandle)) return false;
 
-			// Search for the end of the array
-			if (stristr($line, ');'))
+			// If the first phrase or the end of the array
+			if ($line == '$phrases = array();' || stristr($line, ');'))
 			{
+				$first_coma = ',';
+				if ($line == '$phrases = array();') $first_coma = '';
+
 				// If found then append the new phrase to the current line
 				// and replace the end of the array
-				$line = str_replace(');', ",\n".var_export($phrase, true)."\n".');', $line);
+				$line = str_replace(');', $first_coma."\n".var_export($phrase, true)."\n".');', $line);
 			}
 
 			// In any case copy the line to the temp file
@@ -345,7 +348,7 @@ class PhrasesLib
 	{
 		return !(file_put_contents(
 			$phrasesCategoryFile,
-			'<?php'."\n\n".'$phrases = array('."\n".');'
+			'<?php'."\n\n".'$phrases = array();'
 		) === false);
 	}
 
