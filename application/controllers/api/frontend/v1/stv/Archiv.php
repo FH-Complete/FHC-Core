@@ -107,13 +107,9 @@ class Archiv extends FHCAPI_Controller
 
 		$result = $this->AkteModel->load($akte_id);
 
-
 		if (!hasData($result)) $this->terminateWithError('Akte not found');
 
-		$data = $this->getDataOrTerminateWithError($result);
-
 		$data = getData($result)[0];
-		//$this->addMeta("daa", $data->inhalt);
 
 		$fileObj = new stdClass();
 		if (isset($data->inhalt) && $data->inhalt != '')
@@ -133,12 +129,7 @@ class Archiv extends FHCAPI_Controller
 			//header("Content-type: $data->mimetype");
 			header('Content-Disposition: attachment; filename="'.$data->titel.'"');
 			readfile($filename);
-			//echo base64_decode($data->inhalt);
 			die();
-			//~ $fileObj->file = $data->inhalt;
-			//~ $fileObj->name = $data->titel;
-			//~ $fileObj->mimetype = $data->mimetype;
-			//~ $fileObj->disposition = 'attachment';
 		}
 		else
 		{
@@ -146,12 +137,6 @@ class Archiv extends FHCAPI_Controller
 
 			$result = $this->aktelib->get($akte_id);
 		}
-
-	/*	$fileObj->filename
-	 * 	$fileObj->file
-	 * 	$fileObj->name
-	 * 	$fileObj->mimetype
-	 * 	$fileObj->disposition*/
 	}
 
 	/**
