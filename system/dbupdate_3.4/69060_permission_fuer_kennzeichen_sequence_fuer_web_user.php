@@ -19,9 +19,9 @@
 if (! defined('DB_NAME')) exit('No direct script access allowed');
 
 // GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kennzeichen_id_seq TO web;
-if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relkind = 'S' AND relname = 'tbl_kennzeichen_id_seq' AND relacl::TEXT LIKE '%web=%';"))
+if ($result = $db->db_query("SELECT 1 FROM pg_class WHERE relname = 'tbl_kennzeichen_id_seq' AND relkind = 'S' AND relacl::TEXT NOT LIKE '%web=%';"))
 {
-	if ($db->db_num_rows($result) == 0)
+	if ($db->db_num_rows($result) > 0)
 	{
 		$qry = 'GRANT SELECT, UPDATE ON SEQUENCE public.tbl_kennzeichen_id_seq TO web;';
 		if (!$db->db_query($qry))
