@@ -84,6 +84,7 @@ require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
 require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
+require_once('dbupdate_3.4/69060_permission_fuer_kennzeichen_sequence_fuer_web_user.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
