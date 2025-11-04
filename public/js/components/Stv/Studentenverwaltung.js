@@ -352,7 +352,7 @@ export default {
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow" style="background-color: green !important;">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
-					class="btn btn-outline-secondary border-0 m-1 collapsed"
+					class="btn btn-outline-light border-0 m-1 collapsed"
 					type="button"
 					data-bs-toggle="offcanvas"
 					data-bs-target="#appMenu"
@@ -370,7 +370,7 @@ export default {
 				</a>
 			</div>
 			<button
-				class="btn btn-outline-secondary border-0 d-md-none m-1 collapsed"
+				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
 				type="button"
 				data-bs-toggle="offcanvas"
 				data-bs-target="#sidebarMenu"
