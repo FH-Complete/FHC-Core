@@ -245,6 +245,11 @@ class Config extends FHCAPI_Controller
 			]
 		];
 
+		$result['kontaktieren'] = [
+			'title' => $this->p->t('stv', 'tab_kontaktieren'),
+			'component' => './Stv/Studentenverwaltung/Details/Kontaktieren.js',
+		];
+
 		Events::trigger('stv_conf_students', function & () use (&$result) {
 			return $result;
 		});
