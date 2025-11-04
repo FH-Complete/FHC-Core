@@ -1,5 +1,6 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
+import ListFilter from './List/Filter.js';
 
 import draggable from '../../../directives/draggable.js';
 
@@ -7,7 +8,8 @@ export default {
 	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
-		ListNew
+		ListNew,
+		ListFilter
 	},
 	directives: {
 		draggable
@@ -131,7 +133,7 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({url, params});
+					return this.$api.call({method: 'post', url, params});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -169,8 +171,7 @@ export default {
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
-			filterKontoCount0: undefined,
-			filterKontoMissingCounter: undefined,
+			filter: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
@@ -248,6 +249,10 @@ export default {
 				}
 			}
 		},
+		updateFilter(filter) {
+			this.filter = filter;
+			this.updateUrl();
+		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
@@ -268,14 +273,9 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {}, filter = {};
-			if (this.filterKontoCount0)
-				filter.konto_count_0 = this.filterKontoCount0;
-			if (this.filterKontoMissingCounter)
-				filter.konto_missing_counter = this.filterKontoMissingCounter;
-
-			if (filter.konto_count_0 || filter.konto_missing_counter)
-				params.filter = filter;
+			const params = {};
+			if (this.filter.length)
+				params.filter = this.filter;
 
 			if (!this.$refs.table.tableBuilt) {
 				if (!this.$refs.table.tabulator) {
@@ -360,11 +360,11 @@ export default {
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
-	template: `
+	template: /* html */`
 	<div class="stv-list h-100 pt-3">
 		<div
 			class="tabulator-container d-flex flex-column h-100"
-			:class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}"
+			:class="{'has-filter': filter.length}"
 			tabindex="0"
 			@focusin="onFocus"
 			@keydown="onKeydown"
@@ -388,29 +388,7 @@ export default {
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<div class="input-group mb-3">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-count-0">{{ $p.t('stv/konto_filter_count_0') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-count-0" v-model="filterKontoCount0" @input="$nextTick(updateUrl)">
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoCount0" class="btn btn-outline-secondary" @click="filterKontoCount0 = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
-						<div class="input-group">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-missing-counter">{{ $p.t('stv/konto_filter_missing_counter') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-missing-counter" v-model="filterKontoMissingCounter" @input="$nextTick(updateUrl)">
-								<option value="alle">{{ $p.t('stv/konto_all_types') }}</option>
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoMissingCounter" class="btn btn-outline-secondary" @click="filterKontoMissingCounter = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
+						<list-filter @change="updateFilter" />
 					</div>
 				</div>
 			</template>
