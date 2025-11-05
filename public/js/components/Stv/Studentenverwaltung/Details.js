@@ -37,25 +37,34 @@ export default {
 			return this.configStudents;
 		}
 	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined)
+				this.loadConfig();
+		}
+	},
 	methods: {
+		loadConfig() {
+			this.$api
+				.call(ApiStvApp.configStudent())
+				.then(result => {
+					this.configStudent = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+			this.$api
+				.call(ApiStvApp.configStudents())
+				.then(result => {
+					this.configStudents = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
 		}
 	},
 	created() {
-		this.$api
-			.call(ApiStvApp.configStudent())
-			.then(result => {
-				this.configStudent = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$api
-			.call(ApiStvApp.configStudents())
-			.then(result => {
-				this.configStudents = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+		this.loadConfig();
 	},
 	template: `
 	<div class="stv-details h-100 pb-3 d-flex flex-column">
