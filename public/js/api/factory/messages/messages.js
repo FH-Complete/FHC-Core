@@ -62,10 +62,10 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getUid/' + userParams.id + '/' + userParams.type_id
 		};
 	},
-	getVorlagentext(vorlage_kurzbz){
+	getDataVorlage(vorlage_kurzbz){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getVorlagentext/' + vorlage_kurzbz
+			url: 'api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz
 		};
 	},
 	getNameOfDefaultRecipient(params){

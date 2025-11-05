@@ -328,7 +328,7 @@ export default {
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form"  >
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <edit-profil v-if="showModal" ref="editModal" :isMitarbeiter="true" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
         <div  class="d-md-none col-12 ">
             <!--TODO: uncomment when implemented
