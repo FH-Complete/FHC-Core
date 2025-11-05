@@ -16,6 +16,7 @@
  */
 
 import CoreSearchbar from "../searchbar/searchbar.js";
+import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
@@ -31,6 +32,7 @@ export default {
 	name: 'Studentenverwaltung',
 	components: {
 		CoreSearchbar,
+		NavLanguage,
 		VerticalSplit,
 		StvVerband,
 		StvList,
@@ -43,6 +45,8 @@ export default {
 		permissions: Object,
 		stvRoot: String,
 		cisRoot: String,
+		avatarUrl: String,
+		logoutUrl: String,
 		activeAddons: String, // semicolon separated list of active addons
 		url_studiensemester_kurzbz: String,
 		url_mode: String,
@@ -355,6 +359,37 @@ export default {
 				:searchfunction="searchfunction"
 				class="searchbar position-relative w-100"
 			></core-searchbar>
+			<div id="nav-user" class="dropdown">
+				<button
+					id="nav-user-btn"
+					class="btn btn-link rounded-0 py-0"
+					type="button"
+					data-bs-toggle="dropdown"
+					data-bs-target="#nav-user-menu"
+					aria-expanded="false"
+					aria-controls="nav-user-menu"
+				>
+					<img
+						:src="avatarUrl"
+						:alt="$p.t('profilUpdate/profilBild')"
+						class="bg-light avatar rounded-circle border border-light"
+					/>
+				</button>
+				<ul
+					ref="navUserDropdown"
+					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
+					aria-labelledby="nav-user-btn"
+				>
+					<li>
+						<nav-language
+							item-class="dropdown-item border-left-dark"
+							@changed="tmpFunc"
+						/>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li><a class="dropdown-item" :href="logoutUrl">Logout</a></li>
+				</ul>
+			</div>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">

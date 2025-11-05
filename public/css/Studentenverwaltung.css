@@ -41,6 +41,12 @@ html {
 	width: 0%;
 }
 
+#nav-user-btn img {
+	object-fit: contain;
+	height: 2.5rem;
+	width: 2.5rem;
+}
+
 .tabulator-row.disabled.tabulator-row-odd .tabulator-cell {
 	color: var(--gray-400);
 }
