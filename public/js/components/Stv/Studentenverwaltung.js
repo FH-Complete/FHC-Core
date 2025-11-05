@@ -383,7 +383,6 @@ export default {
 					<li>
 						<nav-language
 							item-class="dropdown-item border-left-dark"
-							@changed="tmpFunc"
 						/>
 					</li>
 					<li><hr class="dropdown-divider m-0"/></li>
