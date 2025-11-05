@@ -1,5 +1,4 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
-import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiPaabgabe from '../../../api/factory/paabgabeUebersicht.js'
 import Loader from "../../Loader.js";
 
@@ -9,7 +8,6 @@ export const ProjektabgabeUebersicht =  {
 		viewData: Object // NOTE: this is inherited from router-view
 	},
 	components: {
-		VueDatePicker,
 		CoreFilterCmpt,
 		Loader
 	},
@@ -115,7 +113,7 @@ export const ProjektabgabeUebersicht =  {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
-		setupData(data){
+		setupData(){
 			//~ const d = data.map(paabgabe => {
 				//~ return {
 					//~ ort_kurzbz: paabgabe.ort_kurzbz,
@@ -125,7 +123,7 @@ export const ProjektabgabeUebersicht =  {
 				//~ }
 			//~ })
 
-			this.$refs.paabgabeTable.tabulator.setData(data);
+			this.$refs.paabgabeTable.tabulator.setData(this.abgaben);
 		},
 		setNoDataPlaceholder() {
 			this.$refs.paabgabeTable.tabulatorOptions.placeholder = this.$p.t('global/noDataAvailable');
@@ -145,45 +143,37 @@ export const ProjektabgabeUebersicht =  {
 		loadTermine() {
 			this.$api.call(ApiPaabgabe.getTermine(this.selectedStudiengang, this.selectedAbgabetyp))
 				.then(res => {
+					this.selectedTermin = null;
 					this.termine = res?.data ?? []
 			})
 		},
 		loadPaAbgaben() {
 			this.$refs.loader.show();
-			//~ const func =
-				//~ this.personSearchString && this.personSearchString != ''
-				//~ ? ApiPaabgabe.searchPaAbgabenByPerson(this.personSearchString)
-				//~ : ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin);
 
 			this.$api.call(
 				ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin, this.personSearchString)
 			)
 			.then(res => {
 				this.$refs.loader.hide();
+				this.abgaben = res?.data ?? [];
 				this.setupData(res?.data ?? []);
 			});
 		},
 		handleUuidDefined(uuid) {
 			this.tabulatorUuid = uuid
 		},
-		searchPaAbgabenByPerson(){
-			this.$api.call(ApiPaabgabe.getPaAbgaben(this.selectedStudiengang, this.selectedAbgabetyp, this.selectedTermin))
-				.then(res => {
-					this.setupData(res?.data ?? []);
-					//this.abgaben = res?.data ?? []
-			});
-		},
 		//~ setRoute(val) {
 			//~ // TODO: router push
 		//~ },
 		async setupMounted() {
+			this.loadStudiengaenge();
+			this.loadPaabgabeTypes();
+			this.loadTermine();
+
 			this.tableBuiltPromise = new Promise(this.tableResolve);
 			await this.tableBuiltPromise;
 
 			this.setNoDataPlaceholder();
-			this.loadStudiengaenge();
-			this.loadPaabgabeTypes();
-			this.loadTermine();
 			//this.loadPaAbgaben();
 
 
@@ -202,21 +192,35 @@ export const ProjektabgabeUebersicht =  {
 			//~ window.open(
 				//~ FHC_JS_DATA_STORAGE_OBJECT.app_root
 				//~ + FHC_JS_DATA_STORAGE_OBJECT.ci_router
-				//~ +'/api/frontend/v1/education/paabgabe/downloadProjektarbeit?paabgabe_id=' + encodeURIComponent(paabgabe_id),
+				//~ +'/api/frontend/v1/education/paabgabeuebersicht/downloadProjektarbeit?paabgabe_id=' + encodeURIComponent(paabgabe_id),
 				//~ '_blank'
 			//~ );
+		},
+		actionDownloadZip(ev) {
+			console.log(ev);
+			const url = new URL(FHC_JS_DATA_STORAGE_OBJECT.app_root
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+'/api/frontend/v1/education/PaabgabeUebersicht/downloadZip');
+			if (this.selectedStudiengang) url.searchParams.append('studiengang_kz', this.selectedStudiengang);
+			if (this.selectedAbgabetyp) url.searchParams.append('abgabetyp_kurzbz', this.selectedAbgabetyp);
+			if (this.selectedTermin) url.searchParams.append('abgabedatum', this.selectedTermin);
+			if (this.personSearchString) url.searchParams.append('personSearchString', this.personSearchString);
+			console.log(url.toString());
+			window.open(url.toString(), '_blank');
 		}
 	},
 	computed: {
-		isDarkMode(){
+		isDarkMode() {
 			return this.$theme.theme_name.value == 'dark';
 		},
 		personSearchEnabled() {
-			this.loadTermine();
 			return this.selectedStudiengang == null && this.selectedTermin == null && this.selectedAbgabetyp == null;
 		},
 		abgabeSearchEnabled() {
 			return this.personSearchString == '' || this.personSearchString == null;
+		},
+		zipDownloadUrl() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/education/PaabgabeUebersicht/downloadZip';
 		}
 	},
 	created() {
@@ -290,6 +294,10 @@ export const ProjektabgabeUebersicht =  {
 		<div class="col-12 col-lg-2">
 			<button class="btn btn-primary border-0" @click="loadPaAbgaben">{{ $p.t('abgabetool/anzeigen') }}</button>
 		</div>
+		<div class="col-12 col-lg-2">
+			<button class="btn btn-secondary border-0" @click="actionDownloadZip">{{ $p.t('abgabetool/zipDownload') }}</button>
+		</div>
+
 	</div>
 
 	<core-filter-cmpt

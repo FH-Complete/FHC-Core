@@ -67,34 +67,25 @@ class Paabgabe_model extends DB_Model
 		$abgabetyp_kurzbz = null,
 		$abgabedatum = null,
 		$personSearchString = null,
-		$limit = 100
+		$limit = 1000
 	) {
-		// convert search string
-		if (is_numeric($personSearchString))
-		{
-			$personSearchString = (int) $personSearchString;
-		}
-		else
-		{
-			// remove empty spaces and lowercase
-			$personSearchString = strtolower(str_replace(' ', '', $personSearchString));
-		}
-
 		$params = [];
 
 		$qry = "
 			SELECT
-				tbl_studiengang.bezeichnung AS stgbez, tbl_paabgabe.datum AS termin,
-				tbl_paabgabe.*, abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel
+				stg.bezeichnung AS stgbez, paabg.datum AS termin,
+				paabg.paabgabe_id, paabg.projektarbeit_id, paabg.paabgabetyp_kurzbz, paabg.abgabedatum,
+				abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel,
+				UPPER(stg.typ || stg.kurzbz) AS studiengang_kuerzel
 			FROM
 				lehre.tbl_projektarbeit pa
-				JOIN campus.tbl_paabgabe USING(projektarbeit_id)
+				JOIN campus.tbl_paabgabe paabg USING(projektarbeit_id)
 				JOIN campus.tbl_paabgabetyp abgabetyp USING(paabgabetyp_kurzbz)
 				LEFT JOIN public.tbl_benutzer ben ON(uid=student_uid)
 				LEFT JOIN public.tbl_person pers ON(ben.person_id=pers.person_id)
 				LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-				LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
+				LEFT JOIN public.tbl_studiengang stg USING(studiengang_kz)
 			WHERE
 				TRUE";
 
@@ -106,24 +97,25 @@ class Paabgabe_model extends DB_Model
 
 		if (isset($studiengang_kz) && is_numeric($studiengang_kz))
 		{
-			$qry .= " AND public.tbl_studiengang.studiengang_kz=?";
+			$qry .= " AND stg.studiengang_kz=?";
 			$params[] = $studiengang_kz;
 		}
 
 		if (isset($abgabetyp_kurzbz))
 		{
-			$qry .= " AND campus.tbl_paabgabe.paabgabetyp_kurzbz=?";
+			$qry .= " AND paabg.paabgabetyp_kurzbz=?";
 			$params[] = $abgabetyp_kurzbz;
 		}
 
 		if (isset($abgabedatum))
 		{
-			$qry .= " AND campus.tbl_paabgabe.datum=?";
+			$qry .= " AND paabg.datum=?";
 			$params[] = $abgabedatum;
 		}
 
-		if (is_integer($personSearchString))
+		if (is_numeric($personSearchString))
 		{
+			$personSearchString = (int) $personSearchString;
 			$params = array_merge($params, [$personSearchString, $personSearchString]);
 			$qry .= " AND (
 				pers.person_id = ?
@@ -132,6 +124,8 @@ class Paabgabe_model extends DB_Model
 		}
 		elseif (is_string($personSearchString))
 		{
+			// remove empty spaces and lowercase
+			$personSearchString = strtolower(str_replace(' ', '', $personSearchString));
 			$qry .= " AND (
 				LOWER(REPLACE(pers.nachname || pers.vorname || pers.nachname, ' ', '')) LIKE ".$this->db->escape('%'.$personSearchString.'%')."
 				OR ben.uid LIKE ".$this->db->escape('%'.$personSearchString.'%')."
@@ -140,9 +134,7 @@ class Paabgabe_model extends DB_Model
 
 		$qry .= " ORDER BY nachname";
 
-		if (isset($limit) && is_numeric($limit)
-			&& (!isset($studiengang_kz) || !is_numeric($studiengang_kz))
-			&& !isset($abgabetyp_kurzbz) && !isset($abgabedatum))
+		if (isset($limit) && is_numeric($limit) && (!isset($studiengang_kz) || !is_numeric($studiengang_kz)) && !isset($abgabedatum))
 		{
 			$qry .= " LIMIT ?";
 			$params[] = $limit;
@@ -191,67 +183,4 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, $params);
 	}
-
-	//~ public function searchPaAbgabenByPerson($projekttyp_kurzbz_arr, $searchString, $limit = 100)
-	//~ {
-		//~ if (is_numeric($searchString))
-		//~ {
-			//~ $searchString = (int) $searchString;
-		//~ }
-		//~ else
-		//~ {
-			//~ $searchString = strtolower(str_replace(' ', '', $searchString));
-		//~ }
-
-		//~ $params = [];
-
-		//~ $qry = "
-			//~ SELECT
-				//~ tbl_studiengang.bezeichnung AS stgbez, tbl_paabgabe.datum AS termin,
-				//~ tbl_paabgabe.*, abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel
-			//~ FROM
-				//~ lehre.tbl_projektarbeit pa
-				//~ JOIN campus.tbl_paabgabe USING(projektarbeit_id)
-				//~ JOIN campus.tbl_paabgabetyp abgabetyp USING(paabgabetyp_kurzbz)
-				//~ LEFT JOIN public.tbl_benutzer ben ON(uid=student_uid)
-				//~ LEFT JOIN public.tbl_person pers ON(ben.person_id=pers.person_id)
-				//~ LEFT JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
-				//~ LEFT JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-				//~ LEFT JOIN public.tbl_studiengang USING(studiengang_kz)
-			//~ WHERE
-				//~ TRUE";
-
-		//~ if (isset($projekttyp_kurzbz_arr) && !isEmptyArray($projekttyp_kurzbz_arr))
-		//~ {
-			//~ $qry .= " AND projekttyp_kurzbz IN ?";
-			//~ $params[] = $projekttyp_kurzbz_arr;
-		//~ }
-
-
-		//~ if (is_integer($searchString))
-		//~ {
-			//~ $params = array_merge($params, [$searchString, $searchString]);
-			//~ $qry .= " AND (
-				//~ pers.person_id = ?
-				//~ OR EXISTS (SELECT 1 FROM public.tbl_prestudent WHERE person_id = pers.person_id AND prestudent_id = ?)
-			//~ )";
-		//~ }
-		//~ else
-		//~ {
-			//~ $qry .= " AND (
-				//~ LOWER(REPLACE(pers.nachname || pers.vorname || pers.nachname, ' ', '')) LIKE ".$this->db->escape('%'.$searchString.'%')."
-				//~ OR ben.uid LIKE ".$this->db->escape('%'.$searchString.'%')."
-			//~ )";
-		//~ }
-
-		//~ $qry .= " ORDER BY nachname";
-
-		//~ if (isset($limit) && is_numeric($limit))
-		//~ {
-			//~ $qry .= " LIMIT ?";
-			//~ $params[] = $limit;
-		//~ }
-
-		//~ return $this->execReadOnlyQuery($qry, $params);
-	//~ }
 }

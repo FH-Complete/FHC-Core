@@ -14,7 +14,6 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-
 class PaabgabeUebersicht extends FHCAPI_Controller
 {
 	const DOWNLOAD_PERMISSION = 'lehre/abgabetool:download';
@@ -26,16 +25,22 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStudiengaenge' => array('lehre/abgabetool:r'),
 			'getPaAbgaben' => array('lehre/abgabetool:r'),
+			'getStudiengaenge' => array('lehre/abgabetool:r'),
 			'getTermine' => array('lehre/abgabetool:r'),
-			'getPaAbgabetypen' => array('lehre/abgabetool:r')
+			'getPaAbgabetypen' => array('lehre/abgabetool:r'),
+			'downloadZip' => array('lehre/abgabetool:r')
 			//'downloadProjektarbeit' => array('lehre/abgabetool:r')
 		]);
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
 		$this->load->library('PermissionLib');
+
+		// Load Phrases
+		$this->loadPhrases([
+			'abgabetool'
+		]);
 	}
 
 	/**
@@ -50,31 +55,12 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 		$abgabedatum = $this->input->get('abgabedatum');
 		$personSearchString = $this->input->get('personSearchString');
 
-
 		$result = $this->PaabgabeModel->getPaAbgaben(self::ABGABE_TYPES, $studiengang_kz, $abgabetyp_kurzbz, $abgabedatum, $personSearchString);
-		$this->addMeta('res', $result);
 
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
 
 		$this->terminateWithSuccess(getData($result) ?: []);
 	}
-
-	/**
-	 *
-	 *
-	 * @return array|stdClass|null
-	 */
-	//~ public function searchPaAbgabenByPerson()
-	//~ {
-		//~ $searchString = $this->input->get('searchString');
-
-		//~ $result = $this->PaabgabeModel->searchPaAbgabenByPerson(self::ABGABE_TYPES, $searchString);
-		//~ $this->addMeta('res', $result);
-
-		//~ if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
-
-		//~ $this->terminateWithSuccess(getData($result) ?: []);
-	//~ }
 
 	/**
 	 *
@@ -98,7 +84,6 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 
 		$this->terminateWithSuccess((getData($result) ?: []));
 	}
-
 
 	/**
 	 *
@@ -127,11 +112,58 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 		// Load model PaabgabetypModel
 		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 
+		$this->PaabgabetypModel->addOrder('bezeichnung');
 		$result = $this->PaabgabetypModel->load();
 
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
 
 		$this->terminateWithSuccess((getData($result) ?: []));
+	}
+
+	/**
+	 *
+	 * @param
+	 * @return object success or error
+	 */
+	public function downloadZip()
+	{
+		$studiengang_kz = $this->input->get('studiengang_kz');
+		$abgabetyp_kurzbz = $this->input->get('abgabetyp_kurzbz');
+		$abgabedatum = $this->input->get('abgabedatum');
+		$personSearchString = $this->input->get('personSearchString');
+
+		if (!isset($studiengang_kz) && !isset($abgabetyp_kurzbz) && !isset($abgabedatum) && !isset($personSearchString))
+			$this->terminateWithFileOutput('text/plain', $this->p->t('abgabetool', 'keineAuswahl'));
+
+		$this->load->library('zip');
+
+		$result = $this->PaabgabeModel->getPaAbgaben(self::ABGABE_TYPES, $studiengang_kz, $abgabetyp_kurzbz, $abgabedatum, $personSearchString);
+
+		if (isError($result)) $this->terminateWithFileOutput('text/plain', getError($result));
+
+		$fileExists = false;
+		$studiengang_kuerzel = null;
+
+		if (!hasData($result)) $this->terminateWithFileOutput('text/plain', $this->p->t('abgabetool', 'keineDateienVorhanden'));
+
+		$abgaben = getData($result);
+
+		foreach ($abgaben as $abgabe)
+		{
+			$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$abgabe->uid.'.pdf';
+			if (file_exists($path))
+			{
+				$fileExists = true;
+				$studiengang_kuerzel = $abgabe->studiengang_kuerzel;
+				$this->zip->read_file($path);
+			}
+		}
+
+		if (!$fileExists) $this->terminateWithFileOutput('text/plain', $this->p->t('abgabetool', 'keineDateienVorhanden'));
+
+		$studiengang_kz = $this->input->get('studiengang_kz');
+		$zipFileName = 'Abgabe'.(isset($studiengang_kz) && isset($studiengang_kuerzel) ? '_'.$studiengang_kuerzel : '').'.zip';
+		$this->zip->download($zipFileName);
 	}
 
 	/**

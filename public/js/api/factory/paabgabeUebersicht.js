@@ -8,13 +8,6 @@ export default {
 			}
 		};
 	},
-	//~ searchPaAbgabenByPerson(searchString) {
-		//~ return {
-			//~ method: 'get',
-			//~ url: '/api/frontend/v1/education/PaabgabeUebersicht/searchPaAbgabenByPerson',
-			//~ params: { searchString: searchString }
-		//~ };
-	//~ },
 	getStudiengaenge() {
 		return {
 			method: 'get',
