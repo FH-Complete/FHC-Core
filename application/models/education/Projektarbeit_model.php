@@ -407,8 +407,6 @@ class Projektarbeit_model extends DB_Model
 						LEFT JOIN public.tbl_benutzer betreuer_benutzer ON (betreuer_person.person_id = betreuer_benutzer.person_id)
 			   WHERE (projekttyp_kurzbz = 'Bachelor' OR projekttyp_kurzbz = 'Diplom')
 				 AND student_benutzer.aktiv AND (lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter' OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')
-				 --   AND lehre.tbl_projektarbeit.note IS NULL
-				 --   AND public.tbl_studiengang.studiengang_kz= 257
 				 AND public.tbl_studiengang.studiengang_kz = ?
 			   ORDER BY tbl_projektarbeit.projektarbeit_id DESC, student_person.nachname ASC           
 		   ) as tmp";

@@ -672,6 +672,7 @@ class Abgabe extends FHCAPI_Controller
 		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
 		$bezeichnung = $_POST['bezeichnung'];
 		$kurzbz = $_POST['kurzbz'];
+		$fixtermin = $_POST['fixtermin'];
 
 		if (!isset($projektarbeit_ids) || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
 			|| !isset($datum) || isEmptyString($datum)
@@ -697,13 +698,14 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
 		$res = [];
+		$abgaben = [];
 		foreach ($projektarbeit_ids as $projektarbeit_id) {
 
 			$result = $this->PaabgabeModel->insert(
 				array(
 					'projektarbeit_id' => $projektarbeit_id,
 					'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
-					'fixtermin' => false,
+					'fixtermin' => $fixtermin,
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'insertvon' => getAuthUID(),
@@ -711,7 +713,9 @@ class Abgabe extends FHCAPI_Controller
 				)
 			);
 
-			$data = $this->getDataOrTerminateWithError($result);
+			$dataAbgabe  = $this->getDataOrTerminateWithError($result);
+			
+			$abgaben[]= getData($this->PaabgabeModel->load($dataAbgabe))[0];
 
 //			$res[] = $data;
 
@@ -751,7 +755,7 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->logLib->logInfoDB(array('serientermin angelegt',$res, getAuthUID(), getAuthPersonId()));
 
-		$this->terminateWithSuccess($res);
+		$this->terminateWithSuccess(array($res, $abgaben));
 
 	}
 
@@ -865,9 +869,6 @@ class Abgabe extends FHCAPI_Controller
 		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		
-		// TODO revert arr return new/old
-//		$arr = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
-//		$result = $arr[0];
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
 
@@ -904,7 +905,7 @@ class Abgabe extends FHCAPI_Controller
 		$stg_allowed = $this->permissionlib->getSTG_isEntitledFor('basis/abgabe_assistenz:rw');
 		
 		if($stg_allowed == false) {
-			$this->terminateWithError($this->p->t('global', 'keineBerechtigung'), 'general');
+			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
 		}
 
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');

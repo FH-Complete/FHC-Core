@@ -73,11 +73,11 @@ export default {
 			params: { paabgabe_id }
 		};
 	},
-	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids) {
+	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids, fixtermin) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postSerientermin',
-			params: { datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids }
+			params: { datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids, fixtermin }
 		};
 	},
 	fetchDeadlines(person_id) {

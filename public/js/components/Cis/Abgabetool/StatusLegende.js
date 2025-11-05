@@ -5,7 +5,7 @@ export const AbgabeterminStatusLegende = {
 			<div class="col"  style="width: 50%; margin-left: 12px;">
 			
 				<div class="row" style="margin-bottom: 2px">
-					<div class="col-auto verspaetet-header" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+					<div class="col-auto verspaetet-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i class="fa-solid fa-triangle-exclamation"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
@@ -14,7 +14,7 @@ export const AbgabeterminStatusLegende = {
 				</div>
 				
 				<div class="row" style="margin-bottom: 2px">
-					<div class="col-auto verpasst-header" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+					<div class="col-auto verpasst-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i class="fa-solid fa-calendar-xmark"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
@@ -23,7 +23,7 @@ export const AbgabeterminStatusLegende = {
 				</div>
 				
 				<div class="row" style="margin-bottom: 2px">
-					<div class="col-auto abzugeben-header" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+					<div class="col-auto abzugeben-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i class="fa-solid fa-hourglass-half"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
@@ -32,7 +32,7 @@ export const AbgabeterminStatusLegende = {
 				</div>
 				
 				<div class="row" style="margin-bottom: 2px">
-					<div class="col-auto standard-header" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+					<div class="col-auto standard-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i class="fa-solid fa-clock"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
@@ -41,7 +41,7 @@ export const AbgabeterminStatusLegende = {
 				</div>
 				
 				<div class="row" style="margin-bottom: 2px">
-					<div class="col-auto abgegeben-header" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+					<div class="col-auto abgegeben-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i class="fa-solid fa-check"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">

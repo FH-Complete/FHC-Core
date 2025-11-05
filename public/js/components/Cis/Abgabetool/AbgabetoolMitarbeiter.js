@@ -179,7 +179,8 @@ export const AbgabetoolMitarbeiter = {
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
-				this.selectedData?.map(projekt => projekt.projektarbeit_id)
+				this.selectedData?.map(projekt => projekt.projektarbeit_id),
+				false
 			)).then(res => {
 				if (res.meta.status === "success" && res.data) {
 					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))

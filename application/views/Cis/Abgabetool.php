@@ -25,6 +25,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/speeddial/speeddial.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/npm-asset/primevue/timeline/timeline.min.js',
+		'vendor/npm-asset/primevue/inplace/inplace.min.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(

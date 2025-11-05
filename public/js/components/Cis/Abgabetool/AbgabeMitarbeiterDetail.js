@@ -86,10 +86,16 @@ export const AbgabeMitarbeiterDetail = {
 					}
 					if(newTerminRes.note) newTerminRes.note = noteOpt
 					const existingTerminRes = res.data[1]
+					
+					const abgabeOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == newTerminRes.paabgabetyp_kurzbz)
+					
 					newTerminRes.bezeichnung = {
 						bezeichnung: termin.bezeichnung?.bezeichnung,
-						paabgabetyp_kurzbz: termin.bezeichnung?.paabgabetyp_kurzbz
+						paabgabetyp_kurzbz: termin.bezeichnung?.paabgabetyp_kurzbz,
+						benotbar: abgabeOpt.benotbar
 					}
+					
+					
 					
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
 					if(!existingTerminRes){
@@ -711,8 +717,8 @@ export const AbgabeMitarbeiterDetail = {
 		<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
 			<h3>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h3>
 		</div>
-</div>
-	 </div>
+		
+	</div>
 `,
 };
 
