@@ -162,6 +162,12 @@ define('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON', '');
 // Legt fest, ob Vertragsdetails zum Projektauftrag im Reiter Projektarbeit angezeigt werden
 define('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN', false);
 
+// Legt default Stunden pro Projektarbeitsbetreuung für Bachelorarbeiten fest
+define('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR', '5.0');
+
+// Legt default Stunden pro Projektarbeitsbetreuung für Masterarbeiten fest
+define('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER', '5.0');
+
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
 define('CIS_LVPLAN_PERSONENAUSWAHL_ANZEIGEN',true);

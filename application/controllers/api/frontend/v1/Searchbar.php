@@ -39,6 +39,8 @@ class Searchbar extends FHCAPI_Controller
 			'searchCis' => self::PERM_LOGGED,
 			'searchStv' => self::PERM_LOGGED
 		]);
+
+		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -102,6 +104,17 @@ class Searchbar extends FHCAPI_Controller
 
 		// Convert to json the result from searchlib->search
 		$result = $this->searchlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
+
+		$this->WebservicelogModel->insert(array(
+			'webservicetyp_kurzbz' => 'content',
+			'beschreibung' => $config['config'],
+			'request_data' => json_encode(array(
+				self::SEARCHSTR_PARAM => $this->input->post(self::SEARCHSTR_PARAM),
+				self::TYPES_PARAM => $this->input->post(self::TYPES_PARAM)
+			)),
+			'execute_user' => getAuthUID(),
+			'execute_time' => 'NOW()'
+		));
 
 		$data = $this->getDataOrTerminateWithError($result);
 

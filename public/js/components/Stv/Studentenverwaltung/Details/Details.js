@@ -186,7 +186,7 @@ export default {
 						<label>{{$p.t('global', 'zugangscode')}}</label>
 						<div class="align-self-center">
 							<span class="form-text">
-								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat" target="_blank">{{data.zugangscode}}</a>
+								<a :href="cisRoot + 'addons/bewerbung/cis/registration.php?code=' + data.zugangscode + '&emailAdresse=' + data.email_privat + '&keepEmailUnverified=true'" target="_blank">{{data.zugangscode}}</a>
 							</span>
 						</div>
 					</div>
@@ -318,16 +318,6 @@ export default {
 					</form-input>
 				</div>
 				<div class="row mb-3">
-					<form-input
-						v-if="!config.hiddenFields.includes('svnr')"
-						container-class="col-4 stv-details-details-svnr"
-						:label="$p.t('person', 'svnr')"
-						type="text"
-						v-model="data.svnr"
-						name="svnr"
-						maxlength="16"
- 						>
-					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('ersatzkennzeichen')"
 						container-class="col-4 stv-details-details-ersatzkennzeichen"
