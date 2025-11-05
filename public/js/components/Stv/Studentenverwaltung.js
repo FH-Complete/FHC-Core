@@ -386,7 +386,11 @@ export default {
 						/>
 					</li>
 					<li><hr class="dropdown-divider m-0"/></li>
-					<li><a class="dropdown-item" :href="logoutUrl">Logout</a></li>
+					<li>
+						<a class="dropdown-item" :href="logoutUrl">
+							{{ $p.t('ui/logout') }}
+						</a>
+					</li>
 				</ul>
 			</div>
 		</header>
