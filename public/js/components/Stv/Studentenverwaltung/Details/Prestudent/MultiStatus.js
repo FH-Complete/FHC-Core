@@ -401,7 +401,7 @@ export default{
 		this.$api
 			.call(ApiStvPrestudent.getLastBismeldestichtag())
 			.then(result => {
-				this.dataMeldestichtag = result.data[0].meldestichtag;
+				this.dataMeldestichtag = result.data[0]?.meldestichtag;
 				if (this.$refs.table && this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.redraw(true);
 			})
