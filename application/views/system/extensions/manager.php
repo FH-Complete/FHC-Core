@@ -57,7 +57,7 @@
 						<label for="notPerformSql"><?php echo $this->p->t('extensions', 'performSql'); ?></label>
 					</div>
 					<div>
-						<input type="checkbox" class="checkbox" id="notPerformSql" name="notPerformSql"/>
+						<input type="checkbox" checked="true" class="checkbox" id="performSql" name="performSql"/>
 					</div>
 				</div>
 			</form>
