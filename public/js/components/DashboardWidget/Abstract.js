@@ -5,7 +5,10 @@ export default {
 		"height",
 		"configMode",
 		"sharedData",
-		"widgetInfo"
+		"widgetInfo",
+		"widgetId", //check
+		"manu2", //TODO(Manu) check/remove
+		"widgetConfig"
 	],
 	emits: [
 		"setConfig",

@@ -4,6 +4,7 @@ import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
 import ApiBookmark from '../../api/factory/widget/bookmark.js';
+import ApiDashboard from '../../api/factory/cis/dashboard.js'; //nutzt aber nicht viel
 
 export default {
 	name: "WidgetsUrl",
@@ -12,6 +13,10 @@ export default {
 		editModeIsActive: {
 			type: Boolean,
 			default: false
+		},
+		sectionName: {
+			type: String,
+			default: false
 		}
 	},
 	components:{
@@ -19,7 +24,8 @@ export default {
 		FormInput,
 		BsModal,
 		PvChips: primevue.chips,
-		PvMultiSelect: primevue.multiselect
+		PvMultiSelect: primevue.multiselect,
+		PvAutoComplete: primevue.autocomplete,
 	},
 	data: () => ({
 		bookmark_id: null,
@@ -30,10 +36,17 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
-		tagsArray: [
-		],
+		tagsArray: [],
 		selectedTags: [],
 		newTag: null,
+		selectedFilters: [], //die aber im benutzer_override speichern
+		items:[],
+		value: '',
+		//viewData: []
+		ArrayAC: [],
+		selectedTagsAC: [],
+		tagsInput2: [],
+		filteredArrayAC: [],
 	}),
 	computed: {
 		tagName() {
@@ -69,7 +82,9 @@ export default {
 		tagsInput(){
 			return this.selectedTags.map(item => item.tag);
 		},
-
+		filterInput(){
+			return this.selectedFilters.map(item => item.tag);
+		},
 	},
 	methods: {
 		stopDrag(event){
@@ -87,7 +102,9 @@ export default {
 			this.title_input = bookmark.title;
 			this.url_input = bookmark.url;
 			this.bookmark_id = bookmark.bookmark_id;
-			this.selectedTags = this.prepareTag(bookmark.tag);
+			//but the JSON string to array
+			this.selectedTagsAC = JSON.parse(bookmark.tag);
+		//	this.selectedTags = this.prepareTag(bookmark.tag);
 
 			this.$refs.editModal.show();
 		},
@@ -100,7 +117,8 @@ export default {
 					bookmark_id: this.bookmark_id,
 					title: this.title_input,
 					url: this.url_input,
-					tag: this.tagsInput,
+					tag: this.selectedTagsAC,
+					//tag: this.tagsInput, //old version
 				}))
 				.then((res) => res.data)
 				.then((result) => {
@@ -133,7 +151,8 @@ export default {
 			this.$api
 				.call(ApiBookmark.insert({
 					//tag: this.config.tag,
-					tag: this.tagsInput,
+					//tag: this.tagsInput, //old version
+					tag: this.selectedTagsAC,
 					title: this.title_input,
 					url: this.url_input,
 					sort: this.sort
@@ -186,6 +205,7 @@ export default {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
 					// refetch the bookmarks to see the updates
 					this.fetchBookmarks();
+					this.getAllBookmarkTags();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -265,27 +285,190 @@ export default {
 				.call(ApiBookmark.getAllBookmarkTags())
 				.then((res) => res.data)
 				.then((result) => {
+					//Variante Chips
 					this.tagsArray = this.prepareTag(result.data);
+
+					//Variante Autocomplete
+/*
+					this.ArrayAC = result.data;
+						console.log("type of " + typeof this.ArrayAC);
+						console.log(Array.isArray(this.ArrayAC));*/
+				//	this.ArrayAC = Object.values(result.data);
+				//	this.ArrayAC = Object.keys(result.data);
+						this.ArrayAC = result.data; //in object umwandeln
+/*					this.ArrayAC = {...this.ArrayAC};
+
+					console.log("type of " + typeof this.ArrayAC);
+					console.log(Array.isArray(this.ArrayAC)); // true*/
+/*					Array.isArray(result.data)
+						? result.data
+						: JSON.parse(result.data); */
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-		}
+		},
+		addBookmarkFilter(){
+			console.log("in addFilterLogic: save in benutzeroverride " +  this.selectedFilters.map(tag => tag.tag).join(", "));
+
+			console.log("widget_id " + this.manu2);
+			console.log("tags " + this.filterInput);
+
+			console.log(`${this.apiurl}/dashboard/Config/insertAndUpdateTagsForBookmarksUser`, {
+				db: "CIS",
+				funktion_kurzbz: this.sectionName,
+				widget_id: this.manu2,
+				tags: this.filterInput
+			});
+
+			axios.post(this.apiurl + '/dashboard/Config/insertAndUpdateTagsForBookmarksUser', {
+				db: "CIS",
+				funktion_kurzbz: this.sectionName,
+				widget_id: this.manu2,
+				tags: this.filterInput
+			})
+				.then(res => {
+					console.log("API Response:", res.data);
+				})
+				.catch(err => {
+					console.error("ERROR:", err);
+				});
+		},
+		getTagFilter(widget_id){
+
+/*			console.log(`${this.apiurl}/dashboard/Config/getTagFilter`, {
+				db: "CIS",
+				funktion_kurzbz: this.sectionName,
+				widget_id: widget_id
+			});*/
+
+			axios.get(this.apiurl + '/dashboard/Config/getTagFilter', {
+				params: {
+					db: "CIS",
+					funktion_kurzbz: this.sectionName,
+					widget_id: widget_id
+				}
+			})
+				.then(res => {
+				//	console.log("API Response:", res.data);
+
+					//old version
+/*					const raw = res.data?.retval?.retval?.[0]?.tags;
+					const filterArray = raw ? JSON.parse(raw) : [];
+					this.selectedFilters = this.prepareTag(filterArray);*/
+
+
+					//unter config
+					const rawTags = res.data.retval.retval[0].tags; // string
+					const filterArray = JSON.parse(rawTags);
+					//this.selectedFilters = res.data.retval;
+					this.selectedFilters = this.prepareTag(filterArray);
+				})
+				.catch(err =>
+					console.error('ERROR: ', err));
+		},
+		//Variante mit AutocompleteFeld
+/*		search(event) {
+			this.ArrayAC = this.ArrayAC.map((item) => item) || event;
+		},*/
+		search(event) {
+			const query = event.query ?? ""; // PrimeVue liefert query
+
+			// Filter ArrayAC nach eingegebenem Text
+			this.filteredArrayAC = this.ArrayAC.filter(item =>
+				item.toLowerCase().includes(query.toLowerCase())
+			);
+
+			// Wenn kein Treffer → manuellen Text erlauben
+			if (this.filteredArrayAC.length === 0 && query) {
+				this.filteredArrayAC = [query];
+			}
+
+			console.log("Filtered suggestions:", this.filteredArrayAC);
+
+		},
+/*		addCustomTag(event) {
+			const value = event.value;  // das ist der vom User eingegebene Text
+			console.log("Custom Tag:", value);
+
+			// Füge den neuen Tag zu selectedTags hinzu
+		//	this.selectedTags = [...this.selectedTags, value];
+			const newTag = { tag: value };
+
+			// Optional: Füge den Tag auch in ArrayAC hinzu, damit er zukünftig auswählbar ist
+			if (!this.tagsArray.includes(value)) {
+				this.tagsArray.push(value);
+			}
+
+
+
+		}*/
 	},
 	async mounted() {
 		await this.fetchBookmarks();
 		this.getAllBookmarkTags();
+		if(this.manu2) {
+			this.getTagFilter(this.manu2);
+		}
+/*		console.log("config " + this.config);
+		console.log("widgetID " + this.widgetId);*/
+	//	console.log("apiurl " + this.apiurl );
+/*		console.log("widgetinfo " + this.widgetInfo);
+		console.log("config " + this.config);
+		console.log(JSON.stringify(this.config));
+		console.log("width " + this.width);
+		console.log("height " + this.height);
+		console.log("configMode " + this.configMode);
+		console.log("sharedData " + this.sharedData);
+		console.log(JSON.stringify(this.sharedData));*/
+
+		//console.log( this.config.map(tag => tag.tag).join(", "));
+/*		console.log("manu " + this.manu);
+		console.log("manu2 " + this.manu2);
+		console.log("widgetID " + this.widgetID);*/
 	},
 	created() {
 		// 
-		// this.$emit('setConfig', true); -> use this to enable widget config mode if needed
+		// this.$emit('setConfig', true); // -> use this to enable widget config mode if needed
+
+		/*
+
+		widgetId: {{widgetId}}
+		    	{{manu2}} {{sectionName}}
+		 */
 	},
 
 
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
-    
 
-        <div class="d-flex flex-column justify-content-between">
-        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+
+		<div class="d-flex flex-column justify-content-between">
+        
+        <!--TODO Manu eigener button mit modal für Filter, Autocomplete Variante !-->
+			<!-- div class="mt-2 row">
+				<div class="col-10">
+					<PvMultiSelect
+						v-model="selectedFilters"
+						id="tagFilterUrl"
+						:options="tagsArray"
+						optionLabel="tag"
+						display="chip"
+						placeholder="Show only tags"
+						:maxSelectedLabels="3"
+						class="p-inputtext-sm w-100 me-2"
+						/>
+				</div>
+				<div class="col-1">
+					<button
+						class="btn btn-secondary"
+						@click="addBookmarkFilter"
+						title="nach Tags filtern"
+						>
+						<i class="fa-solid fa-filter"></i>
+					</button>
+				</div>
+			</div -->
+		</div>
+		<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
             <template v-if="shared">
                 <template v-if="!emptyBookmarks">
@@ -341,15 +524,15 @@ export default {
                     <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
                 </div>
 
-            </template>
 
             <template v-else>
                 <p v-for="i in 4" class="placeholder-glow">
                     <span class="placeholder" :class="{'col-9' : true}"></span>
                 </p>
             </template>
-        </div>
-    </div>
+            
+         </template>
+	</div>
 	<!--EDIT MODAL-->
 	<teleport to="body">
 		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
@@ -362,31 +545,15 @@ export default {
 				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
 
 				<label class="mt-2">Tags</label>
-				<div class="mt-2 row">
-					<div class="col-6">
-					  <form-input
-						v-model="newTag"
-						placeholder="Add new tag"
-						@keyup.enter="addNewTag"
-						class="w-full"
-					  />
-					</div>
-					<div class="col-2">
-				  		<button class="btn btn-secondary" @click="addNewTag">+</button>
-				  	</div>
-				</div>
 				<div class="mt-2">
-					<PvMultiSelect
-						v-model="selectedTags"
-						id="tagUrl"
-						:options="tagsArray"
-						optionLabel="tag"
-						display="chip"
-						placeholder="Selected Tags for URL"
-						:maxSelectedLabels="3"
-						class="w-full md:w-20rem mt-1"
+					<PvAutoComplete
+						v-model="selectedTagsAC"
+						multiple
+						dropdown
+						:suggestions="filteredArrayAC"
+						@complete="search" 
 						/>
-				</div>
+				</div>				
 			</template>
 			<template #footer>
 				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
@@ -405,31 +572,15 @@ export default {
 				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
 
 				<label class="mt-2">Tags</label>
-				<div class="mt-2 row">
-					<div class="col-6">
-					  <form-input
-						v-model="newTag"
-						placeholder="Add new tag"
-						@keyup.enter="addNewTag"
-						class="w-full"
-					  />
-					</div>
-					<div class="col-2">
-				  		<button class="btn btn-secondary" @click="addNewTag">+</button>
-				  	</div>
-				</div>
 				<div class="mt-2">
-					<PvMultiSelect 
-						v-model="selectedTags"
-						id="tagUrl"
-						:options="tagsArray"
-						optionLabel="tag"
-						display="chip"
-						placeholder="Selected Tags for URL"
-						:maxSelectedLabels="3"
-						class="w-full md:w-20rem mt-1"
-						/>
-				</div>
+					<PvAutoComplete
+						v-model="selectedTagsAC"
+						multiple
+						dropdown
+						:suggestions="filteredArrayAC"
+						@complete="search" 
+					/>
+				</div>					
 
 			</template>
 			<template #footer>

@@ -54,4 +54,12 @@ export default {
 			url: '/api/frontend/v1/Bookmark/getAllBookmarkTags'
 		};
 	},
+	//TODO(Manu) getTagFilter and addTagFilter
+	//in bookmark_model
+/*	updateBenutzeroverride() {
+		return{
+			method: 'post',
+			url: `/api/frontend/v1/Bookmark/update/${bookmark_id}`,
+			params: {url, title, tag}
+}*/
 };

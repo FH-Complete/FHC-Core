@@ -189,8 +189,9 @@ export default {
 				</div>
 			</Transition>
 		</div>
+		<!-- TODO Manu rename/remove-->
 		<div v-if="ready" class="card-body overflow-hidden p-0">
-			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+			<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" :widget-id="widgetID" :manu2="widgetID" :widgetConfig="config" @setConfig="setConfig" @change="changeConfigManually"></component>
 		</div>
 		<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 		<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
