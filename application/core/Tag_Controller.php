@@ -42,6 +42,8 @@ class Tag_Controller extends FHCAPI_Controller
 
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
 		{
+			$allowed_tags = array_keys($readonly_tags);
+
 			$readonly_tags = $this->_filterTag($readonly_tags, true);
 
 			foreach ($readonly_tags as $key => $tag)
@@ -57,6 +59,8 @@ class Tag_Controller extends FHCAPI_Controller
 							ELSE FALSE 
 						END as readonly
 					");
+
+			$this->NotizModel->db->where_in('tbl_notiz_typ.typ_kurzbz', $allowed_tags);
 		}
 
 		$this->NotizModel->addSelect(
