@@ -111,14 +111,26 @@ class Student extends FHCAPI_Controller
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
 				"(
-					SELECT kontakt 
-					FROM public.tbl_kontakt 
-					WHERE kontakttyp='email' 
-					AND person_id=p.person_id 
-					AND zustellung 
-					ORDER BY kontakt_id 
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp='email'
+					AND person_id=p.person_id
+					AND zustellung
+					ORDER BY kontakt_id
 					LIMIT 1
 				) AS email_privat",
+				false
+			);
+			$this->PrestudentModel->addSelect(
+				"(
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp='email_unverifiziert'
+					AND person_id=p.person_id
+					AND zustellung
+					ORDER BY kontakt_id
+					LIMIT 1
+				) AS email_privat_unverified",
 				false
 			);
 		}
