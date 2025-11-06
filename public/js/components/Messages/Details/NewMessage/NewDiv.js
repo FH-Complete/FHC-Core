@@ -68,7 +68,8 @@ export default {
 			previewBody: "",
 			replyData: null,
 			uid: null,
-			messageSent: false
+			messageSent: false,
+			studiengang_kz: null
 		}
 	},
 	methods: {
@@ -136,9 +137,9 @@ export default {
 					}
 				);
 		},
-		getDataVorlage(vorlage_kurzbz){
+		getDataVorlage(vorlage_kurzbz, studiengang_kz){
 			return this.$api
-				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
+				.call(this.endpoint.getDataVorlage(vorlage_kurzbz, studiengang_kz))
 				.then(response => {
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
@@ -191,7 +192,7 @@ export default {
 		},
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
-				this.getDataVorlage(vorlage_kurzbz);
+				this.getDataVorlage(vorlage_kurzbz, this.studiengang_kz);
 			}
 		},
 		hideTemplate(){
@@ -218,7 +219,19 @@ export default {
 					this.uid = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-		}
+		},
+		getStudiengang(id, typeId){
+			const params = {
+				id: id,
+				type_id: typeId
+			};
+			this.$api
+				.call(this.endpoint.getStudiengang(params))
+				.then(result => {
+					this.studiengang_kz = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 	},
 	watch: {
 		'formData.body': {
@@ -236,7 +249,7 @@ export default {
 
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
-					return this.getDataVorlage(newVal);
+					return this.getDataVorlage(newVal, this.studiengang_kz);
 				}
 			}
 		},
@@ -264,6 +277,7 @@ export default {
 			}
 
 		if (['prestudent_id', 'uid'].includes(this.typeId)){
+			this.getStudiengang(this.id, this.typeId);
 				const params = {
 				id: this.id,
 				type_id: this.typeId

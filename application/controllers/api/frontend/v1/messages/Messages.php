@@ -21,6 +21,8 @@ class Messages extends FHCAPI_Controller
 			'getReplyData' => ['admin:r', 'assistenz:r'],
 			'getPersonId' => ['admin:r', 'assistenz:r'],
 			'getUid' => ['admin:r', 'assistenz:r'],
+			'getStudiengang' => ['admin:r', 'assistenz:r'],
+
 		]);
 
 		//Load Models
@@ -84,21 +86,17 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess(array());
 	}
 
-	public function getDataVorlage($vorlage_kurzbz)
+	public function getDataVorlage($vorlage_kurzbz, $studiengang_kz)
 	{
-		$studiengang_kz = 0;
-		$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
-		$this->VorlagestudiengangModel->addOrder('version', 'DESC');
+		if(!$studiengang_kz)
+			$this->terminateWithSuccess(null);
 
-		$result = $this->VorlagestudiengangModel->loadWhere(
-			[
-				'vorlage_kurzbz' =>$vorlage_kurzbz,
-				'studiengang_kz' => $studiengang_kz
-			]);
+		$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
+
+		$result = $this->VorlagestudiengangModel->getCurrent($vorlage_kurzbz, $studiengang_kz);
 
 		$data = $this->getDataOrTerminateWithError($result);
-		$vorlage = current($data);
-		$this->terminateWithSuccess($vorlage);
+		$this->terminateWithSuccess(current($data));
 	}
 
 	public function getMessageVarsPerson($id, $typeId)
@@ -143,8 +141,6 @@ class Messages extends FHCAPI_Controller
 	public function sendMessage($recipient_id)
 	{
 		//has to be uid
-		//	$this->terminateWithError("uid", $recipient_id, self::ERROR_TYPE_GENERAL);
-
 		//default setting
 		$receiversPersonId = $this->_getPersonId($recipient_id, 'uid');
 
@@ -387,6 +383,21 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($benutzer->uid);
 	}
 
+	public function getStudiengang($id, $typeId)
+	{
+		if($typeId!= "prestudent_id" && $typeId!="uid" )
+			$this->terminateWithSuccess(null);
+
+		$prestudent_id = ($typeId == 'uid') ? $this->_getPrestudentIdFromUid($id) : $id;
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+		$result = $this->PrestudentModel->load($prestudent_id);
+		$data = $this->getDataOrTerminateWithError($result);
+		$studiengang_kz = current($data)->studiengang_kz;
+
+		return $this->terminateWithSuccess($studiengang_kz);
+	}
+
 	private function _getPersonId($id, $typeId)
 	{
 		if ($typeId == 'uid' || $typeId == 'mitarbeiter_uid')
@@ -416,7 +427,6 @@ class Messages extends FHCAPI_Controller
 
 	private function _getPrestudentIdFromUid($uid)
 	{
-		//	$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->loadWhere(
 			['student_uid' => $uid]

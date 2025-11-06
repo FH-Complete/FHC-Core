@@ -57,6 +57,7 @@ export default {
 			previewBody: "",
 			replyData: null,
 			uid: null,
+			studiengang_kz: null
 		}
 	},
 	methods: {
@@ -136,9 +137,9 @@ export default {
 					}
 				);
 		},
-		getDataVorlage(vorlage_kurzbz){
+		getDataVorlage(vorlage_kurzbz, studiengang_kz){
 			return this.$api
-				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
+				.call(this.endpoint.getDataVorlage(vorlage_kurzbz, studiengang_kz))
 				.then(response => {
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
@@ -193,7 +194,7 @@ export default {
 		},
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
-				this.getDataVorlage(vorlage_kurzbz);
+				this.getDataVorlage(vorlage_kurzbz, this.studiengang_kz);
 			}
 		},
 		showPreview(){
@@ -210,6 +211,18 @@ export default {
 				.call(this.endpoint.getUid(params))
 				.then(result => {
 					this.uid = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		getStudiengang(id, typeId){
+			const params = {
+				id: id,
+				type_id: typeId
+			};
+			this.$api
+				.call(this.endpoint.getStudiengang(params))
+				.then(result => {
+					this.studiengang_kz = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -235,7 +248,7 @@ export default {
 			handler(newVal){
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
-					return this.getDataVorlage(newVal);
+					return this.getDataVorlage(newVal, this.studiengang_kz);
 				}
 			}
 		},
@@ -281,6 +294,7 @@ export default {
 		}
 
 		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
+			this.getStudiengang(this.id, this.typeId);
 			const params = {
 				id: this.id,
 				type_id: this.typeId
@@ -290,6 +304,7 @@ export default {
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
+					//this.studiengang_kz = prestudent.Studiengangskennzahl;
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'

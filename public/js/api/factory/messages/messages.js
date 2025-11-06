@@ -62,10 +62,10 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getUid/' + userParams.id + '/' + userParams.type_id
 		};
 	},
-	getDataVorlage(vorlage_kurzbz){
+	getDataVorlage(vorlage_kurzbz, studiengang_kz){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz
+			url: 'api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz + '/' + studiengang_kz
 		};
 	},
 	getNameOfDefaultRecipient(params){
@@ -106,5 +106,11 @@ export default {
 			method: 'post',
 			url: 'api/frontend/v1/messages/messages/deleteMessage/' + messageId
 		};
-	}
+	},
+	getStudiengang(userParams){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/messages/messages/getStudiengang/' + userParams.id + '/' + userParams.type_id
+		};
+	},
 }
