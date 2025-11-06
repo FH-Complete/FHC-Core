@@ -100,14 +100,14 @@ export default {
 			url: '/api/frontend/v1/Abgabe/getNoten'
 		};
 	},
-	getProjektarbeitenForStudiengang(studiengang_kz) {
+	getProjektarbeitenForStudiengang(studiengang_kz, benotet = 0) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Abgabe/getProjektarbeitenForStudiengang',
-			params: { studiengang_kz }
+			params: { studiengang_kz, benotet }
 		};
 	},
-	// TODO: this could also very well be generic info api :^)
+	// TODO: this could also very well be generic info api
 	getStudiengaenge() {
 		return {
 			method: 'get',

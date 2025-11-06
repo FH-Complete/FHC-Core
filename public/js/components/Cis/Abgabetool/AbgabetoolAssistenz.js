@@ -5,6 +5,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 
 // spoofed date testing
@@ -52,6 +53,8 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
+			allSem: null,
+			curSem: null,
 			notenOptionFilter: null,
 			inplaceToggle: false,
 			headerFiltersRestored: false,
@@ -126,7 +129,8 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
+						responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -166,6 +170,22 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		semesterChanged(e) {
+			if(this.$refs.abgabeTable.tabulator) {
+				const table = this.$refs.abgabeTable.tabulator
+
+				// TODO: maybe check if existing synergy really works with many filters
+				const existing = table.getFilters().filter(f => f.field != 'studiensemester_kurzbz');
+
+				const compVal = e.value.studiensemester_kurzbz == 'Alle' ? '' : e.value.studiensemester_kurzbz
+				const compType = e.value.studiensemester_kurzbz == 'Alle' ? '!=' : '='
+				const newFilter = { field: "studiensemester_kurzbz", type: compType, value: compVal };
+
+				// merge and reapply
+				table.setFilter([...existing, newFilter]);
+			}
+			
+		},
 		checkAbgabetermineProjektarbeit(projekt) {
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
@@ -311,11 +331,11 @@ export const AbgabetoolAssistenz = {
 		getOptionLabelStg(option){
 			return option.kurzbzlang + ' ' + option.bezeichnung
 		},
+		getOptionLabelStudiensemester(option){
+			return option.studiensemester_kurzbz
+		},
 		getNotenFilterOptionLabel(option) {
 			return option.bezeichnung	
-		},
-		sgChanged(e) {
-			debugger	
 		},
 		formatDate(dateParam) {
 			if(dateParam === null) return ''
@@ -437,9 +457,6 @@ export const AbgabetoolAssistenz = {
 				this.$refs.abgabeTable.tabulator.deselectRow()
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
-
-				console.log('this.projektarbeiten', this.projektarbeiten)
-				console.log('mappedData', mappedData)
 				
 				this.$refs.abgabeTable.tabulator.clearData()
 				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
@@ -462,6 +479,13 @@ export const AbgabetoolAssistenz = {
 
 				this.checkAbgabetermineProjektarbeit(projekt)
 
+				if(this.notenOptions && projekt.note) {
+					const opt = this.notenOptions.find(n => n.note == projekt.note)
+				
+					// TODO: mehrsprachig englisch
+					projekt.note_bez = opt.bezeichnung
+				}
+				
 				return {
 					...projekt,
 					abgabetermine: projekt.abgabetermine,
@@ -666,7 +690,10 @@ export const AbgabetoolAssistenz = {
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
-			this.$api.call(ApiAbgabe.getProjektarbeitenForStudiengang(this.getCurrentStudiengang))
+			this.$api.call(ApiAbgabe.getProjektarbeitenForStudiengang(
+				this.getCurrentStudiengang,
+				this.notenOptionFilter?.benotet ?? 0
+			))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				}).finally(() => {
@@ -701,7 +728,9 @@ export const AbgabetoolAssistenz = {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 
-			this.loadProjektarbeiten()
+			
+			// called through notenOptionFilter watcher on startup
+			// this.loadProjektarbeiten()
 
 			// this.$refs.verticalsplit.collapseBottom()
 			this.calcMaxTableHeight()
@@ -716,6 +745,11 @@ export const AbgabetoolAssistenz = {
 	},
 	watch: {
 		selectedStudiengangOption(newVal, oldVal) {
+			this.loadProjektarbeiten()
+		},
+		notenOptionFilter(newVal) {
+			// that single where clause is worth a decent load time so rather not filter tabulator but just 
+			// adapt the qry
 			this.loadProjektarbeiten()
 		}
 	},
@@ -745,6 +779,17 @@ export const AbgabetoolAssistenz = {
 			this.loading = false
 		})
 		
+		this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()).then((res) => {
+			this.allSem = res.data[0]
+			this.curSem = res.data[1]
+			
+			// TODO: maybe filter only for available semester from projektarbeiten dataset
+			this.studiensemesterOptions = [{studiensemester_kurzbz: 'Alle'}, ...this.allSem]
+		}).catch(e => {
+			this.loading = false
+		})
+
+
 		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		this.$api.call(ApiAbgabe.getNoten()).then(res => {
@@ -759,16 +804,16 @@ export const AbgabetoolAssistenz = {
 			// this selection is about graded projektarbeiten, so take different options here
 			this.allowedNotenFilterOptions = [
 				{
-					bezeichnung: this.$p.t('abgabetool/keineNoteEingetragen'),
-					note: null,
+					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/keineNoteEingetragen')),
+					benotet: 0,
 				},
 				{
-					bezeichnung: this.$p.t('abgabetool/c4benotet'),
-					note: 1,
+					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/c4benotet')),
+					benotet: 1,
 				},
 				{
-					bezeichnung: Vue.computed(this.$p.t('abgabetool/showAll')),
-					note: -1,
+					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/showAll')),
+					benotet: -1,
 				},
 			]
 			
@@ -882,7 +927,7 @@ export const AbgabetoolAssistenz = {
 			</template>
 
 <!--			TODO: take care of absolute offset values -->
-			<div class="row">
+			<div class="row" style="margin-bottom: 12px;">
 				<Inplace
 					closable
 					:closeButtonProps="{
@@ -984,8 +1029,7 @@ export const AbgabetoolAssistenz = {
 				</div>
 				<div class="col-3">
 					<Dropdown
-						@change="sgChanged" 
-						:placeholder="$p.t('lehre/studiengang')" 
+						:placeholder="$capitalize($p.t('lehre/studiengang'))" 
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 
 						:optionLabel="getOptionLabelStg" 
 						v-model="selectedStudiengangOption" 
@@ -1000,14 +1044,12 @@ export const AbgabetoolAssistenz = {
 				</div>
 				<div class="col-3">
 					<Dropdown
-						@change="sgChanged" 
 						:placeholder="$p.t('lehre/note')" 
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 
 						:optionLabel="getNotenFilterOptionLabel" 
 						v-model="notenOptionFilter" 
 						:options="allowedNotenFilterOptions" 
-						showClear
-						:tabindex="2"
+						:tabindex="3"
 					>
 						<template #optionsgroup="slotProps">
 							<div>{{ option.bezeichnung }} </div>
@@ -1032,7 +1074,18 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-
+					<Dropdown
+						@change="semesterChanged" 
+						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 
+						:style="{'scroll-behavior': 'auto !important'}" 
+						:optionLabel="getOptionLabelStudiensemester" 
+						v-model="curSem" 
+						:options="studiensemesterOptions" 
+					>
+						<template #optionsgroup="slotProps">
+							<div>{{ option.studiensemester_kurzbz }}</div>
+						</template>
+					</Dropdown>
 				</template>
 			</core-filter-cmpt>
 		</div>

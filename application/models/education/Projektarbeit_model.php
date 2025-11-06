@@ -319,7 +319,7 @@ class Projektarbeit_model extends DB_Model
 		return $version === null ? null : $version->isCurrent;
 	}
 	
-	public function getProjektarbeitenForStudiengang($studiengang_kz) {
+	public function getProjektarbeitenForStudiengang($studiengang_kz, $benotet) {
 		$new_qry = "SELECT DISTINCT ON(tmp.projektarbeit_id) *, campus.get_betreuer_details(tmp.zweitbetreuer_person_id) as zweitbetreuer_full_name, campus.get_betreuer_details(tmp.betreuer_person_id) as erstbetreuer_full_name
        		FROM(
 			   SELECT
@@ -407,8 +407,15 @@ class Projektarbeit_model extends DB_Model
 						LEFT JOIN public.tbl_benutzer betreuer_benutzer ON (betreuer_person.person_id = betreuer_benutzer.person_id)
 			   WHERE (projekttyp_kurzbz = 'Bachelor' OR projekttyp_kurzbz = 'Diplom')
 				 AND student_benutzer.aktiv AND (lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter' OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')
-				 AND public.tbl_studiengang.studiengang_kz = ?
-			   ORDER BY tbl_projektarbeit.projektarbeit_id DESC, student_person.nachname ASC           
+				 AND public.tbl_studiengang.studiengang_kz = ?";
+		
+			     if($benotet == 0) {
+					 $new_qry .= " AND lehre.tbl_projektarbeit.note IS NULL ";
+				 } else if ($benotet == 1) {
+					 $new_qry .= " AND lehre.tbl_projektarbeit.note IS NOT NULL ";
+				 }
+				 
+			   $new_qry .= " ORDER BY tbl_projektarbeit.projektarbeit_id DESC, student_person.nachname ASC           
 		   ) as tmp";
 		
 		return $this->execReadOnlyQuery($new_qry, array($studiengang_kz));

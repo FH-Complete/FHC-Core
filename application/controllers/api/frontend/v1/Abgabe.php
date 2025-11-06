@@ -864,12 +864,13 @@ class Abgabe extends FHCAPI_Controller
 	public function getProjektarbeitenForStudiengang() {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		
-		$studiengang_kz = $this->input->get("studiengang_kz",TRUE);
-
+		$studiengang_kz = $this->input->get("studiengang_kz", TRUE);
+		$benotet = $this->input->get("benotet", TRUE);
+		
 		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		
-		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz);
+		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz, $benotet);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
 
 		if(count($projektarbeiten) == 0) { // avoid further abgabetermin queries if the are no projektarbeiten
@@ -899,6 +900,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 	
+	// TODO: this could be in a generic info controller and resused
 	public function getStudiengaenge() {
 		$this->load->library('PermissionLib');
 		

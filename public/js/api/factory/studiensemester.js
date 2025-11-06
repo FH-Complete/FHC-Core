@@ -19,7 +19,7 @@ export default {
 	getAllStudiensemesterAndAktOrNext() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Studiensemester/getStudiengangInfo'
+			url: '/api/frontend/v1/organisation/Studiensemester/getAllStudiensemesterAndAktOrNext',
 		};
-	},
+	}
 };
