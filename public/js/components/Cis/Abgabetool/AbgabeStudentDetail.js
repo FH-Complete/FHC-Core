@@ -389,7 +389,7 @@ export const AbgabeStudentDetail = {
 							</div>				
 						</template>
 <!--						<div class="row">-->
-<!--							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>-->
+<!--							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv3')}}</div>-->
 <!--							<div class="col-8 col-md-9">-->
 <!--								<Checkbox -->
 <!--									disabled-->
@@ -435,14 +435,14 @@ export const AbgabeStudentDetail = {
 						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
 							<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" :cols=" isMobile ? 30 : 90" disabled></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" disabled></Textarea>
 							</div>
 						</div>
 						
 						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
 							<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
+								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" class="w-100" :disabled="true"></Textarea>
 							</div>
 						</div>
 						
@@ -551,21 +551,21 @@ export const AbgabeStudentDetail = {
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterGer') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter"></Textarea>
+						<Textarea v-model="form.schlagwoerter" class="w-100"></Textarea>
 					</div>
 				</div>
 				
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterEng') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter_en"></Textarea>
+						<Textarea v-model="form.schlagwoerter_en" class="w-100"></Textarea>
 					</div>
 				</div>
 				
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractGer') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.abstract" rows="10" maxlength="5000"></Textarea>
+						<Textarea v-model="form.abstract" rows="10" maxlength="5000" class="w-100"></Textarea>
 						<p>{{ form.abstract?.length ? form.abstract.length : 0 }} / 5000 characters</p>
 					</div>
 				</div>
@@ -573,7 +573,7 @@ export const AbgabeStudentDetail = {
 				<div class="row mb-3 align-items-start">
 					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractEng') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.abstract_en" rows="10" maxlength="5000"></Textarea>
+						<Textarea v-model="form.abstract_en" rows="10" maxlength="5000" class="w-100"></Textarea>
 						<p>{{ form.abstract_en?.length ? form.abstract_en.length : 0 }} / 5000 characters</p>
 					</div>				
 				</div>

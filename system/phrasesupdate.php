@@ -42120,18 +42120,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fixterminv2',
+		'phrase' => 'c4fixterminv3',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fixtermin",
+				'text' => "kein Nachreichen möglich",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Fixed Deadline",
+				'text' => "no late submission possible",
 				'description' => '',
 				'insertvon' => 'system'
 			)

@@ -358,11 +358,8 @@ export const AbgabeMitarbeiterDetail = {
 			return 'position: static !important;'
 		},
 		getSpeedDialWrapperStyle() {
-			// fullscreen -> position wrapper fixed in right bottom corner of viewport/screen
-			if(this.isFullscreen) return 'position: fixed; z-index: 9999; bottom: 24px; right: 24px;'
-			
 			// non fullscreen -> wrapper is positioned on right bottom corner of modal, wherever that is
-			return 'position: absolute; z-index: 9999; bottom: -28px; right: -28px;'
+			return 'position: absolute; z-index: 9999; left: 0px; bottom: 0.5rem;'
 		},
 		getTooltipVerspaetet() {
 			return {
@@ -510,7 +507,7 @@ export const AbgabeMitarbeiterDetail = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{ $capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 					<div class="col-8 col-md-9">
-						<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" :cols=" isMobile ? 30 : 60"></Textarea>
+						<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
 				</div>	
 			</div>
@@ -521,17 +518,17 @@ export const AbgabeMitarbeiterDetail = {
 	</bs-modal>
 
 	<div v-if="projektarbeit">
-		<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">
-			<SpeedDial
-				:style="getSpeedDialStyle"
-				:model="speedDialItems" 
-				direction="up"
-				:radius="80"
-				type="linear"
-				buttonClass="p-button-rounded p-button-lg p-button-primary"
-				:tooltipOptions="{ position: 'left' }"
-			/>
-		</div>
+<!--		<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">-->
+<!--			<SpeedDial-->
+<!--				:style="getSpeedDialStyle"-->
+<!--				:model="speedDialItems" -->
+<!--				direction="up"-->
+<!--				:radius="80"-->
+<!--				type="linear"-->
+<!--				buttonClass="p-button-rounded p-button-lg p-button-primary"-->
+<!--				:tooltipOptions="{ position: 'left' }"-->
+<!--			/>-->
+<!--		</div>-->
 		
 		<h5>{{$capitalize( $p.t('abgabetool/c4abgabeMitarbeiterbereich') )}}</h5>
 
@@ -541,8 +538,8 @@ export const AbgabeMitarbeiterDetail = {
 				<p> {{getProjektarbeitTitel}}</p>
 				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 			</div>
-			<div v-if="!isMobile" class="col-3"></div>
-			<div :class="isMobile ? 'col-6' : 'col-3'">
+			<div class="col-6 d-flex justify-content-end align-items-start">
+<!--				<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">-->
 				<SpeedDial
 					:model="speedDialItems" 
 					direction="left"
@@ -550,7 +547,22 @@ export const AbgabeMitarbeiterDetail = {
 					type="linear"
 					buttonClass="p-button-rounded p-button-lg p-button-primary"
 					:tooltipOptions="{ position: 'down' }"
-				/>
+				>
+					<template #icon>
+
+						<i class="fa-solid fa-bars"></i>
+
+					</template>
+				</SpeedDial>
+<!--				</div>-->
+			</div>
+		</div>
+		<div class="row" style="margin-bottom: 12px;">
+			<div class="col-auto">
+				<button type="button" class="btn btn-primary" @click="openCreateNewAbgabeModal">
+					<i class="fa-solid fa-plus"></i>
+					{{$capitalize( $p.t('abgabetool/c4newAbgabetermin') )}}
+				</button>
 			</div>
 		</div>
 		<Accordion :multiple="true" :activeIndex="getActiveIndexTabArray">
@@ -577,7 +589,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>				
 					</template>
 					<div class="row mt-2" v-if="assistenzMode">
-						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv2')}}</div>
+						<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv3')}}</div>
 						<div class="col-8 col-md-9">
 							<Checkbox 
 								v-model="termin.fixtermin"
@@ -641,14 +653,14 @@ export const AbgabeMitarbeiterDetail = {
 					<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
 						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					
 					<div class="row mt-2">
 						<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 						<div class="col-8 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" :cols=" isMobile ? 30 : 90" :disabled="!termin.allowedToSave"></Textarea>
+							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" class="w-100" rows="1" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					<div class="row mt-2">

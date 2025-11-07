@@ -851,7 +851,7 @@ export const AbgabetoolAssistenz = {
 			<template v-slot:default>
 				<div class="row">
 					<div class="col-1 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4fixterminv2')}}
+						{{$p.t('abgabetool/c4fixterminv3')}}
 					</div>
 					<div class="col-3 d-flex justify-content-center align-items-center">
 						{{$capitalize($p.t('abgabetool/c4zieldatum'))}}
@@ -894,7 +894,7 @@ export const AbgabetoolAssistenz = {
 						</Dropdown>
 					</div>
 					<div class="col-5 d-flex justify-content-center align-items-center">
-						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" cols="40"></Textarea>
+						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
 				</div>
 				
