@@ -76,7 +76,35 @@ class Paabgabe_model extends DB_Model
 				stg.bezeichnung AS stgbez, paabg.datum AS termin,
 				paabg.paabgabe_id, paabg.projektarbeit_id, paabg.paabgabetyp_kurzbz, paabg.abgabedatum,
 				abgabetyp.bezeichnung AS paabgabetyp_bezeichnung, ben.uid, pers.vorname, pers.nachname, pa.projekttyp_kurzbz, pa.titel,
-				UPPER(stg.typ || stg.kurzbz) AS studiengang_kuerzel
+				UPPER(stg.typ || stg.kurzbz) AS studiengang_kuerzel,
+				(
+					 /* show all relevant Studiengänge of person and wether it is an employee*/
+					SELECT
+						STRING_AGG(studiengang || ' ' || last_status, ' | ')
+						|| (CASE WHEN EXISTS (
+							SELECT 1 FROM public.tbl_mitarbeiter ma
+							JOIN public.tbl_benutzer ben ON ma.mitarbeiter_uid = ben.uid
+							WHERE person_id = prestudents.person_id
+							AND ben.aktiv
+							) THEN ' | Mitarbeiter' ELSE '' END)
+					FROM (
+						SELECT
+							DISTINCT person_id, prestudent_id, UPPER(stg.typ || stg.kurzbz) AS studiengang,
+							get_rolle_prestudent(ps.prestudent_id, null) AS last_status
+						FROM
+							public.tbl_prestudent ps
+						JOIN public.tbl_studiengang stg USING (studiengang_kz)
+						WHERE
+							person_id = pers.person_id
+						ORDER BY
+							prestudent_id DESC
+					) prestudents
+					WHERE
+						last_status IN ('Abgewiesener','Aufgenommener', 'Student', 'Incoming', 'Diplomand', 'Abbrecher', 'Unterbrecher', 'Absolvent')
+					GROUP BY
+						person_id
+					LIMIT 1;
+				) AS status
 			FROM
 				lehre.tbl_projektarbeit pa
 				JOIN campus.tbl_paabgabe paabg USING(projektarbeit_id)

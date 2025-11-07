@@ -97,7 +97,8 @@ export const ProjektabgabeUebersicht =  {
 					{title: Vue.computed(() => this.$p.t('person/vorname')), field: 'vorname', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('person/nachname')), field: 'nachname', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/typ')), field: 'projekttyp_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/titel')), field: 'titel', widthGrow: 1}
+					{title: Vue.computed(() => this.$p.t('abgabetool/titel')), field: 'titel', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('abgabetool/status')), field: 'status', widthGrow: 1}
 				],
 				persistence: false,
 			},
