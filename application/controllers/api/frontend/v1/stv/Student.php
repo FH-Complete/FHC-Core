@@ -116,7 +116,7 @@ class Student extends FHCAPI_Controller
 					WHERE kontakttyp='email'
 					AND person_id=p.person_id
 					AND zustellung
-					ORDER BY kontakt_id
+					ORDER BY kontakt_id DESC
 					LIMIT 1
 				) AS email_privat",
 				false
@@ -128,7 +128,7 @@ class Student extends FHCAPI_Controller
 					WHERE kontakttyp='email_unverifiziert'
 					AND person_id=p.person_id
 					AND zustellung
-					ORDER BY kontakt_id
+					ORDER BY kontakt_id DESC
 					LIMIT 1
 				) AS email_privat_unverified",
 				false
