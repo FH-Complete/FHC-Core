@@ -393,7 +393,25 @@ class Projektarbeit_model extends DB_Model
 						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
 					   LIMIT 1
 				   )
-					   as zweitbetreuer_full_name
+					   as zweitbetreuer_full_name,
+			       (
+					   SELECT
+						   COALESCE(tbl_studienplan.orgform_kurzbz,
+									tbl_prestudentstatus.orgform_kurzbz, tbl_studiengang.orgform_kurzbz) as
+							   orgform
+					   FROM
+						   public.tbl_prestudent
+							   JOIN public.tbl_prestudentstatus USING(prestudent_id)
+							   JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+							   JOIN public.tbl_studiengang USING(studiengang_kz)
+							   LEFT JOIN lehre.tbl_studienplan USING(studienplan_id)
+					   WHERE
+						   prestudent_id=tbl_student.prestudent_id
+					   ORDER BY tbl_prestudentstatus.datum DESC LIMIT 1
+				   ) as orgform,
+				   (SELECT status_kurzbz FROM public.tbl_prestudentstatus
+					WHERE prestudent_id=tbl_student.prestudent_id
+					ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as studienstatus
 			   FROM lehre.tbl_projektarbeit
 						LEFT JOIN public.tbl_benutzer student_benutzer ON (student_benutzer.uid = lehre.tbl_projektarbeit.student_uid)
 						LEFT JOIN public.tbl_person student_person ON (student_benutzer.person_id = student_person.person_id)
