@@ -14,6 +14,8 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class PaabgabeUebersicht extends FHCAPI_Controller
 {
 	const DOWNLOAD_PERMISSION = 'lehre/abgabetool:download';
@@ -58,6 +60,12 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 		$result = $this->PaabgabeModel->getPaAbgaben(self::ABGABE_TYPES, $studiengang_kz, $abgabetyp_kurzbz, $abgabedatum, $personSearchString);
 
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
+
+		// check wether Abgabe is in visual library
+		if (hasData($result))
+		{
+			Events::trigger('in_visual_library', getData($result));
+		}
 
 		$this->terminateWithSuccess(getData($result) ?: []);
 	}

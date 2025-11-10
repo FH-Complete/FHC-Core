@@ -65,9 +65,9 @@ export const ProjektabgabeUebersicht =  {
 								let editButton = document.createElement('button');
 								editButton.className = 'btn btn-outline-secondary';
 								editButton.innerHTML = '<i class="fa fa-edit"></i>';
-								editButton.addEventListener('click', () =>
-									this.$refs.edit.open(cell.getData())
-								);
+								//editButton.addEventListener('click', () =>
+									//this.$refs.edit.open(cell.getData())
+								//);
 								container.append(editButton);
 							}
 
@@ -75,6 +75,7 @@ export const ProjektabgabeUebersicht =  {
 						}
 					},
 					{title: Vue.computed(() => this.$p.t('abgabetool/paabgabeid')), field: 'paabgabe_id', widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/projektarbeitid')), field: 'projektarbeit_id', widthGrow: 1, visible: false},
 					{
 						title: Vue.computed(() => this.$p.t('abgabetool/termin')),
 						field: "termin",
@@ -98,7 +99,15 @@ export const ProjektabgabeUebersicht =  {
 					{title: Vue.computed(() => this.$p.t('person/nachname')), field: 'nachname', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/typ')), field: 'projekttyp_kurzbz', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('abgabetool/titel')), field: 'titel', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/status')), field: 'status', widthGrow: 1}
+					{title: Vue.computed(() => this.$p.t('abgabetool/status')), field: 'status', widthGrow: 2},
+					{
+						title: Vue.computed(() => this.$p.t('abgabetool/inVisualLibrary')),
+						field: 'in_visual_library',
+						widthGrow: 1,
+						formatter: (cell) => {
+							return cell.getValue() ? this.$p.t('ui/ja') : this.$p.t('ui/nein');
+						}
+					}
 				],
 				persistence: false,
 			},
@@ -206,7 +215,6 @@ export const ProjektabgabeUebersicht =  {
 			if (this.selectedAbgabetyp) url.searchParams.append('abgabetyp_kurzbz', this.selectedAbgabetyp);
 			if (this.selectedTermin) url.searchParams.append('abgabedatum', this.selectedTermin);
 			if (this.personSearchString) url.searchParams.append('personSearchString', this.personSearchString);
-			console.log(url.toString());
 			window.open(url.toString(), '_blank');
 		}
 	},
