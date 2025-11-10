@@ -24,15 +24,15 @@ export const ProjektabgabeUebersicht =  {
 			abgaben: null,
 			defaultStudiengang: {
 				studiengang_kz: null,
-				kuerzel: Vue.computed(() => this.$p.t('abgabetool/studiengangWaehlen'))
+				kuerzel: '-'
 			},
 			defaultTyp: {
 				paabgabetyp_kurzbz: null,
-				bezeichnung: Vue.computed(() => this.$p.t('abgabetool/abgabetypWaehlen'))
+				bezeichnung: '-'
 			},
 			defaultTermin: {
 				termin: null,
-				termin_anzeige: Vue.computed(() => this.$p.t('abgabetool/terminWaehlen'))
+				termin_anzeige: Vue.computed(() => this.$p.t('ui/alle'))
 			},
 			selectedStudiengang: null,
 			selectedAbgabetyp: null,
@@ -74,8 +74,8 @@ export const ProjektabgabeUebersicht =  {
 							return container;
 						}
 					},
-					{title: Vue.computed(() => this.$p.t('abgabetool/paabgabeid')), field: 'paabgabe_id', widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/projektarbeitid')), field: 'projektarbeit_id', widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/paabgabeid')), field: 'paabgabe_id', visible: false},
+					{title: Vue.computed(() => this.$p.t('abgabetool/projektarbeitid')), field: 'projektarbeit_id', visible: false},
 					{
 						title: Vue.computed(() => this.$p.t('abgabetool/termin')),
 						field: "termin",
@@ -93,15 +93,15 @@ export const ProjektabgabeUebersicht =  {
 							});
 						}
 					},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'paabgabetyp_bezeichnung', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('person/uid')), field: 'uid', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('person/vorname')), field: 'vorname', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('person/nachname')), field: 'nachname', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/typ')), field: 'projekttyp_kurzbz', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/titel')), field: 'titel', widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/status')), field: 'status', widthGrow: 2},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'paabgabetyp_bezeichnung'},
+					{title: Vue.computed(() => this.$p.t('person/uid')), field: 'uid'},
+					{title: Vue.computed(() => this.$p.t('person/vorname')), field: 'vorname'},
+					{title: Vue.computed(() => this.$p.t('person/nachname')), field: 'nachname'},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4projekttyp')), field: 'projekttyp_kurzbz'},
+					{title: Vue.computed(() => this.$p.t('abgabetool/c4titel')), field: 'titel'},
+					{title: Vue.computed(() => this.$p.t('abgabetool/personStatus')), field: 'personStatus'},
 					{
-						title: Vue.computed(() => this.$p.t('abgabetool/inVisualLibrary')),
+						title: "in Visual Library",
 						field: 'in_visual_library',
 						widthGrow: 1,
 						formatter: (cell) => {
@@ -245,6 +245,7 @@ export const ProjektabgabeUebersicht =  {
 	<div class="row">
 
 		<div class="col-12 col-lg-2">
+			<h6>{{ $p.t('abgabetool/studiengang') }}:</h6>
 			<select
 				ref="studiengang"
 				id="studiengangSelect"
@@ -260,12 +261,13 @@ export const ProjektabgabeUebersicht =  {
 		</div>
 
 		<div class="col-12 col-lg-2">
+			<h6>{{ $p.t('abgabetool/c4abgabetyp') }}:</h6>
 			<select
 				ref="abgabetyp"
 				id="abgabetypSelect"
 				v-model="selectedAbgabetyp"
 				class="form-select"
-				:aria-label="$p.t('abgabetool/termin_auswaehlen')"
+				:aria-label="$p.t('abgabetool/abgabetyp_auswaehlen')"
 				:disabled="!abgabeSearchEnabled"
 				@change="loadTermine();"
 			>
@@ -275,12 +277,13 @@ export const ProjektabgabeUebersicht =  {
 		</div>
 
 		<div class="col-12 col-lg-2">
+			<h6>{{ $p.t('abgabetool/termin') }}:</h6>
 			<select
 				ref="termin"
 				id="terminSelect"
 				v-model="selectedTermin"
 				class="form-select"
-				:aria-label="$p.t('abgabetool/abgabetyp_auswaehlen')"
+				:aria-label="$p.t('abgabetool/termin_auswaehlen')"
 				:disabled="!abgabeSearchEnabled"
 			>
 				<option :key="defaultTermin.termin" selected :value="defaultTermin.termin">{{defaultTermin.termin_anzeige}}</option>
@@ -289,21 +292,22 @@ export const ProjektabgabeUebersicht =  {
 		</div>
 
 		<div class="col-12 col-lg-2">
+			<h6>{{ $p.t('abgabetool/personsuche') }}:</h6>
 			<input
 				type="text"
 				name="person-search"
 				class="form-control"
-				:placeholder="$p.t('abgabetool/nach_person_suchen')"
+				:placeholder="'name, uid, person ID, prestudent ID'"
 				:disabled="!personSearchEnabled"
 				v-on:keyup.enter="loadPaAbgaben"
 				v-model="personSearchString"
 			/>
 		</div>
 
-		<div class="col-12 col-lg-2">
+		<div class="col-12 col-lg-2 align-content-end">
 			<button class="btn btn-primary border-0" @click="loadPaAbgaben">{{ $p.t('abgabetool/anzeigen') }}</button>
 		</div>
-		<div class="col-12 col-lg-2">
+		<div class="col-12 col-lg-2 align-content-end">
 			<button class="btn btn-secondary border-0" @click="actionDownloadZip">{{ $p.t('abgabetool/zipDownload') }}</button>
 		</div>
 

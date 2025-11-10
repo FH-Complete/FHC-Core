@@ -141,7 +141,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 		$personSearchString = $this->input->get('personSearchString');
 
 		if (!isset($studiengang_kz) && !isset($abgabetyp_kurzbz) && !isset($abgabedatum) && !isset($personSearchString))
-			$this->terminateWithFileOutput('text/plain', $this->p->t('abgabetool', 'keineAuswahl'));
+			$this->terminateWithFileOutput('text/plain', $this->p->t('abgabetool', 'nichtsAusgewaehlt'));
 
 		$this->load->library('zip');
 

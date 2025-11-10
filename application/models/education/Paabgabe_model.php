@@ -177,7 +177,7 @@ class Paabgabe_model extends DB_Model
 
 		$qry = "
 			SELECT
-				DISTINCT campus.tbl_paabgabe.datum as termin, to_char(campus.tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
+				DISTINCT tbl_paabgabe.datum as termin, to_char(tbl_paabgabe.datum, 'DD.MM.YYYY') as termin_anzeige
 			FROM
 				lehre.tbl_projektarbeit
 				JOIN campus.tbl_paabgabe USING(projektarbeit_id)
