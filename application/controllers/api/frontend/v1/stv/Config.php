@@ -260,15 +260,18 @@ class Config extends FHCAPI_Controller
 		];
 		$result['resources'] = [
 			'title' => $this->p->t('stv', 'tab_resources'),
-			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
+			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js',
+			'showOnlyWithUid' => true
 		];
 		$result['groups'] = [
 			'title' => $this->p->t('stv', 'tab_groups'),
-			'component' => './Stv/Studentenverwaltung/Details/Groups.js'
+			'component' => './Stv/Studentenverwaltung/Details/Groups.js',
+			'showOnlyWithUid' => true
 		];
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
-			'component' => './Stv/Studentenverwaltung/Details/Messages.js'
+			'component' => './Stv/Studentenverwaltung/Details/Messages.js',
+			'showOnlyWithUid' => true
 		];
 
 		$result['grades'] = [
@@ -286,7 +289,8 @@ class Config extends FHCAPI_Controller
 
 		$result['exam'] = [
 			'title' => $this->p->t('stv', 'tab_exam'),
-			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
+			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js',
+			'showOnlyWithUid' => true
 		];
 
 		$result['exemptions'] = [
@@ -298,6 +302,7 @@ class Config extends FHCAPI_Controller
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'showOnlyWithUid' => true,
 			'config' => $config['finalexam']
 		];
 
@@ -313,7 +318,8 @@ class Config extends FHCAPI_Controller
 
 		$result['mobility'] = [
 			'title' => $this->p->t('stv', 'tab_mobility'),
-			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+			'component' => './Stv/Studentenverwaltung/Details/Mobility.js',
+			'showOnlyWithUid' => true
 		];
 
 		$result['archive'] = [
@@ -326,7 +332,8 @@ class Config extends FHCAPI_Controller
 
 		$result['jointstudies'] = [
 			'title' => $this->p->t('stv', 'tab_jointstudies'),
-			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js'
+			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js',
+			'showOnlyWithUid' => true
 		];
 
 		$result['coursedates'] = [
@@ -341,7 +348,8 @@ class Config extends FHCAPI_Controller
 
 		$result['functions'] = [
 			'title' => $this->p->t('stv', 'tab_functions'),
-			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
+			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js',
+			'showOnlyWithUid' => true
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -388,6 +396,7 @@ class Config extends FHCAPI_Controller
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
 			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'showOnlyWithUid' => true,
 			'config' => $config['finalexam']
 		];
 		$result['archive'] = [

@@ -31,10 +31,14 @@ export default {
 			if (this.students.length == 1) {
 				const student = this.students[0];
 				if (student.uid)
-					return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithoutUid));
-				return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithUid));
+					return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithoutUid));
+				return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithUid));
+			} else if (this.students.every(student => student.uid)) {
+				return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithoutUid));
+			} else if (this.students.every(student => !student.uid)) {
+					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
-			return this.configStudents;
+			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		}
 	},
 	methods: {
