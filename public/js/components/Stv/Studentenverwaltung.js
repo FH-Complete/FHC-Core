@@ -22,6 +22,7 @@ import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
+import StvConfig from "./Studentenverwaltung/Config.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiStv from "../../api/factory/stv.js";
@@ -37,7 +38,8 @@ export default {
 		StvVerband,
 		StvList,
 		StvDetails,
-		StvStudiensemester
+		StvStudiensemester,
+		StvConfig
 	},
 	props: {
 		defaultSemester: String,
@@ -78,11 +80,13 @@ export default {
 			},
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
-			configUseReihungstestPunkte: this.config.useReihungstestPunkte
+			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
+			appConfig: Vue.computed(() => this.appconfig)
 		}
 	},
 	data() {
 		return {
+			appconfig: {},
 			selected: [],
 			searchbaroptions: {
 				origin: 'stv',
@@ -381,6 +385,17 @@ export default {
 					aria-labelledby="nav-user-btn"
 				>
 					<li>
+						<button
+							type="button"
+							class="dropdown-item"
+							data-bs-toggle="modal"
+							data-bs-target="#configModal"
+						>
+							{{ $p.t('ui/settings') }}
+						</button>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
 						<nav-language
 							item-class="dropdown-item border-left-dark"
 						/>
@@ -415,5 +430,6 @@ export default {
 				</main>
 			</div>
 		</div>
+		<stv-config v-model="appconfig"></stv-config>
 	</div>`
 };

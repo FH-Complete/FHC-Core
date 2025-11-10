@@ -33,6 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
+			'get' => ['admin:r', 'assistenz:r'],
+			'set' => ['admin:r', 'assistenz:r'],
 			'student' => ['admin:r', 'assistenz:r'],
 			'students' => ['admin:r', 'assistenz:r']
 		]);
@@ -50,6 +52,65 @@ class Config extends FHCAPI_Controller
 
 		// Load Config
 		$this->load->config('stv');
+	}
+
+	/**
+	 * get App config
+	 */
+	public function get()
+	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->config('stv');
+
+		$config = [];
+
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$number_displayed_past_studiensemester_default = $this->config->item('number_displayed_past_studiensemester_default');
+
+		$config['number_displayed_past_studiensemester'] = [
+			"type" => "number",
+			"label" => "Anzahl angezeigter vergangender Studiensemester",// TODO(chris): phrase
+			"value" => $data['number_displayed_past_studiensemester']
+				?? $number_displayed_past_studiensemester_default
+		];
+
+		// TODO(chris): Event
+
+		$this->terminateWithSuccess($config);
+	}
+
+	/**
+	 * set App config
+	 */
+	public function set()
+	{
+		// TODO(chris): rewrite to batch saving
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'number_displayed_past_studiensemester',
+			"Anzahl angezeigter vergangender Studiensemester",// TODO(chris): phrase
+			'required|integer'
+		);
+
+		// TODO(chris): Event
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'number_displayed_past_studiensemester',
+			$this->input->post('number_displayed_past_studiensemester')
+		);
+
+		// TODO(chris): Event
+
+		$this->terminateWithSuccess();
 	}
 
 	public function student()
