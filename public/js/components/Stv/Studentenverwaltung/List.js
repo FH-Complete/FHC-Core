@@ -209,6 +209,23 @@ export default {
 					id
 				};
 			});
+		},
+		downloadConfig() {
+			return {
+				csv: {
+					formatter: 'csv',
+					file: this.fileString,
+					options: {
+						delimiter: ';',
+						bom: true,
+					}
+				}
+			};
+		},
+		fileString() {
+			let today = new Date().toLocaleDateString('en-GB')
+				.replace(/\//g, '_');
+			return "StudentList_" + today + ".csv";
 		}
 	},
 	methods: {
@@ -360,7 +377,7 @@ export default {
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
-	template: /* html */`
+	template: `
 	<div class="stv-list h-100 pt-3">
 		<div 
 			class="tabulator-container d-flex flex-column h-100" 
@@ -379,6 +396,7 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
+				:download="downloadConfig"
 				new-btn-show
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
