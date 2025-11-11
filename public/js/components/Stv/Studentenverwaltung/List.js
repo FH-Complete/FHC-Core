@@ -379,11 +379,11 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div 
-			class="tabulator-container d-flex flex-column h-100" 
-			:class="{'has-filter': filter.length}" 
-			tabindex="0" 
-			@focusin="onFocus" 
+		<div
+			class="tabulator-container d-flex flex-column h-100"
+			:class="{'has-filter': filter.length}"
+			tabindex="0"
+			@focusin="onFocus"
 			@keydown="onKeydown"
 			v-draggable:copyLink.capture="selectedDragObject"
 			@dragend="dragCleanup"

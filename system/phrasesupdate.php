@@ -28988,13 +28988,13 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Einer ihrer Adressen wird bereits zur Zustellung verwendet, möchten sie diese Adressen als Zustellungsadresse übernehmen?',
+					'text' => 'Eine andere Adresse wird aktuell zur Zustellung verwendet, in Zukunft würde diese Adresse als Zustellungsadresse verwendet werden!',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
-					'text' => 'One of your addresses is already used as a contact address, would you like to use this address as your new contact address?',
+					'text' => 'Another address is currently used as contact address, in the future this address would be used as contact address!',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -29008,13 +29008,13 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Einer ihrer Kontakte wird bereits zur Zustellung verwendet, möchten sie diesen Kontakt als Zustellungskontakt übernehmen?',
+					'text' => 'Ein anderer Kontakt wird aktuell zur Zustellung verwendet, in Zukunft würde dieser Kontakt als Zustellungskontakt verwendet werden!',
 					'description' => '',
 					'insertvon' => 'system'
 				),
 				array(
 					'sprache' => 'English',
-					'text' => 'One of your contacts is already used as a communication mean, would you like to use this contact as your new communication mean?',
+					'text' => 'Another contact is currently used for communication, in the future this contact would be used for communication!',
 					'description' => '',
 					'insertvon' => 'system'
 				)
@@ -30481,7 +30481,6 @@ array(
 				)
 			)
 		),
-
 
 		//ProfilUpdate Phrasen ende
 	array(
@@ -39037,46 +39036,6 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Payment confirmation',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'stv',
-		'phrase' => 'konto_filter_count_0',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Liste filtern auf nicht belastet:',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Filter list to not charged:',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'stv',
-		'phrase' => 'konto_filter_missing_counter',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Liste filtern auf fehlende Gegenbuchungen:',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Filter the list for missing offsetting entries:',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -50505,28 +50464,6 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
-	// ###  	DOKUMENTE ERSTELLEN PHRASEN 		START 		###
-	array(
-		'app' => 'core',
-		'category' => 'dokumente',
-		'phrase' => 'dokument_erstellen',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Dokument erstellen',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Create Document',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	// ### 		DOKUMENTE ERSTELLEN PHRASEN 		END 		###
 	// FHC-4 Projektarbeiten & Vertraege START
 	array(
 		'app' => 'core',
@@ -51509,6 +51446,28 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// FHC-4 Projektarbeiten & Vertraege ENDE
+	// ###  	DOKUMENTE ERSTELLEN PHRASEN 		START 		###
+	array(
+		'app' => 'core',
+		'category' => 'dokumente',
+		'phrase' => 'dokument_erstellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dokument erstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create Document',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### 		DOKUMENTE ERSTELLEN PHRASEN 		END 		###
 );
 
 
