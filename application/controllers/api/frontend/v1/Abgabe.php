@@ -45,6 +45,7 @@ class Abgabe extends FHCAPI_Controller
 		]);
 
 		$this->load->library('PhrasesLib');
+		$this->load->library('SignatureLib');
 
 		// Loads LogLib with different debug trace levels to get data of the job that extends this class
 		// It also specify parameters to set database fields
@@ -113,6 +114,10 @@ class Abgabe extends FHCAPI_Controller
 
 		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
 
+		foreach($ret->retval as $termin) {
+			$this->checkAbgabeSignatur($termin, $projektarbeit);
+		}
+		
 		$this->terminateWithSuccess(array($ret, $paIsCurrent));
 	}
 
@@ -134,7 +139,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
 
-		if ($isMitarbeiter && $isZugeteilterBetreuer){
+		if ($isMitarbeiter) {
 			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer($uid);
 		} else {
 			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
@@ -152,7 +157,7 @@ class Abgabe extends FHCAPI_Controller
 				}
 				if($pa->zweitbetreuer_person_id !== null) {
 					
-					// TODO: dont have to wait for 2038, see assistenz query in projektarbeit_model
+					// TODO: see assistenz query in projektarbeit_model
 					
 					// zweitbetreuer info since the 'getStudentProjektarbeitenWithBetreuer' query got quiete large,
 					// enjoy optimizing that one in 2038. we need this to render a string like
@@ -165,8 +170,6 @@ class Abgabe extends FHCAPI_Controller
 						$pa->zweitbetreuer = $data[0];
 					}
 				}
-				
-				
 			}
 		}
 		
@@ -206,7 +209,8 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				));
 
-				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
+				// TODO: consider this for daily abgabetool email job
+//				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
 				$this->logLib->logInfoDB(array('zwischenupload',$res, array(
 					'abgabedatum' => date('Y-m-d'),
@@ -256,48 +260,53 @@ class Abgabe extends FHCAPI_Controller
 
 			if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf')) {
 
-				// Loads Libraries
-				$this->load->library('SignatureLib');
+				$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-				// Check if the document is signed
-				$signaturVorhanden = true;
-				$signList = SignatureLib::list(PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf');
-				if (is_array($signList) && count($signList) > 0)
-				{
-					// The document is signed
-					$uploadedDocumentSigned = 'The document is signed';
-				}
-				elseif ($signList === null)
-				{
-					$uploadedDocumentSigned = 'WARNING: signature server error';
-				}
-				else
-				{
-					$signaturVorhanden = false;
-					$uploadedDocumentSigned = 'No document signature found';
-				}
-				$this->addMeta('signaturInfo', $uploadedDocumentSigned);
+				$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+				$projektarbeitArr = $this->getDataOrTerminateWithError($result);
 
-				if ($signaturVorhanden === false)
+				if(count($projektarbeitArr) > 0) {
+					$projektarbeit = $projektarbeitArr[0];
+				} else {
+					$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+				}
+
+				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+				$result = $this->PaabgabeModel->load($paabgabe_id);
+				$paabgabeArr = $this->getDataOrTerminateWithError($result);
+
+				if(count($paabgabeArr) > 0) {
+					$paabgabe = $paabgabeArr[0];
+				} else {
+					$this->terminateWithError($this->p->t('global','projektabgabeNichtGefunden'), 'general');
+				}
+				
+				$this->checkAbgabeSignatur($paabgabe, $projektarbeit);
+				$signaturstatus = $paabgabe->signatur;
+				
+				if ($paabgabe->signatur === false)
 				{
 					$this->signaturFehltEmail($student_uid);
 				}
 				
 				// update projektarbeit cols
-				$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 				$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
 					,$schlagwoerter, $schlagwoerter_en, $seitenanzahl);
 
 
 				// update paabgabe datum
-				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 				$res = $this->PaabgabeModel->update($paabgabe_id, array(
 					'abgabedatum' => date('Y-m-d'),
 					'updatevon' => getAuthUID(),
 					'updateamum' => date('Y-m-d H:i:s')
 				));
 
-				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
+				$res = $this->PaabgabeModel->load($res->retval);
+				$abgabe = getData($res)[0];
+				$abgabe->signatur = $signaturstatus;
+					
+				// TODO: consider for email job
+//				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
 				$this->logLib->logInfoDB(array('endupload',$res, array(
 					'abgabedatum' => date('Y-m-d'),
@@ -306,7 +315,7 @@ class Abgabe extends FHCAPI_Controller
 				), getAuthUID(), getAuthPersonId(), array($projektarbeit_id,$sprache,$abstract,$abstract_en
 				,$schlagwoerter, $schlagwoerter_en, $seitenanzahl)));
 				
-				$this->terminateWithSuccess($res);
+				$this->terminateWithSuccess($abgabe);
 			} else {
 				$this->terminateWithError('Error moving File');
 			}
@@ -436,12 +445,12 @@ class Abgabe extends FHCAPI_Controller
 				
 				if ($zweitbegutachterRes)
 				{
-					$zweitbegutachterResults = $zweitbegutachterRes->retval;
+					$zweitbegutachterResults = getData($zweitbegutachterRes->retval)[0];
 
 					foreach ($zweitbegutachterResults as $begutachter)
 					{
 						// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
-						$tokenGenRes = $zweitbegutachter->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
+						$tokenGenRes = $this->ProjektbetreuerModel->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
 
 						if (!$tokenGenRes)
 						{
@@ -870,6 +879,7 @@ class Abgabe extends FHCAPI_Controller
 		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		
+		
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz, $benotet);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
 
@@ -886,15 +896,17 @@ class Abgabe extends FHCAPI_Controller
 		$projektabgaben = $this->getDataOrTerminateWithError($ret);
 		
 		// map the abgaben into projektarbeiten
-		
 		foreach($projektarbeiten as $projektarbeit) {
 			$filterFunc = function($projektabgabe) use ($projektarbeit) {
 				return $projektabgabe->projektarbeit_id == $projektarbeit->projektarbeit_id;
 			};
-
 			
 			$projektarbeit->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
-			
+
+			// check the signature status for enduploads
+			foreach($projektarbeit->abgabetermine as $abgabe) {
+				$this->checkAbgabeSignatur($abgabe, $projektarbeit);
+			}
 		}
 		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
@@ -935,24 +947,47 @@ class Abgabe extends FHCAPI_Controller
 		
 		if(getAuthUID() == $student_uid || $isZugeteilterBetreuer || $isAssistenz) {
 			$file_path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
+			
+			
 			if(file_exists($file_path)) {
-
-				header('Content-Description: File Transfer');
-				header('Content-Type: application/octet-stream');
-				header('Expires: 0');
-				header('Cache-Control: must-revalidate');
-				header('Pragma: public');
-				header('Content-Disposition: attachment; filename="'.basename($file_path).'"');
-				header('Content-Length: ' . filesize($file_path));
-
-				flush(); // send headers first just in case
-				readfile($file_path); // read file content to output buffer
+				$this->terminateWithFileOutput('application/octet-stream', filesize($file_path), basename($file_path));
 
 			} else {
 				$this->terminateWithError('File not found');
 			}
 		} else {
 			$this->terminateWithError('Keine Zuordnung!');
+		}
+	}
+
+	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
+		if($abgabe->paabgabetyp_kurzbz != 'end') {
+			return;
+		}
+		
+		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$projektarbeit->student_uid.'.pdf';
+		
+		$signaturVorhanden = null; // if frontend receives null -> indicates no file found at path
+		if(file_exists($path)) {
+
+			// Check if the document is signed
+			$signList = SignatureLib::list($path);
+			if (is_array($signList) && count($signList) > 0)
+			{
+				// The document is signed
+				$signaturVorhanden = true;
+			}
+			elseif ($signList === null)
+			{
+				// frontend knows to handle it this way for signatures
+				$signaturVorhanden = 'error';
+			}
+			else
+			{
+				$signaturVorhanden = false;
+			}
+
+			$abgabe->signatur = $signaturVorhanden;
 		}
 	}
 	

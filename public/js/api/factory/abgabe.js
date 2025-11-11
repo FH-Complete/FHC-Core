@@ -35,11 +35,6 @@ export default {
 			config: {Headers: { "Content-Type": "multipart/form-data" }}
 		};
 	},
-	getStudentProjektarbeitAbgabeFile(paabgabe_id, student_uid) {
-		const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
-
-		window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
-	},
 	getMitarbeiterProjektarbeiten(all) {
 		return {
 			method: 'get',

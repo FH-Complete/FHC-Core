@@ -74,15 +74,18 @@ export const AbgabetoolStudent = {
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
 					termin.allowedToUpload = false
-					// termin.datum = '2025-10-16'
-					// TODO: change this and corresponding tooltips every time FH decides QG work different now
+					
 					if(termin.paabgabetyp_kurzbz == 'end') {
+						// production logic
 						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
+						
+						// development purposes
+						// termin.allowedToUpload = this.checkQualityGates(pa.abgabetermine)
+
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)
 					} else {
-						// TODO: this will confuse people so much, by requirement we should NOT show people this flag
-						// but it still should have an effect?
+						// this could confuse people since we should dont show people this flag
 						termin.allowedToUpload = termin.upload_allowed 
 					}
 
@@ -251,7 +254,6 @@ export const AbgabetoolStudent = {
 		</template>
 		<template v-slot:default>
 			<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-			
 		</template>
 	</bs-modal>
 	
@@ -268,7 +270,7 @@ export const AbgabetoolStudent = {
 				
 				<template #header>
 					<div class="d-flex row w-100">
-						<div class="col-6 text-start">
+						<div class="text-start" :class="projektarbeit.note != null ? 'col-6' : 'col-12'">
 							<span>{{getAccTabHeaderForProjektarbeit(projektarbeit)}}</span>
 						</div>
 						<div class="col-6 text-end">

@@ -53,6 +53,7 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
+			studiensemesterOptions: null,
 			allSem: null,
 			curSem: null,
 			notenOptionFilter: null,
@@ -851,7 +852,7 @@ export const AbgabetoolAssistenz = {
 			<template v-slot:default>
 				<div class="row">
 					<div class="col-1 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4fixterminv3')}}
+						{{$p.t('abgabetool/c4fixterminv4')}}
 					</div>
 					<div class="col-3 d-flex justify-content-center align-items-center">
 						{{$capitalize($p.t('abgabetool/c4zieldatum'))}}
@@ -928,7 +929,6 @@ export const AbgabetoolAssistenz = {
 				{{ $p.t('abgabetool/c4projektarbeitTimelineTitle') }}
 			</template>
 
-<!--			TODO: take care of absolute offset values -->
 			<div class="row" style="margin-bottom: 12px;">
 				<Inplace
 					closable
@@ -945,19 +945,19 @@ export const AbgabetoolAssistenz = {
 					<template #content>
 						<div class="col-auto">
 							<div class="row">
-								<div class="col-2">Student: </div>
+								<div class="col-3">Student: </div>
 								<div class="col-7">{{timelineProjekt?.student_vorname}} {{timelineProjekt?.student_nachname}}</div>
 							</div>
 							<div class="row">
-								<div class="col-2">Uid: </div>
+								<div class="col-3">Uid: </div>
 								<div class="col-7">{{timelineProjekt?.student_uid}}</div>
 							</div>
 							<div class="row">
-								<div class="col-2">{{timelineProjekt?.betreuerart}}: </div>
+								<div class="col-3">{{timelineProjekt?.betreuerart}}: </div>
 								<div class="col-7">{{timelineProjekt?.erstbetreuer_full_name}}</div>
 							</div>
 							<div class="row">
-								<div class="col-2">Titel: </div>
+								<div class="col-3">Titel: </div>
 								<div class="col-7">{{timelineProjekt?.titel}}</div>
 							</div>
 						</div>
