@@ -49987,6 +49987,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'projektabgabeUebersicht',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Projektabgabe Übersicht',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Project work submission overview',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'studiengang',
 		'insertvon' => 'system',
 		'phrases' => array(

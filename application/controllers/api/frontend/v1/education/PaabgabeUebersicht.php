@@ -46,9 +46,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 *
-	 * @return array|stdClass|null
+	 * Get Projektabgaben for search criteria.
 	 */
 	public function getPaAbgaben()
 	{
@@ -71,9 +69,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 *
-	 * @return array|stdClass|null
+	 * Get all Studiengänge for which user is entitled for
 	 */
 	public function getStudiengaenge()
 	{
@@ -94,9 +90,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 *
-	 * @return array|stdClass|null
+	 * Get projekt work due dates, depending on search criteria.
 	 */
 	public function getTermine()
 	{
@@ -111,9 +105,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 *
-	 * @return array|stdClass|null
+	 * Get all submission types.
 	 */
 	public function getPaAbgabetypen()
 	{
@@ -129,9 +121,7 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Download zip files with project works matching submission search criteria.
 	 */
 	public function downloadZip()
 	{

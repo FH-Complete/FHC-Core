@@ -103,7 +103,6 @@ export const ProjektabgabeUebersicht =  {
 					{
 						title: "in Visual Library",
 						field: 'in_visual_library',
-						widthGrow: 1,
 						formatter: (cell) => {
 							return cell.getValue() ? this.$p.t('ui/ja') : this.$p.t('ui/nein');
 						}
@@ -135,6 +134,7 @@ export const ProjektabgabeUebersicht =  {
 
 			this.$refs.paabgabeTable.tabulator.setData(this.abgaben);
 		},
+		// set placeholder text for no data table
 		setNoDataPlaceholder() {
 			this.$refs.paabgabeTable.tabulatorOptions.placeholder = this.$p.t('global/noDataAvailable');
 		},
@@ -176,13 +176,17 @@ export const ProjektabgabeUebersicht =  {
 			//~ // TODO: router push
 		//~ },
 		async setupMounted() {
+
+			// load data for dropdowns
 			this.loadStudiengaenge();
 			this.loadPaabgabeTypes();
 			this.loadTermine();
 
+			// wait for table to build
 			this.tableBuiltPromise = new Promise(this.tableResolve);
 			await this.tableBuiltPromise;
 
+			// data placeholder after table built so phrases are available
 			this.setNoDataPlaceholder();
 			//this.loadPaAbgaben();
 
@@ -206,8 +210,8 @@ export const ProjektabgabeUebersicht =  {
 				//~ '_blank'
 			//~ );
 		},
-		actionDownloadZip(ev) {
-			console.log(ev);
+		// download zip file with all searched submission files
+		actionDownloadZip() {
 			const url = new URL(FHC_JS_DATA_STORAGE_OBJECT.app_root
 				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
 				+'/api/frontend/v1/education/PaabgabeUebersicht/downloadZip');
@@ -297,7 +301,7 @@ export const ProjektabgabeUebersicht =  {
 				type="text"
 				name="person-search"
 				class="form-control"
-				:placeholder="'name, uid, person ID, prestudent ID'"
+				:placeholder="'name/uid/person ID/prestudent ID'"
 				:disabled="!personSearchEnabled"
 				v-on:keyup.enter="loadPaAbgaben"
 				v-model="personSearchString"

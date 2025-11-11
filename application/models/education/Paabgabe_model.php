@@ -61,6 +61,16 @@ class Paabgabe_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
 
+	/**
+	 * Gets project submissions for search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @param string $abgabedatum due date for hand-in
+	 * @param string $personSearchString for searching by person, i.e. name, uid, person/prestudent id
+	 * @param int $limit limiting max number of results if search criteria is not precise enough
+	 * @return object
+	 */
 	public function getPaAbgaben(
 		$projekttyp_kurzbz_arr,
 		$studiengang_kz = null,
@@ -171,6 +181,13 @@ class Paabgabe_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, $params);
 	}
 
+	/**
+	 * Gets due dates for projekt submission search criteria.
+	 * @param array $projekttyp_kurzbz_arr contains all relevant project types (e.g. Bachelor)
+	 * @param int $studiengang_kz study program
+	 * @param string $abgabetyp_kurzbz project submission type (e.g. end upload, intermediate submission)
+	 * @return object
+	 */
 	public function getTermine($projekttyp_kurzbz_arr, $studiengang_kz, $abgabetyp_kurzbz)
 	{
 		$params = [];
