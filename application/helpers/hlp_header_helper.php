@@ -246,3 +246,10 @@ function generateSkipLink($skipID)
 	$toPrint.='" class="fhcSkipLink" aria-label="Skip to main content"></a>';
 	echo $toPrint;
 }
+
+function absoluteJsImportUrl($relurl)
+{
+	$ci =& get_instance();
+	$url = base_url($relurl) . '?'. $ci->config->item('fhcomplete_build_version');
+	return $url;
+}
