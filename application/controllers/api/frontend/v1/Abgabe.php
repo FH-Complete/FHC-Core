@@ -599,7 +599,7 @@ class Abgabe extends FHCAPI_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
-
+			// TODO: consider this in nightly email job
 			$this->logLib->logInfoDB(array('paabgabe created',$result, getAuthUID(), getAuthPersonId()));
 		} else {
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
@@ -625,6 +625,8 @@ class Abgabe extends FHCAPI_Controller
 				)
 			);
 
+			// TODO: consider this in nightly email job
+			
 			$this->logLib->logInfoDB(array('paabgabe updated',$result, array(
 				'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
 				'datum' => $datum,
@@ -692,6 +694,8 @@ class Abgabe extends FHCAPI_Controller
 			$result = $this->PaabgabeModel->delete($paabgabe_id);
 			$result = $this->getDataOrTerminateWithError($result);
 
+			// TODO: consider this in nightly email job
+			
 			$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
 			$this->terminateWithSuccess($result);
 		}
