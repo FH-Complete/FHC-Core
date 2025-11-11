@@ -512,7 +512,7 @@ export const AbgabeStudentDetail = {
 							<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">
 								<div class="row">
-									<div style="width:100px">
+									<div style="width:100px; align-content: center;">
 										<h6>{{ termin.abgabedatum?.split("-").reverse().join(".") }}</h6>
 									</div>
 									
