@@ -403,7 +403,7 @@ var Oehbeitrag = {
 			}
 
 			if (singleUpdate === true)
-				inputHtml += " <i class='fa fa-check text-success' id='confirm_"+fieldname+"_"+oehbeitrag_id+"' ></i>";
+				inputHtml += " <div class='glyphicon glyphicon-floppy-disk text-success' id='confirm_"+fieldname+"_"+oehbeitrag_id+"' title='"+FHC_PhrasesLib.t('ui', 'speichern')+"'></div>";
 
 			initElement.html(inputHtml);
 
