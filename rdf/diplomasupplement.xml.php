@@ -1160,12 +1160,13 @@ function checkNote($note_alt, $note_neu)
 		'4' => 'ea',
 		'5' => 'tg',
 		'6' => 'met',
-		'7' => 'ar',
-		'8' => 'nb',
-		'9' => '5',
-		'10' => 'nea');
+		'7' => 'b',
+		'8' => 'ar',
+		'9' => 'nb',
+		'10' => '5',
+		'11' => 'nea');
 
-	for($i = 0; $i<=9; $i++)
+	for($i = 0; $i<=11; $i++)
 	{
 		if($note_alt == $arrayNotenPriority[$i])
 			$priority_alt = $i;

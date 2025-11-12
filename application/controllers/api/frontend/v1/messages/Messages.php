@@ -16,7 +16,7 @@ class Messages extends FHCAPI_Controller
 			'getNameOfDefaultRecipient' => ['admin:r', 'assistenz:r'],
 			'sendMessage' => ['admin:r', 'assistenz:r'],
 			'deleteMessage' => ['admin:r', 'assistenz:r'],
-			'getVorlagentext' => ['admin:r', 'assistenz:r'],
+			'getDataVorlage' => ['admin:r', 'assistenz:r'],
 			'getPreviewText' => ['admin:r', 'assistenz:r'],
 			'getReplyData' => ['admin:r', 'assistenz:r'],
 			'getPersonId' => ['admin:r', 'assistenz:r'],
@@ -52,11 +52,14 @@ class Messages extends FHCAPI_Controller
 
 		$result = $this->MessageModel->getMessagesForTable($id, $offset, $limit);
 
-		$data = $this->getDataOrTerminateWithError($result);
+		if (hasData($result))
+		{
+			$data = getData($result);
+			$this->addMeta('count', $data['count']);
+			$this->terminateWithSuccess($data['data']);
+		}
 
-		$this->addMeta('count', $data['count']);
-
-		$this->terminateWithSuccess($data['data']);
+		$this->terminateWithSuccess(array());
 	}
 
 	public function getVorlagen()
@@ -66,33 +69,23 @@ class Messages extends FHCAPI_Controller
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$result = $this->BenutzerfunktionModel->getBenutzerfunktionByUid($uid, 'oezuordnung');
 
-		$data = $this->getDataOrTerminateWithError($result);
-		$oe_kurzbz = current($data);
+		if (hasData($result))
+		{
+			$this->load->model('system/Vorlage_model', 'VorlageModel');
 
-		$this->load->model('system/Vorlage_model', 'VorlageModel');
+			$data = getData($result);
 
-		$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz->oe_kurzbz);
-		$data = $this->getDataOrTerminateWithError($result);
+			$oe_kurzbz = array_column($data, 'oe_kurzbz');
+			$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz);
 
-		$this->terminateWithSuccess($data);
+			$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
+		}
 
-		//If admin
-		$this->VorlageModel->addOrder('vorlage_kurzbz', 'ASC');
-		$result = $this->VorlageModel->loadWhere(
-			array(
-				'mimetype' => 'text/html'
-			));
-
-
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess($data);
+		$this->terminateWithSuccess(array());
 	}
 
-	public function getVorlagentext($vorlage_kurzbz)
+	public function getDataVorlage($vorlage_kurzbz)
 	{
-		//$this->terminateWithError("vor " . $vorlage_kurzbz, self::ERROR_TYPE_GENERAL);
-		//$studiengang_kz = 227; //TODO(Manu) dynamisieren NULL
 		$studiengang_kz = 0;
 		$this->load->model('system/Vorlagestudiengang_model', 'VorlagestudiengangModel');
 		$this->VorlagestudiengangModel->addOrder('version', 'DESC');
@@ -104,12 +97,8 @@ class Messages extends FHCAPI_Controller
 			]);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
-		//not correct with Vorlage
 		$vorlage = current($data);
-
-		//$this->terminateWithSuccess($data);
-		$this->terminateWithSuccess($vorlage->text);
+		$this->terminateWithSuccess($vorlage);
 	}
 
 	public function getMessageVarsPerson($id, $typeId)
@@ -154,7 +143,7 @@ class Messages extends FHCAPI_Controller
 	public function sendMessage($recipient_id)
 	{
 		//has to be uid
-	//	$this->terminateWithError("uid", $recipient_id, self::ERROR_TYPE_GENERAL);
+		//	$this->terminateWithError("uid", $recipient_id, self::ERROR_TYPE_GENERAL);
 
 		//default setting
 		$receiversPersonId = $this->_getPersonId($recipient_id, 'uid');
@@ -223,8 +212,6 @@ class Messages extends FHCAPI_Controller
 		}
 		elseif($typeId == 'prestudent_id')
 		{
-		//	$this->terminateWithError("prestudent_id ", self::ERROR_TYPE_GENERAL);
-
 			$result = $this->MessagesModel->parseMessageTextPrestudent($id, $body);
 			$bodyParsed = $this->getDataOrTerminateWithError($result);
 		}
@@ -429,7 +416,7 @@ class Messages extends FHCAPI_Controller
 
 	private function _getPrestudentIdFromUid($uid)
 	{
-	//	$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
+		//	$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->loadWhere(
 			['student_uid' => $uid]

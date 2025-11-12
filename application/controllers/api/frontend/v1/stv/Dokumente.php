@@ -2,6 +2,7 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \CI3_Events as Events;
 use \DateTime as DateTime;
 
 class Dokumente extends FHCAPI_Controller
@@ -19,6 +20,8 @@ class Dokumente extends FHCAPI_Controller
 			'getDoktypen' => ['admin:r', 'assistenz:r'],
 			'uploadDokument' => ['admin:rw', 'assistenz:rw'],
 			'download' => ['admin:rw', 'assistenz:rw'],
+			'getDocumentDropDown' => ['admin:rw', 'assistenz:rw'],
+			'getDocumentDropDownMulti' => ['admin:rw', 'assistenz:rw'],
 		]);
 
 		// Load Libraries
@@ -566,4 +569,395 @@ class Dokumente extends FHCAPI_Controller
 			return false;
 		}
 	}
+
+	public function getDocumentDropDown($prestudent_id, $studiensemester_kurzbz, $studiengang_kz)
+	{
+		$this->load->helper('hlp_common');
+		//permission to create also odt, and doc outputs of certain documents(menu abschlusspruefung)
+		$hasPermissionOutputformat = $this->permissionlib->isBerechtigt('system/change_outputformat', 's');
+
+		if (!$prestudent_id)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Prestudent_id']), self::ERROR_TYPE_GENERAL);
+		if (!$studiensemester_kurzbz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiensemester']), self::ERROR_TYPE_GENERAL);
+		if(!$studiengang_kz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
+
+
+		$uid = $this->_loadUIDFromPrestudent($prestudent_id);
+		$semArray = $this->_getEntriesStudiensemester();
+		$stgTyp = $this->_getStudiengangstyp($studiengang_kz);
+
+		$documents = [
+			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uid, 20, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uid, 21, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uid, 40, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uid, 41, null),
+			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uid", $uid,100, "zutrittskarte.php"),
+			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uid, 60, null),
+			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uid, 61, null),
+
+			$this->buildStudienerfolgSubmenu("de", $uid, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("en", $uid, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("de", $uid, $semArray, $studiensemester_kurzbz, true),
+			$this->buildStudienerfolgSubmenu("en", $uid, $semArray, $studiensemester_kurzbz, true),
+
+			[
+				"id" => "submenu_studstatus",
+				"type" => "submenu",
+				"name" => "Verwaltung des StudierendenStatus",
+				"order" => 110,
+				"data" => [
+					buildDropdownEntryPrintArray("Abmeldung", "Abmeldung", "xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
+					buildDropdownEntryPrintArray("Abmeldung durch Stgl", "AntragAbmeldungStgl", "xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
+					buildDropdownEntryPrintArray("Unterbrechung", "Unterbrechung", "xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
+					buildDropdownEntryPrintArray("Wiederholung", "Abmeldung durch Ablauf der Wiederholungsfrist", "xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&prestudent_id=$prestudent_id&output=pdf", $uid, null, null),
+				]
+			],
+
+			$this->loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uid),
+
+			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uid, 80, null),
+			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uid, 81, null)
+		];
+
+		Events::trigger('DocumentGenerationDropDown',
+			// passing $menu per reference
+			function & () use (&$documents) {
+				return $documents;
+			},
+			$prestudent_id,
+			$studiensemester_kurzbz,
+			$studiengang_kz
+		);
+
+		usort($documents, function ($a, $b) {
+			$orderA = isset($a['order']) ? (int)$a['order'] : PHP_INT_MAX;
+			$orderB = isset($b['order']) ? (int)$b['order'] : PHP_INT_MAX;
+			return $orderA <=> $orderB;
+		});
+
+
+		$this->terminateWithSuccess($documents);
+		return $documents || null;
+	}
+
+	public function getDocumentDropDownMulti($studiensemester_kurzbz,$studiengang_kz)
+	{
+		//permission to create also odt, and doc outputs of certain documents (menu abschlusspruefung)
+		$hasPermissionOutputformat = $this->permissionlib->isBerechtigt('system/change_outputformat', 's');
+
+		$studentUids = $this->input->get('studentUids');
+		$prestudentIds = [];
+
+		if (is_array($studentUids) && !empty($studentUids)) {
+			foreach ($studentUids as $uid) {
+				$prestudent_id = $this-> _loadPrestudentFromUid($uid);
+				$prestudentIds[] = $prestudent_id;
+			}
+		}
+		else
+		{
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Array StudentUIDs']), self::ERROR_TYPE_GENERAL);
+		}
+
+		if (!$studiensemester_kurzbz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiensemester']), self::ERROR_TYPE_GENERAL);
+		if(!$studiengang_kz)
+			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
+
+
+		$uidString = implode(";", $studentUids);
+		$prestudentIdsString = implode(";", $prestudentIds);
+
+		$semArray = $this->_getEntriesStudiensemester();
+		$stgTyp = $this->_getStudiengangstyp($studiengang_kz);
+
+		$documents = [
+			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uidString, 10, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uidString, 20, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uidString, 21, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 40, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 41, null),
+			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,100, "zutrittskarte.php"),
+			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uidString, 60, null),
+			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uidString, 61, null),
+
+			// Studienerfolg Menüs automatisch
+			$this->buildStudienerfolgSubmenu("de", $uidString, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("en", $uidString, $semArray, $studiensemester_kurzbz),
+			$this->buildStudienerfolgSubmenu("de", $uidString, $semArray, $studiensemester_kurzbz, true),
+			$this->buildStudienerfolgSubmenu("en", $uidString, $semArray, $studiensemester_kurzbz, true),
+
+			[
+				"id" => "submenu_studstatus",
+				"type" => "submenu",
+				"name" => "Verwaltung des StudierendenStatus",
+				"order" => 110,
+				"data" => [
+					buildDropdownEntryPrintArray("Abmeldung", "Abmeldung", "xml=AntragAbmeldung.xml.php&xsl=AntragAbmeldung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					buildDropdownEntryPrintArray("Abmeldung durch Stgl", "AntragAbmeldungStgl", "xml=AntragAbmeldungStgl.xml.php&xsl=AntragAbmeldungStgl&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					buildDropdownEntryPrintArray("Unterbrechung", "Unterbrechung", "xml=AntragUnterbrechung.xml.php&xsl=AntragUnterbrechung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+					buildDropdownEntryPrintArray("Wiederholung", "Abmeldung durch Ablauf der Wiederholungsfrist", "xml=AntragWiederholung.xml.php&xsl=AntragWiederholung&prestudent_id=$prestudentIdsString&output=pdf", $uidString, null, null),
+				]
+			],
+
+			$this->loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uidString),
+
+			//TODO(Manu) also in Fas multi not working
+/*			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uidString, 80, null),
+			*/
+
+			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uidString, 81, null)
+		];
+
+		Events::trigger('DocumentGenerationDropDownMulti',
+			// passing $menu per reference
+			function & () use (&$documents) {
+				return $documents;
+			},
+			$studentUids,
+			$studiensemester_kurzbz,
+			$studiengang_kz
+		);
+
+		usort($documents, function ($a, $b) {
+			$orderA = isset($a['order']) ? (int)$a['order'] : PHP_INT_MAX;
+			$orderB = isset($b['order']) ? (int)$b['order'] : PHP_INT_MAX;
+			return $orderA <=> $orderB;
+		});
+
+
+		$this->terminateWithSuccess($documents);
+
+		return $documents || null;
+	}
+
+	private function _loadUIDFromPrestudent($prestudent_id)
+	{
+		if(!$prestudent_id){
+			return $this->terminateWithError("no prestudent ID received.");
+		}
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(
+			['prestudent_id' => $prestudent_id]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$student = current($data);
+
+		return $student->student_uid;
+	}
+
+	private function _loadPrestudentFromUid($studentUid)
+	{
+
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(
+			['student_uid' => $studentUid]
+		);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$student = current($data);
+
+
+		return $student->prestudent_id;
+	}
+
+	/**
+	 * is building an array with studiensemesterkurzb
+	 * actual studiensemester plus the 5 studiensemester in the past
+
+	 * @return Array Studiensemester_kurzbz
+	 */
+	private function _getEntriesStudiensemester(){
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->StudiensemesterModel->addPlusMinus(1, 5);
+		$this->StudiensemesterModel->addOrder('ende', 'DESC');
+		$result = $this->StudiensemesterModel->load();
+		$data = $this->getDataOrTerminateWithError($result);
+
+		foreach($data as $sem)
+		{
+			$semArray[] = $sem->studiensemester_kurzbz;
+		}
+
+		array_shift($semArray);
+
+		return $semArray;
+	}
+	/**
+	 * is returning the typ of Studiengang (Bakk oder Master)
+
+	 * @return character  eg. 'b' or 'm'
+	 */
+	private function _getStudiengangstyp($studiengang_kz)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+		$result = $this->StudiengangModel->loadWhere(
+			array('studiengang_kz' => $studiengang_kz)
+		);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$typStudiengang = current($data)->typ;
+
+		return $typStudiengang;
+	}
+
+	/**
+	 * helper function to create ArrayStructure
+	 * actual studiensemester plus the 5 studiensemester in the past
+
+	 * @return Array Studiensemester_kurzbz
+	 */
+	private function buildStudienerfolgSubmenu($lang, $uid, $semArray, $studiensemester_kurzbz, $fa = false)
+	{
+		$entries = [];
+
+		$xsl = $lang === "de" ? "Studienerfolg" : "StudienerfolgEng";
+		$idPrefix = "submenu_studienerfolg_" . $lang . ($fa ? "_fa" : "");
+
+		$entries[] = buildDropdownEntryPrintArray(
+			$idPrefix . "_aktuell",
+			"ausgewähltes Semester",
+			"xml=studienerfolg.rdf.php&xsl=$xsl&ss=$studiensemester_kurzbz" . ($fa ? "&typ=finanzamt" : ""),
+			$uid
+		);
+
+		//all semester
+		$entries[] = buildDropdownEntryPrintArray(
+			$idPrefix . "_all",
+			"alle Semester",
+			"xml=studienerfolg.rdf.php&xsl=$xsl&ss=$studiensemester_kurzbz&all=true" . ($fa ? "&typ=finanzamt" : ""),
+			$uid
+		);
+
+		//sem from array
+		foreach ($semArray as $i => $sem) {
+			$entries[] = buildDropdownEntryPrintArray(
+				$idPrefix . ($i === 0 ? "_akt" : "_minus" . $i),
+				$sem,
+				"xml=studienerfolg.rdf.php&xsl=$xsl&ss=$sem" . ($fa ? "&typ=finanzamt" : ""),
+				$uid
+			);
+
+		}
+		$order = 0;
+		if ($lang === "de" && !$fa) $order = 75; // Studienerfolg
+		if ($lang === "en" && !$fa) $order = 76; // Studienerfolg Englisch
+		if ($lang === "de" &&  $fa) $order = 77; // Studienerfolg Finanzamt
+		if ($lang === "en" &&  $fa) $order = 78; // Studienerfolg Finanzamt Englisch
+
+		return [
+			"id"   => $idPrefix,
+			"type" => "submenu",
+			"name" => "Studienerfolg " . ($fa ? " Finanzamt" : "") . ($lang === "de" ? "" : "Englisch") ,
+			"order" => $order,
+			"data" => $entries,
+		];
+	}
+
+	private function loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uid)
+	{
+		if ($stgTyp == 'b')
+			$postfix = 'Bakk';
+		else if ($stgTyp == 'm' || $stgTyp == 'd')
+			$postfix = 'Master';
+		else
+			return [];
+
+		$arrayFinalExam = [
+			'pruefungsprotokoll' => [
+				'de' => [
+					'Bakk' => 'PrProtBA',
+					'Master' => 'PrProtMA',
+				],
+				'en' => [
+					'Bakk' => 'PrProtBAEng',
+					'Master' => 'PrProtMAEng',
+				],
+			],
+			'pruefungszeugnis' => [
+				'de' => [
+					'Bakk' => 'Bakkzeugnis',
+					'Master' => 'Diplomzeugnis',
+				],
+				'en' => [
+					'Bakk' => 'BakkzeugnisEng',
+					'Master' => 'DiplomzeugnisEng',
+				],
+			],
+			'urkunde' => [
+				'de' => [
+					'Bakk' => 'Bakkurkunde',
+					'Master' => 'Diplomurkunde',
+				],
+				'en' => [
+					'Bakk' => 'BakkurkundeEng',
+					'Master' => 'DiplomurkundeEng',
+				],
+			],
+		];
+
+		$langLabels = [
+			"de" => "Deutsch",
+			"en" => "Englisch"
+		];
+
+		$docLabels = [
+			"pruefungsprotokoll" => "Prüfungsprotokoll",
+			"pruefungszeugnis" => "Zeugnis",
+			"urkunde" => "Urkunde"
+		];
+
+		$submenuData = [];
+		if ($hasPermissionOutputformat) {
+			foreach ($arrayFinalExam as $docType => $langs) {
+				foreach ($langs as $lang => $types) {
+					$xsl = $types[$postfix];
+					$idPrefix = $docType . "_" . $lang;
+
+					$baseName = $docLabels[$docType] . " " . $langLabels[$lang];
+					$baseUrl = "xml=abschlusspruefung.rdf.php&xsl={$xsl}";
+
+					//3 outputformates
+					foreach (["pdf", "odt", "docx"] as $format) {
+						$submenuData[] = buildDropdownEntryPrintArray(
+							$idPrefix . "_" . $format,
+							$baseName . " (" . strtoupper($format) . ")",
+							$baseUrl . "&output=" . $format,
+							$uid
+						);
+					}
+				}
+			}
+		}
+		else
+		{
+			foreach ($arrayFinalExam as $docType => $langs) {
+				foreach ($langs as $lang => $types) {
+					$xsl = $types[$postfix]; // Auswahl Bakk/Master für jeweilige Sprache
+					$id = $docType . "_" . $lang;
+
+					$name = $docLabels[$docType] . " " . $langLabels[$lang];
+
+					$url = "xml=abschlusspruefung.rdf.php&xsl=" . $xsl . "&output=pdf";
+
+					$submenuData[] = buildDropdownEntryPrintArray($id, $name, $url, $uid);
+				}
+			}
+		}
+		return [
+			"id" => "submenu_finalexam",
+			"type" => "submenu",
+			"name" => "Abschlussprüfung",
+			"data" => $submenuData,
+			"order" => null,
+			"order" => 80,
+		];
+	}
+
 }

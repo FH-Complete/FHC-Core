@@ -114,9 +114,8 @@ class Status extends FHCAPI_Controller
 		$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 
 		$result = $this->BismeldestichtagModel->getLastReachedMeldestichtag();
-		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($data);
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
 	}
 
 	public function isLastStatus($prestudent_id)
@@ -296,7 +295,7 @@ class Status extends FHCAPI_Controller
 			}],
 			//Check if Rolle already exists
 			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
-				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
@@ -903,7 +902,7 @@ class Status extends FHCAPI_Controller
 
 		$this->form_validation->set_rules('_default', '', [
 			['rolle_doesnt_exist', function () use ($prestudent_id, $status_kurzbz, $studiensemester_kurzbz, $ausbildungssemester) {
-				if (!$status_kurzbz || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->PrestudentstatusModel->load([$ausbildungssemester, $studiensemester_kurzbz, $status_kurzbz, $prestudent_id]);
@@ -920,7 +919,7 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryTimesequence(
@@ -945,7 +944,7 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryLaststatus(
@@ -970,7 +969,7 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryUnterbrechersemester(
@@ -995,7 +994,7 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryAbbrechersemester(
@@ -1020,7 +1019,7 @@ class Status extends FHCAPI_Controller
 			) {
 				if ($isBerechtigtNoStudstatusCheck)
 					return true; // Skip if access right says so
-				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !$ausbildungssemester)
+				if (!$status_kurzbz || !$datum || !$studiensemester_kurzbz || !isset($ausbildungssemester) || $ausbildungssemester === '')
 					return true; // Error will be handled by the required statements above
 
 				$result = $this->prestudentstatuschecklib->checkStatusHistoryDiplomant(
