@@ -64,6 +64,7 @@ class Config extends FHCAPI_Controller
 
 		$config = [];
 
+		#number_displayed_past_studiensemester
 		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
 		$data = $this->getDataOrTerminateWithError($result);
 
@@ -76,6 +77,21 @@ class Config extends FHCAPI_Controller
 				?? $number_displayed_past_studiensemester_default
 		];
 
+		#font_size
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['stv_font_size']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$config['font_size'] = [
+			"type" => "select",
+			"label" => "Font size",
+			"value" => $data['stv_font_size'] ?? "fs_normal",
+			"options" => [
+				"fs_small" => "klein",// TODO(chris): phrase
+				"fs_normal" => "normal",// TODO(chris): phrase
+				"fs_big" => "groß",// TODO(chris): phrase
+				"fs_huge" => "sehr groß"// TODO(chris): phrase
+			]
+		];
+
 		// TODO(chris): Event
 
 		$this->terminateWithSuccess($config);
@@ -86,7 +102,6 @@ class Config extends FHCAPI_Controller
 	 */
 	public function set()
 	{
-		// TODO(chris): rewrite to batch saving
 		$this->load->model('system/Variable_model', 'VariableModel');
 		$this->load->library('form_validation');
 
@@ -94,6 +109,11 @@ class Config extends FHCAPI_Controller
 			'number_displayed_past_studiensemester',
 			"Anzahl angezeigter vergangender Studiensemester",// TODO(chris): phrase
 			'required|integer'
+		);
+		$this->form_validation->set_rules(
+			'font_size',
+			"Font size",// TODO(chris): phrase
+			'required|in_list[fs_small,fs_normal,fs_big,fs_huge]'
 		);
 
 		// TODO(chris): Event
@@ -106,6 +126,11 @@ class Config extends FHCAPI_Controller
 			getAuthUID(),
 			'number_displayed_past_studiensemester',
 			$this->input->post('number_displayed_past_studiensemester')
+		);
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'stv_font_size',
+			$this->input->post('font_size')
 		);
 
 		// TODO(chris): Event

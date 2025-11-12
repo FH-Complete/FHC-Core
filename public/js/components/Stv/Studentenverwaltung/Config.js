@@ -60,10 +60,15 @@ export default {
 			.then(res => {
 				this.setup = {};
 				Object.keys(res.data).forEach(key => {
-					const conf = { ...res.data[key] };
-					this.tempValues[key] = conf.value;
-					delete conf.value;
-					this.setup[key] = conf;
+					const binding = { ...res.data[key] };
+					delete binding.value;
+					delete binding.options;
+					const options = res.data[key].options;
+					this.tempValues[key] = res.data[key].value;
+					this.setup[key] = {
+						binding,
+						options
+					};
 				});
 				this.$emit('update:modelValue', { ...this.tempValues });
 			})
@@ -80,11 +85,19 @@ export default {
 		>
 			<template #title>{{ $p.t('ui/settings') }}</template>
 			<template #default>
-				<form-input
-					v-for="(value, key) in setup"
-					v-model="tempValues[key]"
-					v-bind="value"
-				></form-input>
+				<div class="d-flex flex-column gap-5">
+					<form-input
+						v-for="(value, key) in setup"
+						v-model="tempValues[key]"
+						v-bind="value.binding"
+					>
+						<option
+							v-for="(label, val) in value.options"
+							:key="val"
+							:value="val"
+						>{{ label }}</option>
+					</form-input>
+				</div>
 			</template>
 			<template #footer>
 				<button class="btn btn-primary" type="submit">

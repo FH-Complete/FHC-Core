@@ -152,6 +152,22 @@ export default {
 		},
 		'url_mode': function () {
 			this.handlePersonUrl();
+		},
+		'appconfig.font_size'() {
+			// add to html class
+			const classList = Object.keys(this.$refs.config.setup.font_size.options);
+			classList.forEach(cn => document.documentElement.classList.remove(cn));
+			document.documentElement.classList.add(this.appconfig.font_size);
+			// recalc Tabulator heights
+			if (this.$el) {
+				const tabulatorEls = this.$el.querySelectorAll('.tabulator');
+				for (const el of tabulatorEls) {
+					const tabulators = Tabulator.findTable(el);
+					if (tabulators) {
+						tabulators[0].searchRows().forEach(row => row.normalizeHeight());
+					}
+				}
+			}
 		}
 	},
 	methods: {
@@ -430,6 +446,6 @@ export default {
 				</main>
 			</div>
 		</div>
-		<stv-config v-model="appconfig"></stv-config>
+		<stv-config ref="config" v-model="appconfig"></stv-config>
 	</div>`
 };
