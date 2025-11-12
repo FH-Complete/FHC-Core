@@ -1,10 +1,12 @@
 @import './Fhc.css';
+@import './SvgIcons.css';
 @import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
 @import './components/Messages.css';
+@import './components/AppMenu.css';
 
 html {
   font-size: .875em;
@@ -20,6 +22,10 @@ html.fs_big {
 }
 html.fs_huge {
   font-size: 1.4em;
+}
+
+#appMenu {
+	width: 300px;
 }
 
 .navbar-dark .navbar-brand:focus {
@@ -47,10 +53,6 @@ html.fs_huge {
 }
 .stv > div {
 	flex: 1 1 auto;
-}
-
-#sidebarMenu {
-	width: 0%;
 }
 
 #nav-user-btn img {

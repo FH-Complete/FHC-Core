@@ -35,4 +35,14 @@ export default {
 			params
 		};
 	},
+	saveStudent(student_uid, studiensemester_kurzbz, params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/student/saveStudent/'
+				+ encodeURIComponent(student_uid)
+				+ '/'
+				+ encodeURIComponent(studiensemester_kurzbz),
+			params
+		};
+	}
 };

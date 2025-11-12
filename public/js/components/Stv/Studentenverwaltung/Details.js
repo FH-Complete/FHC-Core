@@ -31,10 +31,14 @@ export default {
 			if (this.students.length == 1) {
 				const student = this.students[0];
 				if (student.uid)
-					return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithoutUid));
-				return Object.fromEntries(Object.entries(this.configStudent).filter(([key, value]) => !value.showOnlyWithUid));
+					return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithoutUid));
+				return Object.fromEntries(Object.entries(this.configStudent).filter(([ , value ]) => !value.showOnlyWithUid));
+			} else if (this.students.every(student => student.uid)) {
+				return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithoutUid));
+			} else if (this.students.every(student => !student.uid)) {
+					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
-			return this.configStudents;
+			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		}
 	},
 	watch: {
@@ -67,11 +71,11 @@ export default {
 		this.loadConfig();
 	},
 	template: `
-	<div class="stv-details h-100 pb-3 d-flex flex-column">
+	<div class="stv-details h-100 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
 			{{$p.t('ui', 'chooseStudent')}}
 		</div>
-		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100 pb-3">
+		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
 				:headerData="students"
 				typeHeader="student"
