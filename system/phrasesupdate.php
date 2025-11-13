@@ -13357,13 +13357,13 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'LektorInnen',
+				'text' => 'Lehrende',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Lectors',
+				'text' => 'Lecturers',
 				'description' => '',
 				'insertvon' => 'system'
 			)
