@@ -33,6 +33,10 @@ class Bookmark extends FHCAPI_Controller
 			'update' => self::PERM_LOGGED,
 			'changeOrder' => self::PERM_LOGGED,
 			'getAllBookmarkTags' => self::PERM_LOGGED,
+			'getTagFilter' => self::PERM_LOGGED,
+			'addAndUpdateTagFilter' => self::PERM_LOGGED,
+			'isInOverride' => self::PERM_LOGGED,
+			'addWidgetToOverride' => self::PERM_LOGGED,
 		]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -184,5 +188,140 @@ class Bookmark extends FHCAPI_Controller
 
 		$this->terminateWithSuccess(current($bookmarks));
 	}
+
+	/**
+	 * get all tagFilter of a certain bookmark widget
+	 * @access public
+	 * @return void
+	 */
+	public function getTagFilter($widgetId, $sectionName)
+	{
+		$result = $this->BookmarkModel->getTagFilter($widgetId, $this->uid, $sectionName);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(current($data));
+	}
+	/**
+	 * get all tagFilter of a certain bookmark widget
+	 * @access public
+	 * @return void
+	 */
+	public function addAndUpdateTagFilter($widgetId, $sectionName)
+	{
+		$tags = $this->input->post('tags',true);
+		if (is_array($tags))
+		{
+			$tags = json_encode($tags);
+		}
+		$result = $this->BookmarkModel->addAndUpdateTagFilter($widgetId, $this->uid, $sectionName, $tags);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * checks if a widget has already an entry in the benutzeroverride
+	 * @access public
+	 * @return void
+	 */
+	public function isInOverride($widgetId, $sectionName)
+	{
+		$result = $this->BookmarkModel->checkOrAddToOverride($widgetId, $this->uid, $sectionName);
+
+		$data = getData($result);
+		if(!$data)
+			$this->terminateWithSuccess([false, 0]);
+
+		$id = current($data)->widgetid;
+		$id = trim($id, '"');
+
+		if ($id != $widgetId)
+			$this->terminateWithSuccess([false, 1]);
+		else
+			$this->terminateWithSuccess([true, null]);
+	}
+	/**
+	 * adds widget benutzeroverride
+	 * @access public
+	 * @return void
+	 */
+	public function addWidgetToOverride($widgetId, $sectionName, $mode, $x, $y, $h, $w)
+	{
+		$this->load->library('dashboard/DashboardLib', null, 'DashboardLib');
+		$dashboard_kurzbz = "CIS";
+		$structure = [
+			"custom" => [
+				"widgets" => []
+			],
+			"general" => [
+				"widgets" => [
+					$widgetId => [
+						"widget" => 3,
+						"config" => new stdClass(),
+						"place" => [
+							"3" => [
+								"x" => $x,
+								"y" => $y,
+								"w" => $w,
+								"h" => $h
+							]
+						],
+						"widgetid" => $widgetId,
+						"custom" => 1,
+						"id" => "insertByBookmarkwidget"
+					]
+				]
+			]
+		];
+		$jsonOverrideNew = json_encode($structure, JSON_UNESCAPED_UNICODE);
+
+		//no existing benutzeroverride
+		if($mode == 0)
+		{
+			$override = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $this->uid);
+
+			$override->override = $jsonOverrideNew;
+
+			$result = $this->DashboardLib->insertOrUpdateOverride($override);
+
+			$this->terminateWithSuccess($result);
+
+		}
+		//benutzeroverride existing, but widget not included
+		elseif($mode == 1)
+		{
+			$overrideExisting = $this->DashboardLib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $this->uid);
+			$override = json_decode($overrideExisting->override, true); // decode as Array
+
+			$newWidget = [
+				"widget" => 3,
+				"config" => new stdClass(),
+				"place" => [
+					"3" => [
+						"x" => $x,
+						"y" => $y,
+						"w" => $w,
+						"h" => $h
+					]
+				],
+				"widgetid" => $widgetId,
+				"custom" => 1,
+				"id" => "insertByBookmarkwidget"
+			];
+
+			$override['general']['widgets'][$widgetId] = $newWidget;
+
+			$jsonOverrideUpdated = json_encode($override, JSON_UNESCAPED_UNICODE);
+			$overrideExisting->override = $jsonOverrideUpdated;
+
+			$result = $this->DashboardLib->insertOrUpdateOverride($overrideExisting);
+
+			$this->terminateWithSuccess($result);
+		}
+		else
+			$this->terminateWithError("Error: no known mode");
+	}
+
 }
 

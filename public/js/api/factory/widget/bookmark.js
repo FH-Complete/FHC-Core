@@ -17,6 +17,7 @@
 
 export default {
 	getBookmarks() {
+
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Bookmark/getBookmarks'
@@ -54,12 +55,29 @@ export default {
 			url: '/api/frontend/v1/Bookmark/getAllBookmarkTags'
 		};
 	},
-	//TODO(Manu) getTagFilter and addTagFilter
-	//in bookmark_model
-/*	updateBenutzeroverride() {
-		return{
+	getTagFilter(widgetId, sectionName){
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/Bookmark/getTagFilter/${widgetId}/${sectionName}`
+		};
+	},
+	addTagFilter(widgetId, sectionName, tags){
+		return {
 			method: 'post',
-			url: `/api/frontend/v1/Bookmark/update/${bookmark_id}`,
-			params: {url, title, tag}
-}*/
+			url: `/api/frontend/v1/Bookmark/addAndUpdateTagFilter/${widgetId}/${sectionName}`,
+			params: { tags }
+		};
+	},
+	isInOverride(widgetId, sectionName){
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/Bookmark/isInOverride/${widgetId}/${sectionName}`
+		};
+	},
+	addWidgetToOverride(widgetId, sectionName, mode, x, y, h, w){
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/Bookmark/addWidgetToOverride/${widgetId}/${sectionName}/${mode}/${x}/${y}/${h}/${w}`,
+		};
+	}
 };

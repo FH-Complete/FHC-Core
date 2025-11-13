@@ -4,7 +4,6 @@ import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
 import ApiBookmark from '../../api/factory/widget/bookmark.js';
-import ApiDashboard from '../../api/factory/cis/dashboard.js'; //nutzt aber nicht viel
 
 export default {
 	name: "WidgetsUrl",
@@ -36,17 +35,14 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
-		tagsArray: [],
+		tagsArrayMS: [],
+		tagsArrayAC: [],
 		selectedTags: [],
 		newTag: null,
-		selectedFilters: [], //die aber im benutzer_override speichern
-		items:[],
-		value: '',
-		//viewData: []
-		ArrayAC: [],
-		selectedTagsAC: [],
-		tagsInput2: [],
-		filteredArrayAC: [],
+		selectedFilters: [],
+		filter: [],
+		filteredArray: [],
+		sharedFiltered: {},
 	}),
 	computed: {
 		tagName() {
@@ -71,16 +67,13 @@ export default {
 			if(this.shared.length == 0)
 				return 0;
 			else
-				return Math.max(...this.shared.map(b => b.sort));
+				return Math.max(...this.sharedFiltered.map(b => b.sort));
 		},
 		minSort(){
 			if(this.shared.length == 0)
 				return 0;
 			else
-				return Math.min(...this.shared.map(b => b.sort));
-		},
-		tagsInput(){
-			return this.selectedTags.map(item => item.tag);
+				return Math.min(...this.sharedFiltered.map(b => b.sort));
 		},
 		filterInput(){
 			return this.selectedFilters.map(item => item.tag);
@@ -102,9 +95,7 @@ export default {
 			this.title_input = bookmark.title;
 			this.url_input = bookmark.url;
 			this.bookmark_id = bookmark.bookmark_id;
-			//but the JSON string to array
-			this.selectedTagsAC = JSON.parse(bookmark.tag);
-		//	this.selectedTags = this.prepareTag(bookmark.tag);
+			this.selectedTags = JSON.parse(bookmark.tag);
 
 			this.$refs.editModal.show();
 		},
@@ -117,15 +108,14 @@ export default {
 					bookmark_id: this.bookmark_id,
 					title: this.title_input,
 					url: this.url_input,
-					tag: this.selectedTagsAC,
-					//tag: this.tagsInput, //old version
+					tag: this.selectedTags,
 				}))
 				.then((res) => res.data)
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
 					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					this.getAllBookmarkTags();
+					this.fetchBookmarks();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 					this.$refs.editModal.hide();
@@ -150,9 +140,7 @@ export default {
 
 			this.$api
 				.call(ApiBookmark.insert({
-					//tag: this.config.tag,
-					//tag: this.tagsInput, //old version
-					tag: this.selectedTagsAC,
+					tag: this.selectedTags,
 					title: this.title_input,
 					url: this.url_input,
 					sort: this.sort
@@ -161,15 +149,14 @@ export default {
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
 					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					this.getAllBookmarkTags();
+					this.fetchBookmarks();
 					this.$refs.createModal.hide();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-
 		isValidationSuccessfull() {
 			// validate the input fields
 			if (this.title_input.length === 0) {
@@ -189,6 +176,10 @@ export default {
 				.then((res) => res.data)
 				.then((result) => {
 					this.shared = result;
+
+					this.$nextTick(() => {
+						this.sharedFiltered = this.filterBookmarksByTags(this.shared);
+					});
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -209,10 +200,19 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		sortDown(bookmark_id){
-			const current = this.shared.find(b => b.bookmark_id === bookmark_id);
+		filterBookmarksByTags(bookmarks) {
+			const filter = this.filter;
+			if (!filter || filter.length === 0 || filter == "[]") return bookmarks;
 
-			const next = this.shared
+			return bookmarks.filter(b => {
+				const tags = JSON.parse(b.tag || "[]");
+				return tags.some(tag => filter.includes(tag));
+			});
+		},
+		sortDown(bookmark_id){
+			const current = this.sharedFiltered.find(b => b.bookmark_id === bookmark_id);
+
+			const next = this.sharedFiltered
 				.filter(b => b.sort > current.sort)
 				.sort((a, b) => a.sort - b.sort)[0];
 
@@ -223,9 +223,9 @@ export default {
 			this.changeOrder(current.bookmark_id, next.bookmark_id);
 		},
 		sortUp(bookmark_id){
-			const current = this.shared.find(b => b.bookmark_id === bookmark_id);
+			const current = this.sharedFiltered.find(b => b.bookmark_id === bookmark_id);
 
-			const next = this.shared
+			const next = this.sharedFiltered
 				.filter(b => b.sort < current.sort)
 				.sort((a, b) => a.sort + b.sort)[0];
 
@@ -237,12 +237,12 @@ export default {
 		},
 		addNewTag(){
 			if(this.newTag != null && this.newTag.length) {
-				this.tagsArray.push({tag: this.newTag, code: this.newTag});
+				this.tagsArrayMS.push({tag: this.newTag, code: this.newTag});
 				this.selectedTags.push({tag: this.newTag, code: this.newTag});
 				this.newTag = null;
 			}
 			else
-				this.$fhcAlert.alertError("Eingabe eines Zeichens erforderlich!");
+				this.$fhcAlert.alertError(this.$p.t("bookmark", "errorInputNecessary"));
 		},
 		changeOrder(bookmark_id_1, bookmark_id_2){
 			this.$api
@@ -265,10 +265,11 @@ export default {
 					return false;
 				}
 			}
-			return Array.isArray(tags) && tags.length > 0;
+			if (Array.isArray(tags) && tags.length > 0) {
+				return tags.join(' ');
+			}
 		},
 		prepareTag(bookmarkArr){
-			// parse if string
 			const parsedArr = Array.isArray(bookmarkArr)
 				? bookmarkArr
 				: JSON.parse(bookmarkArr);
@@ -285,200 +286,141 @@ export default {
 				.call(ApiBookmark.getAllBookmarkTags())
 				.then((res) => res.data)
 				.then((result) => {
-					//Variante Chips
-					this.tagsArray = this.prepareTag(result.data);
+					//Version Chips
+					this.tagsArrayMS = this.prepareTag(result.data);
 
-					//Variante Autocomplete
-/*
-					this.ArrayAC = result.data;
-						console.log("type of " + typeof this.ArrayAC);
-						console.log(Array.isArray(this.ArrayAC));*/
-				//	this.ArrayAC = Object.values(result.data);
-				//	this.ArrayAC = Object.keys(result.data);
-						this.ArrayAC = result.data; //in object umwandeln
-/*					this.ArrayAC = {...this.ArrayAC};
-
-					console.log("type of " + typeof this.ArrayAC);
-					console.log(Array.isArray(this.ArrayAC)); // true*/
-/*					Array.isArray(result.data)
-						? result.data
-						: JSON.parse(result.data); */
+					//Version Autocomplete
+					this.tagsArrayAC = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		addBookmarkFilter(){
-			console.log("in addFilterLogic: save in benutzeroverride " +  this.selectedFilters.map(tag => tag.tag).join(", "));
+		openFilterModal(){
+			this.$refs.filterModal.show();
+		},
+		async handleAddingTagFilter(widgetId){
 
-			console.log("widget_id " + this.manu2);
-			console.log("tags " + this.filterInput);
+			const result = await this.isInOverride(widgetId);
 
-			console.log(`${this.apiurl}/dashboard/Config/insertAndUpdateTagsForBookmarksUser`, {
-				db: "CIS",
-				funktion_kurzbz: this.sectionName,
-				widget_id: this.manu2,
-				tags: this.filterInput
-			});
+			if (!result) {
+				return;
+			}
+			const [status, reason] = result;
 
-			axios.post(this.apiurl + '/dashboard/Config/insertAndUpdateTagsForBookmarksUser', {
-				db: "CIS",
-				funktion_kurzbz: this.sectionName,
-				widget_id: this.manu2,
-				tags: this.filterInput
-			})
-				.then(res => {
-					console.log("API Response:", res.data);
+			if (status) {
+				this.addTagFilter(widgetId);
+			} else {
+				this.addWidgetToOverride(widgetId, reason);
+			}
+		},
+		addTagFilter(widgetId){
+			this.$api
+				.call(ApiBookmark.addTagFilter(widgetId, this.sectionName, this.filterInput))
+				.then((res) => res.data)
+				.then((result) => {
+					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
+					this.$refs.filterModal.hide();
+					this.getTagFilter(this.widgetId);
+
+					this.$nextTick(() => {
+						this.getAllBookmarkTags();
+					});
+					this.fetchBookmarks();
 				})
-				.catch(err => {
-					console.error("ERROR:", err);
-				});
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		async isInOverride(widgetId) {
+			try {
+				const res = await this.$api.call(ApiBookmark.isInOverride(widgetId, this.sectionName));
+				const result = res.data;
+				return result;
+			} catch (err) {
+				this.$fhcAlert.handleSystemError(err);
+				return null;
+			}
+		},
+		addWidgetToOverride(widgetId, reason){
+			this.$api
+				.call(ApiBookmark.addWidgetToOverride(
+					widgetId,
+					this.sectionName,
+					reason,
+					this.item_data.x,
+					this.item_data.y,
+					this.item_data.h,
+					this.item_data.w
+				))
+				.then((res) => res.data)
+				.then((result) => {
+					this.addTagFilter(widgetId);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		getTagFilter(widget_id){
-
-/*			console.log(`${this.apiurl}/dashboard/Config/getTagFilter`, {
-				db: "CIS",
-				funktion_kurzbz: this.sectionName,
-				widget_id: widget_id
-			});*/
-
-			axios.get(this.apiurl + '/dashboard/Config/getTagFilter', {
-				params: {
-					db: "CIS",
-					funktion_kurzbz: this.sectionName,
-					widget_id: widget_id
-				}
-			})
-				.then(res => {
-				//	console.log("API Response:", res.data);
-
-					//old version
-/*					const raw = res.data?.retval?.retval?.[0]?.tags;
-					const filterArray = raw ? JSON.parse(raw) : [];
-					this.selectedFilters = this.prepareTag(filterArray);*/
-
-
-					//unter config
-					const rawTags = res.data.retval.retval[0].tags; // string
-					const filterArray = JSON.parse(rawTags);
-					//this.selectedFilters = res.data.retval;
-					this.selectedFilters = this.prepareTag(filterArray);
+			this.$api
+				.call(ApiBookmark.getTagFilter(widget_id, this.sectionName))
+				.then((res) => res.data)
+				.then((result) => {
+					const rawTags = result.tags; // string
+					this.filter = rawTags;
+					if(rawTags != null) {
+						this.rawTagsParsed = JSON.parse(rawTags);
+						this.selectedFilters = this.prepareTag(this.rawTagsParsed);
+					}
+					this.fetchBookmarks();
 				})
-				.catch(err =>
-					console.error('ERROR: ', err));
+				.catch(this.$fhcAlert.handleSystemError);
 		},
-		//Variante mit AutocompleteFeld
-/*		search(event) {
-			this.ArrayAC = this.ArrayAC.map((item) => item) || event;
-		},*/
 		search(event) {
-			const query = event.query ?? ""; // PrimeVue liefert query
+			const query = event.query ?? "";
 
-			// Filter ArrayAC nach eingegebenem Text
-			this.filteredArrayAC = this.ArrayAC.filter(item =>
+			// Filter for text
+			this.filteredArray = this.tagsArrayAC.filter(item =>
 				item.toLowerCase().includes(query.toLowerCase())
 			);
 
-			// Wenn kein Treffer → manuellen Text erlauben
-			if (this.filteredArrayAC.length === 0 && query) {
-				this.filteredArrayAC = [query];
+			// input if search not successful
+			if (this.filteredArray.length === 0 && query) {
+				this.filteredArray = [query];
 			}
-
-			console.log("Filtered suggestions:", this.filteredArrayAC);
-
 		},
-/*		addCustomTag(event) {
-			const value = event.value;  // das ist der vom User eingegebene Text
-			console.log("Custom Tag:", value);
-
-			// Füge den neuen Tag zu selectedTags hinzu
-		//	this.selectedTags = [...this.selectedTags, value];
-			const newTag = { tag: value };
-
-			// Optional: Füge den Tag auch in ArrayAC hinzu, damit er zukünftig auswählbar ist
-			if (!this.tagsArray.includes(value)) {
-				this.tagsArray.push(value);
-			}
-
-
-
-		}*/
 	},
 	async mounted() {
+		if(this.widgetId) {
+			this.getTagFilter(this.widgetId);
+		}
 		await this.fetchBookmarks();
 		this.getAllBookmarkTags();
-		if(this.manu2) {
-			this.getTagFilter(this.manu2);
-		}
-/*		console.log("config " + this.config);
-		console.log("widgetID " + this.widgetId);*/
-	//	console.log("apiurl " + this.apiurl );
-/*		console.log("widgetinfo " + this.widgetInfo);
-		console.log("config " + this.config);
-		console.log(JSON.stringify(this.config));
-		console.log("width " + this.width);
-		console.log("height " + this.height);
-		console.log("configMode " + this.configMode);
-		console.log("sharedData " + this.sharedData);
-		console.log(JSON.stringify(this.sharedData));*/
-
-		//console.log( this.config.map(tag => tag.tag).join(", "));
-/*		console.log("manu " + this.manu);
-		console.log("manu2 " + this.manu2);
-		console.log("widgetID " + this.widgetID);*/
 	},
 	created() {
-		// 
 		// this.$emit('setConfig', true); // -> use this to enable widget config mode if needed
-
-		/*
-
-		widgetId: {{widgetId}}
-		    	{{manu2}} {{sectionName}}
-		 */
 	},
 
 
 	template: /*html*/ `
     <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
 
-
-		<div class="d-flex flex-column justify-content-between">
-        
-        <!--TODO Manu eigener button mit modal für Filter, Autocomplete Variante !-->
-			<!-- div class="mt-2 row">
-				<div class="col-10">
-					<PvMultiSelect
-						v-model="selectedFilters"
-						id="tagFilterUrl"
-						:options="tagsArray"
-						optionLabel="tag"
-						display="chip"
-						placeholder="Show only tags"
-						:maxSelectedLabels="3"
-						class="p-inputtext-sm w-100 me-2"
-						/>
-				</div>
-				<div class="col-1">
-					<button
-						class="btn btn-secondary"
-						@click="addBookmarkFilter"
-						title="nach Tags filtern"
-						>
-						<i class="fa-solid fa-filter"></i>
-					</button>
-				</div>
-			</div -->
+		<div class="d-flex mt-2">
+		  <button class="btn btn-outline-secondary btn-sm flex-grow-1 me-2" @click="openCreateModal">
+			{{$p.t('bookmark','newLink')}}
+		  </button>
+		  <button v-if="selectedFilters.length" class="btn btn-secondary btn-sm" :title="this.$p.t('bookmark/editFilter')" @click="openFilterModal">
+			<i class="fa-solid fa-filter-circle-xmark"></i>
+		  </button>  
+		  <button v-else class="btn btn-outline-secondary btn-sm" :title="this.$p.t('bookmark/filterByTags')" @click="openFilterModal">
+			<i class="fa-solid fa-filter"></i>
+		  </button>
 		</div>
-		<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
 
-            <template v-if="shared">
+            <template v-if="sharedFiltered">
+
                 <template v-if="!emptyBookmarks">
-					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
+					<div v-for="link in sharedFiltered" :key="link.id" class="d-flex mt-2">
 						<a target="_blank" :href="link.url" class="me-1">
 							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
 						</a>
 						<span
 							v-if="hasTags(link)"
-							 :title="link.tag"
+							 :title="hasTags(link)"
 							 style="color: silver;"
 							>
 								<i class="fa fa-solid fa-tag text-gray-500" aria-hidden="true"></i>
@@ -486,32 +428,32 @@ export default {
 
 						<div class="ms-auto">
 							<!--EDIT BOOKMARK-->
-							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" v-tooltip="{showDelay:1000,value:'edit bookmark'}">
+							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" :title="this.$p.t('bookmark/editBookmark')">
 								<i class="fa fa-edit me-1" aria-hidden="true"></i>
 							</a>
 							<!--DELETE BOOKMARK-->
-							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" v-tooltip="{showDelay:1000,value:'delete bookmark'}" @click.prevent="removeLink(link.bookmark_id)">
+							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" :title="this.$p.t('bookmark/deleteBookmark')" @click.prevent="removeLink(link.bookmark_id)">
 								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
 							</a>
 							<!--SORT BOOKMARKS-->
 							<a
-								v-if="shared.length > 1"
+								v-if="sharedFiltered.length > 1"
 								type="button"
 								id="downsortBookmark"
 								href="#"
 								aria-label="sortdown bookmark"
-								v-tooltip="{showDelay:1000,value:'sort down bookmark'}"
+								:title="this.$p.t('bookmark/sortDownwards')"
 								@click.prevent="sortDown(link.bookmark_id)"
 								>
 								<i :class="[ 'fa', 'fa-arrow-down', 'me-1', link.sort === maxSort ? 'text-light pointer-events-none' : '' ]"></i>
 							</a>
 							<a
-								v-if="shared.length > 1"
+								v-if="sharedFiltered.length > 1"
 								type="button"
 								id="upsortBookmark"
 								href="#"
 								aria-label="sortup bookmark"
-								v-tooltip="{showDelay:1000,value:'sort up bookmark'}"
+								:title="this.$p.t('bookmark/sortToTop')"
 								@click.prevent="sortUp(link.bookmark_id)"
 								>
 								<i :class="[ 'fa', 'fa-arrow-up', 'me-1', link.sort === minSort ? 'text-light pointer-events-none' : '' ]"></i>
@@ -541,16 +483,16 @@ export default {
 			</template>
 			<template #default>
 
-				<form-input  :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
+				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
 				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
 
 				<label class="mt-2">Tags</label>
 				<div class="mt-2">
 					<PvAutoComplete
-						v-model="selectedTagsAC"
+						v-model="selectedTags"
 						multiple
 						dropdown
-						:suggestions="filteredArrayAC"
+						:suggestions="filteredArray"
 						@complete="search" 
 						/>
 				</div>				
@@ -574,10 +516,10 @@ export default {
 				<label class="mt-2">Tags</label>
 				<div class="mt-2">
 					<PvAutoComplete
-						v-model="selectedTagsAC"
+						v-model="selectedTags"
 						multiple
 						dropdown
-						:suggestions="filteredArrayAC"
+						:suggestions="filteredArray"
 						@complete="search" 
 					/>
 				</div>					
@@ -585,6 +527,41 @@ export default {
 			</template>
 			<template #footer>
 				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
+			</template>
+		</bs-modal>
+	</teleport>
+	<!--FILTER MODAL-->
+	<teleport to="body">
+		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="filterModal">
+			<template #title>
+				<h2>{{$p.t('bookmark','headerFilterBookmark')}}</h2>
+			</template>
+			<template #default>
+
+			<div class="mt-2 row">
+				<div class="col-10">
+					<PvMultiSelect
+						v-model="selectedFilters"
+						id="tagFilterUrl"
+						:options="tagsArrayMS"
+						optionLabel="tag"
+						display="chip"
+						:placeholder="$p.t('bookmark','noFilter')"
+						:maxSelectedLabels="3"
+						class="p-inputtext-sm w-100 me-2"
+						/>
+				</div>
+			</div>				
+
+			</template>
+			<template #footer>
+				<button
+					class="btn btn-secondary"
+					@click="handleAddingTagFilter(widgetId)"
+					:title="$p.t('bookmark','filterByTags')"
+					>
+					OK
+				</button>
 			</template>
 		</bs-modal>
 	</teleport>

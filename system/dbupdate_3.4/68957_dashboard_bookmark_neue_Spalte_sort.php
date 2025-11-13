@@ -12,12 +12,9 @@ if(!@$db->db_query("SELECT sort FROM dashboard.tbl_bookmark LIMIT 1")) {
 	else
 		echo '<br>Spalte sort zu Tabelle dashboard.tbl_bookmark hinzugefügt';
 
-}
-
-//add preliminary Sort for all bookmarks if NULL
-//TODO(manu) verfeinern, falls einzelne Werte NULL
-if(@$db->db_query("SELECT sort FROM dashboard.tbl_bookmark LIMIT 1")) {
-	$qry = "WITH ranked AS (
+	//add preliminary Sort for all bookmarks if NULL
+	if(@$db->db_query("SELECT sort FROM dashboard.tbl_bookmark LIMIT 1")) {
+		$qry = "WITH ranked AS (
 		  SELECT
 			t1.bookmark_id,
 			(
@@ -34,10 +31,11 @@ if(@$db->db_query("SELECT sort FROM dashboard.tbl_bookmark LIMIT 1")) {
 		WHERE t.bookmark_id = ranked.bookmark_id
 		  AND t.sort IS NULL;";
 
-	if (!$db->db_query($qry))
-		echo '<strong>dashboard.tbl_bookmark ' . $db->db_last_error() . '</strong><br>';
-	else
-		echo '<br>Tabelle dashboard.tbl_bookmark: Spalte sort mit vorläufiger Sortierung befüllt';
+		if (!$db->db_query($qry))
+			echo '<strong>dashboard.tbl_bookmark ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo '<br>Tabelle dashboard.tbl_bookmark: Spalte sort mit vorläufiger Sortierung befüllt';
+	}
 }
 
 //set column tag to type JSONB

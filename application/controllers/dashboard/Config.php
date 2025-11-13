@@ -215,47 +215,4 @@ class Config extends Auth_Controller
 
 		return $this->outputJsonSuccess($result);
 	}
-
-	//TODO(Manu) move to Bookmark controller
-	public function insertAndUpdateTagsForBookmarksUser()
-	{
-		$widgetId = $this->input->get('widget_id');
-		$funktion_kurzbz = $this->input->get('funktion_kurzbz');
-		$uid = $this->AuthLib->getAuthObj()->username;
-		$tags =  $this->input->get('tags');
-
-		$this->load->model('dashboard/Dashboard_Override_model', 'Dashboard_OverrideModel');
-
-		$result = $this->Dashboard_OverrideModel->addTagFilter($widgetId, $uid, $funktion_kurzbz, $tags);
-
-		$this->outputJsonSuccess($result ?: []);
-	}
-
-	//TODO(Manu) move to Bookmark controller
-	public function getTagFilter()
-	{
-		$widgetId = $this->input->get('widget_id');
-		$funktion_kurzbz = $this->input->get('funktion_kurzbz');
-		$uid = $this->AuthLib->getAuthObj()->username;
-		//$dashboard_kurzbz = 1;
-
-
-		$this->load->model('dashboard/Dashboard_Override_model', 'Dashboard_OverrideModel');
-
-/*		$override = $this->DashboardLib->getOverride($dashboard_kurzbz, $uid);
-		if (empty($override)) {
-			http_response_code(404);
-			$this->terminateWithJsonError('userconfig for dashboard ' . $dashboard_kurzbz . ' not found.');
-		}
-
-		$override_decoded = json_decode($override->override, true);
-
-		return $this->outputJsonSuccess($override_decoded ?: []);*/
-
-		$result = $this->Dashboard_OverrideModel->getTagFilter($widgetId, $uid, $funktion_kurzbz);
-
-		$this->outputJsonSuccess($result ?: []);
-
-
-	}
 }

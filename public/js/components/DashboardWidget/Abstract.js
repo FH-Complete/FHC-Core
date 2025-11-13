@@ -6,9 +6,8 @@ export default {
 		"configMode",
 		"sharedData",
 		"widgetInfo",
-		"widgetId", //check
-		"manu2", //TODO(Manu) check/remove
-		"widgetConfig"
+		"widgetId",
+		"item_data"
 	],
 	emits: [
 		"setConfig",
