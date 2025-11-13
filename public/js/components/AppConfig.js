@@ -15,15 +15,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import BsModal from "../../Bootstrap/Modal.js";
-import FhcForm from "../../Form/Form.js";
-import FormInput from "../../Form/Input.js";
-
-import ApiStvConfig from '../../../api/factory/stv/config.js';
+import BsModal from "./Bootstrap/Modal.js";
+import FhcForm from "./Form/Form.js";
+import FormInput from "./Form/Input.js";
 
 
 export default {
-	name: 'StvConfig',
+	name: 'AppConfig',
 	components: {
 		BsModal,
 		FhcForm,
@@ -33,7 +31,14 @@ export default {
 		'update:modelValue'
 	],
 	props: {
-		modelValue: Object
+		modelValue: {
+			type: Object,
+			required: true
+		},
+		endpoints: {
+			type: Object,
+			required: true
+		}
 	},
 	data() {
 		return {
@@ -44,7 +49,7 @@ export default {
 	methods: {
 		update() {
 			this.$refs.form
-				.call(ApiStvConfig.set(this.tempValues))
+				.call(this.endpoints.set(this.tempValues))
 				.then(() => {
 					// TODO(chris): phrase
 					this.$emit('update:modelValue', { ...this.tempValues });
@@ -56,7 +61,7 @@ export default {
 	},
 	created() {
 		this.$api
-			.call(ApiStvConfig.get())
+			.call(this.endpoints.get())
 			.then(res => {
 				this.setup = {};
 				Object.keys(res.data).forEach(key => {

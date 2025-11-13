@@ -19,15 +19,16 @@ import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import AppMenu from "../AppMenu.js";
+import AppConfig from "../AppConfig.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
 import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
-import StvConfig from "./Studentenverwaltung/Config.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiStv from "../../api/factory/stv.js";
 import ApiStvVerband from '../../api/factory/stv/verband.js';
+import ApiStvConfig from '../../api/factory/stv/config.js';
 
 
 export default {
@@ -37,11 +38,11 @@ export default {
 		NavLanguage,
 		VerticalSplit,
 		AppMenu,
+		AppConfig,
 		StvVerband,
 		StvList,
 		StvDetails,
-		StvStudiensemester,
-		StvConfig
+		StvStudiensemester
 	},
 	props: {
 		defaultSemester: String,
@@ -89,6 +90,7 @@ export default {
 	data() {
 		return {
 			appconfig: {},
+			configEndpoints: ApiStvConfig,
 			selected: [],
 			searchbaroptions: {
 				origin: 'stv',
@@ -480,6 +482,6 @@ export default {
 				</main>
 			</div>
 		</div>
-		<stv-config ref="config" v-model="appconfig"></stv-config>
+		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 	</div>`
 };
