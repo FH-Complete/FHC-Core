@@ -115,11 +115,15 @@ class ExtensionsLib
 			$uploadData = $this->_uploadExtension(); // perform the upload of the file and returns info about it
 		}
 
-		// If the given filename is the upper directory or the current one
-		if (trim($uploadData->fullPath) == '..' || trim($uploadData->fullPath) == '.')
+		// If a file has been uploaded
+		if (isset($uploadData))
 		{
-			$this->_printFailure('wrong file name: / has to be escaped with %2F');
-			$uploadData = null; // then it is a wrong one!
+			// If the given filename is the upper directory or the current one
+			if (trim($uploadData->fullPath) == '..' || trim($uploadData->fullPath) == '.')
+			{
+				$this->_printFailure('wrong file name: / has to be escaped with %2F');
+				$uploadData = null; // then it is a wrong one!
+			}
 		}
 
 		// If the no error occurred
@@ -187,7 +191,8 @@ class ExtensionsLib
 
 		if ($this->_errorOccurred === false) // if no errors occurred
 		{
-			if (!$this->_rrm($uploadData->fullPath)) // removes uploaded file
+			// If a file has been uploaded then remove them
+			if (isset($uploadData) && !$this->_rrm($uploadData->fullPath))
 			{
 				$this->_printInfo('Error while cleaning upload directory. Not a blocking error');
 			}
@@ -253,7 +258,7 @@ class ExtensionsLib
 		$this->_ci->ExtensionsModel->addOrder('server_kurzbz', 'ASC');
 		$this->_ci->ExtensionsModel->addOrder('version', 'ASC');
 
-		return $this->_ci->ExtensionsModel->load();
+		return $this->_ci->ExtensionsModel->loadWhere(array('server_kurzbz' => SERVER_NAME));
 	}
 
 	/**

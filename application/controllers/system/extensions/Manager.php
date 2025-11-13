@@ -44,11 +44,7 @@ class Manager extends Auth_Controller
 	 */
 	public function index()
 	{
-		$viewData = array(
-			'extensions' => $this->extensionslib->getInstalledExtensions()
-		);
-
-		$this->load->view('system/extensions/manager.php', $viewData);
+		$this->load->view('system/extensions/manager.php');
 	}
 
 	/**
