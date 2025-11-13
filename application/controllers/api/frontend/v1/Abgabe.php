@@ -42,7 +42,8 @@ class Abgabe extends FHCAPI_Controller
 			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-		]);
+			'notifyStudentMail' => self::PERM_LOGGED
+			]);
 
 		$this->load->library('PhrasesLib');
 		$this->load->library('SignatureLib');
@@ -68,7 +69,7 @@ class Abgabe extends FHCAPI_Controller
 				'abgabetool'
 			)
 		);
-
+		$this->load->config('abgabe');
 		$this->load->helper('hlp_sancho_helper');
 	}
 
@@ -995,6 +996,95 @@ class Abgabe extends FHCAPI_Controller
 		} else {
 			$this->terminateWithError('Keine Zuordnung!');
 		}
+	}
+
+	
+	
+	// test method for abgabe nightly email job
+	public function notifyStudentMail()
+	{
+		// send all new projektarbeit abgabe since the last job run to the related student
+
+//		$this->logInfo('Start job queue scheduler FHC-Core->notifyBetreuerMail');
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+		
+		$milliseconds = $this->config->item('PAABGABE_EMAIL_THRESHOLD_MS');
+
+		$result = $this->PaabgabeModel->findAbgabenNewOrUpdatedSince($milliseconds);
+		$retval = getData($result);
+
+		// group results per projektarbeit/student_uid
+		$student_uids = [];
+		forEach($retval as $paabgabe) {
+			if(!isset($student_uids[$paabgabe->student_uid])) {
+				$student_uids[$paabgabe->student_uid] = [];
+			}
+				
+			$student_uids[$paabgabe->student_uid][] = $paabgabe;
+		}
+
+		foreach ($student_uids as $uid => $abgaben) {
+			// $uid is the student's UID
+			$result = $this->StudentModel->getEmailAnredeForStudentUID($uid);
+			$data = getData($result)[0];
+			
+			// $abgabe is the array of paabgabe objects
+			$anredeFillString = $data->anrede=="Herr"?"r":"";
+			$fullFormattedNameString = trim($data->titelpre." ".$data->vorname." ".$data->vornamen." ".$data->nachname." ".$data->titelpost);
+
+			// https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
+			// php has spaceships 🚀🚀🚀🚀🚀
+			usort($abgaben, function($a, $b) {
+				return strtotime($a->datum) <=> strtotime($b->datum);
+			});
+			
+			$projektarbeit_titel = $abgaben[0]->titel;
+			$abgabenString = '<br /><br />';
+			forEach($abgaben as $abgabe) {
+				$datetime = new DateTime($abgabe->datum);
+				$dateEmailFormatted = $datetime->format('d.m.Y');
+				
+				$abgabenString .= $dateEmailFormatted.' '.$abgabe->bezeichnung.' '.$abgabe->kurzbz.'<br />';
+			}
+
+			// Link to Entschuldigungsmanagement
+			if(defined('CIS4') && CIS4) {
+				$ci3BootstrapFilePath = "cis.php";
+			} else {
+				$ci3BootstrapFilePath = "index.ci.php";
+			}
+			$url = APP_ROOT.$ci3BootstrapFilePath.'/Cis/Abgabetool/Student';
+
+//			$linkAbgabetool = '';
+			$body_fields = array(
+				'anrede' => $data->anrede,
+				'anredeFillString' => $anredeFillString,
+				'fullFormattedNameString' => $fullFormattedNameString,
+				'paTitel' => $projektarbeit_titel,
+				'abgabenString' => $abgabenString,
+				'linkAbgabetool' => $url
+			);
+			
+			// send email with bundled info
+			sendSanchoMail(
+				'paabgabeUpdatesSammelmail',
+				$body_fields,
+				$uid.'@'.DOMAIN,
+				$this->p->t('abgabetool', 'changedAbgabeterminev2')
+			);
+			
+		}
+
+		$this->terminateWithSuccess(
+			array(
+				'student_uids' => $student_uids,
+				'result' => $result,
+				'body_fields' => $body_fields
+			)
+		);
+		
 	}
 
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {

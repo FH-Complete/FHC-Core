@@ -44048,6 +44048,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'changedAbgabeterminev2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Updates: Abgabetermine Bachelor-/Masterarbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Updates: Deadlines Bachelor's-/Master's Thesis",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ABGABETOOL PHRASEN END
 	array(
 		'app' => 'core',

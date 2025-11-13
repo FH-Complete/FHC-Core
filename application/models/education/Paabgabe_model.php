@@ -60,5 +60,21 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
-	
+
+	public function findAbgabenNewOrUpdatedSince($milliseconds)
+	{
+		$interval = $milliseconds . ' milliseconds';
+		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
+					   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
+					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel
+				FROM campus.tbl_paabgabe 
+					JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
+					JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
+				
+				WHERE campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
+					OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?
+	";
+
+		return $this->execQuery($query, [$interval, $interval]);
+	}
 }
