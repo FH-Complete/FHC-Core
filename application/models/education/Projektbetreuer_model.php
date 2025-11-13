@@ -10,6 +10,7 @@ class Projektbetreuer_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_projektbetreuer';
 		$this->pk = array('betreuerart_kurzbz', 'projektarbeit_id', 'person_id');
+		$this->hasSequence = false;
 	}
 
     /**
