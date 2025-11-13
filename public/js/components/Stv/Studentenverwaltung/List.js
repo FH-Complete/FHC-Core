@@ -239,7 +239,6 @@ export default {
 	},
 	methods: {
 		translateTabulator() {
-			let cm = this.$refs.table.tabulator.columnManager;
 			this.$p
 				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
 				.then(() => {

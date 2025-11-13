@@ -165,7 +165,17 @@ class Verband extends FHCAPI_Controller
 		
 		$this->StudiengangModel->addDistinct();
 		$this->StudiengangModel->addSelect("CONCAT(" . $this->StudiengangModel->escape($link) . ", semester) AS link", false);
-		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester ORDER BY verband, gruppe LIMIT 1)) AS name", false);
+		$this->StudiengangModel->addSelect("CONCAT(
+			UPPER(CONCAT(typ, kurzbz)), 
+			'-', 
+			semester, 
+			(
+				SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END 
+				FROM public.tbl_lehrverband 
+				WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester 
+				ORDER BY verband, gruppe LIMIT 1
+			)
+		) AS name", false);
 
 		$this->StudiengangModel->addSelect('semester');
 		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
@@ -217,7 +227,6 @@ class Verband extends FHCAPI_Controller
 					$list = array_merge($list, $result);
 				}
 			}
-
 		}
 		$this->terminateWithSuccess($list);
 	}
