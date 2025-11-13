@@ -74,7 +74,7 @@ class Config extends FHCAPI_Controller
 
 		$config['number_displayed_past_studiensemester'] = [
 			"type" => "number",
-			"label" => "Anzahl angezeigter vergangender Studiensemester",// TODO(chris): phrase
+			"label" => $this->p->t('stv', 'settings_no_displayed_past_sem'),
 			"value" => $data['number_displayed_past_studiensemester']
 				?? $number_displayed_past_studiensemester_default
 		];
@@ -84,17 +84,20 @@ class Config extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 		$config['font_size'] = [
 			"type" => "select",
-			"label" => "Font size",
+			"label" => $this->p->t('stv', 'settings_fontsize'),
 			"value" => $data['stv_font_size'] ?? "fs_normal",
 			"options" => [
-				"fs_small" => "klein",// TODO(chris): phrase
-				"fs_normal" => "normal",// TODO(chris): phrase
-				"fs_big" => "groß",// TODO(chris): phrase
-				"fs_huge" => "sehr groß"// TODO(chris): phrase
+				"fs_small" => $this->p->t('stv', 'settings_fontsize_small'),
+				"fs_normal" => $this->p->t('stv', 'settings_fontsize_normal'),
+				"fs_big" => $this->p->t('stv', 'settings_fontsize_big'),
+				"fs_huge" => $this->p->t('stv', 'settings_fontsize_huge')
 			]
 		];
 
-		// TODO(chris): Event
+		#others
+		Events::trigger('stv_config_get', function & () use (&$config) {
+			return $config;
+		});
 
 		$this->terminateWithSuccess($config);
 	}
@@ -109,16 +112,16 @@ class Config extends FHCAPI_Controller
 
 		$this->form_validation->set_rules(
 			'number_displayed_past_studiensemester',
-			"Anzahl angezeigter vergangender Studiensemester",// TODO(chris): phrase
+			$this->p->t('stv', 'settings_no_displayed_past_sem'),
 			'required|integer'
 		);
 		$this->form_validation->set_rules(
 			'font_size',
-			"Font size",// TODO(chris): phrase
+			$this->p->t('stv', 'settings_fontsize'),
 			'required|in_list[fs_small,fs_normal,fs_big,fs_huge]'
 		);
 
-		// TODO(chris): Event
+		Events::trigger('stv_config_validation', $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -135,7 +138,7 @@ class Config extends FHCAPI_Controller
 			$this->input->post('font_size')
 		);
 
-		// TODO(chris): Event
+		Events::trigger('stv_config_set', $this->input);
 
 		$this->terminateWithSuccess();
 	}
