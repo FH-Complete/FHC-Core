@@ -46,6 +46,29 @@ export default {
 			tempValues: {}
 		};
 	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined && Object.keys(this.setup).length) {
+				this.$api
+					.call(this.endpoints.get())
+					.then(res => {
+						this.setup = {};
+						Object.keys(res.data).forEach(key => {
+							const binding = { ...res.data[key] };
+							delete binding.value;
+							delete binding.options;
+							const options = res.data[key].options;
+							this.setup[key] = {
+								binding,
+								options
+							};
+						});
+					})
+					.catch(this.$fhcAlert.handleSystemErrors);
+			}
+		}
+
+	},
 	methods: {
 		update() {
 			this.$refs.form
@@ -62,7 +85,6 @@ export default {
 		this.$api
 			.call(this.endpoints.get())
 			.then(res => {
-				this.setup = {};
 				Object.keys(res.data).forEach(key => {
 					const binding = { ...res.data[key] };
 					delete binding.value;
