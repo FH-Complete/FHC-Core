@@ -114,7 +114,7 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz, semester: node.data.semester, orgform_kurzbz: node.data.orgform_kurzbz});
 		},
 		mapResultToTreeData(el) {
 			const cp = {

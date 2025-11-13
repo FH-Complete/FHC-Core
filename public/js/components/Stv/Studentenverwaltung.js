@@ -123,6 +123,8 @@ export default {
 			studiengangKz: undefined,
 			studiengangKuerzel: '',
 			studiensemesterKurzbz: this.defaultSemester,
+			selected_semester: undefined,
+			selected_orgform: undefined,
 			lists: {
 				nations: [],
 				sprachen: [],
@@ -182,7 +184,7 @@ export default {
 				+ data.person_id
 				);
 		},
-		onSelectVerband( {link, studiengang_kz}) {
+		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz }) {
 			let urlpath = String(link);
 			if (!urlpath.match(/\/prestudent/))
 			{
@@ -191,6 +193,8 @@ export default {
 			this.$refs.stvList.updateUrl(ApiStv.students.verband(urlpath));
 
 			this.studiengangKz = studiengang_kz;
+			this.selected_semester = semester;
+			this.selected_orgform = orgform_kurzbz;
 			const stg = this.lists.stgs.find((element) => {
 				return (element.studiengang_kz === this.studiengangKz);
 			});
