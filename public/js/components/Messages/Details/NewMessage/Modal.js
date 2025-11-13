@@ -136,17 +136,13 @@ export default {
 					}
 				);
 		},
-		getVorlagentext(vorlage_kurzbz){
+		getDataVorlage(vorlage_kurzbz){
 			return this.$api
-				.call(this.endpoint.getVorlagentext(vorlage_kurzbz))
+				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
-					this.formData.body = response.data;
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					//this.resetForm();
-					//closeModal
-					//closewindwo
-				});
+					this.formData.body = response.data.text;
+					this.formData.subject = response.data.subject;
+				}).catch(this.$fhcAlert.handleSystemError);
 		},
 		getPreviewText(){
 			const data = new FormData();
@@ -197,8 +193,7 @@ export default {
 		},
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
-				this.getVorlagentext(vorlage_kurzbz);
-				this.formData.subject = vorlage_kurzbz;
+				this.getDataVorlage(vorlage_kurzbz);
 			}
 		},
 		showPreview(){
@@ -240,7 +235,7 @@ export default {
 			handler(newVal){
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
-					return this.getVorlagentext(newVal);
+					return this.getDataVorlage(newVal);
 				}
 			}
 		},

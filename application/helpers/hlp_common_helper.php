@@ -517,6 +517,34 @@ function has_permissions_for_stg($studiengang_kz, $permissions = '')
 }
 
 /**
+ * check if an entry exists in the database
+ */
+function is_in_db($key, $model = '')
+{
+	if (!$model)
+		return false;
+
+	$field = strstr($model, ":");
+	if ($field) {
+		$model = strstr($model, ":", true);
+		$field = substr($field, 1);
+	}
+
+	$CI =& get_instance();
+	$CI->load->model($model, $model);
+
+	if ($field) {
+		$result = $CI->$model->loadWhere([
+			$field => $key
+		]);
+	} else {
+		$result = $CI->$model->load($key);
+	}
+
+	return (isSuccess($result) && hasData($result));
+}
+
+/**
  * is building an array for Dropdown Entry in Print Dropdown
  * @param $id id for the Document to add to the Document Array
  * @param $name title of the dropdownEntry
