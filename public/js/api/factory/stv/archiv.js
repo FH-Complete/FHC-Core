@@ -39,5 +39,5 @@ export default {
 			url: 'api/frontend/v1/stv/archiv/delete',
 			params: {akte_id, studiengang_kz}
 		};
-	}
+	},
 };

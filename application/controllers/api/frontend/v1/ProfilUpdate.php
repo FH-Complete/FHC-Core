@@ -637,7 +637,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				//? Send email to the Studiengangsassistentinnen
 				$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
 				$this->StudentModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_student.student_uid");
-				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id and public.tbl_student.studiengang_kz = public.tbl_prestudent.studiengang_kz");
 				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
 				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
 				$this->StudentModel->addGroupBy(["public.tbl_studiengang.email"]);
