@@ -51,10 +51,9 @@ export default {
 			this.$refs.form
 				.call(this.endpoints.set(this.tempValues))
 				.then(() => {
-					// TODO(chris): phrase
 					this.$emit('update:modelValue', { ...this.tempValues });
 					this.$refs.modal.hide();
-					this.$fhcAlert.alertSuccess('config updated');
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/settings_saved'));
 				})
 				.catch(this.$fhcAlert.handleSystemErrors);
 		}
