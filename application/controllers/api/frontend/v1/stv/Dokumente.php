@@ -589,7 +589,7 @@ class Dokumente extends FHCAPI_Controller
 		$stgTyp = $this->_getStudiengangstyp($studiengang_kz);
 
 		$documents = [
-
+			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uid, 20, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uid, 21, null),
 
