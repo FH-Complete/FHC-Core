@@ -11,11 +11,6 @@ $("document").ready(function() {
     $("#saveProtocolBtn, #freigebenProtocolBtn").click(
         function() {
 
-            var freigebendata = {
-                freigeben:  false,
-                password: null
-            }
-
             var data = {
                 abschlussbeurteilung_kurzbz: $("#abschlussbeurteilung_kurzbz").val(),
                 protokoll: $("#protokoll").val(),
@@ -25,11 +20,16 @@ $("document").ready(function() {
 
             if ($(this).prop("id") === 'freigebenProtocolBtn')
             {
-                freigebendata.freigeben = true;
-                freigebendata.password = $("#password").val();
+                Pruefungsprotokoll.freigebendata.freigeben = true;
+                Pruefungsprotokoll.freigebendata.password = $("#password").val();
+            }
+            else
+            {
+                Pruefungsprotokoll.freigebendata.freigeben = false;
+                Pruefungsprotokoll.freigebendata.password = null;
             }
 
-            var checkFields = Pruefungsprotokoll.checkFields(data, freigebendata, $("#verfCheck").prop('checked'));
+            var checkFields = Pruefungsprotokoll.checkFields(data, $("#verfCheck").prop('checked'));
             $("#protocolform td").removeClass('has-error');
             if (checkFields.length > 0)
             {
@@ -50,7 +50,7 @@ $("document").ready(function() {
                 return;
             }
 
-            Pruefungsprotokoll.saveProtokoll($("#abschlusspruefung_id").val(), freigebendata, data);
+            Pruefungsprotokoll.saveProtokoll($("#abschlusspruefung_id").val(), data);
         }
     )
 
@@ -71,6 +71,10 @@ $("document").ready(function() {
 
 var Pruefungsprotokoll = {
     abschlussbeurteilung_kurzbz: '',
+    freigebendata: {
+        freigeben:  false,
+        password: null
+    },
     checkVerfassung: function()
     {
         // if student not mentally and physically fit (checkbox), no grade can be set
@@ -85,11 +89,11 @@ var Pruefungsprotokoll = {
             $("#verfNotice").html(FHC_PhrasesLib.t("abschlusspruefung", "verfNotice"));
         }
     },
-    checkFields: function(data, freigebendata, verfChecked)
+    checkFields: function(data, verfChecked)
     {
         var errors =  [];
 
-        if (data.abschlussbeurteilung_kurzbz == "" && freigebendata.freigeben === true && verfChecked)
+        if (data.abschlussbeurteilung_kurzbz == "" && Pruefungsprotokoll.freigebendata.freigeben === true && verfChecked)
             errors.push({"abschlussbeurteilung_kurzbz": FHC_PhrasesLib.t("abschlusspruefung", "abschlussbeurteilungLeer")});
 
         var zeitregex = /^[0-2][0-9]:[0-5][0-9]$/;
@@ -115,15 +119,19 @@ var Pruefungsprotokoll = {
 
         return errors;
     },
+    setSaveButtonDisabled: function()
+    {
+        $("#saveProtocolBtn").prop("disabled", true).prop("title", FHC_PhrasesLib.t("abschlusspruefung", "bereitsFreigegeben"));
+    },
     // ajax calls
     // -----------------------------------------------------------------------------------------------------------------
-    saveProtokoll: function(abschlusspruefung_id, freigeben, data)
+    saveProtokoll: function(abschlusspruefung_id, data)
     {
         FHC_AjaxClient.ajaxCallPost(
             CALLED_PATH + '/saveProtokoll',
             {
                 abschlusspruefung_id: abschlusspruefung_id,
-                freigebendata: freigeben,
+                freigebendata: Pruefungsprotokoll.freigebendata,
                 protocoldata: data
             },
             {
@@ -133,7 +141,7 @@ var Pruefungsprotokoll = {
                         var dataresponse = FHC_AjaxClient.getData(data);
                         if (dataresponse.freigabedatum)
                         {
-                            $("#saveProtocolBtn").prop("disabled", true);
+                            Pruefungsprotokoll.setSaveButtonDisabled();
                             $("#freigegebenText").html('&nbsp;&nbsp;' + FHC_PhrasesLib.t("abschlusspruefung", "freigegebenAm") +
                                 '&nbsp;' + dataresponse.freigabedatum)
                         }
