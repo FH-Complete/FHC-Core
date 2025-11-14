@@ -379,8 +379,7 @@ export default {
 				.call(ApiStvAbschlusspruefung.loadAbschlusspruefung(abschlusspruefung_id))
 				.then(result => {
 					this.formData = result.data;
-					//TODO(Manu) check if cisRoot is okay
-					this.formData.link = this.cisRoot + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id=' + this.formData.abschlusspruefung_id + '&fhc_controller_id=67481e5ed5490';
+					this.formData.link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/lehre/Pruefungsprotokoll/showProtokoll?abschlusspruefung_id=' + this.formData.abschlusspruefung_id;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
