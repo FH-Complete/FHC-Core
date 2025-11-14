@@ -107,16 +107,10 @@ if(isset($_GET['getAnmeldung']))
 				$abgeschlossen = false;
 				$semesterlock = false;
 				$regelerfuellt = true;
+
 				if ($kompatible_lv)
 				{
 					$lvregelExists = $lvregel->exists($kompatible_lv);
-					if($lvregelExists)
-					{
-						if($lvregel->isAbgeschlossen($uid, $kompatible_lv))
-							$abgeschlossen=true;
-						else
-							$abgeschlossen=false;
-					}
 
 					if(!$lvregel->checkSemester($kompatible_lv, $semester))
 					{
@@ -135,7 +129,7 @@ if(isset($_GET['getAnmeldung']))
 					}
 				}
 
-				if (!(($lvregelExists && !$abgeschlossen) || $semesterlock || !$regelerfuellt))
+				if (!$semesterlock && $regelerfuellt)
 				{
 					$anzahl++;
 					// LV wird angeboten und Anmeldefenster ist offen
@@ -152,7 +146,6 @@ if(isset($_GET['getAnmeldung']))
 						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
 					}
 				}
-
 			}
 /*			else
 			{

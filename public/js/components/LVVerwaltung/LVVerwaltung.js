@@ -1,5 +1,6 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import AppMenu from "../AppMenu.js";
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 import LvTable from "./Setup/Table.js";
@@ -17,6 +18,7 @@ export default {
 	components: {
 		CoreSearchbar,
 		VerticalSplit,
+		AppMenu,
 		StvVerband,
 		StvStudiensemester,
 		LvTable,
@@ -233,14 +235,47 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 
-	template: `
+	template: /* html */`
 	<div class="stv">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3">LV Verwaltung</a>
+			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
+				<button
+					class="btn btn-outline-light border-0 m-1 collapsed"
+					type="button"
+					data-bs-toggle="offcanvas"
+					data-bs-target="#appMenu"
+					aria-controls="appMenu"
+					aria-expanded="false"
+					:aria-label="$p.t('ui/toggle_nav')"
+				>
+					<span class="svg-icon svg-icon-apps"></span>
+				</button>
+				<a class="navbar-brand me-0">LV Verwaltung</a>
+			</div>
+			<button
+				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#sidebarMenu"
+				aria-controls="sidebarMenu"
+				aria-expanded="false"
+				:aria-label="$p.t('ui/toggle_nav')"
+			>
+				<span class="fa-solid fa-table-list"></span>
+			</button>
 			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
+				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+					<div class="offcanvas-header">
+						LV Verwaltung
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+					</div>
+					<div class="offcanvas-body">
+						<app-menu app-identifier="lvv" />
+					</div>
+				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>

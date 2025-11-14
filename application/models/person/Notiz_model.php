@@ -207,7 +207,6 @@ class Notiz_model extends DB_Model
 			";
 
 		return $this->execQuery($qry, array($type, $id));
-
 	}
 
 
