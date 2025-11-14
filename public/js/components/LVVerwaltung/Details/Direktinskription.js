@@ -62,7 +62,6 @@ export default{
 			lastSelected: null,
 			gruppen: [],
 			tabulatorEvents: [],
-			showAutocomplete: false,
 			selectedUser: null,
 			filteredUsers: [],
 			abortController: null,
@@ -150,13 +149,9 @@ export default{
 			table-only
 			:side-menu="false"
 			:reload=true
-			:new-btn-label="$p.t('lehre', 'assignPerson')"
-			new-btn-show
-			@click:new="showAutocomplete = !showAutocomplete"
 			>
 			<template #search> <!--TODO (david) Slot prüfen -->
 				<form-input
-					v-if="showAutocomplete"
 					type="autocomplete"
 					:suggestions="filteredUsers"
 					:placeholder="$p.t('lehre', 'assignPerson')"

@@ -324,7 +324,7 @@ export default {
 					{title: this.$p.t('lehre', 'lehreinheit_id'), field: "lehreinheit_id", headerFilter: true, headerFilterFuncParams: {field: 'lehreinheit_id'}, visible: false},
 					{title: this.$p.t('lehre', 'studiensemester'), field: "studiensemester_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'studiensemester_kurzbz'}, visible: false},
 					{title: this.$p.t('lehre', 'unr'), field: "unr", headerFilter: true, headerFilterFuncParams: {field: 'unr'}, visible: false},
-					{title: this.$p.t('lehre', 'fachbereich'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
+					{title: this.$p.t('lehre', 'organisationseinheit'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
 					{title: this.$p.t('lehre', 'stundenblockung'), field: "stundenblockung", headerFilter: true, headerFilterFuncParams: {field: 'stundenblockung'}, visible: false},
 					{title: this.$p.t('lehre', 'wochenrhythmus'), field: "wochenrythmus", headerFilter: true, headerFilterFuncParams: {field: 'wochenrythmus'}, visible: false},
 					{title: this.$p.t('lehre', 'startkw'), field: "start_kw", headerFilter: true, headerFilterFuncParams: {field: 'startkw'}, visible: false},
@@ -596,11 +596,21 @@ export default {
 		},
 		deleteLehreinheit(row)
 		{
-			let deleteData = {
-				lehreinheit_id: row.getData().lehreinheit_id,
-			}
+			let lehreinheit_id = row.getData().lehreinheit_id;
+
+			let is_selected = this.selectedColumnValues.length > 0 && this.selectedColumnValues.includes(lehreinheit_id);
+
+			let deleteData = is_selected ? {lehreinheit_id: [...new Set(this.selectedColumnValues)]} : {lehreinheit_id: lehreinheit_id};
+
 			return this.$api.call(ApiLehreinheit.delete(deleteData))
 				.then(result => {
+
+					if (result?.data?.errors)
+					{
+						result.data.errors.forEach(error  => {
+							this.$fhcAlert.alertError(error)
+						})
+					}
 					this.reload()
 				})
 				.catch(this.$fhcAlert.handleSystemError);

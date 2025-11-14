@@ -33,7 +33,6 @@ export default{
 					handler: this.lektorSelected
 				}
 			],
-			showAutocomplete: false,
 			filteredLektor: [],
 			selectedLektor: '',
 			abortController: null
@@ -219,13 +218,9 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
-			:new-btn-label="$p.t('lehre', 'addLektor')"
-			new-btn-show
-			@click:new="showAutocomplete = !showAutocomplete"
 			>
 		<template #search> <!--TODO (david) Slot prüfen -->
 			<form-input
-				v-if="showAutocomplete"
 				type="autocomplete"
 				:suggestions="filteredLektor"
 				:placeholder="$p.t('lehre', 'addLektor')"

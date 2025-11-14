@@ -39,7 +39,7 @@ export default {
 			dropdowns: this.dropdowns,
 			configShowVertragsdetails: this.config.showVertragsdetails,
 			configShowGewichtung: this.config.showGewichtung,
-			lehreinheitAnmerkungDefault: this.config.lehreinheitAnmerkungDefault,
+			lehreinheitAnmerkungDefault: (this.config.lehreinheitAnmerkungDefault || '').replace(/\\n/g, '\n'),
 			lehreinheitRaumtypDefault: this.config.lehreinheitRaumtypDefault,
 			lehreinheitRaumtypAlternativeDefault: this.config.lehreinheitRaumtypAlternativeDefault,
 
