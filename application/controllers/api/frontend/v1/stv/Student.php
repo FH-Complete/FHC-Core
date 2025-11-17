@@ -36,6 +36,7 @@ class Student extends FHCAPI_Controller
 		parent::__construct([
 			'get' => ['admin:r', 'assistenz:r'],
 			'save' => ['admin:rw', 'assistenz:rw'],
+			'saveStudent' => ['admin:rw', 'assistenz:rw'],
 			'check' => ['admin:rw', 'assistenz:rw'],
 			'add' => ['admin:rw', 'assistenz:rw'] // TODO(chris): extra permissions
 		]);
@@ -55,7 +56,7 @@ class Student extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'lehre'
+			'ui', 'lehre', 'person'
 		]);
 	}
 
@@ -111,14 +112,26 @@ class Student extends FHCAPI_Controller
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
 				"(
-					SELECT kontakt 
-					FROM public.tbl_kontakt 
-					WHERE kontakttyp='email' 
-					AND person_id=p.person_id 
-					AND zustellung 
-					ORDER BY kontakt_id 
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp='email'
+					AND person_id=p.person_id
+					AND zustellung
+					ORDER BY kontakt_id DESC
 					LIMIT 1
 				) AS email_privat",
+				false
+			);
+			$this->PrestudentModel->addSelect(
+				"(
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp='email_unverifiziert'
+					AND person_id=p.person_id
+					AND zustellung
+					ORDER BY kontakt_id DESC
+					LIMIT 1
+				) AS email_privat_unverified",
 				false
 			);
 		}
@@ -424,6 +437,31 @@ class Student extends FHCAPI_Controller
 		), ''));
 	}
 
+	/**
+	 * Saves data to a prestudent using their student_uid
+	 *
+	 * @param string			$student_uid
+	 * @param string			$studiensemester_kurzbz
+	 * @return void
+	 */
+	public function saveStudent($student_uid, $studiensemester_kurzbz)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+
+		$result = $this->StudentModel->load([$student_uid]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			show_404(); // No Student with that ID
+
+		$student = current($data);
+
+		$this->checkPermissionsForPrestudent($student->prestudent_id, ['admin:rw', 'assistenz:rw']);
+
+		return $this->save($student->prestudent_id, $studiensemester_kurzbz);
+	}
+
 	public function check()
 	{
 		$this->load->library('form_validation');
@@ -465,7 +503,6 @@ class Student extends FHCAPI_Controller
 		if (!$this->input->post('person_id')) {
 			if (!isset($_POST['address']) || !is_array($_POST['address']))
 				$_POST['address'] = [];
-			$_POST['address']['func'] = 1;
 		}
 		if ($this->input->post('incoming')) {
 			$_POST['ausbildungssemester'] = 0;
@@ -474,31 +511,37 @@ class Student extends FHCAPI_Controller
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules('nachname', 'Nachname', 'callback_requiredIfNotPersonId', [
-			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
+			'requiredIfNotPersonId' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'nachname')])
 		]);
 		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
-			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
+			'requiredIfNotPersonId' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'geschlecht')])
 		]);
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'callback_isValidDate', [
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', ['isValidDate', function($value) { return isValidDate($value); }], [
 			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
 		]);
 		$this->form_validation->set_rules('address[func]', 'Address', 'required|integer|less_than[2]|greater_than[-2]');
 		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'plz')])
 		]);
 		$this->form_validation->set_rules('address[gemeinde]', 'Gemeinde', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'gemeinde')])
 		]);
 		$this->form_validation->set_rules('address[ort]', 'Ort', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'ort')])
 		]);
 		$this->form_validation->set_rules('address[address]', 'Adresse', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
+			'requiredIfAddressFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'adresse')])
 		]);
 		$this->form_validation->set_rules('email', 'E-Mail', 'valid_email');
-		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required');
-		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'required');
-		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'required|integer|less_than[9]|greater_than[-1]');
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'callback_requiredIfStudentFunc', [
+			'requiredIfStudentFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'studiengang')])
+		]);
+		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'callback_requiredIfStudentFunc', [
+			'requiredIfStudentFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'studiensemester')])
+		]);
+		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'callback_requiredIfStudentFunc|integer|less_than[9]|greater_than[-1]', [
+			'requiredIfStudentFunc' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'ausbildungssemester')])
+		]);
 		// TODO(chris): validate studienplan with studiengang, semester and orgform?
 		// TODO(chris): validate person_id, studiengang_kz, studiensemester_kurzbz, orgform_kurzbz, nation, gemeinde, ort, geschlecht?
 
@@ -518,7 +561,9 @@ class Student extends FHCAPI_Controller
 		if ($this->db->trans_status() === FALSE)
 			$this->terminateWithError('TODO(chris): TEXT', self::ERROR_TYPE_GENERAL);
 
-		$this->terminateWithSuccess($result);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	protected function addInteressent()
@@ -575,6 +620,8 @@ class Student extends FHCAPI_Controller
 				'zustelladresse' => true,
 			];
 			if ($anlegen < 0) { // Überschreiben
+				$this->AdresseModel->addSelect('adresse_id');
+				$this->AdresseModel->addJoin('public.tbl_adressentyp', 'typ = adressentyp_kurzbz');
 				$this->AdresseModel->addOrder('zustelladresse', 'DESC');
 				$this->AdresseModel->addOrder('sort');
 				$result = $this->AdresseModel->loadWhere([
@@ -631,70 +678,74 @@ class Student extends FHCAPI_Controller
 			}
 		}
 
-		// Prestudent anlegen
-		$data = [
-			'aufmerksamdurch_kurzbz' => 'k.A.',
-			'person_id' => $person_id,
-			'studiengang_kz' => $this->input->post('studiengang_kz'),
-			'ausbildungcode' => $this->input->post('letzteausbildung'),
-			'anmerkung' => $this->input->post('anmerkungen'),
-			'reihungstestangetreten' => false,
-			'bismelden' => true
-		];
-		$ausbildungsart = $this->input->post('ausbildungsart');
-		if ($ausbildungsart)
-			$data['anmerkung'] .= ' Ausbildungsart:' . $ausbildungsart;
-		// Incomings und ausserordentliche sind bei Meldung nicht förderrelevant
-		$incoming = $this->input->post('incoming');
-		if ($incoming || substr($data['studiengang_kz'], 0, 1) == '9')
-			$data['foerderrelevant'] = false;
-		// Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
-		$this->PrestudentModel->addOrder('zgvmas_code');
-		$this->PrestudentModel->addOrder('zgv_code', 'DESC');
-		$this->PrestudentModel->addLimit(1);
-		$result = $this->PrestudentModel->loadWhere([
-			'person_id' => $person_id
-		]);
-		$prestudent = $this->getDataOrTerminateWithError($result);
-		if ($prestudent) {
-			$prestudent = current($prestudent);
-			if ($prestudent->zgv_code) {
-				$data['zgv_code'] = $prestudent->zgv_code;
-				$data['zgvort'] = $prestudent->zgvort;
-				$data['zgvdatum'] = $prestudent->zgvdatum;
+		$personOnly = $anlegen = $this->input->post('personOnly');
 
-				$data['zgvmas_code'] = $prestudent->zgvmas_code;
-				$data['zgvmaort'] = $prestudent->zgvmaort;
-				$data['zgvmadatum'] = $prestudent->zgvmadatum;
+		if (!$personOnly)
+		{
+			// Prestudent anlegen
+			$data = [
+				'aufmerksamdurch_kurzbz' => 'k.A.',
+				'person_id' => $person_id,
+				'studiengang_kz' => $this->input->post('studiengang_kz'),
+				'ausbildungcode' => $this->input->post('letzteausbildung'),
+				'anmerkung' => $this->input->post('anmerkungen'),
+				'reihungstestangetreten' => false,
+				'bismelden' => true
+			];
+			$ausbildungsart = $this->input->post('ausbildungsart');
+			if ($ausbildungsart)
+				$data['anmerkung'] .= ' Ausbildungsart:' . $ausbildungsart;
+			// Incomings und ausserordentliche sind bei Meldung nicht förderrelevant
+			$incoming = $this->input->post('incoming');
+			if ($incoming || substr($data['studiengang_kz'], 0, 1) == '9')
+				$data['foerderrelevant'] = false;
+			// Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
+			$this->PrestudentModel->addOrder('zgvmas_code');
+			$this->PrestudentModel->addOrder('zgv_code', 'DESC');
+			$this->PrestudentModel->addLimit(1);
+			$result = $this->PrestudentModel->loadWhere([
+				'person_id' => $person_id
+			]);
+			$prestudent = $this->getDataOrTerminateWithError($result);
+			if ($prestudent) {
+				$prestudent = current($prestudent);
+				if ($prestudent->zgv_code) {
+					$data['zgv_code'] = $prestudent->zgv_code;
+					$data['zgvort'] = $prestudent->zgvort;
+					$data['zgvdatum'] = $prestudent->zgvdatum;
+
+					$data['zgvmas_code'] = $prestudent->zgvmas_code;
+					$data['zgvmaort'] = $prestudent->zgvmaort;
+					$data['zgvmadatum'] = $prestudent->zgvmadatum;
+				}
+			}
+			// Prestudent speichern
+			$result = $this->PrestudentModel->insert($data);
+			$prestudent_id = $this->getDataOrTerminateWithError($result);
+
+			// Prestudent Rolle Anlegen
+			$data = [
+				'prestudent_id' => $prestudent_id,
+				'status_kurzbz' => $incoming ? 'Incoming' : 'Interessent',
+				'studiensemester_kurzbz' => $this->input->post('studiensemester_kurzbz'),
+				'ausbildungssemester' => $this->input->post('ausbildungssemester') ?: 0,
+				'orgform_kurzbz' => $this->input->post('orgform_kurzbz') ?: null,
+				'studienplan_id' => $this->input->post('studienplan_id') ?: null,
+				'datum' => date('Y-m-d'),
+				'insertamum' => date('c'),
+				'insertvon' => getAuthUID()
+			];
+			$result = $this->PrestudentstatusModel->insert($data);
+			$this->getDataOrTerminateWithError($result);
+
+			if ($incoming) {
+				// TODO(chris): IMPLEMENT!
+				//Matrikelnummer und UID generieren
+				//Benutzerdatensatz anlegen
+				//Studentendatensatz anlegen
+				//StudentLehrverband anlegen
 			}
 		}
-		// Prestudent speichern
-		$result = $this->PrestudentModel->insert($data);
-		$prestudent_id = $this->getDataOrTerminateWithError($result);
-
-		// Prestudent Rolle Anlegen
-		$data = [
-			'prestudent_id' => $prestudent_id,
-			'status_kurzbz' => $incoming ? 'Incoming' : 'Interessent',
-			'studiensemester_kurzbz' => $this->input->post('studiensemester_kurzbz'),
-			'ausbildungssemester' => $this->input->post('ausbildungssemester') ?: 0,
-			'orgform_kurzbz' => $this->input->post('orgform_kurzbz') ?: null,
-			'studienplan_id' => $this->input->post('studienplan_id') ?: null,
-			'datum' => date('Y-m-d'),
-			'insertamum' => date('c'),
-			'insertvon' => getAuthUID()
-		];
-		$result = $this->PrestudentstatusModel->insert($data);
-		$this->getDataOrTerminateWithError($result);
-
-		if ($incoming) {
-			// TODO(chris): IMPLEMENT!
-			//Matrikelnummer und UID generieren
-			//Benutzerdatensatz anlegen
-			//Studentendatensatz anlegen
-			//StudentLehrverband anlegen
-		}
-
 		// TODO(chris): DEBUG
 		/*$result = $this->PrestudentModel->loadWhere([
 			'pestudent_id' => 1
@@ -703,7 +754,7 @@ class Student extends FHCAPI_Controller
 			return $result;
 		}*/
 
-		return success(true);
+		return success($person_id);
 	}
 
 	public function requiredIfNotPersonId($value)
@@ -715,7 +766,14 @@ class Student extends FHCAPI_Controller
 	
 	public function requiredIfAddressFunc($value)
 	{
-		if (!$_POST['address']['func'])
+		if (!$_POST['address']['func'] || $_POST['address']['func'] == 0)
+			return true;
+		return !!$value;
+	}
+
+	public function requiredIfStudentFunc($value)
+	{
+		if ($_POST['personOnly'])
 			return true;
 		return !!$value;
 	}
