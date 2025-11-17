@@ -288,3 +288,47 @@ if($result = $db->db_query("SELECT 1 FROM information_schema.routines WHERE rout
 			echo "<br>campus.get_betreuer_details function hinzugefuegt";
 	}
 }
+
+if($result = $db->db_query("SELECT 1 FROM system.tbl_berechtigung WHERE berechtigung_kurzbz = 'basis/abgabe_assistenz'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO system.tbl_berechtigung(berechtigung_kurzbz, beschreibung)
+				SELECT 'basis/abgabe_assistenz', 'Recht um Abgabetool für Assistenzen zu bedienen'";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_berechtigung: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_berechtigung insert basis/abgabe_assistenz hinzugefuegt";
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'paabgabeUpdatesBetSM'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO public.tbl_vorlage (vorlage_kurzbz, bezeichnung, anmerkung, mimetype)
+				VALUES ('paabgabeUpdatesBetSM', 'paabgabeUpdatesBetSM', null, 'text/html')
+				ON CONFLICT (vorlage_kurzbz) DO NOTHING;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_vorlage paabgabeUpdatesBetSM hinzugefuegt";
+	}
+}
+
+if($result = $db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'paabgabeUpdatesSammelmail'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO public.tbl_vorlage (vorlage_kurzbz, bezeichnung, anmerkung, mimetype)
+				VALUES ('paabgabeUpdatesSammelmail', 'paabgabeUpdatesSammelmail', null, 'text/html')
+				ON CONFLICT (vorlage_kurzbz) DO NOTHING;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_vorlage paabgabeUpdatesSammelmail hinzugefuegt";
+	}
+}

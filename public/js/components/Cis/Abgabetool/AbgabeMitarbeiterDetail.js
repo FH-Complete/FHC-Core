@@ -125,7 +125,7 @@ export const AbgabeMitarbeiterDetail = {
 							'paabgabe_id': -1,
 							'projektarbeit_id': this.projektarbeit.projektarbeit_id,
 							'fixtermin': false,
-							'inertedFixtermin': true,
+							'invertedFixtermin': true,
 							'kurzbz': '', // todo kurzbz textfield value vorschlag für qualgates
 							'datum': new Date().toISOString().split('T')[0],
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
@@ -492,7 +492,7 @@ export const AbgabeMitarbeiterDetail = {
 			<div v-if="showAutomagicModalPhrase" class="text-center"><p>{{$p.t('abgabetool/c4abgabeQualGateNegativAddNewAutomagisch')}}</p></div>
 			<div v-if="newTermin">
 				<div v-if="assistenzMode" class="row">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv4')}}</div>
 					<div class="col-8 col-md-9">
 						<Checkbox 
 							v-model="newTermin.invertedFixtermin"

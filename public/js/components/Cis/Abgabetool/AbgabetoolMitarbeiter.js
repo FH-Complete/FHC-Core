@@ -69,7 +69,7 @@ export const AbgabetoolMitarbeiter = {
 				minHeight: 250,
 				index: 'projektarbeit_id',
 				layout: 'fitDataStretch',
-				placeholder: this.$p.t('global/noDataAvailable'),
+				placeholder: Vue.computed(() => this.$p.t('global/noDataAvailable')),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
 				rowHeight: 80,
@@ -299,7 +299,6 @@ export const AbgabetoolMitarbeiter = {
 			this.domain = data[1]
 			
 			const d = data[0]?.retval?.map(projekt => {
-				let mode = 'detailTermine'
 
 				return {
 					...projekt,
@@ -316,7 +315,7 @@ export const AbgabetoolMitarbeiter = {
 					titel: projekt.titel
 				}
 			})
-
+			
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.$refs.abgabeTable.tabulator.setData(d);
 		},

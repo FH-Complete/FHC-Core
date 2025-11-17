@@ -2,7 +2,7 @@ export const AbgabeterminStatusLegende = {
 	name: 'AbgabeterminStatusLegende',
 	template: `	
 		<div class="text-center">
-			<div class="col"  style="width: 50%; margin-left: 12px;">
+			<div class="col"  style="width: 80%; margin-left: 12px;">
 			
 				<div class="row" style="margin-bottom: 2px">
 					<div class="col-auto verspaetet-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">

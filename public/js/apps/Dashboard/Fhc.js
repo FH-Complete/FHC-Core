@@ -58,7 +58,7 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/Abgabetool/Assistenz`,
+			path: `/Cis/Abgabetool/Assistenz/:stg_kz_prop?`,
 			name: 'AbgabetoolAssistenz',
 			component: AbgabetoolAssistenz,
 			props: true

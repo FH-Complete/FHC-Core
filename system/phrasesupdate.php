@@ -43647,7 +43647,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Download Abgabe',
+				'text' => 'Download File',
 				'description' => '',
 				'insertvon' => 'system'
 			)

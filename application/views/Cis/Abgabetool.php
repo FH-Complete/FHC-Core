@@ -37,7 +37,10 @@ $includesArray = array(
 
 $this->load->view('templates/FHC-Header', $includesArray);
 ?>
-<div id="abgabetoolroot" class="h-100" route=<?php echo json_encode($route) ?> uid=<?php echo $uid ?> student_uid_prop=<?php echo $student_uid_prop ?? '' ?>>
+<div id="abgabetoolroot" class="h-100" route=<?php echo json_encode($route) ?> 
+	uid=<?php echo $uid ?> student_uid_prop=<?php echo $student_uid_prop ?? '""' ?>
+	stg_kz_prop=<?php echo $stg_kz_prop ?? '""' ?>
+	>
 
 </div>
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>

@@ -42,6 +42,9 @@ export const AbgabetoolAssistenz = {
 		}
 	},
 	props: {
+		stg_kz_prop: {
+			default: null
+		},
 		viewData: {
 			type: Object,
 			required: true,
@@ -121,7 +124,7 @@ export const AbgabetoolAssistenz = {
 						width: 40
 					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150,},
-					{title: 'pa_id', field: 'projektarbeit_id', visible: true},
+					// {title: 'pa_id', field: 'projektarbeit_id', visible: true},
 					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1,responsive:0,  tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter,responsive:0, widthGrow: 1, tooltip: false},
 					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4termineTimeLine'))), headerFilter: true, field: 'abgabetermine',responsive:2, formatter: this.timelineFormatter, widthGrow: 1, tooltip: false},
@@ -134,7 +137,7 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
 						responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: true, responsive:2,formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
@@ -150,26 +153,12 @@ export const AbgabetoolAssistenz = {
 					this.tableBuiltResolve()
 				}
 			},
-				// {
-				// 	event: "cellClick",
-				// 	handler: async (e, cell) => {
-				// 		if(cell.getColumn().getField() === "details") {
-				// 			this.setDetailComponent(cell.getValue())
-				// 			this.undoSelection(cell)
-				// 		} else if (cell.getColumn().getField() === "mail") {
-				// 			this.undoSelection(cell)
-				// 		} else if (cell.getColumn().getField() === "abgabetermine") {
-				// 			this.openTimeline(cell.getValue())
-				// 			this.undoSelection(cell)
-				// 		}
-				// 	}
-				// },
-				{
-					event: "rowSelectionChanged",
-					handler: async(data) => {
-						this.selectedData = data
-					}
+			{
+				event: "rowSelectionChanged",
+				handler: async(data) => {
+					this.selectedData = data
 				}
+			}
 			]};
 	},
 	methods: {
@@ -409,15 +398,6 @@ export const AbgabetoolAssistenz = {
 				+ '/Cis/Abgabetool/Deadlines'
 			window.open(link, '_blank')
 		},
-		toggleShowAll(showall) {
-			this.showAll = showall
-			this.loading = true
-			this.loadProjektarbeiten(showall, () => {
-				this.$refs.abgabeTable?.tabulator.redraw(true)
-				this.$refs.abgabeTable?.tabulator.setSort([]);
-				this.loading = false
-			})
-		},
 		openAddSeriesModal() {
 			this.$refs.modalContainerAddSeries.show()
 		},
@@ -460,6 +440,9 @@ export const AbgabetoolAssistenz = {
 				this.$refs.abgabeTable.tabulator.deselectRow()
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+
+								
+				if(!this.$refs.abgabeTable.tabulator) return
 				
 				this.$refs.abgabeTable.tabulator.clearData()
 				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
@@ -540,8 +523,6 @@ export const AbgabetoolAssistenz = {
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 
 			})
-			
-			// TODO: do same thing for sidebar
 			
 			const vorname = pa.vorname ?? pa.student_vorname
 			const nachname = pa.nachname ?? pa.student_nachname
@@ -694,7 +675,7 @@ export const AbgabetoolAssistenz = {
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
 			this.$api.call(ApiAbgabe.getProjektarbeitenForStudiengang(
-				this.getCurrentStudiengang,
+				this.selectedStudiengangOption.studiengang_kz,
 				this.notenOptionFilter?.benotet ?? 0
 			))
 				.then(res => {
@@ -730,37 +711,27 @@ export const AbgabetoolAssistenz = {
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
-
 			
-			// called through notenOptionFilter watcher on startup
+			// called through notenOptionFilter/selectedStudiengangOption watcher on startup
 			// this.loadProjektarbeiten()
 
-			// this.$refs.verticalsplit.collapseBottom()
 			this.calcMaxTableHeight()
-
-		},
-		sendEmailBegutachter() {
-			// TODO: implement
-		},
-		sendEmailStudierende() {
-			// TODO: implement
 		}
 	},
 	watch: {
 		selectedStudiengangOption(newVal, oldVal) {
-			this.loadProjektarbeiten()
+			// implicitely avoids juggling around promises for created api calls,
+			// since we need note & stg flags for loadProjektarbeiten
+			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
+				this.loadProjektarbeiten()
+			}
 		},
 		notenOptionFilter(newVal) {
 			// that single where clause is worth a decent load time so rather not filter tabulator but just 
 			// adapt the qry
-			this.loadProjektarbeiten()
-		}
-	},
-	computed: {
-		getCurrentStudiengang() {
-			// TODO: sophisticated logic pulling from default value by viewData or dropdown select
-			
-			return this.selectedStudiengangOption?.studiengang_kz ?? 257
+			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
+				this.loadProjektarbeiten()
+			}
 		}
 	},
 	created() {
@@ -778,6 +749,13 @@ export const AbgabetoolAssistenz = {
 		// fetch studiengänge options
 		this.$api.call(ApiAbgabe.getStudiengaenge()).then(res => {
 			this.studiengaengeOptions = res.data
+			if(this.studiengaengeOptions?.length) {
+				
+				// use this.stg_kz_prop as default selected in case of url param usage
+				
+				this.selectedStudiengangOption = this.stg_kz_prop ? res.data.find(stgOpt => stgOpt.studiengang_kz == this.stg_kz_prop) : res.data[0]
+			}
+			
 		}).catch(e => {
 			this.loading = false
 		})
@@ -1035,8 +1013,7 @@ export const AbgabetoolAssistenz = {
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 
 						:optionLabel="getOptionLabelStg" 
 						v-model="selectedStudiengangOption" 
-						:options="studiengaengeOptions" 
-						showClear
+						:options="studiengaengeOptions"
 						:tabindex="2"
 					>
 						<template #optionsgroup="slotProps">
