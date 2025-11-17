@@ -3,7 +3,6 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 
-const today = new Date()
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
 	components: {
@@ -215,30 +214,6 @@ export const AbgabeStudentDetail = {
 			
 			
 		},
-		dateDiffInDays(datum, today){
-			const oneDayMs = 1000 * 60 * 60 * 24
-			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
-		},
-		getDateStyleClass(termin, mode) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-			
-			// avoid renaming these statuses as their names are used as css keys
-			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			if (termin.abgabedatum === null) {
-				if(datum < today) {
-					return 'verpasst'
-				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					return 'abzugeben'
-				} else {
-					return 'standard'
-				}
-			} else if(abgabedatum > datum) {
-				return 'verspaetet'
-			} else {
-				return 'abgegeben'
-			}
-		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
 		},
@@ -269,10 +244,6 @@ export const AbgabeStudentDetail = {
 			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter ?? ''
 			this.form.seitenanzahl = newVal.seitenanzahl ?? 1
 			
-			// get dateStyles for each abgabetermin
-			newVal?.abgabetermine?.forEach(termin => {
-				termin.dateStyle = this.getDateStyleClass(termin)
-			})
 		}
 	},
 	computed: {

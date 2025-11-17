@@ -3,6 +3,7 @@ import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
 
+const today = new Date()
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
@@ -46,6 +47,30 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
+		dateDiffInDays(datum, today){
+			const oneDayMs = 1000 * 60 * 60 * 24
+			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
+		},
+		getDateStyleClass(termin) {
+			const datum = new Date(termin.datum)
+			const abgabedatum = new Date(termin.abgabedatum)
+
+			// avoid renaming these statuses as their names are used as css keys
+			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
+			if (termin.abgabedatum === null) {
+				if(datum < today) {
+					return 'verpasst'
+				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
+					return 'abzugeben'
+				} else {
+					return 'standard'
+				}
+			} else if(abgabedatum > datum) {
+				return 'verspaetet'
+			} else {
+				return 'abgegeben'
+			}
+		},
 		checkQualityGates(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
@@ -90,10 +115,12 @@ export const AbgabetoolStudent = {
 						termin.allowedToUpload = termin.upload_allowed 
 					}
 
+					termin.dateStyle = this.getDateStyleClass(termin)
 				})
+				
 				pa.betreuer = this.buildBetreuer(pa)
 				pa.student_uid = this.student_uid
-
+				
 				this.selectedProjektarbeit = pa
 
 				this.$refs.modalContainerAbgabeDetail.show()
