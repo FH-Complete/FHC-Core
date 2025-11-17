@@ -40,7 +40,10 @@ class AbgabetoolJob extends JOB_Controller
 		$retval = getData($result);
 
 		// retval are paabgaben joined with projektarbeit and betreuer
-		if(count($retval) == 0) return; // TODO: terminate appropriately
+		if(count($retval) == 0) {
+			$this->logInfo("Keine Emails an Betreuer versandt");
+			return;
+		}
 
 		// group contents per betreuer person_id
 		$betreuer_uids = [];
@@ -52,6 +55,7 @@ class AbgabetoolJob extends JOB_Controller
 			$betreuer_uids[$paabgabe->person_id][] = $paabgabe;
 		}
 
+		$count = 0;
 		forEach ($betreuer_uids as $person_id => $abgaben) {
 			// $person_id is from betreuer
 
@@ -108,8 +112,11 @@ class AbgabetoolJob extends JOB_Controller
 				$data->private_email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
 			);
+			
+			$count++;
 		}
-
+		
+		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
 		$this->_ci->logInfo('End job queue scheduler FHC-Core->notifyBetreuerMail');
 	}
 
@@ -124,7 +131,10 @@ class AbgabetoolJob extends JOB_Controller
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
 		$retval = getData($result);
 
-		if(count($retval) == 0) return; // TODO: terminate appropriately
+		if(count($retval) == 0) {
+			$this->logInfo("Keine Emails an Studenten versandt");
+			return;
+		}
 		
 		// group results per projektarbeit/student_uid
 		$student_uids = [];
@@ -136,6 +146,7 @@ class AbgabetoolJob extends JOB_Controller
 			$student_uids[$paabgabe->student_uid][] = $paabgabe;
 		}
 
+		$count = 0;
 		foreach ($student_uids as $uid => $abgaben) {
 			// $uid is the student's UID
 			$result = $this->_ci->StudentModel->getEmailAnredeForStudentUID($uid);
@@ -185,8 +196,12 @@ class AbgabetoolJob extends JOB_Controller
 				$uid.'@'.DOMAIN,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
 			);
+
+			$count++;
+			
 		}
 
-		$this->logInfo('End job queue scheduler FHC-Core->notifyStudentMail');
+		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
+		$this->_ci->logInfo('End job queue scheduler FHC-Core->notifyStudentMail');
 	}
 }
