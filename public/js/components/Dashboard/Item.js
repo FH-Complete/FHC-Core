@@ -2,6 +2,8 @@ import BsModal from "../Bootstrap/Modal.js";
 import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
+import {absoluteJsImportUrl} from "../../helpers/UrlHelpers.js";
+
 export default {
 	name: 'Item',
 	components: {
@@ -144,7 +146,7 @@ export default {
 	},
 	async created() {
 		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import(FHC_JS_DATA_STORAGE_OBJECT.app_root + this.widget.setup.file + '?' + FHC_JS_DATA_STORAGE_OBJECT.fhcomplete_build_version)).default;
+		let component = (await import(absoluteJsImportUrl(this.widget.setup.file))).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;
 		this.component = "widget" + this.widget.widget_id;
 		this.arguments = { ...this.widget.arguments, ...this.config };
