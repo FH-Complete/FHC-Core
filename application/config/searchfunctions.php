@@ -29,7 +29,7 @@ $config['similar'] = [
 
 $config['vector'] = [
 	'priority' => 1,
-	'rank' => "ts_rank({field}, to_tsquery('simple', {word}))",
-	'compare' => "to_tsquery('simple', {word}) @@ {field}"
+	'rank' => "ts_rank({field}, plainto_tsquery('simple', {word}))",
+	'compare' => "plainto_tsquery('simple', {word}) @@ {field}"
 ];
 

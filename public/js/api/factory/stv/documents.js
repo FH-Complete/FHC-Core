@@ -73,4 +73,17 @@ export default {
 			params
 		};
 	},
+	getDocumentDropdown(params){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/dokumente/getDocumentDropDown/' + params.prestudent_id + '/' + params.studiensemester_kurzbz + '/' + params.studiengang_kz,
+		};
+	},
+	getDocumentDropdownMulti(studentUids, params){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/dokumente/getDocumentDropDownMulti/' + params.studiensemester_kurzbz + '/' + params.studiengang_kz,
+			params: {studentUids}
+		};
+	}
 }

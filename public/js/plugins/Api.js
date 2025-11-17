@@ -548,6 +548,9 @@ export default {
 				} else {
 					console.error("FhcApi: method not allowed:", method);
 				}
+			},
+			getErrorHandler(config) {
+				return get_error_handler(config);
 			}
 		};
 
