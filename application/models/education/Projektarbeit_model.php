@@ -204,12 +204,9 @@ class Projektarbeit_model extends DB_Model
 	}
 
 	public function getProjektbetreuerAnrede($bperson_id) {
-		$qry_betr="SELECT DISTINCT trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first,
-						public.tbl_mitarbeiter.mitarbeiter_uid, anrede
-						FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
-						LEFT JOIN public.tbl_benutzer ON(public.tbl_benutzer.person_id=public.tbl_person.person_id)
-						LEFT JOIN public.tbl_mitarbeiter ON(public.tbl_benutzer.uid=public.tbl_mitarbeiter.mitarbeiter_uid)
-						WHERE public.tbl_person.person_id= ?";
+		$qry_betr="SELECT DISTINCT ON(public.tbl_person.person_id) trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first, anrede
+			FROM public.tbl_person JOIN lehre.tbl_projektbetreuer ON(lehre.tbl_projektbetreuer.person_id=public.tbl_person.person_id)
+			WHERE public.tbl_person.person_id= ?";
 
 		return $this->execReadOnlyQuery($qry_betr, [$bperson_id]);
 	}
