@@ -228,91 +228,91 @@ export const AbgabetoolAssistenz = {
 		},
 		handleTableBuilt() {
 			const table = this.$refs.abgabeTable.tabulator
-			table.on("columnMoved", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnResized", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnVisibilityChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("filterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("headerFilterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("dataSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("sortersChanged", () => {
-				this.saveState(table);
-			});
-
-			const saved = this.loadState();
+			// table.on("columnMoved", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("columnResized", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("columnVisibilityChanged", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("filterChanged", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("headerFilterChanged", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("dataSorted", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("columnSorted", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// table.on("sortersChanged", () => {
+			// 	this.saveState(table);
+			// });
+			//
+			// const saved = this.loadState();
 			
-			table.on("renderComplete", () => {
-				if(!this.stateRestored) {
-					
-					if (saved?.columns && !this.colLayoutRestored) {
-						const layout = saved.columns.map(col => ({
-							field: col.field,
-							width: col.width,
-							visible: col.visible,
-							// add more if needed, but keep it simple
-						}));
-
-						const safeLayout = layout.filter(col =>
-							col.field && !["rowSelection", "rowHandle", "rowNum", "zweitbetreuer"].includes(col.field)
-						);
-						
-						table.setColumnLayout(safeLayout);
-
-						this.colLayoutRestored = true;
-					}
-
-					if (saved?.filters && !this.filtersRestored) {
-						this.filtersRestored = true // instantly avoid retriggers
-						table.setFilter(saved.filters);
-					}
-					if (saved?.headerFilters && !this.headerFiltersRestored) {
-						this.headerFiltersRestored = true // instantly avoid retriggers
-						for (let hf of saved.headerFilters) {
-							table.setHeaderFilterValue(hf.field, hf.value);
-						}
-					}
-
-					if (saved?.sort?.length && !this.sortRestored) {
-						this.sortRestored = true;
-
-						setTimeout(() => {
-							const sortList = saved.sort.map(s => {
-								const col = table.columnManager.findColumn(s.field);
-								if (!col) {
-									return null;
-								}
-								return { column: col, dir: s.dir };
-							}).filter(Boolean);
-
-							table.setSort(sortList);
-						}, 100);
-					}
-					this.stateRestored = true
-
-				}
-
-			});
+			// table.on("renderComplete", () => {
+			// 	if(!this.stateRestored) {
+			//		
+			// 		if (saved?.columns && !this.colLayoutRestored) {
+			// 			const layout = saved.columns.map(col => ({
+			// 				field: col.field,
+			// 				width: col.width,
+			// 				visible: col.visible,
+			// 				// add more if needed, but keep it simple
+			// 			}));
+			//
+			// 			const safeLayout = layout.filter(col =>
+			// 				col.field && !["rowSelection", "rowHandle", "rowNum", "zweitbetreuer"].includes(col.field)
+			// 			);
+			//			
+			// 			table.setColumnLayout(safeLayout);
+			//
+			// 			this.colLayoutRestored = true;
+			// 		}
+			//
+			// 		if (saved?.filters && !this.filtersRestored) {
+			// 			this.filtersRestored = true // instantly avoid retriggers
+			// 			table.setFilter(saved.filters);
+			// 		}
+			// 		if (saved?.headerFilters && !this.headerFiltersRestored) {
+			// 			this.headerFiltersRestored = true // instantly avoid retriggers
+			// 			for (let hf of saved.headerFilters) {
+			// 				table.setHeaderFilterValue(hf.field, hf.value);
+			// 			}
+			// 		}
+			//
+			// 		if (saved?.sort?.length && !this.sortRestored) {
+			// 			this.sortRestored = true;
+			//
+			// 			setTimeout(() => {
+			// 				const sortList = saved.sort.map(s => {
+			// 					const col = table.columnManager.findColumn(s.field);
+			// 					if (!col) {
+			// 						return null;
+			// 					}
+			// 					return { column: col, dir: s.dir };
+			// 				}).filter(Boolean);
+			//
+			// 				table.setSort(sortList);
+			// 			}, 100);
+			// 		}
+			// 		this.stateRestored = true
+			//
+			// 	}
+			//
+			// });
 		},
 		handleToggleFullscreenDetail() {
 			this.detailIsFullscreen = !this.detailIsFullscreen
@@ -441,10 +441,7 @@ export const AbgabetoolAssistenz = {
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
 
-								
-				if(!this.$refs.abgabeTable.tabulator) return
 				
-				this.$refs.abgabeTable.tabulator.clearData()
 				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 				this.$refs.abgabeTable.tabulator.replaceData(mappedData)
 				
@@ -765,7 +762,8 @@ export const AbgabetoolAssistenz = {
 			this.curSem = res.data[1]
 			
 			// TODO: maybe filter only for available semester from projektarbeiten dataset
-			this.studiensemesterOptions = [{studiensemester_kurzbz: 'Alle'}, ...this.allSem]
+			this.studiensemesterOptions = [{studiensemester_kurzbz: 'Alle'}, this.curSem, ...this.allSem]
+
 		}).catch(e => {
 			this.loading = false
 		})
@@ -1001,7 +999,6 @@ export const AbgabetoolAssistenz = {
 			</template>
 		</BsOffcanvas>
 		
-		<!-- low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways -->
 		<div style="max-height:40vw;">
 			<div class="row">
 				<div class="col-auto">

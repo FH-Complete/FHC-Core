@@ -138,7 +138,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 
 		$isZugeteilterBetreuer = count($this->ProjektarbeitModel->checkZuordnung($uid, getAuthUID())->retval) > 0;
-		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
+//		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
 
 		if ($isMitarbeiter) {
@@ -211,8 +211,8 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				));
 
-				// TODO: consider this for daily abgabetool email job
-				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
+				// enable this when lektor cry that they dont receive enough emails
+//				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
 				$this->logLib->logInfoDB(array('zwischenupload',$res, array(
 					'abgabedatum' => date('Y-m-d'),
@@ -308,7 +308,6 @@ class Abgabe extends FHCAPI_Controller
 				$abgabe = getData($res)[0];
 				$abgabe->signatur = $signaturstatus;
 					
-				// TODO: consider for email job
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
 				$this->logLib->logInfoDB(array('endupload',$res, array(
@@ -403,9 +402,11 @@ class Abgabe extends FHCAPI_Controller
 		} else {
 			$ci3BootstrapFilePath = "index.ci.php";
 		}
-		$url = APP_ROOT . $ci3BootstrapFilePath . '/Cis/Abgabetool/Mitarbeiter';
 
-		$this->addMeta('betreuerArray', $resBetr->retval);
+		$path = $this->_ci->config->item('URL_MITARBEITER');
+		$url = APP_ROOT.$path;
+
+//		$this->addMeta('betreuerArray', $resBetr->retval);
 		
 		// getProjektbetreuerAnrede fetches distinct on person_id, so there should be one row. zweitbetreuer is handled seperately afterwards 
 		foreach($resBetr->retval as $betreuerRow) {
@@ -435,7 +436,7 @@ class Abgabe extends FHCAPI_Controller
 			
 			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
 
-			$this->addMeta('$maildata', $maildata);
+//			$this->addMeta('$maildata', $maildata);
 
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
@@ -458,7 +459,7 @@ class Abgabe extends FHCAPI_Controller
 				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
 				
-				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRetval);
+//				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRetval);
 				
 				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
 				{
@@ -475,7 +476,7 @@ class Abgabe extends FHCAPI_Controller
 						
 						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
 						
-						$this->addMeta('$begutachterMitTokenRetval', $begutachterMitTokenRetval);
+//						$this->addMeta('$begutachterMitTokenRetval', $begutachterMitTokenRetval);
 						
 						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
 						{
@@ -501,9 +502,8 @@ class Abgabe extends FHCAPI_Controller
 						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
 						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
 						
-						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
+//						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
 						
-//							TODO: persist email event somehow, let job bundle the updates later?
 						$mailres = sendSanchoMail(
 							'ParbeitsbeurteilungEndupload',
 							$zweitbetmaildata,
@@ -984,172 +984,6 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError('Keine Zuordnung!');
 		}
 	}
-
-//	public function notifyBetreuerMail() {
-//		// send all new projektarbeit abgabe UPLOADS since the last job run to the related betreuer
-//		// this job gathers all new or changed file uploads via field 'abgabedatum', enduploads still
-//		// send an email directly after happening since they are kind of important
-//
-////		$this->logInfo('Start job queue scheduler FHC-Core->notifyBetreuerMail');
-//		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-//		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-//		$this->load->model('crm/Student_model', 'StudentModel');
-//		
-//		$interval = $this->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
-//
-//		$result = $this->PaabgabeModel->findAbgabenNewOrUpdatedSinceByAbgabedatum($interval);
-//		$retval = getData($result);
-//
-//		// retval are paabgaben joined with projektarbeit and betreuer
-//		if(count($retval) == 0) return; // TODO: terminate appropriately
-//		
-//		// group contents per betreuer person_id
-//		$betreuer_uids = [];
-//		forEach($retval as $paabgabe) {
-//			if(!isset($betreuer_uids[$paabgabe->person_id])) {
-//				$betreuer_uids[$paabgabe->person_id] = [];
-//			}
-//
-//			$betreuer_uids[$paabgabe->person_id][] = $paabgabe;
-//		}
-//
-//		forEach ($betreuer_uids as $person_id => $abgaben) {
-//			// $person_id is from betreuer
-//
-//			$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($person_id);
-//			$data = getData($result)[0];
-//
-//			// $abgabe is the array of paabgabe objects
-//			$anrede = $data->anrede;
-//			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
-//			$fullFormattedNameString = $data->first;
-//
-//			$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($paabgabe->projektarbeit_id);
-//			$data = getData($result)[0];
-//			
-//			// https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
-//			// php has spaceships 🚀🚀🚀🚀🚀
-//			usort($abgaben, function ($a, $b) {
-//				return strtotime($a->datum) <=> strtotime($b->datum);
-//			});
-//
-//			$projektarbeit_titel = $abgaben[0]->titel;
-//			$abgabenString = '<br /><br />';
-//			foreach ($abgaben as $abgabe) {
-//				$datetime = new DateTime($abgabe->datum);
-//				$dateEmailFormatted = $datetime->format('d.m.Y');
-//
-//				$datetimeAbgabe = new DateTime($abgabe->abgabedatum);
-//				$abgabedatumFormatted = $datetimeAbgabe->format('d.m.Y');
-//
-//				$abgabenString .= 'Abgabedatum: '.$abgabedatumFormatted.' Zieldatum: '.$dateEmailFormatted . ' ' . $abgabe->bezeichnung . ' <br /> ' . $abgabe->kurzbz . '<br />';
-//			}
-//
-//			// Link to Abgabetool
-//			if (defined('CIS4') && CIS4) {
-//				$ci3BootstrapFilePath = "cis.php";
-//			} else {
-//				$ci3BootstrapFilePath = "index.ci.php";
-//			}
-//			$url = APP_ROOT . $ci3BootstrapFilePath . '/Cis/Abgabetool/Mitarbeiter';
-//			
-//			$body_fields = array(
-//				'anrede' => $anrede,
-//				'anredeFillString' => $anredeFillString,
-//				'fullFormattedNameString' => $fullFormattedNameString,
-//				'paTitel' => $projektarbeit_titel,
-//				'abgabenString' => $abgabenString,
-//				'linkAbgabetool' => $url
-//			);
-//
-//			// send email with bundled info
-//			sendSanchoMail(
-//				'paabgabeUpdatesBetSM',
-//				$body_fields,
-//				$data->private_email,
-//				$this->p->t('abgabetool', 'changedAbgabeterminev2')
-//			);
-//		}
-//	}
-//	
-//	public function notifyStudentMail()
-//	{
-//		// send all new projektarbeit abgabe since the last job run to the related student
-//
-////		$this->logInfo('Start job queue scheduler FHC-Core->notifyBetreuerMail');
-//		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-//		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
-//		$this->load->model('crm/Student_model', 'StudentModel');
-//		
-//		$interval = $this->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
-//
-//		$result = $this->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
-//		$retval = getData($result);
-//
-//		if(count($retval) == 0) return; // TODO: terminate appropriately
-//		
-//		// group results per projektarbeit/student_uid
-//		$student_uids = [];
-//		forEach($retval as $paabgabe) {
-//			if(!isset($student_uids[$paabgabe->student_uid])) {
-//				$student_uids[$paabgabe->student_uid] = [];
-//			}
-//				
-//			$student_uids[$paabgabe->student_uid][] = $paabgabe;
-//		}
-//
-//		foreach ($student_uids as $uid => $abgaben) {
-//			// $uid is the student's UID
-//			$result = $this->StudentModel->getEmailAnredeForStudentUID($uid);
-//			$data = getData($result)[0];
-//			
-//			// $abgabe is the array of paabgabe objects
-//			$anredeFillString = $data->anrede=="Herr"?"r":"";
-//			$fullFormattedNameString = trim($data->titelpre." ".$data->vorname." ".$data->vornamen." ".$data->nachname." ".$data->titelpost);
-//
-//			// https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
-//			// php has spaceships 🚀🚀🚀🚀🚀
-//			usort($abgaben, function($a, $b) {
-//				return strtotime($a->datum) <=> strtotime($b->datum);
-//			});
-//			
-//			$projektarbeit_titel = $abgaben[0]->titel;
-//			$abgabenString = '<br /><br />';
-//			forEach($abgaben as $abgabe) {
-//				$datetime = new DateTime($abgabe->datum);
-//				$dateEmailFormatted = $datetime->format('d.m.Y');
-//				
-//				$abgabenString .= $dateEmailFormatted.' '.$abgabe->bezeichnung.' '.$abgabe->kurzbz.'<br />';
-//			}
-//
-//			// Link to Entschuldigungsmanagement
-//			if(defined('CIS4') && CIS4) {
-//				$ci3BootstrapFilePath = "cis.php";
-//			} else {
-//				$ci3BootstrapFilePath = "index.ci.php";
-//			}
-//			$url = APP_ROOT.$ci3BootstrapFilePath.'/Cis/Abgabetool/Student';
-//
-////			$linkAbgabetool = '';
-//			$body_fields = array(
-//				'anrede' => $data->anrede,
-//				'anredeFillString' => $anredeFillString,
-//				'fullFormattedNameString' => $fullFormattedNameString,
-//				'paTitel' => $projektarbeit_titel,
-//				'abgabenString' => $abgabenString,
-//				'linkAbgabetool' => $url
-//			);
-//			
-//			// send email with bundled info
-//			sendSanchoMail(
-//				'paabgabeUpdatesSammelmail',
-//				$body_fields,
-//				$uid.'@'.DOMAIN,
-//				$this->p->t('abgabetool', 'changedAbgabeterminev2')
-//			);
-//			
-//		}
-//	}
 
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
 		if($abgabe->paabgabetyp_kurzbz != 'end') {

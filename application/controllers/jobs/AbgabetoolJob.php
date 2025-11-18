@@ -87,15 +87,10 @@ class AbgabetoolJob extends JOB_Controller
 
 				$abgabenString .= 'Abgabedatum: '.$abgabedatumFormatted.' Zieldatum: '.$dateEmailFormatted . ' ' . $abgabe->bezeichnung . ' <br /> ' . $abgabe->kurzbz . '<br />';
 			}
-
-			// Link to Abgabetool
-			if (defined('CIS4') && CIS4) {
-				$ci3BootstrapFilePath = "cis.php";
-			} else {
-				$ci3BootstrapFilePath = "index.ci.php";
-			}
-			$url = APP_ROOT . $ci3BootstrapFilePath . '/Cis/Abgabetool/Mitarbeiter';
-
+			
+			$path = $this->_ci->config->item('URL_MITARBEITER');
+			$url = APP_ROOT.$path;
+			
 			$body_fields = array(
 				'anrede' => $anrede,
 				'anredeFillString' => $anredeFillString,
@@ -170,16 +165,10 @@ class AbgabetoolJob extends JOB_Controller
 
 				$abgabenString .= $dateEmailFormatted.' '.$abgabe->bezeichnung.' '.$abgabe->kurzbz.'<br />';
 			}
-
-			// TODO: check this config flag in job context
-			// Link to Entschuldigungsmanagement
-			if(defined('CIS4') && CIS4) {
-				$ci3BootstrapFilePath = "cis.php";
-			} else {
-				$ci3BootstrapFilePath = "index.ci.php";
-			}
-			$url = APP_ROOT.$ci3BootstrapFilePath.'/Cis/Abgabetool/Student';
 			
+			$route =  $this->_ci->config->item('URL_STUDENTS');
+			$url = APP_ROOT.$route;
+
 			$body_fields = array(
 				'anrede' => $data->anrede,
 				'anredeFillString' => $anredeFillString,
