@@ -322,7 +322,7 @@ export default {
 				this.$refs.filterButton.title = this.$p.t('admission', 'loadZukuenftigeRT');}
 		},
 		openAdministrationPlacementTest(reihungstest_id){
-			let link = this.cisRoot + 'vilesci/stammdaten/reihungstestverwaltung.php';
+			let link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'vilesci/stammdaten/reihungstestverwaltung.php';
 			if(reihungstest_id){
 				link += '?reihungstest_id=' + reihungstest_id;
 			}
