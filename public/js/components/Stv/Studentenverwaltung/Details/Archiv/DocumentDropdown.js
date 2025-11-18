@@ -33,7 +33,7 @@ export default {
 	methods: {
 		printDokument(url, scope){
 			//TODO Manu(check if logic not in content (Zutrittkarte also in content folder))
-			let linkToPdf = this.cisRoot + 'content/' + url;
+			let linkToPdf = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'content/' + url;
 			window.open(linkToPdf, '_blank');
 		}
 	},
