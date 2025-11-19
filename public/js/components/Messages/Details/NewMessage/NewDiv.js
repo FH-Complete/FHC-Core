@@ -136,15 +136,13 @@ export default {
 					}
 				);
 		},
-		getVorlagentext(vorlage_kurzbz){
+		getDataVorlage(vorlage_kurzbz){
 			return this.$api
-				.call(this.endpoint.getVorlagentext(vorlage_kurzbz))
+				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
-					this.formData.body = response.data;
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-					//this.resetForm();
-				});
+					this.formData.body = response.data.text;
+					this.formData.subject = response.data.subject;
+				}).catch(this.$fhcAlert.handleSystemError);
 		},
 		getPreviewText(id, typeId){
 			const data = new FormData();
@@ -164,20 +162,11 @@ export default {
 		insertVariable(selectedItem){
 			if (this.editor) {
 				this.editor.insertContent(selectedItem.value + " ");
-				//TODO(Manu) check: Laden von Variblen geht nicht wenn kein Zeichen danach kommt
-				// nicht mal mit Punkt adden gehts ohne eintrag nach vars
-								//this.editor.focus();
-							//	this.editor.setDirty(true);
 
-				this.editor.setDirty(true);//seting dirty true if changes appear
-			//	console.log(tinyMCE.activeEditor.isDirty());//dirty output  = true
-
-
-				//this.editor.undoManager.add();
-
-				//this.editor.insertContent(selectedItem.value + "\u00A0");
-				//this.editor.insertContent(`<span>${selectedItem.value}&nbsp;</span>`);
-				//this.editor.selection.setCursorLocation(this.editor.getBody(), 1);
+				this.editor.fire('input');
+				this.editor.fire('change');
+				this.editor.setDirty(true);
+				this.editor.save();
 
 			} else {
 				console.error("Editor instance is not available.");
@@ -202,8 +191,7 @@ export default {
 		},
 		handleSelectedVorlage(vorlage_kurzbz) {
 			if (typeof vorlage_kurzbz === "string") {
-				this.getVorlagentext(vorlage_kurzbz);
-				this.formData.subject = vorlage_kurzbz;
+				this.getDataVorlage(vorlage_kurzbz);
 			}
 		},
 		hideTemplate(){
@@ -248,7 +236,7 @@ export default {
 
 				if (newVal && newVal != null) {
 					this.formData.subject = newVal;
-					return this.getVorlagentext(newVal);
+					return this.getDataVorlage(newVal);
 				}
 			}
 		},

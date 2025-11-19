@@ -205,7 +205,7 @@ export default{
 		];*/
 	},
 	template: `
-	<bs-modal class="stv-status-modal" ref="modal">
+	<bs-modal class="stv-status-modal" ref="modal" dialog-class="modal-dialog-scrollable">
 		<template #title>
 			{{ $p.t('lehre', statusNew ? 'status_new' : 'status_edit', prestudent) }}
 		</template>

@@ -1,9 +1,27 @@
-import ApiStvVerband from '../../../api/factory/stv/verband.js';
+import drop from '../../../directives/drop.js';
+import dragClick from '../../../directives/dragClick.js';
+
+import ApiStvGroups from '../../../api/factory/stv/group.js';
+import ApiStvDetails from '../../../api/factory/stv/details.js';
 
 export default {
 	components: {
 		PvTreetable: primevue.treetable,
 		PvColumn: primevue.column
+	},
+	directives: {
+		drop,
+		dragClick
+	},
+	inject: {
+		$reloadList: {
+			from: '$reloadList',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
 	},
 	emits: [
 		'selectVerband'
@@ -112,26 +130,14 @@ export default {
 
 			return cp;
 		},
-		async filterFav() {
+		filterFav() {
 			this.favorites.on = !this.favorites.on;
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(',\n');
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
-		async markFav(key) {
+		markFav(key) {
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
@@ -143,19 +149,7 @@ export default {
 			this.$api
 				.call(this.endpoint.favorites.set(
 					JSON.stringify(this.favorites)
-				))
-				.then(result => {
-					if (result.meta?.removed) {
-						this.favorites.list = this.favorites.list
-							.filter(fav => !result.meta.removed.includes(fav));
-						const items = "\n" + result.meta.removed.map(
-							rem => this.nodes.find(
-								node => node.data.link == rem
-							).label
-						).join(",\n");
-						this.$fhcAlert.alertWarning(this.$p.t('stv/warn_removed_favs', { items }));
-					}
-				});
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -176,7 +170,10 @@ export default {
 		async setPreselection()
 		{
 			if (!this.preselectedKey)
+			{
+				this.selectedKey = null;
 				return;
+			}
 
 			let rawKey = this.preselectedKey
 
@@ -225,6 +222,51 @@ export default {
 
 			this.selectedKey = {[currentNode.key]: true};
 			this.onSelectTreeNode(currentNode);
+		},
+		async toggleTreeNode(node) {
+			if (this.expandedKeys[node.key]) {
+				delete this.expandedKeys[node.key];
+			} else if (!node.leaf) {
+				await this.onExpandTreeNode(node);
+				this.expandedKeys[node.key] = true;
+			}
+		},
+		getStudentAjaxId(student) {
+			let res = student.id;
+			if (student.vorname && student.nachname)
+				res += ' (' + student.vorname + ' ' + student.nachname + ')';
+			return res;
+		},
+		dropStudents(node, students) {
+			const data = node.data;
+			
+			let endpoint;
+			if (data.gruppe_kurzbz) {
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvGroups.add(
+						student.id,
+						data.gruppe_kurzbz,
+						this.currentSemester
+					)
+				]);
+			} else {
+				const { semester, verband, gruppe } = data;
+				const params = { semester, verband, gruppe };
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvDetails.saveStudent(
+						student.id,
+						this.currentSemester,
+						params
+					)
+				]);
+			}
+
+			return this.$api
+				.call(endpoint)
+				.then(this.$reloadList)
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	mounted() {
@@ -286,10 +328,21 @@ export default {
 				</template>
 				<template #body="{ node }">
 					<span
+						v-if="['semester', 'verband', 'gruppe', 'gruppe_kurzbz'].some(key => node.data.hasOwnProperty(key))"
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
 					>
-						{{node.data.name}}
+						{{ node.data.name }}
+					</span>
+					<span
+						v-else
+						:data-tree-item-key="node.key"
+						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+					>
+						{{ node.data.name }}
 					</span>
 				</template>
 			</pv-column>

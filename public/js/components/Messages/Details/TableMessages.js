@@ -274,6 +274,11 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		buildTreemap(messages) {
+			if (!messages || !messages.data || messages.data.length === 0)
+			{
+				return {data: [], last_page: 0};
+			}
+
 			const last_page = messages.meta.count;
 			messages = messages.data;
 			const messageMap = new Map();

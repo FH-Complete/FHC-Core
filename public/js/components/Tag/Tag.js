@@ -200,6 +200,9 @@ export default {
 				minute: "2-digit",
 				second: "2-digit"
 			});
+		},
+		async copy (){
+			await navigator.clipboard.writeText(this.tagData.notiz);
 		}
 	},
 	template: `
@@ -235,7 +238,18 @@ export default {
 						field="notiz"
 						:readonly="tagData.readonly"
 						placeholder="Notiz..."
+						@keyup.stop=""
+						@keydown.stop=""
 					></form-input>
+					<button
+						type="button" 
+						class="btn btn-outline-secondary btn-sm copy-btn" 
+						@click="copy" 
+						v-if="mode === 'edit'" 
+						:disabled="!tagData.notiz || tagData.notiz.trim() === ''"
+					>
+						<i class="fa-solid fa-copy"></i>
+					</button>
 					<div class="modificationdate">
 						<span v-if="tagData.verfasser">
 							{{ $p.t('notiz', 'tag_verfasser', { 0: tagData.verfasser, 1: tagData.insertamum }) }}

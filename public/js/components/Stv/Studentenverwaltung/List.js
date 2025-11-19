@@ -4,18 +4,28 @@ import CoreTag from '../../Tag/Tag.js';
 import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import { extendedHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import ApiTag from "../../../api/factory/stv/tag.js";
+import ListFilter from './List/Filter.js';
 
+import draggable from '../../../directives/draggable.js';
 
 export default {
 	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
 		ListNew,
-		CoreTag
+		CoreTag,
+		ListFilter
+	},
+	directives: {
+		draggable
 	},
 	inject: {
-		'lists': {
+		lists: {
 			from: 'lists',
+			required: true
+		},
+		$reloadList: {
+			from: '$reloadList',
 			required: true
 		},
 		currentSemester: {
@@ -131,8 +141,12 @@ export default {
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
-						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
+					{
+						title: "Geburtsdatum",
+						field: "gebdatum",
+						formatter: dateFormatter, 
+						headerFilter: true,
+						headerFilterFunc(headerValue, rowValue) {
 							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
 							let comparestr = headerValue;
 							if(matches !== null) {
@@ -199,10 +213,7 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({url, params});
-					//version with Tags
-					return this.$api.call({url, params});
-
+					return this.$api.call({method: 'post', url, params});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -225,8 +236,7 @@ export default {
 					event: 'dataProcessed',
 					handler: (data) => {
 						this.reexpandRows()
-						this.autoSelectRows()
-						this.$emit('update:selected', {})
+						this.autoSelectRows(data)
 					}
 				},
 				{
@@ -256,8 +266,7 @@ export default {
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
-			filterKontoCount0: undefined,
-			filterKontoMissingCounter: undefined,
+			filter: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
@@ -268,6 +277,56 @@ export default {
 			tagEndpoint: ApiTag
 		}
 	},
+	computed: {
+		countsToHTML: function() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		selectedDragObject() {
+			return this.selected.map(item => {
+				let type, id;
+				if (item.uid) {
+					type = 'student';
+					id = item.uid;
+				} else if (item.prestudent_id) {
+					type = 'prestudent';
+					id = item.prestudent_id;
+				} else if (item.person_id) {
+					type = 'person';
+					id = item.person_id;
+				}
+				return {
+					...item,
+					type,
+					id
+				};
+			});
+		},
+		downloadConfig() {
+			return {
+				csv: {
+					formatter: 'csv',
+					file: this.fileString,
+					options: {
+						delimiter: ';',
+						bom: true,
+					}
+				}
+			};
+		},
+		fileString() {
+			let today = new Date().toLocaleDateString('en-GB')
+				.replace(/\//g, '_');
+			return "StudentList_" + today + ".csv";
+		}
+	},
 	methods: {
 		reload() {
 			this.$refs.table.reloadTable();
@@ -275,7 +334,7 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
 
@@ -284,6 +343,15 @@ export default {
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
 
 			this.$emit('update:selected', data);
+
+			// set selected elements draggable
+			const tableEl = this.$refs.table?.$refs?.table;
+			if (tableEl) {
+				const oldDragables = tableEl.querySelectorAll('[draggable]');
+				for (const draggable of oldDragables)
+					draggable.removeAttribute('draggable');
+			}
+			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
 			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
@@ -301,6 +369,10 @@ export default {
 					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
 				}
 			}
+		},
+		updateFilter(filter) {
+			this.filter = filter;
+			this.updateUrl();
 		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
@@ -322,14 +394,9 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {}, filter = {};
-			if (this.filterKontoCount0)
-				filter.konto_count_0 = this.filterKontoCount0;
-			if (this.filterKontoMissingCounter)
-				filter.konto_missing_counter = this.filterKontoMissingCounter;
-
-			if (filter.konto_count_0 || filter.konto_missing_counter)
-				params.filter = filter;
+			const params = {};
+			if (this.filter.length)
+				params.filter = this.filter;
 
 			if (!this.$refs.table.tableBuilt) {
 				if (!this.$refs.table.tabulator) {
@@ -342,14 +409,22 @@ export default {
 			} else
 				this.$refs.table.tabulator.setData(endpoint.url, params);
 		},
+		dragCleanup(evt) {
+			if (evt.dataTransfer.dropEffect == 'none')
+				return; // aborted or wrong target
+			
+			this.$reloadList();
+		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
 				return;
+
+			var next;
 			switch (e.code) {
 				case 'Enter':
 				case 'Space':
 					e.preventDefault();
-					const e2 = new Event('click', e);
+					var e2 = new Event('click', e);
 					e2.altKey = e.altKey;
 					e2.ctrlKey = e.ctrlKey;
 					e2.shiftKey = e.shiftKey;
@@ -358,13 +433,13 @@ export default {
 					break;
 				case 'ArrowUp':
 					e.preventDefault();
-					var next = this.focusObj.previousElementSibling;
+					next = this.focusObj.previousElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
-					var next = this.focusObj.nextElementSibling;
+					next = this.focusObj.nextElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
@@ -539,24 +614,19 @@ export default {
 		},
 
 	},
-	computed: {
-		countsToHTML: function() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
-		}
-	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
+		<div
+			class="tabulator-container d-flex flex-column h-100"
+			:class="{'has-filter': filter.length}"
+			tabindex="0"
+			@focusin="onFocus"
+			@keydown="onKeydown"
+			v-draggable:copyLink.capture="selectedDragObject"
+			@dragend="dragCleanup"
+		>
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
@@ -565,6 +635,7 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
+				:download="downloadConfig"
 				` + /* TODO(chris): Ausgeblendet für Testing
 				new-btn-show
 				*/`
@@ -586,29 +657,7 @@ export default {
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<div class="input-group mb-3">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-count-0">{{ $p.t('stv/konto_filter_count_0') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-count-0" v-model="filterKontoCount0" @input="$nextTick(updateUrl)">
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoCount0" class="btn btn-outline-secondary" @click="filterKontoCount0 = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
-						<div class="input-group">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-missing-counter">{{ $p.t('stv/konto_filter_missing_counter') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-missing-counter" v-model="filterKontoMissingCounter" @input="$nextTick(updateUrl)">
-								<option value="alle">{{ $p.t('stv/konto_all_types') }}</option>
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoMissingCounter" class="btn btn-outline-secondary" @click="filterKontoMissingCounter = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
+						<list-filter @change="updateFilter" />
 					</div>
 				</div>
 			</template>
