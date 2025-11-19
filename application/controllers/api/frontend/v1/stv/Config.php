@@ -87,6 +87,8 @@ class Config extends FHCAPI_Controller
 			"label" => $this->p->t('stv', 'settings_fontsize'),
 			"value" => $data['stv_font_size'] ?? "fs_normal",
 			"options" => [
+				"fs_xx-small" => $this->p->t('stv', 'settings_fontsize_xx-small'),
+				"fs_x-small" => $this->p->t('stv', 'settings_fontsize_x-small'),
 				"fs_small" => $this->p->t('stv', 'settings_fontsize_small'),
 				"fs_normal" => $this->p->t('stv', 'settings_fontsize_normal'),
 				"fs_big" => $this->p->t('stv', 'settings_fontsize_big'),
@@ -118,7 +120,7 @@ class Config extends FHCAPI_Controller
 		$this->form_validation->set_rules(
 			'font_size',
 			$this->p->t('stv', 'settings_fontsize'),
-			'required|in_list[fs_small,fs_normal,fs_big,fs_huge]'
+			'required|in_list[fs_xx-small,fs_x-small,fs_small,fs_normal,fs_big,fs_huge]'
 		);
 
 		Events::trigger('stv_config_validation', $this->form_validation);

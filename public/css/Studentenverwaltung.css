@@ -11,8 +11,14 @@
 html {
   font-size: .875em;
 }
+html.fs_xx-small {
+	font-size: .5em;
+}
+html.fs_x-small {
+	font-size: .625em;
+}
 html.fs_small {
-  font-size: .5em;
+	font-size: .75em;
 }
 html.fs_normal {
   font-size: .875em;
@@ -21,7 +27,7 @@ html.fs_big {
   font-size: 1em;
 }
 html.fs_huge {
-  font-size: 1.4em;
+	font-size: 1.125em;
 }
 
 #appMenu {
