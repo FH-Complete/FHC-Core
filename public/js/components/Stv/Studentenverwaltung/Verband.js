@@ -191,7 +191,10 @@ export default {
 		async setPreselection()
 		{
 			if (!this.preselectedKey)
+			{
+				this.selectedKey = null;
 				return;
+			}
 
 			let rawKey = this.preselectedKey
 
