@@ -33,6 +33,15 @@ class benutzer extends person
 	public $updateaktivam;
 	public $updateaktivvon;
 
+	// PHP8 adaption
+	public $mitarbeiter_uid;
+	public $studiengang;
+	public $studiengang_kz;
+	public $telefonklappe;
+	public $raum;
+	public $lektor;
+	public $fixangestellt;
+
 	/**
 	 * Konstruktor - Uebergibt die Connection und laedt optional einen Benutzer
 	 * @param $uid            Benutzer der geladen werden soll (default=null)

@@ -411,7 +411,7 @@ class mitarbeiter extends benutzer
 	 * @param $datum_bis
 	 * @return boolean
 	 */
-	public function getMitarbeiterStg($lektor=true,$fixangestellt, $stge, $fkt_kurzbz, $order='studiengang_kz, nachname, vorname, kurzbz', $datum_von='', $datum_bis='')
+	public function getMitarbeiterStg($lektor=true,$fixangestellt=null, $stge=null, $fkt_kurzbz='', $order='studiengang_kz, nachname, vorname, kurzbz', $datum_von='', $datum_bis='')
 	{
 		$sql_query='SELECT DISTINCT campus.vw_mitarbeiter.*, studiengang_kz, tbl_studiengang.typ, tbl_studiengang.kurzbz AS stg_kurzbz FROM campus.vw_mitarbeiter
 					JOIN public.tbl_benutzerfunktion USING (uid) JOIN public.tbl_studiengang USING(oe_kurzbz)
@@ -1554,7 +1554,7 @@ class mitarbeiter extends benutzer
      * @param $studSemArray Array mit Studiensemestern in denen der externe Lektor zumindest in einem Unterrichtet haben soll oder NULL. Wenn NULL werden nur externe Mitarbeiter ohne Lehrauftrag ausgegeben.
      * @return boolean
      */
-    public function getMitarbeiterForZutrittskarte($filter, $fixangestellt=true, $studSemArray)
+    public function getMitarbeiterForZutrittskarte($filter, $fixangestellt=true, $studSemArray=array())
     {
         $qry = "SELECT
                     vorname,nachname,gebdatum,uid,personalnummer,person_id
