@@ -147,6 +147,9 @@
 		generateJSsInclude('vendor/npm-asset/primevue/autocomplete/autocomplete.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/overlaypanel/overlaypanel.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/datatable/datatable.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/fileupload/fileupload.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tabview/tabview.min.js');
+		generateJSsInclude('vendor/npm-asset/primevue/tabpanel/tabpanel.min.js');
         // TODO check ob notwendig
 		generateJSsInclude('vendor/npm-asset/primevue/toast/toast.min.js');
 		generateJSsInclude('vendor/npm-asset/primevue/toastservice/toastservice.min.js');
