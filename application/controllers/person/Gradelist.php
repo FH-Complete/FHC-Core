@@ -213,7 +213,7 @@ class Gradelist extends Auth_Controller
 					'note' => $row_noten->note,
 					'datum' => $row_noten->benotungsdatum,
 					'zugeordnet' => true,
-					'studiengang_kurzbz' => $result_stg->retval[0]->kurzbzlang
+					'studiengang_kurzbz' => isset($result_stg->retval[0]) ? $result_stg->retval[0]->kurzbzlang : null
 				);
 				if(!isset($courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl']))
 					$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl'] = 0;
