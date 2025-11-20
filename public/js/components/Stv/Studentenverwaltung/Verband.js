@@ -21,6 +21,9 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
+		},
+		appConfig: {
+			from: 'appConfig'
 		}
 	},
 	emits: [
@@ -52,12 +55,23 @@ export default {
 				return this.nodes.filter(node => this.favorites.list.includes(node.key));
 			
 			return this.nodes;
+		},
+		noSemReloadNodes() {
+			return this.nodes.reduce(this.mapNodesToNoSemReloadNodes, []);
 		}
 	},
 	watch: {
 		'preselectedKey': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.setPreselection();
+			}
+		},
+		'appConfig.number_displayed_past_studiensemester'(newVal, oldVal) {
+			if (oldVal !== undefined) {
+				this.noSemReloadNodes.forEach(node => {
+					delete node.children;
+					this.onExpandTreeNode(node);
+				});
 			}
 		}
 	},
@@ -115,6 +129,13 @@ export default {
 		onSelectTreeNode(node) {
 			if (node.data.link)
 				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
+		},
+		mapNodesToNoSemReloadNodes(result, node) {
+			if (node.data.no_sem_reload)
+				result.push(node);
+			if (node.children)
+				result = node.children.reduce(this.mapNodesToNoSemReloadNodes, result);
+			return result;
 		},
 		mapResultToTreeData(el) {
 			const cp = {

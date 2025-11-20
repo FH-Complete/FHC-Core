@@ -16,8 +16,10 @@
  */
 
 import CoreSearchbar from "../searchbar/searchbar.js";
+import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import AppMenu from "../AppMenu.js";
+import AppConfig from "../AppConfig.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
 import StvList from "./Studentenverwaltung/List.js";
 import StvDetails from "./Studentenverwaltung/Details.js";
@@ -26,14 +28,17 @@ import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiStv from "../../api/factory/stv.js";
 import ApiStvVerband from '../../api/factory/stv/verband.js';
+import ApiStvConfig from '../../api/factory/stv/config.js';
 
 
 export default {
 	name: 'Studentenverwaltung',
 	components: {
 		CoreSearchbar,
+		NavLanguage,
 		VerticalSplit,
 		AppMenu,
+		AppConfig,
 		StvVerband,
 		StvList,
 		StvDetails,
@@ -45,6 +50,8 @@ export default {
 		permissions: Object,
 		stvRoot: String,
 		cisRoot: String,
+		avatarUrl: String,
+		logoutUrl: String,
 		activeAddons: String, // semicolon separated list of active addons
 		url_studiensemester_kurzbz: String,
 		url_mode: String,
@@ -76,11 +83,14 @@ export default {
 			},
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
-			configUseReihungstestPunkte: this.config.useReihungstestPunkte
+			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
+			appConfig: Vue.computed(() => this.appconfig)
 		}
 	},
 	data() {
 		return {
+			appconfig: {},
+			configEndpoints: ApiStvConfig,
 			selected: [],
 			searchbaroptions: {
 				origin: 'stv',
@@ -149,6 +159,22 @@ export default {
 		},
 		url_prestudent_id() {
 			this.handlePersonUrl();
+		},
+		'appconfig.font_size'() {
+			// add to html class
+			const classList = Object.keys(this.$refs.config.setup.font_size.options);
+			classList.forEach(cn => document.documentElement.classList.remove(cn));
+			document.documentElement.classList.add(this.appconfig.font_size);
+			// recalc Tabulator heights
+			if (this.$el) {
+				const tabulatorEls = this.$el.querySelectorAll('.tabulator');
+				for (const el of tabulatorEls) {
+					const tabulators = Tabulator.findTable(el);
+					if (tabulators) {
+						tabulators[0].searchRows().forEach(row => row.normalizeHeight());
+					}
+				}
+			}
 		}
 	},
 	methods: {
@@ -431,6 +457,51 @@ export default {
 				show-btn-submit
 				@submit.prevent="onSearch"
 			></core-searchbar>
+			<div id="nav-user" class="dropdown">
+				<button
+					id="nav-user-btn"
+					class="btn btn-link rounded-0 py-0"
+					type="button"
+					data-bs-toggle="dropdown"
+					data-bs-target="#nav-user-menu"
+					aria-expanded="false"
+					aria-controls="nav-user-menu"
+				>
+					<img
+						:src="avatarUrl"
+						:alt="$p.t('profilUpdate/profilBild')"
+						class="bg-light avatar rounded-circle border border-light"
+					/>
+				</button>
+				<ul
+					ref="navUserDropdown"
+					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
+					aria-labelledby="nav-user-btn"
+				>
+					<li>
+						<button
+							type="button"
+							class="dropdown-item"
+							data-bs-toggle="modal"
+							data-bs-target="#configModal"
+						>
+							{{ $p.t('ui/settings') }}
+						</button>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<nav-language
+							item-class="dropdown-item border-left-dark"
+						/>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<a class="dropdown-item" :href="logoutUrl">
+							{{ $p.t('ui/logout') }}
+						</a>
+					</li>
+				</ul>
+			</div>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
@@ -462,5 +533,6 @@ export default {
 				</main>
 			</div>
 		</div>
+		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 	</div>`
 };
