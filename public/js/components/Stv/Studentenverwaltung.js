@@ -133,12 +133,52 @@ export default {
 			studiengangKz: undefined,
 			studiengangKuerzel: '',
 			studiensemesterKurzbz: this.defaultSemester,
+			selected_semester: undefined,
+			selected_orgform: undefined,
 			lists: {
 				nations: [],
 				sprachen: [],
 				geschlechter: []
 			},
 			verbandEndpoint: ApiStvVerband
+		}
+	},
+	computed: {
+		appMenuExtraItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined && this.selected_semester !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+				const semester = String(this.selected_semester);
+				const orgform = this.selected_orgform || '';
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/notenspiegel.php?type=xls'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&orgform=' + orgform,
+					description: 'stv/grade_report_xls'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/notenspiegel_erweitert.php?typ=xls'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&orgform=' + orgform,
+					description: 'stv/grade_report_xls_extended'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/notenspiegel.php?type=html'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&orgform=' + orgform,
+					description: 'stv/grade_report_html'
+				});
+			}
+
+			return extraItems;
 		}
 	},
 	watch: {
@@ -211,7 +251,7 @@ export default {
 				+ data.person_id
 				);
 		},
-		onSelectVerband( {link, studiengang_kz}) {
+		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz }) {
 			let urlpath = String(link);
 			if (!urlpath.match(/\/prestudent/))
 			{
@@ -220,6 +260,8 @@ export default {
 			this.$refs.stvList.updateUrl(ApiStv.students.verband(urlpath));
 
 			this.studiengangKz = studiengang_kz;
+			this.selected_semester = semester;
+			this.selected_orgform = orgform_kurzbz;
 			const stg = this.lists.stgs.find((element) => {
 				return (element.studiengang_kz === this.studiengangKz);
 			});
@@ -511,7 +553,31 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<div class="offcanvas-body">
-						<app-menu app-identifier="stv" />
+						<app-menu app-identifier="stv">
+							<li class="dropend">
+								<a
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									:class="{ disabled: !appMenuExtraItems.length }"
+									data-bs-popper-config='{"strategy":"fixed"}'
+								>
+									{{ $p.t('stv/grade_report') }}
+								</a>
+								<ul class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuExtraItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+						</app-menu>
 					</div>
 				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">

@@ -183,6 +183,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addOrder('semester');
 
 		if ($org_form !== null) {
+			$this->StudiengangModel->addSelect("v.orgform_kurzbz");
 			$this->StudiengangModel->db->group_start();
 			$this->StudiengangModel->db->where('v.semester', 0);
 			$this->StudiengangModel->db->or_where('v.orgform_kurzbz', $org_form);
