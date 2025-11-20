@@ -1,5 +1,4 @@
 import AbgabeDetail from "./AbgabeStudentDetail.js";
-import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
 
@@ -10,8 +9,7 @@ export const AbgabetoolStudent = {
 		Accordion: primevue.accordion,
 		AccordionTab: primevue.accordiontab,
 		BsModal,
-		AbgabeDetail,
-		VerticalSplit
+		AbgabeDetail
 	},
 	inject: ['isMobile'],
 	provide() {
@@ -124,7 +122,6 @@ export const AbgabetoolStudent = {
 				this.selectedProjektarbeit = pa
 
 				this.$refs.modalContainerAbgabeDetail.show()
-				// this.$refs.verticalsplit.showBoth()
 				
 			}).finally(()=>{this.loading=false})
 		},

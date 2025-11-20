@@ -1,6 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
-import VerticalSplit from "../../verticalsplit/verticalsplit.js"
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
@@ -11,7 +10,6 @@ export const AbgabetoolMitarbeiter = {
 		BsModal,
 		CoreFilterCmpt,
 		AbgabeDetail,
-		VerticalSplit,
 		Dropdown: primevue.dropdown,
 		Textarea: primevue.textarea,
 		VueDatePicker
@@ -355,7 +353,6 @@ export const AbgabetoolMitarbeiter = {
 
 			this.loadProjektarbeiten()
 
-			// this.$refs.verticalsplit.collapseBottom()
 			this.calcMaxTableHeight()
 			
 		}

@@ -214,9 +214,6 @@ export const AbgabeStudentDetail = {
 			
 			
 		},
-		openBeurteilungLink(link) {
-			window.open(link, '_blank')
-		},
 		getOptionLabel(option) {
 			return option.sprache
 		},
