@@ -1,6 +1,7 @@
 import AbgabeDetail from "./AbgabeStudentDetail.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
 const today = new Date()
 export const AbgabetoolStudent = {
@@ -9,7 +10,8 @@ export const AbgabetoolStudent = {
 		Accordion: primevue.accordion,
 		AccordionTab: primevue.accordiontab,
 		BsModal,
-		AbgabeDetail
+		AbgabeDetail,
+		FhcOverlay
 	},
 	inject: ['isMobile'],
 	provide() {
@@ -266,9 +268,7 @@ export const AbgabetoolStudent = {
 	},
 	template: `
 <template v-if="phrasenResolved">
-	<div id="loadingOverlay" v-show="loading || saving" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
-		<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
-	</div>
+	<FhcOverlay :active="loading || saving"></FhcOverlay>
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 		dialogClass="modal-xl" :allowFullscreenExpand="true">

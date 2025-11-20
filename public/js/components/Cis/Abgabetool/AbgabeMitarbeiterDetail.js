@@ -774,7 +774,7 @@ export const AbgabeMitarbeiterDetail = {
 		</Accordion>
 		
 		<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
-			<h3>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h3>
+			<h5>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h5>
 		</div>
 		
 	</div>

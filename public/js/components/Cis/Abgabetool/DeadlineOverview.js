@@ -26,6 +26,8 @@ export const DeadlineOverview = {
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
+			phrasenPromise: null,
+			phrasenResolved: false,
 			deadlineTableOptions: {
 				height: 700,
 				index: 'projektarbeit_id',
@@ -128,7 +130,8 @@ export const DeadlineOverview = {
 
 	},
 	created() {
-
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 	},
 	mounted() {
 		this.setupMounted()

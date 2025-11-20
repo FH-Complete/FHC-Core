@@ -3,6 +3,7 @@ import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -12,7 +13,8 @@ export const AbgabetoolMitarbeiter = {
 		AbgabeDetail,
 		Dropdown: primevue.dropdown,
 		Textarea: primevue.textarea,
-		VueDatePicker
+		VueDatePicker,
+		FhcOverlay
 	},
 	provide() {
 		return {
@@ -354,7 +356,7 @@ export const AbgabetoolMitarbeiter = {
 			this.loadProjektarbeiten()
 
 			this.calcMaxTableHeight()
-			
+
 		}
 	},
 	watch: {
@@ -400,9 +402,7 @@ export const AbgabetoolMitarbeiter = {
 	},
 	template: `
 	<template v-if="phrasenResolved">
-		<div id="loadingOverlay" v-show="loading || saving" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
-			<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
-		</div>
+		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
 			dialogClass="modal-lg">

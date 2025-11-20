@@ -2,6 +2,7 @@ import Upload from '../../../components/Form/Upload/Dms.js';
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
@@ -16,7 +17,8 @@ export const AbgabeStudentDetail = {
 		AccordionTab: primevue.accordiontab,
 		Message: primevue.message,
 		Inplace: primevue.inplace,
-		VueDatePicker
+		VueDatePicker,
+		FhcOverlay
 	},
 	inject: ['notenOptions', 'isMobile', 'isViewMode'],
 	props: {
@@ -356,9 +358,7 @@ export const AbgabeStudentDetail = {
 
 	},
 	template: `
-		<div id="loadingOverlay" v-show="loading" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
-			<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
-		</div>
+		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<div v-if="projektarbeit">
 		

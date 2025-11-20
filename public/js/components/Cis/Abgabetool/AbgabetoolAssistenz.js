@@ -1,12 +1,12 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import AbgabeDetail from "./AbgabeMitarbeiterDetail.js";
-import VerticalSplit from "../../verticalsplit/verticalsplit.js"
 import BsModal from '../../Bootstrap/Modal.js';
 import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
 // spoofed date testing
 // const todayISO = '2025-08-08'
@@ -25,13 +25,13 @@ export const AbgabetoolAssistenz = {
 		BsOffcanvas,
 		CoreFilterCmpt,
 		AbgabeDetail,
-		VerticalSplit,
 		Checkbox: primevue.checkbox,
 		Dropdown: primevue.dropdown,
 		Inplace: primevue.inplace,
 		Textarea: primevue.textarea,
 		Timeline: primevue.timeline,
-		VueDatePicker
+		VueDatePicker,
+		FhcOverlay
 	},
 	provide() {
 		return {
@@ -814,9 +814,7 @@ export const AbgabetoolAssistenz = {
 	},
 	template: `
 	<template v-if="phrasenResolved">
-		<div id="loadingOverlay" v-show="loading || saving" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
-			<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
-		</div>
+		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
 			dialogClass="modal-lg">
