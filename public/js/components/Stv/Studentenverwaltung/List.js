@@ -133,7 +133,12 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({method: 'post', url, params});
+					/**
+					 * NOTE(chris): Because of a bug in Tabulator
+					 * we need to get the params from elsewhere.
+					 * @see https://github.com/olifolkerd/tabulator/issues/4318
+					 */
+					return this.$api.call({...config, url, params: this.tabulatorOptions.ajaxParams});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -294,16 +299,17 @@ export default {
 			if (this.filter.length)
 				params.filter = this.filter;
 
+			this.tabulatorOptions.ajaxURL = endpoint.url;
+			this.tabulatorOptions.ajaxParams = { ...params };
+			this.tabulatorOptions.ajaxConfig = method;
 			if (!this.$refs.table.tableBuilt) {
-				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = endpoint.url;
-					this.tabulatorOptions.ajaxParams = params;
-				} else
+				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(endpoint.url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params, method);
 					});
+				}
 			} else
-				this.$refs.table.tabulator.setData(endpoint.url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
 		dragCleanup(evt) {
 			if (evt.dataTransfer.dropEffect == 'none')

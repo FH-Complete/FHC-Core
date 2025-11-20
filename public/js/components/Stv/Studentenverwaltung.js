@@ -146,6 +146,9 @@ export default {
 		},
 		'url_mode': function () {
 			this.handlePersonUrl();
+		},
+		url_prestudent_id() {
+			this.handlePersonUrl();
 		}
 	},
 	methods: {
@@ -159,7 +162,7 @@ export default {
 			}
 		},
 		buildPrestudentSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/prestudent/'
@@ -167,7 +170,7 @@ export default {
 				);
 		},
 		buildStudentSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/student/'
@@ -175,7 +178,7 @@ export default {
 				);
 		},
 		buildPersonSearchResultLink(data) {
-			return this.$fhcApi.getUri(
+			return this.$api.getUri(
 				'/studentenverwaltung'
 				+ '/' + this.studiensemesterKurzbz
 				+ '/person/'
@@ -249,6 +252,21 @@ export default {
 					ApiStv.students.person(this.$route.params.person_id, 'CURRENT_SEMESTER'),
 					true
 					);
+			} else if (this.$route.params.searchstr) {
+				const searchsettings = {
+					searchstr: this.$route.params.searchstr,
+					types: this.$route.params.types?.split('+') || []
+				};
+
+				// init into student list
+				this.$refs.stvList.updateUrl(
+					ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
+				);
+
+				// init into searchbar
+				this.$refs.searchbar.searchsettings.searchstr = searchsettings.searchstr;
+				this.$refs.searchbar.searchsettings.types = searchsettings.types;
+				this.$nextTick(this.blurSearchbar);
 			}
 		},
 		checkUrlStudiengang() {
@@ -269,6 +287,36 @@ export default {
 					});
 				}
 			}
+		},
+		onSearch(e) {
+			const searchsettings = { ...this.$refs.searchbar.searchsettings };
+			if (searchsettings.searchstr.length >= 2) {
+				this.blurSearchbar();
+				
+				if (!searchsettings.types.length || searchsettings.types.length == this.$refs.searchbar.types.length) {
+					this.$router.push({
+						name: 'search',
+						params: {
+							studiensemester_kurzbz: this.studiensemesterKurzbz,
+							searchstr: searchsettings.searchstr
+						}
+					});
+				} else {
+					this.$router.push({
+						name: 'search_w_types',
+						params: {
+							studiensemester_kurzbz: this.studiensemesterKurzbz,
+							searchstr: searchsettings.searchstr,
+							types: searchsettings.types.join('+')
+						}
+					});
+				}
+			}
+		},
+		blurSearchbar() {
+			this.$refs.searchbar.$refs.input.blur();
+			this.$refs.searchbar.abort();
+			this.$refs.searchbar.hideresult();
 		}
 	},
 	created() {
@@ -376,9 +424,12 @@ export default {
 				<span class="fa-solid fa-table-list"></span>
 			</button>
 			<core-searchbar
+				ref="searchbar"
 				:searchoptions="searchbaroptions"
 				:searchfunction="searchfunction"
 				class="searchbar position-relative w-100"
+				show-btn-submit
+				@submit.prevent="onSearch"
 			></core-searchbar>
 		</header>
 		<div class="container-fluid overflow-hidden">
