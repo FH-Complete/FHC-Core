@@ -16,6 +16,8 @@ import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
+import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
+import OverviewLvPlan from "../../components/Cis/LvPlan/OverviewLvPlan.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
@@ -184,6 +186,26 @@ const router = VueRouter.createRouter({
 			path: `/Cis/MyLvPlan/:mode?/:focus_date?`,
 			name: 'MyLvPlan',
 			component: MyLvPlan,
+			props(route) {
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+			path: `/Cis/StgOrgLvPlan/:mode?/:focus_date?`,
+			name: 'StgOrgLvPlan',
+			component: StgOrgLvPlan,
+			props(route) {
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+			path: `/Cis/OverviewLvPlan`,
+			name: 'OverviewLvPlan',
+			component: OverviewLvPlan,
 			props(route) {
 				return {
 					propsViewData: route.params

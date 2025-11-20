@@ -41,7 +41,12 @@ class LvPlan extends FHCAPI_Controller
 			'getLehreinheitStudiensemester' => self::PERM_LOGGED,
 			'studiensemesterDateInterval' => self::PERM_LOGGED,
 			'getLvPlanForStudiensemester' => self::PERM_LOGGED,
-			'getLv' => self::PERM_LOGGED
+			'getLv' => self::PERM_LOGGED,
+			'eventsStgOrg' => self::PERM_LOGGED,
+			'fetchFerienEvents' => self::PERM_LOGGED,
+			'getStudiengaenge' => self::PERM_LOGGED,
+			'getLehrverband' => self::PERM_LOGGED,
+
 		]);
 
         $this->load->library('LogLib');
@@ -83,7 +88,7 @@ class LvPlan extends FHCAPI_Controller
 		// form validation
 		$this->form_validation->set_rules('start_date', "start_date", "required");
 		$this->form_validation->set_rules('end_date', "end_date", "required");
-		
+
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
@@ -100,11 +105,54 @@ class LvPlan extends FHCAPI_Controller
 
 		// fetching ferien events
 		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
-		
+
 
 		$this->terminateWithSuccess(array_merge(
 			$lvplanEvents,
 			$moodleEvents,
+			$ferienEvents
+		));
+	}
+
+	/**
+	 * fetches LvPlan for studiengang / semester / verband / gruppe
+	 *
+	 * @access public
+	 */
+	public function eventsStgOrg()
+	{
+		$this->load->library('StundenplanLib');
+
+		// form validation
+		$this->form_validation->set_rules('start_date', "start_date", "required");
+		$this->form_validation->set_rules('end_date', "end_date", "required");
+		//$this->form_validation->set_rules('stg_kz', "stg_kz", "required"); //no validation show empty calendar
+
+		if (!$this->form_validation->run())
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+			$stgOrgEvents = [];
+			$ferienEvents = [];
+		}
+
+		else
+		{
+			$start_date = $this->input->post('start_date', true);
+			$end_date = $this->input->post('end_date', true);
+			$stg_kz = $this->input->post('stg_kz', true);
+			$sem = $this->input->post('sem', true);
+			$verband = $this->input->post('verband', true);
+			$gruppe = $this->input->post('gruppe', true);
+
+			$result = $this->stundenplanlib->getEventsStgOrg($start_date, $end_date, $stg_kz, $sem, $verband, $gruppe);
+			$stgOrgEvents = $this->getDataOrTerminateWithError($result);
+
+			$result = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $stg_kz);
+			$ferienEvents = $this->getDataOrTerminateWithError($result);
+		}
+
+		$this->terminateWithSuccess(array_merge(
+			$stgOrgEvents,
 			$ferienEvents
 		));
 	}
@@ -137,7 +185,6 @@ class LvPlan extends FHCAPI_Controller
 
 		// fetching ferien events
 		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
-		
 
 		$this->terminateWithSuccess(array_merge(
 			$lvplanEvents,
@@ -287,6 +334,48 @@ class LvPlan extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current($result));
 	}
 
+	public function getStudiengaenge()
+	{
+		$this->load->model('organisation/Studiengang_model','StudiengangModel');
+
+		$this->StudiengangModel->addOrder('typ');
+		$this->StudiengangModel->addOrder('kurzbz');
+		$result = $this->StudiengangModel->loadWhere([
+			'aktiv' => true
+		]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess($data);
+	}
+
+	public function getLehrverband($studiengang_kz, $semester=null, $verband=null)
+	{
+		$this->load->model('organisation/Lehrverband_model','LehrverbandModel');
+
+		$where = [
+			'aktiv' => true,
+			'studiengang_kz' => $studiengang_kz,
+		];
+
+		if ($semester !== null  && $semester !== 'null') {
+			$where['semester'] = $semester;
+		}
+		if ($verband !== null  && $verband !== 'null') {
+			$where['verband'] = $verband;
+		}
+
+		$this->LehrverbandModel->addOrder('studiengang_kz');
+		$this->LehrverbandModel->addOrder('semester');
+		$this->LehrverbandModel->addOrder('verband');
+		$this->LehrverbandModel->addOrder('gruppe');
+		$result = $this->LehrverbandModel->loadWhere($where);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess($data);
+	}
+
 	/**
 	 * fetch moodle events
 	 *
@@ -338,7 +427,7 @@ class LvPlan extends FHCAPI_Controller
 
 		$currentStudiensemester = $this->StudiensemesterModel->getByDate($start_date);
 		$currentStudiensemester = $this->getDataOrTerminateWithError($currentStudiensemester);
-		
+
 		if ($currentStudiensemester) {
 			$studentsemester_kurzbz = current($currentStudiensemester)->studiensemester_kurzbz;
 
@@ -347,7 +436,7 @@ class LvPlan extends FHCAPI_Controller
 				"studiensemester_kurzbz" => $studentsemester_kurzbz
 			]);
 			$studiengang = $this->getDataOrTerminateWithError($studiengang);
-			
+
 			if ($studiengang)
 				$studiengang_kz = current($studiengang)->studiengang_kz;
 			else
@@ -357,7 +446,7 @@ class LvPlan extends FHCAPI_Controller
 		}
 
 		$ferienEvents = $this->stundenplanlib->fetchFerienTageEvents($start_date, $end_date, $studiengang_kz);
-		
+
 		return $this->getDataOrTerminateWithError($ferienEvents);
 	}
 }

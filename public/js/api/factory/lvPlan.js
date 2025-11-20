@@ -92,5 +92,32 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/LvPlan/getLv/' + lehrveranstaltung_id
 		};
-	}
+	},
+	eventsStgOrg(start_date, end_date, stg_kz, sem, verband, gruppe) {
+		console.log("stg_Kz" + stg_kz + " sem " + sem + " vb " + verband + " gr " + gruppe);
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/lvPlan/eventsStgOrg',
+			params: { start_date, end_date, stg_kz, sem, verband, gruppe }
+		};
+	},
+	getStudiengaenge(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/lvPlan/getStudiengaenge'
+		}
+	},
+	getLehrverband(stg_kz, sem){
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/lvPlan/getLehrverband/${stg_kz}/${sem}`
+		}
+	},
+	getGruppe(stg_kz, sem, verband){
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/lvPlan/getLehrverband/${stg_kz}/${sem}/${verband}`
+		}
+	},
+
 };
