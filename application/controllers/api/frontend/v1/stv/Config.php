@@ -33,6 +33,7 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
+			'filter' => ['admin:r', 'assistenz:r'],
 			'student' => ['admin:r', 'assistenz:r'],
 			'students' => ['admin:r', 'assistenz:r']
 		]);
@@ -45,11 +46,164 @@ class Config extends FHCAPI_Controller
 			'lehre',
 			'stv',
 			'konto',
-			'abschlusspruefung'
+			'abschlusspruefung',
+			'projektarbeit'
 		]);
 
 		// Load Config
 		$this->load->config('stv');
+	}
+
+	/**
+	 * Get the config for the student filters
+	 *
+	 * @return void
+	 */
+	public function filter()
+	{
+		$this->load->library('VariableLib', ['uid' => getAuthUID()]);
+
+		$this->load->model('crm/Buchungstyp_model', 'BuchungstypModel');
+
+		$this->BuchungstypModel->addOrder('beschreibung');
+		
+		$result = $this->BuchungstypModel->load();
+
+		$buchungstyp_kurzbz = $this->getDataOrTerminateWithError($result);
+		$buchungstyp_kurzbz_plus_all = array_merge([[
+			'buchungstyp_kurzbz' => 'all',
+			'beschreibung' => $this->p->t('stv', 'konto_all_types')
+		]], $buchungstyp_kurzbz);
+
+		$this->load->model('crm/Statusgrund_model', 'StatusgrundModel');
+
+		$result = $this->StatusgrundModel->getAktiveGruende();
+		
+		$statusgruende = $this->getDataOrTerminateWithError($result);
+
+		$result = [];
+
+		$result[] = [
+			'id' => 'filter_konto_count_0',
+			'label' => $this->p->t('stv', 'filter_konto_count_0'),
+			'type' => 'konto',
+			'fixed' => [
+				'missing' => true,
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_counter',
+			'label' => $this->p->t('stv', 'filter_konto_missing_counter'),
+			'type' => 'konto_counter',
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz_plus_all,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				],
+				'samestg' => [
+					'type' => 'bool',
+					'label' => $this->p->t('stv', 'filter_konto_samestg'),
+					'default' => $this->variablelib->getVar('kontofilterstg') == 'true'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_documents',
+			'label' => $this->p->t('stv', 'filter_documents'),
+			'type' => 'documents'
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_counter_past',
+			'label' => $this->p->t('stv', 'filter_konto_missing_counter_past'),
+			'type' => 'konto_counter',
+			'fixed' => [
+				'past' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz_plus_all,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				],
+				'samestg' => [
+					'type' => 'bool',
+					'label' => $this->p->t('stv', 'filter_konto_samestg'),
+					'default' => $this->variablelib->getVar('kontofilterstg') == 'true'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_missing_studiengebuehr',
+			'label' => $this->p->t('stv', 'filter_konto_missing_studiengebuehr'),
+			'type' => 'konto',
+			'fixed' => [
+				'missing' => true,
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_konto_studiengebuehrerhoeht',
+			'label' => $this->p->t('stv', 'filter_konto_studiengebuehrerhoeht'),
+			'type' => 'konto',
+			'fixed' => [
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'buchungstyp_kurzbz' => [
+					'type' => 'select',
+					'values' => $buchungstyp_kurzbz,
+					'value_key' => 'buchungstyp_kurzbz',
+					'label_key' => 'beschreibung'
+				]
+			]
+		];
+		$result[] = [
+			'id' => 'filter_zgv_without_date',
+			'label' => $this->p->t('stv', 'filter_zgv_without_date'),
+			'type' => 'zgv'
+		];
+		$result[] = [
+			'id' => 'filter_statusgrund',
+			'label' => $this->p->t('stv', 'filter_statusgrund'),
+			'type' => 'statusgrund',
+			'fixed' => [
+				'usestdsem' => true
+			],
+			'dynamic' => [
+				'statusgrund_id' => [
+					'type' => 'select',
+					'values' => $statusgruende,
+					'value_key' => 'statusgrund_id',
+					'label_key' => 'bezeichnung'
+				]
+			]
+		];
+
+		Events::trigger('stv_conf_filter', function & () use (&$result) {
+			return $result;
+		});
+
+		$this->terminateWithSuccess($result);
 	}
 
 	public function student()
@@ -59,21 +213,21 @@ class Config extends FHCAPI_Controller
 
 		$result['details'] = [
 			'title' => $this->p->t('stv', 'tab_details'),
-			'component' => './Stv/Studentenverwaltung/Details/Details.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Details.js'),
 			'config' => $config['details']
 		];
 
 		$result['notes'] = [
 			'title' => $this->p->t('stv', 'tab_notes'),
-			'component' => './Stv/Studentenverwaltung/Details/Notizen.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Notizen.js'),
 			'config'	=> $config['notes'],
 			'showSuffix' => ($config['notes']['showCountNotes'] ?? false),
-			'suffixhelper' => APP_ROOT . 'public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js'
+			'suffixhelper' => absoluteJsImportUrl('public/js/helpers/Stv/Studentenverwaltung/Details/Notizen/NotizenSuffixHelper.js')
 		];
 
 		$result['contact'] = [
 			'title' => $this->p->t('stv', 'tab_contact'),
-			'component' => './Stv/Studentenverwaltung/Details/Kontakt.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontakt.js'),
 			'config' => [
 				'showBankaccount' => $this->permissionlib->isBerechtigt('mitarbeiter/bankdaten')
 					|| $this->permissionlib->isBerechtigt('student/bankdaten')
@@ -81,20 +235,20 @@ class Config extends FHCAPI_Controller
 		];
 		$result['prestudent'] = [
 			'title' => $this->p->t('stv', 'tab_prestudent'),
-			'component' => './Stv/Studentenverwaltung/Details/Prestudent.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Prestudent.js'),
 			'config' => $config['prestudent']
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js')
 		];
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
-			'component' => './Stv/Studentenverwaltung/Details/Dokumente.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Dokumente.js')
 		];
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
-			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Konto.js'),
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
 				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
@@ -106,20 +260,23 @@ class Config extends FHCAPI_Controller
 		];
 		$result['resources'] = [
 			'title' => $this->p->t('stv', 'tab_resources'),
-			'component' => './Stv/Studentenverwaltung/Details/Betriebsmittel.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Betriebsmittel.js'),
+			'showOnlyWithUid' => true
 		];
 		$result['groups'] = [
 			'title' => $this->p->t('stv', 'tab_groups'),
-			'component' => './Stv/Studentenverwaltung/Details/Gruppen.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Groups.js'),
+			'showOnlyWithUid' => true
 		];
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
-			'component' => './Stv/Studentenverwaltung/Details/Messages.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Messages.js'),
+			'showOnlyWithUid' => true
 		];
 
 		$result['grades'] = [
 			'title' => $this->p->t('stv', 'tab_grades'),
-			'component' => './Stv/Studentenverwaltung/Details/Noten.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Noten.js'),
 			'showOnlyWithUid' => true,
 			'config' => [
 				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
@@ -132,29 +289,42 @@ class Config extends FHCAPI_Controller
 
 		$result['exam'] = [
 			'title' => $this->p->t('stv', 'tab_exam'),
-			'component' => './Stv/Studentenverwaltung/Details/Pruefung.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Pruefung.js'),
+			'showOnlyWithUid' => true
 		];
 
 		$result['exemptions'] = [
 			'title' => $this->p->t('lehre', 'anrechnungen'),
-			'component' => './Stv/Studentenverwaltung/Details/Anrechnungen.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Anrechnungen.js'),
 			'config' => $config['exemptions']
 		];
 
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
-			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js'),
+			'showOnlyWithUid' => true,
 			'config' => $config['finalexam']
+		];
+
+		$result['projektarbeit'] = [
+			'title' => $this->p->t('stv', 'tab_projektarbeit'),
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Projektarbeit.js'),
+			'config' => array_merge(
+				$config['projektarbeit'],
+				['showVertragsdetails' =>
+					defined('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN') && FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN]
+			)
 		];
 
 		$result['mobility'] = [
 			'title' => $this->p->t('stv', 'tab_mobility'),
-			'component' => './Stv/Studentenverwaltung/Details/Mobility.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Mobility.js'),
+			'showOnlyWithUid' => true
 		];
 
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
 			'config' => [
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
@@ -162,22 +332,24 @@ class Config extends FHCAPI_Controller
 
 		$result['jointstudies'] = [
 			'title' => $this->p->t('stv', 'tab_jointstudies'),
-			'component' => './Stv/Studentenverwaltung/Details/JointStudies.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/JointStudies.js'),
+			'showOnlyWithUid' => true
 		];
 
 		$result['coursedates'] = [
 			'title' => $this->p->t('stv', 'tab_courseDates'),
-			'component' => './Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Lehrveranstaltungstermine.js')
 		];
 
 		$result['admissionDates'] = [
 			'title' => $this->p->t('stv', 'tab_admissionDates'),
-			'component' => './Stv/Studentenverwaltung/Details/Aufnahmetermine.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Aufnahmetermine.js')
 		];
 
 		$result['functions'] = [
 			'title' => $this->p->t('stv', 'tab_functions'),
-			'component' => './Stv/Studentenverwaltung/Details/Funktionen.js'
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Funktionen.js'),
+			'showOnlyWithUid' => true
 		];
 
 		Events::trigger('stv_conf_student', function & () use (&$result) {
@@ -195,7 +367,7 @@ class Config extends FHCAPI_Controller
 		$config = $this->config->item('tabs');
 		$result['banking'] = [
 			'title' => $this->p->t('stv', 'tab_banking'),
-			'component' => './Stv/Studentenverwaltung/Details/Konto.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Konto.js'),
 			'config' => [
 				'showZahlungsbestaetigung' => (defined('ZAHLUNGSBESTAETIGUNG_ANZEIGEN') && ZAHLUNGSBESTAETIGUNG_ANZEIGEN),
 				'showBuchungsnr' => $this->permissionlib->isBerechtigt('admin'),
@@ -205,9 +377,14 @@ class Config extends FHCAPI_Controller
 				'additionalCols' => []
 			]
 		];
+		$result['groups'] = [
+			'title' => $this->p->t('stv', 'tab_groups'),
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Groups.js'),
+			'showOnlyWithUid' => true
+		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => './Stv/Studentenverwaltung/Details/MultiStatus.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
 			'config' => [
 				'changeStatusToAbbrecherStgl' => $this->permissionlib->isBerechtigt('admin'),
 				'changeStatusToAbbrecherStud' => $this->permissionlib->isBerechtigt('admin'),
@@ -218,12 +395,13 @@ class Config extends FHCAPI_Controller
 		];
 		$result['finalexam'] = [
 			'title' => $this->p->t('stv', 'tab_finalexam'),
-			'component' => './Stv/Studentenverwaltung/Details/Abschlusspruefung.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Abschlusspruefung.js'),
+			'showOnlyWithUid' => true,
 			'config' => $config['finalexam']
 		];
 		$result['archive'] = [
 			'title' => $this->p->t('stv', 'tab_archive'),
-			'component' => './Stv/Studentenverwaltung/Details/Archiv.js',
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Archiv.js'),
 			'config' => [
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
@@ -232,6 +410,11 @@ class Config extends FHCAPI_Controller
 			'title' => $this->p->t('stv', 'tab_combine_people'),
 			'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
 			'config' => $config['combinePeople']
+		];
+
+		$result['kontaktieren'] = [
+			'title' => $this->p->t('stv', 'tab_kontaktieren'),
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontaktieren.js'),
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {

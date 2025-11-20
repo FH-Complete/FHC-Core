@@ -219,7 +219,10 @@ export default {
 				height: '100%',
 				selectable: 1,
 				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis'
+				persistenceID: 'stv-details-noten-zeugnis-2025111801',
+				persistence:{
+					columns: ["width", "visible", "frozen"]
+				}
 			};
 		}
 	},

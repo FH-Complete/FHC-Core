@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -51,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   my-controller/my-method -> my_controller/my_method
 */
 $route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
-$route['translate_uri_dashes'] = FALSE;
+$route['translate_uri_dashes'] = false;
 
 // Class name conflicts
 $route['api/v1/organisation/[S|s]tudiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
@@ -71,9 +71,9 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv
 
 // (studiensemester_kurzbz)/inout[/(incoming|outgoing|gemeinsamestudien)]
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout'] = 'api/frontend/v1/stv/Students/index';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/incoming'] = 'api/frontend/v1/stv/Students/getIncoming';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/outgoing'] = 'api/frontend/v1/stv/Students/getOutgoing';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/gemeinsamestudien'] = 'api/frontend/v1/stv/Students/getGemeinsamestudien';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/incoming'] = 'api/frontend/v1/stv/Students/getIncoming/$1';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/outgoing'] = 'api/frontend/v1/stv/Students/getOutgoing/$1';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/gemeinsamestudien'] = 'api/frontend/v1/stv/Students/getGemeinsamestudien/$1';
 
 // (studiengang_kz)/prestudent[/(studiensemester_kurzbz)[/(filter)[/(otherfilter)]]]
 $route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent'] = 'api/frontend/v1/stv/Students/getPrestudents/$1';

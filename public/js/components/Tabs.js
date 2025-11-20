@@ -214,10 +214,12 @@ export default {
 	template: `
 	<template v-if="useprimevue">
 
-		<tabview 
+		<tabview
+			class="d-flex flex-column"
 			:scrollable="true"
 			:lazy="true"
 			:activeIndex="calcActiveIndex"
+			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll', style: 'flex: 1 1 auto;'}}"
 			@tab-click="handleTabClick"
 		>
 			<tabpanel
