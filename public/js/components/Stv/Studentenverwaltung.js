@@ -95,6 +95,7 @@ export default {
 			searchbaroptions: {
 				origin: 'stv',
 				calcheightonly: true,
+				nolivesearch: true,
 				types: {
 					student: Vue.computed(() => this.$p.t('search/type_student')),
 					prestudent: Vue.computed(() => this.$p.t('search/type_prestudent'))

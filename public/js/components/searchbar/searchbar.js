@@ -304,6 +304,8 @@ export default {
             this.calcSearchResultHeight();
         },
         search: function() {
+            if(this.searchoptions?.nolivesearch === true) return;
+
             this.abort();
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
@@ -417,6 +419,8 @@ export default {
             window.removeEventListener('resize', this.calcSearchResultExtent);
         },
         showsearchresult: function() {
+            if(this.searchoptions?.nolivesearch === true) return;
+
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.showresult = true;
                 window.addEventListener('resize', this.calcSearchResultExtent);
