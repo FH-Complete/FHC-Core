@@ -286,7 +286,7 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester vnull-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
