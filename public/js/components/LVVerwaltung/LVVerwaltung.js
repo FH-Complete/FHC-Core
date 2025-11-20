@@ -124,6 +124,10 @@ export default {
 					? `${this.stg}/${this.semester}`
 					: this.stg;
 			}
+			else
+			{
+				this.selectedStudiengang = '';
+			}
 			this.filter = filter;
 		},
 		handleRowClicked(data)
@@ -163,6 +167,7 @@ export default {
 			const routeName = this.filter.emp ? 'byEmp' : 'byStg';
 			const params = { stg };
 
+			params.semester = '';
 			if (semester !== null)
 				params.semester = semester;
 			if (studiensemester_kurzbz)
@@ -281,7 +286,7 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+					<stv-studiensemester vnull-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">

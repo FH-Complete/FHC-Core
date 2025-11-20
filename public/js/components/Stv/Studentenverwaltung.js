@@ -356,6 +356,18 @@ export default {
 					});
 				}
 			}
+			else
+			{
+				this.studiengangKz = undefined;
+				this.studiengangKuerzel = '';
+				if(['index', 'studiensemester'].includes(this.$route.name))
+				{
+					if(this.$refs?.stvList?.$refs?.table?.tabulator)
+					{
+						this.$refs.stvList.$refs.table.tabulator.setData([]);
+					}
+				}
+			}
 		},
 		onSearch(e) {
 			const searchsettings = { ...this.$refs.searchbar.searchsettings };
@@ -585,7 +597,7 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband :preselectedKey="'' + studiengangKz" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">

@@ -16,14 +16,17 @@ export default {
 	inject: {
 		$reloadList: {
 			from: '$reloadList',
-			required: true
+			default: () => {}
 		},
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
 		},
 		appConfig: {
-			from: 'appConfig'
+			from: 'appConfig',
+			default: {
+				number_displayed_past_studiensemester: 5
+			}
 		}
 	},
 	emits: [
@@ -208,22 +211,25 @@ export default {
 			if (!currentNode)
 				return;
 
-			const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
-			if (currentSelectedKey) {
-				if (currentSelectedKey == currentKey)
-					return;
-				/**
-				 * Do not select a new entry if the current is a child of the new one.
-				 * This happens if a child entry of a new stg is selected and the router
-				 * tries to select the stg root entry (because subtrees do not have
-				 * routes yet)
-				 */
-				const isChild = this.findNodeByKey(
-					currentSelectedKey,
-					currentNode.children
-				);
-				if (isChild)
-					return;
+			if(this.selectedKey)
+			{
+				const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
+				if (currentSelectedKey) {
+					if (currentSelectedKey == currentKey)
+						return;
+					/**
+					 * Do not select a new entry if the current is a child of the new one.
+					 * This happens if a child entry of a new stg is selected and the router
+					 * tries to select the stg root entry (because subtrees do not have
+					 * routes yet)
+					 */
+					const isChild = this.findNodeByKey(
+						currentSelectedKey,
+						currentNode.children || []
+					);
+					if (isChild)
+						return;
+				}
 			}
 
 			for (let i = 1; i < parts.length; i++)
