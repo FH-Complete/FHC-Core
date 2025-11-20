@@ -374,7 +374,8 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {};
+			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
+			const method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
 			if (this.filter.length)
 				params.filter = this.filter;
 

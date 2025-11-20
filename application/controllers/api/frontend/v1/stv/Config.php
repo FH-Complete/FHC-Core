@@ -497,11 +497,15 @@ class Config extends FHCAPI_Controller
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
 		];
-		$result['combinePeople'] = [
-			'title' => $this->p->t('stv', 'tab_combine_people'),
-			'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
-			'config' => $config['combinePeople']
-		];
+
+		if($this->permissionlib->isBerechtigt('basis/person'))
+		{
+			$result['combinePeople'] = [
+				'title' => $this->p->t('stv', 'tab_combine_people'),
+				'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+				'config' => $config['combinePeople']
+			];
+		}
 
 		$result['kontaktieren'] = [
 			'title' => $this->p->t('stv', 'tab_kontaktieren'),
