@@ -42845,13 +42845,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Alle anzeigen",
+				'text' => "Alle betreuten Projektarbeiten anzeigen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Show All',
+				'text' => 'Show all supervised project work',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -42865,13 +42865,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Deadlines anzeigen",
+				'text' => "Deadline Übersicht anzeigen ",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Show Deadlines',
+				'text' => 'Show Deadline Overview',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -43324,6 +43324,26 @@ array(
 				'sprache' => 'English',
 				'text' => 'You are not authorized to delete this deadline.
 					You need at least the permission to edit the deadline, and no file submissions must yet exist.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4ZusatzdatenBearbeiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zusatzdaten bearbeiten",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit additional Data',
 				'description' => '',
 				'insertvon' => 'system'
 			)

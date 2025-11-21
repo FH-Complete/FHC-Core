@@ -41,9 +41,8 @@ class Abgabe extends FHCAPI_Controller
 			'getNoten' => self::PERM_LOGGED,
 			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
-			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
-//			'notifyStudentMail' => self::PERM_LOGGED,
-//			'notifyBetreuerMail' => self::PERM_LOGGED
+			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
 			]);
 
 		$this->load->library('PhrasesLib');
@@ -254,7 +253,7 @@ class Abgabe extends FHCAPI_Controller
 			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz)
 			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
 			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
-			|| !isset($seitenanzahl))
+			|| !isset($seitenanzahl) || !isset($sprache))
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 
 		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
@@ -985,6 +984,50 @@ class Abgabe extends FHCAPI_Controller
 		}
 	}
 
+	public function postStudentProjektarbeitZusatzdaten(){
+		$projektarbeit_id = $_POST['projektarbeit_id'];
+		
+		$sprache = $_POST['sprache'];
+		$abstract = $_POST['abstract'];
+		$abstract_en = $_POST['abstract_en'];
+		$schlagwoerter = $_POST['schlagwoerter'];
+		$schlagwoerter_en = $_POST['schlagwoerter_en'];
+		$seitenanzahl = $_POST['seitenanzahl'];
+
+
+		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
+			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
+			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
+			|| !isset($seitenanzahl) || !isset($sprache)) {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+			
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+
+		if(count($projektarbeitArr) > 0) {
+			$projektarbeit = $projektarbeitArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+		}
+		
+		// update projektarbeit cols
+		$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
+			,$schlagwoerter, $schlagwoerter_en, $seitenanzahl);
+
+		$this->logLib->logInfoDB(array('zusatzdatenEditMitarbeiter', array(
+			'updatevon' => getAuthUID(),
+			'updateamum' => date('Y-m-d H:i:s')
+		), getAuthUID(), getAuthPersonId(), array($projektarbeit_id,$sprache,$abstract,$abstract_en
+		,$schlagwoerter, $schlagwoerter_en, $seitenanzahl)));
+				
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		
+		$this->terminateWithSuccess($result);
+	}
+	
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
 		if($abgabe->paabgabetyp_kurzbz != 'end') {
 			return;

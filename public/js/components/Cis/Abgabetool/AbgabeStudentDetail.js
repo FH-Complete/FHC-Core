@@ -412,15 +412,15 @@ export const AbgabeStudentDetail = {
 								<template #content>
 									<div class="col-auto">
 										<div class="row">
-											<div class="col-12 col-md-3 fw-bold">{{ $capitalize($p.t('abgabetool/c4abgabeZeitstatus')) }}</div>
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4abgabeZeitstatus')) }}</div>
 											<div class="col-12 col-md-9">{{$p.t('abgabetool/c4tooltip' + $capitalize(termin?.dateStyle) )}}</div>
 										</div>
 										<div class="row">
-											<div class="col-12 col-md-3 fw-bold">{{ $capitalize($p.t('abgabetool/c4fixterminv4')) }}</div>
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4fixterminv4')) }}</div>
 											<div class="col-12 col-md-9">{{!termin?.fixtermin}}</div>
 										</div>
 										<div class="row">
-											<div class="col-12 col-md-3 fw-bold">{{ $capitalize($p.t('abgabetool/c4fileUploaded')) }}</div>
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4fileUploaded')) }}</div>
 											<div class="col-12 col-md-9">{{termin?.abgabedatum !== null}}</div>
 										</div>
 									</div>
@@ -431,7 +431,7 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 							<div class="col-12 col-md-9">
 								<VueDatePicker
 									v-model="termin.datum"
@@ -446,14 +446,14 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabetypv2') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 							<div class="col-12 col-md-9">
 								{{ termin.bezeichnung }}
 							</div>
 						</div>
 						
 						<div class="row mt-2" v-if="termin.note">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
 							<div class="col-12 col-md-9">
 								<div class="col-1 d-flex justify-content-start align-items-start">
 									{{ getTerminNoteBezeichnung(termin) }}
@@ -462,21 +462,21 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
 							<div class="col-12 col-md-9">
 								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" disabled></Textarea>
 							</div>
 						</div>
 						
 						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 							<div class="col-12 col-md-9">
 								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" class="w-100" :disabled="true"></Textarea>
 							</div>
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
 							<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">
 								<div class="row">
@@ -508,7 +508,7 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div class="row mt-2" v-if="termin.upload_allowed">
-							<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4fileupload') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4fileupload') )}}</div>
 							<div class="col-12 col-md-9">
 								<div class="row" v-if="termin?.allowedToUpload">
 									<div class="col-12 col-sm-6 mb-2">

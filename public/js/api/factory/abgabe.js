@@ -108,5 +108,13 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Abgabe/getStudiengaenge'
 		};
+	},
+	postStudentProjektarbeitZusatzdaten(formData) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/postStudentProjektarbeitZusatzdaten',
+			params: formData,
+			config: {Headers: { "Content-Type": "multipart/form-data" }}
+		};
 	}
 };

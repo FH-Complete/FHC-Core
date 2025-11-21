@@ -665,7 +665,7 @@ export const AbgabetoolAssistenz = {
 			
 			const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
 			
-			this.$refs.abgabeTable.tabulator.clearData()
+			// this.$refs.abgabeTable.tabulator.clearData()
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.$refs.abgabeTable.tabulator.setData(mappedData);
 		},
@@ -832,7 +832,7 @@ export const AbgabetoolAssistenz = {
 						{{$capitalize($p.t('abgabetool/c4zieldatum'))}}
 					</div>
 					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabetypv2')}}
+						{{$p.t('abgabetool/c4abgabetyp')}}
 					</div>
 					<div class="col-5 d-flex justify-content-center align-items-center">
 						{{$p.t('abgabetool/c4abgabekurzbz')}}

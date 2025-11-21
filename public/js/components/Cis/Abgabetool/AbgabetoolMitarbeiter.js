@@ -87,7 +87,7 @@ export const AbgabetoolMitarbeiter = {
 					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -215,27 +215,12 @@ export const AbgabetoolMitarbeiter = {
 				pa.abgabetermine = res.data[0].retval
 				pa.isCurrent = res.data[1]
 				
-				// pa.abgabetermine.push({ // new abgatermin row
-				//
-				// 	'paabgabe_id': -1,
-				// 	'projektarbeit_id': pa.projektarbeit_id,
-				// 	'fixtermin': false,
-				// 	'kurzbz': '',
-				// 	'datum': new Date().toISOString().split('T')[0],
-				// 	'note': this.allowedNotenOptions.find(opt => opt.note == 9),
-				// 	'upload_allowed': false,
-				// 	'paabgabetyp_kurzbz': '',
-				// 	'bezeichnung': '',
-				// 	'abgabedatum': null,
-				// 	'insertvon': this.viewData?.uid ?? ''
-				//	
-				// })
-				
 				pa.abgabetermine.forEach(termin => {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
 					
 					// lektoren are only allowed to edit their own deadline entries
+					// TODO: cis old
 					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
 					
 					// lektoren are not allowed to delete deadlines with existing submissions
@@ -417,7 +402,7 @@ export const AbgabetoolMitarbeiter = {
 						{{$p.t('abgabetool/c4zieldatum')}}
 					</div>
 					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabetypv2')}}
+						{{$p.t('abgabetool/c4abgabetyp')}}
 					</div>
 					<div class="col-6 d-flex justify-content-center align-items-center">
 						{{$p.t('abgabetool/c4abgabekurzbz')}}

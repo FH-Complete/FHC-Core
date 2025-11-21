@@ -64,7 +64,16 @@ export const AbgabeMitarbeiterDetail = {
 				icon: "fa fa-eye",
 				command: this.openStudentPage
 			}],
-			newTermin: null
+			newTermin: null,
+			form: Vue.reactive({
+				sprache: '',
+				abstract: '',
+				abstract_en: '',
+				schlagwoerter: '',
+				schlagwoerter_en: '',
+				kontrollschlagwoerter: '',
+				seitenanzahl: 1,
+			})
 		}
 	},
 	methods: {
@@ -89,6 +98,7 @@ export const AbgabeMitarbeiterDetail = {
 						...res.data[0]
 					}
 					if(newTerminRes.note) newTerminRes.note = noteOpt
+					newTerminRes.invertedFixtermin = !newTerminRes.fixtermin
 					const existingTerminRes = res.data[1]
 					
 					const abgabeOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == newTerminRes.paabgabetyp_kurzbz)
@@ -147,6 +157,104 @@ export const AbgabeMitarbeiterDetail = {
 					this.$fhcAlert.alertError()
 				}
 			})
+		},
+		openZusatzdatenModal() {
+			this.$refs.modalContainerZusatzdaten.show()
+		},
+		async saveZusatzdaten(){
+			if (!await this.validateZusatzdaten())
+			{
+				return false;
+			}
+			
+			const pa = this.projektarbeit
+
+			// post endabgabe
+			const formData = new FormData();
+			formData.append('projektarbeit_id', this.projektarbeit.projektarbeit_id);
+
+			formData.append('sprache', this.form['sprache'].sprache)
+			formData.append('abstract', this.form['abstract'])
+			formData.append('abstract_en', this.form['abstract_en'])
+			formData.append('schlagwoerter', this.form['schlagwoerter'])
+			formData.append('schlagwoerter_en', this.form['schlagwoerter_en'])
+			formData.append('seitenanzahl', this.form['seitenanzahl'])
+			
+			this.loading = true
+			this.$api.call(ApiAbgabe.postStudentProjektarbeitZusatzdaten(formData))
+				.then(res => {
+					if(res.meta.status == 'success') {
+						this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
+						if(!data?.retval?.[0]) return
+						const paRes = data.retval[0]
+						pa.seitenanzahl = paRes.seitenanzahl ?? 1
+						pa.kontrollschlagwoerter = paRes.kontrollschlagwoerter ?? ''
+						pa.schlagwoerter = paRes.schlagwoerter ?? ''
+						pa.sprache = paRes.sprache ?? ''
+						pa.schlagwoerter_en = paRes.schlagwoerter_en ?? ''
+						pa.abstract = paRes.abstract ?? ''
+						pa.abstract_en = paRes.abstract_en ?? ''
+					}
+					
+				}).finally(()=> {
+				this.loading = false
+			})
+
+			this.$refs.modalContainerZusatzdaten.hide()
+		},
+		async validateZusatzdaten() {
+			// check these input fields for length of entry
+			if(this.form['abstract'].length < 100 && await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/warningShortAbstract'),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'btn btn-danger',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			}
+
+			if(this.form['abstract_en'].length < 100 && await this.$fhcAlert.confirm({
+				message: this.$capitalize(this.$p.t('abgabetool/warningShortAbstractEn')),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'btn btn-danger',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			}
+
+			if(this.form['schlagwoerter'].length < 50 && await this.$fhcAlert.confirm({
+				message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerter')),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'btn btn-danger',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			}
+
+			if(this.form['schlagwoerter_en'].length < 50 && await this.$fhcAlert.confirm({
+				message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerterEn')),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'btn btn-danger',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			}
+
+			if(this.form['seitenanzahl'] <= 5 && await this.$fhcAlert.confirm({
+				message: this.$capitalize(this.$p.t('abgabetool/warningSmallSeitenanzahl')),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'btn btn-danger',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'btn btn-outline-secondary'
+			}) === false) {
+				return false
+			}
+			
+			return true
 		},
 		async handleDeleteTermin(termin){
 			if(await this.$fhcAlert.confirm({
@@ -466,7 +574,17 @@ export const AbgabeMitarbeiterDetail = {
 			// set invertedFixtermin field for UI/UX purposes -> avoid double negation in text
 			
 			newVal?.abgabetermine?.forEach(termin => termin.invertedFixtermin = !termin.fixtermin)
-		}
+			
+			// default select german if projektarbeit sprache was null
+			this.form.sprache = newVal.sprache ? this.allActiveLanguages.find(lang => lang.sprache == newVal.sprache) : this.allActiveLanguages.find(lang => lang.sprache == 'German')
+			this.form.abstract = newVal.abstract ?? ''
+			this.form.abstract_en = newVal.abstract_en ?? ''
+			this.form.schlagwoerter = newVal.schlagwoerter ?? ''
+			this.form.schlagwoerter_en = newVal.schlagwoerter_en ?? ''
+			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter ?? ''
+			this.form.seitenanzahl = newVal.seitenanzahl ?? 1
+			
+		},
 	},
 	created() {
 
@@ -475,7 +593,7 @@ export const AbgabeMitarbeiterDetail = {
 
 	},
 	template: `
-	<bs-modal 
+	<bs-modal
 		id="innerModalNewAbgabe" 
 		ref="modalContainerCreateNewAbgabe" 
 		class="bootstrap-prompt" 
@@ -492,7 +610,7 @@ export const AbgabeMitarbeiterDetail = {
 			<div v-if="showAutomagicModalPhrase" class="text-center"><p>{{$p.t('abgabetool/c4abgabeQualGateNegativAddNewAutomagisch')}}</p></div>
 			<div v-if="newTermin">
 				<div v-if="assistenzMode" class="row">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixterminv4')}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{$p.t('abgabetool/c4fixterminv4')}}</div>
 					<div class="col-8 col-md-9">
 						<Checkbox 
 							v-model="newTermin.invertedFixtermin"
@@ -503,7 +621,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ $capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 					<div class="col-8 col-md-9">
 						<VueDatePicker
 							v-model="newTermin.datum"
@@ -516,7 +634,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ $capitalize( $p.t('abgabetool/c4abgabetypv2') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 					<div class="col-8 col-md-9">
 						<Dropdown
 							:style="{'width': '100%'}"
@@ -528,7 +646,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ $capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
 					<div class="col-8 col-md-9">
 						<Checkbox
 							v-model="newTermin.upload_allowed"
@@ -539,7 +657,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ $capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 					<div class="col-8 col-md-9">
 						<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
@@ -552,18 +670,6 @@ export const AbgabeMitarbeiterDetail = {
 	</bs-modal>
 
 	<div v-if="projektarbeit">
-<!--		<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">-->
-<!--			<SpeedDial-->
-<!--				:style="getSpeedDialStyle"-->
-<!--				:model="speedDialItems" -->
-<!--				direction="up"-->
-<!--				:radius="80"-->
-<!--				type="linear"-->
-<!--				buttonClass="p-button-rounded p-button-lg p-button-primary"-->
-<!--				:tooltipOptions="{ position: 'left' }"-->
-<!--			/>-->
-<!--		</div>-->
-		
 		<h5>{{$capitalize( $p.t('abgabetool/c4abgabeMitarbeiterbereich') )}}</h5>
 
 		<div class="row">
@@ -573,7 +679,6 @@ export const AbgabeMitarbeiterDetail = {
 				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-start">
-<!--				<div id="speedDialWrapper" :style="getSpeedDialWrapperStyle">-->
 				<SpeedDial
 					:model="speedDialItems" 
 					direction="left"
@@ -583,12 +688,9 @@ export const AbgabeMitarbeiterDetail = {
 					:tooltipOptions="{ position: 'down' }"
 				>
 					<template #icon>
-
 						<i class="fa-solid fa-bars"></i>
-
 					</template>
 				</SpeedDial>
-<!--				</div>-->
 			</div>
 		</div>
 		<div class="row" style="margin-bottom: 12px;">
@@ -596,6 +698,13 @@ export const AbgabeMitarbeiterDetail = {
 				<button type="button" class="btn btn-primary" @click="openCreateNewAbgabeModal">
 					<i class="fa-solid fa-plus"></i>
 					{{$capitalize( $p.t('abgabetool/c4newAbgabetermin') )}}
+				</button>
+				
+			</div>
+			<div class="col-auto">
+				<button type="button" class="btn btn-primary ml-4" @click="openZusatzdatenModal">
+					<i class="fa-solid fa-pen-to-square"></i>
+					{{$capitalize( $p.t('abgabetool/c4ZusatzdatenBearbeiten') )}}
 				</button>
 			</div>
 		</div>
@@ -626,7 +735,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>				
 					</template>
 					<div class="row mt-2" v-if="assistenzMode">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4fixterminv4') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4fixterminv4') )}}</div>
 						<div class="col-12 col-md-9">
 							<Checkbox 
 								v-model="termin.invertedFixtermin"
@@ -637,7 +746,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 						<div class="col-12 col-md-9">
 							<VueDatePicker
 								v-model="termin.datum"
@@ -651,7 +760,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 						<div class="col-12 col-md-9">
 							<Dropdown
 								:style="{'width': '100%'}"
@@ -666,7 +775,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2" v-if="termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2'">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
 						<div class="col-12 col-md-9">
 							<Checkbox
 								v-model="termin.upload_allowed"
@@ -677,7 +786,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
 						<div class="col-12 col-md-9">
 							<Dropdown
 								:style="{'width': '100%'}"
@@ -688,20 +797,20 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
 						<div class="col-12 col-md-9">
 							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
 						<div class="col-12 col-md-9">
 							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" class="w-100" rows="1" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
 						<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">
 								<div class="row">
@@ -737,7 +846,7 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold">
+						<div class="col-12 col-md-3 fw-bold align-content-center">
 								 {{ $capitalize( $p.t('abgabetool/c4actions') )}}
 						</div>
 						<div class="col-12 col-md-9">
@@ -776,6 +885,92 @@ export const AbgabeMitarbeiterDetail = {
 		<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
 			<h5>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h5>
 		</div>
+		
+		<bs-modal 
+	 		ref="modalContainerZusatzdaten"
+	 		class="bootstrap-prompt"
+	 		dialogClass="bordered-modal modal-lg">
+			<template v-slot:title>
+				<div>
+					{{$capitalize( $p.t('abgabetool/c4enduploadZusatzdaten') )}}
+				</div>
+				<div class="row mb-3 align-items-start">
+					
+					<p class="ml-4 mr-4">Student UID: {{ projektarbeit?.student_uid}}</p>
+				
+				</div>
+				<div class="row mb-3 align-items-start">
+					
+					<p class="ml-4 mr-4">{{$capitalize( $p.t('abgabetool/c4titel') )}}: {{ projektarbeit?.titel }}</p>
+				
+				</div>
+			</template>
+			<template v-slot:default>
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4Sprache') )}}</div>
+					<div class="row">
+						<Dropdown 
+							:style="{'width': '100%'}"
+							v-model="form.sprache"
+							:options="allActiveLanguages"
+							:optionLabel="getOptionLabelSprache">
+						</Dropdown>
+					</div>
+				</div>
+<!--				 lektor fills these out-->
+<!--				<div class="row mb-3 align-items-start">-->
+<!--					<div class="row">Kontrollierte Schlagwörter</div>-->
+<!--					<div class="row">-->
+<!--						<Textarea v-model="form.kontrollschlagwoerter"></Textarea>-->
+<!--					</div>-->
+<!--					-->
+<!--				-->
+<!--				</div>-->
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterGer') )}}</div>
+					<div class="row">
+						<Textarea v-model="form.schlagwoerter" class="w-100"></Textarea>
+					</div>
+				</div>
+				
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterEng') )}}</div>
+					<div class="row">
+						<Textarea v-model="form.schlagwoerter_en" class="w-100"></Textarea>
+					</div>
+				</div>
+				
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractGer') )}}</div>
+					<div class="row">
+						<Textarea v-model="form.abstract" rows="10" maxlength="5000" class="w-100"></Textarea>
+						<p>{{ form.abstract?.length ? form.abstract.length : 0 }} / 5000 characters</p>
+					</div>
+				</div>
+
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractEng') )}}</div>
+					<div class="row">
+						<Textarea v-model="form.abstract_en" rows="10" maxlength="5000" class="w-100"></Textarea>
+						<p>{{ form.abstract_en?.length ? form.abstract_en.length : 0 }} / 5000 characters</p>
+					</div>				
+				</div>
+				
+				<div class="row mb-3 align-items-start">
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4seitenanzahl') )}}</div>
+					<div class="row">
+						<InputNumber 
+							v-model="form.seitenanzahl"
+							inputId="seitenanzahlInput" :min="1" :max="100000">
+						</InputNumber>
+					</div>		
+				</div>
+				
+			</template>
+			<template v-slot:footer>
+				<button class="btn btn-primary" @click="saveZusatzdaten">{{ $capitalize( $p.t('abgabetool/c4save') )}}</button>
+			</template>
+		</bs-modal>
 		
 	</div>
 `,
