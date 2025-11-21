@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
 import ListFilter from './List/Filter.js';
 
+import { capitalize } from '../../../helpers/StringHelpers.js';
+
 import draggable from '../../../directives/draggable.js';
 
 export default {
@@ -133,7 +135,12 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({method: 'post', url, params});
+					/**
+					 * NOTE(chris): Because of a bug in Tabulator
+					 * we need to get the params from elsewhere.
+					 * @see https://github.com/olifolkerd/tabulator/issues/4318
+					 */
+					return this.$api.call({...config, url, params: this.tabulatorOptions.ajaxParams});
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -228,7 +235,84 @@ export default {
 			return "StudentList_" + today + ".csv";
 		}
 	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
+				this.translateTabulator();
+			}
+		}
+	},
 	methods: {
+		translateTabulator() {
+			this.$p
+				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
+				.then(() => {
+					const translations = {
+						uid: capitalize(this.$p.t('person/uid')),
+						titelpre: capitalize(this.$p.t('person/titelpre')),
+						nachname: capitalize(this.$p.t('person/nachname')),
+						vorname: capitalize(this.$p.t('person/vorname')),
+						wahlname: capitalize(this.$p.t('person/wahlname')),
+						vornamen: capitalize(this.$p.t('person/vornamen')),
+						titelpost: capitalize(this.$p.t('person/titelpost')),
+						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
+						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
+						geschlecht: capitalize(this.$p.t('person/geschlecht')),
+						semester: capitalize(this.$p.t('lehre/sem')),
+						verband: capitalize(this.$p.t('lehre/verb')),
+						gruppe: capitalize(this.$p.t('lehre/grp')),
+						studiengang: capitalize(this.$p.t('lehre/studiengang')),
+						studiengang_kz: capitalize(this.$p.t('lehre/studiengang_kz')),
+						matrikelnr: capitalize(this.$p.t('person/personenkennzeichen')),
+						person_id: capitalize(this.$p.t('person/person_id')),
+						status: capitalize(this.$p.t('global/status')),
+						status_datum: capitalize(this.$p.t('profilUpdate/statusDate')),
+						status_bestaetigung: capitalize(this.$p.t('global/status_bestaetigung')),
+						mail_privat: capitalize(this.$p.t('person/email_private')),
+						mail_intern: capitalize(this.$p.t('person/email_intern')),
+						anmerkungen: capitalize(this.$p.t('stv/notes_person')),
+						anmerkung: capitalize(this.$p.t('stv/notes_prestudent')),
+						orgform_kurzbz: capitalize(this.$p.t('lehre/orgform')),
+						aufmerksamdurch_kurzbz: capitalize(this.$p.t('person/aufmerksamDurch')),
+						punkte: capitalize(this.$p.t('admission/gesamtpunkte')),
+						aufnahmegruppe_kurzbz: capitalize(this.$p.t('stv/aufnahmegruppe_kurzbz')),
+						dual: capitalize(this.$p.t('lehre/dual_short')),
+						matr_nr: capitalize(this.$p.t('person/matrikelnummer')),
+						studienplan_bezeichnung: capitalize(this.$p.t('lehre/studienplan')),
+						prestudent_id: capitalize(this.$p.t('ui/prestudent_id')),
+						priorisierung_relativ: capitalize(this.$p.t('lehre/prioritaet')),
+						mentor: capitalize(this.$p.t('stv/mentor')),
+						bnaktiv: capitalize(this.$p.t('person/aktiv'))
+					};
+
+					/** NOTE(chris):
+					 * use this approach because updateDefinition
+					 * on the Tabulator columns is way slower and
+					 * freezes up the GUI.
+					 */
+					// Overwrite definition for column show/hide
+					this.$refs.table.tabulator.getColumns().forEach(col => {
+						const trans = translations[col.getField()];
+						if (!trans)
+							return;
+						col.getDefinition().title = trans;
+					});
+					// Overwrite node in dom
+					this.$refs.table.tabulator.element
+						.querySelectorAll('.tabulator-col[tabulator-field]')
+						.forEach(el => {
+							const field = el.getAttribute('tabulator-field');
+							if (!translations[field])
+								return;
+
+							const title = el.querySelector('.tabulator-col-title');
+							if (!title)
+								return;
+
+							title.innerText = translations[field];
+						});
+				});
+		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
@@ -290,20 +374,22 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {};
+			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
+			const method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
 			if (this.filter.length)
 				params.filter = this.filter;
 
+			this.tabulatorOptions.ajaxURL = endpoint.url;
+			this.tabulatorOptions.ajaxParams = { ...params };
+			this.tabulatorOptions.ajaxConfig = method;
 			if (!this.$refs.table.tableBuilt) {
-				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = endpoint.url;
-					this.tabulatorOptions.ajaxParams = params;
-				} else
+				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(endpoint.url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params, method);
 					});
+				}
 			} else
-				this.$refs.table.tabulator.setData(endpoint.url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
 		dragCleanup(evt) {
 			if (evt.dataTransfer.dropEffect == 'none')
@@ -400,6 +486,7 @@ export default {
 				new-btn-show
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
+				@table-built="translateTabulator"
 			>
 			<template #filter>
 				<div class="card">
