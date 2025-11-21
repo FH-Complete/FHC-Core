@@ -337,6 +337,19 @@ export default {
 				this.$refs.searchbar.searchsettings.types = searchsettings.types;
 				this.$nextTick(this.blurSearchbar);
 			}
+			else
+			{
+				this.clearTabulator();
+			}
+		},
+		clearTabulator() {
+			if(['index', 'studiensemester'].includes(this.$route.name))
+			{
+				if(this.$refs?.stvList?.$refs?.table?.tabulator)
+				{
+					this.$refs.stvList.$refs.table.tabulator.setData([]);
+				}
+			}
 		},
 		checkUrlStudiengang() {
 			if (this.url_studiengang) {
@@ -360,13 +373,7 @@ export default {
 			{
 				this.studiengangKz = undefined;
 				this.studiengangKuerzel = '';
-				if(['index', 'studiensemester'].includes(this.$route.name))
-				{
-					if(this.$refs?.stvList?.$refs?.table?.tabulator)
-					{
-						this.$refs.stvList.$refs.table.tabulator.setData([]);
-					}
-				}
+				this.clearTabulator();
 			}
 		},
 		onSearch(e) {
