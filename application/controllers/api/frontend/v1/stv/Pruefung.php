@@ -324,7 +324,7 @@ class Pruefung extends FHCAPI_Controller
 			? $benotungsdatum
 			: $uebernahmedatum;
 
-		if ($checkDate >= $this->input->post('datum') && $note !== $note->note)
+		if ($checkDate >= $this->input->post('datum') && $this->input->post('note') !== $note->note)
 		{
 			$this->PruefungModel->db->trans_complete();
 			$this->terminateWithSuccess($this->p->t('exam', 'hinweis_changeAfterExamDate'));
@@ -343,7 +343,6 @@ class Pruefung extends FHCAPI_Controller
 			'updatevon' =>  $authUID,
 			'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null
 		]);
-
 
 		$this->PruefungModel->db->trans_complete();
 		$this->terminateWithSuccess();
