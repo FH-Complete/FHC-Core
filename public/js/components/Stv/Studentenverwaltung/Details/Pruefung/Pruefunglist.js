@@ -229,9 +229,8 @@ export default{
 			return this.$refs.examData
 				.call(ApiStvExam.addPruefung(this.pruefungData))
 				.then(response => {
-					this.checkData = response.data;
-					if (this.checkData === 2 || this.checkData === 5)
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+					if (response.data)
+						this.$fhcAlert.alertDefault('info', 'Info', response.data, true);
 					else
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('pruefungModal');
