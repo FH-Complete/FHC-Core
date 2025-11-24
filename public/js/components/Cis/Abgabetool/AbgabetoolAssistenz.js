@@ -412,19 +412,15 @@ export const AbgabetoolAssistenz = {
 				pids,
 				this.serienTermin.fixtermin
 			)).then(res => {
-				// TODO
-				// sticky lifetime somehow
 				
 				if (res.meta.status === "success" && res.data) {
 					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))
-					// TODO: sticky lifetime erhöhen um sinnvoll lesen zu können?
-					this.$fhcAlert.alertInfo(this.$p.t('abgabetool/serienTerminEmailSentInfo', [this.createInfoString(res.data[0])]));
 				} else {
 					this.$fhcAlert.alertError(this.$p.t('abgabetool/errorSerienterminSpeichern'))
 				}
 				
 				// put new abgaben into projektarbeiten
-				const newAbgaben = res.data[1]
+				const newAbgaben = res.data
 				pids.forEach(pid => {
 					const abgabe = newAbgaben.find(abgabe => abgabe.projektarbeit_id == pid)
 					
@@ -444,8 +440,7 @@ export const AbgabetoolAssistenz = {
 				
 				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 				this.$refs.abgabeTable.tabulator.replaceData(mappedData)
-				
-				// this.$refs.abgabeTable.tabulator.redraw(true)
+				this.$refs.abgabeTable.tabulator.redraw(true)
 			}).finally(()=>{
 				this.saving = false
 			})

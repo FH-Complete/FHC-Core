@@ -744,48 +744,11 @@ class Abgabe extends FHCAPI_Controller
 			$dataAbgabe  = $this->getDataOrTerminateWithError($result);
 			
 			$abgaben[]= getData($this->PaabgabeModel->load($dataAbgabe))[0];
-
-//			$res[] = $data;
-
-			// send mail to student
-			$result = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
-			$data = $this->getDataOrTerminateWithError($result);
-
-//			$this->addMeta('emaildata'.$projektarbeit_id, $data);
-
-			$datetime = new DateTime($datum);
-			$dateEmailFormatted = $datetime->format('d.m.Y');
-
-			$anredeFillString = $data[0]->anrede=="Herr"?"r":"";
-
-			$fullFormattedNameString = trim($data[0]->titelpre." ".$data[0]->vorname." ".$data[0]->nachname." ".$data[0]->titelpost);
-			$res[] = $fullFormattedNameString;
-
-			// Prepare mail content
-			$body_fields = array(
-				'anrede' => $data[0]->anrede,
-				'anredeFillString' => $anredeFillString,
-				'datum' => $dateEmailFormatted,
-				'bezeichnung' => $bezeichnung,
-				'fullFormattedNameString' => $fullFormattedNameString,
-				'kurzbz' => $kurzbz
-			);
-
-			$email = $data[0]->uid."@".DOMAIN;
-
-			// TODO: nightly email job informing about new serientermine
-			
-//			sendSanchoMail(
-//				'neuerAbgabetermin',
-//				$body_fields,
-//				$email,
-//				$this->p->t('abgabetool', 'neuerTerminBachelorMasterbetreuung')
-//			);
 		}
 
 		$this->logLib->logInfoDB(array('serientermin angelegt',$res, getAuthUID(), getAuthPersonId()));
 
-		$this->terminateWithSuccess(array($res, $abgaben));
+		$this->terminateWithSuccess($abgaben);
 
 	}
 

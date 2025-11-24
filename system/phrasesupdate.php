@@ -43343,7 +43343,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Edit additional Data',
+				'text' => 'Edit additional data',
 				'description' => '',
 				'insertvon' => 'system'
 			)

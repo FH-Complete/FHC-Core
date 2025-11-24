@@ -184,8 +184,6 @@ export const AbgabetoolMitarbeiter = {
 			)).then(res => {
 				if (res.meta.status === "success" && res.data) {
 					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))
-					// TODO: sticky lifetime erhöhen um sinnvoll lesen zu können?
-					this.$fhcAlert.alertInfo(this.$p.t('abgabetool/serienTerminEmailSentInfo', [this.createInfoString(res.data)]));
 				} else {
 					this.$fhcAlert.alertError(this.$p.t('abgabetool/errorSerienterminSpeichern'))
 				}
