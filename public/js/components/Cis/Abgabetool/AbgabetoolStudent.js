@@ -102,11 +102,11 @@ export const AbgabetoolStudent = {
 					
 					if(termin.paabgabetyp_kurzbz == 'end') {
 						// production logic
-						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
+						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
 						
 						// development purposes
 						// termin.allowedToUpload = this.checkQualityGates(pa.abgabetermine)
-						termin.allowedToUpload = true
+						// termin.allowedToUpload = true
 
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)
