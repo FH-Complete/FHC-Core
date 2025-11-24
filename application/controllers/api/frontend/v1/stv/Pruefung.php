@@ -325,7 +325,7 @@ class Pruefung extends FHCAPI_Controller
 			? $benotungsdatum
 			: $uebernahmedatum;
 
-		if ($checkDate >= $pruefungsdatum) && $this->input->post('note') !== $note->note)
+		if ($checkDate >= $pruefungsdatum && $this->input->post('note') !== $note->note)
 		{
 			$this->PruefungModel->db->trans_complete();
 			$this->terminateWithSuccess($this->p->t('exam', 'hinweis_changeAfterExamDate'));
