@@ -22,7 +22,8 @@
 			'public/css/components/function.css'
 		],
 		'customJSs' => [
-			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'
+			'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js',
+			'vendor/moment/luxonjs/luxon.min.js'
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
