@@ -163,12 +163,12 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
 				index: 'abschlusspruefung_id',
-				persistenceID: 'stv-details-finalexam'
+				persistenceID: 'stv-details-finalexam-2025112401'
 			},
 			tabulatorEvents: [
 				{
