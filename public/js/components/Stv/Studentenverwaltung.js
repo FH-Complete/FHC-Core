@@ -158,6 +158,7 @@ export default {
 						+ 'content/statistik/notenspiegel.php?type=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_xls'
 				});
@@ -166,6 +167,7 @@ export default {
 						+ 'content/statistik/notenspiegel_erweitert.php?typ=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_xls_extended'
 				});
@@ -174,6 +176,7 @@ export default {
 						+ 'content/statistik/notenspiegel.php?type=html'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_html'
 				});
