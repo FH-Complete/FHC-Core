@@ -277,7 +277,25 @@ $query = '
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
 					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
-			) AS "Kaution"
+			) AS "Kaution",
+			(
+				SELECT
+					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
+				FROM public.tbl_rueckstellung
+					JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
+				WHERE tbl_rueckstellung.person_id = p.person_id
+					ORDER BY person_id, datum_bis DESC, rueckstellung_id DESC
+					LIMIT 1
+			) AS "Rueckstellgrund",
+			(
+				SELECT
+					datum_bis
+				FROM public.tbl_rueckstellung
+					JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
+				WHERE tbl_rueckstellung.person_id = p.person_id
+					ORDER BY person_id, datum_bis DESC, rueckstellung_id DESC
+					LIMIT 1
+			) AS "Rueckstelldatum"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
 			SELECT tpl.person_id,
@@ -351,7 +369,9 @@ $query = '
 			'ZGV Nation MA',
 			'InfoCenter Mitarbeiter',
 			'Identitätsnachweis',
-			ucfirst($this->p->t('infocenter', 'kaution'))
+			ucfirst($this->p->t('infocenter', 'kaution')),
+			ucfirst($this->p->t('infocenter', 'rueckstellgrund')),
+			ucfirst($this->p->t('infocenter', 'rueckstelldatum'))
 		),
 		'formatRow' => function($datasetRaw) {
 
@@ -480,14 +500,33 @@ $query = '
 				$datasetRaw->{'Kaution'} = 'Offen';
 			}
 
+			if ($datasetRaw->{'Rueckstellgrund'} === null)
+			{
+				$datasetRaw->{'Rueckstellgrund'} = '-';
+			}
+			if ($datasetRaw->{'Rueckstelldatum'} === null)
+			{
+				$datasetRaw->{'Rueckstelldatum'} = '-';
+			}
+
 			return $datasetRaw;
 		},
 		'markRow' => function($datasetRaw) {
 
+			$mark = '';
 			if ($datasetRaw->LockDate != null)
 			{
-				return FilterWidget::DEFAULT_MARK_ROW_CLASS;
+				$mark = FilterWidget::DEFAULT_MARK_ROW_CLASS;
 			}
+
+			if ($datasetRaw->Rueckstellgrund != null && $datasetRaw->Rueckstellgrund !== 'Parken')
+				$mark = "onhold";
+
+			if ($datasetRaw->Rueckstellgrund === 'Parken')
+				$mark = "text-info";
+
+			return $mark;
+
 		}
 	);
 

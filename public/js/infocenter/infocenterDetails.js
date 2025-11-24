@@ -11,6 +11,7 @@ const STGFREIGABE_MESSAGE_VORLAGE = "InfocenterSTGfreigegeben";
 const STGFREIGABE_MESSAGE_VORLAGE_MASTER = "InfocenterSTGfreigegebenM";
 const STGFREIGABE_MESSAGE_VORLAGE_MASTER_ENGLISCH = "InfocenterSTGfreigegebenMEng";
 const STGFREIGABE_MESSAGE_VORLAGE_ANDERES_SEMESTER = "InfocenterSTGfreigegebenSemester";
+const STGFREIGABE_MESSAGE_ZUSATZ_RT = "TerminvereinbarungRT";
 
 //Statusgründe for which no Studiengang Freigabe Message should be sent
 const FIT_PROGRAMM_STUDIENGAENGE = [10021, 10027];
@@ -512,7 +513,19 @@ var InfocenterDetails = {
 			}
 			else
 			{
-				if (receiverPrestudent.studiengangtyp === 'm' && freigabedata.statuskurzbz === 'ergPruefung')
+				if (freigabedata.statuskurzbz === 'zusatzRT')
+				{
+					vorlage = STGFREIGABE_MESSAGE_ZUSATZ_RT;
+
+					InfocenterDetails.sendFreigabeMessage(prestudent_id, vorlage, msgvars);
+
+					var rueckstelldate = new Date();
+					rueckstelldate.setDate(rueckstelldate.getDate() + 14);
+					rueckstelldate = $.datepicker.formatDate("dd.mm.yy", rueckstelldate)
+
+					Rueckstellung.set(personid, rueckstelldate, 'reihungstest')
+				}
+				else if (receiverPrestudent.studiengangtyp === 'm' && freigabedata.statuskurzbz === 'ergPruefung')
 				{
 					msgvars = {
 						'studiengangbezeichnung': studiengangbezeichnung,
