@@ -51,13 +51,17 @@ class Vorlagen extends FHCAPI_Controller
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$result = $this->BenutzerfunktionModel->getBenutzerfunktionByUid($uid, 'oezuordnung');
 
-		$data = $this->getDataOrTerminateWithError($result);
-		$oe_kurzbz = current($data);
+		if (hasData($result))
+		{
+			$data = getData($result);
 
-		$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz->oe_kurzbz);
-		$data = $this->getDataOrTerminateWithError($result);
+			$oe_kurzbz = array_column($data, 'oe_kurzbz');
+			$result = $this->VorlageModel->getAllVorlagenByOe($oe_kurzbz);
 
-		$this->terminateWithSuccess($data);
+			$this->terminateWithSuccess(hasData($result) ? getData($result) : array());
+		}
+		$this->terminateWithSuccess(array());
+
 	}
 
 }
