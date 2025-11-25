@@ -59,6 +59,8 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
+		$this->load->model('organisation/Erhalter_model', 'ErhalterModel');
 
 		$this->load->helper('hlp_sancho_helper');
 
@@ -92,26 +94,24 @@ class Noten extends FHCAPI_Controller
 		$grades = array();
 		$student_uids = array_map($func, $studentenData);
 		
+		if(count($student_uids) > 0) {
+			$mobres = $this->MobilitaetModel->getMobilityZusatzForUids($student_uids);
+			$mobData = $this->getDataOrTerminateWithError($mobres);
+
+			$result = $this->ErhalterModel->load();
+			$erhalter = getData($result)[0];
+
+			$erhalter_kz = '9' . sprintf("%03s", $erhalter->erhalter_kz);
+			foreach($mobData as $mob) {
+				$grades[$mob->uid]['mobility_zusatz'] = $this->MobilitaetModel->formatZusatz($mob, $erhalter_kz);
+			}
+		}
+		
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
 			
 			$res = $this->StudentModel->load([$uid]);
 			if(!isError($res) && hasData($res)) $student = getData($res)[0];
-
-			$prestudent_id = $student->prestudent_id;
-			
-			
-			// TODO: last class to get rid of but this one is complicated
-			$mobility = new mobilitaet();
-			$mobility->loadPrestudent($prestudent_id);
-			$output = $mobility->result;
-			$eintrag = '';
-			foreach ($output as $k)
-			{
-				if(($k->mobilitaetstyp_kurzbz == 'GS') && ($k->studiensemester_kurzbz == $sem_kurzbz))
-					$eintrag = ' (d.d.)';
-			}
-			$grades[$uid]['mobility'] = $eintrag;
 			
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
 
@@ -131,6 +131,7 @@ class Noten extends FHCAPI_Controller
 
 		// send $grades reference to moodle addon
 		// TODO: DONT LET FAULTY MOODLE TOKEN BREAK THE STARTUP
+
 //		Events::trigger(
 //			'getExternalGrades',
 //			function & () use (&$grades)
@@ -142,6 +143,8 @@ class Noten extends FHCAPI_Controller
 //				'stsem' => $sem_kurzbz
 //			]
 //		);
+
+		
 		
 		// calculate notenvorschläge from teilnoten
 		foreach($studentenData as $student) {

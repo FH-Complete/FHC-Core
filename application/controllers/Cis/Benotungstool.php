@@ -31,7 +31,7 @@ class Benotungstool extends Auth_Controller
 		
 		// TODO: check if related CIS config is also loaded when being routed in Cis4 by vuerouter
 		// TODO: check if new benotungstool should be configurable the exact same way?
-
+		// TODO: move this to some config api?
 		
 		$viewData = array(
 			'uid'=>getAuthUID(),

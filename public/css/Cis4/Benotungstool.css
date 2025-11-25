@@ -1,0 +1,41 @@
+/* 1. Stick the Header */
+#notentable .tabulator-header .tabulator-col.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Must be higher than other headers */
+	background-color: #fff; /* Opaque background is required */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 2. Stick the Data Cells */
+#notentable .tabulator-tableholder .tabulator-row .tabulator-cell.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Ensure it floats above other cells */
+	background-color: #fff; /* Match your row background color */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 3. Fix for Hover Effects (Optional) */
+/* If you use hover rows, you need to ensure the sticky cell matches the hover color */
+#notentable .tabulator-row:hover .tabulator-cell.sticky-col {
+	background-color: #ccc; /* Match your existing hover color */
+}
+
+
+/* styling for editable dropdown column of notenvorschläge in benotungstool*/
+#notentable .tabulator-tableholder .tabulator-editable {
+	position: relative;
+	background-color: rgba(255, 255, 157, 0.73);
+	cursor: pointer;
+}
+
+#notentable .tabulator-tableholder .tabulator-editable::after {
+	content: "▾";
+	position: absolute;
+	right: 6px;
+	color: rgba(176, 176, 106, 0.73);;
+	font-size: x-large;
+	bottom: 6px;
+	pointer-events: none;
+}

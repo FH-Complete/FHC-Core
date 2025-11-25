@@ -3,6 +3,7 @@ import ApiLehre from "../../../api/factory/lehre.js";
 import ApiNoten from "../../../api/factory/noten.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
+import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
 import MobilityLegende from '../../Mobility/Legende.js';
@@ -12,6 +13,7 @@ export const Benotungstool = {
 	name: "Benotungstool",
 	components: {
 		BsModal,
+		BsOffcanvas,
 		CoreFilterCmpt,
 		MobilityLegende,
 		Dropdown: primevue.dropdown,
@@ -43,8 +45,6 @@ export const Benotungstool = {
 	data() {
 		return {
 			neuesPruefungsdatumModalVisible: false,
-			offsetLeft: 0,
-			headerEl: null,
 			loading: false,
 			selectedUids: [], // shared selection state
 			selectedLehreinheit: null,
@@ -114,6 +114,17 @@ export const Benotungstool = {
 						
 						const row = cell.getRow()
 						row.reformat() // trigger reformat of arrow
+					}
+				}
+			}, 
+			{
+				event: "cellClick",
+				handler: async (e, cell) => {
+					const field = cell.getField()
+					
+					if(field == "mobility_zusatz") {
+						this.$refs.drawer.show()
+						e.stopPropagation()
 					}
 				}
 			}
@@ -258,7 +269,12 @@ export const Benotungstool = {
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlagBulk(this.lv_id, this.sem_kurzbz, notenbulk)).then(res => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/notenImportSuccessAlert'))
+					this.$fhcAlert.alertDefault(
+						'success',
+						'Info',
+						this.$p.t('benotungstool/notenImportSuccessAlert'),
+						true
+					)
 					const lvNoten = res.data
 					
 
@@ -289,7 +305,12 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
 					if(res.meta.status === 'success') {
-						this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungImportSuccessAlert'))
+						this.$fhcAlert.alertDefault(
+							'success',
+							'Info',
+							this.$p.t('benotungstool/pruefungImportSuccessAlert'),
+							true
+						)
 						this.handleAddNewPruefungenResponse(res, pruefungenbulk)
 					}
 				}).finally(()=>{this.loading = false})
@@ -426,8 +447,8 @@ export const Benotungstool = {
 		},
 		getNotenTableOptions() {
 			return {
-				rowHeight: 40,
 				height: 700,
+				virtualDom: false,
 				index: 'uid',
 				layout: 'fitDataStretch',
 				placeholder: this.$p.t('global/noDataAvailable'),
@@ -442,6 +463,7 @@ export const Benotungstool = {
 					
 					return true;  // student can be selected to add pruefung
 				},
+				rowHeight: 40,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: [
 				{
@@ -488,13 +510,15 @@ export const Benotungstool = {
 						handleClick: this.selectAllHandler
 					},
 					width: 50,
-				},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCount')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
-				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc},
+					cssClass: 'sticky-col'
+				}, 
+				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, cssClass: 'sticky-col'},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCountv2')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', headerFilter: true, widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', headerFilter: true, widthGrow: 1}, 
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4mobility')), field: 'mobility_zusatz', headerFilter: true, widthGrow: 1, visible: false},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4note')), field: 'note_vorschlag',
 					editor: 'list',
 					editorParams: (cell) => {
@@ -531,8 +555,9 @@ export const Benotungstool = {
 						if(p || !match?.lkt_ueberschreibbar) style = 'color: gray;font-style: italic; background-color: #f0f0f0;pointer-events: none;opacity: 0.6;user-select: none;cursor: not-allowed;'
 						return '<div style="'+style+'">' + val + '</div>'
 					},
-					widthGrow: 1},
-				{title: '', width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote},
+					widthGrow: 1
+				},
+				{title: '', width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote, variableHeight: true},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4lvnote')), field: 'lv_note',
 					formatter: this.notenFormatter,
 					headerFilter: 'list',
@@ -540,8 +565,9 @@ export const Benotungstool = {
 						return { values: ["\u00A0",this.$p.t('benotungstool/c4noteEmpty') ,this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 					},
 					headerFilterFunc: this.notenFilterFunc,
-					widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter},
+					widthGrow: 1
+				},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4freigabe')), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter, variableHeight: true},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4zeugnisnote')),
 					field: 'note',
 					formatter: this.notenFormatter,
@@ -552,13 +578,15 @@ export const Benotungstool = {
 						return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 					},
 					headerFilterFunc: this.notenFilterFunc,
-					widthGrow: 1}, 
+					widthGrow: 1
+				}, 
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4kommPruef')), 
 					field: 'kommPruef', widthGrow: 1, 
 					formatter: this.pruefungFormatter, 
 					topCalc: this.terminCalcFunc,
 					topCalcFormatter: this.terminCalcFormatter,
-					hozAlign:"center", minWidth: 150}
+					hozAlign:"center", minWidth: 150, visible: false
+				}
 			],
 				persistence: false,
 			}	
@@ -701,14 +729,16 @@ export const Benotungstool = {
 		freigabeFormatter(cell) {
 			const value = cell.getValue()
 			
+			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
+			
 			if(value === 'ok') {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="'+style+'">' +
 				'<i class="fa fa-circle-check" style="color:green"></i></div>'
 			} else if (value === 'offen') {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="'+style+'">' +
 					'<i class="fa-regular fa-circle"></i></div>'
 			} else if (value === 'changed') {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="'+style+'">' +
 					'<i class="fa fa-circle-check"></i></div>'
 			}
 			
@@ -741,11 +771,14 @@ export const Benotungstool = {
 		},
 		teilnotenFormatter(cell) {
 			const val = cell.getValue()
-			return '<div style="white-space: pre-line;">'+val+'</div>'
+			
+			let style = 'white-space: pre-line;'
+			
+			return '<div style="">'+val+'</div>'
 		},
 		pruefungFormatter(cell) {
 			const data = cell.getData()
-			
+
 			const noteDef = data.note ? this.notenOptions.find(n => n.note == data.note) : null
 			if(!data.note || !noteDef?.lkt_ueberschreibbar) {
 				return ''
@@ -901,18 +934,23 @@ export const Benotungstool = {
 			const row = cell.getRow()
 			const data = row.getData()
 			
+			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
+			
 			if(!data.note_vorschlag || (data.note_vorschlag == data.lv_note)) { // uncolored arrow
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+				return '<div style="'+style+'">' +
 					'<i class="fa fa-arrow-right"></i></div>'
 			}
 			
 			// can save a notenvorschlag -> colored
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+			return '<div style="'+style+'">' +
 				'<i class="fa fa-arrow-right fa-2xl" style="color:#00649C"></i></div>'
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+
+			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
+			
+			return '<div style="'+style+'">' +
 				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
 		buildMailToLink(student){
@@ -999,7 +1037,7 @@ export const Benotungstool = {
 				
 				const grades = this.teilnoten[s.uid].grades
 				s.teilnote = ''
-				
+				s.mobility_zusatz = this.teilnoten[s.uid].mobility_zusatz
 				grades.forEach(g => {
 					const notenOption = this.notenOptions.find(n=>n.note == g.grade)
 					if(notenOption.positiv) s.teilnote += ('<span>'+g.text +'</span>'+ '<br/>')
@@ -1121,29 +1159,8 @@ export const Benotungstool = {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 			
-			this.headerEl = document.getElementById('nav-main')
-			if(this.headerEl) {
-				this.headerEl.addEventListener("shown.bs.collapse", this.handleSidebar);
-				this.headerEl.addEventListener("hidden.bs.collapse", this.handleSidebar);
-				this.handleSidebar()
-			}
-			
-			
-			
-			
 			this.loadNoten(this.lv_id, this.sem_kurzbz)
-			// this.calcMaxTableHeight()
-			
-		},
-		handleSidebar() {
-			// this.$refs.notenTable.tabulator.blockRedraw(); // stop automatic resizes
-			
-			this.offsetLeft = this.headerEl.getBoundingClientRect().width;
-			
-			// setTimeout(() => {
-			// 	this.$refs.notenTable.tabulator.restoreRedraw(); // re-enable
-			// 	this.$refs.notenTable.tabulator.redraw(true);    // manual recalculation
-			// }, 400); // after animation finishes
+			this.calcMaxTableHeight()
 			
 		},
 		lvChanged(e) {
@@ -1233,8 +1250,12 @@ export const Benotungstool = {
 				typ
 			)).then(res => {
 				if(res.meta.status === 'success') { //'Prüfung für Student ' + this.pruefungStudent.uid + ' bearbeitet oder angelegt'
-					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungSaveForUid', [this.pruefungStudent.uid]))
-					
+					this.$fhcAlert.alertDefault(
+						'success',
+						'Info',
+						this.$p.t('benotungstool/pruefungSaveForUid', [this.pruefungStudent.uid]),
+						true
+					)
 					const s = this.studenten.find(s => s.uid === res.data[1]?.student_uid)
 					
 					s.freigabedatum = this.parseDate(res.data[1]?.['freigabedatum'])
@@ -1357,7 +1378,12 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
 				.then((res) => {
 				if(res.meta.status === 'success') {
-					this.$fhcAlert.alertWarning('Noten gespeichert')
+					this.$fhcAlert.alertDefault(
+						'success',
+						'Info',
+						'Noten gespeichert',
+						true
+					)
 				}
 				
 				res.data.forEach(d => {
@@ -1416,8 +1442,12 @@ export const Benotungstool = {
 				this.sem_kurzbz,
 			)).then(res => {
 				if(res.meta.status === "success") {
-					this.$fhcAlert.alertSuccess(this.$p.t('benotungstool/pruefungAngelegtAn', [dateStrFront]))
-					
+					this.$fhcAlert.alertDefault(
+						'success',
+						'Info',
+						this.$p.t('benotungstool/pruefungAngelegtAn', [dateStrFront]),
+						true
+					)
 					
 					this.handleAddNewPruefungenResponse(res, uids)
 					
@@ -1558,13 +1588,6 @@ export const Benotungstool = {
 	mounted() {
 		this.setupMounted()
 	},
-	unmounted() {
-		if(this.headerEl) {
-			this.headerEl.removeEventListener("shown.bs.collapse", this.handleSidebar)
-			this.headerEl.removeEventListener("hidden.bs.collapse", this.handleSidebar)
-			this.headerEl = null
-		}
-	},
 	template: `
 		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{$p.t('benotungstool/c4notenImportieren')}}</template>
@@ -1672,6 +1695,23 @@ export const Benotungstool = {
 			</template>
 		 </bs-modal>
 
+<BsOffcanvas
+	ref="drawer"
+	placement="end"
+	:backdrop="true"
+	:style="{ '--bs-offcanvas-width': '600px' }"
+>
+	<template #title>
+	
+	</template>
+
+	<MobilityLegende/>		
+
+	<template #footer>
+	
+	</template>
+</BsOffcanvas>
+
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<div class="row">
@@ -1721,7 +1761,7 @@ export const Benotungstool = {
 		</div>
 		<hr>
 		
-		<div id="notentable" class="row" :style="'overflow-x: auto; max-width: calc(98vw - ' + offsetLeft + 'px);'">
+		<div id="notentable" class="row" :style="'overflow-x: auto;'">
 			<core-filter-cmpt
 				v-if="tabulatorCanBeBuilt"
 				@uuidDefined="handleUuidDefined"
@@ -1753,8 +1793,6 @@ export const Benotungstool = {
 				 </template>
 			</core-filter-cmpt>
 		</div>
-		
-		<MobilityLegende/>		
     `,
 };
 

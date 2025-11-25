@@ -898,8 +898,4 @@ class Prestudent_model extends DB_Model
 
 		return true;
 	}
-	
-	public function getMobilityPrestudent(){
-		
-	}
 }
