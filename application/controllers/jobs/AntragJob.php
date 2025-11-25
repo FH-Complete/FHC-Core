@@ -200,13 +200,14 @@ class AntragJob extends JOB_Controller
 	}
 
 	/**
-	 * Send reminder to Assistant for Wiedereinstieg Unterbrecher
+	 * Send reminder to Assistant and to Student for Wiedereinstieg Unterbrecher
 	 *
 	 */
 	public function sendReminderWiedereinstieg()
 	{
 		$now = new DateTime();
 		$modifier = $this->config->item('unterbrechung_job_remind_wiedereinstieg_date_modifier');
+
 		if (!$modifier)
 			return $this->logError('Konnte Job nicht starten: Config "unterbrechung_job_remind_wiedereinstieg_date_modifiers" nicht gesetzt');
 
@@ -230,6 +231,7 @@ class AntragJob extends JOB_Controller
 
 		$antraege = getData($result) ?: [];
 		$count = 0;
+		$countReminderStudent = 0;
 		foreach ($antraege as $antrag)
 		{
 			$res = $this->StudierendenantragModel->getStgAndSem($antrag->studierendenantrag_id);
@@ -257,7 +259,57 @@ class AntragJob extends JOB_Controller
 				$data['UID'] = $student->student_uid;
 			}
 
-			// NOTE(chris): Sancho mail
+			//Data für Email Student
+			$result = $this->PrestudentModel->load($antrag->prestudent_id);
+			$dataPrestudent = current(getData($result));
+			$person_id = $dataPrestudent->person_id;
+
+			$this->KontaktModel->addSelect('kontakt');
+			$this->KontaktModel->addLimit(1);
+
+			$result = $this->KontaktModel->loadWhere([
+				'person_id'=> $person_id,
+				'zustellung' => true,
+				'kontakttyp' => 'email'
+			]);
+			if (hasData($result)) {
+				$dataKontakt = current(getData($result));
+				$email_student_privat = $dataKontakt->kontakt;
+			}
+
+			$email_student_FH = $this->StudentModel->getEmailFH($this->StudentModel->getUID($antrag->prestudent_id));
+
+			//studiensemester
+			$result = $this->StudiensemesterModel->getByDate($datum->format('d.m.Y'));
+			if (hasData($result)) {
+				$dataSem = current(getData($result));
+			}
+
+			$studiensemester = $dataSem->studiensemester_kurzbz;
+			$studsemShort = substr($studiensemester, 0, 2);
+
+			if($studsemShort == "SS")
+			{
+				$data['studSemShort_Eng'] = "summer semester";
+				$data['meldenBis'] = "15.1.";
+				$data['meldenBis_Eng'] = "January 15";
+			}
+			elseif ($studsemShort == "WS") {
+				$data['studSemShort_Eng'] = "winter semester";
+				$data['meldenBis'] = "1.8.";
+				$data['meldenBis_Eng'] = "August 1";
+			}
+			else
+			{
+				$studsemShort = "SS/WS";
+				$data['studSemShort_Eng'] = "summer/winter semester";
+				$data['meldenBis'] = "15.1. (bei Einstieg ins SS) / 1.8. (bei Einstieg ins WS)";
+				$data['meldenBis_Eng'] = "January 15 (for sommer semester enrollment) / August 1 (for winter semester enrollment)";
+			}
+
+			$data['studSemShort'] = $studsemShort;
+
+			// NOTE(chris): Sancho mail Assistant
 			if(sendSanchoMail('Sancho_Mail_Antrag_U_Reminder', $data, $antrag->email, 'Reminder: Unterbrechung Wiedereinstieg'))
 			{
 				$count++;
@@ -267,8 +319,21 @@ class AntragJob extends JOB_Controller
 					'insertvon' => 'AntragJob'
 				]);
 			}
+
+			//Mail to Student
+			if(sendSanchoMail(
+				'Sancho_Mail_Antrag_U_Remind_Stud',
+				$data,
+				$email_student_FH,
+				'Reminder: Unterbrechung Wiedereinstieg',
+				'',
+				'',
+				'',
+				$email_student_privat)) {
+				$countReminderStudent++;
+			}
 		}
-		$this->logInfo($count . ' Reminder gesendet - Ende Job sendReminderWiedereinstieg');
+		$this->logInfo($count . ' Reminder an Assistenz und ' . $countReminderStudent . ' Reminder an Student gesendet  - Ende Job sendReminderWiedereinstieg');
 	}
 
 	/**

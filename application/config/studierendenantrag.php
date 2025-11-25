@@ -57,7 +57,7 @@ $config['wiederholung_note_nicht_zugelassen'] = 20;
  * @var string	        A string formated as PHP DateTime modifier
  * @see https://www.php.net/manual/de/datetime.modify.php
  */
-$config['unterbrechung_job_remind_wiedereinstieg_date_modifier'] = '+3 days';
+$config['unterbrechung_job_remind_wiedereinstieg_date_modifier'] = '+166 days';
 
 /**
  * The Job will sent a request to everyone who faild the 3rd committee exam
