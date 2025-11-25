@@ -6,6 +6,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
 import MobilityLegende from '../../Mobility/Legende.js';
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
 export const Benotungstool = {
 	name: "Benotungstool",
@@ -14,10 +15,12 @@ export const Benotungstool = {
 		CoreFilterCmpt,
 		MobilityLegende,
 		Dropdown: primevue.dropdown,
+		Divider: primevue.divider,
 		Password: primevue.password,
 		Textarea: primevue.textarea,
 		Datepicker: VueDatePicker,
-		Multiselect: primevue.multiselect
+		Multiselect: primevue.multiselect,
+		FhcOverlay
 	},
 	props: {
 		lv_id: {
@@ -282,7 +285,7 @@ export const Benotungstool = {
 			})
 		},
 		savePruefungBulk(pruefungenbulk) {
-			this.loading = false
+			this.loading = true
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
 					if(res.meta.status === 'success') {
@@ -716,6 +719,7 @@ export const Benotungstool = {
 			const data = row.getData()
 
 			if(!data.note_vorschlag) return
+			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag))
 				.then((res) => {
 				if (res.meta.status === 'success') {
@@ -731,7 +735,7 @@ export const Benotungstool = {
 					row.reformat() // trigger reformat of arrow
 					this.changedNotenCounter++;
 				}
-			})
+			}).finally(()=>this.loading = false)
 			
 			
 		},
@@ -1163,7 +1167,8 @@ export const Benotungstool = {
 					lv_id: this.lv_id
 				}
 			})
-			
+
+			this.loading = true
 			// diff lv_id -> reload zugewiesene lv
 			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, e.value.studiensemester_kurzbz)).then(res => {
 				this.lehrveranstaltungen = res.data
@@ -1178,7 +1183,7 @@ export const Benotungstool = {
 				
 				// reload data
 				this.loadNoten(this.lv_id, e.value.studiensemester_kurzbz)
-			})
+			}).finally( () => this.loading = false)
 
 		},
 		getOptionLabel(option) {
@@ -1490,6 +1495,14 @@ export const Benotungstool = {
 		}
 	},
 	computed: {
+		getFreigabeCounter() {
+			return this.studenten ? this.studenten.reduce((acc, cur) => {
+				if(cur.freigegeben == 'changed') {
+					acc++
+				}
+				return acc
+			}, 0) : 0
+		},
 		LehreinheitenModule() {
 			return LehreinheitenModule;
 		},
@@ -1553,7 +1566,6 @@ export const Benotungstool = {
 		}
 	},
 	template: `
-
 		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
 			<template v-slot:title>{{$p.t('benotungstool/c4notenImportieren')}}</template>
 			<template v-slot:default>
@@ -1563,7 +1575,6 @@ export const Benotungstool = {
 				<div class="row mt-4 justify-content-center">
 					<Textarea v-model="importString" rows="5"></Textarea>
 				</div>
-				
 			</template>
 			<template v-slot:footer>
 				<button type="button" class="btn btn-primary" @click="importNoten">{{ $p.t('benotungstool/c4import') }}</button>
@@ -1577,18 +1588,17 @@ export const Benotungstool = {
 			<template v-slot:title>{{$p.t('benotungstool/c4addNewPruefung')}}</template>
 			<template v-slot:default>
 				<div class="row justify-content-center">
-
 					<div class="col-3 text-center">{{$p.t('benotungstool/c4date')}}:</div>
 					<div class="col-6">
 						<datepicker
 							v-model="selectedPruefungDate"
 							:clearable="false"
+							format="dd.MM.yyyy"
 							:enableTimePicker="false"
 							:text-input="true"
 							:auto-apply="true">
 						</datepicker>
 					</div>
-
 				</div>
 				
 				<div class="row mt-4 justify-content-center">
@@ -1662,9 +1672,7 @@ export const Benotungstool = {
 			</template>
 		 </bs-modal>
 
-		<div v-show="loading" style="position: absolute; width: 100vw; height: 100vh; background: rgba(255,255,255,0.5); z-index: 8500; display: flex; justify-content: center; align-items: center;">
-			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-		</div>
+		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<div class="row">
 			<div class="col-4">
@@ -1673,7 +1681,8 @@ export const Benotungstool = {
 			</div>
 			<div class="col-2">
 				<div class="col-lg-auto">
-					<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv" 
+					<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv"
+						:placeholder="$p.t('lehre/lehrveranstaltung')"
 						v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
 						<template #optionsgroup="slotProps">
 							<div> {{ option.fullString }} </div>
@@ -1724,15 +1733,23 @@ export const Benotungstool = {
 				:sideMenu="false"
 			>
 				 <template #actions>
-					<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
-						{{$p.t('benotungstool/approveGrades')}} <i class="fa fa-save"></i>
-					</button>
+					
 					<button @click="openNewPruefungsdatumModal" role="button" :class="getNewBtnClass">
 						{{$p.t('benotungstool/c4addNewPruefung')}} <i class="fa fa-plus"></i>
 					</button>
+					
+					<Divider layout="vertical" style="transform: translateY(12px)"/>
+					
 					<button @click="openNotenImportModal" role="button" :class="getNotenImportBtnClass">
 						{{$p.t('benotungstool/c4notenImportieren')}} <i class="fa fa-file-import"></i>
 					</button>
+					<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
+						{{$p.t('benotungstool/approveGrades')}} <i class="fa fa-save"></i>
+					</button>
+					
+					<Divider layout="vertical" style="transform: translateY(12px)"/>
+					
+					<h4>{{ getFreigabeCounter > 0 ? $p.t('benotungstool/freigabecounterPositiv', [getFreigabeCounter]) : '' }}</h4>
 				 </template>
 			</core-filter-cmpt>
 		</div>

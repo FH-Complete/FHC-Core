@@ -31,6 +31,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
+		'vendor/npm-asset/primevue/divider/divider.min.js',
 		'vendor/moment/luxonjs/luxon.min.js',
 		'vendor/npm-asset/primevue/password/password.js',
 		'vendor/npm-asset/primevue/multiselect/multiselect.js'

@@ -48107,6 +48107,26 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
+		'phrase' => 'freigabecounterPositiv',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sie können {0} Noten freigeben!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are able to approve {0} grades!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
 		'phrase' => 'noteneingabeSpeichern',
 		'insertvon' => 'system',
 		'phrases' => array(

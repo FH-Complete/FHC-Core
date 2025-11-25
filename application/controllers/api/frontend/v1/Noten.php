@@ -130,17 +130,18 @@ class Noten extends FHCAPI_Controller
 		}
 
 		// send $grades reference to moodle addon
-		Events::trigger(
-			'getExternalGrades',
-			function & () use (&$grades)
-			{
-				return $grades;
-			},
-			[
-				'lvid' => $lv_id,
-				'stsem' => $sem_kurzbz
-			]
-		);
+		// TODO: DONT LET FAULTY MOODLE TOKEN BREAK THE STARTUP
+//		Events::trigger(
+//			'getExternalGrades',
+//			function & () use (&$grades)
+//			{
+//				return $grades;
+//			},
+//			[
+//				'lvid' => $lv_id,
+//				'stsem' => $sem_kurzbz
+//			]
+//		);
 		
 		// calculate notenvorschläge from teilnoten
 		foreach($studentenData as $student) {
