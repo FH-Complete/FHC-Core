@@ -132,9 +132,10 @@ export default {
 						frozen: true
 					}
 					],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData:	false,
 				height: '400',
+				selectable: 1,
 				selectableRangeMode: 'click',
 				index: 'message_id',
 				pagination: true,
@@ -147,7 +148,7 @@ export default {
 				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
 				dataTreeChildIndent: 15,
 				dataTreeStartExpanded: false,
-				persistenceID: 'core-message',
+				persistenceID: 'core-message-2025112401',
 				locale: 'de',
 				"langs": {
 					"de":{ //German language definition
@@ -274,6 +275,11 @@ export default {
 			this.$refs.table.reloadTable();
 		},
 		buildTreemap(messages) {
+			if (!messages || !messages.data || messages.data.length === 0)
+			{
+				return {data: [], last_page: 0};
+			}
+
 			const last_page = messages.meta.count;
 			messages = messages.data;
 			const messageMap = new Map();

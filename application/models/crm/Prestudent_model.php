@@ -1,5 +1,7 @@
 <?php
 
+use CI3_Events as Events;
+
 class Prestudent_model extends DB_Model
 {
 	/**
@@ -781,6 +783,120 @@ class Prestudent_model extends DB_Model
 		";
 
 		return $this->execQuery($query, array($person_id));
+	}
+
+	/**
+	 * Adds a filter to the query builder
+	 *
+	 * @param array			$filter
+	 * @return boolean
+	 */
+	public function addFilter($filter)
+	{
+		if (!isset($filter['type']))
+			return false;
+
+		switch ($filter['type']) {
+			case 'konto':
+				$bt = '';
+				$stdsem = '';
+				$comp = '!=';
+
+				if (isset($filter['buchungstyp_kurzbz']) && $filter['buchungstyp_kurzbz'] != 'all')
+					$bt = ' AND buchungstyp_kurzbz=' . $this->escape($filter['buchungstyp_kurzbz']);
+				
+				if (isset($filter['studiensemester_kurzbz']))
+					$stdsem = ' AND studiensemester_kurzbz=' . $this->escape($filter['studiensemester_kurzbz']);
+
+				if (isset($filter['missing']) && $filter['missing']) {
+					$comp = '=';
+					$this->db->where('get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) !=', 'Incoming');
+				}
+
+				$this->db->where('(
+					SELECT count(*) 
+					FROM public.tbl_konto 
+					WHERE person_id=tbl_prestudent.person_id 
+					' . $bt . ' 
+					' . $stdsem . '
+				) ' . $comp, 0);
+				break;
+			
+			case 'konto_counter':
+				$bt = '';
+				$samestg = '';
+				$past = '';
+
+				if (isset($filter['buchungstyp_kurzbz']) && $filter['buchungstyp_kurzbz'] != 'all')
+					$bt = ' AND buchungstyp_kurzbz = ' . $this->escape($filter['buchungstyp_kurzbz']);
+				
+				if (isset($filter['samestg']) && $filter['samestg'])
+					$samestg = ' AND studiengang_kz = tbl_prestudent.studiengang_kz';
+
+				if (isset($filter['past']) && $filter['past'])
+					$past = ' AND buchungsdatum < NOW()';
+
+				$this->db->where('(
+					SELECT sum(betrag) 
+					FROM public.tbl_konto 
+					WHERE person_id = tbl_prestudent.person_id 
+					' . $bt . ' 
+					' . $samestg . '
+					' . $past . '
+				) !=', 0);
+				break;
+			
+			case 'zgv':
+				$this->db
+					->group_start()
+						->group_start()
+							->where('zgv_code IS NOT NULL')
+							->where('zgvdatum IS NULL')
+						->group_end()
+						->or_group_start()
+							->where('zgvmas_code IS NOT NULL')
+							->where('zgvmadatum IS NULL')
+						->group_end()
+						->or_group_start()
+							->where('zgvdoktor_code IS NOT NULL')
+							->where('zgvdoktordatum IS NULL')
+						->group_end()
+					->group_end();
+				break;
+			
+			case 'documents':
+				$this->db->where('(
+					SELECT count(*) 
+					FROM public.tbl_dokumentstudiengang 
+					WHERE dokument_kurzbz NOT IN (
+						SELECT dokument_kurzbz 
+						FROM tbl_dokumentprestudent 
+						WHERE prestudent_id=tbl_prestudent.prestudent_id
+					)
+					AND studiengang_kz=tbl_prestudent.studiengang_kz
+				) !=', 0);
+				break;
+
+			case 'statusgrund':
+				if (!isset($filter['statusgrund_id']))
+					return false;
+
+				if (isset($filter['studiensemester_kurzbz']))
+					$stdsem = ' AND studiensemester_kurzbz=' . $this->escape($filter['studiensemester_kurzbz']);
+
+				$this->db->where('(
+					SELECT count(*) 
+					FROM public.tbl_prestudentstatus 
+					WHERE prestudent_id = tbl_prestudent.prestudent_id 
+					AND statusgrund_id = ' . $this->escape($filter['statusgrund_id']) . '
+					' . $stdsem . '
+				) !=', 0);
+				break;
+		}
+
+		Events::trigger('prestudent_add_filter', $filter);
+
+		return true;
 	}
 	
 	public function getMobilityPrestudent(){

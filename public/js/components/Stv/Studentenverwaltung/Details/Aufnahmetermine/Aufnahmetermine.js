@@ -120,12 +120,12 @@ export default {
 						frozen: true
 					}
 				],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
 				index: 'aufnahmetermin_id',
-				persistenceID: 'stv-details-table_admission-dates'
+				persistenceID: 'stv-details-table_admission-dates-2025112401'
 			},
 			tabulatorEvents: [
 				{
@@ -322,7 +322,7 @@ export default {
 				this.$refs.filterButton.title = this.$p.t('admission', 'loadZukuenftigeRT');}
 		},
 		openAdministrationPlacementTest(reihungstest_id){
-			let link = this.cisRoot + 'vilesci/stammdaten/reihungstestverwaltung.php';
+			let link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'vilesci/stammdaten/reihungstestverwaltung.php';
 			if(reihungstest_id){
 				link += '?reihungstest_id=' + reihungstest_id;
 			}

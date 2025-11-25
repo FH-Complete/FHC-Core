@@ -1,6 +1,6 @@
 <?php
 
-defined('BASEPATH') OR exit('No direct script access allowed');
+if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------------
@@ -51,7 +51,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |   my-controller/my-method -> my_controller/my_method
 */
 $route['default_controller'] = defined('CIS4') && CIS4 ? 'Cis4' : 'Vilesci';
-$route['translate_uri_dashes'] = FALSE;
+$route['translate_uri_dashes'] = false;
 
 // Class name conflicts
 $route['api/v1/organisation/[S|s]tudiengang/(:any)'] = 'api/v1/organisation/studiengang2/$1';
@@ -63,6 +63,7 @@ $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
+$route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 $route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
 
 // Studierendenverwaltung List Routes
@@ -71,9 +72,9 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv
 
 // (studiensemester_kurzbz)/inout[/(incoming|outgoing|gemeinsamestudien)]
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout'] = 'api/frontend/v1/stv/Students/index';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/incoming'] = 'api/frontend/v1/stv/Students/getIncoming';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/outgoing'] = 'api/frontend/v1/stv/Students/getOutgoing';
-$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/gemeinsamestudien'] = 'api/frontend/v1/stv/Students/getGemeinsamestudien';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/incoming'] = 'api/frontend/v1/stv/Students/getIncoming/$1';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/outgoing'] = 'api/frontend/v1/stv/Students/getOutgoing/$1';
+$route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/inout/gemeinsamestudien'] = 'api/frontend/v1/stv/Students/getGemeinsamestudien/$1';
 
 // (studiengang_kz)/prestudent[/(studiensemester_kurzbz)[/(filter)[/(otherfilter)]]]
 $route['api/frontend/v1/stv/[sS]tudents/(-?[0-9]+)/prestudent'] = 'api/frontend/v1/stv/Students/getPrestudents/$1';
@@ -112,25 +113,29 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'a
 // // (studiensemester_kurzbz)/person/(person_id)
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
 
+// load routes from extensions, also look for environment-specific configs
+$subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
-
-// load routes from extensions
-$subdir = 'application/config/extensions';
-$dirlist = scandir($subdir);
-
-if ($dirlist)
+foreach($subdirs as $subdir)
 {
-	$files = array_diff($dirlist, array('.','..'));
-
-	foreach ($files as &$item)
+	if(is_dir($subdir))
 	{
-		if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
+		$dirlist = scandir($subdir);
+		if ($dirlist)
 		{
-			$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+			$files = array_diff($dirlist, array('.','..'));
 
-			if (file_exists($routes_file))
+			foreach ($files as &$item)
 			{
-				require($routes_file);
+				if (is_dir($subdir . DIRECTORY_SEPARATOR . $item))
+				{
+					$routes_file = $subdir . DIRECTORY_SEPARATOR . $item . DIRECTORY_SEPARATOR . 'routes.php';
+
+					if (file_exists($routes_file))
+					{
+						require($routes_file);
+					}
+				}
 			}
 		}
 	}

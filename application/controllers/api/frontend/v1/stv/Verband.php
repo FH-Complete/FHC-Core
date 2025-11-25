@@ -165,7 +165,17 @@ class Verband extends FHCAPI_Controller
 		
 		$this->StudiengangModel->addDistinct();
 		$this->StudiengangModel->addSelect("CONCAT(" . $this->StudiengangModel->escape($link) . ", semester) AS link", false);
-		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester ORDER BY verband, gruppe LIMIT 1)) AS name", false);
+		$this->StudiengangModel->addSelect("CONCAT(
+			UPPER(CONCAT(typ, kurzbz)), 
+			'-', 
+			semester, 
+			(
+				SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END 
+				FROM public.tbl_lehrverband 
+				WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester 
+				ORDER BY verband, gruppe LIMIT 1
+			)
+		) AS name", false);
 
 		$this->StudiengangModel->addSelect('semester');
 		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
@@ -173,6 +183,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addOrder('semester');
 
 		if ($org_form !== null) {
+			$this->StudiengangModel->addSelect("v.orgform_kurzbz");
 			$this->StudiengangModel->db->group_start();
 			$this->StudiengangModel->db->where('v.semester', 0);
 			$this->StudiengangModel->db->or_where('v.orgform_kurzbz', $org_form);
@@ -188,6 +199,8 @@ class Verband extends FHCAPI_Controller
 		array_unshift($list, [
 			'name' => 'PreStudent',
 			'link' => $link . 'prestudent',
+			'no_sem_reload' => true,
+			'stg_kz' => (int)$studiengang_kz,
 			'children' => $this->getStdSem($link . 'prestudent/', $studiengang_kz)
 		]);
 
@@ -215,7 +228,6 @@ class Verband extends FHCAPI_Controller
 					$list = array_merge($list, $result);
 				}
 			}
-
 		}
 		$this->terminateWithSuccess($list);
 	}
@@ -271,6 +283,7 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, verband, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester AND verband=v.verband ORDER BY gruppe LIMIT 1)) AS name", false);
 		$this->StudiengangModel->addSelect("CASE WHEN MAX(gruppe)='' OR MAX(gruppe)=' ' THEN TRUE ELSE FALSE END AS leaf");
 
+		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($semester) . ' AS semester');
 		$this->StudiengangModel->addSelect('verband');
 		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		
@@ -319,6 +332,8 @@ class Verband extends FHCAPI_Controller
 		$this->StudiengangModel->addSelect("CONCAT(UPPER(CONCAT(typ, kurzbz)), '-', semester, verband, gruppe, (SELECT CASE WHEN bezeichnung IS NULL OR bezeichnung='' THEN ''::TEXT ELSE CONCAT(' (', bezeichnung, ')') END FROM public.tbl_lehrverband WHERE studiengang_kz=v.studiengang_kz AND semester=v.semester AND verband=v.verband AND gruppe=v.gruppe ORDER BY gruppe LIMIT 1)) AS name", false);
 		$this->StudiengangModel->addSelect("TRUE AS leaf", false);
 
+		$this->StudiengangModel->addSelect('v.semester');
+		$this->StudiengangModel->addSelect('v.verband');
 		$this->StudiengangModel->addSelect('gruppe');
 		$this->StudiengangModel->addSelect($this->StudiengangModel->escape($studiengang_kz) . '::integer AS stg_kz', false);
 		

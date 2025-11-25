@@ -61,9 +61,13 @@ $config['tabs'] =
 		'notes' => [
 			//if true, the count of Messages will be shown in the header of the Tab Messages
 			'showCountNotes' => true
-		]
+		],
+		'combinePeople' => [
+			//multitab should only be shown with this length of selection
+			'validCountMulti' => 2,
+		],
 	];
-	
+
 // List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined
 $fieldsZgvDoktor = ['zgvdoktorort', 'zgvdoktordatum', 'zgvdoktornation', 'zgvdoktor_erfuellt', 'zgvdoktor_code'];
 
@@ -83,3 +87,40 @@ if (!defined('ZGV_DOKTOR_ANZEIGEN') || !ZGV_DOKTOR_ANZEIGEN) {
 		$fieldsZgvDoktor
 	);
 }
+
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStunden'] = '4.0';
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStundenDiplom'] = '5.0';
+$config['tabs']['projektarbeit']['lvLektroinnenzuteilungFixangestelltStundensatz'] = true;
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStundensatz'] = '80.0';
+
+$config['student_tab_order'] = [
+	'details',
+	'notes',
+	'messages',
+	'contact',
+	'prestudent',
+	'status',
+	'documents',
+	'archive',
+	'banking',
+	'grades',
+	'exam',
+	'exemptions',
+	'projektarbeit',
+	'finalexam',
+	'mobility',
+	'jointstudies',
+	'admissionDates',
+	'groups',
+	'functions',
+	'coursedates',
+	'resources',
+];
+$config['students_tab_order'] = [
+	'banking',
+	'status',
+	'groups',
+	'finalexam',
+	'combinePeople',
+	'archive',
+];
