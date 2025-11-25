@@ -358,10 +358,10 @@ class LvPlan extends FHCAPI_Controller
 			'studiengang_kz' => $studiengang_kz,
 		];
 
-		if ($semester !== null  && $semester !== 'null') {
+		if ($semester !== null  && $semester !== 'null' && $semester !== 'undefined') {
 			$where['semester'] = $semester;
 		}
-		if ($verband !== null  && $verband !== 'null') {
+		if ($verband !== null  && $verband !== 'null' && $verband !== 'undefined') {
 			$where['verband'] = $verband;
 		}
 

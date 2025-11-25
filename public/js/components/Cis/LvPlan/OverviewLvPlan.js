@@ -17,7 +17,7 @@ export default {
 		return {
 			formData:  {
 				stgkz: null,
-				semester: null,
+				sem: null,
 				verband: null,
 				gruppe: null,
 			},
@@ -25,7 +25,7 @@ export default {
 			listSem: [],
 			listVerband: [],
 			listGroup: [],
-			dataLvStudiengang: {}
+		//	dataLvStudiengang: {}
 		};
 	},
 	methods: {
@@ -34,13 +34,14 @@ export default {
 				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'chooseStg'));
 				return;
 			}
+			console.log(this.$route.name, this.$route.params);
 			this.$router.push({
 				name: "StgOrgLvPlan",
 				params: {
 					mode: "Week",
 					focus_date: this.currentDay,
 					stgkz: this.formData.stgkz,
-					sem: this.formData.semester,
+					sem: this.formData.sem,
 					verband: this.formData.verband,
 					gruppe: this.formData.gruppe,
 				}
@@ -52,7 +53,7 @@ export default {
 		},
 		loadListVerband(){
 			this.$api
-				.call(ApiLvPlan.getLehrverband(this.formData.stgkz, this.formData.semester, this.formData.verband))
+				.call(ApiLvPlan.getLehrverband(this.formData.stgkz, this.formData.sem, this.formData.verband))
 				.then(result => {
 					const data = result.data;
 					const mappedData = data.map(item => item.verband);
@@ -68,7 +69,7 @@ export default {
 		},
 		loadListGroup(){
 			this.$api
-				.call(ApiLvPlan.getGruppe(this.formData.stgkz, this.formData.semester, this.formData.verband))
+				.call(ApiLvPlan.getGruppe(this.formData.stgkz, this.formData.sem, this.formData.verband))
 				.then(result => {
 					const data = result.data;
 					const mappedData = data.map(item => item.gruppe);
@@ -122,7 +123,7 @@ export default {
 	 			</form-input>
 	 			<form-input
 	 				type="select"
-	 				v-model="formData.semester"
+	 				v-model="formData.sem"
 	 				@change="loadListVerband()"
 	 				>
 						<option value="null" selected>Semester</option>
