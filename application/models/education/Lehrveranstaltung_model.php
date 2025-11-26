@@ -1211,7 +1211,7 @@ class Lehrveranstaltung_model extends DB_Model
 	{
 		return "
 		SELECT
-				lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
+				distinct on (lehrveranstaltung_id) lehrveranstaltung_id, tbl_lehrveranstaltung.kurzbz as lv_kurzbz, tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung, bezeichnung_english as lv_bezeichnung_english, studiengang_kz,
 				tbl_studienplan_lehrveranstaltung.semester, tbl_lehrveranstaltung.sprache,
 				ects as lv_ects, semesterstunden, anmerkung, lehre, lehreverzeichnis as lv_lehreverzeichnis, tbl_lehrveranstaltung.aktiv,
 				planfaktor as lv_planfaktor, planlektoren as lv_planlektoren, planpersonalkosten as lv_planpersonalkosten,
