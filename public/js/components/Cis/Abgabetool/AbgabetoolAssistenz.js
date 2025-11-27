@@ -409,6 +409,7 @@ export const AbgabetoolAssistenz = {
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
+				this.serienTermin.upload_allowed,
 				pids,
 				this.serienTermin.fixtermin
 			)).then(res => {
@@ -524,19 +525,27 @@ export const AbgabetoolAssistenz = {
 
 			this.$refs.modalContainerAbgabeDetail.show()
 		},
-		dateDiffInDays(datum, today){
-			const oneDayMs = 1000 * 60 * 60 * 24
-			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
+		dateDiffInDays(datum){
+			const dateToday = luxon.DateTime.now().startOf('day');
+
+			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
+
+			const duration = dateDatum.diff(dateToday, 'days');
+
+			return duration.values.days;
 		},
 		getDateStyleClass(termin) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
-			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			if (termin.abgabedatum === null) {
+			termin.diffindays = this.dateDiffInDays(termin.datum)
+
+			// seperate status if termin is in the past, it needs a note but doesnt have one yet			
+			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
+			else if (termin.abgabedatum === null) {
 				if(datum < today) {
-					return 'verpasst'
-				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
+					return termin.upload_allowed ? 'verpasst' : 'abgegeben'
+				} else if (datum > today && termin.diffindays <= 12) {
 					return 'abzugeben'
 				} else {
 					return 'standard'
@@ -754,10 +763,10 @@ export const AbgabetoolAssistenz = {
 		
 		this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()).then((res) => {
 			this.allSem = res.data[0]
-			this.curSem = res.data[1]
+			const all = {studiensemester_kurzbz: 'Alle'}
+			this.curSem = all // res.data[1]
 			
-			// TODO: maybe filter only for available semester from projektarbeiten dataset
-			this.studiensemesterOptions = [{studiensemester_kurzbz: 'Alle'}, this.curSem, ...this.allSem]
+			this.studiensemesterOptions = [all, ...this.allSem]
 
 		}).catch(e => {
 			this.loading = false
@@ -767,12 +776,13 @@ export const AbgabetoolAssistenz = {
 		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		this.$api.call(ApiAbgabe.getNoten()).then(res => {
-			this.notenOptions = res.data
-			// TODO: more sophisticated way to filter for these two, in essence it is still hardcoded
-			this.allowedNotenOptions = this.notenOptions.filter(
-				opt => opt.bezeichnung === 'Bestanden'
-					|| opt.bezeichnung === 'Nicht bestanden'
-			)
+			if(res.meta.status == 'success') {
+				this.notenOptions = res.data[0]
+
+				this.allowedNotenOptions = this.notenOptions.filter(
+					opt => res.data[1].includes(opt.bezeichnung)
+				)
+			}
 			
 			// allowedNotenOptions apply to quality gates abgabetermine
 			// this selection is about graded projektarbeiten, so take different options here
@@ -819,43 +829,51 @@ export const AbgabetoolAssistenz = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<div class="row">
-					<div class="col-1 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4fixterminv4')}}
-					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$capitalize($p.t('abgabetool/c4zieldatum'))}}
-					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabetyp')}}
-					</div>
-					<div class="col-5 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabekurzbz')}}
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-1 d-flex justify-content-center align-items-center">
-						<Checkbox 
+			
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4fixterminv4') )}}</div>
+					<div class="col-12 col-md-9">
+						<Checkbox
 							v-model="serienTermin.fixtermin"
-							:binary="true" 
+							:binary="true"
 							:pt="{ root: { class: 'ml-auto' }}"
 						>
 						</Checkbox>
 					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						<div>
-							<VueDatePicker
-								style="width: 95%;"
-								v-model="serienTermin.datum"
-								:clearable="false"
-								:enable-time-picker="false"
-								:format="formatDate"
-								:text-input="true"
-								auto-apply>
-							</VueDatePicker>
-						</div>				
+				</div>
+			
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 align-content-center">
+						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
+					<div class="col-12 col-md-9">
+						<VueDatePicker
+							style="width: 95%;"
+							v-model="serienTermin.datum"
+							:clearable="false"
+							:enable-time-picker="false"
+							:format="formatDate"
+							:text-input="true"
+							auto-apply>
+						</VueDatePicker>
+					</div>
+				</div>
+			
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
+					<div class="col-12 col-md-9">
+						<Checkbox
+							v-model="serienTermin.upload_allowed"
+							:binary="true"
+							:pt="{ root: { class: 'ml-auto' }}"
+						>
+						</Checkbox>
+					</div>
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
+					<div class="col-12 col-md-9">
 						<Dropdown 
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
@@ -863,7 +881,11 @@ export const AbgabetoolAssistenz = {
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>
-					<div class="col-5 d-flex justify-content-center align-items-center">
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+					<div class="col-12 col-md-9">
 						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
 				</div>

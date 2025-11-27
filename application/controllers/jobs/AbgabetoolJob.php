@@ -20,6 +20,7 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 
+		$this->_ci->load->config('abgabe');
 		$this->loadPhrases([
 			'abgabetool'
 		]);
@@ -32,7 +33,7 @@ class AbgabetoolJob extends JOB_Controller
 		// this job gathers all new or changed file uploads via field 'abgabedatum', enduploads still
 		// send an email directly after happening since they are kind of important
 
-		$this->_ci->logInfo('Start job queue scheduler FHC-Core->notifyBetreuerMail');
+		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerMail');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 
@@ -102,7 +103,7 @@ class AbgabetoolJob extends JOB_Controller
 
 			// send email with bundled info
 			sendSanchoMail(
-				'paabgabeUpdatesBetSM',
+				'PaabgabeUpdatesBetSM',
 				$body_fields,
 				$data->private_email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
@@ -112,14 +113,14 @@ class AbgabetoolJob extends JOB_Controller
 		}
 		
 		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
-		$this->_ci->logInfo('End job queue scheduler FHC-Core->notifyBetreuerMail');
+		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerMail');
 	}
 
 	public function notifyStudentMail()
 	{
 		// send all new projektarbeit abgabe since the last job run to the related student
 
-		$this->_ci->logInfo('Start job queue scheduler FHC-Core->notifyStudentMail');
+		$this->_ci->logInfo('Start job FHC-Core->notifyStudentMail');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 
@@ -127,7 +128,7 @@ class AbgabetoolJob extends JOB_Controller
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
-			$this->logInfo("Keine Emails an Studenten versandt");
+			$this->_ci->logInfo("Keine Emails an Studenten versandt");
 			return;
 		}
 		
@@ -180,7 +181,7 @@ class AbgabetoolJob extends JOB_Controller
 
 			// send email with bundled info
 			sendSanchoMail(
-				'paabgabeUpdatesSammelmail',
+				'PaabgabeUpdatesSammelmail',
 				$body_fields,
 				$uid.'@'.DOMAIN,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
@@ -191,6 +192,6 @@ class AbgabetoolJob extends JOB_Controller
 		}
 
 		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
-		$this->_ci->logInfo('End job queue scheduler FHC-Core->notifyStudentMail');
+		$this->_ci->logInfo('End job FHC-Core->notifyStudentMail');
 	}
 }

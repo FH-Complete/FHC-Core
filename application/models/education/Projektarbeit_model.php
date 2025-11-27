@@ -175,6 +175,7 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabe.beurteilungsnotiz,
 					campus.tbl_paabgabetyp.paabgabetyp_kurzbz, 
 					campus.tbl_paabgabetyp.bezeichnung, 
+					campus.tbl_paabgabetyp.benotbar, 
 					campus.tbl_paabgabe.abgabedatum,
 					campus.tbl_paabgabe.insertvon
 				FROM campus.tbl_paabgabe JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)

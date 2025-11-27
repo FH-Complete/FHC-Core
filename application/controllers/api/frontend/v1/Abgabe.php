@@ -82,11 +82,13 @@ class Abgabe extends FHCAPI_Controller
 	public function getConfig() {
 		$this->load->config('abgabe');
 		$old_abgabe_beurteilung_link =$this->config->item('old_abgabe_beurteilung_link');
-		$turnitin_link =$this->config->item('turnitin_link');
+		$turnitin_link = $this->config->item('turnitin_link');
+		$abgabetypenBetreuer = $this->config->item('ALLOWED_ABGABETYPEN_BETREUER');
 		
 		$ret = array(
 			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
-			'turnitin_link' => $turnitin_link
+			'turnitin_link' => $turnitin_link,
+			'abgabetypenBetreuer' => $abgabetypenBetreuer
 		);
 		
 		$this->terminateWithSuccess($ret);
@@ -402,7 +404,7 @@ class Abgabe extends FHCAPI_Controller
 			$ci3BootstrapFilePath = "index.ci.php";
 		}
 
-		$path = $this->_ci->config->item('URL_MITARBEITER');
+		$path = $this->config->item('URL_MITARBEITER');
 		$url = APP_ROOT.$path;
 
 //		$this->addMeta('betreuerArray', $resBetr->retval);
@@ -701,6 +703,7 @@ class Abgabe extends FHCAPI_Controller
 		$bezeichnung = $_POST['bezeichnung'];
 		$kurzbz = $_POST['kurzbz'];
 		$fixtermin = $_POST['fixtermin'];
+		$upload_allowed = $_POST['upload_allowed'];
 
 		if (!isset($projektarbeit_ids) || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
 			|| !isset($datum) || isEmptyString($datum)
@@ -736,6 +739,7 @@ class Abgabe extends FHCAPI_Controller
 					'fixtermin' => $fixtermin,
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
+					'upload_allowed' => $upload_allowed,
 					'insertvon' => getAuthUID(),
 					'insertamum' => date('Y-m-d H:i:s')
 				)
@@ -800,7 +804,10 @@ class Abgabe extends FHCAPI_Controller
 
 		$result = $this->NoteModel->getAllActive();
 		$noten = $this->getDataOrTerminateWithError($result);
-		$this->terminateWithSuccess($noten);
+
+		$allowed_noten_abgabetool = $this->config->item('ALLOWED_NOTEN_ABGABETOOL');
+
+		$this->terminateWithSuccess(array($noten, $allowed_noten_abgabetool));
 	}
 	
 	private function sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe) {
@@ -904,7 +911,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->library('PermissionLib');
 		
 		$stg_allowed = $this->permissionlib->getSTG_isEntitledFor('basis/abgabe_assistenz:rw');
-		
+
 		if($stg_allowed == false) {
 			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
 		}

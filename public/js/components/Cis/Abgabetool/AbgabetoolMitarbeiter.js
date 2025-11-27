@@ -11,6 +11,7 @@ export const AbgabetoolMitarbeiter = {
 		BsModal,
 		CoreFilterCmpt,
 		AbgabeDetail,
+		Checkbox: primevue.checkbox,
 		Dropdown: primevue.dropdown,
 		Textarea: primevue.textarea,
 		VueDatePicker,
@@ -19,6 +20,7 @@ export const AbgabetoolMitarbeiter = {
 	provide() {
 		return {
 			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
+			abgabetypenBetreuer: Vue.computed(() => this.abgabetypenBetreuer),
 			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions),
 			turnitin_link: Vue.computed(() => this.turnitin_link),
 			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link)
@@ -36,6 +38,7 @@ export const AbgabetoolMitarbeiter = {
 	},
 	data() {
 		return {
+			abgabetypenBetreuer: null,
 			detailIsFullscreen: false,
 			phrasenPromise: null,
 			phrasenResolved: false,
@@ -52,7 +55,8 @@ export const AbgabetoolMitarbeiter = {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
 				},
-				kurzbz: ''
+				kurzbz: '',
+				upload_allowed: false
 			}),
 			showAll: false,
 			tabulatorUuid: Vue.ref(0),
@@ -179,6 +183,7 @@ export const AbgabetoolMitarbeiter = {
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
+				this.serienTermin.upload_allowed,
 				this.selectedData?.map(projekt => projekt.projektarbeit_id),
 				false
 			)).then(res => {
@@ -346,7 +351,9 @@ export const AbgabetoolMitarbeiter = {
 
 	},
 	computed: {
-		
+		getAllowedAbgabeTypeOptions() {
+			return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.bezeichnung))
+		}
 	},
 	created() {
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
@@ -355,6 +362,7 @@ export const AbgabetoolMitarbeiter = {
 		this.$api.call(ApiAbgabe.getConfig()).then(res => {
 			this.turnitin_link = res.data?.turnitin_link
 			this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link
+			this.abgabetypenBetreuer = res.data?.abgabetypenBetreuer
 		}).catch(e => {
 			console.log(e)
 			this.loading = false
@@ -363,12 +371,14 @@ export const AbgabetoolMitarbeiter = {
 		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		this.$api.call(ApiAbgabe.getNoten()).then(res => {
-			this.notenOptions = res.data
-			// TODO: more sophisticated way to filter for these two, in essence it is still hardcoded
-			this.allowedNotenOptions = this.notenOptions.filter(
-				opt => opt.bezeichnung === 'Bestanden' 
-					|| opt.bezeichnung === 'Nicht bestanden'
-			)
+			if(res.meta.status == 'success') {
+				this.notenOptions = res.data[0]
+
+				this.allowedNotenOptions = this.notenOptions.filter(
+					opt => res.data[1].includes(opt.bezeichnung)
+				)
+			}
+			
 		}).catch(e => {
 			this.loading = false
 		})
@@ -395,40 +405,53 @@ export const AbgabetoolMitarbeiter = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<div class="row">
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4zieldatum')}}
+			
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 align-content-center">
+						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
 					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabetyp')}}
-					</div>
-					<div class="col-6 d-flex justify-content-center align-items-center">
-						{{$p.t('abgabetool/c4abgabekurzbz')}}
+					<div class="col-12 col-md-9">
+						<VueDatePicker
+							style="width: 95%;"
+							v-model="serienTermin.datum"
+							:clearable="false"
+							:enable-time-picker="false"
+							:format="formatDate"
+							:text-input="true"
+							auto-apply>
+						</VueDatePicker>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-3 d-flex justify-content-center align-items-center">
-						<div>
-							<VueDatePicker
-								style="width: 95%;"
-								v-model="serienTermin.datum"
-								:clearable="false"
-								:enable-time-picker="false"
-								:format="formatDate"
-								:text-input="true"
-								auto-apply>
-							</VueDatePicker>
-						</div>				
+			
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
+					<div class="col-12 col-md-9">
+						<Checkbox
+							v-model="serienTermin.upload_allowed"
+							:binary="true"
+							:pt="{ root: { class: 'ml-auto' }}"
+						>
+						</Checkbox>
 					</div>
-					<div class="col-3 d-flex justify-content-center align-items-center">
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
+					<div class="col-12 col-md-9"
+						v-if="abgabetypenBetreuer && abgabeTypeOptions"
+					>
 						<Dropdown 
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
-							:options="abgabeTypeOptions"
+							:options="getAllowedAbgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>
-					<div class="col-6 d-flex justify-content-center align-items-center">
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+					<div class="col-12 col-md-9">
 						<Textarea style="margin-bottom: 4px;" v-model="serienTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
 				</div>

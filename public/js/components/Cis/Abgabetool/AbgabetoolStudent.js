@@ -47,20 +47,26 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
-		dateDiffInDays(datum, today){
-			const oneDayMs = 1000 * 60 * 60 * 24
-			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
+		dateDiffInDays(datum){
+			const dateToday = luxon.DateTime.now().startOf('day');
+
+			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
+
+			const duration = dateDatum.diff(dateToday, 'days');
+
+			return duration.values.days;
 		},
 		getDateStyleClass(termin) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
-			// avoid renaming these statuses as their names are used as css keys
-			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			if (termin.abgabedatum === null) {
+			termin.diffindays = this.dateDiffInDays(termin.datum)
+
+			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
+			else if (termin.abgabedatum === null) {
 				if(datum < today) {
-					return 'verpasst'
-				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
+					return termin.upload_allowed ? 'verpasst' : 'abgegeben'
+				} else if (datum > today && termin.diffindays <= 12) {
 					return 'abzugeben'
 				} else {
 					return 'standard'
@@ -71,7 +77,7 @@ export const AbgabetoolStudent = {
 				return 'abgegeben'
 			}
 		},
-		checkQualityGates(termine) {
+		checkQualityGatesStrict(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
 			
@@ -88,6 +94,40 @@ export const AbgabetoolStudent = {
 
 			return qgate1Passed && qgate2Passed
 		},
+		checkQualityGatesOptional(termine) {
+			const qgate1found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate1')
+			const qgate2found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate2')
+			
+			let qgate1positiv = true
+			if(qgate1found) {
+				qgate1positiv = false
+
+				termine.forEach(t => {
+					const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
+					if(noteOption && noteOption.positiv) {
+						if (t.paabgabetyp_kurzbz == 'qualgate1') {
+							qgate1positiv = true
+						}
+					}
+				})
+			}
+
+			let qgate2positiv = true
+			if(qgate2found) {
+				qgate2positiv = false
+
+				termine.forEach(t => {
+					const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
+					if(noteOption && noteOption.positiv) {
+						if (t.paabgabetyp_kurzbz == 'qualgate2') {
+							qgate2positiv = true
+						}
+					}
+				})
+			}
+
+			return qgate1positiv && qgate2positiv
+		},
 		isPastDate(date) {
 			return new Date(date) < new Date(Date.now())	
 		},
@@ -101,11 +141,15 @@ export const AbgabetoolStudent = {
 					termin.allowedToUpload = false
 					
 					if(termin.paabgabetyp_kurzbz == 'end') {
-						// production logic
-						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
+						// production logic when qgates are required
+						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
 						
+						// larifari we want qgates but they are optional fhtw mode
+						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesOptional(pa.abgabetermine)
+
+
 						// development purposes
-						// termin.allowedToUpload = this.checkQualityGates(pa.abgabetermine)
+						// termin.allowedToUpload = this.checkQualityGatesStrict(pa.abgabetermine)
 						// termin.allowedToUpload = true
 
 					} else if(termin.fixtermin) {
@@ -257,7 +301,13 @@ export const AbgabetoolStudent = {
 		this.loading = true
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		await this.$api.call(ApiAbgabe.getNoten()).then(res => {
-			this.notenOptions = res.data
+			if(res.meta.status == 'success') {
+				this.notenOptions = res.data[0]
+
+				this.allowedNotenOptions = this.notenOptions.filter(
+					opt => res.data[1].includes(opt.bezeichnung)
+				)
+			}
 		}).finally(() => {
 			this.loading = false
 		})

@@ -152,7 +152,7 @@ export const AbgabeStudentDetail = {
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
-		formatDate(dateParam, showTime = true) {
+		formatDate(dateParam) {
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -161,7 +161,7 @@ export const AbgabeStudentDetail = {
 			const day = padZero(date.getDate());
 			const year = date.getFullYear();
 
-			return `${day}.${month}.${year}` + (showTime ? ' 23:59' : '');
+			return `${day}.${month}.${year}`
 		},
 		async upload(termin) {
 
@@ -226,7 +226,7 @@ export const AbgabeStudentDetail = {
 		getAccTabHeaderForTermin(termin) {
 			let tabTitle = ''
 
-			const datumFormatted = this.formatDate(termin.datum, false)
+			const datumFormatted = this.formatDate(termin.datum)
 			tabTitle += termin.bezeichnung + ' ' + datumFormatted
 			
 			return tabTitle
@@ -282,8 +282,11 @@ export const AbgabeStudentDetail = {
 		getEid() {
 			return this.$capitalize(this.$p.t('abgabetool/c4eidesstattlicheErklaerung'))
 		},
+		allowedToSaveZusatzdaten() {
+			return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter_en.length > 0 && this.form.abstract.length > 0 && this.form.abstract_en.length > 0 && this.form.seitenanzahl > 0
+		},
 		getAllowedToSendEndupload() {
-			return !this.eidAkzeptiert
+			return this.eidAkzeptiert && this.allowedToSaveZusatzdaten
 		},
 		qualityGateTerminAvailable() {
 			let qgatefound = false
@@ -384,7 +387,7 @@ export const AbgabeStudentDetail = {
 									<span>{{ termin?.bezeichnung }}</span>
 								</div>
 								<div class="col-auto text-start p-0" style="min-width: max(80px, 15%); transform: translateX(-30px)">
-									<span>{{ formatDate(termin.datum, false) }}</span>
+									<span>{{ formatDate(termin.datum) }}</span>
 								</div>
 								<div class="col-auto" style="transform: translateX(-30px); min-width: 42px;">
 									<i v-if="termin?.fixtermin" v-tooltip.right="getTooltipFixtermin" class="fa-solid fa-lock"></i>
@@ -431,7 +434,10 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+							<div class="col-12 col-md-3 align-content-center">
+								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+								<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
+							</div>
 							<div class="col-12 col-md-9">
 								<VueDatePicker
 									v-model="termin.datum"
@@ -653,7 +659,8 @@ export const AbgabeStudentDetail = {
 				
 			</template>
 			<template v-slot:footer>
-				<button class="btn btn-primary" :disabled="getAllowedToSendEndupload" @click="triggerEndupload">{{$capitalize( $p.t('ui/hochladen') )}}</button>
+				<div v-show="!allowedToSaveZusatzdaten">{{ $p.t('abgabetool/c4zusatzdatenausfuellen') }}</div>
+				<button class="btn btn-primary" :disabled="!getAllowedToSendEndupload" @click="triggerEndupload">{{$capitalize( $p.t('ui/hochladen') )}}</button>
 			</template>
 		</bs-modal>
 	 	

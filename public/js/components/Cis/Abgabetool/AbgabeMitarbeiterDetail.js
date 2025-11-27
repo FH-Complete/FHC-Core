@@ -19,6 +19,7 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	inject: [
 		'abgabeTypeOptions',
+		'abgabetypenBetreuer',
 		'allowedNotenOptions',
 		'turnitin_link',
 		'old_abgabe_beurteilung_link',
@@ -40,6 +41,7 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
+			activeIndexArray: null,
 			showAutomagicModalPhrase: false,
 			eidAkzeptiert: false,
 			enduploadTermin: null,
@@ -77,6 +79,25 @@ export const AbgabeMitarbeiterDetail = {
 		}
 	},
 	methods: {
+		getActiveIndexTabArray(additional = []) {
+			// here we try to assume which abgabetermine are the most relevant to the current user
+
+			// lets try to take the termin with nearest date
+			let closestIndex = -1;
+			let minDiff = Infinity;
+			const today = new Date();
+
+
+			this.projektarbeit.abgabetermine.forEach((obj, i) => {
+				const diff = Math.abs(new Date(obj.datum) - today);
+				if (diff < minDiff) {
+					minDiff = diff;
+					closestIndex = i;
+				}
+			});
+
+			return [closestIndex, ...additional]
+		},
 		getPlaceholderTermin(termin) {
 			return termin?.bezeichnung?.bezeichnung ?? this.$p.t('abgabetool/abgabetypPlaceholder')	
 		},
@@ -114,11 +135,15 @@ export const AbgabeMitarbeiterDetail = {
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
 					if(!existingTerminRes){
 						this.projektarbeit.abgabetermine.push(newTerminRes)
-						this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
 					}
+					
+					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
+					
+					const index = this.projektarbeit.abgabetermine.findIndex(t => termin.paabgabe_id == t.paabgabe_id)
+					this.activeIndexArray = this.getActiveIndexTabArray([index])
 					
 					// negative abgabe -> automagically open new termin modal
 					// really bad feature imo that will be annoying to deal with
@@ -203,49 +228,9 @@ export const AbgabeMitarbeiterDetail = {
 			this.$refs.modalContainerZusatzdaten.hide()
 		},
 		async validateZusatzdaten() {
-			// check these input fields for length of entry
-			if(this.form['abstract'].length < 100 && await this.$fhcAlert.confirm({
-				message: this.$p.t('abgabetool/warningShortAbstract'),
-				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-				acceptClass: 'btn btn-danger',
-				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-				rejectClass: 'btn btn-outline-secondary'
-			}) === false) {
-				return false
-			}
-
-			if(this.form['abstract_en'].length < 100 && await this.$fhcAlert.confirm({
-				message: this.$capitalize(this.$p.t('abgabetool/warningShortAbstractEn')),
-				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-				acceptClass: 'btn btn-danger',
-				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-				rejectClass: 'btn btn-outline-secondary'
-			}) === false) {
-				return false
-			}
-
-			if(this.form['schlagwoerter'].length < 50 && await this.$fhcAlert.confirm({
-				message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerter')),
-				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-				acceptClass: 'btn btn-danger',
-				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-				rejectClass: 'btn btn-outline-secondary'
-			}) === false) {
-				return false
-			}
-
-			if(this.form['schlagwoerter_en'].length < 50 && await this.$fhcAlert.confirm({
-				message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerterEn')),
-				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-				acceptClass: 'btn btn-danger',
-				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-				rejectClass: 'btn btn-outline-secondary'
-			}) === false) {
-				return false
-			}
-
-			if(this.form['seitenanzahl'] <= 5 && await this.$fhcAlert.confirm({
-				message: this.$capitalize(this.$p.t('abgabetool/warningSmallSeitenanzahl')),
+			// just ask once
+			if(await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
 				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
 				acceptClass: 'btn btn-danger',
 				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
@@ -295,27 +280,61 @@ export const AbgabeMitarbeiterDetail = {
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
-		dateDiffInDays(datum, today){
-			const oneDayMs = 1000 * 60 * 60 * 24
-			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
+		convertDateToIsoString(date) {
+			// 1. Check if it is a Date object AND if the date value is valid (not 'Invalid Date')
+			if (param instanceof Date && !isNaN(param.getTime())) {
+				const year = param.getFullYear();
+				// getMonth() is 0-indexed, so we add 1.
+				const month = param.getMonth() + 1;
+				const day = param.getDate();
+		
+				// Helper to pad single-digit numbers with a leading zero
+				const pad = (num) => String(num).padStart(2, '0');
+		
+				// Return the formatted string: YYYY-MM-DD
+				return `${year}-${pad(month)}-${pad(day)}`;
+			}
+		
+			// If it's not a valid Date, return the original parameter
+			return param;
+		},
+		dateDiffInDays(datumParam){
+			let datum = datumParam
+			if(datumParam instanceof Date && !isNaN(datum.getTime()))
+			{
+				const year = datumParam.getFullYear();
+				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
+				const day = datumParam.getDate();
+				const pad = (num) => String(num).padStart(2, '0');
+				datum = `${year}-${pad(month)}-${pad(day)}`	
+			}
+			
+			const dateToday = luxon.DateTime.now().startOf('day');
+			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
+			const duration = dateDatum.diff(dateToday, 'days');
+			
+			return duration.values.days;
 		},
 		getDateStyleClass(termin) {
 			const datum = new Date(termin.datum)
 			const abgabedatum = new Date(termin.abgabedatum)
 
-			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			if (termin.abgabedatum === null) {
+			termin.diffindays = this.dateDiffInDays(termin.datum)
+			
+			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
+			if (termin.abgabedatum === null && termin.upload_allowed) {
 				if(datum < today) {
-					return 'verpasst'
-				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					return 'abzugeben'
+					return 'verpasst' // needs upload, missed it and has not submitted anything 
+				} else if (datum > today && termin.diffindays <= 12) {
+					return 'abzugeben' // needs to upload soon
 				} else {
-					return 'standard'
-				} 
-			} else if(abgabedatum > datum) {
-				return 'verspaetet'
+					return 'standard' // upload in distant future
+				}
+			}
+			else if(abgabedatum > datum) {
+				return 'verspaetet' // needs upload, missed it and has submitted smth late
 			} else {
-				return 'abgegeben'
+				return 'abgegeben' // nothing else to do for that termin
 			}
 		},
 		openBeurteilungLink(link) {
@@ -343,11 +362,19 @@ export const AbgabeMitarbeiterDetail = {
 			window.open(link, '_blank')
 		},
 		openBenotung() {
-			const path = this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter'
-			const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/' + path
-			window.open(link, '_blank')
+			// old link check ?
+			
+			if(this.getSemesterBenotbar && this.projektarbeit?.abgabetermine.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null)) {
+				// TODO: shouldnt be hardcoded here, at least config in abgabetool -> ideally event sourced from projektarbeitsbeurteilung
+				
+				const path = this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter'
+				const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/' + path
+				window.open(link, '_blank')
+			} else {
+				window.open(this.old_abgabe_beurteilung_link, '_blank')
+			}
 		},
-		formatDate(dateParam, showTime = true) {
+		formatDate(dateParam) {
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -356,13 +383,12 @@ export const AbgabeMitarbeiterDetail = {
 			const day = padZero(date.getDate());
 			const year = date.getFullYear();
 			
-			// abgabedatum should SHOW abgabezeit which should always be last minute of the day
-			return `${day}.${month}.${year}` + (showTime ? ' 23:59' : ''); 
+			return `${day}.${month}.${year}`
 		},
 		getAccTabHeaderForTermin(termin) {
 			let tabTitle = ''
 			
-			const datumFormatted = this.formatDate(termin.datum, false)
+			const datumFormatted = this.formatDate(termin.datum)
 			tabTitle += termin.bezeichnung?.bezeichnung + ' ' + datumFormatted
 
 			return tabTitle
@@ -432,6 +458,16 @@ export const AbgabeMitarbeiterDetail = {
 			
 	},
 	computed: {
+		allowedToSaveZusatzdaten() {
+				return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter_en.length > 0 && this.form.abstract.length > 0 && this.form.abstract_en.length > 0 && this.form.seitenanzahl > 0
+		},
+		getAllowedAbgabeTypeOptions() {
+			if(this.assistenzMode) {
+				return this.abgabeTypeOptions
+			} else {
+				return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.bezeichnung))
+			}
+		},
 		getMessagePtStyle() {
 			// adjust outer spacing and internal padding to appear similar to doenload button in size
 			return {
@@ -446,24 +482,6 @@ export const AbgabeMitarbeiterDetail = {
 					}
 				}
 			}	
-		},
-		getActiveIndexTabArray() {
-			// here we try to assume which abgabetermine are the most relevant to the current user
-
-			// lets try to take the termin with nearest date
-			let closestIndex = -1;
-			let minDiff = Infinity;
-			const today = new Date();
-
-			this.projektarbeit.abgabetermine.forEach((obj, i) => {
-				const diff = Math.abs(new Date(obj.datum) - today);
-				if (diff < minDiff) {
-					minDiff = diff;
-					closestIndex = i;
-				}
-			});
-			
-			return [closestIndex]
 		},
 		getEid() {
 			return this.$p.t('abgabetool/c4eidesstattlicheErklaerung')
@@ -515,6 +533,12 @@ export const AbgabeMitarbeiterDetail = {
 		getTooltipStandard() {
 			return {
 				value: this.$p.t('abgabetool/c4tooltipStandard'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipBeurteilungerforderlich() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipBeurteilungerfolderlich'),
 				class: "custom-tooltip"
 			}
 		},
@@ -572,6 +596,8 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		'projektarbeit'(newVal) {
 			// set invertedFixtermin field for UI/UX purposes -> avoid double negation in text
+			
+			this.activeIndexArray = this.getActiveIndexTabArray()
 			
 			newVal?.abgabetermine?.forEach(termin => termin.invertedFixtermin = !termin.fixtermin)
 			
@@ -639,7 +665,7 @@ export const AbgabeMitarbeiterDetail = {
 						<Dropdown
 							:style="{'width': '100%'}"
 							v-model="newTermin.bezeichnung"
-							:options="abgabeTypeOptions"
+							:options="getAllowedAbgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp"
 							scrollHeight="300px">
 						</Dropdown>
@@ -708,7 +734,7 @@ export const AbgabeMitarbeiterDetail = {
 				</button>
 			</div>
 		</div>
-		<Accordion :multiple="true" :activeIndex="getActiveIndexTabArray">
+		<Accordion :multiple="true" :activeIndex="activeIndexArray">
 			<template v-for="termin in this.projektarbeit?.abgabetermine">
 				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
 					<template #header>
@@ -719,12 +745,13 @@ export const AbgabeMitarbeiterDetail = {
 								<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+								<i v-else-if="getDateStyleClass(termin) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
 							</div>
 							<div class="col-auto text-start" style="min-width: max(150px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
 								<span>{{ termin?.bezeichnung?.bezeichnung }}</span>
 							</div>
 							<div class="col-auto text-start" style="min-width: 100px; transform: translateX(-30px)">
-								<span>{{ formatDate(termin.datum, false) }}</span>
+								<span>{{ formatDate(termin.datum) }}</span>
 							</div>
 							<div v-if="termin?.fixtermin" class="col-auto" style="transform: translateX(-30px)">
 								<i  v-tooltip.right="getTooltipFixtermin" class="fa-solid fa-lock"></i>
@@ -746,7 +773,10 @@ export const AbgabeMitarbeiterDetail = {
 						</div>
 					</div>
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+						<div class="col-12 col-md-3 align-content-center">
+							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+							<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
+						</div>
 						<div class="col-12 col-md-9">
 							<VueDatePicker
 								v-model="termin.datum"
@@ -768,7 +798,7 @@ export const AbgabeMitarbeiterDetail = {
 								:placeholder="getPlaceholderTermin(termin)"
 								v-model="termin.bezeichnung"
 								@change="handleChangeAbgabetyp(termin)"
-								:options="abgabeTypeOptions"
+								:options="getAllowedAbgabeTypeOptions"
 								:optionLabel="getOptionLabelAbgabetyp"
 								:optionDisabled="getOptionDisabled">
 							</Dropdown>
@@ -778,6 +808,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4upload_allowed') )}}</div>
 						<div class="col-12 col-md-9">
 							<Checkbox
+								:disabled="!termin.allowedToSave"
 								v-model="termin.upload_allowed"
 								:binary="true"
 								:pt="{ root: { class: 'ml-auto' }}"
@@ -968,7 +999,8 @@ export const AbgabeMitarbeiterDetail = {
 				
 			</template>
 			<template v-slot:footer>
-				<button class="btn btn-primary" @click="saveZusatzdaten">{{ $capitalize( $p.t('abgabetool/c4save') )}}</button>
+				<div v-show="!allowedToSaveZusatzdaten">{{ $p.t('abgabetool/c4zusatzdatenausfuellen') }}</div>
+				<button class="btn btn-primary" :disabled="!allowedToSaveZusatzdaten" @click="saveZusatzdaten">{{ $capitalize( $p.t('abgabetool/c4save') )}}</button>
 			</template>
 		</bs-modal>
 		

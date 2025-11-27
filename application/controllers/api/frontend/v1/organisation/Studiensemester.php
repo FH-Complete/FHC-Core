@@ -160,8 +160,8 @@ class Studiensemester extends FHCAPI_Controller
 		$this->StudiensemesterModel->addOrder("start", "DESC");
 		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		$aktuell = getData($result)[0];
-
-		$result = $this->StudiensemesterModel->getPreviousFrom($aktuell->studiensemester_kurzbz, 10);
+		$this->StudiensemesterModel->addSelect('*');
+		$result = $this->StudiensemesterModel->load();
 		$studiensemester = getData($result);
 		
 		$this->terminateWithSuccess(array($studiensemester, $aktuell));

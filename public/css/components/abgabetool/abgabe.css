@@ -55,6 +55,35 @@
 }
 
 /* Base Header */
+.beurteilungerforderlich-header {
+	background-color: var(--fhc-orange-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+
+/* Hover State */
+.beurteilungerforderlich-header:hover {
+	background-color: var(--fhc-orange-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .beurteilungerforderlich-header {
+	background-color: var(--fhc-orange-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .beurteilungerforderlich-header:hover {
+	background-color: var(--fhc-orange-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Base Header */
 .verspaetet-header {
 	background-color: var(--fhc-pink-40);
 	font-weight: 600;
