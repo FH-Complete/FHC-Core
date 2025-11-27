@@ -193,7 +193,7 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/Cis/StgOrgLvPlan/:mode?/:focus_date?`,
+			path: `/Cis/StgOrgLvPlan/:mode?/:focus_date?/:stgkz?/:sem?/:verband?/:gruppe?`,
 			name: 'StgOrgLvPlan',
 			component: StgOrgLvPlan,
 			props(route) {

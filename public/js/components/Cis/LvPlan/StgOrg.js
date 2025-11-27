@@ -136,7 +136,10 @@ export default {
 				},
 			});
 
+			this.$refs['calendar'].resetEventLoader();
+
 			//wenn sich formvariablen ändern?
+/*
 			if(this.rangeIntervalFirst) {
 				console.log("in range IntervalFirst second try ");
 				const start = luxon.DateTime.fromISO(this.rangeIntervalFirst.start).toISODate();
@@ -144,6 +147,8 @@ export default {
 				console.log("start und end" + start + " - " + end);
 				this.getPromiseFunc(start, end);
 			}
+
+				*/
 
 		},
 		loadListSem(){
@@ -218,6 +223,7 @@ export default {
 			});
 
 			//try for reload
+			/*
 			if(this.rangeIntervalFirst) {
 				console.log("in range IntervalFirst second try ");
 				const start = luxon.DateTime.fromISO(this.rangeIntervalFirst.start).toISODate();
@@ -225,6 +231,7 @@ export default {
 				console.log("start und end" + start + " - " + end);
 				this.getPromiseFunc(start, end);
 			}
+			*/
 
 		},
 		updateRange(rangeInterval) {
@@ -372,6 +379,7 @@ export default {
 		<fhc-calendar
 			v-if="propsViewData && propsViewData.stgkz"
 			ref="calendar"
+			v-model:lv="formData"
 			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
