@@ -115,6 +115,7 @@ $config['student_tab_order'] = [
 $config['students_tab_order'] = [
 	'banking',
 	'status',
+	'messages',
 	'groups',
 	'finalexam',
 	'archive',

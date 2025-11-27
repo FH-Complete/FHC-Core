@@ -271,7 +271,6 @@ class Config extends FHCAPI_Controller
 		$result['messages'] = [
 			'title' => $this->p->t('stv', 'tab_messages'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Messages.js'),
-			'showOnlyWithUid' => true
 		];
 
 		$result['grades'] = [
@@ -410,6 +409,11 @@ class Config extends FHCAPI_Controller
 		$result['kontaktieren'] = [
 			'title' => $this->p->t('stv', 'tab_kontaktieren'),
 			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Kontaktieren.js'),
+		];
+
+		$result['messages'] = [
+			'title' => $this->p->t('stv', 'tab_messages'),
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/Messages.js'),
 		];
 
 		Events::trigger('stv_conf_students', function & () use (&$result) {

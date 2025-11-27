@@ -20,7 +20,7 @@ export default {
 		},
 		typeId: String,
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		messageId: {
@@ -43,6 +43,8 @@ export default {
 			vorlagen: [],
 			recipientsArray: [],
 			defaultRecipient: null,
+			defaultRecipients: [],
+			defaultRecipientString: null,
 			editor: null,
 			fieldsUser: [],
 			fieldsPerson: [],
@@ -57,6 +59,7 @@ export default {
 			previewBody: "",
 			replyData: null,
 			uid: null,
+			uids: null //necessary?
 		}
 	},
 	methods: {
@@ -111,6 +114,10 @@ export default {
 		},
 		sendMessage() {
 			const data = new FormData();
+			data.append('data', JSON.stringify(this.formData));
+			data.append('ids', JSON.stringify(this.id));
+			data.append('uids', JSON.stringify(this.uid));
+
 			const params = {
 				id: this.id,
 				type_id: this.typeId
@@ -121,8 +128,9 @@ export default {
 			};
 			data.append('data', JSON.stringify(merged));
 
+			//Modal Context?
 			return this.$refs.formMessage
-				.call(this.endpoint.sendMessageFromModalContext(this.uid, data))
+				.call(this.endpoint.sendMessageFromModalContext(data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
@@ -146,14 +154,15 @@ export default {
 		},
 		getPreviewText(){
 			const data = new FormData();
-
 			data.append('data', JSON.stringify(this.formData.body));
+			data.append('ids', JSON.stringify(this.id));
+
 			return this.$api
-				.call(this.endpoint.getPreviewText({
-					id: this.id,
-					type_id: this.typeId}, data))
+				.call(this.endpoint.getPreviewText(
+					this.typeId, data))
 				.then(response => {
-					this.previewText = response.data;
+					const previews = response.data;
+					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					//this.resetForm();
@@ -201,13 +210,10 @@ export default {
 				this.previewBody = this.previewText;
 			});
 		},
+		//TODO(Manu) check if No_UID
 		getUid(id, typeId){
-			const params = {
-				id: id,
-				type_id: typeId
-			};
 			this.$api
-				.call(this.endpoint.getUid(params))
+				.call(this.endpoint.getUid(this.id, this.typeId))
 				.then(result => {
 					this.uid = result.data;
 				})
@@ -281,12 +287,8 @@ export default {
 		}
 
 		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMsgVarsPrestudent(params))
+				.call(this.endpoint.getMsgVarsPrestudent(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -310,7 +312,7 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$api
+/*		this.$api
 			.call(this.endpoint.getNameOfDefaultRecipient({
 				id: this.id,
 				type_id: this.typeId}))
@@ -319,6 +321,16 @@ export default {
 				this.recipientsArray.push({
 					'uid': this.uid,
 					'details': this.defaultRecipient});
+			})
+			.catch(this.$fhcAlert.handleSystemError);*/
+
+		//for multiaction too
+		this.$api
+			.call(this.endpoint.getNameOfDefaultRecipients(this.id, this.typeId))
+			.then(result => {
+				this.defaultRecipients = result.data;
+				this.defaultRecipientString =  Object.values(this.defaultRecipients).join("; ");
+
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -367,6 +379,8 @@ export default {
 			</template>
 
 			<form-form ref="formNewMassage">
+			
+			{{defaultRecipients}} | {{defaultRecipient}} || {{uid}}
 
 			<div class="tab-content" id="msg_preview_content">
 				<div class="tab-pane fade show active" id="msg" role="tabpanel" aria-labelledby="msg-tab">
@@ -381,7 +395,7 @@ export default {
 									type="text"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="defaultRecipient"
+									v-model="defaultRecipientString"
 									disabled
 								>
 								</form-input>
@@ -502,17 +516,17 @@ export default {
 								>
 									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
 									<option
-										v-for="recipient in recipientsArray"
-										:key="recipient.uid"
-										:value="recipient.uid" 
-										>{{recipient.details}}
+										v-for="(name, id) in defaultRecipients"
+										  :key="id" 
+										  :value="Number(id)"
+										> {{name}}
 									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn btn-secondary" @click="showPreview()">{{ $p.t('ui', 'btnAktualisieren') }}</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(defaultRecipient)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 

@@ -31,7 +31,7 @@ export default {
 			}
 		},
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		showTable: Boolean,
@@ -124,6 +124,7 @@ export default {
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
+	{{typeId}} {{id}} 
 
 		<message-modal
 			ref="modalMsg"
@@ -150,9 +151,8 @@ export default {
 			>
 			</form-only>
 		</div>
-
-		
-		<div v-if="showTable">
+	
+		<div v-if="showTable && id.length==1">
 			<table-messages
 				ref="templateTableMessage"
 				:type-id="typeId"

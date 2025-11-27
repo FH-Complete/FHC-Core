@@ -19,7 +19,7 @@ export default {
 		},
 		typeId: String,
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		messageLayout: String,
@@ -346,7 +346,7 @@ export default {
 		});*/
 	},
 	created(){
-		if(this.typeId != 'person_id') {
+		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
 			const params = {
 				id: this.id,
 				type_id: this.typeId
