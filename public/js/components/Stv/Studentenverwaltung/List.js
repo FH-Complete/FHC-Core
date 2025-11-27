@@ -2,6 +2,8 @@ import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
 import CoreTag from '../../Tag/Tag.js';
 import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHandler.js";
+import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
 import { extendedHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import ApiTag from "../../../api/factory/stv/tag.js";
 import ListFilter from './List/Filter.js';
@@ -67,72 +69,7 @@ export default {
 						headerFilter: "input",
 						headerFilterFunc: tagHeaderFilter,
 						headerFilterFuncParams: {field: 'tags'},
-						formatter: (cell) => {
-							let tags = cell.getValue();
-							if (!tags) return;
-
-							let container = document.createElement('div');
-							container.className = "d-flex gap-1";
-
-							let parsedTags = JSON.parse(tags);
-							let maxVisibleTags = 2;
-
-							const rowData = cell.getRow().getData();
-							if (rowData._tagExpanded === undefined) {
-								rowData._tagExpanded = false;
-							}
-
-							const renderTags = () => {
-								container.innerHTML = '';
-								parsedTags = parsedTags.filter(item => item !== null);
-
-								parsedTags.sort((a, b) => {
-									let adone = a.done ? 1 : 0;
-									let bbone = b.done ? 1 : 0;
-
-									if (adone !== bbone)
-									{
-										return adone - bbone;
-									}
-									return b.id - a.id;
-								});
-								const tagsToShow = rowData._tagExpanded ? parsedTags : parsedTags.slice(0, maxVisibleTags);
-
-								tagsToShow.forEach(tag => {
-									if (!tag) return;
-									let tagElement = document.createElement('span');
-									tagElement.innerText = tag.beschreibung;
-									tagElement.title = tag.notiz;
-									tagElement.className = "tag " + tag.style;
-									if (tag.done) tagElement.className += " tag_done";
-
-									tagElement.addEventListener('click', (event) => {
-										event.stopPropagation();
-										event.preventDefault();
-										this.$refs.tagComponent.editTag(tag.id);
-									});
-
-									container.appendChild(tagElement);
-								});
-
-								if (parsedTags.length > maxVisibleTags) {
-									let toggle = document.createElement('button');
-									toggle.innerText = (rowData._tagExpanded ? '- ' : '+ ') + (parsedTags.length - maxVisibleTags);
-									toggle.className = "display_all";
-									toggle.title = rowData._tagExpanded ? "Tags ausblenden" : "Tags einblenden";
-
-									toggle.addEventListener('click', () => {
-										rowData._tagExpanded = !rowData._tagExpanded;
-										renderTags();
-									});
-
-									container.appendChild(toggle);
-								}
-							};
-
-							renderTags();
-							return container;
-						},
+						formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
 						width: 150,
 					},
 					{title:"Nachname", field:"nachname", headerFilter: true},
@@ -235,7 +172,7 @@ export default {
 				{
 					event: 'dataProcessed',
 					handler: (data) => {
-						this.reexpandRows()
+						this.getAllRows()
 						this.autoSelectRows(data)
 					}
 				},
@@ -481,136 +418,18 @@ export default {
 		//methods tags
 		addedTag(addedTag)
 		{
-			const table = this.$refs.table.tabulator;
-
-			this.selectedRows.forEach(row =>
-			{
-				if (Array.isArray(addedTag.response))
-				{
-					addedTag.response.forEach(tag => {
-						const targetRow = this.allRows.find(row => row.getData().prestudent_id === tag.prestudent_id);
-						if (targetRow)
-						{
-							const rowData = targetRow.getData();
-							let tags = [];
-							try {
-								tags = JSON.parse(rowData.tags || '[]');
-							} catch (e) {}
-
-							const tagExists = tags.some((t) => t.id === tag.id);
-							if (!tagExists)
-							{
-								addedTag.id = tag.id;
-								tags.unshift({ ...addedTag });
-								targetRow.update({ tags: JSON.stringify(tags) });
-								targetRow.reformat();
-							}
-						}
-					});
-				}
-			});
+			addTagInTable(addedTag, this.allRows, 'prestudent_id')
 		},
-		deletedTag(deletedTag) {
-			const targetRow = this.allRows.find(row => {
-				const rowData = row.getData();
-
-				let tags = [];
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				return tags.some(tag => tag.id === deletedTag);
-			});
-
-			if (targetRow) {
-				const rowData = targetRow.getData();
-				let tags = [];
-
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				const filteredTags = tags.filter(t => t.id !== deletedTag);
-				const updatedTags = JSON.stringify(filteredTags);
-
-				if (updatedTags !== rowData.tags) {
-					targetRow.update({
-						tags: updatedTags
-					});
-
-					targetRow.reformat();
-				}
-			}
-		},
-		updatedTag(updatedTag) {
-			const targetRow = this.allRows.find(row => {
-				const rowData = row.getData();
-				let tags = [];
-
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				return tags.some(t => t?.id === updatedTag.id);
-			});
-
-			if (targetRow)
-			{
-				const rowData = targetRow.getData();
-				let tags = [];
-				try {
-					tags = JSON.parse(rowData.tags || '[]');
-				} catch (e) {}
-
-				let changed = false;
-
-				const tagIndex = tags.findIndex(tag => tag?.id === updatedTag.id);
-				if (tagIndex !== -1) {
-					tags[tagIndex] = { ...updatedTag };
-					changed = true;
-				}
-
-				if (changed)
-				{
-					targetRow.update({
-						tags: JSON.stringify(tags),
-					});
-					targetRow.reformat();
-				}
-			}
-		},
-		getAllRows(rows)
+		deletedTag(deletedTag)
 		{
-			let result = [];
-			rows.forEach(row =>
-			{
-				result.push(row);
-				let children = row.getTreeChildren();
-				if(children && children.length > 0)
-				{
-					result = result.concat(this.getAllRows(children));
-				}
-			});
-			return result;
+			deleteTagInTable(deletedTag, this.allRows);
 		},
-		reexpandRows() {
-			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
-
-			const matchingRows = this.allRows.filter(row =>
-				this.expanded.includes(row.getData().uniqueindex)
-			);
-
-			if (matchingRows.length === 0)
-				this.currentTreeLevel = 0;
-
-			matchingRows.forEach((row, index) => {
-				row._row.modules.dataTree.open = true;
-
-				if (index === matchingRows.length - 1)
-				{
-					row.treeExpand();
-				}
-			});
+		updatedTag(updatedTag)
+		{
+			updateTagInTable(updatedTag, this.allRows)
+		},
+		getAllRows() {
+			this.allRows = this.$refs.table.tabulator.getRows();
 		},
 
 	},
