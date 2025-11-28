@@ -52225,6 +52225,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'projektarbeit',
+		'phrase' => 'zurFirmenverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zur Firmenverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Company management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC-4 Projektarbeiten & Vertraege ENDE
 	// ###  	DOKUMENTE ERSTELLEN PHRASEN 		START 		###
 	array(

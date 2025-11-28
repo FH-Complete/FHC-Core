@@ -158,6 +158,7 @@ export default {
 						+ 'content/statistik/notenspiegel.php?type=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_xls'
 				});
@@ -166,6 +167,7 @@ export default {
 						+ 'content/statistik/notenspiegel_erweitert.php?typ=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_xls_extended'
 				});
@@ -174,6 +176,7 @@ export default {
 						+ 'content/statistik/notenspiegel.php?type=html'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
+						+ '&studiensemester=' + this.studiensemesterKurzbz
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_html'
 				});
@@ -186,8 +189,15 @@ export default {
 		'url_studiensemester_kurzbz': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.studiensemesterKurzbz = newVal;
-				this.$refs.stvList.updateUrl();
-				this.$refs.details.reload();
+				if(this.$route.name === 'search')
+				{
+					this.handleSearchUrl();
+				}
+				else
+				{
+					this.$refs.stvList.updateUrl();
+					this.$refs.details.reload();
+				}
 			}
 		},
 		'url_studiengang': function (newVal, oldVal) {
@@ -295,9 +305,6 @@ export default {
 					studiensemester_kurzbz: v
 				}
 			});
-
-			this.$refs.stvList.updateUrl();
-			this.$refs.details.reload();
 		},
 		reloadList() {
 			this.$refs.stvList.reload();
@@ -322,25 +329,28 @@ export default {
 					true
 					);
 			} else if (this.$route.params.searchstr) {
-				const searchsettings = {
-					searchstr: this.$route.params.searchstr,
-					types: this.$route.params.types?.split('+') || []
-				};
-
-				// init into student list
-				this.$refs.stvList.updateUrl(
-					ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
-				);
-
-				// init into searchbar
-				this.$refs.searchbar.searchsettings.searchstr = searchsettings.searchstr;
-				this.$refs.searchbar.searchsettings.types = searchsettings.types;
-				this.$nextTick(this.blurSearchbar);
+				this.handleSearchUrl();
 			}
 			else
 			{
 				this.clearTabulator();
 			}
+		},
+		handleSearchUrl() {
+			const searchsettings = {
+				searchstr: this.$route.params.searchstr,
+				types: this.$route.params.types?.split('+') || []
+			};
+
+			// init into student list
+			this.$refs.stvList.updateUrl(
+				ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
+			);
+
+			// init into searchbar
+			this.$refs.searchbar.searchsettings.searchstr = searchsettings.searchstr;
+			this.$refs.searchbar.searchsettings.types = searchsettings.types;
+			this.$nextTick(this.blurSearchbar);
 		},
 		clearTabulator() {
 			if(['index', 'studiensemester'].includes(this.$route.name))
