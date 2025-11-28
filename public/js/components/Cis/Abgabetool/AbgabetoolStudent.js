@@ -63,18 +63,22 @@ export const AbgabetoolStudent = {
 			termin.diffindays = this.dateDiffInDays(termin.datum)
 
 			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
-			else if (termin.abgabedatum === null) {
+			if (termin.abgabedatum === null && termin.upload_allowed) {
 				if(datum < today) {
-					return termin.upload_allowed ? 'verpasst' : 'abgegeben'
+					return 'verpasst' // needs upload, missed it and has not submitted anything 
 				} else if (datum > today && termin.diffindays <= 12) {
-					return 'abzugeben'
+					return 'abzugeben' // needs to upload soon
 				} else {
-					return 'standard'
+					return 'standard' // upload in distant future
 				}
-			} else if(abgabedatum > datum) {
-				return 'verspaetet'
+			}
+			else if(abgabedatum > datum) {
+				return 'verspaetet' // needs upload, missed it and has submitted smth late
+			} else if(!termin.upload_allowed) {
+				if(datum > today) return termin.diffinday <= 12 ? 'abzugeben' : 'standard'
+				else if (today > datum) return 'abgegeben'
 			} else {
-				return 'abgegeben'
+				return 'abgegeben' // nothing else to do for that termin
 			}
 		},
 		checkQualityGatesStrict(termine) {

@@ -85,6 +85,18 @@
 	--fhc-pink-70: rgb(160, 40, 90);
 	--fhc-pink-80: rgb(130, 25, 70);
 	--fhc-pink-90: rgb(100, 15, 50);
+
+	/* --- Orange --- */
+	--fhc-orange-5:  rgb(255, 250, 240);
+	--fhc-orange-10: rgb(255, 235, 200);
+	--fhc-orange-20: rgb(255, 210, 140);
+	--fhc-orange-30: rgb(255, 185, 80);
+	--fhc-orange-40: rgb(255, 155, 40);
+	--fhc-orange-50: rgb(255, 128, 0);
+	--fhc-orange-60: rgb(230, 110, 0);
+	--fhc-orange-70: rgb(200, 90, 0);
+	--fhc-orange-80: rgb(170, 70, 0);
+	--fhc-orange-90: rgb(130, 50, 0);
 	
 	--fhc-beige-10: rgba(245, 233, 215, 0.5);
 	--fhc-beige-20: rgba(172, 153, 125, 0.5);

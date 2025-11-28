@@ -266,7 +266,7 @@ class FHCAPI_Controller extends Auth_Controller
 	}
 
 	// ---------------------------------------------------------------
-	// Security
+	// Security Begin
 	// ---------------------------------------------------------------
 
 	/**
@@ -286,5 +286,30 @@ class FHCAPI_Controller extends Auth_Controller
 			'method' => $this->router->method,
 			'required_permissions' => $this->_rpsToString($requiredPermissions, $this->router->method)
 		], self::ERROR_TYPE_AUTH);
+	}
+
+	// ---------------------------------------------------------------
+	// Security End
+	// ---------------------------------------------------------------
+
+	/**
+	 * Checks the client's total request size (Content-Length) against the minimum
+	 * effective PHP limit (min of upload_max_filesize, post_max_size, memory_limit).
+	 * This preempts failures that result in vague "missing parameters" errors on large files.
+	 *
+	 * @return void
+	 */
+	protected function checkUploadSize() {
+		$content_length = (int)$this->input->server('CONTENT_LENGTH');
+
+		//get max serverside size upload
+		$max_upload = (int)(ini_get('upload_max_filesize'));
+		$max_post = (int)(ini_get('post_max_size'));
+		$memory_limit = (int)(ini_get('memory_limit'));
+		$max_upload_mb = min($max_upload, $max_post, $memory_limit);    // smallest of 3 config values
+
+		if($content_length >= $max_upload_mb) {
+			$this->terminateWithError($this->p->t('global', 'filesizeExceeded'), 'general');
+		}
 	}
 }

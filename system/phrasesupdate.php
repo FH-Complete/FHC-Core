@@ -1453,7 +1453,46 @@ $phrases = array(
 			)
 		)
 	),
-
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'unknown_error',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ein unbekannter Fehler ist aufgetreten: {error}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'An unknown error occurred: {error}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'global',
+		'phrase' => 'filesizeExceeded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die maximale Dateigröße wurde überschritten!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The maximum file size has been exceeded!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//*******************************		CORE/ui
 	array(
 		'app' => 'core',

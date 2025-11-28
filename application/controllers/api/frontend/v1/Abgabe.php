@@ -186,6 +186,8 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function postStudentProjektarbeitZwischenabgabe()
 	{
+		$this->checkUploadSize();
+		
 		$projektarbeit_id = $_POST['projektarbeit_id'];
 		$paabgabe_id = $_POST['paabgabe_id'];
 		$student_uid = $_POST['student_uid'];
@@ -236,6 +238,7 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function postStudentProjektarbeitEndupload()
 	{
+		$this->checkUploadSize();
 
 		$projektarbeit_id = $_POST['projektarbeit_id'];
 		$paabgabe_id = $_POST['paabgabe_id'];
@@ -1028,5 +1031,4 @@ class Abgabe extends FHCAPI_Controller
 			$abgabe->signatur = $signaturVorhanden;
 		}
 	}
-	
 }
