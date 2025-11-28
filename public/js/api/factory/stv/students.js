@@ -46,6 +46,14 @@ export default {
 			url: url
 		};
 	},
+	search(params, studiensemester_kurzbz) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/students/search/'
+				+ encodeURIComponent(studiensemester_kurzbz),
+			params
+		};
+	},
 	verband(relative_path) {
 		return {
 			method: 'get',
