@@ -40,7 +40,7 @@ export default {
 				type-id="prestudent_id"
 				:id="prestudent_ids"
 				messageLayout="twoColumnsTableLeft"
-				open-mode="inSamePage"
+				open-mode="modal"
 				show-table
 				>
 			</core-messages>
@@ -52,7 +52,7 @@ export default {
 				type-id="person_id"
 				:id="person_ids"
 				messageLayout="twoColumnsTableLeft"
-				open-mode="inSamePage"
+				open-mode="modal"
 				show-table
 				>
 			</core-messages>
