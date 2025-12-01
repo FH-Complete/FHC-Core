@@ -9,6 +9,7 @@ export default {
 	data() {
 		return {
 			configLVTabs: {},
+			configLVTab: {},
 		};
 	},
 	props: {
@@ -37,18 +38,31 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
+		this.$api.call(Setup.getTab())
+			.then(result => {
+				this.configLVTab = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 		<div class="stv-details h-100 pb-3 d-flex flex-column">
 			<div v-if="!lv?.length" class="justify-content-center d-flex h-100 align-items-center">
 				Bitte eine Lehreinheit auswählen!
 			</div>
-			<div v-else-if="configLVTabs" class="d-flex flex-column h-100 pb-3">
+			<div v-else-if="configLVTabs && configLVTab" class="d-flex flex-column h-100 pb-3">
 				<fhc-tabs 
-					v-if="lv.length === 1"
+					v-if="lv.length === 1 && lv[0]?.lehreinheit_id"
 					ref="tabs"
 					:modelValue="lv[0]"
 					:config="configLVTabs"
+					:default="$route.params.tab"
+					@changed="reload"
+				/>
+				<fhc-tabs 
+					v-else-if="lv.length === 1"
+					ref="tabs"
+					:modelValue="lv[0]"
+					:config="configLVTab"
 					:default="$route.params.tab"
 					@changed="reload"
 				/>

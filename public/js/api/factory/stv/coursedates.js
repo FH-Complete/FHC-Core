@@ -16,20 +16,18 @@
  */
 
 export default {
-	getCourselist(params) {
+	getCourselist(student_uid,  start_date, end_date, stundenplan) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/LvTermine/getStundenplan/' + params.student_uid + '/'
-				+ params.start_date + '/'
-				+ params.end_date + '/'
-				+ params.group_consecutiveHours + '/'
-				+ params.dbStundenplanTable
+			url: 'api/frontend/v1/stv/LvTermine/getStundenplan/' + encodeURIComponent(student_uid) + '/'
+				+ encodeURIComponent(start_date) + '/'
+				+ encodeURIComponent(end_date) + '/'
+				+ encodeURIComponent(stundenplan) + '/'
+				+ encodeURIComponent(true)
 		};
 	},
-	getStudiensemester(){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/stv/LvTermine/getStudiensemester/'
-		};
+	exportCalendar(student_uid, stundenplan)
+	{
+		return FHC_JS_DATA_STORAGE_OBJECT.app_root +  'content/statistik/termine.xls.php?student_uid=' + encodeURIComponent(student_uid) + '&db_stpl_table='+encodeURIComponent(stundenplan);
 	},
 }

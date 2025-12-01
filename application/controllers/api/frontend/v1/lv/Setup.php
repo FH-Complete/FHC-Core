@@ -28,6 +28,7 @@ class Setup extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getTabs' => ['admin:r', 'assistenz:r'],
+			'getTab' => ['admin:r', 'assistenz:r'],
 			'getStudiensemester' => ['admin:r', 'assistenz:r'],
 			'getSprache' => ['admin:r', 'assistenz:r'],
 			'getRaumtyp' => ['admin:r', 'assistenz:r'],
@@ -60,9 +61,24 @@ class Setup extends FHCAPI_Controller
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Lektor.js',
 			'config' => []
 		);
+		$tabs['termine'] = array (
+			'title' =>  'Termine',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Termine.js',
+			'config' => []
+		);
 		$tabs['notiz'] = array (
 			'title' =>  'Notizen',
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Notiz.js',
+			'config' => []
+		);
+		$this->terminateWithSuccess($tabs);
+	}
+
+	public function getTab()
+	{
+		$tabs['termine'] = array (
+			'title' =>  'Termine',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/LVTermine.js',
 			'config' => []
 		);
 		$this->terminateWithSuccess($tabs);

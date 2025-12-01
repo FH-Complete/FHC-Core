@@ -8,7 +8,6 @@ import LvTabs from "./Setup/Tabs.js";
 
 import ApiDetails from "../../api/lehrveranstaltung/details.js";
 import ApiLektor from "../../api/lehrveranstaltung/lektor.js";
-import ApiGruppe from "../../api/lehrveranstaltung/gruppe.js";
 import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 

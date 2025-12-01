@@ -1,4 +1,6 @@
 import TableLvList from "./Lehrveranstaltungstermine/ListLehrveranstaltungstermine.js";
+import ApiStvCoursedates from "../../../../api/factory/stv/coursedates.js";
+
 
 export default {
 	name: "TabCourseList",
@@ -8,11 +10,13 @@ export default {
 	props: {
 		modelValue: Object,
 	},
-	data(){
-		return {}
+	data() {
+		return {
+			endpoint: ApiStvCoursedates
+		};
 	},
 	template: `
 	<div class="stv-details-course-list h-100 d-flex flex-column">	
-		<table-lv-list ref="tbl_course_list" :student="modelValue"></table-lv-list>
+		<table-lv-list ref="tbl_course_list" :id="modelValue.uid" :endpoint="endpoint"></table-lv-list>
 	</div>`
 };

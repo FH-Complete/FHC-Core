@@ -367,14 +367,13 @@ export default {
 
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
 			{
-				this.$emit('update:selected', [data[0]]);
 				this.lv_info = false
 			}
 			else if (data[0]?.lehrveranstaltung_id)
 			{
-				this.$emit('update:selected', {});
 				this.getLVInfos(data[0]);
 			}
+			this.$emit('update:selected', [data[0]]);
 		},
 		getLVInfos(data)
 		{

@@ -181,6 +181,21 @@ class StundenplanLib
 		return success($stundenplan_data);
 	}
 
+	public function getEventsByLE($lehreinheit_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLE($lehreinheit_id, $start, $end, $stundenplan);
+	}
+
+	public function getEventsByLV($lehrveranstaltung_id, $start, $end, $stundenplan)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+		return $this->_ci->StundenplanModel->getStundenplanLV($lehrveranstaltung_id, $start, $end, $stundenplan);
+	}
 	/**
 	 * Get stundenplan for a room
 	 *
