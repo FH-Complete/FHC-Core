@@ -2,6 +2,7 @@ import FormForm from '../../../Form/Form.js';
 import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from '../../../VorlagenDropdown/VorlagenDropdown.js';
+import ApiMessages from "../../../../api/factory/messages/messages.js"; //props not working with route
 
 export default {
 	name: "ComponentNewMessages",
@@ -19,7 +20,7 @@ export default {
 		openMode: String,
 		tempTypeId: String,
 		tempId: {
-			type: [Number, String],
+			type: Array,
 			required: false
 		},
 		tempMessageId: {
@@ -37,7 +38,7 @@ export default {
 		},
 		messageId(){
 			return this.$props.tempMessageId ||this.$route.params.messageId;
-		}
+		},
 	},
 	data(){
 		return {
@@ -53,6 +54,8 @@ export default {
 			vorlagen: [],
 			recipientsArray: [],
 			defaultRecipient: null,
+			defaultRecipients: [],
+			defaultRecipientString: null,
 			editor: null,
 			isVisible: false,
 			fieldsUser: [],
@@ -67,8 +70,7 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-			uid: null,
-			messageSent: false
+			messageSent: false,
 		}
 	},
 	methods: {
@@ -106,19 +108,11 @@ export default {
 		},
 		sendMessage() {
 			const data = new FormData();
+			data.append('data', JSON.stringify(this.formData));
+			data.append('ids', JSON.stringify(this.id));
 
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
-
-			const merged = {
-				...this.formData,
-				...params
-			};
-			data.append('data', JSON.stringify(merged));
 			return this.$api
-				.call(this.endpoint.sendMessage(this.uid, data))
+				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideTemplate();
@@ -126,37 +120,34 @@ export default {
 					this.messageSent = true;
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//TODO(Manu) hier route definieren für openmode in Tab, Page?
-					// ist kein child sondern mit route aufgerufen
-					//würde allerdings neues fenster aktualisiert öffnen, altes bleibt ohne reload gleich
-					//Reload vorheriges tab???
-					if(this.openMode == "inSamePage"){
+					if(this.openMode == "inSamePage" && this.id.length == 1 ){
 						this.$emit('reloadTable');
 						}
+					this.resetForm();
 					}
 				);
 		},
 		getDataVorlage(vorlage_kurzbz){
 			return this.$api
-				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
+				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
 				}).catch(this.$fhcAlert.handleSystemError);
 		},
-		getPreviewText(id, typeId){
+		getPreviewText(){
 			const data = new FormData();
-
 			data.append('data', JSON.stringify(this.formData.body));
+			data.append('ids', JSON.stringify(this.id));
+
 			return this.$api
-				.call(this.endpoint.getPreviewText({
-					id: this.id,
-					type_id: this.typeId}, data))
+				.call(ApiMessages.getPreviewText(
+					this.typeId, data))
 				.then(response => {
-					this.previewText = response.data;
+					const previews = response.data;
+					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//this.resetForm();
 				});
 		},
 		insertVariable(selectedItem){
@@ -177,11 +168,13 @@ export default {
 				vorlage_kurzbz: null,
 				body: null,
 				subject: null,
+				recipient: null,
+				selectedValue: null
 			};
 			if (this.editor) {
 				this.editor.setContent("");
 			}
-			this.$refs.dropdownComp.setValue(null);
+		//	this.$refs.dropdownComp.setValue(null);
 
 			this.previewBody = null;
 
@@ -202,23 +195,11 @@ export default {
 			if (this.openMode == "inSamePage")
 				this.isVisible = true;
 		},
-		showPreview(id, typeId){
-			this.getPreviewText(id, typeId).then(() => {
+		showPreview(){
+			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
 		},
-		getUid(id, typeId){
-			const params = {
-				id: id,
-				type_id: typeId
-			};
-			this.$api
-				.call(this.endpoint.getUid(params))
-				.then(result => {
-					this.uid = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
 	},
 	watch: {
 		'formData.body': {
@@ -242,38 +223,26 @@ export default {
 		},
 	},
 	created(){
-		this.getUid(this.id, this.typeId);
-
-		if (['person_id', 'mitarbeiter_uid'].includes(this.typeId)){
-				const params = {
-					id: this.id,
-					type_id: this.typeId
-				};
-
-				this.$api
-				.call(this.endpoint.getMessageVarsPerson(params))
-					.then(result => {
-						this.fieldsPerson = result.data;
-						const person = this.fieldsPerson[0];
-						this.itemsPerson = Object.entries(person).map(([key, value]) => ({
-							label: key.toLowerCase(),
-							value: '{' + key.toLowerCase() + '}'
-						}));
-					})
-					.catch(this.$fhcAlert.handleSystemError);
-			}
-
-		if (['prestudent_id', 'uid'].includes(this.typeId)){
-				const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
+		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
 			this.$api
-				.call(this.endpoint.getMsgVarsPrestudent(params))
+				.call(ApiMessages.getMessageVarsPerson(this.id, this.typeId))
+				.then(result => {
+					this.fieldsPerson = result.data;
+					const person = this.fieldsPerson[0];
+					this.itemsPerson = Object.entries(person).map(([key, value]) => ({
+						label: key.toLowerCase(),
+						value: '{' + key.toLowerCase() + '}'
+					}));
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
+
+		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
+			this.$api
+				.call(ApiMessages.getMsgVarsPrestudent(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
-
 					this.itemsPrestudent = Object.entries(prestudent).map(([key, value]) => ({
 						label: key.toLowerCase(),
 						value: '{' + key.toLowerCase() + '}'
@@ -283,7 +252,7 @@ export default {
 		}
 
 		this.$api
-			.call(this.endpoint.getMsgVarsLoggedInUser())
+			.call(ApiMessages.getMsgVarsLoggedInUser())
 			.then(result => {
 				this.fieldsUser = result.data;
 				const user = this.fieldsUser;
@@ -295,21 +264,18 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(this.endpoint.getNameOfDefaultRecipient({
-				id: this.id,
-				type_id: this.typeId}))
+			.call(ApiMessages.getNameOfDefaultRecipients(this.id, this.typeId))
 			.then(result => {
-				this.defaultRecipient = result.data;
-				this.recipientsArray.push({
-					'uid': this.uid,
-					'details': this.defaultRecipient});
+				this.defaultRecipients = result.data;
+				this.defaultRecipientString = Object.values(this.defaultRecipients).join("; ");
+
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
 		//case of reply
 		if(this.messageId != null) {
 			this.$api
-				.call(this.endpoint.getReplyData(this.messageId))
+				.call(ApiMessages.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;
@@ -343,7 +309,7 @@ export default {
 									type="text"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="defaultRecipient"
+									v-model="defaultRecipientString"
 									disabled
 								>
 								</form-input>
@@ -472,18 +438,18 @@ export default {
 									v-model="defaultRecipient"
 								>
 									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
-									<option 
-										v-for="recipient in recipientsArray"
-										:key="recipient.uid" 
-										:value="recipient.uid" 
-										>{{recipient.details}}
+									<option
+										v-for="(name, id) in defaultRecipients"
+										  :key="id" 
+										  :value="Number(id)"
+										> {{name}}
 									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn btn-secondary" @click="showPreview(id, typeId)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(defaultRecipient)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 

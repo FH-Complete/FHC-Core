@@ -32,6 +32,7 @@ export default {
 	},
 	template: `
 	<div class="stv-details-messages h-100 pb-3 overflow-hidden">
+
 		<template v-if="prestudent_ids">
 			<core-messages
 				ref="formc"
@@ -39,7 +40,7 @@ export default {
 				type-id="prestudent_id"
 				:id="prestudent_ids"
 				messageLayout="twoColumnsTableLeft"
-				open-mode="modal"
+				open-mode="inSamePage"
 				show-table
 				>
 			</core-messages>
@@ -51,7 +52,7 @@ export default {
 				type-id="person_id"
 				:id="person_ids"
 				messageLayout="twoColumnsTableLeft"
-				open-mode="modal"
+				open-mode="inSamePage"
 				show-table
 				>
 			</core-messages>

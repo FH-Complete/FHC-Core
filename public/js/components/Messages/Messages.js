@@ -98,6 +98,7 @@ export default {
 			}
 
 			const newTab = window.open(path, "_blank");
+
 		},
 		openInNewWindow(id, typeId, messageId){
 			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -124,7 +125,6 @@ export default {
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
-	{{typeId}} {{id}} 
 
 		<message-modal
 			ref="modalMsg"

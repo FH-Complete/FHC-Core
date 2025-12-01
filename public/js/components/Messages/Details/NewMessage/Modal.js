@@ -58,8 +58,7 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-			uid: null,
-			uids: null //necessary?
+
 		}
 	},
 	methods: {
@@ -116,31 +115,20 @@ export default {
 			const data = new FormData();
 			data.append('data', JSON.stringify(this.formData));
 			data.append('ids', JSON.stringify(this.id));
-			data.append('uids', JSON.stringify(this.uid));
 
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
-			const merged = {
-				...this.formData,
-				...params
-			};
-			data.append('data', JSON.stringify(merged));
-
-			//Modal Context?
 			return this.$refs.formMessage
-				.call(this.endpoint.sendMessageFromModalContext(data))
+				.call(this.endpoint.sendMessageFromModalContext(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-						//this.resetForm();
-						//closeModal
-						//closewindwo
+
+					//just emit if no multitasking
+					if(this.id.length == 1){
 						this.$emit('reloadTable');
+						}
 					}
 				);
 		},
@@ -210,15 +198,6 @@ export default {
 				this.previewBody = this.previewText;
 			});
 		},
-		//TODO(Manu) check if No_UID
-		getUid(id, typeId){
-			this.$api
-				.call(this.endpoint.getUid(this.id, this.typeId))
-				.then(result => {
-					this.uid = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		show(){
 			this.$refs.modalNewMessage.show();
 		},
@@ -266,15 +245,9 @@ export default {
 		}
 	},
 	created(){
-		this.getUid(this.id, this.typeId);
-
 		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMessageVarsPerson(params))
+				.call(this.endpoint.getMessageVarsPerson(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPerson = result.data;
 					const person = this.fieldsPerson[0];
@@ -312,19 +285,6 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-/*		this.$api
-			.call(this.endpoint.getNameOfDefaultRecipient({
-				id: this.id,
-				type_id: this.typeId}))
-			.then(result => {
-				this.defaultRecipient = result.data;
-				this.recipientsArray.push({
-					'uid': this.uid,
-					'details': this.defaultRecipient});
-			})
-			.catch(this.$fhcAlert.handleSystemError);*/
-
-		//for multiaction too
 		this.$api
 			.call(this.endpoint.getNameOfDefaultRecipients(this.id, this.typeId))
 			.then(result => {
@@ -379,8 +339,6 @@ export default {
 			</template>
 
 			<form-form ref="formNewMassage">
-			
-			{{defaultRecipients}} | {{defaultRecipient}} || {{uid}}
 
 			<div class="tab-content" id="msg_preview_content">
 				<div class="tab-pane fade show active" id="msg" role="tabpanel" aria-labelledby="msg-tab">

@@ -38,19 +38,13 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getMsgVarsLoggedInUser/'
 		};
 	},
-	getMessageVarsPerson(userParams){
+	getMessageVarsPerson(ids, type_id){
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getMessageVarsPerson/' + userParams.id + '/' + userParams.type_id
+			url: 'api/frontend/v1/messages/messages/getMessageVarsPerson/' + type_id,
+			params: {ids}
 		};
 	},
-	//TODO(Manu) enable for id_array
-/*	getMsgVarsPrestudent(userParams){
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + userParams.id + '/' + userParams.type_id
-		};
-	},	*/
 	getMsgVarsPrestudent(ids, type_id){
 		return {
 			method: 'post',
@@ -58,41 +52,25 @@ export default {
 			params: {ids}
 		};
 	},
-	//TODO(Manu) enable for id_array
 	getPersonId(params){
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/messages/messages/getPersonId/' + params.id + '/' + params.type_id
 		};
 	},
-	//TODO(Manu) enable for id_array
-/*	getUid(userParams){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getUid/' + userParams.id + '/' + userParams.type_id
-		};
-	},	*/
-	getUid(ids, type_id){
+/*	getUid(ids, type_id){
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/messages/messages/getUids/' + type_id,
 			params: {ids}
 		};
-	},
+	},*/
 	getDataVorlage(vorlage_kurzbz){
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz
 		};
 	},
-/*	getNameOfDefaultRecipient(params){
-		console.log(params.id);
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getNameOfDefaultRecipient/' + params.id + '/' + params.type_id
-		};
-	},*/
-	//TODO(Manu) enable for id_array
 	getNameOfDefaultRecipients(ids, type_id){
 		return {
 			method: 'post',
@@ -120,17 +98,17 @@ export default {
 			params
 		};
 	},	*/
-	sendMessageFromModalContext(params) {
+	sendMessageFromModalContext(type_id, params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessages/',
+			url: 'api/frontend/v1/messages/messages/sendMessage/' + type_id,
 			params
 		};
 	},
-	sendMessage(id, params) {
+	sendMessage(type_id, params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessage/' + id,
+			url: 'api/frontend/v1/messages/messages/sendMessage/' + type_id,
 			params
 		};
 	},

@@ -38,12 +38,13 @@ export default {
 				},
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
 				columns: [
-					{title: "subject", field: "subject"},
-					{title: "body", field: "body", formatter: "html", visible: false},
-					{title: "message_id", field: "message_id", visible: false},
+					{title: "subject", field: "subject", headerFilter: true},
+					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
+					{title: "message_id", field: "message_id", visible: false, headerFilter: true},
 					{
 						title: "Datum",
 						field: "insertamum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr); // Convert to Date object
@@ -55,16 +56,28 @@ export default {
 								minute: "2-digit",
 								hour12: false
 							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
 						}
 					},
-					{title: "sender", field: "sender"},
-					{title: "recipient", field: "recipient"},
-					{title: "senderId", field: "sender_id"},
-					{title: "recipientId", field: "recipient_id"},
-					{title: "Relationmessage ID", field: "relationmessage_id"},
+					{title: "sender", field: "sender", headerFilter: true},
+					{title: "recipient", field: "recipient", headerFilter: true},
+					{title: "senderId", field: "sender_id", headerFilter: true},
+					{title: "recipientId", field: "recipient_id", headerFilter: true},
+					{title: "Relationmessage ID", field: "relationmessage_id", headerFilter: true},
 					{
 						title: "Status",
 						field: "status",
+						headerFilter: true,
 						formatterParams: [
 							"unread",
 							"read",
@@ -73,11 +86,12 @@ export default {
 						],
 						formatter: (cell, formatterParams) => {
 							return formatterParams[cell.getValue()];
-						}
+						},
 					},
 					{
 						title: "letzte Änderung",
 						field: "statusdatum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr); // Convert to Date object
@@ -89,6 +103,17 @@ export default {
 								minute: "2-digit",
 								hour12: false
 							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
 						}
 					},
 					{
