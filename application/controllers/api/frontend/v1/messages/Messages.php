@@ -122,6 +122,9 @@ class Messages extends FHCAPI_Controller
 	public function getMsgVarsPrestudent($typeId)
 	{
 		$ids = $this->input->post('ids');
+		if(!is_array($ids)) {
+			$ids = array($ids);
+		}
 		$messageVarsPrestudent = [];
 
 		if($typeId == 'uid')
@@ -169,6 +172,9 @@ class Messages extends FHCAPI_Controller
 	public function getNameOfDefaultRecipients($type_id)
 	{
 		$ids = $this->input->post('ids');
+		if(!is_array($ids)) {
+			$ids = array($ids);
+		}
 		$recipients = [];
 
 		if (empty($ids)) {
@@ -301,6 +307,10 @@ class Messages extends FHCAPI_Controller
 		if (isset($_POST['ids']))
 		{
 			$ids = json_decode($_POST['ids']);
+			if(!is_array($ids))
+			{
+				$ids = array($ids);
+			}
 			unset($_POST['ids']);
 		}
 		else

@@ -13,32 +13,22 @@ export default {
 		DropdownComponent,
 	},
 	props: {
+/*
 		endpoint: {
 			type: Object,
 			required: true
 		},
+*/
 		openMode: String,
-		tempTypeId: String,
-		tempId: {
+		typeId: String,
+		id: {
 			type: Array,
 			required: false
 		},
-		tempMessageId: {
+		messageId: {
 			type: Number,
 			required: false,
 		}
-	},
-	computed: {
-		//params with routes for new tab and new window AND props for inSamePage
-		id(){
-			return this.$props.tempId || this.$route.params.id;
-		},
-		typeId(){
-			return this.$props.tempTypeId || this.$route.params.typeId;
-		},
-		messageId(){
-			return this.$props.tempMessageId ||this.$route.params.messageId;
-		},
 	},
 	data(){
 		return {
@@ -223,6 +213,25 @@ export default {
 		},
 	},
 	created(){
+		const missingparamsmsgs = [];
+		if(!this.typeId)
+		{
+			// TODO(bh) Phrase
+			missingparamsmsgs.push('Fehlender oder ungültiger Parameter Empfänger-Id-Typ.');
+		}
+
+		if(!this.id || this.id.length < 1)
+		{
+			// TODO(bh) Phrase
+			missingparamsmsgs.push('Fehlender oder ungültiger Parameter Empfänger-Id(s).');
+		}
+
+		if(missingparamsmsgs.length > 0)
+		{
+			this.$fhcAlert.alertMultiple(missingparamsmsgs, 'warn', 'Warning', true);
+			return;
+		}
+
 		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
 			this.$api
 				.call(ApiMessages.getMessageVarsPerson(this.id, this.typeId))
