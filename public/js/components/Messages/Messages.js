@@ -14,10 +14,6 @@ export default {
 		}
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: {
 			type: String,
 			required: true,
@@ -74,18 +70,25 @@ export default {
 		handleMessage(id, typeId, messageId){
 			this.messageId = messageId;
 			if (this.openMode == "window") {
-				//this.$refs['newMsgForm'].submit();
 				this.openInNewWindow(id, typeId, messageId);
 			}
 			else if (this.openMode == "newTab"){
-				//this.$refs['newMsgForm'].submit();
 				this.openInNewTab(id, typeId, messageId);
 			}
 			else if (this.openMode == "modal"){
+				if(!messageId)
+					this.$refs.modalMsg.resetForm();
 				this.$refs.modalMsg.show();
 			}
 			else if (this.openMode == "inSamePage"){
+				console.log("in same Page");
 				this.isVisibleDiv = true;
+				if(messageId)
+					this.$refs.templateNewDivMessage.loadReplyData(messageId);
+				else
+					this.$refs.templateNewDivMessage.resetForm();
+
+				this.$refs.templateNewDivMessage.showTemplate();
 			}
 			else
 				console.log("no valid openMode");
@@ -156,7 +159,6 @@ export default {
 			:type-id="typeId"
 			:id="id"
 			:message-id="messageId"
-			:endpoint="endpoint"
 			:openMode="openMode"
 			@reloadTable="reloadTable"
 			@resetMessageId="resetMessageId"
@@ -164,13 +166,12 @@ export default {
 		</message-modal>
 		
 		<!--in same page-->
-		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
+		<div v-show="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
-				ref="templateNewMessage"
+				ref="templateNewDivMessage"
 				:type-id="typeId"
 				:id="id"
 				:message-id="messageId"
-				:endpoint="endpoint"
 				:openMode="openMode"
 				@reloadTable="reloadTable"
 			>
@@ -182,7 +183,6 @@ export default {
 				ref="templateTableMessage"
 				:type-id="typeId"
 				:id="id"
-				:endpoint="endpoint"
 				:messageLayout="messageLayout"
 				:openMode="openMode"
 				@newMessage="handleMessage"		
