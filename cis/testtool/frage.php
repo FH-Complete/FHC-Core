@@ -45,7 +45,7 @@ if (!$db = new basis_db())
 $PHP_SELF=$_SERVER["PHP_SELF"];
 
 // Start session
-session_start();
+require_once './session_init.php';
 
 // If language is changed by language select menu, reset language variables
 if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
@@ -181,6 +181,10 @@ echo '
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
+
+if (!empty($_SESSION['externe_ueberwachung']) && isset($_SESSION['externe_ueberwachung_verified'])): ?>
+	<script type="text/javascript" src="externeueberwachung.js"></script>
+<?php endif;
 
 $pruefling = new pruefling();
 $pruefling->load($_SESSION['pruefling_id']);

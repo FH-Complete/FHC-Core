@@ -517,6 +517,7 @@
 		"phpmd/phpmd": "2.*",
 		"phpmetrics/phpmetrics": "2.*",
 		"sebastian/phpcpd": "3.*",
-		"phpunit/phpunit": "^6"
+		"phpunit/phpunit": "^6",
+		"firebase/php-jwt": "^6.0"
 	}
 }
