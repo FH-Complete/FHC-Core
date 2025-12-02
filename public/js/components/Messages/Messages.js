@@ -31,7 +31,7 @@ export default {
 			}
 		},
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		showTable: Boolean,
@@ -65,15 +65,20 @@ export default {
 		}
 	},
 	methods: {
+		getControllerUrl() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/NeueNachricht';
+		},
 		reloadTable(){
 			this.$refs.templateTableMessage.reload();
 		},
 		handleMessage(id, typeId, messageId){
 			this.messageId = messageId;
 			if (this.openMode == "window") {
+				//this.$refs['newMsgForm'].submit();
 				this.openInNewWindow(id, typeId, messageId);
 			}
 			else if (this.openMode == "newTab"){
+				//this.$refs['newMsgForm'].submit();
 				this.openInNewTab(id, typeId, messageId);
 			}
 			else if (this.openMode == "modal"){
@@ -85,35 +90,47 @@ export default {
 			else
 				console.log("no valid openMode");
 		},
-		openInNewTab(id, typeId, messageId= null){
+		openInNewTab(id, typeId, messageId=null){
+			if(id.length > 1)
+			{
+				this.$refs['newMsgForm'].submit();
+				return;
+			}
 
-			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+			let path = this.getControllerUrl();
 
 			if (messageId){
-				path += "/NeueNachricht/" + id + "/" + typeId + "/" + messageId;
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId) + "/" + encodeURIComponent(messageId);
 			}
 
 			else {
-				path += "/NeueNachricht/" + id + "/" + typeId;
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId);
 			}
 
 			const newTab = window.open(path, "_blank");
 		},
 		openInNewWindow(id, typeId, messageId){
-			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-			if (messageId){
-				path += "/NeueNachricht/" + id + "/" + typeId + "/" + messageId;
-			}
-
-			else {
-				path += "/NeueNachricht/" + id + "/" + typeId;
-			}
-
 			const width = Math.round(window.innerWidth * 0.75);
 			const height = Math.round(window.innerHeight * 0.75);
 			const left = Math.round((window.innerWidth - width) / 2);
 			const top = Math.round((window.innerHeight - height) / 2);
+
+				if(id.length > 1)
+			{
+				const newWindow = window.open('', "NewMsgWindow", `width=${width},height=${height},left=${left},top=${top}`);
+				this.$refs['newMsgForm'].submit();
+				return;
+			}
+
+			let path = this.getControllerUrl();
+
+			if (messageId){
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId) + "/" + encodeURIComponent(messageId);
+			}
+
+			else {
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId);
+			}
 
 			const newWindow = window.open(path, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
 		},
@@ -124,6 +141,15 @@ export default {
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
+		<!-- TODO(bh) set target _self for debugging post but _blank for newTab -->
+		<form ref="newMsgForm"
+			method="post"
+			:action="getControllerUrl()"
+			:target="(openMode === 'window') ? 'NewMsgWindow' : '_blank'"
+		>
+			<input type="hidden" name="typeid" :value="typeId">
+			<input type="hidden" name="ids" :value="id">
+		</form>
 
 		<message-modal
 			ref="modalMsg"
@@ -141,18 +167,17 @@ export default {
 		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
 				ref="templateNewMessage"
-				:temp-type-id="typeId"
-				:temp-id="id"
-				:temp-message-id="messageId"
+				:type-id="typeId"
+				:id="id"
+				:message-id="messageId"
 				:endpoint="endpoint"
 				:openMode="openMode"
 				@reloadTable="reloadTable"
 			>
 			</form-only>
 		</div>
-
-		
-		<div v-if="showTable">
+	
+		<div v-if="showTable && id.length==1">
 			<table-messages
 				ref="templateTableMessage"
 				:type-id="typeId"

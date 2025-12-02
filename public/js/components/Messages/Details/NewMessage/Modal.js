@@ -20,7 +20,7 @@ export default {
 		},
 		typeId: String,
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		messageId: {
@@ -43,6 +43,8 @@ export default {
 			vorlagen: [],
 			recipientsArray: [],
 			defaultRecipient: null,
+			defaultRecipients: [],
+			defaultRecipientString: null,
 			editor: null,
 			fieldsUser: [],
 			fieldsPerson: [],
@@ -56,7 +58,7 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-			uid: null,
+
 		}
 	},
 	methods: {
@@ -111,28 +113,22 @@ export default {
 		},
 		sendMessage() {
 			const data = new FormData();
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
-			const merged = {
-				...this.formData,
-				...params
-			};
-			data.append('data', JSON.stringify(merged));
+			data.append('data', JSON.stringify(this.formData));
+			data.append('ids', JSON.stringify(this.id));
 
 			return this.$refs.formMessage
-				.call(this.endpoint.sendMessageFromModalContext(this.uid, data))
+				.call(this.endpoint.sendMessageFromModalContext(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-						//this.resetForm();
-						//closeModal
-						//closewindwo
+
+					//just emit if no multitasking
+					if(this.id.length == 1){
 						this.$emit('reloadTable');
+						}
 					}
 				);
 		},
@@ -146,14 +142,15 @@ export default {
 		},
 		getPreviewText(){
 			const data = new FormData();
-
 			data.append('data', JSON.stringify(this.formData.body));
+			data.append('ids', JSON.stringify(this.id));
+
 			return this.$api
-				.call(this.endpoint.getPreviewText({
-					id: this.id,
-					type_id: this.typeId}, data))
+				.call(this.endpoint.getPreviewText(
+					this.typeId, data))
 				.then(response => {
-					this.previewText = response.data;
+					const previews = response.data;
+					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					//this.resetForm();
@@ -200,18 +197,6 @@ export default {
 			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
-		},
-		getUid(id, typeId){
-			const params = {
-				id: id,
-				type_id: typeId
-			};
-			this.$api
-				.call(this.endpoint.getUid(params))
-				.then(result => {
-					this.uid = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
 		},
 		show(){
 			this.$refs.modalNewMessage.show();
@@ -260,15 +245,9 @@ export default {
 		}
 	},
 	created(){
-		this.getUid(this.id, this.typeId);
-
 		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMessageVarsPerson(params))
+				.call(this.endpoint.getMessageVarsPerson(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPerson = result.data;
 					const person = this.fieldsPerson[0];
@@ -281,12 +260,8 @@ export default {
 		}
 
 		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMsgVarsPrestudent(params))
+				.call(this.endpoint.getMsgVarsPrestudent(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -311,14 +286,11 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(this.endpoint.getNameOfDefaultRecipient({
-				id: this.id,
-				type_id: this.typeId}))
+			.call(this.endpoint.getNameOfDefaultRecipients(this.id, this.typeId))
 			.then(result => {
-				this.defaultRecipient = result.data;
-				this.recipientsArray.push({
-					'uid': this.uid,
-					'details': this.defaultRecipient});
+				this.defaultRecipients = result.data;
+				this.defaultRecipientString =  Object.values(this.defaultRecipients).join("; ");
+
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -381,7 +353,7 @@ export default {
 									type="text"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="defaultRecipient"
+									v-model="defaultRecipientString"
 									disabled
 								>
 								</form-input>
@@ -502,17 +474,17 @@ export default {
 								>
 									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
 									<option
-										v-for="recipient in recipientsArray"
-										:key="recipient.uid"
-										:value="recipient.uid" 
-										>{{recipient.details}}
+										v-for="(name, id) in defaultRecipients"
+										  :key="id" 
+										  :value="Number(id)"
+										> {{name}}
 									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn btn-secondary" @click="showPreview()">{{ $p.t('ui', 'btnAktualisieren') }}</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(defaultRecipient)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 
