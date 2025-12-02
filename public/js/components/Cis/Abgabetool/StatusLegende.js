@@ -49,6 +49,16 @@ export const AbgabeterminStatusLegende = {
 					</div>
 					
 				</div>
+				
+				<div class="row" style="margin-bottom: 2px">
+					<div class="col-auto beurteilungerforderlich-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+						<i class="fa-solid fa-list-check"></i>
+					</div>
+					<div class="col-auto" style="display: flex; align-items: center;">
+						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipBeurteilungerforderlich')) }}</h5>
+					</div>
+					
+				</div>
 
 			</div>
 		</div>	

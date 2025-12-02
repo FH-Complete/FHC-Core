@@ -214,9 +214,6 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				));
 
-				// enable this when lektor cry that they dont receive enough emails
-//				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
-
 				$this->logLib->logInfoDB(array('zwischenupload',$res, array(
 					'abgabedatum' => date('Y-m-d'),
 					'updatevon' => getAuthUID(),
@@ -290,12 +287,6 @@ class Abgabe extends FHCAPI_Controller
 				$this->checkAbgabeSignatur($paabgabe, $projektarbeit);
 				$signaturstatus = $paabgabe->signatur;
 				
-				if ($paabgabe->signatur === false)
-				{
-					// TODO: decide if we need this email at all, if yes -> nightly job sends email
-//					$this->signaturFehltEmail($student_uid);
-				}
-				
 				// update projektarbeit cols
 				$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
 					,$schlagwoerter, $schlagwoerter_en, $seitenanzahl);
@@ -311,7 +302,7 @@ class Abgabe extends FHCAPI_Controller
 				$res = $this->PaabgabeModel->load($res->retval);
 				$abgabe = getData($res)[0];
 				$abgabe->signatur = $signaturstatus;
-					
+
 				$this->sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid);
 
 				$this->logLib->logInfoDB(array('endupload',$res, array(
@@ -332,203 +323,11 @@ class Abgabe extends FHCAPI_Controller
 
 	}
 
-	private function signaturFehltEmail($student_uid) {
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-
-		$this->StudentModel->addJoin('public.tbl_benutzer', 'ON (public.tbl_benutzer.uid = public.tbl_student.student_uid)');
-		$this->StudentModel->addJoin('public.tbl_person', 'person_id');
-
-//		$this->StudentModel->load($student_uid); -> this loads all students for some reason
-		$result = $this->StudentModel->loadWhere(array('student_uid' => $student_uid));
-		$this->StudentModel->resetQuery();
-		
-		$studentArr = $this->getDataOrTerminateWithError($result);
-
-		if(count($studentArr) > 0) {
-			$student = $studentArr[0];
-		} else {
-			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
-		}
-		
-		$result = $this->StudiengangModel->load($student->studiengang_kz);
-		$studiengangArr = $this->getDataOrTerminateWithError($result);
-
-		if(count($studiengangArr) > 0) {
-			$stg_obj = $studiengangArr[0];
-		} else {
-			$this->terminateWithError($this->p->t('global','fehlerBeimLesenAusDatenbank'), 'general');
-		}
-
-		$subject = 'Abgabe ohne Signatur';
-		$tomail = $stg_obj->email;
-		$data = array(
-			'vorname' => $student->vorname,
-			'nachname' => $student->nachname,
-			'studiengang' => $stg_obj->bezeichnung
-		);
-
-		
-//		$mailres = sendSanchoMail(
-//			'ParbeitsbeurteilungSiganturFehlt',
-//			$data,
-//			$tomail,
-//			$subject,
-//			'sancho_header_min_bw.jpg',
-//			'sancho_footer_min_bw.jpg'
-//		);
-	}
-
-	private function sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid) {
-
-		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-
-		$resBetr = $this->ProjektarbeitModel->getProjektbetreuerAnrede($bperson_id);
-
-
-		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
-
-		if(count($projektarbeitArr) > 0) {
-			$projektarbeit = $projektarbeitArr[0];
-		} else {
-			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
-		}
-
-		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
-		if(!$projektarbeitIsCurrent) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
-		}
-
-		// Link to Abgabetool
-		if (defined('CIS4') && CIS4) {
-			$ci3BootstrapFilePath = "cis.php";
-		} else {
-			$ci3BootstrapFilePath = "index.ci.php";
-		}
-
-		$path = $this->config->item('URL_MITARBEITER');
-		$url = APP_ROOT.$path;
-
-//		$this->addMeta('betreuerArray', $resBetr->retval);
-		
-		// getProjektbetreuerAnrede fetches distinct on person_id, so there should be one row. zweitbetreuer is handled seperately afterwards 
-		foreach($resBetr->retval as $betreuerRow) {
-
-			// query student benutzer view for every betreuer row
-			$studentUser = $this->ProjektarbeitModel->getProjektarbeitBenutzer($student_uid)->retval[0];
-			
-			// 1. Begutachter mail ohne Token
-			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
-			$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
-			$projekttyp_kurzbz = $projektarbeit->projekttyp_kurzbz;
-			$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
-			$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
-
-			$maildata = array();
-			$maildata['geehrt'] = "geehrte".($betreuerRow->anrede=="Herr"?"r":"");
-			$maildata['anrede'] = $betreuerRow->anrede;
-			$maildata['betreuer_voller_name'] = $betreuerRow->first;
-			$maildata['student_anrede'] = $studentUser->anrede;
-			$maildata['student_voller_name'] = trim($studentUser->titelpre." ".$studentUser->vorname." ".$studentUser->nachname." ".$studentUser->titelpost);
-			$maildata['abgabetyp'] = $abgabetyp;
-			$maildata['parbeituebersichtlink'] = "<p><a href='$url'>Zur Projektarbeitsübersicht</a></p>";
-			$maildata['bewertunglink'] = $projektarbeitIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
-			$maildata['token'] = "";
-			
-			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
-			
-			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
-
-//			$this->addMeta('$maildata', $maildata);
-
-			$mailres = sendSanchoMail(
-				'ParbeitsbeurteilungEndupload',
-				$maildata,
-				$email,
-				$subject,
-				'sancho_header_min_bw.jpg',
-				'sancho_footer_min_bw.jpg',
-				get_uid()."@".DOMAIN);
-
-			if(!$mailres)
-			{
-				$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
-			}
-
-			// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
-			if ($paabgabetyp_kurzbz == 'end')
-			{
-				// Zweitbegutachter holen
-				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
-				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
-				
-//				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRetval);
-				
-				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
-				{
-
-					foreach ($zweitbegutachterRetval as $begutachter)
-					{
-						// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
-						$tokenGenRes = $this->ProjektbetreuerModel->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
-
-						if (!$tokenGenRes)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
-						}
-						
-						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
-						
-//						$this->addMeta('$begutachterMitTokenRetval', $begutachterMitTokenRetval);
-						
-						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
-						}
-						
-						$begutachterMitToken = $begutachterMitTokenRetval[0];
-
-						$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
-						$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
-						$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
-						$intern = isset($begutachterMitToken->uid);
-						$mail_link = $intern ? $mail_fulllink : $mail_baselink;
-
-						$zweitbetmaildata = array();
-						$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
-						$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
-						$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
-						$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
-						$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
-						$zweitbetmaildata['abgabetyp'] = $abgabetyp;
-						$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
-						
-//						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
-						
-						$mailres = sendSanchoMail(
-							'ParbeitsbeurteilungEndupload',
-							$zweitbetmaildata,
-							$begutachterMitToken->email,
-							$subject,
-							'sancho_header_min_bw.jpg',
-							'sancho_footer_min_bw.jpg',
-							get_uid()."@".DOMAIN
-						);
-
-						if (!$mailres)
-						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
-						}
-					
-					}
-				}
-			}
-		}
-	}
-
+	/**
+	 * tabulator tabledata fetch for abgabetool/mitarbeiter
+	 * initially fetches all currently active projektarbeiten with assigned mentorship
+	 * showAll functionality also retrieves older finished projektarbeiten
+	 */
 	public function getMitarbeiterProjektarbeiten() {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
@@ -553,7 +352,10 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 	
-	// called by abgabetool/mitarbeiter when adding a new termin
+	/**
+	 * called by abgabetool/mitarbeiter in mitarbeiterdetail.js when adding a single new abgabetermin
+	 * initially fetches all
+	 */
 	public function postProjektarbeitAbgabe() {
 		$projektarbeit_id = $_POST['projektarbeit_id'];
 		$paabgabe_id = $_POST['paabgabe_id'];
@@ -668,6 +470,11 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess([$paabgabe, $existingPaabgabe]);
 	}
 
+	/**
+	 * called by abgabetool/mitarbeiter in mitarbeiterdetail.js when deleting an abgabetermin
+	 * deletion is only possible if user is assistenz OR betreuer deletes their own custom termin
+	 * none of these roles are allowed to delete if students uploaded something for that termin
+	 */
 	public function deleteProjektarbeitAbgabe() {
 		$paabgabe_id = $_POST['paabgabe_id'];
 
@@ -759,6 +566,11 @@ class Abgabe extends FHCAPI_Controller
 
 	}
 
+	/**
+	 * called by Abgabetool/Deadlines
+	 * fetches the next upcoming abgabtermine for a given betreuer person_id
+	 * resembles the legacy abgabetool functionality of "show deadlines"
+	 */
 	public function fetchDeadlines() {
 		$person_id = $_POST['person_id'];
 
@@ -779,6 +591,11 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * called by Abgabetool/Mitarbeiter & Abgabetool/Assistenz
+	 * fetches all available paabgabetypen to enable a logical selection of them
+	 * based on active status and role assistenz/betreuer
+	 */
 	public function getPaAbgabetypen() {
 		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 
@@ -788,7 +605,10 @@ class Abgabe extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($paabgabetypen);
 	}
-	
+
+	/**
+	 * helper function to fetch the correct email for a projektarbeits erstbetreuer
+	 */
 	private function getProjektbetreuerEmail($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
@@ -812,7 +632,11 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->terminateWithSuccess(array($noten, $allowed_noten_abgabetool));
 	}
-	
+
+	/**
+	 * helper function to send a sancho mail to students if a betreuer or assistenz grades a quality gate
+	 * termin as negative (nicht bestanden)
+	 */
 	private function sendQualGateNegativEmail($projektarbeit_id, $betreuer_person_id, $paabgabe) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		
@@ -866,7 +690,11 @@ class Abgabe extends FHCAPI_Controller
 			$subject
 		);
 	}
-	
+
+	/**
+	 * tabulator tabledata fetch for abgabetool/assistenz
+	 * initially fetches all ungraded projektarbeiten with all their abgabetermine
+	 */
 	public function getProjektarbeitenForStudiengang() {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		
@@ -909,7 +737,12 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 	
-	// TODO: this could be in a generic info controller and resused
+	// TODO: this could be in a generic info controller and reused
+	/**
+	 * GET METHOD
+	 * returns List of all studiengang_kz a user has the assigned permission 'basis/abgabe_assistenz:rw' for
+	 * used in Abgabetool/Assistenz to populate Studiengang Dropdown
+	 */
 	public function getStudiengaenge() {
 		$this->load->library('PermissionLib');
 		
@@ -927,6 +760,10 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * GET METHOD
+	 * endpoint to download the abgabe of a paabgabe termin zwischenabgabe or endupload
+	 */
 	public function getStudentProjektarbeitAbgabeFile()
 	{
 		$this->load->helper('download');
@@ -957,6 +794,11 @@ class Abgabe extends FHCAPI_Controller
 		}
 	}
 
+	/**
+	 * POST METHOD
+	 * endpoint to enable Assistenz/Betreuer to edit the zusatzdate of a projektarbeit, in case the student somehow
+	 * can't do it themself
+	 */
 	public function postStudentProjektarbeitZusatzdaten(){
 		$projektarbeit_id = $_POST['projektarbeit_id'];
 		
@@ -1000,7 +842,10 @@ class Abgabe extends FHCAPI_Controller
 		
 		$this->terminateWithSuccess($result);
 	}
-	
+
+	/**
+	 * helper function to check the signature status of uploaded files for zwischenabgabe & endupload
+	 */
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
 		if($abgabe->paabgabetyp_kurzbz != 'end') {
 			return;
@@ -1029,6 +874,156 @@ class Abgabe extends FHCAPI_Controller
 			}
 
 			$abgabe->signatur = $signaturVorhanden;
+		}
+	}
+
+	private function sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid) {
+
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		$resBetr = $this->ProjektarbeitModel->getProjektbetreuerAnrede($bperson_id);
+
+
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+
+		if(count($projektarbeitArr) > 0) {
+			$projektarbeit = $projektarbeitArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+		}
+
+		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
+		if(!$projektarbeitIsCurrent) {
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
+		}
+
+		// Link to Abgabetool
+		if (defined('CIS4') && CIS4) {
+			$ci3BootstrapFilePath = "cis.php";
+		} else {
+			$ci3BootstrapFilePath = "index.ci.php";
+		}
+
+		$path = $this->config->item('URL_MITARBEITER');
+		$url = APP_ROOT.$path;
+
+//		$this->addMeta('betreuerArray', $resBetr->retval);
+
+		// getProjektbetreuerAnrede fetches distinct on person_id, so there should be one row. zweitbetreuer is handled seperately afterwards 
+		foreach($resBetr->retval as $betreuerRow) {
+
+			// query student benutzer view for every betreuer row
+			$studentUser = $this->ProjektarbeitModel->getProjektarbeitBenutzer($student_uid)->retval[0];
+
+			// 1. Begutachter mail ohne Token
+			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
+			$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
+			$projekttyp_kurzbz = $projektarbeit->projekttyp_kurzbz;
+			$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';
+			$abgabetyp = $paabgabetyp_kurzbz == 'end' ? 'Endabgabe' : 'Zwischenabgabe';
+
+			$maildata = array();
+			$maildata['geehrt'] = "geehrte".($betreuerRow->anrede=="Herr"?"r":"");
+			$maildata['anrede'] = $betreuerRow->anrede;
+			$maildata['betreuer_voller_name'] = $betreuerRow->first;
+			$maildata['student_anrede'] = $studentUser->anrede;
+			$maildata['student_voller_name'] = trim($studentUser->titelpre." ".$studentUser->vorname." ".$studentUser->nachname." ".$studentUser->titelpost);
+			$maildata['abgabetyp'] = $abgabetyp;
+			$maildata['parbeituebersichtlink'] = "<p><a href='$url'>Zur Projektarbeitsübersicht</a></p>";
+			$maildata['bewertunglink'] = $projektarbeitIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
+			$maildata['token'] = "";
+
+			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
+
+			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+
+//			$this->addMeta('$maildata', $maildata);
+
+			$mailres = sendSanchoMail(
+				'ParbeitsbeurteilungEndupload',
+				$maildata,
+				$email,
+				$subject,
+				'sancho_header_min_bw.jpg',
+				'sancho_footer_min_bw.jpg',
+				get_uid()."@".DOMAIN);
+
+			if(!$mailres)
+			{
+				$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+			}
+
+			// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
+			if ($paabgabetyp_kurzbz == 'end')
+			{
+				// Zweitbegutachter holen
+				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
+				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
+
+//				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRetval);
+
+				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
+				{
+
+					foreach ($zweitbegutachterRetval as $begutachter)
+					{
+						// token generieren, wenn noch nicht vorhanden und notwendig (wird in methode überprüft)
+						$tokenGenRes = $this->ProjektbetreuerModel->generateZweitbegutachterToken($begutachter->person_id, $projektarbeit_id);
+
+						if (!$tokenGenRes)
+						{
+							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
+						}
+
+						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
+
+//						$this->addMeta('$begutachterMitTokenRetval', $begutachterMitTokenRetval);
+
+						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
+						{
+							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
+						}
+
+						$begutachterMitToken = $begutachterMitTokenRetval[0];
+
+						$path = $begutachterMitToken->betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter';
+						$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/$path";
+						$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
+						$intern = isset($begutachterMitToken->uid);
+						$mail_link = $intern ? $mail_fulllink : $mail_baselink;
+
+						$zweitbetmaildata = array();
+						$zweitbetmaildata['geehrt'] = "geehrte" . ($begutachterMitToken->anrede == "Herr" ? "r" : "");
+						$zweitbetmaildata['anrede'] = $begutachterMitToken->anrede;
+						$zweitbetmaildata['betreuer_voller_name'] = $begutachterMitToken->voller_name;
+						$zweitbetmaildata['student_anrede'] = $maildata['student_anrede'];
+						$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
+						$zweitbetmaildata['abgabetyp'] = $abgabetyp;
+						$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
+						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+
+//						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
+
+						$mailres = sendSanchoMail(
+							'ParbeitsbeurteilungEndupload',
+							$zweitbetmaildata,
+							$begutachterMitToken->email,
+							$subject,
+							'sancho_header_min_bw.jpg',
+							'sancho_footer_min_bw.jpg',
+							get_uid()."@".DOMAIN
+						);
+
+						if (!$mailres)
+						{
+							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+						}
+
+					}
+				}
+			}
 		}
 	}
 }

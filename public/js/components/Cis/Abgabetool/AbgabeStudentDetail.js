@@ -57,49 +57,8 @@ export const AbgabeStudentDetail = {
 			
 			// TODO: define these
 			if(endupload) {
-				// check these input fields for length of entry
-				if(this.form['abstract'].length < 100 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningShortAbstract'),
-					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['abstract_en'].length < 100 && await this.$fhcAlert.confirm({
-					message: this.$capitalize(this.$p.t('abgabetool/warningShortAbstractEn')),
-					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['schlagwoerter'].length < 50 && await this.$fhcAlert.confirm({
-					message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerter')),
-					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['schlagwoerter_en'].length < 50 && await this.$fhcAlert.confirm({
-					message: this.$capitalize(this.$p.t('abgabetool/warningShortSchlagwoerterEn')),
-					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['seitenanzahl'] <= 5 && await this.$fhcAlert.confirm({
-					message: this.$capitalize(this.$p.t('abgabetool/warningSmallSeitenanzahl')),
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
 					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
 					acceptClass: 'btn btn-danger',
 					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
@@ -461,7 +420,7 @@ export const AbgabeStudentDetail = {
 						<div class="row mt-2" v-if="termin.note">
 							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
 							<div class="col-12 col-md-9">
-								<div class="col-1 d-flex justify-content-start align-items-start">
+								<div class="col-auto d-flex justify-content-start align-items-start">
 									{{ getTerminNoteBezeichnung(termin) }}
 								</div>
 							</div>

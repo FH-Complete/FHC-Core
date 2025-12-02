@@ -300,14 +300,25 @@ class FHCAPI_Controller extends Auth_Controller
 	 * @return void
 	 */
 	protected function checkUploadSize() {
-		$content_length = (int)$this->input->server('CONTENT_LENGTH');
-
-		//get max serverside size upload
+		// this number represents bytes
+		$content_length_bytes = (int)$this->input->server('CONTENT_LENGTH');
+		$content_length = $content_length_bytes / 1000000;
+		
+		//get max serverside size upload -> this comes in megabytes
 		$max_upload = (int)(ini_get('upload_max_filesize'));
 		$max_post = (int)(ini_get('post_max_size'));
 		$memory_limit = (int)(ini_get('memory_limit'));
 		$max_upload_mb = min($max_upload, $max_post, $memory_limit);    // smallest of 3 config values
 
+		$this->addMeta('stats', array(
+			'$content_length_bytes' => $content_length_bytes,
+			'$content_length' => $content_length,
+			'$max_upload' => $max_upload,
+			'$max_post' => $max_post,
+			'$memory_limit' => $memory_limit,
+			'$max_upload_mb' => $max_upload_mb,
+		));
+		
 		if($content_length >= $max_upload_mb) {
 			$this->terminateWithError($this->p->t('global', 'filesizeExceeded'), 'general');
 		}

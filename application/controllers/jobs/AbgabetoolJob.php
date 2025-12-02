@@ -25,8 +25,10 @@ class AbgabetoolJob extends JOB_Controller
 			'abgabetool'
 		]);
 	}
-
-
+	
+	public function notifyBetreuerAboutChangedAbgaben() {
+		
+	}
 
 	public function notifyBetreuerMail() {
 		// send all new projektarbeit abgabe UPLOADS since the last job run to the related betreuer
@@ -73,6 +75,8 @@ class AbgabetoolJob extends JOB_Controller
 
 			// https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
 			// php has spaceships 🚀🚀🚀🚀🚀
+			
+			// sorting $abgaben array by datum
 			usort($abgaben, function ($a, $b) {
 				return strtotime($a->datum) <=> strtotime($b->datum);
 			});

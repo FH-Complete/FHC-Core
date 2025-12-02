@@ -145,10 +145,10 @@ export const AbgabetoolStudent = {
 					termin.allowedToUpload = false
 					
 					if(termin.paabgabetyp_kurzbz == 'end') {
-						// production logic when qgates are required
+						// old assumed production logic when qgates are required
 						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
 						
-						// larifari we want qgates but they are optional fhtw mode
+						// new larifari we want qgates but they are optional fhtw mode
 						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesOptional(pa.abgabetermine)
 
 
@@ -225,8 +225,12 @@ export const AbgabetoolStudent = {
 				
 				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
 					// mode = 'beurteilungDownload' // build dl link for both betreuer documents
-					projekt.beurteilungLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.bperson_id
-
+					
+					// TODO: if switch zweitbetreuer beurteilung / erstbetreuer beurteilung download
+					projekt.beurteilungLink1 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.bperson_id
+					if(projekt.zweitbetreuer_abgeschickt && projekt.zweitbetreuer_betreuerart_kurzbz && projekt.zweitbetreuer_person_id) {
+						projekt.beurteilungLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.zweitbetreuer_betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.zweitbetreuer_person_id
+					}
 				}
 				
 				return {
@@ -238,7 +242,8 @@ export const AbgabetoolStudent = {
 						betreuerart_kurzbz: projekt.betreuerart_kurzbz,
 						mode
 					},
-					beurteilung: projekt.beurteilungLink ?? null,
+					beurteilung1: projekt.beurteilungLink1 ?? null,
+					beurteilung2: projekt.beurteilungLink2 ?? null,
 					sem: projekt.studiensemester_kurzbz,
 					stg: projekt.kurzbzlang,
 					mail: this.buildMailToLink(projekt),
@@ -286,8 +291,11 @@ export const AbgabetoolStudent = {
 				return ''
 			}
 		},
-		handleDownloadBeurteilung(projektarbeit) {
-			window.open(projektarbeit.beurteilung)
+		handleDownloadBeurteilung1(projektarbeit) {
+			window.open(projektarbeit.beurteilung1)
+		},
+		handleDownloadBeurteilung2(projektarbeit) {
+			window.open(projektarbeit.beurteilung2)
 		}
 	},
 	watch: {
@@ -369,10 +377,13 @@ export const AbgabetoolStudent = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
-						<button v-if="projektarbeit.beurteilung" @click="handleDownloadBeurteilung(projektarbeit)" class="btn btn-primary">
+						<button v-if="projektarbeit.beurteilung1" @click="handleDownloadBeurteilung1(projektarbeit)" class="btn btn-primary">
 							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilung') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
+						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary">
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilung') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+						</button>
 					</div>
 				</div>
 				<div class="row mt-2">

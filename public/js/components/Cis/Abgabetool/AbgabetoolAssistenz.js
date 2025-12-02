@@ -87,7 +87,9 @@ export const AbgabetoolAssistenz = {
 					bezeichnung: 'Zwischenabgabe'
 				},
 				kurzbz: '',
-				fixtermin: false
+				fixtermin: false,
+				upload_allowed: false
+				
 			}),
 			showAll: false,
 			tabulatorUuid: Vue.ref(0),
@@ -123,7 +125,7 @@ export const AbgabetoolAssistenz = {
 						frozen: true,
 						width: 40
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150,},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150, visible: true},
 					// {title: 'pa_id', field: 'projektarbeit_id', visible: true},
 					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1,responsive:0,  tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter,responsive:0, widthGrow: 1, tooltip: false},
@@ -437,11 +439,10 @@ export const AbgabetoolAssistenz = {
 				this.$refs.abgabeTable.tabulator.deselectRow()
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
-
 				
 				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
-				this.$refs.abgabeTable.tabulator.replaceData(mappedData)
-				this.$refs.abgabeTable.tabulator.redraw(true)
+				this.$refs.abgabeTable.tabulator.setData(mappedData)
+				
 			}).finally(()=>{
 				this.saving = false
 			})
