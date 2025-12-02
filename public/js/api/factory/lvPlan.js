@@ -94,7 +94,6 @@ export default {
 		};
 	},
 	eventsStgOrg(start_date, end_date, stg_kz, sem, verband, gruppe) {
-		console.log("stg_Kz" + stg_kz + " sem " + sem + " vb " + verband + " gr " + gruppe);
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/lvPlan/eventsStgOrg',

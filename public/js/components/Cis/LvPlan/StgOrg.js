@@ -48,18 +48,6 @@ export default {
 			);
 			return currentStg.max_semester;
 		},
-		//use local props, for viewDataProps cannot be changed
-/*		currentDay() {
-			if (!this.localProps?.focus_date || isNaN(new Date(this.localProps.focus_date)))
-				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
-			return this.localProps.focus_date;
-		},
-
-		currentMode() {
-			if (!this.localProps?.mode || !['day', 'week', 'month'].includes(this.localProps.mode.toLowerCase()))
-				return DEFAULT_MODE_LVPLAN;
-			return this.localProps.mode;
-		},*/
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
 				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
@@ -112,48 +100,49 @@ export default {
 				return;
 			}
 
-/*			if(this.rangeIntervalFirst) {
-				console.log("in range IntervalFirst ");
-				this.updateRange(this.rangeIntervalFirst);
+			if(!this.formData.sem && (this.formData.verband || this.formData.gruppe)){
+				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'error_SemMissing'));
+				return;
 			}
 
-			console.log("formParameters: "  + this.formData.stgkz + " focusdate" + this.currentDay);*/
+			if(!this.formData.verband && this.formData.gruppe){
+				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'error_VerbandMissing'));
+				return;
+			}
 
-/*			const newFocus = luxon.DateTime.fromISO(this.propsViewData.focus_date)
-				.setZone(this.viewData.timezone)
-				.toISODate() + "_";*/ // minimaler Unterschied
+			const params = {
+				mode: this.currentMode,
+				focus_date: this.currentDay,
+				stgkz: this.formData.stgkz,
+				sem: this.formData.sem,
+				verband: this.formData.verband,
+				gruppe: this.formData.gruppe,
+			};
 
-			//also use router push here
+			//ensure logic: no value after a null value in route
+			if(params.sem == null)
+			{
+				params.verband = null;
+				params.gruppe = null;
+			}
+			if(params.verband == null) {
+				params.gruppe = null;
+			}
+
+			//delete all null values to avoid null in router
+			Object.keys(params).forEach(
+				key => params[key] == null && delete params[key]
+			);
+
 			this.$router.push({
 				name: "StgOrgLvPlan",
-				params: {
-					mode: this.currentMode,
-					focus_date: this.currentDay,
-					stgkz: this.formData.stgkz,
-					sem: this.formData.sem,
-					verband: this.formData.verband,
-					gruppe: this.formData.gruppe,
-				},
+				params,
 			});
 
 			this.$refs['calendar'].resetEventLoader();
-
-			//wenn sich formvariablen ändern?
-/*
-			if(this.rangeIntervalFirst) {
-				console.log("in range IntervalFirst second try ");
-				const start = luxon.DateTime.fromISO(this.rangeIntervalFirst.start).toISODate();
-				const end   = luxon.DateTime.fromISO(this.rangeIntervalFirst.end).toISODate();
-				console.log("start und end" + start + " - " + end);
-				this.getPromiseFunc(start, end);
-			}
-
-				*/
-
 		},
 		loadListSem(){
 			this.listSem = [...Array(this.maxSemester).keys()].map(i => i + 1);
-			this.loadListVerband();
 		},
 		loadListVerband(){
 			this.$api
@@ -169,7 +158,6 @@ export default {
 						.sort();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-			this.loadListGroup();
 		},
 		loadListGroup(){
 			this.$api
@@ -186,29 +174,11 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		handleChangeDate(day, newMode) {
-			console.log("in handleChangeDate: day: " + day + " newMode " + newMode);
 			return this.handleChangeMode(newMode, day);
 		},
 		handleChangeMode(newMode, day) {
-			console.log("in handleChangeMode: day: " + day + " newMode " + newMode);
-			console.log(this.$route.name, this.$route.params);
 			const mode = newMode[0].toUpperCase() + newMode.slice(1);
 			const focus_date = day.toISODate();
-
-			console.log(this.formData.stgkz, this.formData.sem, this.formData.verband, this.formData.gruppe);
-
-
-/*			this.$router.push({
-				name: "StgOrgLvPlan",
-				params: {
-					mode,
-					focus_date,
-					stgkz: this.propsViewData.stgkz,
-					sem: this.propsViewData.sem,
-					verband: this.propsViewData.verband,
-					gruppe: this.propsViewData.gruppe,
-				}
-			});*/
 
 			this.$router.push({
 				name: "StgOrgLvPlan",
@@ -221,41 +191,8 @@ export default {
 					gruppe: this.formData.gruppe,
 				},
 			});
-
-			//try for reload
-			/*
-			if(this.rangeIntervalFirst) {
-				console.log("in range IntervalFirst second try ");
-				const start = luxon.DateTime.fromISO(this.rangeIntervalFirst.start).toISODate();
-				const end   = luxon.DateTime.fromISO(this.rangeIntervalFirst.end).toISODate();
-				console.log("start und end" + start + " - " + end);
-				this.getPromiseFunc(start, end);
-			}
-			*/
-
 		},
 		updateRange(rangeInterval) {
-			console.log("in updateRange " + rangeInterval);
-
-			//initialise at first run
-			if(!this.rangeIntervalFirst) {
-				this.rangeIntervalFirst = rangeInterval;
-				console.log("new local RI " + this.rangeIntervalFirst);
-			}
-
-
-/*			const startOfWeek = rangeInterval.end.startOf('week').toISODate();
-
-			console.log("in updateRange", startOfWeek);*/
-/*
-			if (!rangeInterval || !rangeInterval.end || !rangeInterval.end.startOf) {
-				console.warn("updateRange: invalid rangeInterval", rangeInterval);
-				return;
-			}
-
-			const startOfWeek = rangeInterval.end.startOf('week').toISODate();
-
-			console.log("in updateRange", startOfWeek);*/
 			this.$api
 				.call(ApiLvPlan.studiensemesterDateInterval(
 					rangeInterval.end.startOf('week').toISODate()
@@ -267,15 +204,7 @@ export default {
 				});
 		},
 		getPromiseFunc(start, end) {
-			console.log("start " + start + "  end " + end);
-			console.log(this.propsViewData.stgkz, this.propsViewData.sem, this.propsViewData.verband, this.propsViewData.gruppe);
-			console.log(this.formData.stgkz, this.formData.sem, this.formData.verband, this.formData.gruppe);
-
 			return [
-				//this.$api.call(ApiLvPlan.eventsStgOrg(start, end, this.propsViewData.stgkz, this.propsViewData.sem, this.propsViewData.verband, this.propsViewData.gruppe)),
-				//variante die von außen funktioniert
-/*				this.$api.call(ApiLvPlan.eventsStgOrg(start.toISODate(), end.toISODate(), this.propsViewData.stgkz, this.propsViewData.sem, this.propsViewData.verband, this.propsViewData.gruppe)),*/
-				//local for test
 				this.$api.call(ApiLvPlan.eventsStgOrg(start, end, this.formData.stgkz, this.formData.sem, this.formData.verband, this.formData.gruppe))
 			];
 		},
@@ -296,8 +225,6 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		//this.localProps = { ...this.propsViewData };
-
 		if(this.propsViewData) {
 			this.formData.stgkz = this.propsViewData.stgkz ? this.propsViewData.stgkz: null;
 			this.formData.sem = this.propsViewData.sem ? this.propsViewData.sem: null;
@@ -305,12 +232,6 @@ export default {
 			this.formData.gruppe = this.propsViewData.gruppe ? this.propsViewData.gruppe: null;
 		}
 	},
-	/*
-
-				v-if="propsViewData && propsViewData.stgkz"
-						{{propsViewData}} || {{formData}} || {{viewData}}
-	 */
-
 	template: `
 	<div class="cis-lvplan-stg-org d-flex flex-column h-100">
 
@@ -321,7 +242,7 @@ export default {
 	 				v-model="formData.stgkz"
 	 				@change="loadListSem(formData.stgkz)"
 	 				>
-					<option value="null" selected>{{ $p.t('LvPlan/chooseStg') }}</option>
+					<option :value="null" selected>{{ $p.t('LvPlan/chooseStg') }}</option>
 					<option
 						v-for="stg in listStg"
 						:key="stg.studiengang_kz"
@@ -334,8 +255,9 @@ export default {
 	 				type="select"
 	 				v-model="formData.sem"
 	 				@change="loadListVerband()"
+	 				@click="loadListSem(formData.stgkz)"
 	 				>
-						<option value="null" selected>Semester</option>
+						<option :value="null" selected>Semester</option>
 						<option
 							v-for="sem in listSem"
 							:key="sem"
@@ -348,8 +270,9 @@ export default {
 	 				type="select"
 	 				v-model="formData.verband"
 	 				@change="loadListGroup()"
+
 	 				>
-	 					<option value="null" selected>{{ $p.t('lehre/verband') }} </option>
+	 					<option :value="null" selected>{{ $p.t('lehre/verband') }} </option>
 					<option
 						v-for="verband in listVerband"
 						:key="verband"
@@ -362,7 +285,7 @@ export default {
 	 				type="select"
 	 				v-model="formData.gruppe"
 	 				>
-	 				<option value="null" selected>{{ $p.t('gruppenmanagement/gruppe') }}</option>
+	 				<option :value="null" selected>{{ $p.t('gruppenmanagement/gruppe') }}</option>
 						<option
 							v-for="group in listGroup"
 							:key="group"
@@ -377,7 +300,7 @@ export default {
 	 	</div>
 
 		<fhc-calendar
-			v-if="propsViewData && propsViewData.stgkz"
+			v-show="propsViewData && propsViewData.stgkz"
 			ref="calendar"
 			v-model:lv="formData"
 			:timezone="viewData.timezone"
