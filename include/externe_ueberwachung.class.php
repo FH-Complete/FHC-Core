@@ -163,7 +163,7 @@ class externeUeberwachung extends basis_db
 			"startDate"=> "2018-03-27T00:00:00Z", //TODO anpassen
 			"endDate"=> "2027-03-30T12:55:00Z", // TODO anpassen
 			"sessionId"=> $session_id,
-			"sessionUrl"=> "https://demo.dev.technikum-wien.at/cis/testtool/index.php"
+			"sessionUrl"=> EXTERNE_UEBERWACHUNG_SESSION_URL
 		];
 		return $payload;
 	}

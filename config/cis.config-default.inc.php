@@ -306,5 +306,6 @@ define('CIS_REDIRECT_TO_CIS4', false);
 define('EXTERNE_UEBERWACHUNG_PROTOCOL_URL', 'https://example.com');
 define('EXTERNE_UEBERWACHUNG_SECRET_KEY', null);
 define('EXTERNE_UEBERWACHUNG_INTEGRATION_NAME', 'example');
+define('EXTERNE_UEBERWACHUNG_SESSION_URL', 'https://example.com');
 
 ?>
