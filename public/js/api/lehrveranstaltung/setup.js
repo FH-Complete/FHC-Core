@@ -1,16 +1,16 @@
 export default {
-	getTabs()
+	getLETabs()
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/setup/getTabs/'
+			url: '/api/frontend/v1/lv/setup/getLETabs/'
 		};
 	},
-	getTab()
+	getLVTabs()
 	{
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/lv/setup/getTab/'
+			url: '/api/frontend/v1/lv/setup/getLVTabs/'
 		};
 	},
 }

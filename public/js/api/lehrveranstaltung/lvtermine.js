@@ -9,5 +9,11 @@ export default {
 	exportCalendar(lv_id, stundenplan)
 	{
 		return FHC_JS_DATA_STORAGE_OBJECT.app_root +  'content/statistik/termine.xls.php?lehrveranstaltung_id=' + encodeURIComponent(lv_id) + '&db_stpl_table='+encodeURIComponent(stundenplan);
-	}
+	},
+	getStudiensemester(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/lv/setup/getStudiensemester/'
+		};
+	},
 };

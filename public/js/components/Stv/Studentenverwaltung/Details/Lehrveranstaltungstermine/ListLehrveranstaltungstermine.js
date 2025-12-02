@@ -2,8 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import FormInput from "../../../../Form/Input.js";
 import FormForm from '../../../../Form/Form.js';
 
-import ApiStudiensemester from "../../../../../api/factory/studiensemester.js";
-
 export default {
 	name: "TblCourseList",
 	components: {
@@ -146,7 +144,7 @@ export default {
 	},
 	created(){
 		this.$api
-			.call(ApiStudiensemester.getStudiensemester())
+			.call(this.endpoint.getStudiensemester())
 			.then(result => {
 				this.listStudiensemester = result.data;
 				this.getDatesOfSemester(this.currentSemester);

@@ -2,7 +2,7 @@ import TableLvList from "../../Stv/Studentenverwaltung/Details/Lehrveranstaltung
 import ApiLVTermine from "../../../api/lehrveranstaltung/lvtermine.js";
 
 export default {
-	name: "TabCourseList",
+	name: "LVTabTermine",
 	components: {
 		TableLvList
 	},
@@ -15,7 +15,7 @@ export default {
 		};
 	},
 	template: `
-	<div class="stv-details-course-list h-100 d-flex flex-column">
+	<div class="lv-details-course-list h-100 d-flex flex-column">
 		<table-lv-list ref="tbl_course_list" :id="modelValue.lehrveranstaltung_id" :endpoint="endpoint"></table-lv-list>
 	</div>`
 };

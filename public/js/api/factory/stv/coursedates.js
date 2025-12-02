@@ -30,4 +30,10 @@ export default {
 	{
 		return FHC_JS_DATA_STORAGE_OBJECT.app_root +  'content/statistik/termine.xls.php?student_uid=' + encodeURIComponent(student_uid) + '&db_stpl_table='+encodeURIComponent(stundenplan);
 	},
+	getStudiensemester(){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/LvTermine/getStudiensemester/'
+		};
+	},
 }

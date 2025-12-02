@@ -1,7 +1,6 @@
 import TableLvList from "./Lehrveranstaltungstermine/ListLehrveranstaltungstermine.js";
 import ApiStvCoursedates from "../../../../api/factory/stv/coursedates.js";
 
-
 export default {
 	name: "TabCourseList",
 	components: {

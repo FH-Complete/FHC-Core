@@ -8,8 +8,8 @@ export default {
 	},
 	data() {
 		return {
+			configLETabs: {},
 			configLVTabs: {},
-			configLVTab: {},
 		};
 	},
 	props: {
@@ -20,7 +20,7 @@ export default {
 			if (!this.lv || !this.lv.length)
 				return {};
 
-			return this.configLVTabs;
+			return this.configLETabs;
 		}
 	},
 	methods: {
@@ -32,15 +32,15 @@ export default {
 		}
 	},
 	created() {
-		this.$api.call(Setup.getTabs())
+		this.$api.call(Setup.getLETabs())
 			.then(result => {
-				this.configLVTabs = result.data;
+				this.configLETabs = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$api.call(Setup.getTab())
+		this.$api.call(Setup.getLVTabs())
 			.then(result => {
-				this.configLVTab = result.data;
+				this.configLVTabs = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -49,12 +49,12 @@ export default {
 			<div v-if="!lv?.length" class="justify-content-center d-flex h-100 align-items-center">
 				Bitte eine Lehreinheit auswählen!
 			</div>
-			<div v-else-if="configLVTabs && configLVTab" class="d-flex flex-column h-100 pb-3">
+			<div v-else-if="configLETabs && configLVTabs" class="d-flex flex-column h-100 pb-3">
 				<fhc-tabs 
 					v-if="lv.length === 1 && lv[0]?.lehreinheit_id"
 					ref="tabs"
 					:modelValue="lv[0]"
-					:config="configLVTabs"
+					:config="configLETabs"
 					:default="$route.params.tab"
 					@changed="reload"
 				/>
@@ -62,7 +62,7 @@ export default {
 					v-else-if="lv.length === 1"
 					ref="tabs"
 					:modelValue="lv[0]"
-					:config="configLVTab"
+					:config="configLVTabs"
 					:default="$route.params.tab"
 					@changed="reload"
 				/>

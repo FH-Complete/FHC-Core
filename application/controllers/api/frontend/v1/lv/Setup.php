@@ -27,8 +27,8 @@ class Setup extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getTabs' => ['admin:r', 'assistenz:r'],
-			'getTab' => ['admin:r', 'assistenz:r'],
+			'getLETabs' => ['admin:r', 'assistenz:r'],
+			'getLVTabs' => ['admin:r', 'assistenz:r'],
 			'getStudiensemester' => ['admin:r', 'assistenz:r'],
 			'getSprache' => ['admin:r', 'assistenz:r'],
 			'getRaumtyp' => ['admin:r', 'assistenz:r'],
@@ -44,7 +44,7 @@ class Setup extends FHCAPI_Controller
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
 	}
 
-	public function getTabs()
+	public function getLETabs()
 	{
 		$tabs['details'] = array (
 			'title' =>  'Details',
@@ -74,7 +74,7 @@ class Setup extends FHCAPI_Controller
 		$this->terminateWithSuccess($tabs);
 	}
 
-	public function getTab()
+	public function getLVTabs()
 	{
 		$tabs['termine'] = array (
 			'title' =>  'Termine',
