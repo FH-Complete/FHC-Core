@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class Abgabe extends FHCAPI_Controller
 {
 
@@ -80,7 +82,6 @@ class Abgabe extends FHCAPI_Controller
 	 * loads config related to abgabetool, found in application/config/abgabe
 	 */
 	public function getConfig() {
-		$this->load->config('abgabe');
 		$old_abgabe_beurteilung_link =$this->config->item('old_abgabe_beurteilung_link');
 		$turnitin_link = $this->config->item('turnitin_link');
 		$abgabetypenBetreuer = $this->config->item('ALLOWED_ABGABETYPEN_BETREUER');
@@ -152,6 +153,38 @@ class Abgabe extends FHCAPI_Controller
 		
 		if(count($projektarbeiten)) {
 			foreach($projektarbeiten as $pa) {
+				
+				if($pa->babgeschickt) {
+					$downloadLink1 = '';
+					$downloadLinkFunc1 = function ($link) use (&$downloadLink1) {
+						$downloadLink1 = $link;
+					};
+					
+					Events::trigger('projektbeurteilung_download_link', $pa->projektarbeit_id, $pa->betreuerart_kurzbz, $pa->bperson_id, $downloadLinkFunc1);
+					
+					// use config fallback in case the event fails
+					if($downloadLink1 == '') {
+						$fallback = $this->config->item('beurteilung_link_fallback');
+
+						$search = array(
+							'betreuerart_kurzbz=?',
+							'projektarbeit_id=?',
+							'person_id=?'
+						);
+
+						$replace = array(
+							'betreuerart_kurzbz=' . $pa->betreuerart_kurzbz,
+							'projektarbeit_id=' . $pa->projektarbeit_id,
+							'person_id=' . $pa->bperson_id
+						);
+
+						$fallback = str_replace($search, $replace, $fallback);
+						$downloadLink1 = APP_ROOT.$fallback;
+						
+					}
+					$pa->downloadLink1 = $downloadLink1;
+				}
+				
 				$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
 				
 				$data = getData($result);
@@ -159,6 +192,39 @@ class Abgabe extends FHCAPI_Controller
 					$pa->email = $data[0]->private_email;
 				}
 				if($pa->zweitbetreuer_person_id !== null) {
+
+					if($pa->zweitbetreuer_abgeschickt) {
+						$downloadLink2 = '';
+						$downloadLinkFunc2 = function ($link) use (&$downloadLink2) {
+							$downloadLink2 = $link;
+						};
+
+						Events::trigger('projektbeurteilung_download_link', $pa->projektarbeit_id, $pa->zweitbetreuer_betreuerart_kurzbz, $pa->zweitbetreuer_person_id, $downloadLinkFunc2);
+
+						// use config fallback in case the event fails
+						if($downloadLink2 == '') {
+							$fallback = $this->config->item('beurteilung_link_fallback');
+
+							$search = array(
+								'betreuerart_kurzbz=?',
+								'projektarbeit_id=?',
+								'person_id=?'
+							);
+
+							$replace = array(
+								'betreuerart_kurzbz=' . $pa->zweitbetreuer_betreuerart_kurzbz,
+								'projektarbeit_id=' . $pa->projektarbeit_id,
+								'person_id=' . $pa->zweitbetreuer_person_id
+							);
+
+							$fallback = str_replace($search, $replace, $fallback);
+							$downloadLink2 = APP_ROOT.$fallback;
+
+						}
+						
+						$pa->downloadLink2 = $downloadLink2;
+					}
+					
 					
 					// TODO: see assistenz query in projektarbeit_model
 					
@@ -1026,4 +1092,5 @@ class Abgabe extends FHCAPI_Controller
 			}
 		}
 	}
+
 }

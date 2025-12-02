@@ -44096,18 +44096,38 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4downloadBeurteilung',
+		'phrase' => 'c4downloadBeurteilungErstbetreuer',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Beurteilung herunterladen",
+				'text' => "Erstbetreuer Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Download Evaluation',
+				'text' => 'Download evaluation of first assesor',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4downloadBeurteilungZweitbetreuer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zweitbetreuer Beurteilung herunterladen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download evaluation of second assesor',
 				'description' => '',
 				'insertvon' => 'system'
 			)

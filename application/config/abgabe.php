@@ -16,3 +16,5 @@ $config['URL_MITARBEITER'] = 'index.ci.php/Cis/Abgabetool/Mitarbeiter';
 // lehre.tbl_paabgabetyp bezeichnung
 $config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
 $config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
+
+$config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';

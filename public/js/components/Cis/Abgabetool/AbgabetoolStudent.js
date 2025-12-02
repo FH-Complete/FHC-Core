@@ -223,15 +223,6 @@ export const AbgabetoolStudent = {
 			this.projektarbeiten = projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
 				
-				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
-					// mode = 'beurteilungDownload' // build dl link for both betreuer documents
-					
-					// TODO: if switch zweitbetreuer beurteilung / erstbetreuer beurteilung download
-					projekt.beurteilungLink1 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.bperson_id
-					if(projekt.zweitbetreuer_abgeschickt && projekt.zweitbetreuer_betreuerart_kurzbz && projekt.zweitbetreuer_person_id) {
-						projekt.beurteilungLink2 = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.zweitbetreuer_betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.zweitbetreuer_person_id
-					}
-				}
 				
 				return {
 					...projekt,
@@ -242,8 +233,8 @@ export const AbgabetoolStudent = {
 						betreuerart_kurzbz: projekt.betreuerart_kurzbz,
 						mode
 					},
-					beurteilung1: projekt.beurteilungLink1 ?? null,
-					beurteilung2: projekt.beurteilungLink2 ?? null,
+					beurteilung1: projekt.downloadLink1 ?? null,
+					beurteilung2: projekt.downloadLink2 ?? null,
 					sem: projekt.studiensemester_kurzbz,
 					stg: projekt.kurzbzlang,
 					mail: this.buildMailToLink(projekt),
@@ -378,11 +369,11 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
 						<button v-if="projektarbeit.beurteilung1" @click="handleDownloadBeurteilung1(projektarbeit)" class="btn btn-primary">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilung') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
-						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilung') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary" style="margin-left: 4px;">
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 					</div>
 				</div>
