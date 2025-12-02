@@ -138,7 +138,8 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				persistenceID: 'lehrveranstaltungen_2025_07_31_v1',
+				height: '100%',
+				persistenceID: 'lehrveranstaltungen_2025_12_02_v1',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
@@ -669,47 +670,50 @@ export default {
 		},
 	},
 	template: `
-	<core-filter-cmpt
-		ref="table"
-		:tabulator-options="tabulatorOptions"
-		:tabulator-events="tabulatorEvents"
-		table-only
-		:side-menu="false"
-		:reload=true
-		new-btn-label="LV-Teil hinzufügen"
-		new-btn-show
-		:new-btn-disabled="!lv_info"
-		@click:new="showLehreinheitModal">
-		
-		<template #actions>
-			<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
-			<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
-			<core-tag ref="tagComponent"
-				:endpoint="tagEndpoint"
-				:values="selectedColumnValues"
-				@added="addedTag"
-				@deleted="deletedTag"
-				@updated="updatedTag"
-				zuordnung_typ="lehreinheit_id"
-			></core-tag>
-		</template>
-		<template #search>
-			<slot name="filterzuruecksetzen"></slot>
-		</template>
-	</core-filter-cmpt>
-	<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
-		<template #title>
-			<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
-		</template>
-			
-		<template v-if="lv_info">
-			<details-form :data="lv_info"/>
-		</template>
-			
-		<template #footer>
-			<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
-		</template>
-	</bs-modal>
-
+	<div class="lv-list h-100 pt-3">
+		<div class="tabulator-container d-flex flex-column h-100">
+			<core-filter-cmpt
+				ref="table"
+				:tabulator-options="tabulatorOptions"
+				:tabulator-events="tabulatorEvents"
+				table-only
+				:side-menu="false"
+				:reload=true
+				new-btn-label="LV-Teil hinzufügen"
+				new-btn-show
+				:new-btn-disabled="!lv_info"
+				@click:new="showLehreinheitModal">
+				
+				<template #actions>
+					<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
+					<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
+					<core-tag ref="tagComponent"
+						:endpoint="tagEndpoint"
+						:values="selectedColumnValues"
+						@added="addedTag"
+						@deleted="deletedTag"
+						@updated="updatedTag"
+						zuordnung_typ="lehreinheit_id"
+					></core-tag>
+				</template>
+				<template #search>
+					<slot name="filterzuruecksetzen"></slot>
+				</template>
+			</core-filter-cmpt>
+		</div>
+		<bs-modal ref="lehreinheitModal" dialogClass="modal-xxl">
+			<template #title>
+				<p class="fw-bold mt-3">{{$p.t('lehre', 'newlehreinheit')}}</p>
+			</template>
+				
+			<template v-if="lv_info">
+				<details-form :data="lv_info"/>
+			</template>
+				
+			<template #footer>
+				<button type="button" class="btn btn-primary" @click="addNewLehreinheit">{{$p.t('ui', 'speichern')}}</button>
+			</template>
+		</bs-modal>
+	</div>
 `
 };
