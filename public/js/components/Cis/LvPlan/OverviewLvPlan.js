@@ -22,34 +22,57 @@ export default {
 				gruppe: null,
 			},
 			listStg: [],
-			listSem: [],
+			listSem: [1,2,3,4,5,6,7,8,9,10],
 			listVerband: [],
 			listGroup: [],
-		//	dataLvStudiengang: {}
 		};
 	},
 	methods: {
-		loadLvPlan(){
-			if(!this.formData.stgkz){
+		loadLvPlan() {
+			if (!this.formData.stgkz) {
 				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'chooseStg'));
 				return;
 			}
-			console.log(this.$route.name, this.$route.params);
+			if (!this.formData.sem && (this.formData.verband || this.formData.gruppe)) {
+				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'error_SemMissing'));
+				return;
+			}
+
+			if (!this.formData.verband && this.formData.gruppe) {
+				this.$fhcAlert.alertError(this.$p.t('LvPlan', 'error_VerbandMissing'));
+				return;
+			}
+
+			const params = {
+				mode: this.currentMode,
+				focus_date: this.currentDay,
+				stgkz: this.formData.stgkz,
+				sem: this.formData.sem,
+				verband: this.formData.verband,
+				gruppe: this.formData.gruppe,
+			};
+
+			//ensure logic: no value after a null value in route
+			if (params.sem == null) {
+				params.verband = null;
+				params.gruppe = null;
+			}
+			if (params.verband == null) {
+				params.gruppe = null;
+			}
+
+			//delete all null values to avoid null in router
+			Object.keys(params).forEach(
+				key => params[key] == null && delete params[key]
+			);
+
 			this.$router.push({
 				name: "StgOrgLvPlan",
-				params: {
-					mode: "Week",
-					focus_date: this.currentDay,
-					stgkz: this.formData.stgkz,
-					sem: this.formData.sem,
-					verband: this.formData.verband,
-					gruppe: this.formData.gruppe,
-				}
+				params,
 			});
 		},
 		loadListSem(){
 			this.listSem = [...Array(this.maxSemester).keys()].map(i => i + 1);
-			this.loadListVerband();
 		},
 		loadListVerband(){
 			this.$api
@@ -65,7 +88,6 @@ export default {
 					.sort();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-			this.loadListGroup();
 		},
 		loadListGroup(){
 			this.$api
@@ -105,14 +127,14 @@ export default {
 	},
 	template: `
 	<div cis-lvplan-stg-org-ues d-flex flex-column h-100>
-		<div class="mt-3">
+				<div class="mt-3">
 	 		<form-form class="row row-cols-1 row-cols-md-2 row-cols-lg-4 row-cols-xl-5 g-3 mb-3">
 	 			<form-input
 	 				type="select"
 	 				v-model="formData.stgkz"
 	 				@change="loadListSem(formData.stgkz)"
 	 				>
-					<option value="null" selected>{{ $p.t('LvPlan/chooseStg') }}</option>
+					<option :value="null" selected>{{ $p.t('LvPlan/chooseStg') }}</option>
 					<option
 						v-for="stg in listStg"
 						:key="stg.studiengang_kz"
@@ -125,8 +147,9 @@ export default {
 	 				type="select"
 	 				v-model="formData.sem"
 	 				@change="loadListVerband()"
+	 				@click="loadListSem(formData.stgkz)"
 	 				>
-						<option value="null" selected>Semester</option>
+						<option :value="null" selected>Semester</option>
 						<option
 							v-for="sem in listSem"
 							:key="sem"
@@ -140,7 +163,7 @@ export default {
 	 				v-model="formData.verband"
 	 				@change="loadListGroup()"
 	 				>
-	 					<option value="null" selected>{{ $p.t('lehre/verband') }} </option>
+	 					<option :value="null" selected>{{ $p.t('lehre/verband') }} </option>
 					<option
 						v-for="verband in listVerband"
 						:key="verband"
@@ -153,7 +176,7 @@ export default {
 	 				type="select"
 	 				v-model="formData.gruppe"
 	 				>
-	 				<option value="null" selected>{{ $p.t('gruppenmanagement/gruppe') }}</option>
+	 				<option :value="null" selected>{{ $p.t('gruppenmanagement/gruppe') }}</option>
 						<option
 							v-for="group in listGroup"
 							:key="group"

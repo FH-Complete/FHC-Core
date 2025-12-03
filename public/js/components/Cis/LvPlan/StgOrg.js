@@ -270,7 +270,6 @@ export default {
 	 				type="select"
 	 				v-model="formData.verband"
 	 				@change="loadListGroup()"
-
 	 				>
 	 					<option :value="null" selected>{{ $p.t('lehre/verband') }} </option>
 					<option
