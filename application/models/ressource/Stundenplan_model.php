@@ -350,13 +350,17 @@ class Stundenplan_model extends DB_Model
 	{
 		$qry = "
 			WITH lehreinheiten AS (
-				SELECT lehreinheit_id FROM lehre.tbl_lehreinheit WHERE lehrveranstaltung_id = ?
+				SELECT lehreinheit_id 
+				FROM lehre.tbl_lehreinheit 
+					JOIN tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE lehrveranstaltung_id = ?
+					AND tbl_studiensemester.start >= ? AND tbl_studiensemester.ende <= ?
 			), " . $this->getStundenplanCTE($stundenplan) . "
 			SELECT *
 			FROM stundenplanentries
 		";
 
-		return $this->execReadOnlyQuery($qry, array($lehrveranstaltung_id, $start_date, $end_date));
+		return $this->execReadOnlyQuery($qry, array($lehrveranstaltung_id, $start_date, $end_date, $start_date, $end_date));
 	}
 
 	private function getStundenplanCTE($stundenplan)
