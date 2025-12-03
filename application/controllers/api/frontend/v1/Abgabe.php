@@ -114,15 +114,22 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
 		}
 		
-		$paIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
+//		$paIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
 
+		$projektarbeitIsCurrent = false;
+		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
+			$projektarbeitIsCurrent = $result;
+		};
+		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
+//		$this->addMeta('isCurrent', $projektarbeitIsCurrent);
+		
 		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
 
 		foreach($ret->retval as $termin) {
 			$this->checkAbgabeSignatur($termin, $projektarbeit);
 		}
 		
-		$this->terminateWithSuccess(array($ret, $paIsCurrent));
+		$this->terminateWithSuccess(array($ret, $projektarbeitIsCurrent));
 	}
 
 	/**
@@ -415,6 +422,22 @@ class Abgabe extends FHCAPI_Controller
 
 		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
 
+
+		forEach($projektarbeiten->retval as $pa) {
+
+			$oldLink = ''; // show this when paIsCurrent == false -> moodle course template
+			$newLink = ''; // get curated path for betreuer type
+			$returnFunc = function ( $resultOld, $resultNew) use (&$oldLink, &$newLink) {
+				$newLink = $resultNew;
+				$oldLink = $resultOld;
+			};
+			
+			Events::trigger('projektbeurteilung_formular_link', $pa->betreuerart_kurzbz, APP_ROOT, $returnFunc);
+			$pa->beurteilungLinkNew = $newLink;
+			$pa->beurteilungLinkOld = $oldLink;
+		}
+		
+		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
 	}
 	
@@ -958,8 +981,16 @@ class Abgabe extends FHCAPI_Controller
 		} else {
 			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
 		}
-
-		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
+		
+		$projektarbeitIsCurrent = false;
+		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
+			$projektarbeitIsCurrent = $result;
+		};
+		
+		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
+		$this->addMeta('isCurrent', $projektarbeitIsCurrent);
+		
+//		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
 		if(!$projektarbeitIsCurrent) {
 			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
 		}
@@ -983,7 +1014,8 @@ class Abgabe extends FHCAPI_Controller
 			$studentUser = $this->ProjektarbeitModel->getProjektarbeitBenutzer($student_uid)->retval[0];
 
 			// 1. Begutachter mail ohne Token
-			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
+			$mail_baselink = APP_ROOT.$this->config->item('PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER');
+//			$mail_baselink = APP_ROOT."index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter";
 			$mail_fulllink = "$mail_baselink?projektarbeit_id=".$projektarbeit_id."&uid=".$studentUser->uid;
 			$projekttyp_kurzbz = $projektarbeit->projekttyp_kurzbz;
 			$subject = $projektarbeit->projekttyp_kurzbz == 'Diplom' ? 'Masterarbeitsbetreuung' : 'Bachelorarbeitsbetreuung';

@@ -364,17 +364,36 @@ export const AbgabeMitarbeiterDetail = {
 			const link = this.turnitin_link
 			window.open(link, '_blank')
 		},
-		openBenotung() {
+		async openBenotung() {
 			// old link check ?
 			
-			if(this.getSemesterBenotbar && this.projektarbeit?.abgabetermine.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null)) {
-				// TODO: shouldnt be hardcoded here, at least config in abgabetool -> ideally event sourced from projektarbeitsbeurteilung
-				
-				const path = this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter' ? 'ProjektarbeitsbeurteilungZweitbegutachter' : 'ProjektarbeitsbeurteilungErstbegutachter'
-				const link = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/' + path
+			if(this.getSemesterBenotbar && this.projektarbeit?.abgabetermine.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && this.projektarbeit?.beurteilungLinkNew) {
+				const link = this.projektarbeit?.beurteilungLinkNew
+				window.open(link, '_blank')
+			} else if(this.projektarbeit?.abgabetermine.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && this.projektarbeit?.beurteilungLinkOld) {
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/c4aeltereParbeitBenoten'),
+					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				const link = this.projektarbeit?.beurteilungLinkOld
 				window.open(link, '_blank')
 			} else {
-				window.open(this.old_abgabe_beurteilung_link, '_blank')
+				// show info text that no endupload with abgabe has been found
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/c4keinEnduploadErfolgt'),
+					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
 			}
 		},
 		formatDate(dateParam) {
