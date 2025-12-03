@@ -55,7 +55,6 @@ export const AbgabeStudentDetail = {
 				return false
 			}
 			
-			// TODO: define these
 			if(endupload) {
 				if(await this.$fhcAlert.confirm({
 					message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
@@ -341,6 +340,7 @@ export const AbgabeStudentDetail = {
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
 									<i v-else-if="termin.dateStyle == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
 									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+									<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
 								</div>
 								<div class="col-auto text-start pl-2 pr-0 pt-0 pb-0" style="min-width: max(120px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
 									<span>{{ termin?.bezeichnung }}</span>

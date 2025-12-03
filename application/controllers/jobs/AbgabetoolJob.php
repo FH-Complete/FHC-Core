@@ -27,7 +27,43 @@ class AbgabetoolJob extends JOB_Controller
 	}
 	
 	public function notifyBetreuerAboutChangedAbgaben() {
+		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+
+		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+
+		// get all new or changed termine in interval
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$retval = getData($result);
+
+		if(count($retval) == 0) {
+			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
+		}
 		
+		// group changed/new abgaben for projektarbeiten, then look up their betreuer and send them email
+		$projektarbeiten = [];
+		foreach($retval as $newOrChangedAbgabe) {
+
+			// Check if the current item has a 'projektarbeit_id' field.
+			// Replace 'projektarbeit_id' with the actual key name if it's different.
+			if (isset($newOrChangedAbgabe['projektarbeit_id'])) {
+				$projektarbeitId = $newOrChangedAbgabe['projektarbeit_id'];
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// initialize it as an empty array.
+				if (!isset($projektarbeiten[$projektarbeitId])) {
+					$projektarbeiten[$projektarbeitId] = [];
+				}
+
+				// Add the current row to the array associated with its 'projektarbeit_id'.
+				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
+			}
+			
+		}
+		$result = $this->_ci->PaabgabeModel->findNewOrChangedTermineByOtherUsersSince($interval);
+
+
+		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 	}
 
 	public function notifyBetreuerMail() {

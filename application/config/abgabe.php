@@ -14,8 +14,10 @@ $config['URL_STUDENTS'] = 'cis.php/Cis/Abgabetool/Student';
 $config['URL_MITARBEITER'] = 'index.ci.php/Cis/Abgabetool/Mitarbeiter';
 
 // lehre.tbl_paabgabetyp bezeichnung
-$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
-$config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
+//$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
+$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['zwischen', 'qualgate1', 'qualgate2']; // tbl_paabgabetyp pk
+//$config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
+$config['ALLOWED_NOTEN_ABGABETOOL'] = ['10', '14']; // tbl_note pk
 
 $config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
 

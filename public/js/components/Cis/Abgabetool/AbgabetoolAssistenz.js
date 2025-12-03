@@ -785,7 +785,7 @@ export const AbgabetoolAssistenz = {
 				this.notenOptions = res.data[0]
 
 				this.allowedNotenOptions = this.notenOptions.filter(
-					opt => res.data[1].includes(opt.bezeichnung)
+					opt => res.data[1].includes(opt.note)
 				)
 			}
 			

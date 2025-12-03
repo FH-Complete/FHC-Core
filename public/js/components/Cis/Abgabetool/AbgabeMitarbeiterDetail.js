@@ -487,7 +487,7 @@ export const AbgabeMitarbeiterDetail = {
 			if(this.assistenzMode) {
 				return this.abgabeTypeOptions
 			} else {
-				return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.bezeichnung))
+				return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.paabgabetyp_kurzbz))
 			}
 		},
 		getMessagePtStyle() {

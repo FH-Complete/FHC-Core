@@ -352,7 +352,7 @@ export const AbgabetoolMitarbeiter = {
 	},
 	computed: {
 		getAllowedAbgabeTypeOptions() {
-			return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.bezeichnung))
+			return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.paabgabetyp_kurzbz))
 		}
 	},
 	created() {
@@ -375,7 +375,7 @@ export const AbgabetoolMitarbeiter = {
 				this.notenOptions = res.data[0]
 
 				this.allowedNotenOptions = this.notenOptions.filter(
-					opt => res.data[1].includes(opt.bezeichnung)
+					opt => res.data[1].includes(opt.note)
 				)
 			}
 			

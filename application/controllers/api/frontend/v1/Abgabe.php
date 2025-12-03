@@ -44,7 +44,8 @@ class Abgabe extends FHCAPI_Controller
 			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
+			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'notifyBetreuerAboutChangedAbgaben' =>  self::PERM_LOGGED
 			]);
 
 		$this->load->library('PhrasesLib');
@@ -1125,4 +1126,77 @@ class Abgabe extends FHCAPI_Controller
 		}
 	}
 
+	public function notifyBetreuerAboutChangedAbgaben() {
+	//	$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+		
+		$this->_ci =& get_instance();
+		$this->_ci->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$this->_ci->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
+		$this->_ci->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+		
+		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+	
+		// get all new or changed termine in interval
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$retval = getData($result);
+	
+		if(count($retval) == 0) {
+	//		$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
+		}
+	
+		$this->addMeta('retval', $retval);
+		
+		// group changed/new abgaben for projektarbeiten
+		$projektarbeiten = [];
+		foreach($retval as $newOrChangedAbgabe) {
+	
+			// Check if the current item has a 'projektarbeit_id' field.
+			// Replace 'projektarbeit_id' with the actual key name if it's different.
+			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
+				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
+	
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// initialize it as an empty array.
+				if (!isset($projektarbeiten[$projektarbeitId])) {
+					$projektarbeiten[$projektarbeitId] = [];
+				}
+	
+				// Add the current row to the array associated with its 'projektarbeit_id'.
+				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
+			}
+		}
+		
+		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
+		$betreuer = [];
+		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
+			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
+			
+//			$projektarbeiten[$projektarbeit_id]['betreuer'] = $betreuerResult;
+//			$projektarbeit->betreuer = $betreuerResult;
+			forEach($betreuerResult->retval as $betreuerRow) {
+				
+			}
+			if (isset($betreuerResult->projektarbeit_id)) {
+				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// initialize it as an empty array.
+				if (!isset($projektarbeiten[$projektarbeitId])) {
+					$projektarbeiten[$projektarbeitId] = [];
+				}
+
+				// Add the current row to the array associated with its 'projektarbeit_id'.
+				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
+			}
+			
+		}
+		$this->addMeta('$projektarbeiten', $projektarbeiten);
+//		$result = $this->_ci->PaabgabeModel->findNewOrChangedTermineByOtherUsersSince($interval);
+	
+	
+	//	$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+	}
+	
 }

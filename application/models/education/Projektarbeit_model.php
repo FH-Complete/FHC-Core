@@ -306,17 +306,7 @@ class Projektarbeit_model extends DB_Model
 		
 		return $this->execReadOnlyQuery($qry, array($projektarbeit_id));
 	}
-
-	/**
-	 * Prüft ob Projektarbeit aktuell ist (also zurzeit online bewertet wird).
-	 * @param $projektarbeit_id
-	 * @return boolean
-	 */
-	public function projektarbeitIsCurrent($projektarbeit_id) {
-		$version = $this->getVersion($projektarbeit_id);
-		// paarbeit sollte nur ab einem Studiensemester online bewertet werden
-		return $version === null ? null : $version->isCurrent;
-	}
+	
 	
 	public function getProjektarbeitenForStudiengang($studiengang_kz, $benotet) {
 		$new_qry = "SELECT DISTINCT ON(tmp.projektarbeit_id) *, campus.get_betreuer_details(tmp.zweitbetreuer_person_id) as zweitbetreuer_full_name, campus.get_betreuer_details(tmp.betreuer_person_id) as erstbetreuer_full_name
