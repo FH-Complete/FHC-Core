@@ -58,13 +58,6 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getPersonId/' + params.id + '/' + params.type_id
 		};
 	},
-/*	getUid(ids, type_id){
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getUids/' + type_id,
-			params: {ids}
-		};
-	},*/
 	getDataVorlage(vorlage_kurzbz){
 		return {
 			method: 'get',
@@ -89,20 +82,6 @@ export default {
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/messages/messages/getReplyData/' + messageId
-		};
-	},
-/*	sendMessageFromModalContext(id, params) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessage/' + id,
-			params
-		};
-	},	*/
-	sendMessageFromModalContext(type_id, params) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessage/' + type_id,
-			params
 		};
 	},
 	sendMessage(type_id, params) {

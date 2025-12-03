@@ -56,7 +56,6 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-
 		}
 	},
 	methods: {
@@ -115,7 +114,7 @@ export default {
 			data.append('ids', JSON.stringify(this.id));
 
 			return this.$refs.formMessage
-				.call(ApiMessages.sendMessageFromModalContext(this.typeId, data))
+				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
@@ -151,7 +150,6 @@ export default {
 					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					this.resetForm();
 					//closeModal
 					//closewindwo
 				});
@@ -166,7 +164,7 @@ export default {
 				this.editor.save();
 
 			} else {
-				console.error("Editor instance is not available.");
+				console.error(this.$p.t('messages', 'errorEditorNotAvailable'));
 			}
 		},
 		resetForm(){
