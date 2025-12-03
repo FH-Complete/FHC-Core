@@ -152,6 +152,7 @@ export default {
 				stunden: null,
 				stundensatz: null
 			},
+			defaultStundensatz: null,
 			newMode: false,
 			editMode: false,
 			initialFormData: null,
@@ -179,45 +180,40 @@ export default {
 		actionEditProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
 			this.editMode = true;
 			this.newMode = false;
-			this.$api
-				.call(ApiStvProjektbetreuer.getDefaultStundensaetze(person_id, this.studiensemester_kurzbz))
-				.then(result => {
-					this.resetForm();
+			this.resetForm();
+			this.getDefaultStundensaetze(person_id).finally(() => {
 
-					// get betreuer from tabulator list
-					let projektbetreuerListe = this.$refs.projektbetreuerTable.tabulator.getData();
-					const idx = projektbetreuerListe.findIndex(
-							betr =>
-								betr.person_id === person_id &&
-								betr.projektarbeit_id === projektarbeit_id &&
-								betr.betreuerart_kurzbz === betreuerart_kurzbz
-						);
+				// get betreuer from tabulator list
+				let projektbetreuerListe = this.$refs.projektbetreuerTable.tabulator.getData();
+				const idx = projektbetreuerListe.findIndex(
+						betr =>
+							betr.person_id === person_id &&
+							betr.projektarbeit_id === projektarbeit_id &&
+							betr.betreuerart_kurzbz === betreuerart_kurzbz
+					);
 
-					if (idx >= 0) { // if betreuer found
+				if (idx >= 0) { // if betreuer found
 
-						// set currently edited betreuer (deep copy)
-						this.formData = JSON.parse(JSON.stringify(projektbetreuerListe[idx]));
+					// set currently edited betreuer (deep copy)
+					this.formData = JSON.parse(JSON.stringify(projektbetreuerListe[idx]));
 
-						// set download link
-						if (this.formData.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = this.formData.beurteilungDownloadLink;
+					// set download link
+					if (this.formData.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = this.formData.beurteilungDownloadLink;
 
-						// set betreuer for autocomplete field
-						this.autocompleteSelectedBetreuer = {
-							person_id: this.formData.person_id,
-							name: this.formData.name,
-							vorname: this.formData.vorname,
-							nachname: this.formData.nachname,
-							vertrag_id: this.formData.vertrag_id
-						};
-					}
+					// set betreuer for autocomplete field
+					this.autocompleteSelectedBetreuer = {
+						person_id: this.formData.person_id,
+						name: this.formData.name,
+						vorname: this.formData.vorname,
+						nachname: this.formData.nachname,
+						vertrag_id: this.formData.vertrag_id
+					};
+				}
 
-					// set default stundensatz (if no other is set yet)
-					if (this.formData.stundensatz == null) this.formData.stundensatz = result.data;
+				// capture initial form data for detecting changes
+				this.captureFormData();
+			});
 
-					// capture initial form data for detecting changes
-					this.captureFormData();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionDeleteProjektbetreuer(betreuer_id, projektarbeit_id, person_id, betreuerart_kurzbz) {
 			this.$fhcAlert
@@ -239,6 +235,7 @@ export default {
 			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
+			this.defaultStundensatz = this.config.defaultProjektbetreuerStundensatz;
 
 			// get other initial data
 			this.$api
@@ -271,7 +268,7 @@ export default {
 					})
 					.catch(this.$fhcAlert.handleSystemError);
 			} else {
-				this.emptyBetreuer();
+				this.emptyBetreuerList();
 			}
 		},
 		saveProjektbetreuer() {
@@ -297,11 +294,13 @@ export default {
 					this.filteredBetreuer = result.data;
 				});
 		},
-		emptyBetreuer() {
+		emptyBetreuerList() {
 			this.$refs.projektbetreuerTable.tabulator.clearData();
 		},
 		resetForm() {
-			this.formData = this.getDefaultFormData();
+			const defaultFormData = this.getDefaultFormData();
+			this.formData = defaultFormData;
+			this.defaultStundensatz = defaultFormData.stundensatz;
 			if (this.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = '';
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
@@ -369,6 +368,16 @@ export default {
 				this.formData.stunden = defaultStunden;
 			}
 		},
+		getDefaultStundensaetze(person_id) {
+			return this.$api
+				.call(ApiStvProjektbetreuer.getDefaultStundensaetze(person_id, this.studiensemester_kurzbz))
+				.then(result => {
+					// set default stundensatz (if no other is set yet)
+					this.defaultStundensatz = result.data;
+					this.formData.stundensatz = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		// check if form data has been modified since initial data has been captured
 		formDataModified() {
 			if (this.autocompleteSelectedBetreuer != null) return true;
@@ -401,6 +410,9 @@ export default {
 		// disable fields which are dependent on Vertrag status
 		disableVertragFields(statusAkzeptiert) {
 			this.vertragFieldsDisabled = statusAkzeptiert;
+		},
+		onBetreuerSelected(ev) {
+			this.getDefaultStundensaetze(ev.value.person_id);
 		}
 	},
 	template: `
@@ -422,7 +434,7 @@ export default {
 				>
 			</core-filter-cmpt>
 
-			<form-form ref="formProjektbetreuer" v-show="betreuerFormOpened" @submit.prevent>
+			<form-form ref="formProjektbetreuer" v-show="betreuerFormOpened" class="mt-3" @submit.prevent >
 				<div class="row mb-3">
 					<form-input
 						container-class="stv-details-projektarbeit-betreuer"
@@ -433,6 +445,8 @@ export default {
 						name="person_id"
 						:suggestions="filteredBetreuer"
 						@complete="searchBetreuer"
+						@item-select="onBetreuerSelected"
+						@option-select="onBetreuerSelected"
 						:min-length="3"
 						:disabled="vertragFieldsDisabled"
 						>
@@ -502,7 +516,7 @@ export default {
 							container-class="stv-details-projektarbeit-stundensatz"
 							type="text"
 							name="stundensatz"
-							:label="$p.t('projektarbeit', 'stundensatz')"
+							:label="$p.t('projektarbeit', 'stundensatz') + (defaultStundensatz ? ' (Default ' + defaultStundensatz + ')' : '')"
 							:disabled="vertragFieldsDisabled"
 							v-model="formData.stundensatz"
 							>

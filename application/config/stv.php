@@ -83,10 +83,15 @@ if (!defined('ZGV_DOKTOR_ANZEIGEN') || !ZGV_DOKTOR_ANZEIGEN) {
 		$fieldsZgvDoktor
 	);
 }
-
-$config['tabs']['projektarbeit']['defaultProjektbetreuerStunden'] = '4.0';
-$config['tabs']['projektarbeit']['defaultProjektbetreuerStundenDiplom'] = '5.0';
-$config['tabs']['projektarbeit']['lvLektroinnenzuteilungFixangestelltStundensatz'] = true;
+error_log(print_r(defined(FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR), true));
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStunden'] =
+	defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR')
+	? FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR
+	: '0.0';
+$config['tabs']['projektarbeit']['defaultProjektbetreuerStundenDiplom'] =
+	defined('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER')
+	? FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER
+	: '0.0';
 $config['tabs']['projektarbeit']['defaultProjektbetreuerStundensatz'] = '80.0';
 
 $config['student_tab_order'] = [

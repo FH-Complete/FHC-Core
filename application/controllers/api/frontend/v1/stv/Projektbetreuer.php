@@ -114,18 +114,36 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
 
+		if (isset($projektbetreuer['stunden']) && !isEmptyString($projektbetreuer['stunden']) && !is_numeric($projektbetreuer['stunden']))
+		{
+			return $this->terminateWithError(
+				$this->p->t('ui', 'error_fieldNotNumeric', ['field'=> 'Stunden', 'Field'=> 'Stunden']), self::ERROR_TYPE_GENERAL
+			);
+		}
+
+		if (isset($projektbetreuer['stundensatz']) && !isEmptyString($projektbetreuer['stundensatz']) && !is_numeric($projektbetreuer['stundensatz']))
+		{
+			return $this->terminateWithError(
+				$this->p->t('ui', 'error_fieldNotNumeric', ['field'=> 'Stundensatz', 'Field'=> 'Stundensatz']), self::ERROR_TYPE_GENERAL
+			);
+		}
+
 		$projektbetreuer = $this->input->post('projektbetreuer');
 
 		if ($this->_validate($projektbetreuer) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$result = null;
 
+		$stunden = isset($projektbetreuer['stunden']) && !isEmptyString($projektbetreuer['stunden']) ? $projektbetreuer['stunden'] : null; 
+		$stundensatz =
+			isset($projektbetreuer['stundensatz']) && !isEmptyString($projektbetreuer['stundensatz']) ? $projektbetreuer['stundensatz'] : null;
+
 		$betreuer = [
 			'projektarbeit_id' => $projektarbeit_id,
 			'person_id' => $projektbetreuer['person_id'],
 			'note' => $projektbetreuer['note'],
-			'stunden' => $projektbetreuer['stunden'],
-			'stundensatz' => $projektbetreuer['stundensatz'],
+			'stunden' => $stunden,
+			'stundensatz' => $stundensatz,
 			'betreuerart_kurzbz' => $projektbetreuer['betreuerart_kurzbz']
 		];
 
