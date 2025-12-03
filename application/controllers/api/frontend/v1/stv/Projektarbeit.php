@@ -17,7 +17,8 @@ class Projektarbeit extends FHCAPI_Controller
 			'getTypenProjektarbeit' => ['admin:r', 'assistenz:r'],
 			'getFirmen' => ['admin:r', 'assistenz:r'],
 			'getLehrveranstaltungen' => ['admin:r', 'assistenz:r'],
-			'getNoten' => ['admin:r', 'assistenz:r']
+			'getNoten' => ['admin:r', 'assistenz:r'],
+			'getStudiensemester' => ['admin:r', 'assistenz:r']
 		]);
 
 		// Load Libraries
@@ -40,6 +41,7 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('education/Note_model', 'NoteModel');
 		$this->load->model('education/Projektbetreuer_model', 'BetreuerModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// load libraries
 		$this->load->library('PermissionLib');
@@ -253,6 +255,16 @@ class Projektarbeit extends FHCAPI_Controller
 	public function getNoten()
 	{
 		$result = $this->NoteModel->load();
+
+		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
+	}
+
+	public function getStudiensemester()
+	{
+		$this->StudiensemesterModel->addOrder('start', 'DESC');
+		$result = $this->StudiensemesterModel->load();
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 

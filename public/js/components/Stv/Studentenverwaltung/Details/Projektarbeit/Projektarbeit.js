@@ -258,7 +258,7 @@ export default {
 			this.statusNew = true;
 			this.editedProjektarbeit = null;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(this.statusNew);
+			this.$refs.projektarbeitDetails.getFormData(this.statusNew, null, null);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditProjektarbeit() {
