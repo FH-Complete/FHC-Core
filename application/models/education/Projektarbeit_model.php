@@ -269,7 +269,7 @@ class Projektarbeit_model extends DB_Model
 					(SELECT tbl_person.vorname, tbl_person.nachname, tbl_studiengang.typ, tbl_studiengang.kurzbz,
 							tbl_projektarbeit.projekttyp_kurzbz, tbl_projekttyp.bezeichnung, tbl_projektarbeit.titel, tbl_projektarbeit.projektarbeit_id,
 							tbl_projektbetreuer.person_id as betreuer_person_id, tbl_projektbetreuer.betreuerart_kurzbz, tbl_betreuerart.beschreibung AS betreuerart_beschreibung,
-							tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz
+							tbl_benutzer.uid, tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz, public.tbl_student.student_uid
 					 FROM lehre.tbl_projektarbeit
 							  LEFT JOIN lehre.tbl_projektbetreuer using(projektarbeit_id)
 							  LEFT JOIN lehre.tbl_betreuerart using(betreuerart_kurzbz)
