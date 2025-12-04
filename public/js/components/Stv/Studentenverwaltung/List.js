@@ -385,7 +385,7 @@ export default {
 
 			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
 			let method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
-			if (this.filter.length)
+			if (this.filter.length && !endpoint.url.match(/\/search\//))
 			{
 				params.filter = this.filter;
 				method = 'post';
