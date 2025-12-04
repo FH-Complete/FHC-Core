@@ -101,7 +101,6 @@ class AbgabetoolJob extends JOB_Controller
 			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($person_id);
 			$data = getData($result)[0];
 
-			// $abgabe is the array of paabgabe objects
 			$anrede = $data->anrede;
 			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
 			$fullFormattedNameString = $data->first;

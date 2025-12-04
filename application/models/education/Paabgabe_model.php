@@ -64,16 +64,20 @@ class Paabgabe_model extends DB_Model
 	public function findAbgabenNewOrUpdatedSince($interval)
 	{
 
-		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
-					   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
-					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel
-				FROM campus.tbl_paabgabe 
-					JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
-					JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
-				
-				WHERE campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
-					OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?
-	";
+		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
+			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
+			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel, 
+			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz
+		FROM campus.tbl_paabgabe
+				 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
+				 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
+				 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+				 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+				 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz=public.tbl_studiengang.studiengang_kz)
+		
+		
+		WHERE campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
+		   OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?";
 
 		return $this->execQuery($query, [$interval, $interval]);
 	}

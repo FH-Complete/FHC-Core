@@ -1169,7 +1169,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
-		$betreuer = [];
+		$betreuerMap = [];
 		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
 			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
 			
@@ -1177,22 +1177,110 @@ class Abgabe extends FHCAPI_Controller
 //			$projektarbeit->betreuer = $betreuerResult;
 			forEach($betreuerResult->retval as $betreuerRow) {
 				
-			}
-			if (isset($betreuerResult->projektarbeit_id)) {
-				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
-
 				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
 				// initialize it as an empty array.
-				if (!isset($projektarbeiten[$projektarbeitId])) {
-					$projektarbeiten[$projektarbeitId] = [];
+				if (!isset($betreuerMap[$betreuerRow->person_id])) {
+					$betreuerMap[$betreuerRow->person_id] = [];
 				}
 
+				
 				// Add the current row to the array associated with its 'projektarbeit_id'.
-				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
+				$betreuerMap[$betreuerRow->person_id][] = [$projektarbeit_id, $betreuerRow];
+				
+			}
+		}
+
+		$count = 0;
+		// now iterate over the betreuerMap and build 1 email about all projektarbeiten and their new/changed termine
+
+		// $tupel = [$projektarbeit_id, $betreuerRow], each betreuer has 0..n [projektarbeit_id, changedAbgaben] tupel
+		forEach($betreuerMap as $betreuer_person_id => $tupelArr) {
+
+			$abgabenString = '<br /><br />';
+			
+//			$betreuerRow = $tupel[1];
+			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer_person_id);
+			$data = getData($result)[0];
+
+			$anrede = $data->anrede;
+			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
+			$fullFormattedNameString = $data->first;
+			
+			forEach($tupelArr as $tupel) {
+				$projektarbeit_id = $tupel[0];
+				$betreuerRow = $tupel[1];
+
+				
+
+				$changedAbgaben = $projektarbeiten[$projektarbeit_id];
+
+				// filter for abgaben which where not inserted by the current betreuer iteration if there is no updateamum
+				// or not changed by the betreuer if there is updateamum
+				$relevantAbgaben = array_filter($changedAbgaben, function($abgabetermin) use ($betreuerRow) {
+					// new termin not created by that betreuer
+					if($abgabetermin->updatevon == null && $abgabetermin->insertvon != $betreuerRow->uid) {
+						return $abgabetermin;
+					} else if($abgabetermin->updatevon != null && $abgabetermin->updatevon != $betreuerRow->uid) {
+						return $abgabetermin;
+					}
+				});
+				
+				if(count($relevantAbgaben) == 0) {
+					break; // skip that projektarbeit if only changes originate from the betreuer in question
+				}
+
+				$projektarbeit_titel = $relevantAbgaben[0]->titel ?? 'Kein Titel vergeben';
+//				$abgabenString = '<br /><br />';
+				$abgabenString .= 'Projektarbeit: '.$projektarbeit_titel.' ('.$betreuerRow->betreuerart_kurzbz.') ID:'.$projektarbeit_id.'<br/>';
+				$abgabeString .= 'Stg: '.$stgtyp.$stgkz.'<br/>';
+				foreach ($relevantAbgaben as $abgabe) {
+					$datetime = new DateTime($abgabe->datum);
+					$dateEmailFormatted = $datetime->format('d.m.Y');
+
+					$datetimeAbgabe = new DateTime($abgabe->abgabedatum);
+					$abgabedatumFormatted = $datetimeAbgabe->format('d.m.Y');
+
+					$abgabenString .= ' Zieldatum: '.$dateEmailFormatted . ' ' . $abgabe->bezeichnung . ' <br /> ';
+					if($abgabe->kurzbz != '') {
+						$abgabenString .= $abgabe->kurzbz . '<br />';
+					}
+				}
+
+				$abgabenString .= '<br/><br/>';
+				
+				
 			}
 			
+			// done with building the change list, now send it
+			$betreuerRow = $tupelArr[0][1];
+			
+
+			$path = $this->_ci->config->item('URL_MITARBEITER');
+			$url = APP_ROOT.$path;
+
+			$body_fields = array(
+				'anrede' => $anrede,
+				'anredeFillString' => $anredeFillString,
+				'fullFormattedNameString' => $fullFormattedNameString,
+				'abgabenString' => $abgabenString,
+				'linkAbgabetool' => $url
+			);
+
+//			if(count($tupelArr) <= 2) break; // testing code 
+			
+			// send email with bundled info
+			sendSanchoMail(
+				'PAAChangesBetSM',
+				$body_fields,
+				$betreuerRow->private_email,
+				$this->p->t('abgabetool', 'changedAbgabeterminev2')
+			);
+
+			$count++;
 		}
+		
 		$this->addMeta('$projektarbeiten', $projektarbeiten);
+		$this->addMeta('$betreuerMap', $betreuerMap);
 //		$result = $this->_ci->PaabgabeModel->findNewOrChangedTermineByOtherUsersSince($interval);
 	
 	

@@ -7,7 +7,7 @@ $config['turnitin_link'] = 'https://technikum-wien.turnitin.com/sso/sp/redwood/s
 
 $config['old_abgabe_beurteilung_link'] = 'https://moodle.technikum-wien.at/mod/page/view.php?id=1005052';
 
-$config['PAABGABE_EMAIL_JOB_INTERVAL'] = '1 day';
+$config['PAABGABE_EMAIL_JOB_INTERVAL'] = '2 day';
 // used as APP_ROOT.URL_STUDENTS -> cis4
 $config['URL_STUDENTS'] = 'cis.php/Cis/Abgabetool/Student';
 // used as APP_ROOT.URL_MITARBEITER -> old cis 
