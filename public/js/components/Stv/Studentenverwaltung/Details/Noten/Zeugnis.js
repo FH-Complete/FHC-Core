@@ -2,8 +2,6 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 import ZeugnisDocuments from './Zeugnis/Documents.js';
 
-import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
-
 export default {
 	name: 'Zeugnis',
 	components: {
@@ -11,6 +9,7 @@ export default {
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
+	emits: ['loaded'],
 	inject: {
 		config: {
 			from: 'config',
@@ -22,7 +21,15 @@ export default {
 		}
 	},
 	props: {
-		student: Object,
+		endpoint: {
+			type: Object,
+			required: true
+		},
+		id: {
+			type: [Number, String],
+			required: true
+		},
+		optionalTabulatorOptions: Object,
 		allSemester: Boolean
 	},
 	data() {
@@ -34,6 +41,10 @@ export default {
 						item.documentslist = document.createElement("div");
 						return item;
 					})
+				},
+				{
+					event: "dataProcessed",
+					handler: () => this.$emit("loaded")
 				},
 				{
 					event: "rowSelected",
@@ -53,7 +64,7 @@ export default {
 	computed: {
 		tabulatorOptions() {
 			const listPromise = this.$api
-				.call(ApiStvGrades.list())
+				.call(this.endpoint.list())
 				.then(res => res.data.map(({bezeichnung: label, note: value}) => ({label, value})));
 
 			let gradeField = {
@@ -86,7 +97,7 @@ export default {
 							note_bezeichnung
 						}))
 						// send to backend
-						.then(data => this.$api.call(ApiStvGrades.updateCertificate(data)))
+						.then(data => this.$api.call(this.endpoint.updateCertificate(data)))
 						// get bezeichnung again
 						.then(() => listPromise)
 						.then(list => list.find(el => el.value == note))
@@ -109,7 +120,7 @@ export default {
 							if (filterTerm) {
 								return this.$api
 									.call(
-										ApiStvGrades.getGradeFromPoints(
+										this.endpoint.getGradeFromPoints(
 											filterTerm,
 											cell.getData().lehrveranstaltung_id,
 											this.currentSemester
@@ -142,27 +153,146 @@ export default {
 					.then(() => node.innerText = this.$p.t('ui/loading'))
 					.catch(this.$fhcAlert.handleSystemError);
 				gradeField.editorParams.placeholderLoading = node;
+				gradeField.visible = this.optionalTabulatorOptions?.visibleColumns?.note ?? true
+				gradeField.headerFiler = this.optionalTabulatorOptions?.headerFilter?.note || this.optionalTabulatorOptions?.note || false
 			}
 
 			const columns = [
-				{ field: 'zeugnis', title: this.$p.t('stv/grades_zeugnis'), formatter: 'tickCross' },
-				{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
-				gradeField,
-				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false },
-				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
-				{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
-				{ field: 'note_number', title: this.$p.t('stv/grades_numericgrade'), visible: false, formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note },
-				{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
-				{ field: 'studiengang', title: this.$p.t('lehre/studiengang'), visible: false },
-				{ field: 'studiengang_kz', title: this.$p.t('lehre/studiengangskennzahlLehre'), visible: false },
-				{ field: 'studiengang_lv', title: this.$p.t('stv/grades_studiengang_lv'), visible: false },
-				{ field: 'studiengang_kz_lv', title: this.$p.t('stv/grades_studiengang_kz_lv'), visible: false },
-				{ field: 'semester_lv', title: this.$p.t('stv/grades_semester_lv'), visible: false },
-				{ field: 'ects_lv', title: this.$p.t('lehre/ects'), visible: false },
-				{ field: 'lehrform', title: this.$p.t('lehre/lehrform'), visible: false },
-				{ field: 'kurzbz', title: this.$p.t('lehre/kurzbz'), visible: false },
-				{ field: 'punkte', title: this.$p.t('stv/grades_points'), visible: false },
-				{ field: 'lehrveranstaltung_bezeichnung_english', title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'), visible: false }
+				{ 
+					field: 'zeugnis',
+					title: this.$p.t('stv/grades_zeugnis'),
+					formatter: 'tickCross',
+					visible: this.optionalTabulatorOptions?.visibleColumns?.zeugnis ?? true,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.zeugnis || this.optionalTabulatorOptions?.zeugnis || false
+				},
+				{ 
+					field: 'lehrveranstaltung_bezeichnung',
+					title: this.$p.t('lehre/lehrveranstaltung'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_bezeichnung ?? true,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrveranstaltung_bezeichnung || this.optionalTabulatorOptions?.lehrveranstaltung_bezeichnung || false
+
+				},
+					gradeField,
+				{ 
+					field: 'uebernahmedatum',
+					title: this.$p.t('stv/grades_takeoverdate'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.uebernahmedatum ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.uebernahmedatum || this.optionalTabulatorOptions?.uebernahmedatum || false
+
+				},
+				{ 
+					field: 'benotungsdatum',
+					title: this.$p.t('stv/grades_gradingdate'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.benotungsdatum ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.benotungsdatum || this.optionalTabulatorOptions?.benotungsdatum || false
+
+				},
+				{ 
+					field: 'studiensemester_kurzbz',
+					title: this.$p.t('lehre/studiensemester'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.studiensemester_kurzbz ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiensemester_kurzbz || this.optionalTabulatorOptions?.studiensemester_kurzbz || false
+
+				},
+				{ 
+					field: 'note_number',
+					title: this.$p.t('stv/grades_numericgrade'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.note_number ?? false,
+					formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.note_number || this.optionalTabulatorOptions?.note_number || false
+
+				},
+				{ 
+					field: 'lehrveranstaltung_id',
+					title: this.$p.t('lehre/lehrveranstaltung_id'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_id ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrveranstaltung_id || this.optionalTabulatorOptions?.lehrveranstaltung_id || false
+
+				},
+				{ 
+					field: 'studiengang',
+					title: this.$p.t('lehre/studiengang'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang || this.optionalTabulatorOptions?.studiengang || false
+
+				},
+				{ 
+					field: 'studiengang_kz',
+					title: this.$p.t('lehre/studiengangskennzahlLehre'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_kz ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_kz || this.optionalTabulatorOptions?.studiengang_kz || false
+
+				},
+				{ 
+					field: 'studiengang_lv',
+					title: this.$p.t('stv/grades_studiengang_lv'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_lv ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_lv || this.optionalTabulatorOptions?.studiengang_lv || false
+
+				},
+				{ 
+					field: 'studiengang_kz_lv',
+					title: this.$p.t('stv/grades_studiengang_kz_lv'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_kz_lv ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_kz_lv || this.optionalTabulatorOptions?.studiengang_kz_lv || false
+
+				},
+				{ 
+					field: 'semester_lv',
+					title: this.$p.t('stv/grades_semester_lv'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.semester_lv ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.semester_lv || this.optionalTabulatorOptions?.semester_lv || false
+
+				},
+				{ 
+					field: 'ects_lv',
+					title: this.$p.t('lehre/ects'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.ects_lv ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.ects_lv || this.optionalTabulatorOptions?.ects_lv || false
+
+				},
+				{ 
+					field: 'lehrform',
+					title: this.$p.t('lehre/lehrform'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrform ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrform || this.optionalTabulatorOptions?.lehrform || false
+
+				},
+				{ 
+					field: 'kurzbz',
+					title: this.$p.t('lehre/kurzbz'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.kurzbz ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.kurzbz || this.optionalTabulatorOptions?.kurzbz || false
+
+				},
+				{ 
+					field: 'punkte',
+					title: this.$p.t('stv/grades_points'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.punkte ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.punkte || this.optionalTabulatorOptions?.punkte || false
+
+				},
+				{ 
+					field: 'vorname',
+					title: this.$p.t('person/vorname'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.vorname ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.vorname || this.optionalTabulatorOptions?.vorname || false
+
+				},
+				{ 
+					field: 'nachname',
+					title: this.$p.t('person/nachname'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.nachname ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.nachname || this.optionalTabulatorOptions?.nachname || false
+
+				},
+				{ 
+					field: 'lehrveranstaltung_bezeichnung_english',
+					title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'),
+					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_bezeichnung_english ?? false,
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrveranstaltung_bezeichnung_english || this.optionalTabulatorOptions?.lehrveranstaltung_bezeichnung_english || false
+
+				}
 			];
 
 			const hasDocuments = ['both', 'inline'].includes(this.config.documents);
@@ -208,8 +338,8 @@ export default {
 
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
-					this.student.prestudent_id,
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getCertificate(
+					this.id,
 						(!this.allSemester ? this.currentSemester : null)
 				)),
 				ajaxResponse: (url, params, response) => {
@@ -218,9 +348,11 @@ export default {
 				columns,
 				height: '100%',
 				layout: 'fitDataStretchFrozen',
-				selectable: 1,
+				selectable: true,
 				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis-2025112401',
+				selectableRowsRangeMode: 'click', //needed for Tabulator v6
+				selectableRows: true, //needed for Tabulator v6
+				persistenceID: this.optionalTabulatorOptions?.persistenceZeugnisID ?? 'stv-details-noten-zeugnis-2025120302',
 				persistence:{
 					columns: ["width", "visible", "frozen"]
 				}
@@ -228,7 +360,8 @@ export default {
 		}
 	},
 	watch: {
-		student(n) {
+		id()
+		{
 			this.$refs.table.reloadTable();
 		},
 		allSemester(n) {
@@ -239,7 +372,7 @@ export default {
 		setGrade(data) {
 			this.$api
 				.call(
-					ApiStvGrades.updateCertificate(data),
+					this.endpoint.updateCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				)
 				.then(this.$refs.table.reloadTable)
@@ -252,7 +385,7 @@ export default {
 				.confirmDelete()
 				.then(result => result ? data : Promise.reject({handled:true}))
 				.then(data => this.$api.call(
-					ApiStvGrades.deleteCertificate(data),
+					this.endpoint.deleteCertificate(data),
 					{ errorHeader: data.lehrveranstaltung_bezeichnung }
 				))
 				.then(this.$refs.table.reloadTable)
@@ -261,7 +394,7 @@ export default {
 		}
 	},
 	created() {
-		this.$p.loadCategory(['global', 'stv', 'lehre'])
+		this.$p.loadCategory(['global', 'stv', 'lehre', 'person'])
 			.then(() => {
 				if (this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.columnManager.setColumns(this.tabulatorOptions.columns);

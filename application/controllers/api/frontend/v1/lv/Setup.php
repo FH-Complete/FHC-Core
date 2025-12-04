@@ -42,6 +42,7 @@ class Setup extends FHCAPI_Controller
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
+		$this->_ci->load->helper('hlp_document');
 	}
 
 	public function getLETabs()
@@ -80,6 +81,18 @@ class Setup extends FHCAPI_Controller
 			'title' =>  'Termine',
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/LVTermine.js',
 			'config' => []
+		);
+		$tabs['noten'] = array (
+			'title' =>  'Noten',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Noten.js',
+			'config' => [
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
+				'edit' => 'both', // Possible values: both|header|inline
+				'delete' => 'inline', // Possible values: both|header|inline
+				'documents' => 'inline', // Possible values: both|header|inline
+				'documentslist' => gradesDocumentsList(),
+				'semesterSelect' => false
+			]
 		);
 		$this->terminateWithSuccess($tabs);
 	}

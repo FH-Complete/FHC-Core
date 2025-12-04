@@ -1,14 +1,12 @@
-import NotenZeugnis from './Noten/Zeugnis.js';
-import NotenTeacher from './Noten/Teacher.js';
-import NotenRepeater from './Noten/Repeater.js';
-
-import ApiStvGrades from '../../../../api/factory/stv/grades.js';
-import { highlightGesamtnote } from "../../../../helpers/DocumentHelper";
-
-const LOCAL_STORAGE_ID = 'stv_details_noten_2024-11-25_stdsem_all';
+import NotenZeugnis from "../../Stv/Studentenverwaltung/Details/Noten/Zeugnis.js";
+import NotenTeacher from "../../Stv/Studentenverwaltung/Details/Noten/Teacher.js";
+import NotenRepeater from "../../Stv/Studentenverwaltung/Details/Noten/Repeater.js";
+import ApiLVNoten from "../../../api/lehrveranstaltung/noten.js";
+import { highlightGesamtnote } from "../../../helpers/DocumentHelper.js";
+const LOCAL_STORAGE_ID = 'lv_details_noten_2025_12_02_stdsem_all';
 
 export default {
-	name: "TabGrades",
+	name: "LVTabNoten",
 	components: {
 		NotenZeugnis,
 		NotenTeacher,
@@ -26,16 +24,32 @@ export default {
 	data() {
 		return {
 			stdsem: '',
-			endpoint: ApiStvGrades,
+			endpoint: ApiLVNoten,
+			tabulatorOptions: {
+				visibleColumns: {
+					vorname: true,
+					nachname: true,
+					lehrveranstaltung_bezeichnung: false
+				},
+				headerFilter: {
+					vorname: true,
+					nachname: true,
+					lehrveranstaltung_bezeichnung: false
+				},
+				persistenceZeugnisID: 'lv-details-noten-zeugnis-2025120401',
+				persistenceTeacherID: 'lv-details-noten-teacher-2025120401',
+			},
 			zeugnisLoaded: false,
 			teacherLoaded: false,
 		};
 	},
 	methods: {
 		reload() {
+			this.zeugnisLoaded = false;
+			this.teacherLoaded = false;
+
 			this.$refs.zeugnis.$refs.table.reloadTable();
 			this.$refs.teacher.$refs.table.reloadTable();
-			this.$refs.repeater.$refs.table.reloadTable();
 		},
 		saveStdsem(event) {
 			window.localStorage.setItem(LOCAL_STORAGE_ID, event.target.value);
@@ -72,18 +86,30 @@ export default {
 	template: `
 	<div class="stv-details-noten d-flex flex-column overflow-hidden">
 		<div class="mb-3">
-			<select class="form-select" v-model="stdsem" @input="saveStdsem">
+			<select class="form-select" v-model="stdsem" @input="saveStdsem" v-if="config?.semesterSelect ?? true">
 				<option value="">{{ $p.t('ui/current_semester') }}</option>
 				<option value="true">{{ $p.t('ui/all_semester') }}</option>
 			</select>
 		</div>
 		<div class="row">
 			<div class="col-8">
-				<noten-zeugnis ref="zeugnis" :id="modelValue.prestudent_id" :all-semester="!!stdsem" :endpoint="endpoint" @loaded="onZeugnisLoaded"></noten-zeugnis>
+				<noten-zeugnis 
+					ref="zeugnis" 
+					:id="modelValue.lehrveranstaltung_id"
+					:all-semester="!!stdsem"
+					:endpoint="endpoint"
+					:optionalTabulatorOptions="tabulatorOptions"
+					@loaded="onZeugnisLoaded"/>
 			</div>
 			<div class="col-4">
-				<noten-teacher ref="teacher" :id="modelValue.prestudent_id" :endpoint="endpoint" :all-semester="!!stdsem" @copied="reload" @loaded="onTeacherLoaded"></noten-teacher>
-				<noten-repeater class="mt-4" ref="repeater" :student="modelValue" :all-semester="!!stdsem" @copied="reload"></noten-repeater>
+				<noten-teacher 
+					ref="teacher"
+					:id="modelValue.lehrveranstaltung_id"
+					:all-semester="!!stdsem"
+					:endpoint="endpoint"
+					@copied="reload"
+					:optionalTabulatorOptions="tabulatorOptions"
+					@loaded="onTeacherLoaded"/>
 			</div>
 		</div>
 	</div>`
