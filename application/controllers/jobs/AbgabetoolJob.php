@@ -17,6 +17,7 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->load->helper('hlp_sancho_helper');
 
 		$this->_ci->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$this->_ci->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 		$this->_ci->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 
@@ -25,12 +26,11 @@ class AbgabetoolJob extends JOB_Controller
 			'abgabetool'
 		]);
 	}
-	
+
 	public function notifyBetreuerAboutChangedAbgaben() {
 		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
-
 		// get all new or changed termine in interval
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
 		$retval = getData($result);
@@ -39,15 +39,14 @@ class AbgabetoolJob extends JOB_Controller
 			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
 			return;
 		}
-		
-		// group changed/new abgaben for projektarbeiten, then look up their betreuer and send them email
+
+		// group changed/new abgaben for projektarbeiten
 		$projektarbeiten = [];
 		foreach($retval as $newOrChangedAbgabe) {
-
 			// Check if the current item has a 'projektarbeit_id' field.
 			// Replace 'projektarbeit_id' with the actual key name if it's different.
-			if (isset($newOrChangedAbgabe['projektarbeit_id'])) {
-				$projektarbeitId = $newOrChangedAbgabe['projektarbeit_id'];
+			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
+				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
 
 				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
 				// initialize it as an empty array.
@@ -58,11 +57,105 @@ class AbgabetoolJob extends JOB_Controller
 				// Add the current row to the array associated with its 'projektarbeit_id'.
 				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
 			}
-			
 		}
-		$result = $this->_ci->PaabgabeModel->findNewOrChangedTermineByOtherUsersSince($interval);
+
+		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
+		$betreuerMap = [];
+		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
+			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
+			
+			forEach($betreuerResult->retval as $betreuerRow) {
+				if (!isset($betreuerMap[$betreuerRow->person_id])) {
+					$betreuerMap[$betreuerRow->person_id] = [];
+				}
+				
+				// Add the current betreuerRow to the betreuerMap as an array associated with its projektarbeit_id.
+				$betreuerMap[$betreuerRow->person_id][] = [$projektarbeit_id, $betreuerRow];
+			}
+		}
+
+		$count = 0;
+		// now iterate over the betreuerMap and build 1 email about all projektarbeiten and their new/changed termine
+		// $tupel = [$projektarbeit_id, $betreuerRow], each betreuer has 0..n [projektarbeit_id, changedAbgaben] tupel
+		forEach($betreuerMap as $betreuer_person_id => $tupelArr) {
+
+			$abgabenString = '<br /><br />';
+			
+			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer_person_id);
+			$data = getData($result)[0];
+
+			$anrede = $data->anrede;
+			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
+			$fullFormattedNameString = $data->first;
+
+			forEach($tupelArr as $tupel) {
+				$projektarbeit_id = $tupel[0];
+				$betreuerRow = $tupel[1];
+
+				$changedAbgaben = $projektarbeiten[$projektarbeit_id];
+
+				// filter for abgaben which where not inserted by the current betreuer iteration if there is no updateamum
+				// or not changed by the betreuer if there is updateamum
+				$relevantAbgaben = array_filter($changedAbgaben, function($abgabetermin) use ($betreuerRow) {
+					// new termin not created by that betreuer
+					if($abgabetermin->updatevon == null && $abgabetermin->insertvon != $betreuerRow->uid) {
+						return $abgabetermin;
+					} else if($abgabetermin->updatevon != null && $abgabetermin->updatevon != $betreuerRow->uid) {
+						return $abgabetermin;
+					}
+				});
+
+				if(count($relevantAbgaben) == 0) {
+					break; // skip that projektarbeit if only changes originate from the betreuer in question
+				}
+
+				$projektarbeit_titel = $relevantAbgaben[0]->titel ?? 'Kein Titel vergeben';
+				$abgabenString .= 'Projektarbeit: '.$projektarbeit_titel.' ('.$betreuerRow->betreuerart_kurzbz.') ID:'.$projektarbeit_id.'<br/>';
+				$abgabenString .= 'Stg: '.$relevantAbgaben[0]->stgtyp.$relevantAbgaben[0]->stgkz.' Semester: '.$relevantAbgaben[0]->studiensemester_kurzbz.'<br/>';
+				foreach ($relevantAbgaben as $abgabe) {
+					$datetime = new DateTime($abgabe->datum);
+					$dateEmailFormatted = $datetime->format('d.m.Y');
+
+					$datetimeAbgabe = new DateTime($abgabe->abgabedatum);
+					$abgabedatumFormatted = $datetimeAbgabe->format('d.m.Y');
+
+					$abgabenString .= ' Zieldatum: '.$dateEmailFormatted . ' ' . $abgabe->bezeichnung . ' <br /> ';
+					if($abgabe->kurzbz != '') {
+						$abgabenString .= $abgabe->kurzbz . '<br />';
+					}
+				}
+
+				$abgabenString .= '<br/><br/>';
 
 
+			}
+
+			// done with building the change list, now send it
+			$betreuerRow = $tupelArr[0][1];
+			
+			$path = $this->_ci->config->item('URL_MITARBEITER');
+			$url = APP_ROOT.$path;
+
+			$body_fields = array(
+				'anrede' => $anrede,
+				'anredeFillString' => $anredeFillString,
+				'fullFormattedNameString' => $fullFormattedNameString,
+				'abgabenString' => $abgabenString,
+				'linkAbgabetool' => $url
+			);
+
+			// send email with bundled info
+			sendSanchoMail(
+				'PAAChangesBetSM',
+				$body_fields,
+				$betreuerRow->private_email,
+				$this->p->t('abgabetool', 'changedAbgabeterminev2')
+			);
+
+			$count++;
+		}
+
+		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
 		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 	}
 
@@ -80,7 +173,7 @@ class AbgabetoolJob extends JOB_Controller
 
 		// retval are paabgaben joined with projektarbeit and betreuer
 		if(count($retval) == 0) {
-			$this->logInfo("Keine Emails an Betreuer versandt");
+			$this->logInfo("Keine Emails über neue Paabgaben an Betreuer versandt");
 			return;
 		}
 

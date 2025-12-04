@@ -67,7 +67,7 @@ class Paabgabe_model extends DB_Model
 		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
 			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
 			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel, 
-			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz
+			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, tbl_lehreinheit.studiensemester_kurzbz
 		FROM campus.tbl_paabgabe
 				 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
 				 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)

@@ -44,8 +44,7 @@ class Abgabe extends FHCAPI_Controller
 			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'notifyBetreuerAboutChangedAbgaben' =>  self::PERM_LOGGED
+			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
 			]);
 
 		$this->load->library('PhrasesLib');
@@ -115,14 +114,11 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
 		}
 		
-//		$paIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
-
 		$projektarbeitIsCurrent = false;
 		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
 			$projektarbeitIsCurrent = $result;
 		};
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
-//		$this->addMeta('isCurrent', $projektarbeitIsCurrent);
 		
 		$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
 
@@ -147,7 +143,8 @@ class Abgabe extends FHCAPI_Controller
 			$uid = getAuthUID();
 		}
 
-		$isZugeteilterBetreuer = count($this->ProjektarbeitModel->checkZuordnung($uid, getAuthUID())->retval) > 0;
+		// TODO: check if this zugriffsberechtigung is alright
+//		$isZugeteilterBetreuer = count($this->ProjektarbeitModel->checkZuordnung($uid, getAuthUID())->retval) > 0;
 //		$this->addMeta('isZugeteilterBetreuer', $isZugeteilterBetreuer);
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
 
@@ -232,13 +229,6 @@ class Abgabe extends FHCAPI_Controller
 						
 						$pa->downloadLink2 = $downloadLink2;
 					}
-					
-					
-					// TODO: see assistenz query in projektarbeit_model
-					
-					// zweitbetreuer info since the 'getStudentProjektarbeitenWithBetreuer' query got quiete large,
-					// enjoy optimizing that one in 2038. we need this to render a string like
-					// Zweitbegutachter: FH-Prof. PD DI Dr. techn. Vorname Nachname MBA
 
 					$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->zweitbetreuer_person_id);
 
@@ -483,7 +473,6 @@ class Abgabe extends FHCAPI_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
-			// TODO: consider this in nightly email job
 			$this->logLib->logInfoDB(array('paabgabe created',$result, getAuthUID(), getAuthPersonId()));
 		} else {
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
@@ -508,8 +497,6 @@ class Abgabe extends FHCAPI_Controller
 					'updateamum' => date('Y-m-d H:i:s')
 				)
 			);
-
-			// TODO: consider this in nightly email job
 			
 			$this->logLib->logInfoDB(array('paabgabe updated',$result, array(
 				'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
@@ -530,7 +517,6 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->PaabgabeModel->load($paabgabe_id);
 		$paabgabeArr = $this->getDataOrTerminateWithError($result);
 		$paabgabe = $paabgabeArr[0];
-//		$this->addMeta('paabgabe', $paabgabeArr);
 
 		// check if abgabe even has note
 		if($paabgabe->note) {
@@ -539,7 +525,6 @@ class Abgabe extends FHCAPI_Controller
 			$noteArr = $this->getDataOrTerminateWithError($result);
 			$note = $noteArr[0];
 			if($note->positiv === false) {
-//				$this->addMeta('noteNegativ', true);
 				
 				if($existingPaabgabe && $existingPaabgabe->note) {
 					$result = $this->NoteModel->load($paabgabe->note);
@@ -767,8 +752,6 @@ class Abgabe extends FHCAPI_Controller
 			'datum' => $dateEmailFormatted,
 			'projektarbeitname' => $projektarbeit->titel
 		);
-
-//		$this->addMeta('$emaildata', $data);
 		
 		// students still get theirs on event, since it is very unlikely that this
 		// leads to spam on their end
@@ -898,8 +881,7 @@ class Abgabe extends FHCAPI_Controller
 		$schlagwoerter = $_POST['schlagwoerter'];
 		$schlagwoerter_en = $_POST['schlagwoerter_en'];
 		$seitenanzahl = $_POST['seitenanzahl'];
-
-
+		
 		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
 			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
 			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
@@ -987,11 +969,7 @@ class Abgabe extends FHCAPI_Controller
 		$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
 			$projektarbeitIsCurrent = $result;
 		};
-		
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
-		$this->addMeta('isCurrent', $projektarbeitIsCurrent);
-		
-//		$projektarbeitIsCurrent = $this->ProjektarbeitModel->projektarbeitIsCurrent($projektarbeit_id);
 		if(!$projektarbeitIsCurrent) {
 			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
 		}
@@ -1005,9 +983,7 @@ class Abgabe extends FHCAPI_Controller
 
 		$path = $this->config->item('URL_MITARBEITER');
 		$url = APP_ROOT.$path;
-
-//		$this->addMeta('betreuerArray', $resBetr->retval);
-
+		
 		// getProjektbetreuerAnrede fetches distinct on person_id, so there should be one row. zweitbetreuer is handled seperately afterwards 
 		foreach($resBetr->retval as $betreuerRow) {
 
@@ -1036,9 +1012,7 @@ class Abgabe extends FHCAPI_Controller
 			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
 
 			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
-
-//			$this->addMeta('$maildata', $maildata);
-
+			
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
 				$maildata,
@@ -1059,9 +1033,7 @@ class Abgabe extends FHCAPI_Controller
 				// Zweitbegutachter holen
 				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
-
-//				$this->addMeta('$zweitbegutachterRes', $zweitbegutachterRetval);
-
+				
 				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
 				{
 
@@ -1076,9 +1048,7 @@ class Abgabe extends FHCAPI_Controller
 						}
 
 						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
-
-//						$this->addMeta('$begutachterMitTokenRetval', $begutachterMitTokenRetval);
-
+						
 						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
 						{
 							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
@@ -1102,9 +1072,7 @@ class Abgabe extends FHCAPI_Controller
 						$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
 						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
 						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
-
-//						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
-
+						
 						$mailres = sendSanchoMail(
 							'ParbeitsbeurteilungEndupload',
 							$zweitbetmaildata,
@@ -1124,167 +1092,6 @@ class Abgabe extends FHCAPI_Controller
 				}
 			}
 		}
-	}
-
-	public function notifyBetreuerAboutChangedAbgaben() {
-	//	$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
-		
-		$this->_ci =& get_instance();
-		$this->_ci->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
-		$this->_ci->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
-		$this->_ci->load->model('education/Paabgabe_model', 'PaabgabeModel');
-		$this->_ci->load->model('crm/Student_model', 'StudentModel');
-		
-		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
-	
-		// get all new or changed termine in interval
-		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
-		$retval = getData($result);
-	
-		if(count($retval) == 0) {
-	//		$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
-			return;
-		}
-	
-		$this->addMeta('retval', $retval);
-		
-		// group changed/new abgaben for projektarbeiten
-		$projektarbeiten = [];
-		foreach($retval as $newOrChangedAbgabe) {
-	
-			// Check if the current item has a 'projektarbeit_id' field.
-			// Replace 'projektarbeit_id' with the actual key name if it's different.
-			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
-				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
-	
-				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
-				// initialize it as an empty array.
-				if (!isset($projektarbeiten[$projektarbeitId])) {
-					$projektarbeiten[$projektarbeitId] = [];
-				}
-	
-				// Add the current row to the array associated with its 'projektarbeit_id'.
-				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
-			}
-		}
-		
-		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
-		$betreuerMap = [];
-		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
-			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
-			
-//			$projektarbeiten[$projektarbeit_id]['betreuer'] = $betreuerResult;
-//			$projektarbeit->betreuer = $betreuerResult;
-			forEach($betreuerResult->retval as $betreuerRow) {
-				
-				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
-				// initialize it as an empty array.
-				if (!isset($betreuerMap[$betreuerRow->person_id])) {
-					$betreuerMap[$betreuerRow->person_id] = [];
-				}
-
-				
-				// Add the current row to the array associated with its 'projektarbeit_id'.
-				$betreuerMap[$betreuerRow->person_id][] = [$projektarbeit_id, $betreuerRow];
-				
-			}
-		}
-
-		$count = 0;
-		// now iterate over the betreuerMap and build 1 email about all projektarbeiten and their new/changed termine
-
-		// $tupel = [$projektarbeit_id, $betreuerRow], each betreuer has 0..n [projektarbeit_id, changedAbgaben] tupel
-		forEach($betreuerMap as $betreuer_person_id => $tupelArr) {
-
-			$abgabenString = '<br /><br />';
-			
-//			$betreuerRow = $tupel[1];
-			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer_person_id);
-			$data = getData($result)[0];
-
-			$anrede = $data->anrede;
-			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
-			$fullFormattedNameString = $data->first;
-			
-			forEach($tupelArr as $tupel) {
-				$projektarbeit_id = $tupel[0];
-				$betreuerRow = $tupel[1];
-
-				
-
-				$changedAbgaben = $projektarbeiten[$projektarbeit_id];
-
-				// filter for abgaben which where not inserted by the current betreuer iteration if there is no updateamum
-				// or not changed by the betreuer if there is updateamum
-				$relevantAbgaben = array_filter($changedAbgaben, function($abgabetermin) use ($betreuerRow) {
-					// new termin not created by that betreuer
-					if($abgabetermin->updatevon == null && $abgabetermin->insertvon != $betreuerRow->uid) {
-						return $abgabetermin;
-					} else if($abgabetermin->updatevon != null && $abgabetermin->updatevon != $betreuerRow->uid) {
-						return $abgabetermin;
-					}
-				});
-				
-				if(count($relevantAbgaben) == 0) {
-					break; // skip that projektarbeit if only changes originate from the betreuer in question
-				}
-
-				$projektarbeit_titel = $relevantAbgaben[0]->titel ?? 'Kein Titel vergeben';
-//				$abgabenString = '<br /><br />';
-				$abgabenString .= 'Projektarbeit: '.$projektarbeit_titel.' ('.$betreuerRow->betreuerart_kurzbz.') ID:'.$projektarbeit_id.'<br/>';
-				$abgabeString .= 'Stg: '.$stgtyp.$stgkz.'<br/>';
-				foreach ($relevantAbgaben as $abgabe) {
-					$datetime = new DateTime($abgabe->datum);
-					$dateEmailFormatted = $datetime->format('d.m.Y');
-
-					$datetimeAbgabe = new DateTime($abgabe->abgabedatum);
-					$abgabedatumFormatted = $datetimeAbgabe->format('d.m.Y');
-
-					$abgabenString .= ' Zieldatum: '.$dateEmailFormatted . ' ' . $abgabe->bezeichnung . ' <br /> ';
-					if($abgabe->kurzbz != '') {
-						$abgabenString .= $abgabe->kurzbz . '<br />';
-					}
-				}
-
-				$abgabenString .= '<br/><br/>';
-				
-				
-			}
-			
-			// done with building the change list, now send it
-			$betreuerRow = $tupelArr[0][1];
-			
-
-			$path = $this->_ci->config->item('URL_MITARBEITER');
-			$url = APP_ROOT.$path;
-
-			$body_fields = array(
-				'anrede' => $anrede,
-				'anredeFillString' => $anredeFillString,
-				'fullFormattedNameString' => $fullFormattedNameString,
-				'abgabenString' => $abgabenString,
-				'linkAbgabetool' => $url
-			);
-
-//			if(count($tupelArr) <= 2) break; // testing code 
-			
-			// send email with bundled info
-			sendSanchoMail(
-				'PAAChangesBetSM',
-				$body_fields,
-				$betreuerRow->private_email,
-				$this->p->t('abgabetool', 'changedAbgabeterminev2')
-			);
-
-			$count++;
-		}
-		
-		$this->addMeta('$projektarbeiten', $projektarbeiten);
-		$this->addMeta('$betreuerMap', $betreuerMap);
-//		$result = $this->_ci->PaabgabeModel->findNewOrChangedTermineByOtherUsersSince($interval);
-	
-	
-	//	$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 	}
 	
 }
