@@ -155,7 +155,7 @@ export default {
 
 				extraItems.push({
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'content/statistik/notenspiegel.php?type=xls'
+						+ 'content/statistik/notenspiegel.php?typ=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
 						+ '&studiensemester=' + this.studiensemesterKurzbz
@@ -173,7 +173,7 @@ export default {
 				});
 				extraItems.push({
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'content/statistik/notenspiegel.php?type=html'
+						+ 'content/statistik/notenspiegel.php?typ=html'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
 						+ '&studiensemester=' + this.studiensemesterKurzbz
