@@ -35,13 +35,49 @@ export default {
 		student: Object
 	},
 	data() {
+		let self = this;
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvAdmissionDates.getAufnahmetermine(this.student.person_id)
 				),
-				ajaxResponse: (url, params, response) => response.data,
+				ajaxResponse: (url, params, response) => {
+					const data = response.data;
+
+					const filtered = data.filter(item =>
+						item.studiengangkurzbzlang === this.student.studiengang ||
+						item.stg_kuerzel === this.student.studiengang
+					);
+
+					if (filtered.length > 0) {
+						filtered.sort((a, b) =>
+							this.parseSemester(b.studiensemester) - this.parseSemester(a.studiensemester)
+						);
+						self.youngestSemester = filtered[0].studiensemester;
+					} else {
+						self.youngestSemester = null;
+					}
+
+					return data;
+				},
+				rowFormatter: function(row) {
+					let data = row.getData(); // get data for this row
+
+					if (data.studiengangkurzbzlang == self.student.studiengang &&
+						data.studiensemester === self.youngestSemester) {
+						let cells = row.getCells();
+
+						cells.forEach((c) => {
+								c.getElement().classList.add("row-green");
+							}
+
+						);
+					}
+				},
+				dataLoaded: function() {
+					this.redraw(true);
+				},
 				columns: [
 					{title: "rt_id", field: "rt_id", visible: false},
 					{title: "rt_person_id", field: "rt_person_id", visible: false},
@@ -187,7 +223,8 @@ export default {
 			listPlacementTests: [],
 			listStudyPlans: [],
 			filterOnlyFutureTestsSet: false,
-			filteredPlacementTests: []
+			filteredPlacementTests: [],
+			youngestSemester: null
 		}
 	},
 	methods: {
@@ -331,6 +368,13 @@ export default {
 		resetForm() {
 			this.formData = {};
 		},
+		parseSemester(semester) {
+			const type = semester.slice(0, 2).toUpperCase(); // "WS" or "SS"
+			const year = parseInt(semester.slice(2), 10);
+
+			// WS > SS
+			return year * 10 + (type === 'SS' ? 1 : 2);
+		}
 	},
 	created() {
 		this.$api
