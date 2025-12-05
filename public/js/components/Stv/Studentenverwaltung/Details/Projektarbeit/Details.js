@@ -195,12 +195,15 @@ export default {
 				)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		lvChanged(event) {
+			this.formData.lehreinheit_id = null;
+		},
 		studiensemesterChanged() {
 			this.formData.lehreinheit_id = null;
 			this.getLehrveranstaltungen();
 		},
-		lvChanged(event) {
-			this.formData.lehreinheit_id = null;
+		gesperrtBisChanged(newSperrdatum) {
+			this.formData.freigegeben = newSperrdatum == null || newSperrdatum == '';
 		},
 		// enrich and modify data before sending
 		getPreparedFormData() {
@@ -400,6 +403,7 @@ export default {
 						format="dd.MM.yyyy"
 						model-type="yyyy-MM-dd"
 						name="gesperrtbis"
+						@update:model-value="gesperrtBisChanged"
 						>
 					</form-input>
 					<div class="col-4">

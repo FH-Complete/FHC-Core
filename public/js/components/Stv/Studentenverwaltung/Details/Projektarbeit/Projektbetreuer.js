@@ -20,6 +20,7 @@ export default {
 		Contact,
 		Vertrag
 	},
+	emits: ['betreuerSaved'],
 	provide() {
 		return {
 			configShowVertragsdetails: this.config.showVertragsdetails
@@ -131,7 +132,43 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'projektarbeit', 'ui']);
+						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'projektarbeit', 'ui']);
+
+						let cm = this.$refs.projektbetreuerTable.tabulator.columnManager;
+
+						cm.getColumnByField('nachname').component.updateDefinition({
+							title: this.$p.t('person', 'nachname')
+						});
+						cm.getColumnByField('vorname').component.updateDefinition({
+							title: this.$p.t('person', 'vorname')
+						});
+						cm.getColumnByField('note').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'note')
+						});
+						cm.getColumnByField('punkte').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'titel')
+						});
+						cm.getColumnByField('stunden').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'stunden')
+						});
+						cm.getColumnByField('stundensatz').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'stundensatz')
+						});
+						cm.getColumnByField('betreuerart_kurzbz').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'betreuerart_kurzbz')
+						});
+						cm.getColumnByField('person_id').component.updateDefinition({
+							title: this.$p.t('system', 'person_id')
+						});
+						cm.getColumnByField('vertrag_id').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'vertrag_id')
+						});
+						cm.getColumnByField('projektarbeit_id').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'projektarbeit_id')
+						});
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'actions')
+						});
 
 						// Force layout recalculation for handling overflow text
 						this.$refs.projektbetreuerTable.tabulator.redraw(true);
@@ -173,6 +210,7 @@ export default {
 	methods: {
 		actionNewProjektbetreuer() {
 			this.resetForm();
+			this.defaultStundensatz = this.config.defaultProjektbetreuerStundensatz;
 			this.newMode = !this.newMode;
 			this.editMode = false;
 			this.captureFormData();
@@ -279,6 +317,7 @@ export default {
 				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 				this.getProjektbetreuer(this.projektarbeit_id, this.studiensemester_kurzbz);
 				this.resetModes();
+				this.$emit('betreuerSaved');
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -300,7 +339,6 @@ export default {
 		resetForm() {
 			const defaultFormData = this.getDefaultFormData();
 			this.formData = defaultFormData;
-			this.defaultStundensatz = defaultFormData.stundensatz;
 			if (this.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = '';
 			this.autocompleteSelectedBetreuer = null;
 			this.initialFormData = null;
@@ -404,6 +442,7 @@ export default {
 				.then(response => {
 					// set the new person in Betreuer autocomplete field
 					this.autocompleteSelectedBetreuer = response.data;
+					this.getDefaultStundensaetze(this.autocompleteSelectedBetreuer.person_id);
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 		},

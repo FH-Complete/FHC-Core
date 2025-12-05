@@ -50,21 +50,30 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!isset($projektarbeit_id))
 			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Projektarbeit ID']), self::ERROR_TYPE_GENERAL);
 
-		$this->ProjektbetreuerModel->addSelect(
-			'projektarbeit_id, person_id, nachname, vorname, note, punkte, round(stunden, 1) AS stunden,
-			stundensatz, betreuerart_kurzbz, vertrag_id, titelpre, titelpost'
-		);
-		$this->ProjektbetreuerModel->addSelect("CASE
-				WHEN EXISTS
-					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=pers.person_id)
-				THEN 'Mitarbeiter'
-				WHEN EXISTS
-					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=pers.person_id)
-				THEN 'Student'
-				ELSE 'Person'
-			END AS status");
-		$this->ProjektbetreuerModel->addJoin('public.tbl_person pers', 'person_id');
-		$result = $this->ProjektbetreuerModel->loadWhere(['projektarbeit_id' => $projektarbeit_id]);
+		$qry = "
+			SELECT * FROM (
+				SELECT
+					projektarbeit_id, person_id, nachname, vorname, note, punkte, round(stunden, 1) AS stunden,
+					stundensatz, betreuerart_kurzbz, vertrag_id, titelpre, titelpost,
+					CASE
+						WHEN EXISTS
+							(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=pers.person_id)
+						THEN 'Mitarbeiter'
+						WHEN EXISTS
+							(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=pers.person_id)
+						THEN 'Student'
+						ELSE 'Person'
+					END AS status
+				FROM
+					lehre.tbl_projektbetreuer
+					JOIN public.tbl_person pers USING (person_id)
+				WHERE
+					projektarbeit_id = ?
+			) betreuer
+			ORDER BY
+				CASE WHEN status = 'Mitarbeiter' THEN 0 WHEN status = 'Person' THEN 1 ELSE 2 END";
+
+		$result = $this->ProjektbetreuerModel->execReadOnlyQuery($qry, [$projektarbeit_id]);
 
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
@@ -245,7 +254,18 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
-		return $this->terminateWithSuccess(hasData($result) ? $this->_addFullNameToBetreuer(getData($result)) : []);
+		// sort persons
+		if (!hasData($result)) $this->terminateWithSuccess([]);
+
+		$persons = $this->_addFullNameToBetreuer(getData($result));
+		usort($persons, function($a, $b)
+		{
+			$statusRanks = ['Mitarbeiter' => 0, 'Person' => 1, 'Student' => 2];
+			return (isset($statusRanks[$a->status]) ? $statusRanks[$a->status] : count($statusRanks) + 1)
+				- (isset($statusRanks[$b->status]) ? $statusRanks[$b->status] : count($statusRanks) + 1);
+		});
+
+		return $this->terminateWithSuccess($persons);
 	}
 
 	public function getPerson()

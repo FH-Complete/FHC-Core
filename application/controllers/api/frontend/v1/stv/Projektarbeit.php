@@ -55,10 +55,7 @@ class Projektarbeit extends FHCAPI_Controller
 
 		$result = $this->ProjektarbeitModel->getProjektarbeit($student_uid);
 
-		if (isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
 		if (!hasData($result)) $this->terminateWithSuccess([]);
 
