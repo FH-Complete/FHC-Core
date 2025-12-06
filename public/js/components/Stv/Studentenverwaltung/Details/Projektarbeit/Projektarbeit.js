@@ -52,7 +52,7 @@ export default {
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'typKurzbezeichnung')
+							title: this.$p.t('projektarbeit', 'typ_kurzbz')
 						});
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'typ')
@@ -199,7 +199,7 @@ export default {
 					{title: "Anmerkung", field: "anmerkung", visible: false},
 					{title: "Lehreinheit ID", field: "lehreinheit_id", visible: false},
 					{title: "Student UID", field: "student_uid", visible: false},
-					{title: "Projektbetreuer", field: "projektbetreuer", visible: false},
+					{title: "Projektbetreuer", field: "projektbetreuer"},
 					{
 						title:"Final",
 						field:"final",

@@ -123,23 +123,30 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
 
-		if (isset($projektbetreuer['stunden']) && !isEmptyString($projektbetreuer['stunden']) && !is_numeric($projektbetreuer['stunden']))
-		{
-			return $this->terminateWithError(
-				$this->p->t('ui', 'error_fieldNotNumeric', ['field'=> 'Stunden', 'Field'=> 'Stunden']), self::ERROR_TYPE_GENERAL
-			);
-		}
-
-		if (isset($projektbetreuer['stundensatz']) && !isEmptyString($projektbetreuer['stundensatz']) && !is_numeric($projektbetreuer['stundensatz']))
-		{
-			return $this->terminateWithError(
-				$this->p->t('ui', 'error_fieldNotNumeric', ['field'=> 'Stundensatz', 'Field'=> 'Stundensatz']), self::ERROR_TYPE_GENERAL
-			);
-		}
-
 		$projektbetreuer = $this->input->post('projektbetreuer');
 
 		if ($this->_validate($projektbetreuer) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// check if assessor has already been assigned
+		if (
+			isset($projektbetreuer['person_id'])
+			&& isset($projektbetreuer['person_id_old'])
+			&& $projektbetreuer['person_id'] != $projektbetreuer['person_id_old']
+		) {
+			$this->ProjektbetreuerModel->addSelect('1');
+			$betreuerRes = $this->ProjektbetreuerModel->loadWhere(
+				[
+					'person_id' => $projektbetreuer['person_id'],
+					'projektarbeit_id' => $projektbetreuer['projektarbeit_id'],
+					'betreuerart_kurzbz' => $projektbetreuer['betreuerart_kurzbz']
+				]
+			);
+
+			if (hasData($betreuerRes))
+			{
+				return $this->terminateWithError($this->p->t('projektarbeit', 'betreuerZugewiesen'), self::ERROR_TYPE_GENERAL);
+			}
+		}
 
 		$result = null;
 
