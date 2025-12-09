@@ -38928,7 +38928,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Anzahl angezeigter vergangender Studiensemester',
+				'text' => 'Anzahl angezeigter vergangener Studiensemester',
 				'description' => '',
 				'insertvon' => 'system'
 			),
