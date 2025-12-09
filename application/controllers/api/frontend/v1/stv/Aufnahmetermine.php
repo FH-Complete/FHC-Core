@@ -224,7 +224,11 @@ class Aufnahmetermine extends FHCAPI_Controller
 			)
 		);
 
-		$data = $this->getDataOrTerminateWithError($result);
+		//check if existing placementtest
+		if(!hasData($result))
+			$this->terminateWithSuccess([]);
+		else
+			$data = getData($result);
 
 		$studienplan_arr = [];
 		$include_ids = [];
@@ -238,7 +242,11 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$person_id = $this->_getPersonId($prestudent_id);
 		$resultRt = $this->ReihungstestModel->getReihungstestPerson($person_id);
 
-		$dataRt = $this->getDataOrTerminateWithError($resultRt);
+		//check if existing placementtest
+		if(!hasData($result))
+			$this->terminateWithSuccess([]);
+		else
+			$dataRt = getData($resultRt);
 
 		foreach ($dataRt as $item)
 		{

@@ -380,7 +380,9 @@ export default {
 		this.$api
 			.call(ApiStvAdmissionDates.getListPlacementTests(this.student.prestudent_id))
 			.then(result => {
-				this.listPlacementTests = this.filteredPlacementTests = result.data;
+				if(result.data)
+					this.listPlacementTests = this.filteredPlacementTests = result.data;
+
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
