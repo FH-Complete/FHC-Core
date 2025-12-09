@@ -359,6 +359,9 @@ export default {
 			this.filter = filter;
 			this.updateUrl();
 		},
+		resetFilters() {
+			this.$refs['filtersList'].clearFilters();
+		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
@@ -505,7 +508,7 @@ export default {
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<list-filter @change="updateFilter" />
+						<list-filter ref="filtersList" @change="updateFilter" />
 					</div>
 				</div>
 			</template>

@@ -74,6 +74,9 @@ export default {
 		},
 		remove(index) {
 			this.filters.splice(index, 1);
+		},
+		clearFilters() {
+			this.filters = [];
 		}
 	},
 	created() {

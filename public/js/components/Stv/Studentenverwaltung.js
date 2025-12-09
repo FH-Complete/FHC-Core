@@ -342,6 +342,8 @@ export default {
 				types: this.$route.params.types?.split('+') || []
 			};
 
+			this.$refs.stvList.resetFilters();
+
 			// init into student list
 			this.$refs.stvList.updateUrl(
 				ApiStv.students.search(searchsettings, this.studiensemesterKurzbz)
