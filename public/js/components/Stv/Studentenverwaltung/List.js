@@ -495,9 +495,7 @@ export default {
 				:side-menu="false"
 				reload
 				:download="downloadConfig"
-				` + /* TODO(chris): Ausgeblendet für Testing
 				new-btn-show
-				*/`
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 				@table-built="translateTabulator"

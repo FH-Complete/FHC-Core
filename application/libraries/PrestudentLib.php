@@ -35,6 +35,89 @@ class PrestudentLib
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
+	/**
+	 * Sets initial prestudent entry, no status yet.
+	 * @return object success or error
+	 */
+	public function setPrestudent(
+		$person_id,
+		$studiengang_kz,
+		$ausbildungscode,
+		$anmerkung,
+		$foerderrelevant
+	)
+	{
+		// Prestudent anlegen
+		$data = [
+			'aufmerksamdurch_kurzbz' => 'k.A.',
+			'person_id' => $person_id,
+			'studiengang_kz' => $studiengang_kz,
+			'ausbildungcode' => $ausbildungscode,
+			'anmerkung' => $anmerkung,
+			'reihungstestangetreten' => false,
+			'bismelden' => true,
+			'foerderrelevant' => $foerderrelevant,
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+		];
+
+		// Wenn die Person schon im System erfasst ist, dann die ZGV des Datensatzes uebernehmen
+		$this->_ci->PrestudentModel->addSelect('public.tbl_prestudent.*, public.tbl_person.vorname, public.tbl_person.nachname');
+		$this->_ci->PrestudentModel->addJoin('public.tbl_person', 'person_id');
+		$this->_ci->PrestudentModel->addOrder('zgvmas_code');
+		$this->_ci->PrestudentModel->addOrder('zgv_code', 'DESC');
+		$this->_ci->PrestudentModel->addLimit(1);
+		$result = $this->_ci->PrestudentModel->loadWhere([
+			'person_id' => $person_id
+		]);
+
+		if (isError($result)) return $result;
+
+		if (hasData($result)) {
+			$prestudent = getData($result)[0];
+			if ($prestudent->zgv_code) {
+				$data['zgv_code'] = $prestudent->zgv_code;
+				$data['zgvort'] = $prestudent->zgvort;
+				$data['zgvdatum'] = $prestudent->zgvdatum;
+
+				$data['zgvmas_code'] = $prestudent->zgvmas_code;
+				$data['zgvmaort'] = $prestudent->zgvmaort;
+				$data['zgvmadatum'] = $prestudent->zgvmadatum;
+			}
+		}
+		// Prestudent speichern
+		return $this->_ci->PrestudentModel->insert($data);
+	}
+
+	/**
+	 * Sets first status of a prestudent.!
+	 * @return object success or error
+	 */
+	public function setFirstStatus(
+		$prestudent_id,
+		$status_kurzbz,
+		$studiensemester_kurzbz,
+		$ausbildungssemester = null,
+		$orgform_kurzbz = null,
+		$studienplan_id = null
+	)
+	{
+		// Prestudent Rolle Anlegen
+		$data = [
+			'prestudent_id' => $prestudent_id,
+			'status_kurzbz' => $status_kurzbz,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'ausbildungssemester' => $ausbildungssemester ?: 0,
+			'orgform_kurzbz' => $orgform_kurzbz ?: null,
+			'studienplan_id' => $studienplan_id ?: null,
+			'datum' => date('Y-m-d'),
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUID()
+		];
+
+		return  $this->_ci->PrestudentstatusModel->insert($data);
+	}
+
 	public function setAbbrecher(
 		$prestudent_id,
 		$studiensemester_kurzbz,
@@ -887,6 +970,155 @@ class PrestudentLib
 			$ausbildungssemester,
 			$statusgrund_id
 		);
+	}
+
+	/**
+	 * Creates an incoming, saves necessary data for an incoming. 
+	 * @param $prestudent_id existing prestudent, for which incoming entry is created
+	 * @param $studiengang_kz Studiengang assigned to incoming
+	 * @param $studiensemester_kurzbz start semester for incoming
+	 * @return object success if incoming successfully saved, or error
+	 */
+	public function setFirstIncoming($prestudent_id, $studiengang_kz, $studiensemester_kurzbz, $orgform_kurzbz, $studienplan_id)
+	{
+		// Verband and Ausbildungssemester for incoming
+		$authUID = getAuthUID();
+		$incomingVerband = 'I';
+		$incomingAusbildungssemester = '0';
+
+		// get prestudent
+		$this->_ci->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
+		$this->_ci->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz');
+		$result = $this->_ci->PrestudentModel->load($prestudent_id);
+
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error('No prestudent');
+
+		$student_data = getData($result)[0];
+
+		$result = $this->setFirstStatus(
+			$prestudent_id,
+			$this->_ci->PrestudentstatusModel::STATUS_INCOMING,
+			$studiensemester_kurzbz,
+			$incomingAusbildungssemester,
+			$orgform_kurzbz,
+			$studienplan_id
+		);
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error('Error when adding prestudentstatus');
+
+		// generate Personenkennzeichen
+		$result = $this->_ci->StudentModel->generateMatrikelnummer2($studiengang_kz, $studiensemester_kurzbz);
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error('No personenkennzeichen could be generated');
+
+		$personenkennzeichen = getData($result);
+
+		$jahr = mb_substr($personenkennzeichen, 0, 2);
+		$stg = mb_substr($personenkennzeichen, 3, 4);
+
+		$nachname_clean = mb_strtolower(sanitizeProblemChars($student_data->nachname));
+		$vorname_clean = mb_strtolower(sanitizeProblemChars($student_data->vorname));
+		$nachname_clean = str_replace(' ','_', $nachname_clean);
+		$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+		// get Studiengang data
+		$result = $this->_ci->StudiengangModel->load(ltrim($stg, '0'));
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error('No Studiengang');
+
+		$stgObj = getData($result)[0];
+
+		// gernerate uid
+		$result = $this->_ci->StudentModel->generateUID($stgObj->kurzbz, $jahr, $stgObj->typ, $personenkennzeichen, $vorname_clean, $nachname_clean);
+		if (isError($result)) return $result;
+		if (!hasData($result)) return error("UID could not be generated");
+		$uid = getData($result);
+
+		//Benutzerdatensatz anlegen
+		$benutzer = [
+			'uid' => $uid,
+			'person_id' => $student_data->person_id,
+			'aktiv' => true,
+			'aktivierungscode' => $this->_ci->BenutzerModel->generateActivationkey()
+		];
+
+		// Generate Alias
+		$alias = '';
+		if (!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT === true)
+		{
+			$result = $this->_ci->BenutzerModel->generateAliasFromName($student_data->vorname, $student_data->nachname);
+			if (isError($result))
+				return $result;
+			$alias = getData($result);
+		}
+
+		$benutzer['alias'] = $alias;
+		$benutzer['insertamum'] = date('Y-m-d H:i:s');
+		$benutzer['insertvon'] = $authUID;
+
+		$result = $this->_ci->BenutzerModel->insert($benutzer);
+
+		if (isError($result)) return $result;
+
+		// Studentendatensatz anlegen
+		$student = [
+			'student_uid' => $uid,
+			'matrikelnr' => $personenkennzeichen,
+			'prestudent_id' => $prestudent_id,
+			'studiengang_kz' => $studiengang_kz,
+			'semester' => $incomingAusbildungssemester,
+			'verband' => $incomingVerband,
+			'gruppe' => ' '
+		];
+
+		$result = $this->_ci->LehrverbandModel->loadWhere([
+				'studiengang_kz' => $student['studiengang_kz'],
+				'semester' => $student['semester'],
+				'verband' => $student['verband'],
+				'gruppe' => $student['gruppe']
+			]);
+
+		if (isError($result)) return $result;
+
+		if (!hasData($result))
+		{
+			// Add Lehrverband if it does not exist
+			$result = $this->_ci->LehrverbandModel->insert([
+				'studiengang_kz' => $student_data->studiengang_kz,
+				'semester' => $student['semester'],
+				'verband' => $student['verband'],
+				'gruppe' => $student['gruppe'],
+				'bezeichnung' => 'Incoming',
+				'aktiv' => true
+			]);
+
+			if (isError($result)) return $result;
+		}
+
+		// add student
+		$student['insertamum'] = date('Y-m-d H:i:s');
+		$student['insertvon'] = $authUID;
+
+		$result = $this->_ci->StudentModel->insert($student);
+		if (isError($result)) return $result;
+
+		// Add Studentlehrverband
+		$result = $this->_ci->StudentlehrverbandModel->insert([
+			'student_uid' => $uid,
+			'studiensemester_kurzbz' => $studiensemester_kurzbz,
+			'studiengang_kz' => $student_data->studiengang_kz,
+			'semester' => $incomingAusbildungssemester,
+			'verband' => $incomingVerband,
+			'gruppe' => ' ',
+			'insertamum' => date('Y-m-d H:i:s'),
+			'insertvon' => $authUID
+		]);
+
+		if (isError($result))
+			return $result;
+
+		return success($prestudent_id);
 	}
 
 	protected function setBasic($authUID, $now, $status_kurzbz, $prestudent_id, $studiensemester_kurzbz, $ausbildungssemester, $statusgrund_id = null)
