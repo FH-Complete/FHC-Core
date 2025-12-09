@@ -140,7 +140,12 @@ export default {
 					 * we need to get the params from elsewhere.
 					 * @see https://github.com/olifolkerd/tabulator/issues/4318
 					 */
-					return this.$api.call({...config, url, params: this.tabulatorOptions.ajaxParams});
+					const apiconfig = {
+						...this.tabulatorOptions.ajaxConfig,
+						url: this.tabulatorOptions.ajaxURL,
+						params: this.tabulatorOptions.ajaxParams
+					};
+					return this.$api.call(apiconfig);
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -182,7 +187,7 @@ export default {
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
-			currentEndpointRawUrl: ''
+			currentEndpoint: null
 		}
 	},
 	computed: {
@@ -357,16 +362,20 @@ export default {
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			if( endpoint === undefined ) 
+			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
+
+			if( endpoint === undefined && this.currentEndpoint === null)
 			{
-				endpoint = {url: this.currentEndpointRawUrl};
-			} 
-			else if( endpoint.url === undefined ) 
+				endpoint = { url: '' };
+			}
+			else if( endpoint === undefined )
 			{
-				endpoint.url = this.currentEndpointRawUrl;
-			} else
+				endpoint = JSON.parse(JSON.stringify(this.currentEndpoint));
+			}
+			else
 			{
-				this.currentEndpointRawUrl = endpoint.url;
+				this.currentEndpoint = JSON.parse(JSON.stringify(endpoint));
 			}
 
 			endpoint.url = endpoint.url.replace(
@@ -375,13 +384,16 @@ export default {
 				);
 
 			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
-			const method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
-			if (this.filter.length)
+			let method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
+			if (this.filter.length && !endpoint.url.match(/\/search\//))
+			{
 				params.filter = this.filter;
+				method = 'post';
+			}
 
 			this.tabulatorOptions.ajaxURL = endpoint.url;
 			this.tabulatorOptions.ajaxParams = { ...params };
-			this.tabulatorOptions.ajaxConfig = method;
+			this.tabulatorOptions.ajaxConfig = {method};
 			if (!this.$refs.table.tableBuilt) {
 				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
