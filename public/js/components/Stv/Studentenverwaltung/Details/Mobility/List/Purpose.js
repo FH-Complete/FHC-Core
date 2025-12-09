@@ -71,10 +71,10 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 200,
-				persistenceID: 'core-mobility-purpose'
+				persistenceID: 'core-mobility-purpose-2025112401'
 			},
 			tabulatorEvents: [
 				{

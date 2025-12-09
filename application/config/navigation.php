@@ -336,3 +336,24 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
+
+$config['navigation_menu']['apps'] = [
+	'stv' => [
+		'link' => site_url('studentenverwaltung'),
+		'description' => 'Studierendenverwaltung',
+		#'icon' => 'users',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lvv' => [
+		'link' => site_url('lVVerwaltung'),
+		'description' => 'LV Verwaltung',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lav' => [
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Lehraufträge',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
+	]
+];

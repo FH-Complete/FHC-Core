@@ -36,6 +36,7 @@ class Student extends FHCAPI_Controller
 		parent::__construct([
 			'get' => ['admin:r', 'assistenz:r'],
 			'save' => ['admin:rw', 'assistenz:rw'],
+			'saveStudent' => ['admin:rw', 'assistenz:rw'],
 			'getPerson' => ['admin:rw', 'assistenz:rw'],
 			'add' => ['admin:rw', 'assistenz:rw'] // TODO(chris): extra permissions
 		]);
@@ -116,9 +117,21 @@ class Student extends FHCAPI_Controller
 					WHERE kontakttyp='email'
 					AND person_id=p.person_id
 					AND zustellung
-					ORDER BY kontakt_id
+					ORDER BY kontakt_id DESC
 					LIMIT 1
 				) AS email_privat",
+				false
+			);
+			$this->PrestudentModel->addSelect(
+				"(
+					SELECT kontakt
+					FROM public.tbl_kontakt
+					WHERE kontakttyp='email_unverifiziert'
+					AND person_id=p.person_id
+					AND zustellung
+					ORDER BY kontakt_id DESC
+					LIMIT 1
+				) AS email_privat_unverified",
 				false
 			);
 		}
@@ -421,6 +434,31 @@ class Student extends FHCAPI_Controller
 			array_keys($update_student),
 			array_keys($update_benutzer)
 		), ''));
+	}
+
+	/**
+	 * Saves data to a prestudent using their student_uid
+	 *
+	 * @param string			$student_uid
+	 * @param string			$studiensemester_kurzbz
+	 * @return void
+	 */
+	public function saveStudent($student_uid, $studiensemester_kurzbz)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+
+		$result = $this->StudentModel->load([$student_uid]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		if (!$data)
+			show_404(); // No Student with that ID
+
+		$student = current($data);
+
+		$this->checkPermissionsForPrestudent($student->prestudent_id, ['admin:rw', 'assistenz:rw']);
+
+		return $this->save($student->prestudent_id, $studiensemester_kurzbz);
 	}
 
 	public function getPerson()

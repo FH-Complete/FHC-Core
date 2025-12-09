@@ -40,6 +40,9 @@ export default {
 			}
 
 			return lehreinheiten;
+		},
+		firmenverwaltungLink(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'vilesci/stammdaten/firma_frameset.html';
 		}
 	},
 	props: {
@@ -255,18 +258,25 @@ export default {
 
 
 				<div class="row mb-3">
-					<form-input
-						container-class="stv-details-projektarbeit-firma"
-						:label="$p.t('projektarbeit', 'firma')"
-						type="autocomplete"
-						optionLabel="name"
-						v-model="formData.firma"
-						name="firma"
-						:suggestions="filteredFirmen"
-						@complete="searchFirma"
-						:min-length="3"
-						>
-					</form-input>
+					<div class="col-10">
+						<form-input
+							container-class="stv-details-projektarbeit-firma"
+							:label="$p.t('projektarbeit', 'firma')"
+							type="autocomplete"
+							optionLabel="name"
+							v-model="formData.firma"
+							name="firma"
+							:suggestions="filteredFirmen"
+							@complete="searchFirma"
+							:min-length="3"
+							>
+						</form-input>
+					</div>
+					<div class="col-2 align-content-center">
+						<a :href="firmenverwaltungLink" target="_blank">
+							{{ $p.t('projektarbeit', 'zurFirmenverwaltung') }}
+						</a>
+					</div>
 				</div>
 
 				<div class="row mb-3">

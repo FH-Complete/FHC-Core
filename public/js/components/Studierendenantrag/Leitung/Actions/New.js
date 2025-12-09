@@ -37,16 +37,16 @@ export default {
 			});
 		},
 		loadData(evt) {
-                        if( evt.query.length < 2 )
-                        {
-                            return false;
-                        }
+			if (evt.query.length < 2)
+			{
+				return false;
+			}
 
-			if (this.abortController instanceof AbortController
-                            && this.abortController.signal.aborted === false)
-                        {
-                            this.abortController.abort();
-                        }
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
 			this.abortController = new AbortController();
 
 			this.$api
@@ -56,16 +56,8 @@ export default {
 				})
 				.then(result => {
 					this.data = result.data;
-                                        this.abortController = null;
 				})
-				.catch(error => {
-                                    if (this.abortController instanceof AbortController 
-                                        && this.abortController.signal.aborted === false)
-                                    {
-                                        this.abortController.abort();
-                                    }
-                                    this.$fhcAlert.handleSystemError(error);
-                                });
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	template: `

@@ -23,7 +23,17 @@ export default {
 		mergedStudent,
 		mergedPerson
 	},
-    props: [ "searchoptions", "searchfunction" ],
+    props: {
+    	searchoptions: {
+    		type: Object,
+    		required: true
+    	},
+    	searchfunction: {
+    		type: Function,
+    		required: true
+    	},
+    	showBtnSubmit: Boolean
+    },
     provide() {
         return {
             query: Vue.computed(() => this.lastQuery)
@@ -102,10 +112,21 @@ export default {
                 >
 				<button
 					v-if="searchsettings.searchstr"
+					type="button"
 					class="searchbar_input_clear btn btn-outline-secondary"
 					@click="clearInput"
+					@focusin.stop
 				>
 					<i class="fas fa-close"></i>
+				</button>
+				<button
+					v-if="showBtnSubmit"
+					type="submit"
+					class="btn btn-primary"
+					:title="$p.t('search/submit')"
+					:aria-label="$p.t('search/submit')"
+				>
+					<i class="fas fa-search"></i>
 				</button>
                 <button
                     data-bs-toggle="collapse"
@@ -219,12 +240,12 @@ export default {
 			});
 		}
 	},
-    methods: {
-    	clearInput() {
-    		this.searchsettings.searchstr = "";
-    		this.hideresult();
-    		this.$refs.input.focus()
-    	},
+	methods: {
+		clearInput() {
+			this.searchsettings.searchstr = "";
+			this.hideresult();
+			this.$refs.input.focus();
+		},
 		getInitiallySelectedTypes() {
 			let result = false;
 			if (this.searchoptions.origin) {
@@ -283,13 +304,9 @@ export default {
             this.calcSearchResultHeight();
         },
         search: function() {
-            if( this.searchtimer !== null ) {
-                clearTimeout(this.searchtimer);
-            }
-            if (this.abortController) {
-                this.abortController.abort();
-                this.abortController = null;
-            }
+            if(this.searchoptions?.nolivesearch === true) return;
+
+            this.abort();
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.calcSearchResultExtent();
                 this.searchtimer = setTimeout(
@@ -299,6 +316,16 @@ export default {
             } else {                
                 this.showresult = false;
             }
+        },
+        abort() {
+            if (this.searchtimer !== null) {
+                clearTimeout(this.searchtimer);
+            }
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
+            }
+            this.searchresult = [];
         },
         callsearchapi: function() {
             this.error = null;
@@ -392,6 +419,8 @@ export default {
             window.removeEventListener('resize', this.calcSearchResultExtent);
         },
         showsearchresult: function() {
+            if(this.searchoptions?.nolivesearch === true) return;
+
             if( this.searchsettings.searchstr.length >= 2 ) {
                 this.showresult = true;
                 window.addEventListener('resize', this.calcSearchResultExtent);
