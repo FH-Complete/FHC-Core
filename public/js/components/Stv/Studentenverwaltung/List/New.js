@@ -292,6 +292,7 @@ export default {
 								no-today
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								:teleport="true"
 								>
 							</form-input>
 						</div>
