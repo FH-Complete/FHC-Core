@@ -86,6 +86,7 @@ require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
 require_once('dbupdate_3.4/62063_lv_evaluierung.php');
 require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
+require_once('dbupdate_3.4/68744_StV_settings.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

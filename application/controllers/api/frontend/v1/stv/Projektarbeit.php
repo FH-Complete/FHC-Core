@@ -268,10 +268,6 @@ class Projektarbeit extends FHCAPI_Controller
 	{
 		$this->form_validation->set_data($formData);
 
-		$this->form_validation->set_rules('titel', 'Titel', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Titel'])
-		]);
-
 		$this->form_validation->set_rules('projekttyp_kurzbz', 'Projekttyp', 'required', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Projekttyp'])
 		]);
