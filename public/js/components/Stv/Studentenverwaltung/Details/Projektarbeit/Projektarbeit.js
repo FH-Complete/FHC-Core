@@ -240,7 +240,7 @@ export default {
 						frozen: true
 					},
 				],
-				//layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				height: 'auto',
 				minHeight: '200',
 				selectable: 1,
@@ -248,7 +248,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektarbeit'
+				persistenceID: 'stv-details-projektarbeit-2025112401'
 			}
 			return options;
 		}
@@ -396,8 +396,8 @@ export default {
 
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button v-if="statusNew" class="btn btn-primary" @click="addNewProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
-					<button v-if="!statusNew && activeTab == 'details'" class="btn btn-primary" @click="updateProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-if="statusNew" class="btn btn-primary" @click="addNewProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-if="!statusNew && activeTab == 'details'" class="btn btn-primary" @click="updateProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
 			</template>
 
 		</bs-modal>

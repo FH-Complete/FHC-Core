@@ -61,7 +61,11 @@ $config['tabs'] =
 		'notes' => [
 			//if true, the count of Messages will be shown in the header of the Tab Messages
 			'showCountNotes' => true
-		]
+		],
+		'combinePeople' => [
+			//multitab should only be shown with this length of selection
+			'validCountMulti' => 2,
+		],
 	];
 
 // List of fields to show when ZGV_DOKTOR_ANZEIGEN is defined
@@ -117,5 +121,6 @@ $config['students_tab_order'] = [
 	'status',
 	'groups',
 	'finalexam',
+	'combinePeople',
 	'archive',
 ];
