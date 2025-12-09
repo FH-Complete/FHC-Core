@@ -227,15 +227,15 @@ export default{
 					const rowData = row.getData();
 					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
 					{
-						row.getElement().classList.add('disabled');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
 				index: 'statusId',
-				persistenceID: 'stv-multistatus'
+				persistenceID: 'stv-multistatus-2025112401'
 			},
 			tabulatorEvents: [
 				{

@@ -844,7 +844,7 @@ html {
 
 #cis-main .modal-header{
 	background-color: var(--fhc-primary);
-	color: var(--fhc-white-50);
+	color: var(--fhc-light);
 }
 
 #cis-main .modal-header .btn-close{
