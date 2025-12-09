@@ -5,7 +5,7 @@ if (!defined('BASEPATH'))
 
 class Tags extends Tag_Controller
 {
-	const BERECHTIGUNG_KURZBZ = ['admin:rw', 'assistenz:rw'];
+	const BERECHTIGUNG_KURZBZ = ['admin:rw', 'assistenz:r'];
 
 	public function __construct()
 	{

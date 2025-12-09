@@ -10,7 +10,7 @@ import ApiStvStudents from '../../../../api/factory/stv/students.js';
 var _uuid = 0;
 const FORMDATA_DEFAULT = {
 	address: {
-		func: 0,
+		func: 1,
 		nation: 'A'
 	},
 	geburtsnation: 'A',
@@ -33,7 +33,9 @@ export default {
 	inject: [
 		'lists'
 	],
+	emits: ['saved'],
 	props: {
+		personOnly: Boolean, 
 		studiengangKz: Number,
 		studiensemesterKurzbz: String
 	},
@@ -108,7 +110,7 @@ export default {
 				return;
 
 			this.abortController.suggestions = new AbortController();
-			
+
 			this.$api
 				.call(ApiStvStudents.check({
 					vorname: this.formData.vorname,
@@ -119,6 +121,11 @@ export default {
 				})
 				.then(result => this.suggestions = result.data)
 				.catch(error => {
+
+					if (error.code == 'ERR_BAD_REQUEST') {
+						return this.suggestions = [];
+					}
+
 					// NOTE(chris): repeat request
 					if (error.code != "ERR_CANCELED")
 						window.setTimeout(this.loadSuggestions, 100);
@@ -191,14 +198,22 @@ export default {
 			if (data.studiensemester_kurzbz === undefined)
 				data.studiensemester_kurzbz = this.studiensemesterKurzbz;
 
-			// TODO(chris): move to fhcapi.factory
-			this.$refs.form
-				.post('api/frontend/v1/stv/student/add', data)
-				.then(result => {
-					this.$fhcAlert.alertSuccess('Gespeichert');
-					this.$refs.modal.hide();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+			data.personOnly = this.personOnly;
+
+			this.$refs.form.call(
+				ApiStvStudents.add(data)
+			)
+			.then(result => {
+				this.$emit('saved', result.data);
+				this.$fhcAlert.alertSuccess('Gespeichert');
+				this.$refs.modal.hide();
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+		},
+		setPerson(suggestion)
+		{
+			this.person = suggestion;
+			this.formData.address.func = -1;
 		}
 	},
 	created() {
@@ -215,7 +230,7 @@ export default {
 	<fhc-form ref="form" class="stv-list-new" @submit.prevent="send">
 		<bs-modal ref="modal" dialog-class="modal-lg modal-dialog-scrollable" @hidden-bs-modal="reset">
 			<template #title>
-				InteressentIn anlegen
+				{{ personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}
 			</template>
 			<template #default>
 
@@ -225,36 +240,38 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Nachname*"
+								:label="$p.t('person', 'nachname')+'*'"
 								type="text"
 								id="stv-list-new-nachname"
 								name="nachname"
 								v-model="formDataPerson['nachname']"
-								:disabled="person"
+								:disabled="!!person"
 								@input="loadSuggestions"
+								:min-length="3"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Vorname"
+								:label="$p.t('person', 'vorname')"
 								type="text"
 								:id="'stv-list-new-vorname-' + uuid"
 								name="vorname"
 								v-model="formDataPerson['vorname']"
-								:disabled="person"
+								:disabled="!!person"
 								@input="loadSuggestions"
+								:min-length="3"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Geburtsdatum"
+								:label="$p.t('person', 'geburtsdatum')"
 								type="datepicker"
 								uid="stv-list-new-gebdatum"
 								name="gebdatum"
 								v-model="formDataPerson['gebdatum']"
-								:disabled="person"
+								:disabled="!!person"
 								@update:model-value="loadSuggestions"
 								text-input
 								auto-apply
@@ -267,13 +284,13 @@ export default {
 					</div>
 					<!-- TODO(chris): more details -->
 					<table class="table caption-top table-striped table-hover">
-						<caption>Prüfung ob Person bereits existiert</caption>
+						<caption>{{ $p.t('person', 'personExistiertPruefung') }}</caption>
 						<tbody>
 							<tr
 								v-for="(suggestion, index) in suggestions"
 								:key="suggestion.person_id"
 								:class="{'active': index == 2}"
-								@click="(index == 2) ? suggestions.shift() : person=suggestion"
+								@click="(index == 2) ? suggestions.shift() : setPerson(suggestion)"
 								v-accessibility:tab.vertical
 								>
 								<td>{{suggestion.vorname + ' ' + suggestion.nachname}}</td>
@@ -286,34 +303,34 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Anrede"
+								:label="$p.t('person', 'anrede')"
 								type="text"
 								id="stv-list-new-anrede"
 								name="anrede"
 								v-model="formDataPerson['anrede']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Titel (Pre)"
+								:label="$p.t('person', 'titelPre')"
 								type="text"
 								id="stv-list-new-titelpre"
 								name="titelpre"
 								v-model="formDataPerson['titelpre']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Titel (Post)"
+								:label="$p.t('person', 'titelPost')"
 								type="text"
 								id="stv-list-new-titelpost"
 								name="titelpost"
 								v-model="formDataPerson['titelpost']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 							</form-input>
 						</div>
@@ -321,36 +338,38 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Nachname*"
+								:label="$p.t('person', 'nachname')+'*'"
 								type="text"
 								id="stv-list-new-nachname"
 								name="nachname"
 								v-model="formDataPerson['nachname']"
-								:disabled="person"
+								:disabled="!!person"
 								@input="loadSuggestions"
+								:min-length="3"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Vorname"
+								:label="$p.t('person', 'vorname')"
 								type="text"
 								id="stv-list-new-vorname"
 								name="vorname"
 								v-model="formDataPerson['vorname']"
-								:disabled="person"
+								:disabled="!!person"
 								@input="loadSuggestions"
+								:min-length="3"
 								>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Weitere Vornamen"
+								:label="$p.t('person', 'weitereVornamen')"
 								type="text"
 								id="stv-list-new-vornamen"
 								name="vornamen"
 								v-model="formDataPerson['vornamen']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 							</form-input>
 						</div>
@@ -358,12 +377,12 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Wahlname"
+								:label="$p.t('person', 'wahlname')"
 								type="text"
 								id="stv-list-new-wahlname"
 								name="wahlname"
 								v-model="formDataPerson['wahlname']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 							</form-input>
 						</div>
@@ -371,24 +390,24 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Geschlecht*"
+								:label="$p.t('person', 'geschlecht')+'*'"
 								type="select"
 								id="stv-list-new-geschlecht"
 								name="geschlecht"
 								v-model="formDataPerson['geschlecht']"
-								:disabled="person"
+								:disabled="!!person"
 								>
 								<option v-for="geschlecht in lists.geschlechter" :key="geschlecht.geschlecht" :value="geschlecht.geschlecht">{{geschlecht.bezeichnung}}</option>
 							</form-input>
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Geburtsdatum"
+								:label="$p.t('person', 'geburtsdatum')"
 								type="datepicker"
 								uid="stv-list-new-gebdatum"
 								name="gebdatum"
 								v-model="formDataPerson['gebdatum']"
-								:disabled="person"
+								:disabled="!!person"
 								@update:model-value="loadSuggestions"
 								text-input
 								auto-apply
@@ -400,7 +419,7 @@ export default {
 						</div>
 					</div>
 					
-					<div v-if="person" class="row">
+					<div class="row">
 						<div class="col-sm-6 mb-3">
 							<form-input
 								type="select"
@@ -408,19 +427,19 @@ export default {
 								name="address[func]"
 								v-model="formData['address']['func']"
 								>
-								<option value="-1">Bestehende Adresse überschreiben</option>
-								<option value="1">Adresse hinzufügen</option>
-								<option value="0">Adresse nicht anlegen</option>
+								<option value="-1" v-if="person">{{ $p.t('person', 'bestehendeAdresseUeberschreiben') }}</option>
+								<option value="1">{{ $p.t('person', 'adresseHinzufuegen') }}</option>
+								<option value="0">{{ $p.t('person', 'adresseNichtAnlegen') }}</option>
 							</form-input>
 						</div>
 					</div>
 					
-					<fieldset v-if="!person || formData['address']['func']">
+					<fieldset v-if="formData['address']['func'] != 0">
 						<legend>Adresse</legend>
 						<div class="row">
 							<div class="col-sm-4 mb-3">
 								<form-input
-									label="Land"
+									:label="$p.t('person', 'land')"
 									type="select"
 									id="stv-list-new-address-nation"
 									name="address[nation]"
@@ -434,7 +453,7 @@ export default {
 						<div class="row">
 							<div class="col-sm-4 mb-3">
 								<form-input
-									label="PLZ"
+									:label="$p.t('person', 'plz')"
 									type="text"
 									id="stv-list-new-address-plz"
 									name="address[plz]"
@@ -445,18 +464,18 @@ export default {
 							</div>
 							<div class="col-sm-4 mb-3">
 								<form-input
-									label="Gemeinde"
+									:label="$p.t('person', 'gemeinde')"
 									type="select"
 									v-if="formData['address']['nation'] == 'A'"
 									id="stv-list-new-address-gemeinde"
 									name="address[gemeinde]"
 									v-model="formData['address']['gemeinde']"
 									>
-									<option v-if="!gemeinden.length" disabled>Bitte gültige PLZ wählen</option>
+									<option v-if="!gemeinden.length" disabled>$p.t('ui', 'bittePlzWaehlen')</option>
 									<option v-for="gemeinde in gemeinden" :key="gemeinde.name" :value="gemeinde.name">{{gemeinde.name}}</option>
 								</form-input>
 								<form-input
-									label="Gemeinde"
+									:label="$p.t('person', 'gemeinde')"
 									type="text"
 									v-else
 									id="stv-list-new-address-gemeinde"
@@ -467,7 +486,7 @@ export default {
 							</div>
 							<div class="col-sm-4 mb-3">
 								<form-input
-									label="Ort"
+									:label="$p.t('person', 'ort')"
 									type="select"
 									v-if="formData['address']['nation'] == 'A'"
 									id="stv-list-new-address-ort"
@@ -478,7 +497,7 @@ export default {
 									<option v-for="ort in orte" :key="ort.ortschaftsname" :value="ort.ortschaftsname">{{ort.ortschaftsname}}</option>
 								</form-input>
 								<form-input
-									label="Ort"
+									:label="$p.t('person', 'ort')"
 									type="text"
 									v-else
 									id="stv-list-new-address-ort"
@@ -491,7 +510,7 @@ export default {
 						<div class="row">
 							<div class="col-12 mb-3">
 								<form-input
-									label="Adresse"
+									:label="$p.t('person', 'adresse')"
 									type="text"
 									id="stv-list-new-address-address"
 									name="address[address]"
@@ -505,7 +524,7 @@ export default {
 					<div class="row">
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Geburtsnation"
+								:label="$p.t('person', 'geburtsnation')"
 								type="select"
 								id="stv-list-new-geburtsnation"
 								name="geburtsnation" class="form-select"
@@ -516,7 +535,7 @@ export default {
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Staatsbürgerschaft"
+								:label="$p.t('person', 'staatsbuergerschaft')"
 								type="select"
 								id="stv-list-new-staatsbuergerschaft"
 								name="staatsbuergerschaft"
@@ -539,7 +558,7 @@ export default {
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Telefon"
+								:label="$p.t('person', 'telefon')"
 								type="text"
 								id="stv-list-new-telefon"
 								name="telefon"
@@ -549,7 +568,7 @@ export default {
 						</div>
 						<div class="col-sm-4 mb-3">
 							<form-input
-								label="Mobil"
+								:label="$p.t('person', 'mobil')"
 								type="text"
 								id="stv-list-new-mobil"
 								name="mobil"
@@ -558,125 +577,127 @@ export default {
 							</form-input>
 						</div>
 					</div>
-					<div class="row">
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Letzte Ausbildung"
-								type="select"
-								id="stv-list-new-letzteausbildung"
-								name="letzteausbildung"
-								v-model="formData['letzteausbildung']"
-								>
-								<option v-for="ausbildung in lists.ausbildungen" :key="ausbildung.ausbildungcode" :value="ausbildung.ausbildungcode">{{ausbildung.ausbildungbez}}</option>
-							</form-input>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Ausbildungsart"
-								type="text"
-								id="stv-list-new-ausbildungsart"
-								name="ausbildungsart"
-								v-model="formDataPerson['ausbildungsart']"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-8 mb-3">
-							<form-input
-								label="Anmerkungen"
-								type="textarea"
-								id="stv-list-new-anmerkungen"
-								name="anmerkungen"
-								v-model="formDataPerson['anmerkungen']"
-								>
-							</form-input>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Studiengang*"
-								type="select"
-								id="stv-list-new-studiengang_kz"
-								name="studiengang_kz"
-								v-model="formDataStg"
-								>
-								<option v-for="stg in lists.active_stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
-							</form-input>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Studiensemester*"
-								type="select"
-								id="stv-list-new-studiensemester_kurzbz"
-								name="studiensemester_kurzbz"
-								v-model="formDataSem"
-								>
-								<option v-for="sem in semester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
-							</form-input>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Ausbildungssemester*"
-								type="select"
-								id="stv-list-new-ausbildungssemester"
-								name="ausbildungssemester"
-								v-model="formData['ausbildungssemester']"
-								:disabled="formData['incoming']"
-								@input="loadStudienplaene"
-								>
-								<option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
-							</form-input>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="OrgForm"
-								type="select"
-								id="stv-list-new-orgform_kurzbz"
-								name="orgform_kurzbz"
-								v-model="formData['orgform_kurzbz']"
-								@input="loadStudienplaene"
-								>
-								<option value="">-- keine Auswahl --</option>
-								<option v-for="orgform in lists.orgforms" :key="orgform.orgform_kurzbz" :value="orgform.orgform_kurzbz">{{orgform.bezeichnung}}</option>
-							</form-input>
-						</div>
-						<div class="col-sm-4 mb-3">
-							<form-input
-								label="Studienplan"
-								type="select"
-								id="stv-list-new-studienplan_id"
-								name="studienplan_id"
-								v-model="formData['studienplan_id']"
-								>
-								<option value="">-- keine Auswahl --</option>
-								<option v-for="plan in studienplaene" :key="plan.studienplan_id" :value="plan.studienplan_id">{{plan.bezeichnung}}</option>
-							</form-input>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-10 mb-3">
-							<div class="form-check">
+					<fieldset v-if="!personOnly">
+						<div class="row">
+							<div class="col-sm-4 mb-3">
 								<form-input
-									label="Incoming"
-									type="checkbox"
-									id="stv-list-new-incoming"
-									name="incoming"
-									v-model="formData['incoming']"
-									value="1"
+									:label="$p.t('lehre', 'letzeAusbildung')"
+									type="select"
+									id="stv-list-new-letzteausbildung"
+									name="letzteausbildung"
+									v-model="formData['letzteausbildung']"
+									>
+									<option v-for="ausbildung in lists.ausbildungen" :key="ausbildung.ausbildungcode" :value="ausbildung.ausbildungcode">{{ausbildung.ausbildungbez}}</option>
+								</form-input>
+							</div>
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'ausbildungsart')"
+									type="text"
+									id="stv-list-new-ausbildungsart"
+									name="ausbildungsart"
+									v-model="formDataPerson['ausbildungsart']"
 									>
 								</form-input>
 							</div>
 						</div>
-					</div>
+						<div class="row">
+							<div class="col-sm-8 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'anmerkungen')"
+									type="textarea"
+									id="stv-list-new-anmerkungen"
+									name="anmerkungen"
+									v-model="formDataPerson['anmerkungen']"
+									>
+								</form-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'studiengang')+'*'"
+									type="select"
+									id="stv-list-new-studiengang_kz"
+									name="studiengang_kz"
+									v-model="formDataStg"
+									>
+									<option v-for="stg in lists.active_stgs" :key="stg.studiengang_kz" :value="stg.studiengang_kz">{{stg.kuerzel}}</option>
+								</form-input>
+							</div>
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'studiensemester')+'*'"
+									type="select"
+									id="stv-list-new-studiensemester_kurzbz"
+									name="studiensemester_kurzbz"
+									v-model="formDataSem"
+									>
+									<option v-for="sem in semester" :key="sem.studiensemester_kurzbz" :value="sem.studiensemester_kurzbz">{{sem.studiensemester_kurzbz}}</option>
+								</form-input>
+							</div>
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'ausbildungssemester')+'*'"
+									type="select"
+									id="stv-list-new-ausbildungssemester"
+									name="ausbildungssemester"
+									v-model="formData['ausbildungssemester']"
+									:disabled="formData['incoming']"
+									@input="loadStudienplaene"
+									>
+									<option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
+								</form-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'organisationsform')"
+									type="select"
+									id="stv-list-new-orgform_kurzbz"
+									name="orgform_kurzbz"
+									v-model="formData['orgform_kurzbz']"
+									@input="loadStudienplaene"
+									>
+									<option value="">-- keine Auswahl --</option>
+									<option v-for="orgform in lists.orgforms" :key="orgform.orgform_kurzbz" :value="orgform.orgform_kurzbz">{{orgform.bezeichnung}}</option>
+								</form-input>
+							</div>
+							<div class="col-sm-4 mb-3">
+								<form-input
+									:label="$p.t('lehre', 'studienplan')"
+									type="select"
+									id="stv-list-new-studienplan_id"
+									name="studienplan_id"
+									v-model="formData['studienplan_id']"
+									>
+									<option value="">-- keine Auswahl --</option>
+									<option v-for="plan in studienplaene" :key="plan.studienplan_id" :value="plan.studienplan_id">{{plan.bezeichnung}}</option>
+								</form-input>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-10 mb-3">
+								<div class="form-check">
+									<form-input
+										label="Incoming"
+										type="checkbox"
+										id="stv-list-new-incoming"
+										name="incoming"
+										v-model="formData['incoming']"
+										value="1"
+										>
+									</form-input>
+								</div>
+							</div>
+						</div>
+					</fieldset>
 				</template>
 			</template>
 			<template #footer>
-				<button v-if="person !== null" type="button" class="btn btn-secondary" @click="person = null"><i class="fa fa-chevron-left"></i>Zurück</button>
-				<button type="submit" class="btn btn-primary">{{ person === null ? 'Person anlegen' : 'InteressentIn anlegen' }}</button>
+				<button v-if="person !== null" type="button" class="btn btn-secondary" @click="person = null; formData.address.func = 1;"><i class="fa fa-chevron-left"></i>{{ $p.t('ui', 'zurueck') }}</button>
+				<button type="submit" class="btn btn-primary">{{ person === null || personOnly ? $p.t('person', 'personAnlegen') : $p.t('lehre', 'interessentAnlegen') }}</button>
 			</template>
 		</bs-modal>
 	</fhc-form>`
