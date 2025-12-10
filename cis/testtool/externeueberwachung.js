@@ -29,7 +29,8 @@
 		if (!proctoringOK)
 		{
 			console.warn("Constructor nicht aktiv!")
-			//window.location.href='resetconnection.php';
+			//TODO einkommentieren
+			//top.location.href='resetconnection.php';
 		}
 	}, 1000);
 })();

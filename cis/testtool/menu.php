@@ -61,8 +61,12 @@ $p = new phrasen($sprache_user);
 <?php
 $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
 $invalid_gebiete = false;
-
-if (isset($_SESSION['pruefling_id']))
+if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true) &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === false)
+{
+	exit;
+}
+else if (isset($_SESSION['pruefling_id']))
 {
 	//content_id fuer Einfuehrung auslesen
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";

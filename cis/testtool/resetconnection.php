@@ -14,12 +14,6 @@ if (isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'
 	$ueberwachung = new externeUeberwachung();
 	$url = $ueberwachung->start($_SESSION['prestudent_id'], $_SESSION['reihungstestID']);
 	$urlSafe = htmlspecialchars($url, ENT_QUOTES);
-
-
-	//var_dump($urlSafe);
-
 	header("Location: $urlSafe");
-	//echo "<script>window.open('{$urlSafe}');</script>";
 	$_SESSION['externe_ueberwachung_verified'] = true;
-
 }

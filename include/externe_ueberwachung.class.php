@@ -79,6 +79,7 @@ class externeUeberwachung extends basis_db
 
 		$qry = "SELECT session_id
 				FROM testtool.tbl_externe_ueberwachung
+				WHERE prestudent_id = ".$this->db_add_param($prestudent_id, FHC_INTEGER) . "
 				ORDER BY insertamum DESC
 				LIMIT 1";
 
@@ -157,7 +158,7 @@ class externeUeberwachung extends basis_db
 			"allowMakingRoomScanSecondCamera" => false,
 			"duration"=> 120,
 			"schedule"=> false,
-			"trial"=> true,
+			"trial"=> EXTERNE_UEBERWACHUNG_TRIAL_TEST,
 			"proctoring"=> "offline",
 			"identification"=> "skip",
 			"startDate"=> "2018-03-27T00:00:00Z", //TODO anpassen
