@@ -146,25 +146,25 @@ class externeUeberwachung extends basis_db
 		$today = $datetime->format('Y-m-d');
 
 		$payload = [
-			"userId"=> $prestudent_id,
-			"lastName"=> $person->nachname,
-			"firstName"=> $person->vorname,
-			"language"=> $person->sprache,
-			"accountName"=> "technikum_wien",
-			"accountId"=> "technikum_wien",
-			"examId" => !is_null(trim($reihungstest->anmerkung)) ? $reihungstest->anmerkung : ($today . " RT Test"),
-			"examName" => !is_null(trim($reihungstest->anmerkung)) ? $reihungstest->anmerkung : ($today . " RT Test"),
+			"userId" => $prestudent_id,
+			"lastName" => $person->nachname,
+			"firstName" => $person->vorname,
+			"language" => $person->sprache,
+			"accountName" => "technikum_wien",
+			"accountId" => "technikum_wien",
+			"examId" => $reihungstest_id . '_' . $today,
+			"examName" => !is_null(trim($reihungstest->anmerkung)) ? ($reihungstest->anmerkung . '_' . $today) : ($reihungstest_id . '_' . $today),
 			"allowMultipleDisplays" => true,
 			"allowMakingRoomScanSecondCamera" => false,
-			"duration"=> 120,
-			"schedule"=> false,
-			"trial"=> EXTERNE_UEBERWACHUNG_TRIAL_TEST,
-			"proctoring"=> "offline",
-			"identification"=> "skip",
-			"startDate"=> "2018-03-27T00:00:00Z", //TODO anpassen
-			"endDate"=> "2027-03-30T12:55:00Z", // TODO anpassen
-			"sessionId"=> $session_id,
-			"sessionUrl"=> EXTERNE_UEBERWACHUNG_SESSION_URL
+			"duration" => 600,
+			"schedule" => false,
+			"trial" => EXTERNE_UEBERWACHUNG_TRIAL_TEST,
+			"proctoring" => "offline",
+			"identification" => "skip",
+			"startDate" => "2018-03-27T00:00:00Z", //TODO anpassen
+			"endDate" => "2027-03-30T12:55:00Z", // TODO anpassen
+			"sessionId" => $session_id,
+			"sessionUrl" => EXTERNE_UEBERWACHUNG_SESSION_URL
 		];
 		return $payload;
 	}
