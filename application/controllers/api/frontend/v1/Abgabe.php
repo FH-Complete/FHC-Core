@@ -190,12 +190,9 @@ class Abgabe extends FHCAPI_Controller
 					$pa->downloadLink1 = $downloadLink1;
 				}
 				
-				$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($pa->projektarbeit_id);
 				
-				$data = getData($result);
-				if(count($data) > 0) {
-					$pa->email = $data[0]->private_email;
-				}
+				$pa->email = $pa->mitarbeiter_uid.'@'.DOMAIN;
+				
 				if($pa->zweitbetreuer_person_id !== null) {
 
 					if($pa->zweitbetreuer_abgeschickt) {
@@ -240,7 +237,7 @@ class Abgabe extends FHCAPI_Controller
 			}
 		}
 		
-		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN, $uid));
+		$this->terminateWithSuccess(array($projektarbeiten));
 	}
 
 
@@ -857,8 +854,7 @@ class Abgabe extends FHCAPI_Controller
 			
 			
 			if(file_exists($file_path)) {
-				$this->terminateWithFileOutput('application/octet-stream', filesize($file_path), basename($file_path));
-
+				$this->terminateWithFileOutput('application/octet-stream', file_get_contents($file_path), basename($file_path));
 			} else {
 				$this->terminateWithError('File not found');
 			}

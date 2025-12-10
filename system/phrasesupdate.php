@@ -41079,7 +41079,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Dokumentabgabe - Mitarbeiterbereich",
+				'text' => "Dokumentabgabe - MitarbeiterInbereich",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -42760,6 +42760,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'keinTitel',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Kein Titel",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Title",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4details',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -43905,7 +43925,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Projektarbeit Detailansicht Mitarbeiter",
+				'text' => "Projektarbeit Detailansicht MitarbeiterIn",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44401,13 +44421,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Emailkontakt BetreuerIn",
+				'text' => "E-Mail BetreuerIn",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Emailcontact Assessor',
+				'text' => 'Email Assessor',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44441,7 +44461,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Erstbetreuer Beurteilung herunterladen",
+				'text' => "ErstbetreuerIn Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44461,7 +44481,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Zweitbetreuer Beurteilung herunterladen",
+				'text' => "ZweitbetreuerIn Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44956,7 +44976,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Studenten Details anzeigen',
+				'text' => 'Studierende Details anzeigen',
 				'description' => '',
 				'insertvon' => 'system'
 			),

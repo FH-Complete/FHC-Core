@@ -38,7 +38,8 @@ export const AbgabetoolAssistenz = {
 			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
 			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions),
 			turnitin_link: Vue.computed(() => this.turnitin_link),
-			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link)
+			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link),
+			abgabetypenBetreuer: Vue.computed(() => this.abgabeTypeOptions)
 		}
 	},
 	props: {
@@ -50,7 +51,7 @@ export const AbgabetoolAssistenz = {
 			required: true,
 			default: () => ({name: '', uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
 			}
 		}
 	},
@@ -89,7 +90,6 @@ export const AbgabetoolAssistenz = {
 				kurzbz: '',
 				fixtermin: false,
 				upload_allowed: false
-				
 			}),
 			showAll: false,
 			tabulatorUuid: Vue.ref(0),
@@ -125,7 +125,7 @@ export const AbgabetoolAssistenz = {
 						frozen: true,
 						width: 40
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, responsive: 1, minWidth: 150},
 					// {title: 'pa_id', field: 'projektarbeit_id', visible: true},
 					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1,responsive:0,  tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter,responsive:0, widthGrow: 1, tooltip: false},
@@ -135,26 +135,21 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgform'))), field: 'orgform', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
-						responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: true, responsive:2,formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, responsive:3, visible: false, formatter: this.centeredTextFormatter, widthGrow: 1},
+						responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, responsive:2,formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', responsive:4, formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', responsive:4, formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetableV27"
+				persistenceID: "abgabetool_2025_12"
 			},
-			abgabeTableEventHandlers: [{
-				event: "tableBuilt",
-				handler: async () => {
-					this.tableBuiltResolve()
-				}
-			},
+			abgabeTableEventHandlers: [
 			{
 				event: "rowSelectionChanged",
 				handler: async(data) => {
@@ -164,6 +159,28 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		getItemBezeichnung(item){
+			if(!item.bezeichnung) return ''
+			
+			return item?.bezeichnung?.bezeichnung ?? item?.bezeichnung
+		},
+		getItemNote(item) {
+			if(!item?.note) return ''
+			
+			const notenOption = this.notenOptions.find(note => note.note == item.note)
+			if(!notenOption) return item.note
+			
+			return notenOption.bezeichnung
+		},
+		handleChangeAbgabetypSerientermin(termin) {
+			// if paabgabetype qualgate is selected, fill out kurzbz textfield with bezeichnung of quality gate so users
+			// are possibly less confused
+			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2') {
+				termin.kurzbz = termin.bezeichnung.bezeichnung
+			} else {
+				termin.kurzbz = ''
+			}
+		},
 		semesterChanged(e) {
 			if(this.$refs.abgabeTable.tabulator) {
 				const table = this.$refs.abgabeTable.tabulator
@@ -230,91 +247,94 @@ export const AbgabetoolAssistenz = {
 		},
 		handleTableBuilt() {
 			const table = this.$refs.abgabeTable.tabulator
-			// table.on("columnMoved", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("columnResized", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("columnVisibilityChanged", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("filterChanged", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("headerFilterChanged", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("dataSorted", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("columnSorted", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// table.on("sortersChanged", () => {
-			// 	this.saveState(table);
-			// });
-			//
-			// const saved = this.loadState();
+
+			this.tableBuiltResolve()
 			
-			// table.on("renderComplete", () => {
-			// 	if(!this.stateRestored) {
-			//		
-			// 		if (saved?.columns && !this.colLayoutRestored) {
-			// 			const layout = saved.columns.map(col => ({
-			// 				field: col.field,
-			// 				width: col.width,
-			// 				visible: col.visible,
-			// 				// add more if needed, but keep it simple
-			// 			}));
-			//
-			// 			const safeLayout = layout.filter(col =>
-			// 				col.field && !["rowSelection", "rowHandle", "rowNum", "zweitbetreuer"].includes(col.field)
-			// 			);
-			//			
-			// 			table.setColumnLayout(safeLayout);
-			//
-			// 			this.colLayoutRestored = true;
-			// 		}
-			//
-			// 		if (saved?.filters && !this.filtersRestored) {
-			// 			this.filtersRestored = true // instantly avoid retriggers
-			// 			table.setFilter(saved.filters);
-			// 		}
-			// 		if (saved?.headerFilters && !this.headerFiltersRestored) {
-			// 			this.headerFiltersRestored = true // instantly avoid retriggers
-			// 			for (let hf of saved.headerFilters) {
-			// 				table.setHeaderFilterValue(hf.field, hf.value);
-			// 			}
-			// 		}
-			//
-			// 		if (saved?.sort?.length && !this.sortRestored) {
-			// 			this.sortRestored = true;
-			//
-			// 			setTimeout(() => {
-			// 				const sortList = saved.sort.map(s => {
-			// 					const col = table.columnManager.findColumn(s.field);
-			// 					if (!col) {
-			// 						return null;
-			// 					}
-			// 					return { column: col, dir: s.dir };
-			// 				}).filter(Boolean);
-			//
-			// 				table.setSort(sortList);
-			// 			}, 100);
-			// 		}
-			// 		this.stateRestored = true
-			//
-			// 	}
-			//
-			// });
+			table.on("columnMoved", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnResized", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnVisibilityChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("filterChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("headerFilterChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("dataSorted", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnSorted", () => {
+				this.saveState(table);
+			});
+
+			table.on("sortersChanged", () => {
+				this.saveState(table);
+			});
+
+			const saved = this.loadState();
+			
+			table.on("renderComplete", () => {
+				if(!this.stateRestored) {
+
+					if (saved?.columns && !this.colLayoutRestored) {
+						const layout = saved.columns.map(col => ({
+							field: col.field,
+							width: col.width,
+							visible: col.visible,
+							// add more if needed, but keep it simple
+						}));
+
+						const safeLayout = layout.filter(col =>
+							col.field && !["rowSelection", "rowHandle", "rowNum", "zweitbetreuer"].includes(col.field)
+						);
+
+						table.setColumnLayout(safeLayout);
+
+						this.colLayoutRestored = true;
+					}
+
+					if (saved?.filters && !this.filtersRestored) {
+						this.filtersRestored = true // instantly avoid retriggers
+						table.setFilter(saved.filters);
+					}
+					if (saved?.headerFilters && !this.headerFiltersRestored) {
+						this.headerFiltersRestored = true // instantly avoid retriggers
+						for (let hf of saved.headerFilters) {
+							table.setHeaderFilterValue(hf.field, hf.value);
+						}
+					}
+
+					if (saved?.sort?.length && !this.sortRestored) {
+						this.sortRestored = true;
+
+						setTimeout(() => {
+							const sortList = saved.sort.map(s => {
+								const col = table.columnManager.findColumn(s.field);
+								if (!col) {
+									return null;
+								}
+								return { column: col, dir: s.dir };
+							}).filter(Boolean);
+
+							table.setSort(sortList);
+						}, 100);
+					}
+					this.stateRestored = true
+
+				}
+
+			});
 		},
 		handleToggleFullscreenDetail() {
 			this.detailIsFullscreen = !this.detailIsFullscreen
@@ -608,7 +628,7 @@ export const AbgabetoolAssistenz = {
 			const val = cell.getValue()
 
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</p></div>'
+				'<a style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</a></div>'
 		},
 		abgabterminFormatter(cell) {
 			const val = cell.getValue()
@@ -668,14 +688,15 @@ export const AbgabetoolAssistenz = {
 		buildZweitbetreuer(projekt) {
 			return projekt.zweitbetreuer_full_name ?? ''
 		},
-		setupData(data){
+		async setupData(data){
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			
 			const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+
+			await this.tableBuiltPromise
 			
 			// this.$refs.abgabeTable.tabulator.clearData()
-			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 			this.$refs.abgabeTable.tabulator.setData(mappedData);
 		},
 		loadProjektarbeiten(all = false, callback) {
@@ -725,6 +746,13 @@ export const AbgabetoolAssistenz = {
 		}
 	},
 	watch: {
+		'serienTermin.bezeichnung'(newVal) {
+			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
+				this.serienTermin.kurzbz = newVal.bezeichnung
+			}
+
+			this.serienTermin.upload_allowed = newVal.upload_allowed_default
+		},
 		selectedStudiengangOption(newVal, oldVal) {
 			// implicitely avoids juggling around promises for created api calls,
 			// since we need note & stg flags for loadProjektarbeiten
@@ -883,6 +911,7 @@ export const AbgabetoolAssistenz = {
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
 							:options="abgabeTypeOptions"
+							@change="handleChangeAbgabetypSerientermin(termin)"
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>
@@ -992,7 +1021,7 @@ export const AbgabetoolAssistenz = {
 							{{ $capitalize($p.t('abgabetool/c4abgabetyp')) }}:
 						</div>
 						<div class="col-7">
-							{{ slotProps?.item?.bezeichnung?.bezeichnung ?? slotProps?.item?.bezeichnung }}
+							{{ getItemBezeichnung(slotProps.item) }}
 						</div>
 				
 						<div class="col-5 fw-semibold text-end">
@@ -1006,7 +1035,7 @@ export const AbgabetoolAssistenz = {
 							{{ $capitalize($p.t('abgabetool/c4note')) }}:
 						</div>
 						<div v-if="slotProps.item.benotbar" class="col-7">
-							{{ slotProps.item.note }}
+							{{ getItemNote(slotProps.item) }}
 						</div>
 				 	</div>
 				 	<hr/>

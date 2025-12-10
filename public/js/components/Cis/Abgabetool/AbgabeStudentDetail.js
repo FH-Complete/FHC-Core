@@ -310,7 +310,13 @@ export const AbgabeStudentDetail = {
 					class: "custom-tooltip"
 				}
 			}
-		}
+		},
+		getTooltipBeurteilungerforderlich() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipBeurteilungerfolderlich'),
+				class: "custom-tooltip"
+			}
+		},
 	},
 	created() {
 		
@@ -333,8 +339,8 @@ export const AbgabeStudentDetail = {
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>
-							<div class="d-flex row w-100 flex-nowrap">
-								<div class="col-auto" style="transform: translateX(-62px)">
+							<div class="d-flex row w-100 flex-nowrap align-items-center">
+								<div class="col-auto" style="transform: translateX(-58px); height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 									<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
@@ -440,7 +446,7 @@ export const AbgabeStudentDetail = {
 							</div>
 						</div>
 						
-						<div class="row mt-2">
+						<div class="row mt-2" v-if="termin.upload_allowed">
 							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
 							<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">

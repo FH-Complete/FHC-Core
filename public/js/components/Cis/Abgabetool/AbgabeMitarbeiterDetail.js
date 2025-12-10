@@ -22,8 +22,7 @@ export const AbgabeMitarbeiterDetail = {
 		'abgabetypenBetreuer',
 		'allowedNotenOptions',
 		'turnitin_link',
-		'old_abgabe_beurteilung_link',
-		'isMobile'
+		'old_abgabe_beurteilung_link'
 	],
 	props: {
 		projektarbeit: {
@@ -472,9 +471,11 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		handleChangeAbgabetyp(termin) {
 			// if paabgabetype qualgate is selected, fill out kurzbz textfield with bezeichnung of quality gate so users
-			// are possibly less confused, which is a pursuit in vain
+			// are possibly less confused
 			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate1' || termin.bezeichnung?.paabgabetyp_kurzbz === 'qualgate2') {
 				termin.kurzbz = termin.bezeichnung.bezeichnung
+			} else {
+				termin.kurzbz = ''
 			}
 		}
 			
@@ -608,8 +609,6 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	watch: {
 		'newTermin.bezeichnung'(newVal) {
-			console.log('\'newTermin.bezeichnung\' watcher', newVal)
-
 			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
 				this.newTermin.kurzbz = newVal.bezeichnung
 			}
@@ -760,8 +759,8 @@ export const AbgabeMitarbeiterDetail = {
 			<template v-for="termin in this.projektarbeit?.abgabetermine">
 				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
 					<template #header>
-						<div class="d-flex row w-100">
-							<div class="col-auto" style="transform: translateX(-62px)">
+						<div class="d-flex row w-100 flex-nowrap align-items-center">
+							<div class="col-auto" style="transform: translateX(-58px); height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 								<i v-if="getDateStyleClass(termin) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>

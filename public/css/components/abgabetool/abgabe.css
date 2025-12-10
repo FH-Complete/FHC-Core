@@ -190,3 +190,7 @@
 .bordered-modal  .modal-body {
 	overflow-y: visible;
 }
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+	padding: 12px!important;
+}

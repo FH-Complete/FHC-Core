@@ -35,6 +35,7 @@ export const AbgabetoolStudent = {
 	},
 	data() {
 		return {
+			activeTabIndex: [0],
 			phrasenPromise: null,
 			phrasenResolved: false,
 			loading: false,
@@ -265,7 +266,7 @@ export const AbgabetoolStudent = {
 		getAccTabHeaderForProjektarbeit(projektarbeit) {
 			let title = ''
 			
-			title += projektarbeit.titel
+			title += projektarbeit.titel ?? this.$p.t('abgabetool/keinTitel')
 			
 			return title
 		},
@@ -342,7 +343,7 @@ export const AbgabetoolStudent = {
 		{{$capitalize( $p.t('abgabetool/c4abgabeStudentNoProjectsFound') )}}
 	</div>
 	
-	<Accordion :multiple="true" :activeIndex="[0]">
+	<Accordion :multiple="true" :activeIndex="activeTabIndex">
 		<template v-for="projektarbeit in projektarbeiten">
 			<AccordionTab>
 				

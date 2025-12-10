@@ -32,7 +32,7 @@ export const AbgabetoolMitarbeiter = {
 			required: true,
 			default: () => ({name: '', uid: ''}),
 			validator(value) {
-				return value && value.name && value.uid
+				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
 			}
 		}
 	},
@@ -268,7 +268,7 @@ export const AbgabetoolMitarbeiter = {
 			const val = cell.getValue()
 
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</p></div>'
+				'<a style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</a></div>'
 		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
