@@ -84,7 +84,12 @@ export default {
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
 			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
-			appConfig: Vue.computed(() => this.appconfig)
+			appConfig: Vue.computed(() => this.appconfig),
+			hasZGVBakkPermission: this.permissions['student/editBakkZgv'],
+			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
+			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
+			hasBismeldenPermission: this.permissions['student/editBismelden'],
+
 		}
 	},
 	data() {
