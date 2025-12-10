@@ -43,6 +43,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		$this->load->library('PermissionLib');
 	}
 
+	/**
+	 * Gets Projektbetreuer data for a Projektarbeit.
+	 */
 	public function getProjektbetreuer()
 	{
 		$projektarbeit_id = $this->input->get('projektarbeit_id');
@@ -95,6 +98,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			//~ }
 		//~ }
 
+		// add thesis download link (from external extension)
 		foreach ($projektbetreuer as $pb)
 		{
 			$downloadLink = null;
@@ -113,6 +117,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		$this->terminateWithSuccess($this->_addFullNameToBetreuer($projektbetreuer));
 	}
 
+	/**
+	 * Saves (adds or updates) a single Projektbetreuer for a Projektarbeit.
+	 */
 	public function saveProjektbetreuer()
 	{
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
@@ -183,6 +190,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
+	/**
+	 * Delete a Projektbetreuer assignment to a Projektarbeit.
+	 */
 	public function deleteProjektbetreuer()
 	{
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
@@ -206,6 +216,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			);
 		}
 
+		// check permission
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
 
@@ -213,6 +224,7 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		if (isError($validate)) return $this->terminateWithError(getError($validate), self::ERROR_TYPE_GENERAL);
 
+		// check if there is a Projektarbeitsbeurteilung - if yes, it is handled (possibly deleted) by external extension.
 		$beurteilungDeleteSuccess = true;
 
 		Events::trigger(
@@ -223,6 +235,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			}
 		);
 
+		// if there is still a Beurteilung, Projektarbeit cannot be deleted - return with error
 		if (!$beurteilungDeleteSuccess) return $this->terminateWithError($this->p->t('projektarbeit', 'error_paarbeitHatBeurteilung'));
 
 		$result = $this->ProjektbetreuerModel->delete(
@@ -239,6 +252,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		return $this->terminateWithSuccess(getData($result));
 	}
 
+	/**
+	 * Get all active Betreuerarten.
+	 */
 	public function getBetreuerarten()
 	{
 		$result = $this->BetreuerartModel->loadWhere(['aktiv' => true]);
@@ -248,6 +264,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
+	/**
+	 * Get all Noten.
+	 */
 	public function getNoten()
 	{
 		$result = $this->NoteModel->load();
@@ -257,6 +276,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
+	/**
+	 * Get default Stundensätze for an employee in a semester.
+	 */
 	public function getDefaultStundensaetze()
 	{
 		$person_id = $this->input->get('person_id');
@@ -267,6 +289,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		return $this->terminateWithSuccess($result);
 	}
 
+	/**
+	 * Get all Projektbetreuer by search string.
+	 */
 	public function getProjektbetreuerBySearchQuery()
 	{
 		$searchString = $this->input->get('searchString');
@@ -278,10 +303,11 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
-		// sort persons
 		if (!hasData($result)) $this->terminateWithSuccess([]);
 
 		$persons = $this->_addFullNameToBetreuer(getData($result));
+
+		// sort persons by type (employees first)
 		usort($persons, function ($a, $b) {
 			$statusRanks = ['Mitarbeiter' => 0, 'Person' => 1, 'Student' => 2];
 			return (isset($statusRanks[$a->status]) ? $statusRanks[$a->status] : count($statusRanks) + 1)
@@ -291,6 +317,9 @@ class Projektbetreuer extends FHCAPI_Controller
 		return $this->terminateWithSuccess($persons);
 	}
 
+	/**
+	 * Get person info by Id.
+	 */
 	public function getPerson()
 	{
 		$person_id = $this->input->get('person_id');
@@ -316,9 +345,7 @@ class Projektbetreuer extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Validate list of Projektbetreuer.
 	 */
 	public function validateProjektbetreuer()
 	{
@@ -338,9 +365,9 @@ class Projektbetreuer extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Validation funciton for checking Projektbetreuer input.
+	 * @param $formData Betreuer data
+	 * @return bool true when data is valid
 	 */
 	private function _validate($formData)
 	{
@@ -367,12 +394,15 @@ class Projektbetreuer extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Check possibility of deletion of a Projektbetreuer.
+	 * @param projektarbeit_id
+	 * @param person_id
+	 * @param betreuerart_kurzbz
+	 * @return object success when delete possible, error otherwise
 	 */
 	private function _validateDelete($projektarbeit_id, $person_id, $betreuerart_kurzbz)
 	{
+		// check if contract exists
 		$this->ProjektbetreuerModel->addSelect('vertrag_id');
 		$result = $this->ProjektbetreuerModel->loadWhere(
 			['projektarbeit_id' => $projektarbeit_id, 'person_id' => $person_id, 'betreuerart_kurzbz' => $betreuerart_kurzbz]
@@ -380,15 +410,16 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		if (isError($result)) return $result;
 
+		// if contract exists, no deletion is possible
 		if (hasData($result) && getData($result)[0]->vertrag_id != null) return error($this->p->t('projektarbeit', 'error_betreuerHatVertrag'));
 
 		return success();
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Add full name to array with Betreuer.
+	 * @param $betreuerArr
+	 * @return array including Betreuer with their full names
 	 */
 	private function _addFullNameToBetreuer($betreuerArr)
 	{
