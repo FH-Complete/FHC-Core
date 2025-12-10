@@ -1,6 +1,5 @@
 <?php
 
-
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Messages extends FHCAPI_Controller
@@ -39,7 +38,7 @@ class Messages extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui'
+			'ui', 'messages'
 		]);
 	}
 
@@ -156,19 +155,6 @@ class Messages extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-/*	public function getNameOfDefaultRecipient($id, $type_id)
-	{
-		$id = ($type_id != 'person_id') ? $this->_getPersonId($id, $type_id) : $id;
-
-		$this->load->model('person/Person_model', 'PersonModel');
-
-		$result = $this->PersonModel->load($id);
-		$data = $this->getDataOrTerminateWithError($result);
-		$name = current($data);
-
-		$this->terminateWithSuccess($name->vorname . " " . $name->nachname );
-	}*/
-
 	public function getNameOfDefaultRecipients($type_id)
 	{
 		$ids = $this->input->post('ids');
@@ -178,7 +164,8 @@ class Messages extends FHCAPI_Controller
 		$recipients = [];
 
 		if (empty($ids)) {
-			throw new InvalidArgumentException("Keine ID(s) übergeben.");
+
+			throw new InvalidArgumentException($this->p->t('ui', 'errorMissingOrInvalidParameters', ['parameter'=> 'Id(s)']), self::ERROR_TYPE_GENERAL);
 		}
 
 		$this->load->model('person/Person_model', 'PersonModel');
@@ -253,6 +240,10 @@ class Messages extends FHCAPI_Controller
 			}
 		}
 
+		if (!is_array($ids)) {
+			$ids = [$ids];
+		}
+
 		foreach ($ids as $id)
 		{
 			$receiversPersonId = $typeId == "person_id" ? $id : $this->_getPersonId($id, $typeId);
@@ -283,7 +274,7 @@ class Messages extends FHCAPI_Controller
 			}
 			else
 			{
-				$this->terminateWithError("type_id " . $typeId . " not valid", self::ERROR_TYPE_GENERAL);
+				$this->terminateWithError($this->p->t('messages', 'error_missingLogic', ['type'=> $typeId]), self::ERROR_TYPE_GENERAL);
 			}
 
 			$result =$this->messagelib->sendMessageUser($receiversPersonId, $subject, $bodyParsed, $benutzer->person_id, null, $relationmessage_id);
@@ -302,7 +293,7 @@ class Messages extends FHCAPI_Controller
 			unset($_POST['data']);
 		}
 		else
-			$this->terminateWithError("Textbody missing ", self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('messages', 'errorMissingOrInvalidParameters', ['parameter'=> "Textbody"]), self::ERROR_TYPE_GENERAL);
 
 		if (isset($_POST['ids']))
 		{
@@ -314,7 +305,7 @@ class Messages extends FHCAPI_Controller
 			unset($_POST['ids']);
 		}
 		else
-			$this->terminateWithError("IDs missing ", self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui', 'errorMissingOrInvalidParameters', ['parameter'=> 'Id(s)']), self::ERROR_TYPE_GENERAL);
 
 		$bodyParsed = [];
 
@@ -343,7 +334,7 @@ class Messages extends FHCAPI_Controller
 					}
 					break;
 				default:
-					$this->terminateWithError("MESSAGES::getPreviewText logic for type_id " . $type_id . " not defined yet", self::ERROR_TYPE_GENERAL);
+					$this->terminateWithError($this->p->t('messages', 'error_missingLogic', ['type'=> $type_id]), self::ERROR_TYPE_GENERAL);
 					break;
 			}
 		}
@@ -353,7 +344,9 @@ class Messages extends FHCAPI_Controller
 
 	public function getReplyData($messageId)
 	{
-		//TODO(Manu) validation of messageId: if number
+		if (!is_numeric($messageId)) {
+			$this->terminateWithError($this->p->t('ui', 'error_valueNotNumeric', ['value'=> 'Message ID']), self::ERROR_TYPE_GENERAL);
+		}
 
 		$this->MessageModel->addSelect('public.tbl_msg_message.*');
 		$this->MessageModel->addSelect('r.*');
@@ -376,7 +369,6 @@ class Messages extends FHCAPI_Controller
 		$replyBody = $this->_getReplyBody($body, $dataMessage[0]->nachname, $dataMessage[0]->vorname, $dataMessage[0]->insertamum);
 
 		$dataMessage[0]->replyBody = $replyBody;
-		$dataMessage[0]->rest = "Help Manu";
 		$dataMessage[0]->replySubject = $prefix . $subject;
 
 		$this->terminateWithSuccess($dataMessage);
@@ -424,55 +416,16 @@ class Messages extends FHCAPI_Controller
 				['prestudent_id' => $id]
 			);
 		}
+		else
+		{
+			$this->terminateWithError($this->p->t('messages', 'error_missingLogic', ['type'=> $typeId]), self::ERROR_TYPE_GENERAL);
+		}
+
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$person = current($data);
 
 		$this->terminateWithSuccess($person->person_id);
-	}
-
-	public function getUid($typeId)
-	{
-		if (!$typeId)
-		{
-			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Type ID']), self::ERROR_TYPE_GENERAL);
-		}
-		elseif ($typeId == 'person_id')
-		{
-			$this->load->model('person/Benutzer_model', 'BenutzerModel');
-			$result = $this->BenutzerModel->loadWhere(
-				['person_id' => $id]
-			);
-		}
-		elseif($typeId == 'prestudent_id')
-		{
-			$this->load->model('crm/Prestudent_model', 'PrestudentModel');
-			$result = $this->PrestudentModel->loadWhere(
-				['prestudent_id' => $id]
-			);
-
-			$data = $this->getDataOrTerminateWithError($result);
-			$person = current($data);
-			$person_id = $person->person_id;
-
-			$this->load->model('person/Benutzer_model', 'BenutzerModel');
-			$result = $this->BenutzerModel->loadWhere(
-				['person_id' => $person_id]
-			);
-		}
-		elseif($typeId == 'uid' || $typeId == 'mitarbeiter_uid')
-		{
-			$this->terminateWithSuccess($id);
-		}
-		else
-		{
-			$this->terminateWithError("MESSAGES::getUID logic for type_id " . $typeId . " not defined yet", self::ERROR_TYPE_GENERAL);
-		}
-
-		$data = $this->getDataOrTerminateWithError($result);
-		$benutzer = current($data);
-
-		$this->terminateWithSuccess($benutzer->uid);
 	}
 
 	public function getUids($typeId)
@@ -527,12 +480,8 @@ class Messages extends FHCAPI_Controller
 		}
 		else
 		{
-			$this->terminateWithError("MESSAGES::getUID logic for type_id " . $typeId . " not defined yet", self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('messages', 'error_missingLogic', ['type'=> $typeId]), self::ERROR_TYPE_GENERAL);
 		}
-
-
-		//$data = $this->getDataOrTerminateWithError($resultBenutzer);
-		//$benutzer = current($data);
 
 		$this->terminateWithSuccess($benutzerIds);
 	}
@@ -553,11 +502,16 @@ class Messages extends FHCAPI_Controller
 				['prestudent_id' => $id]
 			);
 		}
+		else
+		{
+			$this->terminateWithError($this->p->t('messages', 'error_missingLogic', ['type'=> $typeId]), self::ERROR_TYPE_GENERAL);
+		}
+
 
 		$data = $this->getDataOrTerminateWithError($result);
 		if (count($data) < 1)
 		{
-			$this->terminateWithError('Error: Messages API no person_id found.');
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
 		}
 		$person = current($data);
 
@@ -566,7 +520,6 @@ class Messages extends FHCAPI_Controller
 
 	private function _getPrestudentIdFromUid($uid)
 	{
-		//	$this->terminateWithError($uid, self::ERROR_TYPE_GENERAL);
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->loadWhere(
 			['student_uid' => $uid]
@@ -575,7 +528,7 @@ class Messages extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 		if (count($data) < 1)
 		{
-			$this->terminateWithError('Error: Messages API no prestudent_id found.');
+			$this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Prestudent ID']), self::ERROR_TYPE_GENERAL);
 		}
 		$student = current($data);
 

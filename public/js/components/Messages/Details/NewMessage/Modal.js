@@ -4,6 +4,8 @@ import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from "../../../VorlagenDropdown/VorlagenDropdown.js";
 
+import ApiMessages from '../../../../api/factory/messages/messages.js';
+
 export default {
 	name: "ModalNewMessages",
 	components: {
@@ -14,10 +16,6 @@ export default {
 		ListBox
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: String,
 		id: {
 			type: Array,
@@ -58,7 +56,6 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-
 		}
 	},
 	methods: {
@@ -117,7 +114,7 @@ export default {
 			data.append('ids', JSON.stringify(this.id));
 
 			return this.$refs.formMessage
-				.call(this.endpoint.sendMessageFromModalContext(this.typeId, data))
+				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
@@ -134,7 +131,7 @@ export default {
 		},
 		getDataVorlage(vorlage_kurzbz){
 			return this.$api
-				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
+				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
@@ -146,14 +143,13 @@ export default {
 			data.append('ids', JSON.stringify(this.id));
 
 			return this.$api
-				.call(this.endpoint.getPreviewText(
+				.call(ApiMessages.getPreviewText(
 					this.typeId, data))
 				.then(response => {
 					const previews = response.data;
 					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//this.resetForm();
 					//closeModal
 					//closewindwo
 				});
@@ -168,7 +164,7 @@ export default {
 				this.editor.save();
 
 			} else {
-				console.error("Editor instance is not available.");
+				console.error(this.$p.t('messages', 'errorEditorNotAvailable'));
 			}
 		},
 		resetForm(){
@@ -177,6 +173,7 @@ export default {
 				body: null,
 				subject: null,
 			};
+
 			this.$emit('resetMessageId');
 
 			if (this.editor) {
@@ -230,7 +227,7 @@ export default {
 				if (!newMessageId) return;
 
 				try {
-					const result = await this.$api.call(this.endpoint.getReplyData(newMessageId));
+					const result = await this.$api.call(ApiMessages.getReplyData(newMessageId));
 					this.replyData = result.data;
 
 					if (this.replyData.length > 0) {
@@ -247,7 +244,7 @@ export default {
 	created(){
 		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
 			this.$api
-				.call(this.endpoint.getMessageVarsPerson(this.id, this.typeId))
+				.call(ApiMessages.getMessageVarsPerson(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPerson = result.data;
 					const person = this.fieldsPerson[0];
@@ -261,7 +258,7 @@ export default {
 
 		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
 			this.$api
-				.call(this.endpoint.getMsgVarsPrestudent(this.id, this.typeId))
+				.call(ApiMessages.getMsgVarsPrestudent(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -274,7 +271,7 @@ export default {
 		}
 
 		this.$api
-			.call(this.endpoint.getMsgVarsLoggedInUser())
+			.call(ApiMessages.getMsgVarsLoggedInUser())
 			.then(result => {
 				this.fieldsUser = result.data;
 				const user = this.fieldsUser;
@@ -286,7 +283,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(this.endpoint.getNameOfDefaultRecipients(this.id, this.typeId))
+			.call(ApiMessages.getNameOfDefaultRecipients(this.id, this.typeId))
 			.then(result => {
 				this.defaultRecipients = result.data;
 				this.defaultRecipientString =  Object.values(this.defaultRecipients).join("; ");
@@ -297,7 +294,7 @@ export default {
 		//case of reply
 		if(this.messageId) {
 			this.$api
-				.call(this.endpoint.getReplyData(this.messageId))
+				.call(ApiMessages.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;

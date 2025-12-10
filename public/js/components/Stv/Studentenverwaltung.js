@@ -84,7 +84,12 @@ export default {
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
 			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
-			appConfig: Vue.computed(() => this.appconfig)
+			appConfig: Vue.computed(() => this.appconfig),
+			hasZGVBakkPermission: this.permissions['student/editBakkZgv'],
+			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
+			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
+			hasBismeldenPermission: this.permissions['student/editBismelden'],
+
 		}
 	},
 	data() {
@@ -155,7 +160,7 @@ export default {
 
 				extraItems.push({
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'content/statistik/notenspiegel.php?type=xls'
+						+ 'content/statistik/notenspiegel.php?typ=xls'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
 						+ '&studiensemester=' + this.studiensemesterKurzbz
@@ -173,7 +178,7 @@ export default {
 				});
 				extraItems.push({
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'content/statistik/notenspiegel.php?type=html'
+						+ 'content/statistik/notenspiegel.php?typ=html'
 						+ '&studiengang_kz=' + studiengang_kz
 						+ '&semester=' + semester
 						+ '&studiensemester=' + this.studiensemesterKurzbz

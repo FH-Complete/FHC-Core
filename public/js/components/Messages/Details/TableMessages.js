@@ -1,6 +1,8 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
 
+import ApiMessages from "../../../api/factory/messages/messages.js"
+
 export default {
 	name: "TableMessages",
 	components: {
@@ -13,10 +15,6 @@ export default {
 		},
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: String,
 		id: {
 			type: Array,
@@ -281,7 +279,7 @@ export default {
 		},
 		deleteMessage(message_id){
 			return this.$api
-				.call(this.endpoint.deleteMessage(message_id))
+				.call(ApiMessages.deleteMessage(message_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -347,7 +345,7 @@ export default {
 		},
 		loadAjaxCall(url, config, params){
 			return this.$api.call(
-				this.endpoint.getMessages(params)
+				ApiMessages.getMessages(params)
 			);
 		}
 	},
@@ -378,7 +376,7 @@ export default {
 				type_id: this.typeId
 			};
 			this.$api
-				.call(this.endpoint.getPersonId(params))
+				.call(ApiMessages.getPersonId(params))
 				.then(result => {
 					this.personId = result.data;
 				})

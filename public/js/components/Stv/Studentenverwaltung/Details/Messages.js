@@ -1,5 +1,5 @@
 import CoreMessages from "../../../Messages/Messages.js";
-import ApiMessages from "../../../../api/factory/messages/messages.js";
+//import ApiMessages from "../../../../api/factory/messages/messages.js";
 
 export default {
 	name: "TabMessages",
@@ -11,7 +11,7 @@ export default {
 	},
 	data(){
 		return {
-			endpoint: ApiMessages
+			//endpoint: ApiMessages
 		};
 	},
 	computed: {
@@ -36,7 +36,6 @@ export default {
 		<template v-if="prestudent_ids">
 			<core-messages
 				ref="formc"
-				:endpoint="endpoint"
 				type-id="prestudent_id"
 				:id="prestudent_ids"
 				messageLayout="twoColumnsTableLeft"
@@ -48,7 +47,6 @@ export default {
 		<template v-else >
 			<core-messages
 				ref="formc"
-				:endpoint="endpoint"
 				type-id="person_id"
 				:id="person_ids"
 				messageLayout="twoColumnsTableLeft"

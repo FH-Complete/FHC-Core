@@ -1341,6 +1341,7 @@ class Status extends FHCAPI_Controller
 			'updateamum' => date('c'),
 			'updatevon' => $authUID
 		];
+		$nullableFields = ['statusgrund_id', 'anmerkung', 'rt_stufe'];
 		foreach ([
 					'orgform_kurzbz',
 					'anmerkung',
@@ -1349,8 +1350,17 @@ class Status extends FHCAPI_Controller
 					'rt_stufe',
 					'statusgrund_id'
 				] as $key)
-			if ($this->input->post($key))
+		{
+			if (in_array($key, $nullableFields))
+			{
+				$updateData[$key] = ($this->input->post($key) === '') ? null : $this->input->post($key);
+			}
+			else if ($this->input->post($key))
+			{
 				$updateData[$key] = $this->input->post($key);
+			}
+		}
+
 
 		if ($this->input->post('bestaetigtam')) {
 			$updateData['bestaetigtam'] = $this->input->post('bestaetigtam');

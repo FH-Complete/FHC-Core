@@ -13,12 +13,6 @@ export default {
 		DropdownComponent,
 	},
 	props: {
-/*
-		endpoint: {
-			type: Object,
-			required: true
-		},
-*/
 		openMode: String,
 		typeId: String,
 		id: {
@@ -113,7 +107,6 @@ export default {
 					if(this.openMode == "inSamePage" && this.id.length == 1 ){
 						this.$emit('reloadTable');
 						}
-					this.resetForm();
 					}
 				);
 		},
@@ -126,9 +119,13 @@ export default {
 				}).catch(this.$fhcAlert.handleSystemError);
 		},
 		getPreviewText(){
+			console.log("subj" + this.formData.subject);
 			const data = new FormData();
+
 			data.append('data', JSON.stringify(this.formData.body));
 			data.append('ids', JSON.stringify(this.id));
+
+			console.log("subj" + this.formData.subject);
 
 			return this.$api
 				.call(ApiMessages.getPreviewText(
@@ -150,7 +147,7 @@ export default {
 				this.editor.save();
 
 			} else {
-				console.error("Editor instance is not available.");
+				console.error(this.$p.t('messages', 'errorEditorNotAvailable'));
 			}
 		},
 		resetForm(){
@@ -182,14 +179,28 @@ export default {
 				this.isVisible = false;
 		},
 		showTemplate(){
-			if (this.openMode == "inSamePage")
+			if (this.openMode == "inSamePage") {
 				this.isVisible = true;
+				//to enable send newMessage after sentMessage
+				this.messageSent = false;
+			}
 		},
 		showPreview(){
 			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
 		},
+		loadReplyData(messageId){
+			this.$api
+				.call(ApiMessages.getReplyData(messageId))
+				.then(result => {
+					this.replyData = result.data;
+					this.formData.subject = this.replyData[0].replySubject;
+					this.formData.body = this.replyData[0].replyBody;
+					this.formData.relationmessage_id = messageId;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	watch: {
 		'formData.body': {
@@ -216,14 +227,12 @@ export default {
 		const missingparamsmsgs = [];
 		if(!this.typeId)
 		{
-			// TODO(bh) Phrase
-			missingparamsmsgs.push('Fehlender oder ungültiger Parameter Empfänger-Id-Typ.');
+			missingparamsmsgs.push(this.$p.t('messages', 'errorMissingOrInvalidParameterRecipientTypeId'));
 		}
 
 		if(!this.id || this.id.length < 1)
 		{
-			// TODO(bh) Phrase
-			missingparamsmsgs.push('Fehlender oder ungültiger Parameter Empfänger-Id(s).');
+			missingparamsmsgs.push(this.$p.t('messages', 'errorMissingOrInvalidParameterRecipientIds'));
 		}
 
 		if(missingparamsmsgs.length > 0)
@@ -283,7 +292,8 @@ export default {
 
 		//case of reply
 		if(this.messageId != null) {
-			this.$api
+			this.loadReplyData(this.messageId);
+/*			this.$api
 				.call(ApiMessages.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
@@ -291,7 +301,7 @@ export default {
 					this.formData.body = this.replyData[0].replyBody;
 					this.formData.relationmessage_id = this.messageId;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError);*/
 		}
 
 	},
@@ -305,7 +315,7 @@ export default {
 
 	<div class="messages-detail-newmessage-newdiv">
 			<!--new page-->
-			<div v-if="!messageSent" class="overflow-auto m-3">
+			<div v-if="!messageSent" ref="divNewMessage" class="overflow-auto m-3">
 				<h4>{{ $p.t('messages', 'neueNachricht') }}</h4>
 
 				<div class="row">

@@ -51,7 +51,8 @@ export default{
 		}
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object,
 	},
 	data() {
 		return {
@@ -175,15 +176,18 @@ export default{
 							const data = cell.getData();
 
 							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-forward"></i>';
-							button.title = this.$p.t('ui', 'btn_statusVorruecken');
-							button.addEventListener('click', () =>
-								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
-							);
-							if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
-								button.disabled = true;
-							container.append(button);
+							if (this.config?.showStatusVorruecken !== false)
+							{
+								button.className = 'btn btn-outline-secondary btn-action';
+								button.innerHTML = '<i class="fa fa-forward"></i>';
+								button.title = this.$p.t('ui', 'btn_statusVorruecken');
+								button.addEventListener('click', () =>
+									this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
+								);
+								if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
+									button.disabled = true;
+								container.append(button);
+							}
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';

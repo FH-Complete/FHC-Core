@@ -381,7 +381,6 @@ export default {
 			return false;
 		},
 		actionNewPerson() {
-			this.$refs.newPersonModal.reset();
 			this.$refs.newPersonModal.open();
 		},
 		actionKontaktdatenBearbeiten() {
