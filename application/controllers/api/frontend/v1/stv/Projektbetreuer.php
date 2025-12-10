@@ -3,7 +3,7 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 use \DateTime as DateTime;
-use CI3_Events as Events;
+use \CI3_Events as Events;
 
 class Projektbetreuer extends FHCAPI_Controller
 {
@@ -128,11 +128,8 @@ class Projektbetreuer extends FHCAPI_Controller
 		if ($this->_validate($projektbetreuer) == false) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		// check if assessor has already been assigned
-		if (
-			isset($projektbetreuer['person_id'])
-			&& isset($projektbetreuer['person_id_old'])
-			&& $projektbetreuer['person_id'] != $projektbetreuer['person_id_old']
-		) {
+		if (isset($projektbetreuer['person_id']))
+		{
 			$this->ProjektbetreuerModel->addSelect('1');
 			$betreuerRes = $this->ProjektbetreuerModel->loadWhere(
 				[
@@ -142,15 +139,15 @@ class Projektbetreuer extends FHCAPI_Controller
 				]
 			);
 
-			if (hasData($betreuerRes))
-			{
+			if (hasData($betreuerRes)
+				&& (!isset($projektbetreuer['person_id_old']) || $projektbetreuer['person_id'] != $projektbetreuer['person_id_old'])) {
 				return $this->terminateWithError($this->p->t('projektarbeit', 'betreuerZugewiesen'), self::ERROR_TYPE_GENERAL);
 			}
 		}
 
 		$result = null;
 
-		$stunden = isset($projektbetreuer['stunden']) && !isEmptyString($projektbetreuer['stunden']) ? $projektbetreuer['stunden'] : null; 
+		$stunden = isset($projektbetreuer['stunden']) && !isEmptyString($projektbetreuer['stunden']) ? $projektbetreuer['stunden'] : null;
 		$stundensatz =
 			isset($projektbetreuer['stundensatz']) && !isEmptyString($projektbetreuer['stundensatz']) ? $projektbetreuer['stundensatz'] : null;
 
@@ -193,18 +190,26 @@ class Projektbetreuer extends FHCAPI_Controller
 		$betreuerart_kurzbz = $this->input->post('betreuerart_kurzbz');
 
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id))
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'projektarbeit').' ID'], self::ERROR_TYPE_GENERAL));
+		{
+			return $this->terminateWithError(
+				$this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'projektarbeit').' ID'], self::ERROR_TYPE_GENERAL)
+			);
+		}
 
 		if (!isset($person_id) || !is_numeric($person_id))
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID'], self::ERROR_TYPE_GENERAL));
 
 		if (!isset($betreuerart_kurzbz))
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'betreuerart')], self::ERROR_TYPE_GENERAL));
+		{
+			return $this->terminateWithError(
+				$this->p->t('ui', 'error_missingId', ['id'=> $this->p->t('projektarbeit', 'betreuerart')], self::ERROR_TYPE_GENERAL)
+			);
+		}
 
 		if (!$this->ProjektarbeitModel->hasBerechtigungForProjektarbeit($projektarbeit_id))
 			return $this->_outputAuthError([$this->router->method => ['admin:rw', 'assistenz:rw']]);
 
-		$validate = $this->_validateDelete($projektarbeit_id, $person_id);
+		$validate = $this->_validateDelete($projektarbeit_id, $person_id, $betreuerart_kurzbz);
 
 		if (isError($validate)) return $this->terminateWithError(getError($validate), self::ERROR_TYPE_GENERAL);
 
@@ -231,7 +236,7 @@ class Projektbetreuer extends FHCAPI_Controller
 			$this->outputJson($result);
 		}
 
-		return $this->terminateWithSuccess(current(getData($result)) ? : null);
+		return $this->terminateWithSuccess(getData($result));
 	}
 
 	public function getBetreuerarten()
@@ -277,8 +282,7 @@ class Projektbetreuer extends FHCAPI_Controller
 		if (!hasData($result)) $this->terminateWithSuccess([]);
 
 		$persons = $this->_addFullNameToBetreuer(getData($result));
-		usort($persons, function($a, $b)
-		{
+		usort($persons, function ($a, $b) {
 			$statusRanks = ['Mitarbeiter' => 0, 'Person' => 1, 'Student' => 2];
 			return (isset($statusRanks[$a->status]) ? $statusRanks[$a->status] : count($statusRanks) + 1)
 				- (isset($statusRanks[$b->status]) ? $statusRanks[$b->status] : count($statusRanks) + 1);
@@ -367,10 +371,12 @@ class Projektbetreuer extends FHCAPI_Controller
 	 * @param
 	 * @return object success or error
 	 */
-	private function _validateDelete($projektarbeit_id, $person_id)
+	private function _validateDelete($projektarbeit_id, $person_id, $betreuerart_kurzbz)
 	{
 		$this->ProjektbetreuerModel->addSelect('vertrag_id');
-		$result = $this->ProjektbetreuerModel->loadWhere(['projektarbeit_id' => $projektarbeit_id, 'person_id' => $person_id]);
+		$result = $this->ProjektbetreuerModel->loadWhere(
+			['projektarbeit_id' => $projektarbeit_id, 'person_id' => $person_id, 'betreuerart_kurzbz' => $betreuerart_kurzbz]
+		);
 
 		if (isError($result)) return $result;
 
