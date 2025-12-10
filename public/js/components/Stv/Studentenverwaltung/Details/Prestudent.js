@@ -122,7 +122,7 @@ export default {
 	},
 
 	methods: {
-		loadPrestudent() {
+		async loadPrestudent() {
 			return this.$api
 				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id, this.currentSemester))
 				.then(result => result.data)
@@ -170,8 +170,8 @@ export default {
 			)
 		},
 	},
-	created() {
-		this.loadPrestudent();
+	async created() {
+		await this.loadPrestudent();
 		this.$api
 			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
