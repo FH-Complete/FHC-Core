@@ -331,7 +331,10 @@ class Config extends FHCAPI_Controller
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js')
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
+			'config' => [
+				'showStatusVorruecken' => defined('STATUS_VORRUECKEN_ANZEIGEN') ? STATUS_VORRUECKEN_ANZEIGEN : true,
+			]
 		];
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
