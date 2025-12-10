@@ -49,17 +49,8 @@ export default {
 				.then(result => {
 					this.listAufnahmetermine = result.data;
 
-					//TODO(Manu) check logic Fas STG
-					const hasMatch = this.listAufnahmetermine
-						.some(item => item.studiengangkurzbzlang === this.student.studiengang);
-					if(!hasMatch){
-						this.formData.rt_gesamtpunkte = 0;
-						this.$fhcAlert.alertError("Studiengang nicht enthalten: " + this.student.studiengang);
-						return;
-					}
-
 					const listAufnahmetermineFiltered = this.listAufnahmetermine
-						.filter(item => item.studiengangkurzbzlang == this.student.studiengang)
+						.filter(item => item.studiengang_kz_ber == this.student.studiengang_kz)
 						.sort((a, b) => this.parseSemester(b.studiensemester) - this.parseSemester(a.studiensemester));
 
 					let pointsSemStg = 0;
@@ -114,7 +105,7 @@ export default {
 	template: `
 		<div class="stv-details-admission-header-placement h-100 pb-3">
 			<h4>{{ $p.t('lehre', 'studiengang') }}</h4> {{student.studiengang}}
-						
+
 			<form-form class="mt-3" ref="formRtGesamtData" @submit.prevent>
 				<div v-if="showAufnahmegruppen" class="row mb-3">
 					<div class="col-1">

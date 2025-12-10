@@ -46,8 +46,7 @@ export default {
 					const data = response.data;
 
 					const filtered = data.filter(item =>
-						item.studiengangkurzbzlang === this.student.studiengang ||
-						item.stg_kuerzel === this.student.studiengang
+						item.studiengang_kz_ber === this.student.studiengang_kz
 					);
 
 					if (filtered.length > 0) {
@@ -62,17 +61,15 @@ export default {
 					return data;
 				},
 				rowFormatter: function(row) {
-					let data = row.getData(); // get data for this row
+					let data = row.getData();
 
-					if (data.studiengangkurzbzlang == self.student.studiengang &&
+					if (data.studiengang_kz_ber === self.student.studiengang_kz &&
 						data.studiensemester === self.youngestSemester) {
-						let cells = row.getCells();
-
-						cells.forEach((c) => {
-								c.getElement().classList.add("row-green");
-							}
-
-						);
+							let cells = row.getCells();
+							cells.forEach((c) => {
+									c.getElement().classList.add("row-green");
+								}
+							);
 					}
 				},
 				dataLoaded: function() {
@@ -124,8 +121,9 @@ export default {
 					{title: "ort", field: "ort", visible: false},
 					{title: "studienplan", field: "studienplan", visible: false},
 					{title: "studienplan_id", field: "studienplan_id", visible: false},
-					{title: "stg", field: "studiengangkurzbzlang"},
-					{title: "Stg", field: "stg_kuerzel"},
+					//{title: "stg", field: "studiengangkurzbzlang"},
+					{title: "stg_ber", field: "studiengangkurzbzlang_ber"},
+					{title: "stg_kz", field: "studiengang_kz_ber", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -209,11 +207,8 @@ export default {
 						cm.getColumnByField('studienplan_id').component.updateDefinition({
 							title: this.$p.t('ui', 'studienplan_id')
 						});
-						cm.getColumnByField('studiengangkurzbzlang').component.updateDefinition({
+						cm.getColumnByField('studiengangkurzbzlang_ber').component.updateDefinition({
 							title: this.$p.t('projektarbeitsbeurteilung', 'studiengang')
-						});
-						cm.getColumnByField('stg_kuerzel').component.updateDefinition({
-							title: this.$p.t('admission', 'stg_kurz')
 						});
 					}
 				}
@@ -382,7 +377,6 @@ export default {
 			.then(result => {
 				if(result.data)
 					this.listPlacementTests = this.filteredPlacementTests = result.data;
-
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -396,7 +390,7 @@ export default {
 	template: `
 	<div class="stv-details-admission-table h-100 pb-3">
 		<h4>{{$p.t('admission', 'allgemein')}}</h4>
-		
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
