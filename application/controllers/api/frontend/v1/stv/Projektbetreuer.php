@@ -208,6 +208,18 @@ class Projektbetreuer extends FHCAPI_Controller
 
 		if (isError($validate)) return $this->terminateWithError(getError($validate), self::ERROR_TYPE_GENERAL);
 
+		$beurteilungDeleteSuccess = true;
+
+		Events::trigger(
+			'projektarbeitsbeurteilung_delete',
+			$projektarbeit_id,
+			function ($value) use (&$beurteilungDeleteSuccess) {
+				$beurteilungDeleteSuccess = $value;
+			}
+		);
+
+		if (!$beurteilungDeleteSuccess) return $this->terminateWithError($this->p->t('projektarbeit', 'error_paarbeitHatBeurteilung'));
+
 		$result = $this->ProjektbetreuerModel->delete(
 			['projektarbeit_id' => $projektarbeit_id, 'person_id' => $person_id, 'betreuerart_kurzbz' => $betreuerart_kurzbz]
 		);
