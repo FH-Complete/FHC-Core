@@ -209,10 +209,10 @@ export default {
 	},
 	methods: {
 		actionNewProjektbetreuer() {
-			this.resetForm();
-			this.defaultStundensatz = this.config.defaultProjektbetreuerStundensatz;
 			this.newMode = !this.newMode;
 			this.editMode = false;
+			this.resetForm();
+			this.defaultStundensatz = this.config.defaultProjektbetreuerStundensatz;
 			this.captureFormData();
 		},
 		actionEditProjektbetreuer(projektarbeit_id, person_id, betreuerart_kurzbz) {
@@ -397,12 +397,10 @@ export default {
 		},
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.projekttyp_kurzbz = projekttyp_kurzbz;
-			// if form data has not already been modified by user, set the default stunden
-			if (!this.formDataModified()) {
+			// set default stunden if not in edit mode (so hours of editen person are not overwritten)
+			if (!this.editMode)
+			{
 				let defaultStunden = this.getDefaultStunden(projekttyp_kurzbz);
-				// adapt initial form data so it does not count as modified
-				if (this.initialFormData) this.initialFormData.stunden = defaultStunden;
-				// set default Stunden
 				this.formData.stunden = defaultStunden;
 			}
 		},
@@ -415,17 +413,6 @@ export default {
 					this.formData.stundensatz = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-		},
-		// check if form data has been modified since initial data has been captured
-		formDataModified() {
-			if (this.autocompleteSelectedBetreuer != null) return true;
-
-			for (const prop in this.initialFormData) {
-				if (typeof this.formData[prop] == 'undefined') return true;
-				if (this.formData[prop] != this.initialFormData[prop]) return true;
-			}
-
-			return false;
 		},
 		actionNewPerson() {
 			this.$refs.newPersonModal.reset();
