@@ -23,6 +23,10 @@ export default {
 			from: 'configUseReihungstestPunkte',
 			default: true
 		},
+		hasExcludedAreas: {
+			from: 'configHasExcludedAreas',
+			default: false
+		},
 		$reloadList: {
 			from: '$reloadList',
 			required: true
@@ -123,7 +127,7 @@ export default {
 					{title: "studienplan_id", field: "studienplan_id", visible: false},
 					//{title: "stg", field: "studiengangkurzbzlang"},
 					{title: "stg_ber", field: "studiengangkurzbzlang_ber"},
-					{title: "stg_kz", field: "studiengang_kz_ber", visible: false},
+					{title: "Stg_Kz", field: "studiengang_kz_ber", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -136,7 +140,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
 							button.addEventListener('click', (event) =>
-								this.actionEditPlacementTest(cell.getData().rt_person_id)
+								this.actionEditPlacementTest(cell.getData().rt_person_id, cell.getData().studiengang_kz_ber)
 							);
 							container.append(button);
 
@@ -219,7 +223,8 @@ export default {
 			listStudyPlans: [],
 			filterOnlyFutureTestsSet: false,
 			filteredPlacementTests: [],
-			youngestSemester: null
+			youngestSemester: null,
+			stgRtPers: null
 		}
 	},
 	methods: {
@@ -229,11 +234,12 @@ export default {
 			this.formData.anmeldedatum = new Date();
 			this.$refs.placementTestModal.show();
 		},
-		actionEditPlacementTest(rt_person_id) {
+		actionEditPlacementTest(rt_person_id, stg_kz) {
 			this.resetForm();
 			this.statusNew = false;
 			this.loadPlacementTest(rt_person_id);
 			this.$refs.placementTestModal.show();
+			this.stgRtPers = stg_kz;
 		},
 		actionDeletePlacementTest(rt_person_id) {
 			this.$fhcAlert
@@ -303,12 +309,13 @@ export default {
 					this.reload();
 				});
 		},
-		getResultReihungstest(reihungstest_id){
+		getResultReihungstest(reihungstest_id, stg_kz){
 			const paramsRt = {
 				reihungstest_id: reihungstest_id,
 				person_id: this.student.person_id,
 				punkte: this.useReihungstestPunkte,
-				studiengang_kz: this.student.studiengang_kz
+				studiengang_kz: stg_kz,
+				hasExcludedAreas: this.hasExcludedAreas
 			};
 
 			return this.$api
@@ -362,6 +369,7 @@ export default {
 		},
 		resetForm() {
 			this.formData = {};
+			this.stgRtPers = null;
 		},
 		parseSemester(semester) {
 			const type = semester.slice(0, 2).toUpperCase(); // "WS" or "SS"
@@ -528,7 +536,7 @@ export default {
 				
 					<div v-if="allowUebernahmePunkte" class="col-4">
 						<label class="form-label" style="color:transparent;">getPunkte</label>
-						<button class="btn btn-outline-secondary w-100" @click="getResultReihungstest(formData.rt_id)">{{ $p.t('admission', 'getRTErgebnis') }}</button>
+						<button class="btn btn-outline-secondary w-100" @click="getResultReihungstest(formData.rt_id, stgRtPers)">{{ $p.t('admission', 'getRTErgebnis') }}</button>
 					</div>
 
 				</div>				

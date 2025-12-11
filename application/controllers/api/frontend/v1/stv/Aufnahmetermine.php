@@ -392,6 +392,7 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$person_id = $this->input->get('person_id');
 		$punkte = $this->input->get('punkte');
 		$reihungstest_id = $this->input->get('reihungstest_id');
+		$has_excluded_gebiete = $this->input->get('hasExcludedAreas');
 
 		if(!$reihungstest_id)
 		{
@@ -402,22 +403,27 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$studiengang_kz = $this->input->get('studiengang_kz');
 
 		$this->load->model('testtool/Ablauf_model', 'AblaufModel');
-		$result = $this->AblaufModel->getAblaufGebieteAndGewichte($studiengang_kz);
+		$result = $this->AblaufModel->getAblaufGebieteAndGewichte($studiengang_kz, 1);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$weightedArray = [];
+		$basis_gebiet_id_arr = [];
+		$basis_gebiet_id_toString = '';
 		foreach ($data as $abl)
 		{
 			$weightedArray[$abl->gebiet_id] = $abl->gewicht;
+			$basis_gebiet_id_arr[]= $abl->gebiet_id;
 		}
+		$basis_gebiet_id_toString = implode(', ', $basis_gebiet_id_arr);
 
-		$result = $this->ReihungstestModel->getReihungstestErgebnisPerson($person_id, $punkte, $reihungstest_id, $weightedArray);
-
-/*		if (isError($result))
-		{
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}*/
-
+		$result = $this->ReihungstestModel->getReihungstestErgebnisPerson(
+			$person_id,
+			$punkte,
+			$reihungstest_id,
+			$weightedArray,
+			$has_excluded_gebiete,
+			$basis_gebiet_id_toString
+		);
 		$this->terminateWithSuccess($result);
 	}
 

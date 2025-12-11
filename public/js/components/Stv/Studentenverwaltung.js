@@ -84,6 +84,7 @@ export default {
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
 			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
+			configHasExcludedAreas: this.config.hasExcludedAreas,
 			appConfig: Vue.computed(() => this.appconfig)
 		}
 	},
