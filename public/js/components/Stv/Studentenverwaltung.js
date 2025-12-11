@@ -89,6 +89,7 @@ export default {
 	},
 	data() {
 		return {
+			sidebarCollapsed: false,
 			appconfig: {},
 			configEndpoints: ApiStvConfig,
 			selected: [],
@@ -494,7 +495,7 @@ export default {
 		this.handlePersonUrl();
 	},
 	template: /* html */`
-	<div class="stv">
+		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -509,6 +510,14 @@ export default {
 					<span class="svg-icon svg-icon-apps"></span>
 				</button>
 				<a class="navbar-brand me-0" :href="stvRoot">StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}</a>
+				<button
+					class="btn btn-outline-light border-0 d-none d-md-inline-flex m-1  ms-auto"
+					type="button"
+					@click="sidebarCollapsed = !sidebarCollapsed"
+					:aria-label="$p.t('ui/toggle_nav')"
+				>
+					<span class="fa-solid fa-list"></span>
+				</button>
 			</div>
 			<button
 				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
