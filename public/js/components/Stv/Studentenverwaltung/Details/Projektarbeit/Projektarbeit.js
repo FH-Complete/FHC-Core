@@ -47,15 +47,24 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'ui', 'projektarbeit']);
+						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'ui', 'projektarbeit']);
 
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'typ_kurzbz')
+						});
+						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'typ')
+						});
+						cm.getColumnByField('studiensemester_kurzbz').component.updateDefinition({
+							title: this.$p.t('lehre', 'studiensemester')
 						});
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'titel')
+						});
+						cm.getColumnByField('note').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'gesamtnote')
 						});
 						cm.getColumnByField('beginn').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'beginn')
@@ -77,6 +86,12 @@ export default {
 						});
 						cm.getColumnByField('firma_id').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'firmaId')
+						});
+						cm.getColumnByField('abgabedatum').component.updateDefinition({
+							title: this.$p.t('projektarbeit', 'abgabeEndupload')
+						});
+						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
 						});
 					}
 				},
@@ -101,6 +116,7 @@ export default {
 					{title: "Typ Kurzbz", field: "projekttyp_kurzbz", visible: false},
 					{title: "Studiensemester", field: "studiensemester_kurzbz"},
 					{title: "Titel", field: "titel"},
+					{title: "Gesamtnote", field: "note"},
 					{
 						title: "Abgabe Enduplad",
 						field: "abgabedatum",
@@ -183,6 +199,7 @@ export default {
 					{title: "Anmerkung", field: "anmerkung", visible: false},
 					{title: "Lehreinheit ID", field: "lehreinheit_id", visible: false},
 					{title: "Student UID", field: "student_uid", visible: false},
+					{title: "Projektbetreuer", field: "projektbetreuer"},
 					{
 						title:"Final",
 						field:"final",
@@ -258,7 +275,7 @@ export default {
 			this.statusNew = true;
 			this.editedProjektarbeit = null;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(this.statusNew);
+			this.$refs.projektarbeitDetails.getFormData(this.statusNew, null, null);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditProjektarbeit() {
@@ -388,7 +405,7 @@ export default {
 				<div class="tab-pane fade show" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer" role="tabpanel" aria-labelledby="betreuer-tab">
 					<div class="row">
 						<div class="col-12">
-							<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
+							<projektbetreuer ref="projektbetreuer" :config="config" @betreuer-saved="reload"></projektbetreuer>
 						</div>
 					</div>
 				</div>
