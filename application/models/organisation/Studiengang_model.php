@@ -801,4 +801,38 @@ class Studiengang_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
 	}
+
+	/**
+	 * Get active Studiengänge with Kuerzel by given Studiengang-Kennzahlen.
+	 * Helpful to easily get Studiengänge the user is entitled for.
+	 *
+	 * @param $studiengang_kz_arr
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getEntitledStgs($studiengang_kz_arr, $studiensemester_kurzbz)
+	{
+		if (is_numeric($studiengang_kz_arr))
+		{
+			$studiengang_kz_arr = [$studiengang_kz_arr];
+		}
+
+		$qry = '
+			SELECT
+				DISTINCT stg.*, UPPER(typ::varchar(1) || kurzbz) AS kuerzel
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz IN ?
+				AND stg.aktiv = TRUE
+				AND stplsem.studiensemester_kurzbz = ?
+			ORDER BY
+				stg.kurzbzlang
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz_arr, $studiensemester_kurzbz]);
+	}
 }
