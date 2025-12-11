@@ -116,7 +116,7 @@ export default {
 						frozen: true
 					},
 				],
-				//layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
@@ -126,7 +126,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektbetreuer'
+				persistenceID: 'stv-details-projektbetreuer-2025112401'
 			},
 			tabulatorEvents: [
 				{

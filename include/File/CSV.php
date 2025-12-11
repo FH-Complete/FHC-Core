@@ -178,7 +178,7 @@ class File_CSV
             return $field;
         }
 
-        if ($quote && $field{0} == $quote && $field{strlen($field)-1} == $quote) {
+        if ($quote && $field[0] == $quote && $field[strlen($field) - 1] == $quote) {
             return substr($field, 1, -1);
         }
         return $field;
@@ -230,7 +230,7 @@ class File_CSV
                 } elseif ($c == "\n" || $c == "\r") {
                     $sub = ($prev == "\r") ? 2 : 1;
                     if ((strlen($buff) >= $sub) &&
-                        ($buff{strlen($buff) - $sub} == $quote))
+                        ($buff[strlen($buff) - $sub] == $quote))
                     {
                         $in_quote = false;
                     }
@@ -312,9 +312,9 @@ class File_CSV
             $last =& $fields[count($fields) - 1];
             // Fallback to read the line with readQuoted when guess
             // that the simple explode won't work right
-            if (($last{strlen($last) - 1} == "\n"
-                && $last{0} == $conf['quote']
-                && $last{strlen(rtrim($last)) - 1} != $conf['quote'])
+            if (($last[strlen($last) - 1] == "\n"
+                && $last[0] == $conf['quote']
+                && $last[strlen(rtrim($last)) - 1] != $conf['quote'])
                 ||
                 (count($fields) != $conf['fields'])
                 // XXX perhaps there is a separator inside a quoted field

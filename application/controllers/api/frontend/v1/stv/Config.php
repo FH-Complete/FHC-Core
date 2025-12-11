@@ -33,6 +33,8 @@ class Config extends FHCAPI_Controller
 	{
 		// TODO(chris): permissions
 		parent::__construct([
+			'get' => ['admin:r', 'assistenz:r'],
+			'set' => ['admin:r', 'assistenz:r'],
 			'filter' => ['admin:r', 'assistenz:r'],
 			'student' => ['admin:r', 'assistenz:r'],
 			'students' => ['admin:r', 'assistenz:r']
@@ -55,6 +57,95 @@ class Config extends FHCAPI_Controller
 	}
 
 	/**
+	 * get App config
+	 */
+	public function get()
+	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->config('stv');
+
+		$config = [];
+
+		#number_displayed_past_studiensemester
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['number_displayed_past_studiensemester']);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$number_displayed_past_studiensemester_default = $this->config->item('number_displayed_past_studiensemester_default');
+
+		$config['number_displayed_past_studiensemester'] = [
+			"type" => "number",
+			"label" => $this->p->t('stv', 'settings_no_displayed_past_sem'),
+			"value" => $data['number_displayed_past_studiensemester']
+				?? $number_displayed_past_studiensemester_default
+		];
+
+		#font_size
+		$result = $this->VariableModel->getVariables(getAuthUID(), ['stv_font_size']);
+		$data = $this->getDataOrTerminateWithError($result);
+		$config['font_size'] = [
+			"type" => "select",
+			"label" => $this->p->t('stv', 'settings_fontsize'),
+			"value" => $data['stv_font_size'] ?? "fs_normal",
+			"options" => [
+				"fs_xx-small" => $this->p->t('stv', 'settings_fontsize_xx-small'),
+				"fs_x-small" => $this->p->t('stv', 'settings_fontsize_x-small'),
+				"fs_small" => $this->p->t('stv', 'settings_fontsize_small'),
+				"fs_normal" => $this->p->t('stv', 'settings_fontsize_normal'),
+				"fs_big" => $this->p->t('stv', 'settings_fontsize_big'),
+				"fs_huge" => $this->p->t('stv', 'settings_fontsize_huge')
+			]
+		];
+
+		#others
+		Events::trigger('stv_config_get', function & () use (&$config) {
+			return $config;
+		});
+
+		$this->terminateWithSuccess($config);
+	}
+
+	/**
+	 * set App config
+	 */
+	public function set()
+	{
+		$this->load->model('system/Variable_model', 'VariableModel');
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'number_displayed_past_studiensemester',
+			$this->p->t('stv', 'settings_no_displayed_past_sem'),
+			'required|integer'
+		);
+		$this->form_validation->set_rules(
+			'font_size',
+			$this->p->t('stv', 'settings_fontsize'),
+			'required|in_list[fs_xx-small,fs_x-small,fs_small,fs_normal,fs_big,fs_huge]'
+		);
+
+		Events::trigger('stv_config_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'number_displayed_past_studiensemester',
+			$this->input->post('number_displayed_past_studiensemester')
+		);
+		$this->VariableModel->setVariable(
+			getAuthUID(),
+			'stv_font_size',
+			$this->input->post('font_size')
+		);
+
+		Events::trigger('stv_config_set', $this->input);
+
+		$this->terminateWithSuccess();
+	}
+	
+	/*
 	 * Get the config for the student filters
 	 *
 	 * @return void
@@ -240,7 +331,10 @@ class Config extends FHCAPI_Controller
 		];
 		$result['status'] = [
 			'title' => 'Status',
-			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js')
+			'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/MultiStatus.js'),
+			'config' => [
+				'showStatusVorruecken' => defined('STATUS_VORRUECKEN_ANZEIGEN') ? STATUS_VORRUECKEN_ANZEIGEN : true,
+			]
 		];
 		$result['documents'] = [
 			'title' => $this->p->t('stv', 'tab_documents'),
@@ -406,6 +500,15 @@ class Config extends FHCAPI_Controller
 				'showEdit' => $this->permissionlib->isBerechtigt('admin')
 			]
 		];
+
+		if($this->permissionlib->isBerechtigt('basis/person'))
+		{
+			$result['combinePeople'] = [
+				'title' => $this->p->t('stv', 'tab_combine_people'),
+				'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+				'config' => $config['combinePeople']
+			];
+		}
 
 		$result['kontaktieren'] = [
 			'title' => $this->p->t('stv', 'tab_kontaktieren'),

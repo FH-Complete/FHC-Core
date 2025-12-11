@@ -163,12 +163,12 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '200',
 				index: 'abschlusspruefung_id',
-				persistenceID: 'stv-details-finalexam'
+				persistenceID: 'stv-details-finalexam-2025112401'
 			},
 			tabulatorEvents: [
 				{
@@ -438,11 +438,9 @@ export default {
 
 			if (this.stgInfo.typ === 'b') {
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'lg') {
 				this.formData.pruefungstyp_kurzbz = 'lgabschluss';

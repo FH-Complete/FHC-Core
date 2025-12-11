@@ -257,7 +257,7 @@ export default {
 						frozen: true
 					},
 				],
-				//layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				height: 'auto',
 				minHeight: '200',
 				selectable: 1,
@@ -265,7 +265,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektarbeit'
+				persistenceID: 'stv-details-projektarbeit-2025112401'
 			}
 			return options;
 		}
