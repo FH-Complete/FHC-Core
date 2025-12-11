@@ -169,6 +169,11 @@ export default {
 				{
 					this.localData.push(newEntry);
 
+					// reload tabulator mit tabulator method
+					if (this.$refs.table?.tabulator) {
+						this.$refs.table.tabulator.replaceData(this.localData);
+					}
+
 					this.$emit('setMobilityPurposeToNewMobility', {
 						zweck_code: this.formData.zweck_code,
 					});
@@ -198,7 +203,6 @@ export default {
 		<br>
 
 		<div class="override_filtercmpt_actions_style">
-
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
