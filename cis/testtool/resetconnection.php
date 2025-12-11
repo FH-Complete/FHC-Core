@@ -12,7 +12,7 @@ if (!$db = new basis_db())
 if (isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true)
 {
 	$ueberwachung = new externeUeberwachung();
-	$url = $ueberwachung->start($_SESSION['prestudent_id'], $_SESSION['reihungstestID']);
+	$url = $ueberwachung->start($_SESSION['prestudent_id'], $_SESSION['reihungstestID'], $_SESSION['sprache']);
 	$urlSafe = htmlspecialchars($url, ENT_QUOTES);
 	header("Location: $urlSafe");
 	$_SESSION['externe_ueberwachung_verified'] = true;

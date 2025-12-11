@@ -20,7 +20,7 @@ class externeUeberwachung extends basis_db
 		$session_id = $this->getSessionByPrestudent($prestudent_id);
 		return $this->getSessionStatus($session_id);
 	}
-	public function start($prestudent_id, $reihungstest_id)
+	public function start($prestudent_id, $reihungstest_id, $sprache)
 	{
 		$session_id = $this->getSessionByPrestudent($prestudent_id);
 
@@ -38,7 +38,7 @@ class externeUeberwachung extends basis_db
 			}
 		}
 
-		$payload = $this->getPayload($session_id, $prestudent_id, $reihungstest_id);
+		$payload = $this->getPayload($session_id, $prestudent_id, $reihungstest_id, $sprache);
 		return $this->getStartUrl($payload);
 	}
 
@@ -135,7 +135,7 @@ class externeUeberwachung extends basis_db
 		];
 	}
 
-	private function getPayload($session_id, $prestudent_id, $reihungstest_id)
+	private function getPayload($session_id, $prestudent_id, $reihungstest_id, $sprache)
 	{
 		$prestudent = new prestudent($prestudent_id);
 		$person = new Person($prestudent->person_id);
@@ -149,7 +149,7 @@ class externeUeberwachung extends basis_db
 			"userId" => $prestudent_id,
 			"lastName" => $person->nachname,
 			"firstName" => $person->vorname,
-			"language" => $person->sprache,
+			"language" => $sprache === 'German' ? 'de' : 'en',
 			"accountName" => "technikum_wien",
 			"accountId" => "technikum_wien",
 			"examId" => $reihungstest_id . '_' . $today,
