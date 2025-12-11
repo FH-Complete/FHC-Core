@@ -52330,6 +52330,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Personen zusammenlegen Phrasen END
+	array(
+		'app' => 'core',
+		'category' => 'uhstat',
+		'phrase' => 'uhstat1AnmeldungEinleitungstextOhneSvnr',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Senden der Daten ist nur möglich, wenn alle Fragen beantwortet worden sind. Wenn Sie etwas nicht wissen, wählen Sie die Antwortmöglichkeit „unbekannt“, aber beantworten Sie bitte alle Fragen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Sending the data is only possible if all questions have been answered. If you don\'t know something, choose the answer option “unknown”, but please answer all questions.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	)
 );
 
 

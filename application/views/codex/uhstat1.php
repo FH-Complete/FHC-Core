@@ -45,10 +45,7 @@ $saved = isset($saved) && $saved === true;
 			<?php echo $this->p->t('uhstat', 'rechtsbelehrung') ?>
 		</p>
 		<p>
-			<?php echo $this->p->t('uhstat', 'uhstat1AnmeldungEinleitungstext') ?>
-		</p>
-		<p>
-			<?php echo $this->p->t('uhstat', 'uhstat1EinleitungSvnrtext') ?>
+			<?php echo $this->p->t('uhstat', 'uhstat1AnmeldungEinleitungstextOhneSvnr') ?>
 		</p>
 		<br>
 		<?php if ($savePermission): ?>
