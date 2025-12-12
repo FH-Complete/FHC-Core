@@ -442,6 +442,10 @@ class Documents extends FHCAPI_Controller
 			'betreuerart_kurzbz',
 			'studiensemester_kurzbz'
 		] as $key) {
+			if (in_array($xsl, array('Ausbildungsver', 'AusbVerEng')) && $key === 'uid')
+			{
+				continue;
+			}
 			$value = $this->input->post_get($key);
 			if ($value !== null)
 				$params .= '&' . $key . '=' . urlencode($value);
@@ -450,11 +454,6 @@ class Documents extends FHCAPI_Controller
 		if ($value !== null) {
 			foreach ($value as $id)
 				$params .= '&vertrag_id[]=' . urlencode($id);
-		}
-
-		//delete uid param for Ausbildungsvertrag
-		if($xsl == 'Ausbildungsver' || $xsl == "AusbVerEng") {
-			$params = $this->_cutUidParam($params);
 		}
 
 		if (!$vorlage->archivierbar)
@@ -490,21 +489,5 @@ class Documents extends FHCAPI_Controller
 					'sign_user' => $sign_user
 				]
 		];
-	}
-
-
-	/**
-	 * @param string				$string
-	 *
-	 * @return String paramString without paramUid
-	 */
-	private function _cutUidParam($string)
-	{
-		$string = preg_replace('/uid=[^&]*&?/', '', $string);
-
-		$params = trim($string, '&');
-		$params = preg_replace('/&&+/', '&', $params);
-
-		return $params;
 	}
 }
