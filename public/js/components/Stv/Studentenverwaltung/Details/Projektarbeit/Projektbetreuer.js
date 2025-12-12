@@ -116,7 +116,7 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
+				layout: 'fitData',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
@@ -126,7 +126,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektbetreuer-2025112401'
+				persistenceID: 'stv-details-projektbetreuer-2025121201'
 			},
 			tabulatorEvents: [
 				{
@@ -146,7 +146,7 @@ export default {
 							title: this.$p.t('projektarbeit', 'note')
 						});
 						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'titel')
+							title: this.$p.t('projektarbeit', 'punkte')
 						});
 						cm.getColumnByField('stunden').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'stunden')
@@ -158,7 +158,7 @@ export default {
 							title: this.$p.t('projektarbeit', 'betreuerart_kurzbz')
 						});
 						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('system', 'person_id')
+							title: this.$p.t('person', 'person_id')
 						});
 						cm.getColumnByField('vertrag_id').component.updateDefinition({
 							title: this.$p.t('projektarbeit', 'vertrag_id')
