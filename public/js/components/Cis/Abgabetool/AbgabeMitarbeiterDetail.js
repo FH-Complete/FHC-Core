@@ -48,7 +48,8 @@ export const AbgabeMitarbeiterDetail = {
 			speedDialItems: [{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
 				icon: "fa fa-plus",
-				command: this.openCreateNewAbgabeModal
+				command: this.openCreateNewAbgabeModal,
+				disabled: Vue.computed(() => this.projektarbeit?.betreuertyp_kurzbz == 'Zweitbegutachter')
 			},
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
@@ -98,7 +99,7 @@ export const AbgabeMitarbeiterDetail = {
 			return [closestIndex, ...additional]
 		},
 		getPlaceholderTermin(termin) {
-			return termin?.bezeichnung?.bezeichnung ?? this.$p.t('abgabetool/abgabetypPlaceholder')	
+			return termin?.bezeichnung ? this.$p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : this.$p.t('abgabetool/abgabetypPlaceholder')
 		},
 		saveTermin(termin) {
 			const paabgabe_id = termin.paabgabe_id
@@ -345,8 +346,8 @@ export const AbgabeMitarbeiterDetail = {
 		getOptionLabelSprache(option) {
 			return option.sprache
 		},
-		getOptionLabelAbgabetyp(option){
-			return option.bezeichnung
+		getOptionLabelAbgabetyp(option) {
+			return this.$p.t('abgabetool/c4paatyp' + option.paabgabetyp_kurzbz)
 		},
 		getOptionDisabled(option) {
 			return !option.aktiv
@@ -406,14 +407,6 @@ export const AbgabeMitarbeiterDetail = {
 			
 			return `${day}.${month}.${year}`
 		},
-		getAccTabHeaderForTermin(termin) {
-			let tabTitle = ''
-			
-			const datumFormatted = this.formatDate(termin.datum)
-			tabTitle += termin.bezeichnung?.bezeichnung + ' ' + datumFormatted
-
-			return tabTitle
-		},
 		openCreateNewAbgabeModal() {
 			if(!this.newTermin) {
 				const typ = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
@@ -433,7 +426,6 @@ export const AbgabeMitarbeiterDetail = {
 					'insertvon': this.viewData?.uid ?? ''
 				}
 			}
-			console.log(this.$refs.modalContainerCreateNewAbgabe)
 			this.$refs.modalContainerCreateNewAbgabe.show()
 		},
 		validateTermin(termin) {
@@ -646,7 +638,7 @@ export const AbgabeMitarbeiterDetail = {
 		class="bootstrap-prompt" 
 		dialogClass="bordered-modal modal-lg" 
 		:backdrop="true"
-		@hideBsModal="console.log('hideBsModal'); showAutomagicModalPhrase=false;"
+		@hideBsModal="showAutomagicModalPhrase=false;"
 	>
 		<template v-slot:title>
 			<div>
@@ -742,7 +734,8 @@ export const AbgabeMitarbeiterDetail = {
 		</div>
 		<div class="row" style="margin-bottom: 12px;">
 			<div class="col-auto">
-				<button type="button" class="btn btn-primary" @click="openCreateNewAbgabeModal">
+<!--				TODO : tooltip why this button is disabled as zweitbegutachter-->
+				<button type="button" :disabled="projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter'" class="btn btn-primary" @click="openCreateNewAbgabeModal">
 					<i class="fa-solid fa-plus"></i>
 					{{$capitalize( $p.t('abgabetool/c4newAbgabetermin') )}}
 				</button>
@@ -769,7 +762,7 @@ export const AbgabeMitarbeiterDetail = {
 								<i v-else-if="getDateStyleClass(termin) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
 							</div>
 							<div class="col-auto text-start" style="min-width: max(150px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
-								<span>{{ termin?.bezeichnung?.bezeichnung }}</span>
+								<span>{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}</span>
 							</div>
 							<div class="col-auto text-start" style="min-width: 100px; transform: translateX(-30px)">
 								<span>{{ formatDate(termin.datum) }}</span>

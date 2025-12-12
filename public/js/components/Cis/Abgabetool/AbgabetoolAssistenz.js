@@ -111,7 +111,6 @@ export const AbgabetoolAssistenz = {
 				selectableCheck: this.selectionCheck,
 				rowHeight: 40,
 				renderVerticalBuffer: 2000,
-				responsiveLayout: true,
 				columns: [
 					{
 						field: 'rowSelection',
@@ -125,26 +124,24 @@ export const AbgabetoolAssistenz = {
 						frozen: true,
 						width: 40
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, responsive: 1, minWidth: 150},
-					// {title: 'pa_id', field: 'projektarbeit_id', visible: true},
-					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1,responsive:0,  tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter,responsive:0, widthGrow: 1, tooltip: false},
-					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4termineTimeLine'))), headerFilter: true, field: 'abgabetermine',responsive:2, formatter: this.timelineFormatter, widthGrow: 1, tooltip: false},
-					// {title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, visible: false, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgform'))), field: 'orgform', headerFilter: true,responsive:2, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgform'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
-						responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, responsive:2,formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, responsive:3, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, responsive:3,formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', responsive:4, formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', responsive:4, formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						 formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))), headerFilter: true, field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))), headerFilter: true, field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
 				persistenceID: "abgabetool_2025_12"
@@ -159,13 +156,79 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		checkQualityGateStatus(projekt) {
+			// TODO: might refine the representation of these states and maybe refactor code a little
+			const qgate1Termine = []
+			const qgate2Termine = []
+			
+			projekt.qgate1Status = this.$p.t('abgabetool/c4keinTerminVorhanden')// 'Kein Termin vorhanden'
+			projekt.qgate1StatusRank = 0
+			projekt.qgate2Status = this.$p.t('abgabetool/c4keinTerminVorhanden')
+			projekt.qgate2StatusRank = 0
+			
+			projekt.abgabetermine.forEach(termin => {
+				if(termin.paabgabetyp_kurzbz == 'qualgate1') qgate1Termine.push(termin)
+				if(termin.paabgabetyp_kurzbz == 'qualgate2') qgate2Termine.push(termin)
+			})
+			
+			// calculate qgateStatusRank and display the highest order status rank of all quality gate termine until one
+			// counts as passed, which is just a positive note no matter if anything has been uploaded
+			
+			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
+			qgate1Termine.forEach(qgate => {
+				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
+					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					if(noteOpt.positiv) {
+						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
+						projekt.qgate1StatusRank = 5
+					} else {
+						projekt.qgate1Status = this.$p.t('abgabetool/c4negativBenotet')
+						projekt.qgate1StatusRank = 4
+					}
+				} else if (qgate.note == null && projekt.qgate1StatusRank <= 3) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notYetGraded')
+					projekt.qgate1StatusRank = 3
+				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate1StatusRank <= 2) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notSubmitted')
+					projekt.qgate1StatusRank = 2
+				} else if (qgate.upload_allowed == false && diffMs <= 0 && projekt.qgate1StatusRank <= 1) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notHappenedYet')
+					projekt.qgate1StatusRank = 1
+				}
+			})
+
+			qgate2Termine.forEach(qgate => {
+				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
+					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					if(noteOpt.positiv) {
+						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
+						projekt.qgate2StatusRank = 5
+					} else {
+						projekt.qgate2Status = this.$p.t('abgabetool/c4negativBenotet')
+						projekt.qgate2StatusRank = 4
+					}
+				} else if (qgate.note == null && projekt.qgate2StatusRank <= 3) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notYetGraded')
+					projekt.qgate2StatusRank = 3
+				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate2StatusRank <= 2) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notSubmitted')
+					projekt.qgate2StatusRank = 2
+				} else if (qgate.upload_allowed == false && diffMs <= 0 && projekt.qgate2StatusRank <= 1) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notHappenedYet')
+					projekt.qgate2StatusRank = 1
+				}
+			})
+		},
 		getItemBezeichnung(item){
 			if(!item.bezeichnung) return ''
 			
 			return item?.bezeichnung?.bezeichnung ?? item?.bezeichnung
 		},
 		getItemNote(item) {
+			// note can be just a number if it is coming from backend
+			// if note was just set it is a note option
 			if(!item?.note) return ''
+			if(item.note?.bezeichnung) return item.note.bezeichnung
 			
 			const notenOption = this.notenOptions.find(note => note.note == item.note)
 			if(!notenOption) return item.note
@@ -188,8 +251,8 @@ export const AbgabetoolAssistenz = {
 				// TODO: maybe check if existing synergy really works with many filters
 				const existing = table.getFilters().filter(f => f.field != 'studiensemester_kurzbz');
 
-				const compVal = e.value.studiensemester_kurzbz == 'Alle' ? '' : e.value.studiensemester_kurzbz
-				const compType = e.value.studiensemester_kurzbz == 'Alle' ? '!=' : '='
+				const compVal = e.value.studiensemester_kurzbz == this.$p.t('abgabetool/c4all') ? '' : e.value.studiensemester_kurzbz
+				const compType = e.value.studiensemester_kurzbz == this.$p.t('abgabetool/c4all') ? '!=' : '='
 				const newFilter = { field: "studiensemester_kurzbz", type: compType, value: compVal };
 
 				// merge and reapply
@@ -221,6 +284,9 @@ export const AbgabetoolAssistenz = {
 					}
 				}
 			})
+
+			// seperate check for quality gates
+			this.checkQualityGateStatus(projekt)
 		},
 		loadState() {
 			return JSON.parse(localStorage.getItem(this.abgabeTableOptions.persistenceID) || "null");
@@ -283,7 +349,7 @@ export const AbgabetoolAssistenz = {
 			});
 
 			const saved = this.loadState();
-			
+
 			table.on("renderComplete", () => {
 				if(!this.stateRestored) {
 
@@ -294,12 +360,8 @@ export const AbgabetoolAssistenz = {
 							visible: col.visible,
 							// add more if needed, but keep it simple
 						}));
-
-						const safeLayout = layout.filter(col =>
-							col.field && !["rowSelection", "rowHandle", "rowNum", "zweitbetreuer"].includes(col.field)
-						);
-
-						table.setColumnLayout(safeLayout);
+						
+						table.setColumnLayout(layout);
 
 						this.colLayoutRestored = true;
 					}
@@ -475,7 +537,6 @@ export const AbgabetoolAssistenz = {
 
 				projekt.prevTermin = null;
 				projekt.nextTermin = null;
-
 
 				this.checkAbgabetermineProjektarbeit(projekt)
 
@@ -796,7 +857,7 @@ export const AbgabetoolAssistenz = {
 		
 		this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()).then((res) => {
 			this.allSem = res.data[0]
-			const all = {studiensemester_kurzbz: 'Alle'}
+			const all = {studiensemester_kurzbz: this.$p.t('abgabetool/c4all')}
 			this.curSem = all // res.data[1]
 			
 			this.studiensemesterOptions = [all, ...this.allSem]

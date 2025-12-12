@@ -181,14 +181,6 @@ export const AbgabeStudentDetail = {
 			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
 			return noteOpt ? noteOpt.bezeichnung : ''
 		},
-		getAccTabHeaderForTermin(termin) {
-			let tabTitle = ''
-
-			const datumFormatted = this.formatDate(termin.datum)
-			tabTitle += termin.bezeichnung + ' ' + datumFormatted
-			
-			return tabTitle
-		}
 	},
 	watch: {
 		projektarbeit(newVal) {
@@ -331,7 +323,7 @@ export const AbgabeStudentDetail = {
 		
 			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
 			<div class="row">
-				<p> {{projektarbeit?.betreuer}}</p>
+				<p> {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				<p> {{projektarbeit?.titel}}</p>
 			</div>
 			
@@ -348,8 +340,8 @@ export const AbgabeStudentDetail = {
 									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
 									<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
 								</div>
-								<div class="col-auto text-start pl-2 pr-0 pt-0 pb-0" style="min-width: max(120px, 20%); max-width: min(300px, 30%); transform: translateX(-30px)">
-									<span>{{ termin?.bezeichnung }}</span>
+								<div class="col-auto text-start pl-2 pr-0 pt-0 pb-0" style="min-width: min(300px, 30%); max-width: min(300px, 30%); transform: translateX(-30px)">
+									<span>{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}</span>
 								</div>
 								<div class="col-auto text-start p-0" style="min-width: max(80px, 15%); transform: translateX(-30px)">
 									<span>{{ formatDate(termin.datum) }}</span>
@@ -419,7 +411,7 @@ export const AbgabeStudentDetail = {
 						<div class="row mt-2">
 							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 							<div class="col-12 col-md-9">
-								{{ termin.bezeichnung }}
+								{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}
 							</div>
 						</div>
 						

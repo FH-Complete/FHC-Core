@@ -213,7 +213,7 @@ export const AbgabetoolStudent = {
 			}
 		},
 		buildBetreuer(abgabe) {
-			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
+			return (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		async setupData(data){
 			// this.projektarbeiten = data[0]
@@ -223,7 +223,6 @@ export const AbgabetoolStudent = {
 			if(!projektarbeiten) return
 			this.projektarbeiten = projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
-				
 				
 				return {
 					...projekt,
@@ -395,7 +394,7 @@ export const AbgabetoolStudent = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuer') )}}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.betreuer }}
+						{{ projektarbeit.betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">
@@ -405,9 +404,9 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz) : '' }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.zweitbetreuer_betreuerart_beschreibung}}: {{ projektarbeit.zweitbetreuer?.first }}
+						{{ projektarbeit.zweitbetreuer?.first }}
 					</div>
 				</div>
 				<div class="row mt-2">

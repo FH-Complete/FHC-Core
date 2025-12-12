@@ -122,6 +122,7 @@ class Projektarbeit_model extends DB_Model
 			person_id as bperson_id,
 			projektarbeit_id,
 			lehre.tbl_projekttyp.bezeichnung as projekttypbezeichnung,
+			lehre.tbl_projekttyp.projekttyp_kurzbz as projekttypkurzbz,
 			lehre.tbl_lehreinheit.studiensemester_kurzbz,
 			lehre.tbl_lehrveranstaltung.studiengang_kz,
 			public.tbl_studiengang.kurzbzlang,

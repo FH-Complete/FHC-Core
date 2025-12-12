@@ -63,9 +63,9 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 }
 
 // set new cols for zwischenabgabe
-if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='zwischen'"))
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
-	if($db->db_num_rows($result) === 1)
+	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "UPDATE campus.tbl_paabgabetyp 
 				SET benotbar = false,
@@ -81,9 +81,9 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 }
 
 // set new cols for note
-if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='note'"))
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
-	if($db->db_num_rows($result) === 1)
+	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "UPDATE campus.tbl_paabgabetyp 
 				SET benotbar = false,
@@ -99,9 +99,9 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 }
 
 // set new cols for abstract / entwurf
-if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='abstract'"))
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
-	if($db->db_num_rows($result) === 1)
+	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "UPDATE campus.tbl_paabgabetyp 
 				SET benotbar = false,
@@ -117,9 +117,9 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 }
 
 // set new cols for endabgabe / end
-if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='end'"))
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
-	if($db->db_num_rows($result) === 1)
+	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "UPDATE campus.tbl_paabgabetyp 
 				SET benotbar = false,
@@ -135,9 +135,9 @@ if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabet
 }
 
 // set new cols for endabgabe im sekretariat / enda
-if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='enda'"))
+if($result = $db->db_query("SELECT 1 FROM campus.tbl_paabgabetyp WHERE paabgabetyp_kurzbz='qualgate2'"))
 {
-	if($db->db_num_rows($result) === 1)
+	if($db->db_num_rows($result) === 0)
 	{
 		$qry = "UPDATE campus.tbl_paabgabetyp 
 				SET benotbar = false,
