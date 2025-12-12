@@ -452,6 +452,11 @@ class Documents extends FHCAPI_Controller
 				$params .= '&vertrag_id[]=' . urlencode($id);
 		}
 
+		//delete uid param for Ausbildungsvertrag
+		if($xsl == 'Ausbildungsver' || $xsl == "AusbVerEng") {
+			$params = $this->_cutUidParam($params);
+		}
+
 		if (!$vorlage->archivierbar)
 			$this->terminateWithError($this->p->t("stv", "grades_error_archive"));
 
@@ -485,5 +490,21 @@ class Documents extends FHCAPI_Controller
 					'sign_user' => $sign_user
 				]
 		];
+	}
+
+
+	/**
+	 * @param string				$string
+	 *
+	 * @return String paramString without paramUid
+	 */
+	private function _cutUidParam($string)
+	{
+		$string = preg_replace('/uid=[^&]*&?/', '', $string);
+
+		$params = trim($string, '&');
+		$params = preg_replace('/&&+/', '&', $params);
+
+		return $params;
 	}
 }
