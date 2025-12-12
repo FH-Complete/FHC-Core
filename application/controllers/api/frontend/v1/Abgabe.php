@@ -159,11 +159,20 @@ class Abgabe extends FHCAPI_Controller
 		if(count($projektarbeiten)) {
 			foreach($projektarbeiten as $pa) {
 				
+				$downloadPaFunc = function ($babgeschickt, $zweitbetreuer_abgeschickt) use ($pa) {
+					$pa->babgeschickt = $babgeschickt;
+					$pa->zweitbetreuer_abgeschickt = $zweitbetreuer_abgeschickt;
+				};
+				
+				Events::trigger('projektbeurteilung_check_available', $pa->projektarbeit_id, $pa->bperson_id, $downloadPaFunc);
+					
 				if($pa->babgeschickt) {
 					$downloadLink1 = '';
 					$downloadLinkFunc1 = function ($link) use (&$downloadLink1) {
 						$downloadLink1 = $link;
 					};
+					
+					
 					
 					Events::trigger('projektbeurteilung_download_link', $pa->projektarbeit_id, $pa->betreuerart_kurzbz, $pa->bperson_id, $downloadLinkFunc1);
 					
