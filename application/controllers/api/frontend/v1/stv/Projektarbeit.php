@@ -17,7 +17,8 @@ class Projektarbeit extends FHCAPI_Controller
 			'getTypenProjektarbeit' => ['admin:r', 'assistenz:r'],
 			'getFirmen' => ['admin:r', 'assistenz:r'],
 			'getLehrveranstaltungen' => ['admin:r', 'assistenz:r'],
-			'getNoten' => ['admin:r', 'assistenz:r']
+			'getNoten' => ['admin:r', 'assistenz:r'],
+			'getStudiensemester' => ['admin:r', 'assistenz:r']
 		]);
 
 		// Load Libraries
@@ -40,11 +41,15 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('education/Note_model', 'NoteModel');
 		$this->load->model('education/Projektbetreuer_model', 'BetreuerModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// load libraries
 		$this->load->library('PermissionLib');
 	}
 
+	/**
+	 * Get projekt works for a uid.
+	 */
 	public function getProjektarbeit()
 	{
 		$student_uid = $this->input->get('uid');
@@ -53,10 +58,7 @@ class Projektarbeit extends FHCAPI_Controller
 
 		$result = $this->ProjektarbeitModel->getProjektarbeit($student_uid);
 
-		if (isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
+		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 
 		if (!hasData($result)) $this->terminateWithSuccess([]);
 
@@ -79,6 +81,9 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->terminateWithSuccess($projektarbeiten);
 	}
 
+	/**
+	 * Load a single Projektarbeit by id.
+	 */
 	public function loadProjektarbeit()
 	{
 		$projektarbeit_id = $this->input->get('projektarbeit_id');
@@ -101,6 +106,9 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->terminateWithSuccess(current($data));
 	}
 
+	/**
+	 * Inwert a Projektarbeit.
+	 */
 	public function insertProjektarbeit()
 	{
 		$student_uid = $this->input->post('uid');
@@ -128,6 +136,9 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * Update a Projektarbeit by ID.
+	 */
 	public function updateProjektarbeit()
 	{
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
@@ -157,6 +168,9 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
+	/**
+	 * Delete Projektarbeit by ID after validation.
+	 */
 	public function deleteProjektarbeit()
 	{
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
@@ -185,6 +199,9 @@ class Projektarbeit extends FHCAPI_Controller
 		return $this->terminateWithSuccess(current(getData($result)) ? : null);
 	}
 
+	/**
+	 * Get all active projekt work types.
+	 */
 	public function getTypenProjektarbeit()
 	{
 		$result = $this->ProjekttypModel->loadWhere(['aktiv' => true]);
@@ -194,6 +211,9 @@ class Projektarbeit extends FHCAPI_Controller
 		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
+	/**
+	 * Gets companies by search string.
+	 */
 	public function getFirmen()
 	{
 		$searchString = $this->input->get('searchString');
@@ -208,6 +228,9 @@ class Projektarbeit extends FHCAPI_Controller
 		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
+	/**
+	 * Get Lehrveranstaltungen by params, incling lehreinheiten for a specific Studiensemester..
+	 */
 	public function getLehrveranstaltungen()
 	{
 		$student_uid = $this->input->get('student_uid');
@@ -218,6 +241,7 @@ class Projektarbeit extends FHCAPI_Controller
 		if (!isset($student_uid)) $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
 		if (!isset($studiensemester_kurzbz)) $this->terminateWithError('Studiensemster missing', self::ERROR_TYPE_GENERAL);
 
+		// get Lvs
 		$lvsResult = $this->LehrveranstaltungModel->getLvsForProjektarbeit($student_uid, $studiengang_kz, $additional_lehrveranstaltung_id);
 
 		if (isError($lvsResult)) return $this->terminateWithError($lvsResult, self::ERROR_TYPE_GENERAL);
@@ -226,6 +250,7 @@ class Projektarbeit extends FHCAPI_Controller
 
 		foreach ($lvs as $lv)
 		{
+			// add Lehreinheiten for each Lv for the semester
 			$lehreinheiten = $this->LehreinheitModel->getLesForLv(
 				$lv->lehrveranstaltung_id, $studiensemester_kurzbz
 			);
@@ -250,6 +275,9 @@ class Projektarbeit extends FHCAPI_Controller
 		return $this->terminateWithSuccess($lvs);
 	}
 
+	/**
+	 * Get all noten.
+	 */
 	public function getNoten()
 	{
 		$result = $this->NoteModel->load();
@@ -260,9 +288,22 @@ class Projektarbeit extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Get all Studiensemester, sorted.
+	 */
+	public function getStudiensemester()
+	{
+		$this->StudiensemesterModel->addOrder('start', 'DESC');
+		$result = $this->StudiensemesterModel->load();
+
+		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+
+		return $this->terminateWithSuccess(hasData($result) ? getData($result) : []);
+	}
+
+	/**
+	 * Validate Projektarbeit data.
+	 * @param formData
+	 * @return bool true if data valid
 	 */
 	private function _validate($formData)
 	{
@@ -293,9 +334,9 @@ class Projektarbeit extends FHCAPI_Controller
 	}
 
 	/**
-	 * 
-	 * @param
-	 * @return object success or error
+	 * Extract Projektarbeit data from passed form data.
+	 * @param formData
+	 * @return array
 	 */
 	private function _getProjektarbeitArr($formData)
 	{
@@ -317,9 +358,9 @@ class Projektarbeit extends FHCAPI_Controller
 	}
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Check if deletion of a Projektarbeit is possible.
+	 * @param $projektarbeit_id
+	 * @return object success if deletion possible, error otherwise.
 	 */
 	private function _validateDelete($projektarbeit_id)
 	{
@@ -340,6 +381,11 @@ class Projektarbeit extends FHCAPI_Controller
 		return success();
 	}
 
+	/**
+	 * Checks permissions for a student.
+	 * @param $student_uid
+	 * @return bool true if authorized
+	 */
 	private function _hasBerechtigungForStudent($student_uid)
 	{
 		if (!$student_uid)
