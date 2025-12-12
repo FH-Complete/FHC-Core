@@ -64,7 +64,9 @@ export default{
 				'Unterbrecher',
 				'Diplomand',
 				'Incoming'
-			]
+			],
+			original: {},
+			hasCriticalChangesBis: false
 		};
 	},
 	computed: {
@@ -136,6 +138,7 @@ export default{
 						this.statusNew = false;
 						this.formData = result.data;
 						this.originalDatum = new Date(result.data.datum);
+						this.original = { ...this.formData};
 						return prestudent;
 					})
 					.then(this.loadStudienplaeneAndSetPrestudent)
@@ -157,7 +160,7 @@ export default{
 		},
 		editStatus() {
 			this.$refs.form
-				.call(ApiStvStatus.updateStatus(this.statusId, this.formData))
+				.call(ApiStvStatus.updateStatus(this.statusId, this.formData, this.hasCriticalChangesBis))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -179,30 +182,59 @@ export default{
 				.then(result => this.mischform = result.data.mischform);
 		}
 	},
+	watch: {
+		// watching all disabled fields
+		"formData.status_kurzbz"(newVal) {
+			if (newVal !== this.original.status_kurzbz) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+/*		"formData.studiensemester_kurzbz"(newVal) {
+			if (newVal !== this.original.studiensemester_kurzbz) {
+				this.hasCriticalChangesBis = true;
+			}
+		},*/
+		"formData.orgform_kurzbz"(newVal) {
+			if (newVal !== this.original.orgform_kurzbz) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+		"formData.datum"(newVal) {
+			if (newVal !== this.original.datum) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+		"formData.bestaetigtam"(newVal) {
+			if (newVal !== this.original.bestaetigtam) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+		"formData.bewerbung_abgeschicktamum"(newVal) {
+			if (newVal !== this.original.bestaetigtam) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+		"formData.studienplan_id"(newVal) {
+			if (newVal !== this.original.studienplan_id) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+		"formData.rt_stufe"(newVal) {
+			if (newVal !== this.original.rt_stufe) {
+				this.hasCriticalChangesBis = true;
+			}
+		},
+	},
 	created() {
 		this.$api
 			.call(ApiStvStatus.getStatusgruende())
 			.then(result => this.statusgruende = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
 
-		//TODO(Manu) check why it is/was hard coded
 		this.$api
 			.call(ApiStvStatus.getStati())
 			.then(result => this.stati = result.data)
 			.catch(this.$fhcAlert.handleSystemError);
-/*		this.stati = [
-			{ status_kurzbz: 'Interessent', bezeichnung: 'Interessent'},
-			{ status_kurzbz: 'Bewerber', bezeichnung: 'Bewerber'},
-			{ status_kurzbz: 'Aufgenommener', bezeichnung: 'Aufgenommener'},
-			{ status_kurzbz: 'Student', bezeichnung: 'Student'},
-			{ status_kurzbz: 'Unterbrecher', bezeichnung: 'Unterbrecher'},
-			{ status_kurzbz: 'Diplomand', bezeichnung: 'Diplomand'},
-			{ status_kurzbz: 'Incoming', bezeichnung: 'Incoming'},
-			{ status_kurzbz: 'Absolvent', bezeichnung: 'Absolvent'},
-			{ status_kurzbz: 'Abbrecher', bezeichnung: 'Abbrecher'},
-			{ status_kurzbz: 'Abgewiesener', bezeichnung: 'Abgewiesener'},
-			{ status_kurzbz: 'Wartender', bezeichnung: 'Wartender'}
-		];*/
 	},
 	template: `
 	<bs-modal class="stv-status-modal" ref="modal" dialog-class="modal-dialog-scrollable">
@@ -220,7 +252,7 @@ export default{
 			<p v-if="bisLocked && isStatusBeforeStudent">
 				<b>{{$p.t('bismeldestichtag', 'info_MeldestichtagStatusgrundSemester')}}</b>
 			</p>
-			
+
 			<form-input
 				container-class="mb-3"
 				type="select"
@@ -353,7 +385,6 @@ export default{
 				v-model="formData.anmerkung"
 				name="anmerkung"
 				:label="$p.t('global/anmerkung')"
-				:disabled="bisLocked"
 				>
 			</form-input>
 			<form-input

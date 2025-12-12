@@ -206,6 +206,7 @@ class Status extends FHCAPI_Controller
 		$datum_string = date('c');
 		$datum = new DateTime($datum_string);
 
+
 		//Form Validation
 		$this->load->library('form_validation');
 
@@ -1088,7 +1089,7 @@ class Status extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	public function updateStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
+	public function updateStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester, $hasCriticalChangesBis=false)
 	{
 		$result = $this->PrestudentstatusModel->load([
 			$key_ausbildungssemester,
@@ -1130,14 +1131,22 @@ class Status extends FHCAPI_Controller
 				]
 			);
 
+		$hasCriticalChangesBis = filter_var($hasCriticalChangesBis, FILTER_VALIDATE_BOOLEAN);
+
 		$this->form_validation->set_rules(
 			'datum',
 			$this->p->t('global', 'datum'),
 			[
 				'is_valid_date',
-				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck, $hasCriticalChangesBis){
 					if ($isBerechtigtNoStudstatusCheck)
-						return true; // Skip if access right says so
+					{
+						return true; // Skip if access right says so*/
+					}
+					if (!$hasCriticalChangesBis) {
+						return true; // Skip if no critical changes were made
+					}
+
 					if (!$value)
 						return true; // Error will be handled by the required statement above
 

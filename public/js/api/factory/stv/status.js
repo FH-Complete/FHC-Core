@@ -39,14 +39,17 @@ export default {
 		status_kurzbz,
 		studiensemester_kurzbz,
 		ausbildungssemester
-	}, params) {
+	}, params, hasCriticalChangesBis) {
+		console.log("hasCriticalChangesBis " + hasCriticalChangesBis);
 		return {
+
 			method: 'post',
 			url: 'api/frontend/v1/stv/status/updateStatus/'
 				+ prestudent_id + '/'
 				+ status_kurzbz + '/'
 				+ studiensemester_kurzbz + '/'
-				+ ausbildungssemester,
+				+ ausbildungssemester + '/'
+				+ hasCriticalChangesBis,
 			params
 		};
 	},
