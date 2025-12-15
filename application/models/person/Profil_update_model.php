@@ -235,8 +235,11 @@ class Profil_update_model extends DB_Model
 	private function formatProfilRequest($request)
 	{
 		$request->requested_change = json_decode($request->requested_change);
+		$request->insertamum_iso = !is_null($request->insertamum) ? date_create($request->insertamum)->format('Y-m-d') : null;
 		$request->insertamum = !is_null($request->insertamum) ? date_create($request->insertamum)->format('d.m.Y') : null;
+		$request->updateamum_iso = !is_null($request->updateamum) ? date_create($request->updateamum)->format('Y-m-d') : null;
 		$request->updateamum = !is_null($request->updateamum) ? date_create($request->updateamum)->format('d.m.Y') : null;
+		$request->status_timestamp_iso = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('Y-m-d') : null;
 		$request->status_timestamp = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('d.m.Y') : null;
 	}
 

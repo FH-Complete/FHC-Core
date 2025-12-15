@@ -531,6 +531,29 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
+		'dataset_name' => 'onboarding',
+		'filter_kurzbz' => 'InfoCenterOnboarding',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Electronic Onboarding - Alle",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "LockUser"},
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
 		'dataset_name' => 'aufgenommen',
 		'filter_kurzbz' => 'InfoCenterAufgenommenAlle',
 		'description' => '{Alle}',

@@ -402,6 +402,26 @@ class Vertrag_model extends DB_Model
 		return $this->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid, 'lehreinheit_id' => $lehreinheit_id));
 	}
 
+	public function getVertragById($vertrag_id)
+	{
+		$this->addSelect(
+			'tbl_vertrag.vertrag_id, vertragstyp_kurzbz, vertragsstunden, vertragsstunden_studiensemester_kurzbz, status.vertragsstatus_kurzbz,
+			status.bezeichnung AS vertragsstatus, tbl_vertrag.betrag, lema.semesterstunden, lema.stundensatz'
+		);
+		$this->addJoin('lehre.tbl_lehreinheitmitarbeiter lema', 'tbl_vertrag.vertrag_id = lema.vertrag_id', 'LEFT');
+		$this->addJoin('
+			(
+				SELECT DISTINCT ON(vst.vertrag_id) vst.vertrag_id,
+					bezeichnung,
+					tbl_vertragsstatus.vertragsstatus_kurzbz
+				FROM lehre.tbl_vertrag_vertragsstatus vst
+					JOIN lehre.tbl_vertragsstatus USING(vertragsstatus_kurzbz)
+				ORDER BY vst.vertrag_id, datum DESC
+			) as status', 'status.vertrag_id = lehre.tbl_vertrag.vertrag_id', 'LEFT');
+
+		return $this->loadWhere(['tbl_vertrag.vertrag_id' => $vertrag_id]);
+	}
+
 	public function cancelVertrag($vertrag_id, $mitarbeiter_uid)
 	{
 		$vertrag = $this->load($vertrag_id);

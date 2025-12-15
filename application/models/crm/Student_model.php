@@ -27,7 +27,7 @@ class Student_model extends DB_Model
         $this->addSelect('1');
 
         $result = $this->loadWhere(array('student_uid' => $uid));
-        
+
 
         if(hasData($result))
         {
@@ -169,7 +169,7 @@ class Student_model extends DB_Model
 
 		$max = 0;
 		if ($matrikelnrres && hasData($matrikelnrres)) {
-			$max = mb_substr($matrikelnrres->retval[0]->matrikelnr, 7);
+			$max = mb_substr(getData($matrikelnrres)[0]->matrikelnr, 7);
 			if (!is_numeric($max)) {
 				$max = (int)$max;
 			}

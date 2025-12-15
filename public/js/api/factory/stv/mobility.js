@@ -101,7 +101,7 @@ export default {
 	deleteMobilityPurpose(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/mobility/deleteMobilityPurpose/',
+			url: 'api/frontend/v1/stv/mobility/deleteMobilityPurpose/' + params.bisio_id,
 			params
 		};
 	},

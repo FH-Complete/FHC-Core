@@ -4,6 +4,7 @@ import Alert from "../../../components/Bootstrap/Alert.js";
 import Loading from "../../../components/Loader.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 const sortProfilUpdates = (ele1, ele2, thisPointer) => {
   let result = 0;
@@ -241,10 +242,13 @@ export default {
           },
           {
             title: this.$p.t("profilUpdate", "insertamum"),
-            field: "insertamum",
+            field: "insertamum_iso",
             resizable: true,
-            headerFilter: true,
+			headerFilterFunc: 'dates',
+			headerFilter: dateFilter,
             minWidth: 200,
+			formatter:"datetime",
+			formatterParams: this.datetimeFormatterParams(),
             //responsive:0,
           },
           {
@@ -377,6 +381,15 @@ export default {
 					this.showAcceptDenyModal(arrayRowData[0]);
 				}
 			}
+		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
 		}
   },
   watch: {
