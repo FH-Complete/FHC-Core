@@ -19,7 +19,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM testtool.tbl_externe_ueberwachung LI
 			prestudent_id				INTEGER NOT NULL,
 			session_id					UUID NOT NULL,
 			insertamum					TIMESTAMP DEFAULT NOW(),
-			insertvon					VARCHAR(32) NOT NULL,
 			CONSTRAINT tbl_externe_ueberwachung_pk PRIMARY KEY(externe_ueberwachung_id)
 		);
 		CREATE SEQUENCE testtool.tbl_externe_ueberwachungg_id_seq

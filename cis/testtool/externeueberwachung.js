@@ -28,9 +28,7 @@
 	setTimeout(function () {
 		if (!proctoringOK)
 		{
-			console.warn("Constructor nicht aktiv!")
-			//TODO einkommentieren
-			//top.location.href='resetconnection.php';
+			top.location.href='resetconnection.php';
 		}
 	}, 1000);
 })();

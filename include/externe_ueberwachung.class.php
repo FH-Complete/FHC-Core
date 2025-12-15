@@ -53,11 +53,10 @@ class externeUeberwachung extends basis_db
 
 		$uuid = $this->genereateUUID();
 
-		$qry = "INSERT INTO testtool.tbl_externe_ueberwachung (prestudent_id, session_id, insertvon)
+		$qry = "INSERT INTO testtool.tbl_externe_ueberwachung (prestudent_id, session_id)
 				VALUES (".
 			$this->db_add_param($prestudent_id).",".
-			$this->db_add_param($uuid).",".
-			$this->db_add_param(get_uid()).")";
+			$this->db_add_param($uuid).")";
 
 		if($this->db_query($qry))
 		{
