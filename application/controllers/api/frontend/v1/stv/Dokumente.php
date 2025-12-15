@@ -590,11 +590,15 @@ class Dokumente extends FHCAPI_Controller
 
 		$documents = [
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uid, 20, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uid, 21, null),
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uid, 40, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uid, 41, null),
-			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uid", $uid,100, "zutrittskarte.php"),
+			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&prestudent_id=$prestudent_id", null,20, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&prestudent_id=$prestudent_id", null,21, null),
+
+			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uid, 25, null),
+			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uid, 26, null),
+
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uid, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uid, 51, null),
+			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uid", $uid,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uid, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uid, 61, null),
 
@@ -616,10 +620,11 @@ class Dokumente extends FHCAPI_Controller
 				]
 			],
 
-			$this->loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uid),
+			//Bakkzeugnis bzw. Diplomzeugnis is just shown in tab final_exam
+			buildDropdownEntryPrintArray("zeugnis", "Zeugnis", "xml=zeugnis.rdf.php&xsl=Zeugnis&output=pdf&xsl_stg_kz=$studiengang_kz&ss=$studiensemester_kurzbz", $uid, 121, null),
+			buildDropdownEntryPrintArray("zeugnis_en", "Zeugnis Englisch", "xml=zeugnis.rdf.php&xsl=ZeugnisEng&output=pdf&xsl_stg_kz=$studiengang_kz&ss=$studiensemester_kurzbz", $uid, 122, null),
 
-			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uid, 80, null),
-			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uid, 81, null)
+
 		];
 
 		Events::trigger('DocumentGenerationDropDown',
@@ -632,15 +637,18 @@ class Dokumente extends FHCAPI_Controller
 			$studiengang_kz
 		);
 
+		$extraEntries = $this->loadDropDownEntriesBakkOrDipl($stgTyp, $uid);
+
+		$documents = array_merge($documents, $extraEntries);
+
 		usort($documents, function ($a, $b) {
 			$orderA = isset($a['order']) ? (int)$a['order'] : PHP_INT_MAX;
 			$orderB = isset($b['order']) ? (int)$b['order'] : PHP_INT_MAX;
 			return $orderA <=> $orderB;
 		});
 
-
 		$this->terminateWithSuccess($documents);
-		return $documents || null;
+		//return $documents || null;
 	}
 
 	public function getDocumentDropDownMulti($studiensemester_kurzbz,$studiengang_kz)
@@ -678,9 +686,9 @@ class Dokumente extends FHCAPI_Controller
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uidString, 10, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uidString, 20, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uidString, 21, null),
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 40, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 41, null),
-			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,100, "zutrittskarte.php"),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 51, null),
+			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uidString, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uidString, 61, null),
 
@@ -703,13 +711,9 @@ class Dokumente extends FHCAPI_Controller
 				]
 			],
 
-			$this->loadDropDownEntriesFinalExam($hasPermissionOutputformat, $stgTyp, $uidString),
-
-			//TODO(Manu) also in Fas multi not working
-/*			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uidString, 80, null),
-			*/
-
-			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uidString, 81, null)
+			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uidString, 35, null),
+			buildDropdownEntryPrintArray("zeugnis", "Zeugnis", "xml=zeugnis.rdf.php&xsl=Zeugnis&output=pdf&xsl_stg_kz=$studiengang_kz&ss=$studiensemester_kurzbz", $uidString, 121, null),
+			buildDropdownEntryPrintArray("zeugnis_en", "Zeugnis Englisch", "xml=zeugnis.rdf.php&xsl=ZeugnisEng&output=pdf&xsl_stg_kz=$studiengang_kz&ss=$studiensemester_kurzbz", $uidString, 122, null),
 		];
 
 		Events::trigger('DocumentGenerationDropDownMulti',
@@ -721,6 +725,10 @@ class Dokumente extends FHCAPI_Controller
 			$studiensemester_kurzbz,
 			$studiengang_kz
 		);
+
+		$extraEntries = $this->loadDropDownEntriesBakkOrDipl($stgTyp, $uidString);
+
+		$documents = array_merge($documents, $extraEntries);
 
 		usort($documents, function ($a, $b) {
 			$orderA = isset($a['order']) ? (int)$a['order'] : PHP_INT_MAX;
@@ -958,6 +966,25 @@ class Dokumente extends FHCAPI_Controller
 			"order" => null,
 			"order" => 80,
 		];
+	}
+
+	private function loadDropDownEntriesBakkOrDipl($stgTyp, $uid)
+	{
+		$entries = [];
+
+		if ($stgTyp == 'b')
+		{
+			$entries[] = buildDropdownEntryPrintArray("bakkurkunde", "Bakkurkunde", "xml=abschlusspruefung.rdf.php&xsl=Bakkurkunde&output=pdf", $uid, 22, null);
+			$entries[] = buildDropdownEntryPrintArray("bakkurkundeEng", "Bakkurkunde Englisch", "xml=abschlusspruefung.rdf.php&xsl=BakkurkundeEng&output=pdf", $uid, 23, null);
+		}
+
+		if ($stgTyp == 'm' || $stgTyp == 'd')
+		{
+			$entries[] = buildDropdownEntryPrintArray("diplomurkunde", "Diplomurkunde", "xml=abschlusspruefung.rdf.php&xsl=Diplomurkunde&output=pdf", $uid, 27, null);
+			$entries[] = buildDropdownEntryPrintArray("diplomurkundeEng", "Diplomurkunde Englisch", "xml=abschlusspruefung.rdf.php&xsl=DiplomurkundeEng&output=pdf", $uid, 28, null);
+		}
+
+		return $entries;
 	}
 
 }

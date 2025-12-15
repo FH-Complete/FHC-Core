@@ -1078,6 +1078,24 @@ class Status extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	protected function checkForCriticalChangesBis($oldstatus)
+	{
+		$changedFields = array();
+		$allowedFields = array('anmerkung', 'statusgrund_id');
+		$oldstatus_array = get_object_vars($oldstatus);
+		foreach($oldstatus_array as $key => $oldValue)
+		{
+			$newValue = $this->input->post($key);
+			if( $newValue !== $oldValue )
+			{
+				$changedFields[] = $key;
+			}
+		}
+		$criticalFieldsChanged = array_diff($changedFields, $allowedFields);
+		$hasCriticalChangesBis = count($criticalFieldsChanged) > 0 ? true : false;
+		return $hasCriticalChangesBis;
+	}
+
 	/**
 	 * Updates a status entry
 	 *
@@ -1102,6 +1120,7 @@ class Status extends FHCAPI_Controller
 
 		$oldstatus = current($oldstatus);
 
+		$hasCriticalChangesBis = $this->checkForCriticalChangesBis($oldstatus);
 
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
@@ -1111,7 +1130,6 @@ class Status extends FHCAPI_Controller
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz') ?: $oldstatus->studiensemester_kurzbz;
 		$ausbildungssemester = $this->input->post('ausbildungssemester') ?: $oldstatus->ausbildungssemester;
 		$datum = $this->input->post('datum') ?: $oldstatus->datum;
-
 
 		//Form Validation
 		$this->load->library('form_validation');
@@ -1135,9 +1153,15 @@ class Status extends FHCAPI_Controller
 			$this->p->t('global', 'datum'),
 			[
 				'is_valid_date',
-				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck, $hasCriticalChangesBis){
 					if ($isBerechtigtNoStudstatusCheck)
-						return true; // Skip if access right says so
+					{
+						return true; // Skip if access right says so*/
+					}
+					if (!$hasCriticalChangesBis) {
+						return true; // Skip if no critical changes were made
+					}
+
 					if (!$value)
 						return true; // Error will be handled by the required statement above
 
@@ -1341,6 +1365,7 @@ class Status extends FHCAPI_Controller
 			'updateamum' => date('c'),
 			'updatevon' => $authUID
 		];
+		$nullableFields = ['statusgrund_id', 'anmerkung', 'rt_stufe'];
 		foreach ([
 					'orgform_kurzbz',
 					'anmerkung',
@@ -1349,8 +1374,17 @@ class Status extends FHCAPI_Controller
 					'rt_stufe',
 					'statusgrund_id'
 				] as $key)
-			if ($this->input->post($key))
+		{
+			if (in_array($key, $nullableFields))
+			{
+				$updateData[$key] = ($this->input->post($key) === '') ? null : $this->input->post($key);
+			}
+			else if ($this->input->post($key))
+			{
 				$updateData[$key] = $this->input->post($key);
+			}
+		}
+
 
 		if ($this->input->post('bestaetigtam')) {
 			$updateData['bestaetigtam'] = $this->input->post('bestaetigtam');
