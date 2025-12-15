@@ -39,8 +39,7 @@ export default {
 		status_kurzbz,
 		studiensemester_kurzbz,
 		ausbildungssemester
-	}, params, hasCriticalChangesBis) {
-		console.log("hasCriticalChangesBis " + hasCriticalChangesBis);
+	}, params) {
 		return {
 
 			method: 'post',
@@ -48,8 +47,7 @@ export default {
 				+ prestudent_id + '/'
 				+ status_kurzbz + '/'
 				+ studiensemester_kurzbz + '/'
-				+ ausbildungssemester + '/'
-				+ hasCriticalChangesBis,
+				+ ausbildungssemester,
 			params
 		};
 	},

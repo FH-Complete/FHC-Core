@@ -64,9 +64,7 @@ export default{
 				'Unterbrecher',
 				'Diplomand',
 				'Incoming'
-			],
-			original: {},
-			hasCriticalChangesBis: false
+			]
 		};
 	},
 	computed: {
@@ -160,7 +158,7 @@ export default{
 		},
 		editStatus() {
 			this.$refs.form
-				.call(ApiStvStatus.updateStatus(this.statusId, this.formData, this.hasCriticalChangesBis))
+				.call(ApiStvStatus.updateStatus(this.statusId, this.formData))
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$reloadList();
@@ -181,49 +179,6 @@ export default{
 				.then(() => this.$api.call(ApiStvStatus.getStudiengang(prestudent.prestudent_id)))
 				.then(result => this.mischform = result.data.mischform);
 		}
-	},
-	watch: {
-		// watching all disabled fields
-		"formData.status_kurzbz"(newVal) {
-			if (newVal !== this.original.status_kurzbz) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-/*		"formData.studiensemester_kurzbz"(newVal) {
-			if (newVal !== this.original.studiensemester_kurzbz) {
-				this.hasCriticalChangesBis = true;
-			}
-		},*/
-		"formData.orgform_kurzbz"(newVal) {
-			if (newVal !== this.original.orgform_kurzbz) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-		"formData.datum"(newVal) {
-			if (newVal !== this.original.datum) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-		"formData.bestaetigtam"(newVal) {
-			if (newVal !== this.original.bestaetigtam) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-		"formData.bewerbung_abgeschicktamum"(newVal) {
-			if (newVal !== this.original.bestaetigtam) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-		"formData.studienplan_id"(newVal) {
-			if (newVal !== this.original.studienplan_id) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
-		"formData.rt_stufe"(newVal) {
-			if (newVal !== this.original.rt_stufe) {
-				this.hasCriticalChangesBis = true;
-			}
-		},
 	},
 	created() {
 		this.$api

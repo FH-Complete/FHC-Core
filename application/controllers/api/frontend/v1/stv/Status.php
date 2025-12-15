@@ -1079,6 +1079,24 @@ class Status extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	protected function checkForCriticalChangesBis($oldstatus)
+	{
+		$changedFields = array();
+		$allowedFields = array('anmerkung', 'statusgrund_id');
+		$oldstatus_array = get_object_vars($oldstatus);
+		foreach($oldstatus_array as $key => $oldValue)
+		{
+			$newValue = $this->input->post($key);
+			if( $newValue !== $oldValue )
+			{
+				$changedFields[] = $key;
+			}
+		}
+		$criticalFieldsChanged = array_diff($changedFields, $allowedFields);
+		$hasCriticalChangesBis = count($criticalFieldsChanged) > 0 ? true : false;
+		return $hasCriticalChangesBis;
+	}
+
 	/**
 	 * Updates a status entry
 	 *
@@ -1089,7 +1107,7 @@ class Status extends FHCAPI_Controller
 	 *
 	 * @return void
 	 */
-	public function updateStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester, $hasCriticalChangesBis=false)
+	public function updateStatus($prestudent_id, $status_kurzbz, $key_studiensemester_kurzbz, $key_ausbildungssemester)
 	{
 		$result = $this->PrestudentstatusModel->load([
 			$key_ausbildungssemester,
@@ -1103,6 +1121,7 @@ class Status extends FHCAPI_Controller
 
 		$oldstatus = current($oldstatus);
 
+		$hasCriticalChangesBis = $this->checkForCriticalChangesBis($oldstatus);
 
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
@@ -1130,8 +1149,6 @@ class Status extends FHCAPI_Controller
 					'is_null' => $this->p->t('ui', 'error_fieldWriteAccess')
 				]
 			);
-
-		$hasCriticalChangesBis = filter_var($hasCriticalChangesBis, FILTER_VALIDATE_BOOLEAN);
 
 		$this->form_validation->set_rules(
 			'datum',
