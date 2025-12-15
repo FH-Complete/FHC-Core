@@ -808,9 +808,9 @@ class Studiengang_model extends DB_Model
 	 *
 	 * @param $studiengang_kz_arr
 	 * @param $studiensemester_kurzbz
-	 * @return array|stdClass|null
+	 * @return array|stdClass|null	Returns one row per Studiengang. Not considering the Orgforms.
 	 */
-	public function getEntitledStgs($studiengang_kz_arr, $studiensemester_kurzbz)
+	public function getByStgs($studiengang_kz_arr, $studiensemester_kurzbz)
 	{
 		if (is_numeric($studiengang_kz_arr))
 		{
