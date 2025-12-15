@@ -467,8 +467,6 @@
 		"brutusin/json-forms": "1.4.0",
 		"josdejong/jsoneditor": "5.5.6",
 
-		"kingsquare/json-schema-form": "*",
-
 		"ludo/jquery-treetable": "3.2.0",
 
 		"michelf/php-markdown": "1.5.0",
@@ -478,7 +476,7 @@
 		"mottie/tablesorter": "2.*",
 
 		"nategood/httpful": "0.2.*",
-		"netcarver/textile": "3.7.*",
+		"netcarver/textile": "4.1.*",
 		"nicolaskruchten/pivottable": "2.23.0",
 		"npm-asset/primevue": "3.29.1",
 		"npm-asset/primeicons": "5.0.0",
@@ -512,11 +510,6 @@
 	},
 
 	"require-dev": {
-		"vuejs/vuejs3_dev": "3.3.8",
-		"squizlabs/php_codesniffer": "3.6.*",
-		"phpmd/phpmd": "2.*",
-		"phpmetrics/phpmetrics": "2.*",
-		"sebastian/phpcpd": "3.*",
-		"phpunit/phpunit": "^6"
+		"vuejs/vuejs3_dev": "3.3.8"
 	}
 }
