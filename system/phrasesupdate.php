@@ -41300,13 +41300,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund möglich',
+				'text' => 'Meldestichtag erreicht - ausschließlich Bearbeiten Statusgrund und Anmerkung möglich',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Reporting deadline reached - only editing status reason possible',
+				'text' => 'Reporting deadline reached - only editing status reason and note possible',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -41320,13 +41320,13 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Meldestichtag erreicht - Bearbeiten Ausbildungssemester und Statusgrund möglich',
+				'text' => 'Meldestichtag erreicht - Bearbeiten Ausbildungssemester, Statusgrund und Anmerkung möglich',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Edit education semester and status reason possible',
+				'text' => 'Edit education semester, status reason and note possible',
 				'description' => '',
 				'insertvon' => 'system'
 			)
