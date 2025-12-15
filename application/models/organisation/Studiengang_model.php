@@ -835,4 +835,40 @@ class Studiengang_model extends DB_Model
 
 		return $this->execQuery($qry, [$studiengang_kz_arr, $studiensemester_kurzbz]);
 	}
+
+	/**
+	 * Get OrgForms of given Studiengang and Studiensemester.
+	 *
+	 * @param $studiengang_kz
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getOrgformsByStg($studiengang_kz, $studiensemester_kurzbz)
+	{
+		$qry = '
+			SELECT
+				stpl.orgform_kurzbz
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz = ?
+				AND stg.aktiv = TRUE
+				AND stplsem.studiensemester_kurzbz = ?
+			GROUP BY
+				stpl.orgform_kurzbz
+			ORDER BY
+				CASE stpl.orgform_kurzbz
+					WHEN \'VZ\' THEN 1
+					WHEN \'BB\' THEN 2
+					WHEN \'DUA\' THEN 3
+					ELSE 4
+				END,
+				stpl.orgform_kurzbz; 
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz, $studiensemester_kurzbz]);
+	}
 }
