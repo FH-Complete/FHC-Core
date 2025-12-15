@@ -136,7 +136,6 @@ export default{
 						this.statusNew = false;
 						this.formData = result.data;
 						this.originalDatum = new Date(result.data.datum);
-						this.original = { ...this.formData};
 						return prestudent;
 					})
 					.then(this.loadStudienplaeneAndSetPrestudent)
