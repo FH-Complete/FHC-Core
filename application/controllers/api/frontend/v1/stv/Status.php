@@ -1132,7 +1132,6 @@ class Status extends FHCAPI_Controller
 		$ausbildungssemester = $this->input->post('ausbildungssemester') ?: $oldstatus->ausbildungssemester;
 		$datum = $this->input->post('datum') ?: $oldstatus->datum;
 
-
 		//Form Validation
 		$this->load->library('form_validation');
 
