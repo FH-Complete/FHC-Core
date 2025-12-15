@@ -194,3 +194,27 @@
 .p-accordion .p-accordion-header .p-accordion-header-link {
 	padding: 12px!important;
 }
+
+/* 1. Stick the Header */
+#abgabetable .tabulator-header .tabulator-col.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Must be higher than other headers */
+	background-color: #fff; /* Opaque background is required */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 2. Stick the Data Cells */
+#abgabetable .tabulator-tableholder .tabulator-row .tabulator-cell.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Ensure it floats above other cells */
+	background-color: #fff; /* Match your row background color */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 3. Fix for Hover Effects (Optional) */
+/* If you use hover rows, you need to ensure the sticky cell matches the hover color */
+#abgabetable .tabulator-row:hover .tabulator-cell.sticky-col {
+	background-color: #ccc; /* Match your existing hover color */
+}

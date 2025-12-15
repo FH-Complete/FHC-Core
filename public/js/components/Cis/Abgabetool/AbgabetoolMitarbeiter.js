@@ -38,6 +38,7 @@ export const AbgabetoolMitarbeiter = {
 	},
 	data() {
 		return {
+			tableData: null,
 			abgabetypenBetreuer: null,
 			detailIsFullscreen: false,
 			phrasenPromise: null,
@@ -79,17 +80,60 @@ export const AbgabetoolMitarbeiter = {
 				rowHeight: 80,
 				columns: [
 					{
-						formatter: 'rowSelection',
-						titleFormatter: 'rowSelection',
-						titleFormatterParams: {
-							rowRange: "active" // Only toggle the values of the active filtered rows
+						formatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							if(!cell.getRow().getData().selectable) return 
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+							
+							// Handle select manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							cell.getRow().getData().checkbox = checkbox
+
+							let wrapper = document.createElement("div");
+							wrapper.style.cssText = "display: flex; justify-content: center; align-items: center; height: 100%; width: 100%;";
+
+							wrapper.appendChild(checkbox);
+
+							return wrapper;
 						},
-						hozAlign:"center",
+						titleFormatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+
+							// Handle "select all" manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							return checkbox;
+						},
+						hozAlign: "center",
 						headerSort: false,
-						frozen: true,
-						width: 70
+						formatterParams: {
+							handleClick: this.selectHandler
+						},
+						titleFormatterParams: {
+							handleClick: this.selectAllHandler
+						},
+						width: 50,
+						cssClass: 'sticky-col'
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, widthGrow: 1, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
@@ -122,12 +166,51 @@ export const AbgabetoolMitarbeiter = {
 			{
 				event: "rowSelectionChanged",
 				handler: async(data) => {
+					this.selectedData.filter(sd => !data.includes(sd)).forEach(fsd => {
+						if(fsd.checkbox) fsd.checkbox.checked = false
+					})
+					
+					data.forEach(d => {
+						if(d.checkbox) d.checkbox.checked = true
+					})
+					
 					this.selectedData = data
 				}
 			}
 			]};
 	},
 	methods: {
+		selectHandler(e, cell) {
+			const row = cell.getRow();
+
+			if(row.isSelected()) {
+				row.deselect();
+			} else {
+				row.select();
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		selectAllHandler(e, cell) {
+			const table = cell.getTable();
+			const rows = table.getRows();
+
+			// custom select all logic
+			const allowed = rows.filter(r => r.getData().selectable);
+			const selected = allowed.every(r => r.isSelected());
+
+			if(selected) {
+				allowed.forEach(r => r.deselect());
+			} else {
+				allowed.forEach(r => r.select());
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
 		handleToggleFullscreenDetail() {
 			this.detailIsFullscreen = !this.detailIsFullscreen
 		},
@@ -286,7 +369,9 @@ export const AbgabetoolMitarbeiter = {
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			
-			const d = data[0]?.retval?.map(projekt => {
+			this.tableData = data[0]?.retval?.map(projekt => {
+
+				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
 				return {
 					...projekt,
@@ -305,7 +390,7 @@ export const AbgabetoolMitarbeiter = {
 			})
 			
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
-			this.$refs.abgabeTable.tabulator.setData(d);
+			this.$refs.abgabeTable.tabulator.setData(this.tableData);
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.$api.call(ApiAbgabe.getMitarbeiterProjektarbeiten(all))
@@ -477,7 +562,7 @@ export const AbgabetoolMitarbeiter = {
 		</bs-modal>	
 		
 		<!-- low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways -->
-		<div style="max-height:40vw;">
+		<div id="abgabetable" style="max-height:40vw;">
 		
 			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
 			<hr>

@@ -57,6 +57,7 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
+			tableData: null,
 			studiensemesterOptions: null,
 			allSem: null,
 			curSem: null,
@@ -113,18 +114,71 @@ export const AbgabetoolAssistenz = {
 				renderVerticalBuffer: 2000,
 				columns: [
 					{
-						field: 'rowSelection',
-						formatter: 'rowSelection',
-						titleFormatter: 'rowSelection',
-						titleFormatterParams: {
-							rowRange: "active" // Only toggle the values of the active filtered rows
+						formatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+
+							// Handle select manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							cell.getRow().getData().checkbox = checkbox
+
+							let wrapper = document.createElement("div");
+							wrapper.style.cssText = "display: flex; justify-content: center; align-items: center; height: 100%; width: 100%;";
+
+							wrapper.appendChild(checkbox);
+
+							return wrapper;
 						},
-						hozAlign:"center",
+						titleFormatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+
+							// Handle "select all" manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							return checkbox;
+						},
+						hozAlign: "center",
 						headerSort: false,
-						frozen: true,
-						width: 40
+						formatterParams: {
+							handleClick: this.selectHandler
+						},
+						titleFormatterParams: {
+							handleClick: this.selectAllHandler
+						},
+						width: 50,
+						cssClass: 'sticky-col'
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150},
+				// {
+					// 	field: 'rowSelection',
+					// 	formatter: 'rowSelection',
+					// 	titleFormatter: 'rowSelection',
+					// 	titleFormatterParams: {
+					// 		rowRange: "active" // Only toggle the values of the active filtered rows
+					// 	},
+					// 	hozAlign:"center",
+					// 	headerSort: false,
+					// 	frozen: true,
+					// 	width: 40
+					// },
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -150,12 +204,51 @@ export const AbgabetoolAssistenz = {
 			{
 				event: "rowSelectionChanged",
 				handler: async(data) => {
+					this.selectedData.filter(sd => !data.includes(sd)).forEach(fsd => {
+						if(fsd.checkbox) fsd.checkbox.checked = false
+					})
+
+					data.forEach(d => {
+						if(d.checkbox) d.checkbox.checked = true
+					})
+
 					this.selectedData = data
 				}
 			}
 			]};
 	},
 	methods: {
+		selectHandler(e, cell) {
+			const row = cell.getRow();
+
+			if(row.isSelected()){
+				row.deselect();
+			} else {
+				row.select();
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		selectAllHandler(e, cell) {
+			const table = cell.getTable();
+			const rows = table.getRows();
+
+			// custom select all logic
+			const allowed = rows.filter(r => r.getData().selectable);
+			const selected = allowed.every(r => r.isSelected());
+
+			if(selected){
+				allowed.forEach(r => r.deselect());
+			} else {
+				allowed.forEach(r => r.select());
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
 		checkQualityGateStatus(projekt) {
 			// TODO: might refine the representation of these states and maybe refactor code a little
 			const qgate1Termine = []
@@ -534,7 +627,7 @@ export const AbgabetoolAssistenz = {
 		mapProjekteToTableData(projekte) {
 			// const now = luxon.DateTime.now();
 			return projekte.map(projekt => {
-
+				
 				projekt.prevTermin = null;
 				projekt.nextTermin = null;
 
@@ -753,12 +846,11 @@ export const AbgabetoolAssistenz = {
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			
-			const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+			this.tableData = this.mapProjekteToTableData(this.projektarbeiten)
 
 			await this.tableBuiltPromise
 			
-			// this.$refs.abgabeTable.tabulator.clearData()
-			this.$refs.abgabeTable.tabulator.setData(mappedData);
+			this.$refs.abgabeTable.tabulator.setData(this.tableData);
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
@@ -865,8 +957,7 @@ export const AbgabetoolAssistenz = {
 		}).catch(e => {
 			this.loading = false
 		})
-
-
+		
 		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		this.$api.call(ApiAbgabe.getNoten()).then(res => {
@@ -1109,7 +1200,7 @@ export const AbgabetoolAssistenz = {
 			</template>
 		</BsOffcanvas>
 		
-		<div style="max-height:40vw;">
+		<div id="abgabetable" style="max-height:40vw;">
 			<div class="row">
 				<div class="col-auto">
 					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
