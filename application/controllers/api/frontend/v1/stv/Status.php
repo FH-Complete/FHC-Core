@@ -206,7 +206,6 @@ class Status extends FHCAPI_Controller
 		$datum_string = date('c');
 		$datum = new DateTime($datum_string);
 
-
 		//Form Validation
 		$this->load->library('form_validation');
 

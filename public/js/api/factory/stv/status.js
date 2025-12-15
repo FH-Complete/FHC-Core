@@ -41,7 +41,6 @@ export default {
 		ausbildungssemester
 	}, params) {
 		return {
-
 			method: 'post',
 			url: 'api/frontend/v1/stv/status/updateStatus/'
 				+ prestudent_id + '/'
