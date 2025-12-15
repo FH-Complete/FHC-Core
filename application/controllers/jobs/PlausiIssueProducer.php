@@ -18,7 +18,7 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 
 		// get current Studiensemester
-		$studiensemesterRes = $this->StudiensemesterModel->getAktOrNextSemester();
+		$studiensemesterRes = $this->StudiensemesterModel->getAktOrNextSemester(62);
 		if (hasData($studiensemesterRes)) $this->_currentStudiensemester = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
 
 		// set fehler which can be produced by the job

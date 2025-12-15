@@ -52310,6 +52310,25 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Personen zusammenlegen Phrasen END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_invalidId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Id {id} ungültig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Invalid Id {id}',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
 );
 
 
