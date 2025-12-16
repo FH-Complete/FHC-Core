@@ -11,7 +11,11 @@ export default {
 		fehlertyp_kurzbz: String,
 		apps: [String, Array],
 		behebung_parameter: Array,
-		date: null
+		date: null,
+		endpoint: {
+			type: Object,
+			default: ApiIssues
+		}
 	},
 	 data() {
 		return {
@@ -33,9 +37,7 @@ export default {
 		},
 	  },
 	mounted() {
-		//this.currentDate = props.date || new Date();
-		this.currentDate = new Date();
-		console.log("created in list");
+		this.currentDate = this.date || new Date();
 		this.fetchIssues();
 	},
 	 methods: {
@@ -43,7 +45,7 @@ export default {
 		 fetchIssues() {
 			this.isFetching = true;
 			this.$api.call(
-				ApiIssues.getOpenIssuesByProperties(this.person_id, this.oe_kurzbz, this.fehlertyp_kurzbz, this.apps, this.behebung_parameter)
+				this.endpoint.getOpenIssuesByProperties(this.person_id, this.oe_kurzbz, this.fehlertyp_kurzbz, this.apps, this.behebung_parameter)
 			)
 			.then(result => {
 				this.issues = result.data;
