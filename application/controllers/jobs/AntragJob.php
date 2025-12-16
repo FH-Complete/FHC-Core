@@ -314,18 +314,17 @@ class AntragJob extends JOB_Controller
 			$data['studSemShort'] = $studsemShort;
 
 			// NOTE(chris): Sancho mail Assistant
-			if(sendSanchoMail('Sancho_Mail_Antrag_U_Reminder', $data, $antrag->email, 'Reminder: Unterbrechung Wiedereinstieg'))
+			$sancho_assistant_sent = sendSanchoMail('Sancho_Mail_Antrag_U_Reminder', $data, $antrag->email, 'Reminder: Unterbrechung Wiedereinstieg');
+			if($sancho_assistant_sent)
 			{
 				$count++;
-				$this->StudierendenantragstatusModel->insert([
-					'studierendenantrag_id' => $antrag->studierendenantrag_id,
-					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_REMINDERSENT,
-					'insertvon' => 'AntragJob'
-				]);
 			}
-
+			else
+			{
+				$this->logError('Error: failed to send Assistant Reminder studierendenantrag_id: ' . $antrag->studierendenantrag_id);
+			}
 			//Mail to Student
-			if(sendSanchoMail(
+			$sancho_student_sent = sendSanchoMail(
 				'Sancho_Mail_Antrag_U_Remind_Stud',
 				$data,
 				$email_student_FH,
@@ -333,8 +332,24 @@ class AntragJob extends JOB_Controller
 				'',
 				'',
 				'',
-				$email_student_privat)) {
+				$email_student_privat);
+
+			if($sancho_student_sent)
+			{
 				$countReminderStudent++;
+			}
+			else
+			{
+				$this->logError('Error: failed to send Student Reminder studierendenantrag_id: ' . $antrag->studierendenantrag_id);
+			}
+
+			if($sancho_assistant_sent && $sancho_student_sent)
+			{
+				$this->StudierendenantragstatusModel->insert([
+					'studierendenantrag_id' => $antrag->studierendenantrag_id,
+					'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_REMINDERSENT,
+					'insertvon' => 'AntragJob'
+				]);
 			}
 		}
 		$this->logInfo($count . ' Reminder an Assistenz und ' . $countReminderStudent . ' Reminder an Student gesendet  - Ende Job sendReminderWiedereinstieg');
