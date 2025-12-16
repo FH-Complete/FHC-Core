@@ -265,22 +265,26 @@ class AntragJob extends JOB_Controller
 			$person_id = $dataPrestudent->person_id;
 
 			$this->KontaktModel->addSelect('kontakt');
-			$this->KontaktModel->addLimit(1);
 
 			$result = $this->KontaktModel->loadWhere([
 				'person_id'=> $person_id,
 				'zustellung' => true,
 				'kontakttyp' => 'email'
 			]);
-			if (hasData($result)) {
-				$dataKontakt = current(getData($result));
-				$email_student_privat = $dataKontakt->kontakt;
+
+			$email_student_privat = null;
+			$dataKontakt = getData($result);
+			if ($dataKontakt) {
+				$stud_private_zustell_emails = array_map(function($kontakt) {
+					return $kontakt->kontakt;
+				}, $dataKontakt);
+				$email_student_privat = implode(', ', $stud_private_zustell_emails);
 			}
 
 			$email_student_FH = $this->StudentModel->getEmailFH($this->StudentModel->getUID($antrag->prestudent_id));
 
 			//studiensemester
-			$result = $this->StudiensemesterModel->getByDate($datum->format('d.m.Y'));
+			$result = $this->StudiensemesterModel->getByDate($datum->format('Y-m-d'));
 			if (hasData($result)) {
 				$dataSem = current(getData($result));
 			}
