@@ -57,55 +57,70 @@ export default {
 				p.style.setProperty('white-space', 'normal');
 				p.style.setProperty('max-width', '400px');
 			})
-		}
-	},
-    mounted(){
-		// replaces the tablesorter with the tabulator
-		let tables = Array.from(document.getElementsByClassName("tablesorter"));
+		},
+		prepareContent() {
+			// replaces the tablesorter with the tabulator
+			let tables = Array.from(document.getElementsByClassName("tablesorter"));
 
-		tables.forEach((table, index) =>  {
-			this.sanitizeLegacyTables(table)
-			
-			new Tabulator(table, {
-				index: index,
-				layout: "fitDataFill",
+			tables.forEach((table, index) =>  {
+				this.sanitizeLegacyTables(table)
 
-				columnDefaults: {
-					formatter: "html",
-					resizable: true,
-					minWidth: "100px"
-				}
+				new Tabulator(table, {
+					index: index,
+					layout: "fitDataFill",
+
+					columnDefaults: {
+						formatter: "html",
+						resizable: true,
+						minWidth: "100px"
+					}
+				})
 			})
-		})
 
-        document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
-            el.addEventListener("click", (evt) => {
-              evt.preventDefault();
-              BsConfirm.popup(el.dataset.confirm)
-                .then(() => {
-                  Axios.get(el.href)
-                    .then((res) => {
-                      // TODO(chris): check for success then show message and/or reload
-                      location = location;
-                    })
-                    .catch((err) => console.error("ERROR:", err));
-                })
-                .catch(() => {});
-            });
-          });
-          document.querySelectorAll("#cms [data-href]").forEach((el) => {
-            el.href = el.dataset.href.replace(
-              /^ROOT\//,
-              FHC_JS_DATA_STORAGE_OBJECT.app_root
-            );
-          });
-			
+			document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
+				el.addEventListener("click", (evt) => {
+					evt.preventDefault();
+					BsConfirm.popup(el.dataset.confirm)
+					.then(() => {
+						Axios.get(el.href)
+						.then((res) => {
+							// TODO(chris): check for success then show message and/or reload
+							location = location;
+						})
+						.catch((err) => console.error("ERROR:", err));
+					})
+					.catch(() => {});
+				});
+			});
+			document.querySelectorAll("#cms [data-href]").forEach((el) => {
+				el.href = el.dataset.href.replace(
+					/^ROOT\//,
+					FHC_JS_DATA_STORAGE_OBJECT.app_root
+				);
+			});
+
 			document.querySelectorAll("[href]").forEach((element) => {
 				let orignal_href = element.getAttribute("href");
 				let new_href = replaceRelativeLegacyLink(orignal_href);
 				element.href = new_href;
 			});
-    },
+
+			document.querySelectorAll("[style*=background-color]").forEach((element) => {
+				if (element.style.backgroundColor == "rgb(255, 255, 255)"){
+					element.style.backgroundColor = "var(--fhc-background)";
+				}
+				if(element.querySelector("*[style*=background-color]")){
+					element.style.backgroundColor = "var(--fhc-tertiary)";
+				}
+			});
+		}
+	},
+	updated() {
+		this.prepareContent();
+	},
+	mounted(){
+		this.prepareContent();
+	},
     template: /*html*/ `
       <!-- div that contains the content -->
       <div v-if="content" class="container" style="max-width: 100%;"><div class="row"><div class="col">

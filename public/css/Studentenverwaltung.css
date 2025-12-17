@@ -1,12 +1,37 @@
 @import './Fhc.css';
+@import './SvgIcons.css';
 @import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
+@import './components/Messages.css';
+@import './components/AppMenu.css';
 
 html {
   font-size: .875em;
+}
+html.fs_xx-small {
+	font-size: .5em;
+}
+html.fs_x-small {
+	font-size: .625em;
+}
+html.fs_small {
+	font-size: .75em;
+}
+html.fs_normal {
+  font-size: .875em;
+}
+html.fs_big {
+  font-size: 1em;
+}
+html.fs_huge {
+	font-size: 1.125em;
+}
+
+#appMenu {
+	width: 300px;
 }
 
 .navbar-dark .navbar-brand:focus {
@@ -36,8 +61,10 @@ html {
 	flex: 1 1 auto;
 }
 
-#sidebarMenu {
-	width: 0%;
+#nav-user-btn img {
+	object-fit: contain;
+	height: 2.5rem;
+	width: 2.5rem;
 }
 
 .tabulator-row.disabled.tabulator-row-odd .tabulator-cell {
@@ -53,11 +80,12 @@ html {
 }
 
 /* Dropdown AbschlusspruefungList.js */
-.tabulator-row {
+.stv-details-abschlusspruefung .tabulator-row {
 	overflow: visible !important;
 }
 
-.tabulator-cell {
+/* to avoid interference with Notiz.css and overflow for textfield */
+.stv-details-abschlusspruefung .tabulator-cell {
 	overflow: visible !important;
 }
 
@@ -75,6 +103,10 @@ html {
 }
 .tabulator-table {
 	overflow: visible !important;
+}
+
+.highlight-row {
+	background-color: #e5aeae !important;
 }
 
 @media (min-width: 768px) {
@@ -140,4 +172,16 @@ html {
 }
 .override_filtercmpt_actions_style div.d-flex.align-items-baseline {
 	align-items: end !important;
+}
+
+.stv-details-details-foto img {
+	max-width: 150px;
+}
+
+.msg_preview {
+	margin-bottom: -1px;
+}
+
+.tiny-90 div.tox.tox-tinymce {
+	height: 90% !important;
 }

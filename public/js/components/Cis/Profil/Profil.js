@@ -46,7 +46,10 @@ export const Profil = {
 	props: {
 		uid: {
 			type: String,
-			default: 'Profil'
+			required:false,
+		},
+		viewData: {
+			type: Object,
 		}
 	},
 	data() {
@@ -59,10 +62,12 @@ export const Profil = {
 			data: null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
 			notFoundUID: null,
+			isEditable: this.viewData.editable ?? false,
 		};
 	},
 	provide() {
 		return {
+			isEditable: Vue.computed(()=>this.isEditable),
 			profilUpdateStates: Vue.computed(() =>
 				this.profilUpdateStates ? this.profilUpdateStates : false
 			),
@@ -115,10 +120,10 @@ export const Profil = {
 			},
 			sortProfilUpdates: (ele1, ele2) => {
 				let result = 0;
-				if (ele1.status === "pending") {
+				if (ele1.status.toLowerCase() === "pending") {
 					result = -1;
-				} else if (ele1.status === "accepted") {
-					result = ele2.status === "rejected" ? -1 : 1;
+				} else if (ele1.status.toLowerCase() === "accepted") {
+					result = ele2.status.toLowerCase() === "rejected" ? -1 : 1;
 				} else {
 					result = 1;
 				}
@@ -153,18 +158,19 @@ export const Profil = {
 					console.error(error);
 				});
 			
-			let uid = this.uid ?? location.pathname.split("/").pop();
-
+			
 			this.$api
-				.call(ApiProfil.getView(uid))
-				.then((res) => {
-					if (!res.data) {
-						this.notFoundUID = uid;
-					} else {
-						this.view = res.data?.view;
-						this.data = res.data?.data;
-					}
-				});	
+				.call(ApiProfil.profilViewData(this.$route.params.uid??null))
+				.then((response) => response.data).then(data=>{
+					this.view = data?.profil_data.view;
+					this.data = data?.profil_data.data;
+					this.isEditable = data?.editable ?? false;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -220,10 +226,13 @@ export const Profil = {
 				kontakteArray = kontakteArray.concat(
 					this.data.profilUpdates
 						.filter((update) => {
-							return update.requested_change.zustellung;
+							return update.status === 'Pending' && update.requested_change.zustellung;
 						})
 						.map((kontant) => {
-							return kontant.requested_change.kontakt_id;
+							return {
+										kontakt_id: kontant.requested_change.kontakt_id,
+										kontakttyp: kontant.requested_change.kontakttyp
+								};
 						})
 				);
 			}
@@ -235,7 +244,7 @@ export const Profil = {
 					.every((kontakt) =>
 						this.data.profilUpdates.some(
 							(update) =>
-								update.requested_change.kontakt_id == kontakt.kontakt_id
+								update.status === 'Pending' && update.requested_change.kontakt_id == kontakt.kontakt_id
 						)
 					)
 			) {
@@ -245,7 +254,10 @@ export const Profil = {
 							return kontakt.zustellung;
 						})
 						.map((kon) => {
-							return kon.kontakt_id;
+							return {
+										kontakt_id: kon.kontakt_id,
+										kontakttyp: kon.kontakttyp
+								};
 						})
 				);
 			}
@@ -254,6 +266,7 @@ export const Profil = {
 		},
 	},
 	computed: {
+		
 		filteredEditData() {
 			if (!this.data) {
 				return;
@@ -365,7 +378,7 @@ export const Profil = {
 			this.load()
 		}
 	},
-	async created() {
+	created() {
 		this.load()
 	},
 	template: `

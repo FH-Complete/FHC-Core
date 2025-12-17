@@ -16,9 +16,6 @@ export default{
 		StatusDropdown
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
-		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
 			default: false
@@ -54,7 +51,8 @@ export default{
 		}
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object,
 	},
 	data() {
 		return {
@@ -178,15 +176,18 @@ export default{
 							const data = cell.getData();
 
 							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-forward"></i>';
-							button.title = this.$p.t('ui', 'btn_statusVorruecken');
-							button.addEventListener('click', () =>
-								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
-							);
-							if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
-								button.disabled = true;
-							container.append(button);
+							if (this.config?.showStatusVorruecken !== false)
+							{
+								button.className = 'btn btn-outline-secondary btn-action';
+								button.innerHTML = '<i class="fa fa-forward"></i>';
+								button.title = this.$p.t('ui', 'btn_statusVorruecken');
+								button.addEventListener('click', () =>
+									this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
+								);
+								if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
+									button.disabled = true;
+								container.append(button);
+							}
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
@@ -206,8 +207,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
-								button.disabled = true;
+/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;*/
 							container.append(button);
 
 							button = document.createElement('button');
@@ -230,15 +231,15 @@ export default{
 					const rowData = row.getData();
 					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
 					{
-						row.getElement().classList.add('disabled');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
 				index: 'statusId',
-				persistenceID: 'stv-multistatus'
+				persistenceID: 'stv-multistatus-2025112401'
 			},
 			tabulatorEvents: [
 				{
@@ -404,7 +405,7 @@ export default{
 		this.$api
 			.call(ApiStvPrestudent.getLastBismeldestichtag())
 			.then(result => {
-				this.dataMeldestichtag = result.data[0].meldestichtag;
+				this.dataMeldestichtag = result.data[0]?.meldestichtag;
 				if (this.$refs.table && this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.redraw(true);
 			})
@@ -428,6 +429,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"

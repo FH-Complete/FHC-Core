@@ -65,7 +65,7 @@ class Config extends Auth_Controller
 		
 		$preset_decoded = json_decode($preset->preset, true);
 		
-		$this->DashboardLib->addWidgetsToWidgets($preset_decoded['widgets'], $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
+		$this->DashboardLib->addWidgetsToWidgets($preset_decoded, $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$preset->preset = json_encode($preset_decoded);
 				
@@ -92,7 +92,7 @@ class Config extends Auth_Controller
 		}
 		
 		$preset_decoded = json_decode($preset->preset, true);
-		if (!$this->DashboardLib->removeWidgetFromWidgets($preset_decoded['widgets'], $funktion_kurzbz, $widgetid))
+		if (!$this->DashboardLib->removeWidgetFromWidgets($preset_decoded, $funktion_kurzbz, $widgetid))
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -119,7 +119,7 @@ class Config extends Auth_Controller
 		
 		$override_decoded = json_decode($override->override, true);
 
-		$this->DashboardLib->addWidgetsToWidgets($override_decoded['widgets'], $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
+		$this->DashboardLib->addWidgetsToWidgets($override_decoded, $dashboard_kurzbz, $funktion_kurzbz, $input->widgets);
 		
 		$override->override = json_encode($override_decoded);
 				
@@ -148,7 +148,7 @@ class Config extends Auth_Controller
 		
 		$override_decoded = json_decode($override->override, true);
 		
-		if (!$this->DashboardLib->removeWidgetFromWidgets($override_decoded['widgets'], $funktion_kurzbz, $widgetid))
+		if (!$this->DashboardLib->removeWidgetFromWidgets($override_decoded, $funktion_kurzbz, $widgetid))
 		{
 			http_response_code(404);
 			$this->terminateWithJsonError('widgetid ' . $widgetid . ' not found');
@@ -202,10 +202,10 @@ class Config extends Auth_Controller
 			if ($conf)
 			{
 				$preset = json_decode($conf->preset, true);
-				if (!isset($preset['widgets']) || !isset($preset['widgets'][$funktion]))
+				if (!isset($preset[$funktion]) || !isset($preset[$funktion]['widgets']))
 					$result[$funktion] = [];
 				else
-					$result[$funktion] = $preset['widgets'][$funktion];
+					$result[$funktion] = $preset[$funktion]['widgets'];
 			}
 			else
 				$result[$funktion] = [];

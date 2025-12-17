@@ -10,21 +10,34 @@ export default {
 			type: String,
 		}
 	},
-	inject: [
-		'studiengang_kz', // inject info that should not be displayed
-	],
+	inject: {
+		// inject info that should not be displayed
+		'studiengang_kz': {
+			from: 'studiengang_kz',
+			default: false
+		},
+	},
 	computed: {
 		getLinkGruppeListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.gruppe?.value && this.data.verband?.value && this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value
 				+ '&verband=' + this.data.verband.value + '&grp=' + this.data.gruppe.value : ''
 		},
 		getLinkVerbandListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.verband?.value && this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value
 				+ '&verband=' + this.data.verband.value : ''
 		},
 		getLinkSemesterListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value : ''
 		}
@@ -48,24 +61,24 @@ export default {
 						<!-- print semester link -->
 						<span v-else-if="key == 'semester' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkSemesterListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+							<a :aria-label="$p.t('profil','semesterLink')" class="ms-auto mb-2" target="_blank" :href="getLinkSemesterListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
 						<!-- print verband link -->
 						<span v-else-if="key =='verband' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkVerbandListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+							<a :aria-label="$p.t('profil','verbandLink')" class="ms-auto mb-2" target="_blank" :href="getLinkVerbandListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						
 						<!-- print gruppe link -->
 						<span v-else-if="key == 'gruppe' && entry.value"  class="form-underline-content">
 							{{ entry.value }}
-							<a class="ms-auto mb-2" target="_blank" :href="getLinkGruppeListe">
-								<i class="fa fa-arrow-up-right-from-square me-1"></i>
+							<a :aria-label="$p.t('profil','gruppenLink')" class="ms-auto mb-2" target="_blank" :href="getLinkGruppeListe">
+								<i aria-hidden="true" class="fa fa-arrow-up-right-from-square me-1 fhc-link-color"></i>
 							</a>
 						</span>
 						

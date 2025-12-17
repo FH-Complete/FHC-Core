@@ -3973,6 +3973,10 @@
   border-bottom-right-radius: 4px;
   border-bottom-left-radius: 4px;
 }
+.p-tabview-panel .btn-close,
+.p-tabview-panel .carousel-indicators [data-bs-target] {
+  box-sizing: content-box;
+}
 
 .p-toolbar {
   background: #efefef;
@@ -5249,6 +5253,8 @@
 }
 .p-toast .p-toast-message .p-toast-message-content .p-toast-message-text {
   margin: 0 0 0 1rem;
+  flex: 1 0 0%;
+  word-break: break-word;
 }
 .p-toast .p-toast-message .p-toast-message-content .p-toast-message-icon {
   font-size: 2rem;
@@ -5313,6 +5319,15 @@
 .p-toast .p-toast-message.p-toast-message-error .p-toast-message-icon,
 .p-toast .p-toast-message.p-toast-message-error .p-toast-icon-close {
   color: #721c24;
+}
+.p-toast.p-component.p-toast-top-right.fhc-alert {
+  max-height: calc(100vh - 20px - 1rem);
+  overflow: auto;
+}
+
+.p-toast-message-text .alertCollapseText {
+  overflow: auto;
+  max-height: 30rem;
 }
 
 .p-galleria .p-galleria-close {
@@ -5674,4 +5689,33 @@
   border-color: #86b7fe;
   outline: 0;
   box-shadow: 0 0 0 .25rem rgba(13,110,253,.25);
+}
+
+/* input-group */
+/* autocomplete */
+.input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n+3) > .p-autocomplete-input,
+.input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-control > .p-autocomplete-input,
+.input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-select > .p-autocomplete-input,
+.input-group:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) > .p-autocomplete-input,
+.input-group:not(.has-validation) > .dropdown-toggle:nth-last-child(n+3) > .p-autocomplete > .p-autocomplete-input,
+.input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-control > .p-autocomplete > .p-autocomplete-input,
+.input-group:not(.has-validation) > .form-floating:not(:last-child) > .form-select > .p-autocomplete > .p-autocomplete-input,
+.input-group:not(.has-validation) > :not(:last-child):not(.dropdown-toggle):not(.dropdown-menu):not(.form-floating) > .p-autocomplete > .p-autocomplete-input {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) > .p-autocomplete-input,
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) > .p-autocomplete > .p-autocomplete-input {
+  margin-left: calc(var(--bs-border-width) * -1);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.p-inputtext.is-invalid:enabled:hover {
+  border-color: var(--bs-form-invalid-border-color);
+}
+.p-inputtext.is-invalid:enabled:focus,
+.was-validated .p-inputtext:invalid:focus {
+  border-color: var(--bs-form-invalid-border-color);
+  box-shadow: 0 0 0 .25rem rgba(var(--bs-danger-rgb),.25);
 }

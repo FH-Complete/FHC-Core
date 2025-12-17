@@ -30,8 +30,25 @@ export default {
 			from: 'hasAdminPermission',
 			default: false
 		},
-		defaultSemester: {
-			from: 'defaultSemester',
+		hasZGVBakkPermission: {
+			from: 'hasZGVBakkPermission',
+			default: false
+		},
+		hasZGVMasterPermission: {
+			from: 'hasZGVMasterPermission',
+			default: false
+		},
+		hasZGVDoctorPermission: {
+			from: 'hasZGVDoctorPermission',
+			default: false
+		},
+		hasBismeldenPermission: {
+			from: 'hasBismeldenPermission',
+			default: false
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
 		}
 	},
 	props: {
@@ -60,7 +77,13 @@ export default {
 			listBisStandort: [],
 			initialFormData: {},
 			deltaArray: {},
-			actionUpdate: false
+			actionUpdate: false,
+			filteredZgvs: [],
+			selectedZgv: null,
+			filteredMasterZgvs: [],
+			selectedMasterZgv: null,
+			filteredDoktorZgvs: [],
+			selectedDoktorZgv: null
 		};
 	},
 	computed: {
@@ -86,16 +109,26 @@ export default {
 		},
 		modelValue(n){
 			this.loadPrestudent(n);
-		}
+		},
+		selectedZgv(newVal) {
+			this.data.zgv_code = newVal?.zgv_code || null;
+		},
+		selectedMasterZgv(newVal) {
+			this.data.zgvmas_code = newVal?.zgvmas_code || null;
+		},
+		selectedDoktorZgv(newVal) {
+			this.data.zgvdoktor_code = newVal?.zgvdoktor_code || null;
+		},
 	},
 
 	methods: {
-		loadPrestudent() {
+		async loadPrestudent() {
 			return this.$api
-				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id))
+				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id, this.currentSemester))
 				.then(result => result.data)
 				.then(result => {
 					this.data = result;
+
 					//neue DataVariable um ein Delta der vorgenommenen Änderungen berechnen zu können
 					this.initialFormData = {...this.data};
 				})
@@ -118,14 +151,35 @@ export default {
 					window.scrollTo(0, 0);
 				});
 		},
+		filterZgvs(event){
+			const query = event.query.toLowerCase();
+			this.filteredZgvs = this.listZgvs.filter(item =>
+				item.label.toLowerCase().includes(query)
+			)
+		},
+		filterMasterZgvs(event){
+			const query = event.query.toLowerCase();
+			this.filteredMasterZgvs = this.listZgvsmaster.filter(item =>
+				item.label.toLowerCase().includes(query)
+			)
+		},
+		filterDoktorZgvs(event){
+			const query = event.query.toLowerCase();
+			this.filteredDoktorZgvs = this.listZgvsdoktor.filter(item =>
+				item.label.toLowerCase().includes(query)
+			)
+		},
 	},
-	created() {
-		this.loadPrestudent();
+	async created() {
+		await this.loadPrestudent();
 		this.$api
 			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvs = result;
+				this.selectedZgv = this.listZgvs.find(
+					item => item.zgv_code === this.data.zgv_code
+				);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$api
@@ -133,6 +187,9 @@ export default {
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsmaster = result;
+				this.selectedMasterZgv = this.listZgvsmaster.find(
+					item => item.zgvmas_code === this.data.zgvmas_code
+				);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$api
@@ -140,6 +197,9 @@ export default {
 			.then(result => result.data)
 			.then(result => {
 				this.listZgvsdoktor = result;
+				this.selectedDoktorZgv = this.listZgvsdoktor.find(
+					item => item.zgvdoktor_code === this.data.zgvdoktor_code
+				);
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 		this.$api
@@ -197,7 +257,7 @@ export default {
 					<form-input
 					v-if="!config.hiddenFields.includes('prestudent_id')"
 						container-class="col-3 stv-details-prestudent-prestudent_id"
-						label="Prestudent_id"
+						:label="$p.t('ui', 'prestudent_id')"
 						type="text"
 						v-model="data.prestudent_id"
 						name="prestudent_id"
@@ -207,7 +267,7 @@ export default {
 					<form-input
 						v-if="!config.hiddenFields.includes('person_id')"
 						container-class="col-3 stv-details-prestudent-person_id"
-						label="Person_id"
+						:label="$p.t('person', 'person_id')"
 						type="text"
 						v-model="data.person_id"
 						name="person_id"
@@ -220,11 +280,26 @@ export default {
 						v-if="!config.hiddenFields.includes('zgv_code')"
 						container-class="col-3 stv-details-prestudent-zgv_code"
 						label="ZGV"
-						type="select"
-						v-model="data.zgv_code"
-						name="zgvcode"
+						type="autocomplete"
+						v-model="selectedZgv"
+						forceSelection
+						optionLabel="label"
+						optionValue="zgv_code"
+						:suggestions="filteredZgvs"
+						dropdown
+						name="zgv_code"
+						@complete="filterZgvs"
+						:disabled="!hasZGVBakkPermission"
 						>
-					<option v-for="zgv in listZgvs" :key="zgv.zgv_code" :value="zgv.zgv_code">{{zgv.zgv_bez}}</option>
+							<template #option="slotProps">
+								<div
+									:class="!slotProps.option.aktiv
+									? 'item-inactive'
+									: ''"
+									>
+										{{slotProps.option.label}}
+								</div>
+							</template>
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvOrt')"
@@ -233,8 +308,9 @@ export default {
 						type="text"
 						v-model="data.zgvort"
 						name="zgvort"
+						:disabled="!hasZGVBakkPermission"
 						>
-					</form-input>
+					</form-input>	
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvDatum')"
 						container-class="col-3 stv-details-prestudent-zgvDatum"
@@ -245,9 +321,11 @@ export default {
 						no-today
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVBakkPermission"
 						>
 					</form-input>
 					<form-input
@@ -257,8 +335,10 @@ export default {
 						type="select"
 						v-model="data.zgvnation"
 						name="zgvnation"
+						:disabled="!hasZGVBakkPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -267,11 +347,26 @@ export default {
 						v-if="!config.hiddenFields.includes('zgvmas_code')"
 						container-class="col-3 stv-details-prestudent-zgvmas_code"
 						:label="$p.t('lehre', 'zgvMaster')"
-						type="select"
-						v-model="data.zgvmas_code"
-						name="zgvmascode"
+						type="autocomplete"
+						v-model="selectedMasterZgv"
+						forceSelection
+						optionLabel="label"
+						optionValue="zgvmas_code"
+						:suggestions="filteredMasterZgvs"
+						dropdown
+						name="zgvmas_code"
+						@complete="filterMasterZgvs"
+						:disabled="!hasZGVMasterPermission"
 						>
-						<option v-for="mzgv in listZgvsmaster" :key="mzgv.zgvmas_code" :value="mzgv.zgvmas_code">{{mzgv.zgvmas_bez}}</option>
+							<template #option="slotProps">
+								<div
+									:class="!slotProps.option.aktiv
+									? 'item-inactive'
+									: ''"
+									>
+										{{slotProps.option.label}}
+								</div>
+							</template>
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvmaort')"
@@ -280,6 +375,7 @@ export default {
 						type="text"
 						v-model="data.zgvmaort"
 						name="zgvmaort"
+						:disabled="!hasZGVMasterPermission"
 						>
 					</form-input>
 					<form-input
@@ -292,9 +388,11 @@ export default {
 						no-today
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVMasterPermission"
 						>
 					</form-input>
 					<form-input
@@ -304,8 +402,10 @@ export default {
 						type="select"
 						v-model="data.zgvmanation"
 						name="zgvmanation"
+						:disabled="!hasZGVMasterPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -315,11 +415,26 @@ export default {
 						v-if="!config.hiddenFields.includes('zgvdoktor_code')"
 						container-class="col-3 stv-details-prestudent-zgvdoktor_code"
 						:label="$p.t('lehre', 'zgvDoktor')"
-						type="select"
-						v-model="data.zgvdoktor_code"
+						type="autocomplete"
+						v-model="selectedDoktorZgv"
+						forceSelection
+						optionLabel="label"
+						optionValue="zgvdoktor_code"
+						:suggestions="filteredDoktorZgvs"
+						dropdown
 						name="zgvdoktor_code"
+						@complete="filterDoktorZgvs"
+						:disabled="!hasZGVDoctorPermission"
 						>
-						<option v-for="zgv in listZgvsdoktor" :key="zgv.zgvdoktor_code" :value="zgv.zgvdoktor_code">{{zgv.zgvdoktor_bez}}</option>
+							<template #option="slotProps">
+								<div
+									:class="!slotProps.option.aktiv
+									? 'item-inactive'
+									: ''"
+									>
+										{{slotProps.option.label}}
+								</div>
+							</template>
 					</form-input>
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvdoktorort')"
@@ -328,6 +443,7 @@ export default {
 						type="text"
 						v-model="data.zgvdoktorort"
 						name="zgvdoktorort"
+						:disabled="!hasZGVDoctorPermission"
 						>
 					</form-input>
 					<form-input
@@ -339,10 +455,12 @@ export default {
 						name="zgvdoktordatum"
 						no-today
 						auto-apply
+						text-input
 						:enable-time-picker="false"
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVDoctorPermission"
 						>
 					</form-input>
 					<form-input
@@ -352,8 +470,10 @@ export default {
 						type="select"
 						v-model="data.zgvdoktornation"
 						name="zgvdoktornation"
+						:disabled="!hasZGVDoctorPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -367,6 +487,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgv_erfuellt"
 							name="zgv_erfuellt"
+							:disabled="!hasZGVBakkPermission"
 							>
 						</form-input>
 					</div>
@@ -378,6 +499,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgvmas_erfuellt"
 							name="zgvmas_erfuellt"
+							:disabled="!hasZGVMasterPermission"
 							>
 						</form-input>
 					</div>
@@ -389,6 +511,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgvdoktor_erfuellt"
 							name="zgvdoktor_erfuellt"
+							:disabled="!hasZGVDoctorPermission"
 							>
 						</form-input>
 					</div>
@@ -415,6 +538,7 @@ export default {
 						v-model="data.berufstaetigkeit_code"
 						name="berufstaetigkeit_code"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="beruf in listBerufe" :key="beruf.berufstaetigkeit_code" :value="beruf.berufstaetigkeit_code">{{beruf.berufstaetigkeit_bez}} </option>
 					</form-input>
 					<form-input
@@ -425,6 +549,7 @@ export default {
 						v-model="data.ausbildungcode"
 						name="ausbildungcode"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="ausbld in listAusbildung" :key="ausbld.ausbildungcode" :value="ausbld.ausbildungcode">{{ausbld.ausbildungbez}} </option>
 					</form-input>
 				</div>
@@ -485,7 +610,7 @@ export default {
 						v-model="data.gsstudientyp_kurzbz"
 						name="gsstudientyp_kurzbz"
 						>
-						<option v-for="typ in listStgTyp" :key="typ.typ" :value="typ.typ">{{typ.bezeichnung}}</option>
+						<option v-for="typ in listStgTyp" :key="typ.gsstudientyp_kurzbz" :value="typ.gsstudientyp_kurzbz">{{typ.bezeichnung}}</option>
 					</form-input>
 				</div>
 				
@@ -507,6 +632,7 @@ export default {
 							type="checkbox"
 							v-model="data.bismelden"
 							name="bismelden"
+							:disabled="!hasBismeldenPermission"
 							>
 						</form-input>
 					</div>

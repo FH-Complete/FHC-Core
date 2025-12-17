@@ -33,12 +33,6 @@
 				</td>
 			</tr>
 			<tr>
-				<td><strong><?php echo  ucfirst($this->p->t('person','svnr')) ?></strong></td>
-				<td>
-					<div class='stammdaten' id="svnr"><?php echo $stammdaten->svnr ?></div>
-				</td>
-			</tr>
-			<tr>
 				<td><strong><?php echo  ucfirst($this->p->t('person','staatsbuergerschaft')) ?></strong></td>
 				<td>
 					<select id="buergerschaft" disabled>
@@ -112,6 +106,7 @@
 			<tbody>
 			<?php
 			$lastMailAdress = '';
+			$lastUnverifiedMailAdress = '';
 			foreach ($stammdaten->kontakte as $kontakt): ?>
 				<tr>
 				<?php if ($kontakt->kontakttyp === 'email'): ?>
@@ -125,14 +120,16 @@
 						<?php echo '<span class="kontakt '.$kontakt->kontakttyp.'" data-id="'. $kontakt->kontakt_id .'" data-value="' . $kontakt->kontakt .'">';?>
 						<?php if ($kontakt->kontakttyp === 'email'): ?>
 							<a href="mailto:<?php echo $kontakt->kontakt; ?>" target="_top">
-							<?php $lastMailAdress = $kontakt->kontakt;
+							<?php $lastMailAdress = $kontakt->kontakt; ?>
+						<?php elseif ($kontakt->kontakttyp === 'email_unverifiziert'): ?>
+							<?php $lastUnverifiedMailAdress = $kontakt->kontakt;
 							endif;
 							echo $kontakt->kontakt;
-							if ($kontakt->kontakttyp === 'email'):
+						if ($kontakt->kontakttyp === 'email'):
 							?>
 							</a>
-							<?php endif; ?>
-					<?php echo '</span>'?>
+						<?php endif; ?>
+						<?php echo '</span>'?>
 					</td>
 					<td><?php echo $kontakt->anmerkung; ?></td>
 				</tr>
@@ -146,9 +143,9 @@
 						<?php if (isset($adresse)): ?>
 							<div class="row adresse col-sm-12" data-id="<?php echo $adresse->adresse_id ?>">
 								<div class="float-left" data-value="<?php echo $adresse->strasse ?>" data-type="strasse"><?php echo $adresse->strasse ?></div>
-								
+
 								<div class="float-left" data-value="<?php echo $adresse->plz ?>" data-type="plz"><?php echo $adresse->plz ?></div>
-								
+
 								<div class="float-left" data-value="<?php echo $adresse->ort ?>" data-type="ort"><?php echo $adresse->ort ?></div>
 
 							<?php if (isset($adresse->nationkurztext)): ?>
@@ -188,7 +185,8 @@
 			</div>
 			<?php if (isset($stammdaten->zugangscode)): ?>
 				<div class="col-xs-6 text-right">
-					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode).'&emailAdresse='.$lastMailAdress ?>"
+					<a href="<?php echo CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.html_escape($stammdaten->zugangscode)
+					.'&emailAdresse='.(isEmptyString($lastMailAdress)?$lastUnverifiedMailAdress:$lastMailAdress).'&keepEmailUnverified=true' ?>"
 					   target='_blank'><i class="glyphicon glyphicon-new-window"></i>&nbsp;<?php echo  $this->p->t('infocenter','zugangBewerbung') ?></a>
 				</div>
 			<?php endif; ?>
