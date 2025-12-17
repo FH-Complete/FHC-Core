@@ -1105,6 +1105,7 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.getStudentenNoten(lv_id, sem_kurzbz))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
+					if(res?.meta?.getExternalGradesError) this.$fhcAlert.alertError(res.meta.getExternalGradesError)
 				}).finally(()=> {
 					this.loading = false
 			})
