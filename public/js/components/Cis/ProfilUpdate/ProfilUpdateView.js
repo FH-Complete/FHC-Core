@@ -59,6 +59,10 @@ export default {
 		},
 		profilUpdateOptions: function () {
 			return {
+				persistence: {
+					columns: ["width", "visible", "frozen"],
+				},
+				persistenceID: 'cis-profilupdate-2025121702',
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: (url, config, params) => {
 					return this.$api.call(ApiProfilUpdate.getProfilUpdateWithPermission(params.filter));
