@@ -827,7 +827,6 @@ class Studiengang_model extends DB_Model
 				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
 			WHERE
 				stg.studiengang_kz IN ?
-				AND stg.aktiv = TRUE
 				AND stplsem.studiensemester_kurzbz = ?
 			ORDER BY
 				stg.kurzbzlang
