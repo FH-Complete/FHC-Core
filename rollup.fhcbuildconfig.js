@@ -1,5 +1,5 @@
 const fhcBuildConfig = {
-  fhcBuildVersion: '2025111701'
+  fhcBuildVersion: '2025121701'
 }
 
 export default fhcBuildConfig;
