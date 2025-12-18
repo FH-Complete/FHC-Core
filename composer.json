@@ -504,7 +504,8 @@
 		"vuejs/vuedatepicker_js": "7.2.0",
 		"vuejs/vuedatepicker_css": "7.2.0",
 		"vuejs/vuedatepicker_js11": "11.0.1",
-		"vuejs/vuedatepicker_css11": "11.0.1"
+		"vuejs/vuedatepicker_css11": "11.0.1",
+		"phpmailer/phpmailer": "^7.0"
 
 	},
 	"config": {
