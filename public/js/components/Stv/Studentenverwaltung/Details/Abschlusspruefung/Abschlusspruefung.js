@@ -438,11 +438,9 @@ export default {
 
 			if (this.stgInfo.typ === 'b') {
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'lg') {
 				this.formData.pruefungstyp_kurzbz = 'lgabschluss';

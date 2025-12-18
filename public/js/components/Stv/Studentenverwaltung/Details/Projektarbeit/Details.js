@@ -69,10 +69,13 @@ export default {
 				final: true,
 				anmerkung: null
 			},
+			studiensemester: null,
 			arrTypen: [],
 			arrFirmen: [],
 			arrLvs: [],
 			arrNoten: [],
+			arrStudiensemester: [],
+			additional_lehrveranstaltung_id: null,
 			filteredFirmen: [],
 			abortController: {
 				firma: null
@@ -103,7 +106,11 @@ export default {
 			this.formData.anmerkung = null;
 			this.$refs.formDetails.clearValidation();
 		},
-		getFormData(statusNew, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
+		getFormData(newProjektarbeit, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
+
+			this.additional_lehrveranstaltung_id = additional_lehrveranstaltung_id;
+			this.studiensemester = studiensemester_kurzbz || this.defaultSemester;
+			this.newProjektarbeit = newProjektarbeit;
 
 			this.$api
 				.call(ApiStvProjektarbeit.getTypenProjektarbeit())
@@ -112,18 +119,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 
-			this.$api
-				.call(ApiStvProjektarbeit.getLehrveranstaltungen(
-					this.student.uid,
-					statusNew ? this.student.studiengang_kz : null,
-					studiensemester_kurzbz ?? this.defaultSemester,
-					additional_lehrveranstaltung_id
-				))
-				.then(result => {
-						this.arrLvs = result.data
-					}
-				)
-				.catch(this.$fhcAlert.handleSystemError);
+			this.getLehrveranstaltungen();
 
 			this.$api
 				.call(ApiStvProjektarbeit.getNoten())
@@ -132,7 +128,14 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 
-			if (statusNew) this.resetForm();
+			this.$api
+				.call(ApiStvProjektarbeit.getStudiensemester())
+				.then(result => {
+					this.arrStudiensemester = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+
+			if (this.newProjektarbeit) this.resetForm();
 		},
 		loadProjektarbeit(projektarbeit_id) {
 
@@ -178,8 +181,29 @@ export default {
 					this.filteredFirmen = result.data;
 				});
 		},
+		getLehrveranstaltungen() {
+			return this.$api
+				.call(ApiStvProjektarbeit.getLehrveranstaltungen(
+					this.student.uid,
+					this.newProjektarbeit ? this.student.studiengang_kz : null,
+					this.studiensemester,
+					this.additional_lehrveranstaltung_id
+				))
+				.then(result => {
+						this.arrLvs = result.data
+					}
+				)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		lvChanged(event) {
 			this.formData.lehreinheit_id = null;
+		},
+		studiensemesterChanged() {
+			this.formData.lehreinheit_id = null;
+			this.getLehrveranstaltungen();
+		},
+		gesperrtBisChanged(newSperrdatum) {
+			this.formData.freigegeben = newSperrdatum == null || newSperrdatum == '';
 		},
 		// enrich and modify data before sending
 		getPreparedFormData() {
@@ -281,7 +305,7 @@ export default {
 
 				<div class="row mb-3">
 					<form-input
-						container-class="stv-details-projektarbeit-lv"
+						container-class="stv-details-projektarbeit-lv col-10"
 						:label="$p.t('projektarbeit', 'lehrveranstaltung')"
 						type="select"
 						v-model="formData.lehrveranstaltung_id"
@@ -295,6 +319,23 @@ export default {
 							:value="lv.lehrveranstaltung_id"
 							>
 							{{lv.bezeichnung + (lv.orgform_kurzbz ? ' ' + lv.orgform_kurzbz : '') + ' (' + lv.semester + ' Sem) ID: ' + lv.lehrveranstaltung_id}}
+						</option>
+					</form-input>
+					<form-input
+						container-class="col-2"
+						:label="$p.t('lehre', 'studiensemester')"
+						type="select"
+						v-model="studiensemester"
+						name="studiensemester"
+						@change="studiensemesterChanged"
+						>
+						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
+						<option
+							v-for="sem in arrStudiensemester"
+							:key="sem.studiensemester_kurzbz"
+							:value="sem.studiensemester_kurzbz"
+							>
+							{{sem.studiensemester_kurzbz}}
 						</option>
 					</form-input>
 				</div>
@@ -362,6 +403,7 @@ export default {
 						format="dd.MM.yyyy"
 						model-type="yyyy-MM-dd"
 						name="gesperrtbis"
+						@update:model-value="gesperrtBisChanged"
 						>
 					</form-input>
 					<div class="col-4">
