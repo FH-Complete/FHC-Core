@@ -37,6 +37,7 @@ class Issues extends FHCAPI_Controller
 		$fehlertyp_kurzbz = $this->input->get('fehlertyp_kurzbz', true);
 		$apps = $this->input->get('apps', true);
 		$behebung_parameter = $this->input->get('behebung_parameter', true);
+		$hauptzustaendig = filter_var($this->input->get('hauptzustaendig', true), FILTER_VALIDATE_BOOLEAN);
 
 		if (isset($person_id) && !is_numeric($person_id))
 			$this->terminateWithError('person id is not numeric!');
@@ -44,7 +45,16 @@ class Issues extends FHCAPI_Controller
 		if (isset($behebung_parameter) && !is_array($behebung_parameter))
 			$this->terminateWithError('Behebung parameter invalid');
 
-		$issueRes = $this->IssueModel->getOpenIssuesByProperties($person_id, $oe_kurzbz, $fehlertyp_kurzbz, $apps, $behebung_parameter);
+			$this->addMeta("vorher", $hauptzustaendig);
+
+		$issueRes = $this->IssueModel->getOpenIssuesByProperties(
+			$person_id,
+			$oe_kurzbz,
+			$fehlertyp_kurzbz,
+			$apps,
+			$behebung_parameter,
+			$hauptzustaendig
+		);
 
 		if (isError($issueRes))
 		{

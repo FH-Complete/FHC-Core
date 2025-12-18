@@ -20,7 +20,7 @@ class Issue_model extends DB_Model
 	 * @param string $fehlercode_extern
 	 * @return object success with issues or error
 	 */
-	public function getOpenIssues($fehlercodes, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null)
+	public function getOpenIssues($fehlercodes, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null, $hauptzustaendig = false)
 	{
 		// issue exists for a fehlercode (or fehlercode_extern), person_id, oe_kurzbz, if not verarbeitet yet
 		return $this->_getIssues(
@@ -31,7 +31,8 @@ class Issue_model extends DB_Model
 			$ist_verarbeitet = false,
 			$behebung_parameter = null,
 			$fehlercodes,
-			$fehlercode_extern
+			$fehlercode_extern,
+			$hauptzustaendig
 		);
 	}
 
@@ -43,8 +44,14 @@ class Issue_model extends DB_Model
 	 * @param string $fehlercode_extern if provided, only issues with this external fehlercode are counted (for identifying issues from external systems).
 	 * @return Object success with number of issues or error
 	 */
-	public function getOpenIssueCount($fehlercode, $person_id = null, $oe_kurzbz = null, $fehlercode_extern = null, $behebung_parameter = null)
-	{
+	public function getOpenIssueCount(
+		$fehlercode,
+		$person_id = null,
+		$oe_kurzbz = null,
+		$fehlercode_extern = null,
+		$behebung_parameter = null,
+		$hauptzustaendig = false
+	) {
 		$params = array($fehlercode);
 		// issue exists for a fehlercode (or fehlercode_extern), person_id, oe_kurzbz, if not verarbeitet yet
 		$qry = 'SELECT count(*) as anzahl_open_issues FROM system.tbl_issue
@@ -100,9 +107,20 @@ class Issue_model extends DB_Model
 		$oe_kurzbz = null,
 		$fehlertyp_kurzbz = null,
 		$apps = null,
-		$behebung_parameter = null
+		$behebung_parameter = null,
+		$hauptzustaendig = false
 	) {
-		return $this->_getIssues($person_id, $oe_kurzbz, $fehlertyp_kurzbz, $apps, $ist_verarbeitet = false, $behebung_parameter);
+		return $this->_getIssues(
+			$person_id,
+			$oe_kurzbz,
+			$fehlertyp_kurzbz,
+			$apps,
+			$ist_verarbeitet = false,
+			$behebung_parameter,
+			$fehlercodes = null,
+			$fehlercode_extern = null,
+			$hauptzustaendig
+		);
 	}
 
 	/**
@@ -125,7 +143,8 @@ class Issue_model extends DB_Model
 		$ist_verarbeitet = null,
 		$behebung_parameter = null,
 		$fehlercodes = null,
-		$fehlercode_extern = null
+		$fehlercode_extern = null,
+		$hauptzustaendig = false
 	) {
 		$params = array();
 
@@ -183,6 +202,23 @@ class Issue_model extends DB_Model
 				// check if jsonb value is equal to the passed parameters array (if value contains array and array contains value)
 				$qry .= ' AND behebung_parameter @> ? AND behebung_parameter <@ ?';
 				$params = array_merge($params, array($behebung_parameter_string, $behebung_parameter_string));
+			}
+		}
+
+		// retrieving only fehler for which user is hauptzuständig
+		if ($hauptzustaendig === true)
+		{
+			$this->load->model('system/Fehlerzustaendigkeiten_model', 'FehlerzustaendigkeitenModel');
+
+			$result = $this->FehlerzustaendigkeitenModel->getFehlerForUserHauptzustaendig();
+
+
+			if (isError($result)) return $result;
+
+			if (hasData($result))
+			{
+				$fehlercodesZust = array_column(getData($result), 'fehlercode');
+				$fehlercodes = isEmptyArray($fehlercodes) ? $fehlercodesZust : array_intersect($fehlercodes, $fehlercodesZust);
 			}
 		}
 

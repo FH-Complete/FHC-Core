@@ -23,7 +23,7 @@ class IssueChecker extends FHCAPI_Controller
 
 		if(!is_array($permissions))
 		{
-		    $this->terminateWithError("Issue Checker: permissions must be an array");
+			$this->terminateWithError("Issue Checker: permissions must be an array");
 		}
 		
 		$merged_permissions = array_merge($default_permissions, $permissions);
@@ -37,10 +37,12 @@ class IssueChecker extends FHCAPI_Controller
 	public function checkPerson()
 	{
 		$person_id = $this->input->post('person_id', true);
+		$hauptzustaendig = filter_var($this->input->post('hauptzustaendig', true), FILTER_VALIDATE_BOOLEAN);
 
 		if (!is_numeric($person_id)) $this->terminateWithError($this->p->t('ui', 'error_invalidId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
 
 		$this->person_id = intval($person_id);
+		$this->hauptzustaendig = $hauptzustaendig;
 
 		$persRes = $this->PersonModel->load($this->person_id);
 		if (!hasData($persRes)) $this->terminateWithError('Person with id ' . $this->person_id . ' not found.', self::ERROR_TYPE_GENERAL);
@@ -66,11 +68,11 @@ class IssueChecker extends FHCAPI_Controller
 			'PlausicheckResolverLib'
 		);
 
-		$this->produceIssues();
-		$this->resolveIssues();
-		$this->produceIssues();
+		$this->_produceIssues();
+		$this->_resolveIssues();
+		$this->_produceIssues();
 
-		$openIssueCountRes = $this->countOpenIssues(array_keys($allCodeLibMappings));
+		$openIssueCountRes = $this->_countOpenIssues(array_keys($allCodeLibMappings));
 		if (isError($openIssueCountRes)) $this->terminateWithError(getError($openIssueCountRes), self::ERROR_TYPE_GENERAL);
 
 		$data = array(
@@ -87,16 +89,18 @@ class IssueChecker extends FHCAPI_Controller
 	public function countPersonOpenIssues()
 	{
 		$person_id = $this->input->get('person_id', true);
+		$hauptzustaendig = filter_var($this->input->get('hauptzustaendig', true), FILTER_VALIDATE_BOOLEAN);
 
 		if (!is_numeric($person_id)) $this->terminateWithError($this->p->t('ui', 'error_invalidId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
 
 		$this->person_id = intval($person_id);
+		$this->hauptzustaendig = $hauptzustaendig;
 
 		$persRes = $this->PersonModel->load($this->person_id);
 
 		if (!hasData($persRes)) $this->terminateWithError('Person with id ' . $this->person_id . ' not found.', self::ERROR_TYPE_GENERAL);
 
-		$openIssueCountRes = $this->countOpenIssues(array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)));
+		$openIssueCountRes = $this->_countOpenIssues(array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)));
 		if (isError($openIssueCountRes)) $this->terminateWithError(getError($openIssueCountRes), self::ERROR_TYPE_GENERAL);
 
 		$data = array(
@@ -110,14 +114,17 @@ class IssueChecker extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	protected function countOpenIssues($fehlercodes)
+	protected function _countOpenIssues($fehlercodes)
 	{
 		if (isEmptyArray($fehlercodes)) return success([]);
 
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
 			$fehlercodes,
-			$this->person_id
+			$this->person_id,
+			$oe_kurzbz = null,
+			$fehlercode_extern = null,
+			$this->hauptzustaendig
 		);
 
 		// log error if occured
@@ -129,7 +136,7 @@ class IssueChecker extends FHCAPI_Controller
 		return success($issuescount);
 	}
 
-	protected function produceIssues()
+	protected function _produceIssues()
 	{
 		if (isEmptyArray($this->_codeLibMappings) && isEmptyArray($this->_codeProducerLibMappings)) return success([]);
 
@@ -146,7 +153,7 @@ class IssueChecker extends FHCAPI_Controller
 			$this->infos = array_merge($this->infos, $result->infos);
 	}
 
-	protected function resolveIssues()
+	protected function _resolveIssues()
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(

@@ -1,4 +1,4 @@
-import ApiIssues from '../../api/factory/issues.js';
+import ApiIssueList from '../../api/factory/issueList.js';
 
 export default {
 	name: 'IssueList',
@@ -11,10 +11,14 @@ export default {
 		fehlertyp_kurzbz: String,
 		apps: [String, Array],
 		behebung_parameter: Array,
+		hauptzustaendig: {
+			type: Boolean,
+			default: false
+		},
 		date: null,
 		endpoint: {
 			type: Object,
-			default: ApiIssues
+			default: ApiIssueList
 		}
 	},
 	 data() {
@@ -45,7 +49,14 @@ export default {
 		 fetchIssues() {
 			this.isFetching = true;
 			this.$api.call(
-				this.endpoint.getOpenIssuesByProperties(this.person_id, this.oe_kurzbz, this.fehlertyp_kurzbz, this.apps, this.behebung_parameter)
+				this.endpoint.getOpenIssuesByProperties(
+					this.person_id,
+					this.oe_kurzbz,
+					this.fehlertyp_kurzbz,
+					this.apps,
+					this.behebung_parameter,
+					this.hauptzustaendig
+				)
 			)
 			.then(result => {
 				this.issues = result.data;

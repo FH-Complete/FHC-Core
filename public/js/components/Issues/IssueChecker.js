@@ -8,6 +8,10 @@ export default {
 		person_id: Number,
 		//oe_kurzbz: String,
 		apps: [String, Array],
+		hauptzustaendig: {
+			type: Boolean,
+			default: false
+		},
 		endpoint: {
 			type: Object,
 			required: true
@@ -26,14 +30,14 @@ export default {
 	watch: {
 	},
 	mounted() {
-		this.getOpenIssuesCount();
+		this.countPersonOpenIssues();
 	},
 	 methods: {
 
-		getOpenIssuesCount() {
+		countPersonOpenIssues() {
 			this.isFetching = true;
 			this.$api.call(
-				this.endpoint.countPersonOpenIssues(this.person_id)
+				this.endpoint.countPersonOpenIssues(this.person_id, this.hauptzustaendig)
 			)
 			.then(result => {
 				//this.$emit('issuesLoaded', this.issues);
@@ -45,7 +49,7 @@ export default {
 		checkPerson() {
 			this.isFetching = true;
 			this.$api.call(
-				this.endpoint.checkPerson(this.person_id)
+				this.endpoint.checkPerson(this.person_id, this.hauptzustaendig)
 			)
 			.then(result => {
 				//this.$emit('issuesLoaded', this.issues);
