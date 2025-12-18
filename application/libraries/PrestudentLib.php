@@ -68,7 +68,8 @@ class PrestudentLib
 		$this->_ci->PrestudentModel->addOrder('zgv_code', 'DESC');
 		$this->_ci->PrestudentModel->addLimit(1);
 		$result = $this->_ci->PrestudentModel->loadWhere([
-			'person_id' => $person_id
+			'person_id' => $person_id,
+			'zgv_code IS NOT NULL' => null
 		]);
 
 		if (isError($result)) return $result;
