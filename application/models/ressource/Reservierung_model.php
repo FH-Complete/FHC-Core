@@ -50,11 +50,12 @@ class Reservierung_model extends DB_Model
 		
 		$query_result= $this->execReadOnlyQuery("
 		SELECT 
-		'reservierung' as type, beginn, ende, datum,
+		DISTINCT(insertvon),  
+		'reservierung' as type, beginn, ende, datum, array_agg(DISTINCT reservierung_id) AS reservierung_id,
 		COALESCE(titel, beschreibung) as topic,
 		array_agg(DISTINCT mitarbeiter_kurzbz) as lektor,
 		array_agg(DISTINCT (gruppe,verband,semester,studiengang_kz,gruppen_kuerzel)) as gruppe, 
-		
+		array_agg(DISTINCT(uid)) as uids,
 		ort_kurzbz, 'FFFFFF' as farbe
 		
 		FROM 
@@ -62,7 +63,7 @@ class Reservierung_model extends DB_Model
 			". $subquery ."
 		) AS subquery
 
-		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
+		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung, insertvon
 		
 		ORDER BY datum, beginn
 		", is_null($ort_kurzbz) ?[getAuthUID(), getAuthUID(),$start_date,$end_date]: [$ort_kurzbz, $start_date, $end_date]);

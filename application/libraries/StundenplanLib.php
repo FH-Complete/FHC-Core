@@ -368,6 +368,32 @@ class StundenplanLib
 			$item->gruppe = $gruppe_obj_array;
 			$item->lektor = $lektor_obj_array;
 
+			$this->_ci->load->library('PermissionLib');
+			$berechtigt_begrenzt  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'sui');
+
+			$now = time();
+			$res_lektor_start = $this->jump_day($now, RES_TAGE_LEKTOR_MIN - 1);
+			$res_lektor_ende  = mktime(0, 0, 0, date('m', $now), date('d', $now) + RES_TAGE_LEKTOR_BIS, date('Y', $now));
+
+			$start_date = is_numeric($item->beginn) ? $item->beginn : strtotime($item->beginn);
+			if (!date('w', $start_date)) {
+				$start_date = $this->jump_day($start_date, 1);
+			}
+
+			$start_date_str = date('Y-m-d', $start_date);
+			$res_lektor_start_str = date('Y-m-d', $res_lektor_start);
+			$res_lektor_ende_str = date('Y-m-d', $res_lektor_ende);
+
+			$show_delete = (($berechtigt_begrenzt && ($item->insertvon == getAuthUID() || in_array(getAuthUID(), $item->uids))) &&
+				$start_date_str >= $res_lektor_start_str &&
+				$start_date_str <= $res_lektor_ende_str
+			);
+
+			if ($show_delete)
+				$item->deletable = true;
+			else
+				$item->deletable = false;
+
 		}
 	}
 
@@ -443,6 +469,219 @@ class StundenplanLib
 		}, $ferienEventsFlattened);
 		
 		return success($ferienEventsFlattened);
+	}
+
+	public function addReservation($start, $end, $title, $beschreibung, $ort_kurzbz, $lektoren = null, $studiengang = null, $semester = null, $verband = null, $gruppe = null, $spezialgruppe = null)
+	{
+		$this->_ci =& get_instance();
+		$this->_ci->load->model('ressource/Stunde_model', 'StundeModel');
+		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
+		$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+		$this->_ci->load->model('ressource/stundenplan_model', 'StundenplanModel');
+		$this->_ci->load->library('PermissionLib');
+
+		$startTime = new DateTime($start);
+		$endTime = new DateTime($end);
+
+		$stunden = $this->_ci->StundeModel->loadWhere(array(
+			'beginn <' => $endTime->format('H:i:s'),
+			'ende >' => $startTime->format('H:i:s')
+		));
+
+		if (!hasData($stunden))
+		{
+			return error("Keine Stunden vorhanden");
+		}
+
+		$stunden = array_column(getData($stunden), 'stunde');
+
+		$this->_ci->StundenplandevModel->db->select('1');
+		$this->_ci->StundenplandevModel->db->where('datum', $startTime->format('Y-m-d'));
+		$this->_ci->StundenplandevModel->db->where('ort_kurzbz', $ort_kurzbz);
+		$this->_ci->StundenplandevModel->db->where_in('stunde', $stunden);
+		$stundenplandev_belegung = $this->_ci->StundenplandevModel->load();
+
+		$this->_ci->StundenplanModel->db->select('1');
+		$this->_ci->StundenplanModel->db->where('ort_kurzbz', $ort_kurzbz);
+		$this->_ci->StundenplanModel->db->where('datum', $startTime->format('Y-m-d'));
+		$this->_ci->StundenplanModel->db->where_in('stunde', $stunden);
+		$stundenplan_belegung = $this->_ci->StundenplanModel->load();
+
+		if ((hasData($stundenplandev_belegung) || hasData($stundenplan_belegung))
+			&& !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
+			return error ('lvplan/bereitsReserviert');
+
+		$this->_ci->ReservierungModel->addSelect('stunde');
+		$reservation_hours = $this->_ci->ReservierungModel->loadWhere(array('datum' => $startTime->format('Y-m-d'), 'ort_kurzbz' => $ort_kurzbz));
+
+
+		if (isError($reservation_hours))
+			return $reservation_hours;
+
+		$reservation_hours = hasData($reservation_hours) ? array_column(getData($reservation_hours), 'stunde') : array();
+
+		if (!empty(array_intersect($stunden, $reservation_hours))
+			&& !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
+			return error("lvplan/bereitsReserviert");
+
+
+		if (!empty($lektoren))
+		{
+			foreach ($lektoren as $lektor)
+			{
+				$insert = array('ort_kurzbz' => $ort_kurzbz,
+					'datum' => $startTime->format('Y-m-d'),
+					'titel' => $title,
+					'studiengang_kz' => is_null($studiengang) ? 0 : $studiengang,
+					'beschreibung' => $beschreibung,
+					'insertvon' => getAuthUID(),
+					'uid' => $lektor,
+					'semester' => is_null($semester) ? null : $semester,
+					'verband' => is_null($verband) ? null : $verband,
+					'gruppe' => is_null($gruppe) ? null : $gruppe,
+					'gruppe_kurzbz' => is_null($spezialgruppe) ? null : $spezialgruppe,
+				);
+
+				foreach ($stunden as $stunde)
+				{
+					$insert['stunde'] = $stunde;
+					$check_insert = $this->_ci->ReservierungModel->insert($insert);
+					if (isError($check_insert))
+						return $check_insert;
+				}
+			}
+		}
+		else
+		{
+			foreach ($stunden as $stunde)
+			{
+				$check_insert = $this->_ci->ReservierungModel->insert(array(
+					'ort_kurzbz' => $ort_kurzbz,
+					'uid' => getAuthUID(),
+					'stunde' => $stunde,
+					'datum' => $startTime->format('Y-m-d'),
+					'titel' => $title,
+					'studiengang_kz' => is_null($studiengang) ? 0 : $studiengang,
+					'beschreibung' => $beschreibung,
+					'insertvon' => getAuthUID()
+				));
+				if (isError($check_insert))
+					return $check_insert;
+			}
+		}
+
+		return success("Erfolgreich");
+	}
+
+	public function deleteReservation($reservierung_id)
+	{
+		$this->_ci =& get_instance();
+		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
+		$this->_ci->load->model('ressource/Stunde_model', 'StundeModel');
+		$this->_ci->load->library('PermissionLib');
+
+
+		$this->_ci->ReservierungModel->db->where_in('reservierung_id', $reservierung_id);
+		$reservation = $this->_ci->ReservierungModel->load();
+		if (isError($reservation))
+			return $reservation;
+
+		if (!hasData($reservation))
+			return error("Reservierungen nicht gefunden");
+
+		$reservations = getData($reservation);
+
+		$today = new DateTime();
+		foreach ($reservations as $reservierung)
+		{
+			if ($today->format('Y-m-d') > $reservierung->datum)
+				return error("Vergangene Reservierungen können nicht gelöscht werden");
+
+			if (($this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt')) && ($reservierung->insertvon == getAuthUID() || $reservierung->uid === getAuthUID()))
+			{
+				$delete_result = $this->_ci->ReservierungModel->delete($reservierung->reservierung_id);
+
+				if (isError($delete_result))
+					return $delete_result;
+			}
+		}
+		return success("Erfolgreich");
+	}
+
+
+	public function getReservableMap($ort_kurzbz, $start_date, $end_date)
+	{
+		$this->_ci =& get_instance();
+		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
+		$this->_ci->load->library('PermissionLib');
+
+		$berechtigt_begrenzt  = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung:begrenzt', 'suid');
+		$berechtigt_erweitert = $this->_ci->permissionlib->isBerechtigt('lehre/reservierung', 'suid');
+
+		$ort_data = $this->_ci->OrtModel->load($ort_kurzbz);
+		if (isError($ort_data) || !hasData($ort_data))
+			return [];
+
+		$ort_data = getData($ort_data)[0];
+
+		if (!$ort_data->reservieren)
+			return [];
+
+		if (!$berechtigt_begrenzt && !$berechtigt_erweitert)
+			return [];
+
+		$start_ts = is_numeric($start_date) ? (int)$start_date : strtotime($start_date);
+		$end_ts = is_numeric($end_date) ? (int)$end_date : strtotime($end_date);
+
+		if (!$start_ts || !$end_ts)
+			return [];
+
+		if ($end_ts < $start_ts)
+		{
+			$tmp = $start_ts;
+			$start_ts = $end_ts;
+			$end_ts = $tmp;
+		}
+
+		$now = time();
+		$tage_min = defined('RES_TAGE_LEKTOR_MIN') ? (int)RES_TAGE_LEKTOR_MIN : 0;
+		$tage_bis = defined('RES_TAGE_LEKTOR_BIS') ? (int)RES_TAGE_LEKTOR_BIS : 0;
+
+		$datum_res_lektor_start = $this->jump_day($now, $tage_min - 1);
+		$datum_res_lektor_ende = $this->jump_day($now, $tage_bis);
+
+		$start_ymd_allowed = date('Y-m-d', $datum_res_lektor_start);
+		$end_ymd_allowed = date('Y-m-d', $datum_res_lektor_ende);
+
+		$result = [];
+
+		$current = strtotime(date('Y-m-d', $start_ts) . ' 00:00:00');
+		$end_day = strtotime(date('Y-m-d', $end_ts) . ' 00:00:00');
+
+		while ($current <= $end_day)
+		{
+			$ymd = date('Y-m-d', $current);
+
+			if ((int)date('w', $current) === 0)
+			{
+				$result[$ymd] = false;
+				$current = $this->jump_day($current, 1);
+				continue;
+			}
+
+			$result[$ymd] = ($ymd >= $start_ymd_allowed && $ymd <= $end_ymd_allowed) ? true : false;
+
+			$current = $this->jump_day($current, 1);
+		}
+
+		return success($result);
+	}
+
+	private function jump_day($timestamp, $days)
+	{
+		$days = (int)$days;
+		$prefix = ($days >= 0 ? '+' : '');
+		return strtotime($prefix . $days . ' days', $timestamp);
 	}
 
 	// start of the private functions ########################################################################################################

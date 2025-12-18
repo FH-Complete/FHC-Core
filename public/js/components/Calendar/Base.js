@@ -44,7 +44,10 @@ export default {
 				return () => true;
 			}),
 			hasDragoverFunc: Vue.computed(() => this.onDragover),
-			mode: Vue.computed(() => this.mode)
+			mode: Vue.computed(() => this.mode),
+			reservierbarMap: Vue.computed(() => this.reservierbarMap),
+			isReservierbar: Vue.computed(() => this.isReservierbar),
+			createContext: Vue.computed(() => this.createContext)
 		};
 	},
 	props: {
@@ -97,7 +100,13 @@ export default {
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		onDragover: Function,
-		onDrop: Function
+		onDrop: Function,
+		isReservierbar: Boolean,
+		createContext: Object,
+		reservierbarMap: {
+			type: Object,
+			default: () => ({})
+		},
 	},
 	emits: [
 		"click:next",
@@ -105,11 +114,13 @@ export default {
 		"click:mode",
 		"click:event",
 		"click:day",
+		"click:slot",
 		"click:week",
 		"update:date",
 		"update:mode",
 		"update:range",
-		"drop"
+		"drop",
+		"create-event"
 	],
 	data() {
 		return {

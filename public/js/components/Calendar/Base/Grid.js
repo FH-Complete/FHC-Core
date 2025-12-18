@@ -2,6 +2,7 @@ import GridLine from './Grid/Line.js';
 import GridLineEvent from './Grid/Line/Event.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
+import CalClick from '../../../directives/Calendar/Click.js';
 
 export default {
 	name: "CalendarGrid",
@@ -10,12 +11,15 @@ export default {
 		GridLineEvent
 	},
 	directives: {
-		CalDnd
+		CalDnd,
+		CalClick
 	},
 	inject: {
 		originalEvents: "events",
 		originalBackgrounds: "backgrounds",
-		dropAllowed: "dropAllowed"
+		dropAllowed: "dropAllowed",
+		timezone: "timezone",
+		reservierbar: "isReservierbar"
 	},
 	provide() {
 		return {
@@ -308,6 +312,20 @@ export default {
 			} else {
 				this.$refs.scroller.scrollTo(0, 0);
 			}
+		},
+		isFreeSlot(date, part, dayEvents) {
+			const pastEnd = luxon.DateTime.now().setZone(this.timezone);
+
+			const start = date.plus(part.start || part);
+			const end = date.plus(part.end || part.plus({ hours: 1 }));
+
+			if (start < pastEnd)
+				return false;
+
+			if (!dayEvents || !dayEvents.length)
+				return true;
+
+			return !dayEvents.some(ev => ev.start < end && ev.end > start);
 		}
 	},
 	beforeUnmount() {
@@ -400,6 +418,18 @@ export default {
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
 						>
 							<slot name="part-body" v-bind="{ index, part }" />
+							
+							 <div
+							   v-if="isFreeSlot(date, part, eventsNormal[index]) && reservierbar"
+								class="fhc-calendar-empty-slot"
+								style="position:absolute; inset:0; z-index:1"
+								v-cal-click:slot="{ date, part }"
+							>
+								<div class="fhc-calendar-empty-slot-plus">
+									<i class="fa-solid fa-plus"></i>
+								</div>
+							</div>
+
 							<div
 								v-if="snapToGrid && dragging"
 								style="position:absolute;inset:0;z-index:1"
