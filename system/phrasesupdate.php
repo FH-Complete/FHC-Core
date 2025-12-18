@@ -51647,19 +51647,7 @@ and represent the current state of research on the topic. The prescribed citatio
 					<br><br>
 					Wenn alle einzutragenden Noten vermerkt sind (Nachtragung jederzeit möglich) können diese per Klick auf Freigabe für die Studiengangsassistenz freigegeben werden.
 					<br><br>
-					Aus Gründen der erhöhten Sicherheit ist bei der Freigabe der Noten die Eingabe Ihres Passwortes erforderlich.
-					<br><br>
-					Zulässige Noten: 1-5, Nicht beurteilt (nb), Noch nicht eingetragen (), Bestanden (b), Mit Erfolg teilgenommen (met), entschuldigt (en), unentschuldigt (ue)
-					<br><br>
-					Bei der Freigabe wird ein Info-Email an Sie und die zuständige Studiengangsassistenz geschickt. Enthalten sind Mat.Nr., Vor- und Zuname sowie die Note der neuen oder geänderten Einträge.
-					<br><br>
-					Freigegebene Einträge sind mit einem grün hinterlegten Häkchen gekennzeichnet.
-					<br><br>
-					Wenn Sie bereits freigegebene Noten verändern, werden diese mit einem grau hinterlegten Häkchen markiert (als Hinweis für Sie, dass die Assistenz bislang darüber noch nicht per Mail informiert wurde. Sie sieht allerdings diese neue Note sofort in ihrer Oberfläche)
-					<br><br>
-					Freigegebene Noten kann die Assistenz nun als Zeugnisnote übernehmen (wird im nächsten Feld für Sie zur Kontrolle angezeigt)
-					<br><br>
-					Wenn sich die Zeugnisnote von der von Ihnen freigegebenen Note unterscheidet wird erstere rot umrandet markiert.',
+					Aus Gründen der erhöhten Sicherheit ist bei der Freigabe der Noten die Eingabe Ihres Passwortes erforderlich.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -51669,19 +51657,7 @@ and represent the current state of research on the topic. The prescribed citatio
 					<br><br>
 					Once all grades to be entered have been recorded (additions are possible at any time), they can be released to the program assistant by clicking on "Release."
 					<br><br>
-					For increased security reasons, you will be required to enter your password when releasing grades.2)
-					<br><br>
-					Permissible grades: 1-5, Not Assessed (nb), Not Yet Entered (), Passed (b), Successfully Participated (met), Excused (en), Unexcused (ue)
-					<br><br>
-					When the grade is released, an information email will be sent to you and the responsible program assistant. This email contains the student ID number, first and last name, and the grade for the new or changed entries.
-					<br><br>
-					Released entries are marked with a green check mark.
-					<br><br>
-					If you change grades that have already been approved, they will be marked with a gray checkmark (indicating that the assistant has not yet been notified by email. However, they will immediately see this new grade in their interface).
-					<br><br>
-					The assistant can now adopt approved grades as the grade on their report card (this will be displayed in the next field for your review).
-					<br><br>
-					If the report card grade differs from the grade you approved, the former will be highlighted with a red border.',
+					For increased security reasons, you will be required to enter your password when releasing grades.2)',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -51722,6 +51698,66 @@ and represent the current state of research on the topic. The prescribed citatio
 					Paste the content using Ctrl + v or Edit → Paste.
 					<br><br>
 					Click Import to import the grades.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4anwesenheitsquote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anwesenheit',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendance',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4keineLvNoteEingetragen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine LV Note eingetragen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No Subject Grade entered',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4pruefungAnlageError',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Prüfungstermin anlegen für {0} fehlgeschlagen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Not possible to allocate exam on {0}',
 				'description' => '',
 				'insertvon' => 'system'
 			)

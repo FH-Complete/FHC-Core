@@ -16,6 +16,12 @@
  */
 
 export default {
+	getCisConfig(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Noten/getCisConfig'
+		};
+	},
 	getStudentenNoten(lv_id, sem_kurzbz) {
 		return {
 			method: 'get',

@@ -44,6 +44,7 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
+			config: null, // cis config
 			neuesPruefungsdatumModalVisible: false,
 			loading: false,
 			selectedUids: [], // shared selection state
@@ -362,7 +363,8 @@ export const Benotungstool = {
 
 			// add col to table
 			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
-			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+			let kommCol = null
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 
 			// TODO: could reuse cols instead of recreating all from a variable maybe
 			this.distinctPruefungsDates.forEach((date, index)=>{
@@ -385,7 +387,7 @@ export const Benotungstool = {
 				})
 			})
 
-			cols.push(kommCol) // keep kommPruef Col as last
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 			// redraw table
 
 			this.loading = false
@@ -516,7 +518,8 @@ export const Benotungstool = {
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mail')), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4antrittCountv2')), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4vorname')), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', headerFilter: true, widthGrow: 1}, 
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4nachname')), field: 'nachname', headerFilter: true, widthGrow: 1},
+				{title: Vue.computed(() => this.$p.t('benotungstool/c4anwesenheitsquote')), field: 'anwquote', widthGrow: 1, formatter: this.percentFormatter},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4mobility')), field: 'mobility_zusatz', headerFilter: true, widthGrow: 1, visible: false},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4teilnoten')), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true},
 				{title: Vue.computed(() => this.$p.t('benotungstool/c4note')), field: 'note_vorschlag',
@@ -953,6 +956,11 @@ export const Benotungstool = {
 			return '<div style="'+style+'">' +
 				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
+		percentFormatter(cell) {
+			const data = cell.getData()
+			const val = data.anwquote ?? '-'
+			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">'+ val + ' %</div>'	
+		},
 		buildMailToLink(student){
 			return 'mailto:' + student.uid +'@'+ this.domain
 		},
@@ -988,7 +996,8 @@ export const Benotungstool = {
 			// let pruefungenRegularColCount = 0;
 			this.distinctPruefungsDates = []
 			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
-			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+			let kommCol = null
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 			
 			this.pruefungen?.forEach(p => {
 				const dateParts = p.datum.split('-')
@@ -1091,7 +1100,7 @@ export const Benotungstool = {
 				})
 			})
 
-			cols.push(kommCol) // keep kommPruef Col as last
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 
 			this.loading = false
 			
@@ -1119,11 +1128,16 @@ export const Benotungstool = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.notenTableOptions.height = window.visualViewport.height - rect.top
+			this.notenTableOptions.height = window.visualViewport.height - rect.top - 50
 			this.$refs.notenTable.tabulator.setHeight(this.notenTableOptions.height)
 		},
 		setupCreated() {
 			this.loading = true
+			// fetch cis config regarding gesamtnoteneingabe
+			this.$api.call(ApiNoten.getCisConfig()).then(res => {
+				this.config = res.data
+			})
+			
 			// fetch lva dropdown
 			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, this.sem_kurzbz)).then(res => {
 				this.lehrveranstaltungen = res.data
@@ -1341,7 +1355,8 @@ export const Benotungstool = {
 			
 			// add col to table
 			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
-			const kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
+			let kommCol = null
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 
 
 			// TODO: could reuse cols instead of recreating all from a variable maybe
@@ -1367,7 +1382,7 @@ export const Benotungstool = {
 				})
 			})
 
-			cols.push(kommCol) // keep kommPruef Col as last
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 
 			// set Cols
 			this.$refs.notenTable.tabulator.clearSort()
@@ -1443,17 +1458,46 @@ export const Benotungstool = {
 				this.sem_kurzbz,
 			)).then(res => {
 				if(res.meta.status === "success") {
-					this.$fhcAlert.alertDefault(
-						'success',
-						'Info',
-						this.$p.t('benotungstool/pruefungAngelegtAn', [dateStrFront]),
-						true
-					)
 					
-					this.handleAddNewPruefungenResponse(res, uids)
+					// iterate over response data 
+					//  -> alert successful pruefungen
+					//  -> alert denied pruefungen + reason
+					
+					let uidListSuccess = ''
+					let uidListError = ''
+					const successData = []
+					Object.keys(res.data).forEach(student_uid => {
+						const student = res.data[student_uid]
+						// actual pruefung has been allocated
+						if(student.savedPruefung || student.extraPruefung) {
+							uidListSuccess += ' ' + student_uid
+							
+							// keep res.data format intact for handleResponse method
+							successData[student_uid] = student
+						} else { // there should be an error message why no pruefungen where allocated for this person, many reasons possible
+							uidListError += student_uid + ' - ' + student +'\n'// student variable is the error message here
+						}
+					})
+					
+					if(uidListError != '') {
+						this.$fhcAlert.alertError(
+							this.$p.t('benotungstool/c4pruefungAnlageError', [dateStrFront]) + ': ' + uidListError + ' '
+						)
+					}
+					
+					if(uidListSuccess != '') {
+						this.$fhcAlert.alertDefault(
+							'success',
+							'Info',
+							this.$p.t('benotungstool/pruefungAngelegtAn', [dateStrFront]) + ': ' + uidListSuccess,
+							true
+						)
+
+						this.handleAddNewPruefungenResponse({data: successData}, uids)
+					}
 					
 				}
-			})
+			}).finally(()=>this.loading = false)
 		},
 		getAntrittCountStudent(student) {
 			// checks for existence of a prüfung with a note that resolves to a 
@@ -1516,6 +1560,7 @@ export const Benotungstool = {
 			if(newVal) this.$refs.notenTable.tabulator.setFilter("lehreinheit_id", "=", newVal.lehreinheit_id);
 		},
 		getKommPruefCount(newVal) {
+			if(!this.config.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) return 0
 			if(this.$refs.notenTable?.tabulator && newVal > 0) {
 				const kommPruefCol = this.$refs.notenTable?.tabulator.getColumn("kommPruef")
 				kommPruefCol.show()
@@ -1696,24 +1741,24 @@ export const Benotungstool = {
 			</template>
 		 </bs-modal>
 
-<BsOffcanvas
-	ref="drawer"
-	placement="end"
-	:backdrop="true"
-	:style="{ '--bs-offcanvas-width': '600px' }"
->
-	<template #title>
-	
-	</template>
+		<BsOffcanvas
+			ref="drawer"
+			placement="end"
+			:backdrop="true"
+			:style="{ '--bs-offcanvas-width': '600px' }"
+		>
+			<template #title>
+			
+			</template>
+		
+			<MobilityLegende/>		
+		
+			<template #footer>
+			
+			</template>
+		</BsOffcanvas>
 
-	<MobilityLegende/>		
-
-	<template #footer>
-	
-	</template>
-</BsOffcanvas>
-
-		<FhcOverlay :active="loading || saving"></FhcOverlay>
+		<FhcOverlay :active="loading"></FhcOverlay>
 
 		<div class="row">
 			<div class="col-4">

@@ -37,7 +37,8 @@ class Noten extends FHCAPI_Controller
 			'saveStudentPruefung' => array('lehre/benotungstool:rw'),
 			'createPruefungen' => array('lehre/benotungstool:rw'),
 			'saveNotenvorschlagBulk' => array('lehre/benotungstool:rw'),
-			'savePruefungenBulk' => array('lehre/benotungstool:rw')
+			'savePruefungenBulk' => array('lehre/benotungstool:rw'),
+			'getCisConfig' => array('lehre/benotungstool:rw')
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -66,6 +67,31 @@ class Noten extends FHCAPI_Controller
 
 	}
 
+	public function getCisConfig() {
+		$this->terminateWithSuccess(
+			array(
+				// Punkte bei der Noteneingabe anzeigen
+				'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
+				// Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
+				'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
+				// Gewichtung der Lehreinheiten bei Noteneintragung true|false
+				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
+				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 2. Termin anzeigen
+				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
+				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
+				// Erfordert den Eintrag "Termin3" in der Tabelle lehre.tbl_pruefungstyp
+				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
+				// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+				'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
+				// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
+				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
+				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
+				// Gibt an ob die Note im Notenfreigabemail enthalten ist oder nicht
+				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
+			)
+		);
+	}
 
 	/**
 	 * GET METHOD
@@ -93,6 +119,12 @@ class Noten extends FHCAPI_Controller
 		
 		$grades = array();
 		$student_uids = array_map($func, $studentenData);
+
+		$funcpre = function ($value) {
+			return $value->prestudent_id;
+		};
+		
+		$prestudent_ids = array_map($funcpre, $studentenData);
 		
 		if(count($student_uids) > 0) {
 			$mobres = $this->MobilitaetModel->getMobilityZusatzForUids($student_uids);
@@ -146,8 +178,14 @@ class Noten extends FHCAPI_Controller
 			$this->addMeta('getExternalGradesError', $t->getMessage());
 		}
 		
+		// assign the anw% to the students in the studentData loop
+		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
+		
 		// calculate notenvorschläge from teilnoten
 		foreach($studentenData as $student) {
+			
+			$student->anwquote = $anwresult[$student->prestudent_id];
+			
 			$g = $grades[$student->uid]['grades'];
 			$note_lv = $grades[$student->uid]['note_lv'];
 			
@@ -214,7 +252,7 @@ class Noten extends FHCAPI_Controller
 		$pruefungen = $this->LePruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
 		$pruefungenData = getData($pruefungen);
 		
-		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN, $grades));
+		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN, $grades, $anwresult));
 	}
 
 	/**
@@ -536,6 +574,15 @@ class Noten extends FHCAPI_Controller
 	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum) 
 	{
 
+		// extra check if the student has lvnote and a zeugnisnote in the relevant lva
+		$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
+		
+		$lvgesamtnoteData = getData($resultLV);
+		$this->addMeta('lvgesamtnoteData', $lvgesamtnoteData);
+		
+		// allocating pruefungen before lv note is forbidden
+		if($lvgesamtnoteData == null) return $this->p->t('benotungstool', 'c4keineLvNoteEingetragen');
+		
 		$status = [];
 		
 		// send $grades reference to moodle addon
@@ -927,6 +974,32 @@ class Noten extends FHCAPI_Controller
 		}
 		
 		$this->terminateWithSuccess($ret);
+	}
+	
+	private function getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz) {
+
+		$anwesenheiten = [];
+		try {
+			$downloadFunc = function ($anwesenheitenResult) use (&$anwesenheiten) {
+				// map result rows by prestudent_uid to retrieve them by that key later on
+				foreach ($anwesenheitenResult as $anw) {
+					$anwesenheiten[$anw->prestudent_id] = $anw->sum;
+				}
+			};
+			
+			Events::trigger(
+				'getAnwesenheitenForLvAndSemester',
+				$prestudent_ids,
+				$lv_id,
+				$sem_kurzbz,
+				$downloadFunc
+			);
+		} catch (Throwable $t) {
+			$this->addMeta('getAnwesenheitenForLvAndSemester', $t->getMessage());
+		}
+		
+		return $anwesenheiten;
+		
 	}
 
 }
