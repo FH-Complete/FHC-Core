@@ -188,7 +188,6 @@ class Studienplan_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($lv_id));
 	}
 
-
 	public function getStudienplaeneForPerson($person_id)
 	{
 		$this->addDistinct();

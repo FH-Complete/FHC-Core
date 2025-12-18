@@ -107,10 +107,10 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				height: '500',
 				index: 'anrechnung_id',
-				persistenceID: 'stv-details-anrechnungen'
+				persistenceID: 'stv-details-anrechnungen-2025112401'
 			},
 			tabulatorEvents: [
 				{

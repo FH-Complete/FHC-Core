@@ -1,9 +1,33 @@
-import ApiStvVerband from '../../../api/factory/stv/verband.js';
+import drop from '../../../directives/drop.js';
+import dragClick from '../../../directives/dragClick.js';
+
+import ApiStvGroups from '../../../api/factory/stv/group.js';
+import ApiStvDetails from '../../../api/factory/stv/details.js';
 
 export default {
 	components: {
 		PvTreetable: primevue.treetable,
 		PvColumn: primevue.column
+	},
+	directives: {
+		drop,
+		dragClick
+	},
+	inject: {
+		$reloadList: {
+			from: '$reloadList',
+			default: () => {}
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		},
+		appConfig: {
+			from: 'appConfig',
+			default: {
+				number_displayed_past_studiensemester: 5
+			}
+		}
 	},
 	emits: [
 		'selectVerband'
@@ -34,12 +58,23 @@ export default {
 				return this.nodes.filter(node => this.favorites.list.includes(node.key));
 
 			return this.nodes;
+		},
+		noSemReloadNodes() {
+			return this.nodes.reduce(this.mapNodesToNoSemReloadNodes, []);
 		}
 	},
 	watch: {
 		'preselectedKey': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.setPreselection();
+			}
+		},
+		'appConfig.number_displayed_past_studiensemester'(newVal, oldVal) {
+			if (oldVal !== undefined) {
+				this.noSemReloadNodes.forEach(node => {
+					delete node.children;
+					this.onExpandTreeNode(node);
+				});
 			}
 		}
 	},
@@ -96,7 +131,14 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz, semester: node.data.semester, orgform_kurzbz: node.data.orgform_kurzbz});
+		},
+		mapNodesToNoSemReloadNodes(result, node) {
+			if (node.data.no_sem_reload)
+				result.push(node);
+			if (node.children)
+				result = node.children.reduce(this.mapNodesToNoSemReloadNodes, result);
+			return result;
 		},
 		mapResultToTreeData(el) {
 			const cp = {
@@ -152,7 +194,10 @@ export default {
 		async setPreselection()
 		{
 			if (!this.preselectedKey)
+			{
+				this.selectedKey = null;
 				return;
+			}
 
 			let rawKey = this.preselectedKey
 
@@ -166,22 +211,25 @@ export default {
 			if (!currentNode)
 				return;
 
-			const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
-			if (currentSelectedKey) {
-				if (currentSelectedKey == currentKey)
-					return;
-				/**
-				 * Do not select a new entry if the current is a child of the new one.
-				 * This happens if a child entry of a new stg is selected and the router
-				 * tries to select the stg root entry (because subtrees do not have
-				 * routes yet)
-				 */
-				const isChild = this.findNodeByKey(
-					currentSelectedKey,
-					currentNode.children
-				);
-				if (isChild)
-					return;
+			if(this.selectedKey)
+			{
+				const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
+				if (currentSelectedKey) {
+					if (currentSelectedKey == currentKey)
+						return;
+					/**
+					 * Do not select a new entry if the current is a child of the new one.
+					 * This happens if a child entry of a new stg is selected and the router
+					 * tries to select the stg root entry (because subtrees do not have
+					 * routes yet)
+					 */
+					const isChild = this.findNodeByKey(
+						currentSelectedKey,
+						currentNode.children || []
+					);
+					if (isChild)
+						return;
+				}
 			}
 
 			for (let i = 1; i < parts.length; i++)
@@ -201,6 +249,51 @@ export default {
 
 			this.selectedKey = {[currentNode.key]: true};
 			this.onSelectTreeNode(currentNode);
+		},
+		async toggleTreeNode(node) {
+			if (this.expandedKeys[node.key]) {
+				delete this.expandedKeys[node.key];
+			} else if (!node.leaf) {
+				await this.onExpandTreeNode(node);
+				this.expandedKeys[node.key] = true;
+			}
+		},
+		getStudentAjaxId(student) {
+			let res = student.id;
+			if (student.vorname && student.nachname)
+				res += ' (' + student.vorname + ' ' + student.nachname + ')';
+			return res;
+		},
+		dropStudents(node, students) {
+			const data = node.data;
+			
+			let endpoint;
+			if (data.gruppe_kurzbz) {
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvGroups.add(
+						student.id,
+						data.gruppe_kurzbz,
+						this.currentSemester
+					)
+				]);
+			} else {
+				const { semester, verband, gruppe } = data;
+				const params = { semester, verband, gruppe };
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvDetails.saveStudent(
+						student.id,
+						this.currentSemester,
+						params
+					)
+				]);
+			}
+
+			return this.$api
+				.call(endpoint)
+				.then(this.$reloadList)
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	mounted() {
@@ -262,10 +355,21 @@ export default {
 				</template>
 				<template #body="{ node }">
 					<span
+						v-if="['semester', 'verband', 'gruppe', 'gruppe_kurzbz'].some(key => node.data.hasOwnProperty(key))"
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
 					>
-						{{node.data.name}}
+						{{ node.data.name }}
+					</span>
+					<span
+						v-else
+						:data-tree-item-key="node.key"
+						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+					>
+						{{ node.data.name }}
 					</span>
 				</template>
 			</pv-column>

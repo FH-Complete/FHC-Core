@@ -407,6 +407,7 @@ html {
   background-color: var(--fhc-background);
   border-color: var(--fhc-border);
   padding: var(--fhc-cis-main-py) var(--fhc-cis-main-px);
+  min-width: 0; /* fix flex-grow with tabulator exceeding width */
 }
 
 #cis-main .fa-arrow-up-right-from-square {

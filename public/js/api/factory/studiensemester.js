@@ -22,4 +22,12 @@ export default {
 			url: '/api/frontend/v1/Studiensemester/getStudiensemester'
 		};
 	},
+	getAll(order = null, start = null)
+	{
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/organisation/studiensemester/getAll',
+			params: { order, start }
+		};
+	}
 };
