@@ -91,7 +91,7 @@ function var_dump_to_error_log($parameter)
 	var_dump($parameter); // KEEP IT!!!
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
-	error_log(str_replace("\n", '', $ob_get_contents)); // KEEP IT!!!
+	error_log(str_replace("\n", '', $ob_get_contents) . ', referer: ' . "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']); // KEEP IT!!!
 }
 
 /**
