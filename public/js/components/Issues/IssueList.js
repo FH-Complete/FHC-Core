@@ -3,6 +3,7 @@ import ApiIssueList from '../../api/factory/issueList.js';
 export default {
 	name: 'IssueList',
 	emits: ['issuesLoaded'],
+	expose: ['fetchIssues'],
 	 components: {
 	 },
 	 props: {

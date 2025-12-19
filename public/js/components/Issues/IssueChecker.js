@@ -1,5 +1,6 @@
 export default {
 	name: 'IssueChecker',
+	expose: ['countPersonOpenIssues', 'checkPerson'],
 	//emits: ['issuesLoaded'],
 	 components: {
 		"p-skeleton": primevue.skeleton,

@@ -13,7 +13,8 @@ class Issues extends FHCAPI_Controller
 		
 		parent::__construct(
 			array(
-				'getOpenIssuesByProperties' => Self::DEFAULT_PERMISSION
+				'getOpenIssuesByProperties' => Self::DEFAULT_PERMISSION,
+				'getPersonenMitOffenenIssues' => Self::DEFAULT_PERMISSION
 			)
 		);
 
@@ -64,7 +65,7 @@ class Issues extends FHCAPI_Controller
 		$this->terminateWithSuccess(hasData($issueRes) ? getData($issueRes) : []);
 	}
 
-	public function PersonenMitOffenenIssues()
+	public function getPersonenMitOffenenIssues()
 	{
 		
 		$sql = <<<EOSQL
