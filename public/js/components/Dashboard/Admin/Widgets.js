@@ -1,3 +1,5 @@
+import ApiDashboardAdmin from "../../../api/factory/dashboard/dashboardAdmin.js";
+
 export default {
 	emits: [
 		"change",
@@ -7,34 +9,34 @@ export default {
 		dashboard_id: Number,
 		widgets: Array
 	},
-	computed: {
-		apiurl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
-		}
-	},
 	methods: {
 		sendChange(widget_id) {
 			let allow = !this.widgets.find(el => el.widget_id == widget_id).allowed;
-			axios.post(this.apiurl + '/Widget/setAllowed', {
+			const params = {
 				dashboard_id: this.dashboard_id,
 				widget_id,
 				action: allow ? 'add' : 'delete'
-			}).catch(err => console.error('ERROR: ' + err));
+			};
+
+			this.$api
+				.call(ApiDashboardAdmin.setWidgetAllowed(params))
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
-		axios.get(this.apiurl + '/Widget/getAll', {
-			params:{
-				dashboard_id: this.dashboard_id
-			}
-		}).then(
-			result => {
-				this.$emit('assignWidgets', result.data.retval.map(el => ({
+		this.$api
+			.call(ApiDashboardAdmin.getAllWidgets(this.dashboard_id))
+			.then(result => {
+/*				console.log(result.data.map(el => ({
+						...el,
+						...{setup:JSON.parse(el.setup),arguments:JSON.parse(el.arguments),allowed:!!el.allowed}
+				})));*/
+				this.$emit('assignWidgets', result.data.map(el => ({
 					...el,
 					...{setup:JSON.parse(el.setup),arguments:JSON.parse(el.arguments),allowed:!!el.allowed}
 				})));
-			}
-		).catch(err => console.error('ERROR:', err));
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="dashboard-admin-widgets">

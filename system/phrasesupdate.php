@@ -52612,6 +52612,127 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Refactor Messages END
+	// ### Phrases Dashboard Admin START
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'deleteInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mit dieser Aktion werden auch alle Voreinstellungen der verbundenen Widgets gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This action will also delete all presets of the connected widgets.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'error_savePreset',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung konnten nicht gespeichert werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset could not be saved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'error_presetAndFunctionNotFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung für Dashboard {dashboard} und Funktion {funktion} nicht gefunden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset for dashboard {dashboard} and function {funktion} not found.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'error_deleteWidget',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Widget konnte nicht entfernt werden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'failed to remove widget',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'success_savePreset',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung erfolgreich aktualisiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset successfully updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'alert_deleteWidget',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sind Sie sicher, dass Sie dieses Widget löschen möchten?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Are you sure you want to delete this widget?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### Phrases Dashboard Admin END
 );
 
 

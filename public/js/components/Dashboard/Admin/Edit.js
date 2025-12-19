@@ -18,7 +18,9 @@ export default {
 	},
 	methods: {
 		sendDelete() {
-			BsConfirm.popup('Sure?').then(() => this.$emit('delete', this.dashboard_id)).catch();
+			//TODO(Manu) phrases here NOT always working
+			BsConfirm.popup(this.$p.t('alert', 'confirm_delete') + " " + this.$p.t('dashboard', 'deleteInfo'))
+				.then(() => this.$emit('delete', this.dashboard_id)).catch();
 		}
 	},
 	template: `<div class="dashboard-admin-edit px-3">

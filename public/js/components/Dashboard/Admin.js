@@ -3,11 +3,14 @@ import DashboardAdminEdit from "./Admin/Edit.js";
 import DashboardAdminWidgets from "./Admin/Widgets.js";
 import DashboardAdminPresets from "./Admin/Presets.js";
 
+import ApiDashboardAdmin from "../../api/factory/dashboard/dashboardAdmin.js";
+
 export default {
+	name: 'DashboardAdmin',
 	components: {
 		DashboardAdminEdit,
 		DashboardAdminWidgets,
-		DashboardAdminPresets
+		DashboardAdminPresets,
 	},
 	provide() {
 		return {
@@ -22,9 +25,6 @@ export default {
 		};
 	},
 	computed: {
-		apiurl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
-		},
 		dashboard() {
 			return this.dashboards.find(el => el.dashboard_id == this.current);
 		}
@@ -35,33 +35,49 @@ export default {
 			BsPrompt.popup('New Dashboard name').then(
 				name => {
 					_name = name;
-					return axios.post(this.apiurl + '/Dashboard/create', {
+					const params = {
 						dashboard_kurzbz: name
-					})
-				}
-			).then(res => {
-				let newDashboard = {
-					dashboard_id: res.data.retval,
-					dashboard_kurzbz: _name,
-					beschreibung: ''
-				};
-				this.dashboards.push(newDashboard);
-				this.current = newDashboard.dashboard_id;
-			}).catch(err => err !== undefined ? console.error('ERROR:', err) : 0);
+					};
+					return this.$api
+						.call(ApiDashboardAdmin.addDashboard(params))
+						.then(response =>{
+							this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')); //TODO(Manu) phrase here working
+
+							let newDashboard = {
+								dashboard_id: response.data,
+								dashboard_kurzbz: _name,
+								beschreibung: ''
+							};
+							this.dashboards.push(newDashboard);
+							this.current = newDashboard.dashboard_id;
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+					});
 		},
 		dashboardUpdate(dashboard) {
-			// TODO(chris): Loading or message
-			axios.post(this.apiurl + '/Dashboard/update', dashboard).then(() => {
-				let old = this.dashboards.find(el => el.dashboard_id == dashboard.dashboard_id);
-				old.dashboard_kurzbz = dashboard.dashboard_kurzbz;
-				old.beschreibung = dashboard.beschreibung;
-			}).catch(err => console.error('ERROR:', err));
+			return this.$api
+				.call(ApiDashboardAdmin.updateDashboard(dashboard))
+				.then(response =>{
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')); //TODO(Manu) phrase here working
+
+					let old = this.dashboards.find(el => el.dashboard_id == dashboard.dashboard_id);
+					old.dashboard_kurzbz = dashboard.dashboard_kurzbz;
+					old.beschreibung = dashboard.beschreibung;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		dashboardDelete(dashboard_id) {
-			axios.post(this.apiurl + '/Dashboard/delete', {dashboard_id}).then(() => {
-				this.current = -1;
-				this.dashboards = this.dashboards.filter(el => el.dashboard_id != dashboard_id);
-			}).catch(err => console.error('ERROR:', err));
+			return this.$api
+				.call(ApiDashboardAdmin.deleteDashboard(dashboard_id))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete')); //TODO(Manu) phrase here NOT always working
+
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.current = -1;
+					this.dashboards = this.dashboards.filter(el => el.dashboard_id != dashboard_id);
+				});
 		},
 		assignWidgets(widgets) {
 			this.widgets = widgets;
@@ -72,18 +88,23 @@ export default {
 		}
 	},
 	created() {
-		axios.get(this.apiurl + '/Dashboard').then(res => {
-			this.dashboards = res.data.retval;
-		}).catch(err => console.error('ERROR:', err));
+		this.$api
+			.call(ApiDashboardAdmin.getAllDashboards())
+			.then(result => {
+				this.dashboards = result.data.retval;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `<div class="dashboard-admin">
+
 		<div class="input-group">
-			<label for="dashbaord-select" class="input-group-text">Dashboard:</label>
-			<select id="dashbaord-select" class="form-select" v-model="current">
+			<label for="dashboard-select" class="input-group-text">Dashboard:</label>
+			<select id="dashboard-select" class="form-select" v-model="current">
 				<option v-for="dashboard in dashboards" :key="dashboard.dashboard_id" :value="dashboard.dashboard_id">{{dashboard.dashboard_kurzbz}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" @click="dashboardAdd"><i class="fa-solid fa-plus"></i></button>
 		</div>
+
 		<div v-if="dashboard">
 			<ul class="nav nav-tabs mt-3" role="tablist">
 				<li class="nav-item" role="presentation">

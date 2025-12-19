@@ -151,7 +151,7 @@ export default {
 		},
 		removeWidget(item, revert) {
 			if (item.custom) {
-				BsConfirm.popup('Are you sure you want to delete this widget?').then(() => this.$emit('widgetRemove', this.name, item.id));
+				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', this.name, item.id));
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };

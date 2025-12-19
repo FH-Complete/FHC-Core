@@ -1,6 +1,7 @@
 import DashboardSection from "../Section.js";
 import DashboardWidgetPicker from "../Widget/Picker.js";
 import ObjectUtils from "../../../helpers/ObjectUtils.js";
+import ApiDashboardAdmin from "../../../api/factory/dashboard/dashboardAdmin.js";
 
 export default {
 	components: {
@@ -17,9 +18,6 @@ export default {
 		tmpLoading: ''
 	}),
 	computed: {
-		apiurl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
-		},
 		pickerWidgets() {
 			return this.widgets.filter(widget => widget.allowed);
 		}
@@ -36,26 +34,29 @@ export default {
 					if (section.name == section_name)
 						section.widgets.push(loading);
 				});
-				
-				axios.post(this.apiurl + '/Config/addWidgetsToPreset', {
+
+				const params = {
 					db: this.dashboard,
 					funktion_kurzbz: section_name,
 					widgets: [widget]
-				}).then(result => {
-					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
-					widget.id = newId;
-					widget.custom = 1;
-					this.sections.forEach(section => {
-						if (section.name == section_name) {
-							section.widgets.splice(section.widgets.indexOf(loading),1);
-							section.widgets.push(widget);
-						}
-					});
-				}).catch(error => {
-					console.error('ERROR: ', error);
-					alert('ERROR: ' + error.response.data.retval);
-				});
-			}).catch(() => {});
+				};
+
+				return this.$api
+					.call(ApiDashboardAdmin.addWidgetsToPreset(params))
+					.then(result => {
+						let newId = Object.keys(result.data[section_name].widgets).pop();
+						widget.id = newId;
+						widget.custom = 1;
+						this.sections.forEach(section => {
+							if (section.name == section_name) {
+								section.widgets.splice(section.widgets.indexOf(loading),1);
+								section.widgets.push(widget);
+							}
+						});
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+			})
+			.catch(() => {});
 		},
 		widgetUpdate(section_name, payload) {
 			payload = payload[section_name];
@@ -78,76 +79,90 @@ export default {
 				payload[k].widgetid = k;
 				delete payload[k].custom;
 			}
-			axios.post(this.apiurl + '/Config/addWidgetsToPreset', {
+
+			//TODO(manu) test
+			const params = {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
 				widgets: payload
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name) {
-						section.widgets.forEach((widget, i) => {
-							if (payload[widget.id]) {
-								payload[widget.id].id = widget.id;
-								payload[widget.id].index = widget.index;
-								section.widgets[i] = payload[widget.id];
-								section.widgets[i].custom = 1;
-							}
-						});
-					}
-				});
-			}).catch(error => {
-				// TODO(chris): revert placement on failure
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
+			};
+
+			return this.$api
+				.call(ApiDashboardAdmin.addWidgetsToPreset(params))
+				.then(result => {
+					this.sections.forEach(section => {
+						if (section.name == section_name) {
+							section.widgets.forEach((widget, i) => {
+								if (payload[widget.id]) {
+									payload[widget.id].id = widget.id;
+									payload[widget.id].index = widget.index;
+									section.widgets[i] = payload[widget.id];
+									section.widgets[i].custom = 1;
+								}
+							});
+						}
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		widgetRemove(section_name, id) {
-			axios.post(this.apiurl + '/Config/removeWidgetFromPreset', {
+			const params = {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
 				widgetid: id
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name)
-						section.widgets = section.widgets.filter(widget => widget.id != id);
-				});
-			}).catch(error => {
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
+			};
+			return this.$api
+				.call(ApiDashboardAdmin.removeWidgetFromPreset(params))
+				.then(result => {
+					this.sections.forEach(section => {
+						if (section.name == section_name)
+							section.widgets = section.widgets.filter(widget => widget.id != id);
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadSections(evt) {
 			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
 			this.sections = [];
 			this.tmpLoading = funktionen.join('###');
-			axios.get(this.apiurl + '/Config/presetBatch', {params: {
+
+			const params = {
 				db: this.dashboard,
 				funktionen
-			}}).then(res => {
-				if (this.tmpLoading !== funktionen.join('###'))
-					return; // NOTE(chris): prevent race condition
-				for (var section in res.data.retval) {
-					let widgets = [];
-					for (var wid in res.data.retval[section]) {
-						res.data.retval[section][wid].id = wid;
-						res.data.retval[section][wid].custom = 1;
-						widgets.push(res.data.retval[section][wid]);
+			};
+
+			return this.$api
+				.call(ApiDashboardAdmin.presetBatch(params))
+				.then(result => {
+					if (this.tmpLoading !== funktionen.join('###'))
+						return; // NOTE(chris): prevent race condition
+					for (var section in result.data) {
+						let widgets = [];
+						for (var wid in result.data[section]) {
+							result.data[section][wid].id = wid;
+							result.data[section][wid].custom = 1;
+							widgets.push(result.data[section][wid]);
+						}
+						this.sections.push({
+							name: section,
+							widgets
+						});
 					}
-					this.sections.push({
-						name: section,
-						widgets
-					});
-				}
-			}).catch(err => console.error('ERROR:', err));
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+
 		}
 	},
 	created() {
-		axios.get(this.apiurl + '/Config/funktionen').then(res => {
-			this.funktionen = {general: 'GENERAL'};
-			res.data.retval.forEach(funktion => {
-				this.funktionen[funktion.funktion_kurzbz] = funktion.beschreibung;
-			});
-		}).catch(err => console.error('ERROR:', err));
+		this.$api
+			.call(ApiDashboardAdmin.loadFunktionen())
+			.then(result => {
+				//console.log(result);
+				result.data.forEach(funktion => {
+					this.funktionen[funktion.funktion_kurzbz] = funktion.beschreibung;
+				});
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	watch: {
 		dashboard() {

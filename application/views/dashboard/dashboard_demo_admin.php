@@ -8,9 +8,11 @@ $this->load->view(
 		'axios027' => true,
 		'restclient' => true,
 		'vue3' => true,
-		'customJSModules' => ['public/js/apps/DashboardAdmin.js'],
+		'primevue3' => true,
+		'customJSModules' => ['public/js/apps/Dashboard/Admin.js'],
 		'customCSSs' => [
-			'public/css/components/dashboard.css'
+			'public/css/components/dashboard.css',
+			'public/css/components/primevue.css',
 		],
 		'navigationcomponent' => true
 	)
