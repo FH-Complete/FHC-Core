@@ -687,9 +687,6 @@ class PrestudentLib
 		$now = date('c');
 		$today = date('Y-m-d');
 
-		$jahr = mb_substr($studiensemester_kurzbz, 4, 2);
-
-
 		// Genererate Personenkennzeichen
 		$personenkennzeichen = $this->_ci->StudentModel->generateMatrikelnummer2(
 			$student_data->studiengang_kz,
@@ -699,8 +696,9 @@ class PrestudentLib
 		if (isError($personenkennzeichen))
 			return $personenkennzeichen;
 		$personenkennzeichen = getData($personenkennzeichen);
-		
-		
+
+		$jahr = mb_substr($personenkennzeichen, 0, 2);
+
 		// Generate UID
 		$uid = $this->_ci->StudentModel->generateUID(
 			$student_data->kurzbz,
