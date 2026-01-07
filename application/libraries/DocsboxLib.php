@@ -157,8 +157,6 @@ class DocsboxLib
 					->expectsJson()
 					->send();
 
-				error_log(print_r($getStatusResponse, 1));
-
 				// Checks that:
 				// - the response is not empty
 				// - the reponse body has the property id
