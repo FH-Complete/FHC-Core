@@ -166,7 +166,7 @@ class Abgabe extends FHCAPI_Controller
 				
 				Events::trigger('projektbeurteilung_check_available', $pa->projektarbeit_id, $pa->bperson_id, $downloadPaFunc);
 					
-				if($pa->babgeschickt) {
+				if(isset($pa->babgeschickt) && $pa->babgeschickt) {
 					$downloadLink1 = '';
 					$downloadLinkFunc1 = function ($link) use (&$downloadLink1) {
 						$downloadLink1 = $link;
