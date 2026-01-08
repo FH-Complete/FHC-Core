@@ -102,8 +102,9 @@ class Abgabe extends FHCAPI_Controller
 		$projektarbeit_id = $this->input->get("projektarbeit_id",TRUE);
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id))
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
 		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
@@ -139,7 +140,8 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
-		if (!isset($uid) || isEmptyString($uid)) {
+		// if uid is missing or empty, fall back to getAuthUID()
+		if ($uid === NULL || trim((string)$uid) === '') {
 			$uid = getAuthUID();
 		}
 
@@ -257,26 +259,29 @@ class Abgabe extends FHCAPI_Controller
 	public function postStudentProjektarbeitZwischenabgabe()
 	{
 		$this->checkUploadSize();
-		
-		$projektarbeit_id = $_POST['projektarbeit_id'];
-		$paabgabe_id = $_POST['paabgabe_id'];
-		$student_uid = $_POST['student_uid'];
-		$bperson_id = $_POST['bperson_id'];
-		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
 
-		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
-			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
-			|| !isset($student_uid) || isEmptyString($student_uid)
-			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$paabgabe_id = $this->input->post('paabgabe_id');
+		$student_uid = $this->input->post('student_uid');
+		$bperson_id = $this->input->post('bperson_id');
+		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
+
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
+			|| $student_uid === NULL || trim((string)$student_uid) === ''
+			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
+		$path = PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf';
+		
 		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
-			move_uploaded_file($_FILES['file']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf');
+			move_uploaded_file($_FILES['file']['tmp_name'], $path);
 
-			if(file_exists(PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf')) {
+			if(file_exists($path)) {
 
-				exec('chmod 640 "'.PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf'.'"');
-
+				chmod($path, 0640);
+				
 				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 				$res = $this->PaabgabeModel->update($paabgabe_id, array(
 					'abgabedatum' => date('Y-m-d'),
@@ -307,26 +312,27 @@ class Abgabe extends FHCAPI_Controller
 	{
 		$this->checkUploadSize();
 
-		$projektarbeit_id = $_POST['projektarbeit_id'];
-		$paabgabe_id = $_POST['paabgabe_id'];
-		$student_uid = $_POST['student_uid'];
-		$sprache = $_POST['sprache'];
-		$abstract = $_POST['abstract'];
-		$abstract_en = $_POST['abstract_en'];
-		$schlagwoerter = $_POST['schlagwoerter'];
-		$schlagwoerter_en = $_POST['schlagwoerter_en'];
-		$seitenanzahl = $_POST['seitenanzahl'];
-		$bperson_id = $_POST['bperson_id'];
-		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$paabgabe_id = $this->input->post('paabgabe_id');
+		$student_uid = $this->input->post('student_uid');
+		$sprache = $this->input->post('sprache');
+		$abstract = $this->input->post('abstract');
+		$abstract_en = $this->input->post('abstract_en');
+		$schlagwoerter = $this->input->post('schlagwoerter');
+		$schlagwoerter_en = $this->input->post('schlagwoerter_en');
+		$seitenanzahl = $this->input->post('seitenanzahl');
+		$bperson_id = $this->input->post('bperson_id');
+		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
 
-		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
-			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
-			|| !isset($student_uid) || isEmptyString($student_uid)
-			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz)
-			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
-			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
-			|| !isset($seitenanzahl) || !isset($sprache))
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
+			|| $student_uid === NULL || trim((string)$student_uid) === ''
+			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === ''
+			|| $abstract === NULL || $abstract_en === NULL
+			|| $schlagwoerter === NULL || $schlagwoerter_en === NULL
+			|| $seitenanzahl === NULL || $sprache === NULL) {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		if ((isset($_FILES) and isset($_FILES['file']) and ! $_FILES['file']['error'])) {
 			move_uploaded_file($_FILES['file']['tmp_name'], PAABGABE_PATH.$paabgabe_id.'_'.$student_uid.'.pdf');
@@ -411,6 +417,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 		$boolParamStrLower = strtolower($boolParamStr);
 
+		$showAllBool = false; // fallback if input strings are anything else for whatever reason
 		if (in_array($boolParamStrLower, $trueStrings, true)) {
 			$showAllBool = true;
 		} elseif (in_array($boolParamStrLower, $falseStrings, true)) {
@@ -443,23 +450,24 @@ class Abgabe extends FHCAPI_Controller
 	 * initially fetches all
 	 */
 	public function postProjektarbeitAbgabe() {
-		$projektarbeit_id = $_POST['projektarbeit_id'];
-		$paabgabe_id = $_POST['paabgabe_id'];
-		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
-		$datum = $_POST['datum'];
-		$fixtermin = $_POST['fixtermin'];
-		$kurzbz = $_POST['kurzbz'];
-		$note = $_POST['note'];
-		$beurteilungsnotiz = $_POST['beurteilungsnotiz'];
-		$upload_allowed = $_POST['upload_allowed'];
-		$betreuer_person_id = $_POST['betreuer_person_id'];
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$paabgabe_id = $this->input->post('paabgabe_id');
+		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
+		$datum = $this->input->post('datum');
+		$fixtermin = $this->input->post('fixtermin');
+		$kurzbz = $this->input->post('kurzbz');
+		$note = $this->input->post('note');
+		$beurteilungsnotiz = $this->input->post('beurteilungsnotiz');
+		$upload_allowed = $this->input->post('upload_allowed');
+		$betreuer_person_id = $this->input->post('betreuer_person_id');
 
-		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
-			|| !isset($paabgabe_id) || isEmptyString($paabgabe_id)
-			|| !isset($datum) || isEmptyString($datum)
-			|| !isset($kurzbz)
-			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
+			|| $datum === NULL || trim((string)$datum) === ''
+			|| $kurzbz === NULL
+			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
@@ -557,10 +565,11 @@ class Abgabe extends FHCAPI_Controller
 	 * none of these roles are allowed to delete if students uploaded something for that termin
 	 */
 	public function deleteProjektarbeitAbgabe() {
-		$paabgabe_id = $_POST['paabgabe_id'];
+		$paabgabe_id = $this->input->post('paabgabe_id');
 
-		if (!isset($paabgabe_id) || isEmptyString($paabgabe_id))
+		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
@@ -588,20 +597,21 @@ class Abgabe extends FHCAPI_Controller
 	 * can be slow for large n since it queries twice per projektarbeit_id
 	 */
 	public function postSerientermin() {
-		$projektarbeit_ids = $_POST['projektarbeit_ids'];
-		$datum = $_POST['datum'];
-		$paabgabetyp_kurzbz = $_POST['paabgabetyp_kurzbz'];
-		$bezeichnung = $_POST['bezeichnung'];
-		$kurzbz = $_POST['kurzbz'];
-		$fixtermin = $_POST['fixtermin'];
-		$upload_allowed = $_POST['upload_allowed'];
+		$projektarbeit_ids = $this->input->post('projektarbeit_ids');
+		$datum = $this->input->post('datum');
+		$paabgabetyp_kurzbz = $this->input->post('paabgabetyp_kurzbz');
+		$bezeichnung = $this->input->post('bezeichnung');
+		$kurzbz = $this->input->post('kurzbz');
+		$fixtermin = $this->input->post('fixtermin');
+		$upload_allowed = $this->input->post('upload_allowed');
 
-		if (!isset($projektarbeit_ids) || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
-			|| !isset($datum) || isEmptyString($datum)
-			|| !isset($kurzbz)
-			|| !isset($bezeichnung) || isEmptyString($bezeichnung)
-			|| !isset($paabgabetyp_kurzbz) || isEmptyString($paabgabetyp_kurzbz))
+		if ($projektarbeit_ids === NULL || !is_array($projektarbeit_ids) || empty($projektarbeit_ids)
+			|| $datum === NULL || trim((string)$datum) === ''
+			|| $kurzbz === NULL
+			|| $bezeichnung === NULL || trim((string)$bezeichnung) === ''
+			|| $paabgabetyp_kurzbz === NULL || trim((string)$paabgabetyp_kurzbz) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		// old script checks if there already are tbl_paabgabe entries with exact date, type & kurzbz
 		// for each termin - good to check that in principle but should not matter in this place. if necessary
@@ -653,12 +663,12 @@ class Abgabe extends FHCAPI_Controller
 	 * resembles the legacy abgabetool functionality of "show deadlines"
 	 */
 	public function fetchDeadlines() {
-		$person_id = $_POST['person_id'];
+		$person_id = $this->input->post('person_id');
 
-		if (!isset($person_id) || isEmptyString($person_id))
+		if ($person_id === NULL || trim((string)$person_id) === '') {
 			$person_id = getAuthPersonId();
-
-
+		}
+		
 		if($person_id !== getAuthPersonId()) {
 			$this->load->library('PermissionLib');
 			$isAdmin = $this->permissionlib->isBerechtigt('admin');
@@ -779,10 +789,10 @@ class Abgabe extends FHCAPI_Controller
 		
 		$studiengang_kz = $this->input->get("studiengang_kz", TRUE);
 		$benotet = $this->input->get("benotet", TRUE);
-		
-		if (!isset($studiengang_kz) || isEmptyString($studiengang_kz))
+
+		if ($studiengang_kz === NULL || trim((string)$studiengang_kz) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-		
+		}
 		
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz, $benotet);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
@@ -850,8 +860,10 @@ class Abgabe extends FHCAPI_Controller
 		$paabgabe_id = $this->input->get('paabgabe_id');
 		$student_uid = $this->input->get('student_uid');
 
-		if (!isset($paabgabe_id) || isEmptyString($paabgabe_id) || !isset($student_uid) || isEmptyString($student_uid))
+		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
+			|| $student_uid === NULL || trim((string)$student_uid) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
 
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
@@ -878,19 +890,22 @@ class Abgabe extends FHCAPI_Controller
 	 * can't do it themself
 	 */
 	public function postStudentProjektarbeitZusatzdaten(){
-		$projektarbeit_id = $_POST['projektarbeit_id'];
-		
-		$sprache = $_POST['sprache'];
-		$abstract = $_POST['abstract'];
-		$abstract_en = $_POST['abstract_en'];
-		$schlagwoerter = $_POST['schlagwoerter'];
-		$schlagwoerter_en = $_POST['schlagwoerter_en'];
-		$seitenanzahl = $_POST['seitenanzahl'];
-		
-		if (!isset($projektarbeit_id) || isEmptyString($projektarbeit_id)
-			|| !isset($abstract) || !isset($abstract_en) // endupload zusatzdaten can be empty but should never be null
-			|| !isset($schlagwoerter) || !isset($schlagwoerter_en)
-			|| !isset($seitenanzahl) || !isset($sprache)) {
+		$projektarbeit_id = $this->input->post('projektarbeit_id');
+		$sprache = $this->input->post('sprache');
+		$abstract = $this->input->post('abstract');
+		$abstract_en = $this->input->post('abstract_en');
+		$schlagwoerter = $this->input->post('schlagwoerter');
+		$schlagwoerter_en = $this->input->post('schlagwoerter_en');
+		$seitenanzahl = $this->input->post('seitenanzahl');
+
+		if ($projektarbeit_id === NULL || trim((string)$projektarbeit_id) === ''
+			|| $sprache === NULL || trim((string)$sprache) === ''
+			|| $seitenanzahl === NULL || trim((string)$seitenanzahl) === ''
+			|| $abstract === NULL || trim((string)$abstract) === ''
+			|| $abstract_en === NULL || trim((string)$abstract_en) === ''
+			|| $schlagwoerter === NULL || trim((string)$schlagwoerter) === ''
+			|| $schlagwoerter_en === NULL || trim((string)$schlagwoerter_en) === '') {
+
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 			
