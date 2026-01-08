@@ -116,6 +116,7 @@ export const AbgabetoolAssistenz = {
 					{
 						formatter: function (cell, formatterParams, onRendered) {
 							// create the built-in checkbox
+							if(!cell.getRow().getData().selectable) return
 							let checkbox = document.createElement("input");
 							checkbox.type = "checkbox";
 
@@ -628,6 +629,9 @@ export const AbgabetoolAssistenz = {
 			// const now = luxon.DateTime.now();
 			return projekte.map(projekt => {
 				
+				// in assistenz context every projektarbeit should be allowed to be selected i guess
+				projekt.selectable = true;
+				
 				projekt.prevTermin = null;
 				projekt.nextTermin = null;
 
@@ -729,7 +733,7 @@ export const AbgabetoolAssistenz = {
 			else if(abgabedatum > datum) {
 				return 'verspaetet' // needs upload, missed it and has submitted smth late
 			} else if(!termin.upload_allowed) {
-				if(datum > today) return termin.diffinday <= 12 ? 'abzugeben' : 'standard'
+				if(datum > today) return termin.diffindays <= 12 ? 'abzugeben' : 'standard'
 				else if (today > datum) return 'abgegeben'
 			} else {
 				return 'abgegeben' // nothing else to do for that termin

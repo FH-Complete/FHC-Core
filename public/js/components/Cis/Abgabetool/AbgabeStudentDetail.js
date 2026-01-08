@@ -514,6 +514,11 @@ export const AbgabeStudentDetail = {
 					</AccordionTab>
 				</template>
 			</Accordion>
+			
+			<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
+				<h5>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h5>
+			</div>
+			
 		 </div>
 	 	
 	 	<bs-modal 
