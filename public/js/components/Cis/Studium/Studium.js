@@ -88,6 +88,27 @@ export default {
 			studienordnung.selectedIndex = newSelectIndex;
 			this.changeSelectedStudienPlan(studienordnung.value);
 		},
+		onStudiensemesterChange(event) {
+			const value = event.target.value;
+			this.setHash(value);
+			this.changeSelectedStudienSemester(value);
+
+		},
+		onStudiengangChange(event) {
+			const value = event.target.value;
+			this.setHash(value);
+			this.changeSelectedStudienGang(value);
+		},
+		onSemesterChange(event) {
+			const value = event.target.value;
+			this.setHash(value);
+			this.changeSelectedSemester(value);
+		},
+		onStudienordnungChange(event) {
+			const value = event.target.value;
+			this.setHash(value);
+			this.changeSelectedStudienPlan(value);
+		},
 		
 		storeDataToLocalStorage(key,value){
 			localStorage.setItem(key, value);
@@ -159,6 +180,7 @@ export default {
 
 			this.studiengaenge = studiengang.all;
 			this.selectedStudiengang = studiengang.preselected?.studiengang_kz;
+
 
 			this.semester = semester.all;
 			this.selectedSemester = semester?.preselected;
@@ -284,8 +306,8 @@ export default {
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
-			<select ref="studiensemester" v-model="selectedStudiensemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-				<option v-for="semester in studienSemester" @click="changeSelectedStudienSemester(semester.studiensemester_kurzbz)" :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
+			<select ref="studiensemester" v-model="selectedStudiensemester"  @change="onStudiensemesterChange" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+				<option v-for="semester in studienSemester"  :key="semester" :value="semester.studiensemester_kurzbz">{{studiensemesterTitel(semester.studiensemester_kurzbz)	}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiensemester(-1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -299,8 +321,8 @@ export default {
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
-			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-				<option v-for="studiengang in studiengaenge" @click="changeSelectedStudienGang(studiengang.studiengang_kz)" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
+			<select ref="studiengaenge" v-model="selectedStudiengang" class="form-select" @change="onStudiengangChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+				<option v-for="studiengang in studiengaenge"  :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz" >{{studiengangTitel(studiengang)}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudiengang(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -314,8 +336,8 @@ export default {
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
-			<select ref="semester" v-model="selectedSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-				<option v-for="sem in semester" @click="changeSelectedSemester(sem)" :key="semester" :value="sem">{{sem}}. Semester</option>
+			<select ref="semester" v-model="selectedSemester" class="form-select"  @change="onSemesterChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+				<option v-for="sem in semester" :key="semester" :value="sem">{{sem}}. Semester</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -329,8 +351,8 @@ export default {
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(-1)" :aria-label="$p.t('global','previous')" :title="$p.t('global','previous')">
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
-			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setHash($event.target.value)">
-				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" @click="changeSelectedStudienPlan(ordnung?.studienplan?.studienplan_id)" :key="ordnung?.studienplan?.bezeichnung	" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
+			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select"  @change="onStudienordnungChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
+				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" :key="ordnung?.studienplan?.bezeichnung" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
