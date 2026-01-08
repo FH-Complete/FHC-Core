@@ -43,13 +43,23 @@ export default {
 		};
 	},
 	postProjektarbeitAbgabe(termin) {
+		
+		let dateString = termin.datum
+		if(termin.datum instanceof Date) {
+			const year = termin.datum.getFullYear();
+			const month = String(termin.datum.getMonth() + 1).padStart(2, '0');
+			const day = String(termin.datum.getDate()).padStart(2, '0');
+
+			dateString = `${year}-${month}-${day}`
+		}
+		
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postProjektarbeitAbgabe',
 			params: { 
 				paabgabe_id: termin.paabgabe_id,
 				paabgabetyp_kurzbz: termin.bezeichnung.paabgabetyp_kurzbz,
-				datum: termin.datum,
+				datum: dateString,
 				note: termin.note_pk,
 				upload_allowed: !!termin.upload_allowed,
 				beurteilungsnotiz: termin.beurteilungsnotiz ?? '',

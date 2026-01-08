@@ -230,11 +230,11 @@ export const AbgabeMitarbeiterDetail = {
 		async validateZusatzdaten() {
 			// just ask once
 			if(await this.$fhcAlert.confirm({
-				message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
+				message: this.$p.t('abgabetool/confirmZusatzdatenSpeichern'),
 				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-				acceptClass: 'btn btn-danger',
+				acceptClass: 'p-button-primary',
 				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-				rejectClass: 'btn btn-outline-secondary'
+				rejectClass: 'p-button-secondary'
 			}) === false) {
 				return false
 			}
@@ -245,9 +245,9 @@ export const AbgabeMitarbeiterDetail = {
 			if(await this.$fhcAlert.confirm({
 				message: this.$p.t('abgabetool/c4confirm_delete'),
 				acceptLabel: 'Löschen',
-				acceptClass: 'btn btn-danger',
+				acceptClass: 'p-button-danger',
 				rejectLabel: 'Zurück',
-				rejectClass: 'btn btn-outline-secondary'
+				rejectClass: 'p-button-secondary'
 			}) === false) {
 				return false
 			} else {

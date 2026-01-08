@@ -1067,7 +1067,6 @@ export const AbgabetoolAssistenz = {
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
 							:options="abgabeTypeOptions"
-							@change="handleChangeAbgabetypSerientermin(termin)"
 							:optionLabel="getOptionLabelAbgabetyp">
 						</Dropdown>
 					</div>

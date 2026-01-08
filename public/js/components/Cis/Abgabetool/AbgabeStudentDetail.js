@@ -59,9 +59,9 @@ export const AbgabeStudentDetail = {
 				if(await this.$fhcAlert.confirm({
 					message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
 					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
-					acceptClass: 'btn btn-danger',
+					acceptClass: 'p-button-primary',
 					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
-					rejectClass: 'btn btn-outline-secondary'
+					rejectClass: 'p-button-secondary'
 				}) === false) {
 					return false
 				}

@@ -432,7 +432,13 @@ export const AbgabetoolMitarbeiter = {
 		}
 	},
 	watch: {
+		'serienTermin.bezeichnung'(newVal) {
+			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
+				this.serienTermin.kurzbz = newVal.bezeichnung
+			}
 
+			this.serienTermin.upload_allowed = newVal.upload_allowed_default
+		},
 	},
 	computed: {
 		getAllowedAbgabeTypeOptions() {
@@ -524,7 +530,7 @@ export const AbgabetoolMitarbeiter = {
 					<div class="col-12 col-md-9"
 						v-if="abgabetypenBetreuer && abgabeTypeOptions"
 					>
-						<Dropdown 
+						<Dropdown
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
 							:options="getAllowedAbgabeTypeOptions"
