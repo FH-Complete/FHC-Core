@@ -1,5 +1,6 @@
 import LvUebersicht from "../Mylv/LvUebersicht.js";
 
+import ApiCisStudium from '../../../api/factory/cis/studium';
 
 export default {
 	data(){
@@ -118,28 +119,32 @@ export default {
 			return value;
 		},
 		changeSelectedStudienSemester(studiensemester_kurzbz) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester_kurzbz, this.selectedStudiengang, this.selectedSemester, this.selectedStudienordnung)
+			return this.$api
+				.call(ApiCisStudium.getAllStudienSemester(studiensemester_kurzbz, this.selectedStudiengang, this.selectedSemester, this.selectedStudienordnung))
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
 				})
 		},
 		changeSelectedStudienGang(studiengang_kz) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, studiengang_kz, this.selectedSemester, this.selectedStudienordnung)
+			return this.$api
+				.call(ApiCisStudium.getAllStudienSemester(this.selectedStudiensemester, studiengang_kz,  this.selectedSemester, this.selectedStudienordnung))
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
 				})
 		},
 		changeSelectedSemester(semester) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, semester, this.selectedStudienordnung)
+			return this.$api
+				.call(ApiCisStudium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, semester, this.selectedStudienordnung))
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
 				})
 		},
 		changeSelectedStudienPlan(studienplan_id) {
-			this.$fhcApi.factory.studium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, this.selectedSemester, studienplan_id)
+			return this.$api
+				.call(ApiCisStudium.getAllStudienSemester(this.selectedStudiensemester, this.selectedStudiengang, this.selectedSemester, studienplan_id))
 				.then(data => data.data)
 				.then(res => {
 					this.extractPropertyValues(res);
@@ -278,12 +283,13 @@ export default {
 		const studienordnung = JSON.parse(this.getDataFromLocalStorage("studienordnung")) ?? undefined;
 
 		// only fetch default data if no data is stored in the local storage
-		
-		this.$fhcApi.factory.studium.getAllStudienSemester(studiensemester, studiengang, semester, studienordnung)
-		.then(data => data.data)
-		.then(res => {
-			this.extractPropertyValues(res);
-		})
+
+		this.$api
+			.call(ApiCisStudium.getAllStudienSemester(studiensemester, studiengang, semester, studienordnung))
+			.then(data => data.data)
+			.then(res => {
+				this.extractPropertyValues(res);
+			})
 
 	},
 	template: `
