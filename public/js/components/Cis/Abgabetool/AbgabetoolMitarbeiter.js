@@ -305,9 +305,8 @@ export const AbgabetoolMitarbeiter = {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
 					
-					// lektoren are only allowed to edit their own deadline entries
-					// TODO: cis old
-					termin.allowedToSave = termin.insertvon == this.viewData?.uid && pa.betreuerart_kurzbz != 'Zweitbegutachter'
+					// update 08-01-20206: everybody is allowed to do everything in client, critical checks happen at backend level
+					termin.allowedToSave = true
 					
 					// lektoren are not allowed to delete deadlines with existing submissions
 					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum

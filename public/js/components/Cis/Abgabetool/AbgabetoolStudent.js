@@ -40,8 +40,6 @@ export const AbgabetoolStudent = {
 			phrasenResolved: false,
 			loading: false,
 			notenOptions: null,
-			domain: '',
-			student_uid: null,
 			detail: null,
 			projektarbeiten: null,
 			selectedProjektarbeit: null
@@ -155,7 +153,7 @@ export const AbgabetoolStudent = {
 
 						// development purposes
 						// termin.allowedToUpload = this.checkQualityGatesStrict(pa.abgabetermine)
-						// termin.allowedToUpload = true
+						termin.allowedToUpload = true
 
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)
@@ -206,19 +204,14 @@ export const AbgabetoolStudent = {
 			} else return '-'
 		},
 		buildMailToLink(projekt) {
-			if(projekt.mitarbeiter_uid) { // standard
-				return 'mailto:' + projekt.mitarbeiter_uid +'@'+ this.domain
-			} else { // private
-				return 'mailto:' + projekt.email
-			}
+			// should always be "projekt.mitarbeiter_uid +'@'+ this.domain", built in backend
+			return 'mailto:' + projekt.email
 		},
 		buildBetreuer(abgabe) {
 			return (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		async setupData(data){
 			// this.projektarbeiten = data[0]
-			this.domain = data[1]
-			this.student_uid = data[2]
 			const projektarbeiten = data[0] ?? null
 			if(!projektarbeiten) return
 			this.projektarbeiten = projektarbeiten.map(projekt => {
@@ -246,7 +239,7 @@ export const AbgabetoolStudent = {
 
 		},
 		loadProjektarbeiten() {
-			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
+			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
@@ -295,6 +288,9 @@ export const AbgabetoolStudent = {
 	computed: {
 		isViewMode() {
 			return this.student_uid !== this.viewData.uid
+		},
+		student_uid() {
+			return this.student_uid_prop || this.viewData?.uid || null
 		}
 	},
 	async created() {

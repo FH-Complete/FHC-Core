@@ -111,7 +111,7 @@ class Abgabe extends FHCAPI_Controller
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
 		} else {
-			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
 		}
 		
 		$projektarbeitIsCurrent = false;
@@ -341,7 +341,7 @@ class Abgabe extends FHCAPI_Controller
 				if(count($projektarbeitArr) > 0) {
 					$projektarbeit = $projektarbeitArr[0];
 				} else {
-					$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+					$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
 				}
 
 				$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
@@ -351,7 +351,7 @@ class Abgabe extends FHCAPI_Controller
 				if(count($paabgabeArr) > 0) {
 					$paabgabe = $paabgabeArr[0];
 				} else {
-					$this->terminateWithError($this->p->t('global','projektabgabeNichtGefunden'), 'general');
+					$this->terminateWithError($this->p->t('abgabetool','c4projektabgabeNichtGefunden'), 'general');
 				}
 				
 				$this->checkAbgabeSignatur($paabgabe, $projektarbeit);
@@ -743,7 +743,7 @@ class Abgabe extends FHCAPI_Controller
 		$student = $studentArr[0];
 
 		if(!$student) {
-			$this->terminateWithError($this->p->t('global','userNichtGefunden'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4userNichtGefunden'), 'general');
 		}
 		
 		$subject = $this->p->t('abgabetool', 'c4qualgateNegativEmailSubject');
@@ -902,7 +902,7 @@ class Abgabe extends FHCAPI_Controller
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
 		} else {
-			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
 		}
 		
 		// update projektarbeit cols
@@ -967,7 +967,7 @@ class Abgabe extends FHCAPI_Controller
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
 		} else {
-			$this->terminateWithError($this->p->t('global','projektarbeitNichtGefunden'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
 		}
 		
 		$projektarbeitIsCurrent = false;
@@ -1016,7 +1016,7 @@ class Abgabe extends FHCAPI_Controller
 
 			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
 
-			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
 			
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
@@ -1029,7 +1029,7 @@ class Abgabe extends FHCAPI_Controller
 
 			if(!$mailres)
 			{
-				$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+				$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
 			}
 
 			// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
@@ -1049,14 +1049,14 @@ class Abgabe extends FHCAPI_Controller
 
 						if (!$tokenGenRes)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachter'), 'general');
 						}
 
 						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
 						
 						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailZweitBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachter'), 'general');
 						}
 
 						$begutachterMitToken = $begutachterMitTokenRetval[0];
@@ -1090,7 +1090,7 @@ class Abgabe extends FHCAPI_Controller
 
 						if (!$mailres)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'fehlerMailBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
 						}
 
 					}
