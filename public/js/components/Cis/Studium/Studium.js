@@ -27,6 +27,7 @@ export default {
 
 		}
 	},
+	name: "OverviewStudiengaenge",
 	components: {
 		LvUebersicht,
 	},
@@ -343,7 +344,7 @@ export default {
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="semester" v-model="selectedSemester" class="form-select"  @change="onSemesterChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="sem in semester" :key="semester" :value="sem">{{sem}}. Semester</option>
+				<option v-for="sem in semester" :key="sem" :value="sem">{{sem}}. Semester</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeSemester(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
@@ -358,7 +359,7 @@ export default {
 				<i class="fa fa-caret-left" aria-hidden="true"></i>
 			</button>
 			<select ref="studienordnung" v-model="selectedStudienordnung" class="form-select"  @change="onStudienordnungChange" :aria-label="$p.t('global/studiensemester_auswaehlen')">
-				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" :key="ordnung?.studienplan?.bezeichnung" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
+				<option v-for="ordnung in computedStudienOrdnungSelectValues" :disabled="ordnung.disabled" :key="ordnung?.studienplan?.studienplan_id" :value="ordnung?.studienplan?.studienplan_id">{{ordnung.bezeichnung}}</option>
 			</select>
 			<button class="btn btn-outline-secondary" type="button" :disabled="false" @click="changeStudienordnung(1)" :aria-label="$p.t('global','next')" :title="$p.t('global','next')">
 				<i class="fa fa-caret-right" aria-hidden="true"></i>
