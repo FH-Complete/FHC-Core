@@ -13,4 +13,5 @@ const app = Vue.createApp({
   }
 });
 app.use(PluginsPhrasen);
+app.directive('tooltip', primevue.tooltip);
 app.mount('#main');

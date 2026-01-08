@@ -18,8 +18,7 @@ export default {
 	},
 	methods: {
 		sendDelete() {
-			//TODO(Manu) phrases here NOT always working
-			BsConfirm.popup(this.$p.t('alert', 'confirm_delete') + " " + this.$p.t('dashboard', 'deleteInfo'))
+			BsConfirm.popup(this.$p.t('ui', 'confirm_delete') + " " + this.$p.t('ui', 'deleteInfo'))
 				.then(() => this.$emit('delete', this.dashboard_id)).catch();
 		}
 	},
@@ -33,8 +32,8 @@ export default {
 			<textarea id="dashboard-admin-edit-beschreibung" class="form-control" v-model="desc"></textarea>
 		</div>
 		<div>
-			<button class="btn btn-danger" @click="sendDelete">Delete</button>
-			<button class="btn btn-primary" @click="$emit('change', {dashboard_id,dashboard_kurzbz:kurzbz,beschreibung:desc})">Update</button>
+			<button class="btn btn-danger" @click="sendDelete">{{this.$p.t('ui', 'loeschen')}}</button>
+			<button class="btn btn-primary" @click="$emit('change', {dashboard_id,dashboard_kurzbz:kurzbz,beschreibung:desc})">{{this.$p.t('ui', 'btnAktualisieren')}}</button>
 		</div>
 	</div>`
 }

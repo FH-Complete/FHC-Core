@@ -52615,7 +52615,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	// ### Phrases Dashboard Admin START
 	array(
 		'app' => 'core',
-		'category' => 'dashboard',
+		'category' => 'ui',
 		'phrase' => 'deleteInfo',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -52727,6 +52727,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Are you sure you want to delete this widget?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Möchten Sie wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete?',
 				'description' => '',
 				'insertvon' => 'system'
 			)

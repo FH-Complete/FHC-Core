@@ -41,7 +41,7 @@ export default {
 					return this.$api
 						.call(ApiDashboardAdmin.addDashboard(params))
 						.then(response =>{
-							this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')); //TODO(Manu) phrase here working
+							this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
 							let newDashboard = {
 								dashboard_id: response.data,
@@ -58,7 +58,8 @@ export default {
 			return this.$api
 				.call(ApiDashboardAdmin.updateDashboard(dashboard))
 				.then(response =>{
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')); //TODO(Manu) phrase here working
+
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
 					let old = this.dashboards.find(el => el.dashboard_id == dashboard.dashboard_id);
 					old.dashboard_kurzbz = dashboard.dashboard_kurzbz;
@@ -70,7 +71,7 @@ export default {
 			return this.$api
 				.call(ApiDashboardAdmin.deleteDashboard(dashboard_id))
 				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete')); //TODO(Manu) phrase here NOT always working
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -108,7 +109,7 @@ export default {
 		<div v-if="dashboard">
 			<ul class="nav nav-tabs mt-3" role="tablist">
 				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="false">Edit</button>
+					<button class="nav-link" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab" aria-controls="edit" aria-selected="false">{{this.$p.t('ui', 'bearbeiten')}}</button>
 				</li>
 				<li class="nav-item" role="presentation">
 					<button class="nav-link active" id="widgets-tab" data-bs-toggle="tab" data-bs-target="#widgets" type="button" role="tab" aria-controls="widgets" aria-selected="true">Widgets</button>
@@ -122,7 +123,7 @@ export default {
 					<dashboard-admin-edit v-bind="dashboard" :key="dashboard.dashboard_id" @change="dashboardUpdate($event)" @delete="dashboardDelete($event)"></dashboard-admin-edit>
 				</div>
 				<div class="tab-pane fade show active" id="widgets" role="tabpanel" aria-labelledby="widgets-tab">
-					<dashboard-admin-widgets :key="dashboard.dashboard_id" :dashboard_id="dashboard.dashboard_id" :widgets="widgets" @change="test" @assign-widgets="assignWidgets"></dashboard-admin-widgets>
+					<dashboard-admin-widgets :key="dashboard.dashboard_id" :dashboard_id="dashboard.dashboard_id" :widgets="widgets" @assign-widgets="assignWidgets"></dashboard-admin-widgets>
 				</div>
 				<div class="tab-pane fade" id="presets" role="tabpanel" aria-labelledby="presets-tab">
 					<dashboard-admin-presets :dashboard="dashboard.dashboard_kurzbz" :widgets="widgets"></dashboard-admin-presets>
