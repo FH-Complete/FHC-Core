@@ -22,6 +22,7 @@ if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
 	<?php
 	if (!empty($_SESSION['externe_ueberwachung'])) : ?>
+	<script type="text/javascript" src="externeueberwachung.js"></script>
 	<script>
 		function loadInContent(url)
 		{

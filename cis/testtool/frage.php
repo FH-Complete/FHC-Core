@@ -183,7 +183,9 @@ if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
 
 if (!empty($_SESSION['externe_ueberwachung']) && isset($_SESSION['externe_ueberwachung_verified'])): ?>
-	<script type="text/javascript" src="externeueberwachung.js"></script>
+	<link href="frage.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="frage_externe_ueberwachung.js"></script>
+	<div id="proctoringBlocker" class="proctoring-blocker hidden"></div>
 <?php endif;
 
 $pruefling = new pruefling();

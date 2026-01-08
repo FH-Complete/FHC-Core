@@ -1,34 +1,15 @@
 (function () {
-	/*
-
-	const params = new URLSearchParams(location.search);
-	let expectedOrigin = params.get("examus-client-origin");
-
-	if (!expectedOrigin)
-	{
-		window.top.location.href = 'resetconnection.php';
-		return;
+	function sendMessage() {
+		let frame = window.frames['content'];
+		if (frame)
+			frame.postMessage({ type: "proctoringReady" });
 	}
-	*/
-	let proctoringOK = false;
 
-	window.addEventListener("message", function (e) {
-		/*if (e.origin !== expectedOrigin) {
-			return;
-		}*/
-
-		const data = e.data || {};
-
-		if (data.proctoringIsActive)
+	window.addEventListener("message", function (e)
+	{
+		if (e.data.indexOf("proctoringReady_") === 0)
 		{
-			proctoringOK = true;
+			sendMessage();
 		}
 	});
-
-	setTimeout(function () {
-		if (!proctoringOK)
-		{
-			top.location.href='resetconnection.php';
-		}
-	}, 1000);
 })();
