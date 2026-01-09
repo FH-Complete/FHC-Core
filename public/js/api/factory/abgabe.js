@@ -71,11 +71,11 @@ export default {
 			}
 		};
 	},
-	deleteProjektarbeitAbgabe(paabgabe_id) {
+	deleteProjektarbeitAbgabe(paabgabe_id, projektarbeit_id) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/deleteProjektarbeitAbgabe',
-			params: { paabgabe_id }
+			params: { paabgabe_id, projektarbeit_id }
 		};
 	},
 	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, upload_allowed, projektarbeit_ids, fixtermin) {
