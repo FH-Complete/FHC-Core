@@ -285,7 +285,7 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband :preselectedKey="selectedStudiengang" :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+					<stv-verband :preselectedKey="selectedStudiengang" :dragEnabled=true :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				

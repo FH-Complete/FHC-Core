@@ -30,6 +30,10 @@ const TYPE_DEFINITION = {
 	prestudent: {
 		id: "prestudent_id",
 		dragIcon: "fa-solid fa-user-graduate text-muted"
+	},
+	verband: {
+		id: "gruppe_id",
+		dragIcon: "fa-solid fa-user-group text-muted"
 	}
 	// TODO: IMPLEMENT OTHER TYPES
 };
