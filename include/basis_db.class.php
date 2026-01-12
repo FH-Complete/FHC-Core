@@ -27,8 +27,8 @@ require_once(dirname(__FILE__).'/basis.class.php');
 
 abstract class db extends basis
 {
-	protected static $db_conn=null;
-	protected $db_result=null;
+	protected static $db_conn = null;
+	protected $db_result = null;
 	protected $debug=false;
 
 	function __construct()
@@ -46,18 +46,18 @@ abstract class db extends basis
 
 	abstract function db_connect();
 	abstract function db_query($sql);
-	abstract function db_fetch_object($result=null, $i=null);
-	abstract function db_fetch_array($result=null);
-	abstract function db_fetch_row($result=null, $i=null);
-	abstract function db_fetch_assoc($result=null, $i=null);
-	abstract function db_result($result = null, $i, $item);
-	abstract function db_num_rows($result=null);
-	abstract function db_num_fields($result=null);
-	abstract function db_field_name($result=null, $i);
-	abstract function db_affected_rows($result=null);
-	abstract function db_result_seek($result=null, $offset);
+	abstract function db_fetch_object($result = null, $i = null);
+	abstract function db_fetch_array($result = null);
+	abstract function db_fetch_row($result = null, $i = null);
+	abstract function db_fetch_assoc($result = null, $i = null);
+	abstract function db_result($result = null, $i = null, $item = null);
+	abstract function db_num_rows($result = null);
+	abstract function db_num_fields($result = null);
+	abstract function db_field_name($result = null, $i = null);
+	abstract function db_affected_rows($result = null);
+	abstract function db_result_seek($result = null, $offset = null);
 	abstract function db_last_error();
-	abstract function db_free_result($result=null);
+	abstract function db_free_result($result = null);
 	abstract function db_version();
 	abstract function db_escape($var);
 	abstract function db_null_value($var, $qoute=true);

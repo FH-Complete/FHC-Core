@@ -49,6 +49,8 @@ class organisationseinheit extends basis_db
 	public $beschreibung;
 	public $oetyp_bezeichnung;
 
+	public $kurzzeichen;
+
 
 	/**
 	 * Konstruktor
