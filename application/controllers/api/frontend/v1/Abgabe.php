@@ -600,9 +600,12 @@ class Abgabe extends FHCAPI_Controller
 		}
 
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+		
 		if(!$zugeordnet) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
 		}
+		
+		// TODO: check zuordnung paabgabe_id / projektarbeit_id
 		
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
@@ -612,6 +615,7 @@ class Abgabe extends FHCAPI_Controller
 		if(count($paabgabeArr) == 0)
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		
+		// TODO: diese prüfung entfernen
 		if($paabgabeArr[0]->insertvon === getAuthUID()) {
 			$result = $this->PaabgabeModel->delete($paabgabe_id);
 			$result = $this->getDataOrTerminateWithError($result);
@@ -739,6 +743,9 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
 		$email = $this->getDataOrTerminateWithError($result);
+		
+		//TODO: check if private mail exists, if not take uid@domain
+		
 		return $email[0]->private_email;
 	}
 
@@ -830,6 +837,15 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		// TODO: recheck getSTGEntitlement here!
+		$stg_allowed = $this->permissionlib->getSTG_isEntitledFor('basis/abgabe_assistenz:rw');
+		if($stg_allowed == false) {
+			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
+		
+		// check if provided studiengang_kz is included in stg_allowed to proceed
+		if(!in_array($studiengang_kz, $stg_allowed)) {
+			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
 		
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz, $benotet);
 		$projektarbeiten = $this->getDataOrTerminateWithError($result);
