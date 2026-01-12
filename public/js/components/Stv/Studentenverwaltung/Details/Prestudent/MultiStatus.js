@@ -207,8 +207,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
-								button.disabled = true;
+/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;*/
 							container.append(button);
 
 							button = document.createElement('button');
