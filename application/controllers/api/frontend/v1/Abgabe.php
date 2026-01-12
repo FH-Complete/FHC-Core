@@ -124,7 +124,7 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'));
 		}
 		$data = getData($res)[0];
-		$student_uid = $data->student_uid;
+		$student_uid = $data->uid;
 
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(getAuthUID() == $student_uid || $zugeordnet) {
