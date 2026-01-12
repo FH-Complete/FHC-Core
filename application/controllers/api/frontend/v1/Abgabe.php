@@ -990,9 +990,10 @@ class Abgabe extends FHCAPI_Controller
 	 * helper function to check the signature status of uploaded files for zwischenabgabe & endupload
 	 */
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
-		if($abgabe->paabgabetyp_kurzbz != 'end') {
-			return;
-		}
+		// TODO: recomment this whenever we decide every upload needs signature check
+//		if($abgabe->paabgabetyp_kurzbz != 'end') {
+//			return;
+//		}
 
 		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$projektarbeit->student_uid.'.pdf';
 		
