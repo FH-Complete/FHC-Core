@@ -153,7 +153,7 @@ export const AbgabetoolStudent = {
 
 						// development purposes
 						// termin.allowedToUpload = this.checkQualityGatesStrict(pa.abgabetermine)
-						termin.allowedToUpload = true
+						// termin.allowedToUpload = true
 
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)

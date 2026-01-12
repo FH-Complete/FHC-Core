@@ -211,24 +211,6 @@ export const AbgabeStudentDetail = {
 				}
 			}
 		},
-		getActiveIndexTabArray() {
-			// here we try to do mind reading logic by assuming which abgabetermine are the most relevant to the current user
-
-			// lets try to take the termin with nearest date and watch who complains and why
-			let closestIndex = -1;
-			let minDiff = Infinity;
-			const today = new Date();
-
-			this.projektarbeit.abgabetermine.forEach((obj, i) => {
-				const diff = Math.abs(new Date(obj.datum) - today);
-				if (diff < minDiff) {
-					minDiff = diff;
-					closestIndex = i;
-				}
-			});
-
-			return [closestIndex]
-		},
 		getEid() {
 			return this.$capitalize(this.$p.t('abgabetool/c4eidesstattlicheErklaerung'))
 		},
@@ -327,7 +309,7 @@ export const AbgabeStudentDetail = {
 				<p> {{projektarbeit?.titel}}</p>
 			</div>
 			
-			<Accordion :multiple="true" :activeIndex="getActiveIndexTabArray">
+			<Accordion :multiple="true">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>

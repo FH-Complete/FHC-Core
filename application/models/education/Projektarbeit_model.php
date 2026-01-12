@@ -233,7 +233,7 @@ class Projektarbeit_model extends DB_Model
 					   CASE WHEN zustellung THEN 0 ELSE 1 END,
 					   insertamum DESC NULLS LAST
 				   LIMIT 1
-			   ) AS private_email
+			   ) AS private_email, mitarbeiter_uid as uid
 		FROM lehre.tbl_projektarbeit pa
 				 JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
 				 JOIN public.tbl_person pers USING (person_id)
@@ -462,5 +462,18 @@ class Projektarbeit_model extends DB_Model
 			return true;
 
 		return false;
+	}
+
+	public function getProjektarbeitByPaabgabeID($paabgabe_id) {
+		$qry = "SELECT
+					projektarbeit_id
+				FROM
+					campus.tbl_paabgabe
+					JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+				WHERE
+					campus.tbl_paabgabe.paabgabe_id = ?;
+		";
+
+		return $this->execReadOnlyQuery($qry, [$paabgabe_id]);
 	}
 }

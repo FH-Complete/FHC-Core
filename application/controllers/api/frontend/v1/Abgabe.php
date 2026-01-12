@@ -592,41 +592,32 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function deleteProjektarbeitAbgabe() {
 		$paabgabe_id = $this->input->post('paabgabe_id');
-		$projektarbeit_id = $this->input->post('projektarbeit_id');
 
-		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === ''
-			|| $projektarbeit_id === NULL || trim((string)$projektarbeit_id) === '') {
+		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
-		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
+		$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID());
 		
 		if(!$zugeordnet) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
 		}
-		
-		// TODO: check zuordnung paabgabe_id / projektarbeit_id
-		
-		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		
 		$paabgabeResult = $this->PaabgabeModel->load($paabgabe_id);
 		$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult);
 
-		if(count($paabgabeArr) == 0)
+		if(count($paabgabeArr) == 0) {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
-		
-		// TODO: diese prüfung entfernen
-		if($paabgabeArr[0]->insertvon === getAuthUID()) {
-			$result = $this->PaabgabeModel->delete($paabgabe_id);
-			$result = $this->getDataOrTerminateWithError($result);
-
-			// TODO: consider this in nightly email job
-			
-			$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
-			$this->terminateWithSuccess($result);
 		}
+		
+		$result = $this->PaabgabeModel->delete($paabgabe_id);
+		$result = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		// TODO: consider this in nightly email job
+		$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
+		$this->terminateWithSuccess($result);
 	}
 
 	/**
@@ -660,7 +651,6 @@ class Abgabe extends FHCAPI_Controller
 
 		// old script afterwards again queries if user is not the zweitbetreuer of any id - this is blocked in the ui
 		// and should never unintentionally happen
-		
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
@@ -746,7 +736,8 @@ class Abgabe extends FHCAPI_Controller
 		
 		//TODO: check if private mail exists, if not take uid@domain
 		
-		return $email[0]->private_email;
+		return $email[0]->private_email ?? $email[0]->uid.'@'.DOMAIN;
+
 	}
 
 	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
@@ -1002,7 +993,7 @@ class Abgabe extends FHCAPI_Controller
 		if($abgabe->paabgabetyp_kurzbz != 'end') {
 			return;
 		}
-		
+
 		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$projektarbeit->student_uid.'.pdf';
 		
 		$signaturVorhanden = null; // if frontend receives null -> indicates no file found at path
@@ -1222,6 +1213,22 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		return false;
+	}
+	
+	private function checkZuordnungByPaabgabe($paabgabe_id, $betreuer_uid) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->getProjektarbeitByPaabgabeID($paabgabe_id);
+		if(isError($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingProjektarbeitForPaabgabeID'));
+		}
+
+		if(!hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedProjektarbeitForPaabgabeID'));
+		}
+		$data = getData($res)[0];
+		$projektarbeit_id = $data->projektarbeit_id;
+	
+		return $this->checkZuordnung($projektarbeit_id, $betreuer_uid);
 	}
 
 }

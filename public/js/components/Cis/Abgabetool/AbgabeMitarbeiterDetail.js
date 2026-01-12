@@ -40,7 +40,6 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	data() {
 		return {
-			activeIndexArray: null,
 			showAutomagicModalPhrase: false,
 			eidAkzeptiert: false,
 			enduploadTermin: null,
@@ -79,25 +78,6 @@ export const AbgabeMitarbeiterDetail = {
 		}
 	},
 	methods: {
-		getActiveIndexTabArray(additional = []) {
-			// here we try to assume which abgabetermine are the most relevant to the current user
-
-			// lets try to take the termin with nearest date
-			let closestIndex = -1;
-			let minDiff = Infinity;
-			const today = new Date();
-
-
-			this.projektarbeit.abgabetermine.forEach((obj, i) => {
-				const diff = Math.abs(new Date(obj.datum) - today);
-				if (diff < minDiff) {
-					minDiff = diff;
-					closestIndex = i;
-				}
-			});
-
-			return [closestIndex, ...additional]
-		},
 		getPlaceholderTermin(termin) {
 			return termin?.bezeichnung ? this.$p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : this.$p.t('abgabetool/abgabetypPlaceholder')
 		},
@@ -143,7 +123,6 @@ export const AbgabeMitarbeiterDetail = {
 					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
 					
 					const index = this.projektarbeit.abgabetermine.findIndex(t => termin.paabgabe_id == t.paabgabe_id)
-					this.activeIndexArray = this.getActiveIndexTabArray([index])
 					
 					// negative abgabe -> automagically open new termin modal
 					// really bad feature imo that will be annoying to deal with
@@ -255,7 +234,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		deleteTermin(termin) {
-			this.$api.call(ApiAbgabe.deleteProjektarbeitAbgabe(termin.paabgabe_id, this.projektarbeit.projektarbeit_id)).then( (res) => {
+			this.$api.call(ApiAbgabe.deleteProjektarbeitAbgabe(termin.paabgabe_id)).then( (res) => {
 				if(res?.meta?.status == 'success') {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui/genericDeleted', [this.$p.t('abgabetool/abgabe')]))
 					// this.$p.t('global/tooltipLektorDeleteKontrolle', [this.$entryParams.permissions.kontrolleDeleteMaxReach ])
@@ -372,7 +351,7 @@ export const AbgabeMitarbeiterDetail = {
 				window.open(link, '_blank')
 			} else if(this.projektarbeit?.abgabetermine.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && this.projektarbeit?.beurteilungLinkOld) {
 				if(await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/c4aeltereParbeitBenoten'),
+					message: this.$p.t('abgabetool/c4aeltereParbeitBenotenv2'),
 					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
 					acceptClass: 'btn btn-danger',
 					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
@@ -610,8 +589,6 @@ export const AbgabeMitarbeiterDetail = {
 		'projektarbeit'(newVal) {
 			// set invertedFixtermin field for UI/UX purposes -> avoid double negation in text
 			
-			this.activeIndexArray = this.getActiveIndexTabArray()
-			
 			newVal?.abgabetermine?.forEach(termin => termin.invertedFixtermin = !termin.fixtermin)
 			
 			// default select german if projektarbeit sprache was null
@@ -748,7 +725,7 @@ export const AbgabeMitarbeiterDetail = {
 				</button>
 			</div>
 		</div>
-		<Accordion :multiple="true" :activeIndex="activeIndexArray">
+		<Accordion :multiple="true">
 			<template v-for="termin in this.projektarbeit?.abgabetermine">
 				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
 					<template #header>
@@ -880,7 +857,7 @@ export const AbgabeMitarbeiterDetail = {
 										<Message v-else-if="termin?.signatur == 'error'" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $capitalize($p.t('abgabetool/c4signaturServerError')) }} </Message>
 									</div>
 									<div v-else class="col-auto">
-										<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>
+										<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noSignatureCheckPossible') }} </Message>
 									</div>
 									
 								</div>						

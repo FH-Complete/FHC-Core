@@ -29,7 +29,7 @@ const app = Vue.createApp({
 			return { uid: this.uid}
 		},
 		student_uid_computed() {
-			return this.student_uid ?? null
+			return this.student_uid ?? this.uid
 		},
 		stg_kz_computed() {
 			return this.stg_kz ?? null
