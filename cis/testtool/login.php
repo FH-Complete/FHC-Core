@@ -447,14 +447,6 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		{
 			e.preventDefault();
 		});
-		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
-		// show message to use Mozilla Firefox
-		var ua = navigator.userAgent;
-		if ((ua.indexOf("Firefox") > -1) == false)
-		{
-			$("#alertmsgdiv").html("<div class='alert alert-danger'>BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!<br>(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.<br><br>PLEASE USE MOZILLA FIREFOX BROWSER!<br>(Otherwise some exam items will not be displayed correctly</div>");
-			//alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.\n\nPLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
-		}
 	});
 	</script>
 <?php

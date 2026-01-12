@@ -30,6 +30,22 @@ export default {
 			from: 'hasAdminPermission',
 			default: false
 		},
+		hasZGVBakkPermission: {
+			from: 'hasZGVBakkPermission',
+			default: false
+		},
+		hasZGVMasterPermission: {
+			from: 'hasZGVMasterPermission',
+			default: false
+		},
+		hasZGVDoctorPermission: {
+			from: 'hasZGVDoctorPermission',
+			default: false
+		},
+		hasBismeldenPermission: {
+			from: 'hasBismeldenPermission',
+			default: false
+		},
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
@@ -106,7 +122,7 @@ export default {
 	},
 
 	methods: {
-		loadPrestudent() {
+		async loadPrestudent() {
 			return this.$api
 				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id, this.currentSemester))
 				.then(result => result.data)
@@ -154,8 +170,8 @@ export default {
 			)
 		},
 	},
-	created() {
-		this.loadPrestudent();
+	async created() {
+		await this.loadPrestudent();
 		this.$api
 			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
@@ -273,6 +289,7 @@ export default {
 						dropdown
 						name="zgv_code"
 						@complete="filterZgvs"
+						:disabled="!hasZGVBakkPermission"
 						>
 							<template #option="slotProps">
 								<div
@@ -291,6 +308,7 @@ export default {
 						type="text"
 						v-model="data.zgvort"
 						name="zgvort"
+						:disabled="!hasZGVBakkPermission"
 						>
 					</form-input>	
 					<form-input
@@ -307,6 +325,7 @@ export default {
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVBakkPermission"
 						>
 					</form-input>
 					<form-input
@@ -316,8 +335,10 @@ export default {
 						type="select"
 						v-model="data.zgvnation"
 						name="zgvnation"
+						:disabled="!hasZGVBakkPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -335,6 +356,7 @@ export default {
 						dropdown
 						name="zgvmas_code"
 						@complete="filterMasterZgvs"
+						:disabled="!hasZGVMasterPermission"
 						>
 							<template #option="slotProps">
 								<div
@@ -353,6 +375,7 @@ export default {
 						type="text"
 						v-model="data.zgvmaort"
 						name="zgvmaort"
+						:disabled="!hasZGVMasterPermission"
 						>
 					</form-input>
 					<form-input
@@ -369,6 +392,7 @@ export default {
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVMasterPermission"
 						>
 					</form-input>
 					<form-input
@@ -378,8 +402,10 @@ export default {
 						type="select"
 						v-model="data.zgvmanation"
 						name="zgvmanation"
+						:disabled="!hasZGVMasterPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -398,6 +424,7 @@ export default {
 						dropdown
 						name="zgvdoktor_code"
 						@complete="filterDoktorZgvs"
+						:disabled="!hasZGVDoctorPermission"
 						>
 							<template #option="slotProps">
 								<div
@@ -416,6 +443,7 @@ export default {
 						type="text"
 						v-model="data.zgvdoktorort"
 						name="zgvdoktorort"
+						:disabled="!hasZGVDoctorPermission"
 						>
 					</form-input>
 					<form-input
@@ -432,6 +460,7 @@ export default {
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
+						:disabled="!hasZGVDoctorPermission"
 						>
 					</form-input>
 					<form-input
@@ -441,8 +470,10 @@ export default {
 						type="select"
 						v-model="data.zgvdoktornation"
 						name="zgvdoktornation"
+						:disabled="!hasZGVDoctorPermission"
 						>
 						<!-- TODO(chris): gesperrte nationen können nicht ausgewählt werden! Um das zu realisieren müsste man ein pseudo select machen -->
+						<option value="">&nbsp;</option>
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
@@ -456,6 +487,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgv_erfuellt"
 							name="zgv_erfuellt"
+							:disabled="!hasZGVBakkPermission"
 							>
 						</form-input>
 					</div>
@@ -467,6 +499,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgvmas_erfuellt"
 							name="zgvmas_erfuellt"
+							:disabled="!hasZGVMasterPermission"
 							>
 						</form-input>
 					</div>
@@ -478,6 +511,7 @@ export default {
 							type="checkbox"
 							v-model="data.zgvdoktor_erfuellt"
 							name="zgvdoktor_erfuellt"
+							:disabled="!hasZGVDoctorPermission"
 							>
 						</form-input>
 					</div>
@@ -504,6 +538,7 @@ export default {
 						v-model="data.berufstaetigkeit_code"
 						name="berufstaetigkeit_code"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="beruf in listBerufe" :key="beruf.berufstaetigkeit_code" :value="beruf.berufstaetigkeit_code">{{beruf.berufstaetigkeit_bez}} </option>
 					</form-input>
 					<form-input
@@ -514,6 +549,7 @@ export default {
 						v-model="data.ausbildungcode"
 						name="ausbildungcode"
 						>
+						<option value="">&nbsp;</option>
 						<option v-for="ausbld in listAusbildung" :key="ausbld.ausbildungcode" :value="ausbld.ausbildungcode">{{ausbld.ausbildungbez}} </option>
 					</form-input>
 				</div>
@@ -596,6 +632,7 @@ export default {
 							type="checkbox"
 							v-model="data.bismelden"
 							name="bismelden"
+							:disabled="!hasBismeldenPermission"
 							>
 						</form-input>
 					</div>

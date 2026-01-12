@@ -353,12 +353,14 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$filter = strtoLower($filter);
 
+		$returnwert = "p.person_id, p.nachname, p.vorname, p.titelpost,  p.titelpre";
+
 		if ($mode == "mitAkadGrad")
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 		elseif ($mode == "ohneMaUid")
-			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+			$returnwert .= ", CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
 		else
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 
 		$qry = "
 			SELECT " . $returnwert . "  
@@ -373,7 +375,11 @@ class Mitarbeiter_model extends DB_Model
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
-				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower(vorname || ' ' || nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			ORDER BY
+				p.nachname, p.vorname, b.uid, p.person_id";
 
 		return $this->execQuery($qry);
 	}
@@ -429,5 +435,19 @@ class Mitarbeiter_model extends DB_Model
 		$parametersArray = array($studiengang_kz);
 
 		return $this->execQuery($qry, $parametersArray);
+	}
+
+	public function isLehrauftragFirma($mitarbeiter_uid)
+	{
+		$this->addSelect('firma_id');
+		$this->addJoin('public.tbl_benutzer', 'uid = mitarbeiter_uid');
+		$this->addJoin('public.tbl_person', 'person_id');
+		$this->addJoin('public.tbl_adresse', 'person_id', 'LEFT');
+		$this->addOrder('zustelladresse', 'DESC');
+		$this->addOrder('firma_id');
+		$this->addLimit(1);
+		$firma_result = $this->loadWhere(array('mitarbeiter_uid' => $mitarbeiter_uid));
+		$firma = getData($firma_result)[0]->firma_id;
+		return !is_null($firma);
 	}
 }

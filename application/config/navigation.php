@@ -64,7 +64,7 @@ $config['navigation_header'] = array(
 				'lehrveranstaltungen' => array(
 					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
 					'icon' => '',
-					'description' => 'Lehrveranstaltungen',
+					'description' => 'Lehrveranstaltungen Templates',
 					'sort' => 15
 				),
 				'reihungstest' => array(
@@ -80,6 +80,16 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
+				),
+				'lvverwaltung' => array(
+					'link' => site_url('LVVerwaltung'),
+					'icon' => '',
+					'description' => 'LV Verwaltung',
+					'requiredPermissions' => array(
+						'admin:r',
+						'assistenz:r'
+					),
+					'sort' => 35
 				),
 				'lehrauftrag' => array(
 					'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
@@ -326,3 +336,24 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'requiredPermissions' => array('admin:rw')
 	),
 );
+
+$config['navigation_menu']['apps'] = [
+	'stv' => [
+		'link' => site_url('studentenverwaltung'),
+		'description' => 'Studierendenverwaltung',
+		#'icon' => 'users',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lvv' => [
+		'link' => site_url('lVVerwaltung'),
+		'description' => 'LV Verwaltung',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lav' => [
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Lehraufträge',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
+	]
+];
