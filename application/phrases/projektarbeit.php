@@ -1,1032 +1,984 @@
 <?php
 
 $phrases = array(
-
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'input_search_label',
+  'category' => 'projektarbeit',
+  'phrase' => 'projektarbeitAnlegen',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Suche: {types}',
+      'text' => 'Projektarbeit anlegen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Search: {types}',
+      'text' => 'Create project work',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_employee',
+  'category' => 'projektarbeit',
+  'phrase' => 'projektarbeitBearbeiten',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Mitarbeiter',
+      'text' => 'Projektarbeit bearbeiten',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'employees',
+      'text' => 'Edit project work',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_student',
+  'category' => 'projektarbeit',
+  'phrase' => 'titel',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Studenten',
+      'text' => 'Titel',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'students',
+      'text' => 'title',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_prestudent',
+  'category' => 'projektarbeit',
+  'phrase' => 'titelEnglisch',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Prestudenten',
+      'text' => 'Titel Englisch',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'prestudents',
+      'text' => 'title English',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_room',
+  'category' => 'projektarbeit',
+  'phrase' => 'themenbereich',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Räume',
+      'text' => 'Themenbereich',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'rooms',
+      'text' => 'topic area',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_organisationunit',
+  'category' => 'projektarbeit',
+  'phrase' => 'typ',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Organisationseinheiten',
+      'text' => 'Typ',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'organisation units',
+      'text' => 'type',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_cms',
+  'category' => 'projektarbeit',
+  'phrase' => 'firma',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Inhalte',
+      'text' => 'Firma',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'sites',
+      'text' => 'company',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'type_dms',
+  'category' => 'projektarbeit',
+  'phrase' => 'lehrveranstaltung',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Dokumente',
+      'text' => 'Lehrveranstaltung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'documents',
+      'text' => 'course',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'button_filter_label',
+  'category' => 'projektarbeit',
+  'phrase' => 'lvTeil',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Filter',
+      'text' => 'LV-Teil',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Filter',
+      'text' => 'teaching unit',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'applyfilter_label',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuer',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Suche filtern nach:',
+      'text' => 'BetreuerIn',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Filter search for:',
+      'text' => 'assessor',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'action_default_label',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerGross',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Standard Aktion',
+      'text' => 'BetreuerIn',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Default Action',
+      'text' => 'Assessor',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_student_uid',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerart',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Student UID',
+      'text' => 'Betreuerart',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Student UID',
+      'text' => 'assessor type',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_prestudent_id',
+  'category' => 'projektarbeit',
+  'phrase' => 'note',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Prestudent ID',
+      'text' => 'Note',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Prestudent ID',
+      'text' => 'grade',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_emails',
+  'category' => 'projektarbeit',
+  'phrase' => 'stunden',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Emails',
+      'text' => 'Stunden',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Emails',
+      'text' => 'hours',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_group_emails',
+  'category' => 'projektarbeit',
+  'phrase' => 'stundensatz',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Gruppen-Email',
+      'text' => 'Stundensatz',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Group-Email',
+      'text' => 'hourly rate',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_employee',
+  'category' => 'projektarbeit',
+  'phrase' => 'beginn',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'MitarbeiterIn',
+      'text' => 'Beginn',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Employee',
+      'text' => 'start',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_stdkst',
+  'category' => 'projektarbeit',
+  'phrase' => 'ende',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Standard-Kostenstelle',
+      'text' => 'Ende',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Standard cost center',
+      'text' => 'end',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_stdkst_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'freigegeben',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'keine',
+      'text' => 'freigegeben',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'none',
+      'text' => 'approved',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_parent_oe',
+  'category' => 'projektarbeit',
+  'phrase' => 'gesperrtBis',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Übergeordnete OE',
+      'text' => 'Gesperrt bis',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Parent OU',
+      'text' => 'locked until',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_oe_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'anmerkung',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'keine',
+      'text' => 'Anmerkung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'none',
+      'text' => 'annotation',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_room_address',
+  'category' => 'projektarbeit',
+  'phrase' => 'firmaId',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Standort',
+      'text' => 'Firma ID',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Site',
+      'text' => 'company Id',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_address_floor',
+  'category' => 'projektarbeit',
+  'phrase' => 'error_betreuerNichtGeloescht',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => '{floor} Stockwerk',
+      'text' => 'Löschen nicht möglich, dieser Projektarbeit sind bereits BetreuerInnen zugewiesen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => '{floor} floor',
+      'text' => 'Deleting not possible, assessors were already assigned to this projekt work',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_address_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'error_paabgabeNichtGeloescht',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'N/A',
+      'text' => 'Löschen nicht möglich, für diese Projektarbeit gibt es bereits Projektarbeitsabgaben',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'N/A',
+      'text' => 'Deleting not possible, there are projekt submissions for this project work',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_workplaces',
+  'category' => 'projektarbeit',
+  'phrase' => 'error_invalidProjektbetreuer',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Sitzplätze',
+      'text' => 'ProjektbetreuerIn ungültig',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Seats',
+      'text' => 'Invalid project assessors',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_workplaces_pc',
+  'category' => 'projektarbeit',
+  'phrase' => 'error_betreuerHatVertrag',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => '{max_person}, davon {workplaces} PC-Plätze',
+      'text' => 'Löschen nicht möglich, ProjektbetreuerIn hat bereits einen Vertrag',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => '{max_person}, of which {workplaces} PC-Workstations',
+      'text' => 'Deleting not possible, project assessor has a contract already',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_workplaces_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'neuePersonAnlegen',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'N/A',
+      'text' => 'Neue Person anlegen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'N/A',
+      'text' => 'Create new person',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_building',
+  'category' => 'projektarbeit',
+  'phrase' => 'kontaktdatenBearbeiten',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Gebäude',
+      'text' => 'Kontaktdaten bearbeiten',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Building',
+      'text' => 'Edit contact data',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_equipment',
+  'category' => 'projektarbeit',
+  'phrase' => 'projektbeurteilungErstellen',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Zusatz Informationen',
+      'text' => 'Projektbeurteilung erstellen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Additional information',
+      'text' => 'Create project assessment document',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_leader',
+  'category' => 'projektarbeit',
+  'phrase' => 'projektarbeitNochNichtBeurteilt',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Leiter',
+      'text' => 'Projektarbeit ist noch nicht beurteilt',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Leader',
+      'text' => 'Projekt work was not assessed yet',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_leader_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerBearbeiten',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'N.N.',
+      'text' => 'BetreuerIn bearbeiten',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'N/A',
+      'text' => 'Edit assessor',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_number_of_employees',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerSpeichern',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Mitarbeiter-Anzahl',
+      'text' => 'BetreuerIn speichern',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Number of employees',
+      'text' => 'Save assessor',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_dms_id',
+  'category' => 'projektarbeit',
+  'phrase' => 'zurFirmenverwaltung',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'DMS ID',
+      'text' => 'Zur Firmenverwaltung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'DMS ID',
+      'text' => 'Company management',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_version',
+  'category' => 'projektarbeit',
+  'phrase' => 'punkte',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Version',
+      'text' => 'Punkte',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Version',
+      'text' => 'points',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_keywords',
+  'category' => 'projektarbeit',
+  'phrase' => 'gesamtnote',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Schlagwörter',
+      'text' => 'Gesamtnote',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Keywords',
+      'text' => 'final grade',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'result_content_none',
+  'category' => 'projektarbeit',
+  'phrase' => 'abgabeEndupload',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Kein Inhalt',
+      'text' => 'Abgabe Endupload',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'No Content',
+      'text' => 'final submission upload',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_missing_type',
+  'category' => 'projektarbeit',
+  'phrase' => 'vertrag_id',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Kein Ergebnistyp ausgewählt. Bitte mindestens einen Ergebnistyp auswählen.',
+      'text' => 'Vertrag ID',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'No result type selected. Please select at least one result type.',
+      'text' => 'contract ID',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_no_results',
+  'category' => 'projektarbeit',
+  'phrase' => 'projektarbeit_id',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Es wurden keine Ergebnisse gefunden.',
+      'text' => 'Projektarbeit ID',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'No results were found.',
+      'text' => 'project work ID',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_unknown_type',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerart_kurzbz',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Unbekannter Ergebnistyp: \'{type}\'.',
+      'text' => 'Betreuerart Kurzbezeichnung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Unknown resulttype: \'{type}\'.',
+      'text' => 'project assessor short name',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_general',
+  'category' => 'projektarbeit',
+  'phrase' => 'typ_kurzbz',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Bei der Suche ist ein Fehler aufgetreten. {message}',
+      'text' => 'Typ Kurzbezeichnung',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'An error occurred while searching. {message}',
+      'text' => 'type short name',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_missing_config',
+  'category' => 'projektarbeit',
+  'phrase' => 'betreuerZugewiesen',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Such-Konfiguration $config["{type}"] nicht gefunden.',
+      'text' => 'Betreuer*In ist bereits zugewiesen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Search config $config["{type}"] not found.',
+      'text' => 'This project assessor is already assigned',
       'description' => '',
       'insertvon' => 'system',
     ),
   ),
-),
-
+)
+,
 array (
   'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_invalid_config',
+  'category' => 'projektarbeit',
+  'phrase' => 'error_paarbeitHatBeurteilung',
   'insertvon' => 'system',
   'phrases' => 
   array (
     0 => 
     array (
       'sprache' => 'German',
-      'text' => 'Such-Konfiguration für $config["{type}"] ist ungültig: Feld "{field}" fehlt, ist leer oder hat einen ungültigen Typ.',
+      'text' => 'Für diese Projektarbeit ist bereits eine Projektarbeitsbeurteilung eingetragen',
       'description' => '',
       'insertvon' => 'system',
     ),
     1 => 
     array (
       'sprache' => 'English',
-      'text' => 'Search config for $config["{type}"] is invalid: field {field} is missing, empty or has an invalid type.',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-
-array (
-  'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'error_invalid_config_searchfield',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'Such-Konfiguration $config["{type}"]["searchfields"]["{searchfield}"] ist ungültig: Feld "{field}" fehlt oder ist unglültig.',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'Search config $config["{type}"]["searchfields"]["{searchfield}"] is invalid: field {field} is missing or invalid.',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-  ),
-),
-array (
-  'app' => 'core',
-  'category' => 'search',
-  'phrase' => 'submit',
-  'insertvon' => 'system',
-  'phrases' => 
-  array (
-    0 => 
-    array (
-      'sprache' => 'German',
-      'text' => 'suchen',
-      'description' => '',
-      'insertvon' => 'system',
-    ),
-    1 => 
-    array (
-      'sprache' => 'English',
-      'text' => 'search',
+      'text' => 'This project work has already been assessed',
       'description' => '',
       'insertvon' => 'system',
     ),

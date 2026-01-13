@@ -577,4 +577,27 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'dokumente',
+  'phrase' => 'dokument_erstellen',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Dokument erstellen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Create Document',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

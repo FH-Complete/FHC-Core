@@ -265,4 +265,51 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'messages',
+  'phrase' => 'errorEditorNotAvailable',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Editor-Instanz nicht verfügbar.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Editor instance is not available.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'messages',
+  'phrase' => 'error_missingLogic',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Logik für Type ID {type} nicht implementiert.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'logic for type ID {type} not implemented.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

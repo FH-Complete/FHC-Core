@@ -241,4 +241,99 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'gruppenmanagement',
+  'phrase' => 'special_groups',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Spezialgruppen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Special groups',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'gruppenmanagement',
+  'phrase' => 'add_group',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Gruppe hinzufügen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Add group',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'gruppenmanagement',
+  'phrase' => 'groups_added',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => '{n} Gruppen hinzufügen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Added {n} groups',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'gruppenmanagement',
+  'phrase' => 'error_alreadyInGroup',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Der Student {uid} ist bereits im {studiensemester_kurzbz} dieser Gruppe zugeteilt. Entfernen Sie vorher diese Zuteilung.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Student {uid} is already assigned to this group in {studiensemester_kurzbz}. Remove this assignment beforehand.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
