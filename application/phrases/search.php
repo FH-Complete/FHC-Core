@@ -1009,4 +1009,27 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'search',
+  'phrase' => 'submit',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'suchen',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'search',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

@@ -8755,5 +8755,29 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'global',
+  'phrase' => 'status_bestaetigung',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Status Bestätigung',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Status confirmation',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 

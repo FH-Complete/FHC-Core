@@ -70,20 +70,22 @@ abstract class Auth_Controller extends FHC_Controller
 	/**
 	 * Checks for Permissions depending if the given person is a
 	 * Mitarbeiter and/or Student
+	 * If neither Student nor Mitarbeiter, default permissions are checked
 	 * and exits/outputs an error if they are not met.
 	 *
 	 * @param integer 				$person_id
 	 * @param array 				$permMa		Perms if the person is a Mitarbeiter
 	 * @param array 				$permStud	Perms if the person is a Student
+	 * @param array 				$permDefault	Perms if the person is neither a Student nor a Mitarbeiter
 	 *
 	 * @return void
 	 */
-	protected function checkPermissionsForPerson($person_id, $permMa, $permStud)
+	protected function checkPermissionsForPerson($person_id, $permMa, $permStud, $permDefault = null)
 	{
-		$res = $this->hasPermissionsForPerson($person_id, $permMa, $permStud);
-		
+		$res = $this->hasPermissionsForPerson($person_id, $permMa, $permStud, $permDefault);
+
 		if ($res) {
-			$perm = array_keys(array_flip(array_merge($res|1 ? $permMa : [], $res|2 ? $permStud : [])));
+			$perm = array_keys(array_flip(array_merge($res&1 ? $permMa : [], $res&2 ? $permStud : [], $res&4 ? $permDefault : [])));
 			$this->_outputAuthError([$this->router->method => $perm]);
 		}
 	}
@@ -108,16 +110,19 @@ abstract class Auth_Controller extends FHC_Controller
 	 * Checks for Permissions depending if the given person is a
 	 * Mitarbeiter and/or Student
 	 * and returns the result.
-	 *
+	 * If neither Student nor Mitarbeiter, default permissions are checked
+	 * 
 	 * @param integer 				$person_id
 	 * @param array 				$permMa		Perms if the person is a Mitarbeiter
 	 * @param array 				$permStud	Perms if the person is a Student
-	 *
+	 * @param array 				$permDefault	Perms if the person is neither a Student nor a Mitarbeiter
 	 * @return integer				0 if permission is granted
 	 */
-	protected function hasPermissionsForPerson($person_id, $permMa, $permStud)
+	protected function hasPermissionsForPerson($person_id, $permMa, $permStud, $permDefault)
 	{
-		$res = 3;
+		$res = 8;
+		$isMitarbeiter = false;
+		$isStudent = false;
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->PersonModel->addJoin('public.tbl_benutzer', 'person_id');
 		$this->PersonModel->addJoin('public.tbl_mitarbeiter', 'uid = mitarbeiter_uid');
@@ -125,7 +130,8 @@ abstract class Auth_Controller extends FHC_Controller
 		if (hasData($result)) {
 			if ($this->permissionlib->isEntitled(['a' => $permMa], 'a'))
 				return 0;
-			$res = 1;
+			$isMitarbeiter = true;
+			$res += 1;
 		}
 		$this->PersonModel->addJoin('public.tbl_prestudent', 'person_id');
 		$result = $this->PersonModel->load($person_id);
@@ -140,7 +146,14 @@ abstract class Auth_Controller extends FHC_Controller
 						return 0;
 				}
 			}
+			$isStudent = true;
 			$res += 2;
+		}
+		if (isset($permDefault) && !$isMitarbeiter && !$isStudent)
+		{
+			if ($this->permissionlib->isEntitled(['a' => $permDefault], 'a'))
+				return 0;
+			$res += 4;
 		}
 		return $res;
 	}

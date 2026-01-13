@@ -651,7 +651,13 @@ EOSQL;
 											 ELSE NULL
 											 END
 									 END,
-								 ' '
+								 ' ' 
+									ORDER BY
+										UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz),
+										COALESCE(TRIM(tbl_lehreinheitgruppe.semester::text), ''),
+										COALESCE(TRIM(tbl_lehreinheitgruppe.verband), ''),
+										COALESCE(TRIM(tbl_lehreinheitgruppe.gruppe), ''),
+										COALESCE(tbl_lehreinheitgruppe.gruppe_kurzbz, '')
 						 ) AS gruppen
 					 FROM lehre.tbl_lehreinheitgruppe
 						LEFT JOIN public.tbl_studiengang USING (studiengang_kz)

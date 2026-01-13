@@ -3603,4 +3603,195 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'dropdown_Studienwechsel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Studienwechsel',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Change of studies',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'textLong_Studienwechsel',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Studienwechsel: Der*Die Studierende hat uns mitgeteilt, dass er*sie das Studium wechseln wird und bittet um Abmeldung vom Studium.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Change of studies: The student has informed us that he/she will be changing his/her studies and requests to be deregistered from his/her studies.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'dropdown_Studienabbruch_allgemein',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Allgemeiner Studienabbruch',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'General withdrawal from studies',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'textLong_Studienabbruch_allgemein',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Allgemeiner Studienabbruch: Der*Die Studierende hat uns mitgeteilt, dass er*sie das Studium abbrechen wird und bittet um Abmeldung vom Studium.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'General withdrawal from studies: The student has informed us that he/she will be dropping out of his/her studies and requests to be deregistered from the program.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'dropdown_vsCodeOfConduct',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Verstoß gegen Code of Conduct',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Violation of the Code of Conduct',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'textLong_vsCodeOfConduct',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Verstoß gegen Code of Conduct',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Violation of the Code of Conduct',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'dropdown_additionalReason',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kein Grund zutreffend, Details:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No reason applies, details:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'studierendenantrag',
+  'phrase' => 'textLong_additionalReason',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Kein Grund zutreffend, Details:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No reason applies, details:',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
