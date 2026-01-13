@@ -655,27 +655,27 @@ class lehrveranstaltung extends basis_db
 	public function validate()
 	{
 		//Laenge Pruefen
-		if (mb_strlen($this->bezeichnung) > 128)
+		if (mb_strlen($this->bezeichnung ?? '') > 128)
 		{
 			$this->errormsg = 'Bezeichnung darf nicht laenger als 128 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->kurzbz) > 16)
+		if (mb_strlen($this->kurzbz ?? '') > 16)
 		{
 			$this->errormsg = 'Kurzbez darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->anmerkung) > 64)
+		if (mb_strlen($this->anmerkung ?? '') > 64)
 		{
 			$this->errormsg = 'Anmerkung darf nicht laenger als 64 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->lehreverzeichnis) > 16)
+		if (mb_strlen($this->lehreverzeichnis ?? '') > 16)
 		{
 			$this->errormsg = 'Lehreverzeichnis darf nicht laenger als 16 Zeichen sein';
 			return false;
 		}
-		if (mb_strlen($this->lvnr) > 32)
+		if (mb_strlen($this->lvnr ?? '') > 32)
 		{
 			$this->errormsg = 'LVNR darf nicht laenger als 32 Zeichen sein';
 			return false;

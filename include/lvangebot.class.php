@@ -40,6 +40,7 @@ class lvangebot extends basis_db
 	protected $anmeldefenster_start;	// timestamp
 	protected $anmeldefenster_ende;		// timestamp
 	protected $updateamum;				// timestamp
+	protected $updatenamum;
 	protected $updatevon;				// varchar(32)
 	protected $insertamum;				// timestamp
 	protected $insertvon;				// varchar(32)

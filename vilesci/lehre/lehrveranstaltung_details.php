@@ -210,7 +210,7 @@
 			<td>Kurzbz*</td>
 			<td><input type="text" name="kurzbz" '.($lv->lehrveranstaltung_id==''?'onchange="copyToLehreVz();"':'onchange="return copyToLehreVzAsk();"').' value="'.$lv->kurzbz.'" /></td>
 			<td>Bezeichnung*</td>
-			<td colspan=3><input type="text" name="bezeichnung" value="'.htmlentities($lv->bezeichnung, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="128"></td>
+			<td colspan=3><input type="text" name="bezeichnung" value="'.htmlentities($lv->bezeichnung ?? '', ENT_QUOTES, 'UTF-8').'" size="60" maxlength="128"></td>
 		</tr>
 		<tr>
 			<td>Sprache</td>
@@ -226,7 +226,7 @@
 		}
 		$htmlstr .= '</select></td>
 			<td>Bezeichnung English</td>
-			<td colspan=3><input type="text" name="bezeichnung_english" value="'.htmlentities($lv->bezeichnung_english, ENT_QUOTES, 'UTF-8').'" size="60" maxlength="256"></td>
+			<td colspan=3><input type="text" name="bezeichnung_english" value="'.htmlentities($lv->bezeichnung_english ?? '', ENT_QUOTES, 'UTF-8').'" size="60" maxlength="256"></td>
 		</tr><tr>
 			<td>Studiengang</td>
 			<td><select name="studiengang_kz">';
