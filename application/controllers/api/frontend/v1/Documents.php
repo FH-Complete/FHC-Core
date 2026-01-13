@@ -434,6 +434,10 @@ class Documents extends FHCAPI_Controller
 			'betreuerart_kurzbz',
 			'studiensemester_kurzbz'
 		] as $key) {
+			if (in_array($xsl, array('Ausbildungsver', 'AusbVerEng')) && $key === 'uid')
+			{
+				continue;
+			}
 			$value = $this->input->post_get($key);
 			if ($value !== null)
 				$params .= '&' . $key . '=' . urlencode($value);

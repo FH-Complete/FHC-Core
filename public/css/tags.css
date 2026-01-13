@@ -95,6 +95,12 @@
 
 .modificationdate {
 	font-style: italic;
-	font-size: 0.7em;
+	font-size: 1em;
 	text-align: left;
+}
+
+
+.copy-btn {
+	float: right;
+	margin-top: 3px;
 }

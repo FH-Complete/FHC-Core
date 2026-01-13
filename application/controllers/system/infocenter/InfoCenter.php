@@ -22,6 +22,7 @@ class InfoCenter extends Auth_Controller
 	const REIHUNGSTESTABSOLVIERT_PAGE = 'reihungstestAbsolviert';
 	const ABGEWIESEN_PAGE = 'abgewiesen';
 	const AUFGENOMMEN_PAGE = 'aufgenommen';
+	const ONBOARDING_PAGE = 'onboarding';
 	const SHOW_DETAILS_PAGE = 'showDetails';
 	const SHOW_ZGV_DETAILS_PAGE = 'showZGVDetails';
 	const ZGV_UBERPRUEFUNG_PAGE = 'ZGVUeberpruefung';
@@ -116,6 +117,7 @@ class InfoCenter extends Auth_Controller
 				'index' => 'infocenter:r',
 				'freigegeben' => 'infocenter:r',
 				'abgewiesen' => 'infocenter:r',
+				'onboarding' => 'infocenter:r',
 				'aufgenommen' => 'infocenter:r',
 				'reihungstestAbsolviert' => 'infocenter:r',
 				'showDetails' => 'infocenter:r',
@@ -230,6 +232,13 @@ class InfoCenter extends Auth_Controller
 		$this->_setNavigationMenu(self::ABGEWIESEN_PAGE); // define the navigation menu for this page
 
 		$this->load->view('system/infocenter/infocenterAbgewiesen.php');
+	}
+
+	public function onboarding()
+	{
+		$this->_setNavigationMenu(self::ONBOARDING_PAGE); // define the navigation menu for this page
+
+		$this->load->view('system/infocenter/onboarding.php');
 	}
 	
 	/**
@@ -1551,6 +1560,7 @@ class InfoCenter extends Auth_Controller
 		$reihungstestAbsolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
 		$aufgenommenLink = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
+		$onboardingLink = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 
 		$currentFilterId = $this->input->get(self::FILTER_ID);
 		if (isset($currentFilterId))
@@ -1559,6 +1569,7 @@ class InfoCenter extends Auth_Controller
 			$reihungstestAbsolviertLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$abgewiesenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 			$aufgenommenLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
+			$onboardingLink .= '?'.self::PREV_FILTER_ID.'='.$currentFilterId;
 		}
 
 		$this->navigationlib->setSessionMenu(
@@ -1622,6 +1633,18 @@ class InfoCenter extends Auth_Controller
 					'', 				// target
 					40   				// sort
 				),
+				'ohnePrestudent' => $this->navigationlib->oneLevel(
+					'Electronic Onboarding',		// description
+					$onboardingLink,	// link
+					null,				// children
+					'users',		// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					50   				// sort
+				),
 			)
 		);
 	}
@@ -1648,6 +1671,8 @@ class InfoCenter extends Auth_Controller
 			$link = site_url(self::ZGV_UEBERPRUEFUNG_URI);
 		if ($origin_page === self::ABGEWIESEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		if ($origin_page === self::ONBOARDING_PAGE)
+			$link = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 
 		if ($origin_page === self::AUFGENOMMEN_PAGE)
 			$link = site_url(self::INFOCENTER_URI.'/'.self::AUFGENOMMEN_PAGE);
@@ -1689,6 +1714,7 @@ class InfoCenter extends Auth_Controller
 		$freigegebenLink = site_url(self::INFOCENTER_URI.'/'.self::FREIGEGEBEN_PAGE);
 		$absolviertLink = site_url(self::INFOCENTER_URI.'/'.self::REIHUNGSTESTABSOLVIERT_PAGE);
 		$abgewiesenLink = site_url(self::INFOCENTER_URI.'/'.self::ABGEWIESEN_PAGE);
+		$onboardingLink = site_url(self::INFOCENTER_URI.'/'.self::ONBOARDING_PAGE);
 		$prevFilterId = $this->input->get(self::PREV_FILTER_ID);
 		if (isset($prevFilterId))
 		{
@@ -1762,6 +1788,24 @@ class InfoCenter extends Auth_Controller
 					null, 				// subscriptLinkValue
 					'', 				// target
 					40   				// sort
+				)
+			);
+		}
+		if($page == self::ONBOARDING_PAGE)
+		{
+			$this->navigationlib->setSessionElementMenu(
+				'onboarding',
+				$this->navigationlib->oneLevel(
+					'Electronic Onboarding',		// description
+					$onboardingLink,	// link
+					null,				// children
+					'users',			// icon
+					null,				// subscriptDescription
+					false,				// expand
+					null,				// subscriptLinkClass
+					null, 				// subscriptLinkValue
+					'', 				// target
+					50   				// sort
 				)
 			);
 		}

@@ -514,3 +514,73 @@ function has_permissions_for_stg($studiengang_kz, $permissions = '')
 
 	return false;
 }
+
+/**
+ * check if an entry exists in the database
+ */
+function is_in_db($key, $model = '')
+{
+	if (!$model)
+		return false;
+
+	$field = strstr($model, ":");
+	if ($field) {
+		$model = strstr($model, ":", true);
+		$field = substr($field, 1);
+	}
+
+	$CI =& get_instance();
+	$CI->load->model($model, $model);
+
+	if ($field) {
+		$result = $CI->$model->loadWhere([
+			$field => $key
+		]);
+	} else {
+		$result = $CI->$model->load($key);
+	}
+
+	return (isSuccess($result) && hasData($result));
+}
+
+/**
+ * is building an array for Dropdown Entry in Print Dropdown
+ * @param $id id for the Document to add to the Document Array
+ * @param $name title of the dropdownEntry
+ * @param $parameterUrl url of parameters xml, xsl, format etc as needed
+ * 	WITHOUT BASEURL eg. "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf"
+ * @param $uid default parameter, if null only parameterurl will be added
+ * 	additional needed parameter: put in the parameterUrl
+ * @param $alternativeBaseUrl: if baseUrl not pdfExport.php, put here alternative without ? char, eg. "zutrittskarte.php"
+ *
+ * @return Array
+ */
+function buildDropdownEntryPrintArray($id, $name, $parameterurl, $uid=null, $order=null, $alternativeBaseUrl=null)
+{
+	//DEFAULT BASEURL
+	$baseurl = "pdfExport.php?";
+
+	$uidString = $uid ? "&uid=" . $uid : "";
+
+
+
+	if($alternativeBaseUrl)
+	{
+		return [
+			"id"    => $id,
+			"type"  => "documenturl",
+			"name"  => $name,
+			"url"   => $alternativeBaseUrl . "?" . $parameterurl . $uidString,
+			"order" => $order
+		];
+	}
+	else
+		return [
+			"id"    => $id,
+			"type"  => "documenturl",
+			"name"  => $name,
+			"url"   => $baseurl . $parameterurl . "&uid=" . $uid,
+			"order" => $order
+		];
+
+}

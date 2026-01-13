@@ -39,7 +39,7 @@ class Archiv extends FHCAPI_Controller
 			'archive' => ['admin:w', 'assistenz:w'],
 			'download' => ['admin:w', 'assistenz:w'],
 			'update' => ['admin:w'],
-			'delete' => ['admin:w', 'assistenz:w']
+			'delete' => ['admin:w', 'assistenz:w'],
 		]);
 
 		// Load models
