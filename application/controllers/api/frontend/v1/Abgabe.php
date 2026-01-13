@@ -531,6 +531,7 @@ class Abgabe extends FHCAPI_Controller
 					'datum' => $datum,
 					'kurzbz' => $kurzbz,
 					'note' => $note,
+					'fixtermin' => $fixtermin,
 					'beurteilungsnotiz' => $beurteilungsnotiz,
 					'upload_allowed' => $upload_allowed,
 					'updatevon' => getAuthUID(),
@@ -543,6 +544,7 @@ class Abgabe extends FHCAPI_Controller
 				'datum' => $datum,
 				'kurzbz' => $kurzbz,
 				'note' => $note,
+				'fixtermin' => $fixtermin,
 				'beurteilungsnotiz' => $beurteilungsnotiz,
 				'upload_allowed' => $upload_allowed,
 				'updatevon' => getAuthUID(),
@@ -734,7 +736,7 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
 		$email = $this->getDataOrTerminateWithError($result);
 		
-		return $email[0]->private_email ?? $email[0]->uid.'@'.DOMAIN;
+		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
 
 	}
 
@@ -787,7 +789,7 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool','c4userNichtGefunden'), 'general');
 		}
 		
-		$subject = $this->p->t('abgabetool', 'c4qualgateNegativEmailSubject');
+		$subject = $this->p->t('abgabetool', 'c4qualgateNegativEmailSubjectv2');
 		$tomail = $student_uid.'@'.DOMAIN;
 		
 		$datetime = new DateTime($paabgabe->datum);

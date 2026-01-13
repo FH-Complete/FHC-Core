@@ -44855,12 +44855,12 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4qualgateNegativEmailSubject',
+		'phrase' => 'c4qualgateNegativEmailSubjectv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Quality Gate Negativ beurteilt",
+				'text' => "Quality Gate negativ beurteilt",
 				'description' => '',
 				'insertvon' => 'system'
 			),

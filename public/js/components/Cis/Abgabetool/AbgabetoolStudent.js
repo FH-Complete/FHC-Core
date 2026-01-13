@@ -45,11 +45,19 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
-		dateDiffInDays(datum){
+		dateDiffInDays(datumParam){
+			let datum = datumParam
+			if(datumParam instanceof Date && !isNaN(datum.getTime()))
+			{
+				const year = datumParam.getFullYear();
+				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
+				const day = datumParam.getDate();
+				const pad = (num) => String(num).padStart(2, '0');
+				datum = `${year}-${pad(month)}-${pad(day)}`
+			}
+
 			const dateToday = luxon.DateTime.now().startOf('day');
-
 			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-
 			const duration = dateDatum.diff(dateToday, 'days');
 
 			return duration.values.days;
@@ -60,6 +68,12 @@ export const AbgabetoolStudent = {
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
 
+			// console.log('\n\n')
+			// console.log(termin)
+			// console.log(today)
+			// console.log(datum)
+			// console.log('\n\n')
+			
 			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
 			if (termin.abgabedatum === null && termin.upload_allowed) {
 				if(datum < today) {

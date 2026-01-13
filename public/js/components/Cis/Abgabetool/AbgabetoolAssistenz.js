@@ -72,6 +72,7 @@ export const AbgabetoolAssistenz = {
 			selectedStudiengangOption: null,
 			studiengaengeOptions: null,
 			detailIsFullscreen: false,
+			allConfigPromise: null,
 			phrasenPromise: null,
 			phrasenResolved: false,
 			turnitin_link: null,
@@ -90,6 +91,7 @@ export const AbgabetoolAssistenz = {
 				},
 				kurzbz: '',
 				fixtermin: false,
+				invertedFixtermin: true,
 				upload_allowed: false
 			}),
 			showAll: false,
@@ -285,7 +287,7 @@ export const AbgabetoolAssistenz = {
 				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate1StatusRank <= 2) {
 					projekt.qgate1Status = this.$p.t('abgabetool/c4notSubmitted')
 					projekt.qgate1StatusRank = 2
-				} else if (qgate.upload_allowed == false && diffMs <= 0 && projekt.qgate1StatusRank <= 1) {
+				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate1StatusRank <= 1) {
 					projekt.qgate1Status = this.$p.t('abgabetool/c4notHappenedYet')
 					projekt.qgate1StatusRank = 1
 				}
@@ -307,7 +309,7 @@ export const AbgabetoolAssistenz = {
 				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate2StatusRank <= 2) {
 					projekt.qgate2Status = this.$p.t('abgabetool/c4notSubmitted')
 					projekt.qgate2StatusRank = 2
-				} else if (qgate.upload_allowed == false && diffMs <= 0 && projekt.qgate2StatusRank <= 1) {
+				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate2StatusRank <= 1) {
 					projekt.qgate2Status = this.$p.t('abgabetool/c4notHappenedYet')
 					projekt.qgate2StatusRank = 1
 				}
@@ -582,6 +584,7 @@ export const AbgabetoolAssistenz = {
 		addSeries() {
 			const pids = this.selectedData?.map(projekt => projekt.projektarbeit_id)
 			this.saving = true
+			this.serienTermin.fixtermin = !this.serienTermin.invertedFixtermin
 			this.$api.call(ApiAbgabe.postSerientermin(
 				this.serienTermin.datum.toISOString(),
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
@@ -896,6 +899,8 @@ export const AbgabetoolAssistenz = {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
 			
+			await this.allConfigPromise
+			
 			// called through notenOptionFilter/selectedStudiengangOption watcher on startup
 			// this.loadProjektarbeiten()
 
@@ -929,79 +934,74 @@ export const AbgabetoolAssistenz = {
 		this.loading = true
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
-		// fetch config to avoid hard coded links
-		this.$api.call(ApiAbgabe.getConfig()).then(res => {
-			this.turnitin_link = res.data?.turnitin_link
-			this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link
-		}).catch(e => {
-			this.loading = false
-		})
-
-		// fetch studiengänge options
-		this.$api.call(ApiAbgabe.getStudiengaenge()).then(res => {
-			this.studiengaengeOptions = res.data
-			if(this.studiengaengeOptions?.length) {
-				
-				// use this.stg_kz_prop as default selected in case of url param usage
-				
-				this.selectedStudiengangOption = this.stg_kz_prop ? res.data.find(stgOpt => stgOpt.studiengang_kz == this.stg_kz_prop) : res.data[0]
-			}
-			
-		}).catch(e => {
-			this.loading = false
-		})
 		
-		this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()).then((res) => {
-			this.allSem = res.data[0]
-			const all = {studiensemester_kurzbz: this.$p.t('abgabetool/c4all')}
-			this.curSem = all // res.data[1]
-			
-			this.studiensemesterOptions = [all, ...this.allSem]
-
-		}).catch(e => {
-			this.loading = false
-		})
-		
-		// fetch noten options
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
-		this.$api.call(ApiAbgabe.getNoten()).then(res => {
-			if(res.meta.status == 'success') {
-				this.notenOptions = res.data[0]
+		const requests = [
+			this.$api.call(ApiAbgabe.getConfig()),
+			this.$api.call(ApiAbgabe.getStudiengaenge()),
+			this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()),
+			this.$api.call(ApiAbgabe.getNoten()),
+			this.$api.call(ApiAbgabe.getPaAbgabetypen())
+		];
 
-				this.allowedNotenOptions = this.notenOptions.filter(
-					opt => res.data[1].includes(opt.note)
-				)
-			}
-			
-			// allowedNotenOptions apply to quality gates abgabetermine
-			// this selection is about graded projektarbeiten, so take different options here
-			this.allowedNotenFilterOptions = [
-				{
-					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/keineNoteEingetragen')),
-					benotet: 0,
-				},
-				{
-					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/c4benotet')),
-					benotet: 1,
-				},
-				{
-					bezeichnung: Vue.computed(() => this.$p.t('abgabetool/showAll')),
-					benotet: -1,
-				},
-			]
-			
-			this.notenOptionFilter = this.allowedNotenFilterOptions[0]
-				
-		}).catch(e => {
-			this.loading = false
-		})
+		this.allConfigPromise = Promise.allSettled(requests)
+			.then((results) => {
+				// results is an array of { status: 'fulfilled'|'rejected', value?: any, reason?: any }
 
-		// fetch abgabetypen options
-		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
-			this.abgabeTypeOptions = res.data
-		}).catch(e => {
-			this.loading = false
-		})
+				// 1. Config
+				if (results[0].status === 'fulfilled') {
+					const res = results[0].value;
+					this.turnitin_link = res.data?.turnitin_link;
+					this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link;
+				}
+
+				// 2. Studiengänge
+				if (results[1].status === 'fulfilled') {
+					const res = results[1].value;
+					this.studiengaengeOptions = res.data;
+					if (this.studiengaengeOptions?.length) {
+						this.selectedStudiengangOption = this.stg_kz_prop
+							? res.data.find(stgOpt => stgOpt.studiengang_kz == this.stg_kz_prop)
+							: res.data[0];
+					}
+				}
+
+				// 3. Studiensemester
+				if (results[2].status === 'fulfilled') {
+					const res = results[2].value;
+					this.allSem = res.data[0];
+					const all = { studiensemester_kurzbz: this.$p.t('abgabetool/c4all') };
+					this.curSem = all;
+					this.studiensemesterOptions = [all, ...this.allSem];
+				}
+
+				// 4. Noten
+				if (results[3].status === 'fulfilled') {
+					const res = results[3].value;
+					if (res.meta?.status === 'success') {
+						this.notenOptions = res.data[0];
+						this.allowedNotenOptions = this.notenOptions.filter(
+							opt => res.data[1].includes(opt.note)
+						);
+					}
+
+					this.allowedNotenFilterOptions = [
+						{ bezeichnung: Vue.computed(() => this.$p.t('abgabetool/keineNoteEingetragen')), benotet: 0 },
+						{ bezeichnung: Vue.computed(() => this.$p.t('abgabetool/c4benotet')), benotet: 1 },
+						{ bezeichnung: Vue.computed(() => this.$p.t('abgabetool/showAll')), benotet: -1 }
+					];
+					this.notenOptionFilter = this.allowedNotenFilterOptions[0];
+				}
+
+				// 5. Abgabetypen
+				if (results[4].status === 'fulfilled') {
+					const res = results[4].value;
+					this.abgabeTypeOptions = res.data;
+				}
+			})
+			.finally(() => {
+				this.loading = false;
+			});
 	},
 	mounted() {
 		this.setupMounted()
@@ -1023,7 +1023,7 @@ export const AbgabetoolAssistenz = {
 					<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4fixterminv4') )}}</div>
 					<div class="col-12 col-md-9">
 						<Checkbox
-							v-model="serienTermin.fixtermin"
+							v-model="serienTermin.invertedFixtermin"
 							:binary="true"
 							:pt="{ root: { class: 'ml-auto' }}"
 						>

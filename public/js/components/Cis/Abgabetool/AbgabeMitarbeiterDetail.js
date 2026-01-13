@@ -299,6 +299,14 @@ export const AbgabeMitarbeiterDetail = {
 			const abgabedatum = new Date(termin.abgabedatum)
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
+
+			// TODO: load benotbar in every view or change status logic all together!
+			
+			// console.log('\n\n')
+			// console.log(termin)
+			// console.log(today)
+			// console.log(datum)
+			// console.log('\n\n')
 			
 			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
 			if (termin.abgabedatum === null && termin.upload_allowed) {
@@ -532,7 +540,7 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		getTooltipBeurteilungerforderlich() {
 			return {
-				value: this.$p.t('abgabetool/c4tooltipBeurteilungerfolderlich'),
+				value: this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich'),
 				class: "custom-tooltip"
 			}
 		},
