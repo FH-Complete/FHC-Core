@@ -287,7 +287,7 @@ export const AbgabeStudentDetail = {
 		},
 		getTooltipBeurteilungerforderlich() {
 			return {
-				value: this.$p.t('abgabetool/c4tooltipBeurteilungerfolderlich'),
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')),
 				class: "custom-tooltip"
 			}
 		},
