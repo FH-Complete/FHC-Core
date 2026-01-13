@@ -309,15 +309,6 @@ class FHCAPI_Controller extends Auth_Controller
 		$max_post = (int)(ini_get('post_max_size'));
 		$memory_limit = (int)(ini_get('memory_limit'));
 		$max_upload_mb = min($max_upload, $max_post, $memory_limit);    // smallest of 3 config values
-
-		$this->addMeta('stats', array(
-			'$content_length_bytes' => $content_length_bytes,
-			'$content_length' => $content_length,
-			'$max_upload' => $max_upload,
-			'$max_post' => $max_post,
-			'$memory_limit' => $memory_limit,
-			'$max_upload_mb' => $max_upload_mb,
-		));
 		
 		if($content_length >= $max_upload_mb) {
 			$this->terminateWithError($this->p->t('global', 'filesizeExceeded'), 'general');

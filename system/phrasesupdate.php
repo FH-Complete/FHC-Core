@@ -43737,26 +43737,6 @@ array(
 		)
 	),
 	array(
-			'app' => 'core',
-			'category' => 'abgabetool',
-			'phrase' => 'c4noSignatureCheckPossible',
-			'insertvon' => 'system',
-			'phrases' => array(
-		array(
-			'sprache' => 'German',
-			'text' => 'Signatur konnte nicht überprüft werden',
-			'description' => '',
-			'insertvon' => 'system'
-		),
-		array(
-			'sprache' => 'English',
-			'text' => 'Unable to check signature',
-			'description' => '',
-			'insertvon' => 'system'
-		)
-	)
-	),
-	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
 		'phrase' => 'c4keinEnduploadErfolgt',

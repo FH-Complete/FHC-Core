@@ -299,7 +299,7 @@ export const AbgabeStudentDetail = {
 
 	},
 	template: `
-		<FhcOverlay :active="loading || saving"></FhcOverlay>
+		<FhcOverlay :active="loading"></FhcOverlay>
 
 		<div v-if="projektarbeit">
 		
@@ -435,14 +435,14 @@ export const AbgabeStudentDetail = {
 										</button>
 									</div>	
 									<template v-if="termin.paabgabetyp_kurzbz == 'end'">	
-										<div v-if="termin?.signatur !== undefined" class="col-auto">
+										<div v-if="termin?.signatur !== undefined && termin?.signatur !== null" class="col-auto">
 											<Message v-if="termin?.signatur == true" severity="success" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4signaturGefunden') }} </Message>
 											<Message v-else-if="termin?.signatur == false" severity="error" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4keineSignatur') }} </Message>
-											<Message v-else-if="termin?.signatur == null" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4signaturServerError') }} </Message>
+											<Message v-else-if="termin?.signatur == 'error'" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4signaturServerError') }} </Message>
 										</div>
-										<div v-else class="col-auto">
-											<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>
-										</div>
+<!--										<div v-else class="col-auto">-->
+<!--											<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>-->
+<!--										</div>-->
 									</template>
 								</div>					
 							</template>

@@ -23,3 +23,5 @@ $config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/p
 
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ZWEITBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
+
+$config['SIGNATUR_CHECK_PAABGABETYPEN'] = ['end'];

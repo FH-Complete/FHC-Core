@@ -13,7 +13,6 @@ export const AbgabetoolStudent = {
 		AbgabeDetail,
 		FhcOverlay
 	},
-	inject: ['isMobile'],
 	provide() {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions),
@@ -317,7 +316,7 @@ export const AbgabetoolStudent = {
 	},
 	template: `
 <template v-if="phrasenResolved">
-	<FhcOverlay :active="loading || saving"></FhcOverlay>
+	<FhcOverlay :active="loading"></FhcOverlay>
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 		dialogClass="modal-xl" :allowFullscreenExpand="true">
@@ -390,7 +389,7 @@ export const AbgabetoolStudent = {
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuer') )}}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) : '' }}
+						{{ projektarbeit.betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">

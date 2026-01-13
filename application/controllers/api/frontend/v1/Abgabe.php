@@ -734,8 +734,6 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
 		$email = $this->getDataOrTerminateWithError($result);
 		
-		//TODO: check if private mail exists, if not take uid@domain
-		
 		return $email[0]->private_email ?? $email[0]->uid.'@'.DOMAIN;
 
 	}
@@ -990,10 +988,16 @@ class Abgabe extends FHCAPI_Controller
 	 * helper function to check the signature status of uploaded files for zwischenabgabe & endupload
 	 */
 	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
-		// TODO: recomment this whenever we decide not every upload needs signature check
-//		if($abgabe->paabgabetyp_kurzbz != 'end') {
-//			return;
-//		}
+		$paabgabetypenToCheck = $this->config->item('SIGNATUR_CHECK_PAABGABETYPEN');
+
+		if(!in_array($abgabe->paabgabetyp_kurzbz, $paabgabetypenToCheck)) {
+			return;
+		}
+
+		if (!defined('SIGNATUR_URL')) {
+			$abgabe->signatur = 'error';
+			return;
+		}
 
 		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$projektarbeit->student_uid.'.pdf';
 		
@@ -1022,7 +1026,6 @@ class Abgabe extends FHCAPI_Controller
 	}
 
 	private function sendUploadEmail($bperson_id, $projektarbeit_id, $paabgabetyp_kurzbz, $student_uid) {
-
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
 		$resBetr = $this->ProjektarbeitModel->getProjektbetreuerAnrede($bperson_id);

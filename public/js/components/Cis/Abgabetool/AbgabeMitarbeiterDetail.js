@@ -856,9 +856,9 @@ export const AbgabeMitarbeiterDetail = {
 										<Message v-else-if="termin?.signatur == false" severity="error" :closable="false" :pt="getMessagePtStyle"> {{ $capitalize($p.t('abgabetool/c4keineSignatur')) }} </Message>
 										<Message v-else-if="termin?.signatur == 'error'" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $capitalize($p.t('abgabetool/c4signaturServerError')) }} </Message>
 									</div>
-									<div v-else class="col-auto">
-										<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noSignatureCheckPossible') }} </Message>
-									</div>
+<!--									<div v-else class="col-auto">-->
+<!--										<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>-->
+<!--									</div>-->
 									
 								</div>						
 							</template>
