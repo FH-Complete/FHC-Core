@@ -713,13 +713,13 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		$ects_berufliche_kompetenzen = 0;
 
 		//bei masterlehrgängen und $studienplan_ects >= 120 ECTS: Andruck der beruflichen Kompetenzen, wenn die Lv angerechnet wurde
+		//TODO(Manu) check if rule still valid
 		if ($row->typ == 'l' && $regelstudiendauer >= 4)
 		{
 			$ects_berufliche_kompetenzen = 0;
 			echo '<berufliche_kompetenzen>';
 			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
 
-			echo '<ects_berufliche_kompetenz>'.$ects_berufliche_kompetenzen.'</ects_berufliche_kompetenz>';
 			$qry_sem_0="
 				SELECT
 					lehrveranstaltung_id,
@@ -765,6 +765,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						</lv_sem0>';
 				}
 			}
+			echo '<ects_berufliche_kompetenz>'.$ects_berufliche_kompetenzen.'</ects_berufliche_kompetenz>';
 			echo '</berufliche_kompetenzen>';
 		}
 
@@ -1206,7 +1207,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 			echo "</semesters>";
 		}
 
-		//Korrektur ects_total um berufliche Kompetenzen
+		//TODO(Manu) check if rule still valid
 		if ($row->typ == 'l' && $regelstudiendauer >= 4)
 		{
 			$ects_total += $ects_berufliche_kompetenzen;
