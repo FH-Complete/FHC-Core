@@ -247,3 +247,13 @@ function generateSkipLink($skipID)
 	echo $toPrint;
 }
 
+/**
+ *
+ */
+function absoluteJsImportUrl($relurl)
+{
+	$ci =& get_instance();
+	$url = base_url($relurl) . '?'. $ci->config->item('fhcomplete_build_version');
+	return $url;
+}
+

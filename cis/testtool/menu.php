@@ -425,28 +425,6 @@ else
 			e.preventDefault();
 		});
 	});
-    // Get users Browser
-    var ua = navigator.userAgent;
-
-    // If Browser is any other than Mozilla Firefox and the test includes any MathML,
-    // show message to use Mozilla Firefox
-    if ((ua.indexOf("Firefox") > -1) == false)
-    {
-        let hasMathML = "<?php echo (isset($gebiet_hasMathML)?$gebiet_hasMathML:''); ?>";
-        let userLang = "<?php echo $sprache_user; ?>";
-        if (hasMathML == true)
-        {
-            if (userLang == 'German')
-            {
-                alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.)');
-            }
-            else if(userLang == 'English')
-            {
-                alert('PLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
-            }
-        }
-    }
-
     // Error massage if check_gebiet function returns false
     $(function() {
         var invalid_gebiete = "<?php echo (isset($invalid_gebiete)?$invalid_gebiete:''); ?>";

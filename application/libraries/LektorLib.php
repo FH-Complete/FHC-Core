@@ -17,6 +17,7 @@ class LektorLib
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->_ci->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->library('PhrasesLib', array('lehre'));
 	}
 
 	public function addLektorToLehreinheit($lehreinheit_id, $mitarbeiter_uid)
@@ -35,7 +36,7 @@ class LektorLib
 
 		if (isError($already_assigned)) return $already_assigned;
 
-		if (hasData($already_assigned)) return error('Lektor already assigned');
+		if (hasData($already_assigned)) return error($this->_ci->phraseslib->t("lehre", "bereitzugeteilt"));
 
 		$studiensemester_result = $this->_ci->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz' => $lehreinheit->studiensemester_kurzbz));
 		if (isError($studiensemester_result)) return $studiensemester_result;
@@ -88,6 +89,7 @@ class LektorLib
 
 		$lehreinheit = getData($lehreinheit_result)[0];
 
+
 		//TODO kollision check, wird vorerst nicht implementiert -> nur über das FAS möglich
 		if (isset($new_data['mitarbeiter_uid']) && $new_data['mitarbeiter_uid'] !== $mitarbeiter_uid)
 		{
@@ -98,7 +100,13 @@ class LektorLib
 			$verplant = $this->_ci->StundenplandevModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
 
 			if (hasData($verplant))
-				return error('Wechsel vom Mitarbeiter nicht möglich da er bereits verplant ist!');
+				return error($this->_ci->phraseslib->t("lehre", "lektorbereitsverplant"));
+
+			$lehreinheit_data = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('mitarbeiter_uid' => $new_data['mitarbeiter_uid'], 'lehreinheit_id' => $lehreinheit_id));
+
+			if (hasData($lehreinheit_data))
+				return error($this->_ci->phraseslib->t("lehre", "bereitzugeteilt"));
+
 		}
 		$warning = '';
 		if (isset($new_data['semesterstunden']))
