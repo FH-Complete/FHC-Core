@@ -61,4 +61,39 @@ class Zeitsperre_model extends DB_Model
 
         return $this->execQuery($qry);
     }
+
+	/**
+	 * get Zeitsperren of a user
+	 *
+	 * @param $uid mitarbeiteruid
+	 * @return array
+	 */
+	public function getZeitsperrenUser($uid, $bisgrenze=true)
+	{
+		//TODO(Manu) check if bisDate is needed
+/*		$parametersArray = array();
+		array_push($parametersArray, $uid);
+		$parametersArray = [$uid];*/
+
+		$qry = "
+			SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe, tbl_erreichbarkeit.beschreibung AS erreichbarkeit_beschreibung
+			FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))
+			LEFT JOIN campus.tbl_erreichbarkeit USING (erreichbarkeit_kurzbz)
+			WHERE mitarbeiter_uid= ?
+			";
+
+		if($bisgrenze)
+		{
+			$qry.=" 
+				AND (
+					(date_part('month',vondatum)>=9 AND date_part('year', vondatum)>='".(date('Y')-1)."')
+					OR
+					(date_part('month',vondatum)<9 AND date_part('year', vondatum)>='".(date('Y'))."')
+				)";
+		}
+
+		$qry.= " ORDER BY vondatum DESC";
+
+	return $this->execQuery($qry, array('mitarbeiter_uid' => $uid));
+	}
 }

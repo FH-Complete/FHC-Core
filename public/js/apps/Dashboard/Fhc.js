@@ -16,6 +16,7 @@ import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
+import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
@@ -215,6 +216,12 @@ const router = VueRouter.createRouter({
 					},
 				};
 			},
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
 		},
 	]
 })
