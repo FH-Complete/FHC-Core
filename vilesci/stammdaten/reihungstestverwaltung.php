@@ -2573,12 +2573,14 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<input type="number" class="input" id="zugangcode" name="zugangcode" value="<?php echo $db->convert_html_chars($reihungstest->zugangscode) ?>"> (Verpflichtend, wenn die Zugangsüberprüfung aktiviert ist)
 			</td>
 		</tr>
+		<?php if(defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED) : ?>
 			<tr>
 				<td class="feldtitel">Externe Überwachnung</td>
 				<td>
 					<input type="checkbox" id="externe_ueberwachung" name="externe_ueberwachung"<?php echo $reihungstest->externe_ueberwachung ? 'checked="checked"' : '' ?>>
 				</td>
 			</tr>
+		<?php endif; ?>
 		<tr>
 			<td>&nbsp;</td>
 		</tr>

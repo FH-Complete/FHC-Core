@@ -153,18 +153,20 @@ class externeUeberwachung extends basis_db
 			"accountId" => "technikum_wien",
 			"examId" => $reihungstest_id . '_' . $today,
 			"examName" => !is_null(trim($reihungstest->anmerkung)) ? ($reihungstest->anmerkung . '_' . $today) : ($reihungstest_id . '_' . $today),
-			"allowMultipleDisplays" => true,
-			"allowMakingRoomScanSecondCamera" => false,
-			"duration" => 600,
+			"duration" => 1440,
 			"schedule" => false,
 			"trial" => EXTERNE_UEBERWACHUNG_TRIAL_TEST,
 			"proctoring" => "offline",
-			"identification" => "skip",
-			"startDate" => "2018-03-27T00:00:00Z", //TODO anpassen
-			"endDate" => "2027-03-30T12:55:00Z", // TODO anpassen
+			"startDate" => $reihungstest->datum . 'T00:00:00Z',
+			"endDate" => $reihungstest->datum . 'T23:59:59Z',
 			"sessionId" => $session_id,
 			"sessionUrl" => EXTERNE_UEBERWACHUNG_SESSION_URL
 		];
+
+		if (defined('EXTERNE_UEBERWACHUNG_EXAM_PARAMS'))
+		{
+			$payload = array_merge($payload, EXTERNE_UEBERWACHUNG_EXAM_PARAMS);
+		}
 		return $payload;
 	}
 

@@ -173,7 +173,7 @@ if (isset($_REQUEST['prestudent']))
 							$reload_menu = true;
 					}
 
-					if ($rt->externe_ueberwachung)
+					if ($rt->externe_ueberwachung && defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED)
 					{
 						$_SESSION['externe_ueberwachung'] = true;
 						$_SESSION['externe_ueberwachung_verified'] = false;

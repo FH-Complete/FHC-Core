@@ -8,8 +8,7 @@ require_once('../../config/global.config.inc.php');
 require_once '../../include/externe_ueberwachung.class.php';
 if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
-
-if (isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true)
+if ((defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED) && isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true)
 {
 	$ueberwachung = new externeUeberwachung();
 	$url = $ueberwachung->start($_SESSION['prestudent_id'], $_SESSION['reihungstestID'], $_SESSION['sprache']);

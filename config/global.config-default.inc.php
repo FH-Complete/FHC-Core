@@ -360,4 +360,7 @@ define('SANCHO_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
 
 // footer image for eigene Mails
 define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
+
+//externe Ueberwachung im Testtool erlauben
+define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 ?>
