@@ -39,8 +39,40 @@ function parseFilterExpression(expression)
 	return collections;
 }
 
+function collectChildren(rowData, childrenField, remembered)
+{
+	const children = rowData[childrenField];
+	if (Array.isArray(children))
+	{
+		for (let child of children)
+		{
+			remembered.add(child);
+			collectChildren(child, childrenField, remembered);
+		}
+	}
+}
+
 export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParams)
 {
+	if (!extendedHeaderFilter._remembered)
+	{
+		extendedHeaderFilter._remembered = new Set();
+		extendedHeaderFilter._lastHeaderKey = null;
+	}
+
+	const headerKey = headerValue === null || headerValue === undefined ? '' : String(headerValue);
+
+	if (extendedHeaderFilter._lastHeaderKey !== headerKey)
+	{
+		extendedHeaderFilter._lastHeaderKey = headerKey;
+		extendedHeaderFilter._remembered.clear();
+	}
+
+	if (rowData && extendedHeaderFilter._remembered.has(rowData))
+	{
+		return true;
+	}
+
 	const fields = Array.isArray(filterParams?.field)
 		? filterParams.field
 		: [filterParams?.field];
@@ -62,41 +94,45 @@ export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParam
 	function matchValue(value)
 	{
 		try {
+
+			const text = String(value ?? '');
+
 			return collections.some(collection => {
 
 				let positives = collection.positives.length === 0 || collection.positives.every(condition => {
 
 					if (condition.type === 'comparison')
 					{
-						let value = parseFloat(rowValue);
-						if (isNaN(value)) return false;
+						let num = parseFloat(text.replace(',', '.'));
+						if (isNaN(num))
+							return false;
 
 						switch (condition.operator) {
 							case '<':
-								return value < condition.number;
+								return num < condition.number;
 							case '>':
-								return value > condition.number;
+								return num > condition.number;
 							case '<=':
-								return value <= condition.number;
+								return num <= condition.number;
 							case '>=':
-								return value >= condition.number;
+								return num >= condition.number;
 							case '=':
-								return value === condition.number;
+								return num === condition.number;
 							case '!=':
-								return value !== condition.number;
+								return num !== condition.number;
 							default:
 								return false;
 						}
 					}
 					else if (condition.type === 'regex')
 					{
-						return condition.regex.test(rowValue);
+						return condition.regex.test(text);
 					}
 					return false;
 				});
 
 				let negatives = collection.negatives.every(condition => {
-					return !condition.regex.test(rowValue);
+					return !condition.regex.test(text);
 				});
 
 				return positives && negatives;
@@ -104,10 +140,18 @@ export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParam
 		} catch (e) {
 
 		}
+		return false;
 	}
 
 	if (matchValue(rowValue))
+	{
+		if (rowData && filterParams)
+		{
+			const childrenField = filterParams?.children || '_children';
+			collectChildren(rowData, childrenField, extendedHeaderFilter._remembered);
+		}
 		return true;
+	}
 
 	if (rowData && filterParams)
 	{
