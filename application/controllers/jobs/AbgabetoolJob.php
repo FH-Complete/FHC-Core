@@ -96,14 +96,14 @@ class AbgabetoolJob extends JOB_Controller
 
 				// filter for abgaben which where not inserted by the current betreuer iteration if there is no updateamum
 				// or not changed by the betreuer if there is updateamum
-				$relevantAbgaben = array_filter($changedAbgaben, function($abgabetermin) use ($betreuerRow) {
+				$relevantAbgaben = array_values(array_filter($changedAbgaben, function($abgabetermin) use ($betreuerRow) {
 					// new termin not created by that betreuer
 					if($abgabetermin->updatevon == null && $abgabetermin->insertvon != $betreuerRow->uid) {
 						return $abgabetermin;
 					} else if($abgabetermin->updatevon != null && $abgabetermin->updatevon != $betreuerRow->uid) {
 						return $abgabetermin;
 					}
-				});
+				}));
 
 				if(count($relevantAbgaben) == 0) {
 					break; // skip that projektarbeit if only changes originate from the betreuer in question
@@ -143,15 +143,17 @@ class AbgabetoolJob extends JOB_Controller
 				'abgabenString' => $abgabenString,
 				'linkAbgabetool' => $url
 			);
-
+			
+			$email = $betreuerRow->uid ? $betreuerRow->uid."@".DOMAIN : $betreuerRow->private_email;
+			
 			// send email with bundled info
 			sendSanchoMail(
 				'PAAChangesBetSM',
 				$body_fields,
-				$betreuerRow->private_email,
+				$email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
 			);
-
+			
 			$count++;
 		}
 
@@ -170,6 +172,8 @@ class AbgabetoolJob extends JOB_Controller
 
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSinceByAbgabedatum($interval);
 		$retval = getData($result);
+		
+		var_dump($retval);
 
 		// retval are paabgaben joined with projektarbeit and betreuer
 		if(count($retval) == 0) {
@@ -186,14 +190,14 @@ class AbgabetoolJob extends JOB_Controller
 
 			$betreuer_uids[$paabgabe->person_id][] = $paabgabe;
 		}
-
+		
 		$count = 0;
 		forEach ($betreuer_uids as $person_id => $abgaben) {
 			// $person_id is from betreuer
 
 			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($person_id);
 			$data = getData($result)[0];
-
+			
 			$anrede = $data->anrede;
 			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
 			$fullFormattedNameString = $data->first;
@@ -233,11 +237,15 @@ class AbgabetoolJob extends JOB_Controller
 				'linkAbgabetool' => $url
 			);
 
+			// TODO: get this guys uid safely
+//			$email = $betreuerRow->uid ? $betreuerRow->uid."@".DOMAIN : $betreuerRow->private_email;
+
+
 			// send email with bundled info
 			sendSanchoMail(
 				'PaabgabeUpdatesBetSM',
 				$body_fields,
-				$data->private_email,
+				$email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
 			);
 			

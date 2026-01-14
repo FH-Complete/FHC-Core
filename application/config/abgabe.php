@@ -25,3 +25,6 @@ $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.p
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ZWEITBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
 
 $config['SIGNATUR_CHECK_PAABGABETYPEN'] = ['end'];
+
+// to be used as "https://moodle.technikum-wien.at/course/view.php?idnumber=dl{$stg_kz}" for stg specific moodle routing
+$config['STG_MOODLE_LINK'] = 'https://moodle.technikum-wien.at/course/view.php?idnumber=dl';

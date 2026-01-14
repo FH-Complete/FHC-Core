@@ -5,6 +5,12 @@ export default {
 			url: '/api/frontend/v1/Abgabe/getConfig'
 		};
 	},
+	getConfigStudent() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getConfigStudent'
+		};
+	},
 	getStudentProjektarbeiten(uid) {
 		return {
 			method: 'get',

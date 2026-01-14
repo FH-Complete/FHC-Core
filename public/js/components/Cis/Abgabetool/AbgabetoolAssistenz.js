@@ -359,7 +359,8 @@ export const AbgabetoolAssistenz = {
 		checkAbgabetermineProjektarbeit(projekt) {
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
-
+				
+				
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = this.getDateStyleClass(termin)
 
@@ -723,7 +724,7 @@ export const AbgabetoolAssistenz = {
 			termin.diffindays = this.dateDiffInDays(termin.datum)
 
 			// seperate status if termin is in the past, it needs a note but doesnt have one yet			
-			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
+			if(termin.bezeichnung?.benotbar && !termin.note) return 'beurteilungerforderlich'
 			if (termin.abgabedatum === null && termin.upload_allowed) {
 				if(datum < today) {
 					return 'verpasst' // needs upload, missed it and has not submitted anything 

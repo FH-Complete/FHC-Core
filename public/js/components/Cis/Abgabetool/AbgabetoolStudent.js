@@ -16,7 +16,8 @@ export const AbgabetoolStudent = {
 	provide() {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions),
-			isViewMode: Vue.computed(() => this.isViewMode)
+			isViewMode: Vue.computed(() => this.isViewMode),
+			moodle_link: Vue.computed(() => this.moodle_link)
 		}
 	},
 	props: {
@@ -35,17 +36,19 @@ export const AbgabetoolStudent = {
 	data() {
 		return {
 			activeTabIndex: [0],
+			abgabeTypeOptions: null,
 			phrasenPromise: null,
 			phrasenResolved: false,
 			loading: false,
 			notenOptions: null,
 			detail: null,
 			projektarbeiten: null,
-			selectedProjektarbeit: null
+			selectedProjektarbeit: null,
+			moodle_link: null
 		};
 	},
 	methods: {
-		dateDiffInDays(datumParam){
+		dateDiffInDays(datumParam) {
 			let datum = datumParam
 			if(datumParam instanceof Date && !isNaN(datum.getTime()))
 			{
@@ -67,14 +70,8 @@ export const AbgabetoolStudent = {
 			const abgabedatum = new Date(termin.abgabedatum)
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			// console.log('\n\n')
-			// console.log(termin)
-			// console.log(today)
-			// console.log(datum)
-			// console.log('\n\n')
 			
-			if(today > datum && termin.benotbar && !termin.note) return 'beurteilungerforderlich'
+			if (termin.bezeichnung?.benotbar && !termin.note) return 'beurteilungerforderlich'
 			if (termin.abgabedatum === null && termin.upload_allowed) {
 				if(datum < today) {
 					return 'verpasst' // needs upload, missed it and has not submitted anything 
@@ -175,6 +172,7 @@ export const AbgabetoolStudent = {
 						termin.allowedToUpload = termin.upload_allowed 
 					}
 
+					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 					termin.dateStyle = this.getDateStyleClass(termin)
 				})
 				
@@ -324,6 +322,19 @@ export const AbgabetoolStudent = {
 			this.loading = false
 		})
 
+		// fetch abgabetypen options
+		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
+			this.abgabeTypeOptions = res.data
+		}).catch(e => {
+			this.loading = false
+		})
+
+		// fetch config to avoid hard coded links
+		this.$api.call(ApiAbgabe.getConfigStudent()).then(res => {
+			this.moodle_link = res.data?.moodle_link
+		}).catch(e => {
+			this.loading = false
+		})
 	},
 	mounted() {
 		this.setupMounted()

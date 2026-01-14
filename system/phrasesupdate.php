@@ -44875,6 +44875,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4noGradeAssignedYet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Keine Note eingetragen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'no grade assigned yet',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4abgabeQualGateNegativAddNewAutomagisch',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -46148,6 +46168,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "No Deadline found",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4checkoutStgMoodleInfos',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Für weitere Information zu den Abgabemodalitäten Ihres Studienganges lesen Sie bitte die Unterlagen in Moodle: ',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "For further information on the submission procedures for your degree program, please refer to the documents in Moodle: ",
 				'description' => '',
 				'insertvon' => 'system'
 			)

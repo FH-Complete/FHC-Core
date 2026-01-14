@@ -20,7 +20,7 @@ export const AbgabeStudentDetail = {
 		VueDatePicker,
 		FhcOverlay
 	},
-	inject: ['notenOptions', 'isMobile', 'isViewMode'],
+	inject: ['notenOptions', 'isMobile', 'isViewMode', 'moodle_link'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -49,6 +49,17 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	methods: {
+		getNoteBezeichnung(termin){
+			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
+			
+			if(noteOpt?.bezeichnung) {
+				return noteOpt?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
+			} else if(noteOpt?.benotbar === true && !termin.note) {
+				return this.$capitalize(this.$p.t('abgabetool/c4notYetGraded'));
+			} else {
+				return ''
+			}
+		},
 		async validate(termin, endupload = false) {
 			if(!termin.file.length) {
 				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningChooseFile')));
@@ -196,6 +207,9 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	computed: {
+		getMoodleLink() {
+			return this.moodle_link + this.projektarbeit.studiengang_kz	
+		},
 		getMessagePtStyle() {
 			// adjust outer spacing and internal padding to appear similar to doenload button in size
 			return {
@@ -305,16 +319,23 @@ export const AbgabeStudentDetail = {
 		
 			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
 			<div class="row">
-				<p> {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
-				<p> {{projektarbeit?.titel}}</p>
+				<div class="col-8">
+					<p> {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
+					<p> {{projektarbeit?.titel}}</p>
+				</div>
+				<div class="col-4">
+					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
+						<a :href="getMoodleLink">Moodle</a>
+					</p>
+				</div>
 			</div>
 			
 			<Accordion :multiple="true">
 				<template v-for="termin in this.projektarbeit?.abgabetermine">
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>
-							<div class="d-flex row w-100 flex-nowrap align-items-center">
-								<div class="col-auto" style="transform: translateX(-58px); height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
+							<div class="d-flex flex-nowrap align-items-center w-100">
+								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
 									<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
@@ -322,18 +343,21 @@ export const AbgabeStudentDetail = {
 									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
 									<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
 								</div>
-								<div class="col-auto text-start pl-2 pr-0 pt-0 pb-0" style="min-width: min(300px, 30%); max-width: min(300px, 30%); transform: translateX(-30px)">
+								<div class="text-start px-2" style="min-width: 150px; max-width: 300px; margin-left: 40px">
 									<span>{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}</span>
 								</div>
-								<div class="col-auto text-start p-0" style="min-width: max(80px, 15%); transform: translateX(-30px)">
+								<div class="text-start px-2" style="min-width: 100px;">
 									<span>{{ formatDate(termin.datum) }}</span>
 								</div>
-								<div class="col-auto" style="transform: translateX(-30px); min-width: 42px;">
+								<div class="px-1">
 									<i v-if="termin?.fixtermin" v-tooltip.right="getTooltipFixtermin" class="fa-solid fa-lock"></i>
 									<i v-if="termin?.abgabedatum && isMobile" v-tooltip.right="getTooltipAbgabeDetected" class="fa-solid fa-file"></i>
 								</div>
-								<div v-if="termin?.abgabedatum && !isMobile" class="col-auto" style="transform: translateX(-30px); min-width: 42px;">
-									<i  v-tooltip.right="getTooltipAbgabeDetected" class="fa-solid fa-file"></i>
+								<div v-if="termin?.abgabedatum && !isMobile" class="px-1">
+									<i v-tooltip.right="getTooltipAbgabeDetected" class="fa-solid fa-file"></i>
+								</div>
+								<div class="flex-grow-1 text-end pe-2">
+									<span class="fw-bold">{{getNoteBezeichnung(termin)}}</span>
 								</div>
 							</div>				
 						</template>

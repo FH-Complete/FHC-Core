@@ -30,6 +30,7 @@ class Abgabe extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getConfig' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_lektor:rw'),
+			'getConfigStudent' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
 			'getStudentProjektarbeiten' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
 			'getStudentProjektabgaben' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw', 'basis/abgabe_lektor:rw'),
 			'postStudentProjektarbeitZwischenabgabe' => array('basis/abgabe_assistenz:rw', 'basis/abgabe_student:rw'),
@@ -92,6 +93,19 @@ class Abgabe extends FHCAPI_Controller
 			'abgabetypenBetreuer' => $abgabetypenBetreuer
 		);
 		
+		$this->terminateWithSuccess($ret);
+	}
+
+	/**
+	 * loads config related to abgabetool for students to avoid handing out links reserved for employees
+	 */
+	public function getConfigStudent() {
+		$moodle_link =$this->config->item('STG_MOODLE_LINK');
+
+		$ret = array(
+			'moodle_link' => $moodle_link,
+		);
+
 		$this->terminateWithSuccess($ret);
 	}
 	

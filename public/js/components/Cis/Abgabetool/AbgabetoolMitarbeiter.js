@@ -454,7 +454,6 @@ export const AbgabetoolMitarbeiter = {
 			this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link
 			this.abgabetypenBetreuer = res.data?.abgabetypenBetreuer
 		}).catch(e => {
-			console.log(e)
 			this.loading = false
 		})
 		
