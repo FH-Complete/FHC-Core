@@ -21,6 +21,7 @@ abstract class IssueResolver_Controller extends JOB_Controller
 	 */
 	public function run()
 	{
+		// initialize librariy with provided fehlercodes
 		$this->load->library(
 			'issues/PlausicheckResolverLib',
 			[
@@ -30,14 +31,8 @@ abstract class IssueResolver_Controller extends JOB_Controller
 
 		$this->logInfo("Issue resolve job started");
 
-		// load open issues with given errorcodes
-		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			$this->_fehlercodes
-		);
-
-		$openIssues = hasData($openIssuesRes) ? getData($openIssuesRes) : [];
-
-		$result = $this->plausicheckresolverlib->resolvePlausicheckIssues($openIssues);
+		// resolve the issues
+		$result = $this->plausicheckresolverlib->resolvePlausicheckIssues();
 
 		// log if error, or log info if inserted new issue
 		foreach ($result->errors as $error) $this->logError($error);

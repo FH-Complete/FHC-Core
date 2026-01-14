@@ -109,11 +109,27 @@ class PlausicheckResolverLib
 
 	/**
 	 * Reseolves multiple plausicheck issues at once.
-	 * @param array $openIssues passed issues to resolve
+	 * @param array $openIssues passed issues to resolve. If null, issues with fehlercodes in _fehlercodes property are loaded
 	 * @return result object with occured error and info
 	 */
-	public function resolvePlausicheckIssues($openIssues)
+	public function resolvePlausicheckIssues($openIssues = null)
 	{
+		if (!isset($openIssues))
+		{
+			if (!isEmptyArray($this->_fehlercodes))
+			{
+				$this->_ci->load->model('system/Issue_model', 'IssueModel');
+
+				// load open issues with given errorcodes
+				$openIssuesRes = $this->_ci->IssueModel->getOpenIssues(
+					$this->_fehlercodes
+				);
+
+				$openIssues = hasData($openIssuesRes) ? getData($openIssuesRes) : [];
+			}
+		}
+
+
 		$result = new StdClass();
 		$result->errors = [];
 		$result->infos = [];
