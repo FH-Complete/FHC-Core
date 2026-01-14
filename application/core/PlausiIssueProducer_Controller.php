@@ -5,14 +5,14 @@
  */
 abstract class PlausiIssueProducer_Controller extends JOB_Controller
 {
-	protected $_fehlerLibMappings = [];
-	protected $_app;
+	protected $_fehlerKurzbz = [];
+	protected $_apps;
 
 	protected function producePlausicheckIssues($params)
 	{
 		$this->load->library(
 			'issues/PlausicheckProducerLib',
-			['extensionName' => $this->_extensionName ?? null, 'app' => $this->_app, 'fehlerLibMappings' => $this->_fehlerLibMappings]
+			['apps' => $this->_apps, 'fehlerKurzbz' => $this->_fehlerKurzbz]
 		);
 
 		$this->logInfo("Plausicheck issue producer job started");

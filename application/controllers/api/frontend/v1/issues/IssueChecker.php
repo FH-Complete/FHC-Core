@@ -7,8 +7,7 @@ class IssueChecker extends FHCAPI_Controller
 
 	protected $person_id;
 	protected $_extensionName = null;
-	protected $_codeLibMappings = [];
-	protected $_codeProducerLibMappings = [];
+	protected $_fehlercodes = [];
 	protected $_app = null;
 
 	protected $errors = [];
@@ -25,13 +24,40 @@ class IssueChecker extends FHCAPI_Controller
 		{
 			$this->terminateWithError("Issue Checker: permissions must be an array");
 		}
-		
+
 		$merged_permissions = array_merge($default_permissions, $permissions);
-		
+
 		parent::__construct($merged_permissions);
 
 		$this->load->model('system/Issue_model', 'IssueModel');
+		$this->load->model('system/Fehler_model', 'FehlerModel');
 		$this->load->model('person/Person_model', 'PersonModel');
+
+		// get fehler kurzbz from fehlercodes
+		$this->FehlerModel->addSelect('fehler_kurzbz');
+		if (!isEmptyArray($this->_fehlercodes))$this->FehlerModel->db->where_in('tbl_fehler.fehlercode', $this->_fehlercodes);
+		$fehlerKurzbzRes = $this->FehlerModel->load();
+
+		if (isError($fehlerKurzbzRes)) $this->terminateWithError(getError($fehlerKurzbzRes), self::ERROR_TYPE_GENERAL);
+
+		$fehlerKurzbz = hasData($fehlerKurzbzRes) ? array_column(getData($fehlerKurzbzRes), 'fehler_kurzbz') : [];
+
+		// load producer and checker libraries with fehler kurbz and fehlercode list
+		$this->load->library(
+			'issues/PlausicheckProducerLib',
+			array(
+				'fehlerKurzbz' => $fehlerKurzbz
+			),
+			'PlausicheckProducerLib'
+		);
+
+		$this->load->library(
+			'issues/PlausicheckResolverLib',
+			array(
+				'fehlercodes' => $this->_fehlercodes
+			),
+			'PlausicheckResolverLib'
+		);
 	}
 
 	public function checkPerson()
@@ -47,32 +73,11 @@ class IssueChecker extends FHCAPI_Controller
 		$persRes = $this->PersonModel->load($this->person_id);
 		if (!hasData($persRes)) $this->terminateWithError('Person with id ' . $this->person_id . ' not found.', self::ERROR_TYPE_GENERAL);
 
-		$allCodeLibMappings = array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings);
-
-		$this->load->library(
-			'issues/PlausicheckProducerLib',
-			array(
-				'extensionName' => $this->_extensionName,
-				'codeLibMappings' => $allCodeLibMappings
-			),
-			'PlausicheckProducerLib'
-		);
-
-		$this->load->library(
-			'issues/PlausicheckResolverLib',
-			array(
-				'extensionName' => $this->_extensionName,
-				'codeLibMappings' => $this->_codeLibMappings,
-				'codeProducerLibMappings' => $this->_codeProducerLibMappings
-			),
-			'PlausicheckResolverLib'
-		);
-
 		$this->_produceIssues();
 		$this->_resolveIssues();
 		$this->_produceIssues();
 
-		$openIssueCountRes = $this->_countOpenIssues(array_keys($allCodeLibMappings));
+		$openIssueCountRes = $this->_countOpenIssues();
 		if (isError($openIssueCountRes)) $this->terminateWithError(getError($openIssueCountRes), self::ERROR_TYPE_GENERAL);
 
 		$data = array(
@@ -100,7 +105,7 @@ class IssueChecker extends FHCAPI_Controller
 
 		if (!hasData($persRes)) $this->terminateWithError('Person with id ' . $this->person_id . ' not found.', self::ERROR_TYPE_GENERAL);
 
-		$openIssueCountRes = $this->_countOpenIssues(array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)));
+		$openIssueCountRes = $this->_countOpenIssues();
 		if (isError($openIssueCountRes)) $this->terminateWithError(getError($openIssueCountRes), self::ERROR_TYPE_GENERAL);
 
 		$data = array(
@@ -114,13 +119,13 @@ class IssueChecker extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	protected function _countOpenIssues($fehlercodes)
+	protected function _countOpenIssues()
 	{
-		if (isEmptyArray($fehlercodes)) return success([]);
+		if (isEmptyArray($this->_fehlercodes)) return success([]);
 
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			$fehlercodes,
+			$this->_fehlercodes,
 			$this->person_id,
 			$oe_kurzbz = null,
 			$fehlercode_extern = null,
@@ -138,10 +143,6 @@ class IssueChecker extends FHCAPI_Controller
 
 	protected function _produceIssues()
 	{
-		if (isEmptyArray($this->_codeLibMappings) && isEmptyArray($this->_codeProducerLibMappings)) return success([]);
-
-		$allCodeLibMappings = array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings);
-
 		$result = $this->PlausicheckProducerLib->producePlausicheckIssues(
 			array('person_id' => $this->person_id)
 		);
@@ -157,7 +158,7 @@ class IssueChecker extends FHCAPI_Controller
 	{
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			array_keys(array_merge($this->_codeLibMappings, $this->_codeProducerLibMappings)),
+			$this->_fehlercodes,
 			$this->person_id
 		);
 

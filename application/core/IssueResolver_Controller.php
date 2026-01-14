@@ -5,11 +5,8 @@
  */
 abstract class IssueResolver_Controller extends JOB_Controller
 {
-	// mappings in form fehlercode -> resolverlibrary name, fehler which have explicit resolver class defined
-	protected $_codeLibMappings = [];
-
-	// mappings in form fehlercode -> producer library name, fehler which are resolved the same way they are produced
-	protected $_codeProducerLibMappings = [];
+	// codes of fehler to be resolved
+	protected $fehlercodes = [];
 
 	public function __construct()
 	{
@@ -27,9 +24,7 @@ abstract class IssueResolver_Controller extends JOB_Controller
 		$this->load->library(
 			'issues/PlausicheckResolverLib',
 			[
-				'extensionName' => $this->_extensionName ?? null,
-				'codeLibMappings' => $this->_codeLibMappings,
-				'codeProducerLibMappings' => $this->_codeProducerLibMappings
+				'fehlercodes' => $this->_fehlercodes
 			]
 		);
 
@@ -37,7 +32,7 @@ abstract class IssueResolver_Controller extends JOB_Controller
 
 		// load open issues with given errorcodes
 		$openIssuesRes = $this->IssueModel->getOpenIssues(
-			array_merge(array_keys($this->_codeLibMappings), array_keys($this->_codeProducerLibMappings))
+			$this->_fehlercodes
 		);
 
 		$openIssues = hasData($openIssuesRes) ? getData($openIssuesRes) : [];

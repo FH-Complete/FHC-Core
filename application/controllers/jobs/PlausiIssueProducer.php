@@ -6,7 +6,7 @@
 class PlausiIssueProducer extends PlausiIssueProducer_Controller
 {
 	private $_currentStudiensemester;
-	protected $_app = 'core';
+	protected $_apps = 'core';
 
 	public function __construct()
 	{
@@ -23,7 +23,7 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 
 		// set fehler which can be produced by the job
 		// structure: fehler_kurzbz => class (library) name for resolving
-		$this->_fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
+		$this->_fehlerKurzbz = $this->plausicheckdefinitionlib->getFehlerKurzbz();
 	}
 
 	/**

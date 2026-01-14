@@ -16,7 +16,7 @@ class Plausichecks extends Auth_Controller
 		);
 
 		// Load libraries
-		$this->load->library('issues/PlausicheckProducerLib', array('app' => 'core'));
+		$this->load->library('issues/PlausicheckProducerLib', array('apps' => 'core'));
 		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
@@ -46,9 +46,10 @@ class Plausichecks extends Auth_Controller
 
 		// issues array for passing issue texts
 		$allIssues = array();
+
 		// all fehler kurzbz which are going to be checked
 		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckdefinitionlib->getFehlerKurzbz();
-		$fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
+
 		// set Studiengang to null if not passed
 		if (isEmptyString($studiengang_kz)) $studiengang_kz = null;
 
@@ -70,12 +71,8 @@ class Plausichecks extends Auth_Controller
 			// initialize issue array
 			$allIssues[$fehler_kurzbz] = array('fehlercode' => $fehler->fehlercode, 'data' => array());
 
-			// get library name for producing issue
-			$libName = $fehlerLibMappings[$fehler_kurzbz];
-
 			// execute the check
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
-				$libName,
 				$fehler_kurzbz,
 				array(
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,

@@ -18,14 +18,16 @@ class Fehlerkonfiguration_model extends DB_Model
 	 * @param string $app
 	 * @return object success or error
 	 */
-	public function getKonfiguration($app = null)
+	public function getKonfiguration($apps = null)
 	{
 		$fehlerkonfiguration = array();
+		$apps = is_string($apps) ? [$apps] : $apps;
 
 		$this->addSelect('fehlercode, konfigurationstyp_kurzbz, konfiguration, fehler_kurzbz');
 		$this->addJoin('system.tbl_fehler_konfigurationstyp konftyp', 'konfigurationstyp_kurzbz');
 		$this->addJoin('system.tbl_fehler fehler', 'fehlercode');
-		$fehlerkonfigurationRes = isset($app) ? $this->loadWhere(array('fehler.app' => $app)) : $this->load();
+		if (is_array($apps) && !isEmptyArray($apps)) $this->db->where_in('fehler.app', $apps);
+		$fehlerkonfigurationRes = $this->load();
 
 		if (isError($fehlerkonfigurationRes)) return $fehlerkonfigurationRes;
 
