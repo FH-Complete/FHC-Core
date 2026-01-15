@@ -66,15 +66,12 @@ class Zeitsperre_model extends DB_Model
 	 * get Zeitsperren of a user
 	 *
 	 * @param $uid mitarbeiteruid
+	 * @param $bisgrenze @true show only entries of actual business year (1.9.- 31.8.)
+	 *
 	 * @return array
 	 */
 	public function getZeitsperrenUser($uid, $bisgrenze=true)
 	{
-		//TODO(Manu) check if bisDate is needed
-/*		$parametersArray = array();
-		array_push($parametersArray, $uid);
-		$parametersArray = [$uid];*/
-
 		$qry = "
 			SELECT tbl_zeitsperre.*, tbl_zeitsperretyp.*, tbl_erreichbarkeit.farbe  AS erreichbarkeit_farbe, tbl_erreichbarkeit.beschreibung AS erreichbarkeit_beschreibung
 			FROM (campus.tbl_zeitsperre JOIN campus.tbl_zeitsperretyp USING (zeitsperretyp_kurzbz))

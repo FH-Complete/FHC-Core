@@ -1,0 +1,29 @@
+/* Repositioning clear icon Datepicker for not being outside the textfield */
+/* Wrapper */
+.dp__input_wrap {
+    position: relative;
+}
+
+/* calender-Icon left */
+.dp__input_icon {
+    position: absolute;
+    left: 10px;
+    right: auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Clear-Icon right */
+.dp__clear_icon {
+    position: absolute;
+    right: 10px;
+    left: auto;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* padding for Icons */
+.dp__input {
+    padding-left: 36px !important;
+    padding-right: 36px !important;
+}

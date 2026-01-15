@@ -27,5 +27,38 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Zeitsperren/getTypenZeitsperren/'
 		};
+	},
+	getTypenErreichbarkeit(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Zeitsperren/getTypenErreichbarkeit/'
+		};
+	},
+	getStunden(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Zeitsperren/getStunden/'
+		};
+	},
+	addZeitsperre(uid, params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Zeitsperren/add/' + uid,
+			params
+		};
+	},
+	loadZeitsperre(zeitsperre_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Zeitsperren/loadZeitsperre/' + zeitsperre_id
+		};
+	},
+	deleteZeitsperre(zeitsperre_id) {
+		console.log("zeitsperre_id " + zeitsperre_id);
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Zeitsperren/delete/' + zeitsperre_id
+		};
 	}
+
 };
