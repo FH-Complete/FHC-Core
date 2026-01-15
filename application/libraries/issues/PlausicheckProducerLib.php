@@ -6,7 +6,6 @@ class PlausicheckProducerLib
 {
 	const CI_PATH = 'application';
 	const CI_LIBRARY_FOLDER = 'libraries';
-	const EXTENSIONS_FOLDER = 'extensions';
 	const PLAUSI_ISSUES_FOLDER = 'issues/plausichecks';
 	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck';
 	const CONFIG_FEHLER_FILENAME = 'fehler.php';
@@ -40,7 +39,7 @@ class PlausicheckProducerLib
 		$this->_ci->load->model('system/Fehler_model', 'FehlerModel');
 		$this->_ci->load->model('system/Fehlerkonfiguration_model', 'FehlerkonfigurationModel');
 
-		$this->_ci->load->config('fehler');
+		$this->_ci->load->config(self::CONFIG_FEHLER_NAME);
 
 		// get all configuration parameters for the application(s))
 		$fehlerkonfigurationRes = $this->_ci->FehlerkonfigurationModel->getKonfiguration($this->_apps);
@@ -98,20 +97,20 @@ class PlausicheckProducerLib
 
 			$extensionsData = getData($extensions);
 
-
 			foreach ($extensionsData as $ext)
 			{
-				$configFilename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_FILENAME;
+				$configFilePath = ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_FILENAME;
+				$configFilename = APPPATH.'config/'.$configFilePath;
 
 				if (file_exists($configFilename))
 				{
-					$config = array(); // default value
+					$this->_ci->load->config($configFilePath);
 
-					include($configFilename);
+					$extensionEntries = $this->_ci->config->item(self::CONFIG_FEHLER_NAME);
 
-					if (isset($config[self::CONFIG_FEHLER_NAME]) && is_array($config[self::CONFIG_FEHLER_NAME]))
+					if (isset($extensionEntries) && is_array($extensionEntries))
 					{
-						foreach ($config[self::CONFIG_FEHLER_NAME] as $extensionEntry)
+						foreach ($extensionEntries as $extensionEntry)
 						{
 							if (
 								!isset($extensionEntry[self::FEHLER_KURZBZ_NAME])
@@ -201,7 +200,7 @@ class PlausicheckProducerLib
 		$libName = $mapping[self::PRODUCER_LIB_NAME];
 
 		// if called from extension (extension name set), path includes extension names
-		$libRootPath = isset($mapping[self::EXTENSION_NAME]) ? self::EXTENSIONS_FOLDER . '/' . $mapping[self::EXTENSION_NAME] . '/' : '';
+		$libRootPath = isset($mapping[self::EXTENSION_NAME]) ? ExtensionsLib::EXTENSIONS_DIR_NAME . '/' . $mapping[self::EXTENSION_NAME] . '/' : '';
 
 		// path for loading issue library
 		$issuesLibPath = $libRootPath . self::PLAUSI_ISSUES_FOLDER . '/';
