@@ -2882,5 +2882,33 @@ class lehrveranstaltung extends basis_db
 			return false;
 		}
 	}
+
+	public function getStudienplanLehrveranstaltung($lehrveranstaltung_id, $studienplan_id)
+	{
+		$qry = "SELECT studienplan_lehrveranstaltung_id
+				FROM lehre.tbl_lehrveranstaltung
+				JOIN lehre.tbl_studienplan_lehrveranstaltung USING(lehrveranstaltung_id)
+				WHERE lehrveranstaltung_id = ".$this->db_add_param($lehrveranstaltung_id)."
+					AND tbl_studienplan_lehrveranstaltung.studienplan_id = ".$this->db_add_param($studienplan_id);"";
+
+		if($result = $this->db_query($qry))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				return $row->studienplan_lehrveranstaltung_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der studienplan_lehrveranstaltung_id';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+		}
+		return null;
+
+	}
 }
 ?>

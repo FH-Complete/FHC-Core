@@ -1,3 +1,4 @@
+console.warn('plugin/FhcAlert.js is DEPRECATED! Use plugins/FhcAlert.js instead.');
 /**
  * Copyright (C) 2022 fhcomplete.org
  *
@@ -13,7 +14,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- * 
+ *
  * @usage:
  * Preperations:
  * Be sure to have PrimeVue loaded  with the toast and confirmdialog
@@ -23,44 +24,51 @@
  * Use:
  * In your component you can call now the global property $fhcAlert
  * which has the following functions:
- * 
+ *
  * alertSuccess
  * ------------
  * Displays a success message
  * @param string	message
  * @return void
- * 
+ *
  * alertInfo
  * ---------
  * Displays an info message
  * @param string	message
  * @return void
- * 
+ *
  * alertWarning
  * ------------
  * Displays a warning
  * @param string	message
  * @return void
- * 
+ *
  * alertError
  * ----------
  * Displays an error
  * @param string	message
  * @return void
- * 
+ *
  * alertSystemError
  * ----------------
  * Displays an alert with the error details and a button to mail
  * the error to the Support Team
  * @param string	message
  * @return void
- * 
+ *
  * confirmDelete
  * -------------
  * Displays a confirmation dialog and returns a Promise which resolves
  * with true or false depending und the pressed button.
  * @return Promise
- * 
+ *
+ * confirm
+ * ------------
+ * Displays a confirmation dialog and returns a Promise which resolves
+ * with true or false depending und the pressed button.
+ * @param string	message
+ * @return Promise
+ *
  * alertDefault
  * ------------
  * Displays an alert
@@ -69,7 +77,7 @@
  * @param string	message
  * @param boolean	sticky			(optional) defaults to false
  * @return void
- * 
+ *
  * alertMultiple
  * -------------
  * Displays multiple alerts
@@ -78,14 +86,14 @@
  * @param string	title			(optional) defaults to 'Info'
  * @param boolean	sticky			(optional) defaults to false
  * @return void
- * 
+ *
  * handleSystemError
  * -----------------
  * Automatiticly determine how to display an system error and display it.
  * This would be used in a catch block of an ajax call.
  * @param mixed		error
  * @return void
- * 
+ *
  * handleSystemMessage
  * -------------------
  * Automatiticly determine how to display a message and display it.
@@ -109,7 +117,7 @@ const helperApp = Vue.createApp({
 	},
 	methods: {
 		mailToUrl(slotProps) {
-			let mailTo = 'noreply@technikum-wien.at'; // TODO domain anpassen
+			let mailTo = FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto;
 			let subject = 'Meldung%20Systemfehler';
 			let body = `
 				Danke, dass Sie uns den Fehler melden. %0D%0A %0D%0A
@@ -133,6 +141,11 @@ const helperApp = Vue.createApp({
 	unmounted() {
 		helperAppContainer.parentElement.removeChild(helperAppContainer);
 	},
+	computed: {
+		showmaillink: function() {
+			return FHC_JS_DATA_STORAGE_OBJECT.systemerror_mailto !== '';
+		}
+	},
 	template: `
 	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999"></pv-toast>
 	<pv-toast ref="alert" class="fhc-alert" :base-z-index="99999" position="center">
@@ -154,6 +167,7 @@ const helperApp = Vue.createApp({
 						Fehler anzeigen
 					</a>
 					<a
+						v-if="showmaillink"
 						class="btn btn-primary flex-fill"
 						target="_blank"
 						:href="mailToUrl(slotProps)"
@@ -248,7 +262,7 @@ export default {
 			},
 			alertDefault(severity, title, message, sticky = false) {
 				let options = { severity: severity, summary: title, detail: message};
-				
+
 				if (!sticky)
 					options.life = 3000;
 
@@ -266,7 +280,7 @@ export default {
 				// don't show an error message to the user if the error was an aborted request
 				if(error.hasOwnProperty('name') && error.name.toLowerCase() === "AbortError".toLowerCase())
 					return;
-				
+
 				// Error is string
 				if (typeof error === 'string')
 					return $fhcAlert.alertSystemError(error);
@@ -278,7 +292,7 @@ export default {
 				// Error has been handled already
 				if (error.hasOwnProperty('handled') && error.handled)
 					return;
-				
+
 				// Error is object
 				if (typeof error === 'object' && error !== null) {
 					let errMsg = '';
@@ -294,7 +308,7 @@ export default {
 
 					if (error.hasOwnProperty('stack'))
 						errMsg += 'Error Stack: ' + error.stack + '\r\n';
-					
+
 					// Fallback object error message
 					if (errMsg == '')
 						errMsg = 'Error Message: ' + JSON.stringify(error) + '\r\n';
@@ -368,7 +382,7 @@ export default {
 
 						// NOTE(chris): reset form validation
 						$fhcAlert.resetFormValidation(form);
-						
+
 						// NOTE(chris): set form input validation
 						const notFound = Object.entries(errors).filter(([key, detail]) => {
 							const input = form.querySelector('[data-fhc-form-validate="' + key + '"]');

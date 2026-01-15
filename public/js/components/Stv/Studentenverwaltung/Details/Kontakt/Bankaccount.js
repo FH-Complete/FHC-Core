@@ -3,7 +3,10 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvBankaccount from '../../../../../api/factory/stv/kontakt/bankaccount.js';
+
 export default{
+	name: 'BankaccountComponent',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -17,12 +20,7 @@ export default{
 		return{
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getBankverbindung,
-				ajaxParams: () => {
-					return {
-						id: this.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvBankaccount.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns:[
 					{title:"Name", field:"name"},
@@ -88,10 +86,7 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
-				selectable:	true,
 				index: 'bankverbindung_id',
 				persistenceID: 'stv-details-kontakt-bankaccount'
 			},
@@ -143,8 +138,8 @@ export default{
 		}
 	},
 	watch: {
-		uid(){
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getBankverbindung/' + this.uid);
+		uid() {
+			this.reload();
 		}
 	},
 	methods:{
@@ -169,50 +164,58 @@ export default{
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		addNewBankverbindung(bankverbindungData) {
-			return this.$fhcApi.factory.stv.kontakt.addNewBankverbindung(this.$refs.bankverbindungData, this.uid, this.bankverbindungData)
-			.then(response => {
+			return this.$refs.bankverbindungData
+				.call(ApiStvBankaccount.add(this.uid, this.bankverbindungData))
+				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
 		loadBankverbindung(bankverbindung_id){
 			this.statusNew = false;
-			return this.$fhcApi.factory.stv.kontakt.loadBankverbindung(bankverbindung_id)
-				.then(
-				result => {
+			return this.$api
+				.call(ApiStvBankaccount.load(bankverbindung_id))
+				.then(result => {
 					this.bankverbindungData = result.data;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		updateBankverbindung(bankverbindung_id){
-			return this.$fhcApi.factory.stv.kontakt.updateBankverbindung(this.$refs.bankverbindungData, bankverbindung_id,
-				this.bankverbindungData)
+		updateBankverbindung(bankverbindung_id) {
+			return this.$refs.bankverbindungData
+				.call(ApiStvBankaccount.update(
+					bankverbindung_id,
+					this.bankverbindungData
+				))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('bankverbindungModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-			.finally(() => {
-				window.scrollTo(0, 0);
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
 		},
-		deleteBankverbindung(bankverbindung_id){
-			return this.$fhcApi.factory.stv.kontakt.deleteBankverbindung(bankverbindung_id)
+		deleteBankverbindung(bankverbindung_id) {
+			return this.$api
+				.call(ApiStvBankaccount.delete(bankverbindung_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-			.finally(()=> {
-				window.scrollTo(0, 0);
-				this.resetModal();
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.resetModal();
+					this.reload();
+				});
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
@@ -344,6 +347,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('person', 'bankverbindung')"
 			@click:new="actionNewBankverbindung"

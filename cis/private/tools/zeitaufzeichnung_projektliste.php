@@ -384,17 +384,6 @@ for ($i = 0; $i < count($ztaufdata); $i++)
 			}
 		}
 
-		//worktime with no break greater 6 -> compulsory break of half an hour
-		if ($pauseSubtracted < 0.5 && !$lehreExternExists)
-		{
-			if ($projektlines[$day]->arbeitszeit >= 6.5)
-				$projektlines[$day]->arbeitszeit -= 0.5;
-
-			//ensure that no worktime gets smaller than 6 hours because of compulsory break
-			elseif ($projektlines[$day]->arbeitszeit > 6)
-				$projektlines[$day]->arbeitszeit -= $projektlines[$day]->arbeitszeit - 6;
-		}
-
 		$projektlines[$day]->arbeitszeit = round($projektlines[$day]->arbeitszeit, 2);
 
 		//calculate sums

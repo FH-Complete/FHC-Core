@@ -5,7 +5,11 @@ import BsModal from "../../../../Bootstrap/Modal.js";
 import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
+import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
+import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
+
 export default{
+	name: 'AddressComponent',
 	components: {
 		CoreFilterCmpt,
 		PvAutoComplete,
@@ -21,12 +25,7 @@ export default{
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.kontakt.getAdressen,
-				ajaxParams: () => {
-					return {
-						id: this.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvAddress.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				columns:[
@@ -123,10 +122,7 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
 				height:	'auto',
-				selectable:	true,
 				index: 'adresse_id',
 				persistenceID: 'stv-details-kontakt-address'
 			},
@@ -189,8 +185,8 @@ export default{
 							title: this.$p.t('person', 'person_id')
 						});
 /*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+													title: this.$p.t('global', 'aktionen')
+												});*/
 					}
 				}
 			],
@@ -201,7 +197,7 @@ export default{
 				typ: 'h',
 				nation: 'A',
 				address: {plz: null},
-				plz: null
+				plz: null,
 			},
 			statusNew: true,
 			places: [],
@@ -209,11 +205,12 @@ export default{
 			nations: [],
 			adressentypen: [],
 			firmen: [],
+			listFirmen: [],
 			filteredFirmen: [],
+			selectedFirma: null,
 			abortController: {
 				suggestions: null,
-				places: null,
-				firmen: null
+				places: null
 			},
 		}
 	},
@@ -230,8 +227,11 @@ export default{
 	},
 	watch: {
 		uid() {
-			this.$refs.table.tabulator.setData('api/frontend/v1/stv/Kontakt/getAdressen/' + this.uid);
+			this.reload();
 		},
+		selectedFirma(newVal) {
+			this.addressData.firma_id = newVal?.firma_id || null;
+		}
 	},
 	methods:{
 		actionNewAdress() {
@@ -243,8 +243,12 @@ export default{
 			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
+					this.selectedFirma = this.listFirmen.find(
+						item => item.firma_id === this.addressData.firma_id
+					);
+
 					this.addressData.address.plz = this.addressData.plz;
-				//	delete this.addressData.plz;
+					//	delete this.addressData.plz;
 					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
 
@@ -262,22 +266,23 @@ export default{
 		},
 		addNewAddress(addressData) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$fhcApi.factory.stv.kontakt.addNewAddress(this.$refs.addressData, this.uid, this.addressData)
+			return this.$refs.addressData
+				.call(ApiStvAddress.add(this.uid, this.addressData))
 				.then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(this.reload);
 		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
 		loadAdress(adresse_id) {
 			this.statusNew = false;
-			return this.$fhcApi.factory.stv.kontakt.loadAddress(adresse_id)
+			return this.$api
+				.call(ApiStvAddress.load(adresse_id))
 				.then(result => {
 					this.addressData = result.data;
 					this.addressData.address = {};
@@ -288,23 +293,24 @@ export default{
 		},
 		updateAddress(adresse_id) {
 			this.addressData.plz = this.addressData.address.plz;
-			return this.$fhcApi.factory.stv.kontakt.updateAddress(this.$refs.addressData, adresse_id,
-				this.addressData
-			).then(response => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			return this.$refs.addressData
+				.call(ApiStvAddress.update(adresse_id, this.addressData))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('adressModal');
 					this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
-			.finally(() => {
-				this.reload();
-			});
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(this.reload);
 		},
 		deleteAddress(adresse_id) {
-			return this.$fhcApi.factory.stv.kontakt.deleteAddress(adresse_id)
+			return this.$api
+				.call(ApiStvAddress.delete(adresse_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(()=> {
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
 				});
@@ -317,22 +323,19 @@ export default{
 
 			this.abortController.places = new AbortController();
 
-			return this.$fhcApi.factory.stv.kontakt.getPlaces(this.addressData.address.plz)
+			return this.$api
+				.call(ApiStvAddress.getPlaces(this.addressData.address.plz))
 				.then(result => {
 					this.places = result.data;
 				});
 		},
-		search(event) {
-			if (this.abortController.firmen) {
-				this.abortController.firmen.abort();
-			}
+		filterFirmen(event) {
+			const query = event?.query?.toLowerCase()?.trim() || "";
 
-			this.abortController.firmen = new AbortController();
-
-			return this.$fhcApi.factory.stv.kontakt.getFirmen(event.query)
-				.then(result => {
-					this.filteredFirmen = result.data.retval;
-				});
+			this.filteredFirmen = this.listFirmen.filter(item => {
+				const label = (item.label || "").toLowerCase();
+				return label.includes(query);
+			});
 		},
 		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
@@ -351,26 +354,36 @@ export default{
 			this.addressData.typ = 'h';
 			this.addressData.nation = 'A';
 			this.addressData.address = {plz: null};
+			this.selectedFirma = null;
 
 			this.statusNew = true;
 		},
 	},
 	created() {
-		this.$fhcApi.factory.stv.kontakt.getNations()
+		this.$api
+			.call(ApiStvAddress.getNations())
 			.then(result => {
 				this.nations = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.kontakt.getAdressentypen()
+		this.$api
+			.call(ApiStvAddress.getTypes())
 			.then(result => {
 				this.adressentypen = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+
+		this.$api
+			.call(ApiStvAddress.getAllFirmen())
+			.then(result => {
+				this.listFirmen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
-		
+
 		<!--Modal: AddressModal-->
 		<bs-modal ref="adressModal" dialog-class="modal-dialog-scrollable">
 			<template #title>
@@ -395,7 +408,7 @@ export default{
 						</option>
 						</form-input>
 					</div>
-					
+
 					<div class="row mb-3">
 						<form-input
 							type="text"
@@ -405,7 +418,7 @@ export default{
 						>
 						</form-input>					
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="select"
@@ -423,7 +436,7 @@ export default{
 						</option>
 						</form-input>
 				</div>
-													
+							
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -435,7 +448,7 @@ export default{
 					>
 					</form-input>					
 				</div>
-											
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'"
@@ -452,17 +465,17 @@ export default{
 							>
 							{{gemeinde.name}}
 						</option>
-						</form-input>
-						<form-input
+					</form-input>
+					<form-input
 							v-else
 							type="text"
 							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
 						>	
-						</form-input>
-					</div>
-				
+					</form-input>
+				</div>
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'" 
@@ -489,7 +502,7 @@ export default{
 						>	
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -502,7 +515,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -515,7 +528,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -525,7 +538,7 @@ export default{
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -538,58 +551,38 @@ export default{
 						</form-input>
 					</div>
 				</div>
-					
-				<div v-if="statusNew" class="row mb-3">
+
+				<div class="row mb-3">
 					<form-input
 						type="autocomplete"
 						:label="$p.t('person/firma')"
 						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
+						v-model="selectedFirma"
+						optionLabel="label"
+						optionValue="firma_id"
+						dropdown
+						forceSelection
 						:suggestions="filteredFirmen" 
-						@complete="search" 
-						:min-length="3"
-					>
-					</form-input>
-				</div>				
-					
-				<div v-else class="row mb-3">
-					<form-input
-						v-if="addressData.firmenname" 
-						type="text"
-						name="name"
-						:label="$p.t('person/firma')"
-						v-model="addressData.firmenname"
-					>
-					</form-input>
-					<form-input
-						v-else 
-						type="autocomplete"
-						:label="$p.t('person/firma')"
-						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
-						:suggestions="filteredFirmen" 
-						@complete="search" 
+						@complete="filterFirmen"
 						:min-length="3"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
 						name="firma_zusatz"
-						:label="$p.t('person/firma_zusatz')"
+						:label="$p.t('global/name')"
 						v-model="addressData.name"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 							type="text"
@@ -599,16 +592,16 @@ export default{
 						>
 					</form-input>
 				</div>
-			
+
 			</form-form>
-			
+
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
 		</bs-modal>
-			
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -616,6 +609,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('person', 'adresse')"
 			@click:new="actionNewAdress"
@@ -623,4 +617,6 @@ export default{
 		</core-filter-cmpt>
 	</div>`
 };
+
+
 

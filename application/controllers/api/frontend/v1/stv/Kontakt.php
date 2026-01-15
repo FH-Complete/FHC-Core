@@ -28,7 +28,8 @@ class Kontakt extends FHCAPI_Controller
 			'getStandorte' => ['admin:r', 'assistenz:r'],
 			'getStandorteByFirma' => ['admin:r', 'assistenz:r'],
 			'getKontakte' => ['admin:r', 'assistenz:r'],
-			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r']
+			'getBankverbindung' => ['mitarbeiter/bankdaten:r', 'student/bankdaten:r'],
+			'getAllFirmen' => ['admin:r', 'assistenz:r']
 		]);
 
 		// Load Libraries
@@ -46,10 +47,12 @@ class Kontakt extends FHCAPI_Controller
 		$this->load->model('organisation/standort_model', 'StandortModel');
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 		$this->load->model('person/Kontakt_model', 'KontaktModel');
+		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
 
 		// Extra Permissionchecks
 		$permsMa = [];
 		$permsStud = [];
+		$permsDefault = null;
 		switch ($this->router->method) {
 			case 'getBankverbindung':
 			case 'loadBankverbindung':
@@ -66,7 +69,7 @@ class Kontakt extends FHCAPI_Controller
 			case 'getKontakte':
 			case 'loadAddress':
 			case 'loadContact':
-				$permsMa = $permsStud = ['admin:r', 'assistenz:r'];
+				$permsMa = $permsStud = $permsDefault = ['admin:r', 'assistenz:r'];
 				break;
 			case 'addNewAddress':
 			case 'addNewContact':
@@ -74,7 +77,7 @@ class Kontakt extends FHCAPI_Controller
 			case 'updateContact':
 			case 'deleteAddress':
 			case 'deleteContact':
-				$permsMa = $permsStud = ['admin:rw', 'assistenz:rw'];
+				$permsMa = $permsStud = $permsDefault = ['admin:rw', 'assistenz:rw'];
 				break;
 		}
 		if ($this->router->method == 'getAdressen'
@@ -85,8 +88,11 @@ class Kontakt extends FHCAPI_Controller
 			|| $this->router->method == 'addNewBankverbindung'
 		) {
 			$person_id = current(array_slice($this->uri->rsegments, 2));
-			
-			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+
+			if (is_null($person_id) || !ctype_digit((string)$person_id))
+				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud, $permsDefault);
 		} elseif ($this->router->method == 'loadAddress'
 			|| $this->router->method == 'loadContact'
 			|| $this->router->method == 'loadBankverbindung'
@@ -119,6 +125,9 @@ class Kontakt extends FHCAPI_Controller
 				$model = 'person/Bankverbindung_model';
 			}
 
+			if (!isset($id) || !ctype_digit((string)$id))
+				$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 			$this->load->model($model, 'TempModel');
 			$result = $this->TempModel->load($id);
 			$data = $this->getDataOrTerminateWithError($result);
@@ -127,7 +136,7 @@ class Kontakt extends FHCAPI_Controller
 
 			$person_id = current($data)->person_id;
 			
-			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud, $permsDefault);
 		}
 	}
 	public function getAdressen($person_id)
@@ -190,13 +199,7 @@ class Kontakt extends FHCAPI_Controller
 		$name = isset($_POST['name']) ? $_POST['name'] : null;
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
-
-		if(isset($_POST['firma']))
-		{
-			$firma_id = $_POST['firma']['firma_id'];
-		}
-		else
-			$firma_id = null;
+		$firma_id = isset($_POST['firma_id']) ? $_POST['firma_id'] : null;
 
 		$result = $this->AdresseModel->insert(
 			[
@@ -263,17 +266,6 @@ class Kontakt extends FHCAPI_Controller
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Adresse_id']), self::ERROR_TYPE_GENERAL);
 		}
 
-		if(isset($_POST['firma']))
-		{
-			$firma_id = $_POST['firma']['firma_id'];
-		}
-		elseif(isset($_POST['firma_id']))
-		{
-			$firma_id = $_POST['firma_id'];
-		}
-		else
-			$firma_id = null;
-
 		$person_id = isset($_POST['person_id']) ? $_POST['person_id'] : null;
 		$co_name = isset($_POST['co_name']) ? $_POST['co_name'] : null;
 		$strasse = isset($_POST['strasse']) ? $_POST['strasse'] : null;
@@ -283,6 +275,7 @@ class Kontakt extends FHCAPI_Controller
 		$name = isset($_POST['name']) ? $_POST['name'] : null;
 		$typ = isset($_POST['typ']) ? $_POST['typ'] : null;
 		$anmerkung = isset($_POST['anmerkung']) ? $_POST['anmerkung'] : null;
+		$firma_id = isset($_POST['firma_id']) ? $_POST['firma_id'] : null;
 
 		$result = $this->AdresseModel->update(
 			[
@@ -387,8 +380,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
-	public function getFirmen($searchString)
+	public function getFirmen($searchString = null)
 	{
+		if (is_null($searchString))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('ressource/firma_model', 'FirmaModel');
 
 		$result = $this->FirmaModel->searchFirmen($searchString);
@@ -398,8 +394,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess($result ?: []);
 	}
 
-	public function getStandorte($searchString)
+	public function getStandorte($searchString = null)
 	{
+		if (is_null($searchString))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('organisation/standort_model', 'StandortModel');
 
 		$result = $this->StandortModel->searchStandorte($searchString);
@@ -409,8 +408,11 @@ class Kontakt extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-	public function getStandorteByFirma($firma_id)
+	public function getStandorteByFirma($firma_id = null)
 	{
+		if (is_null($firma_id) || !ctype_digit((string)$firma_id))
+			$this->terminateWithError($this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
+
 		$this->load->model('organisation/standort_model', 'StandortModel');
 
 		$result = $this->StandortModel->getStandorteByFirma($firma_id);
@@ -428,10 +430,15 @@ class Kontakt extends FHCAPI_Controller
 				THEN public.tbl_kontakt.updateamum
 				ELSE public.tbl_kontakt.insertamum
 			END) AS lastUpdate, st.bezeichnung, f.name");
+		$this->KontakttypModel->addSelect("kt.beschreibung as kontakttypbeschreibung");
 		$this->StandortModel->addJoin('public.tbl_standort st', 'ON (public.tbl_kontakt.standort_id = st.standort_id)', 'LEFT');
 		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
+		$this->KontakttypModel->addJoin('public.tbl_kontakttyp kt', 'ON (public.tbl_kontakt.kontakttyp = kt.kontakttyp)');
 		$result = $this->KontaktModel->loadWhere(
-			array('person_id' => $person_id)
+			array(
+				'person_id' => $person_id,
+				'public.tbl_kontakt.kontakttyp !=' => 'hidden'
+			)
 		);
 
 		if (isError($result))
@@ -439,20 +446,18 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess((getData($result) ?: []));
+
 	}
 
 	public function getKontakttypen()
 	{
 		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
+		$this->KontakttypModel->addOrder('beschreibung', 'ASC');
+		$result = $this->KontakttypModel->loadWhere(array('kontakttyp !=' => 'hidden'));
 
-		$result = $this->KontakttypModel->load();
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		else
-		{
-			$this->terminateWithSuccess(getData($result) ?: []);
-		}
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	public function loadContact()
@@ -579,8 +584,8 @@ class Kontakt extends FHCAPI_Controller
 				'anmerkung' => $anmerkung,
 				'kontakt' => $kontakt,
 				'zustellung' => $_POST['zustellung'],
-				'insertvon' => 	$uid,
-				'insertamum' => date('c'),
+				'updatevon' => $uid,
+				'updateamum' => date('c'),
 				'standort_id' => $standort_id,
 				'ext_id' => $ext_id
 			]
@@ -652,6 +657,10 @@ class Kontakt extends FHCAPI_Controller
 		$bic = $this->input->post('bic');
 		$blz  = $this->input->post('blz');
 		$kontonr = $this->input->post('kontonr');
+		$iban = $this->input->post('iban');
+		$typ = $this->input->post('typ');
+		$verrechnung = $this->input->post('verrechnung');
+		$uid = getAuthUID();
 
 		$result = $this->BankverbindungModel->insert(
 			[
@@ -659,13 +668,13 @@ class Kontakt extends FHCAPI_Controller
 				'name' => $name,
 				'anschrift' => $anschrift,
 				'bic' => $bic,
-				'iban' => $_POST['iban'],
+				'iban' => $iban,
 				'blz' => $blz,
 				'kontonr' => $kontonr,
-				'insertvon' => 'uid',
+				'insertvon' =>  $uid,
 				'insertamum' => date('c'),
-				'typ' => $_POST['typ'],
-				'verrechnung' => $_POST['verrechnung'],
+				'typ' => $typ,
+				'verrechnung' => $verrechnung,
 				'ext_id' => $ext_id,
 				'oe_kurzbz' => $oe_kurzbz,
 				'orgform_kurzbz' => $orgform_kurzbz
@@ -779,4 +788,25 @@ class Kontakt extends FHCAPI_Controller
 
 		return $this->GemeindeModel->checkLocation($_POST['plz'], $_POST['gemeinde'], $_POST['ort']);
 	}
+
+	/*
+	* returns list of all companies
+	* as key value list to be used in select or autocomplete
+	*/
+	public function getAllFirmen()
+	{
+		$sql = "
+			SELECT
+				f.firma_id, f.name,
+				f.name AS label
+			FROM public.tbl_firma f
+			ORDER BY f.name ASC";
+
+		$result = $this->FirmaModel->execReadOnlyQuery($sql);
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+
 }

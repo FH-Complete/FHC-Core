@@ -2,6 +2,8 @@ import Pagination from "../../Pagination/Pagination.js";
 import StudiengangInformation from "./StudiengangInformation/StudiengangInformation.js";
 import BsConfirm from "../../Bootstrap/Confirm.js";
 
+import ApiCms from '../../../api/factory/cms.js';
+
 export default {
 	name: "NewsComponent",
   components: {
@@ -27,60 +29,77 @@ export default {
 	},
   },
   methods: {
-	fetchNews: function(){
-		return this.$fhcApi.factory.cms.getNews(this.page, this.page_size, this.sprache)
-		.then(res => res.data)
-		.then(result => {
-			this.content = result;
+		fetchNews() {
+			return this.$api
+				.call(ApiCms.getNews(this.page, this.page_size, this.sprache))
+				.then(res => res.data)
+				.then(result => {
+					this.content = result;
 
-			document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
-				el.addEventListener("click", (evt) => {
-					evt.preventDefault();
-					BsConfirm.popup(el.dataset.confirm)
-						.then(() => {
-							Axios.get(el.href)
-								.then((res) => {
-									// TODO(chris): check for success then show message and/or reload
-									location = location;
+					document.querySelectorAll("#cms [data-confirm]").forEach((el) => {
+						el.addEventListener("click", (evt) => {
+							evt.preventDefault();
+							BsConfirm.popup(el.dataset.confirm)
+								.then(() => {
+									Axios.get(el.href)
+										.then((res) => {
+											// TODO(chris): check for success then show message and/or reload
+											location = location;
+										})
+										.catch((err) => console.error("ERROR:", err));
 								})
-								.catch((err) => console.error("ERROR:", err));
-						})
-						.catch(() => {
+								.catch(() => {
+								});
 						});
+					});
+					document.querySelectorAll("#cms [data-href]").forEach((el) => {
+						el.href = el.dataset.href.replace(
+							/^ROOT\//,
+							FHC_JS_DATA_STORAGE_OBJECT.app_root
+						);
+					});
+					Vue.nextTick(()=>{
+						document.querySelectorAll(".card-header").forEach((el) => {
+							el.classList.add("fhc-primary");
+						});
+						document.querySelectorAll(".row").forEach((el) => {
+							el.classList.add("w-100");
+							el.classList.add("align-items-center");
+							
+						});
+						document.querySelectorAll(".row h2").forEach((el) => {
+							el.classList.add("mb-0");
+						});
+
+					})
 				});
-			});
-			document.querySelectorAll("#cms [data-href]").forEach((el) => {
-				el.href = el.dataset.href.replace(
-					/^ROOT\//,
-					FHC_JS_DATA_STORAGE_OBJECT.app_root
-				);
-			});
-		});
-	},
-    loadNewPageContent: function (data) {
-		this.$fhcApi.factory.cms.getNews(data.page, data.rows)
-		.then(res => res.data)
-		.then(result => {
-			this.content = result;
-		});
-		
-    },
+		},
+		loadNewPageContent(data) {
+			this.$api
+				.call(ApiCms.getNews(data.page, data.rows))
+				.then(res => res.data)
+				.then(result => {
+					this.content = result;
+					
+				});
+		}
   },
   created() {
     this.fetchNews();
 
-    this.$fhcApi.factory.cms.getNewsRowCount()
-	.then(res => res.data)
-	.then(result => {
-    	this.maxPageCount = result;
-    });
+		this.$api
+			.call(ApiCms.getNewsRowCount())
+			.then(res => res.data)
+			.then(result => {
+				this.maxPageCount = result;
+			});
   },
   template: /*html*/ `
-  	<h2 >News</h2>
+  	<h2 class="fhc-primary-color">News</h2>
 	<hr/>
 	<pagination v-show="content?true:false" :page_size="page_size"  @page="page=$event.page; loadNewPageContent($event)" :maxPageCount="maxPageCount">
 	</pagination>
-	<div class="container-fluid">
+	<div class="container-fluid mt-4">
 		<div class="row">
 			<div class="col" v-html="content">
 			</div>

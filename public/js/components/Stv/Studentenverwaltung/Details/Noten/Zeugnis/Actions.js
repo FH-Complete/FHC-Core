@@ -2,8 +2,10 @@ import CoreForm from '../../../../../Form/Form.js';
 import FormInput from '../../../../../Form/Input.js';
 import ZeugnisDocuments from './Documents.js';
 
+import ApiStvGrades from '../../../../../../api/factory/stv/grades.js';
 
 export default {
+	name: 'ZeugnisActions',
 	components: {
 		CoreForm,
 		FormInput,
@@ -13,9 +15,16 @@ export default {
 		'setGrade',
 		'deleteGrade'
 	],
-	inject: [
-		'config'
-	],
+	inject: {
+		config: {
+			from: 'config',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		selected: Array
 	},
@@ -62,8 +71,12 @@ export default {
 			if (!query) {
 				return this.suggestions = this.grades;
 			}
-			this.$refs.points.factory
-				.stv.grades.getGradeFromPoints(query, this.selected.find(Boolean)?.lehrveranstaltung_id)
+			this.$refs.points
+				.call(ApiStvGrades.getGradeFromPoints(
+					query,
+					this.selected.find(Boolean)?.lehrveranstaltung_id,
+					this.currentSemester
+				))
 				.then(result => {
 					if (result.data === null) {
 						this.suggestions = [];
@@ -84,8 +97,8 @@ export default {
 		}
 	},
 	created() {
-		this.$fhcApi.factory
-			.stv.grades.list()
+		this.$api
+			.call(ApiStvGrades.list())
 			.then(result => {
 				this.grades = result.data;
 			})

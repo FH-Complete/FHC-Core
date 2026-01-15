@@ -27,6 +27,7 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
+//require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
 require_once('dbupdate_3.4/dbupdate_dashboard.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
@@ -61,6 +62,7 @@ require_once('dbupdate_3.4/41134_C4_bookmark_dashboardWidget.php');
 require_once('dbupdate_3.4/28575_softwarebereitstellung.php');
 require_once('dbupdate_3.4/41150_oe-pfad_db_view.php');
 require_once('dbupdate_3.4/44031_stv_favorites.php');
+require_once('dbupdate_3.4/37620_reihungslisten.php');
 require_once('dbupdate_3.4/40896_kennzeichnung_unruly_person.php');
 require_once('dbupdate_3.4/39911_tabulator_in_contentmittitel.php');
 require_once('dbupdate_3.4/25999_C4_permission.php');
@@ -73,6 +75,19 @@ require_once('dbupdate_3.4/55968_index_anrechnung.php');
 require_once('dbupdate_3.4/25999_locale_update.php');
 require_once('dbupdate_3.4/56017_anrechnungen_lvs_markieren_die_nicht_angerecht_werden_koennen.php');
 require_once('dbupdate_3.4/55289_pep_fine_tuning.php');
+require_once('dbupdate_3.4/55614_perm_verwaltetoe.php');
+require_once('dbupdate_3.4/25999_C4_dashboard.php');
+require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
+require_once('dbupdate_3.4/40128_search.php');
+require_once('dbupdate_3.4/63394_Variablenbeschraenkung.php');
+require_once('dbupdate_3.4/63436_cis4_iframe_component.php');
+require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
+require_once('dbupdate_3.4/66982_berufsschule.php');
+require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
+require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
+require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
+require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
+require_once('dbupdate_3.4/68744_StV_settings.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -155,8 +170,8 @@ $tabellen=array(
 	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum","pruefungsintervall"),
-	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur"),
-	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur", "anderer_raum"),
+	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum", "ects"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_studierendenantrag" => array("studierendenantrag_id","prestudent_id","studiensemester_kurzbz","datum","typ","insertamum","insertvon","datum_wiedereinstieg","grund","dms_id"),
@@ -191,7 +206,7 @@ $tabellen=array(
 	"fue.tbl_ressource"  => array("ressource_id","student_uid","mitarbeiter_uid","betriebsmittel_id","firma_id","bezeichnung","beschreibung","insertamum","insertvon","updateamum","updatevon"),
 	"fue.tbl_scrumteam" => array("scrumteam_kurzbz","bezeichnung","punkteprosprint","tasksprosprint","gruppe_kurzbz"),
 	"fue.tbl_scrumsprint" => array("scrumsprint_id","scrumteam_kurzbz","sprint_kurzbz","sprintstart","sprintende","insertamum","insertvon","updateamum","updatevon"),
-	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon"),
+	"hr.tbl_sachaufwand" => array("sachaufwand_id","mitarbeiter_uid","sachaufwandtyp_kurzbz","dienstverhaeltnis_id","beginn","ende","anmerkung","insertamum","insertvon","updateamum","updatevon","betrag"),
 	"hr.tbl_sachaufwandtyp" => array("sachaufwandtyp_kurzbz","bezeichnung","sort", "aktiv"),
 	"hr.tbl_stundensatz" => array("stundensatz_id","uid","stundensatztyp","stundensatz","oe_kurzbz","gueltig_von","gueltig_bis","insertamum","insertvon","updateamum","updatevon"),
 	"hr.tbl_stundensatztyp" => array("stundensatztyp","bezeichnung","aktiv","insertamum","insertvon","updateamum","updatevon"),
@@ -212,7 +227,7 @@ $tabellen=array(
 	"hr.tbl_teilzeittyp" => array("teilzeittyp_kurzbz","bezeichnung","aktiv"),
 	"hr.tbl_gehaltsbestandteil" => array("gehaltsbestandteil_id","dienstverhaeltnis_id","vertragsbestandteil_id","gehaltstyp_kurzbz","von","bis","anmerkung","grundbetrag","betrag_valorisiert","valorisierungssperre","insertamum", "insertvon","updateamum","updatevon","valorisierung","auszahlungen"),
 	"hr.tbl_gehaltshistorie" => array("gehaltshistorie_id", "datum","betrag","gehaltsbestandteil_id","mitarbeiter_uid","gehaltsbestandteil_von","gehaltsbestandteil_bis"),
-	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv"),
+	"hr.tbl_gehaltstyp" => array("gehaltstyp_kurzbz","bezeichnung","valorisierung","sort","aktiv","lvexport","lvexport_sum"),
 	"hr.tbl_frist" => array("frist_id","mitarbeiter_uid","ereignis_kurzbz","bezeichnung","datum","status_kurzbz","parameter","insertvon","insertamum","updatevon","updateamum"),
 	"hr.tbl_frist_ereignis" => array("ereignis_kurzbz","bezeichnung","manuell","sort"),
 	"hr.tbl_frist_status" => array("status_kurzbz", "bezeichnung","sort"),

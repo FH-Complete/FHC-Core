@@ -709,24 +709,38 @@ class Studiengang_model extends DB_Model
 		if (isError($stg_ltg))
 			return $stg_ltg;
 		$stg_ltg = getData($stg_ltg) ?: [];
+		$stg_ltg = array_values(array_filter($stg_ltg, function($stg_leitung){
+			return $stg_leitung->aktiv;
+		}));
 		$addFotoProperty($stg_ltg);
 
 		$gf_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('gLtg', $stg_obj->oe_kurzbz);
 		if (isError($gf_ltg))
 			return $gf_ltg;
 		$gf_ltg = getData($gf_ltg) ?: [];
+		$gf_ltg = array_values(array_filter($gf_ltg, function($gf_leitung){
+			return $gf_leitung->aktiv;
+		}));
 		$addEmailProperty($gf_ltg);
+		$addFotoProperty($gf_ltg);
 
 		$stv_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stvLtg', $stg_obj->oe_kurzbz);
 		if (isError($stv_ltg))
 			return $stv_ltg;
 		$stv_ltg = getData($stv_ltg) ?: [];
+		$stv_ltg = array_values(array_filter($stv_ltg, function($stv_leitung){
+			return $stv_leitung->aktiv;
+		}));
 		$addEmailProperty($stv_ltg);
-		
+		$addFotoProperty($stv_ltg);
+
 		$ass = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
 		if (isError($ass))
 			return $ass;
 		$ass = getData($ass) ?: [];
+		$ass = array_values(array_filter($ass, function($assistenz){
+			return $assistenz->aktiv;
+		}));
 		$addEmailProperty($ass);
 		$addFotoProperty($ass);
 
@@ -734,6 +748,9 @@ class Studiengang_model extends DB_Model
 		if (isError($hochschulvertr))
 			return $hochschulvertr;
 		$hochschulvertr = getData($hochschulvertr) ?: [];
+		$hochschulvertr = array_values(array_filter($hochschulvertr, function($hochschul_vertreter){
+			return $hochschul_vertreter->aktiv;
+		}));
 		$addEmailProperty($hochschulvertr);
 
 
@@ -741,6 +758,9 @@ class Studiengang_model extends DB_Model
 		if (isError($stdv))
 			return $stdv;
 		$stdv = getData($stdv) ?: [];
+		$stdv = array_values(array_filter($stdv, function($std_vertreter){
+			return $std_vertreter->aktiv;
+		}));
 		$addEmailProperty($stdv);
 
 
@@ -748,6 +768,9 @@ class Studiengang_model extends DB_Model
 		if (isError($jahrgangsvertr))
 			return $jahrgangsvertr;
 		$jahrgangsvertr = getData($jahrgangsvertr) ?: [];
+		$jahrgangsvertr = array_values(array_filter($jahrgangsvertr, function($jahrgang_vertreter){
+			return $jahrgang_vertreter->aktiv;
+		}));
 		$addEmailProperty($jahrgangsvertr);
 
 

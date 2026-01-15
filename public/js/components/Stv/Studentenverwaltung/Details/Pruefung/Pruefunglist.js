@@ -3,6 +3,8 @@ import FormInput from "../../../../Form/Input.js";
 import FormForm from '../../../../Form/Form.js';
 import BsModal from "../../../../Bootstrap/Modal.js";
 
+import ApiStvExam from '../../../../../api/factory/stv/exam.js';
+
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -29,12 +31,7 @@ export default{
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.exam.getPruefungen,
-				ajaxParams: () => {
-					return {
-						id: this.uid
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvExam.getPruefungen(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Datum", field: "format_datum"},
@@ -49,8 +46,6 @@ export default{
 					{title: "Punkte", field: "punkte", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
-						minWidth: 150,
-						maxWidth: 150,
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -92,10 +87,11 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				persistenceID:'stv-details-pruefung-pruefung-list'
+				index: 'pruefung_id',
+				persistenceID: 'stv-details-pruefung-list-2025112402'
 			},
 			tabulatorEvents: [
 				{
@@ -126,7 +122,7 @@ export default{
 							title: this.$p.t('ui', 'pruefung_id')
 						});
 						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('ui', 'lehreinheit_id')
+							title: this.$p.t('global', 'lehreinheit_id')
 						});
 						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
 							title: this.$p.t('ui', 'mitarbeiter_uid')
@@ -150,7 +146,6 @@ export default{
 			listMas: [],
 			listMarks: [],
 			zeugnisData: [],
-			checkData:[],
 			filter: false,
 			statusNew: true,
 			isStartDropDown: false,
@@ -168,7 +163,8 @@ export default{
 	},
 	methods:{
 		loadPruefung(pruefung_id) {
-			return this.$fhcApi.factory.stv.exam.loadPruefung(pruefung_id)
+			return this.$api
+				.call(ApiStvExam.loadPruefung(pruefung_id))
 				.then(result => {
 					this.pruefungData = result.data;
 					return result;
@@ -182,7 +178,7 @@ export default{
 
 			this.pruefungData.student_uid = this.uid;
 			this.pruefungData.note = 9;
-			this.pruefungData.datum = new Date();
+			this.pruefungData.datum = luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 			this.pruefungData.pruefungstyp_kurzbz = null;
 			if(lv_id){
 				this.pruefungData.lehrveranstaltung_id = lv_id;
@@ -194,7 +190,7 @@ export default{
 			this.isStartDropDown = false;
 			this.loadPruefung(pruefung_id).then(() => {
 				this.pruefungData.note = 9;
-				this.pruefungData.datum = new Date();
+				this.pruefungData.datum = luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 				this.pruefungData.pruefungstyp_kurzbz = null;
 				this.pruefungData.anmerkung = null;
 				this.prepareDropdowns();
@@ -226,12 +222,12 @@ export default{
 
 			});
 		},
-		addPruefung(){
-			return this.$fhcApi.factory.stv.exam.addPruefung(this.$refs.examData, this.pruefungData)
+		addPruefung() {
+			return this.$refs.examData
+				.call(ApiStvExam.addPruefung(this.pruefungData))
 				.then(response => {
-					this.checkData = response.data;
-					if (this.checkData === 2 || this.checkData === 5)
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+					if (response.data)
+						this.$fhcAlert.alertDefault('info', 'Info', response.data, true);
 					else
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('pruefungModal');
@@ -243,14 +239,16 @@ export default{
 				});
 		},
 		updatePruefung(pruefung_id){
-			this.checkChangeAfterExamDate();
-			return this.$fhcApi.factory.stv.exam.updatePruefung(this.$refs.examData, pruefung_id, this.pruefungData)
-			.then(response => {
-				this.checkData = response.data;
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-				this.hideModal('pruefungModal');
-				this.resetModal();
-			}).catch(this.$fhcAlert.handleSystemError)
+			return this.$refs.examData
+				.call(ApiStvExam.updatePruefung(pruefung_id, this.pruefungData))
+				.then(response => {
+					if (response.data)
+						this.$fhcAlert.alertDefault('info', 'Info', response.data, true);
+					else
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.hideModal('pruefungModal');
+					this.resetModal();
+				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					window.scrollTo(0, 0);
 					this.reload();
@@ -265,30 +263,13 @@ export default{
 			else
 				this.showHint = false;
 		},
-		checkChangeAfterExamDate(){
-			const data = {
-				student_uid: this.pruefungData.student_uid,
-				studiensemester_kurzbz: this.pruefungData.studiensemester_kurzbz,
-				lehrveranstaltung_id: this.pruefungData.lehrveranstaltung_id
-			};
-			return this.$fhcApi.factory.stv.exam.checkZeugnisnoteLv(data)
-				.then(result => {
-					this.zeugnisData = result.data;
-					let checkDate = this.zeugnisData[0].uebernahmedatum === '' ||
-					this.zeugnisData[0].benotungsdatum > this.zeugnisData[0].uebernahmedatum
-						? this.zeugnisData[0].benotungsdatum
-						: this.zeugnisData[0].uebernahmedatum;
-					if (checkDate >= this.pruefungData.datum
-						&& this.pruefungData.note !== this.zeugnisData[0].note) {
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
-					}
-				}).catch(this.$fhcAlert.handleSystemError);
-		},
 		deletePruefung(pruefung_id) {
-			return this.$fhcApi.factory.stv.exam.deletePruefung(pruefung_id)
+			return this.$api
+				.call(ApiStvExam.deletePruefung(pruefung_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
+				})
+				.catch(this.$fhcAlert.handleSystemError)
 				.finally(()=> {
 					window.scrollTo(0, 0);
 					this.reload();
@@ -304,8 +285,9 @@ export default{
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		getMaFromLv(lv_id){
-			return this.$fhcApi.factory.stv.exam.getMitarbeiterLv(lv_id)
+		getMaFromLv(lv_id) {
+			return this.$api
+				.call(ApiStvExam.getMitarbeiterLv(lv_id))
 				.then(result => {
 					this.listMas = result.data;
 				})
@@ -316,7 +298,8 @@ export default{
 				lv_id: lv_id,
 				studiensemester_kurzbz: studiensemester_kurzbz
 			};
-			return this.$fhcApi.factory.stv.exam.getAllLehreinheiten(data)
+			return this.$api
+				.call(ApiStvExam.getAllLehreinheiten(data))
 				.then(response => {
 					this.listLes = response.data;
 				})
@@ -343,7 +326,7 @@ export default{
 			else {
 				this.$refs.table.tabulator.clearFilter("studiensemester_kurzbz");
 			}
-		},
+		}
 	},
 	watch: {
 		//adaption to go directly through different semesters
@@ -355,31 +338,37 @@ export default{
 			}
 		},
 	},
-	created(){
-		this.$fhcApi.factory.stv.exam.getLvsByStudent(this.uid)
+	created() {
+		this.$api
+			.call(ApiStvExam.getLvsByStudent(this.uid))
 			.then(result => {
 				this.listLvs = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exam.getLvsandLesByStudent(this.uid, this.currentSemester)
+		this.$api
+			.call(ApiStvExam.getLvsandLesByStudent(this.uid, this.currentSemester))
 			.then(result => {
 				this.listLvsAndLes = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-		this.$fhcApi.factory.stv.exam.getLvsAndMas(this.uid)
+
+		this.$api
+			.call(ApiStvExam.getLvsAndMas(this.uid))
 			.then(result => {
 				this.listLvsAndMas = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exam.getTypenPruefungen()
+		this.$api
+			.call(ApiStvExam.getTypenPruefungen())
 			.then(result => {
 				this.listTypesExam = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi.factory.stv.exam.getNoten()
+		this.$api
+			.call(ApiStvExam.getNoten())
 			.then(result => {
 				this.listMarks = result.data;
 			})
@@ -387,10 +376,6 @@ export default{
 	},
 	template: `
 	<div class="stv-details-pruefung-pruefung-list 100 pt-3">
-
-	{{currentSemester}}
-
-	{{listLvsAndLes.gruppe}}
 	
 	  <div>	  
 		<div class="justify-content-end pb-3">
@@ -411,6 +396,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('lehre', 'pruefung')"
 			@click:new="actionNewPruefung"
@@ -424,7 +410,7 @@ export default{
 				<p v-else class="fw-bold mt-3">{{ $p.t('exam', 'edit_pruefung') }}</p>
 			</template>
 	
-			<form-form class="row pt-3" ref="examData">
+			<form-form class="row pt-3" ref="examData" @submit.prevent>
 				<legend>Details</legend>
 				
 				<!--DropDown Lehrveranstaltung-->
@@ -524,10 +510,12 @@ export default{
 					container-class="mb-3"
 					type="DatePicker"
 					v-model="pruefungData.datum"
+					model-type="yyyy-MM-dd"
 					name="datum"
 					:label="$p.t('global/datum')"
 					auto-apply
 					:enable-time-picker="false"
+					text-input
 					format="dd.MM.yyyy"
 					preview-format="dd.MM.yyyy"
 					:teleport="true"

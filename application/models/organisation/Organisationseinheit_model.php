@@ -191,7 +191,7 @@ class Organisationseinheit_model extends DB_Model
 
     /**
      * @param string $oe_kurzbz
-     * 
+     *
      * @return stdClass
      */
     public function getWithType($oe_kurzbz)
@@ -203,18 +203,44 @@ class Organisationseinheit_model extends DB_Model
     }
 
 	/**
-	 * Get OEs by eventQuery string. Use with autocomplete event queries.
-	 * @param $eventQuery String
-	 * @return array
+	 * get highest organisation units
 	 */
-	public function getAutocompleteSuggestions($eventQuery)
+	public function getHeads()
 	{
-		$this->addSelect('oe_kurzbz');
-		$this->addSelect('organisationseinheittyp_kurzbz, oe_kurzbz, bezeichnung, aktiv, lehre');
-		$this->addOrder('organisationseinheittyp_kurzbz, bezeichnung');
+		$this->addSelect('*');
+		$this->addSelect('oe_kurzbz as head');
+		$result = $this->loadWhere(array('oe_parent_kurzbz' => null, 'aktiv' => true));
 
-		return $this->loadWhere("
-			oe_kurzbz ILIKE '%". $this->escapeLike($eventQuery). "%'
-		");
+		return $result;
+	}
+
+	/**
+	 * Ermittelt die Stundenobergrenze fuer Lektoren
+	 * Dabei wird im OE Baum nach oben nach Stundengrenzen gesucht und die niedrigste Stundengrenze ermittelt
+	 * @param $oe_kurzbz Organisationseinheit
+	 * @param $fixangestellt boolean legt fest ob die Grenze
+	 *        fuer Freie oder Fixangestellte Lektoren ermittelt werden soll
+
+	 */
+	public function getStundengrenze($oe_kurzbz, $fixangestellt = true)
+	{
+		$fixfrei = $fixangestellt ? 'fix' : 'frei';
+
+		$qry = "
+			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
+			(
+				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
+				WHERE oe_kurzbz= ?
+				UNION ALL
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
+				WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
+			)
+			SELECT oe_kurzbz, warn_semesterstunden_{$fixfrei} AS stunden
+			FROM oes
+				JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+			ORDER BY warn_semesterstunden_{$fixfrei} ASC
+			LIMIT 1";
+
+		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
 	}
 }

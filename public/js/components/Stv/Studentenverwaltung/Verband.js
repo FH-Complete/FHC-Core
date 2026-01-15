@@ -1,34 +1,81 @@
-import {CoreRESTClient} from '../../../RESTClient.js';
+import drop from '../../../directives/drop.js';
+import dragClick from '../../../directives/dragClick.js';
 
-
-import PvTree from "../../../../../index.ci.php/public/js/components/primevue/tree/tree.esm.min.js";
-import PvTreetable from "../../../../../index.ci.php/public/js/components/primevue/treetable/treetable.esm.min.js";
-import PvColumn from "../../../../../index.ci.php/public/js/components/primevue/column/column.esm.min.js";
-
+import ApiStvGroups from '../../../api/factory/stv/group.js';
+import ApiStvDetails from '../../../api/factory/stv/details.js';
 
 export default {
 	components: {
-		PvTree,
-		PvTreetable,
-		PvColumn
+		PvTreetable: primevue.treetable,
+		PvColumn: primevue.column
+	},
+	directives: {
+		drop,
+		dragClick
+	},
+	inject: {
+		$reloadList: {
+			from: '$reloadList',
+			default: () => {}
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		},
+		appConfig: {
+			from: 'appConfig',
+			default: {
+				number_displayed_past_studiensemester: 5
+			}
+		}
 	},
 	emits: [
 		'selectVerband'
 	],
+	props: {
+		endpoint: {
+			type: Object,
+			required: true,
+		},
+		preselectedKey: {
+			type: String,
+			default: null
+		}
+	},
 	data() {
 		return {
 			loading: true,
 			nodes: [],
 			selectedKey: [],
+			expandedKeys: {},
 			filters: {}, // TODO(chris): filter only 1st level?
-			favnodes: [],
 			favorites: {on: false, list: []}
 		}
 	},
 	computed: {
 		filteredNodes() {
-			// TODO(chris): what to display actually?
-			return this.favorites.on ? this.favnodes : this.nodes;
+			if (this.favorites.on)
+				return this.nodes.filter(node => this.favorites.list.includes(node.key));
+			
+			return this.nodes;
+		},
+		noSemReloadNodes() {
+			return this.nodes.reduce(this.mapNodesToNoSemReloadNodes, []);
+		}
+	},
+	watch: {
+		'preselectedKey': function (newVal, oldVal) {
+			if (newVal !== oldVal) {
+				this.setPreselection();
+			}
+		},
+		'appConfig.number_displayed_past_studiensemester'(newVal, oldVal) {
+			if (oldVal !== undefined) {
+				this.noSemReloadNodes.forEach(node => {
+					delete node.children;
+					this.onExpandTreeNode(node);
+				});
+			}
 		}
 	},
 	methods: {
@@ -43,7 +90,7 @@ export default {
 				return res.pop();
 			return null;
 		},
-		onExpandTreeNode(node) {
+		async onExpandTreeNode(node) {
 			if (!node.children) {
 				if (node.data.link) {
 					let activeEl = null;
@@ -54,8 +101,8 @@ export default {
 					});
 					this.loading = true;
 					
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + node.data.link)
+					return this.$api
+						.call(this.endpoint.get(node.data.link))
 						.then(result => result.data)
 						.then(result => {
 							const subNodes = result.map(this.mapResultToTreeData);
@@ -67,7 +114,7 @@ export default {
 
 							let treeitem = this.$refs.tree.$el.querySelector('[data-tree-item-key="' + node.key + '"]');
 							treeitem = treeitem.closest('[role="row"]');
-							
+
 							this.$nextTick(() => {
 								if (activeEl == document.activeElement)
 									treeitem.dispatchEvent(new KeyboardEvent('keydown', {
@@ -84,7 +131,14 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz, semester: node.data.semester, orgform_kurzbz: node.data.orgform_kurzbz});
+		},
+		mapNodesToNoSemReloadNodes(result, node) {
+			if (node.data.no_sem_reload)
+				result.push(node);
+			if (node.children)
+				result = node.children.reduce(this.mapNodesToNoSemReloadNodes, result);
+			return result;
 		},
 		mapResultToTreeData(el) {
 			const cp = {
@@ -100,66 +154,26 @@ export default {
 
 			return cp;
 		},
-		async filterFav() {
-			if (!this.favorites.on && !this.favnodes.length && this.favorites.list.length) {
-				this.loading = true;
-				this.favnodes = await this.loadNodes(this.favorites.list);
-			}
+		filterFav() {
 			this.favorites.on = !this.favorites.on;
-			this.$fhcApi
-				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
-			this.loading = false;
+			this.$api
+				.call(this.endpoint.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 		},
-		async loadNodes(links) {
-			let sortedInParents = links.reduce((o, link) => {
-				link = link + '';
-				let parent,
-					parts = link.split('/');
-				if (parts.length == 1) {
-					parent = '_';
-				} else {
-					parts.pop();
-					parent = parts.join('/');
-				}
-				if (!o[parent])
-					o[parent] = [link];
-				else
-					o[parent].push(link);
-				return o;
-			}, {});
-			
-			let promises = [];
-			for (let parent in sortedInParents)
-				promises.push(
-					this.$fhcApi
-						.get('api/frontend/v1/stv/verband/' + (parent == '_' ? '' : parent))
-						.then(res => res.data)
-						.then(res => res.filter(node => sortedInParents[parent].includes(node.link + '')))
-				);
-			
-			// NOTE(chris): merge the resulting arrays and transform them to an associative one
-			let result = [].concat.apply([], await Promise.all(promises)).reduce((o, node) => {
-				o[node.link + ''] = this.mapResultToTreeData({...node, leaf: true, children: undefined});
-				return o;
-			}, {});
-
-			return links.map(link => result[link]);
-		},
-		async markFav(key) {
+		markFav(key) {
 			let index = this.favorites.list.indexOf(key.data.link + '');
 
 			if (index != -1) {
-				if (this.favnodes.length)
-					this.favnodes = this.favnodes.filter(node => node.data.link != key.data.link);
 				this.favorites.list.splice(index, 1);
 			} else {
-				if (this.favnodes.length || this.favorites.on)
-					this.favnodes.push((await this.loadNodes([key.data.link])).pop());
 				this.favorites.list.push(key.data.link + '');
 			}
-			
-			this.$fhcApi
-				.factory.stv.verband.favorites.set(JSON.stringify(this.favorites));
+
+			this.$api
+				.call(this.endpoint.favorites.set(
+					JSON.stringify(this.favorites)
+				));
 		},
 		unsetFavFocus(e) {
 			if (e.target.dataset?.linkFavAdd !== undefined) {
@@ -176,36 +190,135 @@ export default {
 				let items = e.target.querySelectorAll('[data-link-fav-add][tabindex="-1"]');
 				items.forEach(el => el.tabIndex = 0);
 			}
+		},
+		async setPreselection()
+		{
+			if (!this.preselectedKey)
+			{
+				this.selectedKey = null;
+				return;
+			}
+
+			let rawKey = this.preselectedKey
+
+			if (!rawKey || typeof rawKey !== 'string')
+				return;
+
+			const parts = this.preselectedKey.split('/');
+			let currentKey = parts[0];
+			let currentNode = this.findNodeByKey(currentKey);
+
+			if (!currentNode)
+				return;
+
+			if(this.selectedKey)
+			{
+				const currentSelectedKey = Object.keys(this.selectedKey).find(Boolean);
+				if (currentSelectedKey) {
+					if (currentSelectedKey == currentKey)
+						return;
+					/**
+					 * Do not select a new entry if the current is a child of the new one.
+					 * This happens if a child entry of a new stg is selected and the router
+					 * tries to select the stg root entry (because subtrees do not have
+					 * routes yet)
+					 */
+					const isChild = this.findNodeByKey(
+						currentSelectedKey,
+						currentNode.children || []
+					);
+					if (isChild)
+						return;
+				}
+			}
+
+			for (let i = 1; i < parts.length; i++)
+			{
+				this.expandedKeys[currentNode.key] = true;
+
+				await this.onExpandTreeNode(currentNode);
+
+				currentKey += '-' + parts[i];
+				currentNode = this.findNodeByKey(currentKey);
+
+				if (!currentNode)
+				{
+					return;
+				}
+			}
+
+			this.selectedKey = {[currentNode.key]: true};
+			this.onSelectTreeNode(currentNode);
+		},
+		async toggleTreeNode(node) {
+			if (this.expandedKeys[node.key]) {
+				delete this.expandedKeys[node.key];
+			} else if (!node.leaf) {
+				await this.onExpandTreeNode(node);
+				this.expandedKeys[node.key] = true;
+			}
+		},
+		getStudentAjaxId(student) {
+			let res = student.id;
+			if (student.vorname && student.nachname)
+				res += ' (' + student.vorname + ' ' + student.nachname + ')';
+			return res;
+		},
+		dropStudents(node, students) {
+			const data = node.data;
+			
+			let endpoint;
+			if (data.gruppe_kurzbz) {
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvGroups.add(
+						student.id,
+						data.gruppe_kurzbz,
+						this.currentSemester
+					)
+				]);
+			} else {
+				const { semester, verband, gruppe } = data;
+				const params = { semester, verband, gruppe };
+				endpoint = students.map(student => [
+					this.getStudentAjaxId(student),
+					ApiStvDetails.saveStudent(
+						student.id,
+						this.currentSemester,
+						params
+					)
+				]);
+			}
+
+			return this.$api
+				.call(endpoint)
+				.then(this.$reloadList)
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	mounted() {
-		this.$fhcApi
-			.factory.stv.verband.get()
+		this.$api
+			.call(this.endpoint.get())
 			.then(result => {
-				this.nodes = result.data.map(this.mapResultToTreeData);
+				this.nodes = result.data.map(el => {
+					el.root = true;
+					return this.mapResultToTreeData(el);
+				});
+				this.setPreselection();
 				this.loading = false;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		this.$fhcApi
-			.factory.stv.verband.favorites.get()
+		this.$api
+			.call(this.endpoint.favorites.get())
 			.then(result => {
 				if (result.data) {
-					let f = JSON.parse(result.data);
-					if (f.on) {
-						this.loading = true;
-						this.favorites = f;
-						this.loadNodes(this.favorites.list).then(res => {
-							this.favnodes = res;
-							this.loading = false;
-						});
-					} else
-						this.favorites = f;
+					this.favorites = JSON.parse(result.data);
 				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="overflow-auto" tabindex="-1">
 		<pv-treetable
 			ref="tree"
@@ -213,6 +326,7 @@ export default {
 			:value="filteredNodes"
 			@node-expand="onExpandTreeNode"
 			selection-mode="single"
+			v-model:expanded-keys="expandedKeys"
 			v-model:selection-keys="selectedKey"
 			@node-select="onSelectTreeNode"
 			scrollable
@@ -220,35 +334,75 @@ export default {
 			@focusin="setFavFocus"
 			@focusout="unsetFavFocus"
 			:filters="filters"
+		>
+			<pv-column
+				field="name"
+				expander
+				class="text-break"
 			>
-			<pv-column field="name" expander>
 				<template #header>
 					<div class="text-right">
 						<div class="p-input-icon-left">
 							<i class="pi pi-search"></i>
-							<input type="text" v-model="filters['global']" class="form-control ps-5" placeholder="Search" />
+							<input
+								type="text"
+								v-model="filters['global']"
+								class="form-control ps-5"
+								placeholder="Search"
+							>
 						</div>
 					</div>
 				</template>
-				<template #body="{node}">
-					<span :data-tree-item-key="node.key" :title="node.data.studiengang_kz">
-						{{node.data.name}}
+				<template #body="{ node }">
+					<span
+						v-if="['semester', 'verband', 'gruppe', 'gruppe_kurzbz'].some(key => node.data.hasOwnProperty(key))"
+						:data-tree-item-key="node.key"
+						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
+					>
+						{{ node.data.name }}
+					</span>
+					<span
+						v-else
+						:data-tree-item-key="node.key"
+						:title="node.data.studiengang_kz"
+						v-drag-click="() => toggleTreeNode(node)"
+					>
+						{{ node.data.name }}
 					</span>
 				</template>
 			</pv-column>
-			<pv-column field="fav" headerStyle="flex: 0 0 auto" style="flex: 0 0 auto">
+			<pv-column
+				field="fav"
+				class="flex-shrink-0 flex-grow-0"
+				header-class="flex-shrink-0 flex-grow-0"
+			>
 				<template #header>
-					<a href="#" @click.prevent="filterFav"><i :class="favorites.on ? 'fa-solid' : 'fa-regular'" class="fa-star"></i></a>
-				</template>
-				<template #body="{node, column}">
 					<a
+						v-if="favorites.on || favorites.list.length"
 						href="#"
-						@click.prevent="markFav(node)"
-						@keydown.enter.stop.prevent="markFav(node)"
+						@click.prevent="filterFav"
+					>
+						<i
+							:class="favorites.on ? 'fa-solid' : 'fa-regular'"
+							class="fa-star"
+						></i>
+					</a>
+				</template>
+				<template #body="{ node }">
+					<a
+						v-if="node.data.root"
+						href="#"
 						tabindex="-1"
 						data-link-fav-add
-						>
-						<i :class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'" class="fa-star"></i>
+						@click.prevent="markFav(node)"
+						@keydown.enter.stop.prevent="markFav(node)"
+					>
+						<i
+							:class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'"
+							class="fa-star"
+						></i>
 					</a>
 				</template>
 			</pv-column>

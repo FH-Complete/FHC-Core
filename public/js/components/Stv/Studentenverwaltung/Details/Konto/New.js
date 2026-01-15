@@ -4,6 +4,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -16,8 +17,8 @@ export default {
 		lists: {
 			from: 'lists'
 		},
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -37,7 +38,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			data: {}
+			data: {},
 		};
 	},
 	computed: {
@@ -46,7 +47,7 @@ export default {
 		},
 		activeBuchungstypen() {
 			return this.lists.buchungstypen.filter(e => e.aktiv);
-		}
+		},
 	},
 	methods: {
 		save() {
@@ -58,8 +59,8 @@ export default {
 				studiengang_kz: this.stgKz
 			}, ...this.data};
 
-			this.$fhcApi
-				.factory.stv.konto.checkDoubles(this.$refs.form, data)
+			this.$refs.form
+				.call(ApiKonto.checkDoubles(data))
 				.then(result => result.data
 					? Promise.all(
 						result.errors
@@ -68,7 +69,7 @@ export default {
 					)
 					: Promise.resolve())
 				.then(() => data)
-				.then((data) => this.$fhcApi.factory.stv.konto.insert(this.$refs.form, data))
+				.then(data => this.$refs.form.call(ApiKonto.insert(data)))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
@@ -88,7 +89,7 @@ export default {
 				buchungsdatum: new Date(),
 				buchungstext: '',
 				mahnspanne: 30,
-				studiensemester_kurzbz: this.defaultSemester,
+				studiensemester_kurzbz: this.currentSemester,
 				credit_points: null,
 				anmerkung: ''
 			};
@@ -143,9 +144,12 @@ export default {
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
 					auto-apply
 					>
 				</form-input>
+
 				<form-input
 					v-model="data.buchungstext"
 					name="buchungstext"
