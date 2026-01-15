@@ -9,7 +9,6 @@ class PlausicheckResolverLib
 	const EXTENSIONS_FOLDER = 'extensions';
 	const ISSUE_RESOLVERS_FOLDER = 'issues/resolvers';
 	const CHECK_ISSUE_RESOLVED_METHOD_NAME = 'checkIfIssueIsResolved';
-	const CONFIG_FEHLER_FILENAME = 'fehler.php';
 	const CONFIG_FEHLER_NAME = 'fehler';
 	const FEHLERCODE_NAME = 'fehlercode';
 	const FEHLER_KURZBZ_NAME = 'fehler_kurzbz';
@@ -70,7 +69,7 @@ class PlausicheckResolverLib
 
 			foreach ($extensionsData as $ext)
 			{
-				$configFilename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_FILENAME;
+				$configFilename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_NAME.'.php';
 
 				if (file_exists($configFilename))
 				{

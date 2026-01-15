@@ -6,7 +6,7 @@
 abstract class IssueResolver_Controller extends JOB_Controller
 {
 	// codes of fehler to be resolved
-	protected $fehlercodes = [];
+	protected $_fehlercodes = [];
 
 	public function __construct()
 	{

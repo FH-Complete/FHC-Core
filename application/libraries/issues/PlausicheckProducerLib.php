@@ -8,8 +8,8 @@ class PlausicheckProducerLib
 	const CI_LIBRARY_FOLDER = 'libraries';
 	const PLAUSI_ISSUES_FOLDER = 'issues/plausichecks';
 	const EXECUTE_PLAUSI_CHECK_METHOD_NAME = 'executePlausiCheck';
-	const CONFIG_FEHLER_FILENAME = 'fehler.php';
 	const CONFIG_FEHLER_NAME = 'fehler';
+	const CONFIG_FEHLER_INDEX = 'fehler';
 	const FEHLER_KURZBZ_NAME = 'fehler_kurzbz';
 	const PRODUCER_LIB_NAME = 'producerLibName';
 	const EXTENSION_NAME = 'extensionName';
@@ -74,7 +74,7 @@ class PlausicheckProducerLib
 		// get producer file paths for the fehler
 
 		// Load Fehler Entries of Core
-		$configArray = $this->_ci->config->item(self::CONFIG_FEHLER_NAME);
+		$configArray = $this->_ci->config->item(self::CONFIG_FEHLER_INDEX);
 
 		foreach ($configArray as $coreEntry)
 		{
@@ -99,14 +99,14 @@ class PlausicheckProducerLib
 
 			foreach ($extensionsData as $ext)
 			{
-				$configFilePath = ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_FILENAME;
+				$configFilePath = ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_NAME.'.php';
 				$configFilename = APPPATH.'config/'.$configFilePath;
 
 				if (file_exists($configFilename))
 				{
 					$this->_ci->load->config($configFilePath);
 
-					$extensionEntries = $this->_ci->config->item(self::CONFIG_FEHLER_NAME);
+					$extensionEntries = $this->_ci->config->item(self::CONFIG_FEHLER_INDEX);
 
 					if (isset($extensionEntries) && is_array($extensionEntries))
 					{
