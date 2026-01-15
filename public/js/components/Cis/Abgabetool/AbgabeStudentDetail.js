@@ -140,7 +140,7 @@ export const AbgabeStudentDetail = {
 				return false;
 			}
 			
-			if(termin.bezeichnung === 'Endupload') {
+			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'end') {
 				// open endupload form modal for further inputs
 				this.enduploadTermin = termin
 				this.$refs.modalContainerEnduploadZusatzdaten.show()
