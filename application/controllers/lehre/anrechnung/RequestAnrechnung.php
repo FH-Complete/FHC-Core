@@ -13,6 +13,8 @@ class requestAnrechnung extends Auth_Controller
 	const ANRECHNUNGSTATUS_APPROVED = 'approved';
 	const ANRECHNUNGSTATUS_REJECTED = 'rejected';
 
+	private $_uid;
+
 	public function __construct()
 	{
 		// Set required permissions
@@ -26,6 +28,7 @@ class requestAnrechnung extends Auth_Controller
 
 		// Load models
 		$this->load->model('education/Anrechnung_model', 'AnrechnungModel');
+		$this->load->model('education/lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('content/DmsVersion_model', 'DmsVersionModel');
 
 		// Load libraries
@@ -75,7 +78,16 @@ class requestAnrechnung extends Auth_Controller
 		{
 			show_error('Cant load user');
 		}
-		
+
+		$lv_result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+		if (!hasData($lv_result))
+			show_error('Cant load LV');
+
+		$lv = getData($lv_result)[0];
+
+		if (!$lv->anrechenbar)
+			show_error('Forbidden');
+
 		// Get Prestudent ID
 		$prestudent_id = getData($result)[0]->prestudent_id;
 		
@@ -118,6 +130,18 @@ class requestAnrechnung extends Auth_Controller
 			? $this->input->post('begruendung_lvinhalt')
 			: NULL;
 
+		if (isEmptyString($lehrveranstaltung_id))
+			return $this->outputJsonError($this->p->t('ui', 'errorFelderFehlen'));
+
+		$lv_result = $this->LehrveranstaltungModel->load($lehrveranstaltung_id);
+
+		if (!hasData($lv_result))
+			return $this->outputJsonError('Cant load LV');
+
+		$lv = getData($lv_result)[0];
+
+		if (!$lv->anrechenbar)
+			return $this->outputJsonError('Forbidden');
 
 		// Validate data
 		if (empty($_FILES['uploadfile']['name']))
@@ -127,7 +151,6 @@ class requestAnrechnung extends Auth_Controller
 
 		if (isEmptyString($begruendung_id) ||
 			isEmptyString($anmerkung) ||
-			isEmptyString($lehrveranstaltung_id) ||
 			isEmptyString($studiensemester_kurzbz) ||
 			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_ects)) ||
 			($this->config->item('explain_equivalence') === TRUE && isEmptyString($begruendung_lvinhalt)))
