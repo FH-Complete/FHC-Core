@@ -40,8 +40,6 @@ class AbgabetoolJob extends JOB_Controller
 			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
 			return;
 		}
-
-		// TODO: student name in abgabenstring hinzufügen
 		
 		// group changed/new abgaben for projektarbeiten
 		$projektarbeiten = [];
@@ -107,53 +105,65 @@ class AbgabetoolJob extends JOB_Controller
 				}));
 
 				if(count($relevantAbgaben) == 0) {
-					continue; // Changed break to continue to allow checking other projects in the tuple
+					continue;
 				}
 
-				$projektarbeit_titel = $relevantAbgaben[0]->titel ?? 'Kein Titel vergeben';
+				// format the Student Name
+				$s = $relevantAbgaben[0];
+				$nameParts = [];
+				if (!empty($s->titelpre)) $nameParts[] = $s->titelpre;
+				$nameParts[] = $s->vorname;
+				$nameParts[] = $s->nachname;
+				if (!empty($s->titelpost)) $nameParts[] = $s->titelpost;
+				$studentFullName = implode(' ', $nameParts);
 
-				// --- Start Project Header Section ---
+				$projektarbeit_titel = $s->titel ?? 'Kein Titel vergeben';
+
+				// project header section
 				$abgabenString .= "
-				<div style='margin-top: 25px; padding: 10px; background-color: #f8f9fa; border-left: 4px solid #007bff;'>
-					<strong style='font-size: 16px;'>Projekt: {$projektarbeit_titel}</strong><br/>
-					<span style='color: #666; font-size: 13px;'>
-						ID: {$projektarbeit_id} | Rolle: {$betreuerRow->betreuerart_kurzbz} | 
-						Studiengang: {$relevantAbgaben[0]->stgtyp}{$relevantAbgaben[0]->stgkz} ({$relevantAbgaben[0]->studiensemester_kurzbz})
-					</span>
-				</div>";
-			
-					// --- Start Table ---
-					$abgabenString .= '
-				<table style="width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px;">
-					<thead>
-						<tr style="background-color: #eee; text-align: left;">
-							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Zieldatum</th>
-							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Abgabe bis</th>
-						</tr>
-					</thead>
-					<tbody>';
+					<div style='margin-top: 25px; padding: 12px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-bottom: 1px solid #eee;'>
+						<strong style='font-size: 16px; color: #0056b3;'>Projekt: {$projektarbeit_titel}</strong><br/>
+						<div style='margin-top: 5px; font-size: 14px;'>
+							<strong>Studierende/r:</strong> {$studentFullName}
+						</div>
+						<span style='color: #666; font-size: 12px;'>
+							ID: {$projektarbeit_id} | Rolle: {$betreuerRow->betreuerart_kurzbz} | 
+							Stg: {$s->stgtyp}{$s->stgkz} ({$s->studiensemester_kurzbz})
+						</span>
+					</div>";
+
+				// start table
+				$abgabenString .= '
+					<table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+						<thead>
+							<tr style="background-color: #eee; text-align: left;">
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
+								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabe bis</th>
+							</tr>
+						</thead>
+						<tbody>';
 
 				foreach ($relevantAbgaben as $abgabe) {
 					$dateEmailFormatted = (new DateTime($abgabe->datum))->format('d.m.Y');
 					$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
-
-					$kurzbzLine = !empty($abgabe->kurzbz) ? "<br/><small style='color: #777;'>{$abgabe->kurzbz}</small>" : "";
+					$kurzbzLine = !empty($abgabe->kurzbz) ? "<br/><small style='color: #777; font-style: italic;'>{$abgabe->kurzbz}</small>" : "";
 
 					$abgabenString .= "
-					<tr>
-						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>{$dateEmailFormatted}</td>
-						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
-							<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
-						</td>
-					   <td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>{$abgabedatumFormatted}</td>
-					</tr>";
+						<tr>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$dateEmailFormatted}</td>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
+								<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
+							</td>
+							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
+						</tr>";
 				}
 
 				$abgabenString .= '</tbody></table>';
 			}
-
-			$abgabenString .= '</div>'; // Close container
+			
+			// close container
+			$abgabenString .= '</div>'; 
 
 			// done with building the change list, now send it
 			$betreuerRow = $tupelArr[0][1];
@@ -197,7 +207,7 @@ class AbgabetoolJob extends JOB_Controller
 
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSinceByAbgabedatum($interval);
 		$retval = getData($result);
-		
+
 		// retval are paabgaben joined with projektarbeit and betreuer
 		if(count($retval) == 0) {
 			$this->logInfo("Keine Emails über neue Paabgaben an Betreuer versandt");
@@ -213,21 +223,18 @@ class AbgabetoolJob extends JOB_Controller
 
 			$betreuer_uids[$paabgabe->person_id][] = $paabgabe;
 		}
-		
+
 		$count = 0;
 		forEach ($betreuer_uids as $person_id => $abgaben) {
 			// $person_id is from betreuer
 
 			$result = $this->_ci->ProjektarbeitModel->getProjektbetreuerAnrede($person_id);
 			$data = getData($result)[0];
-			
+
 			$anrede = $data->anrede;
 			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
 			$fullFormattedNameString = $data->first;
 
-			// https://www.php.net/manual/en/migration70.new-features.php#migration70.new-features.spaceship-op
-			// php has spaceships 🚀🚀🚀🚀🚀
-			
 			// sorting $abgaben array by datum
 			usort($abgaben, function ($a, $b) {
 				return strtotime($a->datum) <=> strtotime($b->datum);
@@ -240,15 +247,26 @@ class AbgabetoolJob extends JOB_Controller
 			<table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; color: #333; margin-top: 15px; margin-bottom: 15px;">
 				<thead>
 					<tr style="background-color: #f2f2f2; text-align: left;">
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
+						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Zieldatum</th>
+						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 25%;">Studierende/r</th>
 						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabe bis</th>
+						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Abgabe bis</th>
 					</tr>
 				</thead>
 				<tbody>';
 
+			var_dump($abgaben);
+			
 			foreach ($abgaben as $abgabe) {
-				// format dates inline for cleaner code
+				// format the student name
+				$nameParts = [];
+				if (!empty($abgabe->titelpre)) $nameParts[] = $abgabe->titelpre;
+				$nameParts[] = $abgabe->vorname;
+				$nameParts[] = $abgabe->nachname;
+				if (!empty($abgabe->titelpost)) $nameParts[] = $abgabe->titelpost;
+				$studentFullName = implode(' ', $nameParts);
+
+				// format dates inline
 				$dateEmailFormatted = (new DateTime($abgabe->datum))->format('d.m.Y');
 				$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
 
@@ -257,19 +275,20 @@ class AbgabetoolJob extends JOB_Controller
 
 				$abgabenString .= "
 				<tr>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>{$dateEmailFormatted}</td>
+					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$dateEmailFormatted}</td>
+					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$studentFullName}</td>
 					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
 						<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
 					</td>
-					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>{$abgabedatumFormatted}</td>
+					<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
 				</tr>";
 			}
 
 			$abgabenString .= '</tbody></table>';
-			
+
 			$path = $this->_ci->config->item('URL_MITARBEITER');
 			$url = CIS_ROOT.$path;
-			
+
 			$body_fields = array(
 				'anrede' => $anrede,
 				'anredeFillString' => $anredeFillString,
@@ -279,9 +298,9 @@ class AbgabetoolJob extends JOB_Controller
 				'linkAbgabetool' => $url
 			);
 
-			$result = $this->_ci->ProjektbetreuerModel->getBetreuerOfProjektarbeit($paabgabe->projektarbeit_id, $paabgabe->betreuerart_kurzbz);
+			$result = $this->_ci->ProjektbetreuerModel->getBetreuerOfProjektarbeit($abgaben[0]->projektarbeit_id, $abgaben[0]->betreuerart_kurzbz);
 			$data = getData($result)[0];
-			
+
 			$email = $data->uid ? $data->uid."@".DOMAIN : $data->private_email;
 
 			// send email with bundled info
@@ -291,10 +310,10 @@ class AbgabetoolJob extends JOB_Controller
 				$email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
 			);
-			
+
 			$count++;
 		}
-		
+
 		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
 		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerMail');
 	}
