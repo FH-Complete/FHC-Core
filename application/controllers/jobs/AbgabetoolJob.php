@@ -254,8 +254,6 @@ class AbgabetoolJob extends JOB_Controller
 					</tr>
 				</thead>
 				<tbody>';
-
-			var_dump($abgaben);
 			
 			foreach ($abgaben as $abgabe) {
 				// format the student name
