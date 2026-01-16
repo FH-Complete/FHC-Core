@@ -231,7 +231,7 @@ class IssuesLib
 			return error("Person_id or oe_kurzbz must be set.");
 
 		// get fehlertextVorlage and replace it with params
-		$fehlerRes = $this->_ci->FehlerModel->load($fehlercode);
+		$fehlerRes = $this->_ci->FehlerModel->loadWhere(['fehlercode' => $fehlercode]);
 
 		if (hasData($fehlerRes))
 		{

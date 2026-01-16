@@ -76,16 +76,19 @@ class PlausicheckProducerLib
 		// Load Fehler Entries of Core
 		$configArray = $this->_ci->config->item(self::CONFIG_FEHLER_INDEX);
 
-		foreach ($configArray as $coreEntry)
+		if (isset($configArray) && is_array($configArray))
 		{
-			if (!isset($coreEntry[self::FEHLER_KURZBZ_NAME])
-				|| !isset($coreEntry[self::PRODUCER_LIB_NAME])
-				|| !in_array($coreEntry[self::FEHLER_KURZBZ_NAME], $this->_fehlerKurzbz)
-			) {
-				continue;
-			}
+			foreach ($configArray as $coreEntry)
+			{
+				if (!isset($coreEntry[self::FEHLER_KURZBZ_NAME])
+					|| !isset($coreEntry[self::PRODUCER_LIB_NAME])
+					|| !in_array($coreEntry[self::FEHLER_KURZBZ_NAME], $this->_fehlerKurzbz)
+				) {
+					continue;
+				}
 
-			$this->_fehlerLibMappings[$coreEntry[self::FEHLER_KURZBZ_NAME]][self::PRODUCER_LIB_NAME] = $coreEntry[self::PRODUCER_LIB_NAME];
+				$this->_fehlerLibMappings[$coreEntry[self::FEHLER_KURZBZ_NAME]][self::PRODUCER_LIB_NAME] = $coreEntry[self::PRODUCER_LIB_NAME];
+			}
 		}
 
 		// load fehler entries of extensions

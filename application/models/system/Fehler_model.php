@@ -9,6 +9,7 @@ class Fehler_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'system.tbl_fehler';
-		$this->pk = 'fehlercode';
+		$this->pk = array('fehlercode');
+		$this->hasSequence = false;
 	}
 }
