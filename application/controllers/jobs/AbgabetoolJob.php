@@ -31,7 +31,7 @@ class AbgabetoolJob extends JOB_Controller
 
 	public function notifyAssistenzAboutChangedAbgaben() {
 
-		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+		$this->_ci->logInfo('Start job FHC-Core->notifyAssistenzAboutChangedAbgaben');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 		// get all new or changed termine in interval
@@ -39,7 +39,7 @@ class AbgabetoolJob extends JOB_Controller
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
-			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			$this->_ci->logInfo("Keine Emails an Assistenzen über neue oder veränderte Termine versandt");
 			return;
 		}
 
@@ -220,7 +220,7 @@ class AbgabetoolJob extends JOB_Controller
 		}
 
 		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
-		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+		$this->_ci->logInfo('End job FHC-Core->notifyAssistenzAboutChangedAbgaben');
 	}
 
 	public function notifyBetreuerAboutChangedAbgaben() {
