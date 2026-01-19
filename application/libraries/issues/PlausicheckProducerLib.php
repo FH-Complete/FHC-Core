@@ -144,6 +144,7 @@ class PlausicheckProducerLib
 		$result = new StdClass();
 		$result->errors = [];
 		$result->infos = [];
+
 		$mappingFehlerKurbz = array_keys($this->_fehlerLibMappings);
 
 		// check if all issues to produce could be found in database

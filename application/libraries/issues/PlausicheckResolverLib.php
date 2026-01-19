@@ -161,7 +161,7 @@ class PlausicheckResolverLib
 			if (isset($this->_codeLibMappings[$issue->fehlercode]))
 			{
 				$codeLibMapping = $this->_codeLibMappings[$issue->fehlercode];
-				$libName = $codeLibMapping[self::RESOLVER_LIB_NAME];
+				$libName = $codeLibMapping[self::RESOLVER_LIB_NAME] ?? null;
 				$extensionName = $codeLibMapping[self::EXTENSION_NAME] ?? null;
 				$producerIsResolver = $codeLibMapping[self::PRODUCER_IS_RESOLVER_NAME] ?? false;
 

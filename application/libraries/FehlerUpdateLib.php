@@ -59,8 +59,9 @@ class FehlerUpdateLib
 		// Loads EPrintfLib
 		$this->_ci->load->library('EPrintfLib');
 
-		// Loads the PhraseModel
+		// Loads the Models
 		$this->_ci->load->model('system/Fehler_model', 'FehlerModel');
+		$this->_ci->load->model('system/App_model', 'AppModel');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -93,7 +94,6 @@ class FehlerUpdateLib
 				$this->installFrom($configFilePath);
 			}
 		}
-
 	}
 
 	/**
@@ -207,23 +207,23 @@ class FehlerUpdateLib
 
 		// no fehler has been found
 
-		// hanlde apps
+		// handle apps
 		if (isset($fehler[self::APP]))
 		{
 			$apps = $fehler[self::APP];
 			if (is_string($apps)) $apps = [$apps];
-			//unset($fehler[self::APP]);
+
+			foreach ($apps as $app)
+			{
+				// check if app exists in db
+				$this->_ci->AppModel->addSelect('1');
+				$appRes = $this->_ci->AppModel->loadWhere(['app' => $app]);
+
+				if (!hasData($appRes)) return error("App ".$app." does not exist");
+				// TODO add entry for each app
+			}
+
 			$fehler[self::APP] = $apps[0];
-
-			//~ foreach ($apps as $app)
-			//~ {
-				//~ // TODO add entry for each app
-				//~ foreach ($_ as $_)
-				//~ {
-
-				//~ }
-
-			//~ }
 		}
 
 		// Then add the fehler to the database
