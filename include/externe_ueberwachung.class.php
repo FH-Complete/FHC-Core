@@ -167,6 +167,17 @@ class externeUeberwachung extends basis_db
 		{
 			$payload = array_merge($payload, EXTERNE_UEBERWACHUNG_EXAM_PARAMS);
 		}
+
+		if (defined('EXTERNE_UEBERWACHUNG_EXAM_RULES'))
+		{
+			$payload['rules'] = EXTERNE_UEBERWACHUNG_EXAM_RULES;
+		}
+
+		if (defined('EXTERNE_UEBERWACHUNG_EXAM_SCORE'))
+		{
+			$payload['scoreConfig'] = EXTERNE_UEBERWACHUNG_EXAM_SCORE;
+		}
+
 		return $payload;
 	}
 
