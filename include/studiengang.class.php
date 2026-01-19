@@ -68,6 +68,11 @@ class studiengang extends basis_db
 	public $beschreibung;
 	public $studiengang_typ_arr = array(); 	// Array mit den Studiengangstypen
 
+	public $telefon;
+	public $aktiv;
+	public $beantragung;
+	public $lgart_biscode;
+
 	/**
 	 * Konstruktor
 	 * @param studiengang_kz Kennzahl des zu ladenden Studienganges

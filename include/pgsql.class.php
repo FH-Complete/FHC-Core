@@ -44,7 +44,7 @@ class basis_db extends db
 
 	public function db_query($sql)
 	{
-		if ($this->db_result=pg_query(basis_db::$db_conn,$sql))
+		if ($this->db_result = @pg_query(basis_db::$db_conn,$sql))
 			return $this->db_result;
 		else
 		{
@@ -53,7 +53,7 @@ class basis_db extends db
 		}
 	}
 
-	public function db_num_rows($result=null)
+	public function db_num_rows($result = null)
 	{
 		if(is_null($result))
 			return pg_num_rows($this->db_result);
@@ -61,7 +61,7 @@ class basis_db extends db
 			return pg_num_rows($result);
 	}
 
-	public function db_fetch_object($result = null, $i=null)
+	public function db_fetch_object($result = null, $i = null)
 	{
 		if(is_null($result))
 		{
@@ -79,7 +79,7 @@ class basis_db extends db
 		}
 	}
 
-	public function db_fetch_row($result = null, $i=null)
+	public function db_fetch_row($result = null, $i = null)
 	{
 		if(is_null($result))
 		{
@@ -97,7 +97,7 @@ class basis_db extends db
 		}
 	}
 
-	public function db_fetch_assoc($result = null, $i=null)
+	public function db_fetch_assoc($result = null, $i = null)
 	{
 		if(is_null($result))
 		{
@@ -115,7 +115,7 @@ class basis_db extends db
 		}
 	}
 
-	public function db_result($result = null, $i,$item)
+	public function db_result($result = null, $i = null, $item = null)
 	{
 		if(is_null($result))
 		{
@@ -153,10 +153,10 @@ class basis_db extends db
 
 	public function db_last_error()
 	{
-		return pg_last_error();
+		return pg_last_error(basis_db::$db_conn);
 	}
 
-	public function db_affected_rows($result=null)
+	public function db_affected_rows($result = null)
 	{
 		if(is_null($result))
 			return pg_affected_rows($this->db_result);
@@ -164,7 +164,7 @@ class basis_db extends db
 			return pg_affected_rows($result);
 	}
 
-	public function db_result_seek($result=null, $offset)
+	public function db_result_seek($result = null, $offset = null)
 	{
 		if(is_null($result))
 			return pg_result_seek($this->db_result, $offset);
@@ -172,7 +172,7 @@ class basis_db extends db
 			return pg_result_seek($result, $offset);
 	}
 
-	public function db_fetch_array($result=null, $row=null, $result_type=PGSQL_NUM)
+	public function db_fetch_array($result = null, $row = null, $result_type=PGSQL_NUM)
 	{
 		if(is_null($result))
 			return pg_fetch_array($this->db_result, $row, $result_type);
@@ -180,7 +180,7 @@ class basis_db extends db
 			return pg_fetch_array($result, $row, $result_type);
 	}
 
-	public function db_num_fields($result=null)
+	public function db_num_fields($result = null)
 	{
 		if(is_null($result))
 			return pg_num_fields($this->db_result);
@@ -191,7 +191,7 @@ class basis_db extends db
 	/**
 	 * Liefert den Feldnamen mit index i
 	 */
-	public function db_field_name($result=null, $i)
+	public function db_field_name($result = null, $i = null)
 	{
 		if(is_null($result))
 			return pg_field_name($this->db_result, $i);
@@ -230,7 +230,7 @@ class basis_db extends db
 	 */
 	public function db_escape($var)
 	{
-		return pg_escape_string($var);
+		return pg_escape_string(basis_db::$db_conn, $var);
 	}
 
 	/**
