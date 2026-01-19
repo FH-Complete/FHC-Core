@@ -725,7 +725,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 				$htmlstr .= '</a></p>';
 			}
 		}
-		if (count($bn) > 0)
+		if (count($bn->berechtigungen) > 0)
 		{
 			$htmlstr .= "<p><a href='benutzerberechtigung_detailliste.php?uid=$uid' target='_blank'>Rechte Detailaufschlüsselung</a></p>";
 		}
@@ -928,7 +928,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 			$data = 'gruen';
 		}
 		// Inaktive Elemente sowie WaWi-Rechte ausblenden
-		if ($b->ende!='' && strtotime($b->ende) < $heute || $b->rolle_kurzbz == 'wawi' || substr($b->berechtigung_kurzbz, 0, 4) == 'wawi')
+		if ($b->ende!='' && strtotime($b->ende) < $heute || $b->rolle_kurzbz == 'wawi' || substr($b->berechtigung_kurzbz ?? '', 0, 4) == 'wawi')
 		{
 			$htmlstr .= "	<tr class='row_berechtigung ausgeblendet' id='".$b->benutzerberechtigung_id."'>";
 			$countInaktiveUndWawi++;
@@ -1061,7 +1061,7 @@ if (isset($_REQUEST['uid']) || isset($_REQUEST['funktion_kurzbz']))
 									name='dataset[$b->benutzerberechtigung_id][anmerkung]'
 									class='input_anmerkung $inaktiv_class' 
 									value='".$b->anmerkung."' 
-									title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung))."' 
+									title='".$db->convert_html_chars(mb_eregi_replace('\r'," ",$b->anmerkung ?? ''))."' 
 									data-toggle='tooltip' 
 									data-html='true' 
 									data-placement='auto'

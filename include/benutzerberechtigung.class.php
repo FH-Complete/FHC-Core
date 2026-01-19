@@ -134,12 +134,12 @@ class benutzerberechtigung extends basis_db
 			return false;
 		}
 
-		if(mb_strlen($this->berechtigung_kurzbz)>32)
+		if(mb_strlen($this->berechtigung_kurzbz ?? '')>32)
 		{
 			$this->errormsg = 'Berechtigung_kurzbz darf nicht laenger als 32 Zeichen sein';
 			return false;
 		}
-		if(mb_strlen($this->uid)>32)
+		if(mb_strlen($this->uid ?? '')>32)
 		{
 			$this->errormsg = 'UID darf nicht laenger als 32 Zeichen sein';
 			return false;
