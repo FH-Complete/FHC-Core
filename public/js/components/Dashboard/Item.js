@@ -143,8 +143,6 @@ export default {
 		},
 	},
 	async created() {
-		debugger
-		
 		this.widget = await CachedWidgetLoader.loadWidget(this.id);
 		let component = (await import("../" + this.widget.setup.file)).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;

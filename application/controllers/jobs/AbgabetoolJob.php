@@ -20,11 +20,207 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 		$this->_ci->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$this->_ci->load->model('crm/Student_model', 'StudentModel');
+		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 
 		$this->_ci->load->config('abgabe');
 		$this->loadPhrases([
 			'abgabetool'
 		]);
+	}
+
+	public function notifyAssistenzAboutChangedAbgaben() {
+
+		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
+
+		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+		// get all new or changed termine in interval
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$retval = getData($result);
+
+		if(count($retval) == 0) {
+			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
+		}
+
+		// group changed/new abgaben for projektarbeiten
+		$projektarbeiten = [];
+		foreach($retval as $newOrChangedAbgabe) {
+			// Check if the current item has a 'projektarbeit_id' field.
+			// Replace 'projektarbeit_id' with the actual key name if it's different.
+			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
+				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// initialize it as an empty array.
+				if (!isset($projektarbeiten[$projektarbeitId])) {
+					$projektarbeiten[$projektarbeitId] = [];
+				}
+
+				// Add the current row to the array associated with its 'projektarbeit_id'.
+				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
+			}
+		}
+
+		// for each projektarbeit fetch their assistenz and same them in their own dictionary to avoid too many mails
+		$assistenzMap = [];
+		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
+		$projektarbeitBetreuerMap = [];
+		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
+			
+			$assistenzResult = $this->_ci->OrganisationseinheitModel->getAssistenzForOE($abgaben[0]->stg_oe_kurzbz);
+
+			forEach($assistenzResult->retval as $assistenzRow) {
+				if (!isset($assistenzMap[$assistenzRow->person_id])) {
+					$assistenzMap[$assistenzRow->person_id] = [];
+				}
+
+				// Add the current $assistenzRow to the $assistenzMap as an array associated with its projektarbeit_id.
+				$assistenzMap[$assistenzRow->person_id][] = [$projektarbeit_id, $assistenzRow];
+			}
+
+			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
+
+			forEach($betreuerResult->retval as $betreuerRow) {
+				if (!isset($projektarbeitBetreuerMap[$projektarbeit_id])) {
+					$projektarbeitBetreuerMap[$projektarbeit_id] = [];
+				}
+
+				// Add the current betreuerRow to the betreuerMap as an array associated with its projektarbeit_id.
+				$projektarbeitBetreuerMap[$projektarbeit_id][] = $betreuerRow;
+			}
+		}
+
+		$count = 0;
+		foreach($assistenzMap as $assistenz_person_id => $tupelArr) {
+
+			$abgabenString = '<div style="font-family: Arial, sans-serif; color: #333;">';
+
+			foreach($tupelArr as $tupel) {
+				$projektarbeit_id = $tupel[0];
+				$assistenzRow = $tupel[1];
+
+				$betreuerArray = $projektarbeitBetreuerMap[$projektarbeit_id] ?? [];
+				$changedAbgaben = $projektarbeiten[$projektarbeit_id];
+
+				$relevantAbgaben = array_values(array_filter($changedAbgaben, function($abgabetermin) use ($assistenzRow) {
+					if($abgabetermin->updatevon == null && $abgabetermin->insertvon != $assistenzRow->uid) {
+						return $abgabetermin;
+					} else if($abgabetermin->updatevon != null && $abgabetermin->updatevon != $assistenzRow->uid) {
+						return $abgabetermin;
+					}
+				}));
+
+				if(count($relevantAbgaben) == 0) {
+					continue;
+				}
+
+				// Format the Student Name
+				$s = $relevantAbgaben[0];
+				$nameParts = [];
+				if (!empty($s->titelpre)) $nameParts[] = $s->titelpre;
+				$nameParts[] = $s->vorname;
+				$nameParts[] = $s->nachname;
+				if (!empty($s->titelpost)) $nameParts[] = $s->titelpost;
+				$studentFullName = implode(' ', $nameParts);
+
+				// Format the Supervisors string
+				$betreuerStrings = [];
+				foreach($betreuerArray as $b) {
+					$bNameParts = [];
+					if (!empty($b->titelpre)) $bNameParts[] = $b->titelpre;
+					$bNameParts[] = $b->vorname;
+					$bNameParts[] = $b->nachname;
+					if (!empty($b->titelpost)) $bNameParts[] = $b->titelpost;
+
+					$bFullName = implode(' ', $bNameParts);
+					$betreuerStrings[] = "{$bFullName} ({$b->betreuerart_kurzbz})";
+				}
+				$allBetreuerFormatted = implode(', ', $betreuerStrings);
+
+				$projektarbeit_titel = $s->titel ?? 'Kein Titel vergeben';
+
+				// Project Header Section
+				$abgabenString .= "
+				<div style='margin-top: 25px; padding: 12px; background-color: #f8f9fa; border-left: 4px solid #007bff; border-bottom: 1px solid #eee;'>
+					<strong style='font-size: 16px; color: #0056b3;'>Projekt: {$projektarbeit_titel}</strong><br/>
+					<div style='margin-top: 5px; font-size: 14px;'>
+						<strong>Studierende/r:</strong> {$studentFullName}
+					</div>
+					<div style='margin-top: 3px; font-size: 14px;'>
+						<strong>Betreuer:</strong> {$allBetreuerFormatted}
+					</div>
+					<span style='color: #666; font-size: 12px;'>
+						ID: {$projektarbeit_id} | Stg: {$s->stgtyp}{$s->stgkz} ({$s->studiensemester_kurzbz})
+					</span>
+				</div>";
+
+				// Start Table
+				$abgabenString .= '
+				<table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+					<thead>
+						<tr style="background-color: #eee; text-align: left;">
+							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
+							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
+							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabe bis</th>
+						</tr>
+					</thead>
+					<tbody>';
+
+				foreach ($relevantAbgaben as $abgabe) {
+					$dateEmailFormatted = (new DateTime($abgabe->datum))->format('d.m.Y');
+					$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
+					$kurzbzLine = !empty($abgabe->kurzbz) ? "<br/><small style='color: #777; font-style: italic;'>{$abgabe->kurzbz}</small>" : "";
+
+					$abgabenString .= "
+					<tr>
+						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$dateEmailFormatted}</td>
+						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
+							<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
+						</td>
+						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
+					</tr>";
+				}
+
+				$abgabenString .= '</tbody></table>';
+			}
+
+			$abgabenString .= '</div>';
+
+			// done with building the change list, now send it
+			$assistenzRow = $tupelArr[0][1];
+			$anrede = $assistenzRow->anrede;
+			$anredeFillString = $assistenzRow->anrede == "Herr" ? "r" : "";
+			$fullFormattedNameString = $assistenzRow->first;
+			
+			
+
+			$path = $this->_ci->config->item('URL_MITARBEITER');
+			$url = CIS_ROOT.$path;
+
+			$body_fields = array(
+				'anrede' => $anrede,
+				'anredeFillString' => $anredeFillString,
+				'fullFormattedNameString' => $fullFormattedNameString,
+				'abgabenString' => $abgabenString,
+				'linkAbgabetool' => $url
+			);
+
+			$email = $assistenzRow->uid."@".DOMAIN;
+
+			// send email with bundled info
+			sendSanchoMail(
+				'PAAChangesAssSM',
+				$body_fields,
+				$email,
+				$this->p->t('abgabetool', 'changedAbgabeterminev2')
+			);
+
+			$count++;
+		}
+
+		$this->_ci->logInfo($count . " Emails erfolgreich versandt");
+		$this->_ci->logInfo('End job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 	}
 
 	public function notifyBetreuerAboutChangedAbgaben() {
