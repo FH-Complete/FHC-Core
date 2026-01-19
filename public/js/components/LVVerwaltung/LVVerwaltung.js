@@ -8,9 +8,10 @@ import LvTabs from "./Setup/Tabs.js";
 
 import ApiDetails from "../../api/lehrveranstaltung/details.js";
 import ApiLektor from "../../api/lehrveranstaltung/lektor.js";
-import ApiGruppe from "../../api/lehrveranstaltung/gruppe.js";
 import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
+import AppConfig from "../AppConfig.js";
+import ApiLvConfig from "../../api/lehrveranstaltung/config.js";
 
 
 export default {
@@ -23,6 +24,7 @@ export default {
 		StvStudiensemester,
 		LvTable,
 		LvTabs,
+		AppConfig
 	},
 	props: {
 		defaultSemester: String,
@@ -32,7 +34,9 @@ export default {
 		stg: { type: String, required: false },
 		semester: { type: [Number, String], required: false, default: null },
 		studiensemester_kurzbz: { type: String, required: false, default: null },
-		emp: { type: String, required: false, default: null }
+		emp: { type: String, required: false, default: null },
+		avatarUrl: String,
+		logoutUrl: String,
 	},
 
 	provide() {
@@ -44,7 +48,6 @@ export default {
 			lehreinheitAnmerkungDefault: (this.config.lehreinheitAnmerkungDefault || '').replace(/\\n/g, '\n'),
 			lehreinheitRaumtypDefault: this.config.lehreinheitRaumtypDefault,
 			lehreinheitRaumtypAlternativeDefault: this.config.lehreinheitRaumtypAlternativeDefault,
-
 			permissionLehrveranstaltung: this.permissions['lehre/lehrveranstaltung'],
 			permissionGruppenEntfernen: this.permissions['lv-plan/gruppenentfernen'],
 			permissionLektorEntfernen: this.permissions['lv-plan/lektorentfernen'],
@@ -72,6 +75,8 @@ export default {
 	},
 	data() {
 		return {
+			appconfig:{},
+			configEndpoints: ApiLvConfig,
 			selected: [],
 			studiengang: "",
 			filter: {},
@@ -269,6 +274,51 @@ export default {
 				<span class="fa-solid fa-table-list"></span>
 			</button>
 			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
+			<div id="nav-user" class="dropdown">
+				<button
+					id="nav-user-btn"
+					class="btn btn-link rounded-0 py-0"
+					type="button"
+					data-bs-toggle="dropdown"
+					data-bs-target="#nav-user-menu"
+					aria-expanded="false"
+					aria-controls="nav-user-menu"
+				>
+					<img
+						:src="avatarUrl"
+						:alt="$p.t('profilUpdate/profilBild')"
+						class="bg-light avatar rounded-circle border border-light"
+					/>
+				</button>
+				<ul
+					ref="navUserDropdown"
+					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
+					aria-labelledby="nav-user-btn"
+				>
+					<li>
+						<button
+							type="button"
+							class="dropdown-item"
+							data-bs-toggle="modal"
+							data-bs-target="#configModal"
+						>
+							{{ $p.t('ui/settings') }}
+						</button>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<nav-language
+							item-class="dropdown-item border-left-dark"
+						/>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<a class="dropdown-item" :href="logoutUrl">
+							{{ $p.t('ui/logout') }}
+						</a>
+					</li>
+				</ul>
+			</div>
 		</header>
 		<div class="container-fluid overflow-hidden">
 			<div class="row h-100">
@@ -327,5 +377,6 @@ export default {
 				</main>
 			</div>
 		</div>
+		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
 	</div>`
 };

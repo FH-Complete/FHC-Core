@@ -241,4 +241,15 @@ class Stundenplandev_model extends DB_Model
 
 		return $this->delete(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
 	}
+
+	public function lektorHasStundenplandevEintrag($uid, $datum, $stunde)
+	{
+		$qry = "SELECT stundenplandev_id, lektor, stg_kurzbz, ort_kurzbz, semester, verband, gruppe, gruppe_kurzbz, datum, stunde 
+				FROM lehre.vw_stundenplandev
+				WHERE uid = ?
+					AND datum = ?
+					AND stunde = ?";
+
+		return $this->execReadOnlyQuery($qry, [$uid, $datum, $stunde]);
+	}
 }

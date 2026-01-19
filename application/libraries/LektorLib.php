@@ -17,7 +17,12 @@ class LektorLib
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 		$this->_ci->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
 		$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->_ci->load->model('ressource/Zeitsperre_model', 'ZeitsperreModel');
+		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
+		$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
+
 		$this->_ci->load->library('PhrasesLib', array('lehre'));
+		$this->_ci->load->library('VariableLib', ['uid' => getAuthUID()]);
 	}
 
 	public function addLektorToLehreinheit($lehreinheit_id, $mitarbeiter_uid)
@@ -78,10 +83,13 @@ class LektorLib
 
 	public function updateLektorFromLehreinheit($lehreinheit_id, $mitarbeiter_uid, $new_data)
 	{
+		$old_uid = $mitarbeiter_uid;
+		$new_uid = isset($new_data['mitarbeiter_uid']) ? $new_data['mitarbeiter_uid'] : $mitarbeiter_uid;
+
 		$this->_ci->LehreinheitmitarbeiterModel->addSelect('lehre.tbl_lehreinheitmitarbeiter.*, lehre.tbl_lehreinheit.studiensemester_kurzbz, tbl_lehrveranstaltung.studiengang_kz');
 		$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehreinheit', 'lehreinheit_id');
 		$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehrveranstaltung', 'lehrveranstaltung_id');
-		$lehreinheit_result = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+		$lehreinheit_result = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $old_uid));
 
 		if (isError($lehreinheit_result)) return $lehreinheit_result;
 
@@ -89,27 +97,47 @@ class LektorLib
 
 		$lehreinheit = getData($lehreinheit_result)[0];
 
+		$semesterstunden_alt = $lehreinheit->semesterstunden;
+		$semesterstunden_neu = isset($new_data['semesterstunden']) ? $new_data['semesterstunden'] : $semesterstunden_alt;
+		$bismelden_neu = isset($new_data['bismelden']) ? $new_data['bismelden'] : $lehreinheit->bismelden;
+		$neue_stunden_eingerechnet = (bool)$bismelden_neu;
+		$alte_stunden_eingerechnet = (bool)$lehreinheit->bismelden;
+		$stundenplan_update = false;
 
-		//TODO kollision check, wird vorerst nicht implementiert -> nur über das FAS möglich
-		if (isset($new_data['mitarbeiter_uid']) && $new_data['mitarbeiter_uid'] !== $mitarbeiter_uid)
+		if ($old_uid !== $new_uid)
 		{
-			$this->_ci->load->model('ressource/stundenplandev_model', 'StundenplandevModel');
-			$this->_ci->StundenplandevModel->addGroupBy('stundenplandev_id');
-			$this->_ci->StundenplandevModel->addGroupBy('mitarbeiter_uid');
-			$this->_ci->StundenplandevModel->addGroupBy('mitarbeiter_uid');
-			$verplant = $this->_ci->StundenplandevModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
-
-			if (hasData($verplant))
-				return error($this->_ci->phraseslib->t("lehre", "lektorbereitsverplant"));
-
-			$lehreinheit_data = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('mitarbeiter_uid' => $new_data['mitarbeiter_uid'], 'lehreinheit_id' => $lehreinheit_id));
+			$lehreinheit_data = $this->_ci->LehreinheitmitarbeiterModel->loadWhere(array('mitarbeiter_uid' => $new_uid, 'lehreinheit_id' => $lehreinheit_id));
 
 			if (hasData($lehreinheit_data))
 				return error($this->_ci->phraseslib->t("lehre", "bereitzugeteilt"));
 
+			$this->_ci->StundenplandevModel->addGroupBy('stundenplandev_id');
+			$this->_ci->StundenplandevModel->addGroupBy('mitarbeiter_uid');
+			$verplant = $this->_ci->StundenplandevModel->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $old_uid));
+
+			if (hasData($verplant))
+			{
+				$kollision = $this->hasKollision(getData($verplant), $new_uid);
+
+				$ignore_kollision = $this->_ci->variablelib->getVar('ignore_kollision');
+
+				if ($kollision === false || $ignore_kollision == 'true')
+				{
+					$stundenplan_update = true;
+				}
+				else if (is_array($kollision))
+				{
+					return error( "Änderung fehlgeschlagen! Die Änderung des Lektors führt zu ".count($kollision)." Kollision(en) im LV-Plan. Deaktivieren Sie die Kollisionspruefung oder wenden Sie sich an die LV-Planung!\n zB. $kollision[0]");
+				}
+				else
+				{
+					return error($kollision);
+				}
+			}
 		}
+
 		$warning = '';
-		if (isset($new_data['semesterstunden']))
+		if (($semesterstunden_neu !== '' && $semesterstunden_alt !== '') && (($semesterstunden_neu > $semesterstunden_alt) || $neue_stunden_eingerechnet))
 		{
 			$studiengang_result = $this->_ci->StudiengangModel->loadWhere(array('studiengang_kz' => $lehreinheit->studiengang_kz));
 			if (isError($studiengang_result)) return $studiengang_result;
@@ -120,7 +148,7 @@ class LektorLib
 			if (isError($studiensemester_result)) return $studiensemester_result;
 			$studiensemester = getData($studiensemester_result)[0];
 
-			$echter_dv_result = $this->_ci->DienstverhaeltnisModel->existsDienstverhaeltnis($mitarbeiter_uid, $studiensemester->start, $studiensemester->ende, 'echterdv');
+			$echter_dv_result = $this->_ci->DienstverhaeltnisModel->existsDienstverhaeltnis($new_uid, $studiensemester->start, $studiensemester->ende, 'echterdv');
 
 			$echter_dv = false;
 
@@ -129,83 +157,78 @@ class LektorLib
 				$echter_dv = true;
 			}
 
-			$neue_stunden_eingerechnet = isset($new_data['bismelden']) ? $new_data['bismelden'] : $lehreinheit->bismelden;
-			$alte_stunden_eingerechnet = $lehreinheit->bismelden;
+			$stundengrenze_result = $this->_ci->OrganisationseinheitModel->getStundengrenze($studiengang->oe_kurzbz, $echter_dv);
+			if (isError($stundengrenze_result)) return $stundengrenze_result;
 
-			if (($new_data['semesterstunden'] > $lehreinheit->semesterstunden) || $neue_stunden_eingerechnet)
+			$stundengrenze = getData($stundengrenze_result)[0];
+
+			$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
+			$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array();
+
+			if ($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu)}) as summe");
+			else if ($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($semesterstunden_alt)) as summe");
+			else if (!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) + ({$this->_ci->LehreinheitmitarbeiterModel->db->escape($semesterstunden_neu)})) as summe");
+			else if (!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
+				$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe");
+
+			$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehreinheit', 'lehreinheit_id');
+			$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehrveranstaltung', 'lehrveranstaltung_id');
+			$this->_ci->LehreinheitmitarbeiterModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+			$this->_ci->LehreinheitmitarbeiterModel->db->where('mitarbeiter_uid', $new_uid);
+			$this->_ci->LehreinheitmitarbeiterModel->db->where('studiensemester_kurzbz', $lehreinheit->studiensemester_kurzbz);
+			$this->_ci->LehreinheitmitarbeiterModel->db->where('bismelden', true);
+			$this->_ci->LehreinheitmitarbeiterModel->db->where('lower(mitarbeiter_uid) NOT LIKE', '_dummy%');
+
+			if (count($oe_array) > 0)
 			{
-				$stundengrenze_result = $this->_ci->OrganisationseinheitModel->getStundengrenze($studiengang->oe_kurzbz, $echter_dv);
-				if (isError($stundengrenze_result)) return $stundengrenze_result;
-
-				$stundengrenze = getData($stundengrenze_result)[0];
-
-				$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
-				$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array('');
-
-				if ($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($lehreinheit->semesterstunden) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($new_data['semesterstunden'])}) as summe");
-				else if ($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($lehreinheit->semesterstunden)) as summe");
-				else if (!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) + ({$this->_ci->LehreinheitmitarbeiterModel->db->escape($new_data['semesterstunden'])})) as summe");
-				else if (!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden)) as summe");
-
-				$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehreinheit', 'lehreinheit_id');
-				$this->_ci->LehreinheitmitarbeiterModel->addJoin('lehre.tbl_lehrveranstaltung', 'lehrveranstaltung_id');
-				$this->_ci->LehreinheitmitarbeiterModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-
-				$this->_ci->LehreinheitmitarbeiterModel->db->where('mitarbeiter_uid', (isset($new_data['mitarbeiter_uid']) ? $new_data['mitarbeiter_uid'] : $mitarbeiter_uid));
-				$this->_ci->LehreinheitmitarbeiterModel->db->where('studiensemester_kurzbz', $lehreinheit->studiensemester_kurzbz);
-				$this->_ci->LehreinheitmitarbeiterModel->db->where('bismelden', true);
-				$this->_ci->LehreinheitmitarbeiterModel->db->where('lower(mitarbeiter_uid) NOT LIKE', '_dummy%');
-
 				$this->_ci->LehreinheitmitarbeiterModel->db->where_in('tbl_studiengang.oe_kurzbz', $oe_array);
+			}
 
+			if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
+				&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
+				&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE) > 0)
+			{
+				$this->_ci->LehreinheitmitarbeiterModel->db->where_not_in('tbl_studiengang.oe_kurzbz', FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE);
+			}
 
-				if(defined('FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE')
-					&& is_array(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE)
-					&& count(FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE) > 0)
+			$summe_result = $this->_ci->LehreinheitmitarbeiterModel->load();
+
+			if (isError($summe_result)) return $summe_result;
+
+			if (!hasData($summe_result)) return error('Fehler beim Ermitteln der Gesamtstunden');
+
+			$summe = getData($summe_result)[0]->summe;
+
+			if ($summe > $stundengrenze->stunden)
+			{
+				if (!$echter_dv && (!$this->_ci->permissionlib->isBerechtigt('admin')))
 				{
-					$this->_ci->LehreinheitmitarbeiterModel->db->where_not_in('tbl_studiengang.oe_kurzbz', FAS_LV_LEKTORINNENZUTEILUNG_STUNDEN_IGNORE_OE);
+					if (!$this->LehrauftragAufFirma($new_uid))
+						return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden NICHT gespeichert!\n\n");
+				}
+				else
+				{
+					$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden gespeichert!\n\n";
 				}
 
-				$summe_result = $this->_ci->LehreinheitmitarbeiterModel->load();
+				$stunden_limit_result = $this->getStundenInstitut($new_uid, $lehreinheit->studiensemester_kurzbz, $oe_array);
 
-				if (isError($summe_result)) return $summe_result;
-
-				if (!hasData($summe_result)) return error('Fehler beim Ermitteln der Gesamtstunden');
-
-				$summe = getData($summe_result)[0]->summe;
-
-				if ($summe > $stundengrenze->stunden)
+				if (hasData($stunden_limit_result))
 				{
-
-					if (!$echter_dv && (!$this->_ci->permissionlib->isBerechtigt('admin')))
+					$stunden_limit_array = getData($stunden_limit_result);
+					foreach ($stunden_limit_array as $stunden_limit)
 					{
-						if (!$this->LehrauftragAufFirma(isset($formData['mitarbeiter_uid']) ? $formData['mitarbeiter_uid'] : $mitarbeiter_uid))
-							return error("ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden NICHT gespeichert!\n\n");
-					}
-					else
-					{
-						$warning .= "ACHTUNG: Die maximal erlaubte Semesterstundenanzahl des Lektors von $summe Stunden ($stundengrenze->stunden) wurde ueberschritten!\nDaten wurden gespeichert!\n\n";
-					}
-
-					$stunden_limit_result = $this->getStundenInstitut($mitarbeiter_uid, $lehreinheit->studiensemester_kurzbz, $oe_array);
-
-					if (hasData($stunden_limit_result))
-					{
-						$stunden_limit_array = getData($stunden_limit_result);
-						foreach ($stunden_limit_array as $stunden_limit)
-						{
-							$warning .= $stunden_limit->summe . ' Stunden ' . $stunden_limit->bezeichnung . "\n";
-						}
+						$warning .= $stunden_limit->summe . ' Stunden ' . $stunden_limit->bezeichnung . "\n";
 					}
 				}
 			}
 		}
 
-		$benutzer_result = $this->_ci->BenutzerModel->load(array(isset($formData['mitarbeiter_uid']) ? $formData['mitarbeiter_uid'] : $mitarbeiter_uid));
+		$benutzer_result = $this->_ci->BenutzerModel->load(array($new_uid));
 
 		if (isError($benutzer_result)) return $benutzer_result;
 
@@ -240,9 +263,23 @@ class LektorLib
 		$updateData['updatevon'] = getAuthUID();
 		$updateData['updateamum'] = date('Y-m-d H:i:s');
 
-		$result = $this->_ci->LehreinheitmitarbeiterModel->update(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid), $updateData);
+		$result = $this->_ci->LehreinheitmitarbeiterModel->update(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $old_uid), $updateData);
 
 		if (isError($result)) return $result;
+
+		if ($stundenplan_update)
+		{
+			$update_result = $this->_ci->StundenplandevModel->update([
+				'lehreinheit_id' => $lehreinheit_id,
+				'mitarbeiter_uid' => $old_uid,
+			], [
+				'mitarbeiter_uid' => $new_uid,
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => getAuthUID()
+			]);
+
+			if (isError($update_result)) return $update_result;
+		}
 
 		if ($warning !== '') return success(['warning' => $warning]);
 
@@ -346,5 +383,54 @@ class LektorLib
 
 		$this->_ci->LehreinheitmitarbeiterModel->addGroupBy('tbl_studiengang.bezeichnung');
 		return $this->_ci->LehreinheitmitarbeiterModel->load();
+	}
+//if($rechte->isBerechtigt('lv-plan'))
+
+	private function hasKollision($stunden, $mitarbeiter)
+	{
+		$kollision = array();
+
+		$ignore_zeitsperre = $this->_ci->variablelib->getVar('ignore_zeitsperre');
+		$ignore_reservierung = $this->_ci->variablelib->getVar('ignore_reservierung');
+
+		foreach ($stunden as $stunde)
+		{
+			$stundenplan_result = $this->_ci->StundenplandevModel->lektorHasStundenplandevEintrag($mitarbeiter, $stunde->datum, $stunde->stunde);
+
+			if (isError($stundenplan_result))
+				return $stundenplan_result;
+
+			if (hasData($stundenplan_result))
+			{
+				$stundenplan_result = getData($stundenplan_result)[0];
+				$kollision[] = "Kollision stundenplandev: $stundenplan_result->stundenplandev_id|$stundenplan_result->lektor|$stundenplan_result->ort_kurzbz|$stundenplan_result->stg_kurzbz-$stundenplan_result->semester$stundenplan_result->verband$stundenplan_result->gruppe$stundenplan_result->gruppe_kurzbz - $stundenplan_result->datum/$stundenplan_result->stunde";
+			}
+			else
+			{
+				if ($ignore_zeitsperre == 'false' && (!defined('KOLLISIONSFREIE_USER') || !in_array($mitarbeiter, unserialize(KOLLISIONSFREIE_USER))))
+				{
+					$zeitsperre_result = $this->_ci->ZeitsperreModel->checkIfZeitsperreExists($mitarbeiter, $stunde->datum, $stunde->stunde);
+
+					if (hasData($zeitsperre_result))
+					{
+						$zeitsperre_result = getData($zeitsperre_result)[0];
+						$kollision[] = "Kollision (Zeitsperre): $zeitsperre_result->zeitsperre_id|$zeitsperre_result->mitarbeiter_uid|$zeitsperre_result->zeitsperretyp_kurzbz - $zeitsperre_result->vondatum/$zeitsperre_result->vonstunde|$zeitsperre_result->bisdatum/$zeitsperre_result->bisstunde";
+					}
+				}
+
+				if ($ignore_reservierung == 'false' && (!defined('KOLLISIONSFREIE_USER') || !in_array($mitarbeiter, unserialize(KOLLISIONSFREIE_USER))))
+				{
+					$reservierung_result = $this->_ci->ReservierungModel->lektorHasReservierung($mitarbeiter, $stunde->datum, $stunde->stunde);
+
+					if (hasData($reservierung_result))
+					{
+						$reservierung_result = getData($reservierung_result)[0];
+						$kollision[] = "Kollision (Reservierung): $reservierung_result->reservierung_id|$reservierung_result->uid|$reservierung_result->ort_kurzbz|$reservierung_result->stg_kurzbz-$reservierung_result->semester$reservierung_result->verband$reservierung_result->gruppe$reservierung_result->gruppe_kurzbz - $reservierung_result->datum/$reservierung_result->stunde";
+					}
+				}
+			}
+		}
+
+		return isEmptyArray($kollision) ? false : $kollision;
 	}
 }

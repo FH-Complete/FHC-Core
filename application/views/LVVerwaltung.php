@@ -31,6 +31,8 @@
 		lv-root="<?= site_url('LVVerwaltung'); ?>"
 		:permissions="<?= htmlspecialchars(json_encode($permissions));?>"
 		:config="<?=  htmlspecialchars(json_encode($configs)); ?>"
+		avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
+		logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 	>
 	</router-view>
 

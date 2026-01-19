@@ -144,6 +144,9 @@ class Lektor extends FHCAPI_Controller
 		if (!$lehreinheit_permission)
 			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
 
+		if (!is_null($this->getLektorVertrag($lehreinheit_id, $mitarbeiter_uid)) && (array_key_exists('mitarbeiter_uid', $formData) && $mitarbeiter_uid !== $formData['mitarbeiter_uid']))
+			$this->terminateWithError($this->p->t('ui', 'error_fieldWriteAccess'));
+
 		$result = $this->_ci->lektorlib->updateLektorFromLehreinheit($lehreinheit_id, $mitarbeiter_uid, $formData);
 
 		if (isError($result)) $this->terminateWithError(getError($result));
