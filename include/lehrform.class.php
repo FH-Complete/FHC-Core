@@ -34,6 +34,8 @@ class lehrform extends basis_db
 	public $bezeichnung_kurz;
 	public $bezeichnung_lang;
 
+	public $lehrform_kurzbz;
+
 	/**
 	 * Konstruktor - Laedt optional eine Lehrform
 	 * @param $lehrform_kurbz Lehrform die geladen werden soll (default=null)

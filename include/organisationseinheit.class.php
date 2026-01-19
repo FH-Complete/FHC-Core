@@ -51,6 +51,7 @@ class organisationseinheit extends basis_db
 
 	public $kurzzeichen;
 
+	public $freigabegrenze;
 
 	/**
 	 * Konstruktor

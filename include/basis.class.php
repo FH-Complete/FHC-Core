@@ -130,6 +130,6 @@ class basis
 	 */
 	public function convert_html_chars($value)
 	{
-		return htmlspecialchars($value);
+		return htmlspecialchars($value ?? '');
 	}
 }
