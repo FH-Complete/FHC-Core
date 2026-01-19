@@ -60,6 +60,11 @@ class vorlage extends basis_db
 	public $updateamum;
 	public $updatevon;
 
+	public $oe_parent_kurzbz;
+	public $organisationseinheittyp_kurzbz;
+	public $mailverteiler;
+	public $lehre;
+
 	/**
 	 * Konstruktor
 	 */
