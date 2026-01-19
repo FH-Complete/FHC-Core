@@ -48,7 +48,7 @@ export const AbgabeMitarbeiterDetail = {
 				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
 				icon: "fa fa-plus",
 				command: this.openCreateNewAbgabeModal,
-				disabled: Vue.computed(() => this.projektarbeit?.betreuertyp_kurzbz == 'Zweitbegutachter')
+				disabled: Vue.computed(() => this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter')
 			},
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
@@ -396,6 +396,13 @@ export const AbgabeMitarbeiterDetail = {
 			return `${day}.${month}.${year}`
 		},
 		openCreateNewAbgabeModal() {
+			if(this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter') {
+				// maybe alert that this is not allowed or smth
+
+				this.$fhcAlert.alertWarning('Terminanlage disabled')
+				return
+			}
+			
 			if(!this.newTermin) {
 				const typ = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
 				this.newTermin = {
