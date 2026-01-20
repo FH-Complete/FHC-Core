@@ -757,6 +757,7 @@ export default {
 						:label="$p.t('global', 'datum')"
 						type="DatePicker"
 						v-model="formData.datum"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
@@ -781,6 +782,7 @@ export default {
 						:label="$p.t('abschlusspruefung', 'sponsion')"
 						type="DatePicker"
 						v-model="formData.sponsion"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
