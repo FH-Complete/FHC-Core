@@ -27256,6 +27256,26 @@ array(
 	array(
 		'app' => 'personalverwaltung',
 		'category' => 'person',
+		'phrase' => 'weiterbildung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weiterbildung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Training',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'category' => 'person',
 		'phrase' => 'buero',
 		'insertvon' => 'system',
 		'phrases' => array(
