@@ -40,8 +40,7 @@ if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 // Start session
-session_start();
-
+require_once './session_init.php';
 // Logout (triggered by logout button in menu.php)
 if (isset($_GET['logout']) && $_GET['logout'] == true)
 {
@@ -172,6 +171,12 @@ if (isset($_REQUEST['prestudent']))
 						}
 						else
 							$reload_menu = true;
+					}
+
+					if ($rt->externe_ueberwachung && defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED)
+					{
+						$_SESSION['externe_ueberwachung'] = true;
+						$_SESSION['externe_ueberwachung_verified'] = false;
 					}
 				}
 
@@ -339,6 +344,8 @@ if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
 	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
 	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
 	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+	isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
 	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
 {
 	$pruefling = new pruefling();
@@ -447,14 +454,6 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 		{
 			e.preventDefault();
 		});
-		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
-		// show message to use Mozilla Firefox
-		var ua = navigator.userAgent;
-		if ((ua.indexOf("Firefox") > -1) == false)
-		{
-			$("#alertmsgdiv").html("<div class='alert alert-danger'>BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!<br>(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.<br><br>PLEASE USE MOZILLA FIREFOX BROWSER!<br>(Otherwise some exam items will not be displayed correctly</div>");
-			//alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.\n\nPLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
-		}
 	});
 	</script>
 <?php
@@ -468,7 +467,13 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <?php
 
-if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true) &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === false)
+{
+	echo "<script> top.location.href = 'resetconnection.php';</script>";
+	exit;
+}
+else if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
 	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === false)
 {
 	echo '

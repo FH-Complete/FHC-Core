@@ -349,5 +349,11 @@ $config['navigation_menu']['apps'] = [
 		'description' => 'LV Verwaltung',
 		#'icon' => 'person-chalkboard',
 		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lav' => [
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Lehraufträge',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
 	]
 ];

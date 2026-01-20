@@ -217,9 +217,13 @@ export default {
 				},
 				columns,
 				height: '100%',
+				layout: 'fitDataStretchFrozen',
 				selectable: 1,
 				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis'
+				persistenceID: 'stv-details-noten-zeugnis-2025112401',
+				persistence:{
+					columns: ["width", "visible", "frozen"]
+				}
 			};
 		}
 	},
