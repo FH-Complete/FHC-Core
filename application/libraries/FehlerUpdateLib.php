@@ -21,7 +21,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class FehlerUpdateLib
 {
 	// Who adds phrases into the database
-	//const INSERT_BY = 'FehlerUpdate';
+	const UPSERT_BY = 'FehlerUpdate';
 
 	const CONFIG_DIRECTORY = 'config';
 	const CONFIG_FEHLER_NAME = 'fehler';
@@ -43,8 +43,8 @@ class FehlerUpdateLib
 	const FEHLER_ATTRIBUTES = [
 		self::FEHLERCODE => ['required' => true],
 		self::FEHLER_KURZBZ  => ['required' => false],
-		self::FEHLERTEXT => ['required' => true],
-		self::FEHLERTYP_KURZBZ => ['required' => false],
+		self::FEHLERTEXT => ['required' => true, 'updateable' => false],
+		self::FEHLERTYP_KURZBZ => ['required' => false, 'updateable' => true],
 		self::APP => ['required' => true, 'types' => [self::TYPE_STRING, self::TYPE_ARRAY]],
 		self::FEHLERCODE_EXTERN => ['required' => false]
 	];
@@ -170,7 +170,7 @@ class FehlerUpdateLib
 			elseif (hasData($createFehlerResult))
 			{
 				// add fehler to db
-				$addFehlerResult = $this->_addFehler(getData($createFehlerResult));
+				$addFehlerResult = $this->_updateFehler(getData($createFehlerResult));
 
 				if (isError($addFehlerResult))
 				{
@@ -188,10 +188,9 @@ class FehlerUpdateLib
 	/**
 	 * Add a new fehler to the database
 	 */
-	private function _addFehler($fehler)
+	private function _updateFehler($fehler)
 	{
 		// Checks if the fehler already exists in the database
-		$this->_ci->FehlerModel->addSelect(self::FEHLERCODE.', '.self::FEHLER_KURZBZ);
 		$this->_ci->FehlerModel->db->where(self::FEHLERCODE.' = ', $fehler[self::FEHLERCODE]);
 		if ($fehler[self::FEHLER_KURZBZ] != null) $this->_ci->FehlerModel->db->or_where(self::FEHLER_KURZBZ.' = ', $fehler[self::FEHLER_KURZBZ]);
 		$fehlerResult = $this->_ci->FehlerModel->load();
@@ -215,6 +214,31 @@ class FehlerUpdateLib
 					.(isset($fehler[self::FEHLER_KURZBZ]) ? " (".$fehler[self::FEHLER_KURZBZ].")" : "")
 					." already exists in database"
 			);
+
+			$updateArr = [];
+
+			// update fehler, if needed
+			foreach (self::FEHLER_ATTRIBUTES as $attributeName => $attributeInfo)
+			{
+				// set attributes to be updated
+				if (isset($attributeInfo['updateable']) && $attributeInfo['updateable'] && $foundFehler->{$attributeName} != $fehler[$attributeName])
+				{
+					$updateArr[$attributeName] = $fehler[$attributeName];
+				}
+			}
+
+			if (!isEmptyArray($updateArr))
+			{
+				$updateRes = $this->_ci->FehlerModel->update(
+					[self::FEHLERCODE => $foundFehler->{self::FEHLERCODE}],
+					array_merge($updateArr, ['updateamum' => 'NOW()', 'updatevon' => self::UPSERT_BY])
+				);
+				if (isError($updateRes)) return $updateRes;
+
+				$this->_ci->eprintflib->printMessage(
+					"Fehler ".$fehler[self::FEHLERCODE].(isset($fehler[self::FEHLER_KURZBZ]) ? " (".$fehler[self::FEHLER_KURZBZ].")" : "")." updated"
+				);
+			}
 
 			return success($fehler[self::FEHLERCODE]);
 		}
@@ -242,12 +266,7 @@ class FehlerUpdateLib
 
 		// Then add the fehler to the database
 		$fehlerInsertResult = $this->_ci->FehlerModel->insert(
-			$fehler
-			// TODO: add insertamum?
-			//~ array(
-				//~ 'insertamum' => 'NOW()',
-				//~ 'insertvon' => self::INSERT_BY
-			//~ )
+			array_merge($fehler, ['insertamum' => 'NOW()', 'insertvon' => self::UPSERT_BY])
 		);
 
 		// If an error occurred then return the error itself
@@ -274,9 +293,9 @@ class FehlerUpdateLib
 	private function _createFehlerFromEntry($configEntry)
 	{
 		$fehler = [];
-		foreach (self::FEHLER_ATTRIBUTES as $attributeName => $attributeConditions)
+		foreach (self::FEHLER_ATTRIBUTES as $attributeName => $attributeInfo)
 		{
-			$required = isset($attributeConditions['required']) && $attributeConditions['required'];
+			$required = isset($attributeInfo['required']) && $attributeInfo['required'];
 			if ($required && !isset($configEntry[$attributeName]))
 			{
 				return error('attribute'.$attributeName.' is missing');
@@ -284,9 +303,9 @@ class FehlerUpdateLib
 
 			$attributeValue = $configEntry[$attributeName];
 			$validType = false;
-			if (isset($attributeConditions['types']) && is_array($attributeConditions['types']))
+			if (isset($attributeInfo['types']) && is_array($attributeInfo['types']))
 			{
-				foreach ($attributeConditions['types'] as $type)
+				foreach ($attributeInfo['types'] as $type)
 				{
 					switch ($type)
 					{
