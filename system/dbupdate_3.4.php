@@ -88,6 +88,7 @@ require_once('dbupdate_3.4/62063_lv_evaluierung.php');
 require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
 require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
 require_once('dbupdate_3.4/68744_StV_settings.php');
+require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -360,7 +361,7 @@ $tabellen=array(
 	"public.tbl_profil_update_status" => array("status_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_profil_update_topic" => array("topic_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten","aktiv"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode", "externe_ueberwachung"),
 	"public.tbl_rueckstellung" => array("rueckstellung_id","person_id","status_kurzbz","datum_bis","insertamum","insertvon"),
 	"public.tbl_rueckstellung_status" => array("status_kurzbz", "bezeichnung_mehrsprachig", "sort", "aktiv"),
 	"public.tbl_rt_ort" => array("rt_id","ort_kurzbz","uid"),
