@@ -50,8 +50,8 @@ class CLI_Manager extends CLI_Controller
 	/**
 	 *
 	 */
-	public function installFrom($fehlerConfigDirectory)
+	public function installFrom($extensionName)
 	{
-		$this->fehlerupdatelib->installFrom(urldecode($fehlerConfigDirectory));
+		$this->fehlerupdatelib->installFrom(urldecode($extensionName));
 	}
 }

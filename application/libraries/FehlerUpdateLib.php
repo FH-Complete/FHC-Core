@@ -36,15 +36,17 @@ class FehlerUpdateLib
 	const FEHLERTEXT = 'fehlertext';
 	const FEHLERTYP_KURZBZ = 'fehlertyp_kurzbz';
 	const APP = 'app';
+	const FEHLERCODE_EXTERN = 'fehlercode_extern';
 
 	// structure of a fehler
 	// type default: string
 	const FEHLER_ATTRIBUTES = [
 		self::FEHLERCODE => ['required' => true],
-		self::FEHLER_KURZBZ  => ['required' => true],
+		self::FEHLER_KURZBZ  => ['required' => false],
 		self::FEHLERTEXT => ['required' => true],
 		self::FEHLERTYP_KURZBZ => ['required' => false],
-		self::APP => ['required' => true, 'types' => [self::TYPE_STRING, self::TYPE_ARRAY]]
+		self::APP => ['required' => true, 'types' => [self::TYPE_STRING, self::TYPE_ARRAY]],
+		self::FEHLERCODE_EXTERN => ['required' => false]
 	];
 
 	private $_ci; // Code igniter instance
@@ -62,6 +64,9 @@ class FehlerUpdateLib
 		// Loads the Models
 		$this->_ci->load->model('system/Fehler_model', 'FehlerModel');
 		$this->_ci->load->model('system/App_model', 'AppModel');
+
+		// Loads extensions lib
+		$this->_ci->load->library('ExtensionsLib');
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------
@@ -77,8 +82,6 @@ class FehlerUpdateLib
 	{
 		$this->installFromCore();
 
-		$this->_ci->load->library('ExtensionsLib');
-
 		// load fehler entries of extensions
 		$extensions = $this->_ci->extensionslib->getInstalledExtensions();
 
@@ -90,8 +93,7 @@ class FehlerUpdateLib
 
 			foreach ($extensionsData as $ext)
 			{
-				$configFilePath = ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.FehlerUpdateLib::CONFIG_FEHLER_NAME;
-				$this->installFrom($configFilePath);
+				$this->installFrom($ext->name);
 			}
 		}
 	}
@@ -107,9 +109,16 @@ class FehlerUpdateLib
 	/**
 	 * Install fehler from the given path
 	 */
-	public function installFrom($fehlerConfigDirectory)
+	public function installFrom($extensionName)
 	{
-		$this->_installFehler($fehlerConfigDirectory);
+		if (!isset($extensionName))
+		{
+			$this->_ci->eprintflib->printError('Extension name missing!');
+			return;
+		}
+
+		$this->_installFehler(ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName.'/'.FehlerUpdateLib::CONFIG_FEHLER_NAME);
+
 	}
 
 
@@ -122,9 +131,9 @@ class FehlerUpdateLib
 	private function _installFehler($fehlerConfigDirectory = null)
 	{
 		// check that fehler config file exists
-		$fehlerConfigDirectory = isset($fehlerConfigDirectory) ? $fehlerConfigDirectory : self::CONFIG_FEHLER_NAME;
+		$configDir = isset($fehlerConfigDirectory) ? $fehlerConfigDirectory : self::CONFIG_FEHLER_NAME;
 
-		$configFilename = APPPATH.self::CONFIG_DIRECTORY.'/'.$fehlerConfigDirectory.'.php';
+		$configFilename = APPPATH.self::CONFIG_DIRECTORY.'/'.$configDir.'.php';
 
 		if (!file_exists($configFilename))
 		{
@@ -132,19 +141,19 @@ class FehlerUpdateLib
 		}
 
 		// Load Fehler Entries
-		$this->_ci->load->config($fehlerConfigDirectory);
+		$this->_ci->load->config($configDir);
 		$configArray = $this->_ci->config->item(self::CONFIG_FEHLER_INDEX);
 
 		if (!isset($configArray) || !is_array($configArray)) // check if fehler config entries could be loaded
 		{
 			$this->_ci->eprintflib->printError(
-				'Fehler config array could not be loaded, directory '.$fehlerConfigDirectory.' index '.self::CONFIG_FEHLER_INDEX
+				'Fehler config array could not be loaded, directory '.$configDir.' index '.self::CONFIG_FEHLER_INDEX
 			);
 			return;
 		}
 
 		$this->_ci->eprintflib->printInfo('------------------------------------------------------------------------------------------');
-		$this->_ci->eprintflib->printInfo('Fehler installation started, directory '.$fehlerConfigDirectory);
+		$this->_ci->eprintflib->printInfo('Fehler installation started, directory '.$configDir);
 
 		foreach ($configArray as $idx => $configEntry)
 		{
@@ -155,7 +164,7 @@ class FehlerUpdateLib
 			if (isError($createFehlerResult))
 			{
 				$this->_ci->eprintflib->printError(
-					getError($createFehlerResult).', directory'.$fehlerConfigDirectory.', index '.$idx
+					getError($createFehlerResult).', directory '.$configDir.', index '.$idx
 				);
 			}
 			elseif (hasData($createFehlerResult))
@@ -166,7 +175,7 @@ class FehlerUpdateLib
 				if (isError($addFehlerResult))
 				{
 					$this->_ci->eprintflib->printError(
-						getError($addFehlerResult).', directory'.$fehlerConfigDirectory.', index '.$idx
+						getError($addFehlerResult).', directory'.$configDir.', index '.$idx
 					);
 				}
 			}
@@ -184,7 +193,7 @@ class FehlerUpdateLib
 		// Checks if the fehler already exists in the database
 		$this->_ci->FehlerModel->addSelect(self::FEHLERCODE.', '.self::FEHLER_KURZBZ);
 		$this->_ci->FehlerModel->db->where(self::FEHLERCODE.' = ', $fehler[self::FEHLERCODE]);
-		$this->_ci->FehlerModel->db->or_where(self::FEHLER_KURZBZ.' = ', $fehler[self::FEHLER_KURZBZ]);
+		if ($fehler[self::FEHLER_KURZBZ] != null) $this->_ci->FehlerModel->db->or_where(self::FEHLER_KURZBZ.' = ', $fehler[self::FEHLER_KURZBZ]);
 		$fehlerResult = $this->_ci->FehlerModel->load();
 
 		// If an error occurred then return the error itself
@@ -201,7 +210,12 @@ class FehlerUpdateLib
 				return error("Wrong fehlercode - fehler kurzbz combination: ".$fehler[self::FEHLERCODE].", ".$fehler[self::FEHLER_KURZBZ]);
 			}
 
-			$this->_ci->eprintflib->printMessage("Fehler ".$fehler[self::FEHLERCODE]." already exists in database");
+			$this->_ci->eprintflib->printMessage(
+				"Fehler ".$fehler[self::FEHLERCODE]
+					.(isset($fehler[self::FEHLER_KURZBZ]) ? " (".$fehler[self::FEHLER_KURZBZ].")" : "")
+					." already exists in database"
+			);
+
 			return success($fehler[self::FEHLERCODE]);
 		}
 
