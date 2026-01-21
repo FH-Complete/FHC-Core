@@ -25,6 +25,6 @@ class Zeitsperren extends Auth_Controller
 			'uid'=>getAuthUID(),
 		);
 
-		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'zeitsperren']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'zeitsperren']);
 	}
 }

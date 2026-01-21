@@ -27,3 +27,13 @@
     padding-left: 36px !important;
     padding-right: 36px !important;
 }
+
+.info-feedback {
+    display: block;
+    font-size: 0.875em;
+    color: #0d6efd; /* Bootstrap primary */
+}
+
+.is-info {
+    border-color: #0d6efd;
+}

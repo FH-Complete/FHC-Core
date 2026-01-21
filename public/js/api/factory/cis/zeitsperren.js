@@ -47,6 +47,13 @@ export default {
 			params
 		};
 	},
+	editZeitsperre(zeitsperre_id, params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Zeitsperren/update/' + zeitsperre_id,
+			params
+		};
+	},
 	loadZeitsperre(zeitsperre_id) {
 		return {
 			method: 'get',
@@ -54,7 +61,6 @@ export default {
 		};
 	},
 	deleteZeitsperre(zeitsperre_id) {
-		console.log("zeitsperre_id " + zeitsperre_id);
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Zeitsperren/delete/' + zeitsperre_id
