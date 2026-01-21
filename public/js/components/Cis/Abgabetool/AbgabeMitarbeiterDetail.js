@@ -727,7 +727,8 @@ export const AbgabeMitarbeiterDetail = {
 		</div>
 		<div class="row" style="margin-bottom: 12px;">
 			<div class="col-auto">
-<!--				TODO : tooltip why this button is disabled as zweitbegutachter-->
+<!--				TODO: tooltip why this button is disabled as zweitbegutachter-->
+<!--				TODO: fix bug where this button is sometimes correctly disabled, sometimes just wrong when betreuer is both first and second assesor-->
 				<button type="button" :disabled="projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter'" class="btn btn-primary" @click="openCreateNewAbgabeModal">
 					<i class="fa-solid fa-plus"></i>
 					{{$capitalize( $p.t('abgabetool/c4newAbgabetermin') )}}

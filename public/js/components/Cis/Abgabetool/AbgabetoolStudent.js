@@ -419,9 +419,9 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuer') )}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuer') ) }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : '' }}
+						{{ projektarbeit.betreuerart_kurzbz ? projektarbeit.betreuer : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">
