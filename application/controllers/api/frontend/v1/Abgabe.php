@@ -121,7 +121,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
@@ -131,11 +131,11 @@ class Abgabe extends FHCAPI_Controller
 		
 		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
 		if(isError($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
 		}
 
 		if(!hasData($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
 		}
 		$data = getData($res)[0];
 		$student_uid = $data->uid;
@@ -294,6 +294,8 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+		
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(getAuthUID() == $student_uid || $zugeordnet) {
 			
@@ -322,11 +324,11 @@ class Abgabe extends FHCAPI_Controller
 					
 					$this->terminateWithSuccess($res);
 				} else {
-					$this->terminateWithError('Error moving File');
+					$this->terminateWithError('Error moving File', 'general');
 				}
 	
 			} else {
-				$this->terminateWithError('File missing');
+				$this->terminateWithError('File missing', 'general');
 			}
 		} else {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
@@ -363,6 +365,8 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+		
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(getAuthUID() == $student_uid || $zugeordnet) {
 			if ((isset($_FILES) and isset($_FILES['file']) and !$_FILES['file']['error'])) {
@@ -373,7 +377,7 @@ class Abgabe extends FHCAPI_Controller
 					$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
 					$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-					$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+					$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 
 					if (count($projektarbeitArr) > 0) {
 						$projektarbeit = $projektarbeitArr[0];
@@ -383,7 +387,7 @@ class Abgabe extends FHCAPI_Controller
 
 					$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 					$result = $this->PaabgabeModel->load($paabgabe_id);
-					$paabgabeArr = $this->getDataOrTerminateWithError($result);
+					$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
 
 					if (count($paabgabeArr) > 0) {
 						$paabgabe = $paabgabeArr[0];
@@ -421,11 +425,11 @@ class Abgabe extends FHCAPI_Controller
 
 					$this->terminateWithSuccess($abgabe);
 				} else {
-					$this->terminateWithError('Error moving File');
+					$this->terminateWithError('Error moving File', 'general');
 				}
 
 			} else {
-				$this->terminateWithError('File missing');
+				$this->terminateWithError('File missing', 'general');
 			}
 		} else {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
@@ -503,6 +507,8 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
+
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(!$zugeordnet) {
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
@@ -567,23 +573,23 @@ class Abgabe extends FHCAPI_Controller
 		
 		// check if $paaabgabe is a qual gate and its note is deemed negative
 		// -> send email to student with that info
-		$paabgabe_id = $this->getDataOrTerminateWithError($result);
+		$paabgabe_id = $this->getDataOrTerminateWithError($result, 'general');
 		
 		$result = $this->PaabgabeModel->load($paabgabe_id);
-		$paabgabeArr = $this->getDataOrTerminateWithError($result);
+		$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
 		$paabgabe = $paabgabeArr[0];
 
 		// check if abgabe even has note
 		if($paabgabe->note) {
 			$this->load->model('education/Note_model', 'NoteModel');
 			$result = $this->NoteModel->load($paabgabe->note);
-			$noteArr = $this->getDataOrTerminateWithError($result);
+			$noteArr = $this->getDataOrTerminateWithError($result, 'general');
 			$note = $noteArr[0];
 			if($note->positiv === false) {
 				
 				if($existingPaabgabe && $existingPaabgabe->note) {
 					$result = $this->NoteModel->load($paabgabe->note);
-					$noteArr = $this->getDataOrTerminateWithError($result);
+					$noteArr = $this->getDataOrTerminateWithError($result, 'general');
 					$note = $noteArr[0];
 					if($note->positiv === false) {
 						// do nothing since this means $beurteilungsnotiz change or smth else
@@ -611,24 +617,26 @@ class Abgabe extends FHCAPI_Controller
 		if ($paabgabe_id === NULL || trim((string)$paabgabe_id) === '') {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
+		
+		$this->checkProjektarbeitForFinishedStatus($this->getProjektarbeitIDForPaabgabeID($paabgabe_id));
 
 		$zugeordnet = $this->checkZuordnungByPaabgabe($paabgabe_id, getAuthUID());
 		
 		if(!$zugeordnet) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		
 		$paabgabeResult = $this->PaabgabeModel->load($paabgabe_id);
-		$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult);
+		$paabgabeArr = $this->getDataOrTerminateWithError($paabgabeResult, 'general');
 
 		if(count($paabgabeArr) == 0) {
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 		
 		$result = $this->PaabgabeModel->delete($paabgabe_id);
-		$result = $this->getDataOrTerminateWithError($result);
+		$result = $this->getDataOrTerminateWithError($result, 'general');
 
 		// TODO: consider this in nightly email job
 		$this->logLib->logInfoDB(array($paabgabeArr[0], getAuthUID(), getAuthPersonId()));
@@ -672,10 +680,12 @@ class Abgabe extends FHCAPI_Controller
 		$res = [];
 		$abgaben = [];
 		foreach ($projektarbeit_ids as $projektarbeit_id) {
+
+			$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 			
 			$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 			if(!$zugeordnet) {
-				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+				$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 			}
 			
 			$result = $this->PaabgabeModel->insert(
@@ -691,7 +701,7 @@ class Abgabe extends FHCAPI_Controller
 				)
 			);
 
-			$dataAbgabe  = $this->getDataOrTerminateWithError($result);
+			$dataAbgabe  = $this->getDataOrTerminateWithError($result, 'general');
 			
 			$abgaben[]= getData($this->PaabgabeModel->load($dataAbgabe))[0];
 		}
@@ -721,7 +731,7 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
 		$result = $this->PaabgabeModel->getDeadlines($person_id);
-		$data = $this->getDataOrTerminateWithError($result);
+		$data = $this->getDataOrTerminateWithError($result, 'general');
 		
 		$this->terminateWithSuccess($data);
 	}
@@ -735,7 +745,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 
 		$result = $this->PaabgabetypModel->getAll();
-		$paabgabetypen = $this->getDataOrTerminateWithError($result);
+		$paabgabetypen = $this->getDataOrTerminateWithError($result, 'general');
 		
 		
 		$this->terminateWithSuccess($paabgabetypen);
@@ -747,7 +757,7 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmail($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
-		$email = $this->getDataOrTerminateWithError($result);
+		$email = $this->getDataOrTerminateWithError($result, 'general');
 		
 		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
 
@@ -763,7 +773,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Note_model', 'NoteModel');
 
 		$result = $this->NoteModel->getAllActive();
-		$noten = $this->getDataOrTerminateWithError($result);
+		$noten = $this->getDataOrTerminateWithError($result, 'general');
 
 		$allowed_noten_abgabetool = $this->config->item('ALLOWED_NOTEN_ABGABETOOL');
 
@@ -778,24 +788,24 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 		$projektarbeit = $projektarbeitArr[0];
 		
 		$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($betreuer_person_id);
-		$anredeArr = $this->getDataOrTerminateWithError($result);
+		$anredeArr = $this->getDataOrTerminateWithError($result, 'general');
 		$anrede = $anredeArr[0];
 		
 		$student_uid = $projektarbeit->student_uid;
 
 		$this->load->model('education/Paabgabetyp_model', 'PaabgabetypModel');
 		$result = $this->PaabgabetypModel->load($paabgabe->paabgabetyp_kurzbz);
-		$paabgabetyp_kurzbzArr = $this->getDataOrTerminateWithError($result);
+		$paabgabetyp_kurzbzArr = $this->getDataOrTerminateWithError($result, 'general');
 		$paabgabetyp_kurzbz = $paabgabetyp_kurzbzArr[0];
 		
 		// Mail an Student wenn Qualgate negativ beurteilt wurde
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$result = $this->StudentModel->load([$student_uid]);
-		$studentArr = $this->getDataOrTerminateWithError($result);
+		$studentArr = $this->getDataOrTerminateWithError($result, 'general');
 		$student = $studentArr[0];
 
 		if(!$student) {
@@ -853,7 +863,7 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		$result = $this->ProjektarbeitModel->getProjektarbeitenForStudiengang($studiengang_kz, $benotet);
-		$projektarbeiten = $this->getDataOrTerminateWithError($result);
+		$projektarbeiten = $this->getDataOrTerminateWithError($result, 'general');
 
 		if(count($projektarbeiten) == 0) { // avoid further abgabetermin queries if the are no projektarbeiten
 			$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
@@ -865,7 +875,7 @@ class Abgabe extends FHCAPI_Controller
 		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten);
 		
 		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
-		$projektabgaben = $this->getDataOrTerminateWithError($ret);
+		$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
 		
 		// map the abgaben into projektarbeiten
 		foreach($projektarbeiten as $projektarbeit) {
@@ -902,7 +912,7 @@ class Abgabe extends FHCAPI_Controller
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		
 		$result = $this->StudiengangModel->getStudiengaengeFiltered($stg_allowed);
-		$data = $this->getDataOrTerminateWithError($result);
+		$data = $this->getDataOrTerminateWithError($result, 'general');
 		
 		$this->terminateWithSuccess($data);
 	}
@@ -937,10 +947,10 @@ class Abgabe extends FHCAPI_Controller
 			if(file_exists($file_path)) {
 				$this->terminateWithFileOutput('application/octet-stream', file_get_contents($file_path), basename($file_path));
 			} else {
-				$this->terminateWithError('File not found');
+				$this->terminateWithError('File not found', 'general');
 			}
 		} else {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
 	}
 
@@ -971,18 +981,22 @@ class Abgabe extends FHCAPI_Controller
 			
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
+		
+		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
 		} else {
 			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
 		}
+		
+		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(!$zugeordnet) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
 		
 		// update projektarbeit cols
@@ -1048,7 +1062,7 @@ class Abgabe extends FHCAPI_Controller
 
 
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$projektarbeitArr = $this->getDataOrTerminateWithError($result);
+		$projektarbeitArr = $this->getDataOrTerminateWithError($result, 'general');
 
 		if(count($projektarbeitArr) > 0) {
 			$projektarbeit = $projektarbeitArr[0];
@@ -1193,11 +1207,11 @@ class Abgabe extends FHCAPI_Controller
 		
 		$res = $this->ProjektarbeitModel->getStudentInfoForProjektarbeitId($projektarbeit_id);
 		if(isError($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingStudentForProjektarbeitID'), 'general');
 		}
 		
 		if(!hasData($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedStudentForProjektarbeitID'), 'general');
 		}
 		$data = getData($res)[0];
 		$student_uid = $data->uid;
@@ -1205,7 +1219,7 @@ class Abgabe extends FHCAPI_Controller
 		
 		$res = $this->ProjektarbeitModel->checkZuordnung($student_uid, $betreuer_uid);
 		if(isError($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingBetreuerStudentZuordnung'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingBetreuerStudentZuordnung'), 'general');
 		}
 
 		// if this is true betreuer has zuordnung to the given $projektarbeit_id and conversely the $student_uid
@@ -1235,20 +1249,40 @@ class Abgabe extends FHCAPI_Controller
 		return false;
 	}
 	
-	private function checkZuordnungByPaabgabe($paabgabe_id, $betreuer_uid) {
+	private function getProjektarbeitIDForPaabgabeID($paabgabe_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
 		$res = $this->ProjektarbeitModel->getProjektarbeitByPaabgabeID($paabgabe_id);
 		if(isError($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingProjektarbeitForPaabgabeID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4errorLoadingProjektarbeitForPaabgabeID'), 'general');
 		}
 
 		if(!hasData($res)) {
-			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedProjektarbeitForPaabgabeID'));
+			$this->terminateWithError($this->p->t('abgabetool', 'c4noAssignedProjektarbeitForPaabgabeID'), 'general');
 		}
 		$data = getData($res)[0];
-		$projektarbeit_id = $data->projektarbeit_id;
+		return $data->projektarbeit_id;
+	}
 	
+	private function checkZuordnungByPaabgabe($paabgabe_id, $betreuer_uid) {
+		$projektarbeit_id = $this->getProjektarbeitIDForPaabgabeID($paabgabe_id);
 		return $this->checkZuordnung($projektarbeit_id, $betreuer_uid);
+	}
+
+	// loads a projektarbeit table row by id and looks if a note has been set. A non null note field
+	// currently indicates that a projektarbeit has been finished and should not accept further crud manipulation
+	private function checkProjektarbeitForFinishedStatus($projektarbeit_id) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$res = $this->ProjektarbeitModel->load($projektarbeit_id);
+
+		if(isError($res) || !hasData($res)) {
+			$this->terminateWithError($this->p->t('abgabetool','c4projektarbeitNichtGefunden'), 'general');
+		}
+
+		$data = getData($res)[0];
+		if($data->note !== NULL) {
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
+		}
 	}
 
 }
