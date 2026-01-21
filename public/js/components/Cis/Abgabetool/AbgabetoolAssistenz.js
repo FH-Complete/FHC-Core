@@ -687,7 +687,10 @@ export const AbgabetoolAssistenz = {
 			// pa.isCurrent = res.data[1]
 
 			pa.abgabetermine.forEach(termin => {
-				termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				if(typeof termin.note !== 'object') {
+					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				}
+				
 				termin.file = []
 
 				// assistenz should be able to edit every abgabe

@@ -142,7 +142,6 @@ class Abgabe extends FHCAPI_Controller
 
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
 		if(getAuthUID() == $student_uid || $zugeordnet) {
-
 			$projektarbeitIsCurrent = false;
 			$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
 				$projektarbeitIsCurrent = $result;
@@ -825,6 +824,7 @@ class Abgabe extends FHCAPI_Controller
 			$tomail,
 			$subject
 		);
+		
 	}
 
 	/**
