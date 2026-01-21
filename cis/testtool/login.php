@@ -731,7 +731,7 @@ else // LOGIN Site (vor Login)
 			echo '<script>
 				function changeconfirmation()
 				{
-					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked;
+					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked || !document.getElementById("dsgvoconfirm").checked || !document.getElementById("procotoringconfirm").checked;
 				}
 				</script>';
 			echo '<div class="row text-center">
@@ -740,6 +740,12 @@ else // LOGIN Site (vor Login)
 			<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
 			<input id="confirmationCheckbox" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
 			'.$p->t('testtool/confirmationText').'
+			<br><br>
+			<input id="dsgvoconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/dsgvoConfirmText').'
+			<br><br>
+			<input id="procotoringconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/procotoringConfirmText').'
 			<br><br>
 			<button id="confirmationSubmit" type="submit" class="btn btn-primary" disabled/>
 				'.$p->t('testtool/start').'
