@@ -501,8 +501,8 @@ if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTU
 }
 
 // LV-Evaluierung NEU
-if(defined('CIS_EVALUIERUNG_ANZEIGEN_STG')
-	&& CIS_EVALUIERUNG_ANZEIGEN_STG
+if(defined('CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN')
+	&& CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN
 	&& $angemeldet
 	&& (!defined('CIS_EVALUIERUNG_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_EVALUIERUNG_ANZEIGEN_STG)))
 	&& ($rechte->isBerechtigt('extension/lvevaluierung_init')))
