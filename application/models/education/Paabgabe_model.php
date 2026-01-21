@@ -61,7 +61,7 @@ class Paabgabe_model extends DB_Model
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
 
-	public function findAbgabenNewOrUpdatedSince($interval)
+	public function findAbgabenNewOrUpdatedSince($interval, $relevantTypes)
 	{
 
 		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
@@ -79,10 +79,11 @@ class Paabgabe_model extends DB_Model
 				 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 				 JOIN public.tbl_person USING (person_id)
 		
-		WHERE campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
-		   OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?";
+		WHERE (campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
+		   OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?)
+		   AND campus.tbl_paabgabe.paabgabetyp_kurzbz IN ?";
 
-		return $this->execQuery($query, [$interval, $interval]);
+		return $this->execQuery($query, [$interval, $interval, $relevantTypes]);
 	}
 
 	public function findAbgabenNewOrUpdatedSinceByAbgabedatum($interval) {

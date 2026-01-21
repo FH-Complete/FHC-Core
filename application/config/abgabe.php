@@ -16,6 +16,12 @@ $config['URL_MITARBEITER'] = 'index.ci.php/Cis/Abgabetool/Mitarbeiter';
 // lehre.tbl_paabgabetyp bezeichnung
 //$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
 $config['ALLOWED_ABGABETYPEN_BETREUER'] = ['zwischen', 'qualgate1', 'qualgate2']; // tbl_paabgabetyp pk
+// paabgabetypen for which betreuer is benachrichtigt via sammelmail
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_BETREUER'] = ['qualgate1', 'qualgate2', 'end'];
+// paabgabetypen for which assistenz is benachrichtigt via sammelmail
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ'] = ['end'];
+// paabgabetypen for which student is benachrichtigt via sammelmail -> basically all of them but still defined for consistency
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT'] = ['qualgate1', 'qualgate2', 'zwischen', 'note', 'abstract', 'end', 'enda'];
 //$config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
 $config['ALLOWED_NOTEN_ABGABETOOL'] = [10, 14]; // tbl_note pk
 

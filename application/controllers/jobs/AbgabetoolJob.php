@@ -34,8 +34,10 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->logInfo('Start job FHC-Core->notifyAssistenzAboutChangedAbgaben');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ');
 		// get all new or changed termine in interval
-		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
+		
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
@@ -162,7 +164,6 @@ class AbgabetoolJob extends JOB_Controller
 						<tr style="background-color: #eee; text-align: left;">
 							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
 							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-							<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabe bis</th>
 						</tr>
 					</thead>
 					<tbody>';
@@ -178,7 +179,6 @@ class AbgabetoolJob extends JOB_Controller
 						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
 							<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
 						</td>
-						<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
 					</tr>";
 				}
 
@@ -207,7 +207,7 @@ class AbgabetoolJob extends JOB_Controller
 			);
 
 			$email = $assistenzRow->uid."@".DOMAIN;
-
+			
 			// send email with bundled info
 			sendSanchoMail(
 				'PAAChangesAssSM',
@@ -228,8 +228,11 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerAboutChangedAbgaben');
 
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+
+		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_BETREUER');
+
 		// get all new or changed termine in interval
-		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
@@ -335,7 +338,6 @@ class AbgabetoolJob extends JOB_Controller
 							<tr style="background-color: #eee; text-align: left;">
 								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Zieldatum</th>
 								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-								<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Abgabe bis</th>
 							</tr>
 						</thead>
 						<tbody>';
@@ -351,7 +353,6 @@ class AbgabetoolJob extends JOB_Controller
 							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
 								<strong>{$abgabe->bezeichnung}</strong>{$kurzbzLine}
 							</td>
-							<td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
 						</tr>";
 				}
 
@@ -399,6 +400,8 @@ class AbgabetoolJob extends JOB_Controller
 
 		$this->_ci->logInfo('Start job FHC-Core->notifyBetreuerMail');
 
+		// dont filter for relevant types since this mail should gather all UPLOAD info
+		
 		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSinceByAbgabedatum($interval);
@@ -446,7 +449,7 @@ class AbgabetoolJob extends JOB_Controller
 						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Zieldatum</th>
 						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 25%;">Studierende/r</th>
 						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung</th>
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Abgabe bis</th>
+						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 15%;">Abgabedatum</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -518,9 +521,11 @@ class AbgabetoolJob extends JOB_Controller
 
 		$this->_ci->logInfo('Start job FHC-Core->notifyStudentMail');
 
-		$interval = '10 days';//$this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+		$interval = '20 days';$this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 
-		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval);
+		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT');
+
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
 		$retval = getData($result);
 
 		if(count($retval) == 0) {
@@ -561,7 +566,7 @@ class AbgabetoolJob extends JOB_Controller
 			<table style="width: 100%; border-collapse: collapse; font-family: Arial, sans-serif; color: #333; margin-top: 15px; margin-bottom: 15px;">
 				<thead>
 					<tr style="background-color: #f2f2f2; text-align: left;">
-						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 25%;">Datum</th>
+						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 25%;">Zieldatum</th>
 						<th style="padding: 10px; border: 1px solid #ddd; font-size: 13px;">Bezeichnung / Hinweis</th>
 					</tr>
 				</thead>

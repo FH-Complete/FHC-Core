@@ -149,6 +149,9 @@ export const AbgabetoolStudent = {
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
+				
+				const paIsBenotet = pa.note !== null
+				
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
 					termin.allowedToUpload = false
@@ -172,6 +175,10 @@ export const AbgabetoolStudent = {
 						termin.allowedToUpload = termin.upload_allowed 
 					}
 
+					// blocks client upload button if projektarbeitet is already beurteilt und thus further abgaben on any termin should be blocked
+					if(paIsBenotet) termin.allowedToUpload = false
+					
+					
 					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 					termin.dateStyle = this.getDateStyleClass(termin)
 				})

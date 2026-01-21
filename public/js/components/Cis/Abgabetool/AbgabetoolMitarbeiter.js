@@ -300,13 +300,18 @@ export const AbgabetoolMitarbeiter = {
 				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
 				pa.isCurrent = res.data[1]
-				
+
+				const paIsBenotet = pa.note !== null
+
 				pa.abgabetermine.forEach(termin => {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 					termin.file = []
 					
-					// update 08-01-20206: everybody is allowed to do everything in client, critical checks happen at backend level
-					termin.allowedToSave = true
+					// update 08-01-2026: everybody is allowed to do everything in client, critical checks happen at backend level
+					// termin.allowedToSave = true
+					
+					// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
+					termin.allowedToSave = paIsBenotet ? false : true
 					
 					// lektoren are not allowed to delete deadlines with existing submissions
 					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum

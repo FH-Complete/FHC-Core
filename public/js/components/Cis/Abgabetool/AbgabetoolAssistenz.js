@@ -685,7 +685,8 @@ export const AbgabetoolAssistenz = {
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
 			// pa.isCurrent = res.data[1]
-
+			const paIsBenotet = pa.note !== null
+			
 			pa.abgabetermine.forEach(termin => {
 				if(typeof termin.note !== 'object') {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
@@ -694,10 +695,11 @@ export const AbgabetoolAssistenz = {
 				termin.file = []
 
 				// assistenz should be able to edit every abgabe
-				termin.allowedToSave = true
+				// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
+				termin.allowedToSave = paIsBenotet ? false : true
 
 				// assistenz are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = !termin.abgabedatum
+				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum
 
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 
