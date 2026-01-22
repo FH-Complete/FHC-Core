@@ -73,11 +73,11 @@ export default {
 		},
 		grade() {
 			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
+			// no more showing of grade LV, if grade Zeugnis is not existing yet
 			if(this.benotung && this.znotebez?.length) {
 				return this.znotebez[languageIndex]
-			} else if(this.benotung && this.lvnotebez?.length) {
-				return this.lvnotebez[languageIndex]
-			} else return null
+			}
+			else return null
 		},
 		LvHasPruefungenInformation(){
 			return this.pruefungenData && this.pruefungenData.length > 0;

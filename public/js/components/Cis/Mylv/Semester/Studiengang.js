@@ -1,9 +1,11 @@
 import MylvSemesterStudiengangLv from "./Studiengang/Lv.js";
+import MylvSemesterStudiengangAverageGrade from "./Studiengang/AverageGrade.js";
 import Phrasen from "../../../../mixins/Phrasen.js";
 
 export default {
 	components: {
-		MylvSemesterStudiengangLv
+		MylvSemesterStudiengangLv,
+		MylvSemesterStudiengangAverageGrade
 	},
 	mixins: [
 		Phrasen
@@ -29,9 +31,10 @@ export default {
 	methods: {
 		note(lv) {
 			return lv.benotung ? lv.znote || lv.lvnote || null : null;
-		}
+		},
 	},
 	template: `<div class="card mb-3">
+
 		<div class="card-body">
 			<h4 class="card-title mb-3">{{$p.user_language.value === 'English' ? sg_bezeichnung_eng : bezeichnung}} - {{kuerzel}}
 				<small>{{semester}}.{{$p.t('lehre/semester')}}</small>
@@ -41,6 +44,7 @@ export default {
 					<mylv-semester-studiengang-lv v-bind="lv" class="text-center h-100"></mylv-semester-studiengang-lv>
 				</div>
 			</div>
+			<mylv-semester-studiengang-average-grade :lvs="lvs" />
 		</div>
 	</div>`
 };
