@@ -1,7 +1,6 @@
 import ProfilUpdateView from "../../components/Cis/ProfilUpdate/ProfilUpdateView.js";
-import PluginsPhrasen from "../../plugins/Phrasen.js";
-
 import ApiProfilUpdate from '../../api/factory/profilUpdate.js';
+import FhcBase from "../../plugins/FhcBase/FhcBase.js";
 
 // TODO: sobald in verwendung den vue router pfad zu ProfilUpdateView definieren und diese app in component auslagern
 const app = Vue.createApp({
@@ -34,4 +33,4 @@ const app = Vue.createApp({
       });
   },
 });
-app.use(PluginsPhrasen).mount("#content");
+app.use(FhcBase).mount("#content");

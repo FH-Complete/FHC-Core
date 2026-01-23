@@ -3,7 +3,6 @@ import FhcSearchbar from "../searchbar/searchbar.js";
 import CisSprachen from "./Sprachen.js"
 import ThemeSwitch from "./ThemeSwitch.js";
 import ApiCisMenu from '../../api/factory/cis/menu.js';
-
 export default {
     components: {
         CisMenuEntry,

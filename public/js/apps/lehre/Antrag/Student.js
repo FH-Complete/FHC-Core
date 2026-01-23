@@ -1,5 +1,5 @@
 import LvPopup from '../../../components/Studierendenantrag/Leitung/LvPopup.js';
-import PluginsPhrasen from '../../../plugins/Phrasen.js';
+import FhcBase from "../../../plugins/FhcBase/FhcBase.js";
 
 const app = Vue.createApp({
 	name: 'StudentApp',
@@ -8,5 +8,5 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(PluginsPhrasen)
+	.use(FhcBase)
 	.mount('#wrapper');

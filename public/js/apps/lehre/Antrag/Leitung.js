@@ -1,5 +1,5 @@
 import StudierendenantragLeitung from '../../../components/Studierendenantrag/Leitung.js';
-import PluginsPhrasen from '../../../plugins/Phrasen.js';
+import FhcBase from "../../../plugins/FhcBase/FhcBase.js";
 
 const app = Vue.createApp({
 	name: 'LeitungApp',
@@ -8,6 +8,6 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(PluginsPhrasen)
+	.use(FhcBase)
 	.use(primevue.config.default,{zIndex: {overlay: 9999}})
 	.mount('#wrapper');

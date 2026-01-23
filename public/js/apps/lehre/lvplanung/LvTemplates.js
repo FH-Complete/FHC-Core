@@ -17,7 +17,7 @@
 
 import LvTemplateUebersicht from '../../../lehre/lvplanung/LvTemplateUebersicht.js';
 import {CoreNavigationCmpt} from '../../../components/navigation/Navigation.js';
-import PluginsPhrasen from "../../../plugins/Phrasen.js";
+import FhcBase from "../../../plugins/FhcBase/FhcBase.js";
 
 
 const lvTemplatesApp = Vue.createApp({
@@ -30,5 +30,5 @@ const lvTemplatesApp = Vue.createApp({
 
 lvTemplatesApp
 	.use(primevue.config.default,{zIndex: {overlay: 9999}})
-	.use(PluginsPhrasen)
+	.use(FhcBase)
 	.mount('#main')

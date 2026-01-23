@@ -1,7 +1,7 @@
 import StudierendenantragAntrag from "../../components/Studierendenantrag/Antrag.js";
 import StudierendenantragStatus from "../../components/Studierendenantrag/Status.js";
 import StudierendenantragInfoblock from "../../components/Studierendenantrag/Infoblock.js";
-import PluginsPhrasen from '../../plugins/Phrasen.js';
+import FhcBase from "../../plugins/FhcBase/FhcBase.js";
 
 const app = Vue.createApp({
 	name: 'AntragApp',
@@ -21,5 +21,5 @@ const app = Vue.createApp({
 	}
 });
 app
-	.use(PluginsPhrasen)
+	.use(FhcBase)
 	.mount('#wrapper');

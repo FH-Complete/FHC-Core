@@ -1,5 +1,6 @@
 import FhcDashboard from '../../components/Dashboard/Dashboard.js';
-import PluginsPhrasen from '../../plugins/Phrasen.js';
+import FhcBase from '../../plugins/FhcBase/FhcBase.js';
+
 import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
@@ -330,7 +331,7 @@ app.use(primevue.config.default, {
 	}
 })
 app.directive('tooltip', primevue.tooltip);
-app.use(PluginsPhrasen);
+app.use(FhcBase);
 app.use(Theme);
 app.directive('contrast', contrast);
 app.mount('#fhccontent');

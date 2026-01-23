@@ -1,5 +1,5 @@
 import LVVerwaltung from "../components/LVVerwaltung/LVVerwaltung.js";
-import Phrasen from "../plugins/Phrasen.js";
+import FhcBase from "../plugins/FhcBase/FhcBase.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -98,5 +98,5 @@ app
 			overlay: 1100
 		}
 	})
-	.use(Phrasen)
+	.use(FhcBase)
 	.mount('#main');

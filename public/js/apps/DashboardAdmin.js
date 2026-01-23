@@ -1,6 +1,6 @@
 import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
 import DashboardAdmin from '../components/Dashboard/Admin.js';
-import Phrases from "../plugin/Phrasen.js"
+import FhcBase from "../plugins/FhcBase/FhcBase.js";
 
 Vue.createApp({
   name: 'DashboardAdminApp',
@@ -13,4 +13,4 @@ Vue.createApp({
   },
   mounted() {
   }
-}).use(Phrases).mount('#main');
+}).use(FhcBase).mount('#main');

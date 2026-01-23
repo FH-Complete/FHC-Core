@@ -1,5 +1,6 @@
 import PluginsPhrasen from '../../plugins/Phrasen.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
+import FhcBase from "../../plugins/FhcBase/FhcBase.js";
 
 const app = Vue.createApp({
 	name: 'DocumentsApp',
@@ -89,5 +90,5 @@ const app = Vue.createApp({
 
 setScrollbarWidth();
 
-app.use(PluginsPhrasen);
+app.use(FhcBase);
 app.mount('#content');

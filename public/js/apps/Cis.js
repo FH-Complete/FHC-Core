@@ -1,9 +1,9 @@
 import FhcSearchbar from "../components/searchbar/searchbar.js";
 import CisMenu from "../components/Cis/Menu.js";
-import PluginsPhrasen from '../plugins/Phrasen.js';
 import ApiSearchbar from '../api/factory/searchbar.js';
 import Theme from "../plugins/Theme.js";
-
+import FhcBase from '../plugins/FhcBase/FhcBase.js';
+// import PluginsPhrasen from '../plugins/Phrasen.js';
 const app = Vue.createApp({
     name: 'CisApp',
     components: {
@@ -148,6 +148,7 @@ app.use(primevue.config.default, {
 		tooltip: 8000
 	}
 })
-app.use(PluginsPhrasen);
+// app.use(PluginsPhrasen);
+app.use(FhcBase);
 app.use(Theme);
 app.mount('#cis-header');

@@ -29,7 +29,7 @@ class Studium extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStudienAllSemester'=> self::PERM_LOGGED,
+			'getAllStudienSemester'=> self::PERM_LOGGED,
 			'getStudiengaengeForStudienSemester'=> self::PERM_LOGGED,
 			'getStudienplaeneBySemester'=> self::PERM_LOGGED,
 			'getLvEvaluierungInfo'=> self::PERM_LOGGED,
@@ -51,7 +51,7 @@ class Studium extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-	public function getStudienAllSemester(){
+	public function getAllStudienSemester(){
 
 		$parameter_studiensemester = $this->input->get('studiensemester',true);
         $parameter_studiengang = $this->input->get('studiengang',true);
@@ -59,24 +59,26 @@ class Studium extends FHCAPI_Controller
 		$parameter_studienplan = $this->input->get('studienplan',true);
 
 		$aktuelles_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->getAktOrNextSemester()));
-
+		
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
-			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
-			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
+			$lv_result =$this->StudentlehrverbandModel->loadWhere([
+				"student_uid" => getAuthUID(),
+				"studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz
+			]);
+			$lv_data = $this->getDataOrTerminateWithError($lv_result);
 			
-			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
-			$student_studiengang = $studentLehrverband->studiengang_kz;
-			$student_semester = $studentLehrverband->semester;
+			if ($studentLehrverband = current($lv_data)) {
+				$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
+				$student_studiengang = $studentLehrverband->studiengang_kz;
+				$student_semester = $studentLehrverband->semester;
+			}
+			
 			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
-			
-			if(!isset($parameter_studiensemester))
-			$parameter_studiensemester = $student_studiensemester;
-			if(!isset($parameter_studiengang))
-			$parameter_studiengang = $student_studiengang;
-			if(!isset($parameter_semester))
-			$parameter_semester = $student_semester;
-			if(!isset($parameter_studienplan))
-			$parameter_studienplan = $student_studienplan;
+
+			$parameter_studiensemester = $parameter_studiensemester ?? $student_studiensemester;
+			$parameter_studiengang = $parameter_studiengang ?? $student_studiengang;
+			$parameter_semester = $parameter_semester ?? $student_semester;
+			$parameter_studienplan = $parameter_studienplan ?? $student_studienplan;
 		}  
 
 		if(isset($parameter_studiensemester)){
