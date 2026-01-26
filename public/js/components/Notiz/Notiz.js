@@ -154,7 +154,7 @@ export default {
 						title: "Erledigt",
 						field: "erledigt",
 						width: 97,
-						visible: false,
+						visible: this.showVariables.showErledigt,
 						formatter:"tickCross",
 						hozAlign:"center",
 						formatterParams: {
