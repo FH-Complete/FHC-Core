@@ -587,3 +587,5 @@ export class BaseApi {
 	// === private functions END ===
 	
 }
+
+export default BaseApi;
