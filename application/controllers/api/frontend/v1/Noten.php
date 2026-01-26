@@ -430,13 +430,42 @@ class Noten extends FHCAPI_Controller
 
 	/**
 	 * GET METHOD
-	 * should return Notenvorschlag for single Students, not yet implemented since it is not needed anywhere right now,
-	 * but could be useful later on.
+	 * should return Notenvorschlag for single Students, not used anywhere but required as per
+	 * https://openproject.technikum-wien.at/projects/fh-complete/work_packages/60873/activity
 	 */
 	public function getNotenvorschlagStudent() {
-		// TODO: Notenvorschlag laden allgemeiner Endpunkt, der im Backend mit Logik (z.B. Moodle) angepasst werden kann.
+		$uid = $this->input->get("uid",TRUE);
+
+		// if uid is missing or empty, fall back to getAuthUID()
+		if ($uid === NULL || trim((string)$uid) === '') {
+			$uid = getAuthUID();
+		}
+
+		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
+		$lv_id = $this->input->get("lv_id",TRUE);
+
+		if ($uid === NULL || trim((string)$uid) === ''
+			|| $sem_kurzbz === NULL || trim((string)$sem_kurzbz) === ''
+			|| $lv_id === NULL || trim((string)$lv_id) === '') {
+			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		}
 		
-		$this->terminateWithSuccess();
+		// TODO: we need a zuordnungscheck here? any lektor can get any grades?
+		// what about assistenz with different rights doing lectors job once again?
+		// students checking their own grades?
+		
+		
+		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		// TODO: moodle teilnote but it seems they only work for a whole course?
+		
+		// get anw% of student by prestudent_id
+		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
+
+
+
+		$this->terminateWithSuccess($data);
 	}
 
 	/**
