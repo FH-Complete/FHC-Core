@@ -91,7 +91,15 @@ export default{
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				index: 'pruefung_id',
-				persistenceID: 'stv-details-pruefung-list-2025112402'
+				persistenceID: 'stv-details-pruefung-list-2026012701',
+				persistence: {
+					sort: false,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false
+				}
 			},
 			tabulatorEvents: [
 				{
