@@ -34,7 +34,7 @@ if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 // Start session
-session_start();
+require_once './session_init.php';
 
 // If language is changed by language select menu, reset language and session variables
 if(isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
@@ -61,8 +61,12 @@ $p = new phrasen($sprache_user);
 <?php
 $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
 $invalid_gebiete = false;
-
-if (isset($_SESSION['pruefling_id']))
+if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true) &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === false)
+{
+	exit;
+}
+else if (isset($_SESSION['pruefling_id']))
 {
 	//content_id fuer Einfuehrung auslesen
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
@@ -73,7 +77,7 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Startseite
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool navButton" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
+			<a class="ItemTesttool navButton" href="login.php" onclick="return loadContent(this.href);">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
 
 // Link zur Einleitung
@@ -83,7 +87,7 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			echo '
 				<tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-					<a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" target="content">'.$p->t('testtool/einleitung').'</a>
+					<a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" onclick="return loadContent(this.href);">'.$p->t('testtool/einleitung').'</a>
 				</td></tr>
 			';
 		}
@@ -379,10 +383,13 @@ if (isset($_SESSION['pruefling_id']))
 				}
 			}
 
+
 			echo '<tr>
 					<!--<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>-->
+
 						<td class="'.$class.'">
-							<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$gebietbezeichnung.'</a>
+								<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="return loadContent(this.href);"  style="'.$style.'">'.$gebietbezeichnung.'</a>
+								
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
@@ -401,7 +408,7 @@ if (isset($_SESSION['pruefling_id']))
 	// Link zum Logout
 
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool navButton" href="login.php?logout=true" target="content">Logout</a>
+			<a class="ItemTesttool navButton" href="login.php?logout=true" onclick="return loadContent(this.href);">Logout</a>
 		</td></tr>';
 
 	echo '</td></tr></table>';
@@ -425,28 +432,6 @@ else
 			e.preventDefault();
 		});
 	});
-    // Get users Browser
-    var ua = navigator.userAgent;
-
-    // If Browser is any other than Mozilla Firefox and the test includes any MathML,
-    // show message to use Mozilla Firefox
-    if ((ua.indexOf("Firefox") > -1) == false)
-    {
-        let hasMathML = "<?php echo (isset($gebiet_hasMathML)?$gebiet_hasMathML:''); ?>";
-        let userLang = "<?php echo $sprache_user; ?>";
-        if (hasMathML == true)
-        {
-            if (userLang == 'German')
-            {
-                alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.)');
-            }
-            else if(userLang == 'English')
-            {
-                alert('PLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
-            }
-        }
-    }
-
     // Error massage if check_gebiet function returns false
     $(function() {
         var invalid_gebiete = "<?php echo (isset($invalid_gebiete)?$invalid_gebiete:''); ?>";
@@ -461,5 +446,22 @@ else
                 '</td></tr>');
         }
     });
+
+	function loadContent(url)
+	{
+		if (parent && typeof parent.loadInContent === 'function')
+		{
+			parent.loadInContent(url);
+			return false;
+		}
+
+		let frame = parent?.frames?.["content"];
+		if (frame)
+		{
+			frame.location.href = url;
+			return false;
+		}
+	}
+
 </script>
 </html>

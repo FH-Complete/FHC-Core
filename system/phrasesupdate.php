@@ -54311,6 +54311,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'lvevaluierung',
+		'category' => 'fragebogen',
+		'phrase' => 'pflichtantwortFehlt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Pflichtantwort fehlt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Mandatory answer missing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ### 		DOKUMENTE ERSTELLEN PHRASEN 		END 		###
 	// ### Personen zusammenlegen Phrasen BEGIN
 	array(

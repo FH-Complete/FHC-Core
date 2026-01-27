@@ -64,16 +64,16 @@ class Projektarbeit_model extends DB_Model
 		if (isset($projekttyp))
 		{
 			if (is_array($projekttyp))
-				$qry .= ' AND tbl_projektarbeit.projekttyp_kurzbz IN ?';
+				$qry .= ' AND pa.projekttyp_kurzbz IN ?';
 			else
-				$qry .= ' AND tbl_projektarbeit.projekttyp_kurzbz=?';
+				$qry .= ' AND pa.projekttyp_kurzbz=?';
 
 			$params[] = $projekttyp;
 		}
 
 		if (isset($final))
 		{
-			$qry .= ' AND tbl_projektarbeit.final=?';
+			$qry .= ' AND pa.final=?';
 			$params[] = $final;
 		}
 

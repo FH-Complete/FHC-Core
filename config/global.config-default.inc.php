@@ -27,7 +27,7 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
-define('CIS_EVALUIERUNG_ANZEIGEN_STG', true);
+define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN', true);
 
 // Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
@@ -367,5 +367,8 @@ define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
 
 // Gibt an, ob in der StudVW der Status vorgerueckt werden kann
 define('STATUS_VORRUECKEN_ANZEIGEN', true);
+
+//externe Ueberwachung im Testtool erlauben
+define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 
 ?>
