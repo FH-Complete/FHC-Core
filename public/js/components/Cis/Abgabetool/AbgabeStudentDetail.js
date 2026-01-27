@@ -337,7 +337,7 @@ export const AbgabeStudentDetail = {
 				</div>
 				<div class="col-4">
 					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
-						<a :href="getMoodleLink">Moodle</a>
+						<a :href="getMoodleLink" target="_blank">Moodle</a>
 					</p>
 				</div>
 			</div>

@@ -824,7 +824,16 @@ export const AbgabetoolAssistenz = {
 						icon = '<i class="fa-solid fa-clock"></i>'
 						break
 					case 'abgegeben':
+						icon = '<i class="fa-solid fa-paperclip"></i>'
+						break
+					case 'beurteilungerfolderlich':
+						icon = '<i class="fa-solid fa-list-check"></i>'
+						break
+					case 'bestanden':
 						icon = '<i class="fa-solid fa-check"></i>'
+						break
+					case 'nichtbestanden':
+						icon = '<i class="fa-solid fa-circle-exclamation"></i>'
 						break
 				}
 				
