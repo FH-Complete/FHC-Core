@@ -71,7 +71,7 @@ export const AbgabetoolStudent = {
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
 
-			const isLate = abgabedatum && abgabedatum > datum;
+			const isLate = termin.abgabedatum && abgabedatum > datum;
 
 			// GRADE STATUS
 			if (termin.note) {
@@ -90,7 +90,7 @@ export const AbgabetoolStudent = {
 
 			// SUBMISSION STATUS
 			if (termin.upload_allowed) {
-				if (abgabedatum) {
+				if (termin.abgabedatum) {
 					return isLate ? 'verspaetet' : 'abgegeben';
 				}
 
