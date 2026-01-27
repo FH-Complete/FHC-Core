@@ -195,7 +195,7 @@ class AbgabetoolJob extends JOB_Controller
 			
 			
 
-			$path = $this->_ci->config->item('URL_MITARBEITER');
+			$path = $this->_ci->config->item('URL_ASSISTENZ');
 			$url = CIS_ROOT.$path;
 
 			$body_fields = array(
