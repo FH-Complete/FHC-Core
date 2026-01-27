@@ -728,25 +728,33 @@ export const AbgabetoolAssistenz = {
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
 
-			// seperate status if termin is in the past, it needs a note but doesnt have one yet			
-			if(termin.bezeichnung?.benotbar && !termin.note) return 'beurteilungerforderlich'
-			if (termin.abgabedatum === null && termin.upload_allowed) {
-				if(datum < today) {
-					return 'verpasst' // needs upload, missed it and has not submitted anything 
-				} else if (datum > today && termin.diffindays <= 12) {
-					return 'abzugeben' // needs to upload soon
-				} else {
-					return 'standard' // upload in distant future
+			const isLate = abgabedatum && abgabedatum > datum;
+
+			// GRADE STATUS
+			if (termin.note) {
+				if (termin.note.positiv) return 'bestanden';
+				return 'nichtbestanden';
+			}
+
+			// ACTION REQUIRED FOR GRADE
+			if (termin.bezeichnung?.benotbar && datum < today) {
+				return 'beurteilungerforderlich';
+			}
+
+			// SUBMISSION STATUS
+			if (termin.upload_allowed) {
+				if (abgabedatum) {
+					return isLate ? 'verspaetet' : 'abgegeben';
 				}
+
+				// no submission yet
+				if (datum < today) return 'verpasst';
+				if (termin.diffindays <= 12) return 'abzugeben';
+				return 'standard';
 			}
-			else if(abgabedatum > datum) {
-				return 'verspaetet' // needs upload, missed it and has submitted smth late
-			} else if(!termin.upload_allowed) {
-				if(datum > today) return termin.diffindays <= 12 ? 'abzugeben' : 'standard'
-				else if (today > datum) return 'abgegeben'
-			} else {
-				return 'abgegeben' // nothing else to do for that termin
-			}
+
+			// GENERIC STATUS
+			return datum < today ? 'verpasst' : 'standard';
 		},
 		openTimeline(val) {
 			const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)

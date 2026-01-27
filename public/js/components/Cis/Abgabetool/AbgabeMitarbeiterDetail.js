@@ -308,25 +308,34 @@ export const AbgabeMitarbeiterDetail = {
 			const abgabedatum = new Date(termin.abgabedatum)
 
 			termin.diffindays = this.dateDiffInDays(termin.datum)
-			
-			if(termin.bezeichnung?.benotbar && !termin.note) return 'beurteilungerforderlich'
-			if (termin.abgabedatum === null && termin.upload_allowed) {
-				if(datum < today) {
-					return 'verpasst' // needs upload, missed it and has not submitted anything 
-				} else if (datum > today && termin.diffindays <= 12) {
-					return 'abzugeben' // needs to upload soon
-				} else {
-					return 'standard' // upload in distant future
+
+			const isLate = abgabedatum && abgabedatum > datum;
+
+			// GRADE STATUS
+			if (termin.note) {
+				if (termin.note.positiv) return 'bestanden';
+				return 'nichtbestanden';
+			}
+
+			// ACTION REQUIRED FOR GRADE
+			if (termin.bezeichnung?.benotbar && datum < today) {
+				return 'beurteilungerforderlich';
+			}
+
+			// SUBMISSION STATUS
+			if (termin.upload_allowed) {
+				if (abgabedatum) {
+					return isLate ? 'verspaetet' : 'abgegeben';
 				}
+
+				// no submission yet
+				if (datum < today) return 'verpasst';
+				if (termin.diffindays <= 12) return 'abzugeben';
+				return 'standard';
 			}
-			else if(abgabedatum > datum) {
-				return 'verspaetet' // needs upload, missed it and has submitted smth late
-			} else if(!termin.upload_allowed) {
-				if(datum > today) return termin.diffindays <= 12 ? 'abzugeben' : 'standard'
-				else if (today > datum) return 'abgegeben'
-			} else {
-				return 'abgegeben' // nothing else to do for that termin
-			}
+
+			// GENERIC STATUS
+			return datum < today ? 'verpasst' : 'standard';
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -582,6 +591,18 @@ export const AbgabeMitarbeiterDetail = {
 				class: "custom-tooltip"
 			}
 		},
+		getTooltipBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipBestanden'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipNichtBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipNichtBestanden'),
+				class: "custom-tooltip"
+			}
+		},
 		getProjektarbeitTitel() {
 			if(this.projektarbeit?.titel) return this.projektarbeit.titel
 			
@@ -753,8 +774,11 @@ export const AbgabeMitarbeiterDetail = {
 								<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
 								<i v-else-if="getDateStyleClass(termin) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
+								<i v-else-if="getDateStyleClass(termin) == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
+								<i v-else-if="getDateStyleClass(termin) == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
+							
 							</div>
 					
 							<div class="text-start px-2" style="min-width: 150px; max-width: 300px; margin-left: 40px">
