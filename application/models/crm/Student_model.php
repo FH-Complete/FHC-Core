@@ -169,7 +169,7 @@ class Student_model extends DB_Model
 
 		$max = 0;
 		if ($matrikelnrres && hasData($matrikelnrres)) {
-			$max = mb_substr(getData($matrikelnrres)[0]->matrikelnr, 7);
+			$max = mb_substr(trim(getData($matrikelnrres)[0]->matrikelnr), -3);
 			if (!is_numeric($max)) {
 				$max = (int)$max;
 			}

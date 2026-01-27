@@ -84,9 +84,11 @@ require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
 require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
 require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
+require_once('dbupdate_3.4/62063_lv_evaluierung.php');
 require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
 require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
 require_once('dbupdate_3.4/68744_StV_settings.php');
+require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -254,7 +256,7 @@ $tabellen=array(
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrmodus" => array("lehrmodus_kurzbz","bezeichnung_mehrsprachig","aktiv"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id", "evaluierung"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -359,7 +361,7 @@ $tabellen=array(
 	"public.tbl_profil_update_status" => array("status_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_profil_update_topic" => array("topic_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten","aktiv"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode", "externe_ueberwachung"),
 	"public.tbl_rueckstellung" => array("rueckstellung_id","person_id","status_kurzbz","datum_bis","insertamum","insertvon"),
 	"public.tbl_rueckstellung_status" => array("status_kurzbz", "bezeichnung_mehrsprachig", "sort", "aktiv"),
 	"public.tbl_rt_ort" => array("rt_id","ort_kurzbz","uid"),

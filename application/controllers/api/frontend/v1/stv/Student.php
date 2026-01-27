@@ -321,6 +321,10 @@ class Student extends FHCAPI_Controller
 		foreach ($array_allowed_props_benutzer as $prop) {
 			$val = $this->input->post($prop);
 			if ($val !== null) {
+				if($prop === 'alias' && $val === '')
+				{
+					$val = null;
+				}
 				$update_benutzer[$prop] = $val;
 			}
 		}

@@ -301,4 +301,16 @@ define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
 
 // Weiterleiten zu CIS neu (wenn Rechte vorhanden)
 define('CIS_REDIRECT_TO_CIS4', false);
+
+//Externe Ueberwachung
+define('EXTERNE_UEBERWACHUNG_PROTOCOL_URL', 'https://example.com');
+define('EXTERNE_UEBERWACHUNG_SECRET_KEY', null);
+define('EXTERNE_UEBERWACHUNG_INTEGRATION_NAME', 'example');
+define('EXTERNE_UEBERWACHUNG_SESSION_URL', 'https://example.com');
+define('EXTERNE_UEBERWACHUNG_TRIAL_TEST', false);
+define('EXTERNE_UEBERWACHUNG_EXAM_PARAMS', []);
+define('EXTERNE_UEBERWACHUNG_EXAM_RULES', []);
+define('EXTERNE_UEBERWACHUNG_EXAM_SCORE', []);
+
+
 ?>

@@ -801,4 +801,73 @@ class Studiengang_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
 	}
+
+	/**
+	 * Get active Studiengänge with Kuerzel by given Studiengang-Kennzahlen.
+	 * Helpful to easily get Studiengänge the user is entitled for.
+	 *
+	 * @param $studiengang_kz_arr
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null	Returns one row per Studiengang. Not considering the Orgforms.
+	 */
+	public function getByStgs($studiengang_kz_arr, $studiensemester_kurzbz)
+	{
+		if (is_numeric($studiengang_kz_arr))
+		{
+			$studiengang_kz_arr = [$studiengang_kz_arr];
+		}
+
+		$qry = '
+			SELECT
+				DISTINCT stg.*, UPPER(typ::varchar(1) || kurzbz) AS kuerzel
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz IN ?
+				AND stplsem.studiensemester_kurzbz = ?
+			ORDER BY
+				stg.kurzbzlang
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz_arr, $studiensemester_kurzbz]);
+	}
+
+	/**
+	 * Get OrgForms of given Studiengang and Studiensemester.
+	 *
+	 * @param $studiengang_kz
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getOrgformsByStg($studiengang_kz, $studiensemester_kurzbz)
+	{
+		$qry = '
+			SELECT
+				stpl.orgform_kurzbz
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz = ?
+				AND stg.aktiv = TRUE
+				AND stplsem.studiensemester_kurzbz = ?
+			GROUP BY
+				stpl.orgform_kurzbz
+			ORDER BY
+				CASE stpl.orgform_kurzbz
+					WHEN \'VZ\' THEN 1
+					WHEN \'BB\' THEN 2
+					WHEN \'DUA\' THEN 3
+					ELSE 4
+				END,
+				stpl.orgform_kurzbz; 
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz, $studiensemester_kurzbz]);
+	}
 }
