@@ -75,6 +75,10 @@ export const AbgabetoolStudent = {
 
 			// GRADE STATUS
 			if (termin.note) {
+				if(Number.isInteger(termin.note)) {
+					const opt = this.notenOptions.find(opt => opt.note == termin.note)
+					if(opt.positiv) return 'bestanden'
+				}
 				if (termin.note.positiv) return 'bestanden';
 				return 'nichtbestanden';
 			}
