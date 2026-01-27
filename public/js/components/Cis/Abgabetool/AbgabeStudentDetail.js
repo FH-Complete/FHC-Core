@@ -332,8 +332,9 @@ export const AbgabeStudentDetail = {
 			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
 			<div class="row">
 				<div class="col-8">
-					<p> {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
-					<p> {{projektarbeit?.titel}}</p>
+					<p> {{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4titel') ) }}: {{projektarbeit?.titel}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4betreuer') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				</div>
 				<div class="col-4">
 					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 

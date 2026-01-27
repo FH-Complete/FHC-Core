@@ -164,7 +164,8 @@ class Abgabe extends FHCAPI_Controller
 	public function getStudentProjektarbeiten()
 	{
 		$uid = $this->input->get("uid",TRUE);
-		
+
+		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 
@@ -184,6 +185,8 @@ class Abgabe extends FHCAPI_Controller
 		
 		if(count($projektarbeiten)) {
 			foreach($projektarbeiten as $pa) {
+				
+				$pa->student = getData($this->PersonModel->getFullName($uid));
 				
 				$downloadPaFunc = function ($babgeschickt, $zweitbetreuer_abgeschickt) use ($pa) {
 					$pa->babgeschickt = $babgeschickt;
@@ -466,7 +469,11 @@ class Abgabe extends FHCAPI_Controller
 
 
 		forEach($projektarbeiten->retval as $pa) {
-
+			
+			$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->betreuer_person_id);
+			$anredeArr = $this->getDataOrTerminateWithError($result, 'general');
+			$pa->betreuer = $anredeArr[0];
+			
 			$oldLink = ''; // show this when paIsCurrent == false -> moodle course template
 			$newLink = ''; // get curated path for betreuer type
 			$returnFunc = function ( $resultOld, $resultNew) use (&$oldLink, &$newLink) {

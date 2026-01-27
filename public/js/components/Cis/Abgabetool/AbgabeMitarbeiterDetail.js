@@ -604,13 +604,13 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		getProjektarbeitTitel() {
-			if(this.projektarbeit?.titel) return this.projektarbeit.titel
+			if(this.projektarbeit?.titel) return this.$capitalize(this.$p.t('abgabetool/c4titel')) + ': ' + this.projektarbeit.titel
 			
 			return ''
 		},
 		getProjektarbeitStudent(){
 
-			if(this.projektarbeit?.student) return this.projektarbeit.student
+			if(this.projektarbeit?.student) return this.$capitalize(this.$p.t('person/student')) + ': ' + this.projektarbeit.student
 
 			return ''
 		}
@@ -729,7 +729,13 @@ export const AbgabeMitarbeiterDetail = {
 			<div class="col-6">
 				<p> {{getProjektarbeitStudent}}</p>
 				<p> {{getProjektarbeitTitel}}</p>
-				<p v-if="projektarbeit?.zweitbegutachter"> {{projektarbeit?.zweitbegutachter}}</p>
+				<template v-if="assistenzMode">
+					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{$capitalize( $p.t('abgabetool/c4betreuer') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{$capitalize( $p.t('abgabetool/c4zweitbetreuer') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
+				</template>
+				<template v-else>
+					<p v-if="projektarbeit?.betreuer"> {{$p.t('abgabetool/c4betreuer')}}: {{projektarbeit?.betreuer?.first}}</p>
+				</template>		
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-start">
 				<SpeedDial
