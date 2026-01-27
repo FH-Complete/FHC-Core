@@ -1167,9 +1167,13 @@ export const AbgabetoolAssistenz = {
 					<div :class="slotProps.item.dateStyle + '-header'" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
 						<i v-if="slotProps.item.dateStyle == 'verspaetet'" class="fa-solid fa-triangle-exclamation"></i>
 						<i v-else-if="slotProps.item.dateStyle == 'verpasst'" class="fa-solid fa-calendar-xmark"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'abzugeben'"  class="fa-solid fa-hourglass-half"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'standard'"  class="fa-solid fa-clock"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'abgegeben'"  class="fa-solid fa-check"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'abzugeben'" class="fa-solid fa-hourglass-half"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'standard'" class="fa-solid fa-clock"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'abgegeben'" class="fa-solid fa-paperclip"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'beurteilungerforderlich'" class="fa-solid fa-list-check"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'bestanden'" class="fa-solid fa-check"></i>
+						<i v-else-if="slotProps.item.dateStyle == 'nichtbestanden'" class="fa-solid fa-circle-exclamation"></i>
+					
 					</div>
 				</template>
 			

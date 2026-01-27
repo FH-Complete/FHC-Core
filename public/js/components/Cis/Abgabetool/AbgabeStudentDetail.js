@@ -305,6 +305,18 @@ export const AbgabeStudentDetail = {
 				class: "custom-tooltip"
 			}
 		},
+		getTooltipBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipBestanden'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipNichtBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipNichtBestanden'),
+				class: "custom-tooltip"
+			}
+		},
 	},
 	created() {
 		
@@ -340,8 +352,11 @@ export const AbgabeStudentDetail = {
 									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
 									<i v-else-if="termin.dateStyle == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
-									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-check"></i>
+									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
 									<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
+									<i v-else-if="termin.dateStyle == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
+									<i v-else-if="termin.dateStyle == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
+							
 								</div>
 								<div class="text-start px-2" style="min-width: 150px; max-width: 300px; margin-left: 40px">
 									<span>{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}</span>

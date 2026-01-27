@@ -42,7 +42,7 @@ export const AbgabeterminStatusLegende = {
 				
 				<div class="row" style="margin-bottom: 2px">
 					<div class="col-auto abgegeben-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
-						<i class="fa-solid fa-check"></i>
+						<i class="fa-solid fa-paperclip"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
 						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipAbgegeben')) }}</h5>
@@ -60,7 +60,7 @@ export const AbgabeterminStatusLegende = {
 				
 				<div class="row" style="margin-bottom: 2px">
 					<div class="col-auto bestanden-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
-						<i class="fa-solid fa-list-check"></i>
+						<i class="fa-solid fa-check"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
 						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipBestanden')) }}</h5>
@@ -69,7 +69,7 @@ export const AbgabeterminStatusLegende = {
 				
 				<div class="row" style="margin-bottom: 2px">
 					<div class="col-auto nichtbestanden-header" style="height: 36px; width:36px; padding: 0px; display: flex; align-items: center; justify-content: center;">
-						<i class="fa-solid fa-list-check"></i>
+						<i class="fa-solid fa-circle-exclamation"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
 						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipNichtBestanden')) }}</h5>

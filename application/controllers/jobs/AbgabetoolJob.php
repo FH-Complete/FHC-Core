@@ -521,7 +521,7 @@ class AbgabetoolJob extends JOB_Controller
 
 		$this->_ci->logInfo('Start job FHC-Core->notifyStudentMail');
 
-		$interval = '20 days';$this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
 
 		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT');
 
