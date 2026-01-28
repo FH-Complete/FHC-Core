@@ -107,13 +107,13 @@ class PlausicheckProducerLib
 
 				if (file_exists($configFilename))
 				{
-					$this->_ci->load->config($configFilePath);
+					$config = array(); // default value
 
-					$extensionEntries = $this->_ci->config->item(self::CONFIG_FEHLER_INDEX);
+					include($configFilename);
 
-					if (isset($extensionEntries) && is_array($extensionEntries))
+					if (isset($config[self::CONFIG_FEHLER_NAME]) && is_array($config[self::CONFIG_FEHLER_NAME]))
 					{
-						foreach ($extensionEntries as $extensionEntry)
+						foreach ($config[self::CONFIG_FEHLER_NAME] as $extensionEntry)
 						{
 							if (
 								!isset($extensionEntry[self::FEHLER_KURZBZ_NAME])
