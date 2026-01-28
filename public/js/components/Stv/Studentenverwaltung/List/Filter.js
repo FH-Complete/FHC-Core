@@ -7,6 +7,9 @@ export default {
 	components: {
 		FilterItem
 	},
+	props: {
+		filterActive: Boolean,
+	},
 	emits: [
 		'change'
 	],
@@ -74,6 +77,9 @@ export default {
 		},
 		remove(index) {
 			this.filters.splice(index, 1);
+		},
+		resetFilter(){
+			this.filters = [];
 		}
 	},
 	created() {
