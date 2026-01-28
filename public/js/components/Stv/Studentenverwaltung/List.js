@@ -327,8 +327,6 @@ export default {
 		},
 		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
-/*			if (data.length > 0 )
-				console.log("test manu" + this.selectedcount);*/
 			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
 
