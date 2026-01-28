@@ -8,7 +8,7 @@ class IssueChecker extends FHCAPI_Controller
 	protected $person_id;
 	protected $_extensionName = null;
 	protected $_fehlercodes = [];
-	protected $_app = null;
+	//protected $_app = null; TODO possible to check for all fehler of app?
 
 	protected $errors = [];
 	protected $infos = [];
@@ -35,7 +35,7 @@ class IssueChecker extends FHCAPI_Controller
 
 		// get fehler kurzbz from fehlercodes
 		$this->FehlerModel->addSelect('fehler_kurzbz');
-		if (!isEmptyArray($this->_fehlercodes))$this->FehlerModel->db->where_in('tbl_fehler.fehlercode', $this->_fehlercodes);
+		if (!isEmptyArray($this->_fehlercodes)) $this->FehlerModel->db->where_in('tbl_fehler.fehlercode', $this->_fehlercodes);
 		$fehlerKurzbzRes = $this->FehlerModel->load();
 
 		if (isError($fehlerKurzbzRes)) $this->terminateWithError(getError($fehlerKurzbzRes), self::ERROR_TYPE_GENERAL);
