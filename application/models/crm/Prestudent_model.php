@@ -784,11 +784,6 @@ class Prestudent_model extends DB_Model
 
 		return $this->execQuery($query, array($person_id));
 	}
-<<<<<<< HEAD
-	
-	public function getMobilityPrestudent(){
-		
-=======
 
 	/**
 	 * Adds a filter to the query builder
@@ -902,6 +897,5 @@ class Prestudent_model extends DB_Model
 		Events::trigger('prestudent_add_filter', $filter);
 
 		return true;
->>>>>>> master
 	}
 }
