@@ -32,15 +32,15 @@ export default {
 		},
 		hasZGVBakkPermission: {
 			from: 'hasZGVBakkPermission',
-			default: false
+			default: []
 		},
 		hasZGVMasterPermission: {
 			from: 'hasZGVMasterPermission',
-			default: false
+			default: []
 		},
 		hasZGVDoctorPermission: {
 			from: 'hasZGVDoctorPermission',
-			default: false
+			default: []
 		},
 		hasBismeldenPermission: {
 			from: 'hasBismeldenPermission',
@@ -89,6 +89,15 @@ export default {
 	computed: {
 		deltaLength() {
 			return Object.keys(this.deltaArray).length;
+		},
+		disableZgvBakk: function() {
+			return !this.hasZGVBakkPermission.includes(this.modelValue.studiengang_kz.toString());
+		},
+		disableZgvMaster: function() {
+			return !this.hasZGVMasterPermission.includes(this.modelValue.studiengang_kz.toString());
+		},
+		disableZgvDoctor: function() {
+			return !this.hasZGVDoctorPermission.includes(this.modelValue.studiengang_kz.toString());
 		}
 	},
 	watch: {
@@ -289,7 +298,7 @@ export default {
 						dropdown
 						name="zgv_code"
 						@complete="filterZgvs"
-						:disabled="!hasZGVBakkPermission"
+						:disabled="disableZgvBakk"
 						>
 							<template #option="slotProps">
 								<div
@@ -353,7 +362,7 @@ export default {
 						dropdown
 						name="zgvmas_code"
 						@complete="filterMasterZgvs"
-						:disabled="!hasZGVMasterPermission"
+						:disabled="disableZgvMaster"
 						>
 							<template #option="slotProps">
 								<div
@@ -418,7 +427,7 @@ export default {
 						dropdown
 						name="zgvdoktor_code"
 						@complete="filterDoktorZgvs"
-						:disabled="!hasZGVDoctorPermission"
+						:disabled="disableZgvDoctor"
 						>
 							<template #option="slotProps">
 								<div
