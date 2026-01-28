@@ -105,10 +105,12 @@ class PlausicheckProducerLib
 				$configFilePath = ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_NAME.'.php';
 				$configFilename = APPPATH.'config/'.$configFilePath;
 
+				// if fehler config file exists in extension
 				if (file_exists($configFilename))
 				{
 					$config = array(); // default value
 
+					// include the config file
 					include($configFilename);
 
 					if (isset($config[self::CONFIG_FEHLER_NAME]) && is_array($config[self::CONFIG_FEHLER_NAME]))
@@ -123,6 +125,7 @@ class PlausicheckProducerLib
 								continue;
 							}
 
+							// add extension config data to fehler lib mappings
 							$fehler_kurzbz = $extensionEntry[self::FEHLER_KURZBZ_NAME];
 
 							$this->_fehlerLibMappings[$fehler_kurzbz][self::PRODUCER_LIB_NAME] = $extensionEntry[self::PRODUCER_LIB_NAME];

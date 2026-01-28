@@ -41,20 +41,23 @@ class PlausicheckResolverLib
 		// Load Fehler Entries of Core
 		$configArray = $this->_ci->config->item(self::CONFIG_FEHLER_NAME);
 
-		$fehlerKurzbzArr = [];
-
 		foreach ($configArray as $coreEntry)
 		{
+			// each entry must have fehlercode
 			if (!isset($coreEntry[self::FEHLERCODE_NAME])
 				|| !in_array($coreEntry[self::FEHLERCODE_NAME], $this->_fehlercodes)
 			) {
 				continue;
 			}
 
-			if (isset($coreEntry[self::FEHLER_KURZBZ_NAME])) $fehlerKurzbzArr[] = $coreEntry[self::FEHLER_KURZBZ_NAME];
+			// fill code lib mappings with needed values
+			$fehlercode = $coreEntry[self::FEHLERCODE_NAME];
 
-			$this->_codeLibMappings[$coreEntry[self::FEHLERCODE_NAME]][self::RESOLVER_LIB_NAME] = $coreEntry[self::RESOLVER_LIB_NAME] ?? null;
-			$this->_codeLibMappings[$coreEntry[self::FEHLERCODE_NAME]][self::PRODUCER_IS_RESOLVER_NAME]
+			if (isset($coreEntry[self::FEHLER_KURZBZ_NAME]))
+				$this->_codeLibMappings[$fehlercode][self::FEHLER_KURZBZ_NAME] = $coreEntry[self::FEHLER_KURZBZ_NAME];
+
+			$this->_codeLibMappings[$fehlercode][self::RESOLVER_LIB_NAME] = $coreEntry[self::RESOLVER_LIB_NAME] ?? null;
+			$this->_codeLibMappings[$fehlercode][self::PRODUCER_IS_RESOLVER_NAME]
 				= $coreEntry[self::PRODUCER_IS_RESOLVER_NAME] ?? false;
 		}
 
@@ -71,10 +74,12 @@ class PlausicheckResolverLib
 			{
 				$configFilename = APPPATH.'config/'.ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$ext->name.'/'.self::CONFIG_FEHLER_NAME.'.php';
 
+				// if fehler config file exists in teh extension
 				if (file_exists($configFilename))
 				{
 					$config = array(); // default value
 
+					// include config data
 					include($configFilename);
 
 					if (isset($config[self::CONFIG_FEHLER_NAME]) && is_array($config[self::CONFIG_FEHLER_NAME]))
@@ -88,22 +93,21 @@ class PlausicheckResolverLib
 								continue;
 							}
 
+							// add extension config data to fehlercode lib mappings
 							$fehlercode = $extensionEntry[self::FEHLERCODE_NAME];
-							if (isset($extensionEntry[self::FEHLER_KURZBZ_NAME])) $fehlerKurzbzArr[] = $extensionEntry[self::FEHLER_KURZBZ_NAME];
+							if (isset($extensionEntry[self::FEHLER_KURZBZ_NAME]))
+								$this->_codeLibMappings[$fehlercode][self::FEHLER_KURZBZ_NAME] = $extensionEntry[self::FEHLER_KURZBZ_NAME];
 
 							$this->_codeLibMappings[$fehlercode][self::RESOLVER_LIB_NAME]
 								= $extensionEntry[self::RESOLVER_LIB_NAME] ?? null;
 							$this->_codeLibMappings[$fehlercode][self::EXTENSION_NAME] = $ext->name;
 							$this->_codeLibMappings[$fehlercode][self::PRODUCER_IS_RESOLVER_NAME]
 								= $extensionEntry[self::PRODUCER_IS_RESOLVER_NAME] ?? false;
-
 						}
 					}
 				}
 			}
 		}
-
-		$this->_ci->load->library('issues/PlausicheckProducerLib', ['fehlerKurzbz' => $fehlerKurzbzArr]);
 	}
 
 	/**
@@ -113,6 +117,12 @@ class PlausicheckResolverLib
 	 */
 	public function resolvePlausicheckIssues($openIssues = null)
 	{
+		// loading producer lib with fehler kurzbz of provided code mappings, for "self resolving" issues
+		$this->_ci->load->library(
+			'issues/PlausicheckProducerLib',
+			['fehlerKurzbz' => array_column($this->_codeLibMappings, self::FEHLER_KURZBZ_NAME)], 'PlausicheckResolverProducerLib'
+		);
+
 		if (!isset($openIssues))
 		{
 			if (!isEmptyArray($this->_fehlercodes))
@@ -168,7 +178,7 @@ class PlausicheckResolverLib
 				if ($producerIsResolver)
 				{
 					// execute same check as used for issue production
-					$issueResolvedRes = $this->_ci->plausicheckproducerlib->producePlausicheckIssue(
+					$issueResolvedRes = $this->_ci->PlausicheckResolverProducerLib->producePlausicheckIssue(
 						$issue->fehler_kurzbz,
 						$params
 					);
