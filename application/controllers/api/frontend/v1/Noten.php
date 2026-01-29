@@ -57,6 +57,7 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$this->load->model('education/Notenschluesselaufteilung_model', 'NotenschluesselaufteilungModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
@@ -70,21 +71,43 @@ class Noten extends FHCAPI_Controller
 	public function getCisConfig() {
 		$this->terminateWithSuccess(
 			array(
+				// TODO
 				// Punkte bei der Noteneingabe anzeigen
 				'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
+				
+				// TODO
+				// basically on/of toggle for the points/grade col and the arrow button
 				// Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
 				'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
-				// Gewichtung der Lehreinheiten bei Noteneintragung true|false
-				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
+				
+				// only relevant in punkte calculation in backend
+//				// Gewichtung der Lehreinheiten bei Noteneintragung true|false
+//				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
+				
+				// this one should always be set true since fh prüfungsordnung requires at least 3 antritte (t1+t2+kP)
 				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 2. Termin anzeigen
-				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
+//				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
+			
+			
+				// TODO
+				// should in 99% of cases be kept true to enable 4 antritte in total, but if a certain
+				// fh still works with 3 antritte per note this can limit the max number of pruefungen accordingly
 				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
 				// Erfordert den Eintrag "Termin3" in der Tabelle lehre.tbl_pruefungstyp
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
+				
+				// used to toggle availability of kommPruef type pruefungen
 				// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
 				'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
-				// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
-				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
+				
+
+				//technically exists but is never used
+//				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+//				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
+			
+			
+				// TODO
+				// basically show the source of teilnoten (moodle or le)
 				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
 				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
 				// Gibt an ob die Note im Notenfreigabemail enthalten ist oder nicht
@@ -113,6 +136,10 @@ class Noten extends FHCAPI_Controller
 		$studenten = $this->LehrveranstaltungModel->getStudentsByLv($sem_kurzbz, $lv_id);
 		$studentenData = $this->getDataOrTerminateWithError($studenten);
 		
+		if(count($studentenData) == 0) {
+			$this->terminateWithError('No students found for lva and semester');
+		}
+		
 		$func = function ($value) {
 			return $value->uid;
 		};
@@ -132,7 +159,7 @@ class Noten extends FHCAPI_Controller
 
 			$result = $this->ErhalterModel->load();
 			$erhalter = getData($result)[0];
-
+			
 			$erhalter_kz = '9' . sprintf("%03s", $erhalter->erhalter_kz);
 			foreach($mobData as $mob) {
 				$grades[$mob->uid]['mobility_zusatz'] = $this->MobilitaetModel->formatZusatz($mob, $erhalter_kz);
@@ -211,39 +238,28 @@ class Noten extends FHCAPI_Controller
 						$anzahlnoten += 1;
 					}
 				}
-
 				
 				// TODO: develop the punkte feature with models
 				// calculate grades points from notenschlüssel
-				if (CIS_GESAMTNOTE_PUNKTE)
-				{
-					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
-					{
+				if (CIS_GESAMTNOTE_PUNKTE) {
+					// TODO: can only be implemented once
+					
+					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG) {
 						// Lehreinheitsgewichtung
 						$punkte_vorschlag = round($punktesumme_gewichtet / $gewichtsumme, 2);
-						$notenschluessel = new notenschluessel();
-						$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
-					}
-					else
-					{
+						$note_vorschlag = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+					} else {
 						$punkte_vorschlag = round($punktesumme / $anzahlnoten, 2);
-						$notenschluessel = new notenschluessel();
-						$note_vorschlag = $notenschluessel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+						$note_vorschlag = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
 					}
-				}
-				else
-				{
-					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG)
-					{
+				} else {
+					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG) {
 						$note_vorschlag = round($notensumme_gewichtet / $gewichtsumme);
-					}
-					else
-					{
+					} else {
 						$note_vorschlag = round($notensumme / $anzahlnoten);
 					}
 				}
 				
-
 				$student->note_vorschlag = $note_vorschlag;
 			}
 		}
@@ -509,12 +525,10 @@ class Noten extends FHCAPI_Controller
 //		if($punkte!='')
 //		{
 //			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
-//			$notenschluessel = new notenschluessel();
-//			$note_pruef = $notenschluessel->getNote($punkte, $lva_id, $stsem);
+//			$note_pruef = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
 //			if($note_pruef!=$note)
 //			{
 //				$note = $note_pruef;
-//				$note_dirty=true;
 //			}
 //		}
 
@@ -663,6 +677,7 @@ class Noten extends FHCAPI_Controller
 				}
 				else if(!hasData($resultLV))// set Termin1 note to "noch nicht eingetragen"
 				{
+					// TODO: avoid hardcoded noten primary keys!
 					$pr_note = 9; 
 					$pr_punkte = null;
 					$benotungsdatum = $jetzt;
