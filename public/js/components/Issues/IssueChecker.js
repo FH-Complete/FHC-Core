@@ -26,10 +26,10 @@ export default {
 			required: true
 		},
 		issueListStyle: {
-			type: String
+			type: Object
 		},
 		issueListStyleBreakpoints: {
-			type: String
+			type: Object
 		}
 	},
 	 data() {
