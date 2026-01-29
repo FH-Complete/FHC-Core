@@ -202,9 +202,9 @@ else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_
 	}
 	$method = $_GET["method"];
 }
-else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_GET["method"]=="delete")
+else if(isset($_POST["delete"]))
 {
-	$pruefungsfenster_id = $_GET["id"];
+	$pruefungsfenster_id = $_POST["delete"];
 	$pruefungsfenster = new pruefungsfenster();
 	$pruefungsfenster->load($pruefungsfenster_id);
 
@@ -226,7 +226,7 @@ else if(isset($_GET["id"]) && $_GET["id"]!= null && isset($_GET["method"]) && $_
 		{
 			echo $p->t('pruefung/pruefungsfensterKonnteNichtGeloeschtWerdenDaPruefungen');
 		}
-		$method = $_GET["method"];
+		$method = 'delete';
 	}
 	else
 	{
@@ -394,39 +394,41 @@ else
 				if(!empty($prfFenster->result)){
 
 			?>
-			<table class="tablesorter" id="prfTable">
-				<thead>
-					<tr>
-						<th><?php echo $p->t('global/studiensemester'); ?></th>
-						<th><?php echo $p->t('global/organisationseinheit'); ?></th>
-						<th><?php echo $p->t('pruefung/start'); ?></th>
-						<th><?php echo $p->t('pruefung/ende'); ?></th>
-						<th><?php echo $p->t('global/bearbeiten'); ?></th>
-						<th><?php echo $p->t('global/loeschen'); ?></th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php
-						$organisationseinheit = new organisationseinheit();
-						foreach ($prfFenster->result as $result)
-						{
-							if(in_array($result->oe_kurzbz, $oe))
+			<form method="POST" action="pruefungsfenster_anlegen.php">
+				<table class="tablesorter" id="prfTable">
+					<thead>
+						<tr>
+							<th><?php echo $p->t('global/studiensemester'); ?></th>
+							<th><?php echo $p->t('global/organisationseinheit'); ?></th>
+							<th><?php echo $p->t('pruefung/start'); ?></th>
+							<th><?php echo $p->t('pruefung/ende'); ?></th>
+							<th><?php echo $p->t('global/bearbeiten'); ?></th>
+							<th><?php echo $p->t('global/loeschen'); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php
+							$organisationseinheit = new organisationseinheit();
+							foreach ($prfFenster->result as $result)
 							{
-								$organisationseinheit->load($result->oe_kurzbz);
-								echo
-								'<tr>
-									<td>'.$result->studiensemester_kurzbz.'</td>
-									<td>'.$organisationseinheit->organisationseinheittyp_kurzbz." ".$organisationseinheit->bezeichnung.'</td>
-									<td>'.$result->start.'</td>
-									<td>'.$result->ende.'</td>
-									<td><a href="pruefungsfenster_anlegen.php?method=update&id='.$result->pruefungsfenster_id.'">'.$p->t('global/bearbeiten').'</a></td>
-									<td><a href="pruefungsfenster_anlegen.php?method=delete&id='.$result->pruefungsfenster_id.'">'. $p->t('global/loeschen').'</a></td>
-								</tr>';
+								if(in_array($result->oe_kurzbz, $oe))
+								{
+									$organisationseinheit->load($result->oe_kurzbz);
+									echo
+									'<tr>
+										<td>'.$result->studiensemester_kurzbz.'</td>
+										<td>'.$organisationseinheit->organisationseinheittyp_kurzbz." ".$organisationseinheit->bezeichnung.'</td>
+										<td>'.$result->start.'</td>
+										<td>'.$result->ende.'</td>
+										<td><a href="pruefungsfenster_anlegen.php?method=update&id='.$result->pruefungsfenster_id.'">'.$p->t('global/bearbeiten').'</a></td>
+										<td><button type="submit" name="delete" value="'. $result->pruefungsfenster_id .'">'. $p->t('global/loeschen') .'</button></td>
+									</tr>';
+								}
 							}
-						}
-					?>
-				</tbody>
-			</table>
+						?>
+					</tbody>
+				</table>
+			</form>
 			<?php
 				}
 				else

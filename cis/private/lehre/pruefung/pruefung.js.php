@@ -565,7 +565,7 @@ function openDialog(lehrveranstaltung_id, termin_id, lvBezeichnung, terminVon, t
  * @param {type} termin_id ID des Prüfungstermines
  * @returns {undefined}
  */
-function saveAnmeldung(lehrveranstaltung_id, termin_id)
+function saveAnmeldung(lehrveranstaltung_id, termin_id, force = false)
 {
 	var uid = $("#anmeldung_hinzufuegen_uid").val();
 	if(lehrveranstaltung_id === undefined)
@@ -602,10 +602,21 @@ function saveAnmeldung(lehrveranstaltung_id, termin_id)
 			uid: uid,
 			studienverpflichtung_id: studienverpflichtung_id,
 			studiengang_kz: studiengang_kz,
-			ects: ects
+			ects: ects,
+			force: force
 		},
 		error: loadError,
 		success: function(data){
+
+			if (data?.confirm === 'true')
+			{
+				if (confirm(data.errormsg))
+				{
+					saveAnmeldung(lehrveranstaltung_id, termin_id, true);
+				}
+				return;
+			}
+
 			if(data.error === 'false')
 			{
 				messageBox("message", data.result, "green", "highlight", 10000);

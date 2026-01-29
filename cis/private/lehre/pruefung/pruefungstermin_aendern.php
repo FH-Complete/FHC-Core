@@ -56,18 +56,24 @@ $lehrveranstaltung->loadLVAfromMitarbeiter(0, $uid, $studiensemester->getaktorNe
 if(empty($lehrveranstaltung->lehrveranstaltungen) && !$rechte->isBerechtigt('lehre/pruefungsterminAdmin'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
-if (!ctype_digit($_GET['termin_id']))
-	die('Wrong Parameter');
-else
-	$termin_id = $_GET['termin_id'];
-
-if (isset($_GET["speichern"]))
+if (isset($_GET['termin_id']))
 {
+	if (!ctype_digit($_GET['termin_id']))
+		die('Wrong Parameter');
+
+	$termin_id = $_GET['termin_id'];
+}
+else if (isset($_POST["speichern"]))
+{
+
+	$termin_id = $_POST['termin_id'];
 	$prfgtermin = new pruefungstermin($termin_id);
-	$von = $_GET["datum"]." ".$_GET["vonzeit"];
-	$bis = $_GET["datum"]." ".$_GET["biszeit"];
+	$von = $_POST["datum"]." ".$_POST["vonzeit"];
+	$bis = $_POST["datum"]." ".$_POST["biszeit"];
 	$prfgtermin->von = $von;
 	$prfgtermin->bis = $bis;
+	$prfgtermin->teilnehmer_min = $_POST["terminmin"];
+	$prfgtermin->teilnehmer_max = $_POST["terminmax"];
 	$prfgtermin->save();
 }
 
@@ -110,6 +116,8 @@ $datum = explode(" ", $prfgtermin->von)[0];
 $vonzeit = substr(explode(" ", $prfgtermin->von)[1],0,5);
 $biszeit = substr(explode(" ", $prfgtermin->bis)[1],0,5);
 $pruefung_id = $prfgtermin->pruefung_id;
+$teilnehmer_min = $prfgtermin->teilnehmer_min;
+$teilnehmer_max = $prfgtermin->teilnehmer_max;
 
 $pruefung = new pruefungCis($pruefung_id);
 $pruefung->getLehrveranstaltungenByPruefung();
@@ -178,7 +186,7 @@ foreach ($anmeldungen as $row)
 	</head>
 	<body style="padding-top:20px">
 		<center>
-		<form name="change_termin" action="./pruefungstermin_aendern.php" method="GET">
+		<form name="change_termin" action="./pruefungstermin_aendern.php" method="POST">
 		<table>
 			<tr>
 				<td><?php echo $p->t('global/lehrveranstaltung'); ?></td>
@@ -195,6 +203,15 @@ foreach ($anmeldungen as $row)
 			<tr>
 				<td><?php echo $p->t('global/bis'); ?></td>
 				<td><input type="text" name="biszeit" value="<?php echo $biszeit ?>" maxlength="5"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/pruefungMinTeilnehmer'); ?></td>
+				<td>
+					<input type="number" name="terminmin" placeholder="0" min="0" value="<?php echo $teilnehmer_min; ?>"></td>
+			</tr>
+			<tr>
+				<td><?php echo $p->t('pruefung/pruefungMaxTeilnehmer'); ?></td>
+				<td><input type="number" name="terminmax" placeholder="0" min="0" value="<?php echo $teilnehmer_max; ?>"></td>
 			</tr>
 			<tr>
 				<td></td>

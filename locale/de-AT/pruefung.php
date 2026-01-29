@@ -124,6 +124,7 @@ $this->phrasen['pruefung/anmeldungenVerwalten'] = 'Anmeldungen Verwalten';
 $this->phrasen['pruefung/anmeldungErfolgreich'] = 'Anmeldung erfolgreich!';
 $this->phrasen['pruefung/zuWenigeCreditPoints'] = 'Credit-Points-Guthaben ist zu gering.';
 $this->phrasen['pruefung/kollisionMitAndererAnmeldung'] = 'Kollision mit anderer Anmeldung.';
+$this->phrasen['pruefung/kollisionMitAndererAnmeldungForce'] = 'Kollision mit anderer Anmeldung. Trotzdem fortfahren?';
 $this->phrasen['pruefung/keineFreienPlaetzeVorhanden'] = 'Keine freien Plätze vorhanden.';
 $this->phrasen['pruefung/anmeldungAufgrundVonSperreNichtMoeglich'] = 'Anmeldung auf Grund von Sperre nicht möglich.';
 $this->phrasen['pruefung/prestudentNichtGefunden'] = 'Prestudent nicht gefunden.';

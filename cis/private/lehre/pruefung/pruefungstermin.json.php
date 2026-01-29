@@ -654,7 +654,7 @@ function checkCollision($uid, $beginn, $ende)
 {
 	$collision = false;
 	$pruefung = new pruefungCis();
-	$pruefung->getAllPruefungen($uid);
+	$pruefung->getAllPruefungen($uid, false);
 	$datum = new datum();
 	foreach($pruefung->result as $prf)
 	{

@@ -525,7 +525,11 @@ class pruefungCis extends basis_db
             return false;
         }
 
-        $qry = 'UPDATE campus.tbl_pruefung SET storniert=true WHERE pruefung_id='.$this->db_add_param($pruefung_id).';';
+        $qry = 'UPDATE campus.tbl_pruefung 
+				SET storniert=true,
+					updatevon='.$this->db_add_param($this->updatevon).',
+					updateamum= now()
+				WHERE pruefung_id='.$this->db_add_param($pruefung_id).';';
 
         if(!$this->db_query($qry))
         {
@@ -706,13 +710,18 @@ class pruefungCis extends basis_db
      * @param String $mitarbeiter_uid UID des Mitarbeiters (optional)
      * @return boolean
      */
-    public function getAllPruefungen($mitarbeiter_uid = NULL)
+    public function getAllPruefungen($mitarbeiter_uid = NULL, $storniert = null)
     {
-	$qry = 'SELECT * FROM campus.tbl_pruefung';
+	$qry = 'SELECT * FROM campus.tbl_pruefung WHERE 1 = 1';
 
 	if(!is_null($mitarbeiter_uid))
 	{
-	    $qry .= ' WHERE mitarbeiter_uid='.$this->db_add_param($mitarbeiter_uid);
+	    $qry .= ' AND mitarbeiter_uid='.$this->db_add_param($mitarbeiter_uid);
+	}
+
+	if(!is_null($storniert))
+	{
+	    $qry .= ' AND storniert = '.$this->db_add_param($storniert, FHC_BOOLEAN);
 	}
 
 	$qry .= ';';

@@ -394,7 +394,7 @@ function loadTermine()
  */
 function saveAnmeldung($aktStudiensemester = null, $uid = null)
 {
-	global $p;
+	global $p, $rechte;
 	$termin = new pruefungstermin($_REQUEST["termin_id"]);
 	$pruefung = new pruefung();
 	$lehrveranstaltung = new lehrveranstaltung($_REQUEST["lehrveranstaltung_id"]);
@@ -404,6 +404,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
 	$studiengang_kz = filter_input(INPUT_POST, "studiengang_kz");
 	$ects = filter_input(INPUT_POST, "ects");
+	$force = filter_input(INPUT_POST, "force", FILTER_VALIDATE_BOOLEAN);
 
 	//Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
 	$maxAnzahlVersuche = 0;
@@ -557,11 +558,28 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 					$ects_verwendet += $lehrveranstaltung->ects;
 
 					$datum = new datum();
-					if(($datum->between($termin->von, $termin->bis, $temp->von)) || ($datum->between($termin->von, $termin->bis, $temp->bis)))
+
+					$kollision = ($datum->between($termin->von, $termin->bis, $temp->von)) || ($datum->between($termin->von, $termin->bis, $temp->bis));
+					if ($kollision)
 					{
-						$data['result'][$temp->pruefungstermin_id] = "true";
-						$data['error'] = 'true';
-						$data['errormsg'] = $p->t('pruefung/kollisionMitAndererAnmeldung');
+						$is_berechtigt = $rechte->isBerechtigt('lehre/pruefungsanmeldungAdmin');
+
+						if ($is_berechtigt)
+						{
+							if (!$force)
+							{
+								$data['result'][$temp->pruefungstermin_id] = "true";
+								$data['error'] = 'true';
+								$data['confirm'] = 'true';
+								$data['errormsg'] = $p->t('pruefung/kollisionMitAndererAnmeldungForce');
+							}
+						}
+						else
+						{
+							$data['result'][$temp->pruefungstermin_id] = "true";
+							$data['error'] = 'true';
+							$data['errormsg'] = $p->t('pruefung/kollisionMitAndererAnmeldung');
+						}
 					}
 				}
 
