@@ -23,36 +23,7 @@ export default{
 	},
 	data() {
 		return {
-			addressData: {
-				zustelladresse: true,
-				heimatadresse: true,
-				rechnungsadresse: false,
-				typ: 'h',
-				nation: 'A',
-				address: {plz: null},
-				plz: null,
-			},
-			statusNew: true,
-			places: [],
-			suggestions: {},
-			nations: [],
-			adressentypen: [],
-			firmen: [],
-			listFirmen: [],
-			filteredFirmen: [],
-			selectedFirma: null,
-			abortController: {
-				suggestions: null,
-				places: null
-			},
-			height:	'auto',
-			index: 'adresse_id',
-			persistenceID: 'stv-details-kontakt-address'
-		}
-	},
-	computed:{
-		tabulatorOptions() {
-			const options = {
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvAddress.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -151,11 +122,11 @@ export default{
 						frozen: true
 					},
 				],
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+				height:	'auto',
+				index: 'adresse_id',
+				persistenceID: 'stv-details-kontakt-address'
+			},
+			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -213,11 +184,37 @@ export default{
 						cm.getColumnByField('person_id').component.updateDefinition({
 							title: this.$p.t('person', 'person_id')
 						});
+/*						cm.getColumnByField('actions').component.updateDefinition({
+													title: this.$p.t('global', 'aktionen')
+												});*/
 					}
 				}
-			];
-			return events;
-		},
+			],
+			addressData: {
+				zustelladresse: true,
+				heimatadresse: true,
+				rechnungsadresse: false,
+				typ: 'h',
+				nation: 'A',
+				address: {plz: null},
+				plz: null,
+			},
+			statusNew: true,
+			places: [],
+			suggestions: {},
+			nations: [],
+			adressentypen: [],
+			firmen: [],
+			listFirmen: [],
+			filteredFirmen: [],
+			selectedFirma: null,
+			abortController: {
+				suggestions: null,
+				places: null
+			},
+		}
+	},
+	computed:{
 		orte() {
 			return this.places.filter(ort => ort.name == this.addressData.gemeinde);
 		},

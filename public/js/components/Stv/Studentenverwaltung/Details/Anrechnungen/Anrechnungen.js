@@ -31,24 +31,7 @@ export default {
 	},
 	data() {
 		return {
-			formData: {},
-			listBegruendungen: [],
-			listNewLehrveranstaltungen: [],
-			listLektoren: [],
-			listKompatibleLehrveranstaltungen: [],
-			statusNew: true,
-			showNotizen: false,
-			currentAnrechnung_id: null,
-			endpoint: ApiNotizPerson,
-			layout: 'fitDataStretchFrozen',
-			height: '500',
-			index: 'anrechnung_id',
-			persistenceID: 'stv-details-anrechnungen-2025112401'
-		}
-	},
-	computed: {
-		tabulatorOptions() {
-			const options = {
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvExemptions.getAnrechnungen(this.student.prestudent_id)
@@ -124,11 +107,12 @@ export default {
 						frozen: true
 					},
 				],
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+				layout: 'fitDataStretchFrozen',
+				height: '500',
+				index: 'anrechnung_id',
+				persistenceID: 'stv-details-anrechnungen-2025112401'
+			},
+			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -170,8 +154,16 @@ export default {
 
 					}
 				}
-			];
-			return events;
+			],
+			formData: {},
+			listBegruendungen: [],
+			listNewLehrveranstaltungen: [],
+			listLektoren: [],
+			listKompatibleLehrveranstaltungen: [],
+			statusNew: true,
+			showNotizen: false,
+			currentAnrechnung_id: null,
+			endpoint: ApiNotizPerson
 		}
 	},
 	watch: {

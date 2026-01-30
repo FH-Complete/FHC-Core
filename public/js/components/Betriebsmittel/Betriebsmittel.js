@@ -43,22 +43,7 @@ export default {
 	},
 	data() {
 		return {
-			listBetriebsmitteltyp: [],
-			formData: {
-				ausgegebenam : new Date(),
-				betriebsmitteltyp: 'Zutrittskarte'
-			},
-			statusNew: true,
-			filteredInventar: [],
-			layout: 'fitColumns',
-			layoutColumnsOnNewData: false,
-			height: '550',
-			persistenceID: 'core-betriebsmittel'
-		}
-	},
-	computed: {
-		tabulatorOptions() {
-			const options = {
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
@@ -130,7 +115,7 @@ export default {
 										'/content/pdfExport.php?xml=betriebsmittelperson.rdf.php&xsl=Uebernahme&id=' + cellData.betriebsmittelperson_id + '&output=pdf';
 
 									window.open(linkToPdf, '_blank');
-								});
+							});
 							container.append(button);
 
 							button = document.createElement('button');
@@ -158,13 +143,13 @@ export default {
 							return container;
 						},
 						frozen: true
-					}
-				],
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+					}],
+				layout: 'fitColumns',
+				layoutColumnsOnNewData: false,
+				height: '550',
+				persistenceID: 'core-betriebsmittel'
+			},
+			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
@@ -208,8 +193,14 @@ export default {
 						});
 					}
 				}
-			];
-			return events;
+			],
+			listBetriebsmitteltyp: [],
+			formData: {
+				ausgegebenam : new Date(),
+				betriebsmitteltyp: 'Zutrittskarte'
+			},
+			statusNew: true,
+			filteredInventar: []
 		}
 	},
 	watch: {

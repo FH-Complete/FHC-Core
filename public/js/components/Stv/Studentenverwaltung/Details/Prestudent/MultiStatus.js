@@ -26,8 +26,37 @@ export default{
 		}
 	},
 	computed: {
-		tabulatorOptions() {
-			const options = {
+		prestudentIds() {
+			if (this.modelValue.prestudent_id)
+			{
+				return [this.modelValue.prestudent_id];
+			}
+			return this.modelValue.map(e => e.prestudent_id);
+		},
+		showToolbarStudent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return this.modelValue.every(item => item.uid);
+			}
+			return !!this.modelValue.uid;
+		},
+		showToolbarInteressent() {
+			if (Array.isArray(this.modelValue)) {
+				if (!this.modelValue.length)
+					return false;
+				return !this.modelValue.some(item => item.uid);
+			}
+			return !this.modelValue.uid;
+		}
+	},
+	props: {
+		modelValue: Object,
+		config: Object,
+	},
+	data() {
+		return {
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudent(this.modelValue.prestudent_id)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -135,7 +164,7 @@ export default{
 						}
 					},
 					{title: "UpdateVon", field: "updatevon", visible: false},
-					/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
+/*					{title: "Aufnahmestufe", field: "aufnahmestufe", visible: false},*/
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
@@ -178,8 +207,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-							/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
-															button.disabled = true;*/
+/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;*/
 							container.append(button);
 
 							button = document.createElement('button');
@@ -211,11 +240,8 @@ export default{
 				selectable: false,
 				index: 'statusId',
 				persistenceID: 'stv-multistatus-2025112401'
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+			},
+			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -224,8 +250,8 @@ export default{
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('lehrverband').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrverband')
-						});
+									title: this.$p.t('lehre', 'lehrverband')
+								});
 
 						cm.getColumnByField('bestaetigtam').component.updateDefinition({
 							title: this.$p.t('lehre', 'bestaetigt_am')
@@ -272,39 +298,7 @@ export default{
 						});
 					}
 				}
-			];
-			return events;
-		},
-		prestudentIds() {
-			if (this.modelValue.prestudent_id)
-			{
-				return [this.modelValue.prestudent_id];
-			}
-			return this.modelValue.map(e => e.prestudent_id);
-		},
-		showToolbarStudent() {
-			if (Array.isArray(this.modelValue)) {
-				if (!this.modelValue.length)
-					return false;
-				return this.modelValue.every(item => item.uid);
-			}
-			return !!this.modelValue.uid;
-		},
-		showToolbarInteressent() {
-			if (Array.isArray(this.modelValue)) {
-				if (!this.modelValue.length)
-					return false;
-				return !this.modelValue.some(item => item.uid);
-			}
-			return !this.modelValue.uid;
-		}
-	},
-	props: {
-		modelValue: Object,
-		config: Object,
-	},
-	data() {
-		return {
+			],
 			statusData: {},
 			statusId: {},
 			dataMeldestichtag: null,
