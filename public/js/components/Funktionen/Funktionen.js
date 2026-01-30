@@ -33,7 +33,40 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			isFilterSet: true,
+			listOrgHeads: [],
+			listOrgUnits: [], //Old
+			listAllOrgUnits: [],
+			listOrgUnits_GST: [],
+			listOrgUnits_GMBH: [],
+			formData: {
+				head: 'gst',
+				oe_kurzbz: '',
+				funktion_kurzbz: null,
+				label:'',
+				//funktion_label: '',
+				funktion: null,
+			},
+			statusNew: true,
+			listAllFunctions: [],
+			abortController: {
+				oes: null,
+				functions: null
+			},
+			filteredOes: [],
+			filteredFunctions: [],
+			newBtnStyle: '',
+			selectedFunction: null,
+			selectedOe: null,
+			layout: 'fitDataFill',
+			layoutColumnsOnNewData: false,
+			height: '300',
+			persistenceID: 'core-functions',
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiCoreFunktion.getAllUserFunctions(this.personUID)
@@ -142,12 +175,11 @@ export default {
 						frozen: true
 					}
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData: false,
-				height: '300',
-				persistenceID: 'core-functions',
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -193,36 +225,11 @@ export default {
 							title: this.$p.t('ui', 'bezeichnung'),
 							width: 140
 						});
-
 					}
 				}
-			],
-			isFilterSet: true,
-			listOrgHeads: [],
-			listOrgUnits: [], //Old
-			listAllOrgUnits: [],
-			listOrgUnits_GST: [],
-			listOrgUnits_GMBH: [],
-			formData: {
-				head: 'gst',
-				oe_kurzbz: '',
-				funktion_kurzbz: null,
-				label:'',
-				//funktion_label: '',
-				funktion: null,
-			},
-			statusNew: true,
-			listAllFunctions: [],
-			abortController: {
-				oes: null,
-				functions: null
-			},
-			filteredOes: [],
-			filteredFunctions: [],
-			newBtnStyle: '',
-			selectedFunction: null,
-			selectedOe: null
-		}
+			];
+			return events;
+		},
 	},
 	watch: {
 		selectedFunction(newVal) {
@@ -340,6 +347,8 @@ export default {
 			this.formData.head = 'gst';
 			this.formData.oe_kurzbz = '';
 			this.formData.funktion_kurzbz = '';
+			this.selectedFunction = null;
+			this.selectedOe= null;
 		},
 		filterFunctions(event) {
 			const query = event.query.toLowerCase();
@@ -460,14 +469,12 @@ export default {
 				</template>
 
 				<form-form class="row pt-3" ref="functionData">
-
 					<form-input
 						container-class="mb-3 col-8"
 						type="select"
 						name="companies"
 						:label="$p.t('core/unternehmen')"
 						v-model="formData.head"
-						@change="getOrgetsForCompanyOld"
 						>
 						<option
 							v-for="org in listOrgHeads"
