@@ -128,6 +128,7 @@ export default {
 						frozen: true
 					},
 				],
+				height:	'auto'
 			};
 			return options;
 		},

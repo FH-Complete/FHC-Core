@@ -45,7 +45,6 @@ export default{
 				suggestions: null,
 				places: null
 			},
-			height:	'auto',
 			index: 'adresse_id',
 			persistenceID: 'stv-details-kontakt-address'
 		}
@@ -151,6 +150,7 @@ export default{
 						frozen: true
 					},
 				],
+				height:	'auto'
 			};
 			return options;
 		},

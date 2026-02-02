@@ -17,8 +17,20 @@ export default{
 		uid: Number
 	},
 	data() {
-		return{
-			tabulatorOptions: {
+		return {
+			lastSelected: null,
+			bankverbindungData: {
+				verrechnung: true,
+				typ: 'p'
+			},
+			statusNew: true,
+			index: 'bankverbindung_id',
+			persistenceID: 'stv-details-kontakt-bankaccount'
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvBankaccount.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -86,11 +98,12 @@ export default{
 						frozen: true
 					},
 				],
-				height:	'auto',
-				index: 'bankverbindung_id',
-				persistenceID: 'stv-details-kontakt-bankaccount'
-			},
-			tabulatorEvents: [
+				height:	'auto'
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
@@ -123,19 +136,11 @@ export default{
 						cm.getColumnByField('bankverbindung_id').component.updateDefinition({
 							title: this.$p.t('ui', 'bankverbindung_id')
 						});
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
 					}
 				}
-			],
-			lastSelected: null,
-			bankverbindungData: {
-				verrechnung: true,
-				typ: 'p'
-			},
-			statusNew: true
-		}
+			];
+			return events;
+		},
 	},
 	watch: {
 		uid() {
