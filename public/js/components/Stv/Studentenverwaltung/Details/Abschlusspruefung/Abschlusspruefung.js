@@ -438,11 +438,9 @@ export default {
 
 			if (this.stgInfo.typ === 'b') {
 				this.formData.pruefungstyp_kurzbz = 'Bachelor';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'd' || this.stgInfo === 'm') {
 				this.formData.pruefungstyp_kurzbz = 'Diplom';
-				this.formData.protokoll = this.$p.t('abschlusspruefung', 'pruefungsnotizenMaster');
 			}
 			if (this.stgInfo.typ === 'lg') {
 				this.formData.pruefungstyp_kurzbz = 'lgabschluss';
@@ -759,6 +757,7 @@ export default {
 						:label="$p.t('global', 'datum')"
 						type="DatePicker"
 						v-model="formData.datum"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input
@@ -783,6 +782,7 @@ export default {
 						:label="$p.t('abschlusspruefung', 'sponsion')"
 						type="DatePicker"
 						v-model="formData.sponsion"
+						model-type="yyyy-MM-dd"
 						auto-apply
 						:enable-time-picker="false"
 						text-input

@@ -157,6 +157,11 @@ export default {
 				{
 					this.localData.push(newEntry);
 
+					// reload tabulator mit tabulator method
+					if (this.$refs.table?.tabulator) {
+						this.$refs.table.tabulator.replaceData(this.localData);
+					}
+
 					this.$emit('setMobilitySupportToNewMobility', {
 						aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
 					});
