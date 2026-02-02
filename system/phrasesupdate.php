@@ -50878,18 +50878,18 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4note',
+		'phrase' => 'c4notenvorschlag',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Punkte/Note',
+				'text' => 'Notenvorschlag',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Points/Grade',
+				'text' => 'Grade Suggestion',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -51763,10 +51763,27 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
-	
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4punkte',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Punkte',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Points',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// CIS4 GESAMTNOTENEINGABE ENDE ------------------------------------------------------------------------------------
-
-
 	array(
 		'app' => 'core',
 		'category' => 'lehre',

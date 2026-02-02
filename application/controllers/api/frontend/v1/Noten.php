@@ -38,7 +38,8 @@ class Noten extends FHCAPI_Controller
 			'createPruefungen' => array('lehre/benotungstool:rw'),
 			'saveNotenvorschlagBulk' => array('lehre/benotungstool:rw'),
 			'savePruefungenBulk' => array('lehre/benotungstool:rw'),
-			'getCisConfig' => array('lehre/benotungstool:rw')
+			'getCisConfig' => array('lehre/benotungstool:rw'),
+			'getNoteByPunkte' => array('lehre/benotungstool:rw')
 		]);
 
 		$this->load->library('AuthLib', null, 'AuthLib');
@@ -1043,6 +1044,27 @@ class Noten extends FHCAPI_Controller
 		}
 		
 		return $anwesenheiten;
+		
+	}
+	
+	public function getNoteByPunkte() {
+		$result = $this->getPostJSON();
+
+		//  TODO validate post properly
+		if(!property_exists($result, 'punkte') 
+			|| !property_exists($result, 'lv_id')
+			|| !property_exists($result, 'sem_kurzbz')) {
+			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
+		}
+
+		$punkte = $result->punkte;
+		$lv_id = $result->lv_id;
+		$sem_kurzbz = $result->sem_kurzbz;
+		
+		$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lv_id, $sem_kurzbz);
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		$this->terminateWithSuccess($data);
 		
 	}
 

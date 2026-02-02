@@ -76,5 +76,12 @@ export default {
 			url: '/api/frontend/v1/Noten/savePruefungenBulk',
 			params: { lv_id, sem_kurzbz, pruefungen }
 		};
+	},
+	getNoteByPunkte(punkte, lv_id, sem_kurzbz) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Noten/getNoteByPunkte',
+			params: { punkte, lv_id, sem_kurzbz }
+		};
 	}
-};
+}

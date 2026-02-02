@@ -24,13 +24,13 @@
 
 
 /* styling for editable dropdown column of notenvorschläge in benotungstool*/
-#notentable .tabulator-tableholder .tabulator-editable {
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"] {
 	position: relative;
 	background-color: rgba(255, 255, 157, 0.73);
 	cursor: pointer;
 }
 
-#notentable .tabulator-tableholder .tabulator-editable::after {
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"]::after {
 	content: "▾";
 	position: absolute;
 	right: 6px;
