@@ -590,14 +590,14 @@ class Dokumente extends FHCAPI_Controller
 
 		$documents = [
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uid, 10, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uid, 20, null),
-			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uid, 21, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf&prestudent_id=$prestudent_id", null,20, null),
+			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Zweisprachig", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf&prestudent_id=$prestudent_id", null,21, null),
 
 			buildDropdownEntryPrintArray("bescheid", "Bescheid (nur Voransicht)", "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf", $uid, 25, null),
 			buildDropdownEntryPrintArray("diplomasupp", "Diploma Supplement (nur Voransicht)", "xml=diplomasupplement.xml.php&xsl_stg_kz=$studiengang_kz&xsl=DiplSupplement&output=pdf", $uid, 26, null),
 
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uid, 50, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uid, 51, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uid, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uid, 51, null),
 			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uid", $uid,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uid, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uid, 61, null),
@@ -686,8 +686,8 @@ class Dokumente extends FHCAPI_Controller
 			buildDropdownEntryPrintArray("accountinfo", "Accountinfoblatt", "xml=accountinfoblatt.xml.php&xsl=AccountInfo&output=pdf", $uidString, 10, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag", "Ausbildungsvertrag", "xml=ausbildungsvertrag.xml.php&xsl=Ausbildungsver&output=pdf", $uidString, 20, null),
 			buildDropdownEntryPrintArray("ausbildungsvertrag_en", "Ausbildungsvertrag Englisch", "xml=ausbildungsvertrag.xml.php&xsl=AusbVerEng&output=pdf", $uidString, 21, null),
-			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf", $uidString, 50, null),
-			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf", $uidString, 51, null),
+			buildDropdownEntryPrintArray("studienbestaetigung", "Studienbestätigung", "xml=student.rdf.php&xsl=Inskription&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uidString, 50, null),
+			buildDropdownEntryPrintArray("studienbestaetigung_en", "Studienbestätigung Englisch", "xml=student.rdf.php&xsl=InskriptionEng&output=pdf&ss=$studiensemester_kurzbz&xsl_stg_kz=$studiengang_kz", $uidString, 51, null),
 			buildDropdownEntryPrintArray("zutrittskarte", "Zutrittskarte", "xsl=ZutrittskarteStud&output=pdf&data=$uidString", $uidString,200, "zutrittskarte.php"),
 			buildDropdownEntryPrintArray("studienblatt", "Studienblatt", "xml=studienblatt.xml.php&xsl=Studienblatt&output=pdf&ss=$studiensemester_kurzbz", $uidString, 60, null),
 			buildDropdownEntryPrintArray("studienblatt_eng", "Studienblatt Englisch", "xml=studienblatt.xml.php&xsl=StudienblattEng&output=pdf&ss=$studiensemester_kurzbz", $uidString, 61, null),
