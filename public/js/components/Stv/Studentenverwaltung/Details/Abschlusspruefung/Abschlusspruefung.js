@@ -34,58 +34,40 @@ export default {
 			default: false
 		}
 	},
+	computed: {
+		studentUids() {
+			if (this.student.uid)
+			{
+				return [this.student.uid];
+			}
+			return this.student.map(e => e.uid);
+		},
+		studentKzs(){
+			if (this.student.uid)
+			{
+				return [this.student.studiengang_kz];
+			}
+			return this.student.map(e => e.studiengang_kz);
+		},
+		stg_kz(){
+			return this.studentKzs[0];
+		},
+		showAllFormats() {
+			if( this.isBerechtigtDocAndOdt === false
+				|| !Array.isArray(this.isBerechtigtDocAndOdt) )
+			{
+				return false;
+			}
+			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
+			return retval;
+		}
+	},
 	props: {
 		student: Object
 	},
 	data() {
 		return {
-			tabulatorData: [],
-			lastSelected: null,
-			formData: {
-				typStg: null,
-				pruefungstyp_kurzbz: null,
-				akadgrad_id: null,
-				vorsitz: null,
-				pruefungsantritt_kurzbz: null,
-				abschlussbeurteilung_kurzbz: null,
-				datum: null,
-				sponsion: null,
-				pruefer1: null,
-				pruefer2: null,
-				pruefer3: null,
-				anmerkung: null,
-				protokoll: null,
-				note: null,
-				link: null
-			},
-			statusNew: true,
-			arrTypen: [],
-			arrAntritte: [],
-			arrBeurteilungen: [],
-			arrAkadGrad: [],
-			arrNoten: [],
-			selectedVorsitz: null,
-			filteredMitarbeiter: [],
-			filteredPersons: [],
-			selectedPruefer1: null,
-			selectedPruefer2: null,
-			selectedPruefer3: null,
-			stgInfo: { typ: '', oe_kurzbz: '' },
-			abortController: {
-				mitarbeiter: null,
-				persons: null
-			},
-			layout: 'fitDataStretchFrozen',
-			layoutColumnsOnNewData: false,
-			height: 'auto',
-			minHeight: '200',
-			index: 'abschlusspruefung_id',
-			persistenceID: 'stv-details-finalexam-2025112401'
-		}
-	},
-	computed: {
-		tabulatorOptions() {
-			const options = {
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvAbschlusspruefung.getAbschlusspruefung(this.student.uid)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -181,11 +163,14 @@ export default {
 						frozen: true
 					},
 				],
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+				layout: 'fitDataStretchFrozen',
+				layoutColumnsOnNewData: false,
+				height: 'auto',
+				minHeight: '200',
+				index: 'abschlusspruefung_id',
+				persistenceID: 'stv-details-finalexam-2025112401'
+			},
+			tabulatorEvents: [
 				{
 					event: 'dataLoaded',
 					handler: data => this.tabulatorData = data.map(item => {
@@ -240,36 +225,50 @@ export default {
 						cm.getColumnByField('abschlusspruefung_id').component.updateDefinition({
 							title: this.$p.t('abschlusspruefung', 'abschlusspruefung_id')
 						});
+						/*
+						cm.getColumnByField('actions').component.updateDefinition({
+						title: this.$p.t('global', 'aktionen')
+												});
+						*/
 					}
 				}
-			];
-			return events;
-		},
-		studentUids() {
-			if (this.student.uid)
-			{
-				return [this.student.uid];
-			}
-			return this.student.map(e => e.uid);
-		},
-		studentKzs(){
-			if (this.student.uid)
-			{
-				return [this.student.studiengang_kz];
-			}
-			return this.student.map(e => e.studiengang_kz);
-		},
-		stg_kz(){
-			return this.studentKzs[0];
-		},
-		showAllFormats() {
-			if( this.isBerechtigtDocAndOdt === false
-				|| !Array.isArray(this.isBerechtigtDocAndOdt) )
-			{
-				return false;
-			}
-			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
-			return retval;
+			],
+			tabulatorData: [],
+			lastSelected: null,
+			formData: {
+				typStg: null,
+				pruefungstyp_kurzbz: null,
+				akadgrad_id: null,
+				vorsitz: null,
+				pruefungsantritt_kurzbz: null,
+				abschlussbeurteilung_kurzbz: null,
+				datum: null,
+				sponsion: null,
+				pruefer1: null,
+				pruefer2: null,
+				pruefer3: null,
+				anmerkung: null,
+				protokoll: null,
+				note: null,
+				link: null
+			},
+			statusNew: true,
+			arrTypen: [],
+			arrAntritte: [],
+			arrBeurteilungen: [],
+			arrAkadGrad: [],
+			arrNoten: [],
+			selectedVorsitz: null,
+			filteredMitarbeiter: [],
+			filteredPersons: [],
+			selectedPruefer1: null,
+			selectedPruefer2: null,
+			selectedPruefer3: null,
+			stgInfo: { typ: '', oe_kurzbz: '' },
+			abortController: {
+				mitarbeiter: null,
+				persons: null
+			},
 		}
 	},
 	watch: {
