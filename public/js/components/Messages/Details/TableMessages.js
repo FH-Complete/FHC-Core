@@ -25,7 +25,103 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			previewBody: "",
+			open: false,
+			personId: null,
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData:	false,
+			height: '400',
+			persistenceID: 'core-message-2025112401',
+			selectable: 1,
+			selectableRangeMode: 'click',
+			index: 'message_id',
+		}
+	},
+	methods: {
+		actionDeleteMessage(message_id){
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? message_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteMessage)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteMessage(message_id){
+			return this.$api
+				.call(ApiMessages.deleteMessage(message_id))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		actionNewMessage(){
+			this.$emit('newMessage', this.id, this.typeId);
+		},
+		actionReplyToMessage(message_id){
+			this.$emit('replyToMessage', this.id, this.typeId, message_id);
+		},
+		reload() {
+			this.$refs.table.reloadTable();
+		},
+		buildTreemap(messages) {
+			if (!messages || !messages.data || messages.data.length === 0)
+			{
+				return {data: [], last_page: 0};
+			}
+
+			const last_page = messages.meta.count;
+			messages = messages.data;
+			const messageMap = new Map();
+			const messageNested = [];
+			const remainingMessages = new Set(messages);
+
+			//save all Data in Map
+			messages.forEach(msg => messageMap.set(msg.message_id, msg));
+
+			let iteration = 0;
+			let changes = true;
+
+			// do until each relationmessage_id finds message_id (not sensitive to order)
+			while (changes) {
+				changes = false;
+				iteration++;
+
+				remainingMessages.forEach(msg => {
+					if (msg.relationmessage_id === null) {
+						messageNested.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					} else if (messageMap.has(msg.relationmessage_id)) {
+
+						const parent = messageMap.get(msg.relationmessage_id);
+
+						if (!parent.children) {
+							parent.children = [];
+						}
+						parent.children.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					}
+				});
+
+				// to avoid endless loop
+				if (iteration > messages.length) break;
+			}
+			return {data: messageNested, last_page: last_page};
+		},
+		loadAjaxCall(url, config, params){
+			return this.$api.call(
+				ApiMessages.getMessages(params)
+			);
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.loadAjaxCall,
 				ajaxParams: () => {
@@ -154,13 +250,7 @@ export default {
 						},
 						frozen: true
 					}
-					],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData:	false,
-				height: '400',
-				selectable: 1,
-				selectableRangeMode: 'click',
-				index: 'message_id',
+				],
 				pagination: true,
 				paginationMode: "remote",
 				paginationSize: 15,
@@ -171,7 +261,6 @@ export default {
 				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
 				dataTreeChildIndent: 15,
 				dataTreeStartExpanded: false,
-				persistenceID: 'core-message-2025112401',
 				locale: 'de',
 				"langs": {
 					"de":{ //German language definition
@@ -192,8 +281,11 @@ export default {
 						},
 					},
 				}
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
@@ -238,118 +330,19 @@ export default {
 							]
 						});
 						this.$refs.table.tabulator.rowManager.getDisplayRows();
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-												});
-						*/
 					}
 				},
 				{
 					event: 'rowClick',
 					handler: (e, row) => {
-							const selectedMessage = row.getData().message_id;
-							const body = row.getData().body;
-							this.previewBody = body;
+						const selectedMessage = row.getData().message_id;
+						const body = row.getData().body;
+						this.previewBody = body;
 					}
 				},
-/*
-				{
-					event: 'pageLoaded',
-					handler: (pageno) => {
-						this.pageNo = pageno+1;
-					}
-				}
-*/
-			],
-			previewBody: "",
-			open: false,
-			personId: null,
-		}
-	},
-	methods: {
-		actionDeleteMessage(message_id){
-			this.$fhcAlert
-				.confirmDelete()
-				.then(result => result
-					? message_id
-					: Promise.reject({handled: true}))
-				.then(this.deleteMessage)
-				.catch(this.$fhcAlert.handleSystemError);
+			];
+			return events;
 		},
-		deleteMessage(message_id){
-			return this.$api
-				.call(ApiMessages.deleteMessage(message_id))
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(()=> {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		actionNewMessage(){
-			this.$emit('newMessage', this.id, this.typeId);
-		},
-		actionReplyToMessage(message_id){
-			this.$emit('replyToMessage', this.id, this.typeId, message_id);
-		},
-		reload() {
-			this.$refs.table.reloadTable();
-		},
-		buildTreemap(messages) {
-			if (!messages || !messages.data || messages.data.length === 0)
-			{
-				return {data: [], last_page: 0};
-			}
-
-			const last_page = messages.meta.count;
-			messages = messages.data;
-			const messageMap = new Map();
-			const messageNested = [];
-			const remainingMessages = new Set(messages);
-
-			//save all Data in Map
-			messages.forEach(msg => messageMap.set(msg.message_id, msg));
-
-			let iteration = 0;
-			let changes = true;
-
-			// do until each relationmessage_id finds message_id (not sensitive to order)
-			while (changes) {
-				changes = false;
-				iteration++;
-
-				remainingMessages.forEach(msg => {
-					if (msg.relationmessage_id === null) {
-						messageNested.push(messageMap.get(msg.message_id));
-						remainingMessages.delete(msg);
-						changes = true;
-					} else if (messageMap.has(msg.relationmessage_id)) {
-
-						const parent = messageMap.get(msg.relationmessage_id);
-
-						if (!parent.children) {
-							parent.children = [];
-						}
-						parent.children.push(messageMap.get(msg.message_id));
-						remainingMessages.delete(msg);
-						changes = true;
-					}
-				});
-
-			// to avoid endless loop
-			if (iteration > messages.length) break;
-			}
-		return {data: messageNested, last_page: last_page};
-		},
-		loadAjaxCall(url, config, params){
-			return this.$api.call(
-				ApiMessages.getMessages(params)
-			);
-		}
-	},
-	computed: {
 		statusText(){
 			return {
 				0: this.$p.t('messsages', 'unread'),
@@ -361,13 +354,13 @@ export default {
 	},
 	mounted() {
 		// change to target="_blank"
-/*		this.$nextTick(() => {
-			const links = document.querySelectorAll('.preview a');
-			links.forEach(link => {
-				link.setAttribute('target', '_blank');
-				link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
-			});
-		});*/
+		/*		this.$nextTick(() => {
+					const links = document.querySelectorAll('.preview a');
+					links.forEach(link => {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
+					});
+				});*/
 	},
 	created(){
 		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
@@ -382,6 +375,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
+
 	},
 	template: `
 	<div class="messages-detail-table">
