@@ -40,7 +40,11 @@ export default {
 		showErweitert: Boolean,
 		showDocument: Boolean,
 		showTinyMce: Boolean,
-		visibleColumns: Array
+		visibleColumns: Array,
+		tabulatorPersistenceId: {
+			type: String,
+			default: 'core-notiz'
+		}
 	},
 	data() {
 		return {
@@ -177,7 +181,15 @@ export default {
 				//responsiveLayout: "collapse",
 				maxHeight: '200px',
 				index: 'notiz_id',
-				persistenceID: 'core-notiz'
+				persistenceID: this.tabulatorPersistenceId,
+				persistence: {
+					sort: false,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				}
 			},
 			tabulatorEvents: [
 				{

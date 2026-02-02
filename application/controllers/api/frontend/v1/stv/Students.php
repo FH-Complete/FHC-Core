@@ -766,6 +766,86 @@ class Students extends FHCAPI_Controller
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
+	 *
+	 * @return void
+	 */
+	public function search($studiensemester_kurzbz)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
+
+		$this->load->library('SearchLib', [ 'config' => 'searchstv' ]);
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('searchstr', 'searchstr', 'required');
+		$this->form_validation->set_rules('types[]', 'types', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$result = $this->searchlib->search($this->input->post('searchstr'), $this->input->post('types'));
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->prepareQuery($studiensemester_kurzbz);
+
+		$this->PrestudentModel->addSelect("COALESCE(v.semester::text, CASE WHEN public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN public.get_absem_prestudent(tbl_prestudent.prestudent_id, NULL)::text ELSE ''::text END) AS semester", false);
+		$this->PrestudentModel->addSelect('v.verband');
+		$this->PrestudentModel->addSelect('v.gruppe');
+
+		//add status per semester
+		$this->PrestudentModel->addSelect(
+			"(
+				SELECT status_kurzbz
+				FROM public.tbl_prestudentstatus pss
+				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
+				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
+				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
+				LIMIT 1
+				) AS statusofsemester"
+		);
+
+		$this->addSelectPrioRel();
+
+		$this->addFilter($studiensemester_kurzbz);
+
+		$prestudent_ids = [];
+		$student_uids = [];
+			$this->addMeta('data', $data);
+		foreach ($data as $row) {
+			$dataset = json_decode($row->data);
+			if ($row->type == 'prestudent') {
+				$prestudent_ids[] = $dataset->prestudent_id;
+			} elseif ($row->type == 'student') {
+				$student_uids[] = $dataset->uid;
+			}
+		}
+
+		if ($prestudent_ids && $student_uids) {
+			$this->PrestudentModel->db->where_in('tbl_prestudent.prestudent_id', $prestudent_ids);
+			$this->PrestudentModel->db->or_where_in('s.student_uid', $student_uids);
+		} elseif ($prestudent_ids) {
+			$this->PrestudentModel->db->where_in('tbl_prestudent.prestudent_id', $prestudent_ids);
+		} elseif ($student_uids) {
+			$this->PrestudentModel->db->where_in('s.student_uid', $student_uids);
+		} else {
+			$this->terminateWithSuccess([]);
+		}
+
+		$result = $this->PrestudentModel->load();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/**
 	 * @param string|null	$studiensemester_kurzbz
 	 * @param string		$type
 	 *

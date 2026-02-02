@@ -30,6 +30,7 @@ export default {
 		show-tiny-mce
 		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
 		@reload="$emit('update:suffix')"
+		tabulator-persistence-id="stv-notiz-2026011301"
 		>
 </core-notiz>
 

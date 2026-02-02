@@ -62,6 +62,11 @@ if(!$rechte->isBerechtigt('student/noten',$studiengang_kz, 's'))
 $semester = isset($_GET['semester'])?$_GET['semester']:'';
 $typ = isset($_GET['typ'])?$_GET['typ']:'';
 
+if(isset($_GET['studiensemester']) && preg_match('/[WS]S[0-9]{4}/', $_GET['studiensemester']))
+{
+	$semester_aktuell = $_GET['studiensemester'];
+}
+
 if($semester=='')
 	die('Bitte ein Semester auswaehlen');
 	

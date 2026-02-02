@@ -135,7 +135,8 @@ class Profil_update_model extends DB_Model
 				attachment_id,
 				UPPER(public.tbl_studiengang.typ || public.tbl_studiengang.kurzbz) AS studiengang,
 				COALESCE(of.orgform_kurzbz, public.tbl_studiengang.orgform_kurzbz) AS orgform,
-				NULL as oezuordnung
+				NULL as oezuordnung,
+				tbl_student.semester
 			FROM public.tbl_profil_update
 			JOIN public.tbl_profil_update_status ON public.tbl_profil_update_status.status_kurzbz = public.tbl_profil_update.status 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
