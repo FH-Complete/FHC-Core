@@ -500,6 +500,27 @@ if((!defined('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN') || CIS_LEHRVERANSTALTU
 	);
 }
 
+// LV-Evaluierung NEU
+if(defined('CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN')
+	&& CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN
+	&& $angemeldet
+	&& (!defined('CIS_EVALUIERUNG_ANZEIGEN_STG') || in_array($lv->studiengang_kz, unserialize(CIS_EVALUIERUNG_ANZEIGEN_STG)))
+	&& ($rechte->isBerechtigt('extension/lvevaluierung_init')))
+{
+	$text='(Pilotphase)';
+
+	$link= APP_ROOT. 'index.ci.php/extensions/FHC-Core-Evaluierung/Initiierung?lehrveranstaltung_id='. urlencode($lv->lehrveranstaltung_id).'&studiensemester_kurzbz='.urlencode($angezeigtes_stsem);
+
+	$menu[]=array
+	(
+		'id'=>'extension_lvevaluierung_menu_initiierung',
+		'position'=>'140',
+		'name'=>$p->t('lvevaluierung/lvevaluierung'). ' - '. strtoupper($p->t('global/neu')),
+		'icon'=>'../../../skin/images/button_lvevaluierung.png',
+		'link'=> $link,
+		'text'=>$text
+	);
+}
 
 //************* Menuepunkte anzeigen ****************
 
