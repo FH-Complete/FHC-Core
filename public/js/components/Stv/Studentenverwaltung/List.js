@@ -43,7 +43,8 @@ export default {
 		studiensemesterKurzbz: String
 	},
 	emits: [
-		'update:selected'
+		'update:selected',
+		'filterActive'
 	],
 	data() {
 		function dateFormatter(cell)
@@ -274,7 +275,7 @@ export default {
 			let today = new Date().toLocaleDateString('en-GB')
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
-		}
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -398,13 +399,14 @@ export default {
 		},
 		updateFilter(filter) {
 			this.filter = filter;
+			this.$emit('filterActive', filter);
 			this.updateUrl();
 		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			console.log('function param endpoint: ' + JSON.stringify(endpoint));
-			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
+/*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
 			if( endpoint === undefined && this.currentEndpoint === null)
 			{
@@ -435,6 +437,7 @@ export default {
 			this.tabulatorOptions.ajaxURL = endpoint.url;
 			this.tabulatorOptions.ajaxParams = { ...params };
 			this.tabulatorOptions.ajaxConfig = {method};
+
 			if (!this.$refs.table.tableBuilt) {
 				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
@@ -529,7 +532,9 @@ export default {
 		getAllRows() {
 			this.allRows = this.$refs.table.tabulator.getRows();
 		},
-
+		resetFilter(){
+			this.$refs.listfilter.resetFilter();
+		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
@@ -544,6 +549,7 @@ export default {
 			v-draggable:copyLink.capture="selectedDragObject"
 			@dragend="dragCleanup"
 		>
+
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
@@ -557,6 +563,7 @@ export default {
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 				@table-built="translateTabulator"
+				:useSelectionSpan="false"
 			>
 
 			<template #actions>
@@ -570,10 +577,26 @@ export default {
 				></core-tag>
 			</template>
 
+			<template #actions v-if="filter.length">
+			  <div class="d-flex align-items-center gap-2 ps-4">
+				<p class="text-danger mb-0">
+				  <strong>{{$p.t('filter','filterActive')}}</strong>
+				</p>
+
+				<button
+				  class="btn btn-outline-danger sm"
+				  :title="$p.t('filter/filterDelete')"
+				  @click="resetFilter"
+				>
+				 <span class="fa-solid fa-filter-circle-xmark"></span>
+				</button>
+			  </div>
+			</template>
+
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<list-filter @change="updateFilter" />
+						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length" />
 					</div>
 				</div>
 			</template>

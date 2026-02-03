@@ -146,7 +146,8 @@ export default {
 				sprachen: [],
 				geschlechter: []
 			},
-			verbandEndpoint: ApiStvVerband
+			verbandEndpoint: ApiStvVerband,
+			filter: []
 		}
 	},
 	computed: {
@@ -392,6 +393,7 @@ export default {
 			}
 		},
 		onSearch(e) {
+			this.deleteCustomFilter();
 			const searchsettings = { ...this.$refs.searchbar.searchsettings };
 			if (searchsettings.searchstr.length >= 2) {
 				this.blurSearchbar();
@@ -420,6 +422,12 @@ export default {
 			this.$refs.searchbar.$refs.input.blur();
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
+		},
+		handleCustomFilter(filter){
+			this.filter = filter;
+		},
+		deleteCustomFilter(){
+			this.$refs.stvList.resetFilter();
 		}
 	},
 	created() {
@@ -625,7 +633,7 @@ export default {
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<vertical-split>
 						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
+							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
 						</template>
 						<template #bottom>
 							<stv-details ref="details" :students="selected"></stv-details>
