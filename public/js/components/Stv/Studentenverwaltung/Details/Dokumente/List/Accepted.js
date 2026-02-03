@@ -17,7 +17,18 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			listDocuments: [],
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 300,
+			selectable: true,
+			selectableRangeMode: 'click',
+			persistenceID: 'core-details-documents-accepted-2025072101',
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvDocuments.getDocumentsAccepted({
@@ -146,15 +157,11 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 300,
-				selectable: true,
-				selectableRangeMode: 'click',
-				persistenceID: 'core-details-documents-accepted-2025072101',
-				listDocuments: [],
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -210,14 +217,15 @@ export default {
 						}
 					}
 				}
-			]
-		}
+			];
+			return events;
+		},
 	},
 	methods: {
 		actionDownloadFile(akte_id){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-				+ '/api/frontend/v1/stv/dokumente/download?akte_id=' 
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/api/frontend/v1/stv/dokumente/download?akte_id='
 				+ encodeURIComponent(akte_id);
 		},
 		actionUploadFile(dokument_kurzbz){

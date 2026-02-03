@@ -17,7 +17,19 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 300,
+			selectable: true,
+			selectableRangeMode: 'click',
+			persistenceID: 'core-details-documents-unaccepted',
+			listDocuments: [],
+			prestudentDocumentData: [],
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvDocuments.getDocumentsUnaccepted({
@@ -42,7 +54,7 @@ export default {
 								hour12: false
 							});
 						}
-						},
+					},
 					{title: "nachgereicht", field: "nachgereicht", visible: false,
 						formatter:"tickCross",
 						hozAlign:"center",
@@ -76,7 +88,7 @@ export default {
 							return `${tickCrossIcon} ${pill}`;
 						},
 						hozAlign: "center"
-						},
+					},
 					{title: "Infotext", field: "infotext"},
 					{title: "akte_id", field: "akte_id"},
 					{title: "titel_intern", field: "titel_intern"},
@@ -162,16 +174,11 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 300,
-				selectable: true,
-				selectableRangeMode: 'click',
-				persistenceID: 'core-details-documents-unaccepted',
-				listDocuments: [],
-				prestudentDocumentData: [],
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -221,14 +228,15 @@ export default {
 						}
 					}
 				}
-			]
-		}
+			];
+			return events;
+		},
 	},
 	methods: {
 		actionDownloadFile(akte_id){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-				+ '/api/frontend/v1/stv/dokumente/download?akte_id=' 
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/api/frontend/v1/stv/dokumente/download?akte_id='
 				+ encodeURIComponent(akte_id);
 		},
 		actionUploadFile(dokument_kurzbz){
@@ -277,9 +285,9 @@ export default {
 								dokument_kurzbz: e.dokument_kurzbz
 							}))
 							.then(() => ({
-							success: true,
-							dokument_bz: e.bezeichnung
-						}))
+								success: true,
+								dokument_bz: e.bezeichnung
+							}))
 							.catch(() => ({
 								success: false,
 								dokument_bz: e.bezeichnung
@@ -287,23 +295,23 @@ export default {
 					)
 				)
 				.then(results => {
-						const failed = results.filter(res => !res.value.success);
-						const suceeded = results.filter(res => res.value.success);
-						if (failed.length > 0) {
-							failed.forEach(res => {
-								this.$fhcAlert.alertError(this.$p.t('dokumente', 'errorAccepted',
-									{'dokument_kurzbz': res.value.dokument_bz}
-								));
-							});
-							let countSuceeded = suceeded.length;
-							if(countSuceeded > 0)
-								this.$fhcAlert.alertSuccess(this.$p.t('dokumente', 'successCountAccepted',
-									{'count': countSuceeded}));
+					const failed = results.filter(res => !res.value.success);
+					const suceeded = results.filter(res => res.value.success);
+					if (failed.length > 0) {
+						failed.forEach(res => {
+							this.$fhcAlert.alertError(this.$p.t('dokumente', 'errorAccepted',
+								{'dokument_kurzbz': res.value.dokument_bz}
+							));
+						});
+						let countSuceeded = suceeded.length;
+						if(countSuceeded > 0)
+							this.$fhcAlert.alertSuccess(this.$p.t('dokumente', 'successCountAccepted',
+								{'count': countSuceeded}));
 
-						} else {
-							this.$fhcAlert.alertSuccess(this.$p.t('dokumente', 'successAccepted'));
-						}
-						this.reloadAll();
+					} else {
+						this.$fhcAlert.alertSuccess(this.$p.t('dokumente', 'successAccepted'));
+					}
+					this.reloadAll();
 				});
 		},
 		deleteFile(akte_id){

@@ -37,7 +37,44 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			formData: {
+				von: new Date(),
+				bis: new Date(),
+				mobilitaetsprogramm_code: 7,
+				nation_code: 'A',
+				herkunftsland_code: 'A',
+				bisio_id: null,
+				localPurposes: [],
+				localSupports: [],
+				lehrveranstaltung_id: null,
+				lehreinheit_id: null
+			},
+			statusNew: true,
+			programsMobility: [],
+			listLvs: [],
+			listLes: [],
+			listLvsAndLes: [],
+			listPurposes: [],
+			listSupports: [],
+			tabulatorData: [],
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 'auto',
+			minHeight: 200,
+			index: 'bisio_id',
+			persistenceID: 'stv-details-table_mobiliy-2025112401'
+		}
+	},
+	watch: {
+		student(){
+			if (this.$refs.table) {
+				this.$refs.table.reloadTable();
+			}
+		},
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvMobility.getMobilitaeten(this.student.uid)
@@ -63,8 +100,8 @@ export default {
 					},
 					{
 						title: "Bis",
-						 field: "bis",
-						 formatter: function (cell) {
+						field: "bis",
+						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
 
@@ -109,18 +146,15 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				minHeight: 200,
-				index: 'bisio_id',
-				persistenceID: 'stv-details-table_mobiliy-2025112401'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'dataLoaded',
 					handler: data => this.tabulatorData = data.map(item => {
-					//	item.actionDiv = document.createElement('div');
+						//	item.actionDiv = document.createElement('div');
 						return item;
 					}),
 				},
@@ -147,43 +181,11 @@ export default {
 						cm.getColumnByField('bisio_id').component.updateDefinition({
 							title: this.$p.t('mobility', 'bisio_id')
 						});
-
-/*						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-						});*/
 					}
 				}
-			],
-			formData: {
-				von: new Date(),
-				bis: new Date(),
-				mobilitaetsprogramm_code: 7,
-				nation_code: 'A',
-				herkunftsland_code: 'A',
-				bisio_id: null,
-				localPurposes: [],
-				localSupports: [],
-				lehrveranstaltung_id: null,
-				lehreinheit_id: null
-			},
-			statusNew: true,
-			programsMobility: [],
-			listLvs: [],
-			listLes: [],
-			listLvsAndLes: [],
-			listPurposes: [],
-			listSupports: [],
-			tabulatorData: []
-		}
-	},
-	watch: {
-		student(){
-			if (this.$refs.table) {
-				this.$refs.table.reloadTable();
-			}
+			];
+			return events;
 		},
-	},
-	computed:{
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
 		},
