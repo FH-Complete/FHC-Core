@@ -80,7 +80,7 @@ export default {
 					{title: "farbe", field: "farbe", visible: false},
 					{title: "Gruppen", field: "gruppen_kuerzel"},
 					{title: "ort", field: "ort_kurzbz"},
-					{title: "lektorIn", field: "lektorname", sorter:"string"},
+					{title: "lektorIn", field: "lektorname", sorter: "string"},
 					{title: "Lehrfach", field: "lehrfach_bez"}
 				],
 				rowFormatter: function(row){

@@ -211,6 +211,8 @@ export default {
 	},
 	computed: {
 		tabulatorOptions() {
+			const self = this;
+
 			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
@@ -236,7 +238,6 @@ export default {
 				},
 				rowFormatter: function(row) {
 					let data = row.getData();
-
 					if (data.studiengang_kz_ber === self.student.studiengang_kz &&
 						data.studiensemester === self.youngestSemester) {
 						let cells = row.getCells();
@@ -378,10 +379,10 @@ export default {
 						cm.getColumnByField('studienplan_id').component.updateDefinition({
 							title: this.$p.t('ui', 'studienplan_id')
 						});
-						cm.getColumnByField('studiengangkurzbzlang').component.updateDefinition({
+						cm.getColumnByField('studiengangkurzbzlang_ber').component.updateDefinition({
 							title: this.$p.t('projektarbeitsbeurteilung', 'studiengang')
 						});
-						cm.getColumnByField('stg_kuerzel').component.updateDefinition({
+						cm.getColumnByField('studiengang_kz_ber').component.updateDefinition({
 							title: this.$p.t('admission', 'stg_kurz')
 						});
 					}
