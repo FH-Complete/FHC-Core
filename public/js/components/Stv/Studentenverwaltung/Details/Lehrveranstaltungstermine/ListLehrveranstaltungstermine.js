@@ -11,22 +11,6 @@ export default {
 		FormInput,
 		FormForm
 	},
-	computed: {
-		downloadLink: function(){
-			if(!this.dataSem.start || !this.dataSem.ende || !this.student.uid) return;
-			let start = new Date(this.dataSem.start);
-			start = Math.floor(start.getTime()/1000);
-			let ende = new Date(this.dataSem.ende);
-			ende = Math.floor(ende.getTime() / 1000);
-
-			let link =
-				FHC_JS_DATA_STORAGE_OBJECT.app_root + "cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=" + this.student.uid + "&begin=" + start + "&ende= " +ende + "&format=excel";
-			return link;
-		},
-		dbStundenplanTable: function (){
-			return this.showStundenplanDev ? 'stundenplandev' : 'stundenplan';
-		}
-	},
 	inject: {
 		currentSemester: {
 			from: 'currentSemester',
@@ -43,6 +27,22 @@ export default {
 			dataSem: {},
 			showStundenplanDev: false
 		};
+	},
+	computed: {
+		downloadLink: function(){
+			if(!this.dataSem.start || !this.dataSem.ende || !this.student.uid) return;
+			let start = new Date(this.dataSem.start);
+			start = Math.floor(start.getTime()/1000);
+			let ende = new Date(this.dataSem.ende);
+			ende = Math.floor(ende.getTime() / 1000);
+
+			let link =
+				FHC_JS_DATA_STORAGE_OBJECT.app_root + "cis/private/lvplan/stpl_kalender.php?type=student&pers_uid=" + this.student.uid + "&begin=" + start + "&ende= " +ende + "&format=excel";
+			return link;
+		},
+		dbStundenplanTable: function (){
+			return this.showStundenplanDev ? 'stundenplandev' : 'stundenplan';
+		},
 	},
 	methods: {
 		initTabulatorOptions(){
@@ -80,7 +80,7 @@ export default {
 					{title: "farbe", field: "farbe", visible: false},
 					{title: "Gruppen", field: "gruppen_kuerzel"},
 					{title: "ort", field: "ort_kurzbz"},
-					{title: "lektorIn", field: "lektorname"},
+					{title: "lektorIn", field: "lektorname", sorter:"string"},
 					{title: "Lehrfach", field: "lehrfach_bez"}
 				],
 				rowFormatter: function(row){
@@ -135,7 +135,7 @@ export default {
 		},
 		getDatesOfSemester(studiensemester_kurzbz) {
 			this.dataSem = this.listStudiensemester.find(item => item.studiensemester_kurzbz === studiensemester_kurzbz);
-			},
+		},
 		exportToExcel(){
 			window.open(this.downloadLink, '_blank');
 		},
