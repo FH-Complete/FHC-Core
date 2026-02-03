@@ -64,6 +64,9 @@ $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
+//Routes for Lvplan Verband and page for dropdown Stg/Semester/Verband/Gruppe
+$route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
+$route['Cis/OverviewLvPlan/.*'] = 'Cis/OverviewLvPlan/index/$1';
 
 // Studierendenverwaltung List Routes
 $route['api/frontend/v1/stv/[sS]tudents/inout'] = 'api/frontend/v1/stv/Students/index';

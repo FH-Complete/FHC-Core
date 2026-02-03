@@ -445,6 +445,24 @@ class StundenplanLib
 		return success($ferienEventsFlattened);
 	}
 
+	public function getEventsStgOrg( $start, $end, $stg_kz, $sem, $verband, $gruppe)
+	{
+		$this->_ci =& get_instance();
+
+		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
+
+		$stundenplan_data = $this->_ci->StundenplanModel->getStundenplanStudiengang($start, $end, $stg_kz, $sem, $verband, $gruppe);
+		if (isError($stundenplan_data))
+			return $stundenplan_data;
+		$stundenplan_data = getData($stundenplan_data) ?? [];
+
+		$function_error = $this->expandObjectInformation($stundenplan_data);
+		if ($function_error)
+			return $function_error;
+
+		return success($stundenplan_data);
+	}
+
 	// start of the private functions ########################################################################################################
 
 	// function used to sort an array of studiensemester strings
