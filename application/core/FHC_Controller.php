@@ -163,7 +163,7 @@ abstract class FHC_Controller extends CI_Controller
 			header('Content-Type: '. $fileObj->mimetype);
 			header('Content-Length: ' . $content_length);
 			header('Content-Transfer-Encoding: binary');
-			header('Content-Disposition: '. $fileObj->disposition. '; file_name="'. $fileObj->name. '"');
+			header('Content-Disposition: '. $fileObj->disposition. '; filename="'. $fileObj->name. '"');
 			header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
 			header('Expires: ' . date("D, d M Y H:i:s", time()));
 			header('Pragma: public');
