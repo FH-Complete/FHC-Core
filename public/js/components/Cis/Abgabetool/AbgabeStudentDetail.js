@@ -264,7 +264,7 @@ export const AbgabeStudentDetail = {
 		},
 		getTooltipStandard() {
 			return {
-				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipStandard')),
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipStandardv2')),
 				class: "custom-tooltip"
 			}
 		},

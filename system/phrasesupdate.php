@@ -44559,12 +44559,12 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4tooltipStandard',
+		'phrase' => 'c4tooltipStandardv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Termin mehr als 12 Tag entfernt",
+				'text' => "Termin mehr als 12 Tage entfernt",
 				'description' => '',
 				'insertvon' => 'system'
 			),

@@ -551,7 +551,7 @@ export const AbgabeMitarbeiterDetail = {
 		},
 		getTooltipStandard() {
 			return {
-				value: this.$p.t('abgabetool/c4tooltipStandard'),
+				value: this.$p.t('abgabetool/c4tooltipStandardv2'),
 				class: "custom-tooltip"
 			}
 		},

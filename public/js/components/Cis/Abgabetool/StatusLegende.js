@@ -36,7 +36,7 @@ export const AbgabeterminStatusLegende = {
 						<i class="fa-solid fa-clock"></i>
 					</div>
 					<div class="col-auto" style="display: flex; align-items: center;">
-						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipStandard')) }}</h5>
+						<h5>{{ $capitalize($p.t('abgabetool/c4tooltipStandardv2')) }}</h5>
 					</div>
 				</div>
 				
