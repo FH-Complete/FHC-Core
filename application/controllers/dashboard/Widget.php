@@ -33,19 +33,26 @@ class Widget extends Auth_Controller
 			return $this->outputJsonSuccess([
 				"widget_id" => 0,
 				"widget_kurzbz" => "notfound",
-				"arguments" => json_encode([
+				"arguments" => [
 					"className" => 'alert-danger',
 					"title" => 'Widget Not Found',
 					"msg" => 'The widget with the id ' . $widget_id . ' could not be found'
-				]),
-				"setup" => json_encode([
+				],
+				"setup" => [
 					"name" => 'Widget Not Found',
-					"file" => 'DashboardWidget/Default.js',
+					"file" => absoluteJsImportUrl('public/js/components/DashboardWidget/Default.js'),
 					"width" => 1,
 					"height" => 1
-				])
+				]
 			]);
-		return $this->outputJsonSuccess(current(getData($widget)));
+
+		$widget = current(getData($widget));
+		$widget->arguments = json_decode($widget->arguments);
+		$tmpsetup = json_decode($widget->setup);
+		$tmpsetup->file = absoluteJsImportUrl($tmpsetup->file);
+		$widget->setup = $tmpsetup;
+
+		return $this->outputJsonSuccess($widget);
 	}
 	
 	public function getAll()
@@ -56,7 +63,16 @@ class Widget extends Auth_Controller
 		if (isError($result))
 			return $this->outputJsonError(getError($result));
 
-		$this->outputJsonSuccess(getData($result) ?: []);
+		$tmpwidgets = getData($result) ?: [];
+		$widgets = array_map(function($widget) {
+			$widget->arguments = json_decode($widget->arguments);
+			$tmpsetup = json_decode($widget->setup);
+			$tmpsetup->file = absoluteJsImportUrl($tmpsetup->file);
+			$widget->setup = $tmpsetup;
+			return $widget;
+		}, $tmpwidgets);
+
+		$this->outputJsonSuccess($widgets);
 	}
 	
 	public function getWidgetsForDashboard()
@@ -71,7 +87,16 @@ class Widget extends Auth_Controller
 			]);
 		}
 
-		$this->outputJsonSuccess(getData($result) ?: []);
+		$tmpwidgets = getData($result) ?: [];
+		$widgets = array_map(function($widget) {
+			$widget->arguments = json_decode($widget->arguments);
+			$tmpsetup = json_decode($widget->setup);
+			$tmpsetup->file = absoluteJsImportUrl($tmpsetup->file);
+			$widget->setup = $tmpsetup;
+			return $widget;
+		}, $tmpwidgets);
+
+		$this->outputJsonSuccess($widgets);
 	}
 	
 	public function setAllowed()
