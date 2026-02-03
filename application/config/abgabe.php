@@ -17,7 +17,7 @@ $config['URL_ASSISTENZ'] = 'index.ci.php/Cis/Abgabetool/Assistenz';
 
 // lehre.tbl_paabgabetyp bezeichnung
 //$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
-$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['zwischen', 'qualgate1', 'qualgate2']; // tbl_paabgabetyp pk
+$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['abstract','zwischen', 'qualgate1', 'qualgate2']; // tbl_paabgabetyp pk
 // paabgabetypen for which betreuer is benachrichtigt via sammelmail
 $config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_BETREUER'] = ['qualgate1', 'qualgate2', 'end'];
 // paabgabetypen for which assistenz is benachrichtigt via sammelmail
