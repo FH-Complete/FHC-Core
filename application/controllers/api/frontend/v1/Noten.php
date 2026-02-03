@@ -170,8 +170,8 @@ class Noten extends FHCAPI_Controller
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
 			
-			$res = $this->StudentModel->load([$uid]);
-			if(!isError($res) && hasData($res)) $student = getData($res)[0];
+//			$res = $this->StudentModel->load([$uid]);
+//			if(!isError($res) && hasData($res)) $student = getData($res)[0];
 			
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
 
@@ -504,7 +504,7 @@ class Noten extends FHCAPI_Controller
 
 		$student_uid = $result->student_uid;
 		$note = $result->note;
-		$punkte = null;
+		$punkte = $result->punkte;
 		$datum = $result->datum;
 		$lva_id = $result->lva_id;
 		$lehreinheit_id = $result->lehreinheit_id;
@@ -521,17 +521,22 @@ class Noten extends FHCAPI_Controller
 //		$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
 //		$lehreinheit_id = $result->lehreinheit_id;
 		
-		$punkte = null;
+//		$punkte = null;
 
-//		if($punkte!='')
-//		{
-//			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
-//			$note_pruef = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
-//			if($note_pruef!=$note)
-//			{
-//				$note = $note_pruef;
-//			}
-//		}
+		if(isset($punkte) && $punkte >= 0) {
+			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
+			$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
+			if(isError($result)) {
+				$this->terminateWithError('notenspiegel hats zrissen');
+			} else {
+				$data = getData($result);
+				if($data != $note)
+				{
+					$note = $data;
+				}
+			}
+			
+		}
 
 		// TODO: more sophisticated empty check
 		if($note=='')
@@ -552,7 +557,6 @@ class Noten extends FHCAPI_Controller
 			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
 		}
 		
-		$pruefungenChanged = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
 		
 		//Gesamtnote updaten
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
@@ -603,6 +607,9 @@ class Noten extends FHCAPI_Controller
 			
 		}
 		
+		// save pruefung after updating lvnote, since pruefungspunkte get loaded by lv punkte 
+		$pruefungenChanged = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
+
 		$savedPruefung = $pruefungenChanged['savedPruefung'] ?? null;
 		$extraPruefung = $pruefungenChanged['extraPruefung'] ?? null;
 
@@ -615,7 +622,7 @@ class Noten extends FHCAPI_Controller
 	/**
 	 * private helper method to update/insert pruefungstermine 
 	 */
-	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum) 
+	private function savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte = '', $datum) 
 	{
 
 		// extra check if the student has lvnote and a zeugnisnote in the relevant lva
@@ -680,7 +687,7 @@ class Noten extends FHCAPI_Controller
 				{
 					// TODO: avoid hardcoded noten primary keys!
 					$pr_note = 9; 
-					$pr_punkte = null;
+					$pr_punkte = '';
 					$benotungsdatum = $jetzt;
 				}
 				
@@ -690,7 +697,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $pr_note,
-//						'punkte' => $pr_punkte,
+						'punkte' => $pr_punkte,
 						'pruefungstyp_kurzbz' => "Termin1",
 						'datum' => $benotungsdatum,
 						'anmerkung' => "",
@@ -720,7 +727,7 @@ class Noten extends FHCAPI_Controller
 						'updateamum' => $jetzt,
 						'updatevon' => getAuthUID(),
 						'note' => $note,
-//						'punkte' => $punkte,
+						'punkte' => $punkte,
 						'datum' => $datum,
 						'anmerkung' => ""
 					)
@@ -739,7 +746,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $note,
-//						'punkte' => null,//$punkte,
+						'punkte' => $punkte,
 						'pruefungstyp_kurzbz' => $typ,
 						'datum' => $datum,
 						'anmerkung' => "",
@@ -771,7 +778,7 @@ class Noten extends FHCAPI_Controller
 						'updateamum' => $jetzt,
 						'updatevon' => getAuthUID(),
 						'note' => $note,
-//						'punkte' => $punkte,
+						'punkte' => $punkte,
 						'datum' => $datum,
 						'anmerkung' => ""
 					)
@@ -790,7 +797,7 @@ class Noten extends FHCAPI_Controller
 						'student_uid' => $student_uid,
 						'mitarbeiter_uid' => getAuthUID(),
 						'note' => $note,
-//						'punkte' => null,//$punkte,
+						'punkte' => $punkte,
 						'pruefungstyp_kurzbz' => $typ,
 						'datum' => $datum,
 						'anmerkung' => "",
@@ -979,7 +986,7 @@ class Noten extends FHCAPI_Controller
 			$student_uid = $student->uid;
 			$typ = $student->typ;
 			$note = 9; //$result->note; // TODO: parameterize for import maybe
-			$punkte = ''; // TODO: check punkte feature
+			$punkte = ''; // new pruefungen never have punkte, TODO: check if null or '' prefered
 
 			$lehreinheit_id = $student->lehreinheit_id;
 			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
