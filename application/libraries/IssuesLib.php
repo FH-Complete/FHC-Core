@@ -20,6 +20,10 @@ class IssuesLib
 	const ERRORTYPE_CODE = 'error';
 	const WARNINGTYPE_CODE = 'warning';
 
+	const STATUS_KURZBZ = 'status_kurzbz';
+	const VERARBEITET_AMUM = 'verarbeitetamum';
+	const VERARBEITET_VON = 'verarbeitetvon';
+
 	public function __construct($params = null)
 	{
 		$this->_ci =& get_instance();
@@ -91,12 +95,16 @@ class IssuesLib
 			return error("fehlercode_extern missing");
 
 		// get external fehlercode (unique for each app)
-		$this->_ci->FehlerModel->addSelect('fehlercode');
-		$fehlerRes = $this->_ci->FehlerModel->loadWhere(
-			array(
-				'fehlercode_extern' => $fehlercode_extern,
-				'app' => $this->_app
-			)
+		$fehlerRes = $this->_ci->FehlerModel->execReadOnlyQuery(
+			'
+				SELECT
+					fehlercode
+				FROM
+					system.tbl_fehler fe
+				WHERE
+					fehlercode_extern = ?
+					AND EXISTS (SELECT 1 FROM system.tbl_fehler_app WHERE fehlercode = fe.fehlercode AND app = ?)',
+			[$fehlercode_extern, $this->_app]
 		);
 
 		if (isError($fehlerRes))
@@ -105,8 +113,10 @@ class IssuesLib
 		// check if there is a predefined custom error for the external issue
 		if (hasData($fehlerRes))
 		{
-			$fehlerData = getData($fehlerRes)[0];
 			// if found, use the code
+			$fehlerData = getData($fehlerRes);
+			if (count($fehlerData) > 1) return error("Multiple fehlercode_extern ".$fehlercode_extern. " for app ".$this->_app);
+			$fehlerData = getData($fehlerRes)[0];
 			$fehlercode = $fehlerData->fehlercode;
 		}
 		else
@@ -128,9 +138,9 @@ class IssuesLib
 	public function setBehoben($issue_id, $user)
 	{
 		$data = array(
-			'status_kurzbz' => self::STATUS_BEHOBEN,
-			'verarbeitetvon' => $user,
-			'verarbeitetamum' => date('Y-m-d H:i:s')
+			self::STATUS_KURZBZ => self::STATUS_BEHOBEN,
+			self::VERARBEITET_VON => $user,
+			self::VERARBEITET_AMUM => date('Y-m-d H:i:s')
 		);
 
 		return $this->_changeIssueStatus($issue_id, $data, $user);
@@ -145,8 +155,8 @@ class IssuesLib
 	public function setInBearbeitung($issue_id, $user)
 	{
 		$data = array(
-			'status_kurzbz' => self::STATUS_IN_BEARBEITUNG,
-			'verarbeitetvon' => $user
+			self::STATUS_KURZBZ => self::STATUS_IN_BEARBEITUNG,
+			self::VERARBEITET_VON => $user
 		);
 
 		return $this->_changeIssueStatus($issue_id, $data, $user);
@@ -161,9 +171,9 @@ class IssuesLib
 	public function setNeu($issue_id, $user)
 	{
 		$data = array(
-			'status_kurzbz' => self::STATUS_NEU,
-			'verarbeitetvon' => null,
-			'verarbeitetamum' => null
+			self::STATUS_KURZBZ => self::STATUS_NEU,
+			self::VERARBEITET_VON => null,
+			self::VERARBEITET_AMUM => null
 		);
 
 		return $this->_changeIssueStatus($issue_id, $data, $user);
@@ -185,13 +195,18 @@ class IssuesLib
 			return error("Issue Id must be set correctly.");
 
 		// check if given status is same as existing
-		$this->_ci->IssueModel->addSelect('status_kurzbz');
+		$this->_ci->IssueModel->addSelect(self::STATUS_KURZBZ.', '.self::VERARBEITET_AMUM);
 		$currStatus = $this->_ci->IssueModel->load($issue_id);
 
 		if (hasData($currStatus))
 		{
-			if (getData($currStatus)[0]->status_kurzbz == $data['status_kurzbz'])
+			$currStatusData = getData($currStatus)[0];
+			// if same status set, and verarbeitet amum is not being newly set
+			if ($currStatusData->{self::STATUS_KURZBZ} == $data[self::STATUS_KURZBZ]
+				&& !(isset($data[self::VERARBEITET_AMUM]) && !isset($currStatusData->{self::VERARBEITET_AMUM}))
+			) {
 				return success("Same status already set");
+			}
 		}
 		else
 			return error("Error when getting status");

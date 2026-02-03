@@ -182,7 +182,7 @@ class Issue_model extends DB_Model
 
 			if (is_array($apps))
 			{
-				$qry .= ' AND app IN ?';
+				$qry .= ' AND EXISTS (SELECT 1 FROM system.tbl_fehler_app WHERE fehlercode = fe.fehlercode AND app IN ?)';
 				$params[] = $apps;
 			}
 		}

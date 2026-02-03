@@ -49,7 +49,8 @@ $query .= "
 				inhalt AS \"Inhalt\", inhalt_extern AS \"Inhalt extern\", iss.person_id AS \"PersonId\", iss.oe_kurzbz AS \"OE\",
 				ftyp.bezeichnung_mehrsprachig[".$this->db->escape($language_index)."] AS \"Fehlertyp\",
 				stat.bezeichnung_mehrsprachig[".$this->db->escape($language_index)."] AS \"Fehlerstatus\",
-				verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\", fr.app AS \"Applikation\",
+				verarbeitetvon AS \"Verarbeitet von\",verarbeitetamum AS \"Verarbeitet am\",
+				(SELECT STRING_AGG(app, ', ') FROM system.tbl_fehler_app WHERE fehlercode = fr.fehlercode GROUP BY fehlercode) AS \"Applikation\",
 				fr.fehlertyp_kurzbz AS \"Fehlertypcode\", iss.status_kurzbz AS \"Statuscode\",
 				pers.vorname AS \"Vorname\", pers.nachname AS \"Nachname\",
 				(
@@ -168,7 +169,7 @@ $query .= 							")
 
 $query .= ") ";
 
-if (!isEmptyString($APPS)) $query .= " AND fr.app IN ".$APPS;
+if (!isEmptyString($APPS)) $query .= " AND EXISTS (SELECT 1 FROM system.tbl_fehler_app WHERE fehlercode = fr.fehlercode AND app IN ".$APPS.")";
 
 $query .= " ORDER BY
 			CASE

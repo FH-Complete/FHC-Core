@@ -2,7 +2,8 @@
 
 // get assigned Konfiguration
 $query = "SELECT
-				konftyp.konfigurationstyp_kurzbz, fe.fehlercode, fe.fehler_kurzbz, konf.konfiguration, fe.app,
+				konftyp.konfigurationstyp_kurzbz, fe.fehlercode, fe.fehler_kurzbz, konf.konfiguration,
+				(SELECT STRING_AGG(app, ', ') FROM system.tbl_fehler_app WHERE fehlercode = fe.fehlercode GROUP BY fehlercode) AS app,
 				konftyp.beschreibung AS  konfigurationsbeschreibung, konftyp.konfigurationsdatentyp, fe.fehlertext
 			FROM
 				system.tbl_fehler_konfiguration konf

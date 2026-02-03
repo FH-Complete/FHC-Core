@@ -50,6 +50,7 @@ class FehlerUpdateLib
 	];
 
 	private $_ci; // Code igniter instance
+	private $_updateHistory = [];
 
 	/**
 	 * Loads parser library
@@ -74,9 +75,7 @@ class FehlerUpdateLib
 
 
 	/**
-	 *
-	 * @param
-	 * @return object success or error
+	 * Install all possible fehler, from core and extensions
 	 */
 	public function installAll()
 	{
@@ -120,7 +119,6 @@ class FehlerUpdateLib
 		$this->_installFehler(ExtensionsLib::EXTENSIONS_DIR_NAME.'/'.$extensionName.'/'.FehlerUpdateLib::CONFIG_FEHLER_NAME);
 
 	}
-
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Private methods
@@ -190,13 +188,19 @@ class FehlerUpdateLib
 	 */
 	private function _updateFehler($fehler)
 	{
+		$fehlerReferences = $fehler['references'];
+		$fehler = $fehler['fehler'];
+
 		// Checks if the fehler already exists in the database
 		$this->_ci->FehlerModel->db->where(self::FEHLERCODE.' = ', $fehler[self::FEHLERCODE]);
-		if ($fehler[self::FEHLER_KURZBZ] != null) $this->_ci->FehlerModel->db->or_where(self::FEHLER_KURZBZ.' = ', $fehler[self::FEHLER_KURZBZ]);
+		if (isset($fehler[self::FEHLER_KURZBZ]) && !isEmptyString($fehler[self::FEHLER_KURZBZ]))
+			$this->_ci->FehlerModel->db->or_where(self::FEHLER_KURZBZ.' = ', $fehler[self::FEHLER_KURZBZ]);
 		$fehlerResult = $this->_ci->FehlerModel->load();
 
 		// If an error occurred then return the error itself
 		if (isError($fehlerResult)) return $fehlerResult;
+
+		$updateRes = null;
 
 		// if fehler has been found
 		if (hasData($fehlerResult))
@@ -204,8 +208,9 @@ class FehlerUpdateLib
 			$foundFehler = getData($fehlerResult)[0];
 
 			// check if fehlercode - fehler kurzbz combination is correct
-			if ($foundFehler->{self::FEHLERCODE} != $fehler[self::FEHLERCODE] || $foundFehler->{self::FEHLER_KURZBZ} != $fehler[self::FEHLER_KURZBZ])
-			{
+			if ($foundFehler->{self::FEHLERCODE} != $fehler[self::FEHLERCODE]
+				|| $foundFehler->{self::FEHLER_KURZBZ} != ($fehler[self::FEHLER_KURZBZ] ?? null)
+			) {
 				return error("Wrong fehlercode - fehler kurzbz combination: ".$fehler[self::FEHLERCODE].", ".$fehler[self::FEHLER_KURZBZ]);
 			}
 
@@ -224,6 +229,13 @@ class FehlerUpdateLib
 				if (isset($attributeInfo['updateable']) && $attributeInfo['updateable'] && $foundFehler->{$attributeName} != $fehler[$attributeName])
 				{
 					$updateArr[$attributeName] = $fehler[$attributeName];
+
+					if (isset($this->_updateHistory[$foundFehler->{self::FEHLERCODE}][$attributeName])
+						&& $this->_updateHistory[$foundFehler->{self::FEHLERCODE}][$attributeName] != $fehler[$attributeName]
+					) {
+						return error("Conflicting update values for attribute ".$attributeName.", fehler ".$foundFehler->{self::FEHLERCODE});
+					}
+					$this->_updateHistory[$foundFehler->{self::FEHLERCODE}][$attributeName] = $fehler[$attributeName];
 				}
 			}
 
@@ -239,49 +251,59 @@ class FehlerUpdateLib
 					"Fehler ".$fehler[self::FEHLERCODE].(isset($fehler[self::FEHLER_KURZBZ]) ? " (".$fehler[self::FEHLER_KURZBZ].")" : "")." updated"
 				);
 			}
+		}
+		else
+		{
+			// no fehler has been found
 
-			return success($fehler[self::FEHLERCODE]);
+			// then add the fehler to the database
+			$updateRes = $this->_ci->FehlerModel->insert(
+				array_merge($fehler, ['insertamum' => 'NOW()', 'insertvon' => self::UPSERT_BY])
+			);
+
+			// If an error occurred then return the error itself
+			if (isError($updateRes)) return $updateRes;
+
+			// Prints info about the new added fehler
+			$this->_ci->eprintflib->printMessage(
+				sprintf(
+					'A new fehler has been added into the database: '.
+					'fehlercode => %s | fehler_kurzbz => %s | fehlertyp => %s',
+					$fehler[self::FEHLERCODE],
+					$fehler[self::FEHLER_KURZBZ],
+					$fehler[self::FEHLERTYP_KURZBZ]
+				)
+			);
 		}
 
-		// no fehler has been found
-
-		// handle apps
-		if (isset($fehler[self::APP]))
+		// handle references
+		if (isset($fehlerReferences[self::APP]))
 		{
-			$apps = $fehler[self::APP];
-			if (is_string($apps)) $apps = [$apps];
+			$this->_ci->load->model('system/FehlerApp_model', 'FehlerAppModel');
+			$apps = $fehlerReferences[self::APP];
 
-			foreach ($apps as $app)
+			// load all assigned apps
+			$this->_ci->FehlerAppModel->addSelect(self::APP);
+			$fehlerAppRes = $this->_ci->FehlerAppModel->loadWhere([self::FEHLERCODE => $fehler[self::FEHLERCODE]]);
+
+			$fehlerApps = hasData($fehlerAppRes) ? array_column(getData($fehlerAppRes), self::APP) : [];
+
+			$appsToInsert = array_diff($apps, $fehlerApps);
+
+			foreach ($appsToInsert as $app)
 			{
 				// check if app exists in db
-				$this->_ci->AppModel->addSelect('1');
-				$appRes = $this->_ci->AppModel->loadWhere(['app' => $app]);
+				$fehlerAppsInsertRes = $this->_ci->FehlerAppModel->insert(
+					[self::FEHLERCODE => $fehler[self::FEHLERCODE], self::APP => $app, 'insertamum' => 'NOW()', 'insertvon' => self::UPSERT_BY]
+				);
 
-				if (!hasData($appRes)) return error("App ".$app." does not exist");
-				// TODO add entry for each app
+				if (isError($fehlerAppsInsertRes)) return $fehlerAppsInsertRes;
+
+				$this->_ci->eprintflib->printMessage(
+					"Added app ".$app." to fehler ".$fehler[self::FEHLERCODE]
+				);
 			}
-
-			$fehler[self::APP] = $apps[0];
 		}
-
-		// Then add the fehler to the database
-		$fehlerInsertResult = $this->_ci->FehlerModel->insert(
-			array_merge($fehler, ['insertamum' => 'NOW()', 'insertvon' => self::UPSERT_BY])
-		);
-
-		// If an error occurred then return the error itself
-		if (isError($fehlerInsertResult)) return $fehlerInsertResult;
-
-		// Prints info about the new added fehler
-		$this->_ci->eprintflib->printMessage(
-			sprintf(
-				'A new fehler has been added into the database: '.
-				'fehlercode => %s | fehler_kurzbz => %s | fehlertyp => %s',
-				$fehler[self::FEHLERCODE],
-				$fehler[self::FEHLER_KURZBZ],
-				$fehler[self::FEHLERTYP_KURZBZ]
-			)
-		);
 
 		// If here then no blocking errors occurred
 		return success();
@@ -292,13 +314,14 @@ class FehlerUpdateLib
 	 */
 	private function _createFehlerFromEntry($configEntry)
 	{
-		$fehler = [];
+		$fehler = ['fehler' => [], 'references' => []];
 		foreach (self::FEHLER_ATTRIBUTES as $attributeName => $attributeInfo)
 		{
 			$required = isset($attributeInfo['required']) && $attributeInfo['required'];
-			if ($required && !isset($configEntry[$attributeName]))
+			if (!isset($configEntry[$attributeName]))
 			{
-				return error('attribute'.$attributeName.' is missing');
+				if ($required) return error('attribute'.$attributeName.' is missing');
+				continue;
 			}
 
 			$attributeValue = $configEntry[$attributeName];
@@ -330,7 +353,29 @@ class FehlerUpdateLib
 				return error('attribute'.$attributeName.' has invalid type');
 			}
 
-			$fehler[$attributeName] = $configEntry[$attributeName];
+			if ($attributeName == self::APP)
+			{
+				if (is_string($attributeValue)) $attributeValue = [$attributeValue];
+
+				foreach ($attributeValue as $app)
+				{
+					// check if app exists in db
+					$this->_ci->AppModel->addSelect('1');
+					$appRes = $this->_ci->AppModel->loadWhere(['app' => $app]);
+
+					if (!hasData($appRes)) return error("App ".$app." does not exist");
+				}
+			}
+
+			if (isset($attributeInfo['types']) && is_array($attributeInfo['types']) && in_array(self::TYPE_ARRAY, $attributeInfo['types']))
+			{
+				$fehler['references'][$attributeName] = $attributeValue;
+			}
+			else
+			{
+				$fehler['fehler'][$attributeName] = $attributeValue;
+			}
+
 		}
 		return success($fehler);
 	}
