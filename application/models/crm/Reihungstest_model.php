@@ -10,7 +10,7 @@ class Reihungstest_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'public.tbl_reihungstest';
 		$this->pk = 'reihungstest_id';
-	}	
+	}
 	
 	/**
 	 * Gets a test from a test id only if it is available
@@ -42,8 +42,8 @@ class Reihungstest_model extends DB_Model
 	/**
 	 * Checks if there are active studyplans which have no public placement tests assigned yet.
 	 * Only check assignment to studyplans that are
-	 *	- Bachelor, 
-	 *	- active, 
+	 *	- Bachelor,
+	 *	- active,
 	 *	- set as online application
 	 *  - valid for 1st terms
 	 * @return array Returns object array with studyplans that have no public placement tests assigned yet.
@@ -97,7 +97,7 @@ class Reihungstest_model extends DB_Model
 					USING (reihungstest_id)
 				WHERE 
 					datum >= now() 
-				AND 
+				AND
 					oeffentlich = \'t\'
 				)
 			';
@@ -105,7 +105,7 @@ class Reihungstest_model extends DB_Model
 		return $this->execQuery($query);
 	}
 	
-	/**	
+	/**
 	 *  Gets amount of free places.
 	 * @return array Returns object array with faculty and amount of free places
 	 * for each public actual placement test date.
@@ -432,10 +432,10 @@ class Reihungstest_model extends DB_Model
 	}
 
 	/**
- * Loads all applicants of a placement test
- * @param integer $reihungstest_id ID of placement test
- * @return array Returns object array with data of applicants.
- */
+	 * Loads all applicants of a placement test
+	 * @param integer $reihungstest_id ID of placement test
+	 * @return array Returns object array with data of applicants.
+	 */
 	public function getApplicantsOfPlacementTest($reihungstest_id)
 	{
 		$query = '
@@ -556,13 +556,22 @@ class Reihungstest_model extends DB_Model
 	 * Calculates Result of Placement Test for a given Person and given placementtest
 	 * and with taking account of weighting per area
 	 *
-	 * @param $person_id ID of Person
-	 * @param $punkte if true result is points else result is percentage of sum
-	 * @param $reihungstest_id ID of Placementtest
-	 * @param $weightedArray array of weighting per area (gewicht per gebiet_id)
-	 * @return float result
+	 * @param Number $person_id ID of Person
+	 * @param Boolean $punkte if true result is points else result is percentage of sum
+	 * @param Number $reihungstest_id ID of Placementtest
+	 * @param Array $weightedArray array of weighting per area (gewicht per gebiet_id)
+	 * @param Boolean $has_excluded_gebiete if true, areas in the configArray will be excluded
+	 * @param Array $basis_gebiet_id_toString areas to exclude
+	 * @return float result points of RT
 	 */
-	public function getReihungstestErgebnisPerson($person_id, $punkte, $reihungstest_id, $weightedArray = null)
+	public function getReihungstestErgebnisPerson(
+		$person_id,
+		$punkte,
+		$reihungstest_id,
+		$weightedArray = null,
+		$has_excluded_gebiete = false,
+		$basis_gebiet_id_toString = null
+	)
 	{
 		$parametersArray = array($reihungstest_id);
 
@@ -576,6 +585,35 @@ class Reihungstest_model extends DB_Model
 					public.tbl_studiengang USING (studiengang_kz)
 				WHERE
 					reihungstest_id = ? ";
+
+		//areas of Studiengang
+		if (!empty($basis_gebiet_id_toString))
+		{
+			$qry .= "
+				AND
+					gebiet_id IN (". $basis_gebiet_id_toString. ")
+			";
+		}
+
+		//areas to exclude
+		if($has_excluded_gebiete)
+		{
+			if (defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE))
+			{
+				$excluded_gebiete = unserialize(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE);
+				$exclude_gebiet_id_arr = $excluded_gebiete;
+				if (is_array($exclude_gebiet_id_arr) && count($exclude_gebiet_id_arr) > 0)
+				{
+					$exclude_gebiet_id_toString = implode(', ', $exclude_gebiet_id_arr);
+					$qry .= "
+							AND
+								gebiet_id NOT IN (". $exclude_gebiet_id_toString. ")
+						--	AND
+						--		typ = 'b'
+						";
+				}
+			}
+		}
 
 		//using prestudent Status to avoid to get the sum of more than 1 placement tests
 		$qry .= "

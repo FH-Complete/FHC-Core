@@ -74,6 +74,12 @@ html.fs_huge {
 	color: var(--gray-500);
 }
 
+/* Aufnahme Termine: background color green*/
+.stv-details-admission-table .row-green{
+    background-color: lightgreen !important;
+    //color: var(--green-200);
+}
+
 /* Dropdown Toolbar Interessent, submenu */
 .dropend .dropdown-toggle.d-flex::after {
 	height: 0;
