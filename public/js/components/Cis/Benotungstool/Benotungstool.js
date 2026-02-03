@@ -433,6 +433,8 @@ export const Benotungstool = {
 				}
 			})
 			
+			// TODO: punkte parsen!
+			
 			// parsers check for notenOption.lehre === true and if student uid/matrikelnr matches
 			
 			// pruefungen check for younger pruefungen, so there are no further antritte with 
@@ -792,7 +794,7 @@ export const Benotungstool = {
 
 			if(!data.note_vorschlag) return
 			this.loading = true
-			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag))
+			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag, data.punkte))
 				.then((res) => {
 				if (res.meta.status === 'success') {
 					const s = this.studenten.find(s => s.uid === data.uid)
@@ -1086,6 +1088,8 @@ export const Benotungstool = {
 				s.freigabedatum = this.parseDate(this.teilnoten[s.uid]['freigabedatum'])
 				s.benotungsdatum = this.parseDate(this.teilnoten[s.uid]['benotungsdatum'])
 				s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
+				
+				s.punkte = this.teilnoten[s.uid].punkte_lv
 				
 				const grades = this.teilnoten[s.uid].grades
 				s.teilnote = ''

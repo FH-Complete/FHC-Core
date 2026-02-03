@@ -42,11 +42,11 @@ export default {
 			params: { password, noten, lv_id, sem_kurzbz }
 		};
 	},
-	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note) {
+	saveNotenvorschlag(lv_id, sem_kurzbz, student_uid, note, punkte = null) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Noten/saveNotenvorschlag',
-			params: { lv_id, sem_kurzbz, student_uid, note }
+			params: { lv_id, sem_kurzbz, student_uid, note, punkte }
 		};
 	},
 	saveStudentPruefung(student_uid, note, punkte, datum, lva_id, lehreinheit_id, sem_kurzbz, typ){

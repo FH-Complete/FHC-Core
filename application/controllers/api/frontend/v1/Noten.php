@@ -107,8 +107,7 @@ class Noten extends FHCAPI_Controller
 //				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
 			
 			
-				// TODO
-				// basically show the source of teilnoten (moodle or le)
+				// basically a toggle for "use teilnoten" and the source is always moodle
 				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
 				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
 				// Gibt an ob die Note im Notenfreigabemail enthalten ist oder nicht
@@ -240,11 +239,7 @@ class Noten extends FHCAPI_Controller
 					}
 				}
 				
-				// TODO: develop the punkte feature with models
-				// calculate grades points from notenschlüssel
 				if (CIS_GESAMTNOTE_PUNKTE) {
-					// TODO: can only be implemented once
-					
 					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG) {
 						// Lehreinheitsgewichtung
 						$punkte_vorschlag = round($punktesumme_gewichtet / $gewichtsumme, 2);
@@ -839,6 +834,9 @@ class Noten extends FHCAPI_Controller
 		$student_uid = $result->student_uid;
 		$sem_kurzbz = $result->sem_kurzbz;
 		$note = $result->note;
+		$punkte = $result->punkte;
+
+		
 
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $student_uid, $sem_kurzbz);
 
@@ -849,7 +847,7 @@ class Noten extends FHCAPI_Controller
 				[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
 				array(
 					'note' => $note,
-					'punkte' => null,
+					'punkte' => $punkte,
 					'benotungsdatum' => date("Y-m-d H:i:s"),
 					'updateamum' => date("Y-m-d H:i:s"),
 					'updatevon' => getAuthUID()
@@ -867,7 +865,7 @@ class Noten extends FHCAPI_Controller
 					'lehrveranstaltung_id' => $lv_id,
 					'studiensemester_kurzbz' => $sem_kurzbz,
 					'note' => $note,
-					'punkte' => null,
+					'punkte' => $punkte,
 					'mitarbeiter_uid' => getAuthUID(),
 					'benotungsdatum' => date("Y-m-d H:i:s"),
 					'freigabedatum' => null,
