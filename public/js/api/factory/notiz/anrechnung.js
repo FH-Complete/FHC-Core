@@ -23,32 +23,7 @@ export default {
 	getNotizen(id, type) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/notiz/notizLehreinheit/getNotizen/' + encodeURIComponent(id) + '/' + encodeURIComponent(type)
-		};
-	},
-	addNewNotiz(lehreinheit_id, params) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/notiz/notizLehreinheit/addNewNotiz/' + lehreinheit_id,
-			params
-		};
-	},
-	updateNotiz(notiz_id, params) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/notiz/notizLehreinheit/updateNotiz/' + notiz_id,
-			params
-		};
-	},
-	deleteNotiz(notiz_id, type_id, id) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/notiz/notizLehreinheit/deleteNotiz/',
-			params: {
-				notiz_id,
-				type_id,
-				id
-			}
+			url: 'api/frontend/v1/notiz/notizAnrechnung/getNotizen/' + encodeURIComponent(id) + '/' + encodeURIComponent(type)
 		};
 	},
 };

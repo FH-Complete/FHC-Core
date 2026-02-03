@@ -17,7 +17,6 @@ export default {
 	},
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
-	
 
 <!--	Test Version classicFas for enter with one click vs popupModal-->
 	<core-notiz
@@ -76,7 +75,6 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ------------------------ SOME TESTDATA	-----------------------------------------------------	
 ---------------------------------------------------------------------------------------------
 
-
 		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
 			ref="formc"
@@ -114,7 +112,8 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 			:showTinyMCE="true"
 			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</core-notiz>-->
+		</core-notiz>
+-->
 		
 	</div>
 	`
