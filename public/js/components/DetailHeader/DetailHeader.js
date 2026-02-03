@@ -137,7 +137,7 @@ export default {
 			this.redirectToLeitung();
 		},
 		redirectToLeitung() {
-			this.$emit('redirect', {
+			this.$emit('redirectToLeitung', {
 				person_id: this.leitungData.person_id,
 				uid: this.leitungData.uid
 			});
@@ -173,6 +173,13 @@ export default {
 				this.$emit('reload');
 			}
 		},
+		getFotoSrc(foto) {
+			if(foto === null) {
+				return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'skin/images/profilbild_dummy.jpg';
+			} else {
+				return 'data:image/jpeg;base64,' + foto;
+			}
+		}
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
@@ -201,8 +208,9 @@ export default {
 				>
 					<img
 					  class="d-block h-100 rounded"
+					  style="height: 84px;"
 					  alt="Profilbild"
-					  :src="'data:image/jpeg;base64,' + person.foto"
+					  :src="getFotoSrc(person.foto)"
 					/>
 
 					<template v-if="person.foto_sperre">
@@ -291,10 +299,10 @@ export default {
 
 				<div class="foto-container col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
-					  class="d-block w-100 h-100 rounded"
+					  class="d-block rounded"
+					  style="height: 84px; object-fit: contain;"
 					  alt="Profilbild"
-					  :src="'data:image/jpeg;base64,' + headerDataMa.foto"
-					  style="object-fit: contain;"
+					  :src="getFotoSrc(headerDataMa.foto)"
 					/>
 					<template v-if="headerDataMa.foto_sperre">
 						<i

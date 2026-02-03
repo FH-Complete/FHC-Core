@@ -13,7 +13,7 @@ function parseFilterExpression(expression)
 
 			andParts.forEach(term => {
 
-				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(\d+(?:[.,]\d+)?)$/);
+				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(-?\d+(?:[.,]\d+)?)$/);
 
 				if (comparisonMatch)
 				{
@@ -39,8 +39,19 @@ function parseFilterExpression(expression)
 	return collections;
 }
 
-export function extendedHeaderFilter(headerValue, rowValue)
+export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParams)
 {
+	const fields = Array.isArray(filterParams?.field)
+		? filterParams.field
+		: [filterParams?.field];
+
+	if (fields.length > 1 && rowData)
+	{
+		rowValue = fields
+			.map(f => rowData[f] ?? '')
+			.filter(Boolean)
+			.join(' ');
+	}
 	if (typeof headerValue === 'boolean')
 	{
 		return rowValue === headerValue;
@@ -48,52 +59,79 @@ export function extendedHeaderFilter(headerValue, rowValue)
 
 	const collections = parseFilterExpression(headerValue);
 
-	try {
+	function matchValue(value)
+	{
+		try {
+			return collections.some(collection => {
 
-		return collections.some(collection => {
+				let positives = collection.positives.length === 0 || collection.positives.every(condition => {
 
-			let positives = collection.positives.length === 0 || collection.positives.every(condition => {
+					if (condition.type === 'comparison')
+					{
+						let value = parseFloat(rowValue);
+						if (isNaN(value)) return false;
 
-				if (condition.type === 'comparison')
-				{
-					let value = parseFloat(rowValue);
-					if (isNaN(value)) return false;
-
-					switch (condition.operator) {
-						case '<':
-							return value < condition.number;
-						case '>':
-							return value > condition.number;
-						case '<=':
-							return value <= condition.number;
-						case '>=':
-							return value >= condition.number;
-						case '=':
-							return value === condition.number;
-						case '!=':
-							return value !== condition.number;
-						default:
-							return false;
+						switch (condition.operator) {
+							case '<':
+								return value < condition.number;
+							case '>':
+								return value > condition.number;
+							case '<=':
+								return value <= condition.number;
+							case '>=':
+								return value >= condition.number;
+							case '=':
+								return value === condition.number;
+							case '!=':
+								return value !== condition.number;
+							default:
+								return false;
+						}
 					}
-				}
-				else if (condition.type === 'regex')
-				{
-					return condition.regex.test(rowValue);
-				}
-				return false;
+					else if (condition.type === 'regex')
+					{
+						return condition.regex.test(rowValue);
+					}
+					return false;
+				});
+
+				let negatives = collection.negatives.every(condition => {
+					return !condition.regex.test(rowValue);
+				});
+
+				return positives && negatives;
 			});
+		} catch (e) {
 
-			let negatives = collection.negatives.every(condition => {
-				return !condition.regex.test(rowValue);
-			});
-
-			return positives && negatives;
-		});
-	} catch (e) {
-
+		}
 	}
+
+	if (matchValue(rowValue))
+		return true;
+
+	if (rowData && filterParams)
+	{
+		const childrenField = filterParams?.children || '_children';
+		const field = filterParams?.field;
+
+		const children = rowData[childrenField];
+		if (Array.isArray(children))
+		{
+			for (let child of children)
+			{
+				let childValue = child[field];
+				if (extendedHeaderFilter(headerValue, childValue, child, filterParams))
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
-export function tagHeaderFilter(headerValue, rowValue) {
+export function tagHeaderFilter(headerValue, rowValue, rowData, filterParams)
+{
 
 	let data;
 
@@ -108,18 +146,18 @@ export function tagHeaderFilter(headerValue, rowValue) {
 	if (Array.isArray(data))
 	{
 		combinedText = data
+			.filter(item => item?.done === false)
 			.map(item => `${item?.beschreibung} ${item?.notiz}`)
 			.join(' ');
 	}
 	else if (typeof data === 'object' && data !== null)
 	{
-		combinedText = `${data?.beschreibung} ${data?.notiz}`;
+		combinedText = data?.erledigt === false ? `${data?.beschreibung} ${data?.notiz}` : '';
 	}
 	else
 	{
 		combinedText = String(data);
 	}
 
-	return extendedHeaderFilter(headerValue, combinedText)
+	return extendedHeaderFilter(headerValue, combinedText, rowData, filterParams)
 }
-

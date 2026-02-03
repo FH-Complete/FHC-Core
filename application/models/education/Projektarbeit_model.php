@@ -24,16 +24,28 @@ class Projektarbeit_model extends DB_Model
 	public function getProjektarbeit($student_uid, $studiengang_kz = null, $studiensemester_kurzbz = null, $projekttyp = null, $final = null)
 	{
 		$qry = "SELECT
-					tbl_projektarbeit.* , tbl_projekttyp.bezeichnung
+					pa.*, tbl_projekttyp.bezeichnung,
+					tbl_lehreinheit.studiensemester_kurzbz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+					tbl_firma.name AS firma_name,
+					(
+						SELECT
+							STRING_AGG(trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')), ', ')
+						FROM
+							lehre.tbl_projektbetreuer
+							JOIN public.tbl_person USING (person_id)
+						WHERE
+							projektarbeit_id = pa.projektarbeit_id
+							AND student_uid = pa.student_uid
+						GROUP BY projektarbeit_id
+					) AS projektbetreuer
 				FROM
-					lehre.tbl_projektarbeit
-				JOIN
-					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
-
+					lehre.tbl_projektarbeit pa
+					JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
+					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
+					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
+					LEFT JOIN public.tbl_firma USING (firma_id)
 				WHERE
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_projektarbeit.student_uid = ?";
+					pa.student_uid = ?";
 
 		$params = array($student_uid);
 
@@ -52,16 +64,16 @@ class Projektarbeit_model extends DB_Model
 		if (isset($projekttyp))
 		{
 			if (is_array($projekttyp))
-				$qry .= ' AND tbl_projektarbeit.projekttyp_kurzbz IN ?';
+				$qry .= ' AND pa.projekttyp_kurzbz IN ?';
 			else
-				$qry .= ' AND tbl_projektarbeit.projekttyp_kurzbz=?';
+				$qry .= ' AND pa.projekttyp_kurzbz=?';
 
 			$params[] = $projekttyp;
 		}
 
 		if (isset($final))
 		{
-			$qry .= ' AND tbl_projektarbeit.final=?';
+			$qry .= ' AND pa.final=?';
 			$params[] = $final;
 		}
 
@@ -260,5 +272,31 @@ class Projektarbeit_model extends DB_Model
 					WHERE projektarbeit_id = ? )";
 		
 		return $this->execReadOnlyQuery($qry, array($projektarbeit_id));
+	}
+
+	/**
+	 *
+	 * @param
+	 * @return object success or error
+	 */
+	public function hasBerechtigungForProjektarbeit($projektarbeit_id)
+	{
+		if (!$projektarbeit_id || !is_numeric($projektarbeit_id))
+			return false;
+
+		$this->ProjektarbeitModel->addSelect('studiengang_kz');
+		$this->ProjektarbeitModel->addJoin('public.tbl_student', 'student_uid');
+		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
+		if (isError($result) || !hasData($result))
+			return false;
+
+		$studiengang_kz = getData($result)[0]->studiengang_kz;
+
+		if ($this->permissionlib->isBerechtigt('admin', 'suid', $studiengang_kz))
+			return true;
+		if ($this->permissionlib->isBerechtigt('assistenz', 'suid', $studiengang_kz))
+			return true;
+
+		return false;
 	}
 }

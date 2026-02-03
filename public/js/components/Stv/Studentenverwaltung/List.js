@@ -1,16 +1,28 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
+import ListFilter from './List/Filter.js';
 
+import { capitalize } from '../../../helpers/StringHelpers.js';
+
+import draggable from '../../../directives/draggable.js';
 
 export default {
 	name: "ListPrestudents",
 	components: {
 		CoreFilterCmpt,
-		ListNew
+		ListNew,
+		ListFilter
+	},
+	directives: {
+		draggable
 	},
 	inject: {
-		'lists': {
+		lists: {
 			from: 'lists',
+			required: true
+		},
+		$reloadList: {
+			from: '$reloadList',
 			required: true
 		},
 		currentSemester: {
@@ -51,8 +63,12 @@ export default {
 					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
 					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{title:"Geburtsdatum", field:"gebdatum", formatter:dateFormatter, 
-						headerFilter: true, headerFilterFunc: function(headerValue, rowValue, rowData, filterParams) {
+					{
+						title: "Geburtsdatum",
+						field: "gebdatum",
+						formatter: dateFormatter, 
+						headerFilter: true,
+						headerFilterFunc(headerValue, rowValue) {
 							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
 							let comparestr = headerValue;
 							if(matches !== null) {
@@ -120,7 +136,17 @@ export default {
 					{
 						return Promise.resolve({ data: []});
 					}
-					return this.$api.call({url, params});
+					/**
+					 * NOTE(chris): Because of a bug in Tabulator
+					 * we need to get the params from elsewhere.
+					 * @see https://github.com/olifolkerd/tabulator/issues/4318
+					 */
+					const apiconfig = {
+						...this.tabulatorOptions.ajaxConfig,
+						url: this.tabulatorOptions.ajaxURL,
+						params: this.tabulatorOptions.ajaxParams
+					};
+					return this.$api.call(apiconfig);
 				},
 				ajaxResponse: (url, params, response) => {
 					return response?.data;
@@ -158,25 +184,160 @@ export default {
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
 			lastSelected: null,
-			filterKontoCount0: undefined,
-			filterKontoMissingCounter: undefined,
+			filter: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
-			currentEndpointRawUrl: ''
+			currentEndpoint: null
+		}
+	},
+	computed: {
+		countsToHTML: function() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
+		selectedDragObject() {
+			return this.selected.map(item => {
+				let type, id;
+				if (item.uid) {
+					type = 'student';
+					id = item.uid;
+				} else if (item.prestudent_id) {
+					type = 'prestudent';
+					id = item.prestudent_id;
+				} else if (item.person_id) {
+					type = 'person';
+					id = item.person_id;
+				}
+				return {
+					...item,
+					type,
+					id
+				};
+			});
+		},
+		downloadConfig() {
+			return {
+				csv: {
+					formatter: 'csv',
+					file: this.fileString,
+					options: {
+						delimiter: ';',
+						bom: true,
+					}
+				}
+			};
+		},
+		fileString() {
+			let today = new Date().toLocaleDateString('en-GB')
+				.replace(/\//g, '_');
+			return "StudentList_" + today + ".csv";
+		}
+	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
+				this.translateTabulator();
+			}
 		}
 	},
 	methods: {
+		translateTabulator() {
+			this.$p
+				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
+				.then(() => {
+					const translations = {
+						uid: capitalize(this.$p.t('person/uid')),
+						titelpre: capitalize(this.$p.t('person/titelpre')),
+						nachname: capitalize(this.$p.t('person/nachname')),
+						vorname: capitalize(this.$p.t('person/vorname')),
+						wahlname: capitalize(this.$p.t('person/wahlname')),
+						vornamen: capitalize(this.$p.t('person/vornamen')),
+						titelpost: capitalize(this.$p.t('person/titelpost')),
+						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
+						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
+						geschlecht: capitalize(this.$p.t('person/geschlecht')),
+						semester: capitalize(this.$p.t('lehre/sem')),
+						verband: capitalize(this.$p.t('lehre/verb')),
+						gruppe: capitalize(this.$p.t('lehre/grp')),
+						studiengang: capitalize(this.$p.t('lehre/studiengang')),
+						studiengang_kz: capitalize(this.$p.t('lehre/studiengang_kz')),
+						matrikelnr: capitalize(this.$p.t('person/personenkennzeichen')),
+						person_id: capitalize(this.$p.t('person/person_id')),
+						status: capitalize(this.$p.t('global/status')),
+						status_datum: capitalize(this.$p.t('profilUpdate/statusDate')),
+						status_bestaetigung: capitalize(this.$p.t('global/status_bestaetigung')),
+						mail_privat: capitalize(this.$p.t('person/email_private')),
+						mail_intern: capitalize(this.$p.t('person/email_intern')),
+						anmerkungen: capitalize(this.$p.t('stv/notes_person')),
+						anmerkung: capitalize(this.$p.t('stv/notes_prestudent')),
+						orgform_kurzbz: capitalize(this.$p.t('lehre/orgform')),
+						aufmerksamdurch_kurzbz: capitalize(this.$p.t('person/aufmerksamDurch')),
+						punkte: capitalize(this.$p.t('admission/gesamtpunkte')),
+						aufnahmegruppe_kurzbz: capitalize(this.$p.t('stv/aufnahmegruppe_kurzbz')),
+						dual: capitalize(this.$p.t('lehre/dual_short')),
+						matr_nr: capitalize(this.$p.t('person/matrikelnummer')),
+						studienplan_bezeichnung: capitalize(this.$p.t('lehre/studienplan')),
+						prestudent_id: capitalize(this.$p.t('ui/prestudent_id')),
+						priorisierung_relativ: capitalize(this.$p.t('lehre/prioritaet')),
+						mentor: capitalize(this.$p.t('stv/mentor')),
+						bnaktiv: capitalize(this.$p.t('person/aktiv'))
+					};
+
+					/** NOTE(chris):
+					 * use this approach because updateDefinition
+					 * on the Tabulator columns is way slower and
+					 * freezes up the GUI.
+					 */
+					// Overwrite definition for column show/hide
+					this.$refs.table.tabulator.getColumns().forEach(col => {
+						const trans = translations[col.getField()];
+						if (!trans)
+							return;
+						col.getDefinition().title = trans;
+					});
+					// Overwrite node in dom
+					this.$refs.table.tabulator.element
+						.querySelectorAll('.tabulator-col[tabulator-field]')
+						.forEach(el => {
+							const field = el.getAttribute('tabulator-field');
+							if (!translations[field])
+								return;
+
+							const title = el.querySelector('.tabulator-col-title');
+							if (!title)
+								return;
+
+							title.innerText = translations[field];
+						});
+				});
+		},
 		reload() {
 			this.$refs.table.reloadTable();
 		},
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
 			this.$emit('update:selected', data);
+
+			// set selected elements draggable
+			const tableEl = this.$refs.table?.$refs?.table;
+			if (tableEl) {
+				const oldDragables = tableEl.querySelectorAll('[draggable]');
+				for (const draggable of oldDragables)
+					draggable.removeAttribute('draggable');
+			}
+			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
 			if (this.lastSelected) {
@@ -195,19 +356,27 @@ export default {
 				}
 			}
 		},
+		updateFilter(filter) {
+			this.filter = filter;
+			this.updateUrl();
+		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			if( endpoint === undefined ) 
+			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
+
+			if( endpoint === undefined && this.currentEndpoint === null)
 			{
-				endpoint = {url: this.currentEndpointRawUrl};
-			} 
-			else if( endpoint.url === undefined ) 
+				endpoint = { url: '' };
+			}
+			else if( endpoint === undefined )
 			{
-				endpoint.url = this.currentEndpointRawUrl;
-			} else
+				endpoint = JSON.parse(JSON.stringify(this.currentEndpoint));
+			}
+			else
 			{
-				this.currentEndpointRawUrl = endpoint.url;
+				this.currentEndpoint = JSON.parse(JSON.stringify(endpoint));
 			}
 
 			endpoint.url = endpoint.url.replace(
@@ -215,34 +384,42 @@ export default {
 				encodeURIComponent(this.currentSemester)
 				);
 
-			const params = {}, filter = {};
-			if (this.filterKontoCount0)
-				filter.konto_count_0 = this.filterKontoCount0;
-			if (this.filterKontoMissingCounter)
-				filter.konto_missing_counter = this.filterKontoMissingCounter;
+			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
+			let method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
+			if (this.filter.length && !endpoint.url.match(/\/search\//))
+			{
+				params.filter = this.filter;
+				method = 'post';
+			}
 
-			if (filter.konto_count_0 || filter.konto_missing_counter)
-				params.filter = filter;
-
+			this.tabulatorOptions.ajaxURL = endpoint.url;
+			this.tabulatorOptions.ajaxParams = { ...params };
+			this.tabulatorOptions.ajaxConfig = {method};
 			if (!this.$refs.table.tableBuilt) {
-				if (!this.$refs.table.tabulator) {
-					this.tabulatorOptions.ajaxURL = endpoint.url;
-					this.tabulatorOptions.ajaxParams = params;
-				} else
+				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(endpoint.url, params);
+						this.$refs.table.tabulator.setData(endpoint.url, params, method);
 					});
+				}
 			} else
-				this.$refs.table.tabulator.setData(endpoint.url, params);
+				this.$refs.table.tabulator.setData(endpoint.url, params, method);
+		},
+		dragCleanup(evt) {
+			if (evt.dataTransfer.dropEffect == 'none')
+				return; // aborted or wrong target
+			
+			this.$reloadList();
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
 				return;
+
+			var next;
 			switch (e.code) {
 				case 'Enter':
 				case 'Space':
 					e.preventDefault();
-					const e2 = new Event('click', e);
+					var e2 = new Event('click', e);
 					e2.altKey = e.altKey;
 					e2.ctrlKey = e.ctrlKey;
 					e2.shiftKey = e.shiftKey;
@@ -251,13 +428,13 @@ export default {
 					break;
 				case 'ArrowUp':
 					e.preventDefault();
-					var next = this.focusObj.previousElementSibling;
+					next = this.focusObj.previousElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
 				case 'ArrowDown':
 					e.preventDefault();
-					var next = this.focusObj.nextElementSibling;
+					next = this.focusObj.nextElementSibling;
 					if (next)
 						this.changeFocus(this.focusObj, next);
 					break;
@@ -297,24 +474,19 @@ export default {
 			}
 		}
 	},
-	computed: {
-		countsToHTML: function() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
-		}
-	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-		<div class="tabulator-container d-flex flex-column h-100" :class="{'has-filter': filterKontoCount0 || filterKontoMissingCounter}" tabindex="0" @focusin="onFocus" @keydown="onKeydown">
+		<div
+			class="tabulator-container d-flex flex-column h-100"
+			:class="{'has-filter': filter.length}"
+			tabindex="0"
+			@focusin="onFocus"
+			@keydown="onKeydown"
+			v-draggable:copyLink.capture="selectedDragObject"
+			@dragend="dragCleanup"
+		>
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
@@ -323,38 +495,16 @@ export default {
 				table-only
 				:side-menu="false"
 				reload
-				` + /* TODO(chris): Ausgeblendet für Testing
+				:download="downloadConfig"
 				new-btn-show
-				*/`
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
+				@table-built="translateTabulator"
 			>
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<div class="input-group mb-3">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-count-0">{{ $p.t('stv/konto_filter_count_0') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-count-0" v-model="filterKontoCount0" @input="$nextTick(updateUrl)">
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoCount0" class="btn btn-outline-secondary" @click="filterKontoCount0 = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
-						<div class="input-group">
-							<label class="input-group-text col-4" for="stv-list-filter-konto-missing-counter">{{ $p.t('stv/konto_filter_missing_counter') }}</label>
-							<select class="form-select" id="stv-list-filter-konto-missing-counter" v-model="filterKontoMissingCounter" @input="$nextTick(updateUrl)">
-								<option value="alle">{{ $p.t('stv/konto_all_types') }}</option>
-								<option v-for="typ in lists.buchungstypen" :key="typ.buchungstyp_kurzbz" :value="typ.buchungstyp_kurzbz">
-									{{ typ.beschreibung }}
-								</option>
-							</select>
-							<button v-if="filterKontoMissingCounter" class="btn btn-outline-secondary" @click="filterKontoMissingCounter = undefined; updateUrl()">
-								<i class="fa fa-times"></i>
-							</button>
-						</div>
+						<list-filter @change="updateFilter" />
 					</div>
 				</div>
 			</template>

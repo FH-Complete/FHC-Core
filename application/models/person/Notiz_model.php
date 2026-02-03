@@ -151,7 +151,7 @@ class Notiz_model extends DB_Model
 	 *         bestellung_id, lehreinheit_id, anrechnung_id, uid)
 	 * @param $id the corresponding id, part of public.tbl_notizzuordnung
 	 */
-	public function getNotizWithDocEntries($id, $type)
+	public function getNotizWithDocEntries($id, $type, $withoutTags = true)
 	{
 			$qry = "
 				SELECT
@@ -195,15 +195,18 @@ class Notiz_model extends DB_Model
 				LEFT JOIN 
 						      public.tbl_person person_bearbeiter ON (person_bearbeiter.person_id = p_bearbeiter.person_id)
 				WHERE 
-				   z.$type  = ?
-				GROUP BY 
+				   z.$type  = ?";
+
+		if ($withoutTags)
+			$qry .= " AND n.typ IS NULL ";
+
+			$qry .= "GROUP BY 
 					notiz_id, z.notizzuordnung_id,
  					person_verfasser.vorname, person_verfasser.nachname,
 					person_bearbeiter.vorname, person_bearbeiter.nachname
 			";
 
 		return $this->execQuery($qry, array($type, $id));
-
 	}
 
 

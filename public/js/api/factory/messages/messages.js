@@ -38,16 +38,18 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getMsgVarsLoggedInUser/'
 		};
 	},
-	getMessageVarsPerson(userParams){
+	getMessageVarsPerson(ids, type_id){
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getMessageVarsPerson/' + userParams.id + '/' + userParams.type_id
+			url: 'api/frontend/v1/messages/messages/getMessageVarsPerson/' + type_id,
+			params: {ids}
 		};
 	},
-	getMsgVarsPrestudent(userParams){
+	getMsgVarsPrestudent(ids, type_id){
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + userParams.id + '/' + userParams.type_id
+			url: 'api/frontend/v1/messages/messages/getMsgVarsPrestudent/' + type_id,
+			params: {ids}
 		};
 	},
 	getPersonId(params){
@@ -56,28 +58,23 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getPersonId/' + params.id + '/' + params.type_id
 		};
 	},
-	getUid(userParams){
+	getDataVorlage(vorlage_kurzbz){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getUid/' + userParams.id + '/' + userParams.type_id
+			url: 'api/frontend/v1/messages/messages/getDataVorlage/' + vorlage_kurzbz
 		};
 	},
-	getVorlagentext(vorlage_kurzbz){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getVorlagentext/' + vorlage_kurzbz
-		};
-	},
-	getNameOfDefaultRecipient(params){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getNameOfDefaultRecipient/' + params.id + '/' + params.type_id
-		};
-	},
-	getPreviewText(userParams, params){
+	getNameOfDefaultRecipients(ids, type_id){
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/getPreviewText/' + userParams.id + '/' + userParams.type_id,
+			url: 'api/frontend/v1/messages/messages/getNameOfDefaultRecipients/' + type_id,
+			params: {ids}
+		};
+	},
+	getPreviewText(type_id, params){
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/messages/messages/getPreviewText/' + type_id,
 			params
 		};
 	},
@@ -87,17 +84,10 @@ export default {
 			url: 'api/frontend/v1/messages/messages/getReplyData/' + messageId
 		};
 	},
-	sendMessageFromModalContext(id, params) {
+	sendMessage(type_id, params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessage/' + id,
-			params
-		};
-	},
-	sendMessage(id, params) {
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/messages/messages/sendMessage/' + id,
+			url: 'api/frontend/v1/messages/messages/sendMessage/' + type_id,
 			params
 		};
 	},
