@@ -168,6 +168,11 @@ class externeUeberwachung extends basis_db
 			$payload = array_merge($payload, EXTERNE_UEBERWACHUNG_EXAM_PARAMS);
 		}
 
+		if (defined('EXTERNE_UEBERWACHUNG_EXAM_WARNINGS'))
+		{
+			$payload['visibleWarnings'] = EXTERNE_UEBERWACHUNG_EXAM_WARNINGS;
+		}
+
 		if (defined('EXTERNE_UEBERWACHUNG_EXAM_RULES'))
 		{
 			$payload['rules'] = EXTERNE_UEBERWACHUNG_EXAM_RULES;
