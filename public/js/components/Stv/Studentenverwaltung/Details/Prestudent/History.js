@@ -12,7 +12,16 @@ export default{
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			layout: 'fitDataFill',
+			layoutColumnsOnNewData:	false,
+			height:	'auto',
+			selectable:	false,
+			persistenceID: 'stv-details-prestudent-history',
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -37,13 +46,11 @@ export default{
 						element.classList.add('fw-bold');
 					}
 				},
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
-				height:	'auto',
-				selectable:	false,
-				persistenceID: 'stv-details-prestudent-history'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -64,8 +71,9 @@ export default{
 						});
 					}
 				}
-			]
-		}
+			];
+			return events;
+		},
 	},
 	watch: {
 		personId() {
