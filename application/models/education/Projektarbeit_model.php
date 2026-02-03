@@ -360,7 +360,7 @@ class Projektarbeit_model extends DB_Model
 					   SELECT person_id
 					   FROM lehre.tbl_projektbetreuer
 					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
 					   LIMIT 1
 				   )
 					   AS zweitbetreuer_person_id,
@@ -368,7 +368,7 @@ class Projektarbeit_model extends DB_Model
 					   SELECT betreuerart_kurzbz
 					   FROM lehre.tbl_projektbetreuer
 					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
 					   LIMIT 1
 				   )
 					   AS zweitbetreuer_betreuerart_kurzbz,
@@ -389,7 +389,7 @@ class Projektarbeit_model extends DB_Model
 								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
 								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
 					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
-						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter')
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
 					   LIMIT 1
 				   )
 					   as zweitbetreuer_full_name,
@@ -423,7 +423,13 @@ class Projektarbeit_model extends DB_Model
 						LEFT JOIN public.tbl_person betreuer_person ON (betreuer_person.person_id = lehre.tbl_projektbetreuer.person_id)
 						LEFT JOIN public.tbl_benutzer betreuer_benutzer ON (betreuer_person.person_id = betreuer_benutzer.person_id)
 			   WHERE (projekttyp_kurzbz = 'Bachelor' OR projekttyp_kurzbz = 'Diplom')
-				 AND student_benutzer.aktiv AND (lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter' OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter')
+				 AND student_benutzer.aktiv AND (
+				     lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbegutachter' 
+				     OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Begutachter'
+				     OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Betreuer'
+				     OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Erstbetreuer'
+				     OR lehre.tbl_projektbetreuer.betreuerart_kurzbz = 'Senatsvorsitz'
+				     )
 				 AND public.tbl_studiengang.studiengang_kz = ?";
 		
 			     if($benotet == 0) {
