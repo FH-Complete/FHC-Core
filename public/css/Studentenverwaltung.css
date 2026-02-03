@@ -116,6 +116,15 @@ html.fs_huge {
 		position: inherit;
 		z-index: 1;
 	}
+
+	.sidebar-collapsed #sidebarMenu {
+		display: none !important;
+	}
+
+	.sidebar-collapsed .container-fluid > .row > main {
+		flex: 0 0 100%;
+		max-width: 100%;
+	}
 }
 
 
