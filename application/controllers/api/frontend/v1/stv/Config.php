@@ -504,7 +504,7 @@ class Config extends FHCAPI_Controller
 		{
 			$result['combinePeople'] = [
 				'title' => $this->p->t('stv', 'tab_combine_people'),
-				'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+				'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/CombinePeople.js'),
 				'config' => $config['combinePeople']
 			];
 		}
