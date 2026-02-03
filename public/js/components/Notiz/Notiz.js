@@ -48,7 +48,49 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			notizen: [],
+			multiupload: true,
+			mitarbeiter: [],
+			filteredMitarbeiter: [],
+			zwischenvar: '',
+			editorInitialized: false,
+			editor: null,
+			notizData: {
+				typeId: this.typeId,
+				id: this.id,
+				titel: null,
+				statusNew: true,
+				text: '',
+				lastUpdate: null,
+				von: null,
+				bis: null,
+				document: null,
+				erledigt: false,
+				verfasser: null,
+				bearbeiter: null,
+				anhang: []
+			},
+			showVariables: {
+				showTitel: false,
+				showText: false,
+				showVerfasser: false,
+				showBearbeiter: false,
+				showVon: false,
+				showBis: false,
+				showDokumente: false,
+				showErledigt: false,
+				showNotiz_id: false,
+				showNotizzuordnung_id: false,
+				showType_id: false,
+				showId: false,
+				showLastupdate: false
+			},
+			currentVerfasserUid: null
+		}
+	},
+	computed: {
+		tabulatorOptions: function() {
+			return {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
 				ajaxParams: () => {
@@ -63,6 +105,7 @@ export default {
 						title: "Titel",
 						field: "titel",
 						width: 100,
+						visible: this.showVariables.showTitel,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -85,6 +128,7 @@ export default {
 						width: 250,
 						formatter: "html",
 						//clipContents: true,
+						visible: this.showVariables.showText,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -99,18 +143,18 @@ export default {
 							return el;
 						},
 					},
-					{title: "VerfasserIn", field: "verfasser", width: 124},
-					{title: "BearbeiterIn", field: "bearbeiter", width: 126},
+					{title: "VerfasserIn", field: "verfasser", width: 124, visible: this.showVariables.showVerfasser},
+					{title: "BearbeiterIn", field: "bearbeiter", width: 126, visible: this.showVariables.showBearbeiter},
 					{title: "Verfasser UID", field: "verfasser_uid", width: 124, visible: false},
 					{title: "Bearbeiter UID", field: "bearbeiter_uid", width: 126, visible: false},
-					{title: "Start", field: "start_format", width: 86, visible: false},
-					{title: "Ende", field: "ende_format", width: 86, visible: false},
-					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
+					{title: "Start", field: "start_format", width: 86, visible: this.showVariables.showVon},
+					{title: "Ende", field: "ende_format", width: 86, visible: this.showVariables.showBis},
+					{title: "Dokumente", field: "countdoc", width: 100, visible: this.showVariables.showDokumente},
 					{
 						title: "Erledigt",
 						field: "erledigt",
 						width: 97,
-						visible: false,
+						visible: this.showVariables.showErledigt,
 						formatter:"tickCross",
 						hozAlign:"center",
 						formatterParams: {
@@ -118,15 +162,15 @@ export default {
 							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
 					},
-					{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
-					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
-					{title: "type_id", field: "type_id", width: 164, visible: false},
-					{title: "extension_id", field: "id", width: 135, visible: false},
+					{title: "Notiz_id", field: "notiz_id", width: 92, visible: this.showVariables.showNotiz_id},
+					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: this.showVariables.showNotizzuordnung_id},
+					{title: "type_id", field: "type_id", width: 164, visible: this.showVariables.showType_id},
+					{title: "extension_id", field: "id", width: 135, visible: this.showVariables.showId},
 					{
-						title: "letzte Änderung", 
+						title: "letzte Änderung",
 						field: "lastupdate",
 						width: 146,
-						visible: false,
+						visible: this.showVariables.showLastupdate,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
@@ -190,8 +234,10 @@ export default {
 					group: false,
 					page: false,
 				}
-			},
-			tabulatorEvents: [
+			};
+		},
+		tabulatorEvents: function () {
+			return [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
@@ -202,56 +248,44 @@ export default {
 
 						cm.getColumnByField('verfasser').component.updateDefinition({
 							title: this.$p.t('notiz', 'verfasser'),
-							visible: this.showVariables.showVerfasser
 						});
 						cm.getColumnByField('verfasser_uid').component.updateDefinition({
 							title: this.$p.t('ui', 'verfasser_uid'),
 						});
 						cm.getColumnByField('titel').component.updateDefinition({
 							title: this.$p.t('global', 'titel'),
-							//visible: this.showVariables.showTitel
 						});
 						cm.getColumnByField('bearbeiter').component.updateDefinition({
 							title: this.$p.t('notiz', 'bearbeiter'),
-							visible: this.showVariables.showBearbeiter
 						});
 						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
 							title: this.$p.t('ui', 'bearbeiter_uid'),
 						});
 						cm.getColumnByField('start_format').component.updateDefinition({
 							title: this.$p.t('global', 'gueltigVon'),
-							visible: this.showVariables.showVon
 						});
 						cm.getColumnByField('ende_format').component.updateDefinition({
 							title: this.$p.t('global', 'gueltigBis'),
-							visible: this.showVariables.showBis
 						});
 						cm.getColumnByField('countdoc').component.updateDefinition({
 							title: this.$p.t('notiz', 'document'),
-							visible: this.showVariables.showDokumente
 						});
 						cm.getColumnByField('erledigt').component.updateDefinition({
 							title: this.$p.t('notiz', 'erledigt'),
-							visible: this.showVariables.showErledigt
 						});
 						cm.getColumnByField('lastupdate').component.updateDefinition({
 							title: this.$p.t('notiz', 'letzte_aenderung'),
-							visible: this.showVariables.showLastupdate
 						});
 						cm.getColumnByField('notiz_id').component.updateDefinition({
-							visible: this.showVariables.showNotiz_id,
 							title: this.$p.t('ui', 'notiz_id')
 						});
 						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							visible: this.showVariables.showNotizzuordnung_id,
 							title: this.$p.t('ui', 'notizzuordnung_id')
 						});
 						cm.getColumnByField('type_id').component.updateDefinition({
-							visible: this.showVariables.showType_id,
 							title: this.$p.t('ui', 'type_id')
 						});
 						cm.getColumnByField('id').component.updateDefinition({
-							visible: this.showVariables.showId,
 							title: this.$p.t('ui', 'extension_id')
 						});
 						cm.getColumnByField('actions').component.updateDefinition({
@@ -269,45 +303,7 @@ export default {
 						this.$refs.table.tabulator.redraw(true);
 					}
 				}
-			],
-			notizen: [],
-			multiupload: true,
-			mitarbeiter: [],
-			filteredMitarbeiter: [],
-			zwischenvar: '',
-			editorInitialized: false,
-			editor: null,
-			notizData: {
-				typeId: this.typeId,
-				id: this.id,
-				titel: null,
-				statusNew: true,
-				text: '',
-				lastUpdate: null,
-				von: null,
-				bis: null,
-				document: null,
-				erledigt: false,
-				verfasser: null,
-				bearbeiter: null,
-				anhang: []
-			},
-			showVariables: {
-				showTitel: false,
-				showText: false,
-				showVerfasser: false,
-				showBearbeiter: false,
-				showVon: false,
-				showBis: false,
-				showDokumente: false,
-				showErledigt: false,
-				showNotiz_id: false,
-				showNotizzuordnung_id: false,
-				showType_id: false,
-				showId: false,
-				showLastupdate: false
-			},
-			currentVerfasserUid: null
+			];
 		}
 	},
 	methods: {
