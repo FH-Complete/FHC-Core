@@ -7,7 +7,7 @@ import FormInput from '../../../../Form/Input.js';
 import ApiStvContact from '../../../../../api/factory/stv/kontakt/contact.js';
 import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
-export default {
+export default{
 	name: 'ContactComponent',
 	components: {
 		CoreFilterCmpt,
@@ -20,42 +20,8 @@ export default {
 		uid: Number
 	},
 	data() {
-		return {
-			lastSelected: null,
-			contactData: {
-				zustellung: true,
-				kontakttyp: 'email',
-				firma_id: null
-			},
-			statusNew: true,
-			kontakttypen: [],
-			firmen: [],
-			filteredFirmen: [],
-			filteredOrte: null,
-			abortController: {
-				firmen: null,
-				standorte: null
-			},
-			lastSelected: null,
-			contactData: {
-				zustellung: true,
-				kontakttyp: 'email',
-				firma_id: null
-			},
-			statusNew: true,
-			kontakttypen: [],
-			firmen: [],
-			filteredFirmen: [],
-			filteredOrte: null,
-			abortController: {
-				firmen: null,
-				standorte: null
-			},
-		}
-	},
-	computed: {
-		tabulatorOptions(){
-			const options = {
+		return{
+			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
@@ -128,11 +94,11 @@ export default {
 						frozen: true
 					},
 				],
-			};
-			return options;
-		},
-		tabulatorEvents() {
-			const events = [
+				height:	'auto',
+				index: 'kontakt_id',
+				persistenceID: 'stv-details-kontakt-contact'
+			},
+			tabulatorEvents: [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
@@ -173,11 +139,27 @@ export default {
 						cm.getColumnByField('standort_id').component.updateDefinition({
 							title: this.$p.t('ui', 'standort_id')
 						});
-					}
-				}
-			];
-			return events;
-		},
+/*						cm.getColumnByField('actions').component.updateDefinition({
+							title: this.$p.t('global', 'aktionen')
+						});*/
+				}}
+			],
+			lastSelected: null,
+			contactData: {
+				zustellung: true,
+				kontakttyp: 'email',
+				firma_id: null
+			},
+			statusNew: true,
+			kontakttypen: [],
+			firmen: [],
+			filteredFirmen: [],
+			filteredOrte: null,
+			abortController: {
+				firmen: null,
+				standorte: null
+			},
+		}
 	},
 	watch: {
 		uid() {
