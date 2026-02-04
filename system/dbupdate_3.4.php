@@ -90,6 +90,7 @@ require_once('dbupdate_3.4/61164_abgabetool_quality_gates.php');
 require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
 require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
+require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
