@@ -892,11 +892,6 @@ class Abgabe extends FHCAPI_Controller
 			};
 			
 			$projektarbeit->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
-
-//			// check the signature status for enduploads
-//			foreach($projektarbeit->abgabetermine as $abgabe) {
-//				$this->checkAbgabeSignatur($abgabe, $projektarbeit);
-//			}
 		}
 		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
