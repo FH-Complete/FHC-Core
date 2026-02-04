@@ -8,7 +8,7 @@ export default {
 		FilterItem
 	},
 	props: {
-		filterActive: Boolean,
+		filterActive: Number,
 	},
 	emits: [
 		'change'

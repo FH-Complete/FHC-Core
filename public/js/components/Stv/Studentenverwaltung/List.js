@@ -578,7 +578,7 @@ export default {
 			</template>
 
 			<template #actions v-if="filter.length">
-			  <div class="d-flex align-items-center gap-2 ps-4">
+			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
 				<p class="text-danger mb-0">
 				  <strong>{{$p.t('filter','filterActive')}}</strong>
 				</p>
