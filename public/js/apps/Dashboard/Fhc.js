@@ -14,6 +14,7 @@ import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
 import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
+import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 
@@ -54,6 +55,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Abgabetool/Mitarbeiter`,
 			name: 'AbgabetoolMitarbeiter',
 			component: AbgabetoolMitarbeiter,
+			props: true
+		},
+		{
+			path: `/Cis/Abgabetool/Assistenz/:stg_kz_prop?`,
+			name: 'AbgabetoolAssistenz',
+			component: AbgabetoolAssistenz,
 			props: true
 		},
 		{
@@ -228,13 +235,16 @@ const app = Vue.createApp({
 	components: {},
 	computed: {
 		isMobile() {
-			return /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
+			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+			return smallScreen;// && touchCapable;
 		}	
 	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			renderers: Vue.computed(() => this.renderers),
+			isMobile: this.isMobile
 		}	
 	},
 	methods: {
@@ -273,6 +283,7 @@ const app = Vue.createApp({
 		}
 	},
 	async created(){
+		
 		await this.$api
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)
@@ -313,6 +324,7 @@ const app = Vue.createApp({
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);
+		
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);

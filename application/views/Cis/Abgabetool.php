@@ -12,18 +12,10 @@ $includesArray = array(
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
 		'public/css/components/verticalsplit.css',
-		'public/css/components/searchbar/searchbar.css',
-		'public/css/Fhc.css',
-		'public/css/components/dashboard.css',
-		//'public/css/components/calendar.css', <= imported in dashboard.css
-		'public/css/components/Sprachen.css',
-		'public/css/components/MyLv.css',
 		'public/css/components/FilterComponent.css',
-		'public/css/components/Profil.css',
 		'public/css/components/FormUnderline.css',
-		'public/css/components/abgabetool/abgabe.css',
-		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css',
+		'public/css/theme/default.css',
+		'public/css/components/abgabetool/abgabe.css'
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
@@ -38,16 +30,17 @@ $includesArray = array(
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js',
+		'public/js/apps/Abgabetool/Abgabetool.js',
 	),
 
 );
 
-$this->load->view('templates/CISVUE-Header', $includesArray);
+$this->load->view('templates/FHC-Header', $includesArray);
 ?>
-<div id="fhccontent" class="h-100" route=<?php echo $route ?>>
-	<router-view 
-			:view-data='<?php echo json_encode($viewData) ?>'
-	></router-view>
+<div id="abgabetoolroot" class="h-100" style="max-width: 95%;" route=<?php echo json_encode($route) ?> 
+	uid=<?php echo $uid ?> 
+	 student_uid_prop="<?php echo $student_uid_prop ?? '' ?>"
+	stg_kz_prop="<?php echo $stg_kz_prop ?? '' ?>"
+	>
 </div>
-<?php $this->load->view('templates/CISVUE-Footer', $includesArray); ?>
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
