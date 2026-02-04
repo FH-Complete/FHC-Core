@@ -601,7 +601,7 @@ export const Benotungstool = {
 					},
 					widthGrow: 1
 				},
-				{title: '', width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote, variableHeight: true},
+				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorschlag_übernehmen'))), width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote, variableHeight: true},
 				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4lvnote'))), field: 'lv_note',
 					formatter: this.notenFormatter,
 					headerFilter: 'list',

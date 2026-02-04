@@ -51783,6 +51783,26 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'benotungstool',
+		'phrase' => 'c4vorschlag_übernehmen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vorschlag übernehmen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'apply suggestion',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// CIS4 GESAMTNOTENEINGABE ENDE ------------------------------------------------------------------------------------
 	array(
 		'app' => 'core',
