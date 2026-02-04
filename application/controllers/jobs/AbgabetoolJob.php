@@ -502,7 +502,7 @@ class AbgabetoolJob extends JOB_Controller
 
 			// send email with bundled info
 			sendSanchoMail(
-				'paabgabeUpdatesBetSM',
+				'PaabgabeUpdatesBetSM',
 				$body_fields,
 				$email,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
@@ -605,7 +605,7 @@ class AbgabetoolJob extends JOB_Controller
 
 			// send email with bundled info
 			sendSanchoMail(
-				'paabgabeUpdatesSammelmail',
+				'PaabgabeUpdatesSammelmail',
 				$body_fields,
 				$uid.'@'.DOMAIN,
 				$this->p->t('abgabetool', 'changedAbgabeterminev2')
