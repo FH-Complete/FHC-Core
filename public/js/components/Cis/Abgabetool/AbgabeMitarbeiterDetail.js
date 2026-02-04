@@ -53,7 +53,8 @@ export const AbgabeMitarbeiterDetail = {
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
 				icon: "fa fa-user-check",
-				command: this.openBenotung
+				command: this.openBenotung,
+				disabled: Vue.computed(()=> this.assistenzMode == true)
 			},
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4plagiatcheck_link')),
@@ -730,11 +731,11 @@ export const AbgabeMitarbeiterDetail = {
 				<p> {{getProjektarbeitStudent}}</p>
 				<p> {{getProjektarbeitTitel}}</p>
 				<template v-if="assistenzMode">
-					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{$capitalize( $p.t('abgabetool/c4betreuer') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
-					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{$capitalize( $p.t('abgabetool/c4zweitbetreuer') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{ projektarbeit.betreuerart ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart)) : $capitalize( $p.t('abgabetool/c4betreuer') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{ projektarbeit?.zweitbetreuer_betreuerart_kurzbz ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)) : $capitalize( $p.t('abgabetool/c4zweitbetreuer') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
 				</template>
 				<template v-else>
-					<p v-if="projektarbeit?.betreuer"> {{$p.t('abgabetool/c4betreuer')}}: {{projektarbeit?.betreuer?.first}}</p>
+					<p v-if="projektarbeit?.betreuer"> {{$capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz))}}: {{projektarbeit?.betreuer?.first}}</p>
 				</template>		
 			</div>
 			<div class="col-6 d-flex justify-content-end align-items-start">
