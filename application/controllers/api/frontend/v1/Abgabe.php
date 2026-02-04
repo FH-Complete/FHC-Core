@@ -45,8 +45,9 @@ class Abgabe extends FHCAPI_Controller
 			'getProjektarbeitenForStudiengang' =>array('basis/abgabe_assistenz:rw'),
 			'getStudiengaenge' => array('basis/abgabe_assistenz:rw'),
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
-			]);
+			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'getSignaturStatusForProjektarbeitAbgaben' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
+		]);
 
 		$this->load->library('PhrasesLib');
 		$this->load->library('SignatureLib');
@@ -151,7 +152,7 @@ class Abgabe extends FHCAPI_Controller
 			$ret = $this->ProjektarbeitModel->getProjektarbeitAbgabetermine($projektarbeit_id);
 
 			foreach ($ret->retval as $termin) {
-				$this->checkAbgabeSignatur($termin, $projektarbeit);
+				$this->checkAbgabeSignatur($termin, $projektarbeit->student_uid);
 			}
 
 			$this->terminateWithSuccess(array($ret, $projektarbeitIsCurrent));
@@ -398,7 +399,7 @@ class Abgabe extends FHCAPI_Controller
 						$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
 					}
 
-					$this->checkAbgabeSignatur($paabgabe, $projektarbeit);
+					$this->checkAbgabeSignatur($paabgabe, $projektarbeit->student_uid);
 					$signaturstatus = $paabgabe->signatur;
 
 					// update projektarbeit cols
@@ -892,10 +893,10 @@ class Abgabe extends FHCAPI_Controller
 			
 			$projektarbeit->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
 
-			// check the signature status for enduploads
-			foreach($projektarbeit->abgabetermine as $abgabe) {
-				$this->checkAbgabeSignatur($abgabe, $projektarbeit);
-			}
+//			// check the signature status for enduploads
+//			foreach($projektarbeit->abgabetermine as $abgabe) {
+//				$this->checkAbgabeSignatur($abgabe, $projektarbeit);
+//			}
 		}
 		
 		$this->terminateWithSuccess(array($projektarbeiten, DOMAIN));
@@ -1021,10 +1022,33 @@ class Abgabe extends FHCAPI_Controller
 		$this->terminateWithSuccess($result);
 	}
 
+	// used to lazy load signatur status for assistenzen, since they could run into very long fetch times
+	// since they fetch the projektarbeiten with paabgaben included and could have a lot of huge endupload files
+	// in their stg resulting in huge loading times -> use this api call on opening detail component instead
+	public function getSignaturStatusForProjektarbeitAbgaben() {
+		$paabgabe_ids = $this->input->post('paabgabe_ids');
+		$student_uid = $this->input->post('student_uid');
+
+		if ($paabgabe_ids === NULL || $student_uid === NULL || trim((string)$student_uid) === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+		
+		$result = $this->PaabgabeModel->loadByIDs($paabgabe_ids);
+		$data = $this->getDataOrTerminateWithError($result);
+		
+		foreach($data as $paabgabetermin) {
+			$this->checkAbgabeSignatur($paabgabetermin, $student_uid);
+		}
+		
+		$this->terminateWithSuccess($data);
+	}
+
 	/**
 	 * helper function to check the signature status of uploaded files for zwischenabgabe & endupload
 	 */
-	private function checkAbgabeSignatur($abgabe, $projektarbeit) {
+	private function checkAbgabeSignatur($abgabe, $student_uid) {
 		$paabgabetypenToCheck = $this->config->item('SIGNATUR_CHECK_PAABGABETYPEN');
 
 		if(!in_array($abgabe->paabgabetyp_kurzbz, $paabgabetypenToCheck)) {
@@ -1036,7 +1060,7 @@ class Abgabe extends FHCAPI_Controller
 			return;
 		}
 
-		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$projektarbeit->student_uid.'.pdf';
+		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$student_uid.'.pdf';
 		
 		$signaturVorhanden = null; // if frontend receives null -> indicates no file found at path
 		if(file_exists($path)) {

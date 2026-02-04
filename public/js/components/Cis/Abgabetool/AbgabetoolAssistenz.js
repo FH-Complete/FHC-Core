@@ -684,7 +684,18 @@ export const AbgabetoolAssistenz = {
 			
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
-			// pa.isCurrent = res.data[1]
+			if(pa?.abgabetermine?.length) {
+				this.$api.call(ApiAbgabe.getSignaturStatusForProjektarbeitAbgaben(pa.abgabetermine.map(termin => termin.paabgabe_id), pa.student_uid))
+					.then(res => {
+						if(res.meta.status === 'success') {
+							res.data.forEach(paabgabe => {
+								const termin = pa.abgabetermine.find(abgabe => abgabe.paabgabe_id == paabgabe.paabgabe_id)
+								if(termin && paabgabe.signatur !== undefined) termin.signatur = paabgabe.signatur
+							})
+						}
+					})
+			}
+			
 			const paIsBenotet = pa.note !== null
 			
 			pa.abgabetermine.forEach(termin => {
