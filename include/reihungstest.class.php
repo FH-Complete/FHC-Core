@@ -63,6 +63,7 @@ class reihungstest extends basis_db
 	
 	public $zugangs_ueberpruefung = false; //boolean
 	public $zugangscode; //smallint
+	public $externe_ueberwachung = false; //boolean
 
 
 	/**
@@ -119,6 +120,7 @@ class reihungstest extends basis_db
 				$this->aufnahmegruppe_kurzbz = $row->aufnahmegruppe_kurzbz;
 				$this->zugangs_ueberpruefung = $this->db_parse_bool($row->zugangs_ueberpruefung);
 				$this->zugangscode = $row->zugangscode;
+				$this->externe_ueberwachung = $this->db_parse_bool($row->externe_ueberwachung);
 
 				return true;
 			}
@@ -234,7 +236,7 @@ class reihungstest extends basis_db
 
 			$qry = 'BEGIN; INSERT INTO public.tbl_reihungstest (studiengang_kz, ort_kurzbz, anmerkung, datum, uhrzeit,
 				insertamum, insertvon, updateamum, updatevon, max_teilnehmer, oeffentlich, freigeschaltet,
-				studiensemester_kurzbz, stufe, anmeldefrist, aufnahmegruppe_kurzbz, zugangs_ueberpruefung, zugangscode) VALUES('.
+				studiensemester_kurzbz, stufe, anmeldefrist, aufnahmegruppe_kurzbz, zugangs_ueberpruefung, zugangscode, externe_ueberwachung) VALUES('.
 				$this->db_add_param($this->studiengang_kz, FHC_INTEGER).', '.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->anmerkung).', '.
@@ -250,7 +252,8 @@ class reihungstest extends basis_db
 				$this->db_add_param($this->anmeldefrist).','.
 				$this->db_add_param($this->aufnahmegruppe_kurzbz). ',' .
 				$this->db_add_param($this->zugangs_ueberpruefung, FHC_BOOLEAN).','.
-				$this->db_add_param($this->zugangscode) . ');';
+				$this->db_add_param($this->zugangscode) . ','.
+				$this->db_add_param($this->externe_ueberwachung, FHC_BOOLEAN) . ');';
 		}
 		else
 		{
@@ -270,7 +273,8 @@ class reihungstest extends basis_db
 				'anmeldefrist='.$this->db_add_param($this->anmeldefrist).', '.
 				'aufnahmegruppe_kurzbz='.$this->db_add_param($this->aufnahmegruppe_kurzbz).', '.
 				'zugangs_ueberpruefung='.$this->db_add_param($this->zugangs_ueberpruefung, FHC_BOOLEAN).', '.
-				'zugangscode='.$this->db_add_param($this->zugangscode).' '.
+				'zugangscode='.$this->db_add_param($this->zugangscode).', '.
+				'externe_ueberwachung='.$this->db_add_param($this->externe_ueberwachung, FHC_BOOLEAN).' '.
 				'WHERE reihungstest_id='.$this->db_add_param($this->reihungstest_id, FHC_INTEGER, false).';';
 		}
 

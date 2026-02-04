@@ -4,7 +4,7 @@ export const FhcOverlay = {
 		active: {
 			type: Boolean,
 			default: false
-		}
+		}	
 	},
 	template: `	
 		<div v-show="active"

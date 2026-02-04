@@ -46,7 +46,8 @@ export default {
 		"hiddenBsModal",
 		"hidePreventedBsModal",
 		"showBsModal",
-		"shownBsModal"
+		"shownBsModal",
+		"toggleFullscreen"
 	],
 	methods: {
 		dispose() {
@@ -66,6 +67,7 @@ export default {
 		},
 		toggleFullscreen() {
 			this.fullscreen = !this.fullscreen
+			this.$emit('toggleFullscreen')
 		}
 	},
 	mounted() {

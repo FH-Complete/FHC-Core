@@ -535,4 +535,53 @@ class Stundenplan_model extends DB_Model
 
 		return $this->execQuery($query, [$uid, $uid]);
 	}
+
+	/**
+	 * Get Stundenplantermine for given Lehreinheit.
+	 *
+	 * @param $lehreinheit_id
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLe($lehreinheit_id)
+	{
+		$qry = '
+			SELECT DISTINCT
+			    datum
+			FROM 
+		       	lehre.vw_stundenplan
+			WHERE 
+				lehreinheit_id = ?
+			ORDER BY 
+			    datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehreinheit_id]);
+	}
+
+	/**
+	 * Get Stundenplantermine for given Lehrveranstaltung of given Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLv($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = '
+		  	SELECT DISTINCT
+				datum
+	   		FROM
+	   		    lehre.vw_stundenplan
+	  		WHERE 
+	  		    lehreinheit_id IN (
+					SELECT lehreinheit_id
+					FROM lehre.tbl_lehreinheit 
+					WHERE lehrveranstaltung_id = ?
+					AND studiensemester_kurzbz = ?
+				)    
+	   		ORDER BY datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehrveranstaltung_id, $studiensemester_kurzbz]);
+	}
 }

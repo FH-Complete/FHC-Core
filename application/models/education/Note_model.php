@@ -19,6 +19,4 @@ class Note_model extends DB_Model
 		
 		return $this->execReadOnlyQuery($qry);
 	}
-	
-	
 }
