@@ -14,6 +14,7 @@
 			'ui',
 			'notiz',
 		),
+		'tags' => true,
 		'customCSSs' => [
 			#datepicker fuer component functions
 			'public/css/components/vue-datepicker.css',
@@ -46,6 +47,7 @@ $configArray = [
 	'showAufnahmegruppen' => !defined('FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN') ? false : FAS_REIHUNGSTEST_AUFNAHMEGRUPPEN,
 	'allowUebernahmePunkte' => !defined('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME') ? true : FAS_REIHUNGSTEST_PUNKTEUEBERNAHME,
 	'useReihungstestPunkte' => !defined('FAS_REIHUNGSTEST_PUNKTE') ? true : FAS_REIHUNGSTEST_PUNKTE,
+	'hasExcludedAreas' => defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE),
 ];
 ?>
 

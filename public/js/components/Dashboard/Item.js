@@ -144,7 +144,7 @@ export default {
 	},
 	async created() {
 		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import("../" + this.widget.setup.file)).default;
+		let component = (await import(this.widget.setup.file)).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;
 		this.component = "widget" + this.widget.widget_id;
 		this.arguments = { ...this.widget.arguments, ...this.config };

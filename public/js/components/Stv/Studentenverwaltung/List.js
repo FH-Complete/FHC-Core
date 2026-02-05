@@ -1,5 +1,11 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
+import CoreTag from '../../Tag/Tag.js';
+import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
+import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
+//import { extendedHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import ApiTag from "../../../api/factory/stv/tag.js";
 import ListFilter from './List/Filter.js';
 
 import { capitalize } from '../../../helpers/StringHelpers.js';
@@ -11,6 +17,7 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		ListNew,
+		CoreTag,
 		ListFilter
 	},
 	directives: {
@@ -36,7 +43,8 @@ export default {
 		studiensemesterKurzbz: String
 	},
 	emits: [
-		'update:selected'
+		'update:selected',
+		'filterActive'
 	],
 	data() {
 		function dateFormatter(cell)
@@ -57,6 +65,16 @@ export default {
 				columns:[
 					{title:"UID", field:"uid", headerFilter: true},
 					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{
+						title: 'Tags',
+						field: 'tags',
+						tooltip: false,
+						headerFilter: "input",
+						headerFilterFunc: tagHeaderFilter,
+						headerFilterFuncParams: {field: 'tags'},
+						formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
+						width: 150,
+					},
 					{title:"Nachname", field:"nachname", headerFilter: true},
 					{title:"Vorname", field:"vorname", headerFilter: true},
 					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
@@ -158,7 +176,7 @@ export default {
 				selectable: true,
 				selectableRangeMode: 'click',
 				index: 'prestudent_id',
-				persistenceID: 'stv-list'
+				persistenceID: 'stv-list',
 			},
 			tabulatorEvents: [
 				{
@@ -167,7 +185,10 @@ export default {
 				},
 				{
 					event: 'dataProcessed',
-					handler: this.autoSelectRows
+					handler: (data) => {
+						this.getAllRows()
+						this.autoSelectRows(data)
+					}
 				},
 				{
 					event: 'dataLoaded',
@@ -180,6 +201,18 @@ export default {
 				{
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
+				},
+				{
+					event: 'dataTreeRowExpanded',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: 'dataTreeRowCollapsed',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
@@ -188,6 +221,10 @@ export default {
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
+			//tags
+			expanded: [],
+			selectedColumnValues: [],
+			tagEndpoint: ApiTag,
 			currentEndpoint: null
 		}
 	},
@@ -239,7 +276,7 @@ export default {
 			let today = new Date().toLocaleDateString('en-GB')
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
-		}
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -328,6 +365,11 @@ export default {
 		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
 			this.lastSelected = this.selected;
+
+			//for tags
+			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
+
 			this.$emit('update:selected', data);
 
 			// set selected elements draggable
@@ -340,7 +382,7 @@ export default {
 			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
-			if (this.lastSelected) {
+			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
 				// NOTE(chris): reselect rows on refresh
 				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
 				// TODO(chris): unselect current item if it's no longer in the table?
@@ -349,7 +391,7 @@ export default {
 
 				if (selected.length)
 					this.$refs.table.tabulator.selectRow(selected);
-			} else if(this.lastSelected === undefined) {
+			} else if(data && this.lastSelected === undefined) {
 				// NOTE(chris): select row if it's the only one (preferably only on startup)
 				if (data.length == 1) {
 					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
@@ -358,13 +400,14 @@ export default {
 		},
 		updateFilter(filter) {
 			this.filter = filter;
+			this.$emit('filterActive', filter);
 			this.updateUrl();
 		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			console.log('function param endpoint: ' + JSON.stringify(endpoint));
-			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
+/*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
 			if( endpoint === undefined && this.currentEndpoint === null)
 			{
@@ -395,6 +438,7 @@ export default {
 			this.tabulatorOptions.ajaxURL = endpoint.url;
 			this.tabulatorOptions.ajaxParams = { ...params };
 			this.tabulatorOptions.ajaxConfig = {method};
+
 			if (!this.$refs.table.tableBuilt) {
 				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
@@ -472,6 +516,25 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
+		},
+		//methods tags
+		addedTag(addedTag)
+		{
+			addTagInTable(addedTag, this.allRows, 'prestudent_id')
+		},
+		deletedTag(deletedTag)
+		{
+			deleteTagInTable(deletedTag, this.allRows);
+		},
+		updatedTag(updatedTag)
+		{
+			updateTagInTable(updatedTag, this.allRows)
+		},
+		getAllRows() {
+			this.allRows = this.$refs.table.tabulator.getRows();
+		},
+		resetFilter(){
+			this.$refs.listfilter.resetFilter();
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
@@ -487,6 +550,7 @@ export default {
 			v-draggable:copyLink.capture="selectedDragObject"
 			@dragend="dragCleanup"
 		>
+
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
@@ -500,11 +564,40 @@ export default {
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 				@table-built="translateTabulator"
+				:useSelectionSpan="false"
 			>
+
+			<template #actions>
+				<core-tag ref="tagComponent"
+					:endpoint="tagEndpoint"
+					:values="selectedColumnValues"
+					@added="addedTag"
+					@deleted="deletedTag"
+					@updated="updatedTag"
+					zuordnung_typ="prestudent_id"
+				></core-tag>
+			</template>
+
+			<template #actions v-if="filter.length">
+			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
+				<p class="text-success mb-0">
+				  <strong>{{$p.t('filter','filterActive')}}</strong>
+				</p>
+
+				<button
+				  class="btn btn-outline-success sm"
+				  :title="$p.t('filter/filterDelete')"
+				  @click="resetFilter"
+				>
+				 <span class="fa-solid fa-filter-circle-xmark"></span>
+				</button>
+			  </div>
+			</template>
+
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<list-filter @change="updateFilter" />
+						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length" />
 					</div>
 				</div>
 			</template>

@@ -31,12 +31,29 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			formData: {},
+			listBegruendungen: [],
+			listNewLehrveranstaltungen: [],
+			listLektoren: [],
+			listKompatibleLehrveranstaltungen: [],
+			statusNew: true,
+			showNotizen: false,
+			currentAnrechnung_id: null,
+			endpoint: ApiNotizPerson,
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvExemptions.getAnrechnungen(this.student.prestudent_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				layout: 'fitDataStretchFrozen',
+				height: '500',
+				index: 'anrechnung_id',
+				persistenceID: 'stv-details-anrechnungen-2025112401',
 				columns: [
 					{title: "anrechnung_id", field: "anrechnung_id", visible: false},
 					{title: "lehrveranstaltung_id", field: "lehrveranstaltung_id", visible: false},
@@ -107,63 +124,43 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				height: '500',
-				index: 'anrechnung_id',
-				persistenceID: 'stv-details-anrechnungen-2025112401'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 
 						await this.$p.loadCategory(['anrechnungen', 'global', 'ui', 'lehre']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('anrechnung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'anrechnung_id'),
-						});
-						cm.getColumnByField('lehrveranstaltung_id').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrveranstaltung_id'),
-						});
-						cm.getColumnByField('bez_lehrveranstaltung').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrveranstaltung'),
-						});
-						cm.getColumnByField('begruendung').component.updateDefinition({
-							title: this.$p.t('global', 'begruendung'),
-						});
-						cm.getColumnByField('lehrveranstaltung_id_kompatibel').component.updateDefinition({
-							title: this.$p.t('anrechnung', 'lehrveranstaltung_id_kompatibel'),
-						});
-						cm.getColumnByField('lehrveranstaltung_bez_kompatibel').component.updateDefinition({
-							title: this.$p.t('anrechnung', 'lehrveranstaltung_bez_kompatibel'),
-						});
-						cm.getColumnByField('status').component.updateDefinition({
-							title: this.$p.t('global', 'status'),
-						});
-						cm.getColumnByField('genehmigt_von').component.updateDefinition({
-							title: this.$p.t('anrechnung', 'genehmigtVon'),
-						});
-						cm.getColumnByField('notizen_anzahl').component.updateDefinition({
-							title: this.$p.t('anrechnung', 'existingNotes'),
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'datum'),
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+						setHeader(	'anrechnung_id', this.$p.t('ui', 'anrechnung_id'));
+						setHeader(	'lehrveranstaltung_id', this.$p.t('lehre', 'lehrveranstaltung_id'));
+						setHeader(	'bez_lehrveranstaltung', this.$p.t('lehre', 'lehrveranstaltung'));
+						setHeader(	'begruendung', this.$p.t('global', 'begruendung'));
+						setHeader(	'lehrveranstaltung_id_kompatibel', this.$p.t('anrechnung', 'lehrveranstaltung_id_kompatibel'));
+						setHeader(	'lehrveranstaltung_bez_kompatibel', this.$p.t('anrechnung', 'lehrveranstaltung_bez_kompatibel'));
+						setHeader(	'status', this.$p.t('global', 'status'));
+						setHeader(	'genehmigt_von', this.$p.t('anrechnung', 'genehmigtVon'));
+						setHeader(	'notizen_anzahl', this.$p.t('anrechnung', 'existingNotes'));
+						setHeader(	'insertamum', this.$p.t('global', 'datum'));
 					}
 				}
-			],
-			formData: {},
-			listBegruendungen: [],
-			listNewLehrveranstaltungen: [],
-			listLektoren: [],
-			listKompatibleLehrveranstaltungen: [],
-			statusNew: true,
-			showNotizen: false,
-			currentAnrechnung_id: null,
-			endpoint: ApiNotizPerson
+			];
+			return events;
 		}
 	},
 	watch: {

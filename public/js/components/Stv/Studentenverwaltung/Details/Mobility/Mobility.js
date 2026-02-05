@@ -37,12 +37,49 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			formData: {
+				von: new Date(),
+				bis: new Date(),
+				mobilitaetsprogramm_code: 7,
+				nation_code: 'A',
+				herkunftsland_code: 'A',
+				bisio_id: null,
+				localPurposes: [],
+				localSupports: [],
+				lehrveranstaltung_id: null,
+				lehreinheit_id: null
+			},
+			statusNew: true,
+			programsMobility: [],
+			listLvs: [],
+			listLes: [],
+			listLvsAndLes: [],
+			listPurposes: [],
+			listSupports: [],
+			tabulatorData: [],
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 'auto',
+			minHeight: 200,
+		}
+	},
+	watch: {
+		student(){
+			if (this.$refs.table) {
+				this.$refs.table.reloadTable();
+			}
+		},
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvMobility.getMobilitaeten(this.student.uid)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'bisio_id',
+				persistenceID: 'stv-details-table_mobility-2025112401',
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},
@@ -63,8 +100,8 @@ export default {
 					},
 					{
 						title: "Bis",
-						 field: "bis",
-						 formatter: function (cell) {
+						field: "bis",
+						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
 
@@ -109,81 +146,49 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				minHeight: 200,
-				index: 'bisio_id',
-				persistenceID: 'stv-details-table_mobiliy-2025112401'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'dataLoaded',
 					handler: data => this.tabulatorData = data.map(item => {
-					//	item.actionDiv = document.createElement('div');
+						//	item.actionDiv = document.createElement('div');
 						return item;
 					}),
 				},
 				{
 					event: 'tableBuilt',
 					handler: async() => {
+
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['global', 'person', 'stv', 'mobility', 'ui']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz_program')
-						});
-						cm.getColumnByField('nation_code').component.updateDefinition({
-							title: this.$p.t('mobility', 'gastnation')
-						});
-						cm.getColumnByField('von').component.updateDefinition({
-							title: this.$p.t('ui', 'von')
-						});
-						cm.getColumnByField('bis').component.updateDefinition({
-							title: this.$p.t('global', 'bis')
-						});
-						cm.getColumnByField('bisio_id').component.updateDefinition({
-							title: this.$p.t('mobility', 'bisio_id')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-/*						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-						});*/
+						setHeader('kurzbz', this.$p.t('mobility', 'kurzbz_program'));
+						setHeader('nation_code', this.$p.t('mobility', 'gastnation'));
+						setHeader('von', this.$p.t('ui', 'von'));
+						setHeader('bis', this.$p.t('global', 'bis'));
+						setHeader('bisio_id', this.$p.t('mobility', 'bisio_id'));
 					}
 				}
-			],
-			formData: {
-				von: new Date(),
-				bis: new Date(),
-				mobilitaetsprogramm_code: 7,
-				nation_code: 'A',
-				herkunftsland_code: 'A',
-				bisio_id: null,
-				localPurposes: [],
-				localSupports: [],
-				lehrveranstaltung_id: null,
-				lehreinheit_id: null
-			},
-			statusNew: true,
-			programsMobility: [],
-			listLvs: [],
-			listLes: [],
-			listLvsAndLes: [],
-			listPurposes: [],
-			listSupports: [],
-			tabulatorData: []
-		}
-	},
-	watch: {
-		student(){
-			if (this.$refs.table) {
-				this.$refs.table.reloadTable();
-			}
+			];
+			return events;
 		},
-	},
-	computed:{
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
 		},

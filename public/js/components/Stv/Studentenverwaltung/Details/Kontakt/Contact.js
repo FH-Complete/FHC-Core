@@ -7,7 +7,7 @@ import FormInput from '../../../../Form/Input.js';
 import ApiStvContact from '../../../../../api/factory/stv/kontakt/contact.js';
 import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
-export default{
+export default {
 	name: 'ContactComponent',
 	components: {
 		CoreFilterCmpt,
@@ -20,11 +20,46 @@ export default{
 		uid: Number
 	},
 	data() {
-		return{
-			tabulatorOptions: {
+		return {
+			lastSelected: null,
+			contactData: {
+				zustellung: true,
+				kontakttyp: 'email',
+				firma_id: null
+			},
+			statusNew: true,
+			kontakttypen: [],
+			firmen: [],
+			filteredFirmen: [],
+			filteredOrte: null,
+			abortController: {
+				firmen: null,
+				standorte: null
+			},
+			lastSelected: null,
+			contactData: {
+				zustellung: true,
+				kontakttyp: 'email',
+				firma_id: null
+			},
+			statusNew: true,
+			kontakttypen: [],
+			firmen: [],
+			filteredFirmen: [],
+			filteredOrte: null,
+			abortController: {
+				firmen: null,
+				standorte: null
+			},
+		}
+	},
+	computed: {
+		tabulatorOptions(){
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'stv-details-kontakt-contact',
 				columns:[
 					{title:"Typ", field:"kontakttypbeschreibung"},
 					{title:"Kontakt", field:"kontakt"},
@@ -94,12 +129,13 @@ export default{
 						frozen: true
 					},
 				],
-				height:	'auto',
-				index: 'kontakt_id',
-				persistenceID: 'stv-details-kontakt-contact'
-			},
-			tabulatorEvents: [
-				{
+				height:	'auto'
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
+/*				{
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['notiz','global','person']);
@@ -139,27 +175,42 @@ export default{
 						cm.getColumnByField('standort_id').component.updateDefinition({
 							title: this.$p.t('ui', 'standort_id')
 						});
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
-				}}
-			],
-			lastSelected: null,
-			contactData: {
-				zustellung: true,
-				kontakttyp: 'email',
-				firma_id: null
-			},
-			statusNew: true,
-			kontakttypen: [],
-			firmen: [],
-			filteredFirmen: [],
-			filteredOrte: null,
-			abortController: {
-				firmen: null,
-				standorte: null
-			},
-		}
+					}
+				},	*/
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['notiz','global','person']);
+
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('kontakttypbeschreibung', this.$p.t('global', 'typ'));
+						setHeader('kontakt', this.$p.t('global', 'kontakt'));
+						setHeader('zustellung', this.$p.t('person', 'zustellung'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('name', this.$p.t('person', 'firma'));
+						setHeader('bezeichnung', this.$p.t('person', 'standort'));
+						setHeader('firma_id', this.$p.t('ui', 'firma_id'));
+						setHeader('kontakt_id', this.$p.t('ui', 'kontakt_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('standort_id', this.$p.t('ui', 'standort_id'));
+					}
+				}
+			];
+			return events;
+		},
 	},
 	watch: {
 		uid() {

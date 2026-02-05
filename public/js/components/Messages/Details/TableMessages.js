@@ -25,246 +25,13 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
-				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.loadAjaxCall,
-				ajaxParams: () => {
-					return {
-						id: this.id,
-						type: this.typeId
-					};
-				},
-				ajaxResponse: (url, params, response) => this.buildTreemap(response),
-				columns: [
-					{title: "subject", field: "subject", headerFilter: true},
-					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
-					{title: "message_id", field: "message_id", visible: false, headerFilter: true},
-					{
-						title: "Datum",
-						field: "insertamum",
-						headerFilter: true,
-						formatter: function (cell) {
-							const dateStr = cell.getValue();
-							const date = new Date(dateStr); // Convert to Date object
-							return date.toLocaleString("de-DE", {
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-								hour: "2-digit",
-								minute: "2-digit",
-								hour12: false
-							});
-						},
-						headerFilterFunc(headerValue, rowValue) {
-							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
-							let comparestr = headerValue;
-							if(matches !== null) {
-								const year = (matches[4] !== undefined) ? matches[4] : '';
-								const month = matches[3];
-								const day = (matches[2] !== undefined) ? matches[2] : '';
-								comparestr = year + '-' + month + '-' + day;
-							}
-							return rowValue.match(comparestr);
-						}
-					},
-					{title: "sender", field: "sender", headerFilter: true},
-					{title: "recipient", field: "recipient", headerFilter: true},
-					{title: "senderId", field: "sender_id", headerFilter: true},
-					{title: "recipientId", field: "recipient_id", headerFilter: true},
-					{title: "Relationmessage ID", field: "relationmessage_id", headerFilter: true},
-					{
-						title: "Status",
-						field: "status",
-						headerFilter: true,
-						formatterParams: [
-							"unread",
-							"read",
-							"archived",
-							"deleted"
-						],
-						formatter: (cell, formatterParams) => {
-							return formatterParams[cell.getValue()];
-						},
-					},
-					{
-						title: "letzte Änderung",
-						field: "statusdatum",
-						headerFilter: true,
-						formatter: function (cell) {
-							const dateStr = cell.getValue();
-							const date = new Date(dateStr); // Convert to Date object
-							return date.toLocaleString("de-DE", {
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-								hour: "2-digit",
-								minute: "2-digit",
-								hour12: false
-							});
-						},
-						headerFilterFunc(headerValue, rowValue) {
-							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
-							let comparestr = headerValue;
-							if(matches !== null) {
-								const year = (matches[4] !== undefined) ? matches[4] : '';
-								const month = matches[3];
-								const day = (matches[2] !== undefined) ? matches[2] : '';
-								comparestr = year + '-' + month + '-' + day;
-							}
-							return rowValue.match(comparestr);
-						}
-					},
-					{
-						title: 'Aktionen', field: 'actions',
-						width: 100,
-						formatter: (cell, formatterParams, onRendered) => {
-							let container = document.createElement('div');
-							container.className = "d-flex gap-2";
-
-							let button = document.createElement('button');
-							if (this.personId != cell.getData().sender_id) {
-								button.disabled = true;
-								button.style = "visibility: hidden";
-								button.ariaHidden = true;
-							}
-
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('global', 'reply');
-							button.innerHTML = '<i class="fa fa-reply"></i>';
-							button.addEventListener(
-								'click',
-								(event) =>
-									this.actionReplyToMessage(cell.getData().message_id)
-							);
-
-							container.append(button);
-
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('ui', 'loeschen');
-							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.addEventListener(
-								'click',
-								() =>
-									this.actionDeleteMessage(cell.getData().message_id)
-							);
-							container.append(button);
-
-							return container;
-						},
-						frozen: true
-					}
-					],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData:	false,
-				height: '400',
-				selectable: 1,
-				selectableRangeMode: 'click',
-				index: 'message_id',
-				pagination: true,
-				paginationMode: "remote",
-				paginationSize: 15,
-				paginationInitialPage: 1,
-				dataTree: true,
-				headerSort: true,
-				dataTreeChildField: "children",
-				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
-				dataTreeChildIndent: 15,
-				dataTreeStartExpanded: false,
-				persistenceID: 'core-message-2025112401',
-				locale: 'de',
-				"langs": {
-					"de":{ //German language definition
-						"data":{
-							"loading":"Lädt", //data loader text
-							"error":"Fehler", //data error text
-						},
-						"pagination":{
-							"first":"Erste",
-							"first_title":"Erste Seite",
-							"last":"Letzte",
-							"last_title":"Letzte Seite",
-							"prev":"Vorige",
-							"prev_title":"Vorige Seite",
-							"next":"Nächste",
-							"next_title":"Nächste Seite",
-							"all":"Alle"
-						},
-					},
-				}
-			},
-			tabulatorEvents: [
-				{
-					event: 'tableBuilt',
-					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
-
-
-						let cm = this.$refs.table.tabulator.columnManager;
-
-						cm.getColumnByField('subject').component.updateDefinition({
-							title: this.$p.t('global', 'betreff')
-						});
-						cm.getColumnByField('body').component.updateDefinition({
-							title: this.$p.t('messages', 'body')
-						});
-						cm.getColumnByField('message_id').component.updateDefinition({
-							title: this.$p.t('messages', 'message_id')
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('sender').component.updateDefinition({
-							title: this.$p.t('messages', 'sender')
-						});
-						cm.getColumnByField('recipient').component.updateDefinition({
-							title: this.$p.t('messages', 'recipient')
-						});
-						cm.getColumnByField('sender_id').component.updateDefinition({
-							title: this.$p.t('messages', 'senderId')
-						});
-						cm.getColumnByField('recipient_id').component.updateDefinition({
-							title: this.$p.t('messages', 'recipientId')
-						});
-						cm.getColumnByField('statusdatum').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('status').component.updateDefinition({
-							formatterParams: [
-								this.$p.t('messages/unread'),
-								this.$p.t('messages/read'),
-								this.$p.t('messages/archived'),
-								this.$p.t('messages/deleted')
-							]
-						});
-						this.$refs.table.tabulator.rowManager.getDisplayRows();
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-												});
-						*/
-					}
-				},
-				{
-					event: 'rowClick',
-					handler: (e, row) => {
-							const selectedMessage = row.getData().message_id;
-							const body = row.getData().body;
-							this.previewBody = body;
-					}
-				},
-/*
-				{
-					event: 'pageLoaded',
-					handler: (pageno) => {
-						this.pageNo = pageno+1;
-					}
-				}
-*/
-			],
 			previewBody: "",
 			open: false,
 			personId: null,
+			layoutColumnsOnNewData:	false,
+			height: '400',
+			selectable: 1,
+			selectableRangeMode: 'click',
 		}
 	},
 	methods: {
@@ -338,10 +105,10 @@ export default {
 					}
 				});
 
-			// to avoid endless loop
-			if (iteration > messages.length) break;
+				// to avoid endless loop
+				if (iteration > messages.length) break;
 			}
-		return {data: messageNested, last_page: last_page};
+			return {data: messageNested, last_page: last_page};
 		},
 		loadAjaxCall(url, config, params){
 			return this.$api.call(
@@ -350,6 +117,221 @@ export default {
 		}
 	},
 	computed: {
+		tabulatorOptions() {
+			const options = {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.loadAjaxCall,
+				ajaxParams: () => {
+					return {
+						id: this.id,
+						type: this.typeId
+					};
+				},
+				ajaxResponse: (url, params, response) => this.buildTreemap(response),
+				layout: 'fitDataStretchFrozen',
+				index: 'message_id',
+				persistenceID: 'core-message-2025112401',
+				columns: [
+					{title: "subject", field: "subject", headerFilter: true},
+					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
+					{title: "message_id", field: "message_id", visible: false, headerFilter: true},
+					{
+						title: "Datum",
+						field: "insertamum",
+						headerFilter: true,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
+						}
+					},
+					{title: "sender", field: "sender", headerFilter: true},
+					{title: "recipient", field: "recipient", headerFilter: true},
+					{title: "senderId", field: "sender_id", headerFilter: true},
+					{title: "recipientId", field: "recipient_id", headerFilter: true},
+					{title: "Relationmessage ID", field: "relationmessage_id", headerFilter: true},
+					{
+						title: "Status",
+						field: "status",
+						headerFilter: true,
+						formatterParams: [
+							"unread",
+							"read",
+							"archived",
+							"deleted"
+						],
+/*						formatter: (cell, formatterParams) => {
+							return formatterParams[cell.getValue()];
+						},*/
+						formatter: (cell, formatterParams) => {
+							const key = formatterParams[cell.getValue()];
+							return this.$p.t('messages', key);
+						},
+					},
+					{
+						title: "letzte Änderung",
+						field: "statusdatum",
+						headerFilter: true,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
+						}
+					},
+					{
+						title: 'Aktionen', field: 'actions',
+						width: 100,
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							if (this.personId != cell.getData().sender_id) {
+								button.disabled = true;
+								button.style = "visibility: hidden";
+								button.ariaHidden = true;
+							}
+
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('global', 'reply');
+							button.innerHTML = '<i class="fa fa-reply"></i>';
+							button.addEventListener(
+								'click',
+								(event) =>
+									this.actionReplyToMessage(cell.getData().message_id)
+							);
+
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('ui', 'loeschen');
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener(
+								'click',
+								() =>
+									this.actionDeleteMessage(cell.getData().message_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					}
+				],
+				pagination: true,
+				paginationMode: "remote",
+				paginationSize: 15,
+				paginationInitialPage: 1,
+				dataTree: true,
+				headerSort: true,
+				dataTreeChildField: "children",
+				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
+				dataTreeChildIndent: 15,
+				dataTreeStartExpanded: false,
+				locale: 'de',
+				"langs": {
+					"de":{ //German language definition
+						"data":{
+							"loading":"Lädt", //data loader text
+							"error":"Fehler", //data error text
+						},
+						"pagination":{
+							"first":"Erste",
+							"first_title":"Erste Seite",
+							"last":"Letzte",
+							"last_title":"Letzte Seite",
+							"prev":"Vorige",
+							"prev_title":"Vorige Seite",
+							"next":"Nächste",
+							"next_title":"Nächste Seite",
+							"all":"Alle"
+						},
+					},
+				}
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
+
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('subject', this.$p.t('global', 'betreff'));
+						setHeader('body', this.$p.t('messages', 'body'));
+						setHeader('message_id', this.$p.t('messages', 'message_id'));
+						setHeader('insertamum', this.$p.t('global', 'datum'));
+						setHeader('sender', this.$p.t('messages', 'sender'));
+						setHeader('recipient', this.$p.t('messages', 'recipient'));
+						setHeader('sender_id', this.$p.t('messages', 'senderId'));
+						setHeader('recipient_id', this.$p.t('messages', 'recipientId'));
+						setHeader('statusdatum', this.$p.t('notiz', 'letzte_aenderung'));
+
+						this.$refs.table.tabulator.rowManager.getDisplayRows();
+					}
+				},
+				{
+					event: 'rowClick',
+					handler: (e, row) => {
+						const selectedMessage = row.getData().message_id;
+						const body = row.getData().body;
+						this.previewBody = body;
+					}
+				},
+			];
+			return events;
+		},
 		statusText(){
 			return {
 				0: this.$p.t('messsages', 'unread'),
@@ -361,13 +343,13 @@ export default {
 	},
 	mounted() {
 		// change to target="_blank"
-/*		this.$nextTick(() => {
-			const links = document.querySelectorAll('.preview a');
-			links.forEach(link => {
-				link.setAttribute('target', '_blank');
-				link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
-			});
-		});*/
+		/*		this.$nextTick(() => {
+					const links = document.querySelectorAll('.preview a');
+					links.forEach(link => {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
+					});
+				});*/
 	},
 	created(){
 		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
@@ -382,6 +364,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
+
 	},
 	template: `
 	<div class="messages-detail-table">

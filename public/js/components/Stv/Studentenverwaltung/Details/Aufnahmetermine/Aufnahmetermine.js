@@ -23,6 +23,10 @@ export default {
 			from: 'configUseReihungstestPunkte',
 			default: true
 		},
+		hasExcludedAreas: {
+			from: 'configHasExcludedAreas',
+			default: false
+		},
 		$reloadList: {
 			from: '$reloadList',
 			required: true
@@ -35,159 +39,20 @@ export default {
 		student: Object
 	},
 	data() {
+		let self = this;
 		return {
-			tabulatorOptions: {
-				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(
-					ApiStvAdmissionDates.getAufnahmetermine(this.student.person_id)
-				),
-				ajaxResponse: (url, params, response) => response.data,
-				columns: [
-					{title: "rt_id", field: "rt_id", visible: false},
-					{title: "rt_person_id", field: "rt_person_id", visible: false},
-					{title: "person_id", field: "person_id", visible: false},
-					{title: "datum", field: "datum",
-						formatter: function (cell) {
-							const dateStr = cell.getValue();
-							if (!dateStr) return "";
-
-							const date = new Date(dateStr);
-							return date.toLocaleString("de-DE", {
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-							});
-						}
-					},
-					{title: "stufe", field: "stufe"},
-					{title: "studiensemester", field: "studiensemester"},
-					{title: "anmerkung", field: "anmerkung", visible: false},
-					{title: "anmeldedatum", field: "anmeldedatum", visible: false,
-						formatter: function (cell) {
-							const dateStr = cell.getValue();
-							if (!dateStr) return "";
-
-							const date = new Date(dateStr);
-							return date.toLocaleString("de-DE", {
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-							});
-						}
-					},
-					{title: "punkte", field: "punkte"},
-					{
-						title: "teilgenommen", field: "teilgenommen",
-						formatter: "tickCross",
-						hozAlign: "center",
-						formatterParams: {
-							tickElement: '<i class="fa fa-check text-success"></i>',
-							crossElement: '<i class="fa fa-xmark text-danger"></i>'
-						}
-					},
-					{title: "ort", field: "ort", visible: false},
-					{title: "studienplan", field: "studienplan", visible: false},
-					{title: "studienplan_id", field: "studienplan_id", visible: false},
-					{title: "stg", field: "studiengangkurzbzlang"},
-					{title: "Stg", field: "stg_kuerzel"},
-					{
-						title: 'Aktionen', field: 'actions',
-						minWidth: 150, // Ensures Action-buttons will be always fully displayed
-						formatter: (cell, formatterParams, onRendered) => {
-							let container = document.createElement('div');
-							container.className = "d-flex gap-2";
-
-							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = this.$p.t('ui', 'bearbeiten');
-							button.addEventListener('click', (event) =>
-								this.actionEditPlacementTest(cell.getData().rt_person_id)
-							);
-							container.append(button);
-
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = this.$p.t('ui', 'loeschen');
-							button.addEventListener('click', () =>
-								this.actionDeletePlacementTest(cell.getData().rt_person_id)
-							);
-							container.append(button);
-
-							return container;
-						},
-						frozen: true
-					}
-				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				minHeight: 200,
-				index: 'aufnahmetermin_id',
-				persistenceID: 'stv-details-table_admission-dates-2025112401'
-			},
-			tabulatorEvents: [
-				{
-					event: 'tableBuilt',
-					handler: async () => {
-						await this.$p.loadCategory(['admission', 'global', 'person', 'ui', 'projektarbeitsbeurteilung']);
-						let cm = this.$refs.table.tabulator.columnManager;
-
-						cm.getColumnByField('rt_id').component.updateDefinition({
-							title: this.$p.t('ui', 'reihungstest_id')
-						});
-						cm.getColumnByField('rt_person_id').component.updateDefinition({
-							title: this.$p.t('ui', 'reihungstest_person_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('stufe').component.updateDefinition({
-							title: this.$p.t('admission', 'stufe')
-						});
-						cm.getColumnByField('studiensemester').component.updateDefinition({
-							title: this.$p.t('lehre', 'studiensemester')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('anmeldedatum').component.updateDefinition({
-							title: this.$p.t('admission', 'anmeldedatum')
-						});
-						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('exam', 'punkte')
-						});
-						cm.getColumnByField('teilgenommen').component.updateDefinition({
-							title: this.$p.t('admission', 'teilgenommen')
-						});
-						cm.getColumnByField('ort').component.updateDefinition({
-							title: this.$p.t('person', 'ort')
-						});
-						cm.getColumnByField('studienplan').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
-						cm.getColumnByField('studienplan_id').component.updateDefinition({
-							title: this.$p.t('ui', 'studienplan_id')
-						});
-						cm.getColumnByField('studiengangkurzbzlang').component.updateDefinition({
-							title: this.$p.t('projektarbeitsbeurteilung', 'studiengang')
-						});
-						cm.getColumnByField('stg_kuerzel').component.updateDefinition({
-							title: this.$p.t('admission', 'stg_kurz')
-						});
-					}
-				}
-			],
 			formData: {},
 			statusNew: true,
 			listPlacementTests: [],
 			listStudyPlans: [],
 			filterOnlyFutureTestsSet: false,
-			filteredPlacementTests: []
+			filteredPlacementTests: [],
+			youngestSemester: null,
+			stgRtPers: null,
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 'auto',
+			minHeight: 200
 		}
 	},
 	methods: {
@@ -197,11 +62,12 @@ export default {
 			this.formData.anmeldedatum = new Date();
 			this.$refs.placementTestModal.show();
 		},
-		actionEditPlacementTest(rt_person_id) {
+		actionEditPlacementTest(rt_person_id, stg_kz) {
 			this.resetForm();
 			this.statusNew = false;
 			this.loadPlacementTest(rt_person_id);
 			this.$refs.placementTestModal.show();
+			this.stgRtPers = stg_kz;
 		},
 		actionDeletePlacementTest(rt_person_id) {
 			this.$fhcAlert
@@ -271,12 +137,13 @@ export default {
 					this.reload();
 				});
 		},
-		getResultReihungstest(reihungstest_id){
+		getResultReihungstest(reihungstest_id, stg_kz){
 			const paramsRt = {
 				reihungstest_id: reihungstest_id,
 				person_id: this.student.person_id,
 				punkte: this.useReihungstestPunkte,
-				studiengang_kz: this.student.studiengang_kz
+				studiengang_kz: stg_kz,
+				hasExcludedAreas: this.hasExcludedAreas
 			};
 
 			return this.$api
@@ -330,13 +197,188 @@ export default {
 		},
 		resetForm() {
 			this.formData = {};
+			this.stgRtPers = null;
 		},
+		parseSemester(semester) {
+			const type = semester.slice(0, 2).toUpperCase(); // "WS" or "SS"
+			const year = parseInt(semester.slice(2), 10);
+
+			// WS > SS
+			return year * 10 + (type === 'SS' ? 1 : 2);
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const self = this;
+
+			const options = {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(
+					ApiStvAdmissionDates.getAufnahmetermine(this.student.person_id)
+				),
+				ajaxResponse: (url, params, response) => {
+					const data = response.data;
+
+					const filtered = data.filter(item =>
+						item.studiengang_kz_ber === this.student.studiengang_kz
+					);
+
+					if (filtered.length > 0) {
+						filtered.sort((a, b) =>
+							this.parseSemester(b.studiensemester) - this.parseSemester(a.studiensemester)
+						);
+						self.youngestSemester = filtered[0].studiensemester;
+					} else {
+						self.youngestSemester = null;
+					}
+
+					return data;
+				},
+				rowFormatter: function(row) {
+					let data = row.getData();
+					if (data.studiengang_kz_ber === self.student.studiengang_kz &&
+						data.studiensemester === self.youngestSemester) {
+						let cells = row.getCells();
+						cells.forEach((c) => {
+								c.getElement().classList.add("row-green");
+							}
+						);
+					}
+				},
+				dataLoaded: function() {
+					this.redraw(true);
+				},
+				index: 'aufnahmetermin_id',
+				persistenceID: 'stv-details-table_admission-dates-2025112401',
+				columns: [
+					{title: "rt_id", field: "rt_id", visible: false},
+					{title: "rt_person_id", field: "rt_person_id", visible: false},
+					{title: "person_id", field: "person_id", visible: false},
+					{title: "datum", field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
+					{title: "stufe", field: "stufe"},
+					{title: "studiensemester", field: "studiensemester"},
+					{title: "anmerkung", field: "anmerkung", visible: false},
+					{title: "anmeldedatum", field: "anmeldedatum", visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+							});
+						}
+					},
+					{title: "punkte", field: "punkte"},
+					{
+						title: "teilgenommen", field: "teilgenommen",
+						formatter: "tickCross",
+						hozAlign: "center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
+						}
+					},
+					{title: "ort", field: "ort", visible: false},
+					{title: "studienplan", field: "studienplan", visible: false},
+					{title: "studienplan_id", field: "studienplan_id", visible: false},
+					//{title: "stg", field: "studiengangkurzbzlang"},
+					{title: "stg_ber", field: "studiengangkurzbzlang_ber"},
+					{title: "Stg_Kz", field: "studiengang_kz_ber", visible: false},
+					{
+						title: 'Aktionen', field: 'actions',
+						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('ui', 'bearbeiten');
+							button.addEventListener('click', (event) =>
+								this.actionEditPlacementTest(cell.getData().rt_person_id, cell.getData().studiengang_kz_ber)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.title = this.$p.t('ui', 'loeschen');
+							button.addEventListener('click', () =>
+								this.actionDeletePlacementTest(cell.getData().rt_person_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					}
+				],
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+						await this.$p.loadCategory(['admission', 'global', 'person', 'ui', 'projektarbeitsbeurteilung']);
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('rt_id', this.$p.t('ui', 'reihungstest_id'));
+						setHeader('rt_person_id', this.$p.t('ui', 'reihungstest_person_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('stufe', this.$p.t('admission', 'stufe'));
+						setHeader('studiensemester', this.$p.t('lehre', 'studiensemester'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('anmeldedatum', this.$p.t('admission', 'anmeldedatum'));
+						setHeader('punkte', this.$p.t('exam', 'punkte'));
+						setHeader('teilgenommen', this.$p.t('admission', 'teilgenommen'));
+						setHeader('ort', this.$p.t('person', 'ort'));
+						setHeader('studienplan', this.$p.t('lehre', 'studienplan'));
+						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));
+						setHeader('studiengangkurzbzlang_ber', this.$p.t('projektarbeitsbeurteilung', 'studiengang'));
+						setHeader('studiengang_kz_ber', this.$p.t('admission', 'stg_kurz'));
+					}
+				}
+			];
+
+			return events;
+		}
 	},
 	created() {
 		this.$api
 			.call(ApiStvAdmissionDates.getListPlacementTests(this.student.prestudent_id))
 			.then(result => {
-				this.listPlacementTests = this.filteredPlacementTests = result.data;
+				if(result.data)
+					this.listPlacementTests = this.filteredPlacementTests = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
@@ -488,7 +530,7 @@ export default {
 				
 					<div v-if="allowUebernahmePunkte" class="col-4">
 						<label class="form-label" style="color:transparent;">getPunkte</label>
-						<button class="btn btn-outline-secondary w-100" @click="getResultReihungstest(formData.rt_id)">{{ $p.t('admission', 'getRTErgebnis') }}</button>
+						<button class="btn btn-outline-secondary w-100" @click="getResultReihungstest(formData.rt_id, stgRtPers)">{{ $p.t('admission', 'getRTErgebnis') }}</button>
 					</div>
 
 				</div>				

@@ -17,11 +17,23 @@ export default{
 		uid: Number
 	},
 	data() {
-		return{
-			tabulatorOptions: {
+		return {
+			lastSelected: null,
+			bankverbindungData: {
+				verrechnung: true,
+				typ: 'p'
+			},
+			statusNew: true,
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvBankaccount.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'bankverbindung_id',
+				persistenceID: 'stv-details-kontakt-bankaccount',
 				columns:[
 					{title:"Name", field:"name"},
 					{title:"Anschrift", field:"anschrift", visible:false},
@@ -86,56 +98,41 @@ export default{
 						frozen: true
 					},
 				],
-				height:	'auto',
-				index: 'bankverbindung_id',
-				persistenceID: 'stv-details-kontakt-bankaccount'
-			},
-			tabulatorEvents: [
+				height:	'auto'
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['global','person']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('name').component.updateDefinition({
-							title: this.$p.t('global', 'name')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('typ').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('anschrift').component.updateDefinition({
-							title: this.$p.t('person', 'anschrift')
-						});
-						cm.getColumnByField('kontonr').component.updateDefinition({
-							title: this.$p.t('person', 'kontonr')
-						});
-						cm.getColumnByField('blz').component.updateDefinition({
-							title: this.$p.t('person', 'blz')
-						});
-						cm.getColumnByField('verrechnung').component.updateDefinition({
-							title: this.$p.t('person', 'verrechnung')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('bankverbindung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'bankverbindung_id')
-						});
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('name', this.$p.t('global','name'));
+						setHeader('typ', this.$p.t('global','typ'));
+						setHeader('anschrift', this.$p.t('person','anschrift'));
+						setHeader('kontonr', this.$p.t('person','kontonr'));
+						setHeader('blz', this.$p.t('person','blz'));
+						setHeader('verrechnung', this.$p.t('person','verrechnung'));
 					}
 				}
-			],
-			lastSelected: null,
-			bankverbindungData: {
-				verrechnung: true,
-				typ: 'p'
-			},
-			statusNew: true
-		}
+			];
+			return events;
+		},
 	},
 	watch: {
 		uid() {

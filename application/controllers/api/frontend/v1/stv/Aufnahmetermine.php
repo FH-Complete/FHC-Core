@@ -36,15 +36,44 @@ class Aufnahmetermine extends FHCAPI_Controller
 		// Load models
 		$this->load->model('crm/Reihungstest_model', 'ReihungstestModel');
 		$this->load->model('crm/RtPerson_model', 'RtPersonModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 	}
 
 	public function getAufnahmetermine($person_id)
 	{
 		$result = $this->ReihungstestModel->getReihungstestPerson($person_id);
+		$arrayRt = $this->getDataOrTerminateWithError($result);
 
-		$data = $this->getDataOrTerminateWithError($result);
+		foreach ($arrayRt as $item) {
+			//Studienplan
+			$result = $this->StudienplanModel->loadWhere([
+				'studienplan_id' => $item->studienplan_id
+			]);
+			$data = $this->getDataOrTerminateWithError($result);
+			$studienordnung_id_ber = current($data)->studienordnung_id;
 
-		$this->terminateWithSuccess($data);
+			//Studienordnung
+			$result = $this->StudienordnungModel->loadWhere([
+				'studienordnung_id' => $studienordnung_id_ber
+			]);
+			$data = $this->getDataOrTerminateWithError($result);
+			$studiengang_kz_ber = current($data)->studiengang_kz;
+
+			//Studiengang von studiengang_kz_ber
+			$result = $this->StudiengangModel->load($studiengang_kz_ber);
+			$data = $this->getDataOrTerminateWithError($result);
+
+			$studiengangkurzbzlang_ber = current($data)->kurzbzlang;
+			$typ_ber = current($data)->typ;
+
+			//add to Array
+			$item->studiengang_kz_ber = $studiengang_kz_ber;
+			$item->studiengangkurzbzlang_ber = $studiengangkurzbzlang_ber;
+			$item->studiengangtyp_ber = $typ_ber;
+		}
+		$this->terminateWithSuccess($arrayRt);
 	}
 
 	public function insertAufnahmetermin()
@@ -59,7 +88,6 @@ class Aufnahmetermine extends FHCAPI_Controller
 		{
 			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
 		}
-
 
 		$rt_id = (isset($formData['rt_id']) && !empty($formData['rt_id'])) ? $formData['rt_id'] : null;
 		$anmeldedatum =	(isset($formData['anmeldedatum']) && !empty($formData['anmeldedatum'])) ? $formData['anmeldedatum'] : null;
@@ -224,7 +252,11 @@ class Aufnahmetermine extends FHCAPI_Controller
 			)
 		);
 
-		$data = $this->getDataOrTerminateWithError($result);
+		//check if existing placementtest
+		if(!hasData($result))
+			$this->terminateWithSuccess([]);
+		else
+			$data = getData($result);
 
 		$studienplan_arr = [];
 		$include_ids = [];
@@ -233,12 +265,18 @@ class Aufnahmetermine extends FHCAPI_Controller
 			if($item->studienplan_id != null)
 				$studienplan_arr[] = $item->studienplan_id;
 		}
+		if(!hasData($studienplan_arr))
+			$this->terminateWithSuccess([]);
 
 		//get Placementtests Person
 		$person_id = $this->_getPersonId($prestudent_id);
 		$resultRt = $this->ReihungstestModel->getReihungstestPerson($person_id);
 
-		$dataRt = $this->getDataOrTerminateWithError($resultRt);
+		//check if existing placementtest
+		if(!hasData($result))
+			$this->terminateWithSuccess([]);
+		else
+			$dataRt = getData($resultRt);
 
 		foreach ($dataRt as $item)
 		{
@@ -354,6 +392,7 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$person_id = $this->input->get('person_id');
 		$punkte = $this->input->get('punkte');
 		$reihungstest_id = $this->input->get('reihungstest_id');
+		$has_excluded_gebiete = $this->input->get('hasExcludedAreas');
 
 		if(!$reihungstest_id)
 		{
@@ -364,22 +403,27 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$studiengang_kz = $this->input->get('studiengang_kz');
 
 		$this->load->model('testtool/Ablauf_model', 'AblaufModel');
-		$result = $this->AblaufModel->getAblaufGebieteAndGewichte($studiengang_kz);
+		$result = $this->AblaufModel->getAblaufGebieteAndGewichte($studiengang_kz, 1);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$weightedArray = [];
+		$basis_gebiet_id_arr = [];
+		$basis_gebiet_id_toString = '';
 		foreach ($data as $abl)
 		{
 			$weightedArray[$abl->gebiet_id] = $abl->gewicht;
+			$basis_gebiet_id_arr[]= $abl->gebiet_id;
 		}
+		$basis_gebiet_id_toString = implode(', ', $basis_gebiet_id_arr);
 
-		$result = $this->ReihungstestModel->getReihungstestErgebnisPerson($person_id, $punkte, $reihungstest_id, $weightedArray);
-
-/*		if (isError($result))
-		{
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}*/
-
+		$result = $this->ReihungstestModel->getReihungstestErgebnisPerson(
+			$person_id,
+			$punkte,
+			$reihungstest_id,
+			$weightedArray,
+			$has_excluded_gebiete,
+			$basis_gebiet_id_toString
+		);
 		$this->terminateWithSuccess($result);
 	}
 

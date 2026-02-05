@@ -84,6 +84,7 @@ export default {
 			configShowAufnahmegruppen: this.config.showAufnahmegruppen,
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
 			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
+			configHasExcludedAreas: this.config.hasExcludedAreas,
 			appConfig: Vue.computed(() => this.appconfig),
 			hasZGVBakkPermission: this.permissions['student/editBakkZgv'],
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
@@ -94,6 +95,7 @@ export default {
 	},
 	data() {
 		return {
+			sidebarCollapsed: false,
 			appconfig: {},
 			configEndpoints: ApiStvConfig,
 			selected: [],
@@ -146,7 +148,8 @@ export default {
 				sprachen: [],
 				geschlechter: []
 			},
-			verbandEndpoint: ApiStvVerband
+			verbandEndpoint: ApiStvVerband,
+			filter: []
 		}
 	},
 	computed: {
@@ -392,6 +395,7 @@ export default {
 			}
 		},
 		onSearch(e) {
+			this.deleteCustomFilter();
 			const searchsettings = { ...this.$refs.searchbar.searchsettings };
 			if (searchsettings.searchstr.length >= 2) {
 				this.blurSearchbar();
@@ -420,6 +424,12 @@ export default {
 			this.$refs.searchbar.$refs.input.blur();
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
+		},
+		handleCustomFilter(filter){
+			this.filter = filter;
+		},
+		deleteCustomFilter(){
+			this.$refs.stvList.resetFilter();
 		}
 	},
 	created() {
@@ -497,7 +507,7 @@ export default {
 		this.handlePersonUrl();
 	},
 	template: /* html */`
-	<div class="stv">
+		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -512,6 +522,14 @@ export default {
 					<span class="svg-icon svg-icon-apps"></span>
 				</button>
 				<a class="navbar-brand me-0" :href="stvRoot">StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}</a>
+				<button
+					class="btn btn-outline-light border-0 d-none d-md-inline-flex m-1  ms-auto"
+					type="button"
+					@click="sidebarCollapsed = !sidebarCollapsed"
+					:aria-label="$p.t('ui/toggle_nav')"
+				>
+					<span class="fa-solid fa-list"></span>
+				</button>
 			</div>
 			<button
 				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
@@ -623,7 +641,7 @@ export default {
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<vertical-split>
 						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
+							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
 						</template>
 						<template #bottom>
 							<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>

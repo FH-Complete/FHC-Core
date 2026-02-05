@@ -17,7 +17,15 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			listDocuments: [],
+			layoutColumnsOnNewData: false,
+			height: 300,
+			selectable: true,
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvDocuments.getDocumentsAccepted({
@@ -27,7 +35,12 @@ export default {
 				ajaxResponse: (url, params, response) =>  {
 					return response.data;
 				},
+				layout: 'fitDataStretchFrozen',
+				index: 'akte_id',
+				selectableRangeMode: 'click',
+				persistenceID: 'stv-details-accepted-2026020401',
 				columns: [
+					{title: "akte_id", field: "akte_id", visible: false},
 					{title: "Dokument", field: "bezeichnung"},
 					{title: "Akzeptiertdatum", field: "docdatum",
 						formatter: function (cell) {
@@ -67,7 +80,6 @@ export default {
 							crossElement: '<i class="fa fa-xmark text-secondary"></i>'
 						}},
 					{title: "Infotext", field: "infotext"},
-					{title: "akte_id", field: "akte_id"},
 					{title: "dms_id", field: "dms_id", visible: false},
 					{title: "titel", field: "titel_intern", visible: false},
 					{title: "vorhanden", field: "vorhanden",
@@ -146,58 +158,40 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 300,
-				selectable: true,
-				selectableRangeMode: 'click',
-				persistenceID: 'core-details-documents-accepted-2025072101',
-				listDocuments: [],
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['global', 'dokumente', 'ui', 'mobility', 'ampeln']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'dokument')
-						});
-						cm.getColumnByField('docdatum').component.updateDefinition({
-							title: this.$p.t('dokumente', 'datumAkzeptiert')
-						});
-						cm.getColumnByField('dokument_kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz')
-						});
-						cm.getColumnByField('insertvonma').component.updateDefinition({
-							title: this.$p.t('dokumente', 'akzeptiertVon')
-						});
-						cm.getColumnByField('hochgeladenamum').component.updateDefinition({
-							title: this.$p.t('global', 'uploaddatum')
-						});
-						cm.getColumnByField('nachgereicht').component.updateDefinition({
-							title: this.$p.t('dokumente', 'nachgereicht')
-						});
-						cm.getColumnByField('vorhanden').component.updateDefinition({
-							title: this.$p.t('dokumente', 'vorhanden')
-						});
-						cm.getColumnByField('dms_id').component.updateDefinition({
-							title: this.$p.t('global', 'dms_id')
-						});
-						cm.getColumnByField('titel_intern').component.updateDefinition({
-							title: this.$p.t('global', 'titel')
-						});
-						cm.getColumnByField('anmerkung_intern').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('akte_id').component.updateDefinition({
-							title: this.$p.t('global', 'akte_id')
-						});
-						cm.getColumnByField('nachgereicht_am').component.updateDefinition({
-							title: this.$p.t('dokumente', 'nachreichungAm')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+						setHeader('bezeichnung', this.$p.t('global', 'dokument'));
+						setHeader('docdatum', this.$p.t('dokumente', 'datumAkzeptiert'));
+						setHeader('dokument_kurzbz', this.$p.t('mobility', 'kurzbz'));
+						setHeader('insertvonma', this.$p.t('dokumente', 'akzeptiertVon'));
+						setHeader('hochgeladenamum', this.$p.t('global', 'uploaddatum'));
+						setHeader('nachgereicht', this.$p.t('dokumente', 'nachgereicht'));
+						setHeader('vorhanden', this.$p.t('dokumente', 'vorhanden'));
+						setHeader('dms_id', this.$p.t('global', 'dms_id'));
+						setHeader('titel_intern', this.$p.t('global', 'titel'));
+						setHeader('anmerkung_intern', this.$p.t('global', 'anmerkung'));
+						setHeader('akte_id', this.$p.t('global', 'akte_id'));
+						setHeader('nachgereicht_am', this.$p.t('dokumente', 'nachreichungAm'));
 					}
 				},
 				{
@@ -210,14 +204,15 @@ export default {
 						}
 					}
 				}
-			]
-		}
+			];
+			return events;
+		},
 	},
 	methods: {
 		actionDownloadFile(akte_id){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router 
-				+ '/api/frontend/v1/stv/dokumente/download?akte_id=' 
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router
+				+ '/api/frontend/v1/stv/dokumente/download?akte_id='
 				+ encodeURIComponent(akte_id);
 		},
 		actionUploadFile(dokument_kurzbz){
@@ -314,7 +309,7 @@ export default {
 		}
 	},
 	template: `
-	 <div class="stv-details-documents h-100 pb-3">
+	 <div class="stv-details-aceepted h-100 pb-3">
 		<h5>{{$p.t('dokumente', 'accepted')}}</h5>
 
 		 <modal-edit

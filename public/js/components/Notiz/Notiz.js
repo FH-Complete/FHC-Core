@@ -1,5 +1,4 @@
 import VueDatePicker from '../vueDatepicker.js.php';
-import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FormUploadDms from '../Form/Upload/Dms.js';
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal.js";
@@ -11,7 +10,6 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		VueDatePicker,
-		PvAutoComplete,
 		FormUploadDms,
 		FormForm,
 		FormInput,
@@ -50,7 +48,49 @@ export default {
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			notizen: [],
+			multiupload: true,
+			mitarbeiter: [],
+			filteredMitarbeiter: [],
+			zwischenvar: '',
+			editorInitialized: false,
+			editor: null,
+			notizData: {
+				typeId: this.typeId,
+				id: this.id,
+				titel: null,
+				statusNew: true,
+				text: '',
+				lastUpdate: null,
+				von: null,
+				bis: null,
+				document: null,
+				erledigt: false,
+				verfasser: null,
+				bearbeiter: null,
+				anhang: []
+			},
+			showVariables: {
+				showTitel: false,
+				showText: false,
+				showVerfasser: false,
+				showBearbeiter: false,
+				showVon: false,
+				showBis: false,
+				showDokumente: false,
+				showErledigt: false,
+				showNotiz_id: false,
+				showNotizzuordnung_id: false,
+				showType_id: false,
+				showId: false,
+				showLastupdate: false
+			},
+			currentVerfasserUid: null
+		}
+	},
+	computed: {
+		tabulatorOptions: function() {
+			return {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
 				ajaxParams: () => {
@@ -65,6 +105,7 @@ export default {
 						title: "Titel",
 						field: "titel",
 						width: 100,
+						visible: this.showVariables.showTitel,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -87,6 +128,7 @@ export default {
 						width: 250,
 						formatter: "html",
 						//clipContents: true,
+						visible: this.showVariables.showText,
 						tooltip:function(e, cell, onRendered){
 							var el = document.createElement("div");
 							el.style.backgroundColor = "white";
@@ -101,18 +143,18 @@ export default {
 							return el;
 						},
 					},
-					{title: "VerfasserIn", field: "verfasser", width: 124},
-					{title: "BearbeiterIn", field: "bearbeiter", width: 126},
+					{title: "VerfasserIn", field: "verfasser", width: 124, visible: this.showVariables.showVerfasser},
+					{title: "BearbeiterIn", field: "bearbeiter", width: 126, visible: this.showVariables.showBearbeiter},
 					{title: "Verfasser UID", field: "verfasser_uid", width: 124, visible: false},
 					{title: "Bearbeiter UID", field: "bearbeiter_uid", width: 126, visible: false},
-					{title: "Start", field: "start_format", width: 86, visible: false},
-					{title: "Ende", field: "ende_format", width: 86, visible: false},
-					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
+					{title: "Start", field: "start_format", width: 86, visible: this.showVariables.showVon},
+					{title: "Ende", field: "ende_format", width: 86, visible: this.showVariables.showBis},
+					{title: "Dokumente", field: "countdoc", width: 100, visible: this.showVariables.showDokumente},
 					{
 						title: "Erledigt",
 						field: "erledigt",
 						width: 97,
-						visible: false,
+						visible: this.showVariables.showErledigt,
 						formatter:"tickCross",
 						hozAlign:"center",
 						formatterParams: {
@@ -120,15 +162,15 @@ export default {
 							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						}
 					},
-					{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
-					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
-					{title: "type_id", field: "type_id", width: 164, visible: false},
-					{title: "extension_id", field: "id", width: 135, visible: false},
+					{title: "Notiz_id", field: "notiz_id", width: 92, visible: this.showVariables.showNotiz_id},
+					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: this.showVariables.showNotizzuordnung_id},
+					{title: "type_id", field: "type_id", width: 164, visible: this.showVariables.showType_id},
+					{title: "extension_id", field: "id", width: 135, visible: this.showVariables.showId},
 					{
-						title: "letzte Änderung", 
+						title: "letzte Änderung",
 						field: "lastupdate",
 						width: 146,
-						visible: false,
+						visible: this.showVariables.showLastupdate,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
@@ -185,129 +227,60 @@ export default {
 				index: 'notiz_id',
 				persistenceID: this.tabulatorPersistenceId,
 				persistence: {
-					sort: false,
+					sort: true,
 					columns: ["width", "visible", "frozen"],
 					filter: false,
 					headerFilter: false,
 					group: false,
 					page: false,
 				}
-			},
-			tabulatorEvents: [
+			};
+		},
+		tabulatorEvents: function () {
+			return [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 
+						//to avoid js error
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['notiz', 'global', 'ui']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('verfasser').component.updateDefinition({
-							title: this.$p.t('notiz', 'verfasser'),
-							visible: this.showVariables.showVerfasser
-						});
-						cm.getColumnByField('verfasser_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'verfasser_uid'),
-						});
-						cm.getColumnByField('titel').component.updateDefinition({
-							title: this.$p.t('global', 'titel'),
-							//visible: this.showVariables.showTitel
-						});
-						cm.getColumnByField('bearbeiter').component.updateDefinition({
-							title: this.$p.t('notiz', 'bearbeiter'),
-							visible: this.showVariables.showBearbeiter
-						});
-						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'bearbeiter_uid'),
-						});
-						cm.getColumnByField('start_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigVon'),
-							visible: this.showVariables.showVon
-						});
-						cm.getColumnByField('ende_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigBis'),
-							visible: this.showVariables.showBis
-						});
-						cm.getColumnByField('countdoc').component.updateDefinition({
-							title: this.$p.t('notiz', 'document'),
-							visible: this.showVariables.showDokumente
-						});
-						cm.getColumnByField('erledigt').component.updateDefinition({
-							title: this.$p.t('notiz', 'erledigt'),
-							visible: this.showVariables.showErledigt
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung'),
-							visible: this.showVariables.showLastupdate
-						});
-						cm.getColumnByField('notiz_id').component.updateDefinition({
-							visible: this.showVariables.showNotiz_id,
-							title: this.$p.t('ui', 'notiz_id')
-						});
-						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							visible: this.showVariables.showNotizzuordnung_id,
-							title: this.$p.t('ui', 'notizzuordnung_id')
-						});
-						cm.getColumnByField('type_id').component.updateDefinition({
-							visible: this.showVariables.showType_id,
-							title: this.$p.t('ui', 'type_id')
-						});
-						cm.getColumnByField('id').component.updateDefinition({
-							visible: this.showVariables.showId,
-							title: this.$p.t('ui', 'extension_id')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							width: 250,
-							tooltip: true,
-							//clipContents: true,
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('verfasser', this.$p.t('notiz', 'verfasser'));
+						setHeader('verfasser_uid', this.$p.t('ui', 'verfasser_uid'));
+						setHeader('titel', this.$p.t('global', 'titel'));
+						setHeader('bearbeiter', this.$p.t('notiz', 'bearbeiter'));
+						setHeader('bearbeiter_uid', this.$p.t('ui', 'bearbeiter_uid'));
+						setHeader('start_format', this.$p.t('global', 'gueltigVon'));
+						setHeader('ende_format', this.$p.t('global', 'gueltigBis'));
+						setHeader('countdoc', this.$p.t('notiz', 'document'));
+						setHeader('erledigt', this.$p.t('notiz', 'erledigt'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('notiz_id', this.$p.t('ui', 'notiz_id'));
+						setHeader('notizzuordnung_id', this.$p.t('ui', 'notizzuordnung_id'));
+						setHeader('type_id', this.$p.t('ui', 'type_id'));
+						setHeader('id', this.$p.t('ui', 'extension_id'));
+						setHeader('text_stripped', this.$p.t('global', 'text'));
 
 						// Force layout recalculation for handling overflow text
 						this.$refs.table.tabulator.redraw(true);
 					}
 				}
-			],
-			notizen: [],
-			multiupload: true,
-			mitarbeiter: [],
-			filteredMitarbeiter: [],
-			zwischenvar: '',
-			editorInitialized: false,
-			editor: null,
-			notizData: {
-				typeId: this.typeId,
-				titel: null,
-				statusNew: true,
-				text: '',
-				lastUpdate: null,
-				von: null,
-				bis: null,
-				document: null,
-				erledigt: false,
-				verfasser: null,
-				bearbeiter: null,
-				anhang: []
-			},
-			showVariables: {
-				showTitel: false,
-				showText: false,
-				showVerfasser: false,
-				showBearbeiter: false,
-				showVon: false,
-				showBis: false,
-				showDokumente: false,
-				showErledigt: false,
-				showNotiz_id: false,
-				showNotizzuordnung_id: false,
-				showType_id: false,
-				showId: false,
-				showLastupdate: false
-			}
+			];
 		}
 	},
 	methods: {
@@ -335,8 +308,6 @@ export default {
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
 					this.notizData.erledigt = this.notizen.erledigt;
-					this.notizData.verfasser = this.notizen.verfasser_uid;
-					this.notizData.intVerfasser = this.notizen.verfasser_uid;
 					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
 					this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
 				}
@@ -359,6 +330,7 @@ export default {
 		},
 		addNewNotiz() {
 			const formData = new FormData();
+			this.notizData.id = this.id;
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
@@ -402,6 +374,7 @@ export default {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
 					this.notizData.anhang = [];
+					this.currentVerfasserUid = result.data.verfasser_uid;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -455,16 +428,17 @@ export default {
 				bis: null,
 				document: null,
 				erledigt: false,
-				verfasser: this.uid,
 				bearbeiter: null,
-				anhang: []
+				anhang: [],
 			};
+			this.currentVerfasserUid = this.uid
 		},
 		getUid() {
 			return this.$api
 				.call(this.endpoint.getUid())
 				.then(result => {
-					this.notizData.intVerfasser = result.data;
+					this.currentVerfasserUid = result.data;
+					this.uid = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -547,14 +521,7 @@ export default {
 			},
 			deep: true
 		},
-		'notizData.intVerfasser': {
-			handler(newVal) {
-				if (typeof newVal === 'object') {
-					this.notizData.verfasser = newVal.mitarbeiter_uid;
-				}
-			},
-			deep: true
-		},
+
 		id() {
 			this.reload();
 		}
@@ -654,24 +621,23 @@ export default {
 					<div class="row mb-3">
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
 											
-						<div v-if="notizData.verfasser_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.verfasser_uid">
-						</div>
-						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
+						<div class="col-sm-3">
+							<input type="text" readonly="readonly" class="form-control" id="name" v-model="currentVerfasserUid">
 						</div>
 						
 						<label for="von" class="form-label col-sm-1">{{$p.t('global','gueltigVon')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="von"
-								v-model="notizData.start"
-								clearable="false"
+							<form-input
+								type="DatePicker"
+								v-model="notizData['start']"
+								name="von"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy"></vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 					
@@ -679,26 +645,35 @@ export default {
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
 						
 						<div v-if="notizData.bearbeiter_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
+							<input type="text" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
 						</div>
 						
 						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intBearbeiter" optionLabel="mitarbeiter" :suggestions="filteredMitarbeiter" @complete="search" minlength="3"/>
+							<form-input
+								type="autocomplete"
+								v-model="notizData.intBearbeiter"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minlength="3"
+							>
+							</form-input>
 						</div>
 						
 						
 						<label for="bis" class="form-label col-sm-1">{{$p.t('global','gueltigBis')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="bis"
+							<form-input
+								type="DatePicker"
 								v-model="notizData.ende"
-								clearable="false"
+								name="bis"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy">
-							</vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 										
@@ -842,28 +817,15 @@ export default {
 							
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"
@@ -1008,25 +970,12 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
-									>
-								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
 								
@@ -1195,33 +1144,21 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+					
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'bearbeiter')"
 									v-model="notizData.bearbeiter_uid"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>
@@ -1235,6 +1172,7 @@ export default {
 									:suggestions="filteredMitarbeiter" 
 									@complete="search" 
 									optionLabel="mitarbeiter"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>	
