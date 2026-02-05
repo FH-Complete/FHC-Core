@@ -18,18 +18,9 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
-//require_once('../../../include/studiengang.class.php');
-//require_once('../../../include/student.class.php');
-//require_once('../../../include/datum.class.php');
-//require_once('../../../include/mail.class.php');
-//require_once('../../../include/benutzerberechtigung.class.php');
-//require_once('../../../include/phrasen.class.php');
-//require_once('../../../include/projektarbeit.class.php');
-//require_once('../../../include/projektbetreuer.class.php');
-
 class Lehre extends FHCAPI_Controller
 {
-	
+
 	/**
 	 * Object initialization
 	 */
@@ -38,39 +29,57 @@ class Lehre extends FHCAPI_Controller
 		parent::__construct([
 			'lvStudentenMail' => self::PERM_LOGGED,
 			'LV' => self::PERM_LOGGED,
-			'Pruefungen' => self::PERM_LOGGED
+			'Pruefungen' => self::PERM_LOGGED,
+			'getZugewieseneLv' => self::PERM_LOGGED,
+			'getLeForLv' => self::PERM_LOGGED
 		]);
-		
+
+		$this->load->library('PhrasesLib');
+
+		$this->loadPhrases(
+			array(
+				'global',
+				'ui',
+				'abgabetool'
+			)
+		);
+
+		$this->load->helper('hlp_sancho_helper');
+
+		require_once(FHCPATH . 'include/studiengang.class.php');
+		require_once(FHCPATH . 'include/student.class.php');
+		require_once(FHCPATH . 'include/projektarbeit.class.php');
+		require_once(FHCPATH . 'include/projektbetreuer.class.php');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
-    /**
+	/**
 	 * constructs the emails of the groups from a lehrveranstaltung
 	 */
-    public function lvStudentenMail()
+	public function lvStudentenMail()
 	{
-        $lehreinheit_id = $this->input->get("lehreinheit_id",TRUE);
-        
-        // return early if the required parameter is missing
-        if(!isset($lehreinheit_id))
-        {
-            $this->terminateWithError('Missing required parameter', self::ERROR_TYPE_GENERAL);
-        }
+		$lehreinheit_id = $this->input->get("lehreinheit_id",TRUE);
 
-        $this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-        
-        $studentenMails = $this->LehreinheitModel->getStudentenMail($lehreinheit_id);
+		// return early if the required parameter is missing
+		if(!isset($lehreinheit_id))
+		{
+			$this->terminateWithError('Missing required parameter', self::ERROR_TYPE_GENERAL);
+		}
 
-        $studentenMails = $this->getDataOrTerminateWithError($studentenMails);
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+		$studentenMails = $this->LehreinheitModel->getStudentenMail($lehreinheit_id);
+
+		$studentenMails = $this->getDataOrTerminateWithError($studentenMails);
 
 		//convert array of objects into array of strings
 		$studentenMails = array_map(function($element){
 			return $element->mail;
 		}, $studentenMails);
 
-        $this->terminateWithSuccess($studentenMails);
+		$this->terminateWithSuccess($studentenMails);
 	}
 
 	public function LV($studiensemester_kurzbz, $lehrveranstaltung_id)
@@ -80,13 +89,13 @@ class Lehre extends FHCAPI_Controller
 		$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage(), $lehrveranstaltung_id);
 
 		$result = current($this->getDataOrTerminateWithError($result));
-		
+
 		$this->terminateWithSuccess($result);
 	}
 
 	/**
 	 * fetches all Pruefungen of a student for a specific lehrveranstaltung
-	 * if the student passed the Pruefung on the first attempt, no information about the Pruefungen is stored in the database 
+	 * if the student passed the Pruefung on the first attempt, no information about the Pruefungen is stored in the database
 	 * @param mixed $lehrveranstaltung_id
 	 * @return void
 	 */
@@ -100,5 +109,46 @@ class Lehre extends FHCAPI_Controller
 
 		$this->terminateWithSuccess($result);
 	}
-}
 
+	/**
+	 * fetches all assigned lehrveranstaltungen of a mitarbeiter for a given semester
+	 * @param mixed $uid
+	 * @param mixed $sem_kurzbz
+	 * @return void
+	 */
+	public function getZugewieseneLv() {
+		$uid = $this->input->get("uid",TRUE);
+		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
+
+		// TODO: error messages
+
+		if(!isset($sem_kurzbz) || isEmptyString($sem_kurzbz))
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+
+		if (!isset($uid) || isEmptyString($uid))
+			$uid = getAuthUID();
+
+		// querying other ma_uids data requires admin permission
+		if($uid !== getAuthUID()) {
+			$this->load->library('PermissionLib');
+			$isAdmin = $this->permissionlib->isBerechtigt('admin');
+			if(!$isAdmin) $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'), 'general');
+		}
+
+		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
+		$result = $this->LehrveranstaltungModel->getLvForLektorInSemester($sem_kurzbz, $uid);
+		$data = $this->getDataOrTerminateWithError($result);
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getLeForLv() {
+		$lv_id = $this->input->get("lv_id",TRUE);
+		$sem_kurzbz = $this->input->get("sem_kurzbz",TRUE);
+
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+//		$this->terminateWithSuccess($this->LehreinheitModel->getLesForLv($lv_id, $sem_kurzbz));
+		$this->terminateWithSuccess($this->LehreinheitModel->getAllLehreinheitenForLvaAndMaUid($lv_id, getAuthUID(), $sem_kurzbz));
+	}
+
+}

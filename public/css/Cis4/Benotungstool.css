@@ -23,6 +23,12 @@
 }
 
 
+/* styling for points input column for notenvorschläge in benotungstool*/
+#notentable .tabulator-tableholder .tabulator-editable[tabulator-field="punkte"] {
+	position: relative;
+	background-color: rgba(255, 255, 157, 0.73);
+}
+
 /* styling for editable dropdown column of notenvorschläge in benotungstool*/
 #notentable .tabulator-tableholder .tabulator-editable[tabulator-field="note_vorschlag"] {
 	position: relative;

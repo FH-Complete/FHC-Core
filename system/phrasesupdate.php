@@ -54320,26 +54320,24 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'notenfreigabeHinweistextv3',
+		'phrase' => 'notenfreigabeHinweistextv4',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Notenfreigabe
-					<br><br>
+				'text' => '
 					Wenn alle einzutragenden Noten vermerkt sind (Nachtragung jederzeit möglich) können diese per Klick auf Freigabe für die Studiengangsassistenz freigegeben werden.
-					<br><br>
+					<br>
 					Aus Gründen der erhöhten Sicherheit ist bei der Freigabe der Noten die Eingabe Ihres Passwortes erforderlich.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Grade Release
-					<br><br>
-					Once all grades to be entered have been recorded (additions are possible at any time), they can be released to the program assistant by clicking on "Release."
-					<br><br>
-					For increased security reasons, you will be required to enter your password when releasing grades.2)',
+				'text' => '
+					Once all grades to be entered have been recorded (additions are possible at any time), they can be released to the program assistant by clicking on "Confirm Grades"
+					<br>
+					For increased security reasons, you will be required to enter your password when releasing grades.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -54348,38 +54346,28 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'notenimportHinweistextv3',
+		'phrase' => 'notenimportHinweistextv5',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Laden Sie sich die Notenliste im Excel-Format unter CIS → Lehrveranstaltungen → Anwesenheits- und Notenlisten → Notenliste herunter.
-					<br><br>
-					Tragen Sie die Noten in das Dokument und speichern Sie dieses.
-					<br><br>
-					Markieren Sie im Excel-Dokument die Inhalte der Spalten Personenkennzeichen und Note für jene Studierende, deren Noten Sie importieren möchten (ohne Überschrift !)
-					<br><br>
-					Kopieren Sie die markierten Inhalte mittels strg + c oder Bearbeiten → Kopieren in die Zwischenablage
-					<br><br>
-					Einfügen der Inhalte mittels strg + v oder Bearbeiten → Einfügen
-					<br><br>
-					Mit einem Klick auf Import werden die Noten übernommen.',
+				'text' => '• Laden Sie sich die Notenliste im Excel-Format unter CIS → Lehrveranstaltungen → Anwesenheits- und Notenlisten → Notenliste herunter.<br>
+					• Tragen Sie die Noten in das Dokument und speichern Sie dieses.<br>
+					• Markieren Sie im Excel-Dokument die Inhalte der Spalten Personenkennzeichen und Note für jene Studierende, deren Noten Sie importieren möchten (ohne Überschrift !)<br>
+					• Kopieren Sie die markierten Inhalte mittels strg + c oder Bearbeiten → Kopieren in die Zwischenablage<br>
+					• Einfügen der Inhalte mittels strg + v oder Bearbeiten → Einfügen<br>
+					• Mit einem Klick auf Import werden die Noten übernommen.<br>',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Download the grade list in Excel format from CIS → Courses → Attendance and Grade Lists → Grade List.
-					<br><br>
-					Enter the grades into the document and save it.
-					<br><br>
-					In the Excel document, select the contents of the Person ID and Grade columns for the students whose grades you want to import (without headings!).
-					<br><br>
-					Copy the selected content to the clipboard using Ctrl + c or Edit → Copy.
-					<br><br>
-					Paste the content using Ctrl + v or Edit → Paste.
-					<br><br>
-					Click Import to import the grades.',
+				'text' => '• Download the grade list in Excel format from CIS → Courses → Attendance and Grade Lists → Grade List.<br>
+					• Enter the grades into the document and save it.<br>
+					• In the Excel document, select the contents of the Person ID and Grade columns for the students whose grades you want to import (without headings!).<br>
+					• Copy the selected content to the clipboard using Ctrl + c or Edit → Copy.<br>
+					• Paste the content using Ctrl + v or Edit → Paste.<br>
+					• Click Import to import the grades.<br>',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -54468,7 +54456,7 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'c4vorschlag_übernehmen',
+		'phrase' => 'c4notenvorschlagUebernehmen',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(

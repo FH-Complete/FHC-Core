@@ -119,18 +119,9 @@ export const Benotungstool = {
 						
 						const row = cell.getRow()
 						row.reformat() // trigger reformat of arrow
-					} else if (field === 'punkte') {
-						const newValue = cell.getValue();
-						if(newValue == '' || newValue == null) return
-						this.$api.call(ApiNoten.getNoteByPunkte(newValue, this.lv_id, this.sem_kurzbz)).then(res => {
-							if(res?.meta?.status === 'success' && res.data >= 0) {
-								const row = cell.getRow();
-								row.update({note_vorschlag: res.data})
-							}
-						})
 					}
 				}
-			}, 
+			},
 			{
 				event: "cellClick",
 				handler: async (e, cell) => {
@@ -139,18 +130,68 @@ export const Benotungstool = {
 					if(field == "mobility_zusatz") {
 						this.$refs.drawer.show()
 						e.stopPropagation()
+						this.undoSelection(cell)
+					} else if (field == "punkte" || field == "note_vorschlag" || field == "übernehmen") {
+						this.undoSelection(cell)
 					}
 				}
 			}
 			]};
 	},
 	methods: {
+		undoSelection(cell) {
+			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
+			// but actually just revert it after the fact
+
+			const row = cell.getRow()
+			if(row.isSelected()) {
+				row.deselect();
+			}
+		},
+		// using this to expose input event of editor element properly, tabulator makes it hard to access on default editor
+		// implemented after tabulator/src/js/modules/edit/defaults/editors/number.js
+		liveNumberEditor(cell, onRendered, success, cancel) {
+			const editor = document.createElement("input");
+			editor.setAttribute("type", "number");
+			editor.value = cell.getValue();
+			
+			const row = cell.getRow()
+			const rowData = row.getData()
+			
+			rowData._debouncedFetchNoteForPunkte = debounce(this.fetchNoteForPunkte, 500)
+			editor.addEventListener("input", (e) => {
+				rowData._debouncedFetchNoteForPunkte(e.target.value, row)
+			});
+			
+			onRendered(() => {
+				editor.focus();
+				editor.style.height = "100%";
+			});
+
+			editor.addEventListener("change", () => success(editor.value));
+			editor.addEventListener("blur", () => success(editor.value));
+			editor.addEventListener("keydown", (e) => {
+				if (e.keyCode === 13) success(editor.value);
+				if (e.keyCode === 27) cancel();
+			});
+
+			return editor;
+		},
+		fetchNoteForPunkte(valueParam, row) {
+			const value = valueParam == '' ? null : valueParam
+			this.$api.call(ApiNoten.getNoteByPunkte(value, this.lv_id, this.sem_kurzbz)).then(res => {
+				if(res?.meta?.status === 'success' && res.data >= 0) {
+					row.update({note_vorschlag: res.data})
+				}
+			})
+		},
 		fetchNoteForPunktePruefung(event) {
-			this.$api.call(ApiNoten.getNoteByPunkte(event.value, this.lv_id, this.sem_kurzbz)).then(res => {
+			const value = event.value == '' ? null : event.value
+			this.$api.call(ApiNoten.getNoteByPunkte(value, this.lv_id, this.sem_kurzbz)).then(res => {
 				if(res?.meta?.status === 'success' && res.data >= 0) {
 					this.selectedPruefungNote = this.notenOptions.find(n => n.note == res.data)
 				}
-			})	
+			})
 		},
 		isValidDate_ddmmyyyy(str) {
 			if (typeof str !== 'string') return false;
@@ -219,12 +260,15 @@ export const Benotungstool = {
 			// in case we need to further validate noten, currently parser does all
 		},
 		parseNote(rowParts, notenbulk, rowNum) {
+			debugger
 			const id = this.identifyUid(rowParts[0])
+			const idTrimmed = rowParts[0].trim()
 			let student = null
+			
 			if(id === 'matrikelnr') { // find student by matrnr and use uid later on
-				student = this.studenten.find(s => s.matrikelnr === rowParts[0])
+				student = this.studenten.find(s => s.matrikelnr?.trim() === idTrimmed)
 			} else if(id === 'uid') {
-				student = this.studenten.find(s => s.uid === uid)
+				student = this.studenten.find(s => s.uid?.trim() === idTrimmed)
 			}
 			if(!student) {
 				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
@@ -471,6 +515,8 @@ export const Benotungstool = {
 		},
 		getNotenTableOptions() {
 			return {
+				// debugEventsExternal:true,
+				// debugEventsInternal:true,
 				height: 700,
 				virtualDom: false,
 				index: 'uid',
@@ -489,151 +535,156 @@ export const Benotungstool = {
 				},
 				rowHeight: 40,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
-				columns: [
-				{
-					formatter: function (cell, formatterParams, onRendered) {
-						// create the built-in checkbox
-						let checkbox = document.createElement("input");
-						checkbox.type = "checkbox";
-
-						// Handle select manually
-						checkbox.addEventListener("click", (e) => {
-							e.stopPropagation();
-
-							// call our function
-							if (formatterParams && formatterParams.handleClick) {
-								formatterParams.handleClick(e, cell);
-							}
-						});
-
-						return checkbox;
-					},
-					titleFormatter: function (cell, formatterParams, onRendered) {
-						// create the built-in checkbox
-						let checkbox = document.createElement("input");
-						checkbox.type = "checkbox";
-
-						// Handle "select all" manually
-						checkbox.addEventListener("click", (e) => {
-							e.stopPropagation();
-
-							// call our function
-							if (formatterParams && formatterParams.handleClick) {
-								formatterParams.handleClick(e, cell);
-							}
-						});
-
-						return checkbox;
-					},
-					hozAlign: "center",
-					headerSort: false,
-					formatterParams: {
-						handleClick: this.selectHandler
-					},
-					titleFormatterParams: {
-						handleClick: this.selectAllHandler
-					},
-					width: 50,
-					cssClass: 'sticky-col'
-				}, 
-				{title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, cssClass: 'sticky-col'},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', headerFilter: true, widthGrow: 1},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', widthGrow: 1, formatter: this.percentFormatter},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', headerFilter: true, widthGrow: 1, visible: false},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4teilnoten'))), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4punkte'))), field: 'punkte', widthGrow: 1, 
-					editor: 'number',
-					editorParams: (cell) => {
-						return {
-							min: 0,
-							max: 9999,
-							step: 1,
-							elementAttributes: {
-								maxlength: "4"
-							},
-							selectContents: true,
-							verticalNavigation: "table"
-						}
-					},
-					variableHeight: true
-				},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4notenvorschlag'))), field: 'note_vorschlag',
-					editor: 'list',
-					editorParams: (cell) => {
-						// write original cell value into row to it can be retrieved if edit is cancelled without selection
-						const rowData = cell.getRow().getData();
-						rowData._originalNoteVorschlag = cell.getValue();
-						
-						return {
-							values: this.notenOptionsLehre.map(opt => ({
-								label: opt.bezeichnung,
-								value: opt.note
-							}))
-						};
-					},
-					editable: (cell) => {
-						// TODO: css style this a bit
-						// punkte features enables mapping but unable to set note directly
-						if(this.config?.CIS_GESAMTNOTE_PUNKTE) return false
-						const rowData = cell.getRow().getData();
-						const noteOption = this.notenOptions.find(opt => opt.note == rowData.note)
-						if(!noteOption) return true
-						
-						// also if student has any pruefungsnote disable noten selection
-						if(this.pruefungen?.find(p => p.student_uid == rowData.uid)) return false
-						
-						return noteOption.lkt_ueberschreibbar
-					},
-					formatter: (cell) => {
-						const rowData = cell.getRow().getData();
-						const value = cell.getValue()
-						const match = this.notenOptions?.find(opt => opt.note == value)
-						const val =  match ? match.bezeichnung : value
-						const p = this.pruefungen?.find(p => p.student_uid == rowData.uid)
-						let style = ''
-						
-						if(val === undefined) return ''
-						if(p || !match?.lkt_ueberschreibbar) style = 'color: gray;font-style: italic; background-color: #f0f0f0;pointer-events: none;opacity: 0.6;user-select: none;cursor: not-allowed;'
-						return '<div style="'+style+'">' + val + '</div>'
-					},
-					widthGrow: 1
-				},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorschlag_übernehmen'))), width: 50, hozAlign: 'center', formatter: this.arrowFormatter, cellClick: this.saveNote, variableHeight: true},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4lvnote'))), field: 'lv_note',
-					formatter: this.notenFormatter,
-					headerFilter: 'list',
-					headerFilterParams: () => {
-						return { values: ["\u00A0",this.$p.t('benotungstool/c4noteEmpty') ,this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
-					},
-					headerFilterFunc: this.notenFilterFunc,
-					widthGrow: 1
-				},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4freigabe'))), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter, variableHeight: true},
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4zeugnisnote'))),
-					field: 'note',
-					formatter: this.notenFormatter,
-					topCalc: this.negativeNotenCalc,
-					topCalcFormatter: this.negativeNotenCalcFormatter,
-					headerFilter: 'list',
-					headerFilterParams: () => {
-						return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
-					},
-					headerFilterFunc: this.notenFilterFunc,
-					widthGrow: 1
-				}, 
-				{title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4kommPruef'))), 
-					field: 'kommPruef', widthGrow: 1, 
-					formatter: this.pruefungFormatter, 
-					topCalc: this.terminCalcFunc,
-					topCalcFormatter: this.terminCalcFormatter,
-					hozAlign:"center", minWidth: 150, visible: false
-				}
-			],
+				columns: this.getColumnsDefinition(),
 				persistence: false,
 			}	
+		},
+		getColumnsDefinition() {
+			const columns = []
+
+
+			columns.push({
+				formatter: function (cell, formatterParams, onRendered) {
+					// create the built-in checkbox
+					let checkbox = document.createElement("input");
+					checkbox.type = "checkbox";
+
+					// Handle select manually
+					checkbox.addEventListener("click", (e) => {
+						e.stopPropagation();
+
+						// call our function
+						if (formatterParams && formatterParams.handleClick) {
+							formatterParams.handleClick(e, cell);
+						}
+					});
+
+					return checkbox;
+				},
+				titleFormatter: function (cell, formatterParams, onRendered) {
+					// create the built-in checkbox
+					let checkbox = document.createElement("input");
+					checkbox.type = "checkbox";
+
+					// Handle "select all" manually
+					checkbox.addEventListener("click", (e) => {
+						e.stopPropagation();
+
+						// call our function
+						if (formatterParams && formatterParams.handleClick) {
+							formatterParams.handleClick(e, cell);
+						}
+					});
+
+					return checkbox;
+				},
+				hozAlign: "center",
+				headerSort: false,
+				formatterParams: {
+					handleClick: this.selectHandler
+				},
+				titleFormatterParams: {
+					handleClick: this.selectAllHandler
+				},
+				width: 50,
+				cssClass: 'sticky-col'
+			})
+			columns.push({title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, cssClass: 'sticky-col'})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', headerFilter: true, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', widthGrow: 1, formatter: this.percentFormatter})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', headerFilter: true, widthGrow: 1, visible: false})
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE) {
+				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4teilnoten'))), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true})
+			}
+			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
+				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4punkte'))), field: 'punkte', widthGrow: 1,
+					editor: this.liveNumberEditor,
+					editable: (cell) => {
+						const rowData = cell.getRow().getData();
+						if(this.pruefungen?.find(p => p.student_uid == rowData.uid)) return false
+
+						return true
+					},
+					variableHeight: true
+				})
+			}
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4notenvorschlag'))), field: 'note_vorschlag',
+				editor: 'list',
+				editorParams: (cell) => {
+					// write original cell value into row to it can be retrieved if edit is cancelled without selection
+					const rowData = cell.getRow().getData();
+					rowData._originalNoteVorschlag = cell.getValue();
+
+					return {
+						values: this.notenOptionsLehre.map(opt => ({
+							label: opt.bezeichnung,
+							value: opt.note
+						}))
+					};
+				},
+				editable: (cell) => {
+					// punkte features enables mapping but unable to set note directly
+					if(this.config?.CIS_GESAMTNOTE_PUNKTE) return false
+					const rowData = cell.getRow().getData();
+					const noteOption = this.notenOptions.find(opt => opt.note == rowData.note)
+					if(!noteOption) return true
+
+					// also if student has any pruefungsnote disable noten selection
+					if(this.pruefungen?.find(p => p.student_uid == rowData.uid)) return false
+
+					return noteOption.lkt_ueberschreibbar
+				},
+				formatter: (cell) => {
+					const rowData = cell.getRow().getData();
+					const value = cell.getValue()
+					const match = this.notenOptions?.find(opt => opt.note == value)
+					const val =  match ? match.bezeichnung : value
+					const p = this.pruefungen?.find(p => p.student_uid == rowData.uid)
+					let style = ''
+
+					if(val === undefined) return ''
+					if(p || !match?.lkt_ueberschreibbar) style = 'color: gray;font-style: italic; background-color: #f0f0f0;pointer-events: none;opacity: 0.6;user-select: none;cursor: not-allowed;'
+					return '<div style="'+style+'">' + val + '</div>'
+				},
+				widthGrow: 1
+			})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorschlag_übernehmen'))), field: 'übernehmen', width: 150, hozAlign: 'center', formatter: this.arrowFormatter, 
+				// cellClick: this.saveNote, 
+				variableHeight: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4lvnote'))), field: 'lv_note',
+				formatter: this.notenFormatter,
+				headerFilter: 'list',
+				headerFilterParams: () => {
+					return { values: ["\u00A0",this.$p.t('benotungstool/c4noteEmpty') ,this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
+				},
+				headerFilterFunc: this.notenFilterFunc,
+				widthGrow: 1
+			})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4freigabe'))), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter, variableHeight: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4zeugnisnote'))),
+				field: 'note',
+				formatter: this.notenFormatter,
+				topCalc: this.negativeNotenCalc,
+				topCalcFormatter: this.negativeNotenCalcFormatter,
+				headerFilter: 'list',
+				headerFilterParams: () => {
+					return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
+				},
+				headerFilterFunc: this.notenFilterFunc,
+				widthGrow: 1
+			})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4kommPruef'))),
+				field: 'kommPruef', widthGrow: 1,
+				formatter: this.pruefungFormatter,
+				topCalc: this.terminCalcFunc,
+				topCalcFormatter: this.terminCalcFormatter,
+				hozAlign:"center", minWidth: 150, visible: false
+			})
+		
+			return columns
 		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
@@ -789,6 +840,10 @@ export const Benotungstool = {
 			return value
 		},
 		saveNote(e, cell) { // Notenvorschlag freigeben
+			// TODO: rename & rework so it handles with a button
+			
+			// TODO: save this method once we decide the arrow was actually very cool
+			
 			const row = cell.getRow()
 			const data = row.getData()
 
@@ -812,9 +867,6 @@ export const Benotungstool = {
 			}).finally(()=>this.loading = false)
 			
 			
-		},
-		punkteFormatter(cell) {
-				
 		},
 		teilnotenFormatter(cell) {
 			const val = cell.getValue()
@@ -843,7 +895,6 @@ export const Benotungstool = {
 			const canAdd = field !== 'kommPruef' && data.hoechsterAntritt < 4 && !colDef.originalNote
 			
 			// TODO: check for some time limit maybe? old pruefungen can be changed/created
-			// TODO: it also looks ugly and unprofessional, should at some peoplt disable/hide the change action
 			
 			// Create root row div
 			const rowDiv = document.createElement('div');
@@ -892,6 +943,7 @@ export const Benotungstool = {
 			}
 			
 			if(data[field]) {
+				
 				// showing date in 
 				
 				// const dateParts = data[field].datum.split('-')
@@ -912,16 +964,18 @@ export const Benotungstool = {
 					return rowDiv
 				} 
 				
-				// Third column (button)
-				const button = document.createElement('button');
-				button.className = 'btn btn-outline-secondary';
-				button.textContent = this.$capitalize(this.$p.t('benotungstool/changePruefungButtonText'));
-				button.addEventListener('click', () => {
-					this.openPruefungModal(data, data[field], field);
-				});
+				if(data[field]?.pruefungstyp_kurzbz !== 'Termin1') {
+					// Third column (button)
+					const button = document.createElement('button');
+					button.className = 'btn btn-outline-secondary';
+					button.textContent = this.$capitalize(this.$p.t('benotungstool/changePruefungButtonText'));
+					button.addEventListener('click', () => {
+						this.openPruefungModal(data, data[field], field);
+					});
 
-				rowDiv.appendChild(createCol(button, 'col-4 d-flex justify-content-center align-items-center'));
-
+					rowDiv.appendChild(createCol(button, 'col-4 d-flex justify-content-center align-items-center'));
+				}
+				
 				return rowDiv;
 				
 			} else if (canAdd) { // return new btn action
@@ -984,14 +1038,27 @@ export const Benotungstool = {
 			
 			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
 			
-			if(!data.note_vorschlag || (data.note_vorschlag == data.lv_note)) { // uncolored arrow
-				return '<div style="'+style+'">' +
-					'<i class="fa fa-arrow-right"></i></div>'
+			if(!data.note_vorschlag || (data.note_vorschlag == data.lv_note)) {
+				// arrow to ambiguous in meaning, use str8 forward worded button here instead
+				// uncolored arrow
+				// return '<div style="'+style+'">' +
+				// 	'<i class="fa fa-arrow-right"></i></div>'
+
+				return ''
 			}
 			
-			// can save a notenvorschlag -> colored
-			return '<div style="'+style+'">' +
-				'<i class="fa fa-arrow-right fa-2xl" style="color:#00649C"></i></div>'
+			const button = document.createElement('button');
+			button.className = 'btn btn-outline-secondary';
+			button.textContent = this.$capitalize(this.$p.t('benotungstool/c4notenvorschlagUebernehmen'));
+			button.addEventListener('click', () => {
+				this.saveNote(data)
+				console.log('button click')
+			});
+			return button;
+			
+			// // can save a notenvorschlag -> colored
+			// return '<div style="'+style+'">' +
+			// 	'<i class="fa fa-arrow-right fa-2xl" style="color:#00649C"></i></div>'
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
@@ -1676,10 +1743,10 @@ export const Benotungstool = {
 			return cs
 		},
 		getNotenfreigabeHinweistext() {
-			return this.$capitalize(this.$p.t('benotungstool/notenfreigabeHinweistextv3'))
+			return this.$capitalize(this.$p.t('benotungstool/notenfreigabeHinweistextv4'))
 		},
 		getNotenimportHinweistext() {
-			return this.$capitalize(this.$p.t('benotungstool/notenimportHinweistextv3'))
+			return this.$capitalize(this.$p.t('benotungstool/notenimportHinweistextv5'))
 		}
 	},
 	created() {

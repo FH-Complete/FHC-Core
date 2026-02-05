@@ -53,7 +53,6 @@ class Noten extends FHCAPI_Controller
 			'lehre',
 			'ui'
 		]);
-		require_once(FHCPATH . 'include/mobilitaet.class.php');
 		
 		$this->load->model('education/LePruefung_model', 'LePruefungModel');
 		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
@@ -72,45 +71,38 @@ class Noten extends FHCAPI_Controller
 	public function getCisConfig() {
 		$this->terminateWithSuccess(
 			array(
-				// TODO
 				// Punkte bei der Noteneingabe anzeigen
 				'CIS_GESAMTNOTE_PUNKTE' => CIS_GESAMTNOTE_PUNKTE,
 				
-				// TODO
 				// basically on/of toggle for the points/grade col and the arrow button
-				// Gibt an ob der Lektor erneut eine LVNote eintragen kann wenn bereits eine Zeugnisnote vorhanden ist (true | false) DEFAULT true
 				'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
 				
 				// only relevant in punkte calculation in backend
-//				// Gewichtung der Lehreinheiten bei Noteneintragung true|false
 //				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
 				
 				// this one should always be set true since fh prüfungsordnung requires at least 3 antritte (t1+t2+kP)
-				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 2. Termin anzeigen
 //				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
 			
 			
 				// TODO
 				// should in 99% of cases be kept true to enable 4 antritte in total, but if a certain
 				// fh still works with 3 antritte per note this can limit the max number of pruefungen accordingly
-				// Bei Gesamtnote eine zusaetzliche Spalte fuer den 3. Termin anzeigen
-				// Erfordert den Eintrag "Termin3" in der Tabelle lehre.tbl_pruefungstyp
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
 				
 				// used to toggle availability of kommPruef type pruefungen
-				// Bei Gesamtnote eine zusaetzliche Spalte fuer die kommissionelle Pruefung anlegen
 				'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
 				
-
-				//technically exists but is never used
-//				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+				//technically exists but is never used, could be LE pendant to next flag
 //				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
 			
-			
 				// basically a toggle for "use teilnoten" and the source is always moodle
-				// Bei Gesamtnote die Spalte fuer die Quelle der Noten anzeigen (Moodle oder LE)
+				// setting this to false breaks legacy tool and if that was fixed it wouldnt render any table at all
+				// anyway so not sure why this even is a config at all. placebo at best
+				
+				// TODO: do we really need this?
 				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
-				// Gibt an ob die Note im Notenfreigabemail enthalten ist oder nicht
+				
+				// send a mail when approving grades
 				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
 			)
 		);
@@ -263,7 +255,7 @@ class Noten extends FHCAPI_Controller
 		// get all prüfungen with noten held in that semester in that lva
 		$pruefungen = $this->LePruefungModel->getPruefungenByLvStudiensemester($lv_id, $sem_kurzbz);
 		$pruefungenData = getData($pruefungen);
-		
+
 		$this->terminateWithSuccess(array($studentenData, $pruefungenData, DOMAIN, $grades, $anwresult));
 	}
 
@@ -348,6 +340,9 @@ class Noten extends FHCAPI_Controller
 			<td><b>" . $this->p->t('lehre','studiengang') . "</b></td>\n
 			<td><b>" . $this->p->t('benotungstool','c4nachname') . "</b></td>\n
 			<td><b>" . $this->p->t('benotungstool','c4vorname') . "</b></td>\n";
+			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+				$studlist .= "<td><b>" . $this->p->t('benotungstool','c4punkte') . "</b></td>\n";
+			}
 			$studlist .= "<td><b>" . $this->p->t('benotungstool','c4grade') . "</b></td>\n";
 			$studlist .= "<td><b>" . $this->p->t('ui','bearbeitetVon') . "</b></td></tr>\n";
 		} else {
@@ -391,7 +386,9 @@ class Noten extends FHCAPI_Controller
 						$studlist .= "<td>" . trim($note->nachname) . "</td>";
 						$studlist .= "<td>" . trim($note->vorname) . "</td>";
 
-						// TODO: if defined(CIS_PUNKTE) ...
+						if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+							$studlist .= "<td>" . trim($lvgesamtnote->punkte) . "</td>";
+						}
 						$studlist .= "<td>" .$note->noteBezeichnung. "</td>";
 
 						$studlist .= "<td>" . $lvgesamtnote->mitarbeiter_uid;
@@ -407,13 +404,13 @@ class Noten extends FHCAPI_Controller
 		$studlist .= "</table>";
 
 		// always send the mail, config toggles data contents
-		$this->sendEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
+		$this->sendFreigabeEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
 		
 		$this->terminateWithSuccess($ret);
 	}
 
 	
-	private function sendEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
+	private function sendFreigabeEmail($lektorFullName, $lvaFullName, $notenCount, $emailAdressen, $studlist, $betreff)
 	{
 		$emailAdressen[] = getAuthUID() . "@" . DOMAIN; // also send mail to lektors own adress
 		$adressen = implode(";", $emailAdressen);
@@ -984,7 +981,7 @@ class Noten extends FHCAPI_Controller
 			$student_uid = $student->uid;
 			$typ = $student->typ;
 			$note = 9; //$result->note; // TODO: parameterize for import maybe
-			$punkte = ''; // new pruefungen never have punkte, TODO: check if null or '' prefered
+			$punkte = null; // new pruefungen never have punkte,
 
 			$lehreinheit_id = $student->lehreinheit_id;
 			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
@@ -1017,7 +1014,7 @@ class Noten extends FHCAPI_Controller
 			$typ = $pruefung->typ;
 			$note = $pruefung->note; // TODO: parameterize for import maybe
 			$datum = $pruefung->datum;
-			$punkte = ''; // TODO: check punkte feature
+			$punkte = null;
 
 			$lehreinheit_id = $pruefung->lehreinheit_id;
 			$ret[$student_uid] = $this->savePruefungstermin($typ, $student_uid, $lv_id, $sem_kurzbz, $lehreinheit_id, $note, $punkte, $datum);
