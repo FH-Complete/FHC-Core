@@ -51,6 +51,9 @@ class dms extends basis_db
 	public $kategorie_oe_kurzbz;
 	public $berechtigung_kurzbz;
 	public $bezeichnung;
+	public $gueltig_ab;
+	public $oe_kurzbz_verantwortlich;
+	public $archiviert;
 
 	/**
 	 * Konstruktor
@@ -97,6 +100,9 @@ class dms extends basis_db
 				$this->updatevon = $row->updatevon;
 				$this->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$this->schlagworte = $row->schlagworte;
+				$this->gueltig_ab = $row->gueltig_ab;
+				$this->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$this->archiviert = $this->db_parse_bool($row->archiviert);
 
 				return true;
 			}
@@ -148,7 +154,7 @@ class dms extends basis_db
 
 			$qry.="INSERT INTO campus.tbl_dms_version(dms_id, version,
 						filename, mimetype, name, beschreibung, letzterzugriff, insertamum, insertvon,
-						updateamum, updatevon, cis_suche, schlagworte) VALUES(".
+						updateamum, updatevon, cis_suche, schlagworte, oe_kurzbz_verantwortlich, gueltig_ab, archiviert) VALUES(".
 					$dms_id.','.
 					$this->db_add_param($this->version, FHC_INTEGER).','.
 					$this->db_add_param($this->filename).','.
@@ -161,7 +167,11 @@ class dms extends basis_db
 					$this->db_add_param($this->updateamum).','.
 					$this->db_add_param($this->updatevon).','.
 					$this->db_add_param($this->cis_suche, FHC_BOOLEAN).','.
-					$this->db_add_param($this->schlagworte).');';
+					$this->db_add_param($this->schlagworte).','.
+					$this->db_add_param($this->oe_kurzbz_verantwortlich).','.
+					$this->db_add_param($this->gueltig_ab).','.
+					$this->db_add_param($this->archiviert, FHC_BOOLEAN).
+					');';
 		}
 		else
 		{
@@ -179,7 +189,10 @@ class dms extends basis_db
 						" updateamum=".$this->db_add_param($this->updateamum).",".
 						" updatevon=".$this->db_add_param($this->updatevon).",".
 						" cis_suche=".$this->db_add_param($this->cis_suche, FHC_BOOLEAN).",".
-						" schlagworte=".$this->db_add_param($this->schlagworte).
+						" schlagworte=".$this->db_add_param($this->schlagworte).",".
+						" archiviert=".$this->db_add_param($this->archiviert, FHC_BOOLEAN).",".
+						" oe_kurzbz_verantwortlich=".$this->db_add_param($this->oe_kurzbz_verantwortlich).",".
+						" gueltig_ab=".$this->db_add_param($this->gueltig_ab).
 						" WHERE dms_id=".$this->db_add_param($this->dms_id,FHC_INTEGER)." AND version=".$this->db_add_param($this->version, FHC_INTEGER).";";
 		}
 
@@ -685,6 +698,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -789,6 +805,9 @@ class dms extends basis_db
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
 				$obj->berechtigung_kurzbz = $row->berechtigung_kurzbz;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -840,6 +859,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -888,6 +910,9 @@ class dms extends basis_db
 				$obj->version = $row->version;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -966,6 +991,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -1017,6 +1045,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -1069,6 +1100,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}
@@ -1425,6 +1459,9 @@ class dms extends basis_db
 				$obj->updateamum = $row->updateamum;
 				$obj->cis_suche = $this->db_parse_bool($row->cis_suche);
 				$obj->schlagworte = $row->schlagworte;
+				$obj->gueltig_ab = $row->gueltig_ab;
+				$obj->oe_kurzbz_verantwortlich = $row->oe_kurzbz_verantwortlich;
+				$obj->archiviert = $this->db_parse_bool($row->archiviert);
 
 				$this->result[] = $obj;
 			}

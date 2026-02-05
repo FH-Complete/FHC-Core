@@ -17,13 +17,14 @@
  * Karl Burkhart <karl.burkhart@technikum-wien.at> and
  * Manfred Kindl <manfred.kindl@technikum-wien.at>.
  */
-require_once ('../config/cis.config.inc.php');
-require_once ('../include/functions.inc.php');
-require_once ('../include/dms.class.php');
-require_once ('../include/benutzerberechtigung.class.php');
-require_once ('../include/basis_db.class.php');
-require_once ('../include/datum.class.php');
-require_once ('../include/log.class.php');
+require_once('../config/cis.config.inc.php');
+require_once('../include/functions.inc.php');
+require_once('../include/dms.class.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/basis_db.class.php');
+require_once('../include/datum.class.php');
+require_once('../include/log.class.php');
+require_once('../include/organisationseinheit.class.php');
 
 $db = new basis_db();
 $user = get_uid();
@@ -52,6 +53,7 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 	<script type="text/javascript" src="../vendor/jquery/sizzle/sizzle.js"></script>
 	<script type="text/javascript" src="../vendor/joeldbirch/superfish/dist/js/superfish.min.js"></script>
 	<script type="text/javascript" src="../include/tiny_mce/tiny_mce_popup.js"></script>
+	<script type="text/javascript" src="../include/js/jquery.ui.datepicker.translation.js"></script>
 	<style type="text/css">
 	.buttondesign
 	{
@@ -129,6 +131,8 @@ if (! $rechte->isberechtigt('basis/dms', null, 's', null))
 	{
 		//$('#divupload').hide();
 		jQuery('ul.sf-menu').superfish({speed:'fast', delay:200});
+
+		$(".datepicker_datum").datepicker($.datepicker.regional['de']);
 	});
 
 	function upload(id, name)
@@ -265,6 +269,11 @@ $mimetypes = array(
 	'image/png' => 'img_icon.png'
 );
 
+// Organsiationseinheit dropdown
+$organisationseinheiten = new organisationseinheit();
+$organisationseinheiten->getAll(true, null, 'organisationseinheittyp_kurzbz, bezeichnung');
+$oe_typ = '';
+
 // Hole Datei aus Import Verzeichnis
 if ($importFile != '')
 {
@@ -334,6 +343,9 @@ if (isset($_POST['fileupload']))
 	$schlagworte = $_POST['schlagworte'];
 	$mimetype = isset($_POST['mimetype']) ? $_POST['mimetype'] : '';
 	$cis_suche = isset($_POST['cis_suche']) ? true : false;
+	$gueltig_ab = isset($_POST['gueltig_ab']) ? $_POST['gueltig_ab'] : null;
+	$oe_kurzbz_verantwortlich = isset($_POST['oe_kurzbz_verantwortlich']) ? $_POST['oe_kurzbz_verantwortlich'] : null;
+	$archiviert = isset($_POST['archiviert']) ? true : false;
 	$ext = pathinfo($_FILES['userfile']['name'], PATHINFO_EXTENSION);
 	$filename = uniqid();
 	$filename .= ".".$ext;
@@ -377,6 +389,10 @@ if (isset($_POST['fileupload']))
 		$dms->beschreibung = $beschreibung;
 		$dms->schlagworte = $schlagworte;
 		$dms->cis_suche = $cis_suche;
+		$gueltig_ab_date = DateTime::createFromFormat('d.m.Y', $gueltig_ab);
+		$dms->gueltig_ab = $gueltig_ab_date->format('Y-m-d');
+		$dms->oe_kurzbz_verantwortlich = $oe_kurzbz_verantwortlich;
+		$dms->archiviert = $archiviert;
 
 		if ($dms->save(true))
 		{
@@ -414,6 +430,9 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 	$schlagworte = $_POST['schlagworte'];
 	$mimetype = isset($_POST['mimetype']) ? $_POST['mimetype'] : '';
 	$cis_suche = isset($_POST['cis_suche']) ? true : false;
+	$gueltig_ab = isset($_POST['gueltig_ab']) ? $_POST['gueltig_ab'] : null;
+	$oe_kurzbz_verantwortlich = isset($_POST['oe_kurzbz_verantwortlich']) ? $_POST['oe_kurzbz_verantwortlich'] : null;
+	$archiviert = isset($_POST['archiviert']) ? true : false;
 
 	$dms = new dms();
 	if ($dms->load($dms_id, $version))
@@ -432,6 +451,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'rename')
 		}
 		$dms->updateamum = date('Y-m-d H:i:s');
 		$dms->updatevon = $user;
+		$gueltig_ab_date = DateTime::createFromFormat('d.m.Y', $gueltig_ab);
+		$dms->gueltig_ab = $gueltig_ab_date->format('Y-m-d');
+		$dms->oe_kurzbz_verantwortlich = $oe_kurzbz_verantwortlich;
+		$dms->archiviert = $archiviert;
 
 		if ($dms->save(false))
 			echo '<span class="ok">Dateiname wurde erfolgreich geändert</span>';
@@ -1038,6 +1061,34 @@ else
 					<td><input type="checkbox" id="cis_suche_checkbox" name="cis_suche"></td>
 				</tr>
 				<tr>
+					<td>Gültig ab</td>
+					<td><input id="gueltig_ab" class="datepicker_datum" type="text" name="gueltig_ab" value=""></td>
+				</tr>
+				<tr>
+                                        <td>Organisationseinheit: <br>(Upload, Ansicht, Änderungen)</td>
+					<td>
+						<select name="oe_kurzbz_verantwortlich">
+                                                	<option value="">-- Bitte Auswählen --</option>';
+                                                		foreach ($organisationseinheiten->result as $oe)
+                                                		{
+                                                		        if ($oe_typ != $oe->organisationseinheittyp_kurzbz || $oe_typ == '')
+                                                		        {
+                                                		                if ($oe_typ != '') echo '</optgroup>';
+
+                                                		                echo '<optgroup label="'.$oe->organisationseinheittyp_kurzbz.'">';
+                                                		        }
+                                                		        echo '<option value="'.$oe->oe_kurzbz.'">'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</option>';
+                                                		        $oe_typ = $oe->organisationseinheittyp_kurzbz;
+                                                		}
+		echo '
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>Archiviert</td>
+					<td><input type="checkbox" id="archiviert_checkbox" name="archiviert"></td>
+				</tr>
+				<tr>
 					<td></td>
 					<td><input type="file" name="userfile"></td>
 				</tr>
@@ -1555,6 +1606,7 @@ function drawFilesList($rows)
 function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching, $searchstring)
 {
 	global $kategorie_kurzbz;
+	global $organisationseinheiten, $oe_typ;
 
 	$dms = new dms();
 	if ($dms->load($dms_id, $version))
@@ -1577,6 +1629,12 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 				echo '&dpp='.$dpp;
 			echo '" method="POST">';
 		}
+		$gueltig_ab_date = '';
+		if ($dms->gueltig_ab != null || $dms->gueltig_ab != '')
+		{
+			$tmp_date = date_create($dms->gueltig_ab);
+			$gueltig_ab_date = $tmp_date->format('d.m.Y');
+		}
 		echo '
 		<table>
 		<tr>
@@ -1598,6 +1656,37 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 		<tr>
 			<td>CIS-Suche:</td>
 			<td><input type="checkbox" name="cis_suche" '.($dms->cis_suche == 'true'?'checked="checked"':'').'></td>
+		</tr>
+		<tr>
+			<td>Gültig ab</td>
+			<td><input id="gueltig_ab" class="datepicker_datum" type="text" name="gueltig_ab" value="'.$gueltig_ab_date.'"></td>
+		</tr>
+		<tr>
+                        <td>Organisationseinheit: <br>(Upload, Ansicht, Änderungen)</td>
+			<td>
+				<select name="oe_kurzbz_verantwortlich">
+                                	<option value="">-- Bitte Auswählen --</option>';
+                                		foreach ($organisationseinheiten->result as $oe)
+                                		{
+                                		        if ($oe_typ != $oe->organisationseinheittyp_kurzbz || $oe_typ == '')
+                                		        {
+                                		                if ($oe_typ != '') echo '</optgroup>';
+
+                                		                echo '<optgroup label="'.$oe->organisationseinheittyp_kurzbz.'">';
+                                		        }
+							$selected = '';
+                                                        if ($oe->oe_kurzbz == $dms->oe_kurzbz_verantwortlich)
+                                                                $selected = 'selected';
+                                		        echo '<option '.$selected.' value="'.$oe->oe_kurzbz.'">'.$oe->organisationseinheittyp_kurzbz.' '.$oe->bezeichnung.'</option>';
+                                                		        $oe_typ = $oe->organisationseinheittyp_kurzbz;
+						}
+		echo '
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>Archiviert</td>
+			<td><input type="checkbox" id="archiviert_checkbox" name="archiviert" '.($dms->archiviert == 'true'?'checked="checked"':'').'></td>
 		</tr>
 		</table>
 		<input type="hidden" name="action" value="rename">

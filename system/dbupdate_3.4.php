@@ -89,6 +89,7 @@ require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
 require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
 require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
+require_once('dbupdate_3.4/70806_DMS_Erweiterung_Metadaten.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -151,7 +152,7 @@ $tabellen=array(
 	"campus.tbl_dms"  => array("dms_id","oe_kurzbz","dokument_kurzbz","kategorie_kurzbz"),
 	"campus.tbl_dms_kategorie"  => array("kategorie_kurzbz","bezeichnung","beschreibung","parent_kategorie_kurzbz","oe_kurzbz","berechtigung_kurzbz"),
 	"campus.tbl_dms_kategorie_gruppe" => array("kategorie_kurzbz","gruppe_kurzbz","insertamum","insertvon"),
-	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon","cis_suche","schlagworte"),
+	"campus.tbl_dms_version"  => array("dms_id","version","filename","mimetype","name","beschreibung","letzterzugriff","updateamum","updatevon","insertamum","insertvon","cis_suche","schlagworte", "oe_kurzbz_verantwortlich", "gueltig_ab", "archiviert"),
 	"campus.tbl_erreichbarkeit"  => array("erreichbarkeit_kurzbz","beschreibung","farbe"),
 	"campus.tbl_feedback"  => array("feedback_id","betreff","text","datum","uid","lehrveranstaltung_id","updateamum","updatevon","insertamum","insertvon"),
 	"campus.tbl_freebusy"  => array("freebusy_id","uid","freebusytyp_kurzbz","url","aktiv","bezeichnung","insertamum","insertvon","updateamum","updatevon"),
