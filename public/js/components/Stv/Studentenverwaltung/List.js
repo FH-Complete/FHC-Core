@@ -579,12 +579,12 @@ export default {
 
 			<template #actions v-if="filter.length">
 			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
-				<p class="text-danger mb-0">
+				<p class="text-success mb-0">
 				  <strong>{{$p.t('filter','filterActive')}}</strong>
 				</p>
 
 				<button
-				  class="btn btn-outline-danger sm"
+				  class="btn btn-outline-success sm"
 				  :title="$p.t('filter/filterDelete')"
 				  @click="resetFilter"
 				>
