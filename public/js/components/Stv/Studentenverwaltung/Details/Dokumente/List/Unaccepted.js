@@ -17,12 +17,10 @@ export default {
 	},
 	data(){
 		return {
-			layout: 'fitDataStretchFrozen',
 			layoutColumnsOnNewData: false,
 			height: 300,
 			selectable: true,
 			selectableRangeMode: 'click',
-			persistenceID: 'core-details-documents-unaccepted',
 			listDocuments: [],
 			prestudentDocumentData: [],
 		}
@@ -37,6 +35,8 @@ export default {
 						studiengang_kz: this.studiengang_kz})
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'stv-details-unaccepted-2026020401',
+				layout: 'fitDataStretchFrozen',
 				columns: [
 					{title: "Dokument", field: "bezeichnung"},
 					{title: "Kurzbz", field: "dokument_kurzbz", visible: false},
@@ -184,38 +184,29 @@ export default {
 					handler: async () => {
 						await this.$p.loadCategory(['global', 'dokumente', 'ui', 'mobility', 'ampeln']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'dokument')
-						});
-						cm.getColumnByField('dokument_kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz')
-						});
-						cm.getColumnByField('hochgeladenamum').component.updateDefinition({
-							title: this.$p.t('global', 'uploaddatum')
-						});
-						cm.getColumnByField('nachgereicht').component.updateDefinition({
-							title: this.$p.t('dokumente', 'nachgereicht')
-						});
-						cm.getColumnByField('vorhanden').component.updateDefinition({
-							title: this.$p.t('dokumente', 'vorhanden')
-						});
-						cm.getColumnByField('titel_intern').component.updateDefinition({
-							title: this.$p.t('global', 'titel')
-						});
-						cm.getColumnByField('anmerkung_intern').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('akte_id').component.updateDefinition({
-							title: this.$p.t('global', 'akte_id')
-						});
-						cm.getColumnByField('pflicht').component.updateDefinition({
-							title: this.$p.t('ampeln', 'mandatory')
-						});
-						cm.getColumnByField('nachgereicht_am').component.updateDefinition({
-							title: this.$p.t('global', 'dokument')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('bezeichnung', this.$p.t('global', 'dokument'));
+						setHeader('dokument_kurzbz', this.$p.t('mobility', 'kurzbz'));
+						setHeader('hochgeladenamum', this.$p.t('global', 'uploaddatum'));
+						setHeader('nachgereicht', this.$p.t('dokumente', 'nachgereicht'));
+						setHeader('vorhanden', this.$p.t('dokumente', 'vorhanden'));
+						setHeader('titel_intern', this.$p.t('global', 'titel'));
+						setHeader('anmerkung_intern', this.$p.t('global', 'anmerkung'));
+						setHeader('akte_id', this.$p.t('global', 'akte_id'));
+						setHeader('pflicht', this.$p.t('ampeln', 'mandatory'));
+						setHeader('nachgereicht_am', this.$p.t('global', 'dokument'));
 					}
 				},
 				{

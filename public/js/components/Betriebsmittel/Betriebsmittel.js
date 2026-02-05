@@ -53,7 +53,6 @@ export default {
 			layout: 'fitColumns',
 			layoutColumnsOnNewData: false,
 			height: '550',
-			persistenceID: 'core-betriebsmittel'
 		}
 	},
 	computed: {
@@ -64,6 +63,7 @@ export default {
 					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'core-betriebsmittel',
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
 					{title: "PersonId", field: "person_id", visible: false},
@@ -171,41 +171,30 @@ export default {
 
 						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel', 'person']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('nummer').component.updateDefinition({
-							title: this.$p.t('wawi', 'nummer')
-						});
-						cm.getColumnByField('betriebsmitteltyp').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('retouram').component.updateDefinition({
-							title: this.$p.t('wawi', 'retourdatum')
-						});
-						cm.getColumnByField('beschreibung').component.updateDefinition({
-							title: this.$p.t('global', 'beschreibung')
-						});
-						cm.getColumnByField('kaution').component.updateDefinition({
-							title: this.$p.t('infocenter', 'kaution')
-						});
-						cm.getColumnByField('ausgegebenam').component.updateDefinition({
-							title: this.$p.t('wawi', 'ausgabedatum')
-						});
-						cm.getColumnByField('betriebsmittel_id').component.updateDefinition({
-							title: this.$p.t('ui', 'betriebsmittel_id')
-						});
-						cm.getColumnByField('betriebsmittelperson_id').component.updateDefinition({
-							title: this.$p.t('ui', 'betriebsmittelperson_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('uid').component.updateDefinition({
-							title: this.$p.t('person', 'uid')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('nummer', this.$p.t('wawi', 'nummer'));
+						setHeader('betriebsmitteltyp', this.$p.t('global', 'typ'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('retouram', this.$p.t('wawi', 'retourdatum'));
+						setHeader('beschreibung', this.$p.t('global', 'beschreibung'));
+						setHeader('kaution', this.$p.t('infocenter', 'kaution'));
+						setHeader('ausgegebenam', this.$p.t('wawi', 'ausgabedatum'));
+						setHeader('betriebsmittel_id', this.$p.t('ui', 'betriebsmittel_id'));
+						setHeader('betriebsmittelperson_id', this.$p.t('ui', 'betriebsmittelperson_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('uid', this.$p.t('person', 'uid'));
 					}
 				}
 			];

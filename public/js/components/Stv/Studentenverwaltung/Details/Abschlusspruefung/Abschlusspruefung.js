@@ -79,8 +79,6 @@ export default {
 			layoutColumnsOnNewData: false,
 			height: 'auto',
 			minHeight: '200',
-			index: 'abschlusspruefung_id',
-			persistenceID: 'stv-details-finalexam-2025112401'
 		}
 	},
 	computed: {
@@ -89,6 +87,8 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvAbschlusspruefung.getAbschlusspruefung(this.student.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'abschlusspruefung_id',
+				persistenceID: 'stv-details-finalexam-2025112401',
 				columns: [
 					{title: "vorsitz", field: "vorsitz_nachname"},
 					{title: "abschlussbeurteilung", field: "beurteilung_bezeichnung"},
@@ -196,50 +196,36 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['global', 'person', 'stv', 'abschlusspruefung', 'ui']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('vorsitz_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'vorsitz_header')
-						});
-						cm.getColumnByField('beurteilung_bezeichnung').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'abschlussbeurteilung')
-						});
-						cm.getColumnByField('p1_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer1')
-						});
-						cm.getColumnByField('p2_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer2')
-						});
-						cm.getColumnByField('p3_nachname').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefer3')
-						});
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('uhrzeit').component.updateDefinition({
-							title: this.$p.t('global', 'uhrzeit')
-						});
-						cm.getColumnByField('freigabedatum').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'freigabe')
-						});
-						cm.getColumnByField('antritt_bezeichnung').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'pruefungsantritt')
-						});
-						cm.getColumnByField('sponsion').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'sponsion')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('abschlusspruefung_id').component.updateDefinition({
-							title: this.$p.t('abschlusspruefung', 'abschlusspruefung_id')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('vorsitz_nachname', this.$p.t('abschlusspruefung', 'vorsitz_header'));
+						setHeader('beurteilung_bezeichnung', this.$p.t('abschlusspruefung', 'abschlussbeurteilung'));
+						setHeader('p1_nachname', this.$p.t('abschlusspruefung', 'pruefer1'));
+						setHeader('p2_nachname', this.$p.t('abschlusspruefung', 'pruefer2'));
+						setHeader('p3_nachname', this.$p.t('abschlusspruefung', 'pruefer3'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('uhrzeit', this.$p.t('global', 'uhrzeit'));
+						setHeader('freigabedatum', this.$p.t('abschlusspruefung', 'freigabe'));
+						setHeader('antritt_bezeichnung', this.$p.t('abschlusspruefung', 'pruefungsantritt'));
+						setHeader('sponsion', this.$p.t('abschlusspruefung', 'sponsion'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('pruefungstyp_kurzbz', this.$p.t('global', 'typ'));
+						setHeader('abschlusspruefung_id', this.$p.t('abschlusspruefung', 'abschlusspruefung_id'));
 					}
 				}
 			];

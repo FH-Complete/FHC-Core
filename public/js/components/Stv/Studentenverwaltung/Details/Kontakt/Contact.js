@@ -59,6 +59,7 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'stv-details-kontakt-contact',
 				columns:[
 					{title:"Typ", field:"kontakttypbeschreibung"},
 					{title:"Kontakt", field:"kontakt"},
@@ -134,7 +135,7 @@ export default {
 		},
 		tabulatorEvents() {
 			const events = [
-				{
+/*				{
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['notiz','global','person']);
@@ -174,6 +175,37 @@ export default {
 						cm.getColumnByField('standort_id').component.updateDefinition({
 							title: this.$p.t('ui', 'standort_id')
 						});
+					}
+				},	*/
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['notiz','global','person']);
+
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('kontakttypbeschreibung', this.$p.t('global', 'typ'));
+						setHeader('kontakt', this.$p.t('global', 'kontakt'));
+						setHeader('zustellung', this.$p.t('person', 'zustellung'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('name', this.$p.t('person', 'firma'));
+						setHeader('bezeichnung', this.$p.t('person', 'standort'));
+						setHeader('firma_id', this.$p.t('ui', 'firma_id'));
+						setHeader('kontakt_id', this.$p.t('ui', 'kontakt_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('standort_id', this.$p.t('ui', 'standort_id'));
 					}
 				}
 			];

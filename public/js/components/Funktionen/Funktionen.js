@@ -60,8 +60,7 @@ export default {
 			selectedOe: null,
 			layout: 'fitDataFill',
 			layoutColumnsOnNewData: false,
-			height: '300',
-			persistenceID: 'core-functions',
+			height: '300'
 		}
 	},
 	computed: {
@@ -72,20 +71,33 @@ export default {
 					ApiCoreFunktion.getAllUserFunctions(this.personUID)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'core-functions',
 				columns: [
 					{
 						title: "dienstverhaeltnis_unternehmen",
 						field: "dienstverhaeltnis_unternehmen",
 						headerFilter: "list",
-						headerFilterParams: {valuesLookup: true, autocomplete: true, sort: "asc"},
+						headerFilterParams: {
+							valuesLookup: true, autocomplete: true, sort: "asc"
+						},
+						width: 140,
+						//Field Company: if visible show link to dv
+						visible: this.showDvCompany,
+						formatter: this.companyLinkFormatter
 					},
 					{
 						title: "funktion_beschreibung", field: "funktion_beschreibung", headerFilter: "list",
-						headerFilterParams: {valuesLookup: true, autocomplete: true, sort: "asc"},
+						headerFilterParams: {
+							valuesLookup: true, autocomplete: true, sort: "asc"
+						},
+						width: 140
 					},
 					{
 						title: "funktion_oebezeichnung", field: "funktion_oebezeichnung", headerFilter: "list",
-						headerFilterParams: {valuesLookup: true, autocomplete: true, sort: "asc"}
+						headerFilterParams: {
+							valuesLookup: true, autocomplete: true, sort: "asc"
+						},
+						width: 140
 					},
 					{title: "wochenstunden", field: "wochenstunden", headerFilter: true},
 					{
@@ -120,7 +132,7 @@ export default {
 							});
 						},
 					},
-					{title: "bezeichnung", field: "bezeichnung", headerFilter: true},
+					{title: "bezeichnung", field: "bezeichnung", headerFilter: true, width: 140},
 					{title: "aktiv", field: "aktiv", visible: false},
 					{title: "benutzerfunktion_id", field: "benutzerfunktion_id", visible: false},
 					{title: "uid", field: "uid", visible: false},
@@ -184,47 +196,27 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['global', 'lehre', 'person', 'ui']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						//Field Company: if visible show link to dv
-						const column = cm.getColumnByField('dienstverhaeltnis_unternehmen');
-						const companyDv = {
-							title: this.$p.t('person', 'dv_unternehmen'),
-							width: 140,
-							visible: this.showDvCompany,
-							formatter: this.companyLinkFormatter
-						};
-						column.component.updateDefinition(companyDv);
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('funktion_beschreibung').component.updateDefinition({
-							title: this.$p.t('person', 'zuordnung_taetigkeit'),
-							width: 140
-						});
-						cm.getColumnByField('funktion_oebezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'organisationseinheit'),
-							width: 140
-						});
-						cm.getColumnByField('wochenstunden').component.updateDefinition({
-							title: this.$p.t('person', 'wochenstunden')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						const columnDatumVon = cm.getColumnByField('datum_von');
-						const fieldVonDatum = {
-							title: this.$p.t('ui', 'from')
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
 						};
 
-						columnDatumVon.component.updateDefinition(fieldVonDatum);
-
-						const columnDatumBis = cm.getColumnByField('datum_bis');
-						const fieldBisDatum = {
-							title: this.$p.t('global', 'bis'),
-						};
-						columnDatumBis.component.updateDefinition(fieldBisDatum);
-
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('ui', 'bezeichnung'),
-							width: 140
-						});
+						setHeader('dienstverhaeltnis_unternehmen', this.$p.t('person', 'dv_unternehmen'));
+						setHeader('funktion_beschreibung', this.$p.t('person', 'zuordnung_taetigkeit'));
+						setHeader('funktion_oebezeichnung', this.$p.t('lehre', 'organisationseinheit'));
+						setHeader('wochenstunden', this.$p.t('person', 'wochenstunden'));
+						setHeader('datum_von', this.$p.t('ui', 'from'));
+						setHeader('datum_bis', this.$p.t('global', 'bis'));
+						setHeader('bezeichnung', this.$p.t('ui', 'bezeichnung'));
 					}
 				}
 			];

@@ -52,9 +52,7 @@ export default {
 			layout: 'fitDataStretchFrozen',
 			layoutColumnsOnNewData: false,
 			height: 'auto',
-			minHeight: 200,
-			index: 'aufnahmetermin_id',
-			persistenceID: 'stv-details-table_admission-dates-2025112401'
+			minHeight: 200
 		}
 	},
 	methods: {
@@ -250,6 +248,8 @@ export default {
 				dataLoaded: function() {
 					this.redraw(true);
 				},
+				index: 'aufnahmetermin_id',
+				persistenceID: 'stv-details-table_admission-dates-2025112401',
 				columns: [
 					{title: "rt_id", field: "rt_id", visible: false},
 					{title: "rt_person_id", field: "rt_person_id", visible: false},
@@ -338,53 +338,34 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['admission', 'global', 'person', 'ui', 'projektarbeitsbeurteilung']);
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('rt_id').component.updateDefinition({
-							title: this.$p.t('ui', 'reihungstest_id')
-						});
-						cm.getColumnByField('rt_person_id').component.updateDefinition({
-							title: this.$p.t('ui', 'reihungstest_person_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('stufe').component.updateDefinition({
-							title: this.$p.t('admission', 'stufe')
-						});
-						cm.getColumnByField('studiensemester').component.updateDefinition({
-							title: this.$p.t('lehre', 'studiensemester')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('anmeldedatum').component.updateDefinition({
-							title: this.$p.t('admission', 'anmeldedatum')
-						});
-						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('exam', 'punkte')
-						});
-						cm.getColumnByField('teilgenommen').component.updateDefinition({
-							title: this.$p.t('admission', 'teilgenommen')
-						});
-						cm.getColumnByField('ort').component.updateDefinition({
-							title: this.$p.t('person', 'ort')
-						});
-						cm.getColumnByField('studienplan').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
-						cm.getColumnByField('studienplan_id').component.updateDefinition({
-							title: this.$p.t('ui', 'studienplan_id')
-						});
-						cm.getColumnByField('studiengangkurzbzlang_ber').component.updateDefinition({
-							title: this.$p.t('projektarbeitsbeurteilung', 'studiengang')
-						});
-						cm.getColumnByField('studiengang_kz_ber').component.updateDefinition({
-							title: this.$p.t('admission', 'stg_kurz')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('rt_id', this.$p.t('ui', 'reihungstest_id'));
+						setHeader('rt_person_id', this.$p.t('ui', 'reihungstest_person_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('stufe', this.$p.t('admission', 'stufe'));
+						setHeader('studiensemester', this.$p.t('lehre', 'studiensemester'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('anmeldedatum', this.$p.t('admission', 'anmeldedatum'));
+						setHeader('punkte', this.$p.t('exam', 'punkte'));
+						setHeader('teilgenommen', this.$p.t('admission', 'teilgenommen'));
+						setHeader('ort', this.$p.t('person', 'ort'));
+						setHeader('studienplan', this.$p.t('lehre', 'studienplan'));
+						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));
+						setHeader('studiengangkurzbzlang_ber', this.$p.t('projektarbeitsbeurteilung', 'studiengang'));
+						setHeader('studiengang_kz_ber', this.$p.t('admission', 'stg_kurz'));
 					}
 				}
 			];

@@ -29,10 +29,41 @@ export default{
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			pruefungData: {},
+			listTypesExam: [],
+			listLvsAndLes: [],
+			listLvsAndMas: [],
+			listLvs: [],
+			listLes: [],
+			listMas: [],
+			listMarks: [],
+			zeugnisData: [],
+			filter: false,
+			statusNew: true,
+			isStartDropDown: false,
+			isFilterSet: false,
+			showHint: false,
+		}
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvExam.getPruefungen(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				layout: 'fitDataStretchFrozen',
+				layoutColumnsOnNewData: false,
+				height: 'auto',
+				index: 'pruefung_id',
+				persistenceID: 'stv-details-pruefung-list-2026012701',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false
+				},
 				columns: [
 					{title: "Datum", field: "format_datum"},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
@@ -87,81 +118,44 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				index: 'pruefung_id',
-				persistenceID: 'stv-details-pruefung-list-2026012701',
-				persistence: {
-					sort: false,
-					columns: ["width", "visible", "frozen"],
-					filter: false,
-					headerFilter: false,
-					group: false,
-					page: false
-				}
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['fristenmanagement', 'global', 'lehre', 'exam', 'ui']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('format_datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('lehrveranstaltung_bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrveranstaltung')
-						});
-						cm.getColumnByField('note_bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'note')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('exam', 'punkte')
-						});
-						cm.getColumnByField('pruefung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'pruefung_id')
-						});
-						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('global', 'lehreinheit_id')
-						});
-						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'mitarbeiter_uid')
-						});
-						cm.getColumnByField('student_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'student_uid')
-						});
-						//Uncaught TypeError: e.element.after is not a function
-						/*	cm.getColumnByField('actions').component.updateDefinition({
-								title: this.$p.t('global', 'actions')
-							});*/
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('format_datum', this.$p.t('global', 'datum'));
+						setHeader('lehrveranstaltung_bezeichnung', this.$p.t('lehre', 'lehrveranstaltung'));
+						setHeader('note_bezeichnung', this.$p.t('lehre', 'note'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('pruefungstyp_kurzbz', this.$p.t('global', 'typ'));
+						setHeader('punkte', this.$p.t('exam', 'punkte'));
+						setHeader('pruefung_id', this.$p.t('ui', 'pruefung_id'));
+						setHeader('lehreinheit_id', this.$p.t('global', 'lehreinheit_id'));
+						setHeader('mitarbeiter_uid', this.$p.t('ui', 'mitarbeiter_uid'));
+						setHeader('student_uid', this.$p.t('ui', 'student_uid'));
 					}
-				}
-			],
-			pruefungData: {},
-			listTypesExam: [],
-			listLvsAndLes: [],
-			listLvsAndMas: [],
-			listLvs: [],
-			listLes: [],
-			listMas: [],
-			listMarks: [],
-			zeugnisData: [],
-			filter: false,
-			statusNew: true,
-			isStartDropDown: false,
-			isFilterSet: false,
-			showHint: false,
-		}
-	},
-	computed:{
+				},
+			];
+			return events;
+		},
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
 		},

@@ -28,13 +28,10 @@ export default {
 			previewBody: "",
 			open: false,
 			personId: null,
-			layout: 'fitDataStretchFrozen',
 			layoutColumnsOnNewData:	false,
 			height: '400',
-			persistenceID: 'core-message-2025112401',
 			selectable: 1,
 			selectableRangeMode: 'click',
-			index: 'message_id',
 		}
 	},
 	methods: {
@@ -131,6 +128,9 @@ export default {
 					};
 				},
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
+				layout: 'fitDataStretchFrozen',
+				index: 'message_id',
+				persistenceID: 'core-message-2025112401',
 				columns: [
 					{title: "subject", field: "subject", headerFilter: true},
 					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
@@ -178,8 +178,12 @@ export default {
 							"archived",
 							"deleted"
 						],
-						formatter: (cell, formatterParams) => {
+/*						formatter: (cell, formatterParams) => {
 							return formatterParams[cell.getValue()];
+						},*/
+						formatter: (cell, formatterParams) => {
+							const key = formatterParams[cell.getValue()];
+							return this.$p.t('messages', key);
 						},
 					},
 					{
@@ -291,44 +295,29 @@ export default {
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('subject').component.updateDefinition({
-							title: this.$p.t('global', 'betreff')
-						});
-						cm.getColumnByField('body').component.updateDefinition({
-							title: this.$p.t('messages', 'body')
-						});
-						cm.getColumnByField('message_id').component.updateDefinition({
-							title: this.$p.t('messages', 'message_id')
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('sender').component.updateDefinition({
-							title: this.$p.t('messages', 'sender')
-						});
-						cm.getColumnByField('recipient').component.updateDefinition({
-							title: this.$p.t('messages', 'recipient')
-						});
-						cm.getColumnByField('sender_id').component.updateDefinition({
-							title: this.$p.t('messages', 'senderId')
-						});
-						cm.getColumnByField('recipient_id').component.updateDefinition({
-							title: this.$p.t('messages', 'recipientId')
-						});
-						cm.getColumnByField('statusdatum').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('status').component.updateDefinition({
-							formatterParams: [
-								this.$p.t('messages/unread'),
-								this.$p.t('messages/read'),
-								this.$p.t('messages/archived'),
-								this.$p.t('messages/deleted')
-							]
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('subject', this.$p.t('global', 'betreff'));
+						setHeader('body', this.$p.t('messages', 'body'));
+						setHeader('message_id', this.$p.t('messages', 'message_id'));
+						setHeader('insertamum', this.$p.t('global', 'datum'));
+						setHeader('sender', this.$p.t('messages', 'sender'));
+						setHeader('recipient', this.$p.t('messages', 'recipient'));
+						setHeader('sender_id', this.$p.t('messages', 'senderId'));
+						setHeader('recipient_id', this.$p.t('messages', 'recipientId'));
+						setHeader('statusdatum', this.$p.t('notiz', 'letzte_aenderung'));
+
 						this.$refs.table.tabulator.rowManager.getDisplayRows();
 					}
 				},

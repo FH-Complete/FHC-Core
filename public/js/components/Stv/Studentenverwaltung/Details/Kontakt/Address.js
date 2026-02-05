@@ -45,8 +45,6 @@ export default{
 				suggestions: null,
 				places: null
 			},
-			index: 'adresse_id',
-			persistenceID: 'stv-details-kontakt-address'
 		}
 	},
 	computed:{
@@ -56,6 +54,8 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvAddress.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
+				index: 'adresse_id',
+				persistenceID: 'stv-details-kontakt-address',
 				columns:[
 					{title:"Typ", field:"bezeichnung"},
 					{title:"Strasse", field:"strasse"},
@@ -158,61 +158,39 @@ export default{
 			const events = [
 				{
 					event: 'tableBuilt',
-					handler: async () => {
+					handler: async() => {
 						await this.$p.loadCategory(['notiz', 'global', 'person', 'ui']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('strasse').component.updateDefinition({
-							title: this.$p.t('person', 'strasse')
-						});
-						cm.getColumnByField('plz').component.updateDefinition({
-							title: this.$p.t('person', 'plz')
-						});
-						cm.getColumnByField('ort').component.updateDefinition({
-							title: this.$p.t('person', 'ort')
-						});
-						cm.getColumnByField('gemeinde').component.updateDefinition({
-							title: this.$p.t('person', 'gemeinde')
-						});
-						cm.getColumnByField('nation').component.updateDefinition({
-							title: this.$p.t('person', 'nation')
-						});
-						cm.getColumnByField('heimatadresse').component.updateDefinition({
-							title: this.$p.t('person', 'heimatadresse')
-						});
-						cm.getColumnByField('zustelladresse').component.updateDefinition({
-							title: this.$p.t('person', 'zustelladresse')
-						});
-						cm.getColumnByField('co_name').component.updateDefinition({
-							title: this.$p.t('person', 'co_name')
-						});
-						cm.getColumnByField('name').component.updateDefinition({
-							title: this.$p.t('person', 'firma_zusatz')
-						});
-						cm.getColumnByField('firmenname').component.updateDefinition({
-							title: this.$p.t('person', 'firma')
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('rechnungsadresse').component.updateDefinition({
-							title: this.$p.t('person', 'rechnungsadresse')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('firma_id').component.updateDefinition({
-							title: this.$p.t('ui', 'firma_id')
-						});
-						cm.getColumnByField('adresse_id').component.updateDefinition({
-							title: this.$p.t('ui', 'adresse_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('bezeichnung', this.$p.t('global', 'typ'));
+						setHeader('strasse', this.$p.t('person', 'strasse'));
+						setHeader('plz', this.$p.t('person', 'plz'));
+						setHeader('ort', this.$p.t('person', 'ort'));
+						setHeader('gemeinde', this.$p.t('person', 'gemeinde'));
+						setHeader('nation', this.$p.t('person', 'nation'));
+						setHeader('heimatadresse', this.$p.t('person', 'heimatadresse'));
+						setHeader('zustelladresse', this.$p.t('person', 'zustelladresse'));
+						setHeader('co_name', this.$p.t('person', 'co_name'));
+						setHeader('name', this.$p.t('person', 'firma_zusatz'));
+						setHeader('firmenname', this.$p.t('person', 'firma'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('rechnungsadresse', this.$p.t('person', 'rechnungsadresse'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('firma_id', this.$p.t('ui', 'firma_id'));
+						setHeader('adresse_id', this.$p.t('ui', 'adresse_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
 					}
 				}
 			];

@@ -15,8 +15,7 @@ export default{
 			layout: 'fitDataFill',
 			layoutColumnsOnNewData:	false,
 			height:	'auto',
-			selectable:	false,
-			persistenceID: 'stv-details-prestudent-history',
+			selectable:	false
 		}
 	},
 	computed: {
@@ -26,6 +25,7 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
+				persistenceID: 'stv-details-prestudent-history',
 				columns:[
 					{title:"StSem", field:"studiensemester_kurzbz"},
 					{title:"Prio", field:"priorisierung"},

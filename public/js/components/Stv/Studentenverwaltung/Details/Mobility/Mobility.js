@@ -61,8 +61,6 @@ export default {
 			layoutColumnsOnNewData: false,
 			height: 'auto',
 			minHeight: 200,
-			index: 'bisio_id',
-			persistenceID: 'stv-details-table_mobiliy-2025112401'
 		}
 	},
 	watch: {
@@ -80,6 +78,8 @@ export default {
 					ApiStvMobility.getMobilitaeten(this.student.uid)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'bisio_id',
+				persistenceID: 'stv-details-table_mobility-2025112401',
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},
@@ -161,26 +161,29 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
+
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['global', 'person', 'stv', 'mobility', 'ui']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz_program')
-						});
-						cm.getColumnByField('nation_code').component.updateDefinition({
-							title: this.$p.t('mobility', 'gastnation')
-						});
-						cm.getColumnByField('von').component.updateDefinition({
-							title: this.$p.t('ui', 'von')
-						});
-						cm.getColumnByField('bis').component.updateDefinition({
-							title: this.$p.t('global', 'bis')
-						});
-						cm.getColumnByField('bisio_id').component.updateDefinition({
-							title: this.$p.t('mobility', 'bisio_id')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('kurzbz', this.$p.t('mobility', 'kurzbz_program'));
+						setHeader('nation_code', this.$p.t('mobility', 'gastnation'));
+						setHeader('von', this.$p.t('ui', 'von'));
+						setHeader('bis', this.$p.t('global', 'bis'));
+						setHeader('bisio_id', this.$p.t('mobility', 'bisio_id'));
 					}
 				}
 			];

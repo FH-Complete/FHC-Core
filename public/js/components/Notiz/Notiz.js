@@ -227,7 +227,7 @@ export default {
 				index: 'notiz_id',
 				persistenceID: this.tabulatorPersistenceId,
 				persistence: {
-					sort: false,
+					sort: true,
 					columns: ["width", "visible", "frozen"],
 					filter: false,
 					headerFilter: false,
@@ -242,62 +242,39 @@ export default {
 					event: 'tableBuilt',
 					handler: async () => {
 
+						//to avoid js error
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['notiz', 'global', 'ui']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('verfasser').component.updateDefinition({
-							title: this.$p.t('notiz', 'verfasser'),
-						});
-						cm.getColumnByField('verfasser_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'verfasser_uid'),
-						});
-						cm.getColumnByField('titel').component.updateDefinition({
-							title: this.$p.t('global', 'titel'),
-						});
-						cm.getColumnByField('bearbeiter').component.updateDefinition({
-							title: this.$p.t('notiz', 'bearbeiter'),
-						});
-						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'bearbeiter_uid'),
-						});
-						cm.getColumnByField('start_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigVon'),
-						});
-						cm.getColumnByField('ende_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigBis'),
-						});
-						cm.getColumnByField('countdoc').component.updateDefinition({
-							title: this.$p.t('notiz', 'document'),
-						});
-						cm.getColumnByField('erledigt').component.updateDefinition({
-							title: this.$p.t('notiz', 'erledigt'),
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung'),
-						});
-						cm.getColumnByField('notiz_id').component.updateDefinition({
-							title: this.$p.t('ui', 'notiz_id')
-						});
-						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'notizzuordnung_id')
-						});
-						cm.getColumnByField('type_id').component.updateDefinition({
-							title: this.$p.t('ui', 'type_id')
-						});
-						cm.getColumnByField('id').component.updateDefinition({
-							title: this.$p.t('ui', 'extension_id')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							width: 250,
-							tooltip: true,
-							//clipContents: true,
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('verfasser', this.$p.t('notiz', 'verfasser'));
+						setHeader('verfasser_uid', this.$p.t('ui', 'verfasser_uid'));
+						setHeader('titel', this.$p.t('global', 'titel'));
+						setHeader('bearbeiter', this.$p.t('notiz', 'bearbeiter'));
+						setHeader('bearbeiter_uid', this.$p.t('ui', 'bearbeiter_uid'));
+						setHeader('start_format', this.$p.t('global', 'gueltigVon'));
+						setHeader('ende_format', this.$p.t('global', 'gueltigBis'));
+						setHeader('countdoc', this.$p.t('notiz', 'document'));
+						setHeader('erledigt', this.$p.t('notiz', 'erledigt'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('notiz_id', this.$p.t('ui', 'notiz_id'));
+						setHeader('notizzuordnung_id', this.$p.t('ui', 'notizzuordnung_id'));
+						setHeader('type_id', this.$p.t('ui', 'type_id'));
+						setHeader('id', this.$p.t('ui', 'extension_id'));
+						setHeader('text_stripped', this.$p.t('global', 'text'));
 
 						// Force layout recalculation for handling overflow text
 						this.$refs.table.tabulator.redraw(true);

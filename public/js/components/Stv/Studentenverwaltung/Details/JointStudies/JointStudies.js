@@ -24,12 +24,30 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			formData: {
+				mobilitaetstyp_kurzbz: "GS",
+				studiensemester_kurzbz: this.currentSemester,
+				status_kurzbz: 'Student',
+				mobilitaet_id: null
+			},
+			statusNew: true,
+			listTypenMobility: [],
+			listStudiensemester: [],
+			programsMobility: [],
+			listStudienprogramme: [],
+			listPartner: [],
+			statiPrestudent: [],
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvJointstudies.getStudies(this.student.prestudent_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'stv-details-jointstudies',
 				columns: [
 					{title: "mobilitaet_id", field: "mobilitaet_id", visible: false},
 					{title: "StSem", field: "studiensemester_kurzbz"},
@@ -120,70 +138,43 @@ export default {
 						frozen: true
 					},
 				],
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'jointstudies', 'ui', 'lehre', 'mobility']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('mobilitaet_id').component.updateDefinition({
-							title: this.$p.t('global', 'mobilitaet_id')
-						});
-/*						cm.getColumnByField('studiensemester_kurzbz').component.updateDefinition({
-							title: this.$p.t('lehre', 'studiensemester')
-						});*/
-						cm.getColumnByField('gsprogrammtyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-/*						cm.getColumnByField('ausbildungssemester').component.updateDefinition({
-							title: this.$p.t('lehre', 'semester')
-						});*/
-						cm.getColumnByField('prestudent_id').component.updateDefinition({
-							title: this.$p.t('global', 'prestudentID')
-						});
-						cm.getColumnByField('kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'mobilitaetsprogramm')
-						});
-						cm.getColumnByField('studienprogramm').component.updateDefinition({
-							title: this.$p.t('jointstudies', 'studienprogramm')
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'insertamum')
-						});
-						cm.getColumnByField('insertvon').component.updateDefinition({
-							title: this.$p.t('global', 'insertvon')
-						});
-						cm.getColumnByField('updateamum').component.updateDefinition({
-							title: this.$p.t('global', 'updateamum')
-						});
-						cm.getColumnByField('updatevon').component.updateDefinition({
-							title: this.$p.t('global', 'updatevon')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-/*						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-						});*/
+						setHeader('mobilitaet_id', this.$p.t('global', 'mobilitaet_id'));
+						setHeader('gsprogrammtyp_kurzbz', this.$p.t('global', 'typ'));
+						setHeader('prestudent_id', this.$p.t('global', 'prestudentID'));
+						setHeader('kurzbz', this.$p.t('mobility', 'mobilitaetsprogramm'));
+						setHeader('studienprogramm', this.$p.t('jointstudies', 'studienprogramm'));
+						setHeader('insertamum', this.$p.t('global', 'insertamum'));
+						setHeader('insertvon', this.$p.t('global', 'insertvon'));
+						setHeader('updateamum', this.$p.t('global', 'updateamum'));
+						setHeader('updatevon', this.$p.t('global', 'updatevon'));
 					}
 				}
-			],
-			formData: {
-				mobilitaetstyp_kurzbz: "GS",
-				studiensemester_kurzbz: this.currentSemester,
-				status_kurzbz: 'Student',
-				mobilitaet_id: null
-			},
-			statusNew: true,
-			listTypenMobility: [],
-			listStudiensemester: [],
-			programsMobility: [],
-			listStudienprogramme: [],
-			listPartner: [],
-			statiPrestudent: [],
-		}
+			];
+			return events;
+		},
 	},
 	methods: {
 		actionDeleteJointStudy(mobilitaet_id) {
