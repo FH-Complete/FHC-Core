@@ -335,7 +335,7 @@ export default {
 						{{departmentData.bezeichnung}}
 					<span v-if="leitungData.uid"> | </span>
 					<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
-					<a href="#" @click.prevent="goToLeitung" >
+					<a href="#" @click.prevent="goToLeitung">
 						{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
 					</a>
 					<p>

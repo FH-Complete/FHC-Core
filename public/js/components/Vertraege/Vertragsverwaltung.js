@@ -62,12 +62,14 @@ export default {
 							typeHeader="mitarbeiter"
 							:domain="config.domain"
 							fotoEditable
+							@redirectToLeitung="handleSelection"
 						>
 							<template #uid>{{mitarbeiter_uid}}</template>
 							<template #titleAlphaTile>pID</template>
 							<template #valueAlphaTile>{{person_id}}</template>
 						</fhc-header>
 						<vertraege-mitarbeiter
+							ref="CoreTableVertraege"
 							:endpoint="endpoint"
 							:person_id="this.person_id"
 							:mitarbeiter_uid="this.mitarbeiter_uid"
