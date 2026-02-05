@@ -275,20 +275,20 @@ export default {
 							<slot name="issues"></slot>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueGammaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueBetaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueBetaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueAlphaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1">UID</h4>
-							<h6 class="text-muted"><slot name="uid"></slot></h6>
+							<h4 class="mb-1 text-center">UID</h4>
+							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
 						</div>
 					</div>
 				</div>
@@ -299,7 +299,7 @@ export default {
 
 				<div class="foto-container col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 mt-3 position-relative" style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
-					  class="d-block rounded"
+					  class="d-block w-100 h-100 rounded"
 					  style="height: 84px; object-fit: contain;"
 					  alt="Profilbild"
 					  :src="getFotoSrc(headerDataMa.foto)"
@@ -359,20 +359,20 @@ export default {
 							<slot name="issues"></slot>
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueGammaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted"><slot name="valueAlphaTile"></slot></h6>
+							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
+							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1">UID</h4>
-							<h6 class="text-muted"><slot name="uid"></slot></h6>
+							<h4 class="mb-1 text-center">UID</h4>
+							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
 						</div>
 					</div>
 				</div>
