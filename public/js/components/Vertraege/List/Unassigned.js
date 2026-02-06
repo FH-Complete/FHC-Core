@@ -58,8 +58,8 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '200',
-				selectableRangeMode: 'click',
-				selectable: true,
+				selectableRowsRangeMode: 'click',
+				selectableRows: true,
 				persistenceID: 'core-contracts-unassigned'
 			},
 			tabulatorEvents: [

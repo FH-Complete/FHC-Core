@@ -132,8 +132,9 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '250',
-				selectableRangeMode: 'click',
-				selectable: true,
+				selectableRowsRangeMode: 'click',
+				selectableRows: true,
+				index: "vertrag_id",
 				persistence: {
 					sort: true,
 					page: true,
@@ -149,38 +150,30 @@ export default {
 
 						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('ui', 'bezeichnung')
-						});
-						cm.getColumnByField('betrag').component.updateDefinition({
-							title: this.$p.t('ui', 'betrag')
-						});
-						cm.getColumnByField('status').component.updateDefinition({
-							title: this.$p.t('global', 'status')
-						});
-						cm.getColumnByField('vertragstyp_bezeichnung').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragstyp')
-						});
-						cm.getColumnByField('vertragsdatum').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsdatum')
-						});
-						cm.getColumnByField('vertragsstunden').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsstunden')
-						});
-						cm.getColumnByField('vertragsstunden_studiensemester_kurzbz').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsstunden_studiensemester')
-						});
-						cm.getColumnByField('vertrag_id').component.updateDefinition({
-							title: this.$p.t('ui', 'vertrag_id')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('isabgerechnet').component.updateDefinition({
-							title: this.$p.t('vertrag', 'abgerechnet')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('bezeichnung', this.$p.t('ui', 'bezeichnung'));
+						setHeader('betrag', this.$p.t('ui', 'betrag'));
+						setHeader('status', this.$p.t('global', 'status'));
+						setHeader('vertragstyp_bezeichnung', this.$p.t('vertrag', 'vertragstyp'));
+						setHeader('vertragsdatum', this.$p.t('vertrag', 'vertragsdatum'));
+						setHeader('vertragsstunden', this.$p.t('vertrag', 'vertragsstunden'));
+						setHeader('vertragsstunden_studiensemester_kurzbz', this.$p.t('vertrag', 'vertragsstunden_studiensemester'));
+						setHeader('vertrag_id', this.$p.t('ui', 'vertrag_id'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('isabgerechnet', this.$p.t('vertrag', 'abgerechnet'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
 /*						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
 						});*/
@@ -265,15 +258,42 @@ export default {
 			return this.$refs.contractData
 				.call(this.endpoint.addNewContract(dataToSend))
 				.then(response => {
+					//get new ID of request to focus the new entry
+					let vertrag_id = response.data;
+
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					//this.$refs.contractdetails.reload();
+					this.$refs.contractdetails.reload();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
+
 					this.reload();
+					//TODO(Manu) Finish Selection of current dataset
+/*					this.reload().then(() => {
+						this.selectRow(vertrag_id);
+					})*/
+
+
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+/*		async selectRow(vertrag_id){
+			console.log("in selectRow " + vertrag_id);
+			//if (!this.table) return;
+
+			if (!this.$refs.table) return;
+
+			//this.table.selectRow(this.$refs.table.tabulator.getRows()[0]);
+
+			this.$refs.table.tabulator.selectRow(vertrag_id);
+		//	this.$refs.table.tabulator.selectRow("visible");
+			console.log("Vertrag_id" + vertrag_id);
+
+			//console.log(this.$refs.table.tabulator.getRow(vertrag_id));
+			//this.table.selectRow(vertrag_id);
+
+		//	this.$refs.table.selectRow(vertrag_id);
+		},*/
 		updateContract(vertrag_id) {
 			this.$refs.unassignedLehrauftraege.emitSaveEvent();
 
@@ -287,11 +307,20 @@ export default {
 				.call(this.endpoint.updateContract(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					//TODO(Manu) get Id from dataToSend
+					let vertrag_id = response.data;
+					console.log(vertrag_id);
 					this.$refs.contractModal.hide();
 					this.resetModal();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.$refs.contractdetails.reload();
 					this.reload();
+					//TODO(Manu) Finish Selection of current dataset
+					/*					this.reload().then(() => {
+											this.selectRow(vertrag_id);
+										})*/
+
+					//this.selectRow(vertrag_id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -331,7 +360,7 @@ export default {
 
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
-					this.reload();
+					//this.reload(); //focus get lost with reload
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -372,7 +401,7 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
-					this.reload();
+					//this.reload(); //focus gets lost with reload
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},

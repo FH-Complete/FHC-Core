@@ -238,7 +238,7 @@ class Vertraege extends FHCAPI_Controller
 			}
 		}
 		$this->db->trans_complete();
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($vertrag_id);
 	}
 
 	public function updateContract()
@@ -355,7 +355,7 @@ class Vertraege extends FHCAPI_Controller
 		}
 		$this->db->trans_complete();
 
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($vertrag_id);
 	}
 
 	public function loadContract($vertrag_id)

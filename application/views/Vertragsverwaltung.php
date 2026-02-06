@@ -8,7 +8,7 @@ $includesArray = array(
 	'primevue3' => true,
 	'filtercomponent' => true,
 	'navigationcomponent' => true,
-	'tabulator5' => true,
+	'tabulator6' => true,
 	'tinymce5' => true,
 	'phrases' => array(
 		'global',

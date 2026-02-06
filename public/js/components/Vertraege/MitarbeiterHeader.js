@@ -65,8 +65,8 @@ export default {
 				layout: 'fitColumns',
 				persistenceID: 'core-mitarbeiter_20250901-2',
 				footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
-				selectableRangeMode: 'click',
-				selectable: true,
+				selectableRowsRangeMode: 'click',
+				selectableRows: true,
 			},
 			tabulatorEvents: [
 				{

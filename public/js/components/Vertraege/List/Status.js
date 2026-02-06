@@ -47,6 +47,7 @@ export default {
 					this.endpoint.getStatiOfContract(this.person_id, this.vertrag_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'core-contracts-status',
 				columns: [
 					{title: "Status", field: "bezeichnung"},
 					{
@@ -148,9 +149,8 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '200',
-				selectableRangeMode: 'click',
-				selectable: true,
-				persistenceID: 'core-contracts-status'
+				selectableRowsRangeMode: 'click',
+				selectableRows: true,
 			},
 			tabulatorEvents: [
 				{

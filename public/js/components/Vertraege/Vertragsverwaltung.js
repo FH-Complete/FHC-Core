@@ -65,7 +65,7 @@ export default {
 							@redirectToLeitung="handleSelection"
 						>
 							<template #uid>{{mitarbeiter_uid}}</template>
-							<template #titleAlphaTile>pID</template>
+							<template #titleAlphaTile>persID</template>
 							<template #valueAlphaTile>{{person_id}}</template>
 						</fhc-header>
 						<vertraege-mitarbeiter
