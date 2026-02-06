@@ -15,7 +15,7 @@ export default{
 			layout: 'fitDataFill',
 			layoutColumnsOnNewData:	false,
 			height:	'auto',
-			selectable:	false
+			selectableRows:	false
 		}
 	},
 	computed: {
@@ -25,7 +25,7 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
-				persistenceID: 'stv-details-prestudent-history',
+				persistenceID: 'stv-details-prestudent-history-20260204',
 				columns:[
 					{title:"StSem", field:"studiensemester_kurzbz"},
 					{title:"Prio", field:"priorisierung"},
@@ -56,19 +56,23 @@ export default{
 					handler: async () => {
 						await this.$p.loadCategory(['lehre']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('orgform_kurzbz').component.updateDefinition({
-							title: this.$p.t('lehre', 'organisationsform')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-						cm.getColumnByField('prestudent_id').component.updateDefinition({
-							title: this.$p.t('ui', 'prestudent_id')
-						});
+						setHeader('orgform_kurzbz', this.$p.t('lehre', 'organisationsform'));
+						setHeader('bezeichnung', this.$p.t('lehre', 'studienplan'));
+						setHeader('prestudent_id', this.$p.t('ui', 'prestudent_id'));
+
 					}
 				}
 			];

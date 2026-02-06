@@ -148,8 +148,38 @@ export default {
 				{ field: 'zeugnis', title: this.$p.t('stv/grades_zeugnis'), formatter: 'tickCross' },
 				{ field: 'lehrveranstaltung_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
 				gradeField,
-				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false },
-				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
+				{ field: 'uebernahmedatum', title: this.$p.t('stv/grades_takeoverdate'), visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}},
+				{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}},
 				{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 				{ field: 'note_number', title: this.$p.t('stv/grades_numericgrade'), visible: false, formatter: cell => cell.getData().note, tooltip: (evt, cell) => cell.getData().note },
 				{ field: 'lehrveranstaltung_id', title: this.$p.t('lehre/lehrveranstaltung_id'), visible: false },
@@ -218,8 +248,8 @@ export default {
 				columns,
 				height: '100%',
 				layout: 'fitDataStretchFrozen',
-				selectable: 1,
-				selectableRangeMode: 'click',
+				selectableRows: 1,
+				selectableRowsRangeMode: 'click',
 				persistenceID: 'stv-details-noten-zeugnis-2025112401',
 				persistence:{
 					columns: ["width", "visible", "frozen"]

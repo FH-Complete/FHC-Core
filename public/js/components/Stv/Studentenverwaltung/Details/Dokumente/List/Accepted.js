@@ -20,7 +20,6 @@ export default {
 			listDocuments: [],
 			layoutColumnsOnNewData: false,
 			height: 300,
-			selectable: true,
 		}
 	},
 	computed: {
@@ -37,7 +36,8 @@ export default {
 				},
 				layout: 'fitDataStretchFrozen',
 				index: 'akte_id',
-				selectableRangeMode: 'click',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				persistenceID: 'stv-details-accepted-2026020401',
 				columns: [
 					{title: "akte_id", field: "akte_id", visible: false},

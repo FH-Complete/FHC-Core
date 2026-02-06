@@ -39,8 +39,38 @@ export default {
 					{ field: 'lv_bezeichnung', title: this.$p.t('lehre/lehrveranstaltung') },
 					{ field: 'note_bezeichnung', title: this.$p.t('lehre/note') },
 					{ field: 'insertvon', title: this.$p.t('profil/mitarbeiterIn'), visible: false },
-					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false },
-					{ field: 'freigabedatum', title: this.$p.t('stv/grades_approvaldate'), visible: false },
+					{ field: 'benotungsdatum', title: this.$p.t('stv/grades_gradingdate'), visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}},
+					{ field: 'freigabedatum', title: this.$p.t('stv/grades_approvaldate'), visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}},
 					{ field: 'studiensemester_kurzbz', title: this.$p.t('lehre/studiensemester'), visible: false },
 					{ field: 'stg_bezeichnung', title: this.$p.t('lehre/studiengang'), visible: false },
 					{ field: 'note', title: this.$p.t('stv/grades_numericgrade'), visible: false },
@@ -49,8 +79,8 @@ export default {
 				],
 				layout: 'fitDataStretch',
 				height: '100%',
-				selectable: true,
-				selectableRangeMode: 'click',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				persistenceID: 'stv-details-noten-repeater'
 			};
 		}

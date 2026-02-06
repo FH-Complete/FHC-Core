@@ -208,7 +208,7 @@ export default{
 				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
-				selectable: false,
+				selectableRows: false,
 				index: 'statusId',
 				persistenceID: 'stv-multistatus-2025112401'
 			};

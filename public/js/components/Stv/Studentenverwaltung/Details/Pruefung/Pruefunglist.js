@@ -64,8 +64,21 @@ export default{
 					group: false,
 					page: false
 				},
+				selectableRows: true,
 				columns: [
-					{title: "Datum", field: "format_datum"},
+					{title: "Datum", field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
 					{title: "Note", field: "note_bezeichnung"},
 					{title: "Anmerkung", field: "anmerkung"},
@@ -141,7 +154,7 @@ export default{
 							}
 						};
 
-						setHeader('format_datum', this.$p.t('global', 'datum'));
+						setHeader('datum', this.$p.t('global', 'datum'));
 						setHeader('lehrveranstaltung_bezeichnung', this.$p.t('lehre', 'lehrveranstaltung'));
 						setHeader('note_bezeichnung', this.$p.t('lehre', 'note'));
 						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));

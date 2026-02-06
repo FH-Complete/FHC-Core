@@ -260,7 +260,7 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				height: 'auto',
 				minHeight: '200',
-				selectable: 1,
+				selectableRows: 1,
 				index: 'projektarbeit_id',
 				persistence:{
 					columns: true, //persist column layout

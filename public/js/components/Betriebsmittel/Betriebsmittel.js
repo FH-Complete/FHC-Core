@@ -64,6 +64,7 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				persistenceID: 'core-betriebsmittel',
+				selectableRows: true,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
 					{title: "PersonId", field: "person_id", visible: false},

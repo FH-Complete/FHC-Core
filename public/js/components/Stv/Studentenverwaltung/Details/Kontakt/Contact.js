@@ -135,48 +135,6 @@ export default {
 		},
 		tabulatorEvents() {
 			const events = [
-/*				{
-					event: 'tableBuilt',
-					handler: async() => {
-						await this.$p.loadCategory(['notiz','global','person']);
-
-						let cm = this.$refs.table.tabulator.columnManager;
-
-						cm.getColumnByField('kontakttypbeschreibung').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('kontakt').component.updateDefinition({
-							title: this.$p.t('global', 'kontakt')
-						});
-						cm.getColumnByField('zustellung').component.updateDefinition({
-							title: this.$p.t('person', 'zustellung')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('name').component.updateDefinition({
-							title: this.$p.t('person', 'firma')
-						});
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('person', 'standort')
-						});
-						cm.getColumnByField('firma_id').component.updateDefinition({
-							title: this.$p.t('ui', 'firma_id')
-						});
-						cm.getColumnByField('kontakt_id').component.updateDefinition({
-							title: this.$p.t('ui', 'kontakt_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('standort_id').component.updateDefinition({
-							title: this.$p.t('ui', 'standort_id')
-						});
-					}
-				},	*/
 				{
 					event: 'tableBuilt',
 					handler: async() => {

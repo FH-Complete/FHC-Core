@@ -54,6 +54,7 @@ export default {
 				height: '500',
 				index: 'anrechnung_id',
 				persistenceID: 'stv-details-anrechnungen-2025112401',
+				selectableRows: true,
 				columns: [
 					{title: "anrechnung_id", field: "anrechnung_id", visible: false},
 					{title: "lehrveranstaltung_id", field: "lehrveranstaltung_id", visible: false},

@@ -30,8 +30,6 @@ export default {
 			personId: null,
 			layoutColumnsOnNewData:	false,
 			height: '400',
-			selectable: 1,
-			selectableRangeMode: 'click',
 		}
 	},
 	methods: {
@@ -131,6 +129,8 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				index: 'message_id',
 				persistenceID: 'core-message-2025112401',
+				selectableRows: 1,
+				selectableRowsRangeMode: 'click',
 				columns: [
 					{title: "subject", field: "subject", headerFilter: true},
 					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},

@@ -120,8 +120,8 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
-				selectable: true,
-				selectable: 1,
+				selectableRows: true,
+				selectableRows: 1,
 				index: 'betreuer_id',
 				persistence:{
 					columns: true, //persist column layout

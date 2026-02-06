@@ -19,8 +19,6 @@ export default {
 		return {
 			layoutColumnsOnNewData: false,
 			height: 300,
-			selectable: true,
-			selectableRangeMode: 'click',
 			listDocuments: [],
 			prestudentDocumentData: [],
 		}
@@ -35,8 +33,10 @@ export default {
 						studiengang_kz: this.studiengang_kz})
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'stv-details-unaccepted-2026020401',
 				layout: 'fitDataStretchFrozen',
+				persistenceID: 'stv-details-unaccepted-2026020401',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				columns: [
 					{title: "Dokument", field: "bezeichnung"},
 					{title: "Kurzbz", field: "dokument_kurzbz", visible: false},

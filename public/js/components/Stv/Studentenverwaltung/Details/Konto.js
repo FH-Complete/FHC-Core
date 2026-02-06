@@ -127,8 +127,8 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				dataTree: true,
 				columns: this.tabulatorColumns,
-				selectable: true,
-				selectableRangeMode: 'click',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				index: 'buchungsnr',
 				persistenceID: 'stv-details-konto'
 			};
