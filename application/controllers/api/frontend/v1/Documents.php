@@ -153,12 +153,10 @@ class Documents extends FHCAPI_Controller
 			$this->load->library('form_validation');
 			if (!$xml) {
 				$xml = $this->input->post_get('xml');
-				$this->addMeta('xml', $xml);
 				$this->form_validation->set_rules('xml', 'xml', 'required');
 			}
 			if (!$xsl) {
 				$xsl = $this->input->post_get('xsl');
-				$this->addMeta('xsl', $xsl);
 				$this->form_validation->set_rules('xsl', 'xsl', 'required');
 			}
 
@@ -200,7 +198,6 @@ class Documents extends FHCAPI_Controller
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
 		$result = $this->VorlageModel->load($xsl);
-		$this->addMeta("ress", $result);
 		$vorlage = current($this->getDataOrTerminateWithError($result));
 		if (!$vorlage)
 			show_404();
