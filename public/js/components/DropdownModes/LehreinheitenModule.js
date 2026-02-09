@@ -1,4 +1,5 @@
 import ApiLehre from "../../api/factory/lehre.js";
+import {capitalize} from "../../helpers/StringHelpers.js";
 
 const options = Vue.ref([]);
 const params = Vue.ref({});
@@ -63,7 +64,7 @@ async function fetchLehreinheiten(lv_id, sem_kurzbz) {
 const LehreinheitenModule = Vue.reactive({
 	options,
 	optionLabel: 'infoString',
-	placeholder: Vue.computed(()=>appContext?.$p.t('lehre/lehreinheit')),
+	placeholder: capitalize(Vue.computed(()=>appContext?.$p.t('lehre/lehreinheit'))),
 	setupContext,
 	bindParams
 });

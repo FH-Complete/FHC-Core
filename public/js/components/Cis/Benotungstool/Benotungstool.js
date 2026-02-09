@@ -260,7 +260,6 @@ export const Benotungstool = {
 			// in case we need to further validate noten, currently parser does all
 		},
 		parseNote(rowParts, notenbulk, rowNum) {
-			debugger
 			const id = this.identifyUid(rowParts[0])
 			const idTrimmed = rowParts[0].trim()
 			let student = null
@@ -271,36 +270,47 @@ export const Benotungstool = {
 				student = this.studenten.find(s => s.uid?.trim() === idTrimmed)
 			}
 			if(!student) {
+				// TODO: phrase
 				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
 				return
 			}
 
-			const note = rowParts[1]
+			let punkte = null
+			let note = null
+			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
+				punkte = Number.parseFloat(rowParts[1])
+			} else {
+				note = rowParts[1]
 
-			// find notenoption and check if its allowed to use in lehre
-			const notenOption = this.notenOptions.find(n => n.note == note)
-			if(!notenOption.lehre) {
-				this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
-				return
+				// find notenoption and check if its allowed to use in lehre
+				const notenOption = this.notenOptions.find(n => n.note == note)
+				if(!notenOption.lehre) {
+					// TODO: phrasen
+					this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+					return
+				}
 			}
-
-			notenbulk.push({uid: student.uid, note})
+			
+			notenbulk.push({uid: student.uid, note, punkte})
 		},
 		parsePruefung(rowParts, pruefungbulk, rowNum) {
 			const id = this.identifyUid(rowParts[0])
+			const idTrimmed = rowParts[0].trim()
 			let student = null
 			if(id === 'matrikelnr') { // find student by matrnr and use uid later on
-				student = this.studenten.find(s => s.matrikelnr === rowParts[0])
+				student = this.studenten.find(s => s.matrikelnr?.trim() === idTrimmed)
 			} else if(id === 'uid') {
-				student = this.studenten.find(s => s.uid === rowParts[0])
+				student = this.studenten.find(s => s.uid?.trim() === idTrimmed)
 			}
 			if(!student) {
+				// TODO: phrase
 				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
 				return
 			}
 
 			const datum = rowParts[1] // should be in 'dd.MM.yyyy'
 			if(!this.isValidDate_ddmmyyyy(datum)) {
+				// TODO: phrase
 				this.$fhcAlert.alertWarning('Ungültiges Datumformat für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + '. Bitte verwenden Sie das Format "DD.MM.YYYY". Die Zeile wurde übersprungen.')
 				return	
 			}
@@ -314,21 +324,27 @@ export const Benotungstool = {
 			let monthInt = parseInt(month, 10)
 			monthInt -= 1
 			const dateObj = new Date(year, monthInt, day)
-			
-			const note = rowParts[2]
 
-			// find notenoption and check if its allowed to use in lehre
-			const notenOption = this.notenOptions.find(n => n.note == note)
-			if(!notenOption.lehre) {
-				
-				
-				this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
-				return
-			}
 			
+			let punkte = null
+			let note = null
+			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
+				punkte = Number.parseFloat(rowParts[1]) 
+			} else {
+				note = rowParts[1]
+
+				// find notenoption and check if its allowed to use in lehre
+				const notenOption = this.notenOptions.find(n => n.note == note)
+				if(!notenOption.lehre) {
+					// TODO: phrasen
+					this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+					return
+				}
+			}
+
 			const typ = this.getPruefungstypForStudentByAntritt(student)
 			
-			pruefungbulk.push({uid: student.uid, datum: dateStr, note, typ, lehreinheit_id: student.lehreinheit_id, dateObj})
+			pruefungbulk.push({uid: student.uid, datum: dateStr, note, punkte, typ, lehreinheit_id: student.lehreinheit_id, dateObj})
 		},
 		saveNotenBulk(notenbulk) {
 			this.loading = true
@@ -477,8 +493,6 @@ export const Benotungstool = {
 				}
 			})
 			
-			// TODO: punkte parsen!
-			
 			// parsers check for notenOption.lehre === true and if student uid/matrikelnr matches
 			
 			// pruefungen check for younger pruefungen, so there are no further antritte with 
@@ -514,6 +528,7 @@ export const Benotungstool = {
 			return arrsREqual
 		},
 		getNotenTableOptions() {
+
 			return {
 				// debugEventsExternal:true,
 				// debugEventsInternal:true,
@@ -527,17 +542,18 @@ export const Benotungstool = {
 				selectablePersistence: false, // reset selection on table reload
 				selectableCheck: function(row, e){
 					const data = row.getData();
-					
+
 					if(data['kommPruef']) return false
 					else if(data.hoechsterAntritt >= 3) return false // 3 pruefungen counted
-					
+
 					return true;  // student can be selected to add pruefung
 				},
 				rowHeight: 40,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: this.getColumnsDefinition(),
 				persistence: false,
-			}	
+			}
+
 		},
 		getColumnsDefinition() {
 			const columns = []

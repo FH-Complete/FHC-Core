@@ -44,6 +44,20 @@ class Noten extends FHCAPI_Controller
 
 		$this->load->library('AuthLib', null, 'AuthLib');
 		$this->load->library('PhrasesLib');
+
+		// Loads LogLib with different debug trace levels to get data of the job that extends this class
+		// It also specify parameters to set database fields
+		$this->load->library('LogLib', array(
+			'classIndex' => 5,
+			'functionIndex' => 5,
+			'lineIndex' => 4,
+			'dbLogType' => 'API', // required
+			'dbExecuteUser' => 'RESTful API',
+			'requestId' => 'API',
+			'requestDataFormatter' => function ($data) {
+				return json_encode($data);
+			}
+		), 'logLib');
 		
 		// Loads phrases system
 		$this->loadPhrases([
@@ -235,10 +249,12 @@ class Noten extends FHCAPI_Controller
 					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG) {
 						// Lehreinheitsgewichtung
 						$punkte_vorschlag = round($punktesumme_gewichtet / $gewichtsumme, 2);
-						$note_vorschlag = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+						$note_vorschlag_result = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+						$note_vorschlag = $this->getDataOrTerminateWithError($note_vorschlag_result);
 					} else {
 						$punkte_vorschlag = round($punktesumme / $anzahlnoten, 2);
-						$note_vorschlag = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+						$note_vorschlag_result = $this->NotenschluesselaufteilungModel->getNote($punkte_vorschlag, $lv_id, $sem_kurzbz);
+						$note_vorschlag = $this->getDataOrTerminateWithError($note_vorschlag_result);
 					}
 				} else {
 					if (defined('CIS_GESAMTNOTE_GEWICHTUNG') && CIS_GESAMTNOTE_GEWICHTUNG) {
@@ -403,6 +419,11 @@ class Noten extends FHCAPI_Controller
 		}
 		$studlist .= "</table>";
 
+		$this->logLib->logInfoDB(array('saveStudentenNoten', array(
+			'updatevon' => getAuthUID(),
+			'updateamum' => date('Y-m-d H:i:s')
+		), getAuthUID(), getAuthPersonId(), array($result->noten, $lv_id, $sem_kurzbz)));
+		
 		// always send the mail, config toggles data contents
 		$this->sendFreigabeEmail($lektorFullName, $lvaFullName, count($result->noten), $emails, $studlist, $betreff);
 		
@@ -505,21 +526,12 @@ class Noten extends FHCAPI_Controller
 		$typ = $result->typ;
 		
 		$jetzt = date("Y-m-d H:i:s");
-		
-		// nachpruefungeintragen.php script calls query on campus.student_lehrveranstaltung to find a
-		// lehreinheit_id for lva_id -> lehreinheit should be determined prior to that in new benotungstool
-		// by retrieving it from students row in campus.vw_student_lehrveranstaltung earlier on
-		
-//		$lehreinheit_id = getLehreinheit($db, $lvid, $student_uid, $stsem);
-//		$lehreinheit_id = $result->lehreinheit_id;
-		
-//		$punkte = null;
 
 		if(isset($punkte) && $punkte >= 0) {
 			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
 			$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
 			if(isError($result)) {
-				$this->terminateWithError('notenspiegel hats zrissen');
+				$this->terminateWithError('Notenspiegel Error');
 			} else {
 				$data = getData($result);
 				if($data != $note)
@@ -533,7 +545,6 @@ class Noten extends FHCAPI_Controller
 		// TODO: more sophisticated empty check
 		if($note=='')
 			$note = 9;
-		
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -548,7 +559,6 @@ class Noten extends FHCAPI_Controller
 		if(isError($res) || !hasData($res)) {
 			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
 		}
-		
 		
 		//Gesamtnote updaten
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
@@ -576,6 +586,12 @@ class Noten extends FHCAPI_Controller
 				$res = $this->LvgesamtnoteModel->load($id->retval);
 				if(hasData($res)) $lvgesamtnote = getData($res)[0];
 			}
+
+			$this->logLib->logInfoDB(array('saveStudentPruefung insert lvnote', $res, array(
+				'insertvon' => getAuthUID(),
+				'insertamum' => date('Y-m-d H:i:s')
+			), getAuthUID(), getAuthPersonId(), $student_uid, $lva_id, $stsem, $note,$punkte, $jetzt));
+
 		}
 		else if(!isError($result) && hasData($result))
 		{
@@ -597,6 +613,10 @@ class Noten extends FHCAPI_Controller
 				if(hasData($res)) $lvgesamtnote = getData($res)[0];
 			}
 			
+			$this->logLib->logInfoDB(array('saveStudentPruefung update lvnote', $res, array(
+				'updatevon' => getAuthUID(),
+				'updateamum' => date('Y-m-d H:i:s')
+			), getAuthUID(), getAuthPersonId(), $student_uid, $lva_id, $stsem, $note,$punkte, $jetzt));
 		}
 		
 		// save pruefung after updating lvnote, since pruefungspunkte get loaded by lv punkte 
@@ -705,8 +725,10 @@ class Noten extends FHCAPI_Controller
 					if(hasData($res)) $pruefungenChanged['extraPruefung'] = getData($res);
 				}
 			}
-			
-			
+
+			$this->logLib->logInfoDB(array('termin1 created',$res, getAuthUID(), getAuthPersonId()));
+
+
 			// Die Pruefung wird als Termin2 eingetragen
 			$result2 = $this->LePruefungModel->getPruefungenByUidTypLvStudiensemester($student_uid, "Termin2", $lva_id, $stsem);
 			// if there is a termin 2 entry already update it
@@ -728,6 +750,9 @@ class Noten extends FHCAPI_Controller
 					$res = $this->LePruefungModel->load($id->retval);
 					if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
 				}
+
+				$this->logLib->logInfoDB(array('termin2 updated',$res, getAuthUID(), getAuthPersonId()));
+
 
 			} else if(!isError($result2) && !hasData($result2)) {
 				// new entry termin 2
@@ -753,6 +778,9 @@ class Noten extends FHCAPI_Controller
 					$res = $this->LePruefungModel->load($id->retval);
 					if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
 				}
+
+				$this->logLib->logInfoDB(array('termin2 inserted',$res, getAuthUID(), getAuthPersonId()));
+
 			}
 
 		} else if($typ == "Termin3" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN3') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) 
@@ -780,6 +808,8 @@ class Noten extends FHCAPI_Controller
 					if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
 				}
 
+				$this->logLib->logInfoDB(array('termin3 updated',$res, getAuthUID(), getAuthPersonId()));
+
 			} else if(!isError($result3) && !hasData($result3)) {
 				// insert new termin3
 
@@ -805,6 +835,8 @@ class Noten extends FHCAPI_Controller
 					if(hasData($res)) $pruefungenChanged['savedPruefung'] = getData($res);
 				}
 				
+				$this->logLib->logInfoDB(array('termin3 inserted',$res, getAuthUID(), getAuthPersonId()));
+
 			}
 		} else {
 			$this->terminateWithError($this->p->t('benotungstool', 'wrongPruefungType', [$student_uid, $typ]), 'general');
@@ -855,6 +887,9 @@ class Noten extends FHCAPI_Controller
 				$res = $this->LvgesamtnoteModel->load($id->retval);
 				if(hasData($res)) $lvgesamtnote = getData($res)[0];
 			}
+
+			$this->logLib->logInfoDB(array('saveNotenvorschlag update lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
+
 		} else if(!isError($result) && !hasData($result)) {
 			$id = $this->LvgesamtnoteModel->insert(
 				array(
@@ -878,6 +913,8 @@ class Noten extends FHCAPI_Controller
 				$res = $this->LvgesamtnoteModel->load($id->retval);
 				if(hasData($res)) $lvgesamtnote = getData($res)[0];
 			}
+
+			$this->logLib->logInfoDB(array('saveNotenvorschlag insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
 		}
 		
 		$this->terminateWithSuccess(array($lvgesamtnote));
@@ -895,6 +932,7 @@ class Noten extends FHCAPI_Controller
 			!property_exists($result, 'noten')) {
 			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
 		}
+		
 
 		$lv_id = $result->lv_id;
 		$sem_kurzbz = $result->sem_kurzbz;
@@ -907,6 +945,11 @@ class Noten extends FHCAPI_Controller
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
 
+			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+				$note->note = $this->NotenschluesselaufteilungModel->getNote($note->punkte, $lv_id, $sem_kurzbz);
+				$this->addMeta($note);
+			}
+			
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
 
@@ -914,7 +957,7 @@ class Noten extends FHCAPI_Controller
 					[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
 					array(
 						'note' => trim($note->note),
-						'punkte' => null,
+						'punkte' => $note->punkte,
 						'benotungsdatum' => date("Y-m-d H:i:s"),
 						'updateamum' => date("Y-m-d H:i:s"),
 						'updatevon' => getAuthUID()
@@ -925,6 +968,9 @@ class Noten extends FHCAPI_Controller
 					$res = $this->LvgesamtnoteModel->load($id->retval);
 					if(hasData($res)) $lvgesamtnote = getData($res)[0];
 				}
+
+				$this->logLib->logInfoDB(array('saveNotenvorschlagBulk update lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
+
 			} else if(!isError($result) && !hasData($result)) {
 				$id = $this->LvgesamtnoteModel->insert(
 					array(
@@ -932,7 +978,7 @@ class Noten extends FHCAPI_Controller
 						'lehrveranstaltung_id' => $lv_id,
 						'studiensemester_kurzbz' => $sem_kurzbz,
 						'note' => trim($note->note),
-						'punkte' => null,
+						'punkte' => $note->punkte,
 						'mitarbeiter_uid' => getAuthUID(),
 						'benotungsdatum' => date("Y-m-d H:i:s"),
 						'freigabedatum' => null,
@@ -948,6 +994,8 @@ class Noten extends FHCAPI_Controller
 					$res = $this->LvgesamtnoteModel->load($id->retval);
 					if(hasData($res)) $lvgesamtnote = getData($res)[0];
 				}
+
+				$this->logLib->logInfoDB(array('saveNotenvorschlagBulk insert lv gesamtnote',$res, getAuthUID(), getAuthPersonId()));
 			}
 
 			$retLvNoten[] = $lvgesamtnote;
@@ -987,6 +1035,8 @@ class Noten extends FHCAPI_Controller
 			$ret[$student->uid] = $this->savePruefungstermin($typ, $student_uid, $lva_id, $stsem, $lehreinheit_id, $note, $punkte, $datum);
 		}
 
+		$this->logLib->logInfoDB(array('createPruefungen',$ret, getAuthUID(), getAuthPersonId()));
+
 		$this->terminateWithSuccess($ret);
 	}
 
@@ -1010,15 +1060,23 @@ class Noten extends FHCAPI_Controller
 		$ret = [];
 
 		foreach ($pruefungen as $pruefung) {
+			
+			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+				$result = $this->NotenschluesselaufteilungModel->getNote($pruefung->punkte, $lv_id, $sem_kurzbz);
+				$pruefung->note = $this->getDataOrTerminateWithError($result);
+			}
+			
 			$student_uid = $pruefung->uid;
 			$typ = $pruefung->typ;
 			$note = $pruefung->note; // TODO: parameterize for import maybe
 			$datum = $pruefung->datum;
-			$punkte = null;
+			$punkte = $pruefung->punkte;
 
 			$lehreinheit_id = $pruefung->lehreinheit_id;
 			$ret[$student_uid] = $this->savePruefungstermin($typ, $student_uid, $lv_id, $sem_kurzbz, $lehreinheit_id, $note, $punkte, $datum);
 		}
+
+		$this->logLib->logInfoDB(array('savePruefungenBulk',$ret, getAuthUID(), getAuthPersonId()));
 		
 		$this->terminateWithSuccess($ret);
 	}
@@ -1051,8 +1109,7 @@ class Noten extends FHCAPI_Controller
 	
 	public function getNoteByPunkte() {
 		$result = $this->getPostJSON();
-
-		//  TODO validate post properly
+		
 		if(!property_exists($result, 'punkte') 
 			|| !property_exists($result, 'lv_id')
 			|| !property_exists($result, 'sem_kurzbz')) {
