@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "00798f1647938b79b8a3bfc109836a6a",
+    "content-hash": "a5332278fd4a7b51b78292f29a6704cf",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -883,6 +883,63 @@
             "type": "library"
         },
         {
+            "name": "firebase/php-jwt",
+            "version": "v6.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/firebase/php-jwt.git",
+                "reference": "0541cba75ab108ef901985e68055a92646c73534"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/0541cba75ab108ef901985e68055a92646c73534",
+                "reference": "0541cba75ab108ef901985e68055a92646c73534",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=4.8 <=9"
+            },
+            "suggest": {
+                "paragonie/sodium_compat": "Support EdDSA (Ed25519) signatures when libsodium is not present"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Firebase\\JWT\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Neuman Vong",
+                    "email": "neuman+pear@twilio.com",
+                    "role": "Developer"
+                },
+                {
+                    "name": "Anant Narayanan",
+                    "email": "anant@php.net",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple library to encode and decode JSON Web Tokens (JWT) in PHP. Should conform to the current spec.",
+            "homepage": "https://github.com/firebase/php-jwt",
+            "keywords": [
+                "jwt",
+                "php"
+            ],
+            "support": {
+                "issues": "https://github.com/firebase/php-jwt/issues",
+                "source": "https://github.com/firebase/php-jwt/tree/v6.0.0"
+            },
+            "time": "2022-01-24T15:18:34+00:00"
+        },
+        {
             "name": "fortawesome/font-awesome4",
             "version": "4.7.0",
             "dist": {
@@ -1549,16 +1606,16 @@
         },
         {
             "name": "phpmailer/phpmailer",
-            "version": "v7.0.1",
+            "version": "v7.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/PHPMailer/PHPMailer.git",
-                "reference": "360ae911ce62e25e11249f6140fa58939f556ebe"
+                "reference": "ebf1655bd5b99b3f97e1a3ec0a69e5f4cd7ea088"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/360ae911ce62e25e11249f6140fa58939f556ebe",
-                "reference": "360ae911ce62e25e11249f6140fa58939f556ebe",
+                "url": "https://api.github.com/repos/PHPMailer/PHPMailer/zipball/ebf1655bd5b99b3f97e1a3ec0a69e5f4cd7ea088",
+                "reference": "ebf1655bd5b99b3f97e1a3ec0a69e5f4cd7ea088",
                 "shasum": ""
             },
             "require": {
@@ -1619,7 +1676,7 @@
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
             "support": {
                 "issues": "https://github.com/PHPMailer/PHPMailer/issues",
-                "source": "https://github.com/PHPMailer/PHPMailer/tree/v7.0.1"
+                "source": "https://github.com/PHPMailer/PHPMailer/tree/v7.0.2"
             },
             "funding": [
                 {
@@ -1627,20 +1684,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-25T07:18:09+00:00"
+            "time": "2026-01-09T18:02:33+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "2.0.48",
+            "version": "2.0.51",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "eaa7be704b8b93a6913b69eb7f645a59d7731b61"
+                "reference": "ed661e7cdaeb8c419e609e2f3203551a13c2ed48"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/eaa7be704b8b93a6913b69eb7f645a59d7731b61",
-                "reference": "eaa7be704b8b93a6913b69eb7f645a59d7731b61",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/ed661e7cdaeb8c419e609e2f3203551a13c2ed48",
+                "reference": "ed661e7cdaeb8c419e609e2f3203551a13c2ed48",
                 "shasum": ""
             },
             "require": {
@@ -1721,7 +1778,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.48"
+                "source": "https://github.com/phpseclib/phpseclib/tree/2.0.51"
             },
             "funding": [
                 {
@@ -1737,7 +1794,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2024-12-14T21:03:54+00:00"
+            "time": "2026-01-27T09:11:52+00:00"
         },
         {
             "name": "rmariuzzo/jquery-checkboxes",
@@ -1946,8 +2003,18 @@
             ],
             "support": {
                 "issues": "https://github.com/twigphp/Twig/issues",
-                "source": "https://github.com/twigphp/Twig/tree/1.x"
+                "source": "https://github.com/twigphp/Twig/tree/v1.42.5"
             },
+            "funding": [
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/twig/twig",
+                    "type": "tidelift"
+                }
+            ],
             "time": "2020-02-11T05:59:23+00:00"
         },
         {
@@ -2741,33 +2808,29 @@
         },
         {
             "name": "phpmetrics/phpmetrics",
-            "version": "v2.8.2",
+            "version": "v2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpmetrics/PhpMetrics.git",
-                "reference": "4b77140a11452e63c7a9b98e0648320bf6710090"
+                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/4b77140a11452e63c7a9b98e0648320bf6710090",
-                "reference": "4b77140a11452e63c7a9b98e0648320bf6710090",
+                "url": "https://api.github.com/repos/phpmetrics/PhpMetrics/zipball/e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
+                "reference": "e2e68ddd1543bc3f44402c383f7bccb62de1ece3",
                 "shasum": ""
             },
             "require": {
                 "ext-dom": "*",
                 "ext-tokenizer": "*",
-                "nikic/php-parser": "^3|^4",
-                "php": ">=5.5"
+                "nikic/php-parser": "^3|^4|^5"
             },
             "replace": {
                 "halleck45/php-metrics": "*",
                 "halleck45/phpmetrics": "*"
             },
             "require-dev": {
-                "phpunit/phpunit": "^4.8.36 || ^5.7.27 || ^6.5.14",
-                "sebastian/comparator": ">=1.2.3",
-                "squizlabs/php_codesniffer": "^3.5",
-                "symfony/dom-crawler": "^3.0 || ^4.0 || ^5.0"
+                "phpunit/phpunit": "*"
             },
             "bin": [
                 "bin/phpmetrics"
@@ -2803,9 +2866,15 @@
             ],
             "support": {
                 "issues": "https://github.com/PhpMetrics/PhpMetrics/issues",
-                "source": "https://github.com/phpmetrics/PhpMetrics/tree/v2.8.2"
+                "source": "https://github.com/phpmetrics/PhpMetrics/tree/v2.9.1"
             },
-            "time": "2023-03-08T15:03:36+00:00"
+            "funding": [
+                {
+                    "url": "https://github.com/Halleck45",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-09-25T05:21:02+00:00"
         },
         {
             "name": "phpspec/prophecy",
@@ -3978,16 +4047,16 @@
         },
         {
             "name": "sebastian/recursion-context",
-            "version": "3.0.2",
+            "version": "3.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/recursion-context.git",
-                "reference": "9bfd3c6f1f08c026f542032dfb42813544f7d64c"
+                "reference": "8fe7e75986a9d24b4cceae847314035df7703a5a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/9bfd3c6f1f08c026f542032dfb42813544f7d64c",
-                "reference": "9bfd3c6f1f08c026f542032dfb42813544f7d64c",
+                "url": "https://api.github.com/repos/sebastianbergmann/recursion-context/zipball/8fe7e75986a9d24b4cceae847314035df7703a5a",
+                "reference": "8fe7e75986a9d24b4cceae847314035df7703a5a",
                 "shasum": ""
             },
             "require": {
@@ -4029,15 +4098,27 @@
             "homepage": "http://www.github.com/sebastianbergmann/recursion-context",
             "support": {
                 "issues": "https://github.com/sebastianbergmann/recursion-context/issues",
-                "source": "https://github.com/sebastianbergmann/recursion-context/tree/3.0.2"
+                "source": "https://github.com/sebastianbergmann/recursion-context/tree/3.0.3"
             },
             "funding": [
                 {
                     "url": "https://github.com/sebastianbergmann",
                     "type": "github"
+                },
+                {
+                    "url": "https://liberapay.com/sebastianbergmann",
+                    "type": "liberapay"
+                },
+                {
+                    "url": "https://thanks.dev/u/gh/sebastianbergmann",
+                    "type": "thanks_dev"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/sebastian/recursion-context",
+                    "type": "tidelift"
                 }
             ],
-            "time": "2024-03-01T14:07:30+00:00"
+            "time": "2025-08-10T05:25:53+00:00"
         },
         {
             "name": "sebastian/resource-operations",
