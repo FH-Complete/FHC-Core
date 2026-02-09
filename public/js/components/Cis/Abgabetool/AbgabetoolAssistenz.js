@@ -77,6 +77,8 @@ export const AbgabetoolAssistenz = {
 			phrasenResolved: false,
 			turnitin_link: null,
 			old_abgabe_beurteilung_link: null,
+			ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT: null,
+			ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER: null,
 			saving: false,
 			loading: false,
 			abgabeTypeOptions: null,
@@ -221,6 +223,32 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		sammelMailStudent() {
+			const emails = this.selectedData
+				.map(row => `${row.student_uid}@${this.domain}`)
+				.join(',');
+			
+			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
+			
+			const href = `mailto:${emails}?subject=${subject}`;
+			
+			window.location.href = href
+		},
+		sammelMailBetreuer() {
+			const recipientList = [];
+			this.selectedData.forEach(row => {
+				if (row.betreuer_mail) recipientList.push(row.betreuer_mail);
+				if (row.zweitbetreuer_mail) recipientList.push(row.zweitbetreuer_mail);
+			});
+
+			// actually not necessary for email clients but looks better for assistenz if we avoid duplicates here
+			const uniqueRecipients = [...new Set(recipientList)];
+
+			const subject = this.$p.t('abgabetool/c4sammelmailBetreuerBetreff', [this.selectedStudiengangOption?.bezeichnung]);
+			const href = `mailto:${uniqueRecipients.join(',')}?subject=${encodeURIComponent(subject)}`;
+
+			window.location.href = href;
+		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
 
@@ -620,9 +648,8 @@ export const AbgabetoolAssistenz = {
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
 				
-				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 				this.$refs.abgabeTable.tabulator.setData(mappedData)
-				
+				this.$refs.abgabeTable.tabulator.redraw(true)
 			}).finally(()=>{
 				this.saving = false
 			})
@@ -867,8 +894,8 @@ export const AbgabetoolAssistenz = {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
-		buildMailToLink(abgabe) {
-			return 'mailto:' + abgabe.student_uid +'@'+ this.domain
+		buildMailToLink(projekt) {
+			return 'mailto:' + projekt.student_uid +'@'+ this.domain
 		},
 		buildPKZ(projekt) {
 			return `${projekt.student_uid} / ${projekt.matrikelnr}`
@@ -941,6 +968,29 @@ export const AbgabetoolAssistenz = {
 			this.calcMaxTableHeight()
 		}
 	},
+	computed: {
+		uniqueBetreuerEmailCount() {
+			const emails = new Set();
+			
+			this.selectedData.forEach(row => {
+				if (row.betreuer_mail) emails.add(row.betreuer_mail);
+				if (row.zweitbetreuer_mail) emails.add(row.zweitbetreuer_mail);
+			});
+
+			return emails.size;
+		},
+		uniqueStudentEmailCount() {
+			const emails = new Set();
+
+			this.selectedData.forEach(row => {
+				if (row.student_uid) {
+					emails.add(row.student_uid); // actually dont need domain for this
+				}
+			});
+
+			return emails.size;
+		}
+	},
 	watch: {
 		'serienTermin.bezeichnung'(newVal) {
 			if(newVal?.paabgabetyp_kurzbz === 'qualgate1' || newVal?.paabgabetyp_kurzbz === 'qualgate2') {
@@ -987,6 +1037,8 @@ export const AbgabetoolAssistenz = {
 					const res = results[0].value;
 					this.turnitin_link = res.data?.turnitin_link;
 					this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link;
+					this.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT;
+					this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER;
 				}
 
 				// 2. Studiengänge
@@ -1292,6 +1344,16 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
+					<button v-if="ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT"
+						role="button" class="btn btn-secondary ml-2"
+						@click="sammelMailStudent">
+						{{ $p.t('abgabetool/c4sendEmailStudierendev2', [uniqueStudentEmailCount]) }} 
+					</button>
+					<button v-if="ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER" 
+						role="button" class="btn btn-secondary ml-2"
+						@click="sammelMailBetreuer">
+						{{ $p.t('abgabetool/c4sendEmailBetreuerv2', [uniqueBetreuerEmailCount]) }}
+					</button>
 					<Dropdown
 						@change="semesterChanged" 
 						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 

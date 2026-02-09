@@ -87,11 +87,15 @@ class Abgabe extends FHCAPI_Controller
 		$old_abgabe_beurteilung_link =$this->config->item('old_abgabe_beurteilung_link');
 		$turnitin_link = $this->config->item('turnitin_link');
 		$abgabetypenBetreuer = $this->config->item('ALLOWED_ABGABETYPEN_BETREUER');
+		$ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT');
+		$ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER');
 		
 		$ret = array(
 			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
 			'turnitin_link' => $turnitin_link,
-			'abgabetypenBetreuer' => $abgabetypenBetreuer
+			'abgabetypenBetreuer' => $abgabetypenBetreuer,
+			'ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT' => $ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT,
+			'ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER' => $ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER
 		);
 		
 		$this->terminateWithSuccess($ret);
@@ -762,7 +766,7 @@ class Abgabe extends FHCAPI_Controller
 	/**
 	 * helper function to fetch the correct email for a projektarbeits erstbetreuer
 	 */
-	private function getProjektbetreuerEmail($projektarbeit_id) {
+	private function getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
 		$email = $this->getDataOrTerminateWithError($result, 'general');
@@ -771,6 +775,18 @@ class Abgabe extends FHCAPI_Controller
 
 	}
 
+	/**
+	 * helper function to fetch the correct email for a projektarbeits zweitbetreuer by their person id
+	 * can be used for erstbetreuer aswell if necessary
+	 */
+	private function getProjektbetreuerEmailByPersonID($person_id) {
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+		$result = $this->ProjektarbeitModel->getProjektbetreuerEmailByPersonID($person_id);
+		$email = $this->getDataOrTerminateWithError($result, 'general');
+
+		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+	}
+ 
 	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 
 	/**
@@ -887,6 +903,12 @@ class Abgabe extends FHCAPI_Controller
 		
 		// map the abgaben into projektarbeiten
 		foreach($projektarbeiten as $projektarbeit) {
+			$projektarbeit->betreuer_mail = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit->projektarbeit_id);
+			
+			if($projektarbeit->zweitbetreuer_person_id !== null) {
+				$projektarbeit->zweitbetreuer_mail = $this->getProjektbetreuerEmailByPersonID($projektarbeit->zweitbetreuer_person_id);
+			}
+			
 			$filterFunc = function($projektabgabe) use ($projektarbeit) {
 				return $projektabgabe->projektarbeit_id == $projektarbeit->projektarbeit_id;
 			};
@@ -1140,7 +1162,7 @@ class Abgabe extends FHCAPI_Controller
 			$maildata['bewertunglink'] = $projektarbeitIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 			$maildata['token'] = "";
 
-			$email = $this->getProjektbetreuerEmail($projektarbeit_id);
+			$email = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id);
 
 			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
 			

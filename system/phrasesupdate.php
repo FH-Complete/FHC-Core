@@ -45510,18 +45510,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailStudierende',
+		'phrase' => 'c4sendEmailStudierendev2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Studierende schicken',
+				'text' => 'Email an {0} Studierende schicken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to students',
+				'text' => 'Send Email to {0} students',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45530,18 +45530,58 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailBetreuer',
+		'phrase' => 'c4sammelmailStudentBetreff',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Betreuende schicken',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to assessors',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sendEmailBetreuerv2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Email an {0} Betreuende schicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send Email to {0} assessors',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sammelmailBetreuerBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
 				'description' => '',
 				'insertvon' => 'system'
 			)
