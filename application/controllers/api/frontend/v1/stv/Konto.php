@@ -239,7 +239,7 @@ class Konto extends FHCAPI_Controller
 				$data[$field] = $this->input->post($field);
 
 		if (defined('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE') && isset(unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']])) {
-			$data['kostenstelle'] = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']];
+			$data['studiengang_kz'] = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']];
 		}
 
 		$result = [];
