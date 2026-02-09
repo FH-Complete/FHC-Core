@@ -1,0 +1,38 @@
+<?php
+
+
+if (!defined('BASEPATH')) exit('No direct script access allowed');
+
+$config['turnitin_link'] = 'https://technikum-wien.turnitin.com/sso/sp/redwood/saml/5IyfmBr2OcSIaWQTKlFCGj/start';
+
+$config['old_abgabe_beurteilung_link'] = 'https://moodle.technikum-wien.at/mod/page/view.php?id=1005052';
+
+$config['PAABGABE_EMAIL_JOB_INTERVAL'] = '1 day';
+// used as APP_ROOT.URL_STUDENTS -> cis4
+$config['URL_STUDENTS'] = 'cis.php/Cis/Abgabetool/Student';
+// used as APP_ROOT.URL_MITARBEITER -> old cis 
+$config['URL_MITARBEITER'] = 'index.ci.php/Cis/Abgabetool/Mitarbeiter';
+// used as APP_ROOT.URL_MITARBEITER -> old cis 
+$config['URL_ASSISTENZ'] = 'index.ci.php/Cis/Abgabetool/Assistenz';
+
+// lehre.tbl_paabgabetyp bezeichnung
+//$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['Zwischenabgabe', 'Quality Gate 1', 'Quality Gate 2'];
+$config['ALLOWED_ABGABETYPEN_BETREUER'] = ['abstract','zwischen', 'qualgate1', 'qualgate2']; // tbl_paabgabetyp pk
+// paabgabetypen for which betreuer is benachrichtigt via sammelmail
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_BETREUER'] = ['qualgate1', 'qualgate2', 'end'];
+// paabgabetypen for which assistenz is benachrichtigt via sammelmail
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ'] = ['end'];
+// paabgabetypen for which student is benachrichtigt via sammelmail -> basically all of them but still defined for consistency
+$config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT'] = ['qualgate1', 'qualgate2', 'zwischen', 'note', 'abstract', 'end', 'enda'];
+//$config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
+$config['ALLOWED_NOTEN_ABGABETOOL'] = [10, 14]; // tbl_note pk
+
+$config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
+
+$config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
+$config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ZWEITBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
+
+$config['SIGNATUR_CHECK_PAABGABETYPEN'] = ['end'];
+
+// to be used as "https://moodle.technikum-wien.at/course/view.php?idnumber=dl{$stg_kz}" for stg specific moodle routing
+$config['STG_MOODLE_LINK'] = 'https://moodle.technikum-wien.at/course/view.php?idnumber=dl';

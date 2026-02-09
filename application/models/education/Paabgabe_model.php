@@ -60,5 +60,52 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execReadOnlyQuery($qry, array($person_id));
 	}
-	
+
+	public function findAbgabenNewOrUpdatedSince($interval, $relevantTypes)
+	{
+
+		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, campus.tbl_paabgabe.kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
+			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
+			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
+			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
+			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
+			   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
+		FROM campus.tbl_paabgabe
+				 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
+				 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
+				 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
+				 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+				 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
+				 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
+				 JOIN public.tbl_person USING (person_id)
+		
+		WHERE (campus.tbl_paabgabe.insertamum >= NOW() - INTERVAL ?
+		   OR campus.tbl_paabgabe.updateamum >= NOW() - INTERVAL ?)
+		   AND campus.tbl_paabgabe.paabgabetyp_kurzbz IN ?";
+
+		return $this->execQuery($query, [$interval, $interval, $relevantTypes]);
+	}
+
+	public function findAbgabenNewOrUpdatedSinceByAbgabedatum($interval) {
+
+		$query = "SELECT projektarbeit_id, paabgabe_id, paabgabetyp_kurzbz, fixtermin, datum, kurzbz, campus.tbl_paabgabetyp.bezeichnung, campus.tbl_paabgabe.abgabedatum,
+						campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
+						campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
+						lehre.tbl_projektbetreuer.betreuerart_kurzbz, lehre.tbl_projektbetreuer.person_id,
+						public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
+				
+				FROM campus.tbl_paabgabe 
+					JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
+					JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
+					JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
+					JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
+				 	JOIN public.tbl_person ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+				
+				WHERE campus.tbl_paabgabe.abgabedatum IS NOT NULL 
+				AND campus.tbl_paabgabe.abgabedatum >= NOW() - INTERVAL ?
+				ORDER BY abgabedatum DESC
+	";
+
+		return $this->execQuery($query, [$interval]);
+	}
 }
