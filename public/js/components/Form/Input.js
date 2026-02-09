@@ -280,6 +280,7 @@ export default {
 			<template #chip="data"><slot name="chip" v-bind="data"></slot></template>
 			<template #header="data"><slot name="header" v-bind="data"></slot></template>
 			<template #footer="data"><slot name="footer" v-bind="data"></slot></template>
+			<template #selectedItem="data"><slot name="selectedItem" v-bind="data"></slot></template>
 			<template #option="data"><slot name="option" v-bind="data"></slot></template>
 			<template #optiongroup="data"><slot name="optiongroup" v-bind="data"></slot></template>
 			<template #content="data"><slot name="content" v-bind="data"></slot></template>
