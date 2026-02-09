@@ -755,9 +755,7 @@ class Dokumente extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
-		$student = current($data);
-
-		return $student->student_uid;
+		return hasData($data) ? getData($data)[0]->student_uid : null;
 	}
 
 	private function _loadPrestudentFromUid($studentUid)
@@ -769,10 +767,7 @@ class Dokumente extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
-		$student = current($data);
-
-
-		return $student->prestudent_id;
+		return hasData($data) ? getData($data)[0]->prestudent_id : null;
 	}
 
 	/**

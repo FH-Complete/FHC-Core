@@ -202,14 +202,14 @@ export default {
 			{
 				return [this.modelValue.uid];
 			}
-			return this.modelValue.map(e => e.uid);
+			return Array.isArray(this.modelValue) ? this.modelValue.map(e => e.uid) : [];
 		},
 		studentKzs(){
 			if (this.modelValue.uid)
 			{
 				return [this.modelValue.studiengang_kz];
 			}
-			return this.modelValue.map(e => e.studiengang_kz);
+			return Array.isArray(this.modelValue) ? this.modelValue.map(e => e.studiengang_kz) : [];
 		},
 		stg_kz(){
 			return this.studentKzs[0];
@@ -282,7 +282,8 @@ export default {
 		actionDownload(akte_id) {
 			window.open(
 				FHC_JS_DATA_STORAGE_OBJECT.app_root
-				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/akte/download?akte_id=' + encodeURIComponent(akte_id),
+				//+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/akte/download?akte_id=' + encodeURIComponent(akte_id),
+				+ FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/stv/dokumente/download?akte_id=' + encodeURIComponent(akte_id),
 				'_blank'
 			);
 		},

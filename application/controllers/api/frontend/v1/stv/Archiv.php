@@ -60,7 +60,7 @@ class Archiv extends FHCAPI_Controller
 
 	/**
 	 * Get archive documents for a person
-	 
+
 	 * @return void
 	 */
 	public function getArchiv()
@@ -79,6 +79,7 @@ class Archiv extends FHCAPI_Controller
 
 		$result = $this->aktelib->getByPersonId(
 			$person_id,
+			null, // dokument_kurzbz
 			true // archiv
 		);
 
@@ -98,68 +99,6 @@ class Archiv extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
-	}
-
-	/**
-	 * 
-	 * @param
-	 * @return object success or error
-	 */
-	public function download()
-	{
-		$akte_id = $this->input->get('akte_id');
-
-		if (!is_numeric($akte_id)) $this->terminateWithError('akte Id missing');
-
-		$result = $this->aktelib->getByAkteId($akte_id);
-
-		if (!hasData($result)) $this->terminateWithError('Akte not found');
-
-		$data = $this->getDataOrTerminateWithError($result)[0];
-
-		// If the file content is from the akte table or from the DMS
-		if (!isEmptyString($data->inhalt) || !isEmptyString($data->filename))
-		{
-			// Define handle to output stream
-			$tmpFilePointer = fopen("php://output", 'w');
-			$meta_data = stream_get_meta_data($tmpFilePointer);
-			$filename = $meta_data["uri"];
-
-			// File content from akte...
-			if (!isEmptyString($data->inhalt))
-			{
-				// Writes into the output buffer
-				fwrite($tmpFilePointer, $data->inhalt);
-			}
-			else //...or from DMS
-			{
-				$this->load->model('content/DmsFS_model', 'DmsFSModel');
-
-				$fileHandleResult = $this->DmsFSModel->openRead($data->filename);
-				if (isError($fileHandleResult) || !hasData($fileHandleResult)) $this->terminateWithError('DMS is not able to load this file');
-
-				// Read blocks from the file and writes them into the output buffer
-				while (hasData($fileData = readBlock($fileHandleResult)))
-				{
-					fwrite($tmpFilePointer, $fileData);
-				}
-			}
-
-			fclose($tmpFilePointer);
-
-			header('Content-Description: File Transfer');
-			header('Content-Type: '. $data->mimetype);
-			header('Expires: 0');
-			header('Cache-Control: must-revalidate');
-			header('Pragma: public');
-			header('Content-Disposition: attachment; filename="'.$data->titel.'"');
-			readfile($filename);
-			die();
-		}
-		else
-		{
-			$this->terminateWithError('This file content is not available');
-		}
 	}
 
 	/**
@@ -216,7 +155,7 @@ class Archiv extends FHCAPI_Controller
 			$this->addMeta('content', base64_encode($content));
 		}
 
-		
+
 		foreach ($allowed as $field)
 			if ($this->input->post($field) !== null)
 				$data[$field] = $this->input->post($field);
@@ -271,7 +210,7 @@ class Archiv extends FHCAPI_Controller
 				'akte_id' => $akte_id
 			]));
 		}
-		
+
 		$result = $this->AkteModel->delete($akte_id);
 		if (isError($result)) $this->terminateWithError(getError($result));
 

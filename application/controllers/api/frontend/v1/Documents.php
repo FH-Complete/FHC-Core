@@ -458,9 +458,11 @@ class Documents extends FHCAPI_Controller
 		$result = $this->documentexportlib->getDataURL($xml, $params);
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->documentexportlib->addArchiveToData($data);
+		$contentResult = $this->documentexportlib->getContent($vorlage, $data, $xsl_oe_kurzbz, $version, $outputformat, $sign_user);
 
-		$content = $this->getDataOrTerminateWithError($result);
+		$content = $this->getDataOrTerminateWithError($contentResult);
 		$akteData['titel'] .= '.pdf';
+		$akteData['inhalt'] = base64_encode($content);
 
 		return [
 			'akteData' => $akteData,

@@ -403,17 +403,18 @@ class DocumentExportLib
 
 		clearstatcache();
 
+		$temp_filename = $temp_folder . '/out.' . $outputformat;
 		switch ($outputformat) {
 			case 'pdf':
 			case 'doc':
-				$converResult = $this->documentlib->convert($tempname_zip, $temp_filename, $outputformat);
+				$converResult = $this->_ci->documentlib->convert($tempname_zip, $temp_filename, $outputformat);
 
 				if (isError($converResult))
 					return error($this->_ci->DocumentExportPhrases->t('document_export', 'error_conv_timeout'));
 				break;
 			case 'odt':
-			default:
-				$temp_filename = $tempname_zip;
+			//~ default:
+				//~ $temp_filename = $tempname_zip;
 		}
 
 		return success($temp_filename);
@@ -435,13 +436,13 @@ class DocumentExportLib
 	{
 		if ($outputformat != 'pdf') return error($this->_ci->DocumentExportPhrases->t('document_export', 'error_sign_pdf'));
 
-		$signed_filename = $this->_ci->signaturelib->sign($temp_filename, $user, $profile);
+		$signed_filename = $this->_ci->signaturelib->sign($temp_folder, $temp_filename, $user, $profile);
 
 		// If fine then return it
 		if (isSuccess($signed_filename)) return $signed_filename;
 
 		// Otherwise it is an error
-		return error($this->_ci->DocumentExportPhrases->t('global', 'unknown_error', ['error' => $result]));
+		return error($this->_ci->DocumentExportPhrases->t('global', 'unknown_error', ['error' => getError($signed_filename)]));
 	}
 
 	/**

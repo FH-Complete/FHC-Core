@@ -144,7 +144,7 @@ class DocumentLib
 		// If it is set to use docsbox
 		if (defined('DOCSBOX_ENABLED') && DOCSBOX_ENABLED === true)
 		{
-			require_once(dirname(__FILE__).'/../application/libraries/DocsboxLib.php');
+			require_once(dirname(__FILE__).'/DocsboxLib.php');
 
 			$ret = DocsboxLib::convert($inFile, $outFile, $format);
 		}
