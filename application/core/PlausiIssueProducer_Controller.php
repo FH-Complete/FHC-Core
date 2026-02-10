@@ -8,6 +8,15 @@ abstract class PlausiIssueProducer_Controller extends JOB_Controller
 	protected $_fehlerKurzbz = [];
 	protected $_apps;
 
+	/**
+	 * Runs issue production job.
+	 */
+	public function run()
+	{
+		// producing issues
+		$this->producePlausicheckIssues(array());
+	}
+
 	protected function producePlausicheckIssues($params)
 	{
 		$this->load->library(
