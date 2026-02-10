@@ -1,0 +1,308 @@
+/* Base Header */
+.verpasst-header {
+	background-color: var(--fhc-red-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.verpasst-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .verpasst-header {
+	background-color: var(--fhc-red-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .verpasst-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Base Header */
+.abzugeben-header {
+	background-color: var(--fhc-yellow-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.abzugeben-header:hover {
+	background-color: var(--fhc-yellow-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .abzugeben-header {
+	background-color: var(--fhc-yellow-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .abzugeben-header:hover {
+	background-color: var(--fhc-yellow-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Base Header */
+.beurteilungerforderlich-header {
+	background-color: var(--fhc-orange-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+
+/* Hover State */
+.beurteilungerforderlich-header:hover {
+	background-color: var(--fhc-orange-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .beurteilungerforderlich-header {
+	background-color: var(--fhc-orange-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .beurteilungerforderlich-header:hover {
+	background-color: var(--fhc-orange-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Base Header */
+.verspaetet-header {
+	background-color: var(--fhc-pink-40);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.verspaetet-header:hover {
+	background-color: var(--fhc-pink-20);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .verspaetet-header {
+	background-color: var(--fhc-pink-30);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .verspaetet-header:hover {
+	background-color: var(--fhc-pink-20);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Base Header */
+.abgegeben-header {
+	background-color: var(--fhc-green-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.abgegeben-header:hover {
+	background-color: var(--fhc-green-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .abgegeben-header {
+	background-color: var(--fhc-green-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .abgegeben-header:hover {
+	background-color: var(--fhc-green-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+
+/* Base Header */
+.bestanden-header {
+	background-color: var(--fhc-green-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.bestanden-header:hover {
+	background-color: var(--fhc-green-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .bestanden-header {
+	background-color: var(--fhc-green-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .bestanden-header:hover {
+	background-color: var(--fhc-green-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+
+/* Base Header */
+.nichtbestanden-header {
+	background-color: var(--fhc-red-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.nichtbestanden-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .nichtbestanden-header {
+	background-color: var(--fhc-red-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .nichtbestanden-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+
+/* Base Header */
+.erledigt-header {
+	background-color: var(--fhc-red-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.erledigt-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .erledigt-header {
+	background-color: var(--fhc-red-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .erledigt-header:hover {
+	background-color: var(--fhc-red-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+
+/* Base Header */
+.standard-header {
+	background-color: var(--fhc-white-70);
+	font-weight: 600;
+	border-radius: 6px;
+	padding: 0px 0px 0px 34px;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease, color 0.3s ease;
+	box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+}
+
+/* Hover State */
+.standard-header:hover {
+	background-color: var(--fhc-white-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+/* Active / Expanded State */
+.p-accordion-tab-active > .standard-header {
+	background-color: var(--fhc-white-50);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+/* Hover State Active*/
+.p-accordion-tab-active > .standard-header:hover {
+	background-color: var(--fhc-white-60);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+}
+
+#abgabetoolroot .modal-header{
+	background-color: var(--fhc-blue-primary);
+	color: var(--fhc-white-50);
+}
+
+#abgabetoolroot .modal-header .btn-close{
+	filter: invert(1);
+}
+
+#abgabetoolroot .modal-footer {
+	background-color: var(--fhc-white-20);
+
+}
+
+.bordered-modal {
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 0.5rem;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.bordered-modal  .modal-body {
+	overflow-y: visible;
+}
+
+.p-accordion .p-accordion-header .p-accordion-header-link {
+	padding: 12px!important;
+}
+
+/* 1. Stick the Header */
+#abgabetable .tabulator-header .tabulator-col.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Must be higher than other headers */
+	background-color: #fff; /* Opaque background is required */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 2. Stick the Data Cells */
+#abgabetable .tabulator-tableholder .tabulator-row .tabulator-cell.sticky-col {
+	position: sticky;
+	left: 0;
+	z-index: 10; /* Ensure it floats above other cells */
+	background-color: #fff; /* Match your row background color */
+	border-right: 2px solid #ddd; /* Optional: Separator line */
+}
+
+/* 3. Fix for Hover Effects (Optional) */
+/* If you use hover rows, you need to ensure the sticky cell matches the hover color */
+#abgabetable .tabulator-row:hover .tabulator-cell.sticky-col {
+	background-color: #ccc; /* Match your existing hover color */
+}

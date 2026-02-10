@@ -25,7 +25,8 @@ class Studiensemester extends FHCAPI_Controller
 			array(
 				'getAll' => self::PERM_LOGGED,
 				'getAktNext' => self::PERM_LOGGED,
-				'getStudienjahrByStudiensemester' => self::PERM_LOGGED
+				'getStudienjahrByStudiensemester' => self::PERM_LOGGED,
+				'getAllStudiensemesterAndAktOrNext' => self::PERM_LOGGED
 			)
 		);
 		// Load model StudiensemesterModel
@@ -151,5 +152,18 @@ class Studiensemester extends FHCAPI_Controller
 		}
 
 		$this->terminateWithSuccess((getData(success($studienjahrObj))));
+	}
+
+	public function getAllStudiensemesterAndAktOrNext() {
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$this->StudiensemesterModel->addOrder("start", "DESC");
+		$result = $this->StudiensemesterModel->getAktOrNextSemester();
+		$aktuell = getData($result)[0];
+		$this->StudiensemesterModel->addSelect('*');
+		$result = $this->StudiensemesterModel->load();
+		$studiensemester = getData($result);
+		
+		$this->terminateWithSuccess(array($studiensemester, $aktuell));
 	}
 }
