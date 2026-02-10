@@ -30,6 +30,7 @@ export const AbgabetoolAssistenz = {
 		Inplace: primevue.inplace,
 		Textarea: primevue.textarea,
 		Timeline: primevue.timeline,
+		TieredMenu: primevue.tieredmenu,
 		VueDatePicker,
 		FhcOverlay
 	},
@@ -969,6 +970,25 @@ export const AbgabetoolAssistenz = {
 		}
 	},
 	computed: {
+		emailItems() {
+			const menu = []
+			
+			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT){
+				menu.push({
+					label: this.$p.t('abgabetool/c4sendEmailStudierendev2', [this.uniqueStudentEmailCount]),
+					command: this.sammelMailStudent
+				})
+			}
+			
+			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER) {
+				menu.push({
+					label: this.$p.t('abgabetool/c4sendEmailBetreuerv2', [this.uniqueBetreuerEmailCount]),
+					command: this.sammelMailBetreuer
+				})
+			}
+
+			return menu
+		},
 		uniqueBetreuerEmailCount() {
 			const emails = new Set();
 			
@@ -1344,16 +1364,6 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-					<button v-if="ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT"
-						role="button" class="btn btn-secondary ml-2"
-						@click="sammelMailStudent">
-						{{ $p.t('abgabetool/c4sendEmailStudierendev2', [uniqueStudentEmailCount]) }} 
-					</button>
-					<button v-if="ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER" 
-						role="button" class="btn btn-secondary ml-2"
-						@click="sammelMailBetreuer">
-						{{ $p.t('abgabetool/c4sendEmailBetreuerv2', [uniqueBetreuerEmailCount]) }}
-					</button>
 					<Dropdown
 						@change="semesterChanged" 
 						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 
@@ -1366,6 +1376,17 @@ export const AbgabetoolAssistenz = {
 							<div>{{ option.studiensemester_kurzbz }}</div>
 						</template>
 					</Dropdown>
+					
+					<button 
+						v-if="emailItems.length"
+						role="button"
+						@click="evt => $refs.menu.toggle(evt)"
+						class="btn btn-outline-secondary dropdown-toggle"
+						aria-haspopup="true"
+					>
+						<i class="fa fa-envelope"></i>
+					</button>
+					<tiered-menu ref="menu" :model="emailItems" popup/>
 				</template>
 			</core-filter-cmpt>
 		</div>
