@@ -182,6 +182,7 @@ export const Benotungstool = {
 			this.$api.call(ApiNoten.getNoteByPunkte(value, this.lv_id, this.sem_kurzbz)).then(res => {
 				if(res?.meta?.status === 'success' && res.data >= 0) {
 					row.update({note_vorschlag: res.data})
+					row.reformat()
 				}
 			})
 		},
@@ -365,6 +366,9 @@ export const Benotungstool = {
 						s.note_vorschlag = lvn.note // TODO: check if note_vorschlag should be changed by import
 
 						s.lv_note = lvn.note
+						if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
+							s.punkte = lvn.punkte
+						}
 						
 						this.teilnoten[s.uid].note_lv = lvn.note
 						// recalculate freigabestatus
@@ -668,7 +672,7 @@ export const Benotungstool = {
 				widthGrow: 1
 			})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorschlag_übernehmen'))), field: 'übernehmen', width: 150, hozAlign: 'center', formatter: this.arrowFormatter, 
-				// cellClick: this.saveNote, 
+				cellClick: this.saveNote, 
 				variableHeight: true})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4lvnote'))), field: 'lv_note',
 				formatter: this.notenFormatter,
@@ -1067,7 +1071,7 @@ export const Benotungstool = {
 			button.className = 'btn btn-outline-secondary';
 			button.textContent = this.$capitalize(this.$p.t('benotungstool/c4notenvorschlagUebernehmen'));
 			button.addEventListener('click', () => {
-				this.saveNote(data)
+				// this.saveNote(data)
 				console.log('button click')
 			});
 			return button;

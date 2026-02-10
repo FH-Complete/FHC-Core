@@ -529,11 +529,11 @@ class Noten extends FHCAPI_Controller
 
 		if(isset($punkte) && $punkte >= 0) {
 			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
-			$result = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
-			if(isError($result)) {
-				$this->terminateWithError('Notenspiegel Error');
+			$resultNote = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
+			if(isError($resultNote)) {
+				$this->terminateWithError(getError($resultNote));
 			} else {
-				$data = getData($result);
+				$data = getData($resultNote);
 				if($data != $note)
 				{
 					$note = $data;
@@ -865,10 +865,9 @@ class Noten extends FHCAPI_Controller
 		$note = $result->note;
 		$punkte = $result->punkte;
 
-		
-
 		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $student_uid, $sem_kurzbz);
-
+		$this->addMeta('LvgesamtnoteModelresult', $result);
+		
 		if(!isError($result) && hasData($result)) {
 			$lvgesamtnote = getData($result)[0];
 			
@@ -933,7 +932,6 @@ class Noten extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'missingParameters'), 'general');
 		}
 		
-
 		$lv_id = $result->lv_id;
 		$sem_kurzbz = $result->sem_kurzbz;
 		$noten = $result->noten;
@@ -944,10 +942,12 @@ class Noten extends FHCAPI_Controller
 		{
 
 			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
-
-			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
-				$note->note = $this->NotenschluesselaufteilungModel->getNote($note->punkte, $lv_id, $sem_kurzbz);
-				$this->addMeta($note);
+			$this->addMeta($note->uid.'$result', $result);
+			
+			if(CIS_GESAMTNOTE_PUNKTE) {
+				$resultNote = $this->NotenschluesselaufteilungModel->getNote($note->punkte, $lv_id, $sem_kurzbz);
+				$note->note = $this->getDataOrTerminateWithError($resultNote);
+				$this->addMeta($note->uid.'note', $note);
 			}
 			
 			if(!isError($result) && hasData($result)) {
@@ -1061,9 +1061,11 @@ class Noten extends FHCAPI_Controller
 
 		foreach ($pruefungen as $pruefung) {
 			
-			if(defined(CIS_GESAMTNOTE_PUNKTE) && CIS_GESAMTNOTE_PUNKTE) {
+			if(CIS_GESAMTNOTE_PUNKTE) {
 				$result = $this->NotenschluesselaufteilungModel->getNote($pruefung->punkte, $lv_id, $sem_kurzbz);
+				$this->addMeta($pruefung->uid."result", $result);
 				$pruefung->note = $this->getDataOrTerminateWithError($result);
+				$this->addMeta($pruefung->uid."note", $pruefung->note);
 			}
 			
 			$student_uid = $pruefung->uid;
