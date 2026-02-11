@@ -38,6 +38,7 @@ export const AbgabetoolAssistenz = {
 		return {
 			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
 			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions),
+			notenOptionsNonFinal: Vue.computed(() => this.notenOptionsNonFinal),
 			turnitin_link: Vue.computed(() => this.turnitin_link),
 			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link),
 			abgabetypenBetreuer: Vue.computed(() => this.abgabeTypeOptions)
@@ -86,6 +87,7 @@ export const AbgabetoolAssistenz = {
 			notenOptions: null,
 			allowedNotenFilterOptions: null,
 			allowedNotenOptions: null,
+			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
 				datum: new Date(),
 				bezeichnung: {
@@ -1089,6 +1091,10 @@ export const AbgabetoolAssistenz = {
 						this.allowedNotenOptions = this.notenOptions.filter(
 							opt => res.data[1].includes(opt.note)
 						);
+
+						this.notenOptionsNonFinal = this.notenOptions.filter(
+							opt => res.data[2].includes(opt.note)
+						)
 					}
 
 					this.allowedNotenFilterOptions = [

@@ -801,7 +801,10 @@ class Abgabe extends FHCAPI_Controller
 
 		$allowed_noten_abgabetool = $this->config->item('ALLOWED_NOTEN_ABGABETOOL');
 
-		$this->terminateWithSuccess(array($noten, $allowed_noten_abgabetool));
+		$nonfinal_noten_abgabetool = $this->config->item('NONFINAL_NOTEN_ABGABETOOL');
+
+
+		$this->terminateWithSuccess(array($noten, $allowed_noten_abgabetool, $nonfinal_noten_abgabetool));
 	}
 
 	/**
