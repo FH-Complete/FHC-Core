@@ -174,12 +174,9 @@ class Noten extends FHCAPI_Controller
 		
 		foreach($student_uids as $uid) {
 			$grades[$uid]['grades'] = [];
-			
-//			$res = $this->StudentModel->load([$uid]);
-//			if(!isError($res) && hasData($res)) $student = getData($res)[0];
-			
-			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
 
+			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
+			$this->addMeta($uid.'getLvGesamtNoten', $result);
 			if(!isError($result) && hasData($result)) {
 				$lvgesamtnote = getData($result)[0];
 				$grades[$uid]['note_lv'] = $lvgesamtnote->note;
@@ -367,8 +364,8 @@ class Noten extends FHCAPI_Controller
 		
 		foreach($result->noten as $note) {
 
-			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
-
+			$resultLVGes = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
+			$this->addMeta($note->uid.'$resultLVGes', $resultLVGes);
 			if (!isError($resultLVGes) && hasData($resultLVGes))
 			{
 				$lvgesamtnote = getData($resultLVGes)[0];
@@ -379,7 +376,7 @@ class Noten extends FHCAPI_Controller
 					$id = $this->LvgesamtnoteModel->update(
 						[$lvgesamtnote->student_uid, $lvgesamtnote->studiensemester_kurzbz, $lvgesamtnote->lehrveranstaltung_id],
 						array(
-							'note' => $note->note,
+							'note' => $lvgesamtnote->note,
 							'freigabevon_uid' => getAuthUID(),
 							'freigabedatum' => date("Y-m-d H:i:s"),
 							'updateamum' => date("Y-m-d H:i:s"),
@@ -483,15 +480,14 @@ class Noten extends FHCAPI_Controller
 		// TODO: we need a zuordnungscheck here? any lektor can get any grades?
 		// what about assistenz with different rights doing lectors job once again?
 		// students checking their own grades?
-		
-		
-		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $uid, $sem_kurzbz);
+
+		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $uid, $sem_kurzbz);
 		$data = $this->getDataOrTerminateWithError($result);
 		
 		// TODO: moodle teilnote but it seems they only work for a whole course?
 		
 		// get anw% of student by prestudent_id
-		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
+//		$anwresult = $this->getAnwesenheiten($prestudent_ids, $lv_id, $sem_kurzbz);
 
 
 
@@ -527,7 +523,7 @@ class Noten extends FHCAPI_Controller
 		
 		$jetzt = date("Y-m-d H:i:s");
 
-		if(isset($punkte) && $punkte >= 0) {
+		if(CIS_GESAMTNOTE_PUNKTE && isset($punkte) && $punkte >= 0) {
 			// Bei Punkteeingabe wird die Note nochmals geprueft und ggf korrigiert
 			$resultNote = $this->NotenschluesselaufteilungModel->getNote($punkte, $lva_id, $stsem);
 			if(isError($resultNote)) {
@@ -543,8 +539,12 @@ class Noten extends FHCAPI_Controller
 		}
 
 		// TODO: more sophisticated empty check
-		if($note=='')
-			$note = 9;
+		if($note=='') {
+			$this->load->model('education/Note_model', 'NoteModel');
+			$result = $this->NoteModel->getNochNichtEingetragenNote();
+			$note = getData($result)[0]->note;
+		}
+
 
 		$this->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
@@ -560,8 +560,8 @@ class Noten extends FHCAPI_Controller
 			$this->terminateWithError('Kein gültiger Studiengang gefunden für ID: '.$studiengang_kz);
 		}
 		
-		//Gesamtnote updaten
-		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
+
+		$result = $this->LvgesamtnoteModel->getLvGesamtNote($lva_id, $student_uid, $stsem);
 		if(!isError($result) && !hasData($result)) {
 			
 			$id = $this->LvgesamtnoteModel->insert(
@@ -639,7 +639,6 @@ class Noten extends FHCAPI_Controller
 
 		// extra check if the student has lvnote and a zeugnisnote in the relevant lva
 		$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
-		
 		$lvgesamtnoteData = getData($resultLV);
 		$this->addMeta('lvgesamtnoteData', $lvgesamtnoteData);
 		
@@ -662,7 +661,9 @@ class Noten extends FHCAPI_Controller
 		);
 		
 		if(count($status) > 0 && $status[0] == true) {
-			$note = 17; //entschuldigt
+			$this->load->model('education/Note_model', 'NoteModel');
+			$result = $this->NoteModel->getEntschuldigtNote();
+			$note = getData($result)[0]->note;
 		}
 		
 		$jetzt = date("Y-m-d H:i:s");
@@ -685,7 +686,7 @@ class Noten extends FHCAPI_Controller
 			} else if(!isError($result1) && !hasData($result1)) {
 				// new entry termin1
 
-				$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
+				$resultLV = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lva_id, $student_uid, $stsem);
 				
 				// update Termin1 note
 				if (hasData($resultLV))
@@ -697,8 +698,9 @@ class Noten extends FHCAPI_Controller
 				}
 				else if(!hasData($resultLV))// set Termin1 note to "noch nicht eingetragen"
 				{
-					// TODO: avoid hardcoded noten primary keys!
-					$pr_note = 9; 
+					$this->load->model('education/Note_model', 'NoteModel');
+					$result = $this->NoteModel->getNochNichtEingetragenNote();
+					$pr_note = getData($result)[0]->note;
 					$pr_punkte = '';
 					$benotungsdatum = $jetzt;
 				}
@@ -864,8 +866,9 @@ class Noten extends FHCAPI_Controller
 		$sem_kurzbz = $result->sem_kurzbz;
 		$note = $result->note;
 		$punkte = $result->punkte;
+		
+		$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $student_uid, $sem_kurzbz);
 
-		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $student_uid, $sem_kurzbz);
 		$this->addMeta('LvgesamtnoteModelresult', $result);
 		
 		if(!isError($result) && hasData($result)) {
@@ -941,7 +944,7 @@ class Noten extends FHCAPI_Controller
 		foreach($noten as $note)
 		{
 
-			$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lv_id, $note->uid, $sem_kurzbz);
+			$result = $this->LvgesamtnoteModel->getLvGesamtNoteVorschlag($lv_id, $note->uid, $sem_kurzbz);
 			$this->addMeta($note->uid.'$result', $result);
 			
 			if(CIS_GESAMTNOTE_PUNKTE) {
@@ -1024,11 +1027,14 @@ class Noten extends FHCAPI_Controller
 		$stsem = $result->sem_kurzbz;
 		
 		$ret = [];
+
+		$this->load->model('education/Note_model', 'NoteModel');
+		$result = $this->NoteModel->getNochNichtEingetragenNote();
+		$note = getData($result)[0]->note;
 		
 		foreach ($uids as $student) {
 			$student_uid = $student->uid;
 			$typ = $student->typ;
-			$note = 9; //$result->note; // TODO: parameterize for import maybe
 			$punkte = null; // new pruefungen never have punkte,
 
 			$lehreinheit_id = $student->lehreinheit_id;

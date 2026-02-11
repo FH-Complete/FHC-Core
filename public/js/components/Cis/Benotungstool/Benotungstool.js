@@ -860,14 +860,16 @@ export const Benotungstool = {
 			return value
 		},
 		saveNote(e, cell) { // Notenvorschlag freigeben
-			// TODO: rename & rework so it handles with a button
-			
-			// TODO: save this method once we decide the arrow was actually very cool
-			
 			const row = cell.getRow()
 			const data = row.getData()
 
+			
+			
+			
 			if(!data.note_vorschlag) return
+			
+			// if vorschlag is the same as lv_note do nothing
+			if(data.note_vorschlag == data.lv_note) return
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag, data.punkte))
 				.then((res) => {
@@ -1070,10 +1072,6 @@ export const Benotungstool = {
 			const button = document.createElement('button');
 			button.className = 'btn btn-outline-secondary';
 			button.textContent = this.$capitalize(this.$p.t('benotungstool/c4notenvorschlagUebernehmen'));
-			button.addEventListener('click', () => {
-				// this.saveNote(data)
-				console.log('button click')
-			});
 			return button;
 			
 			// // can save a notenvorschlag -> colored
@@ -1528,7 +1526,7 @@ export const Benotungstool = {
 			// set Cols
 			this.$refs.notenTable.tabulator.clearSort()
 			this.$refs.notenTable.tabulator.setColumns(cols)
-			
+			this.$refs.notenTable.tabulator.redraw(true)
 			// redraw table outside this function
 		},
 		saveNoteneingabe() {
