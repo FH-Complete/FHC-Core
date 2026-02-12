@@ -1392,7 +1392,7 @@ export const AbgabetoolAssistenz = {
 					>
 						<i class="fa fa-envelope"></i>
 					</button>
-					<tiered-menu ref="menu" :model="emailItems" popup/>
+					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 				</template>
 			</core-filter-cmpt>
 		</div>
