@@ -181,9 +181,8 @@ class LvPlan extends FHCAPI_Controller
 		$this->load->library('StundenplanLib');
 
 		$result = $this->stundenplanlib->getEventsByLV($lv_id, $start_date, $end_date, $stundenplan);
-		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($lvplanEvents);
+		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
 	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
