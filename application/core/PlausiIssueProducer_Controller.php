@@ -6,7 +6,7 @@
 abstract class PlausiIssueProducer_Controller extends JOB_Controller
 {
 	protected $_fehlerKurzbz = [];
-	protected $_apps;
+	protected $_apps = [];
 
 	/**
 	 * Runs issue production job.

@@ -30,7 +30,11 @@ export default {
 		},
 		issueListStyleBreakpoints: {
 			type: Object
-		}
+		},
+		includeIssueList: {
+			type: Boolean,
+			default: true
+		},
 	},
 	 data() {
 		return {
@@ -80,11 +84,11 @@ export default {
 	 template: `
 		<div class="px-2">
 			<h4 class="mb-1">Issues<a class="refresh-issues" title="erneut prüfen" href="javascript:void(0);" @click="checkPerson"><i class="fas fa-sync"></i></a></h4>
-			<h6 v-if="!isFetching" class="text-muted" role="button" @click="toggle">{{ openissuescount }}</h6>
+			<h6 v-if="!isFetching" class="text-muted" :role="includeIssueList ? 'button' : ''" @click="toggle">{{ openissuescount }}</h6>
 			<h6 v-else class="mb-2"><p-skeleton v-if="isFetching" style="width:45%"></p-skeleton></h6>
 		</div>
 
-		<p-overlaypanel ref="issuesOverlay" :style="issueListStyle" :breakpoints="issueListStyleBreakpoints">
+		<p-overlaypanel ref="issuesOverlay" :style="issueListStyle" :breakpoints="issueListStyleBreakpoints" v-if="includeIssueList">
 			<issue-list
 				ref="issueListRef"
 				:person_id = "person_id"
