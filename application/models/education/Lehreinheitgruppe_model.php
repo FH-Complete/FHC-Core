@@ -341,7 +341,7 @@ class Lehreinheitgruppe_model extends DB_Model
 		$this->db->where('lehreinheit_id', $lehreinheit_id);
 		$this->db->where('studiengang_kz', $gruppen_array->studiengang_kz);
 
-		if (!isEmptyString($gruppen_array->semester))
+		if (!isEmptyString((string)$gruppen_array->semester))
 		{
 			$this->db->where('semester', $gruppen_array->semester);
 		}
@@ -444,30 +444,37 @@ class Lehreinheitgruppe_model extends DB_Model
 										) 
 									ELSE tbl_gruppe.beschreibung
 								END AS beschreibung");
-		$this->addSelect("CASE 
-									WHEN tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL THEN 
-										(
-											SELECT EXISTS (
-												SELECT 1 
-												FROM lehre.tbl_stundenplandev
-												WHERE lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
-													AND studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
-													AND semester = tbl_lehreinheitgruppe.semester
-													AND TRIM(COALESCE(verband, '')) = TRIM(tbl_lehreinheitgruppe.verband)
-													AND TRIM(COALESCE(gruppe, '')) = TRIM(tbl_lehreinheitgruppe.gruppe)
-													AND (gruppe_kurzbz IS NULL OR gruppe_kurzbz = '')
-											)
-										)
-									ELSE 
+		$this->addSelect("
+									CASE
+										WHEN trim(COALESCE(tbl_lehreinheitgruppe.gruppe_kurzbz, '')) = '' THEN
 										(
 											SELECT EXISTS (
 												SELECT 1
-												FROM lehre.tbl_stundenplandev
-												WHERE lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
-													AND gruppe_kurzbz = tbl_lehreinheitgruppe.gruppe_kurzbz
+												FROM lehre.tbl_stundenplandev sp
+												WHERE sp.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+													AND sp.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
+													AND sp.semester = tbl_lehreinheitgruppe.semester
+													AND trim(COALESCE(sp.verband, '')) = trim(COALESCE(tbl_lehreinheitgruppe.verband, ''))
+													AND trim(COALESCE(sp.gruppe, ''))  = trim(COALESCE(tbl_lehreinheitgruppe.gruppe, ''))
+													AND trim(COALESCE(sp.gruppe_kurzbz, '')) = ''
 											)
 										)
-								END AS verplant");
+									ELSE
+										(
+											SELECT EXISTS (
+												SELECT 1
+												FROM lehre.tbl_stundenplandev sp
+												WHERE sp.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+													AND sp.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
+													AND sp.semester = tbl_lehreinheitgruppe.semester
+													AND trim(COALESCE(sp.verband, '')) = trim(COALESCE(tbl_lehreinheitgruppe.verband, ''))
+													AND trim(COALESCE(sp.gruppe, ''))  = trim(COALESCE(tbl_lehreinheitgruppe.gruppe, ''))
+													AND trim(COALESCE(sp.gruppe_kurzbz, '')) = trim(COALESCE(tbl_lehreinheitgruppe.gruppe_kurzbz, ''))
+											)
+										)
+										END AS verplant
+									");
+
 		$this->addJoin('tbl_studiengang', 'studiengang_kz', 'LEFT');
 		$this->addJoin('public.tbl_gruppe', 'gruppe_kurzbz', 'LEFT');
 

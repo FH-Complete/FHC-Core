@@ -38,3 +38,9 @@ textarea[name="anmerkung"] {
 {
 	border-color: black;
 }
+
+.node-verband {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}

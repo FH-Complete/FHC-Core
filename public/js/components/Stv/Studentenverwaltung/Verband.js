@@ -1,5 +1,6 @@
 import drop from '../../../directives/drop.js';
 import dragClick from '../../../directives/dragClick.js';
+import draggable from '../../../directives/draggable.js';
 
 import ApiStvGroups from '../../../api/factory/stv/group.js';
 import ApiStvDetails from '../../../api/factory/stv/details.js';
@@ -11,7 +12,8 @@ export default {
 	},
 	directives: {
 		drop,
-		dragClick
+		dragClick,
+		draggable
 	},
 	inject: {
 		$reloadList: {
@@ -40,6 +42,10 @@ export default {
 		preselectedKey: {
 			type: String,
 			default: null
+		},
+		dragEnabled: {
+			type: Boolean,
+			default: false
 		}
 	},
 	data() {
@@ -79,6 +85,22 @@ export default {
 		}
 	},
 	methods: {
+		dragVerband(node) {
+			const gruppe = node?.data || {};
+
+			const id = gruppe.gruppe_kurzbz ?? gruppe.link ?? node?.key ?? null;
+
+			return [{
+				type: 'verband',
+				id: id,
+				gruppe_kurzbz: gruppe.gruppe_kurzbz ?? null,
+				semester: gruppe.semester ?? null,
+				verband: gruppe.verband ?? null,
+				gruppe: gruppe.gruppe ?? null,
+				lehrverband: gruppe.gruppe_kurzbz == null,
+				stg_kz: gruppe.stg_kz ?? null,
+			}];
+		},
 		findNodeByKey(key, arr) {
 			if (!arr)
 				arr = this.nodes;
@@ -359,7 +381,9 @@ export default {
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
+						class="node-verband"
 						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
+						v-draggable:link-strict="dragEnabled && dragVerband(node)"
 					>
 						{{ node.data.name }}
 					</span>
