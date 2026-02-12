@@ -28,7 +28,7 @@ $config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT'] = ['qualgate1', 'qualgate2'
 $config['ALLOWED_NOTEN_ABGABETOOL'] = [10, 14]; // tbl_note pk
 // benotete projektarbeiten sperren weitere terminanlage & bearbeitung, diese noten sind ausnahmen dieser Regel
 // wie zB "Nicht beurteilt" & "Noch nicht eingetragen"
-$config['NONFINAL_NOTEN_ABGABETOOL'] = [7, 9];
+$config['NONFINAL_NOTEN_ABGABETOOL'] = [9];
 $config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
 
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
