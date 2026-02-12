@@ -384,7 +384,6 @@ class LektorLib
 		$this->_ci->LehreinheitmitarbeiterModel->addGroupBy('tbl_studiengang.bezeichnung');
 		return $this->_ci->LehreinheitmitarbeiterModel->load();
 	}
-//if($rechte->isBerechtigt('lv-plan'))
 
 	private function hasKollision($stunden, $mitarbeiter)
 	{
