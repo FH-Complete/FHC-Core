@@ -22,6 +22,7 @@ export const AbgabetoolMitarbeiter = {
 			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
 			abgabetypenBetreuer: Vue.computed(() => this.abgabetypenBetreuer),
 			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions),
+			notenOptionsNonFinal: Vue.computed(() => this.notenOptionsNonFinal),
 			turnitin_link: Vue.computed(() => this.turnitin_link),
 			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link)
 		}
@@ -50,6 +51,7 @@ export const AbgabetoolMitarbeiter = {
 			abgabeTypeOptions: null,
 			notenOptions: null,
 			allowedNotenOptions: null,
+			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
 				datum: new Date(),
 				bezeichnung: {
@@ -301,7 +303,15 @@ export const AbgabetoolMitarbeiter = {
 				pa.abgabetermine = res.data[0].retval
 				pa.isCurrent = res.data[1]
 
-				const paIsBenotet = pa.note !== null
+				let paIsBenotet = false
+				if(pa.note !== undefined && pa !== null) {
+					// check if the note is not defined as a non final projektarbeit note
+					const opt = this.notenOptionsNonFinal.find(opt => opt.note)
+					// if thats the case allow further work
+					if(opt) paIsBenotet = false
+					// else the PA is to be considered finished
+					paIsBenotet = true
+				}
 
 				pa.abgabetermine.forEach(termin => {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
@@ -470,6 +480,10 @@ export const AbgabetoolMitarbeiter = {
 
 				this.allowedNotenOptions = this.notenOptions.filter(
 					opt => res.data[1].includes(opt.note)
+				)
+				
+				this.notenOptionsNonFinal = this.notenOptions.filter(
+					opt => res.data[2].includes(opt.note)
 				)
 			}
 			

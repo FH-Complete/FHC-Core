@@ -132,5 +132,13 @@ export default {
 			params: formData,
 			config: {Headers: { "Content-Type": "multipart/form-data" }}
 		};
+	},
+	getSignaturStatusForProjektarbeitAbgaben(paabgabe_ids, student_uid) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/getSignaturStatusForProjektarbeitAbgaben',
+			params: {paabgabe_ids, student_uid},
+
+		};
 	}
 };
