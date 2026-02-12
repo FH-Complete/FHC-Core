@@ -61,14 +61,10 @@ class PlausicheckProducerLib
 		}
 		else
 		{
-			$this->_ci->FehlerModel->addSelect('fehler_kurzbz');
-			if (!isEmptyArray($this->_apps)) $this->_ci->FehlerModel->db->where_in('app', $this->_apps);
-			$fehlerRes = $this->_ci->FehlerModel->load();
+			// get fehler by apps
+			$fehlerRes = $this->_ci->FehlerModel->getByApps($this->_apps);
 
-			if (hasData($fehlerRes))
-			{
-				$this->_fehlerKurzbz = array_column(getData($fehlerRes), 'fehler_kurzbz');
-			}
+			if (hasData($fehlerRes)) $this->_fehlerKurzbz = array_column(getData($fehlerRes), 'fehler_kurzbz');
 		}
 
 		// get producer file paths for the fehler
@@ -151,10 +147,10 @@ class PlausicheckProducerLib
 		$mappingFehlerKurbz = array_keys($this->_fehlerLibMappings);
 
 		// check if all issues to produce could be found in database
-		$notFoundFehlerKurzbz = array_diff($this->_fehlerKurzbz, $mappingFehlerKurbz);
+		//~ $notFoundFehlerKurzbz = array_diff($this->_fehlerKurzbz, $mappingFehlerKurbz);
 
-		if (!isEmptyArray($notFoundFehlerKurzbz))
-			$result->errors[] = error('Fehler to produce not defined in config: '.implode(', ', $notFoundFehlerKurzbz));
+		//~ if (!isEmptyArray($notFoundFehlerKurzbz))
+			//~ $result->errors[] = error('Fehler to produce not defined in config: '.implode(', ', $notFoundFehlerKurzbz));
 
 		foreach ($mappingFehlerKurbz as $fehler_kurzbz)
 		{

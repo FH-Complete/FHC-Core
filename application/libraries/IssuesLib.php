@@ -243,7 +243,7 @@ class IssuesLib
 		$inhalt_extern = null
 	) {
 		if (isEmptyString($person_id) && isEmptyString($oe_kurzbz))
-			return error("Person_id or oe_kurzbz must be set.");
+			return error("Person_id or oe_kurzbz must be set, fehlercode: $fehlercode");
 
 		// get fehlertextVorlage and replace it with params
 		$fehlerRes = $this->_ci->FehlerModel->loadWhere(['fehlercode' => $fehlercode]);
@@ -256,7 +256,7 @@ class IssuesLib
 			if (!isEmptyArray($fehlertext_params))
 			{
 				if (count($fehlertext_params) != substr_count($fehlertextVorlage, '%s'))
-					return error('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehlercode);
+					return error('Wrong number of parameters for Fehlertext, fehlercode ' . $fehlercode);
 
 				$fehlertext = vsprintf($fehlertextVorlage, $fehlertext_params);
 			}

@@ -6,11 +6,9 @@ defined('BASEPATH') || exit('No direct script access allowed');
 class Issues extends FHCAPI_Controller
 {
 	const DEFAULT_PERMISSION = 'system/issues_verwalten:r';
-	// code igniter 
-	protected $CI;
 
 	public function __construct() {
-		
+
 		parent::__construct(
 			array(
 				'getOpenIssuesByProperties' => Self::DEFAULT_PERMISSION,
@@ -26,9 +24,6 @@ class Issues extends FHCAPI_Controller
 		$this->load->model('system/Fehler_model','FehlerModel');
 		$this->load->model('system/Issue_model', 'IssueModel');
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-		
-		// get CI for transaction management
-		$this->CI = &get_instance();
 	}
 
 	public function getOpenIssuesByProperties()
@@ -45,8 +40,6 @@ class Issues extends FHCAPI_Controller
 
 		if (isset($behebung_parameter) && !is_array($behebung_parameter))
 			$this->terminateWithError('Behebung parameter invalid');
-
-			$this->addMeta("vorher", $hauptzustaendig);
 
 		$issueRes = $this->IssueModel->getOpenIssuesByProperties(
 			$person_id,
@@ -67,39 +60,39 @@ class Issues extends FHCAPI_Controller
 
 	public function getPersonenMitOffenenIssues()
 	{
-		
+
 		$sql = <<<EOSQL
 SELECT
 
 		person_id, uid, vorname, nachname, count(*) AS openissues ,
-		(select count(*) anz_aktiv 
-		 from hr.tbl_dienstverhaeltnis dv 
-		 where dv.mitarbeiter_uid=uid and dv.von<=now() and 
+		(select count(*) anz_aktiv
+		 from hr.tbl_dienstverhaeltnis dv
+		 where dv.mitarbeiter_uid=uid and dv.von<=now() and
 		       (dv.bis is null OR dv.bis>=now())
 		) aktiv
-FROM 
-		system.tbl_issue 
-JOIN 
-		system.tbl_fehler USING (fehlercode) 
-JOIN 
-		public.tbl_person USING (person_id) 
-JOIN 
-		public.tbl_benutzer USING (person_id) 
-JOIN 
-		public.tbl_mitarbeiter ON uid = mitarbeiter_uid                         
-WHERE 
-		app = 'personalverwaltung' AND verarbeitetamum IS NULL 
-GROUP BY 
-		person_id, uid, vorname, nachname 
-HAVING 
-		count(*) > 0 
-ORDER BY 
+FROM
+		system.tbl_issue
+JOIN
+		system.tbl_fehler USING (fehlercode)
+JOIN
+		public.tbl_person USING (person_id)
+JOIN
+		public.tbl_benutzer USING (person_id)
+JOIN
+		public.tbl_mitarbeiter ON uid = mitarbeiter_uid
+WHERE
+		app = 'personalverwaltung' AND verarbeitetamum IS NULL
+GROUP BY
+		person_id, uid, vorname, nachname
+HAVING
+		count(*) > 0
+ORDER BY
 		count(*) DESC;
-			
+
 EOSQL;
-		
+
 		$personenmitissues = $this->IssueModel->execReadOnlyQuery($sql);
-		if( hasData($personenmitissues) ) 
+		if( hasData($personenmitissues) )
 		{
 			$this->terminateWithSuccess(getData($personenmitissues));
 		}

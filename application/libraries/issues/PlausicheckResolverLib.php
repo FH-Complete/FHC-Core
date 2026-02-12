@@ -20,18 +20,36 @@ class PlausicheckResolverLib
 	private $_ci; // ci instance
 	private $_extensionName; // name of extension
 	private $_fehlercodes = []; // name of extension
+	private $_apps = []; // apps for which issues should be resolved
 	private $_codeLibMappings = []; // mappings for issues which explicitly defined resolver
 	private $_defaultIssueParams = ['issue_id' => 'issue_id', 'issue_person_id' => 'person_id', 'issue_oe_kurzbz' => 'oe_kurzbz'];
 
 	public function __construct($params = null)
 	{
+		// set application(s))
+		if (isset($params['apps']))
+		{
+			if (is_string($params['apps'])) $params['apps'] = [$params['apps']];
+			if (is_array($params['apps'])) $this->_apps = $params['apps'];
+		}
+
+		$this->_ci =& get_instance(); // get ci instance
+
 		// get all fehler to be produced (by kurzbz array or app)
 		if (isset($params['fehlercodes']) && !isEmptyArray($params['fehlercodes']))
 		{
 			$this->_fehlercodes = $params['fehlercodes'];
 		}
+		elseif (isset($params['apps']) && !isEmptyArray($params['apps']))
+		{
+			$this->_ci->load->model('system/Fehler_model', 'FehlerModel');
+			$fehlerRes = $this->_ci->FehlerModel->getByApps($this->_apps);
 
-		$this->_ci =& get_instance(); // get ci instance
+			if (hasData($fehlerRes))
+			{
+				$this->_fehlercodes = array_column(getData($fehlerRes), 'fehlercode');
+			}
+		}
 
 		$this->_ci->load->library('IssuesLib');
 		$this->_ci->load->library('ExtensionsLib');
@@ -144,11 +162,11 @@ class PlausicheckResolverLib
 		$result->infos = [];
 
 		// check if all issues to resolve could be found in database
-		$mappingFehlerCodes = array_keys($this->_codeLibMappings);
-		$notFoundFehlerCodes = array_diff($this->_fehlercodes, $mappingFehlerCodes);
+		//~ $mappingFehlerCodes = array_keys($this->_codeLibMappings);
+		//~ $notFoundFehlerCodes = array_diff($this->_fehlercodes, $mappingFehlerCodes);
 
-		if (!isEmptyArray($notFoundFehlerCodes))
-			$result->errors[] = error('Fehler to resolve not defined in config: '.implode(', ', $notFoundFehlerCodes));
+		//~ if (!isEmptyArray($notFoundFehlerCodes))
+			//~ $result->errors[] = error('Fehler to resolve not defined in config: '.implode(', ', $notFoundFehlerCodes));
 
 		foreach ($openIssues as $issue)
 		{

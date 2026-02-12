@@ -8,7 +8,7 @@ class IssueChecker extends FHCAPI_Controller
 	protected $person_id;
 	protected $_extensionName = null;
 	protected $_fehlercodes = [];
-	//protected $_app = null; TODO possible to check for all fehler of app?
+	protected $_apps = [];
 
 	protected $errors = [];
 	protected $infos = [];
@@ -33,30 +33,52 @@ class IssueChecker extends FHCAPI_Controller
 		$this->load->model('system/Fehler_model', 'FehlerModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 
-		// get fehler kurzbz from fehlercodes
-		$this->FehlerModel->addSelect('fehler_kurzbz');
-		if (!isEmptyArray($this->_fehlercodes)) $this->FehlerModel->db->where_in('tbl_fehler.fehlercode', $this->_fehlercodes);
-		$fehlerKurzbzRes = $this->FehlerModel->load();
+		$producerArgs = [];
+		$resolverArgs = [];
 
-		if (isError($fehlerKurzbzRes)) $this->terminateWithError(getError($fehlerKurzbzRes), self::ERROR_TYPE_GENERAL);
+		// get fehler kurzbz from fehlercodes, if fehlercodes provided
+		if (!isEmptyArray($this->_fehlercodes))
+		{
+			$this->FehlerModel->addSelect('fehlercode, fehler_kurzbz');
+			$this->FehlerModel->db->where_in('tbl_fehler.fehlercode', $this->_fehlercodes);
+			$fehlerKurzbzRes = $this->FehlerModel->load();
 
-		$fehlerKurzbz = hasData($fehlerKurzbzRes) ? array_column(getData($fehlerKurzbzRes), 'fehler_kurzbz') : [];
+			if (isError($fehlerKurzbzRes)) $this->terminateWithError(getError($fehlerKurzbzRes), self::ERROR_TYPE_GENERAL);
+			if (hasData($fehlerKurzbzRes))
+			{
+				$producerArgs['fehlerKurzbz'] = array_column(getData($fehlerKurzbzRes), 'fehler_kurzbz');
+				$resolverArgs['fehlercode'] = array_column(getData($fehlerKurzbzRes), 'fehlercode');
+			}
+		}
+		elseif (!isEmptyArray($this->_apps)) // if apps are provided
+		{
+			// get fehlercodes for the apps
+			$fehlerRes = $this->FehlerModel->getByApps($this->_apps);
+			if (hasData($fehlerRes)) $this->_fehlercodes = array_column(getData($fehlerRes), 'fehlercode');
+
+			$producerArgs['apps'] = $this->_apps;
+			$resolverArgs['apps'] = $this->_apps;
+		}
 
 		// load producer and checker libraries with fehler kurbz and fehlercode list
 		$this->load->library(
 			'issues/PlausicheckProducerLib',
-			array(
-				'fehlerKurzbz' => $fehlerKurzbz
-			),
+			$producerArgs,
 			'PlausicheckProducerLib'
 		);
 
 		$this->load->library(
 			'issues/PlausicheckResolverLib',
-			array(
-				'fehlercodes' => $this->_fehlercodes
-			),
+			$resolverArgs,
 			'PlausicheckResolverLib'
+		);
+
+		$this->load->library('PhrasesLib');
+
+		$this->loadPhrases(
+			array(
+				'ui'
+			)
 		);
 	}
 
