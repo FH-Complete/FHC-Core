@@ -95,7 +95,8 @@ class Noten extends FHCAPI_Controller
 //				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
 				
 				// this one should always be set true since fh prüfungsordnung requires at least 3 antritte (t1+t2+kP)
-//				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
+				// send it anyway to use in maxAntritte calculation
+				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
 			
 			
 				// TODO
@@ -561,7 +562,7 @@ class Noten extends FHCAPI_Controller
 		}
 		
 
-		$result = $this->LvgesamtnoteModel->getLvGesamtNote($lva_id, $student_uid, $stsem);
+		$result = $this->LvgesamtnoteModel->getLvGesamtNoten($lva_id, $student_uid, $stsem);
 		if(!isError($result) && !hasData($result)) {
 			
 			$id = $this->LvgesamtnoteModel->insert(
@@ -670,8 +671,6 @@ class Noten extends FHCAPI_Controller
 		
 		$pruefungenChanged = [];
 		
-		$this->load->model('education/Lvgesamtnote_model', 'LvgesamtnoteModel');
-		
 		if($typ == "Termin2" && defined('CIS_GESAMTNOTE_PRUEFUNG_TERMIN2') && CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) 
 		{
 			
@@ -726,9 +725,12 @@ class Noten extends FHCAPI_Controller
 					$res = $this->LePruefungModel->load($id->retval);
 					if(hasData($res)) $pruefungenChanged['extraPruefung'] = getData($res);
 				}
+
+				$this->logLib->logInfoDB(array('termin1 created',$res, getAuthUID(), getAuthPersonId()));
+				
 			}
 
-			$this->logLib->logInfoDB(array('termin1 created',$res, getAuthUID(), getAuthPersonId()));
+			
 
 
 			// Die Pruefung wird als Termin2 eingetragen

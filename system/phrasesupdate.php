@@ -54020,18 +54020,18 @@ and represent the current state of research on the topic. The prescribed citatio
 	array(
 		'app' => 'core',
 		'category' => 'benotungstool',
-		'phrase' => 'approveGrades',
+		'phrase' => 'approveGradesv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Noten freigeben',
+				'text' => '{0} Noten freigeben',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Approve Grades',
+				'text' => 'Approve {0} Grades',
 				'description' => '',
 				'insertvon' => 'system'
 			)

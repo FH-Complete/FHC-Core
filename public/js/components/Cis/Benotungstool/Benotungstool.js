@@ -231,14 +231,28 @@ export const Benotungstool = {
 			}
 		},
 		validatePruefungBulk(pruefungen) {
+			console.log('validatePruefungBulk')
+			
 			// need to check pruefungen for validity in respect to the students nr of antritte
 			// pruefungsdatum will be validated aswell so we dont get a termin 3 chronologically before
 			// a termin 2 which is totally possible in the old tool
 			const validatedPruefungen = []
 			pruefungen.forEach( p => {
 				const student = this.studenten.find(s => s.uid === p.uid)
+
+				// if a student doesnt have a lv_note entered definitely dont allow to create pruefung
+				if(!student.lv_note) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat noch keine LV-Note eingetragen! Es wird keine Prüfung angelegt.')
+					return
+				}
+
+				if(!student.note) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat noch keine Zeugnis Note eingetragen! Es wird keine Prüfung angelegt.')
+					return
+				}
+				
 				// check if student antrittCount is too high already
-				if(student.hoechsterAntritt >= 3) {
+				if(student.hoechsterAntritt >= this.maxAntrittCount) {
 					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits ' + student.hoechsterAntritt + ' Prüfungsantritte abgelegt. Die Zeile wurde übersprungen.')
 					return
 				}
@@ -386,6 +400,7 @@ export const Benotungstool = {
 			})
 		},
 		savePruefungBulk(pruefungenbulk) {
+			console.log('pruefungenbulk', pruefungenbulk)
 			this.loading = true
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
@@ -467,7 +482,8 @@ export const Benotungstool = {
 					widthGrow: 1,
 					minWidth: 150,
 					originalNote,
-					visible: true
+					visible: true,
+					tooltip: false
 				})
 			})
 
@@ -476,6 +492,8 @@ export const Benotungstool = {
 
 			this.loading = false
 
+			// TODO: find some solution so the tool does not appear "jumpy" after pruefung calls
+			
 			this.$refs.notenTable.tabulator.clearSort()
 			this.$refs.notenTable.tabulator.setColumns(cols)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
@@ -548,7 +566,7 @@ export const Benotungstool = {
 					const data = row.getData();
 
 					if(data['kommPruef']) return false
-					else if(data.hoechsterAntritt >= 3) return false // 3 pruefungen counted
+					else if(data.hoechsterAntritt >= this.maxAntrittCount) return false // 3 pruefungen counted
 
 					return true;  // student can be selected to add pruefung
 				},
@@ -701,7 +719,8 @@ export const Benotungstool = {
 				formatter: this.pruefungFormatter,
 				topCalc: this.terminCalcFunc,
 				topCalcFormatter: this.terminCalcFormatter,
-				hozAlign:"center", minWidth: 150, visible: false
+				hozAlign:"center", minWidth: 150, visible: false,
+				tooltip: false
 			})
 		
 			return columns
@@ -742,7 +761,7 @@ export const Benotungstool = {
 			
 			const data = row.getData()
 			
-			const notSelectable = data.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef') || data.hoechsterAntritt >= 3
+			const notSelectable = data.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef') || data.hoechsterAntritt >= this.maxAntrittCount
 			if(notSelectable) {
 				row.getElement().children[0]?.children[0]?.remove()
 			}
@@ -898,10 +917,12 @@ export const Benotungstool = {
 			return '<div style="">'+val+'</div>'
 		},
 		pruefungFormatter(cell) {
+			console.log('pruefungFormatter')
 			const data = cell.getData()
 
 			const noteDef = data.note ? this.notenOptions.find(n => n.note == data.note) : null
 			if(!data.note || !noteDef?.lkt_ueberschreibbar) {
+				console.log('!data.note || !noteDef?.lkt_ueberschreibbar')
 				return ''
 			}
 			
@@ -963,9 +984,12 @@ export const Benotungstool = {
 
 				return colDiv;
 			}
+
+			console.log(data)
+			console.log(field)
 			
 			if(data[field]) {
-				
+				console.log(data[field])
 				// showing date in 
 				
 				// const dateParts = data[field].datum.split('-')
@@ -1001,7 +1025,7 @@ export const Benotungstool = {
 				return rowDiv;
 				
 			} else if (canAdd) { // return new btn action
-				
+				console.log('canAdd')
 				// dont render the add button in cells where a younger pruefung exists for the students
 				const youngerPruefung = data.pruefungen.find(p => p.datum > field) 
 				if(youngerPruefung) return rowDiv
@@ -1016,7 +1040,10 @@ export const Benotungstool = {
 				rowDiv.appendChild(createCol(button), 'col-4 d-flex justify-content-center align-items-center');
 
 				return rowDiv;
-			} else return ''
+			} else {
+				console.log('return empty else')
+				return ''
+			}
 		},
 		openPruefungModal(student, pruefung = null, field) {
 			this.pruefungStudent = student
@@ -1188,7 +1215,7 @@ export const Benotungstool = {
 				Object.defineProperty(s, 'selectable', {
 					get() {
 						const kP = s.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef')
-						return !(kP || s.hoechsterAntritt >= 3)
+						return !(kP || s.hoechsterAntritt >= this.maxAntrittCount)
 					},
 					set() {
 						// empty setter so tabulator doesnt scream	
@@ -1228,7 +1255,8 @@ export const Benotungstool = {
 					widthGrow: 1,
 					minWidth: 200,
 					originalNote,
-					visible: true
+					visible: true,
+					tooltip: false
 				})
 			})
 
@@ -1517,7 +1545,8 @@ export const Benotungstool = {
 					widthGrow: 1,
 					minWidth: 200,
 					originalNote,
-					visible: true
+					visible: true,
+					tooltip: false
 				})
 			})
 
@@ -1581,12 +1610,41 @@ export const Benotungstool = {
 			const dateStrDb = `${year}-${month}-${day}`;
 			const dateStrFront = `${day}.${month}.${year}`;
 			
-			const uids = this.selectedUids.map(student => {
-				return {
+			const uids = []
+			// const uids = this.selectedUids.map(student => {
+			this.selectedUids.forEach(student => {
+				
+				// if a student doesnt have a lv_note entered definitely dont allow to create pruefung
+				if(!student.lv_note) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat noch keine LV-Note eingetragen! Es wird keine Prüfung angelegt.')
+					return
+				}
+
+				if(!student.note) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat noch keine Zeugnis Note eingetragen! Es wird keine Prüfung angelegt.')
+					return
+				}
+
+				// check if student antrittCount is too high already
+				if(student.hoechsterAntritt >= this.maxAntrittCount) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits ' + student.hoechsterAntritt + ' Prüfungsantritte abgelegt. Es wird keine Prüfung angelegt.')
+					return
+				}
+
+				// get student for pruefung and check if proposed datum does not conflict (no new pruefungen before existing ones)
+				const youngerPruefung = student.pruefungen.find(pr => {
+					return pr.dateObj >= this.selectedPruefungDate
+				})
+				if(youngerPruefung) {
+					this.$fhcAlert.alertWarning('Student ' + student.uid + ' hat bereits eine Prüfung am '+ youngerPruefung.datum +' eingetragen. Es wird keine Prüfung angelegt.')
+					return
+				}
+
+				uids.push({
 					uid: student.uid,
 					lehreinheit_id: student.lehreinheit_id,
 					typ: this.getPruefungstypForStudentByAntritt(student)//student.hoechsterAntritt 
-				}
+				})
 			})
 			
 			this.loading = true;
@@ -1710,6 +1768,14 @@ export const Benotungstool = {
 		}
 	},
 	computed: {
+		maxAntrittCount() {
+			let maxAntritte = 1;
+			
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN2) maxAntritte++
+			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_TERMIN3) maxAntritte++
+			
+			return maxAntritte;
+		},
 		getFreigabeCounter() {
 			return this.studenten ? this.studenten.reduce((acc, cur) => {
 				if(cur.freigegeben == 'changed') {
@@ -1980,12 +2046,9 @@ export const Benotungstool = {
 						{{$capitalize($p.t('benotungstool/c4notenImportieren'))}} <i class="fa fa-file-import"></i>
 					</button>
 					<button @click="openSaveModal" role="button" :class="getSaveBtnClass">
-						{{$capitalize($p.t('benotungstool/approveGrades'))}} <i class="fa fa-save"></i>
+						{{$capitalize($p.t('benotungstool/approveGradesv2', [getFreigabeCounter]))}} <i class="fa fa-save"></i>
 					</button>
 					
-					<Divider layout="vertical" style="transform: translateY(12px)"/>
-					
-					<h4>{{ getFreigabeCounter > 0 ? $capitalize($p.t('benotungstool/freigabecounterPositiv', [getFreigabeCounter])) : '' }}</h4>
 				 </template>
 			</core-filter-cmpt>
 		</div>
