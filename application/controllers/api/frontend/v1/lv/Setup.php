@@ -27,7 +27,8 @@ class Setup extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getTabs' => ['admin:r', 'assistenz:r'],
+			'getLETabs' => ['admin:r', 'assistenz:r'],
+			'getLVTabs' => ['admin:r', 'assistenz:r'],
 			'getStudiensemester' => ['admin:r', 'assistenz:r'],
 			'getSprache' => ['admin:r', 'assistenz:r'],
 			'getRaumtyp' => ['admin:r', 'assistenz:r'],
@@ -41,9 +42,10 @@ class Setup extends FHCAPI_Controller
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 
 		$this->_ci->load->library('VariableLib', ['uid' => $this->_uid]);
+		$this->_ci->load->helper('hlp_document');
 	}
 
-	public function getTabs()
+	public function getLETabs()
 	{
 		$tabs['details'] = array (
 			'title' =>  'Details',
@@ -60,10 +62,37 @@ class Setup extends FHCAPI_Controller
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Lektor.js',
 			'config' => []
 		);
+		$tabs['termine'] = array (
+			'title' =>  'Termine',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Termine.js',
+			'config' => []
+		);
 		$tabs['notiz'] = array (
 			'title' =>  'Notizen',
 			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Notiz.js',
 			'config' => []
+		);
+		$this->terminateWithSuccess($tabs);
+	}
+
+	public function getLVTabs()
+	{
+		$tabs['termine'] = array (
+			'title' =>  'Termine',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/LVTermine.js',
+			'config' => []
+		);
+		$tabs['noten'] = array (
+			'title' =>  'Noten',
+			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Noten.js',
+			'config' => [
+				'usePoints' => defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE,
+				'edit' => 'both', // Possible values: both|header|inline
+				'delete' => 'inline', // Possible values: both|header|inline
+				'documents' => 'inline', // Possible values: both|header|inline
+				'documentslist' => gradesDocumentsList(),
+				'semesterSelect' => false
+			]
 		);
 		$this->terminateWithSuccess($tabs);
 	}
