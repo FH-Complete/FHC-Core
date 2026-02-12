@@ -45,11 +45,9 @@ export default {
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
-		}
-	},
-	data() {
-		return {
-			tabulatorOptions: {
+		},
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					this.endpoint.getAllVertraege(this.person_id)
@@ -141,15 +139,17 @@ export default {
 					columns: true,
 					filter: false //to avoids js errors
 				},
-				persistenceID: 'core-contracts-20250905'
-			},
-			tabulatorEvents: [
+				persistenceID: 'core-contracts-20260212',
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
 
 						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
-
 						const setHeader = (field, text) => {
 							const col = this.$refs.table.tabulator.getColumn(field);
 							if (!col) return;
@@ -174,9 +174,9 @@ export default {
 						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
 						setHeader('isabgerechnet', this.$p.t('vertrag', 'abgerechnet'));
 						setHeader('actions', this.$p.t('global', 'aktionen'));
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+						/*						cm.getColumnByField('actions').component.updateDefinition({
+													title: this.$p.t('global', 'aktionen')
+												});*/
 					}
 				},
 				{
@@ -193,7 +193,24 @@ export default {
 						}
 					}
 				},
-			],
+				{
+					event: "dataProcessed",
+					handler: () => {
+						if (this.pendingSelectId) {
+							// delete old Selection
+							this.$refs.table.tabulator.deselectRow();
+							// select new Selection
+							this.$refs.table.tabulator.selectRow(this.pendingSelectId);
+							this.pendingSelectId = null;
+						}
+					}
+				},
+			];
+			return events;
+		},
+	},
+	data() {
+		return {
 			statusNew: true,
 			formData: {	},
 			listContractsUnassigned: [],
@@ -210,6 +227,7 @@ export default {
 			isFilterSet: false,
 			clickedRows: [],
 			arraySelectedContracts: [],
+			pendingSelectId: null
 		}
 	},
 	watch: {
@@ -244,6 +262,7 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					//window.scrollTo(0, 0);
 					this.reload();
+					this.contractSelected.vertrag_id = null;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -259,41 +278,24 @@ export default {
 				.call(this.endpoint.addNewContract(dataToSend))
 				.then(response => {
 					//get new ID of request to focus the new entry
-					let vertrag_id = response.data;
+					this.pendingSelectId = response.data;
 
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractModal.hide();
 					this.resetModal();
-					this.$refs.contractdetails.reload();
-					this.$refs.unassignedLehrauftraege.reloadUnassigned();
+
+					//for getting correct responding Details and Stati of Contract
+					this.contractSelected.vertrag_id = this.pendingSelectId;
+					if(this.$refs.contractdetails)
+						this.$refs.contractdetails.reload();
+
+					if(this.$refs.unassignedLehrauftraege)
+						this.$refs.unassignedLehrauftraege.reloadUnassigned();
 
 					this.reload();
-					//TODO(Manu) Finish Selection of current dataset
-/*					this.reload().then(() => {
-						this.selectRow(vertrag_id);
-					})*/
-
-
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-/*		async selectRow(vertrag_id){
-			console.log("in selectRow " + vertrag_id);
-			//if (!this.table) return;
-
-			if (!this.$refs.table) return;
-
-			//this.table.selectRow(this.$refs.table.tabulator.getRows()[0]);
-
-			this.$refs.table.tabulator.selectRow(vertrag_id);
-		//	this.$refs.table.tabulator.selectRow("visible");
-			console.log("Vertrag_id" + vertrag_id);
-
-			//console.log(this.$refs.table.tabulator.getRow(vertrag_id));
-			//this.table.selectRow(vertrag_id);
-
-		//	this.$refs.table.selectRow(vertrag_id);
-		},*/
 		updateContract(vertrag_id) {
 			this.$refs.unassignedLehrauftraege.emitSaveEvent();
 
@@ -307,20 +309,12 @@ export default {
 				.call(this.endpoint.updateContract(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-					//TODO(Manu) get Id from dataToSend
-					let vertrag_id = response.data;
-					console.log(vertrag_id);
+					this.pendingSelectId = response.data;
 					this.$refs.contractModal.hide();
 					this.resetModal();
 					this.$refs.unassignedLehrauftraege.reloadUnassigned();
 					this.$refs.contractdetails.reload();
 					this.reload();
-					//TODO(Manu) Finish Selection of current dataset
-					/*					this.reload().then(() => {
-											this.selectRow(vertrag_id);
-										})*/
-
-					//this.selectRow(vertrag_id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
