@@ -142,10 +142,12 @@ class LektorLib
 				$oe_result = $this->_ci->OrganisationseinheitModel->getChilds($stundengrenze->oe_kurzbz);
 				$oe_array = hasData($oe_result) ? array_column(getData($oe_result), 'oe_kurzbz') : array('');
 
+				$old_semesterstunden = $lehreinheit->semesterstunden ?: 0;
+
 				if ($alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($lehreinheit->semesterstunden) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($new_data['semesterstunden'])}) as summe");
+					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($old_semesterstunden) + {$this->_ci->LehreinheitmitarbeiterModel->db->escape($new_data['semesterstunden'])}) as summe");
 				else if ($alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
-					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($lehreinheit->semesterstunden)) as summe");
+					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) - ($old_semesterstunden)) as summe");
 				else if (!$alte_stunden_eingerechnet && $neue_stunden_eingerechnet)
 					$this->_ci->LehreinheitmitarbeiterModel->addSelect("(SUM(tbl_lehreinheitmitarbeiter.semesterstunden) + ({$this->_ci->LehreinheitmitarbeiterModel->db->escape($new_data['semesterstunden'])})) as summe");
 				else if (!$alte_stunden_eingerechnet && !$neue_stunden_eingerechnet)
@@ -227,12 +229,23 @@ class LektorLib
 			'bismelden'
 		);
 
+		$nullable_fields = array('stundensatz', 'semesterstunden', 'planstunden');
+
 		$updateData = array();
 		foreach ($updatableFields as $field)
 		{
-			$value = isset($new_data[$field]) ? $new_data[$field] : null;
+			if (!array_key_exists($field, $new_data))
+			{
+				continue;
+			}
 
-			if ($value !== null)
+			$value = $new_data[$field];
+
+			if (in_array($field, $nullable_fields))
+			{
+				$updateData[$field] = $value;
+			}
+			elseif ($value !== null)
 			{
 				$updateData[$field] = $value;
 			}
