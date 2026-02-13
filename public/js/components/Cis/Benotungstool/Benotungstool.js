@@ -231,8 +231,6 @@ export const Benotungstool = {
 			}
 		},
 		validatePruefungBulk(pruefungen) {
-			console.log('validatePruefungBulk')
-			
 			// need to check pruefungen for validity in respect to the students nr of antritte
 			// pruefungsdatum will be validated aswell so we dont get a termin 3 chronologically before
 			// a termin 2 which is totally possible in the old tool
@@ -400,7 +398,6 @@ export const Benotungstool = {
 			})
 		},
 		savePruefungBulk(pruefungenbulk) {
-			console.log('pruefungenbulk', pruefungenbulk)
 			this.loading = true
 			this.$api.call(ApiNoten.saveStudentPruefungBulk(this.lv_id, this.sem_kurzbz, pruefungenbulk))
 				.then((res)=> {
@@ -426,19 +423,15 @@ export const Benotungstool = {
 
 				// check for extra pruefung (termin1) to add before
 				if(extra) {
-					extra.datum = extra.datum.split(' ')[0]
-					if(!this.distinctPruefungsDates.includes(extra.datum)) {
-						this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
-					}
-
-					student.pruefungen.push(extra)
-					student[extra.datum] = extra
+					student["Termin1"] = extra
 				}
 
+				this.correctOldTerminTypenForStudent(student, saved)
+				
 				if(!this.distinctPruefungsDates.includes(saved.datum)) {
 					this.insertSortedDate(this.distinctPruefungsDates, saved.datum)
 				}
-
+				
 				// add pruefung to pruefungen array
 				student.pruefungen.push(saved)
 
@@ -465,14 +458,26 @@ export const Benotungstool = {
 			let kommCol = null
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 
-			// TODO: could reuse cols instead of recreating all from a variable maybe
-			this.distinctPruefungsDates.forEach((date, index)=>{
+			if(this.distinctPruefungsDates.length) {
+				cols.push({
+					title: this.$capitalize(this.$p.t('benotungstool/c4originalZnote')),
+					field: "Termin1",
+					formatter: this.pruefungFormatter,
+					titleFormatter: this.pruefungTitleFormatter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
+					hozAlign:"center",
+					widthGrow: 1,
+					minWidth: 200,
+					visible: true,
+					tooltip: false
+				})
+			}
+			
+			this.distinctPruefungsDates.forEach((date)=>{
 				const dateparts = date.split('-')
 				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
 				
-
-				// TODO: test if this holds true
-				const originalNote = index === 0
 				cols.push({
 					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
 					field: date,
@@ -481,7 +486,6 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 150,
-					originalNote,
 					visible: true,
 					tooltip: false
 				})
@@ -498,6 +502,30 @@ export const Benotungstool = {
 			this.$refs.notenTable.tabulator.setColumns(cols)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
+		},
+		correctOldTerminTypenForStudent(student, saved) {
+			// check if student has a preceding pruefung from same type and remove it since in this case 
+			// the new pruefung will have overwritten the old one
+			const oldP = student.pruefungen.find(p => p.pruefungstyp_kurzbz == saved.pruefungstyp_kurzbz)
+			if(oldP) {
+				delete student[oldP.datum] // delete the variable col value
+
+				const pIndex = student.pruefungen.indexOf(oldP)
+				if (pIndex > -1) {
+					student.pruefungen.splice(pIndex, 1)
+				}
+				// student.pruefungen.splice(student.pruefungen.indexOf(oldP), 1) // delete from pruefungen array
+
+				// check if on that date any other student has a pruefung, if not delete it from distinctPruefungsDates
+				const other = this.studenten.find(s => s[oldP.datum] !== undefined)
+				if(!other) {
+					const dateIndex = this.distinctPruefungsDates.indexOf(oldP.datum);
+					if (dateIndex > -1) {
+						this.distinctPruefungsDates.splice(dateIndex, 1);
+					}
+					// this.distinctPruefungsDates.splice(this.distinctPruefungsDates.findIndex(oldP.datum), 1)
+				}
+			}
 		},
 		importNoten() {
 			const rows = this.importString.split('\n')
@@ -689,7 +717,7 @@ export const Benotungstool = {
 				},
 				widthGrow: 1
 			})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorschlag_übernehmen'))), field: 'übernehmen', width: 150, hozAlign: 'center', formatter: this.arrowFormatter, 
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4notenvorschlagUebernehmen'))), field: 'übernehmen', width: 150, hozAlign: 'center', formatter: this.arrowFormatter, 
 				cellClick: this.saveNote, 
 				variableHeight: true})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4lvnote'))), field: 'lv_note',
@@ -881,14 +909,15 @@ export const Benotungstool = {
 		saveNote(e, cell) { // Notenvorschlag freigeben
 			const row = cell.getRow()
 			const data = row.getData()
-
-			
-			
 			
 			if(!data.note_vorschlag) return
 			
 			// if vorschlag is the same as lv_note do nothing
 			if(data.note_vorschlag == data.lv_note) return
+			
+			// if the student already has pruefungen disable this part
+			if(data.pruefungen.length) return
+			
 			this.loading = true
 			this.$api.call(ApiNoten.saveNotenvorschlag(this.lv_id, this.sem_kurzbz, data.uid, data.note_vorschlag, data.punkte))
 				.then((res) => {
@@ -917,12 +946,10 @@ export const Benotungstool = {
 			return '<div style="">'+val+'</div>'
 		},
 		pruefungFormatter(cell) {
-			console.log('pruefungFormatter')
 			const data = cell.getData()
 
 			const noteDef = data.note ? this.notenOptions.find(n => n.note == data.note) : null
 			if(!data.note || !noteDef?.lkt_ueberschreibbar) {
-				console.log('!data.note || !noteDef?.lkt_ueberschreibbar')
 				return ''
 			}
 			
@@ -932,10 +959,13 @@ export const Benotungstool = {
 			// student.pruefungen and look for a pruefung with this cols title as date
 
 			const field = cell.getColumn().getField()
-			const studentPruefung = field != 'kommPruef' ? data.pruefungen.find(p => p.datum === field) : data['kommPruef']
+			let studentPruefung = null
+			if(field === 'kommPruef') { studentPruefung = data['kommPruef'] }
+			else if(field === "Termin1") { studentPruefung = data['Termin1'] }
+			else { studentPruefung = data.pruefungen.find(p => p.datum === field) }
 
 			// is this column/cell allowed to have an add pruefung action 			
-			const canAdd = field !== 'kommPruef' && data.hoechsterAntritt < 4 && !colDef.originalNote
+			const canAdd = field !== 'kommPruef' && field !== "Termin1" && data.hoechsterAntritt < this.maxAntrittCount
 			
 			// TODO: check for some time limit maybe? old pruefungen can be changed/created
 			
@@ -984,12 +1014,8 @@ export const Benotungstool = {
 
 				return colDiv;
 			}
-
-			console.log(data)
-			console.log(field)
 			
 			if(data[field]) {
-				console.log(data[field])
 				// showing date in 
 				
 				// const dateParts = data[field].datum.split('-')
@@ -1005,7 +1031,7 @@ export const Benotungstool = {
 				
 				// no actions on kommPruef allowed
 				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
-				if(field === 'kommPruef' || colDef.originalNote) { 
+				if(field === 'kommPruef' || field === "Termin1") { 
 					// rowDiv.appendChild(createCol('', 'col-4 d-flex justify-content-center align-items-center')); // append empty col4 to have formatting similar
 					return rowDiv
 				} 
@@ -1025,7 +1051,6 @@ export const Benotungstool = {
 				return rowDiv;
 				
 			} else if (canAdd) { // return new btn action
-				console.log('canAdd')
 				// dont render the add button in cells where a younger pruefung exists for the students
 				const youngerPruefung = data.pruefungen.find(p => p.datum > field) 
 				if(youngerPruefung) return rowDiv
@@ -1041,7 +1066,6 @@ export const Benotungstool = {
 
 				return rowDiv;
 			} else {
-				console.log('return empty else')
 				return ''
 			}
 		},
@@ -1052,16 +1076,6 @@ export const Benotungstool = {
 		
 			const pruefungDateParts = dateStr.split('-')
 			
-			// does not work correctly
-
-			// new date obj so datepicker picks ob the change by ref
-			// const newDate = new Date()
-			// newDate.setFullYear(+pruefungDateParts[0])
-			// newDate.setMonth(+pruefungDateParts[1])
-			// // newDate.setMonth(newDate.getMonth() - 1) // acount for js date month offset
-			// newDate.setDate(+pruefungDateParts[2])
-			
-			// works correctly
 			const newDate = new Date(Number(pruefungDateParts[0]), Number(pruefungDateParts[1]) - 1, Number(pruefungDateParts[2]))
 			this.selectedPruefungDate = newDate
 			
@@ -1078,7 +1092,6 @@ export const Benotungstool = {
 		},
 		pruefungTitleFormatter(cell) {
 			const def = cell.getColumn().getDefinition()
-			if(def.originalNote) return this.$capitalize(this.$p.t('benotungstool/c4originalZnote'))
 			return def.title;
 		},
 		arrowFormatter(cell) {
@@ -1087,7 +1100,7 @@ export const Benotungstool = {
 			
 			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;'
 			
-			if(!data.note_vorschlag || (data.note_vorschlag == data.lv_note)) {
+			if(!data.note_vorschlag || (data.note_vorschlag == data.lv_note) || data.pruefungen.length) {
 				// arrow to ambiguous in meaning, use str8 forward worded button here instead
 				// uncolored arrow
 				// return '<div style="'+style+'">' +
@@ -1161,12 +1174,13 @@ export const Benotungstool = {
 				p.dateObj = new Date(dateParts[0], +(dateParts[1]) - 1, dateParts[2])
 				
 				const student = this.studenten.find(s => s.uid === p.student_uid)
-				
 				if(!student) return
 				
-				// TODO: filter kommPruef here? or change kommProf ColDefinition
-				
-				if(p.pruefungstyp_kurzbz !== 'kommPruef' && !this.distinctPruefungsDates.includes(p.datum)) this.distinctPruefungsDates.push(p.datum)
+				if(p.pruefungstyp_kurzbz !== 'kommPruef' 
+					&& p.pruefungstyp_kurzbz !== 'Termin1'
+					&& !this.distinctPruefungsDates.includes(p.datum)) {
+					this.distinctPruefungsDates.push(p.datum)
+				} 
 				
 				// seperate kommPruefungen from previous pruefungen counts since the column count variability always ends with this
 				if(p.pruefungstyp_kurzbz == 'kommPruef') {
@@ -1175,7 +1189,6 @@ export const Benotungstool = {
 					student.pruefungen.push(p)
 				}
 				
-				// if(student.pruefungen.length > pruefungenRegularColCount) pruefungenRegularColCount = student.pruefungen.length
 			})
 
 			this.studenten?.forEach(s => {
@@ -1191,7 +1204,12 @@ export const Benotungstool = {
 				})
 				// set the sorted pruefungen to their respective column fields
 				s.pruefungen.forEach((p, i) => {
-					s[p.datum] = p
+					// Termin1 aka originale Zeugnisnote should note create variable columns
+					if(p.pruefungstyp_kurzbz == "Termin1") {
+						s["Termin1"] = p
+					} else {
+						s[p.datum] = p
+					}
 				})
 
 				s.hoechsterAntritt = this.getAntrittCountStudent(s)
@@ -1225,6 +1243,23 @@ export const Benotungstool = {
 				})
 				
 			})
+			
+			// if we have any pruefungen at all someone must have original note/termin1 pruefung
+			if(this.distinctPruefungsDates.length) {
+				cols.push({
+					title: this.$capitalize(this.$p.t('benotungstool/c4originalZnote')),
+					field: "Termin1",
+					formatter: this.pruefungFormatter,
+					titleFormatter: this.pruefungTitleFormatter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
+					hozAlign:"center",
+					widthGrow: 1,
+					minWidth: 200,
+					visible: true,
+					tooltip: false
+				})
+			}
 
 			this.distinctPruefungsDates.sort((d1, d2) => {
 				if(d1 > d2) {
@@ -1235,17 +1270,12 @@ export const Benotungstool = {
 					return 0
 				}
 			})
-			this.distinctPruefungsDates.forEach((date, index)=>{
+			this.distinctPruefungsDates.forEach((date)=>{
 				const dateparts = date.split('-')
 				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
-				
-				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
-				// col filled for consistency reasons?
-			
-				// TODO: test if this holds true
-				const originalNote = index === 0
+
 				cols.push({
-					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
+					title: titledate,
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
@@ -1254,7 +1284,6 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
-					originalNote,
 					visible: true,
 					tooltip: false
 				})
@@ -1419,7 +1448,6 @@ export const Benotungstool = {
 
 			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : this.getPruefungstypForStudentByAntritt(this.pruefungStudent)
 			const note = this.selectedPruefungNote?.note ?? 9 // noch nicht eingetragen
-			// TODO: check if this is supposed to work this way
 			const punkte = this.selectedPruefungPunkte ?? 0
 			this.$api.call(ApiNoten.saveStudentPruefung(
 				this.pruefungStudent.uid,
@@ -1487,15 +1515,11 @@ export const Benotungstool = {
 			
 			// check for extra pruefung (termin1) to add before
 			if(extra) {
-				extra.datum = extra.datum.split(' ')[0]
-				if(!this.distinctPruefungsDates.includes(extra.datum)) {
-					this.insertSortedDate(this.distinctPruefungsDates, extra.datum)
-				}
-				
-				student.pruefungen.push(extra)
-				student[extra.datum] = extra
+				student["Termin1"] = extra
 			}
 
+			this.correctOldTerminTypenForStudent(student, savedPruefung)
+			
 			if(!this.distinctPruefungsDates.includes(savedPruefung.datum)) {
 				this.insertSortedDate(this.distinctPruefungsDates, savedPruefung.datum)
 			}
@@ -1525,17 +1549,26 @@ export const Benotungstool = {
 			let kommCol = null
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) kommCol = this.notenTableOptions.columns[this.notenTableOptions.columns.length - 1];
 
-
-			// TODO: could reuse cols instead of recreating all from a variable maybe
-			this.distinctPruefungsDates.forEach((date, index)=>{
+			if(this.distinctPruefungsDates.length) {
+				cols.push({
+					title: this.$capitalize(this.$p.t('benotungstool/c4originalZnote')),
+					field: "Termin1",
+					formatter: this.pruefungFormatter,
+					titleFormatter: this.pruefungTitleFormatter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
+					hozAlign:"center",
+					widthGrow: 1,
+					minWidth: 200,
+					visible: true,
+					tooltip: false
+				})
+			}
+			
+			this.distinctPruefungsDates.forEach((date)=>{
 				const dateparts = date.split('-')
 				const titledate = `${dateparts[2]}.${dateparts[1]}.${dateparts[0]}`
-
-				// TODO: should studenten without shadow pruefung Termin have their "ursprüngliche Zeugnisnote" 
-				// col filled for consistency reasons?
-
-				// TODO: test if this holds true, maybe in case where there are only kommPruef?
-				const originalNote = index === 0
+				
 				cols.push({
 					title: titledate,//this.$p.t('benotungstool/pruefungNr', [index+1]),
 					field: date,
@@ -1544,7 +1577,6 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
-					originalNote,
 					visible: true,
 					tooltip: false
 				})
@@ -1694,7 +1726,7 @@ export const Benotungstool = {
 					}
 					
 				}
-			}).finally(()=>this.loading = false)
+			}).finally(()=> this.loading = false)
 		},
 		getAntrittCountStudent(student) {
 			// checks for existence of a prüfung with a note that resolves to a 
@@ -1712,6 +1744,7 @@ export const Benotungstool = {
 			for(let i = 0; i < pLen; i++) {
 				const p = student.pruefungen[i]
 				
+				// TODO: CHECK AGAINST NOTEN OPTIONS
 				if(p.note != 9 && p.note != 17) pruefungsAntrittCount++
 			}
 
