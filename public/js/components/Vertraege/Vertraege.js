@@ -132,6 +132,7 @@ export default {
 				height: '250',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
+				selectableRowsRollingSelection: false, //only allow multiselect with STRG
 				index: "vertrag_id",
 				persistence: {
 					sort: true,
@@ -179,7 +180,7 @@ export default {
 												});*/
 					}
 				},
-				{
+/*				{
 					//is just enabled for ADDON Injection KU: MultiprintHonorarvertrag
 					//(maybe enable also for ADDON FH Burgenland: MultiAccept later)
 					event: 'rowClick',
@@ -191,6 +192,16 @@ export default {
 
 							this.toggleRowClick(selectedContract, status, bezeichnung);
 						}
+					}
+				},*/
+				{
+					event: 'rowClick',
+					handler: (e, row) => {
+						if (!this.dataPrintHonorar?.multiselect) return;
+
+						const { vertrag_id, status, bezeichnung, vertragstyp_bezeichnung } = row.getData();
+
+						this.toggleRowClick(e, vertrag_id, status, bezeichnung, vertragstyp_bezeichnung);
 					}
 				},
 				{
@@ -234,6 +245,8 @@ export default {
 		person_id() {
 			this.$refs.table.reloadTable();
 			this.arraySelectedContracts = [];
+/*			if(this.dataPrintHonorar?.multiselect)
+				this.dataPrintHonorar.multiselect = [];*/
 		},
 	},
 	methods: {
@@ -350,11 +363,12 @@ export default {
 			return this.$refs.contractstati.$refs.statusData
 				.call(this.endpoint.insertContractStatus(params))
 				.then(response => {
-					//this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
-					//this.reload(); //focus get lost with reload
+					this.pendingSelectId = params.vertrag_id;
+					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -395,7 +409,8 @@ export default {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.contractstati.closeModal();
 					this.$refs.contractstati.reload();
-					//this.reload(); //focus gets lost with reload
+					this.pendingSelectId = params.vertrag_id;
+					this.reload();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -489,7 +504,7 @@ export default {
 			}
 
 			//check if status=="Genehmigt"
-			const statusNotGenehmigtExists = this.arraySelectedContracts.some(([_, status]) => status !== 'Genehmigt');
+			const statusNotGenehmigtExists = this.arraySelectedContracts.some(v => v.status !== 'Genehmigt');
 			if(statusNotGenehmigtExists) {
 				this.$fhcAlert.alertError(this.$p.t('vertrag', 'alertOnlyApprovedContracts'));
 				return;
@@ -499,14 +514,14 @@ export default {
 			let vertragString = '';
 
 			this.arraySelectedContracts.forEach(element => {
-				vertragString += '&vertrag_id[]=' + element[0].toString();
+				vertragString += '&vertrag_id[]=' + element.vertrag_id.toString();
 			});
 
 			let linkToPdf = this.dataPrintHonorar.link +
 					'content/pdfExport.php?xml=' + this.dataPrintHonorar.xml + '&xsl=' + this.dataPrintHonorar.xsl + '&mitarbeiter_uid=' + this.mitarbeiter_uid + vertragString + '&output=pdf&uid=' + this.mitarbeiter_uid;
 			window.open(linkToPdf, '_blank');
 		},
-		toggleRowClick(contractId, status, bezeichnung) {
+/*		toggleRowClick(contractId, status, bezeichnung) {
 			const index = this.arraySelectedContracts.findIndex(
 				([id]) => id === contractId
 			);
@@ -515,10 +530,41 @@ export default {
 			} else {
 				this.arraySelectedContracts.push([contractId, status, bezeichnung]);
 			}
+		},*/
+		toggleRowClick(event, vertrag_id, status, bezeichnung, vertragstyp_bezeichnung) {
+			if (!this.dataPrintHonorar?.multiselect) return;
+
+			const isCtrl = event.ctrlKey || event.metaKey;
+
+			const entry = {
+				vertrag_id,
+				status,
+				bezeichnung,
+				vertragstyp_bezeichnung
+			};
+
+			// Single click
+			if (!isCtrl) {
+				this.arraySelectedContracts = [entry];
+				return;
+			}
+
+			// CTRL / CMD → toggle
+			const index = this.arraySelectedContracts.findIndex(
+				e => e.vertrag_id === vertrag_id
+			);
+
+			if (index === -1) {
+				this.arraySelectedContracts.push(entry);
+				//this.arraySelectedContracts.push([entry.vertrag_id, entry.status, entry.bezeichnung, entry.vertragstyp_bezeichnung]);
+			} else {
+				this.arraySelectedContracts.splice(index, 1);
+			}
 		},
-		clearSelection(){
+/*		clearSelection(){
 			this.arraySelectedContracts = [];
-		}
+			this.$refs.table.tabulator.deselectRow();
+		}*/
 	},
 	created() {
 		Promise.all([
@@ -544,33 +590,28 @@ export default {
 		});
 		this.getFormattedDate();
 	},
-	template: `
-	<div class="core-contracts h-100 d-flex flex-column">
+	/*
+		   <template v-if="arraySelectedContracts.length >= 2" class="container mt-2">
 
-		<!--	injected print functionality for KU Linz (printHonorarvertrag)  -->
-	   <template v-if="arraySelectedContracts.length >= 2" class="container mt-2">
-
-		   <div v-for="item in arraySelectedContracts" :key="item[0]">
+			<div v-for="item in arraySelectedContracts" :key="item.vertrag_id">
 			  <input
 				class="form-control"
 				type="text"
-				:value="item[2] + ' | ' + item[1] + ' (ID: ' + item[0] + ')'"
+				:value="item.vertragstyp_bezeichnung + ' | ' + item.bezeichnung + ' | ' + item.status + ' (ID: ' + item.vertrag_id + ')'"
 				aria-label="readonly input example"
 				readonly
 			  >
 			</div>
 		</template>
 
-		<template v-if="arraySelectedContracts.length >= 2" class="d-flex">
-			<div class="ms-auto mt-2">
-				<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
-				<button :disabled="!this.hasSchreibrechte" type="button" class="btn btn-primary" @click="printContract()">{{$p.t('vertrag', 'printHonorarvertrag')}}</button>
-			</div>
-		</template>
+		{{arraySelectedContracts}} || {{dataPrintHonorar}}
 
-	<hr>
+							<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
+	 */
+	template: `
+	<div class="core-contracts h-100 d-flex flex-column">
 
-<!--	filter: open means no status abgerechnet yet-->
+		<!--	filter: open means no status abgerechnet yet-->
 		<div class="justify-content-end pb-3">
 			<form-input
 				container-class="form-switch"
@@ -593,6 +634,13 @@ export default {
 			:new-btn-label="this.$p.t('ui', 'vertrag')"
 			@click:new="actionNewContract"
 			>
+
+			<!-- injected print functionality for KU Linz (printHonorarvertrag)  -->
+			<template #actions v-if="arraySelectedContracts.length >= 2">
+				<div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
+					<button :disabled="!this.hasSchreibrechte" type="button" class="btn btn-secondary" @click="printContract()">{{$p.t('vertrag', 'printHonorarvertrag')}}</button>
+				</div>
+			</template>
 		</core-filter-cmpt>
 
 		<div class="row">

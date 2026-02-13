@@ -57,9 +57,11 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: '200',
+				height: 200,
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
+				selectableRowsRollingSelection: false, //only allow multiselect with STRG
+				index: "lehreinheit_id",
 				persistenceID: 'core-contracts-unassigned'
 			},
 			tabulatorEvents: [
@@ -67,7 +69,9 @@ export default {
 					event: 'rowClick',
 					handler: (e, row) => {
 						const data = row.getData();
-						this.toggleRowClick(data);
+
+						//this.toggleRowClick(e, data);
+						this.toggleSelect(e, data);
 					}
 				},
 				{
@@ -125,18 +129,18 @@ export default {
 		}
 	},
 	watch: {
-		//TODO(Manu) check if still working
+		//TODO(Manu) check
 		person_id() {
 			this.$refs.table.reloadTable();
 			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
 		},
-		clickedRows() {
+/*		clickedRows() {
 			this.$refs.table.reloadTable();
 			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
-		},
+		},*/
 	},
 	methods: {
-		toggleRowClick(rowData){
+/*		toggleRowClick(rowData){
 			// check row
 			const exists = this.clickedRows.some(row => JSON.stringify(row) === JSON.stringify(rowData));
 
@@ -147,10 +151,48 @@ export default {
 			} else {
 				this.clickedRows.push(rowData);
 				this.sumBetragLehrauftraege += Number(rowData.betrag1);
-				//console.log(rowData.betrag1);
 				this.handleSumUp();
 			}
 
+		},*/
+		toggleSelect(event, rowData) {
+
+			const isCtrlPressed = event.ctrlKey;
+
+			if (!isCtrlPressed) {
+
+				const isSameSingleSelection =
+					this.clickedRows.length === 1 &&
+					this.clickedRows[0].lehreinheit_id === rowData.lehreinheit_id;
+
+				if (isSameSingleSelection) {
+					this.clickedRows = [];
+					this.sumBetragLehrauftraege = 0;
+				} else {
+					this.clickedRows = [rowData];
+					this.sumBetragLehrauftraege = Number(rowData.betrag1);
+				}
+			}
+
+			// Multiselect
+			else {
+
+				const exists = this.clickedRows.some(
+					row => row.lehreinheit_id === rowData.lehreinheit_id
+				);
+
+				if (exists) {
+					this.clickedRows = this.clickedRows.filter(
+						row => row.lehreinheit_id !== rowData.lehreinheit_id
+					);
+					this.sumBetragLehrauftraege -= Number(rowData.betrag1);
+				} else {
+					this.clickedRows.push(rowData);
+					this.sumBetragLehrauftraege += Number(rowData.betrag1);
+				}
+			}
+
+			this.handleSumUp();
 		},
 		emitSaveEvent() {
 			this.$emit('saveClickedRows', this.clickedRows);
@@ -164,6 +206,21 @@ export default {
 			this.$emit("sum-updated", this.sumBetragLehrauftraege);
 		},
 	},
+	/*
+			<p v-if="clickedRows.length > 0" >{{$p.t('vertrag', 'text_addLehrauftrag')}}</p>
+
+		<div v-for="item in clickedRows" :key="item.lehreinheit_id" class="row">
+			<div class="col-md-6">
+			  <input
+				class="form-control"
+				type="text"
+				:value="item.type + ' | ' + item.studiensemester_kurzbz + ' | ' + item.bezeichnung + ' ( lehreinheit_id: ' + item.lehreinheit_id + ')'"
+				aria-label="readonly input example"
+				readonly
+			  >
+			</div>
+		</div>
+	 */
 	template: `
 	<div class="core-contracts-unassigned h-50 d-flex flex-column w-100">
 		<p v-if="totalRows > 0">{{$p.t('vertrag', 'text_explainLehrauftrag')}}</p>
@@ -176,18 +233,5 @@ export default {
 			>
 		</core-filter-cmpt>
 		
-		<p v-if="clickedRows.length > 0" >{{$p.t('vertrag', 'text_addLehrauftrag')}}</p>
-		  
-		<div v-for="item in clickedRows" :key="item.lehreinheit_id" class="row">
-			<div class="col-md-6">
-			  <input
-				class="form-control"
-				type="text"
-				:value="item.type + ' | ' + item.studiensemester_kurzbz + ' | ' + item.bezeichnung + ' ( lehreinheit_id: ' + item.lehreinheit_id + ')'"
-				aria-label="readonly input example"
-				readonly
-			  >
-			</div>
-		</div>
 	</div>`
 }
