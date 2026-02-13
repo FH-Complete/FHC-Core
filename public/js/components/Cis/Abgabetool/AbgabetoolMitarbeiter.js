@@ -333,7 +333,6 @@ export const AbgabetoolMitarbeiter = {
 				pa.student = `${pa.vorname} ${pa.nachname}`
 				
 				this.selectedProjektarbeit = pa
-				
 				this.$refs.modalContainerAbgabeDetail.show()
 			
 			}).finally(()=>{this.loading = false})
