@@ -91,7 +91,7 @@ class LehrauftragErteilen extends Auth_Controller
         $studiensemester_kurzbz = $this->input->get('studiensemester'); // if provided by selected studiensemester
         if (is_null($studiensemester_kurzbz)) // else set next studiensemester as default value
         {
-            $studiensemester = $this->StudiensemesterModel->getAktOrNextSemester();
+            $studiensemester = $this->StudiensemesterModel->getAktOrNextSemester(62);
             if (hasData($studiensemester))
             {
                 $studiensemester_kurzbz = $studiensemester->retval[0]->studiensemester_kurzbz;

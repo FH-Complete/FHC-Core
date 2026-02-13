@@ -45,41 +45,46 @@ class Studiensemester_model extends DB_Model
 
 	/**
 	 * getLastOrAktSemester
+	 * @param $days offset in days, if last semester should be returned instead of current
 	 */
-	public function getLastOrAktSemester($days = 60)
+	public function getLastOrAktSemester($days = 0)
 	{
-		if (!is_numeric($days))
-		{
-			$days = 60;
-		}
+		if (!is_numeric($days)) $days = 0;
 
-		$query = 'SELECT studiensemester_kurzbz, start, ende
-					FROM public.tbl_studiensemester
-				   WHERE start < NOW() - \'' . $days . ' DAYS\'::INTERVAL
-				ORDER BY start DESC
-				   LIMIT 1';
+		$query = '
+			SELECT
+				studiensemester_kurzbz, start, ende
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				start < NOW() - \'' . $this->escape($days) . ' DAYS\'::INTERVAL
+			ORDER
+				BY start DESC
+			LIMIT 1';
 
 		return $this->execQuery($query);
 	}
 
 	/**
-	 * getNextOrAktSemester
-	 * 62 days - in july and august, semester after summer is returned
+	 * Returns current semester, or next
+	 * @param $days offset in days, if next semester should be returned earlier
 	 */
-	public function getAktOrNextSemester($days = 62)
+	public function getAktOrNextSemester($days = 0)
 	{
-		if (!is_numeric($days))
-		{
-			$days = 62;
-		}
+		$days = is_numeric($days) ? $this->escape($days) : 0;
 
-		$query = 'SELECT studiensemester_kurzbz, start, ende
-					FROM public.tbl_studiensemester
-					WHERE start < NOW() + \'' . $days . ' DAYS\':: INTERVAL
-					ORDER BY start DESC
-					LIMIT 1';
+		$query = "
+			SELECT
+				studiensemester_kurzbz, start, ende
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				ende >= NOW() + '". $this->escape($days) . " DAYS'::INTERVAL
+			ORDER BY
+				ende
+			LIMIT 1;";
 
-		return $this->execQuery($query);
+		return $this->execQuery($query, [$days, $days]);
 	}
 
 	/**
@@ -177,15 +182,19 @@ class Studiensemester_model extends DB_Model
 	 */
 	public function getByDate($date)
 	{
-		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		// gets the studiensemster of a date or the closest previous studiensemester if a date is not within a studiensemester
 		$query = "
-			SELECT  studiensemester_kurzbz, start, ende
-			FROM	public.tbl_studiensemester
-			WHERE   ( ende >= ?::date AND start <= ?::date ) OR ( ende >= ?::date + '-45 days'::interval AND start <= ?::date + '-45 days'::interval )
-			ORDER BY start DESC
+			SELECT
+				studiensemester_kurzbz, start, ende
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				start <= ?::date
+			ORDER BY
+				start DESC
 			LIMIT 1";
 
-		return $this->execQuery($query, array($date,$date,$date,$date));
+		return $this->execQuery($query, array($date));
 	}
 
 	/**
@@ -200,10 +209,13 @@ class Studiensemester_model extends DB_Model
 			return success(array());
 
 		$query = "
-			SELECT  *
-			FROM	public.tbl_studiensemester
-			WHERE   ( ?::date < ende AND ?::date > start )
-			ORDER BY start DESC";
+			SELECT *
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				?::date < ende AND ?::date > start
+			ORDER BY
+				start DESC";
 
 		return $this->execQuery($query, array($from, $to));
 	}
@@ -275,7 +287,7 @@ class Studiensemester_model extends DB_Model
 			$this->addLimit($minus);
 		$this->db->where('start <= NOW()', null, false);
 		$minus = $this->db->get_compiled_select($this->dbTable);
-		
+
 		$this->db->where_in($this->pk, '(' . $plus . ') UNION (' . $minus . ')', false);
 	}
 
