@@ -665,10 +665,11 @@ elseif (isset($prestudent_id))
 	else
 	{
 		// Letzten Status für des Prestudenten einholen
-		$ps_master = new Prestudent();
+		$ps_master = new Prestudent($prestudent_id);
 		$ps_master->getLastStatus($prestudent_id);
 		$sto = new Studienordnung();
 		$sto->getStudienordnungFromStudienplan($ps_master->studienplan_id);
+		$stg = new Studiengang($ps_master->studiengang_kz);
 		// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
 		$stg_name = $sto->studiengangbezeichnung;
 		$stg_name_eng = $sto->studiengangbezeichnung_englisch;
