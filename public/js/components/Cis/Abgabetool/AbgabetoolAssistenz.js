@@ -7,6 +7,7 @@ import ApiAbgabe from '../../../api/factory/abgabe.js'
 import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 
 // spoofed date testing
 // const todayISO = '2025-08-08'
@@ -226,18 +227,17 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
-		sammelMailStudent() {
+		sammelMailStudent(param) {
+			
 			const emails = this.selectedData
 				.map(row => `${row.student_uid}@${this.domain}`)
 				.join(',');
-			
+			const uniqueRecipients = [...new Set(emails)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			
-			const href = `mailto:${emails}?subject=${subject}`;
-			
-			window.location.href = href
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
 		},
-		sammelMailBetreuer() {
+		sammelMailBetreuer(param) {
+			
 			const recipientList = [];
 			this.selectedData.forEach(row => {
 				if (row.betreuer_mail) recipientList.push(row.betreuer_mail);
@@ -246,11 +246,8 @@ export const AbgabetoolAssistenz = {
 
 			// actually not necessary for email clients but looks better for assistenz if we avoid duplicates here
 			const uniqueRecipients = [...new Set(recipientList)];
-
 			const subject = this.$p.t('abgabetool/c4sammelmailBetreuerBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			const href = `mailto:${uniqueRecipients.join(',')}?subject=${encodeURIComponent(subject)}`;
-
-			window.location.href = href;
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
 		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
@@ -1392,7 +1389,7 @@ export const AbgabetoolAssistenz = {
 					>
 						<i class="fa fa-envelope"></i>
 					</button>
-					<tiered-menu ref="menu" :model="emailItems" popup/>
+					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 				</template>
 			</core-filter-cmpt>
 		</div>
