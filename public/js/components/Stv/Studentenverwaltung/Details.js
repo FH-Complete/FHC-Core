@@ -39,7 +39,19 @@ export default {
 					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
-		}
+		},
+		tile_PersId(){
+			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
+			return tile;
+		},
+		tile_MatrNr(){
+			let tile = this.students[0].matr_nr != null ? this.students[0].matr_nr : '-';
+			return tile;
+		},
+		tile_PersKz(){
+			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
+			return tile;
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -86,11 +98,11 @@ export default {
 				fotoEditable
 			>
 				<template #titleAlphaTile>PersID</template>
-				<template #valueAlphaTile>{{students[0].person_id}}</template>
+				<template #valueAlphaTile>{{tile_PersId}}</template>
 				<template #titleBetaTile>MatrNr</template>
-				<template #valueBetaTile>{{students[0].matr_nr}}</template>
+				<template #valueBetaTile>{{tile_MatrNr}}</template>
 				<template #titleGammaTile>PersKz</template>
-				<template #valueGammaTile>{{students[0].matrikelnr}}</template>
+				<template #valueGammaTile>{{tile_PersKz}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"

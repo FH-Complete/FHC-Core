@@ -32,6 +32,16 @@ export default {
 			endpoint: ApiCoreVertraege
 		}
 	},
+	computed: {
+		tile_MaUid(){
+			let tile = this.mitarbeiter_uid != null ? this.mitarbeiter_uid : '-';
+			return tile;
+		},
+		tile_PersId(){
+			let tile = this.person_id != null ? this.person_id : '-';
+			return tile;
+		},
+	},
 	methods: {
 		handleSelection(selection) {
 			this.mitarbeiter_uid = selection.uid;
@@ -64,9 +74,9 @@ export default {
 							fotoEditable
 							@redirectToLeitung="handleSelection"
 						>
-							<template #uid>{{mitarbeiter_uid}}</template>
+							<template #uid>{{tile_MaUid}}</template>
 							<template #titleAlphaTile>persID</template>
-							<template #valueAlphaTile>{{person_id}}</template>
+							<template #valueAlphaTile>{{tile_PersId}}</template>
 						</fhc-header>
 						<vertraege-mitarbeiter
 							ref="CoreTableVertraege"
