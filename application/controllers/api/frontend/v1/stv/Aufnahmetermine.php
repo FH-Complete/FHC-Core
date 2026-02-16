@@ -298,7 +298,7 @@ class Aufnahmetermine extends FHCAPI_Controller
 		$reihungstestangetreten =
 			(isset($formData['reihungstestangetreten']) && !empty($formData['reihungstestangetreten']))
 				? $formData['reihungstestangetreten']
-				: null;
+				: false;
 		$aufnahmegruppe_kurzbz =
 			(isset($formData['aufnahmegruppe_kurzbz']) && !empty($formData['aufnahmegruppe_kurzbz']))
 				? $formData['aufnahmegruppe_kurzbz']

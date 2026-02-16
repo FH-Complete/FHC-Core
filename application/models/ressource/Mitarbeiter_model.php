@@ -353,12 +353,14 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$filter = strtoLower($filter);
 
+		$returnwert = "p.person_id, p.nachname, p.vorname, p.titelpost,  p.titelpre";
+
 		if ($mode == "mitAkadGrad")
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 		elseif ($mode == "ohneMaUid")
-			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+			$returnwert .= ", CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
 		else
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 
 		$qry = "
 			SELECT " . $returnwert . "  
@@ -373,7 +375,11 @@ class Mitarbeiter_model extends DB_Model
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
-				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower(vorname || ' ' || nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			ORDER BY
+				p.nachname, p.vorname, b.uid, p.person_id";
 
 		return $this->execQuery($qry);
 	}

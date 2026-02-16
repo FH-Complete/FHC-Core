@@ -13,7 +13,7 @@ function parseFilterExpression(expression)
 
 			andParts.forEach(term => {
 
-				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(\d+(?:[.,]\d+)?)$/);
+				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(-?\d+(?:[.,]\d+)?)$/);
 
 				if (comparisonMatch)
 				{

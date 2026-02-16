@@ -19,6 +19,7 @@ import Studium from "../../components/Cis/Studium/Studium.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
+import {capitalize} from "../../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -320,7 +321,7 @@ const app = Vue.createApp({
 
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
-
+app.config.globalProperties.$capitalize = capitalize;
 app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {

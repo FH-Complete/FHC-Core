@@ -151,12 +151,21 @@ class Person_model extends DB_Model
 	 */
 	public function searchPerson($filter)
 	{
-		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$this->addSelect('vorname, nachname, gebdatum, person_id, titelpre, titelpost');
+		$this->addSelect("CASE
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Mitarbeiter'
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Student'
+				ELSE 'Person'
+			END AS status");
 		$result = $this->loadWhere(
-			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
+			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%')
+			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')
 		);
 
 		return $result;

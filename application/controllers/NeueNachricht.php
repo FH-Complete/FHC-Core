@@ -20,11 +20,18 @@ class NeueNachricht extends Auth_Controller
 	 */
 	public function _remap()
 	{
+		$typeid = $this->input->post('typeid');
+		$ids = ($this->input->post('ids') && strpos($this->input->post('ids'), ',')) 
+			? explode(',', $this->input->post('ids'))
+			: $this->input->post('ids');
+
 		//now working
 		$this->load->view('Nachrichten', [
 			'permissions' => [
 				'assistenz_schreibrechte' => $this->permissionlib->isBerechtigt('assistenz','suid'),
-			]
+			],
+			'ids' => $ids,
+			'typeid' => $typeid
 		]);
 	}
 }

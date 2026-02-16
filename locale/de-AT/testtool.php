@@ -53,6 +53,8 @@ $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengäng
 $this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
 $this->phrasen['testtool/confirmationText']='<b>Ich bestätige, den Online-Reihungstest persönlich, selbständig, ohne Hilfe einer zusätzlichen Person und ohne Hilfsmittel zu absolvieren.<br>
 											I confirm that I will complete the online placement test personally, independently, without the help of an additional person and without any aids.</b>';
+$this->phrasen['testtool/dsgvoConfirmText']='<b>Ich habe die <a href ="'. APP_ROOT. 'cms/dms.php?id=373121" target="_blank">Datenschutzerklärung</a> gelesen.</b>';
+$this->phrasen['testtool/procotoringConfirmText']='<b>Ich stimme der digitalen Beaufsichtigung beim Online-Reihungstest (Proctoring) zu.</b>';
 $this->phrasen['testtool/loginNoetig']='Bitte beachten Sie, dass der Reihungstest erst <b>unmittelbar</b> vor Ihrem <b>Reihungstesttermin</b> von uns aktiviert wird.<br>
 										Please note that the test will be activated by us <b>immediately</b> before your <b>placement test date</b>.';
 $this->phrasen['testtool/start']='Reihungstest jetzt starten';
