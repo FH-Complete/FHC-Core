@@ -4,7 +4,7 @@ import CoreTag from '../../Tag/Tag.js';
 import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
 import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
 import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
-//import { extendedHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+
 import ApiTag from "../../../api/factory/stv/tag.js";
 import ListFilter from './List/Filter.js';
 
@@ -456,6 +456,14 @@ export default {
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
+				return;
+
+			// Ignore typing inside editable elements
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement ||
+				e.target.isContentEditable
+			)
 				return;
 
 			var next;
