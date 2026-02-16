@@ -128,7 +128,7 @@ export default {
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
 				layout: 'fitDataStretchFrozen',
 				index: 'message_id',
-				persistenceID: 'core-message-2025112401',
+				persistenceID: 'core-message-20260216',
 				selectableRows: 1,
 				selectableRowsRangeMode: 'click',
 				columns: [
@@ -178,9 +178,6 @@ export default {
 							"archived",
 							"deleted"
 						],
-/*						formatter: (cell, formatterParams) => {
-							return formatterParams[cell.getValue()];
-						},*/
 						formatter: (cell, formatterParams) => {
 							const key = formatterParams[cell.getValue()];
 							return this.$p.t('messages', key);
@@ -331,14 +328,6 @@ export default {
 				},
 			];
 			return events;
-		},
-		statusText(){
-			return {
-				0: this.$p.t('messsages', 'unread'),
-				1: this.$p.t('messsages', 'read'),
-				2: this.$p.t('messsages', 'archived'),
-				3: this.$p.t('messsages', 'deleted')
-			}
 		},
 	},
 	mounted() {
