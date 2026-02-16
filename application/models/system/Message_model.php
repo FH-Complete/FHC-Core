@@ -251,9 +251,23 @@ class Message_model extends DB_Model
 				join
 					public.tbl_msg_recipient mr on mr.message_id = m.message_id
 				where
-					m.person_id = ? or mr.person_id = ?
+					m.person_id = ?
 				group by
 					m.message_id, m.person_id, mr.person_id
+
+				union
+
+				select
+					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
+				from
+					public.tbl_msg_message m
+				join
+					public.tbl_msg_recipient mr on mr.message_id = m.message_id
+				where
+					mr.person_id = ?
+				group by
+					m.message_id, m.person_id, mr.person_id
+
 			), lastmsgstatus as (
 				select
 					ms.*
