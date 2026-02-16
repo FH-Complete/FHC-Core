@@ -276,8 +276,8 @@ class Message_model extends DB_Model
 				m.body AS body,
 				m.insertamum AS insertamum,
 				m.relationmessage_id AS relationmessage_id,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = fm.sender_id) as sender,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = fm.recipient_id) as recipient,
+				(COALESCE(ps.titelpre,'') || ' ' || COALESCE(ps.vorname,'') || ' ' || COALESCE(ps.nachname,'') || ' ' || COALESCE(ps.titelpost,'')) as sender,
+				(COALESCE(pr.titelpre,'') || ' ' || COALESCE(pr.vorname,'') || ' ' || COALESCE(pr.nachname,'') || ' ' || COALESCE(pr.titelpost,'')) as recipient,
 				fm.sender_id,
 				fm.recipient_id,
 				ms.status,
@@ -288,6 +288,10 @@ class Message_model extends DB_Model
 				public.tbl_msg_message m on fm.message_id = m.message_id
 			join
 				lastmsgstatus ms on fm.message_id = ms.message_id and fm.recipient_id = ms.person_id
+			left join
+				public.tbl_person ps on ps.person_id = fm.sender_id
+			left join
+				public.tbl_person pr on pr.person_id = fm.recipient_id
 			order by
 				m.insertamum DESC
 			limit ?
