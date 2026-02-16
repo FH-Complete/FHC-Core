@@ -966,7 +966,10 @@ export const AbgabetoolAssistenz = {
 			// this.loadProjektarbeiten()
 
 			this.calcMaxTableHeight()
-		}
+		},
+		getOptionDisabled(option) {
+			return !option.aktiv
+		},
 	},
 	computed: {
 		emailItems() {
@@ -1176,7 +1179,8 @@ export const AbgabetoolAssistenz = {
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
 							:options="abgabeTypeOptions"
-							:optionLabel="getOptionLabelAbgabetyp">
+							:optionLabel="getOptionLabelAbgabetyp"
+							:optionDisabled="getOptionDisabled">
 						</Dropdown>
 					</div>
 				</div>

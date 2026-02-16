@@ -729,6 +729,7 @@ export const AbgabeMitarbeiterDetail = {
 							v-model="newTermin.bezeichnung"
 							:options="getAllowedAbgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp"
+							:optionDisabled="getOptionDisabled"
 							scrollHeight="300px">
 						</Dropdown>
 					</div>

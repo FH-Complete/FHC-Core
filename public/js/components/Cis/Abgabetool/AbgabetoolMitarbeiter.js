@@ -304,7 +304,7 @@ export const AbgabetoolMitarbeiter = {
 				pa.isCurrent = res.data[1]
 
 				let paIsBenotet = false
-				if(pa.note !== undefined && pa !== null) {
+				if(pa.note !== undefined && pa.note !== null) {
 					// check if the note is not defined as a non final projektarbeit note
 					const opt = this.notenOptionsNonFinal.find(opt => opt.note)
 					// if thats the case allow further work
