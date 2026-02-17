@@ -3578,6 +3578,12 @@
   transition: box-shadow 0.15s;
   margin-right: 0.5rem;
 }
+
+.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler > svg,
+.p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler > svg * {
+  pointer-events: none;
+}
+
 .p-treetable .p-treetable-tbody > tr > td .p-treetable-toggler:enabled:hover {
   color: #495057;
   border-color: transparent;
