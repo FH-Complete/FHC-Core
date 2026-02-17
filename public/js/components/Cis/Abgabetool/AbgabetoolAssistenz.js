@@ -212,7 +212,8 @@ export const AbgabetoolAssistenz = {
 			abgabeTableEventHandlers: [
 			{
 				event: "rowSelectionChanged",
-				handler: async(data) => {
+				handler: async(data) => 
+				{
 					this.selectedData.filter(sd => !data.includes(sd)).forEach(fsd => {
 						if(fsd.checkbox) fsd.checkbox.checked = false
 					})
@@ -220,7 +221,7 @@ export const AbgabetoolAssistenz = {
 					data.forEach(d => {
 						if(d.checkbox) d.checkbox.checked = true
 					})
-
+					
 					this.selectedData = data
 				}
 			}
@@ -612,6 +613,9 @@ export const AbgabetoolAssistenz = {
 		},
 		addSeries() {
 			const pids = this.selectedData?.map(projekt => projekt.projektarbeit_id)
+			
+			const preserveSelected = [...this.selectedData]
+			
 			this.saving = true
 			this.serienTermin.fixtermin = !this.serienTermin.invertedFixtermin
 			this.$api.call(ApiAbgabe.postSerientermin(
@@ -644,14 +648,27 @@ export const AbgabetoolAssistenz = {
 				})
 				
 				// reset selection to empty
-				this.$refs.abgabeTable.tabulator.deselectRow()
-
-				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+				// this.$refs.abgabeTable.tabulator.deselectRow()
+				const table = this.$refs.abgabeTable.tabulator;
+				const scrollX = table.rowManager.element.scrollLeft;
+				const scrollY = table.rowManager.element.scrollTop;
 				
-				this.$refs.abgabeTable.tabulator.setData(mappedData)
-				this.$refs.abgabeTable.tabulator.redraw(true)
+				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+
+				table.setData(mappedData)
+				table.redraw(true)
+
+				
+				requestAnimationFrame(() => {
+					table.rowManager.element.scrollLeft = scrollX;
+					table.rowManager.element.scrollTop = scrollY;
+				});
+				
+				
+				
 			}).finally(()=>{
 				this.saving = false
+				this.selectedData = preserveSelected
 			})
 
 			this.$refs.modalContainerAddSeries.hide()
@@ -705,7 +722,9 @@ export const AbgabetoolAssistenz = {
 			return str
 		},
 		isPastDate(date) {
-			return new Date(date) < new Date(Date.now())
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' });
+			const nowInBerlin = luxon.DateTime.now().setZone('Europe/Berlin');
+			return nowInBerlin > deadline;
 		},
 		setDetailComponent(details){
 			
@@ -1034,6 +1053,24 @@ export const AbgabetoolAssistenz = {
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
 				this.loadProjektarbeiten()
 			}
+		},
+		selectedData(newVal) {
+			const table = this.$refs.abgabeTable?.tabulator
+			if(!table) return
+
+			const allRows = table.getRows();
+
+			newVal.forEach(selected => {
+				const row = allRows.find(r => {
+					const data = r.getData()
+					if (data.projektarbeit_id == selected.projektarbeit_id) return r
+				}) 	
+				
+				row.select()
+				const cb = row.getElement().children[0]?.children[0]?.children[0]
+				if(cb) cb.checked = true
+			})
+
 		}
 	},
 	created() {

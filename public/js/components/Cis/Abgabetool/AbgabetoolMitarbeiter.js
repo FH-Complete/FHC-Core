@@ -294,7 +294,9 @@ export const AbgabetoolMitarbeiter = {
 			return str
 		},
 		isPastDate(date) {
-			return new Date(date) < new Date(Date.now())
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' });
+			const nowInBerlin = luxon.DateTime.now().setZone('Europe/Berlin');
+			return nowInBerlin > deadline;
 		},
 		setDetailComponent(details){
 			this.loading=true
