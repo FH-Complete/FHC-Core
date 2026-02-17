@@ -646,7 +646,7 @@ export default {
 		<div class="row">
 			<div class="col-sm-6">
 				<!-- ContractDetails -->
-				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">
+				 <div class="md-4" v-if="contractSelected.vertrag_id !=null && arraySelectedContracts.length == 1">
 					<contract-details
 						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
@@ -659,7 +659,7 @@ export default {
 			</div>
 			<div class="col-sm-6">
 				<!-- ContractStati -->
-				 <div class="md-4" v-if="contractSelected.vertrag_id !=null">
+				 <div class="md-4" v-if="contractSelected.vertrag_id !=null && arraySelectedContracts.length == 1">
 					<contract-stati
 						:person_id="person_id"
 						:vertrag_id="contractSelected.vertrag_id"
