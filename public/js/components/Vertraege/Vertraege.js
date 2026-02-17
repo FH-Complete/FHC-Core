@@ -175,9 +175,6 @@ export default {
 						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
 						setHeader('isabgerechnet', this.$p.t('vertrag', 'abgerechnet'));
 						setHeader('actions', this.$p.t('global', 'aktionen'));
-						/*						cm.getColumnByField('actions').component.updateDefinition({
-													title: this.$p.t('global', 'aktionen')
-												});*/
 					}
 				},
 /*				{

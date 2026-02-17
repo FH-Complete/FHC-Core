@@ -221,56 +221,31 @@ export default{
 					handler: async () => {
 						await this.$p.loadCategory(['lehre','global','person','ui']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('lehrverband').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrverband')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('bestaetigtam').component.updateDefinition({
-							title: this.$p.t('lehre', 'bestaetigt_am')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-						cm.getColumnByField('bewerbung_abgeschicktamum').component.updateDefinition({
-							title: this.$p.t('lehre', 'bewerbung_abgeschickt_am')
-						});
-
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'studienplan')
-						});
-
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
-
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-
-						cm.getColumnByField('bestaetigtvon').component.updateDefinition({
-							title: this.$p.t('lehre', 'bestaetigt_von')
-						});
-
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('lehre', 'insert_am')
-						});
-
-						cm.getColumnByField('insertvon').component.updateDefinition({
-							title: this.$p.t('lehre', 'insert_von')
-						});
-
-						cm.getColumnByField('prestudent_id').component.updateDefinition({
-							title: this.$p.t('ui', 'prestudent_id')
-						});
-
-						cm.getColumnByField('studienplan_id').component.updateDefinition({
-							title: this.$p.t('ui', 'studienplan_id')
-						});
-					}
+						setHeader('lehrverband', this.$p.t('lehre', 'lehrverband'));
+						setHeader('bestaetigtam', this.$p.t('lehre', 'bestaetigt_am'));
+						setHeader('bewerbung_abgeschicktamum', this.$p.t('lehre', 'bewerbung_abgeschickt_am'));
+						setHeader('bezeichnung', this.$p.t('lehre', 'studienplan'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('bestaetigtvon', this.$p.t('lehre', 'bestaetigt_von'));
+						setHeader('insertamum', this.$p.t('lehre', 'insert_am'));
+						setHeader('insertvon', this.$p.t('lehre', 'insert_von'));
+						setHeader('prestudent_id', this.$p.t('ui', 'prestudent_id'));
+						setHeader('studienplan_id', this.$p.t('ui', 'studienplan_id'));					}
 				}
 			];
 			return events;

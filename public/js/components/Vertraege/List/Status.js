@@ -159,38 +159,29 @@ export default {
 
 						await this.$p.loadCategory(['ui', 'global', 'vertrag']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'status')
-						});
-						cm.getColumnByField('datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
-							title: this.$p.t('person', 'uid')
-						});
-						cm.getColumnByField('vertrag_id').component.updateDefinition({
-							title: this.$p.t('ui', 'vertrag_id')
-						});
-						cm.getColumnByField('vertragsstatus_kurzbz').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragStatus')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
-						cm.getColumnByField('updatevon').component.updateDefinition({
-							title: this.$p.t('global', 'updatevon')
-						});
-						cm.getColumnByField('updateamum').component.updateDefinition({
-							title: this.$p.t('global', 'updateamum')
-						});
-						cm.getColumnByField('insertvon').component.updateDefinition({
-							title: this.$p.t('global', 'insertvon')
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'insertamum')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('bezeichnung', this.$p.t('global', 'status'));
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('mitarbeiter_uid', this.$p.t('person', 'uid'));
+						setHeader('vertrag_id', this.$p.t('ui', 'vertrag_id'));
+						setHeader('vertragsstatus_kurzbz', this.$p.t('vertrag', 'vertragStatus'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
+						setHeader('updatevon', this.$p.t('global', 'updatevon'));
+						setHeader('updateamum', this.$p.t('global', 'updateamum'));
+						setHeader('insertvon', this.$p.t('global', 'insertvon'));
+						setHeader('insertamum', this.$p.t('global', 'insertamum'));
 					}
 				}
 			],

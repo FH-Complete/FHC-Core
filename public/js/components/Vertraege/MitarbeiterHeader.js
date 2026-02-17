@@ -77,42 +77,28 @@ export default {
 					event: 'tableBuilt',
 					handler: async() => {
 						await this.$p.loadCategory(['person', 'global', 'vertrag']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('uid').component.updateDefinition({
-							visible: true
-						});
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('nachname').component.updateDefinition({
-							title: this.$p.t('person', 'nachname'),
-							visible: true
-						});
-						cm.getColumnByField('vorname').component.updateDefinition({
-							title: this.$p.t('person', 'vorname'),
-							visible: true
-						});
-						cm.getColumnByField('gebdatum').component.updateDefinition({
-							title: this.$p.t('person', 'geburtsdatum')
-						});
-						cm.getColumnByField('unternehmen').component.updateDefinition({
-							title: this.$p.t('person', 'firma')
-						});
-						cm.getColumnByField('vertragsarten').component.updateDefinition({
-							title: this.$p.t('vertrag', 'vertragsarten'),
-							visible: true
-						});
-						cm.getColumnByField('ids').component.updateDefinition({
-							title: this.$p.t('vertrag', 'idsDienstverhaeltnisse'),
-							visible: true
-						});
-						cm.getColumnByField('aktiv').component.updateDefinition({
-							title: this.$p.t('global', 'aktiv'),
-							width: 45
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('nachname', this.$p.t('person', 'nachname'));
+						setHeader('vorname', this.$p.t('person', 'vorname'));
+						setHeader('gebdatum', this.$p.t('person', 'geburtsdatum'));
+						setHeader('unternehmen', this.$p.t('person', 'firma'));
+						setHeader('vertragsarten', this.$p.t('vertrag', 'vertragsarten'));
+						setHeader('ids', this.$p.t('vertrag', 'idsDienstverhaeltnisse'));
+						setHeader('aktiv', this.$p.t('global', 'aktiv'));
 					}
 				},
 				{

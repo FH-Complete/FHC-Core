@@ -84,41 +84,31 @@ export default {
 					event: 'tableBuilt',
 					handler: () => {
 						this.$p.loadCategory(['ui', 'global', 'vertrag', 'projektarbeitsbeurteilung', 'lehre']).then(() => {
-							let cm = this.$refs.table.tabulator.columnManager;
 
-							cm.getColumnByField('type').component.updateDefinition({
-								title: this.$p.t('global', 'typ')
-							});
-							cm.getColumnByField('bezeichnung').component.updateDefinition({
-								title: this.$p.t('ui', 'bezeichnung')
-							});
-							cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-								title: this.$p.t('ui', 'lehreinheit_id')
-							});
-							cm.getColumnByField('betrag1').component.updateDefinition({
-								title: this.$p.t('ui', 'betrag')
-							});
-							cm.getColumnByField('studiensemester_kurzbz').component.updateDefinition({
-								title: this.$p.t('lehre', 'studiensemester')
-							});
-							cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
-								title: this.$p.t('ui', 'mitarbeiter_uid')
-							});
-							cm.getColumnByField('projektarbeit_id').component.updateDefinition({
-								title: this.$p.t('ui', 'projektarbeit_id')
-							});
-							cm.getColumnByField('betreuerart_kurzbz').component.updateDefinition({
-								title: this.$p.t('projektarbeitsbeurteilung', 'betreuerart')
-							});
-							cm.getColumnByField('vertragsstunden').component.updateDefinition({
-								title: this.$p.t('vertrag', 'vertragsstunden')
-							});
-							cm.getColumnByField('vertrag_id').component.updateDefinition({
-								title: this.$p.t('ui', 'vertrag_id')
-							});
-							cm.getColumnByField('vertragsstunden_studiensemester_kurzbz').component.updateDefinition({
-								title: this.$p.t('vertrag', 'vertragsstunden_studiensemester')
-							});
+							const setHeader = (field, text) => {
+								const col = this.$refs.table.tabulator.getColumn(field);
+								if (!col) return;
+
+								const el = col.getElement();
+								if (!el || !el.querySelector) return;
+
+								const titleEl = el.querySelector('.tabulator-col-title');
+								if (titleEl) {
+									titleEl.textContent = text;
+								}
+							};
+
+							setHeader('type', this.$p.t('global', 'typ'));
+							setHeader('bezeichnung', this.$p.t('ui', 'bezeichnung'));
+							setHeader('lehreinheit_id', this.$p.t('ui', 'lehreinheit_id'));
+							setHeader('betrag1', this.$p.t('ui', 'betrag'));
+							setHeader('studiensemester_kurzbz', this.$p.t('lehre', 'studiensemester'));
+							setHeader('mitarbeiter_uid', this.$p.t('ui', 'mitarbeiter_uid'));
+							setHeader('projektarbeit_id', this.$p.t('ui', 'projektarbeit_id'));
+							setHeader('betreuerart_kurzbz', this.$p.t('projektarbeitsbeurteilung', 'betreuerart'));
+							setHeader('vertragsstunden', this.$p.t('vertrag', 'vertragsstunden'));
+							setHeader('vertrag_id', this.$p.t('ui', 'vertrag_id'));
+							setHeader('vertragsstunden_studiensemester_kurzbz', this.$p.t('vertrag', 'vertragsstunden_studiensemester'));
 						});
 					}
 				}
