@@ -255,7 +255,7 @@ class Message_model extends DB_Model
 				group by
 					m.message_id, m.person_id, mr.person_id
 
-				union
+				union all
 
 				select
 					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
