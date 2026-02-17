@@ -643,6 +643,24 @@ export const AbgabeMitarbeiterDetail = {
 		'projektarbeit'(newVal) {
 			// set invertedFixtermin field for UI/UX purposes -> avoid double negation in text
 			
+			// reset newTermin object
+			const typ = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
+			this.newTermin = {
+				'paabgabe_id': -1,
+				'projektarbeit_id': newVal.projektarbeit_id,
+				'fixtermin': false,
+				'invertedFixtermin': true,
+				'kurzbz': '',
+				'datum': new Date().toISOString().split('T')[0],
+				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+				'beurteilungsnotiz': '',
+				'upload_allowed': typ.upload_allowed_default,
+				'paabgabetyp_kurzbz': '',
+				'bezeichnung': typ,
+				'abgabedatum': null,
+				'insertvon': this.viewData?.uid ?? ''
+			}
+			
 			newVal?.abgabetermine?.forEach(termin => termin.invertedFixtermin = !termin.fixtermin)
 			
 			// default select german if projektarbeit sprache was null
@@ -711,6 +729,7 @@ export const AbgabeMitarbeiterDetail = {
 							v-model="newTermin.bezeichnung"
 							:options="getAllowedAbgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp"
+							:optionDisabled="getOptionDisabled"
 							scrollHeight="300px">
 						</Dropdown>
 					</div>

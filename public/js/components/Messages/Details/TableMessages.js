@@ -316,6 +316,7 @@ export default {
 						setHeader('statusdatum', this.$p.t('notiz', 'letzte_aenderung'));
 
 						this.$refs.table.tabulator.rowManager.getDisplayRows();
+						this.$emit('tabulator_tablebuilt');
 					}
 				},
 				{
