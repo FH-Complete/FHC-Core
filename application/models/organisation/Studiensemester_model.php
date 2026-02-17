@@ -84,7 +84,7 @@ class Studiensemester_model extends DB_Model
 				ende
 			LIMIT 1;";
 
-		return $this->execQuery($query, [$days, $days]);
+		return $this->execQuery($query);
 	}
 
 	/**
