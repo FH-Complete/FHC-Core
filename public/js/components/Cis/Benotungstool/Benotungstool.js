@@ -46,6 +46,12 @@ export const Benotungstool = {
 	},
 	data() {
 		return {
+			headerFiltersRestored: false,
+			filtersRestored: false,
+			colLayoutRestored: false,
+			sortRestored: false,
+			stateRestored: false,
+			persistenceID: 'notenToolTable2026-02-16',
 			debouncedFetchPunkteForPruefung: null,
 			config: null, // cis config
 			neuesPruefungsdatumModalVisible: false,
@@ -78,12 +84,7 @@ export const Benotungstool = {
 			notenOptionsPromise: null,
 			tableBuiltPromise: null,
 			notenTableOptions: null, // built later when noten are available
-			notenTableEventHandlers: [{
-				event: "tableBuilt",
-				handler: async () => {
-					this.tableBuiltResolve()
-				}
-			},
+			notenTableEventHandlers: [
 			{
 				event: "rowSelectionChanged",
 				handler: async (data, rows) => {
@@ -139,6 +140,99 @@ export const Benotungstool = {
 			]};
 	},
 	methods: {
+		loadState() {
+			return JSON.parse(localStorage.getItem(this.persistenceID) || "null");
+		},
+		saveState(table) {
+			// Only save if we have finished the initial restoration 
+			// AND the table actually has columns (to avoid saving empty states)
+			if (!this.stateRestored) return;
+			
+			
+			const rawLayout = table.getColumnLayout();
+			const state = {
+				columns: rawLayout.map(col => ({
+					field: col.field,
+					visible: col.visible,
+					width: col.width,
+				})),
+				sort: table.getSorters().map(s => ({
+					field: s.field,
+					dir: s.dir,
+				})),
+				filters: table.getFilters(),
+				headerFilters: table.getHeaderFilters()
+			};
+
+			localStorage.setItem(this.persistenceID, JSON.stringify(state));
+		},
+		handleTableBuilt() {
+			const table = this.$refs.notenTable.tabulator;
+
+			this.tableBuiltResolve()
+			
+			const saved = this.loadState();
+
+			// setup change eventlisteners
+			const events = [
+				"columnMoved", "columnResized", "columnVisibilityChanged",
+				"filterChanged", "headerFilterChanged", "dataSorted",
+				"columnSorted", "sortersChanged"
+			];
+
+			events.forEach(eventName => {
+				table.on(eventName, () => this.saveState(table));
+			});
+
+			// renderComplete restore state logic
+			table.on("renderComplete", () => {
+				if (this.stateRestored) return;
+
+				// restore layout first
+				if (saved?.columns && !this.colLayoutRestored) {
+					const layout = saved.columns.map(col => ({
+						field: col.field,
+						width: col.width,
+						visible: col.visible,
+						// add more if needed, but keep it simple
+					}));
+
+					table.setColumnLayout(layout);
+					this.colLayoutRestored = true;
+				}
+				
+				if (saved?.filters && !this.filtersRestored) {
+					this.filtersRestored = true;
+					table.setFilter(saved.filters);
+				}
+				
+				if (saved?.headerFilters && !this.headerFiltersRestored) {
+					this.headerFiltersRestored = true;
+					saved.headerFilters.forEach(hf => {
+						table.setHeaderFilterValue(hf.field, hf.value);
+					});
+				}
+				
+				if (saved?.sort?.length && !this.sortRestored) {
+					this.sortRestored = true;
+					setTimeout(() => {
+						const sortList = saved.sort.map(s => {
+							const col = table.columnManager.findColumn(s.field);
+							return col ? { column: col, dir: s.dir } : null;
+						}).filter(Boolean);
+
+						if (sortList.length) {
+							table.setSort(sortList);
+						}
+					}, 100);
+				}
+
+				this.stateRestored = true;
+			});
+
+			// finalize the promise
+			if (this.tableResolve) this.tableResolve();
+		},
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
 			// but actually just revert it after the fact
@@ -498,7 +592,6 @@ export const Benotungstool = {
 
 			// TODO: find some solution so the tool does not appear "jumpy" after pruefung calls
 			
-			this.$refs.notenTable.tabulator.clearSort()
 			this.$refs.notenTable.tabulator.setColumns(cols)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
@@ -580,8 +673,6 @@ export const Benotungstool = {
 		getNotenTableOptions() {
 
 			return {
-				// debugEventsExternal:true,
-				// debugEventsInternal:true,
 				height: 700,
 				virtualDom: false,
 				index: 'uid',
@@ -1151,7 +1242,7 @@ export const Benotungstool = {
 		notenOptionsResolve(resolve) {
 			this.notenOptionsResolve = resolve
 		},
-		setupData(data){
+		async setupData(data){
 			this.studenten = data[0] ?? []
 			this.studenten.forEach(s => {
 				s.pruefungen = []
@@ -1293,7 +1384,8 @@ export const Benotungstool = {
 
 			this.loading = false
 			
-			this.$refs.notenTable.tabulator.clearSort()
+			console.log('setColumns', cols)
+			
 			this.$refs.notenTable.tabulator.setColumns(cols)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
@@ -2064,6 +2156,7 @@ export const Benotungstool = {
 				ref="notenTable"
 				:tabulator-options="notenTableOptions"
 				:tabulator-events="notenTableEventHandlers"
+				@tableBuilt="handleTableBuilt"
 				tableOnly
 				:sideMenu="false"
 			>
