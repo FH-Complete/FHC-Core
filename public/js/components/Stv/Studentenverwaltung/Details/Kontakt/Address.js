@@ -6,7 +6,6 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
 import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
-import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
 export default{
 	name: 'AddressComponent',
@@ -55,7 +54,7 @@ export default{
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
 				index: 'adresse_id',
-				persistenceID: 'stv-details-kontakt-address',
+				persistenceID: 'stv-details-kontakt-address-20260217',
 				columns:[
 					{title:"Typ", field:"bezeichnung"},
 					{title:"Strasse", field:"strasse"},

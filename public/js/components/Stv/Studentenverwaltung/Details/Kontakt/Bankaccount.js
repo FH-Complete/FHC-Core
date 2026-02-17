@@ -33,7 +33,7 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvBankaccount.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				index: 'bankverbindung_id',
-				persistenceID: 'stv-details-kontakt-bankaccount',
+				persistenceID: 'stv-details-kontakt-bankaccount-20260217',
 				columns:[
 					{title:"Name", field:"name"},
 					{title:"Anschrift", field:"anschrift", visible:false},

@@ -74,7 +74,7 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 200,
-				persistenceID: 'core-mobility-purpose-2025112401'
+				persistenceID: 'core-mobility-purpose-20260217'
 			},
 			tabulatorEvents: [
 				{

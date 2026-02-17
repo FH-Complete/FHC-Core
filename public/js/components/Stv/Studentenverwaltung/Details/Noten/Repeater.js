@@ -81,7 +81,7 @@ export default {
 				height: '100%',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-repeater'
+				persistenceID: 'stv-details-noten-repeater-20260217'
 			};
 		}
 	},

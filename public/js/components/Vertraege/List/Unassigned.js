@@ -123,28 +123,9 @@ export default {
 		person_id() {
 			this.$refs.table.reloadTable();
 			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
-		},
-/*		clickedRows() {
-			this.$refs.table.reloadTable();
-			//this.$refs.table.tabulator.setData('api/frontend/v1/vertraege/vertraege/getAllContractsNotAssigned/' + this.person_id);
-		},*/
+		}
 	},
 	methods: {
-/*		toggleRowClick(rowData){
-			// check row
-			const exists = this.clickedRows.some(row => JSON.stringify(row) === JSON.stringify(rowData));
-
-			if (exists) {
-				this.clickedRows = this.clickedRows.filter(row => JSON.stringify(row) !== JSON.stringify(rowData));
-				this.sumBetragLehrauftraege -= Number(rowData.betrag1);
-				this.handleSumUp();
-			} else {
-				this.clickedRows.push(rowData);
-				this.sumBetragLehrauftraege += Number(rowData.betrag1);
-				this.handleSumUp();
-			}
-
-		},*/
 		toggleSelect(event, rowData) {
 
 			const isCtrlPressed = event.ctrlKey;

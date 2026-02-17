@@ -91,7 +91,7 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				layout:"fitDataTable",
 				index: 'akte_id',
-				persistenceID: 'stv-details-archiv',
+				persistenceID: 'stv-details-archiv-20260217',
 				columns: [
 					{title: "Akte Id", field: "akte_id", visible: false},
 					{title: this.$p.t('stv', 'archiv_title'), field: "titel"},

@@ -128,7 +128,7 @@ export default {
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
 				layout: 'fitDataStretchFrozen',
 				index: 'message_id',
-				persistenceID: 'core-message-20260216',
+				persistenceID: 'core-message-20260217',
 				selectableRows: 1,
 				selectableRowsRangeMode: 'click',
 				columns: [

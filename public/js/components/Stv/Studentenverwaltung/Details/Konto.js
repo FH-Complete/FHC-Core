@@ -130,7 +130,7 @@ export default {
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
 				index: 'buchungsnr',
-				persistenceID: 'stv-details-konto'
+				persistenceID: 'stv-details-konto-20260217'
 			};
 		},
 	},

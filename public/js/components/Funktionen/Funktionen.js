@@ -71,7 +71,7 @@ export default {
 					ApiCoreFunktion.getAllUserFunctions(this.personUID)
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'core-functions',
+				persistenceID: 'core-functions-20260217',
 				columns: [
 					{
 						title: "dienstverhaeltnis_unternehmen",

@@ -47,7 +47,7 @@ export default {
 					ApiStvJointstudies.getStudies(this.student.prestudent_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'stv-details-jointstudies',
+				persistenceID: 'stv-details-jointstudies-20260217',
 				columns: [
 					{title: "mobilitaet_id", field: "mobilitaet_id", visible: false},
 					{title: "StSem", field: "studiensemester_kurzbz"},

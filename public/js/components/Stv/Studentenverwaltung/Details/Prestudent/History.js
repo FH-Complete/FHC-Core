@@ -25,7 +25,7 @@ export default{
 				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudents(this.personId)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
-				persistenceID: 'stv-details-prestudent-history-20260204',
+				persistenceID: 'stv-details-prestudent-history-20260217',
 				columns:[
 					{title:"StSem", field:"studiensemester_kurzbz"},
 					{title:"Prio", field:"priorisierung"},

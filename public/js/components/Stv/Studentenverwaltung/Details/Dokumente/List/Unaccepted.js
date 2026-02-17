@@ -34,7 +34,7 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				layout: 'fitDataStretchFrozen',
-				persistenceID: 'stv-details-unaccepted-2026020401',
+				persistenceID: 'stv-details-unaccepted-20260217',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
 				columns: [

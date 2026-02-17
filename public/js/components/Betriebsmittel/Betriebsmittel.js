@@ -63,7 +63,7 @@ export default {
 					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'core-betriebsmittel',
+				persistenceID: 'core-betriebsmittel-20260217',
 				selectableRows: true,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},

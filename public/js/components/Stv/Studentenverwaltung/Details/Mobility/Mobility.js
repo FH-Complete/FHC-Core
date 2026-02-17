@@ -79,7 +79,7 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				index: 'bisio_id',
-				persistenceID: 'stv-details-table_mobility-2025112401',
+				persistenceID: 'stv-details-table_mobility-20260217',
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},

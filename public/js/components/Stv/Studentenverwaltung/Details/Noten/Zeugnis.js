@@ -250,7 +250,7 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				selectableRows: 1,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis-2025112401',
+				persistenceID: 'stv-details-noten-zeugnis-20260217',
 				persistence:{
 					columns: ["width", "visible", "frozen"]
 				}

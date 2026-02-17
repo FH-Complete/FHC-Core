@@ -81,7 +81,7 @@ export default {
 				height: '100%',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-noten-teacher'
+				persistenceID: 'stv-details-noten-teacher-20260217'
 			};
 		}
 	},

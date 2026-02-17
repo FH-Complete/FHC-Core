@@ -126,7 +126,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektbetreuer-2025121201'
+				persistenceID: 'stv-details-projektbetreuer-20260217'
 			},
 			tabulatorEvents: [
 				{

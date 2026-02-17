@@ -210,7 +210,7 @@ export default{
 				height: 'auto',
 				selectableRows: false,
 				index: 'statusId',
-				persistenceID: 'stv-multistatus-2025112401'
+				persistenceID: 'stv-multistatus-20260217'
 			};
 			return options;
 		},

@@ -59,7 +59,7 @@ export default {
 				ajaxResponse: (url, params, response) => {
 					return response.data;
 				},
-				persistenceID: 'stv-details-lvtermine',
+				persistenceID: 'stv-details-lvtermine-20260217',
 				columns: [
 					{title: "lv_id", field: "lehrveranstaltung_id", visible: false},
 					{title: "lehreinheit_id", field: "lehreinheit_id", visible: false},

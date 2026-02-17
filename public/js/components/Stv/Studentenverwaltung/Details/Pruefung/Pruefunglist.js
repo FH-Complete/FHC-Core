@@ -55,7 +55,7 @@ export default{
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				index: 'pruefung_id',
-				persistenceID: 'stv-details-pruefung-list-2026012701',
+				persistenceID: 'stv-details-pruefung-list-20260217',
 				persistence: {
 					sort: true,
 					columns: ["width", "visible", "frozen"],

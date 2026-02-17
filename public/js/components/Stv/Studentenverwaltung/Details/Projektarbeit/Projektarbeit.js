@@ -248,7 +248,7 @@ export default {
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektarbeit-2025112401'
+				persistenceID: 'stv-details-projektarbeit-20260217'
 			}
 			return options;
 		}

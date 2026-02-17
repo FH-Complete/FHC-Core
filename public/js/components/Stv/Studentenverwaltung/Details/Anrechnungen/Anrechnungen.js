@@ -53,7 +53,7 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				height: '500',
 				index: 'anrechnung_id',
-				persistenceID: 'stv-details-anrechnungen-2025112401',
+				persistenceID: 'stv-details-anrechnungen-20260217',
 				selectableRows: true,
 				columns: [
 					{title: "anrechnung_id", field: "anrechnung_id", visible: false},

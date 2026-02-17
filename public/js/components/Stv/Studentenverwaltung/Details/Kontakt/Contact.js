@@ -59,7 +59,7 @@ export default {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvContact.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'stv-details-kontakt-contact',
+				persistenceID: 'stv-details-kontakt-contact-20260217',
 				columns:[
 					{title:"Typ", field:"kontakttypbeschreibung"},
 					{title:"Kontakt", field:"kontakt"},

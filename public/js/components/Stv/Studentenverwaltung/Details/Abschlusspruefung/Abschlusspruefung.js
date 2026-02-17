@@ -88,7 +88,7 @@ export default {
 				ajaxRequestFunc: () => this.$api.call(ApiStvAbschlusspruefung.getAbschlusspruefung(this.student.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				index: 'abschlusspruefung_id',
-				persistenceID: 'stv-details-finalexam-2025112401',
+				persistenceID: 'stv-details-finalexam-20260217',
 				columns: [
 					{title: "vorsitz", field: "vorsitz_nachname"},
 					{title: "abschlussbeurteilung", field: "beurteilung_bezeichnung"},

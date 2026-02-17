@@ -249,7 +249,7 @@ export default {
 					this.redraw(true);
 				},
 				index: 'aufnahmetermin_id',
-				persistenceID: 'stv-details-table_admission-dates-2025112401',
+				persistenceID: 'stv-details-table_admission-dates-20260217',
 				columns: [
 					{title: "rt_id", field: "rt_id", visible: false},
 					{title: "rt_person_id", field: "rt_person_id", visible: false},

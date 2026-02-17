@@ -38,7 +38,7 @@ export default {
 				index: 'akte_id',
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
-				persistenceID: 'stv-details-accepted-2026020401',
+				persistenceID: 'stv-details-accepted-20260217',
 				columns: [
 					{title: "akte_id", field: "akte_id", visible: false},
 					{title: "Dokument", field: "bezeichnung"},
