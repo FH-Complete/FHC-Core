@@ -57,7 +57,7 @@ export default {
 				],
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
-				height: 200,
+				height: 150,
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
 				selectableRowsRollingSelection: false, //only allow multiselect with STRG
@@ -206,21 +206,6 @@ export default {
 			this.$emit("sum-updated", this.sumBetragLehrauftraege);
 		},
 	},
-	/*
-			<p v-if="clickedRows.length > 0" >{{$p.t('vertrag', 'text_addLehrauftrag')}}</p>
-
-		<div v-for="item in clickedRows" :key="item.lehreinheit_id" class="row">
-			<div class="col-md-6">
-			  <input
-				class="form-control"
-				type="text"
-				:value="item.type + ' | ' + item.studiensemester_kurzbz + ' | ' + item.bezeichnung + ' ( lehreinheit_id: ' + item.lehreinheit_id + ')'"
-				aria-label="readonly input example"
-				readonly
-			  >
-			</div>
-		</div>
-	 */
 	template: `
 	<div class="core-contracts-unassigned h-50 d-flex flex-column w-100">
 		<p v-if="totalRows > 0">{{$p.t('vertrag', 'text_explainLehrauftrag')}}</p>

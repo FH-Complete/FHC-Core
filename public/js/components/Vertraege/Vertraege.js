@@ -591,22 +591,85 @@ export default {
 		this.getFormattedDate();
 	},
 	/*
-		   <template v-if="arraySelectedContracts.length >= 2" class="container mt-2">
 
-			<div v-for="item in arraySelectedContracts" :key="item.vertrag_id">
-			  <input
-				class="form-control"
-				type="text"
-				:value="item.vertragstyp_bezeichnung + ' | ' + item.bezeichnung + ' | ' + item.status + ' (ID: ' + item.vertrag_id + ')'"
-				aria-label="readonly input example"
-				readonly
-			  >
-			</div>
-		</template>
+						<div class="row mb-3">
+							<form-input
+								type="DatePicker"
+								:label="$p.t('vertrag/datum_vertrag')"
+								name="vertragsdatum"
+								v-model="formData.vertragsdatum"
+								auto-apply
+								:enable-time-picker="false"
+								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
+								:teleport="true"
+								>
+							</form-input>
+						</div>
 
-		{{arraySelectedContracts}} || {{dataPrintHonorar}}
-
-							<button type="button" class="btn btn-secondary mx-1" @click="clearSelection()"><i class="fa fa-trash"></i></button>
+						<div class="row mb-3">
+							<form-input
+								type="text"
+								:label="$p.t('ui/bezeichnung')"
+								name="bezeichnung"
+								v-model="formData.bezeichnung"
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								type="select"
+								:label="$p.t('global/typ')"
+								v-model="formData.vertragstyp_kurzbz"
+								name="vertragstyp_kurzbz"
+								>
+								<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+								<option
+									v-for="entry in listContractTypes"
+									:key="entry.vertragstyp_kurzbz"
+									:value="entry.vertragstyp_kurzbz"
+									>
+									{{entry.bezeichnung}}
+								</option>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								:label="$p.t('ui/betrag')"
+								name="betrag"
+								v-model="formData.betrag"
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3" v-if="!statusNew">
+							<form-input
+								type="text"
+								:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+								name="vertragsstunden"
+								v-model="formData.vertragsstunden"
+								disabled
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3" v-if="!statusNew">
+							<form-input
+								type="text"
+								:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+								name="vertragsstunden_studiensemester_kurzbz"
+								v-model="formData.vertragsstunden_studiensemester_kurzbz"
+								disabled
+								>
+							</form-input>
+						</div>
+						<div class="row mb-3">
+							<form-input
+								type="textarea"
+								:label="$p.t('global/anmerkung')"
+								name="anmerkung"
+								v-model="formData.anmerkung"
+								>
+							</form-input>
+						</div>
 	 */
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
@@ -692,75 +755,82 @@ export default {
 						></list-unassigned>
 					<hr>
 					<core-form ref="contractData">
+
 						<div class="row mb-3">
-							<form-input
-								type="DatePicker"
-								:label="$p.t('vertrag/datum_vertrag')"
-								name="vertragsdatum"
-								v-model="formData.vertragsdatum"
-								auto-apply
-								:enable-time-picker="false"
-								format="dd.MM.yyyy"
-								preview-format="dd.MM.yyyy"
-								:teleport="true"
-								>
-							</form-input>
+							<div :class="statusNew ? 'col-6' : 'col-4'">
+								<form-input
+									type="DatePicker"
+									:label="$p.t('vertrag/datum_vertrag')"
+									name="vertragsdatum"
+									v-model="formData.vertragsdatum"
+									auto-apply
+									:enable-time-picker="false"
+									format="dd.MM.yyyy"
+									preview-format="dd.MM.yyyy"
+									:teleport="true"
+									>
+								</form-input>
+							</div>
+
+							<div :class="statusNew ? 'col-6' : 'col-4'">
+								<form-input
+									type="text"
+									:label="$p.t('ui/bezeichnung')"
+									name="bezeichnung"
+									v-model="formData.bezeichnung"
+									>
+								</form-input>
+							</div>
+							<div class="col-4" v-if="!statusNew">
+								<form-input
+									type="text"
+									:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+									name="vertragsstunden"
+									v-model="formData.vertragsstunden"
+									disabled
+									>
+								</form-input>
+							</div>
 						</div>
 
 						<div class="row mb-3">
-							<form-input
-								type="text"
-								:label="$p.t('ui/bezeichnung')"
-								name="bezeichnung"
-								v-model="formData.bezeichnung"
-								>
-							</form-input>
-						</div>
-						<div class="row mb-3">
-							<form-input
-								type="select"
-								:label="$p.t('global/typ')"
-								v-model="formData.vertragstyp_kurzbz"
-								name="vertragstyp_kurzbz"
-								>
-								<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-								<option
-									v-for="entry in listContractTypes"
-									:key="entry.vertragstyp_kurzbz"
-									:value="entry.vertragstyp_kurzbz"
+							<div :class="statusNew ? 'col-6' : 'col-4'">
+								<form-input
+									type="select"
+									:label="$p.t('global/typ')"
+									v-model="formData.vertragstyp_kurzbz"
+									name="vertragstyp_kurzbz"
 									>
-									{{entry.bezeichnung}}
-								</option>
-							</form-input>
+									<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
+									<option
+										v-for="entry in listContractTypes"
+										:key="entry.vertragstyp_kurzbz"
+										:value="entry.vertragstyp_kurzbz"
+										>
+										{{entry.bezeichnung}}
+									</option>
+								</form-input>
+							</div>
+							<div :class="statusNew ? 'col-6' : 'col-4'">
+								<form-input
+									:label="$p.t('ui/betrag')"
+									name="betrag"
+									v-model="formData.betrag"
+									>
+								</form-input>
+							</div>
+							<div class="col-4" v-if="!statusNew">
+								<form-input
+									type="text"
+									:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
+									name="vertragsstunden_studiensemester_kurzbz"
+									v-model="formData.vertragsstunden_studiensemester_kurzbz"
+									disabled
+									>
+								</form-input>
+							</div>
 						</div>
-						<div class="row mb-3">
-							<form-input
-								:label="$p.t('ui/betrag')"
-								name="betrag"
-								v-model="formData.betrag"
-								>
-							</form-input>
-						</div>
-						<div class="row mb-3" v-if="!statusNew">
-							<form-input
-								type="text"
-								:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-								name="vertragsstunden"
-								v-model="formData.vertragsstunden"
-								disabled
-								>
-							</form-input>
-						</div>
-						<div class="row mb-3" v-if="!statusNew">
-							<form-input
-								type="text"
-								:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-								name="vertragsstunden_studiensemester_kurzbz"
-								v-model="formData.vertragsstunden_studiensemester_kurzbz"
-								disabled
-								>
-							</form-input>
-						</div>
+
 						<div class="row mb-3">
 							<form-input
 								type="textarea"
@@ -770,6 +840,7 @@ export default {
 								>
 							</form-input>
 						</div>
+
 					</core-form>
 
 				<template #footer>
