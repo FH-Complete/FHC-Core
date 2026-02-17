@@ -113,7 +113,7 @@ export default {
 				height: '200',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
-				persistenceID: 'core-contracts-details'
+				persistenceID: 'core-contracts-details-2026021701'
 			},
 			tabulatorEvents: [
 				{

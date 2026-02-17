@@ -140,7 +140,7 @@ export default {
 					columns: true,
 					filter: false //to avoids js errors
 				},
-				persistenceID: 'core-contracts-20260212',
+				persistenceID: 'core-contracts-2026021701',
 			};
 			return options;
 		},

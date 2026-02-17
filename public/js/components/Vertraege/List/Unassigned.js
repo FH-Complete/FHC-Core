@@ -62,7 +62,7 @@ export default {
 				selectableRows: true,
 				selectableRowsRollingSelection: false, //only allow multiselect with STRG
 				index: "lehreinheit_id",
-				persistenceID: 'core-contracts-unassigned'
+				persistenceID: 'core-contracts-unassigned-2026021701'
 			},
 			tabulatorEvents: [
 				{

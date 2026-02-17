@@ -47,7 +47,7 @@ export default {
 					this.endpoint.getStatiOfContract(this.person_id, this.vertrag_id)
 				),
 				ajaxResponse: (url, params, response) => response.data,
-				persistenceID: 'core-contracts-status',
+				persistenceID: 'core-contracts-status-2026021701',
 				columns: [
 					{title: "Status", field: "bezeichnung"},
 					{

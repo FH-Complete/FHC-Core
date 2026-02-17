@@ -63,7 +63,7 @@ export default {
 					{title: "Ids Dienstverträge", field: "ids", visible: true, headerFilter: "input"},
 				],
 				layout: 'fitColumns',
-				persistenceID: 'core-mitarbeiter_20250901-2',
+				persistenceID: 'core-mitarbeiter-2026021701',
 				footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 				selectableRowsRangeMode: 'click',
 				selectableRows: true,
