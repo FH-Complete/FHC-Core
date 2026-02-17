@@ -423,7 +423,8 @@ export const AbgabeStudentDetail = {
 									:clearable="false"
 									:disabled="true"
 									:enable-time-picker="false"
-									:format="formatDate"
+									locale="de"
+									format="dd.MM.yyyy"
 									:text-input="true"
 									auto-apply>
 								</VueDatePicker>

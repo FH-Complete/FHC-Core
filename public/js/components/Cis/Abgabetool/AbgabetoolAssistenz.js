@@ -1189,8 +1189,9 @@ export const AbgabetoolAssistenz = {
 							style="width: 95%;"
 							v-model="serienTermin.datum"
 							:clearable="false"
+							locale="de"
+							format="dd.MM.yyyy"
 							:enable-time-picker="false"
-							:format="formatDate"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>

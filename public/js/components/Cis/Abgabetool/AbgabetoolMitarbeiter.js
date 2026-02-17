@@ -525,7 +525,8 @@ export const AbgabetoolMitarbeiter = {
 							v-model="serienTermin.datum"
 							:clearable="false"
 							:enable-time-picker="false"
-							:format="formatDate"
+							locale="de"
+							format="dd.MM.yyyy"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>

@@ -715,7 +715,8 @@ export const AbgabeMitarbeiterDetail = {
 							v-model="newTermin.datum"
 							:clearable="false"
 							:enable-time-picker="false"
-							:format="formatDate"
+							locale="de"
+							format="dd.MM.yyyy"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -864,7 +865,8 @@ export const AbgabeMitarbeiterDetail = {
 								:clearable="false"
 								:disabled="!termin.allowedToSave"
 								:enable-time-picker="false"
-								:format="formatDate"
+								locale="de"
+								format="dd.MM.yyyy"
 								:text-input="true"
 								auto-apply>
 							</VueDatePicker>
@@ -931,7 +933,9 @@ export const AbgabeMitarbeiterDetail = {
 											v-model="termin.abgabedatum"
 											:clearable="false"
 											:disabled="true"
-											:format="formatDate">
+											locale="de"
+											format="dd.MM.yyyy"
+											>
 										</VueDatePicker>
 									</div>
 

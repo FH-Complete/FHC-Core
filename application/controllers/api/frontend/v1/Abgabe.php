@@ -373,6 +373,8 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		$this->checkPaabgabeDeadline($paabgabe_id);
+		
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 		
 		$zugeordnet = $this->checkZuordnung($projektarbeit_id, getAuthUID());
@@ -443,6 +445,33 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'));
 		}
 
+	}
+	
+	// validate paabgabe deadline against servertime just in case a student spoofs their local clock and thus
+	// unlocks the upload ui
+	private function checkPaabgabeDeadline($paabgabe_id) {
+		$this->load->model('education/Paabgabe_model', 'PaabgabeModel');
+
+		$result = $this->PaabgabeModel->load($paabgabe_id);
+		$paabgabeArr = $this->getDataOrTerminateWithError($result, 'general');
+
+		if (count($paabgabeArr) > 0) {
+			$paabgabe = $paabgabeArr[0];
+		} else {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
+		}
+		
+		$tz = new DateTimeZone('Europe/Berlin');
+		$now = new DateTimeImmutable('now', $tz);
+		$deadline = DateTimeImmutable::createFromFormat(
+			'Y-m-d H:i:s',
+			$paabgabe->datum . ' 23:59:59',
+			$tz
+		);
+		
+		if($now >= $deadline) {
+			$this->terminateWithError($this->p->t('abgabetool', 'c4deadlineExceeded'));
+		}
 	}
 
 	/**
