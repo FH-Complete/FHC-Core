@@ -563,6 +563,24 @@ export const AbgabetoolMitarbeiter = {
 			)).then(res => {
 				if (res.meta.status === "success" && res.data) {
 					this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/serienTerminGespeichert'))
+
+					const oldScrollLeft = this.$refs.abgabeTable?.tabulator.rowManager.scrollLeft
+					const oldScrollTop = this.$refs.abgabeTable?.tabulator.rowManager.scrollTop
+					this.loading = true
+					this.loadProjektarbeiten(this.showAll, () => {
+						this.$refs.abgabeTable?.tabulator.redraw(true)
+						this.$refs.abgabeTable?.tabulator.setSort([]);
+						this.loading = false
+
+						Vue.nextTick(()=> {
+							const table = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+							if(table) {
+								table.scrollLeft = oldScrollLeft;
+								table.scrollTop = oldScrollTop;
+							}
+						})
+						
+					})
 				} else {
 					this.$fhcAlert.alertError(this.$p.t('abgabetool/errorSerienterminSpeichern'))
 				}

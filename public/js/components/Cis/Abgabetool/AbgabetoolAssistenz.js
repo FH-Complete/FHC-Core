@@ -643,21 +643,21 @@ export const AbgabetoolAssistenz = {
 				// reset selection to empty
 				// this.$refs.abgabeTable.tabulator.deselectRow()
 				const table = this.$refs.abgabeTable.tabulator;
-				const scrollX = table.rowManager.element.scrollLeft;
-				const scrollY = table.rowManager.element.scrollTop;
+				const scrollX = table.rowManager.scrollLeft;
+				const scrollY = table.rowManager.scrollTop;
 				
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
 
 				table.setData(mappedData)
 				table.redraw(true)
 
-				
-				requestAnimationFrame(() => {
-					table.rowManager.element.scrollLeft = scrollX;
-					table.rowManager.element.scrollTop = scrollY;
-				});
-				
-				
+				Vue.nextTick(()=> {
+					const table = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+					if(table) {
+						table.scrollLeft = scrollX;
+						table.scrollTop = scrollY;
+					}
+				})
 				
 			}).finally(()=>{
 				this.saving = false
