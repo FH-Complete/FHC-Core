@@ -461,6 +461,9 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool', 'c4projektabgabeNichtGefunden'), 'general');
 		}
 		
+		// in that case any submission date is fine
+		if($paabgabe->fixtermin === false) return;
+		
 		$tz = new DateTimeZone('Europe/Berlin');
 		$now = new DateTimeImmutable('now', $tz);
 		$deadline = DateTimeImmutable::createFromFormat(
@@ -502,6 +505,15 @@ class Abgabe extends FHCAPI_Controller
 		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
 
 
+		$mapFunc = function($projektarbeit) {
+			return $projektarbeit->projektarbeit_id;
+		};
+		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
+
+		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+		$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		
+		
 		forEach($projektarbeiten->retval as $pa) {
 			
 			$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->betreuer_person_id);
@@ -518,6 +530,12 @@ class Abgabe extends FHCAPI_Controller
 			Events::trigger('projektbeurteilung_formular_link', $pa->betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
 			$pa->beurteilungLinkNew = $newLink;
 			$pa->beurteilungLinkOld = $oldLink;
+
+			$filterFunc = function($projektabgabe) use ($pa) {
+				return $projektabgabe->projektarbeit_id == $pa->projektarbeit_id;
+			};
+			
+			$pa->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
 		}
 		
 		

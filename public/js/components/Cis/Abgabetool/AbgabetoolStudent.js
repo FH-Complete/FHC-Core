@@ -155,7 +155,7 @@ export const AbgabetoolStudent = {
 			return qgate1positiv && qgate2positiv
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' });
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' }).endOf('day');
 			const nowInBerlin = luxon.DateTime.now().setZone('Europe/Berlin');
 			return nowInBerlin > deadline;
 		},
@@ -175,8 +175,8 @@ export const AbgabetoolStudent = {
 						// old assumed production logic when qgates are required
 						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
 						
-						// new larifari we want qgates but they are optional fhtw mode
-						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesOptional(pa.abgabetermine)
+						const inTime = termin.fixtermin ? !this.isPastDate(termin.datum) : true
+						termin.allowedToUpload = inTime && this.checkQualityGatesOptional(pa.abgabetermine)
 
 
 						// development purposes
