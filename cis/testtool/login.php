@@ -340,13 +340,26 @@ else
 	}
 }
 
-if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
-	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
-	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
-	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
-	isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
-	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
-	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
+if (
+	(
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+		!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code']) &&
+		!isset($_SESSION['externe_ueberwachung']) && !isset($_SESSION['externe_ueberwachung_verified'])
+	)
+	||
+	(
+		isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+		isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+	||
+	(
+		isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
+		isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+
+)
 {
 	$pruefling = new pruefling();
 
