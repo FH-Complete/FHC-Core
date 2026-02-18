@@ -67,8 +67,15 @@ export default {
 		}
 	},
 	watch: {
-		cleanFilters(n) {
-			this.$emit('change', n);
+		cleanFilters: {
+			//only emit if filteredValue is not empty array
+			handler(newVal) {
+				console.log("emitting clean filters", newVal);
+				if (newVal.length)
+					this.$emit("change", newVal);
+			},
+			deep: true,
+			immediate: false
 		}
 	},
 	methods: {
@@ -77,6 +84,7 @@ export default {
 		},
 		remove(index) {
 			this.filters.splice(index, 1);
+			this.$emit("change", this.filters);
 		},
 		resetFilter(){
 			this.filters = [];
