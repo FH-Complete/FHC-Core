@@ -208,7 +208,6 @@ class Documents extends FHCAPI_Controller
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
 		$result = $this->VorlageModel->load($xsl);
-		$this->addMeta("ress", $result);
 		$vorlage = current($this->getDataOrTerminateWithError($result));
 		if (!$vorlage)
 			show_404();
@@ -251,6 +250,9 @@ class Documents extends FHCAPI_Controller
 					'studiensemester_kurzbz' => $ss,
 					'student_uid' => $akteData['uid']
 				]);
+
+				if (!hasData($result)) $this->terminateWithError($this->p->t("stv", "error_noLehrverbandAssigned"));
+
 				$res = current($this->getDataOrTerminateWithError($result));
 
 				$studiengang_kz = $res->studiengang_kz;

@@ -33,6 +33,10 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 	 */
 	public function run($studiensemester_kurzbz = null, $studiengang_kz = null)
 	{
+		//$a = $this->StudiensemesterModel->getByDate('2026-02-14', '2026-02-16');
+		$a = $this->StudiensemesterModel->getAktOrNextSemester();
+		var_dump(getData($a));
+		die();
 		// get Studiensemester
 		if (isEmptyString($studiensemester_kurzbz)) $studiensemester_kurzbz = $this->_currentStudiensemester;
 
