@@ -139,7 +139,7 @@ function sendSanchoMail($vorlage_kurzbz, $vorlage_data, $to, $subject, $headerIm
 function parseMailContent($vorlage_kurzbz, $vorlage_data)
 {
 	$vorlage = new Vorlage();
-	$vorlage->getAktuelleVorlage('etw', $vorlage_kurzbz);
+	$vorlage->getAktuelleVorlage(FHC_OE_ROOT, $vorlage_kurzbz);
 
 	// If the text and the subject of the template are not empty
 	if (!empty($vorlage->text))

@@ -58,6 +58,9 @@ class LehrauftragAkzeptieren extends Auth_Controller
 			)
 		);
 
+		// Load "cis" config
+		$this->load->config('cis');
+
 		$this->_setAuthUID(); // sets property uid
 
 		$this->setControllerId(); // sets the controller id
@@ -100,7 +103,8 @@ class LehrauftragAkzeptieren extends Auth_Controller
 
 		$view_data = array(
 			'studiensemester_selected' => $studiensemester_kurzbz,
-			'is_external_lector' => $is_external_lector
+			'is_external_lector' => $is_external_lector,
+			'cis_oes_lehrauftraege' => $this->config->item('cis_oes_lehrauftraege')
 		);
 
 		$this->load->view('lehre/lehrauftrag/acceptLehrauftrag.php', $view_data);

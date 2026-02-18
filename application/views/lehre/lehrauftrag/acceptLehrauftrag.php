@@ -188,8 +188,13 @@ $this->load->view(
 						<?php echo $this->p->t('global', 'dokumentePDF'); ?>&nbsp;&nbsp;<i class="fa fa-arrow-down"></i>&nbsp;&nbsp;&nbsp;&nbsp;<span class="caret"></span>
 					</button>
 					<ul id="ul-download-pdf" class="dropdown-menu">
-						<li value="etw"><a class="dropdown-item" href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeFH'); ?></a></li>
-						<li value="lehrgang"><a class="dropdown-item" href="#"><?php echo $this->p->t('global', 'PDFLehrauftraegeLehrgaenge'); ?></a></li>
+						<?php foreach ($cis_oes_lehrauftraege as $oe => $phrase): ?>
+							<li value="<?php echo $oe;?>">
+								<a class="dropdown-item" href="#">
+									<?php echo $this->p->t('global', $phrase); ?>
+								</a>
+							</li>
+						<?php endforeach;?>
 					</ul>
 				</div>
 			</div>

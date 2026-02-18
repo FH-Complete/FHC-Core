@@ -541,23 +541,20 @@ $(function () {
 
     if ($(this).attr("value") != null && $(this).attr("value") != "") {
       var selected = $(this).attr("value");
-
-      if (selected == "etw" || selected == "lehrgang") {
-        window.open(
-          APP_ROOT +
-            "cis/private/pdfExport.php" +
-            "?xml=lehrauftrag_annehmen.xml.php" +
-            "&xsl=Lehrauftrag" +
-            "&xsl_oe_kurzbz=" +
-            selected +
-            "&stg_kz=" +
-            "&uid=" +
-            uid +
-            "&ss=" +
-            studiensemester,
-          "_parent"
-        );
-      }
+      window.open(
+        APP_ROOT +
+          "cis/private/pdfExport.php" +
+          "?xml=lehrauftrag_annehmen.xml.php" +
+          "&xsl=Lehrauftrag" +
+          "&xsl_oe_kurzbz=" +
+          selected +
+          "&stg_kz=" +
+          "&uid=" +
+          uid +
+          "&ss=" +
+          studiensemester,
+        "_parent"
+      );
     }
   });
 

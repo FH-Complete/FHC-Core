@@ -13,3 +13,11 @@ $config['cis_vilesci_index_page'] = 'index.ci.php';
 // Cis CI BaseUrl
 $config['cis_base_url'] = defined('CIS_ROOT') ? CIS_ROOT : APP_ROOT;
 $config['cis_index_page'] = 'cis.php';
+
+// Associative array of OEs allowed to have lehrauftraege
+// Array structure: OE => Name of the phrase that contains the name of the OE
+$config['cis_oes_lehrauftraege'] = array(
+	'etw' => 'PDFLehrauftraegeFH',
+	'lehrgang' => 'PDFLehrauftraegeLehrgaenge'
+);
+

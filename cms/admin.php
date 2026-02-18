@@ -19,7 +19,10 @@
  *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at> and
  *          Karl Burkhart <karl.burkhart@technikum-wien.at>.
  */
+
 session_start();
+
+require_once('../config/global.config.inc.php');
 require_once('../config/cis.config.inc.php');
 require_once('../include/content.class.php');
 require_once('../include/template.class.php');
@@ -64,8 +67,8 @@ if(isset($_POST['NewContent']))
 		if(!isset($template->result[0]))
 			exit('Es ist kein Template vorhanden');
 			
-		if(in_array('etw',$berechtigte_oe))
-			$oe = 'etw';
+		if (in_array(FHC_OE_ROOT, $berechtigte_oe))
+			$oe = FHC_OE_ROOT;
 		else
 			$oe = $berechtigte_oe[0];
 		
@@ -294,8 +297,8 @@ if(!is_null($method))
 			if(!isset($template->result[0]))
 				die('Es ist kein Template vorhanden');
 				
-			if(in_array('etw',$berechtigte_oe))
-				$oe = 'etw';
+			if (in_array(FHC_OE_ROOT, $berechtigte_oe))
+				$oe = FHC_OE_ROOT;
 			else
 				$oe = $berechtigte_oe[0];
 			

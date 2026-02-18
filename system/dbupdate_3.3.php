@@ -5053,7 +5053,7 @@ if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kateg
 					'Anrechnung',
 					'Dokumente zur Anrechnung von Lehrveranstaltungen',
 					'studium',
-					'etw',
+					".$db->db_add_param(FHC_OE_ROOT).",
 					NULL
 			   );";
 		if (!$db->db_query($qry))
@@ -5712,7 +5712,7 @@ if ($result = @$db->db_query("SELECT 1 FROM campus.tbl_dms_kategorie WHERE kateg
 					'International Nachweis',
 					'Nachweis der Internationalisierungsmaßnahmen',
 					'fas',
-					'etw',
+					".$db->db_add_param(FHC_OE_ROOT).",
 					NULL
 			   );";
 		if (!$db->db_query($qry))

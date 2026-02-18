@@ -312,7 +312,7 @@ function drawLehrauftrag($uid)
 	}
 	elseif (!empty($xsl_oe_kurzbz))
 	{
-		if ($xsl_oe_kurzbz == 'etw')
+		if ($xsl_oe_kurzbz == FHC_OE_ROOT)
 		{
 			$qry .= " AND lv_studiengang_kz > 0";
 		}
@@ -446,7 +446,7 @@ function drawLehrauftrag($uid)
 	}
 	elseif (!empty($xsl_oe_kurzbz))
 	{
-		if ($xsl_oe_kurzbz == 'etw')
+		if ($xsl_oe_kurzbz == FHC_OE_ROOT)
 		{
 			$qry .= " AND lv.studiengang_kz > 0";
 		}
