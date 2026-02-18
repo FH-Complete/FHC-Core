@@ -722,9 +722,9 @@ export const AbgabetoolAssistenz = {
 			return str
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' });
-			const nowInBerlin = luxon.DateTime.now().setZone('Europe/Berlin');
-			return nowInBerlin > deadline;
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
+			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
+			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
 			
