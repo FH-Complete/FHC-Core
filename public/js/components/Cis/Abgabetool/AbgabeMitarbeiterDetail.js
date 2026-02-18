@@ -270,48 +270,13 @@ export const AbgabeMitarbeiterDetail = {
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
-		convertDateToIsoString(date) {
-			// 1. Check if it is a Date object AND if the date value is valid (not 'Invalid Date')
-			if (param instanceof Date && !isNaN(param.getTime())) {
-				const year = param.getFullYear();
-				// getMonth() is 0-indexed, so we add 1.
-				const month = param.getMonth() + 1;
-				const day = param.getDate();
-		
-				// Helper to pad single-digit numbers with a leading zero
-				const pad = (num) => String(num).padStart(2, '0');
-		
-				// Return the formatted string: YYYY-MM-DD
-				return `${year}-${pad(month)}-${pad(day)}`;
-			}
-		
-			// If it's not a valid Date, return the original parameter
-			return param;
-		},
-		dateDiffInDays(datumParam){
-			let datum = datumParam
-			if(datumParam instanceof Date && !isNaN(datum.getTime()))
-			{
-				const year = datumParam.getFullYear();
-				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
-				const day = datumParam.getDate();
-				const pad = (num) => String(num).padStart(2, '0');
-				datum = `${year}-${pad(month)}-${pad(day)}`	
-			}
-			
-			const dateToday = luxon.DateTime.now().startOf('day');
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-			const duration = dateDatum.diff(dateToday, 'days');
-			
-			return duration.values.days;
-		},
 		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
+			const zone = 'Europe/Vienna';
+			const today = luxon.DateTime.now().setZone(zone);
+			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
+			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
+			termin.diffindays = datum.diff(today, 'days').days;
+			const isLate = abgabedatum && abgabedatum > datum;
 
 			// GRADE STATUS
 			if (termin.note) {
@@ -396,6 +361,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		formatDate(dateParam) {
+			// unsafe for datepickers, dont use there
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -476,7 +442,6 @@ export const AbgabeMitarbeiterDetail = {
 				termin.kurzbz = ''
 			}
 		}
-			
 	},
 	computed: {
 		getAllowedToCreateNewTermin() {
@@ -626,7 +591,6 @@ export const AbgabeMitarbeiterDetail = {
 			return ''
 		},
 		getProjektarbeitStudent(){
-
 			if(this.projektarbeit?.student) return this.$capitalize(this.$p.t('person/student')) + ': ' + this.projektarbeit.student
 
 			return ''
@@ -671,7 +635,6 @@ export const AbgabeMitarbeiterDetail = {
 			this.form.schlagwoerter_en = newVal.schlagwoerter_en ?? ''
 			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter ?? ''
 			this.form.seitenanzahl = newVal.seitenanzahl ?? 1
-			
 		},
 	},
 	created() {

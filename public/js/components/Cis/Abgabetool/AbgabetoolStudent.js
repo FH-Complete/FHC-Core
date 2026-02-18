@@ -48,30 +48,13 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
-		dateDiffInDays(datumParam) {
-			let datum = datumParam
-			if(datumParam instanceof Date && !isNaN(datum.getTime()))
-			{
-				const year = datumParam.getFullYear();
-				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
-				const day = datumParam.getDate();
-				const pad = (num) => String(num).padStart(2, '0');
-				datum = `${year}-${pad(month)}-${pad(day)}`
-			}
-
-			const dateToday = luxon.DateTime.now().startOf('day');
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-			const duration = dateDatum.diff(dateToday, 'days');
-
-			return duration.values.days;
-		},
 		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
+			const zone = 'Europe/Vienna';
+			const today = luxon.DateTime.now().setZone(zone);
+			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
+			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
+			termin.diffindays = datum.diff(today, 'days').days;
+			const isLate = abgabedatum && abgabedatum > datum;
 
 			// GRADE STATUS
 			if (termin.note) {

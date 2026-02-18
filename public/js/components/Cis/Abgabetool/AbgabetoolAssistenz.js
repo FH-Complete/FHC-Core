@@ -9,15 +9,6 @@ import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 
-// spoofed date testing
-// const todayISO = '2025-08-08'
-// const today = new Date(todayISO)
-// const now = luxon.DateTime.fromISO(todayISO)
-
-// prod code
-const today = new Date()
-const now = luxon.DateTime.now()
-
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
 	components: {
@@ -386,6 +377,8 @@ export const AbgabetoolAssistenz = {
 			
 		},
 		checkAbgabetermineProjektarbeit(projekt) {
+			const now = luxon.DateTime.now()
+			
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
 				
@@ -393,7 +386,7 @@ export const AbgabetoolAssistenz = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = this.getDateStyleClass(termin)
 
-				const date = luxon.DateTime.fromISO(termin.datum)
+				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
 				if (termin.diffMs < 0) {
@@ -770,22 +763,13 @@ export const AbgabetoolAssistenz = {
 
 			this.$refs.modalContainerAbgabeDetail.show()
 		},
-		dateDiffInDays(datum){
-			const dateToday = luxon.DateTime.now().startOf('day');
-
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-
-			const duration = dateDatum.diff(dateToday, 'days');
-
-			return duration.values.days;
-		},
 		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
+			const zone = 'Europe/Vienna';
+			const today = luxon.DateTime.now().setZone(zone);
+			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
+			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
+			termin.diffindays = datum.diff(today, 'days').days;
+			const isLate = abgabedatum && abgabedatum > datum;
 
 			// GRADE STATUS
 			if (termin.note) {

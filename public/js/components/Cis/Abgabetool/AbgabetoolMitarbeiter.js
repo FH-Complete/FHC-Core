@@ -79,7 +79,7 @@ export const AbgabetoolMitarbeiter = {
 				placeholder: Vue.computed(() => this.$p.t('global/noDataAvailable')),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
-				rowHeight: 80,
+				rowHeight: 40,
 				columns: [
 					{
 						formatter: function (cell, formatterParams, onRendered) {
@@ -144,9 +144,14 @@ export const AbgabetoolMitarbeiter = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerart'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 1}
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerart'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))), headerFilter: true, field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))), headerFilter: true, field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false}
 				],
 				persistence: false,
+				persistenceID: 'abgabeTableBetreuer2026-02-18'
 			},
 			abgabeTableEventHandlers: [{
 				event: "tableBuilt",
@@ -182,6 +187,290 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		loadState() {
+			return JSON.parse(localStorage.getItem(this.abgabeTableOptions.persistenceID) || "null");
+		},
+		saveState(table) {
+			// avoid storing state after first restore part happened
+			if(!this.stateRestored) return
+			const rawLayout = table.getColumnLayout();
+			const state = {
+				columns: rawLayout.map(col => ({
+					field: col.field,
+					visible: col.visible,
+					width: col.width,
+				})),
+				sort: table.getSorters().map(s => ({
+					field: s.field,
+					dir: s.dir,
+				})),
+				filters: table.getFilters(),
+				headerFilters: table.getHeaderFilters()
+			};
+
+			localStorage.setItem(this.abgabeTableOptions.persistenceID, JSON.stringify(state));
+		},
+		handleTableBuilt() {
+			const table = this.$refs.abgabeTable.tabulator
+
+			this.tableBuiltResolve()
+
+			table.on("columnMoved", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnResized", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnVisibilityChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("filterChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("headerFilterChanged", () => {
+				this.saveState(table);
+			});
+
+			table.on("dataSorted", () => {
+				this.saveState(table);
+			});
+
+			table.on("columnSorted", () => {
+				this.saveState(table);
+			});
+
+			table.on("sortersChanged", () => {
+				this.saveState(table);
+			});
+
+			const saved = this.loadState();
+
+			table.on("renderComplete", () => {
+				if(!this.stateRestored) {
+
+					if (saved?.columns && !this.colLayoutRestored) {
+						const layout = saved.columns.map(col => ({
+							field: col.field,
+							width: col.width,
+							visible: col.visible,
+							// add more if needed, but keep it simple
+						}));
+
+						table.setColumnLayout(layout);
+
+						this.colLayoutRestored = true;
+					}
+
+					if (saved?.filters && !this.filtersRestored) {
+						this.filtersRestored = true // instantly avoid retriggers
+						table.setFilter(saved.filters);
+					}
+					if (saved?.headerFilters && !this.headerFiltersRestored) {
+						this.headerFiltersRestored = true // instantly avoid retriggers
+						for (let hf of saved.headerFilters) {
+							table.setHeaderFilterValue(hf.field, hf.value);
+						}
+					}
+
+					if (saved?.sort?.length && !this.sortRestored) {
+						this.sortRestored = true;
+
+						setTimeout(() => {
+							const sortList = saved.sort.map(s => {
+								const col = table.columnManager.findColumn(s.field);
+								if (!col) {
+									return null;
+								}
+								return { column: col, dir: s.dir };
+							}).filter(Boolean);
+
+							table.setSort(sortList);
+						}, 100);
+					}
+					this.stateRestored = true
+
+				}
+
+			});
+		},
+		checkQualityGateStatus(projekt) {
+			// TODO: might refine the representation of these states and maybe refactor code a little
+			const qgate1Termine = []
+			const qgate2Termine = []
+
+			projekt.qgate1Status = this.$p.t('abgabetool/c4keinTerminVorhanden')// 'Kein Termin vorhanden'
+			projekt.qgate1StatusRank = 0
+			projekt.qgate2Status = this.$p.t('abgabetool/c4keinTerminVorhanden')
+			projekt.qgate2StatusRank = 0
+
+			projekt.abgabetermine.forEach(termin => {
+				if(termin.paabgabetyp_kurzbz == 'qualgate1') qgate1Termine.push(termin)
+				if(termin.paabgabetyp_kurzbz == 'qualgate2') qgate2Termine.push(termin)
+			})
+
+			// calculate qgateStatusRank and display the highest order status rank of all quality gate termine until one
+			// counts as passed, which is just a positive note no matter if anything has been uploaded
+
+			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
+			qgate1Termine.forEach(qgate => {
+				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
+					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					if(noteOpt.positiv) {
+						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
+						projekt.qgate1StatusRank = 5
+					} else {
+						projekt.qgate1Status = this.$p.t('abgabetool/c4negativBenotet')
+						projekt.qgate1StatusRank = 4
+					}
+				} else if (qgate.note == null && projekt.qgate1StatusRank <= 3) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notYetGraded')
+					projekt.qgate1StatusRank = 3
+				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate1StatusRank <= 2) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notSubmitted')
+					projekt.qgate1StatusRank = 2
+				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate1StatusRank <= 1) {
+					projekt.qgate1Status = this.$p.t('abgabetool/c4notHappenedYet')
+					projekt.qgate1StatusRank = 1
+				}
+			})
+
+			qgate2Termine.forEach(qgate => {
+				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
+					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					if(noteOpt.positiv) {
+						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
+						projekt.qgate2StatusRank = 5
+					} else {
+						projekt.qgate2Status = this.$p.t('abgabetool/c4negativBenotet')
+						projekt.qgate2StatusRank = 4
+					}
+				} else if (qgate.note == null && projekt.qgate2StatusRank <= 3) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notYetGraded')
+					projekt.qgate2StatusRank = 3
+				} else if(qgate.upload_allowed == true && qgate.abgabedatum == null && projekt.qgate2StatusRank <= 2) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notSubmitted')
+					projekt.qgate2StatusRank = 2
+				} else if (qgate.upload_allowed == false && qgate.diffMs <= 0 && projekt.qgate2StatusRank <= 1) {
+					projekt.qgate2Status = this.$p.t('abgabetool/c4notHappenedYet')
+					projekt.qgate2StatusRank = 1
+				}
+			})
+		},
+		checkAbgabetermineProjektarbeit(projekt) {
+			const now = luxon.DateTime.now()
+			// calculate Abgabetermin time diff to now and assign last and next to projekt
+			projekt.abgabetermine.forEach(termin => {
+				
+				// while already looping through each termin, calculate datestyle beforehand
+				termin.dateStyle = this.getDateStyleClass(termin)
+
+				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
+
+				if (termin.diffMs < 0) {
+					if (!projekt.prevTermin ||
+						termin.diffMs > projekt.prevTermin.diffMs // larger (less negative) = closer to now
+					) {
+						projekt.prevTermin = termin;
+					}
+				} else if (termin.diffMs > 0) {
+					if (!projekt.nextTermin ||
+						termin.diffMs < projekt.nextTermin.diffMs // smaller positive = closer to now
+					) {
+						projekt.nextTermin = termin;
+					}
+				}
+			})
+
+			// seperate check for quality gates
+			this.checkQualityGateStatus(projekt)
+		},
+		getDateStyleClass(termin) {
+			const zone = 'Europe/Vienna';
+			const today = luxon.DateTime.now().setZone(zone);
+			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
+			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
+			termin.diffindays = datum.diff(today, 'days').days;
+			const isLate = abgabedatum && abgabedatum > datum;
+
+			// GRADE STATUS
+			if (termin.note) {
+				if (termin.note.positiv) return 'bestanden';
+				return 'nichtbestanden';
+			}
+
+			// ACTION REQUIRED FOR GRADE
+			if (termin.bezeichnung?.benotbar && datum < today) {
+				return 'beurteilungerforderlich';
+			}
+
+			// SUBMISSION STATUS
+			if (termin.upload_allowed) {
+				if (termin.abgabedatum) {
+					return isLate ? 'verspaetet' : 'abgegeben';
+				}
+
+				// no submission yet
+				if (datum < today) return 'verpasst';
+				if (termin.diffindays <= 12) return 'abzugeben';
+				return 'standard';
+			}
+
+			// GENERIC STATUS
+			return datum < today ? 'verpasst' : 'standard';
+		},
+		abgabterminFormatter(cell) {
+			const val = cell.getValue()
+
+			if(val) {
+				let icon = ''
+				switch(val.dateStyle) {
+					case 'verspaetet':
+						icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
+						break
+					case 'verpasst':
+						icon = '<i class="fa-solid fa-calendar-xmark"></i>'
+						break
+					case 'abzugeben':
+						icon = '<i class="fa-solid fa-hourglass-half"></i>'
+						break
+					case 'standard':
+						icon = '<i class="fa-solid fa-clock"></i>'
+						break
+					case 'abgegeben':
+						icon = '<i class="fa-solid fa-paperclip"></i>'
+						break
+					case 'beurteilungerfolderlich':
+						icon = '<i class="fa-solid fa-list-check"></i>'
+						break
+					case 'bestanden':
+						icon = '<i class="fa-solid fa-check"></i>'
+						break
+					case 'nichtbestanden':
+						icon = '<i class="fa-solid fa-circle-exclamation"></i>'
+						break
+				}
+
+				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
+
+				return '<div style="display: flex; height: 100%">' +
+					'<div class=' + val.dateStyle + "-header" + ' style="width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+					icon +
+					'</div>' +
+					'<div style="margin-left: 4px;">' +
+					'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
+					'</div>'+
+					'</div>'
+
+			} else {
+				return ''
+			}
+
+		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
 
@@ -294,9 +583,9 @@ export const AbgabetoolMitarbeiter = {
 			return str
 		},
 		isPastDate(date) {
-			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Berlin' });
-			const nowInBerlin = luxon.DateTime.now().setZone('Europe/Berlin');
-			return nowInBerlin > deadline;
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
+			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
+			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
 			this.loading=true
@@ -381,11 +670,13 @@ export const AbgabetoolMitarbeiter = {
 			return (projekt.typ + projekt.kurzbz)?.toUpperCase()	
 		},
 		setupData(data){
+			
+			
 			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			
 			this.tableData = data[0]?.retval?.map(projekt => {
-
+				this.checkAbgabetermineProjektarbeit(projekt)
 				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
 				return {
@@ -601,6 +892,7 @@ export const AbgabetoolMitarbeiter = {
 				@click:new=openAddSeriesModal
 				:tabulator-options="abgabeTableOptions"  
 				:tabulator-events="abgabeTableEventHandlers"
+				@tableBuilt="handleTableBuilt"
 				tableOnly
 				:sideMenu="false"
 				:useSelectionSpan="false"
