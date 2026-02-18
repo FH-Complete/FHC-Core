@@ -183,7 +183,7 @@ html.fs_huge {
 }
 
 .has-filter .fa-filter {
-	color: var(--bs-success);
+	color: var(--bs-danger);
 }
 .override_filtercmpt_actions_style div.d-flex.align-items-baseline {
 	align-items: end !important;

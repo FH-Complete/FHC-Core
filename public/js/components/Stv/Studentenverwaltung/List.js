@@ -225,7 +225,8 @@ export default {
 			expanded: [],
 			selectedColumnValues: [],
 			tagEndpoint: ApiTag,
-			currentEndpoint: null
+			currentEndpoint: null,
+			headerFilterActive: false
 		}
 	},
 	computed: {
@@ -543,6 +544,10 @@ export default {
 		},
 		resetFilter(){
 			this.$refs.listfilter.resetFilter();
+			this.$refs.table.clearFilters();
+		},
+		handleHeaderFilter(filterActive){
+			this.headerFilterActive = filterActive;
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
@@ -558,7 +563,6 @@ export default {
 			v-draggable:copyLink.capture="selectedDragObject"
 			@dragend="dragCleanup"
 		>
-
 			<core-filter-cmpt
 				ref="table"
 				:description="countsToHTML"
@@ -573,6 +577,7 @@ export default {
 				@click:new="actionNewPrestudent"
 				@table-built="translateTabulator"
 				:useSelectionSpan="false"
+				@headerFilterOn="handleHeaderFilter"
 			>
 
 			<template #actions>
@@ -586,14 +591,14 @@ export default {
 				></core-tag>
 			</template>
 
-			<template #actions v-if="filter.length">
+			<template #actions v-if="filter.length || headerFilterActive">
 			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
-				<p class="text-success mb-0">
+				<p class="text-danger mb-0">
 				  <strong>{{$p.t('filter','filterActive')}}</strong>
 				</p>
 
 				<button
-				  class="btn btn-outline-success sm"
+				  class="btn btn-outline-danger sm"
 				  :title="$p.t('filter/filterDelete')"
 				  @click="resetFilter"
 				>
@@ -605,7 +610,7 @@ export default {
 			<template #filter>
 				<div class="card">
 					<div class="card-body">
-						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length" />
+						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length"/>
 					</div>
 				</div>
 			</template>
