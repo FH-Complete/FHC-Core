@@ -88,6 +88,7 @@ export default {
 		},
 		resetFilter(){
 			this.filters = [];
+			this.$emit("change", this.filters);
 		}
 	},
 	created() {
