@@ -531,6 +531,14 @@ class Abgabe extends FHCAPI_Controller
 			$pa->beurteilungLinkNew = $newLink;
 			$pa->beurteilungLinkOld = $oldLink;
 
+			// has previously been retrieved via getStudentProjektabgaben but is fetched in advance to avoid having to reload abgaben
+			$projektarbeitIsCurrent = false;
+			$returnFunc = function ($result) use (&$projektarbeitIsCurrent) {
+				$projektarbeitIsCurrent = $result;
+			};
+			Events::trigger('projektarbeit_is_current', $pa->projektarbeit_id, $returnFunc);
+			$pa->isCurrent = $projektarbeitIsCurrent;
+			
 			$filterFunc = function($projektabgabe) use ($pa) {
 				return $projektabgabe->projektarbeit_id == $pa->projektarbeit_id;
 			};

@@ -8,6 +8,7 @@ import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
+import { getDateStyleClass} from "./getDateStyleClass.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -381,10 +382,11 @@ export const AbgabetoolAssistenz = {
 			
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
-				
+
+				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 				
 				// while already looping through each termin, calculate datestyle beforehand
-				termin.dateStyle = this.getDateStyleClass(termin)
+				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
 				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
@@ -720,7 +722,6 @@ export const AbgabetoolAssistenz = {
 			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
-			
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
 			if(pa?.abgabetermine?.length) {
@@ -750,9 +751,7 @@ export const AbgabetoolAssistenz = {
 
 				// assistenz are not allowed to delete deadlines with existing submissions
 				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum
-
-				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
-
+				
 			})
 			
 			const vorname = pa.vorname ?? pa.student_vorname
@@ -760,42 +759,7 @@ export const AbgabetoolAssistenz = {
 			pa.student = `${vorname} ${nachname}`
 
 			this.selectedProjektarbeit = pa
-
 			this.$refs.modalContainerAbgabeDetail.show()
-		},
-		getDateStyleClass(termin) {
-			const zone = 'Europe/Vienna';
-			const today = luxon.DateTime.now().setZone(zone);
-			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
-			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
-			termin.diffindays = datum.diff(today, 'days').days;
-			const isLate = abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
 		},
 		openTimeline(val) {
 			const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)
@@ -867,7 +831,7 @@ export const AbgabetoolAssistenz = {
 					case 'abgegeben':
 						icon = '<i class="fa-solid fa-paperclip"></i>'
 						break
-					case 'beurteilungerfolderlich':
+					case 'beurteilungerforderlich':
 						icon = '<i class="fa-solid fa-list-check"></i>'
 						break
 					case 'bestanden':

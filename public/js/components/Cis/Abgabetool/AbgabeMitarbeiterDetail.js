@@ -1,8 +1,8 @@
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import { getDateStyleClass } from "./getDateStyleClass.js";
 
-const today = new Date()
 export const AbgabeMitarbeiterDetail = {
 	name: "AbgabeMitarbeiterDetail",
 	components: {
@@ -125,10 +125,12 @@ export const AbgabeMitarbeiterDetail = {
 					
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
 					if(!existingTerminRes){
+						newTerminRes.dateStyle = getDateStyleClass(newTerminRes, this.notenOptions)
 						this.projektarbeit.abgabetermine.push(newTerminRes)
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
+						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
 					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
@@ -269,40 +271,6 @@ export const AbgabeMitarbeiterDetail = {
 
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
-		},
-		getDateStyleClass(termin) {
-			const zone = 'Europe/Vienna';
-			const today = luxon.DateTime.now().setZone(zone);
-			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
-			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
-			termin.diffindays = datum.diff(today, 'days').days;
-			const isLate = abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -769,20 +737,29 @@ export const AbgabeMitarbeiterDetail = {
 			</div>
 		</div>
 		<Accordion :multiple="true">
-			<template v-for="termin in this.projektarbeit?.abgabetermine">
-				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
+			<template v-for="termin in this.projektarbeit?.abgabetermine" :key="termin.paabgabe_id">
+				<AccordionTab :headerClass="termin.dateStyle + '-header'">
 					<template #header>
 						<div class="d-flex flex-nowrap align-items-center w-100">
 			
 							<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
-								<i v-if="getDateStyleClass(termin) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
+<!--								<i v-if="getDateStyleClass(termin, notenOptions) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>-->
+<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>-->
+								
+								<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
+								<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
+								<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
+								<i v-else-if="termin.dateStyle == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
+								<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
+								<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
+								<i v-else-if="termin.dateStyle == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
+								<i v-else-if="termin.dateStyle == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
 							
 							</div>
 					

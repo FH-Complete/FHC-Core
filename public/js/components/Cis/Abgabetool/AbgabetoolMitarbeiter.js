@@ -4,6 +4,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { getDateStyleClass } from "./getDateStyleClass.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -366,7 +367,7 @@ export const AbgabetoolMitarbeiter = {
 			projekt.abgabetermine.forEach(termin => {
 				
 				// while already looping through each termin, calculate datestyle beforehand
-				termin.dateStyle = this.getDateStyleClass(termin)
+				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
 				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
@@ -389,40 +390,6 @@ export const AbgabetoolMitarbeiter = {
 			// seperate check for quality gates
 			this.checkQualityGateStatus(projekt)
 		},
-		getDateStyleClass(termin) {
-			const zone = 'Europe/Vienna';
-			const today = luxon.DateTime.now().setZone(zone);
-			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
-			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
-			termin.diffindays = datum.diff(today, 'days').days;
-			const isLate = abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
-		},
 		abgabterminFormatter(cell) {
 			const val = cell.getValue()
 
@@ -444,7 +411,7 @@ export const AbgabetoolMitarbeiter = {
 					case 'abgegeben':
 						icon = '<i class="fa-solid fa-paperclip"></i>'
 						break
-					case 'beurteilungerfolderlich':
+					case 'beurteilungerforderlich':
 						icon = '<i class="fa-solid fa-list-check"></i>'
 						break
 					case 'bestanden':
@@ -607,44 +574,57 @@ export const AbgabetoolMitarbeiter = {
 		},
 		setDetailComponent(details){
 			this.loading=true
-			this.loadAbgaben(details).then((res)=> {
-				const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
-				pa.abgabetermine = res.data[0].retval
-				pa.isCurrent = res.data[1]
 
-				let paIsBenotet = false
-				if(pa.note !== undefined && pa.note !== null) {
-					// check if the note is not defined as a non final projektarbeit note
-					const opt = this.notenOptionsNonFinal.find(opt => opt.note)
-					// if thats the case allow further work
-					if(opt) paIsBenotet = false
-					// else the PA is to be considered finished
-					paIsBenotet = true
-				}
+			const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 
-				pa.abgabetermine.forEach(termin => {
-					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
-					termin.file = []
-					
-					// update 08-01-2026: everybody is allowed to do everything in client, critical checks happen at backend level
-					// termin.allowedToSave = true
-					
-					// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
-					termin.allowedToSave = paIsBenotet ? false : true
-					
-					// lektoren are not allowed to delete deadlines with existing submissions
-					termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
-					
-					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
+			let paIsBenotet = false
+			if(pa.note !== undefined && pa.note !== null) {
+				// check if the note is not defined as a non final projektarbeit note
+				const opt = this.notenOptionsNonFinal.find(opt => opt.note)
+				// if thats the case allow further work
+				if(opt) paIsBenotet = false
+				// else the PA is to be considered finished
+				paIsBenotet = true
+			}
 
-				})
-				pa.student_uid = details.student_uid
-				pa.student = `${pa.vorname} ${pa.nachname}`
+			if(pa?.abgabetermine?.length) {
+				this.$api.call(ApiAbgabe.getSignaturStatusForProjektarbeitAbgaben(pa.abgabetermine.map(termin => termin.paabgabe_id), pa.student_uid))
+					.then(res => {
+						if(res.meta.status === 'success') {
+							res.data.forEach(paabgabe => {
+								const termin = pa.abgabetermine.find(abgabe => abgabe.paabgabe_id == paabgabe.paabgabe_id)
+								if(termin && paabgabe.signatur !== undefined) termin.signatur = paabgabe.signatur
+							})
+						}
+					})
+			}
+
+			pa.abgabetermine.forEach(termin => {
+				termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				termin.file = []
 				
-				this.selectedProjektarbeit = pa
-				this.$refs.modalContainerAbgabeDetail.show()
+				// update 08-01-2026: everybody is allowed to do everything in client, critical checks happen at backend level
+				// termin.allowedToSave = true
+				
+				// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
+				termin.allowedToSave = paIsBenotet ? false : true
+				
+				// lektoren are not allowed to delete deadlines with existing submissions
+				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
+				
+				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
+
+			})
 			
-			}).finally(()=>{this.loading = false})
+			pa.student_uid = details.student_uid
+			pa.student = `${pa.vorname} ${pa.nachname}`
+			
+			this.selectedProjektarbeit = pa
+			this.$refs.modalContainerAbgabeDetail.show()
+		
+		
+			this.loading = false
+			
 		},
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()

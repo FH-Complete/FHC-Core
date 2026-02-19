@@ -2,8 +2,8 @@ import AbgabeDetail from "./AbgabeStudentDetail.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { getDateStyleClass} from "./getDateStyleClass.js";
 
-const today = new Date()
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
@@ -48,44 +48,6 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
-		getDateStyleClass(termin) {
-			const zone = 'Europe/Vienna';
-			const today = luxon.DateTime.now().setZone(zone);
-			const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
-			const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
-			termin.diffindays = datum.diff(today, 'days').days;
-			const isLate = abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if(Number.isInteger(termin.note)) {
-					const opt = this.notenOptions.find(opt => opt.note == termin.note)
-					if(opt.positiv) return 'bestanden'
-				}
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
-		},
 		checkQualityGatesStrict(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
@@ -178,7 +140,7 @@ export const AbgabetoolStudent = {
 					
 					
 					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
-					termin.dateStyle = this.getDateStyleClass(termin)
+					termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 				})
 				
 				pa.betreuer = this.buildBetreuer(pa)
@@ -368,7 +330,7 @@ export const AbgabetoolStudent = {
 	</div>
 	
 	<Accordion :multiple="true" :activeIndex="activeTabIndex">
-		<template v-for="projektarbeit in projektarbeiten">
+		<template v-for="projektarbeit in projektarbeiten" :key="projektarbeit.projektarbeit_id">
 			<AccordionTab>
 				
 				<template #header>

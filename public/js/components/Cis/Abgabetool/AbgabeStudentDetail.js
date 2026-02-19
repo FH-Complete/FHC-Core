@@ -344,7 +344,7 @@ export const AbgabeStudentDetail = {
 			</div>
 			
 			<Accordion :multiple="true">
-				<template v-for="termin in this.projektarbeit?.abgabetermine">
+				<template v-for="termin in this.projektarbeit?.abgabetermine" :key="termin.paabgabe_id">
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>
 							<div class="d-flex flex-nowrap align-items-center w-100">
