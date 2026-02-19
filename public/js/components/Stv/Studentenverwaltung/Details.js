@@ -97,6 +97,7 @@ export default {
 				@reload="reloadList"
 				fotoEditable
 			>
+				<template #uid>{{students[0].uid}}</template>
 				<template #titleAlphaTile>PersID</template>
 				<template #valueAlphaTile>{{tile_PersId}}</template>
 				<template #titleBetaTile>MatrNr</template>

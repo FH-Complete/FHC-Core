@@ -269,7 +269,7 @@ export default {
 					  </h5>
 
 				</div>
-				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
+				<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
 					<div class="d-flex py-1">
 						<div class="px-2" style="min-width: 100px;">
 							<slot name="issues"></slot>

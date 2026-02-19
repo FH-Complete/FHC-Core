@@ -66,7 +66,7 @@ export default {
 				persistenceID: 'core-mitarbeiter-2026021701',
 				footerElement: '<div>&sum; <span id="search_count"></span> / <span id="total_count"></span></div>',
 				selectableRowsRangeMode: 'click',
-				selectableRows: true,
+				selectableRows: 1,
 			},
 			tabulatorEvents: [
 				{
