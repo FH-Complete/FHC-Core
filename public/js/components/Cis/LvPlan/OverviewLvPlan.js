@@ -2,6 +2,7 @@ import FormForm from '../../Form/Form.js';
 import FormInput from '../../Form/Input.js';
 
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
+export const DEFAULT_MODE_LVPLAN = 'Week';
 
 export default {
 	name: "OverviewLvPlan",
@@ -115,6 +116,11 @@ export default {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
 				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
 			return this.propsViewData?.focus_date;
+		},
+		currentMode() {
+			if (!this.propsViewData?.mode || !['day', 'week', 'month'].includes(this.propsViewData?.mode.toLowerCase()))
+				return DEFAULT_MODE_LVPLAN;
+			return this.propsViewData?.mode;
 		},
 	},
 	created(){

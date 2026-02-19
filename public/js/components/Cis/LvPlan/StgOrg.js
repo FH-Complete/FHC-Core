@@ -232,12 +232,12 @@ export default {
 			this.formData.verband = this.propsViewData.verband ? this.propsViewData.verband: null;
 			this.formData.gruppe = this.propsViewData.gruppe ? this.propsViewData.gruppe: null;
 
-			//ensure loading dropdown arrays for version propsView (OverviewLvPlan.js)
-			if(!this.listVerband.length)
+			//ensure loading dropdown arrays for version propsView
+			if(!this.listVerband.length && this.formData.sem)
 			{
 				this.loadListVerband();
 			}
-			if(!this.listGroup.length)
+			if(!this.listGroup.length && this.formData.verband)
 			{
 				this.loadListGroup();
 			}
