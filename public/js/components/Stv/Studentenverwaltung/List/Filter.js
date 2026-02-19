@@ -70,7 +70,6 @@ export default {
 		cleanFilters: {
 			//only emit if filteredValue is not empty array
 			handler(newVal) {
-				console.log("emitting clean filters", newVal);
 				if (newVal.length)
 					this.$emit("change", newVal);
 			},
