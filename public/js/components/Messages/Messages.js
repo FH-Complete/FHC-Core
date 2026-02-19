@@ -158,7 +158,7 @@ export default {
 		</form>
 
 		<message-modal
-			v-if="tablebuilt"
+			v-if="tablebuilt || id.length > 1"
 			ref="modalMsg"
 			:type-id="typeId"
 			:id="id"
@@ -172,7 +172,7 @@ export default {
 		<!--in same page-->
 		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
-				v-if="tablebuilt"
+				v-if="tablebuilt || id.length > 1"
 				ref="templateNewDivMessage"
 				:type-id="typeId"
 				:id="id"
