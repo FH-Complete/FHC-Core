@@ -142,11 +142,12 @@ export default {
 			this.$refs['calendar'].resetEventLoader();
 		},
 		loadListSem(){
-			this.listSem = [...Array(this.maxSemester).keys()].map(i => i + 1);
+			if(!this.listSem)
+				this.listSem = [...Array(this.maxSemester).keys()].map(i => i + 1);
 		},
 		loadListVerband(){
 			this.$api
-				.call(ApiLvPlan.getLehrverband(this.formData.stgkz, this.formData.semester, this.formData.verband))
+				.call(ApiLvPlan.getLehrverband(this.formData.stgkz, this.formData.sem, this.formData.verband))
 				.then(result => {
 					const data = result.data;
 					const mappedData = data.map(item => item.verband);
@@ -161,7 +162,7 @@ export default {
 		},
 		loadListGroup(){
 			this.$api
-				.call(ApiLvPlan.getGruppe(this.formData.stgkz, this.formData.semester, this.formData.verband))
+				.call(ApiLvPlan.getGruppe(this.formData.stgkz, this.formData.sem, this.formData.verband))
 				.then(result => {
 					const data = result.data;
 					const mappedData = data.map(item => item.gruppe);
@@ -230,6 +231,16 @@ export default {
 			this.formData.sem = this.propsViewData.sem ? this.propsViewData.sem: null;
 			this.formData.verband = this.propsViewData.verband ? this.propsViewData.verband: null;
 			this.formData.gruppe = this.propsViewData.gruppe ? this.propsViewData.gruppe: null;
+
+			//ensure loading dropdown arrays for version propsView (OverviewLvPlan.js)
+			if(!this.listVerband.length)
+			{
+				this.loadListVerband();
+			}
+			if(!this.listGroup.length)
+			{
+				this.loadListGroup();
+			}
 		}
 	},
 	template: `
