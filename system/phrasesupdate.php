@@ -19128,6 +19128,27 @@ array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'error.opproject_does_not_exists',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es ist kein Openproject Projekt verknüpft.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Openproject project is linked.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+    //*******************	KVP end
+	array(
 		'app' => 'international',
 		'category' => 'international',
 		'phrase' => 'studiensemesterGeplant',
