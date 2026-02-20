@@ -62,12 +62,18 @@ class Studium extends FHCAPI_Controller
 
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
 			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
+
+			//TODO(Manu) check if use Fallback or just comment out all paramschecks?
+			//add Fallback: if no LehrverbandData of actual semester, get Data of previous one
+			if(!hasData($studentLehrverband))
+			{
+				$result= $this->StudiensemesterModel->getPreviousFrom($aktuelles_studiensemester->studiensemester_kurzbz);
+
+				$data = $this->getDataOrTerminateWithError($result);
+				$vorheriges_studiensemester = current($data)->studiensemester_kurzbz;
+				$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $vorheriges_studiensemester]);
+			}
 			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
-			
-/*			//load later if needed to avoid warning
-			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
-			$student_studiengang = $studentLehrverband->studiengang_kz;
-			$student_semester = $studentLehrverband->semester;*/
 
 			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
 			
