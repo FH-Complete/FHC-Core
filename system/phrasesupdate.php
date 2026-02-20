@@ -46393,6 +46393,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4missingSignatureNotification',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgabetool: Fehlende Signatur bei Endupload',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submission tool: Missing signature at final upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// ABGABETOOL PHRASEN END
 	array(
 		'app' => 'core',
