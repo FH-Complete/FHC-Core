@@ -62,12 +62,18 @@ class Studium extends FHCAPI_Controller
 
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
 			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
-			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));
-			
-/*			//load later if needed to avoid warning
-			$student_studiensemester = $studentLehrverband->studiensemester_kurzbz;
-			$student_studiengang = $studentLehrverband->studiengang_kz;
-			$student_semester = $studentLehrverband->semester;*/
+
+			//TODO(Manu) check if use Fallback or just comment out all paramschecks?
+			//add Fallback: if no LehrverbandData of actual semester, get Data of previous one
+			if(!hasData($studentLehrverband))
+			{
+				$result= $this->StudiensemesterModel->getPreviousFrom($aktuelles_studiensemester->studiensemester_kurzbz);
+
+				$data = $this->getDataOrTerminateWithError($result);
+				$vorheriges_studiensemester = current($data)->studiensemester_kurzbz;
+				$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $vorheriges_studiensemester]);
+			}
+			$studentLehrverband = current(getData($studentLehrverband));
 
 			$student_studienplan = $this->getStudienPlanFromPrestudentStatus(getAuthPersonId())->studienplan_id;
 			
@@ -84,7 +90,8 @@ class Studium extends FHCAPI_Controller
 				$parameter_semester = $student_semester;
 			}
 			if(!isset($parameter_studienplan))
-			$parameter_studienplan = $student_studienplan;
+				$parameter_studienplan = $student_studienplan;
+
 		}  
 
 		if(isset($parameter_studiensemester)){
@@ -104,8 +111,7 @@ class Studium extends FHCAPI_Controller
 
 		// fetch studiensemester
 		$allStudienSemester = $this->getDataOrTerminateWithError($this->StudiensemesterModel->load());
-		
-		
+
 		if(isset($parameter_studiensemester) && !empty(array_filter($allStudienSemester, function($studiensemester) use($parameter_studiensemester){
 			return $studiensemester->studiensemester_kurzbz == $parameter_studiensemester->studiensemester_kurzbz;
 		}))){
