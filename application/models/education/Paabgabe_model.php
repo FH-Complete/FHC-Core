@@ -108,4 +108,10 @@ class Paabgabe_model extends DB_Model
 
 		return $this->execQuery($query, [$interval]);
 	}
+	
+	public function loadByIDs($paabgabe_ids) {
+		$qry = "SELECT * FROM campus.tbl_paabgabe WHERE paabgabe_id IN ?";
+		
+		return $this->execReadOnlyQuery($qry, [$paabgabe_ids]);
+	}
 }
