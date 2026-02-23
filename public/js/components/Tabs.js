@@ -33,7 +33,8 @@ export default {
 	data() {
 		return {
 			current: null,
-			tabs: {}
+			tabs: {},
+			count: null
 		}
 	},
 	computed: {
@@ -113,10 +114,12 @@ export default {
 				};
 			}
 
-			if (Array.isArray(config))
+			if (Array.isArray(config)) {
 				config.forEach((item, key) => _addToTabs(key, item));
-			else
+			}
+			else {
 				Object.entries(config).forEach(([key, item]) => _addToTabs(key, item));
+			}
 
 			if (this.current === null || !tabs[this.current]) {
 				if (tabs[this.default])
@@ -128,6 +131,57 @@ export default {
 		},
 		updateSuffix() {
 			this.getTabSuffix(this.currentTab);
+		},
+		removeInvalidCountTabs(){
+			if(this.modelValue.length)
+			{
+				let countIst = this.modelValue.length;
+				const tabsToDelete = [];
+
+				Object.entries(this.config).forEach(([key, item]) => {
+
+					const target = item?.config ? item : item?.value || item;
+
+					// check config for validCountMulti
+					if (target.config?.validCountMulti !== undefined) {
+						let tab;
+						let countSoll;
+						tab = key;
+						countSoll = target.config.validCountMulti;
+
+						//check if tab is existing
+						if (countSoll !== undefined && countSoll == countIst) {
+							//add tab if it was removed before
+							if (tab in this.tabs == false) {
+								const value = Vue.reactive({
+									suffix: '',
+									showSuffix: item.showSuffix || false
+								});
+
+								this.tabs[tab] = {
+									component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
+									title: Vue.computed(() => item.title || tab),
+									config: item.config,
+									tab,
+									value,
+									suffixhelper: item.suffixhelper ?? null
+								};
+							}
+						}
+
+						//add to toDeleteArray if count is not allowed
+						if (countSoll !== undefined && countSoll !== countIst) {
+							tabsToDelete.push(tab);
+						}
+					}
+				});
+
+				// Delete all tabs with count not allowed
+				tabsToDelete.forEach(k => {
+					delete this.tabs[k];
+				});
+
+			}
 		},
 		async getTabSuffix(tab) {
 			if (!tab.value.showSuffix) {
@@ -151,17 +205,21 @@ export default {
 	},
 	mounted() {
 		this.getTabSuffixes();
+		this.removeInvalidCountTabs();
 	},
 	updated() {
 		this.getTabSuffixes();
+		this.removeInvalidCountTabs();
 	},
 	template: `
 	<template v-if="useprimevue">
 
-		<tabview 
+		<tabview
+			class="d-flex flex-column"
 			:scrollable="true"
 			:lazy="true"
 			:activeIndex="calcActiveIndex"
+			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll', style: 'flex: 1 1 auto;'}}"
 			@tab-click="handleTabClick"
 		>
 			<tabpanel

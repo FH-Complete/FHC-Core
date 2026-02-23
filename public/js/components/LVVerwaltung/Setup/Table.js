@@ -324,7 +324,7 @@ export default {
 					{title: this.$p.t('lehre', 'lehreinheit_id'), field: "lehreinheit_id", headerFilter: true, headerFilterFuncParams: {field: 'lehreinheit_id'}, visible: false},
 					{title: this.$p.t('lehre', 'studiensemester'), field: "studiensemester_kurzbz", headerFilter: true, headerFilterFuncParams: {field: 'studiensemester_kurzbz'}, visible: false},
 					{title: this.$p.t('lehre', 'unr'), field: "unr", headerFilter: true, headerFilterFuncParams: {field: 'unr'}, visible: false},
-					{title: this.$p.t('lehre', 'fachbereich'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
+					{title: this.$p.t('lehre', 'organisationseinheit'), field: "fachbereich", headerFilter: true, headerFilterFuncParams: {field: 'fachbereich'}, visible: false},
 					{title: this.$p.t('lehre', 'stundenblockung'), field: "stundenblockung", headerFilter: true, headerFilterFuncParams: {field: 'stundenblockung'}, visible: false},
 					{title: this.$p.t('lehre', 'wochenrhythmus'), field: "wochenrythmus", headerFilter: true, headerFilterFuncParams: {field: 'wochenrythmus'}, visible: false},
 					{title: this.$p.t('lehre', 'startkw'), field: "start_kw", headerFilter: true, headerFilterFuncParams: {field: 'startkw'}, visible: false},
@@ -563,36 +563,54 @@ export default {
 			this.allRows.forEach(row => {
 				if (row.getTreeChildren().length > 0 && row.isTreeExpanded())
 				{
-					this.expanded.push(row.getData().uniqueindex);
+					this.expanded.push(row.getData().lv_bezeichnung);
 				}
 			});
 		},
 		reexpandRows() {
 			this.allRows = this.getAllRows(this.$refs.table.tabulator.getRows());
 
-			const matchingRows = this.allRows.filter(row =>
-				this.expanded.includes(row.getData().uniqueindex)
-			);
+			let lastMatchingRow = null;
 
-			if (matchingRows.length === 0)
-				this.currentTreeLevel = 0;
-
-			matchingRows.forEach((row, index) => {
-				row._row.modules.dataTree.open = true;
-
-				if (index === matchingRows.length - 1)
+			this.allRows.forEach(row => {
+				if (this.expanded.includes(row.getData().lv_bezeichnung))
 				{
-					row.treeExpand();
+					if (row._row.modules.dataTree)
+					{
+						row._row.modules.dataTree.open = true;
+					}
+
+					if (row._row.data._children?.length > 0)
+					{
+						lastMatchingRow = row;
+					}
 				}
 			});
+
+			if (lastMatchingRow)
+			{
+				lastMatchingRow.treeExpand();
+			}
+
+			this.$refs.table.tabulator.redraw();
 		},
 		deleteLehreinheit(row)
 		{
-			let deleteData = {
-				lehreinheit_id: row.getData().lehreinheit_id,
-			}
+			let lehreinheit_id = row.getData().lehreinheit_id;
+
+			let is_selected = this.selectedColumnValues.length > 0 && this.selectedColumnValues.includes(lehreinheit_id);
+
+			let deleteData = is_selected ? {lehreinheit_id: [...new Set(this.selectedColumnValues)]} : {lehreinheit_id: lehreinheit_id};
+
 			return this.$api.call(ApiLehreinheit.delete(deleteData))
 				.then(result => {
+
+					if (result?.data?.errors)
+					{
+						result.data.errors.forEach(error  => {
+							this.$fhcAlert.alertError(error)
+						})
+					}
 					this.reload()
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -624,7 +642,7 @@ export default {
 		},
 		expandTree()
 		{
-			this.currentTreeLevel = (this.currentTreeLevel || 0) + 1;
+			this.currentTreeLevel = (this.currentTreeLevel || 1);
 
 			let lastMatchingRow = null;
 
@@ -645,6 +663,7 @@ export default {
 			if (lastMatchingRow)
 			{
 				lastMatchingRow.treeExpand();
+				this.currentTreeLevel++;
 			}
 			this.$refs.table.tabulator.redraw();
 		},
@@ -663,6 +682,8 @@ export default {
 		@click:new="showLehreinheitModal">
 		
 		<template #actions>
+			<button @click="expandTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'aufklappen')"><i class="fa-solid fa-maximize"></i></button>
+			<button @click="resetTree" class="btn btn-outline-secondary" type="button" :title="$p.t('lehre', 'zuklappen')"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 			<core-tag ref="tagComponent"
 				:endpoint="tagEndpoint"
 				:values="selectedColumnValues"
@@ -671,8 +692,6 @@ export default {
 				@updated="updatedTag"
 				zuordnung_typ="lehreinheit_id"
 			></core-tag>
-			<button @click="expandTree" class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-maximize"></i></button>
-			<button @click="resetTree" class="btn btn-outline-secondary" type="button"><i id="togglegroup" class="fa-solid fa-minimize"></i></button>
 		</template>
 		<template #search>
 			<slot name="filterzuruecksetzen"></slot>

@@ -69,10 +69,10 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitColumns',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 200,
-				persistenceID: 'core-mobility-support'
+				persistenceID: 'core-mobility-support-2025112401'
 			},
 			tabulatorEvents: [
 				{
@@ -156,6 +156,11 @@ export default {
 				else
 				{
 					this.localData.push(newEntry);
+
+					// reload tabulator mit tabulator method
+					if (this.$refs.table?.tabulator) {
+						this.$refs.table.tabulator.replaceData(this.localData);
+					}
 
 					this.$emit('setMobilitySupportToNewMobility', {
 						aufenthaltfoerderung_code: this.formData.aufenthaltfoerderung_code,
