@@ -19088,6 +19088,27 @@ array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'error.opproject_does_not_exists',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es ist kein Openproject Projekt verknüpft.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Openproject project is linked.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+    //*******************	KVP end
+	array(
 		'app' => 'international',
 		'category' => 'international',
 		'phrase' => 'studiensemesterGeplant',
@@ -35028,6 +35049,46 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentByLVATitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheiten der gesamten Lehrveranstaltung - alle LV-Teile',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances of the full course - all teaching units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolliertVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Kontrolliert von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Checked by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
 	//
@@ -45510,18 +45571,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailStudierende',
+		'phrase' => 'c4sendEmailStudierendev2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Studierende schicken',
+				'text' => 'Email an {0} Studierende schicken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to students',
+				'text' => 'Send Email to {0} students',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45530,18 +45591,58 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailBetreuer',
+		'phrase' => 'c4sammelmailStudentBetreff',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Betreuende schicken',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to assessors',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sendEmailBetreuerv2',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Email an {0} Betreuende schicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send Email to {0} assessors',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sammelmailBetreuerBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
 				'description' => '',
 				'insertvon' => 'system'
 			)
