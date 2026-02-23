@@ -13,7 +13,7 @@ function parseFilterExpression(expression)
 
 			andParts.forEach(term => {
 
-				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(\d+(?:[.,]\d+)?)$/);
+				const comparisonMatch = term.match(/^(<=|>=|<|>|=|!=)\s*(-?\d+(?:[.,]\d+)?)$/);
 
 				if (comparisonMatch)
 				{
@@ -146,7 +146,7 @@ export function tagHeaderFilter(headerValue, rowValue, rowData, filterParams)
 	if (Array.isArray(data))
 	{
 		combinedText = data
-			.filter(item => item?.done === false)
+			.filter(item => item?.done !== true)
 			.map(item => `${item?.beschreibung} ${item?.notiz}`)
 			.join(' ');
 	}

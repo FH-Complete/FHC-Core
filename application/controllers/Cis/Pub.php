@@ -14,7 +14,7 @@ class Pub extends Auth_Controller
 	{
 		parent::__construct(
 		    array(
-			'bild' => ['basis/cis:r']
+			'bild' => ['basis/cis:r', 'assistenz:r']
 		    )
 		);
 	}

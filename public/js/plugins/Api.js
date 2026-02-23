@@ -380,7 +380,8 @@ export default {
 			}
 			return result;
 		}
-
+		
+		
 		const fhcApiAxios = axios.create({
 			timeout: 500000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root
@@ -548,6 +549,9 @@ export default {
 				} else {
 					console.error("FhcApi: method not allowed:", method);
 				}
+			},
+			getErrorHandler(config) {
+				return get_error_handler(config);
 			}
 		};
 

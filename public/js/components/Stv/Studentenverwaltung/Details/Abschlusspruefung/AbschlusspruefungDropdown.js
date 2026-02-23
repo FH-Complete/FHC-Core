@@ -102,9 +102,9 @@ export default {
 			uids = !Array.isArray(this.studentUids) ? this.studentUids : this.studentUids.join(";");
 
 			let linkToPdf = this.showDropDownMulti
-				? this.cisRoot +
+				? FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				'content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl=' + xsl + '&uid=' + uids + '&xsl_stg_kz=' + this.stgKz + '&output=' + output
-				: this.cisRoot +
+				: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				'content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl=' + xsl + '&abschlusspruefung_id=' +  this.abschlusspruefung_id + '&uid=' + uids + '&xsl_stg_kz=' + this.stgKz + '&output=' + output;
 
 			this.$emit('linkGenerated', linkToPdf);
