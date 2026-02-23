@@ -1369,4 +1369,27 @@ array (
     ),
   ),
 ),
+array (
+  'app' => 'core',
+  'category' => 'kvp',
+  'phrase' => 'error.opproject_does_not_exists',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Es ist kein Openproject Projekt verknüpft.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'No Openproject project is linked.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
