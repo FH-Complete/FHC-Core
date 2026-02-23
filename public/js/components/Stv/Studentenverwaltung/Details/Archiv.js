@@ -3,18 +3,29 @@ import FormInput from "../../../Form/Input.js";
 import AkteEdit from "./Archiv/Edit.js";
 
 import ApiStvArchiv from '../../../../api/factory/stv/archiv.js';
+import ApiStvDocuments from '../../../../api/factory/stv/documents.js';
+import DocumentDropdown from "../Details/Archiv/DocumentDropdown.js";
+
 
 export default {
 	name: 'Archiv',
 	components: {
 		CoreFilterCmpt,
 		FormInput,
-		AkteEdit
+		AkteEdit,
+		DocumentDropdown
 	},
 	inject: {
 		currentSemester: {
 			from: 'currentSemester'
-		}
+		},
+		/* isBerechtigtDocAndOdt: {
+			from: 'hasPermissionOutputformat',
+			default: false
+		},*/
+		cisRoot: {
+			from: 'cisRoot'
+		},
 	},
 	props: {
 		modelValue: Object,
@@ -64,7 +75,8 @@ export default {
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
 				]
-			}
+			},
+			documentDropdownObject: {}
 		};
 	},
 	computed: {
@@ -184,6 +196,38 @@ export default {
 			];
 
 			return events;
+		},
+		studentUids() {
+			if (this.modelValue.uid)
+			{
+				return [this.modelValue.uid];
+			}
+			return this.modelValue.map(e => e.uid);
+		},
+		studentKzs(){
+			if (this.modelValue.uid)
+			{
+				return [this.modelValue.studiengang_kz];
+			}
+			return this.modelValue.map(e => e.studiengang_kz);
+		},
+		stg_kz(){
+			return this.studentKzs[0];
+		},
+		showAllFormats() {
+			if( this.isBerechtigtDocAndOdt === false
+				|| !Array.isArray(this.isBerechtigtDocAndOdt) )
+			{
+				return false;
+			}
+			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
+			return retval;
+		},
+		showDropDownMulti(){
+			if (this.modelValue.length) {
+				return true;
+			}
+			return false;
 		}
 	},
 	watch: {
@@ -252,14 +296,43 @@ export default {
 		}
 	},
 	created() {
+		this.$api
+			.call(ApiStvArchiv.getArchivVorlagen())
+			.then(result => {
+				this.vorlagenArchiv = result.data;
+				this.selectedVorlage = result.data.filter(o => o.vorlage_kurzbz == 'Zeugnis')[0];
+			})
+			.catch(this.$fhcAlert.handleSystemError);
+
+		if (this.modelValue.length) {
+			const params = {
+				studiensemester_kurzbz: this.currentSemester,
+				studiengang_kz: this.stg_kz
+			};
 			this.$api
-				.call(ApiStvArchiv.getArchivVorlagen())
-				.then(result => {this.vorlagenArchiv = result.data; this.selectedVorlage = result.data.filter(o => o.vorlage_kurzbz == 'Zeugnis')[0];})
+				.call(ApiStvDocuments.getDocumentDropdownMulti(this.studentUids, params))
+				.then(result => {
+					this.documentDropdownObject = result;
+				})
 				.catch(this.$fhcAlert.handleSystemError);
+		} else {
+			const params = {
+				prestudent_id: this.modelValue.prestudent_id,
+				studiensemester_kurzbz: this.currentSemester,
+				studiengang_kz: this.modelValue.studiengang_kz
+			};
+			this.$api
+				.call(ApiStvDocuments.getDocumentDropdown(params))
+				.then(result => {
+					this.documentDropdownObject = result;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 
 	},
 	template: `
 	<div class="stv-details-archiv h-100 d-flex flex-column">
+
 		<core-filter-cmpt
 			ref="table"
 			table-only
@@ -270,6 +343,7 @@ export default {
 			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template #actions>
+
 				<div class="input-group w-auto">
 					<select class="form-select" v-model="selectedVorlage">
 						<option v-for="vorlage in vorlagenArchiv" :key="vorlage.vorlage_kurzbz" :value="vorlage">
@@ -285,6 +359,17 @@ export default {
 						{{ $p.t('stv/archiv_dokument_archivieren') }}
 					</button>
 				</div>
+
+				<document-dropdown
+					v-if="documentDropdownObject.data"
+					:documents="documentDropdownObject.data"
+					:showAllFormats='true'
+					:studentUids="studentUids"
+					:showDropDownMulti="showDropDownMulti"
+					:cisRoot="cisRoot"
+					:stgKz="stg_kz"
+				></document-dropdown>
+
 			</template>
 		</core-filter-cmpt>
 		<akte-edit ref="edit" :config="config" @saved="updateData"></akte-edit>

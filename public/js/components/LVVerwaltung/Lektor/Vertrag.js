@@ -113,23 +113,16 @@ export default{
 		<core-form ref="form">
 			<fieldset class="overflow-hidden" v-if="showVertragsdetails">
 				<legend>  {{$p.t('lehre', 'vertragsdetails')}}  
-						  {{ data === null ? ' – Noch kein Vertrag' : '' }}
-				  </legend>
+						{{ data?.vertrag === null ? ' – ' + $p.t('lehre', 'keinvertrag') : '' }}
+				</legend>
 				<template v-if="data?.vertrag">
-					<div class="row align-items-end mb-3">
-						<form-input 
-							:label="$p.t('lehre', 'vertragsstatus')"
-							type="text"
-							readonly
-							container-class="col-3"
-							v-model="vertragsstatus"
-							:style="{fontWeight: vertragsstatus === 'Geändert' ? 'bold' : 'normal'}"
-							name="vertragsstatus"
-						/>
-						<div class="col-3 d-flex align-items-end">
-							<button 
-								type="button" 
-								class="btn btn-outline-secondary w-100"
+					<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+						<div class="d-flex align-items-center flex-wrap gap-2">
+							<span class="fw-bold">{{ $p.t('lehre', 'vertragsstatus') }}:</span>
+							<span :class="{ 'fw-bold': vertragsstatus === 'Geändert' }">{{ vertragsstatus }}</span>
+							<button
+								type="button"
+								class="btn btn-outline-secondary btn-sm"
 								@click="cancelVertrag"
 								:title="$p.t('lehre', 'cancelvertrag')"
 							>
@@ -137,28 +130,18 @@ export default{
 							</button>
 						</div>
 					</div>
-					{{$p.t('lehre', 'vertragurfassung')}}
-					<div class="row mb-3">
-						<form-input
-							:label="$p.t('lehre', 'semesterstunden')"
-							type="text"
-							container-class="col-3"
-							readonly
-							v-model="data.vertrag.vertragsstunden"
-							name="vertragsstunden"
-							>
-						</form-input>
+					<div class="mb-2 fw-bold text-decoration-underline">
+						{{ $p.t('lehre', 'vertragurfassung') }}
 					</div>
-					<div class="row mb-3">
-						<form-input
-							:label="$p.t('lehre', 'studiensemester')"
-							type="text"
-							container-class="col-3"
-							readonly
-							v-model="data.vertrag.vertragsstunden_studiensemester_kurzbz"
-							name="vertragsstunden_studiensemester_kurzbz"
-							>
-						</form-input>
+					<div class="ps-4">
+						<div class="d-flex mb-2 gap-2">
+							<span class="fw-bold">{{ $p.t('lehre', 'semesterstunden') }}:</span>
+							<span>{{ data.vertrag.vertragsstunden }}</span>
+						</div>
+						<div class="d-flex mb-2 gap-2">
+							<span class="fw-bold">{{ $p.t('lehre', 'studiensemester') }}:</span>
+							<span>{{ data.vertrag.vertragsstunden_studiensemester_kurzbz }}</span>
+						</div>
 					</div>
 				</template>
 			</fieldset>

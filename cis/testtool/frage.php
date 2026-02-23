@@ -45,7 +45,7 @@ if (!$db = new basis_db())
 $PHP_SELF=$_SERVER["PHP_SELF"];
 
 // Start session
-session_start();
+require_once './session_init.php';
 
 // If language is changed by language select menu, reset language variables
 if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
@@ -181,6 +181,12 @@ echo '
 <?php
 if(!isset($_SESSION['pruefling_id']))
 	die($p->t('testtool/bitteZuerstAnmelden'));
+
+if (!empty($_SESSION['externe_ueberwachung']) && isset($_SESSION['externe_ueberwachung_verified'])): ?>
+	<link href="frage.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="frage_externe_ueberwachung.js"></script>
+	<div id="proctoringBlocker" class="proctoring-blocker hidden"></div>
+<?php endif;
 
 $pruefling = new pruefling();
 $pruefling->load($_SESSION['pruefling_id']);
@@ -575,14 +581,14 @@ if($frage->frage_id!='')
 			else
 				$value=$p->t('testtool/blaettern').' &gt;&gt;';
 
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value</a>";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item' style='padding-left: 5px'>$value</a>";
 		}
 		else
 		{
 			if(!$demo)
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
+				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item' style='padding-left: 5px'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
 			}
 		}
 	}
