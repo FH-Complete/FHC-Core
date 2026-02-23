@@ -1657,7 +1657,7 @@ class AntragLib
 
 		$result = $this->_ci->StudierendenantragModel->loadWithStatusWhere($where);
 		if (isError($result))
-		return $result;
+			return $result;
 
 		if (!hasData($result))
 			return error($this->_ci->p->t('studierendenantrag', "error_no_antrag_found", ['id' => $studierendenantrag_id]));
@@ -1709,6 +1709,7 @@ class AntragLib
 		$result->statustyp = $antrag->statustyp;
 		$result->status_insertvon = $antrag->status_insertvon;
 		$result->grund = $antrag->grund;
+		$result->status_grund = $antrag->status_grund;
 		$result->studierendenantrag_id = $antrag->studierendenantrag_id;
 		$result->typ = $antrag->typ;
 		$result->datum = $antrag->datum;
