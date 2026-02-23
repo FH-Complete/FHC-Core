@@ -905,6 +905,13 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('pls.status_kurzbz AS status');
 		$this->PrestudentModel->addSelect('pls.datum AS status_datum');
 		$this->PrestudentModel->addSelect('pls.bestaetigtam AS status_bestaetigung');
+		$this->PrestudentModel->addSelect("
+			CASE
+				WHEN pls.status_kurzbz = 'Interessent'
+				THEN pls.ausbildungssemester
+				ELSE s.semester
+			END AS semester_berechnet
+		");
 		$this->PrestudentModel->addSelect(
 			"(SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=p.person_id AND zustellung LIMIT 1) AS mail_privat",
 			false
