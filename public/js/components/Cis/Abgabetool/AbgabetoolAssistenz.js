@@ -7,6 +7,7 @@ import ApiAbgabe from '../../../api/factory/abgabe.js'
 import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 
 // spoofed date testing
 // const todayISO = '2025-08-08'
@@ -30,6 +31,7 @@ export const AbgabetoolAssistenz = {
 		Inplace: primevue.inplace,
 		Textarea: primevue.textarea,
 		Timeline: primevue.timeline,
+		TieredMenu: primevue.tieredmenu,
 		VueDatePicker,
 		FhcOverlay
 	},
@@ -37,6 +39,7 @@ export const AbgabetoolAssistenz = {
 		return {
 			abgabeTypeOptions: Vue.computed(() => this.abgabeTypeOptions),
 			allowedNotenOptions: Vue.computed(() => this.allowedNotenOptions),
+			notenOptionsNonFinal: Vue.computed(() => this.notenOptionsNonFinal),
 			turnitin_link: Vue.computed(() => this.turnitin_link),
 			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link),
 			abgabetypenBetreuer: Vue.computed(() => this.abgabeTypeOptions)
@@ -77,12 +80,15 @@ export const AbgabetoolAssistenz = {
 			phrasenResolved: false,
 			turnitin_link: null,
 			old_abgabe_beurteilung_link: null,
+			ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT: null,
+			ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER: null,
 			saving: false,
 			loading: false,
 			abgabeTypeOptions: null,
 			notenOptions: null,
 			allowedNotenFilterOptions: null,
 			allowedNotenOptions: null,
+			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
 				datum: new Date(),
 				bezeichnung: {
@@ -221,6 +227,28 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		sammelMailStudent(param) {
+			
+			const emails = this.selectedData
+				.map(row => `${row.student_uid}@${this.domain}`)
+				.join(',');
+			const uniqueRecipients = [...new Set(emails)];
+			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+		},
+		sammelMailBetreuer(param) {
+			
+			const recipientList = [];
+			this.selectedData.forEach(row => {
+				if (row.betreuer_mail) recipientList.push(row.betreuer_mail);
+				if (row.zweitbetreuer_mail) recipientList.push(row.zweitbetreuer_mail);
+			});
+
+			// actually not necessary for email clients but looks better for assistenz if we avoid duplicates here
+			const uniqueRecipients = [...new Set(recipientList)];
+			const subject = this.$p.t('abgabetool/c4sammelmailBetreuerBetreff', [this.selectedStudiengangOption?.bezeichnung]);
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
 
@@ -620,9 +648,8 @@ export const AbgabetoolAssistenz = {
 
 				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
 				
-				this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
 				this.$refs.abgabeTable.tabulator.setData(mappedData)
-				
+				this.$refs.abgabeTable.tabulator.redraw(true)
 			}).finally(()=>{
 				this.saving = false
 			})
@@ -684,7 +711,18 @@ export const AbgabetoolAssistenz = {
 			
 			const pa = this.projektarbeiten.find(projektarbeit => projektarbeit.projektarbeit_id == details.projektarbeit_id)
 
-			// pa.isCurrent = res.data[1]
+			if(pa?.abgabetermine?.length) {
+				this.$api.call(ApiAbgabe.getSignaturStatusForProjektarbeitAbgaben(pa.abgabetermine.map(termin => termin.paabgabe_id), pa.student_uid))
+					.then(res => {
+						if(res.meta.status === 'success') {
+							res.data.forEach(paabgabe => {
+								const termin = pa.abgabetermine.find(abgabe => abgabe.paabgabe_id == paabgabe.paabgabe_id)
+								if(termin && paabgabe.signatur !== undefined) termin.signatur = paabgabe.signatur
+							})
+						}
+					})
+			}
+			
 			const paIsBenotet = pa.note !== null
 			
 			pa.abgabetermine.forEach(termin => {
@@ -856,8 +894,8 @@ export const AbgabetoolAssistenz = {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
-		buildMailToLink(abgabe) {
-			return 'mailto:' + abgabe.student_uid +'@'+ this.domain
+		buildMailToLink(projekt) {
+			return 'mailto:' + projekt.student_uid +'@'+ this.domain
 		},
 		buildPKZ(projekt) {
 			return `${projekt.student_uid} / ${projekt.matrikelnr}`
@@ -928,6 +966,51 @@ export const AbgabetoolAssistenz = {
 			// this.loadProjektarbeiten()
 
 			this.calcMaxTableHeight()
+		},
+		getOptionDisabled(option) {
+			return !option.aktiv
+		},
+	},
+	computed: {
+		emailItems() {
+			const menu = []
+			
+			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT){
+				menu.push({
+					label: this.$p.t('abgabetool/c4sendEmailStudierendev2', [this.uniqueStudentEmailCount]),
+					command: this.sammelMailStudent
+				})
+			}
+			
+			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER) {
+				menu.push({
+					label: this.$p.t('abgabetool/c4sendEmailBetreuerv2', [this.uniqueBetreuerEmailCount]),
+					command: this.sammelMailBetreuer
+				})
+			}
+
+			return menu
+		},
+		uniqueBetreuerEmailCount() {
+			const emails = new Set();
+			
+			this.selectedData.forEach(row => {
+				if (row.betreuer_mail) emails.add(row.betreuer_mail);
+				if (row.zweitbetreuer_mail) emails.add(row.zweitbetreuer_mail);
+			});
+
+			return emails.size;
+		},
+		uniqueStudentEmailCount() {
+			const emails = new Set();
+
+			this.selectedData.forEach(row => {
+				if (row.student_uid) {
+					emails.add(row.student_uid); // actually dont need domain for this
+				}
+			});
+
+			return emails.size;
 		}
 	},
 	watch: {
@@ -976,6 +1059,8 @@ export const AbgabetoolAssistenz = {
 					const res = results[0].value;
 					this.turnitin_link = res.data?.turnitin_link;
 					this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link;
+					this.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT;
+					this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER;
 				}
 
 				// 2. Studiengänge
@@ -1006,6 +1091,10 @@ export const AbgabetoolAssistenz = {
 						this.allowedNotenOptions = this.notenOptions.filter(
 							opt => res.data[1].includes(opt.note)
 						);
+
+						this.notenOptionsNonFinal = this.notenOptions.filter(
+							opt => res.data[2].includes(opt.note)
+						)
 					}
 
 					this.allowedNotenFilterOptions = [
@@ -1090,7 +1179,8 @@ export const AbgabetoolAssistenz = {
 							:style="{'width': '100%'}"
 							v-model="serienTermin.bezeichnung"
 							:options="abgabeTypeOptions"
-							:optionLabel="getOptionLabelAbgabetyp">
+							:optionLabel="getOptionLabelAbgabetyp"
+							:optionDisabled="getOptionDisabled">
 						</Dropdown>
 					</div>
 				</div>
@@ -1293,6 +1383,17 @@ export const AbgabetoolAssistenz = {
 							<div>{{ option.studiensemester_kurzbz }}</div>
 						</template>
 					</Dropdown>
+					
+					<button 
+						v-if="emailItems.length"
+						role="button"
+						@click="evt => $refs.menu.toggle(evt)"
+						class="btn btn-outline-secondary dropdown-toggle"
+						aria-haspopup="true"
+					>
+						<i class="fa fa-envelope"></i>
+					</button>
+					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 				</template>
 			</core-filter-cmpt>
 		</div>
