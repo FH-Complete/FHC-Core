@@ -155,7 +155,7 @@ class externeUeberwachung extends basis_db
 			"examName" => !is_null(trim($reihungstest->anmerkung)) ? ($reihungstest->anmerkung . '_' . $today) : ($reihungstest_id . '_' . $today),
 			"duration" => 1440,
 			"schedule" => false,
-			"trial" => EXTERNE_UEBERWACHUNG_TRIAL_TEST,
+			"trial" => defined('EXTERNE_UEBERWACHUNG_TRIAL_TEST') && EXTERNE_UEBERWACHUNG_TRIAL_TEST,
 			"proctoring" => "offline",
 			"startDate" => $reihungstest->datum . 'T00:00:00Z',
 			"endDate" => $reihungstest->datum . 'T23:59:59Z',
