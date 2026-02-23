@@ -345,6 +345,7 @@ class gebiet extends basis_db
 		}
 
 		//Pruefen ob jede Fragen mindestens 2 Vorschlaege hat
+		//Angepasst am 28.01.2026 auf ein Warning.
 		$qry = "SELECT frage_id, nummer FROM testtool.tbl_frage
 				WHERE (SELECT count(*) as anzahl FROM testtool.tbl_vorschlag WHERE frage_id=tbl_frage.frage_id)<2
 				AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." AND NOT demo;";
@@ -352,7 +353,7 @@ class gebiet extends basis_db
 		{
 			while($row = $this->db_fetch_object())
 			{
-				$this->errormsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) hat weniger als 2 Vorschlaege.\n";
+				$this->warningmsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) hat weniger als 2 Vorschlaege.\n";
 			}
 		}
 
@@ -445,6 +446,52 @@ class gebiet extends basis_db
 			while($row = $this->db_fetch_object())
 			{
 				$this->warningmsg .= "Frage Nummer $row->nummer (ID: $row->frage_id) Sprache $row->sprache hat mehrere gleiche Antworten.\n";
+			}
+		}
+
+		//Pruefen ob es leere Fragen (ohne Text, Bild oder Audio) gibt
+		$qry = "SELECT
+					fr.frage_id,
+					fr.nummer,
+					fs.sprache
+				FROM
+					testtool.tbl_frage fr
+				JOIN testtool.tbl_frage_sprache fs
+						USING (frage_id)
+				WHERE
+					(fs.text IS NULL
+						OR fs.text = '')
+					AND fs.bild IS NULL
+					AND fs.audio IS NULL
+					AND demo = false
+					AND gebiet_id=".$this->db_add_param($gebiet_id, FHC_INTEGER)." 
+					AND EXISTS (
+					SELECT
+						1
+					FROM
+						testtool.tbl_frage fr2
+					JOIN testtool.tbl_frage_sprache fs2
+							USING (frage_id)
+					WHERE
+						fs2.sprache = fs.sprache
+						AND fr2.gebiet_id = fr.gebiet_id
+						AND fr2.frage_id != fr.frage_id
+						AND (
+							(fs2.text IS NOT NULL
+							AND fs2.text != '')
+						OR fs2.bild IS NOT NULL
+						OR fs2.audio IS NOT NULL
+							)
+						AND demo = false
+					)
+				ORDER BY
+					fs.sprache,
+					fr.nummer;";
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$this->warningmsg .= "Frage Nummer $row->nummer (ID: $row->frage_id), Sprache $row->sprache hat keinen Text, Bild oder Audio.\n";
 			}
 		}
 
