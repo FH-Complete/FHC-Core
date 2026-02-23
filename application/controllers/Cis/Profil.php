@@ -55,8 +55,13 @@ class Profil extends Auth_Controller
 	 */
 	public function index()
 	{
+		
+		$this->load->library('ProfilLib');
+		$profil_data = $this->profillib->getView(getAuthUID());
+		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
 		$viewData = array(
-
+			'editable'=>true,
+			'profil_data' => $profil_data,
 		);
 		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilIndex']);
 	}
@@ -68,8 +73,16 @@ class Profil extends Auth_Controller
 	 */
 	public function View($uid)
 	{
-		$viewData = array ('uid' => $uid);
-		
+		$this->load->library('ProfilLib');
+		$profil_data = $this->profillib->getView($uid);
+		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
+		$viewData = array (
+			'uid' => $uid,
+			'profil_data'=>$profil_data,
+		);
+		if($uid == getAuthUID()){
+			$viewData['editable'] = true;
+		}
 		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'profilViewUid']);
 	}
 

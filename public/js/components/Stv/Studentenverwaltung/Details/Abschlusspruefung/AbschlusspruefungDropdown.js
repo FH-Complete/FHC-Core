@@ -1,3 +1,5 @@
+import ApiStvAbschlusspruefung from '../../../../../api/factory/stv/abschlusspruefung.js';
+
 export default {
 	inject: {
 		$reloadList: {
@@ -76,7 +78,8 @@ export default {
 			return labels[documentKey] || documentKey;
 		},
 		checkUidsIfExistingFinalExams(uids) {
-			return this.$fhcApi.factory.stv.abschlusspruefung.checkForExistingExams(uids)
+			return this.$api
+				.call(ApiStvAbschlusspruefung.checkForExistingExams(uids))
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		printDocument(document, lang, format) {
@@ -99,9 +102,9 @@ export default {
 			uids = !Array.isArray(this.studentUids) ? this.studentUids : this.studentUids.join(";");
 
 			let linkToPdf = this.showDropDownMulti
-				? this.cisRoot +
+				? FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				'content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl=' + xsl + '&uid=' + uids + '&xsl_stg_kz=' + this.stgKz + '&output=' + output
-				: this.cisRoot +
+				: FHC_JS_DATA_STORAGE_OBJECT.app_root +
 				'content/pdfExport.php?xml=abschlusspruefung.rdf.php&xsl=' + xsl + '&abschlusspruefung_id=' +  this.abschlusspruefung_id + '&uid=' + uids + '&xsl_stg_kz=' + this.stgKz + '&output=' + output;
 
 			this.$emit('linkGenerated', linkToPdf);

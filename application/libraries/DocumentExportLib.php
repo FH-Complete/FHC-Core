@@ -55,7 +55,7 @@ use SimpleXMLElement as SimpleXMLElement;
  * $doc->create($outputformat);
  * $doc->output(true);
  * $doc->close();
- * 
+ *
  * New:
  * $xml_data = $this->documentexportlib->getDataXML($data);
  * $images = [[
@@ -397,20 +397,24 @@ class DocumentExportLib
 		$vorlage_stg = current(getData($result));
 		foreach ($vorlage_stg as $k => $v)
 			$vorlage->$k = $v;
-		
+
+		if ($sign_user)
+		{
+			$this->addSignToData($xml_data);
+		}
+
 		$result = $this->create($temp_folder, $outputformat, $vorlage, $xml_data, $images);
 		if (isError($result))
 			return $result;
-		
+
 		$temp_filename = getData($result);
 
-		if ($sign_user) {
-			$this->addSignToData($xml_data);
-
+		if ($sign_user)
+		{
 			$result = $this->sign($temp_folder, $temp_filename, $outputformat, $sign_user, $sign_profile);
 			if (isError($result))
 				return $result;
-			
+
 			$temp_filename = getData($result);
 		}
 
@@ -445,6 +449,7 @@ class DocumentExportLib
 		if ($xml_data->firstChild->tagName == 'error')
 			return error($xml_data->firstChild->textContent);
 
+		$styles_xsl = null;
 		// styles.xml erstellen
 		if ($vorlage->style) {
 			$styles_xsl = new DOMDocument();
@@ -461,7 +466,7 @@ class DocumentExportLib
 		// Template holen
 		$vorlage_found = false;
 		$vorlage_filename = $vorlage->vorlage_kurzbz . ($vorlage->mimetype == 'application/vnd.oasis.opendocument.spreadsheet' ? '.ods' : '.odt');
-		
+
 		$aktive_addons = array_filter(array_map('trim', explode(";", ACTIVE_ADDONS)));
 		foreach($aktive_addons as $addon) {
 			$zipfile = DOC_ROOT . 'addons/' . $addon . '/system/vorlage_zip/' . $vorlage_filename;
@@ -652,7 +657,7 @@ class DocumentExportLib
 		foreach ($files as $file)
 			if (is_file($file))
 				unlink($file);
-		
+
 		chdir($source_folder);
 		rmdir($temp_folder);
 	}
@@ -703,12 +708,12 @@ class DocumentExportLib
 	{
 		if ($outputformat)
 			return $outputformat;
-		
+
 		if ($mimetype == 'application/vnd.oasis.opendocument.spreadsheet')
 			return 'ods';
 		if ($mimetype == 'application/vnd.oasis.opendocument.text')
 			return 'odt';
-		
+
 		return 'pdf';
 	}
 }

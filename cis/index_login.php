@@ -22,6 +22,8 @@
  */
 require_once('../config/cis.config.inc.php');
 require_once('../include/functions.inc.php');
+require_once('../include/benutzerberechtigung.class.php');
+require_once('../include/student.class.php');
 
 if(isset($_GET['login']))
 {
@@ -35,7 +37,26 @@ if(isset($_GET['login']))
 
 	if($uid!='')
 	{
-		header('Location: '.APP_ROOT.'cis/index.php');
+		$benutzerberechtigung = new benutzerberechtigung();
+		$benutzerberechtigung->getBerechtigungen($uid);
+		$student = new student();
+		$student->load($uid);
+
+		$redirectToCisneu = (defined('CIS_REDIRECT_TO_CIS4') && (true === CIS_REDIRECT_TO_CIS4));
+		$isBerechtigtCisneu = ($benutzerberechtigung->isBerechtigt('basis/cis') 
+			&& $benutzerberechtigung->isBerechtigt('dashboard/benutzer'));
+		$isValidStudent = $student->checkIfValidStudentUID($uid);
+
+		if( $redirectToCisneu && $isBerechtigtCisneu && $isValidStudent ) 
+		{
+			http_response_code(303);
+			header('Location: ' . APP_ROOT . 'cis.php');
+			exit();
+		}
+		else
+		{
+			header('Location: '.APP_ROOT.'cis/index.php');
+		}
 	}
 }
 

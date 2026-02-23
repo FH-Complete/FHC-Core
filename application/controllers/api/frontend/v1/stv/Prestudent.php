@@ -43,7 +43,7 @@ class Prestudent extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'ui', 'studierendenantrag', 'lehre'
+			'ui', 'studierendenantrag', 'lehre', 'global'
 		]);
 	}
 
@@ -98,11 +98,9 @@ class Prestudent extends FHCAPI_Controller
 			'person_id',
 			'berufstaetigkeit_code',
 			'ausbildungcode',
-			'zgv_code',
 			'zgvort',
 			'zgvdatum',
 			'zgvnation',
-			'zgvmas_code',
 			'zgvmaort',
 			'zgvmadatum',
 			'zgvmanation',
@@ -110,7 +108,6 @@ class Prestudent extends FHCAPI_Controller
 			'bismelden',
 			'anmerkung',
 			'dual',
-			'zgvdoktor_code',
 			'zgvdoktorort',
 			'zgvdoktordatum',
 			'zgvdoktornation',
@@ -125,6 +122,57 @@ class Prestudent extends FHCAPI_Controller
 			'standort_code'
 		];
 
+		// add zgv code fields only if user has permission
+		$this->load->library('PermissionLib');
+		$prestudentres = $this->PrestudentModel->load($prestudent_id);
+		if(!hasData($prestudentres))
+		{
+			$this->terminateWithError($this->p->t('ui', 'error_fieldNotFound', ['field' => 'Prestudent ' . $prestudent_id]));
+		}
+		$prestudent = (getData($prestudentres))[0];
+		$bakkZgvStg = $this->permissionlib->getSTG_isEntitledFor('student/editBakkZgv') ?: array();
+		$makkZgvStg = $this->permissionlib->getSTG_isEntitledFor('student/editMakkZgv') ?: array();
+		$dokZgvStg = $this->permissionlib->getSTG_isEntitledFor('student/editDokZgv') ?: array();
+
+		if(in_array($prestudent->studiengang_kz, $bakkZgvStg)) 
+		{
+			$array_allowed_props_prestudent[] = 'zgv_code';
+		}
+		else if(!is_null($this->input->post('zgv_code')))
+		{
+			$this->terminateWithError(
+				$this->p->t('global', 'zgv')
+				. ' - ' .
+				$this->p->t('ui', 'error_keineBerechtigungStg')
+			);
+		}
+
+		if(in_array($prestudent->studiengang_kz, $makkZgvStg))
+		{
+			$array_allowed_props_prestudent[] = 'zgvmas_code';
+		}
+		else if(!is_null($this->input->post('zgvmas_code')))
+		{
+			$this->terminateWithError(
+				$this->p->t('lehre', 'zgvMaster')
+				. ' - ' .
+				$this->p->t('ui', 'error_keineBerechtigungStg')
+			);
+		}
+
+		if(in_array($prestudent->studiengang_kz, $dokZgvStg))
+		{
+			$array_allowed_props_prestudent[] = 'zgvdoktor_code';
+		}
+		else if(!is_null($this->input->post('zgvdoktor_code')))
+		{
+			$this->terminateWithError(
+				$this->p->t('lehre', 'zgvDoktor')
+				. ' - ' .
+				$this->p->t('ui', 'error_keineBerechtigungStg')
+			);
+		}
+
 		// add UDFs
 		$result = $this->udflib->getDefinitionForModel($this->PrestudentModel);
 
@@ -136,9 +184,31 @@ class Prestudent extends FHCAPI_Controller
 		$update_prestudent = array();
 		foreach ($array_allowed_props_prestudent as $prop)
 		{
-			$val = $this->input->post($prop);
-			if ($val !== null || $prop == 'foerderrelevant') {
+			$val = $this->input->post($prop, true);
+
+			if ($val !== null) {
+				if(in_array($prop, ['dual', 'bismelden', 'foerderrelevant']))
+				{
+					$val = boolval($val);
+				}
+				elseif (
+					$val === ''
+					&& in_array($prop, ['zgvnation', 'zgvmanation', 'zgvdoktornation', 'berufstaetigkeit_code', 'ausbildungcode'])
+				)
+				{
+					$val = null;
+				}
 				$update_prestudent[$prop] = $val;
+			}
+
+			// allowed to be null, but has to be in postparameter
+			if (
+				in_array($prop, ['foerderrelevant', 'zgvdatum', 'zgvmadatum', 'zgvdoktordatum', 'zgv_code', 'zgvmas_code', 'zgvdoktor_code'])
+				&& !isset($update_prestudent[$prop])
+				&& array_key_exists($prop, $_POST)
+			)
+			{
+				$update_prestudent[$prop] = null;
 			}
 		}
 
@@ -174,7 +244,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgv_model', 'ZgvModel');
 
-		$this->ZgvModel->addOrder('zgv_code');
+		$this->ZgvModel->addSelect('zgv_code');
+		$this->ZgvModel->addSelect('zgv_bez');
+		$this->ZgvModel->addSelect('aktiv');
+		$this->ZgvModel->addSelect('zgv_bez as label');
+		$this->ZgvModel->addOrder('zgv_bez');
 
 		$result = $this->ZgvModel->load();
 		if (isError($result))
@@ -188,7 +262,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvdoktor_model', 'ZgvdoktorModel');
 
-		$this->ZgvdoktorModel->addOrder('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_code');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez');
+		$this->ZgvdoktorModel->addSelect('aktiv');
+		$this->ZgvdoktorModel->addSelect('zgvdoktor_bez as label');
+		$this->ZgvdoktorModel->addOrder('zgvdoktor_bez');
 
 		$result = $this->ZgvdoktorModel->load();
 		if (isError($result))
@@ -202,7 +280,11 @@ class Prestudent extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Zgvmaster_model', 'ZgvmasterModel');
 
-		$this->ZgvmasterModel->addOrder('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_code');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez');
+		$this->ZgvmasterModel->addSelect('aktiv');
+		$this->ZgvmasterModel->addSelect('zgvmas_bez as label');
+		$this->ZgvmasterModel->addOrder('zgvmas_bez');
 
 		$result = $this->ZgvmasterModel->load();
 		if (isError($result))

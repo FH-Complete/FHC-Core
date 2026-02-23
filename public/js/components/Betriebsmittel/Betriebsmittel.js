@@ -29,19 +29,25 @@ export default {
 		uid: {
 			type: [Number, String],
 			required: true
-		}
+		},
+		/** List of types to allow for creation */
+		betriebsmittelTypes: {
+			type: Array,
+			default: null
+		},
+		/**
+		 * If true: only show the types specified in 'betriebsmittelTypes'.
+		 * If false: show all available types.
+		 */
+		filterByProvidedTypes: Boolean
 	},
 	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
-				ajaxParams: () => {
-					return {
-						type: this.typeId,
-						id: this.id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
+				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
@@ -141,8 +147,6 @@ export default {
 				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
 				persistenceID: 'core-betriebsmittel'
 			},
 			tabulatorEvents: [
@@ -221,7 +225,9 @@ export default {
 				.then(result => result
 					? betriebsmittelperson_id
 					: Promise.reject({handled: true}))
-				.then(this.endpoint.deleteBetriebsmittel)
+				.then(betriebsmittelperson_id => this.$api.call(
+					this.endpoint.deleteBetriebsmittel(betriebsmittelperson_id))
+				)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					window.scrollTo(0, 0);
@@ -234,8 +240,8 @@ export default {
 			this.formData.uid = this.uid;
 			if (this.formData.betriebsmitteltyp == 'Inventar')
 				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
-			return this.endpoint
-				.addNewBetriebsmittel(this.$refs.betriebsmittelData, this.id, this.formData)
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.addNewBetriebsmittel(this.id, this.formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.betriebsmittelModal.hide();
@@ -248,8 +254,11 @@ export default {
 		updateBetriebsmittel(betriebsmittelperson_id) {
 			if (this.formData.betriebsmitteltyp == 'Inventar')
 				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
-			return this.endpoint
-				.updateBetriebsmittel(this.$refs.betriebsmittelData, betriebsmittelperson_id, this.formData)
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.updateBetriebsmittel(
+					betriebsmittelperson_id,
+					this.formData
+				))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.betriebsmittelModal.hide();
@@ -262,8 +271,8 @@ export default {
 		loadBetriebsmittel(betriebsmittelperson_id) {
 			this.resetModal();
 			this.statusNew = false;
-			return this.endpoint
-				.loadBetriebsmittel(betriebsmittelperson_id)
+			return this.$api
+				.call(this.endpoint.loadBetriebsmittel(betriebsmittelperson_id))
 				.then(result => {
 					this.formData = result.data;
 				})
@@ -271,8 +280,8 @@ export default {
 		},
 		searchInventar(event) {
 			const encodedQuery = encodeURIComponent(event.query);
-			return this.endpoint
-				.loadInventarliste(encodedQuery)
+			return this.$api
+				.call(this.endpoint.loadInventarliste(encodedQuery))
 				.then(result => {
 					this.filteredInventar = result.data;
 				});
@@ -294,8 +303,8 @@ export default {
 		}
 	},
 	created() {
-		return this.endpoint
-			.getTypenBetriebsmittel()
+		return this.$api
+			.call(this.endpoint.getTypenBetriebsmittel(this.betriebsmittelTypes))
 			.then(result => {
 				this.listBetriebsmitteltyp = result.data;
 			})
@@ -310,6 +319,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"
@@ -426,6 +436,7 @@ export default {
 						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -441,6 +452,7 @@ export default {
 						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"

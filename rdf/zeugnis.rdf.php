@@ -35,6 +35,7 @@ require_once('../include/studiengang.class.php');
 require_once('../include/mitarbeiter.class.php');
 require_once('../include/anrechnung.class.php');
 require_once('../include/prestudent.class.php');
+require_once('../include/nation.class.php');
 
 $datum = new datum();
 $db = new basis_db();
@@ -107,7 +108,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					tbl_studiengang.bezeichnung, tbl_studiengang.english, tbl_studentlehrverband.semester,
 					tbl_person.vorname, tbl_person.vornamen, tbl_person.nachname,tbl_person.gebdatum,tbl_person.titelpre,
 					tbl_person.titelpost, tbl_person.anrede, tbl_studiensemester.bezeichnung as sembezeichnung,
-					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id, tbl_studiengang.max_semester
+					tbl_studiensemester.studiensemester_kurzbz as stsem, tbl_student.prestudent_id, tbl_studiengang.max_semester, tbl_person.gebort, tbl_person.geburtsnation, tbl_person.geschlecht
 				FROM tbl_person, tbl_student, tbl_studiengang, tbl_benutzer, tbl_studentlehrverband, tbl_studiensemester
 				WHERE tbl_student.studiengang_kz = tbl_studiengang.studiengang_kz
 				AND tbl_student.student_uid = tbl_benutzer.uid AND tbl_benutzer.person_id = tbl_person.person_id
@@ -187,6 +188,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				else
 					$studiengang_kz = sprintf("%04s", abs($row->studiengang_kz));
 
+
+				$nation = new nation($row->geburtsnation);
+				$geburtsnation = $nation->kurztext;
+
 				$xml .= "		<studiengang_art><![CDATA[".$bezeichnung."]]></studiengang_art>";
 				$xml .= "		<studiengang_kz><![CDATA[".$studiengang_kz."]]></studiengang_kz>";
 				$xml .= "\n		<anrede><![CDATA[".$row->anrede."]]></anrede>";
@@ -195,6 +200,9 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				$xml .= "		<name><![CDATA[".trim($row->titelpre.' '.trim($row->vorname.' '.$row->vornamen).' '.$row->nachname.($row->titelpost!=''?', '.$row->titelpost:''))."]]></name>";
 				$gebdatum = date('d.m.Y',strtotime($row->gebdatum));
 				$xml .= "		<gebdatum><![CDATA[".$gebdatum."]]></gebdatum>";
+				$xml .= "		<gebort><![CDATA[".$row->gebort."]]></gebort>";
+				$xml .= "		<geburtsnation><![CDATA[".$geburtsnation."]]></geburtsnation>";
+				$xml .= "		<geschlecht><![CDATA[".$row->geschlecht."]]></geschlecht>";
 				$xml .= "		<matrikelnr><![CDATA[".trim($row->matrikelnr)."]]></matrikelnr>";
 				$xml .= "		<studiengangsleiter><![CDATA[".$stgl."]]></studiengangsleiter>";
 				$datum_aktuell = date('d.m.Y');
@@ -266,6 +274,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 				//wenn Incoming, sollen am Zeugnis alle Noten gedruckt werden
 				if ($lastPrestudentStatus)
 					$showAllNoten = $prestudent->status_kurzbz === 'Incoming';
+
+				$lastBenotungsdatum = '';
+
+				$dates = array_column($obj->result, 'benotungsdatum');
+				if (!empty($dates))
+				{
+					$lastBenotungsdatum = max($dates);
+					$xml .= "<last_benotungsdatum><![CDATA[".date('d.m.Y', strtotime($lastBenotungsdatum))."]]></last_benotungsdatum>";
+				}
 
 				foreach ($obj->result as $row)
 				{
@@ -390,12 +407,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							}
 						}
 						$xml .= "\n			<unterrichtsfach>";
+						$xml .= "				<benotungsdatum><![CDATA[".date('d.m.Y', strtotime($row->benotungsdatum))."]]></benotungsdatum>";
 						$xml .= "				<bezeichnung><![CDATA[".$bezeichnung."]]></bezeichnung>";
 						$xml .= "				<bezeichnung_englisch><![CDATA[".$bezeichnung_englisch."]]></bezeichnung_englisch>";
 						$xml .= "				<note_positiv><![CDATA[".$row->note_positiv."]]></note_positiv>";
 						$xml .= "				<note><![CDATA[".$note2."]]></note>";
 						$xml .= "				<sws><![CDATA[".($row->semesterstunden==0?'':number_format(sprintf('%.1F',$row->semesterstunden/$wochen),1))."]]></sws>";
 						$xml .= "				<sws_lv><![CDATA[".($row->sws==0?'':number_format(sprintf('%.1F',$row->sws),1))."]]></sws_lv>";
+						$xml .= "				<lv_id><![CDATA[".$row->lehrveranstaltung_id."]]></lv_id>";
+
 						$ectspunkte='';
 
 						$anrechnung = new anrechnung();

@@ -1,4 +1,8 @@
 import EditProfil from "../ProfilModal/EditProfil.js";
+
+import ApiProfil from '../../../../api/factory/profil.js';
+import ApiProfilUpdate from '../../../../api/factory/profilUpdate.js';
+
 //? EditProfil is the modal used to edit the profil updates
 export default {
 	components: {EditProfil},
@@ -52,11 +56,13 @@ export default {
 				};
 
 				const filesFromDatabase =
-					await this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(
-						updateRequest.profil_update_id
-					).then((res) => {
-						return res.data;
-					});
+					await this.$api
+						.call(ApiProfilUpdate.getProfilRequestFiles(
+							updateRequest.profil_update_id
+						))
+						.then((res) => {
+							return res.data;
+						});
 
 				files = filesFromDatabase;
 				if (files) {
@@ -77,11 +83,23 @@ export default {
 
 			if (view === "EditAdresse") {
 
-				const isMitarbeiter = await this.$fhcApi.factory.profil.isMitarbeiter(updateRequest.uid).then((res) => res.data);
+				const isMitarbeiter = await this.$api.call(ApiProfil.isMitarbeiter(updateRequest.uid)).then((res) => res.data);
 
 				if (isMitarbeiter) {
 					content["isMitarbeiter"] = isMitarbeiter;
 				}
+
+				const filesFromDatabase =
+					await this.$api
+						.call(ApiProfilUpdate.getProfilRequestFiles(
+							updateRequest.profil_update_id
+						))
+						.then((res) => {
+							return res.data;
+						});
+
+				files = filesFromDatabase;
+				content["files"] = files;
 			}
 
 			//? adds the status information if the profil update request was rejected or accepted
@@ -106,16 +124,16 @@ export default {
 		},
 
 		deleteRequest: function (item) {
-			this.$fhcApi.factory.profilUpdate.deleteProfilRequest(item.profil_update_id).then(
-				(res) => {
+			this.$api
+				.call(ApiProfilUpdate.deleteProfilRequest(item.profil_update_id))
+				.then((res) => {
 					if (res.data.error) {
 						//? open alert
 						console.error("error happened", res.data);
 					} else {
 						this.$emit("fetchUpdates");
 					}
-				}
-			);
+				});
 		},
 
 		getView: function (topic, status) {
@@ -149,7 +167,7 @@ export default {
 
 	template: /*html*/ `
 <div class="card">
-    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :title="editProfilTitle"></edit-profil>
+    <edit-profil v-if="showUpdateModal" ref="updateEditModal" @hideBsModal="hideEditProfilModal" :value="content" :titel="editProfilTitle"></edit-profil>
     <div class="card-header">{{$p.t('profilUpdate','profilUpdates')}}</div>
     <div class="card-body">
         <div class="table-responsive text-nowrap">
@@ -174,9 +192,9 @@ export default {
                                         <div  class="align-middle text-center"><i role="button" @click="showEditProfilModal(item)" class="fa fa-eye"></i></div>
                                     </template>
                                     <template v-else >
-                                        <div class="align-middle text-center" ><i style="color:#00639c" @click="showEditProfilModal(item)" role="button" class="fa fa-edit"></i></div>
+                                        <div class="align-middle text-center" ><i  @click="showEditProfilModal(item)" role="button" class="fa fa-edit fhc-primary-color"></i></div>
                                     </template>
-                                    <div class="align-middle text-center"><i style="color:red" role="button" @click="deleteRequest(item)" class="fa fa-trash"></i></div>
+                                    <div class="align-middle text-center"><i role="button" @click="deleteRequest(item)" class="text-danger fa fa-trash"></i></div>
                                 </div>
                             </td>
                         </template>          

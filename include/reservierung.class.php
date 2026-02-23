@@ -322,5 +322,37 @@ class reservierung extends basis_db
 		}
 				
 	}
+
+	public function getReservierungen($ort_kurzbz, $datum)
+	{
+		$datum_obj = new Datum();
+		if(!$datum_obj->checkDatum($datum))
+		{
+			$this->errormsg='Datum hat ein ungueltiges Format';
+			return false;
+		}
+
+		$qry = "SELECT stunde FROM campus.tbl_reservierung 
+				WHERE 
+					ort_kurzbz=".$this->db_add_param($ort_kurzbz)." AND 
+					datum=".$this->db_add_param($datum);
+
+
+		if($this->db_query($qry))
+		{
+			$result = array();
+			while($row = $this->db_fetch_object())
+			{
+				$result[] = $row->stunde;
+			}
+		}
+		else
+		{
+			$this->errormsg = "Prüfungstypen konnten nicht geladen werden.";
+			return false;
+		}
+
+		return $result;
+	}
 }
 ?>

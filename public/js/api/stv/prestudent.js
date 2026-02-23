@@ -2,8 +2,13 @@ export default {
 
 //------------- Prestudent.js------------------------------------------------------
 
-	get(prestudent_id){
-		return 	this.$fhcApi.post('api/frontend/v1/stv/prestudent/get/' + prestudent_id);
+	get(prestudent_id, studiensemester_kurzbz) {
+		return 	this.$fhcApi.post(
+			'api/frontend/v1/stv/prestudent/get/'
+			+ encodeURIComponent(prestudent_id)
+			+ '/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			);
 	},
 	updatePrestudent(form, prestudent_id, data){
 		return this.$fhcApi.post(form, 'api/frontend/v1/stv/prestudent/updatePrestudent/' + prestudent_id,

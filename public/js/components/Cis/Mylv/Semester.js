@@ -22,7 +22,8 @@ export default {
 					lv.studiengang_kz + '#' + lv.semester, 
 					{
 						studiengang_kz: lv.studiengang_kz, 
-						bezeichnung: lv.sg_bezeichnung, 
+						bezeichnung: lv.sg_bezeichnung,
+						sg_bezeichnung_eng: lv.sg_bezeichnung_eng,
 						kuerzel: lv.studiengang_kuerzel, 
 						semester: lv.semester
 					}

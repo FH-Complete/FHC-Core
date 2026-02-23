@@ -5,6 +5,7 @@ import NotenRepeater from './Noten/Repeater.js';
 const LOCAL_STORAGE_ID = 'stv_details_noten_2024-11-25_stdsem_all';
 
 export default {
+	name: "TabGrades",
 	components: {
 		NotenZeugnis,
 		NotenTeacher,

@@ -20,7 +20,7 @@
 				'ui' => array('bitteEintragWaehlen')
 			),
 			'customCSSs' => array('public/css/sbadmin2/tablesort_bootstrap.css', 'public/css/infocenter/infocenterPersonDataset.css'),
-			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/infocenterPersonDataset.js')
+			'customJSs' => array('public/js/bootstrapper.js', 'public/js/infocenter/rueckstellung.js', 'public/js/infocenter/infocenterPersonDataset.js')
 		)
 	);
 ?>
