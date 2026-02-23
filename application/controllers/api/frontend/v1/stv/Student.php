@@ -136,14 +136,9 @@ class Student extends FHCAPI_Controller
 			);
 		}
 		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
+			"public.get_rolle_prestudent(public.tbl_prestudent.prestudent_id, "
+				. $this->PrestudentModel->escape($studiensemester_kurzbz)
+				. ")  AS statusofsemester"
 		);
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
@@ -321,6 +316,10 @@ class Student extends FHCAPI_Controller
 		foreach ($array_allowed_props_benutzer as $prop) {
 			$val = $this->input->post($prop);
 			if ($val !== null) {
+				if($prop === 'alias' && $val === '')
+				{
+					$val = null;
+				}
 				$update_benutzer[$prop] = $val;
 			}
 		}
