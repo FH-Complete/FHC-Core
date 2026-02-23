@@ -197,11 +197,14 @@ else if (isset($_SESSION['pruefling_id']))
 		)
 
 
-		SELECT DISTINCT ON
+		SELECT * 
+		FROM 
+		(SELECT DISTINCT ON
 			(gebiet_id, semester, reihung)
 			semester,
 			gebiet_id,
 			STRING_AGG(studiengang_kz::TEXT, ', ' ORDER BY studiengang_kz) AS studiengang_kz_list,
+			MIN(studiengang_kz) AS sort_stg,
 			bezeichnung,
 			MIN(reihung) AS reihung,
 			". $bezeichnung_mehrsprachig_sel. "
@@ -273,6 +276,11 @@ else if (isset($_SESSION['pruefling_id']))
 
 		ORDER BY
 			semester,
+			reihung,
+			gebiet_id) tmp3
+		ORDER BY
+			semester,
+			sort_stg,
 			reihung,
 			gebiet_id
 		";
