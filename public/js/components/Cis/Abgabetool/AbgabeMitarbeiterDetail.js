@@ -21,6 +21,7 @@ export const AbgabeMitarbeiterDetail = {
 		'abgabeTypeOptions',
 		'abgabetypenBetreuer',
 		'allowedNotenOptions',
+		'notenOptionsNonFinal',
 		'turnitin_link',
 		'old_abgabe_beurteilung_link'
 	],
@@ -48,7 +49,7 @@ export const AbgabeMitarbeiterDetail = {
 				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
 				icon: "fa fa-plus",
 				command: this.openCreateNewAbgabeModal,
-				disabled: Vue.computed(() => this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter')
+				disabled: Vue.computed(() => !this.getAllowedToCreateNewTermin)
 			},
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
@@ -478,6 +479,21 @@ export const AbgabeMitarbeiterDetail = {
 			
 	},
 	computed: {
+		getAllowedToCreateNewTermin() {
+			if(this.assistenzMode) return true
+			if(this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter') return false
+			if(this.projektarbeit?.note !== undefined && this.projektarbeit.note !== null) {
+				// check if the note is not defined as a non final projektarbeit note
+				const opt = this.notenOptionsNonFinal.find(opt => opt.note)
+				// if thats the case allow further work
+				if(opt) return true
+				// else the PA is to be considered finished
+				return false
+			}
+			
+			// normally should be allowed if no rules apply
+			return true
+		},
 		allowedToSaveZusatzdaten() {
 				return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter_en.length > 0 && this.form.abstract.length > 0 && this.form.abstract_en.length > 0 && this.form.seitenanzahl > 0
 		},
@@ -627,6 +643,24 @@ export const AbgabeMitarbeiterDetail = {
 		'projektarbeit'(newVal) {
 			// set invertedFixtermin field for UI/UX purposes -> avoid double negation in text
 			
+			// reset newTermin object
+			const typ = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
+			this.newTermin = {
+				'paabgabe_id': -1,
+				'projektarbeit_id': newVal.projektarbeit_id,
+				'fixtermin': false,
+				'invertedFixtermin': true,
+				'kurzbz': '',
+				'datum': new Date().toISOString().split('T')[0],
+				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
+				'beurteilungsnotiz': '',
+				'upload_allowed': typ.upload_allowed_default,
+				'paabgabetyp_kurzbz': '',
+				'bezeichnung': typ,
+				'abgabedatum': null,
+				'insertvon': this.viewData?.uid ?? ''
+			}
+			
 			newVal?.abgabetermine?.forEach(termin => termin.invertedFixtermin = !termin.fixtermin)
 			
 			// default select german if projektarbeit sprache was null
@@ -695,6 +729,7 @@ export const AbgabeMitarbeiterDetail = {
 							v-model="newTermin.bezeichnung"
 							:options="getAllowedAbgabeTypeOptions"
 							:optionLabel="getOptionLabelAbgabetyp"
+							:optionDisabled="getOptionDisabled"
 							scrollHeight="300px">
 						</Dropdown>
 					</div>
@@ -755,9 +790,8 @@ export const AbgabeMitarbeiterDetail = {
 		</div>
 		<div class="row" style="margin-bottom: 12px;">
 			<div class="col-auto">
-<!--				TODO: tooltip why this button is disabled as zweitbegutachter-->
-<!--				TODO: fix bug where this button is sometimes correctly disabled, sometimes just wrong when betreuer is both first and second assesor-->
-				<button type="button" :disabled="projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter'" class="btn btn-primary" @click="openCreateNewAbgabeModal">
+<!--				TODO: tooltip why this button is disabled-->
+				<button type="button" :disabled="!getAllowedToCreateNewTermin" class="btn btn-primary" @click="openCreateNewAbgabeModal">
 					<i class="fa-solid fa-plus"></i>
 					{{$capitalize( $p.t('abgabetool/c4newAbgabetermin') )}}
 				</button>
