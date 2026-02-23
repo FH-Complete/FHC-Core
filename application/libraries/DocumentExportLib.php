@@ -413,8 +413,6 @@ class DocumentExportLib
 					return error($this->_ci->DocumentExportPhrases->t('document_export', 'error_conv_timeout'));
 				break;
 			case 'odt':
-			//~ default:
-				//~ $temp_filename = $tempname_zip;
 		}
 
 		return success($temp_filename);
