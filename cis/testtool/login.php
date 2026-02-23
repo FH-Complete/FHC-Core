@@ -340,13 +340,26 @@ else
 	}
 }
 
-if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
-	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
-	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
-	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
-	isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
-	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
-	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
+if (
+	(
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+		!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code']) &&
+		!isset($_SESSION['externe_ueberwachung']) && !isset($_SESSION['externe_ueberwachung_verified'])
+	)
+	||
+	(
+		isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+		isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+	||
+	(
+		isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
+		isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+
+)
 {
 	$pruefling = new pruefling();
 
@@ -665,10 +678,11 @@ elseif (isset($prestudent_id))
 	else
 	{
 		// Letzten Status für des Prestudenten einholen
-		$ps_master = new Prestudent();
+		$ps_master = new Prestudent($prestudent_id);
 		$ps_master->getLastStatus($prestudent_id);
 		$sto = new Studienordnung();
 		$sto->getStudienordnungFromStudienplan($ps_master->studienplan_id);
+		$stg = new Studiengang($ps_master->studiengang_kz);
 		// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
 		$stg_name = $sto->studiengangbezeichnung;
 		$stg_name_eng = $sto->studiengangbezeichnung_englisch;
@@ -731,7 +745,7 @@ else // LOGIN Site (vor Login)
 			echo '<script>
 				function changeconfirmation()
 				{
-					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked;
+					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked || !document.getElementById("dsgvoconfirm").checked || !document.getElementById("procotoringconfirm").checked;
 				}
 				</script>';
 			echo '<div class="row text-center">
@@ -740,6 +754,12 @@ else // LOGIN Site (vor Login)
 			<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
 			<input id="confirmationCheckbox" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
 			'.$p->t('testtool/confirmationText').'
+			<br><br>
+			<input id="dsgvoconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/dsgvoConfirmText').'
+			<br><br>
+			<input id="procotoringconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/procotoringConfirmText').'
 			<br><br>
 			<button id="confirmationSubmit" type="submit" class="btn btn-primary" disabled/>
 				'.$p->t('testtool/start').'
