@@ -14,10 +14,6 @@ export default {
 		}
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: {
 			type: String,
 			required: true,
@@ -31,7 +27,7 @@ export default {
 			}
 		},
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		showTable: Boolean,
@@ -60,11 +56,15 @@ export default {
 	},
 	data() {
 		return {
+			tablebuilt: false,
 			isVisibleDiv: false,
 			messageId: null
 		}
 	},
 	methods: {
+		getControllerUrl() {
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/NeueNachricht';
+		},
 		reloadTable(){
 			this.$refs.templateTableMessage.reload();
 		},
@@ -77,60 +77,92 @@ export default {
 				this.openInNewTab(id, typeId, messageId);
 			}
 			else if (this.openMode == "modal"){
+				if(!messageId)
+					this.$refs.modalMsg.resetForm();
 				this.$refs.modalMsg.show();
 			}
 			else if (this.openMode == "inSamePage"){
+				console.log("in same Page");
 				this.isVisibleDiv = true;
+				if(messageId)
+					this.$refs.templateNewDivMessage.loadReplyData(messageId);
+				else
+					this.$refs.templateNewDivMessage.resetForm();
+
+				this.$refs.templateNewDivMessage.showTemplate();
 			}
 			else
 				console.log("no valid openMode");
 		},
-		openInNewTab(id, typeId, messageId= null){
+		openInNewTab(id, typeId, messageId=null){
+			if(id.length > 1)
+			{
+				this.$refs['newMsgForm'].submit();
+				return;
+			}
 
-			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+			let path = this.getControllerUrl();
 
 			if (messageId){
-				path += "/NeueNachricht/" + id + "/" + typeId + "/" + messageId;
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId) + "/" + encodeURIComponent(messageId);
 			}
 
 			else {
-				path += "/NeueNachricht/" + id + "/" + typeId;
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId);
 			}
 
 			const newTab = window.open(path, "_blank");
 		},
 		openInNewWindow(id, typeId, messageId){
-			let path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-			if (messageId){
-				path += "/NeueNachricht/" + id + "/" + typeId + "/" + messageId;
-			}
-
-			else {
-				path += "/NeueNachricht/" + id + "/" + typeId;
-			}
-
 			const width = Math.round(window.innerWidth * 0.75);
 			const height = Math.round(window.innerHeight * 0.75);
 			const left = Math.round((window.innerWidth - width) / 2);
 			const top = Math.round((window.innerHeight - height) / 2);
 
+				if(id.length > 1)
+			{
+				const newWindow = window.open('', "NewMsgWindow", `width=${width},height=${height},left=${left},top=${top}`);
+				this.$refs['newMsgForm'].submit();
+				return;
+			}
+
+			let path = this.getControllerUrl();
+
+			if (messageId){
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId) + "/" + encodeURIComponent(messageId);
+			}
+
+			else {
+				path += "/" + encodeURIComponent(id) + "/" + encodeURIComponent(typeId);
+			}
+
 			const newWindow = window.open(path, "_blank", `width=${width},height=${height},left=${left},top=${top}`);
 		},
 		resetMessageId(){
 			this.messageId = null;
+		},
+		tableBuilt: function() {
+			this.tablebuilt = true;
 		}
-
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
+		<!-- TODO(bh) set target _self for debugging post but _blank for newTab -->
+		<form ref="newMsgForm"
+			method="post"
+			:action="getControllerUrl()"
+			:target="(openMode === 'window') ? 'NewMsgWindow' : '_blank'"
+		>
+			<input type="hidden" name="typeid" :value="typeId">
+			<input type="hidden" name="ids" :value="id">
+		</form>
 
 		<message-modal
+			v-if="tablebuilt || id.length > 1"
 			ref="modalMsg"
 			:type-id="typeId"
 			:id="id"
 			:message-id="messageId"
-			:endpoint="endpoint"
 			:openMode="openMode"
 			@reloadTable="reloadTable"
 			@resetMessageId="resetMessageId"
@@ -140,28 +172,27 @@ export default {
 		<!--in same page-->
 		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
-				ref="templateNewMessage"
-				:temp-type-id="typeId"
-				:temp-id="id"
-				:temp-message-id="messageId"
-				:endpoint="endpoint"
+				v-if="tablebuilt || id.length > 1"
+				ref="templateNewDivMessage"
+				:type-id="typeId"
+				:id="id"
+				:message-id="messageId"
 				:openMode="openMode"
 				@reloadTable="reloadTable"
 			>
 			</form-only>
 		</div>
-
-		
-		<div v-if="showTable">
+	
+		<div v-if="showTable && id.length==1">
 			<table-messages
 				ref="templateTableMessage"
 				:type-id="typeId"
 				:id="id"
-				:endpoint="endpoint"
 				:messageLayout="messageLayout"
 				:openMode="openMode"
 				@newMessage="handleMessage"		
 				@replyToMessage="handleMessage"
+				@tabulator_tablebuilt="tableBuilt"
 			>		
 			</table-messages>
 		</div>

@@ -192,7 +192,15 @@ export default {
 							<option value="textLong_plageat">{{$p.t('studierendenantrag', 'dropdown_plageat')}}
 							</option>					
 							<option value="textLong_MissingZgv">{{$p.t('studierendenantrag', 'dropdown_MissingZgv')}}
-							</option>	
+							</option>
+							<option value="textLong_Studienwechsel">{{$p.t('studierendenantrag', 'dropdown_Studienwechsel')}}
+							</option>
+							<option value="textLong_Studienabbruch_allgemein">{{$p.t('studierendenantrag', 'dropdown_Studienabbruch_allgemein')}}
+							</option>
+							<option value="textLong_vsCodeOfConduct">{{$p.t('studierendenantrag', 'dropdown_vsCodeOfConduct')}}
+							</option>
+							<option value="textLong_additionalReason">{{$p.t('studierendenantrag', 'dropdown_additionalReason')}}
+							</option>
 <!--
 							<option value="textLong_unruly">{{$p.t('studierendenantrag', 'dropdown_unruly')}}
 							</option>

@@ -109,12 +109,12 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: 200,
 				index: 'bisio_id',
-				persistenceID: 'stv-details-table_mobiliy'
+				persistenceID: 'stv-details-table_mobiliy-2025112401'
 			},
 			tabulatorEvents: [
 				{
