@@ -21,7 +21,7 @@ class Reservierung_model extends DB_Model
 	public function getReservierungen($start_date, $end_date, $ort_kurzbz = null)
 	{
 		
-		$stundenplan_reservierungen_query="SELECT r.* , stund.beginn, stund.ende,
+		$lvplan_reservierungen_query="SELECT r.* , stund.beginn, stund.ende,
 			CASE
 				WHEN r.gruppe_kurzbz IS NOT NULL THEN r.gruppe_kurzbz 
 				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/')) 
@@ -46,7 +46,7 @@ class Reservierung_model extends DB_Model
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?";
 
-		$subquery = is_null($ort_kurzbz)? $stundenplan_reservierungen_query:$raum_reservierungen_query;
+		$subquery = is_null($ort_kurzbz)? $lvplan_reservierungen_query:$raum_reservierungen_query;
 		
 		$query_result= $this->execReadOnlyQuery("
 		SELECT 
@@ -76,7 +76,7 @@ class Reservierung_model extends DB_Model
 	 *
 	 * @return stdClass
 	 */
-	public function getReservierungenMitarbeiter($start_date, $end_date, $ort_kurzbz = null)
+	public function getReservierungenMitarbeiter($start_date, $end_date)
 	{
 
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
@@ -89,7 +89,6 @@ class Reservierung_model extends DB_Model
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.uid = ? AND datum >= ? AND datum <= ?";
 
-//		$subquery = is_null($ort_kurzbz)? $stundenplan_reservierungen_query:$raum_reservierungen_query;
 		$subquery = $raum_reservierungen_query;
 
 		

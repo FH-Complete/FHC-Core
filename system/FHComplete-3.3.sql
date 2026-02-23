@@ -9755,7 +9755,7 @@ COMMENT ON TABLE public.tbl_tag IS 'Orders and Company Tags';
 CREATE TABLE public.tbl_variable (
     name character varying(64) NOT NULL,
     uid character varying(32) NOT NULL,
-    wert character varying(64)
+    wert text
 );
 
 

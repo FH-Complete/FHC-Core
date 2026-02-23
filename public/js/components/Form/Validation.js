@@ -23,7 +23,8 @@ export default {
 			if (!Array.isArray(feedback))
 				feedback = [feedback];
 			const ts = Date.now();
-			this.feedback[valid ? 'success' : 'danger'] = feedback.map(msg => [msg, ts]);
+			this.feedback[valid ? 'success' : 'danger']
+				.push(...feedback.map(msg => [msg, ts]));
 		}
 	},
 	mounted() {

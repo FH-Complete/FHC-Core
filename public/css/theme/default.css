@@ -1,0 +1,379 @@
+/* css overrides for static cms content */
+@import './default_cms_fixes.css';
+
+/* colors */
+:root {
+
+	--fhc-black-10: black;
+	--fhc-black-20: #1d2024;
+	--fhc-black-30: #212529;
+	--fhc-black-40: #292b2a;
+	--fhc-black-50: #2B3035;
+	--fhc-black-60: #2c3136;
+	--fhc-black-70: #343a40;
+
+	--fhc-white-10: #FFFFFF;
+	--fhc-white-20: #f6f6f6;
+	--fhc-white-30: #eceff1;
+	--fhc-white-40: #e9ecef;
+	--fhc-white-50: #dee2e6;
+	--fhc-white-60: #d5dae0;
+	--fhc-white-70: #ced4da;
+	--fhc-white-80: #c7cbcf;
+	--fhc-white-90: #aeb3b8;
+
+	--fhc-gray-10: #858f97;
+	--fhc-gray-20: #72777A;
+	--fhc-gray-30: #616568;
+	--fhc-gray-40: #495057;
+
+	--fhc-blue-10: #0a57ca;
+	--fhc-blue-20: #79b7d8;
+	/*  --fhc-blue-20: #00649c;*/
+	--fhc-blue-30: #00598d;
+	/*--fhc-blue-40: #005585;*/
+	--fhc-blue-40: #61aed8;
+	--fhc-blue-50: #00507e;
+
+	--fhc-blue-primary: #006095;
+	--fhc-blue-primary-highlight: #0086CB;
+
+	/* --- Green --- */
+	--fhc-green-5:  rgb(240, 250, 240);
+	--fhc-green-10: rgb(220, 245, 220);
+	--fhc-green-20: rgb(190, 235, 190);
+	--fhc-green-30: rgb(150, 220, 150);
+	--fhc-green-40: rgb(110, 200, 110);
+	--fhc-green-50: rgb(70, 170, 70);
+	--fhc-green-60: rgb(50, 145, 50);
+	--fhc-green-70: rgb(35, 120, 35);
+	--fhc-green-80: rgb(25, 95, 25);
+	--fhc-green-90: rgb(15, 70, 15);
+
+	/* --- Red --- */
+	--fhc-red-5:  rgb(255, 245, 246);
+	--fhc-red-10: rgb(255, 225, 228);
+	--fhc-red-20: rgb(250, 190, 195);
+	--fhc-red-30: rgb(240, 150, 160);
+	--fhc-red-40: rgb(225, 110, 120);
+	--fhc-red-50: rgb(200, 70, 85);
+	--fhc-red-60: rgb(170, 50, 65);
+	--fhc-red-70: rgb(140, 35, 50);
+	--fhc-red-80: rgb(110, 20, 35);
+	--fhc-red-90: rgb(85, 10, 25);
+
+	/* --- Yellow --- */
+	--fhc-yellow-5:  rgb(255, 255, 240);
+	--fhc-yellow-10: rgb(255, 250, 210);
+	--fhc-yellow-20: rgb(255, 240, 160);
+	--fhc-yellow-30: rgb(255, 225, 100);
+	--fhc-yellow-40: rgb(250, 210, 50);
+	--fhc-yellow-50: rgb(240, 190, 0);
+	--fhc-yellow-60: rgb(220, 165, 0);
+	--fhc-yellow-70: rgb(190, 135, 0);
+	--fhc-yellow-80: rgb(160, 105, 0);
+	--fhc-yellow-90: rgb(120, 75, 0);
+
+	/* --- Pink --- */
+	--fhc-pink-5:  rgb(255, 245, 250);
+	--fhc-pink-10: rgb(255, 225, 235);
+	--fhc-pink-20: rgb(250, 195, 215);
+	--fhc-pink-30: rgb(245, 160, 190);
+	--fhc-pink-40: rgb(235, 120, 160);
+	--fhc-pink-50: rgb(220, 80, 130);
+	--fhc-pink-60: rgb(190, 60, 110);
+	--fhc-pink-70: rgb(160, 40, 90);
+	--fhc-pink-80: rgb(130, 25, 70);
+	--fhc-pink-90: rgb(100, 15, 50);
+
+	/* --- Orange --- */
+	--fhc-orange-5:  rgb(255, 250, 240);
+	--fhc-orange-10: rgb(255, 235, 200);
+	--fhc-orange-20: rgb(255, 210, 140);
+	--fhc-orange-30: rgb(255, 185, 80);
+	--fhc-orange-40: rgb(255, 155, 40);
+	--fhc-orange-50: rgb(255, 128, 0);
+	--fhc-orange-60: rgb(230, 110, 0);
+	--fhc-orange-70: rgb(200, 90, 0);
+	--fhc-orange-80: rgb(170, 70, 0);
+	--fhc-orange-90: rgb(130, 50, 0);
+	
+	--fhc-beige-10: rgba(245, 233, 215, 0.5);
+	--fhc-beige-20: rgba(172, 153, 125, 0.5);
+
+	/* --- Purple --- */
+	--fhc-purple-5:  rgb(250, 245, 255);
+	--fhc-purple-10: rgb(240, 230, 255);
+	--fhc-purple-20: rgb(220, 200, 250);
+	--fhc-purple-30: rgb(190, 160, 245);
+	--fhc-purple-40: rgb(160, 120, 235);
+	--fhc-purple-50: rgb(130, 80, 220);
+	--fhc-purple-60: rgb(110, 60, 190);
+	--fhc-purple-70: rgb(90, 40, 160);
+	--fhc-purple-80: rgb(70, 25, 130);
+	--fhc-purple-90: rgb(50, 15, 100);
+
+	/* --- Teal --- */
+	--fhc-teal-5:  rgb(240, 252, 252);
+	--fhc-teal-10: rgb(220, 245, 245);
+	--fhc-teal-20: rgb(180, 235, 235);
+	--fhc-teal-30: rgb(130, 220, 220);
+	--fhc-teal-40: rgb(80, 200, 200);
+	--fhc-teal-50: rgb(30, 170, 170);
+	--fhc-teal-60: rgb(20, 140, 140);
+	--fhc-teal-70: rgb(15, 115, 115);
+	--fhc-teal-80: rgb(10, 90, 90);
+	--fhc-teal-90: rgb(5, 65, 65);
+
+	/* --- Indigo --- */
+	--fhc-indigo-5:  rgb(245, 247, 255);
+	--fhc-indigo-10: rgb(230, 235, 255);
+	--fhc-indigo-20: rgb(200, 210, 250);
+	--fhc-indigo-30: rgb(160, 175, 245);
+	--fhc-indigo-40: rgb(120, 140, 235);
+	--fhc-indigo-50: rgb(80, 100, 220);
+	--fhc-indigo-60: rgb(60, 80, 190);
+	--fhc-indigo-70: rgb(45, 60, 160);
+	--fhc-indigo-80: rgb(30, 40, 130);
+	--fhc-indigo-90: rgb(20, 25, 100);
+
+}
+
+:root.light {
+
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-blue-primary);
+	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
+
+	--fhc-secondary: var(--fhc-white-20);
+	--fhc-secondary-highlight: var(--fhc-white-40);
+	
+	--fhc-tertiary: var(--fhc-white-40);
+	--fhc-tertiary-highlight: var(--fhc-white-60);
+
+	--fhc-fourth: var(--fhc-white-60);
+	--fhc-fourth-highlight: var(--fhc-white-80);
+
+	--fhc-fifth: var(--fhc-white-80);
+	--fhc-fifth-highlight: var(--fhc-white-90);
+
+	/*background*/
+	--fhc-background: var(--fhc-white-10);
+	--fhc-background-highlight: var(--fhc-white-60);
+
+	/*text*/
+	--fhc-text: var(--fhc-black-30);
+
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(0, 0, 0, 0.2);
+	--fhc-shadow-40: rgba(0, 0, 0, 0.4);
+	--fhc-shadow-60: rgba(0, 0, 0, 0.6);
+	--fhc-shadow-80: rgba(0, 0, 0, 0.8);
+	--fhc-box-shadow: var(--fhc-white-50);
+	--fhc-border: var(--fhc-white-50);
+	--fhc-border-highlight: var(--fhc-gray-40);
+
+	/* links */
+	--fhc-link: var(--fhc-blue-10);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-gray-90);
+	--fhc-disabled-background: var(--fhc-gray-30);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-30);
+	--fhc-light: var(--fhc-white-50);
+
+	--fhc-cis-menu-lvl-1-color: var(--fhc-white-50);
+}
+
+:root.dark {
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-blue-primary);
+	--fhc-primary-highlight: var(--fhc-blue-primary-highlight);
+
+	--fhc-secondary: var(--fhc-black-50);
+	--fhc-secondary-highlight: var(--fhc-black-70);
+
+	--fhc-tertiary: var(--fhc-black-70);
+	--fhc-tertiary-highlight: var(--fhc-gray-40);
+
+	--fhc-danger: var(--fhc-red-10);
+
+	/*background*/
+	--fhc-background: var(--fhc-black-30);
+	--fhc-background-highlight: var(--fhc-black-20);
+
+	/*text*/
+	--fhc-text: var(--fhc-white-50);
+
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(125, 125, 125, 0.2);
+	--fhc-shadow-40: rgba(125, 125, 125, 0.4);
+	--fhc-shadow-60: rgba(125, 125, 125, 0.6);
+	--fhc-shadow-80: rgba(125, 125, 125, 0.8);
+	--fhc-box-shadow: var(--fhc-gray-40);
+	--fhc-border: var(--fhc-gray-40);
+	--fhc-border-highlight: var(--fhc-white-90);
+
+	/* links */
+	--fhc-link: var(--fhc-white-70);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-gray-10);
+	--fhc-disabled-background: var(--fhc-gray-120);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-50);
+	--fhc-light: var(--fhc-white-70);
+
+}
+
+:root.purple {
+
+	--fhc-purple-primary: rgb(150, 120, 255);
+	--fhc-purple-primary-highlight: rgb(170, 140, 255);
+	--fhc-purple-5: rgb(245, 240, 255);
+	--fhc-purple-10: rgb(235, 225, 255);
+	--fhc-purple-20: rgb(220, 200, 255);
+	--fhc-purple-30: rgb(200, 170, 255);
+	--fhc-purple-40: rgb(180, 140, 240);
+	--fhc-purple-50: rgb(160, 110, 225);
+	--fhc-purple-60: rgb(140, 90, 210);
+	--fhc-purple-70: rgb(120, 70, 195);
+	--fhc-purple-80: rgb(100, 50, 180);
+	--fhc-purple-90: rgb(80, 30, 165);
+
+	/* fhc base colors */
+	--fhc-primary: var(--fhc-purple-primary-highlight);
+	--fhc-primary-highlight: var(--fhc-purple-primary);
+
+	--fhc-secondary: var(--fhc-purple-20);
+	--fhc-secondary-highlight: var(--fhc-purple-40);
+
+	--fhc-tertiary: var(--fhc-purple-30);
+	--fhc-tertiary-highlight: var(--fhc-purple-50);
+
+	/* background */
+	--fhc-background: var(--fhc-purple-5);
+	--fhc-background-highlight: var(--fhc-purple-10);
+
+	/* text */
+	--fhc-text: var(--fhc-black-20);
+
+	/* shadows and borders */
+	--fhc-shadow-20: rgba(150, 100, 200, 0.2);
+	--fhc-shadow-40: rgba(150, 100, 200, 0.4);
+	--fhc-shadow-60: rgba(150, 100, 200, 0.6);
+	--fhc-shadow-80: rgba(150, 100, 200, 0.8);
+	--fhc-box-shadow: var(--fhc-white-50);
+	--fhc-border: var(--fhc-white-50);
+	--fhc-border-highlight: var(--fhc-gray-40);
+
+	/* links */
+	--fhc-link: var(--fhc-black-50);
+
+	/* disabled */
+	--fhc-disabled: var(--fhc-purple-20);
+
+	/* status colors */
+	--fhc-danger: var(--fhc-red-10);
+	--fhc-success: var(--fhc-green-10);
+	--fhc-dark: var(--fhc-black-20);
+	--fhc-light: var(--fhc-white-70);
+
+}
+
+/* fhc primary*/
+html.dark .bg-primary,
+html.dark .btn-primary,
+html.dark .btn-outline-primary {
+	background-color: var(--fhc-primary) !important;
+	border-color: var(--fhc-primary) !important;
+	color: white;
+}
+
+html.dark .btn-outline-primary:hover,
+html.dark .btn-primary:hover {
+	filter: brightness(90%);
+}
+
+html.dark .text-primary {
+	color: var(--fhc-primary) !important;
+}
+
+html.dark .btn-outline-primary,
+html.dark .border-primary {
+	border-color: var(--fhc-primary) !important;
+}
+
+/* fhc danger*/
+html.dark .bg-danger,
+html.dark .btn-danger,
+html.dark .btn-outline-danger {
+	background-color: var(--fhc-danger) !important;
+	border-color: var(--fhc-danger) !important;
+	color: white;
+}
+
+html.dark .btn-outline-danger:hover,
+html.dark .btn-danger:hover {
+	filter: brightness(90%);
+}
+
+html.dark .text-danger {
+	color: var(--fhc-danger) !important;
+}
+
+html.dark .border-danger {
+	border-color: var(--fhc-danger) !important;
+}
+
+
+html.dark .tabulator,
+html.dark .tabulator .tabulator-header,
+html.dark .tabulator .tabulator-header .tabulator-col,
+html.dark .tabulator .tabulator-table,
+html.dark .tabulator .tabulator-row {
+	background-color: var(--fhc-tertiary) !important;
+	color: var(--fhc-text) !important;
+	border-color: var(--fhc-border) !important;
+}
+
+html.dark .tabulator .tabulator-cell {
+	background-color: var(--fhc-tertiary) !important;
+	border-color: var(--fhc-border) !important;
+}
+
+html.dark .tabulator .tabulator-header .tabulator-col:hover {
+	background-color: var(--fhc-tertiary) !important;
+}
+
+.p-paginator{
+	background-color: var(--fhc-background) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page.p-highlight,
+.p-dropdown-panel .p-dropdown-items .p-dropdown-item.p-highlight {
+	background-color: var(--fhc-primary) !important;
+	border-color: var(--fhc-primary) !important;
+	color: var(--fhc-light) !important;
+}
+
+.p-paginator .p-paginator-pages .p-paginator-page,
+.p-paginator .p-paginator-next,
+.p-paginator .p-paginator-prev,
+.p-paginator .p-paginator-first,
+.p-paginator .p-paginator-last {
+	color: var(--fhc-primary) !important;
+}
+
+.p-link:focus {
+	box-shadow: 0 0 0 0.2rem rgba(var(--fhc-primary), 0.5) !important;
+}

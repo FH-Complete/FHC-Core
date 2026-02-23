@@ -1,6 +1,7 @@
 import PruefungList from "./Pruefung/Pruefunglist.js";
 
 export default {
+	name: "TabExam",
 	components: {
 		PruefungList
 	},

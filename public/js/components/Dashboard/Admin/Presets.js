@@ -42,7 +42,7 @@ export default {
 					funktion_kurzbz: section_name,
 					widgets: [widget]
 				}).then(result => {
-					let newId = Object.keys(result.data.retval.data.widgets[section_name]).pop();
+					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
 					widget.id = newId;
 					widget.custom = 1;
 					this.sections.forEach(section => {
@@ -126,7 +126,6 @@ export default {
 			}}).then(res => {
 				if (this.tmpLoading !== funktionen.join('###'))
 					return; // NOTE(chris): prevent race condition
-				
 				for (var section in res.data.retval) {
 					let widgets = [];
 					for (var wid in res.data.retval[section]) {

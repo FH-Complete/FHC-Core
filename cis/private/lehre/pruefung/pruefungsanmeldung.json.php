@@ -106,9 +106,14 @@ switch($method)
 	case 'getStudiengaenge':
 		$data = getStudiengaenge();
 		break;
-	case 'getPruefungenStudiengang':
+	case 'getPruefungenStudiensemester':
 		$studiensemester = filter_input(INPUT_POST,"studiensemester");
-		$data = getPruefungenStudiengang($uid, $studiensemester);
+		$data = getPruefungenStudiengangBySemester($studiensemester);
+		break;
+	case 'terminezusammenlegen':
+		$termine = filter_input(INPUT_POST, 'termine', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+		$lv_id = filter_input(INPUT_POST, 'lv_id');
+		$data = terminezusammenlegen($termine, $lv_id);
 		break;
 	case 'saveKommentar':
 		$data = saveKommentar();
@@ -120,7 +125,8 @@ switch($method)
 	case 'saveRaum':
 		$terminId = $_REQUEST["terminId"];
 		$ort_kurzbz = $_REQUEST["ort_kurzbz"];
-		$data = saveRaum($terminId, $ort_kurzbz, $uid);
+		$anderer_raum = $_REQUEST["anderer_raum"];
+		$data = saveRaum($terminId, $ort_kurzbz, $uid, $anderer_raum);
 		break;
 	case 'getLvKompatibel':
 		$lvid = filter_input(INPUT_POST, "lehrveranstaltung_id");
@@ -397,6 +403,7 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 	$lv_besucht = false;
 	$studienverpflichtung_id = filter_input(INPUT_POST, "studienverpflichtung_id");
 	$studiengang_kz = filter_input(INPUT_POST, "studiengang_kz");
+	$ects = filter_input(INPUT_POST, "ects");
 
 	//Defaulteinstellung für Anzahlprüfungsversuche (wird durch Addon "ktu" überschrieben)
 	$maxAnzahlVersuche = 0;
@@ -731,6 +738,10 @@ function saveAnmeldung($aktStudiensemester = null, $uid = null)
 					else
 						$anmeldung->anrechnung_id = $anrechnung->anrechnung_id;
 
+					if (defined('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE') && (CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE === true))
+					{
+						$anmeldung->ects = $ects;
+					}
 					if($anmeldung->save(true))
 					{
 						$pruefung = new pruefungCis($termin->pruefung_id);
@@ -960,9 +971,13 @@ function alleBestaetigen($uid)
 	global $p;
 	$lehrveranstaltung_id = $_REQUEST["lehrveranstaltung_id"];
 	$pruefungstermin_id = $_REQUEST["termin_id"];
+	$emails = $_REQUEST["emails"];
 	$pruefungstermin = new pruefungstermin($pruefungstermin_id);
 	$pruefungsanmeldung = new pruefungsanmeldung();
 	$pranmeldungen = $pruefungsanmeldung->getAnmeldungenByTermin($pruefungstermin_id, $lehrveranstaltung_id);
+
+	$mail_benutzer = [];
+	$mail_inhalt = [];
 	foreach($pranmeldungen as $a)
 	{
 		$anmeldung = new pruefungsanmeldung($a->pruefungsanmeldung_id);
@@ -976,6 +991,13 @@ function alleBestaetigen($uid)
 				$ma = new mitarbeiter($uid);
 				$datum = new datum();
 				$ort = new ort($termin->ort_kurzbz);
+
+				$ortbezeichnung = $ort->bezeichnung;
+				if (is_null($termin->ort_kurzbz) && !is_null($termin->anderer_raum))
+				{
+					$ortbezeichnung = $termin->anderer_raum;
+				}
+
 				$pruefung = new pruefungCis($termin->pruefung_id);
 
 				$to = $anm->uid."@".DOMAIN;
@@ -995,15 +1017,64 @@ function alleBestaetigen($uid)
 				}
 				else
 					$html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "H:i")."<br>";
-				$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
+				$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ortbezeichnung."<br>";
 				$html .= "<br>";
 				$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
 				$html .= "<br>";
+
+				$mail_benutzer[] = [
+					'uid' => $anm->uid
+				];
+
+				if (empty($mail_inhalt))
+				{
+					$mail_inhalt = array(
+						'von' => $ma->vorname." ".$ma->nachname,
+						'lv' => $lv->bezeichnung,
+						'ort' => $ortbezeichnung,
+						'datum' => $datum->formatDatum($termin->von, "d.m.Y") . ' ' . $p->t('pruefung/emailBodyUm') . ' ' . (isset($von) ? $von : $datum->formatDatum($termin->von, "H:i")),
+						'dauer' => $pruefung->einzeln ? ($pruefung->pruefungsintervall . ' ' . $p->t('pruefung/emailBodyMinuten')): '');
+				}
 
 				$mail = new mail($to, $from, $subject,$p->t('pruefung/emailBodyBitteHtmlSicht'));
 				$mail->setHTMLContent($html);
 				$mail->send();
 			}
+		}
+	}
+
+	if (!empty($emails) && !empty($mail_inhalt))
+	{
+		foreach ($emails as $email)
+		{
+			$from = "noreply@".DOMAIN;
+			$subject = $p->t('pruefung/emailSubjectAnmeldungBestaetigung');
+			$html = $p->t('pruefung/sammelemailBody',array($mail_inhalt['lv'], $mail_inhalt['datum'], $mail_inhalt['von']));
+
+			if ($mail_inhalt['ort'])
+			{
+				$html .= $p->t('pruefung/sammelemailBody2',array($mail_inhalt['ort']));
+			}
+
+			$html .= "<br /><table border='1'>
+						<thead>
+							<tr>
+								<th>UID</th>
+							</tr>
+						</thead>
+						<tbody>";
+
+			foreach($mail_benutzer as $benutzer)
+			{
+				$html .= "<tr>
+							<td>" . htmlspecialchars($benutzer['uid']) . "</td>
+						</tr>";
+			}
+			$html .= "</tbody></table><br />";
+
+			$mail = new mail($email, $from, $subject, $p->t('pruefung/emailBodyBitteHtmlSicht'));
+			$mail->setHTMLContent($html);
+			$mail->send();
 		}
 	}
 	$data['result']=true;
@@ -1032,6 +1103,12 @@ function anmeldungBestaetigen($uid)
 	$ort = new ort($termin->ort_kurzbz);
 	$pruefung = new pruefungCis($termin->pruefung_id);
 
+	$ortbezeichnung = $ort->bezeichnung;
+	if (is_null($termin->ort_kurzbz) && !is_null($termin->anderer_raum))
+	{
+		$ortbezeichnung = $termin->anderer_raum;
+	}
+
 	$to = $anmeldung->uid."@".DOMAIN;
 	$from = "noreply@".DOMAIN;
 	$subject = $p->t('pruefung/emailSubjectAnmeldungBestaetigung');
@@ -1049,7 +1126,7 @@ function anmeldungBestaetigen($uid)
 	}
 	else
 		$html .= $p->t('pruefung/emailBodyTermin')." ".$datum->formatDatum($termin->von, "d.m.Y")." ".$p->t('pruefung/emailBodyUm')." ".$datum->formatDatum($termin->von, "H:i")."<br>";
-	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ort->bezeichnung."<br>";
+	$html .= $p->t('pruefung/anmeldungErfolgreich')." ".$ortbezeichnung."<br>";
 	$html .= "<br>";
 	$html .= "<a href='".APP_ROOT."cis/private/lehre/pruefung/pruefungsanmeldung.php'>".$p->t('pruefung/emailBodyLinkZurAnmeldung')."</a><br>";
 	$html .= "<br>";
@@ -1166,6 +1243,258 @@ function getPruefungenStudiengang($uid, $aktStudiensemester)
 	return $data;
 }
 
+function getPruefungenStudiengangBySemester($aktStudiensemester)
+{
+	$result = array();
+	$pruefungen = new pruefungCis();
+	$pruefungen->getPruefungByStudiensemester($aktStudiensemester);
+
+	if(!empty($pruefungen->lehrveranstaltungen))
+	{
+		$lehrveranstaltungen = [];
+		foreach ($pruefungen->lehrveranstaltungen as $prf)
+		{
+			$pruefung = new pruefungCis();
+			$pruefung->load($prf->pruefung_id);
+
+			if ($pruefung->storniert)
+				continue;
+
+			$pruefung->getTermineByPruefung();
+
+			$lvid = $prf->lehrveranstaltung_id;
+
+			if (!isset($lehrveranstaltungen[$lvid]))
+			{
+				$lv = new stdClass();
+				$lehrveranstaltung = new lehrveranstaltung();
+				$lehrveranstaltung->load($lvid);
+
+				$studiengang = new studiengang();
+				$studiengang->load($lehrveranstaltung->studiengang_kz);
+
+				$lv->bezeichnung = $lehrveranstaltung->bezeichnung;
+				$lv->lehrveranstaltung_id = $lvid;
+				$lv->studiengang = $studiengang->kuerzel;
+				$lv->pruefung = [];
+				$lehrveranstaltungen[$lvid] = $lv;
+			}
+
+			$lehrveranstaltungen[$lvid]->pruefung[] = $pruefung;
+		}
+		$result = array_values($lehrveranstaltungen);
+	}
+	$data['result']=$result;
+	$data['error']='false';
+	$data['errormsg']='';
+	return $data;
+}
+
+function terminezusammenlegen($termine, $lv_id)
+{
+	$result = array();
+	$alle_termine = array();
+	$error = false;
+	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
+	foreach($termine as $termin)
+	{
+		$pruefungstermin = new pruefungstermin();
+		$pruefungstermin->load($termin);
+		$pruefung = new pruefungCis();
+		$pruefung->load($pruefungstermin->pruefung_id);
+		$pruefung->getLehrveranstaltungenByPruefung();
+
+		$lehrveranstaltungen = array_column($pruefung->lehrveranstaltungen, 'lehrveranstaltung_id');
+		if (!in_array($lv_id, $lehrveranstaltungen))
+			continue;
+
+		$pruefung->lehrveranstaltung_id = $lv_id;
+		$pruefung->termin = $pruefungstermin;
+		$alle_termine[] = $pruefung;
+	}
+
+
+	if (count($alle_termine) >= 1)
+	{
+		usort($alle_termine, function($a, $b) {
+			return strcmp($a->termin->von, $b->termin->von);
+		});
+
+		$first_termin = $alle_termine[0];
+
+		$first_mitarbeiter = $first_termin->mitarbeiter_uid;
+		$first_date = date('Y-m-d', strtotime($first_termin->termin->von));
+		$first_studiensemester = $first_termin->studiensemester_kurzbz;
+		$first_sammelklausur = $first_termin->termin->sammelklausur;
+		$first_ort = $first_termin->termin->ort_kurzbz;
+		$first_raum = $first_termin->termin->anderer_raum;
+		$first_lv = $first_termin->lehrveranstaltung_id;
+		$first_titel = $first_termin->titel;
+
+		$max_von = strtotime($first_termin->termin->von);
+		$max_bis = strtotime($first_termin->termin->bis);
+		$teilnehmer_min = (int)$first_termin->termin->teilnehmer_min;
+		$teilnehmer_max = (int)$first_termin->termin->teilnehmer_max;
+
+
+		$prevEnd = $max_bis;
+
+		foreach ($alle_termine as $termin)
+		{
+			if (date('Y-m-d', strtotime($termin->termin->von)) !== $first_date)
+			{
+				$data['errormsg'] = 'Nicht der gleiche Tag!';
+				$error = true;
+			}
+
+			if ($termin->mitarbeiter_uid !== $first_mitarbeiter)
+			{
+				$data['errormsg'] = 'Unterschiedliche Lektoren!';
+				$error = true;
+			}
+
+			if ($termin->studiensemester_kurzbz !== $first_studiensemester)
+			{
+				$data['errormsg'] = 'Unterschiedliche Studiensemester!';
+				$error = true;
+			}
+
+			if ($termin->termin->sammelklausur !== $first_sammelklausur)
+			{
+				$data['errormsg'] = 'Sammelklausur unterschiedlich!';
+				$error = true;
+			}
+
+			if (!($termin->termin->ort_kurzbz === $first_ort || $first_termin->termin->anderer_raum == $first_raum))
+			{
+				$data['errormsg'] = 'Ort/Raum unterschiedlich!';
+				$error = true;
+			}
+
+			if ($termin->lehrveranstaltung_id !== $first_lv)
+			{
+				$data['errormsg'] = 'Lehrveranstaltungen unterscheiden sich!';
+				$error = true;
+			}
+
+
+			$start = strtotime($termin->termin->von);
+			$max_von = min($max_von, $start);
+			$max_bis = max($max_bis, strtotime($termin->termin->bis));
+			$teilnehmer_min = min($teilnehmer_min, (int)$termin->termin->teilnehmer_min);
+			$teilnehmer_max = max($teilnehmer_max, (int)$termin->termin->teilnehmer_max);
+
+			if (($start - $prevEnd > 0) && $first_ort)
+			{
+				$stunde = new stunde();
+
+				$gapStartStr = date('Y-m-d H:i:s', $prevEnd);
+				$gapEndStr = date('Y-m-d H:i:s', $start);
+
+				$gapStartArr = explode(' ', $gapStartStr);
+				$gapEndArr = explode(' ', $gapEndStr);
+
+				$stunden = $stunde->getStunden($gapStartArr[1], $gapEndArr[1]);
+
+				$reservierung = new reservierung();
+				$reserviert = false;
+
+				$reservierungs_stunden = $reservierung->getReservierungen($first_ort, $gapStartArr[0]);
+
+				$need_stunden = array_diff($stunden, $reservierungs_stunden);
+
+				foreach ($need_stunden as $h)
+				{
+					if ($reservierung->isReserviert($first_ort, $gapStartArr[0], $h))
+						$reserviert = true;
+				}
+
+				if (!$terminkollision && $reserviert && !$first_sammelklausur)
+				{
+					$error = true;
+					$data['errormsg'] = 'Kann nicht zusammengelegt werden, da der Raum reserviert ist';
+				}
+				else
+				{
+					$reservierung->studiengang_kz = "0";
+					$reservierung->ort_kurzbz = $first_ort;
+					$reservierung->uid = $first_mitarbeiter;
+					$reservierung->datum = $gapStartArr[0];
+					$reservierung->titel = $first_titel;
+					if (strlen($first_titel) > 10)
+					{
+						$reservierung->titel = "Prüfung";
+					}
+					$reservierung->beschreibung = "Prüfung";
+					$reservierung->insertamum = date('Y-m-d G:i:s');
+					$reservierung->insertvon = get_uid();
+					$reservierungError = false;
+
+					foreach ($need_stunden as $h)
+					{
+						$reservierung->stunde = $h;
+						if (!$reservierungError)
+						{
+							if (!$reservierung->save(true))
+							{
+								$error = true;
+								$data['errormsg'] = $reservierung->errormsg;
+								$reservierungError = true;
+							}
+						}
+					}
+				}
+			}
+			$prevEnd = strtotime($termin->termin->bis);
+		}
+
+		if (!$error)
+		{
+			$first_pruefungstermin =  new pruefungstermin();
+			$first_pruefungstermin->load($first_termin->termin->pruefungstermin_id);
+
+			$first_pruefungstermin->von = date('Y-m-d H:i:s', $max_von);
+			$first_pruefungstermin->bis = date('Y-m-d H:i:s', $max_bis);
+			$first_pruefungstermin->teilnehmer_min = $teilnehmer_min;
+			$first_pruefungstermin->teilnehmer_max = $teilnehmer_max;
+
+			$first_pruefungstermin->save();
+
+			$alle_termine = array_slice($alle_termine, 1);
+
+			foreach ($alle_termine as $termin)
+			{
+				$anmeldung_termin = new pruefungsanmeldung();
+				$anmeldungen_termine = $anmeldung_termin->getAnmeldungenByTermin($termin->termin->pruefungstermin_id);
+
+				if (count($anmeldungen_termine) === 0)
+				{
+					$first_pruefungstermin->delete($termin->termin->pruefungstermin_id);
+				}
+				$i = 0;
+				$anmeldungen_termine_count = count($anmeldungen_termine);
+				foreach ($anmeldungen_termine as $anmeldungtermin)
+				{
+					$anmeldung = new pruefungsanmeldung();
+					$anmeldung->load($anmeldungtermin->pruefungsanmeldung_id);
+					$old_pruefuengstermin_id = $anmeldung->pruefungstermin_id;
+					$anmeldung->pruefungstermin_id = $first_termin->termin->pruefungstermin_id;
+					if ($anmeldung->save(false) && ($i === $anmeldungen_termine_count - 1))
+					{
+						$first_pruefungstermin->delete($old_pruefuengstermin_id);
+					}
+					$i ++;
+				}
+			}
+		}
+	}
+
+	$data['result']= $result;
+	$data['error']= $error ? 'true' : 'false';
+	//$data['errormsg']='';
+	return $data;
+}
+
 /**
  *
  * @return typespeichert ein Kommentar zu einer Prüfungsanmeldung
@@ -1246,7 +1575,7 @@ function compareRaeume($a, $b)
 	return strcmp($a->ort_kurzbz, $b->ort_kurzbz);
 }
 
-function saveRaum($terminId, $ort_kurzbz, $uid)
+function saveRaum($terminId, $ort_kurzbz, $uid, $anderer_raum = '')
 {
 	$terminkollision = defined('CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION') ? CIS_PRUEFUNGSANMELDUNG_ERLAUBE_TERMINKOLLISION : false;
 	$pruefungstermin = new pruefungstermin($terminId);
@@ -1265,7 +1594,24 @@ function saveRaum($terminId, $ort_kurzbz, $uid)
 	{
 	$pruefung = new pruefungCis($pruefungstermin->pruefung_id);
 	$mitarbeiter = new mitarbeiter($pruefung->mitarbeiter_uid);
-	if($ort_kurzbz === "buero")
+
+	if ($ort_kurzbz === "" && $anderer_raum !== "")
+	{
+		$pruefungstermin->anderer_raum = $anderer_raum;
+
+		if($pruefungstermin->save(false))
+		{
+			$data['result']="reserviert";
+			$data['error']='false';
+			$data['errormsg']='';
+		}
+		else
+		{
+			$data['error']='true';
+			$data['errormsg']=$pruefungstermin->errormsg;
+		}
+	}
+	else if($ort_kurzbz === "buero")
 	{
 		$pruefungstermin->ort_kurzbz = $mitarbeiter->ort_kurzbz;
 		if($pruefungstermin->save(false))

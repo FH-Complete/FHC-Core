@@ -4,6 +4,9 @@ import ViewStudentProfil from "./StudentViewProfil.js";
 import ViewMitarbeiterProfil from "./MitarbeiterViewProfil.js";
 import Loading from "../../Loader.js";
 
+import ApiProfil from '../../../api/factory/profil.js';
+import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+
 Vue.$collapseFormatter = function (data) {
 	//data - an array of objects containing the column title and value for each cell
 	var container = document.createElement("div");
@@ -43,7 +46,10 @@ export const Profil = {
 	props: {
 		uid: {
 			type: String,
-			default: 'Profil'
+			required:false,
+		},
+		viewData: {
+			type: Object,
 		}
 	},
 	data() {
@@ -56,10 +62,12 @@ export const Profil = {
 			data: null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
 			notFoundUID: null,
+			isEditable: this.viewData.editable ?? false,
 		};
 	},
 	provide() {
 		return {
+			isEditable: Vue.computed(()=>this.isEditable),
 			profilUpdateStates: Vue.computed(() =>
 				this.profilUpdateStates ? this.profilUpdateStates : false
 			),
@@ -112,10 +120,10 @@ export const Profil = {
 			},
 			sortProfilUpdates: (ele1, ele2) => {
 				let result = 0;
-				if (ele1.status === "pending") {
+				if (ele1.status.toLowerCase() === "pending") {
 					result = -1;
-				} else if (ele1.status === "accepted") {
-					result = ele2.status === "rejected" ? -1 : 1;
+				} else if (ele1.status.toLowerCase() === "accepted") {
+					result = ele2.status.toLowerCase() === "rejected" ? -1 : 1;
 				} else {
 					result = 1;
 				}
@@ -132,7 +140,8 @@ export const Profil = {
 	methods: {
 		async load() {
 			// fetch profilUpdateStates to provide them to children components
-			await this.$fhcApi.factory.profilUpdate.getStatus()
+			await this.$api
+				.call(ApiProfilUpdate.getStatus())
 				.then((response) => {
 					this.profilUpdateStates = response.data;
 				})
@@ -140,7 +149,8 @@ export const Profil = {
 					console.error(error);
 				});
 
-			this.$fhcApi.factory.profilUpdate.getTopic()
+			this.$api
+				.call(ApiProfilUpdate.getTopic())
 				.then((response) => {
 					this.profilUpdateTopic = response.data;
 				})
@@ -148,16 +158,19 @@ export const Profil = {
 					console.error(error);
 				});
 			
-			let uid = this.uid ?? location.pathname.split("/").pop();
-
-			this.$fhcApi.factory.profil.getView(uid).then((res) => {
-				if (!res.data) {
-					this.notFoundUID = uid;
-				} else {
-					this.view = res.data?.view;
-					this.data = res.data?.data;
-				}
-			});	
+			
+			this.$api
+				.call(ApiProfil.profilViewData(this.$route.params.uid??null))
+				.then((response) => response.data).then(data=>{
+					this.view = data?.profil_data.view;
+					this.data = data?.profil_data.data;
+					this.isEditable = data?.editable ?? false;
+				})
+				.catch((error) => {
+					console.error(error);
+				});
+			
+			
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -213,10 +226,13 @@ export const Profil = {
 				kontakteArray = kontakteArray.concat(
 					this.data.profilUpdates
 						.filter((update) => {
-							return update.requested_change.zustellung;
+							return update.status === 'Pending' && update.requested_change.zustellung;
 						})
 						.map((kontant) => {
-							return kontant.requested_change.kontakt_id;
+							return {
+										kontakt_id: kontant.requested_change.kontakt_id,
+										kontakttyp: kontant.requested_change.kontakttyp
+								};
 						})
 				);
 			}
@@ -228,7 +244,7 @@ export const Profil = {
 					.every((kontakt) =>
 						this.data.profilUpdates.some(
 							(update) =>
-								update.requested_change.kontakt_id == kontakt.kontakt_id
+								update.status === 'Pending' && update.requested_change.kontakt_id == kontakt.kontakt_id
 						)
 					)
 			) {
@@ -238,7 +254,10 @@ export const Profil = {
 							return kontakt.zustellung;
 						})
 						.map((kon) => {
-							return kon.kontakt_id;
+							return {
+										kontakt_id: kon.kontakt_id,
+										kontakttyp: kon.kontakttyp
+								};
 						})
 				);
 			}
@@ -247,6 +266,7 @@ export const Profil = {
 		},
 	},
 	computed: {
+		
 		filteredEditData() {
 			if (!this.data) {
 				return;
@@ -358,7 +378,7 @@ export const Profil = {
 			this.load()
 		}
 	},
-	async created() {
+	created() {
 		this.load()
 	},
 	template: `

@@ -3,6 +3,7 @@ import CoreForm from "../../../../Form/Form.js";
 import FormValidation from "../../../../Form/Validation.js";
 import FormInput from "../../../../Form/Input.js";
 
+import ApiKonto from '../../../../../api/factory/stv/konto.js';
 
 export default {
 	components: {
@@ -33,8 +34,8 @@ export default {
 			this.$refs.form.clearValidation();
 			this.loading = true;
 
-			this.$fhcApi
-				.factory.stv.konto.edit(this.$refs.form, this.data)
+			this.$refs.form
+				.call(ApiKonto.edit(this.data))
 				.then(result => {
 					this.$emit('saved', result.data);
 					this.loading = false;
@@ -81,6 +82,8 @@ export default {
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
 					auto-apply
 					>
 				</form-input>

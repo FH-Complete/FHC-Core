@@ -9,7 +9,8 @@
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
 	$ORG_NAME = '\'InfoCenter\'';
-	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
+	$KAUTION_DRITT_STAAT = '\'KautionDrittStaat\'';
+
 
 $query = '
 		SELECT
@@ -206,7 +207,7 @@ $query = '
 				FROM public.tbl_konto konto
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
-					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
 			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (

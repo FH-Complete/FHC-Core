@@ -5,6 +5,8 @@ import FormInput from '../../../../Form/Input.js';
 import StatusModal from '../Status/Modal.js';
 import StatusDropdown from '../Status/Dropdown.js';
 
+import ApiStvPrestudent from '../../../../../api/factory/stv/prestudent.js';
+
 export default{
 	components: {
 		CoreFilterCmpt,
@@ -14,9 +16,6 @@ export default{
 		StatusDropdown
 	},
 	inject: {
-		defaultSemester: {
-			from: 'defaultSemester',
-		},
 		hasPermissionToSkipStatusCheck: {
 			from: 'hasPermissionToSkipStatusCheck',
 			default: false
@@ -52,18 +51,14 @@ export default{
 		}
 	},
 	props: {
-		modelValue: Object
+		modelValue: Object,
+		config: Object,
 	},
 	data() {
 		return {
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.$fhcApi.factory.stv.prestudent.getHistoryPrestudent,
-				ajaxParams: () => {
-					return {
-						id: this.modelValue.prestudent_id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvPrestudent.getHistoryPrestudent(this.modelValue.prestudent_id)),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
 					{title: "Kurzbz", field: "status_kurzbz", tooltip: true},
@@ -181,15 +176,18 @@ export default{
 							const data = cell.getData();
 
 							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-forward"></i>';
-							button.title = this.$p.t('ui', 'btn_statusVorruecken');
-							button.addEventListener('click', () =>
-								this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
-							);
-							if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
-								button.disabled = true;
-							container.append(button);
+							if (this.config?.showStatusVorruecken !== false)
+							{
+								button.className = 'btn btn-outline-secondary btn-action';
+								button.innerHTML = '<i class="fa fa-forward"></i>';
+								button.title = this.$p.t('ui', 'btn_statusVorruecken');
+								button.addEventListener('click', () =>
+									this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
+								);
+								if (!['Student', 'Diplomand', 'Unterbrecher'].includes(data.status_kurzbz))
+									button.disabled = true;
+								container.append(button);
+							}
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
@@ -209,8 +207,8 @@ export default{
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
-							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
-								button.disabled = true;
+/*							if (this.dataMeldestichtag && this.dataMeldestichtag > data.datum && !this.hasPermissionToSkipStatusCheck)
+								button.disabled = true;*/
 							container.append(button);
 
 							button = document.createElement('button');
@@ -233,15 +231,15 @@ export default{
 					const rowData = row.getData();
 					if (this.dataMeldestichtag && this.dataMeldestichtag > rowData.datum)
 					{
-						row.getElement().classList.add('disabled');
+						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 				},
-				layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				selectable: false,
 				index: 'statusId',
-				persistenceID: 'stv-multistatus'
+				persistenceID: 'stv-multistatus-2025112401'
 			},
 			tabulatorEvents: [
 				{
@@ -322,7 +320,8 @@ export default{
 				? [this.modelValue.studiengang_kz]
 				: this.modelValue.map(prestudent => prestudent.studiengang_kz);
 			this.maxSem = 0;
-			this.$fhcApi.factory.stv.prestudent.getMaxSem(studiengang_kzs)
+			this.$api
+				.call(ApiStvPrestudent.getMaxSem(studiengang_kzs))
 				.then(result => this.maxSem = result.data)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -345,7 +344,7 @@ export default{
 				.then(result => {
 					// If confirmed, check if this is the last status
 					return result
-						? this.$fhcApi.factory.stv.prestudent.isLastStatus(statusId.prestudent_id)
+						? this.$api.call(ApiStvPrestudent.isLastStatus(statusId.prestudent_id))
 						: Promise.reject({handled: true});
 				})
 				.then(result => {
@@ -359,7 +358,7 @@ export default{
 				})
 				.then(result => {
 					return result
-						? this.$fhcApi.factory.stv.prestudent.deleteStatus(statusId)
+						? this.$api.call(ApiStvPrestudent.deleteStatus(statusId))
 						: Promise.reject({handled: true});
 				})
 				.then(() => {
@@ -376,7 +375,8 @@ export default{
 				studiensemester_kurzbz: stdsem,
 				ausbildungssemester: ausbildungssemester
 			};
-			return this.$fhcApi.factory.stv.prestudent.advanceStatus(statusId)
+			return this.$api
+				.call(ApiStvPrestudent.advanceStatus(statusId))
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successAdvance')))
 				.then(this.reload)
 				.catch(this.$fhcAlert.handleSystemError);
@@ -390,7 +390,7 @@ export default{
 			};
 			BsConfirm
 				.popup(this.$p.t('stv', 'status_confirm_popup'))
-				.then(() => this.$fhcApi.factory.stv.prestudent.confirmStatus(statusId))
+				.then(() => this.$api.call(ApiStvPrestudent.confirmStatus(statusId)))
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successConfirm')))
 				.then(this.reload)
 				.catch(this.$fhcAlert.handleSystemError);
@@ -402,9 +402,10 @@ export default{
 	},
 	created() {
 		this.getMaxSem();
-		this.$fhcApi.factory.stv.prestudent.getLastBismeldestichtag()
+		this.$api
+			.call(ApiStvPrestudent.getLastBismeldestichtag())
 			.then(result => {
-				this.dataMeldestichtag = result.data[0].meldestichtag;
+				this.dataMeldestichtag = result.data[0]?.meldestichtag;
 				if (this.$refs.table && this.$refs.table.tableBuilt)
 					this.$refs.table.tabulator.redraw(true);
 			})
@@ -428,6 +429,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('global', 'status')"
 			@click:new="actionNewStatus"

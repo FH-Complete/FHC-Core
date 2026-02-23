@@ -57,7 +57,7 @@ export default {
 		init() {
 			if (!this.endpoint)
 				return;
-			this.endpoint.getTags()
+			this.$api.call(this.endpoint.getTags())
 				.then(response => response.data)
 				.then(response => {
 					this.tags = response
@@ -71,7 +71,7 @@ export default {
 				'id': tag_id
 			};
 
-			this.endpoint.getTag(getData)
+			this.$api.call(this.endpoint.getTag(getData))
 				.then(result => result.data)
 				.then(result => this.openModal(result))
 		},
@@ -86,6 +86,7 @@ export default {
 			this.tagData.updateamum = this.formatDateTime(item.updateamum)
 			this.tagData.bearbeiter = item.bearbeiter;
 			this.tagData.verfasser = item.verfasser;
+			this.tagData.readonly = item.readonly;
 
 			if (item && item.notiz_id)
 			{
@@ -118,7 +119,7 @@ export default {
 			{
 				postData.id = this.selectedTagId;
 				this.tagData.id = this.selectedTagId;
-				this.endpoint.updateTag(postData);
+				this.$api.call(this.endpoint.updateTag(postData));
 				this.$emit("updated", this.tagData);
 				this.$refs.tagModal.hide();
 			}
@@ -130,7 +131,7 @@ export default {
 						return;
 				}
 
-				this.endpoint.addTag(postData)
+				this.$api.call(this.endpoint.addTag(postData))
 					.then(response => response.data)
 					.then(response => {
 						if (typeof response === 'number') {
@@ -154,9 +155,10 @@ export default {
 
 			let postData = {
 				id: this.selectedTagId,
-				done: !this.tagData.done
+				done: !this.tagData.done,
+				notiz: this.tagData.notiz,
 			}
-			this.endpoint.doneTag(postData)
+			this.$api.call(this.endpoint.doneTag(postData))
 			this.$emit("updated", this.tagData);
 			this.$refs.tagModal.hide();
 		},
@@ -165,7 +167,7 @@ export default {
 			let postData = {
 				id: this.selectedTagId
 			}
-			this.endpoint.deleteTag(postData)
+			this.$api.call(this.endpoint.deleteTag(postData))
 			this.$emit("deleted", this.selectedTagId)
 			this.$refs.tagModal.hide();
 		},
@@ -182,7 +184,8 @@ export default {
 				verfasser: "",
 				updateamum: "",
 				bearbeiter: "",
-				response: ""
+				response: "",
+				readonly: false
 			};
 			this.selectedTagId = null;
 			this.mode = "create";
@@ -197,6 +200,9 @@ export default {
 				minute: "2-digit",
 				second: "2-digit"
 			});
+		},
+		async copy (){
+			await navigator.clipboard.writeText(this.tagData.notiz);
 		}
 	},
 	template: `
@@ -230,8 +236,18 @@ export default {
 						v-model="tagData.notiz"
 						type="textarea"
 						field="notiz"
+						:readonly="tagData.readonly"
 						placeholder="Notiz..."
 					></form-input>
+					<button
+						type="button" 
+						class="btn btn-outline-secondary btn-sm copy-btn" 
+						@click="copy" 
+						v-if="mode === 'edit'" 
+						:disabled="!tagData.notiz || tagData.notiz.trim() === ''"
+					>
+						<i class="fa-solid fa-copy"></i>
+					</button>
 					<div class="modificationdate">
 						<span v-if="tagData.verfasser">
 							{{ $p.t('notiz', 'tag_verfasser', { 0: tagData.verfasser, 1: tagData.insertamum }) }}
@@ -243,7 +259,7 @@ export default {
 					</div>
 				</div>
 			</template>
-			<template #footer>
+			<template #footer v-if="!tagData.readonly">
 				<div class="d-flex justify-content-between w-100">
 					<div>
 						<button 

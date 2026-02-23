@@ -87,9 +87,14 @@ class Cms extends Auth_Controller
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData'=>$viewData, 'route' => 'News']);
 	}
 	
-	public function getRoomInformation($ort_kurzbz){
+	public function getRoomInformation($ort_kurzbz)
+	{
+		// Load Config
+		$this->load->config('calendar');
+
 		$viewData = array(
-			'ort_kurzbz' => $ort_kurzbz
+			'ort_kurzbz' => $ort_kurzbz,
+			'timezone' => $this->config->item('timezone')
 		);
 		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'CmsRoom']);
 	}

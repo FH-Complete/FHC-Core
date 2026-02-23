@@ -2,15 +2,25 @@ import {CoreFilterCmpt} from "../../../../filter/Filter.js";
 import ZeugnisActions from './Zeugnis/Actions.js';
 import ZeugnisDocuments from './Zeugnis/Documents.js';
 
+import ApiStvGrades from '../../../../../api/factory/stv/grades.js';
+
 export default {
+	name: 'Zeugnis',
 	components: {
 		CoreFilterCmpt,
 		ZeugnisActions,
 		ZeugnisDocuments
 	},
-	inject: [
-		'config'
-	],
+	inject: {
+		config: {
+			from: 'config',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		student: Object,
 		allSemester: Boolean
@@ -42,8 +52,8 @@ export default {
 	},
 	computed: {
 		tabulatorOptions() {
-			const listPromise = this.$fhcApi.factory
-				.stv.grades.list()
+			const listPromise = this.$api
+				.call(ApiStvGrades.list())
 				.then(res => res.data.map(({bezeichnung: label, note: value}) => ({label, value})));
 
 			let gradeField = {
@@ -76,7 +86,7 @@ export default {
 							note_bezeichnung
 						}))
 						// send to backend
-						.then(this.$fhcApi.factory.stv.grades.updateCertificate)
+						.then(data => this.$api.call(ApiStvGrades.updateCertificate(data)))
 						// get bezeichnung again
 						.then(() => listPromise)
 						.then(list => list.find(el => el.value == note))
@@ -97,8 +107,15 @@ export default {
 					gradeField.editorParams = {
 						valuesLookup: (cell, filterTerm) => {
 							if (filterTerm) {
-								return this.$fhcApi.factory
-									.stv.grades.getGradeFromPoints(filterTerm, cell.getData().lehrveranstaltung_id, true)
+								return this.$api
+									.call(
+										ApiStvGrades.getGradeFromPoints(
+											filterTerm,
+											cell.getData().lehrveranstaltung_id,
+											this.currentSemester
+										),
+										{ errorHandling: false }
+									)
 									.then(result => 
 										result.data === null
 										? []
@@ -191,23 +208,22 @@ export default {
 
 			return {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: (url, config, params) => {
-					return this.$fhcApi.factory.stv.grades.getCertificate(params.prestudent_id, params.stdsem);
-				},
-				ajaxParams: () => {
-					return {
-						prestudent_id: this.student.prestudent_id,
-						stdsem: this.allSemester
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(ApiStvGrades.getCertificate(
+					this.student.prestudent_id,
+						(!this.allSemester ? this.currentSemester : null)
+				)),
 				ajaxResponse: (url, params, response) => {
 					return response.data || [];
 				},
 				columns,
 				height: '100%',
+				layout: 'fitDataStretchFrozen',
 				selectable: 1,
 				selectableRangeMode: 'click',
-				persistenceID: 'stv-details-noten-zeugnis'
+				persistenceID: 'stv-details-noten-zeugnis-2025112401',
+				persistence:{
+					columns: ["width", "visible", "frozen"]
+				}
 			};
 		}
 	},
@@ -221,8 +237,11 @@ export default {
 	},
 	methods: {
 		setGrade(data) {
-			this.$fhcApi.factory
-				.stv.grades.updateCertificate(data)
+			this.$api
+				.call(
+					ApiStvGrades.updateCertificate(data),
+					{ errorHeader: data.lehrveranstaltung_bezeichnung }
+				)
 				.then(this.$refs.table.reloadTable)
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('stv/grades_updated')))
 				.catch(this.$fhcAlert.handleFormValidation);
@@ -232,7 +251,10 @@ export default {
 			return this.$fhcAlert
 				.confirmDelete()
 				.then(result => result ? data : Promise.reject({handled:true}))
-				.then(this.$fhcApi.factory.stv.grades.deleteCertificate)
+				.then(data => this.$api.call(
+					ApiStvGrades.deleteCertificate(data),
+					{ errorHeader: data.lehrveranstaltung_bezeichnung }
+				))
 				.then(this.$refs.table.reloadTable)
 				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui/successDelete')))
 				.catch(this.$fhcAlert.handleSystemError);
@@ -255,6 +277,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			>
 			<template v-if="['both', 'header'].includes(config.edit) || ['both', 'header'].includes(config.delete)" #actions="{selected}">
 				<zeugnis-actions :selected="selected" @set-grade="setGrade" @delete-grade="deleteGrade"></zeugnis-actions>

@@ -1185,13 +1185,16 @@ td.headerbar
 {
 	background-image: url(styles/tw/header.png);
 	background-position: top;
-	background-repeat: repeat-x;"
+	background-repeat: repeat-x;
 }
 
 div.cis_logo
 {
 	background-image:url(styles/tw/cis_logo_text_400x78.png);
 	background-repeat: no-repeat;
-	width: 400px;
+	max-width: 400px;
 	height: 78px;
+	background-size: 100%;
+	width: 90%;
+	background-position: center;
 }

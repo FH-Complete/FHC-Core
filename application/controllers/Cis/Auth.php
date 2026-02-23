@@ -72,6 +72,7 @@ class Auth extends FHC_Controller
 	{
 		$this->load->library('AuthLib');
 		$this->authlib->logout();
-		redirect('/Cis/Auth/login', 'refresh');
+		setcookie('fhclogout', 'fhclogout', 0, '/');
+		redirect(base_url('/cis/private/logout.php'), 'refresh');
 	}
 }

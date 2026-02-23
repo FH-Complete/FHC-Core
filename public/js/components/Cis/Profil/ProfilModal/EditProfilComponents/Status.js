@@ -1,6 +1,8 @@
 import Adresse from "../../ProfilComponents/Adresse.js";
 import Kontakt from "../../ProfilComponents/Kontakt.js";
 
+import ApiProfilUpdate from '../../../../../api/factory/profilUpdate.js';
+
 export default {
   components: {
     Adresse,
@@ -65,11 +67,11 @@ export default {
     topic: { type: String },
   },
   created() {
-    this.$fhcApi.factory.profilUpdate.getProfilRequestFiles(this.updateID).then(
-      (res) => {
+    this.$api
+      .call(ApiProfilUpdate.getProfilRequestFiles(this.updateID))
+      .then((res) => {
         this.files = res.data;
-      }
-    );
+      });
   },
   template: /*html*/ `
     <div class="row">
@@ -110,14 +112,17 @@ export default {
     <div class="form-underline-titel">{{topic}}</div>
     <span  class="form-underline-content">{{data.value}} </span>
     </div>
-    <div v-if="files?.length" class="ms-2">
-    
-    <a target="_blank" :href="getDocumentLink(file.dms_id)" v-for="file in files">{{file.name}}</a>
-    </div>
     </template>
     <component v-else :is="getComponentView" :data="data"></component>
     
     </div>
     </div>
+
+	<div v-if="files?.length" class="card mt-4">
+		<div class="card-header">{{$p.t('profilUpdate','nachweisdokumente')}}</div>
+		<div class="card-body">
+			<a target="_blank" :href="getDocumentLink(file.dms_id)" v-for="file in files">{{file.name}}</a>
+		</div>
+	</div>
     `,
 };

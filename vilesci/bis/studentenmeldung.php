@@ -930,26 +930,29 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Matrikelnummer ('".trim($row->matr_nr)."') ist nicht 8 Zeichen lang";
 	}
+	/* Alle SVNR Checks entfernt
 	if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
-	}
+	}*/
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 	}
+	/* Alle SVNR Checks entfernt
 	if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 	{
-		$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
-	}
+		$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht (Nicht BIS-Relevant)";
+	}*/
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
 	}
+	/* Alle SVNR Checks entfernt
 	if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 	{
 		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
-	}
+	}*/
 	if($row->staatsbuergerschaft=='' || $row->staatsbuergerschaft==null)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Staatsb&uuml;rgerschaft ('".$row->staatsbuergerschaft."')";
@@ -972,7 +975,7 @@ function GenerateXMLStudentBlock($row)
 	}
 	if($row->bpk == '' || $row->bpk == null)
 	{
-		$error_log_hinweis .= (!empty($error_log_hinweis) ? ', ' : '') . "bPK fehlt";
+		$error_log .= (!empty($error_log) ? ', ' : '') . "bPK fehlt";
 	}
 	if($row->bpk != '' && $row->bpk != null)
 	{
@@ -1300,6 +1303,12 @@ function GenerateXMLStudentBlock($row)
 				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Partner Code ist leer\n";
 			if($rowgs->programm_code=='')
 				$gserror.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gemeinsame Studien - Programm ist leer\n";
+			// Check, wenn Staatsbuergerschft oder Geburtsnation nicht Ö, dann vermutlich Externer
+			if ($studtyp=='I' && (($row->staatsbuergerschaft != '' && $row->staatsbuergerschaft != 'A') || ($row->geburtsnation != '' && $row->geburtsnation != 'A')))
+			{
+				$error_log_hinweis .= (!empty($error_log_hinweis) ? ', ' : '') . "Hinweis: Person scheint aufgrund der Staatsbürgerschaft <b>externer Studierende*r</b> zu sein. Bitte prüfen und ggf. korrigieren.";
+				//$gserror .= "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Studierende*r scheint <b>externer Studierende*r</b> zu sein. Bitte prüfen und ggf. korrigieren.\n";
+			}
 
 			if($gserror!='')
 			{
@@ -1340,7 +1349,7 @@ function GenerateXMLStudentBlock($row)
 				}
 				if($row_ap->sponsion=='' || $row_ap->sponsion==null)
 				{
-					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
+					$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."') (Nicht BIS-Relevant)";
 				}
 				$ap++;
 			}
@@ -1354,6 +1363,26 @@ function GenerateXMLStudentBlock($row)
 			die("\nQry Failed:".$qry_ap);
 		}
 	}
+
+	//Wenn Beendigungsdatum VOR der Meldung und kein Absolvent vorhanden
+	if($aktstatus!='Absolvent' && !$gemeinsamestudien)
+	{
+		$qry_abs="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." 
+				AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL
+				AND datum <= '".$bisdatum."'::date";
+		if($result_abs = $db->db_query($qry_abs))
+		{
+			while($row_abs = $db->db_fetch_object($result_abs))
+			{
+				$error_log.=(!empty($error_log)?', ':'')."Wenn das Abschlussdatum (".$datum_obj->formatDatum($row_abs->datum,'d.m.Y').") vor der BIS-Meldung liegt, muss ein Absolventenstatus vorhanden sein";
+			}
+		}
+		else
+		{
+			die("\nQry Failed:".$qry_abs);
+		}
+	}
+	
 	if($orgform_code_array[$storgform]!=1) // Wenn nicht Vollzeit
 	{
 		if($row->berufstaetigkeit_code=='' || $row->berufstaetigkeit_code==null)
@@ -1420,7 +1449,7 @@ function GenerateXMLStudentBlock($row)
 		}
 		if($error_log_hinweis != '')
 		{
-			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis."</span>\n";
 			$error_log_hinweis = '';
 		}
 		$anzahl_fehler++;
@@ -1434,7 +1463,7 @@ function GenerateXMLStudentBlock($row)
 		if($error_log_hinweis != '')
 		{
 			$v.="<u>Bei Student (UID, Nachname, Vorname) '".$row->student_uid."', '".$row->nachname."', '".$row->vorname."' ($laststatus->status_kurzbz): </u>\n";
-			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis." (Nicht BIS-Relevant)</span>\n\n";
+			$v.="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color: grey'>".$error_log_hinweis."</span>\n\n";
 			$error_log_hinweis = '';
 		}
 
@@ -1484,14 +1513,17 @@ function GenerateXMLStudentBlock($row)
 			<Vorname>" . $row->vorname . "</Vorname>
 			<Familienname>" . $row->nachname . "</Familienname>";
 
+		/* Alle SVNR Checks entfernt
 		if ($row->svnr != '')
 		{
 			$datei .= "
 			<SVNR>" . $row->svnr . "</SVNR>";
-		}
+		}*/
 
 		// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
-		if ($row->ersatzkennzeichen != '' && $row->svnr == null)
+		//  Alle SVNR Checks entfernt
+		// if ($row->ersatzkennzeichen != '' && $row->svnr == null)
+		if ($row->ersatzkennzeichen != '')
 		{
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";

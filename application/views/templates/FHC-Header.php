@@ -9,12 +9,14 @@
 	$title = isset($title) ? $title : null;
 	$refresh = isset($refresh) ? $refresh : null;
 	$customCSSs = isset($customCSSs) ? $customCSSs : null;
+	$skipID = isset($skipID) ? $skipID : null;
 ?>
 <!-- Header start -->
 
 <!DOCTYPE HTML>
 <html>
 	<head>
+
 		<title><?php printPageTitle($title); ?></title>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -95,7 +97,12 @@
 				generateCSSsInclude('vendor/npm-asset/primeicons/primeicons.css');
 			}
 
-			// --------------------------------------------------------------------------------------------------------
+			if ($vuedatepicker11 === true)
+			{
+				generateCSSsInclude('vendor/vuejs/vuedatepicker_css11/main.css');
+			}
+			
+		// --------------------------------------------------------------------------------------------------------
 			// From public folder
 
 			// AjaxLib CSS
@@ -130,6 +137,8 @@
 		?>
 	</head>
 	<body>
+
+		<?php if($skipID) generateSkipLink($skipID); ?>
 
 <!-- Header end -->
 

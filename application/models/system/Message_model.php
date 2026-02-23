@@ -85,7 +85,7 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesOfPerson($person_id, $status = null)
 	{
-		$sql = 'SELECT m.message_id,
+		$sql = "SELECT m.message_id,
 						m.person_id,
 						m.subject,
 						m.body,
@@ -122,7 +122,7 @@ class Message_model extends DB_Model
 						  ) s ON (m.message_id = s.message_id AND re.person_id = s.person_id)
 				 WHERE se.person_id = ?
 				 OR re.person_id = ?
-				 ';
+				 ";
 
 		if (is_numeric($status))
 		{
@@ -230,4 +230,150 @@ class Message_model extends DB_Model
 		
 		return $this->execQuery($query, $params);
 	}
+
+	/**
+	 * Gets messages for a person for tableMessages.
+	 * @param $person_id
+	 * paginationInitialPage: 1,
+	 * @param $offset number to skip, calculated by tabulatorParam paginationInitialPage and 	paginationSize, refers to specified numer of skipped items
+	 * and page
+	 * @param $limit refers to tabulatorParam paginationSize
+	 * @return array|null
+	 */
+	public function getMessagesForTable($person_id, $offset, $limit)
+	{
+		$sql = <<<EOSQL
+			with filtered_messages as (
+				select
+					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
+				from
+					public.tbl_msg_message m
+				join
+					public.tbl_msg_recipient mr on mr.message_id = m.message_id
+				where
+					m.person_id = ?
+				group by
+					m.message_id, m.person_id, mr.person_id
+
+				union all
+
+				select
+					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
+				from
+					public.tbl_msg_message m
+				join
+					public.tbl_msg_recipient mr on mr.message_id = m.message_id
+				where
+					mr.person_id = ?
+				group by
+					m.message_id, m.person_id, mr.person_id
+
+			), lastmsgstatus as (
+				select
+					ms.*
+				from (
+						select
+							s.message_id, s.person_id, MAX(s.insertamum) as lastinserted
+						from
+							public.tbl_msg_status s
+						group by
+							s.message_id, s.person_id
+					) ls
+				join
+					public.tbl_msg_status ms on ms.message_id = ls.message_id and ms.person_id = ls.person_id and ms.insertamum = ls.lastinserted
+			)
+
+			select
+				(select count(*) from filtered_messages) as total_msgs,
+				m.message_id AS message_id,
+				m.subject AS subject,
+				m.body AS body,
+				m.insertamum AS insertamum,
+				m.relationmessage_id AS relationmessage_id,
+				(COALESCE(ps.titelpre,'') || ' ' || COALESCE(ps.vorname,'') || ' ' || COALESCE(ps.nachname,'') || ' ' || COALESCE(ps.titelpost,'')) as sender,
+				(COALESCE(pr.titelpre,'') || ' ' || COALESCE(pr.vorname,'') || ' ' || COALESCE(pr.nachname,'') || ' ' || COALESCE(pr.titelpost,'')) as recipient,
+				fm.sender_id,
+				fm.recipient_id,
+				ms.status,
+				ms.insertamum as statusdatum
+			from
+				filtered_messages fm
+			join
+				public.tbl_msg_message m on fm.message_id = m.message_id
+			join
+				lastmsgstatus ms on fm.message_id = ms.message_id and fm.recipient_id = ms.person_id
+			left join
+				public.tbl_person ps on ps.person_id = fm.sender_id
+			left join
+				public.tbl_person pr on pr.person_id = fm.recipient_id
+			order by
+				m.insertamum DESC
+			limit ?
+			offset ?;
+EOSQL;
+
+		$parametersArray = array($person_id, $person_id, $limit, $offset);
+
+		$count = 0;
+		$data = $this->execQuery($sql, $parametersArray);
+
+		if (isError($data))
+			return $data;
+
+		$data = getData($data);
+		if($data)
+		{
+			$count = ceil($data[0]->total_msgs / $limit);
+		}
+
+		return success(['data' => $data, 'count' => $count]);
+	}
+
+	/**
+	 * Deletes entry in dependency table tbl_msg_recipient
+	 *
+	 * @param $message_id
+	 * @return boolean success
+	 */
+	public function deleteMessageRecipient($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_recipient
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+
+	/**
+	 * Deletes entry in dependency table tbl_msg_status
+	 *
+	 * @param $message_id
+	 * @return boolean success
+	 */
+	public function deleteMessageStatus($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_status
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+	/**
+	 * Deletes entry in dependency table tbl_msg_message
+	 *
+	 * @param $message_id
+	 * @return boolean success
+	 */
+	public function deleteMessage($message_id)
+	{
+		$sql = "
+		 DELETE FROM public.tbl_msg_message
+			WHERE message_id = ?;
+		 ";
+
+		return $this->execQuery($sql, array($message_id));
+	}
+	
 }

@@ -1,4 +1,5 @@
 <?php
+
 class Studienjahr_model extends DB_Model
 {
 
@@ -29,6 +30,22 @@ class Studienjahr_model extends DB_Model
 
 		return $this->execQuery($query);
 	}
+	public function getNextStudienjahr()
+	{
+		$this->addJoin('public.tbl_studiensemester', 'studienjahr_kurzbz');
+		$this->addOrder('start');
+		$this->addLimit(1);
+
+		return $this->loadWhere(['start >' => 'NOW()']);
+	}
+	public function getNextFrom($studienjahr_kurzbz)
+	{
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'studienjahr_kurzbz >' => $studienjahr_kurzbz
+		]);
+	}
 
 	/**
 	 * Get the current Studienjahr. During the summer term, continue using the previous Studienjahr.
@@ -38,8 +55,7 @@ class Studienjahr_model extends DB_Model
 	 */
 	public function getLastOrAktStudienjahr($days = 60)
 	{
-		if (!is_numeric($days))
-		{
+		if (!is_numeric($days)) {
 			$days = 60;
 		}
 
@@ -63,8 +79,7 @@ class Studienjahr_model extends DB_Model
 	 */
 	public function getAktOrNextStudienjahr($days = 62)
 	{
-		if (!is_numeric($days))
-		{
+		if (!is_numeric($days)) {
 			$days = 62;
 		}
 
