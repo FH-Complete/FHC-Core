@@ -9,6 +9,6 @@ class Ferien_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_ferien';
-		$this->pk = array('studiengang_kz', 'bezeichnung');
+		$this->pk = 'ferien_id';
 	}
 }
