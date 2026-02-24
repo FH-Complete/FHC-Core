@@ -356,11 +356,11 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
 						<button v-if="projektarbeit.beurteilung1" @click="handleDownloadBeurteilung1(projektarbeit)" class="btn btn-primary">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
 						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary" style="margin-left: 4px;">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 					</div>
 				</div>
@@ -379,13 +379,13 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuer') ) }}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuerv2') ) }}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.betreuerart_kurzbz ? projektarbeit.betreuer : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontakt') )}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontaktv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>

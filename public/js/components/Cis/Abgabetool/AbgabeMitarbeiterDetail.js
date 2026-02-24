@@ -640,7 +640,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<VueDatePicker
 							v-model="newTermin.datum"
@@ -698,8 +698,8 @@ export const AbgabeMitarbeiterDetail = {
 				<p> {{getProjektarbeitStudent}}</p>
 				<p> {{getProjektarbeitTitel}}</p>
 				<template v-if="assistenzMode">
-					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{ projektarbeit.betreuerart ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart)) : $capitalize( $p.t('abgabetool/c4betreuer') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
-					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{ projektarbeit?.zweitbetreuer_betreuerart_kurzbz ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)) : $capitalize( $p.t('abgabetool/c4zweitbetreuer') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{ projektarbeit.betreuerart ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart)) : $capitalize( $p.t('abgabetool/c4betreuerv2') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{ projektarbeit?.zweitbetreuer_betreuerart_kurzbz ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)) : $capitalize( $p.t('abgabetool/c4zweitbetreuerv2') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
 				</template>
 				<template v-else>
 					<p v-if="projektarbeit?.betreuer"> {{$capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz))}}: {{projektarbeit?.betreuer?.first}}</p>
@@ -796,7 +796,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					<div class="row mt-2">
 						<div class="col-12 col-md-3 align-content-center">
-							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 							<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
 						</div>
 						<div class="col-12 col-md-9">

@@ -334,7 +334,7 @@ export const AbgabeStudentDetail = {
 				<div class="col-8">
 					<p> {{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>
 					<p> {{$capitalize( $p.t('abgabetool/c4titel') ) }}: {{projektarbeit?.titel}}</p>
-					<p> {{$capitalize( $p.t('abgabetool/c4betreuer') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				</div>
 				<div class="col-4">
 					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
@@ -414,7 +414,7 @@ export const AbgabeStudentDetail = {
 						
 						<div class="row mt-2">
 							<div class="col-12 col-md-3 align-content-center">
-								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 								<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
 							</div>
 							<div class="col-12 col-md-9">

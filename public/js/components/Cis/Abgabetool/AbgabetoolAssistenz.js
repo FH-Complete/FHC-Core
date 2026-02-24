@@ -9,6 +9,7 @@ import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -179,7 +180,7 @@ export const AbgabetoolAssistenz = {
 					// 	frozen: true,
 					// 	width: 40
 					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -191,15 +192,41 @@ export const AbgabetoolAssistenz = {
 						 formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuer'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuer'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), headerFilter: true, field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), headerFilter: true, field: 'nextTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))), headerFilter: true, field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))), headerFilter: true, field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPre'))), field: 'betreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerVorname'))), field: 'betreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerNachname'))), field: 'betreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPost'))), field: 'betreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPre'))), field: 'zweitbetreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminCol,
+						sorter: this.sortFuncTerminCol,
+						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminCol,
+						sorter: this.sortFuncTerminCol,
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
+						headerFilter: 'list',
+						headerFilterParams: { valuesLookup: this.getQGateStatusList },
+						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
+						headerFilter: 'list',
+						headerFilterParams: { valuesLookup: this.getQGateStatusList },
+						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2025_12"
+				persistenceID: "abgabetool_2026_02"
 			},
 			abgabeTableEventHandlers: [
 			{
@@ -220,6 +247,67 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		getQGateStatusList() {
+			return [
+				this.$p.t('abgabetool/c4keinTerminVorhanden'),
+				this.$p.t('abgabetool/c4positivBenotet'),
+				this.$p.t('abgabetool/c4negativBenotet'),
+				this.$p.t('abgabetool/c4notYetGraded'),
+				this.$p.t('abgabetool/c4notSubmitted'),
+				this.$p.t('abgabetool/c4notHappenedYet')
+			]	
+		},
+		sortFuncTerminCol(a, b, aRow, bRow, column, dir, params) {
+			if (a === null || typeof a === "undefined") return 1;
+			if (b === null || typeof b === "undefined") return -1;
+			
+			// try to handle the prev/next interpretation consistently
+			// can only make this wrong UX whise so whatever
+			if(column._column.field == 'prevTermin') {
+				return Math.abs(b.diffMs) - Math.abs(a.diffMs)
+			} else if (column._column.field == 'nextTermin') {
+				return Math.abs(a.diffMs) - Math.abs(b.diffMs)
+			}
+			
+			// just in case someone reuses this
+			return Math.abs(b.diffMs) - Math.abs(a.diffMs) 
+		},
+		headerFilterTerminCol(filterVal, rowVal) {
+			if (!rowVal || !rowVal.luxonDate || !rowVal.luxonDate.isValid) {
+				return false;
+			}
+
+			const rowDate = rowVal.luxonDate;
+
+			const toLuxon = (val) => {
+				if (!val) return null;
+				let dt;
+				if (val instanceof Date) {
+					dt = luxon.DateTime.fromJSDate(val);
+				} else if (typeof val === "string") {
+					dt = luxon.DateTime.fromISO(val);
+				} else { // fallback
+					dt = luxon.DateTime.fromMillis(Number(val));
+				}
+
+				return dt.isValid ? dt : null;
+			};
+
+			const von = toLuxon(filterVal[0]);
+			const bis = toLuxon(filterVal[1]);
+
+			// specific day
+			if (von && !bis) {
+				return rowDate.hasSame(von, "day");
+			}
+
+			// range case
+			if (von && bis) {
+				return rowDate >= von.startOf("day") && rowDate <= bis.endOf("day");
+			}
+
+			return false
+		},
 		sammelMailStudent(param) {
 			
 			const emails = this.selectedData
@@ -389,6 +477,7 @@ export const AbgabetoolAssistenz = {
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
 				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
 				if (termin.diffMs < 0) {
@@ -951,7 +1040,7 @@ export const AbgabetoolAssistenz = {
 			
 			if(this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER) {
 				menu.push({
-					label: this.$p.t('abgabetool/c4sendEmailBetreuerv2', [this.uniqueBetreuerEmailCount]),
+					label: this.$p.t('abgabetool/c4sendEmailBetreuerv3', [this.uniqueBetreuerEmailCount]),
 					command: this.sammelMailBetreuer
 				})
 			}
@@ -1130,7 +1219,7 @@ export const AbgabetoolAssistenz = {
 			
 				<div class="row mt-2">
 					<div class="col-12 col-md-3 align-content-center">
-						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+						<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 					</div>
 					<div class="col-12 col-md-9">
 						<VueDatePicker
@@ -1265,7 +1354,7 @@ export const AbgabetoolAssistenz = {
 				<template #opposite="slotProps">
 					<div class="row g-1">
 						<div class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4zieldatum')) }}:
+							{{ $capitalize($p.t('abgabetool/c4zieldatumv2')) }}:
 						</div>
 						<div class="col-7">
 							{{ formatDate(slotProps.item.datum) }}

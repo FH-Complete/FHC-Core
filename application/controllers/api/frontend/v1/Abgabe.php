@@ -1222,7 +1222,7 @@ class Abgabe extends FHCAPI_Controller
 
 			$email = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id);
 
-			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
+			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
 			
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
@@ -1235,7 +1235,7 @@ class Abgabe extends FHCAPI_Controller
 
 			if(!$mailres)
 			{
-				$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
+				$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
 			}
 
 			// 2. Begutachter mail, wenn Endabgabe, mit Token wenn extern
@@ -1255,14 +1255,14 @@ class Abgabe extends FHCAPI_Controller
 
 						if (!$tokenGenRes)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
 						}
 
 						$begutachterMitTokenRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid, $begutachter->person_id));
 						
 						if (!$begutachterMitTokenRetval && count($begutachterMitTokenRetval) <= 0)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailZweitBegutachterv2'), 'general');
 						}
 
 						$begutachterMitToken = $begutachterMitTokenRetval[0];
@@ -1296,7 +1296,7 @@ class Abgabe extends FHCAPI_Controller
 
 						if (!$mailres)
 						{
-							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachter'), 'general');
+							$this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
 						}
 
 					}
