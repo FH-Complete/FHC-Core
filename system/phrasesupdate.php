@@ -35089,6 +35089,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'oldEntsWithoutDocumentFound',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Alte Entschuldigungen ohne Dateiupload gefunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Old excuse notes without file upload detected',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
 	//

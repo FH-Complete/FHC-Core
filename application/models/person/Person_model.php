@@ -424,12 +424,13 @@ class Person_model extends DB_Model
 	public function loadAllStudentUIDSForPersonID($person_id) {
 		$qry = "SELECT
 			CONCAT(tp.vorname, ' ', tp.nachname) AS name,
-			ARRAY_AGG(DISTINCT b.uid ORDER BY b.uid) AS uids
+			ARRAY_AGG(DISTINCT b.uid ORDER BY b.uid) AS uids,
+			ARRAY_AGG(DISTINCT s.studiengang_kz ORDER BY s.studiengang_kz) AS stg_kzs
 		FROM public.tbl_student s
 				 JOIN public.tbl_benutzer b ON s.student_uid = b.uid
 				 JOIN public.tbl_person tp ON b.person_id = tp.person_id
-		GROUP BY tp.vorname, tp.nachname, b.aktiv, b.person_id
-		HAVING b.person_id = ? AND b.aktiv IS TRUE;";
+		GROUP BY tp.vorname, tp.nachname, b.aktiv, b.person_id, s.semester, s.studiengang_kz
+		HAVING b.person_id = ? AND b.aktiv IS TRUE AND s.semester > 0;";
 		
 		return $this->execReadOnlyQuery($qry, [$person_id]);
 	}
