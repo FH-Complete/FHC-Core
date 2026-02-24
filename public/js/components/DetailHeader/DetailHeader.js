@@ -112,7 +112,7 @@ export default {
 		}
 	},
 	template: `
-		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
+		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
 					<div
@@ -122,7 +122,7 @@ export default {
 					>
 						<img
 						  class="d-block rounded"
-						  style="height: 84px;"
+						  style="height: 75px;"
 						  alt="Profilbild"
 						  :src="getFotoSrc(person.foto)"
 						/>

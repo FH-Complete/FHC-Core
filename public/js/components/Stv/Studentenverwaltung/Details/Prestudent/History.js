@@ -73,7 +73,7 @@ export default{
 		},
 	},
 	template: `
-	<div class="stv-details-prestudent-history h-100 pt-3">
+	<div class="stv-details-prestudent-history h-100">
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"

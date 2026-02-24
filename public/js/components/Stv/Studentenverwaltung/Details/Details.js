@@ -164,14 +164,14 @@ export default {
 		this.updateStudent(this.modelValue);
 	},
 	template: `
-	<core-form ref="form" class="stv-details-details" @submit.prevent="save">
+	<core-form ref="form" class="stv-details-details mb-4" @submit.prevent="save">
 		<div class="position-sticky top-0 z-1">
 			<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!changedLength">{{$p.t('ui', 'speichern')}}</button>
 		</div>
-		<fieldset class="overflow-hidden">
+		<fieldset class="overflow-hidden mb-2">
 			<legend>Person</legend>
 			<template v-if="data">
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('person_id')"
 						container-class="col stv-details-details-person_id"
@@ -211,7 +211,7 @@ export default {
  						>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('anrede')"
 						container-class="col stv-details-details-anrede"
@@ -243,7 +243,7 @@ export default {
  						>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('nachname')"
 						container-class="col stv-details-details-nachname"
@@ -286,7 +286,7 @@ export default {
 					</form-input>
 
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('gebdatum')"
 						container-class="col stv-details-details-gebdatum"
@@ -337,7 +337,7 @@ export default {
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 
 					<form-input
 						v-if="!config.hiddenFields.includes('matr_nr')"
@@ -380,7 +380,7 @@ export default {
 						<option v-for="(bezeichnung, key) in familienstaende" :key="key" :value="key">{{bezeichnung}}</option>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('foto')"
 						container-class="col stv-details-details-foto"
@@ -420,16 +420,16 @@ export default {
 				v-if="!config.hideUDFs"
 				@load="udfsLoaded"
 				v-model="data"
-				class="row-cols-3 g-3 mb-3"
+				class="row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1"
 				ci-model="person/person"
 				:pk="{person_id:modelValue.person_id}"
 				>
 			</core-udf>
 		</fieldset>
-		<fieldset v-if="data?.student_uid" class="overflow-hidden">
+		<fieldset v-if="data?.student_uid" class="overflow-hidden mb-2">
 			<legend>{{$p.t('person', 'studentIn')}}</legend>
 			<template v-if="data">
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('student_uid')"
 						container-class="col stv-details-details-student_uid"
@@ -471,7 +471,7 @@ export default {
 						>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('semester')"
 						container-class="col stv-details-details-semester"

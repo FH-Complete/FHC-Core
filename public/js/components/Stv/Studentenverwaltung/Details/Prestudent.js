@@ -260,9 +260,9 @@ export default {
 			<div class="position-sticky top-0 z-1">
 				<button type="submit" class="btn btn-primary position-absolute top-0 end-0" :disabled="!deltaLength">Speichern</button>
 			</div>
-			<fieldset class="overflow-hidden">
+			<fieldset class="overflow-hidden mb-2">
 				<legend>{{$p.t('lehre', 'title_zgv')}} {{modelValue.nachname}} {{modelValue.vorname}}</legend>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 					v-if="!config.hiddenFields.includes('prestudent_id')"
 						container-class="col stv-details-prestudent-prestudent_id"
@@ -284,7 +284,7 @@ export default {
 						>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('zgv_code')"
 						container-class="col stv-details-prestudent-zgv_code"
@@ -348,7 +348,7 @@ export default {
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvmas_code')"
 						container-class="col stv-details-prestudent-zgvmas_code"
@@ -413,7 +413,7 @@ export default {
 					</form-input>
 				</div>
 				<!--ZGV Doktor-->
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('zgvdoktor_code')"
 						container-class="col stv-details-prestudent-zgvdoktor_code"
@@ -477,11 +477,13 @@ export default {
 						<option v-for="nation in lists.nations" :key="nation.nation_code" :value="nation.nation_code" :disabled="nation.sperre">{{nation.kurztext}}</option>
 					</form-input>
 				</div>
-																
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-3 mb-3">
-					<template class="col pt-4 d-flex align-items-center">
+
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 gx-3 gy-1 mb-1">
+					<div
+						class="col pt-4 d-flex align-items-center"
+						v-if="!config.hiddenFields.includes('zgv_erfuellt')"
+					>
 						<form-input
-							v-if="!config.hiddenFields.includes('zgv_erfuellt')"
 							container-class="form-check stv-details-prestudent-zgv_erfuellt"
 							:label="$p.t('infocenter', 'zgvErfuellt')"
 							type="checkbox"
@@ -489,10 +491,12 @@ export default {
 							name="zgv_erfuellt"
 							>
 						</form-input>
-					</template>
-					<template class="col pt-4 d-flex align-items-center">
+					</div>
+					<div
+						class="col pt-4 d-flex align-items-center"
+						v-if="!config.hiddenFields.includes('zgvmas_erfuellt')"
+					>
 						<form-input
-							v-if="!config.hiddenFields.includes('zgvmas_erfuellt')"
 							container-class="form-check stv-details-prestudent-zgvmas_erfuellt"
 							:label="$p.t('lehre', 'zgvMasterErfuellt')"
 							type="checkbox"
@@ -500,10 +504,12 @@ export default {
 							name="zgvmas_erfuellt"
 							>
 						</form-input>
-					</template>
-					<template class="col pt-4 d-flex align-items-center">
+					</div>
+					<div
+						class="col pt-4 d-flex align-items-center"
+						v-if="!config.hiddenFields.includes('zgvdoktor_erfuellt')"
+					>
 						<form-input
-							v-if="!config.hiddenFields.includes('zgvdoktor_erfuellt')"
 							container-class="form-check stv-details-prestudent-zgvdoktor_erfuellt"
 							:label="$p.t('lehre', 'zgvDoktorErfuellt')"
 							type="checkbox"
@@ -511,12 +517,12 @@ export default {
 							name="zgvdoktor_erfuellt"
 							>
 						</form-input>
-					</template>
+					</div>
 				</div>
 			</fieldset>
-			<fieldset class="overflow-hidden">
+			<fieldset class="overflow-hidden mb-2">
 				<legend>PrestudentIn</legend>
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('aufmerksamdurch_kurzbz')"
 						container-class="col stv-details-prestudent-aufmerksamdurch_kurzbz"
@@ -551,7 +557,7 @@ export default {
 					</form-input>
 				</div>
 				
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('aufnahmeschluessel')"
 						container-class="col stv-details-prestudent-aufnahmeschluessel"
@@ -563,9 +569,11 @@ export default {
 						>
 					</form-input>
 					
-					<template class="col pt-4 d-flex align-items-center">
+					<div
+						v-if="!config.hiddenFields.includes('facheinschlaegigBerufstaetig')"
+						class="col pt-4 d-flex align-items-center"
+					>
 						<form-input
-							v-if="!config.hiddenFields.includes('facheinschlaegigBerufstaetig')"
 							container-class="form-check stv-details-prestudent-facheinschlaegigBerufstaetig"
 							:label="$p.t('person', 'facheinschlaegigBerufstaetig')"
 							type="checkbox"
@@ -573,7 +581,7 @@ export default {
 							name="facheinschlberuf"
 							>
 						</form-input>
-					</template>
+					</div>
 					
 					<form-input
 						v-if="!config.hiddenFields.includes('standort_code')"
@@ -587,7 +595,7 @@ export default {
 					</form-input>		 
 				</div>
 								
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('studiengang_kz')"
 						container-class="col stv-details-prestudent-studiengang_kz"
@@ -611,7 +619,7 @@ export default {
 					</form-input>
 				</div>
 				
-				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 g-3 mb-3">
+				<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-3 gx-3 gy-1 mb-1">
 					<form-input
 						v-if="!config.hiddenFields.includes('anmerkung')"
 						container-class="col stv-details-prestudent-anmerkung"
@@ -623,9 +631,11 @@ export default {
 					</form-input>
 					<div class="col">
 						<div class="row g-3 align-items-center mb-3">
-							<template class="col-12 col-md-6 pt-4 d-flex align-items-center">
+							<div
+								class="col-12 col-md-6 pt-4 d-flex align-items-center"
+								v-if="!config.hiddenFields.includes('bismelden')"
+							>
 								<form-input
-									v-if="!config.hiddenFields.includes('bismelden')"
 									container-class="col form-check stv-details-prestudent-bismelden"
 									:label="$p.t('person', 'bismelden')"
 									type="checkbox"
@@ -634,10 +644,12 @@ export default {
 									:disabled="!hasBismeldenPermission"
 									>
 								</form-input>
-							</template>
-							<template class="col-12 col-md-6 pt-4 d-flex align-items-center">
+							</div>
+							<div
+								class="col-12 col-md-6 pt-4 d-flex align-items-center"
+								v-if="!config.hiddenFields.includes('dual')"
+							>
 								<form-input
-									v-if="!config.hiddenFields.includes('dual')"
 									container-class="col form-check stv-details-prestudent-dual"
 									:label="$p.t('lehre', 'dual')"
 									type="checkbox"
@@ -645,7 +657,7 @@ export default {
 									name="dual"
 									>
 								</form-input>
-							</template>
+							</div>
 						</div>
 					</div>
 					
@@ -677,7 +689,7 @@ export default {
 					v-if="!config.hideUDFs" 
 					@load="udfsLoaded" 
 					v-model="data" 
-					class="row-cols-3 g-3 mb-3" 
+					class="row-cols-3 gx-3 gy-1 mb-1"
 					ci-model="crm/prestudent" 
 					:pk="{prestudent_id:modelValue.prestudent_id}"
 					>

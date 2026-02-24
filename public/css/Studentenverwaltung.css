@@ -12,22 +12,22 @@ html {
   font-size: .875em;
 }
 html.fs_xx-small {
-	font-size: .5em;
+	font-size: .625em;
 }
 html.fs_x-small {
-	font-size: .625em;
+	font-size: .6875em;
 }
 html.fs_small {
 	font-size: .75em;
 }
 html.fs_normal {
-  font-size: .875em;
+	font-size: .8125em;
 }
 html.fs_big {
-  font-size: 1em;
+	font-size: .875em;
 }
 html.fs_huge {
-	font-size: 1.125em;
+	font-size: 1em;
 }
 
 #appMenu {
@@ -185,3 +185,41 @@ html.fs_huge {
 .tiny-90 div.tox.tox-tinymce {
 	height: 90% !important;
 }
+
+/* slim begin */
+.stv .form-label {
+	margin-bottom: .15rem;
+}
+
+.stv .form-control,
+.stv .form-select,
+.stv .input-group-text {
+	padding-top: .15rem;
+	padding-bottom: .15rem;
+	line-height: 1.25;
+}
+
+:root {
+	--bs-body-line-height: 1.25;
+}
+
+.stv .tabulator-row .tabulator-cell,
+.stv .tabulator-header-filter input {
+	padding-top: 1px !important;
+	padding-bottom: 1px !important;
+}
+
+.stv .tabulator-row {
+	min-height: 18px;
+}
+
+.stv .btn {
+	--bs-btn-padding-y: 0.15rem;
+	--bs-btn-line-height: 1.25;
+}
+
+.stv .p-button.p-button-icon-only {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+/* slim ende */
