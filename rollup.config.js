@@ -1,4 +1,3 @@
-import fhcBuildConfig from './rollup.fhcbuildconfig.js';
 import babel from '@rollup/plugin-babel';
 import { globSync } from 'glob';
 import path from 'node:path';
@@ -10,7 +9,6 @@ import json from '@rollup/plugin-json';
 
 const debug = (process.env.DEBUG !== undefined) && (process.env.DEBUG === "true");
 
-const buildversion = fhcBuildConfig.fhcBuildVersion;
 const fhcbasepath = import.meta.dirname;
 
 let apps = {};
@@ -43,7 +41,7 @@ function FhcResolver () {
 
       if( source.includes('index.ci.php') ) {
 	let source_abs = fhcbasepath + '/' + source.replace(/(\.\.\/)+/, '');
-	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildversion;
+	let source_rel = path.relative(path.dirname(curapp), source_abs);
 
 	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 
@@ -55,7 +53,7 @@ function FhcResolver () {
 	if(source_abs.match(/\/FHC-Core-[^\/]+\/public\//)) {
 	  source_abs = fhcbasepath + source_abs.replace(/^.+?\/(FHC-Core-[^\/]+)\/public\//, '/public/extensions/$1/');
 	}
-	let source_rel = path.relative(path.dirname(curapp), source_abs) + '?' + buildversion;
+	let source_rel = path.relative(path.dirname(curapp), source_abs);
 
 	debug && console.log('SOURCE_ABS:' + source_abs + 'APP: ' + curapp + 'SOURCE_REL: ' + source_rel);
 

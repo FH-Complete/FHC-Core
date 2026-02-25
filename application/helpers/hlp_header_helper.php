@@ -191,9 +191,9 @@ function generateJSModulesInclude($JSModules)
 			$item = $tmpJSs[$tmpJSsCounter];
 			if($use_bundled_javascript)
 			{
-				$item = str_replace('/public/', '/public/dist/', $item);
+				$item = preg_replace('#^public/#', 'public/dist/', $item);
 			}
-
+			echo "<!--{$item}-->".PHP_EOL;
 			if($ci->config->item('use_fhcomplete_build_version_in_path'))
 			{
 				$relurl = preg_replace('#public/#', 'public/' . $ci->config->item('fhcomplete_build_version') . '/', $item);
