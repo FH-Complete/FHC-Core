@@ -19,6 +19,8 @@
 if (!defined('BASEPATH'))
 	exit('No direct script access allowed');
 
+use CI3_Events as Events;
+
 class Setup extends FHCAPI_Controller
 {
 	private $_ci;
@@ -65,6 +67,11 @@ class Setup extends FHCAPI_Controller
 			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Notiz.js'),
 			'config' => []
 		);
+
+		Events::trigger('lvv_conf_tabs', function & () use (&$tabs) {
+			return $tabs;
+		});
+
 		$this->terminateWithSuccess($tabs);
 	}
 

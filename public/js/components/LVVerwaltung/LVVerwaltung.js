@@ -8,7 +8,6 @@ import LvTabs from "./Setup/Tabs.js";
 
 import ApiDetails from "../../api/lehrveranstaltung/details.js";
 import ApiLektor from "../../api/lehrveranstaltung/lektor.js";
-import ApiGruppe from "../../api/lehrveranstaltung/gruppe.js";
 import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 import ApiSearchbar from "../../api/factory/searchbar.js";
 
@@ -205,6 +204,21 @@ export default {
 			this.$router.push({ name: routeName, params: newParams });
 			this.selected = [];
 		},
+		isDisabled(item)
+		{
+			if (!item?.requires?.length)
+				return false;
+
+			const values = {
+				stg: this.stg,
+				emp: this.emp,
+				studiensemester: this.selectedStudiensemester,
+				semester: this.semester
+			};
+
+			return item.requires.some(req => !values[req]);
+
+		}
 	},
 	created() {
 		this.$p.loadCategory(['lehre', 'person', 'global'])
@@ -238,6 +252,62 @@ export default {
 				this.dropdowns.lehrfunktion_array = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+	},
+	computed:
+	{
+		appMenuExtraItems()
+		{
+			let extraItems = [];
+
+			const studiengang_kz = this.stg || '';
+			const studiensemester = this.selectedStudiensemester;
+			const semester = this.semester || '';
+			const uid = this.emp || '';
+
+			extraItems.push({
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/statistik/lvplanung.xls.php'
+					+ '?studiengang_kz=' + studiengang_kz
+					+ '&studiensemester_kurzbz=' + studiensemester
+					+ '&semester=' + semester,
+				description: 'lehre/lvplanung',
+				requires: ['stg']
+			});
+
+			extraItems.push({
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/statistik/lehrauftragsliste_gst.xls.php'
+					+ '?studiengang_kz=' + studiengang_kz
+					+ '&studiensemester_kurzbz=' + studiensemester
+					+ '&semester=' + semester,
+				description: 'lehre/lehrauftragsliste',
+				requires: ['stg']
+			});
+
+			extraItems.push({
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+					+ '&xsl=Lehrauftrag'
+					+ '&stg_kz=' + studiengang_kz
+					+ '&ss=' + studiensemester,
+				description: 'lehre/lehrauftraege',
+				requires: ['stg']
+			});
+
+			extraItems.push({
+				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+					+ '&xsl=Lehrauftrag'
+					+ '&stg_kz=' + studiengang_kz
+					+ '&ss=' + studiensemester
+					+ '&uid=' + uid,
+				description: 'lehre/lehrauftragslisteemp',
+				requires: ['emp']
+			});
+
+			return extraItems;
+
+		}
 	},
 
 	template: /* html */`
@@ -278,7 +348,31 @@ export default {
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<div class="offcanvas-body">
-						<app-menu app-identifier="lvv" />
+						<app-menu app-identifier="lvv">
+							<li class="dropend">
+								<a
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									data-bs-popper-config='{"strategy":"fixed"}'
+								>
+									{{ $p.t('lehre/berichte') }}
+								</a>
+								<ul class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuExtraItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank" :class="{ disabled: isDisabled(item) }"
+>
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+						</app-menu>
 					</div>
 				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
