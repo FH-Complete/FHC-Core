@@ -43740,7 +43740,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgabekurzbz',
+		'phrase' => 'c4abgabekurzbzv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43751,7 +43751,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Short description of the submitted file",
+				'text' => "Short description of the submitted document",
 				'description' => '',
 				'insertvon' => 'system'
 			)
