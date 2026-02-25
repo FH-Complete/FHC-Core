@@ -9,8 +9,9 @@
 		'navigationcomponent' => true,
 		'tabulator6' => true,
 		'primevue3' => true,
-		'vuedatepicker11' => true,
+		//'vuedatepicker11' => true,
 		'customJSModules' => array('public/js/apps/lehre/Ferienverwaltung/Ferienverwaltung.js'),
+		'customCSSs' => array('vendor/vuejs/vuedatepicker_css/main.css')
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);

@@ -35,6 +35,7 @@ class Ferien extends FHCAPI_Controller
 			'getFerien' => 'basis/ferien:r',
 			'getStg' => 'basis/ferien:r',
 			'insert' => 'basis/ferien:w',
+			'update' => 'basis/ferien:w',
 			'delete' => 'basis/ferien:w'
 		]);
 
@@ -105,42 +106,50 @@ class Ferien extends FHCAPI_Controller
 	 */
 	public function insert()
 	{
-		$this->load->library('form_validation');
+		$this->_validate();
 
-		$this->form_validation->set_rules('vondatum', 'Von Datum', 'required|is_valid_date');
-		$this->form_validation->set_rules('bisdatum', 'Bis Datum', 'required|is_valid_date');
-		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required|max_length[128]');
-		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required|numeric');
-
-		//Events::trigger('konto_insert_validation', $this->form_validation);
-
-		if (!$this->form_validation->run())
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-
-		$allowed = [
-			'vondatum',
-			'bisdatum',
-			'bezeichnung',
-			'studiengang_kz'
-		];
-
-		$data = [];
+		$data = $this->_getData();
 
 		// TODO add insertaum and updateamum?
 		//~ $data = [
 			//~ 'insertamum' => date('c'),
 			//~ 'insertvon' => getAuthUID()
 		//~ ];
-		foreach ($allowed as $field)
-		{
-			if ($this->input->post($field) !== null) $data[$field] = $this->input->post($field);
-		}
-
-		$result = [];
-
 		$id = $this->getDataOrTerminateWithError($this->FerienModel->insert($data));
 
 		$this->terminateWithSuccess(hasData($id) ? getData($id) : null);
+	}
+
+	/**
+	 * Update Ferien
+	 *
+	 * @return void
+	 */
+	public function update()
+	{
+		$id = $this->input->post('ferien_id');
+
+		if (!is_numeric($id))
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Ferien Id']), self::ERROR_TYPE_GENERAL);
+
+		$this->_validate();
+
+		$data = $this->_getData();
+
+		if (isEmptyArray($data)) $this->terminateWithSuccess(null);
+		// TODO add insertaum and updateamum?
+		//~ $data = [
+			//~ 'updateamum' => date('c'),
+			//~ 'updatevon' => getAuthUID()
+		//~ ];
+
+		$data['ferien_id'] = $id;
+
+		$result = $this->FerienModel->update($id, $data);
+
+		if (isError($result)) $this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess($id);
 	}
 
 	/**
@@ -181,12 +190,51 @@ class Ferien extends FHCAPI_Controller
 		//Events::trigger('konto_delete', $ferien_id);
 
 		$result = $this->getDataOrTerminateWithError($this->FerienModel->delete($ferien_id));
-		//~ if (isError($result)) {
-			//~ if (getCode($result) != 42)
-				//~ $this->terminateWithError(getError($result));
-			//~ $this->terminateWithError($this->p->t('konto', 'error_delete_level'));
-		//~ }
 
 		$this->terminateWithSuccess();
+	}
+
+	/**
+	 * Validate ferien post input.
+	 * @param
+	 * @return object success or error
+	 */
+	private function _validate()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('vondatum', 'Von Datum', 'required|is_valid_date');
+		$this->form_validation->set_rules('bisdatum', 'Bis Datum', 'required|is_valid_date');
+		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required|max_length[128]');
+		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required|numeric');
+
+		//Events::trigger('konto_insert_validation', $this->form_validation);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+	}
+
+	/**
+	 * Gets Ferien data from post input.
+	 * @return array
+	 */
+	private function _getData()
+	{
+		$data = [];
+
+		$allowed = [
+			'vondatum',
+			'bisdatum',
+			'bezeichnung',
+			'studiengang_kz'
+		];
+
+
+		foreach ($allowed as $field)
+		{
+			if ($this->input->post($field) !== null) $data[$field] = $this->input->post($field);
+		}
+
+		return $data;
 	}
 }

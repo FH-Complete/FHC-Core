@@ -1,7 +1,6 @@
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import FormInput from "../Form/Input.js";
-import FerienNew from "./New.js";
-//import KontoEdit from "./Konto/Edit.js";
+import FerienModal from "./Modal.js";
 
 import ApiFerienverwaltung from '../../api/factory/ferienverwaltung/ferienverwaltung.js';
 
@@ -10,8 +9,7 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		FormInput,
-		FerienNew
-		//KontoEdit
+		FerienModal
 	},
 	props: {
 		//modelValue: Object,
@@ -73,15 +71,16 @@ export default {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
-							//~ let button = document.createElement('button');
-							//~ button.className = 'btn btn-outline-secondary btn-action';
-							//~ button.innerHTML = '<i class="fa fa-edit"></i>';
-							//~ button.title = this.$p.t('person', 'adresse_edit');
-							//~ button.addEventListener('click', (event) =>
-								//~ this.actionEditAdress(cell.getData().adresse_id)
-							//~ );
-							//~ container.append(button);
 							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.title = this.$p.t('person', 'ferien_edit');
+							button.addEventListener('click', (event) =>
+								this.$refs.modal.open(cell.getData())
+							);
+							container.append(button);
+
+							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary';
 							button.innerHTML = '<i class="fa fa-trash"></i>';
 							button.addEventListener('click', evt => {
@@ -144,13 +143,13 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		updateData(data) {
-			if (!data)
-				return this.reload();
-			//this.$refs.table.tabulator.updateOrAddData(data);
-		},
+		//~ updateData(data) {
+			//~ if (!data)
+				//~ return this.reload();
+			//~ //this.$refs.table.tabulator.updateOrAddData(data);
+		//~ },
 		actionNew() {
-			this.$refs.new.open();
+			this.$refs.modal.open();
 		},
 		loadByStg() {
 			this.reload();
@@ -172,8 +171,8 @@ export default {
 			});
 	},
 	template: `
-	<div class="stv-details-konto h-100 d-flex flex-column">
-		<div class="row justify-content-end">
+	<div class="h-100 d-flex flex-column">
+		<div class="row justify-content-center">
 			<div class="col-lg-3">
 				<div class="input-group w-auto">
 					<select class="form-select" v-model="studiengang_kz">
@@ -194,20 +193,23 @@ export default {
 				</div>
 			</div>
 		</div>
-
-		<core-filter-cmpt
-			ref="table"
-			table-only
-			:side-menu="false"
-			:tabulator-options="tabulatorOptions"
-			:tabulator-events="tabulatorEvents"
-			reload
-			:reload-btn-infotext="this.$p.t('table', 'reload')"
-			new-btn-show
-			:new-btn-label="$p.t('ui/neu')"
-			@click:new="actionNew"
-			>
-		</core-filter-cmpt>
-		<ferien-new ref="new" :studiengang_kz_list="studiengang_kz_list" @saved="updateData"></ferien-new>
+		<div class="row">
+			<div class="col">
+				<core-filter-cmpt
+					ref="table"
+					table-only
+					:side-menu="false"
+					:tabulator-options="tabulatorOptions"
+					:tabulator-events="tabulatorEvents"
+					reload
+					:reload-btn-infotext="this.$p.t('table', 'reload')"
+					new-btn-show
+					:new-btn-label="$p.t('ui/neu')"
+					@click:new="actionNew"
+					>
+				</core-filter-cmpt>
+				<ferien-modal ref="modal" :studiengang_kz_list="studiengang_kz_list" @saved="reload"></ferien-modal>
+			</div>
+		</div>
 	</div>`
 };

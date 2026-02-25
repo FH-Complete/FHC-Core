@@ -38,6 +38,13 @@ export default {
 			params
 		};
 	},
+	update(params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/education/ferien/update',
+			params
+		};
+	},
 	delete(ferien_id) {
 		return {
 			method: 'post',
