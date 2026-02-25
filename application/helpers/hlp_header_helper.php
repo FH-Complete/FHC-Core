@@ -188,10 +188,20 @@ function generateJSModulesInclude($JSModules)
 
 		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
 		{
-			$toPrint = sprintf($jsInclude, base_url($tmpJSs[$tmpJSsCounter].$cachetoken)).PHP_EOL;
+			$item = $tmpJSs[$tmpJSsCounter];
 			if($use_bundled_javascript)
 			{
-				$toPrint = str_replace('/public/', '/public/dist/', $toPrint);
+				$item = str_replace('/public/', '/public/dist/', $item);
+			}
+
+			if($ci->config->item('use_fhcomplete_build_version_in_path'))
+			{
+				$relurl = preg_replace('#public/#', 'public/' . $ci->config->item('fhcomplete_build_version') . '/', $item);
+				$toPrint = sprintf($jsInclude, base_url($relurl)).PHP_EOL;
+			}
+			else
+			{
+				$toPrint = sprintf($jsInclude, base_url($item.$cachetoken)).PHP_EOL;
 			}
 
 			if ($tmpJSsCounter > 0) $toPrint = "\t\t".$toPrint;
@@ -257,6 +267,14 @@ function generateSkipLink($skipID)
 function absoluteJsImportUrl($relurl)
 {
 	$ci =& get_instance();
-	$url = base_url($relurl) . '?'. $ci->config->item('fhcomplete_build_version');
+	$ci->load->config('javascript');
+	if($ci->config->item('use_fhcomplete_build_version_in_path'))
+	{
+		$url = base_url(preg_replace('#^public/#', 'public/' . $ci->config->item('fhcomplete_build_version') . '/', $relurl));
+	}
+	else
+	{
+		$url = base_url($relurl) . '?'. $ci->config->item('fhcomplete_build_version');
+	}
 	return $url;
 }

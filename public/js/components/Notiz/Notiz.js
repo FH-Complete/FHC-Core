@@ -42,7 +42,11 @@ export default {
 		showErweitert: Boolean,
 		showDocument: Boolean,
 		showTinyMce: Boolean,
-		visibleColumns: Array
+		visibleColumns: Array,
+		tabulatorPersistenceId: {
+			type: String,
+			default: 'core-notiz'
+		}
 	},
 	data() {
 		return {
@@ -150,7 +154,7 @@ export default {
 
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('ui', 'notiz_edit');
+							button.title = this.$p.t('notiz', 'notiz_edit');
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.addEventListener(
 								'click',
@@ -179,7 +183,15 @@ export default {
 				//responsiveLayout: "collapse",
 				maxHeight: '200px',
 				index: 'notiz_id',
-				persistenceID: 'core-notiz'
+				persistenceID: this.tabulatorPersistenceId,
+				persistence: {
+					sort: false,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				}
 			},
 			tabulatorEvents: [
 				{
