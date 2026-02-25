@@ -64,5 +64,6 @@ export default {
 				{{ menu.description }}
 			</a>
 		</li>
+		<slot />
 	</ul>`
 };

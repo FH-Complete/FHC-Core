@@ -124,6 +124,10 @@ export default {
 					? `${this.stg}/${this.semester}`
 					: this.stg;
 			}
+			else
+			{
+				this.selectedStudiengang = '';
+			}
 			this.filter = filter;
 		},
 		handleRowClicked(data)
@@ -163,6 +167,7 @@ export default {
 			const routeName = this.filter.emp ? 'byEmp' : 'byStg';
 			const params = { stg };
 
+			params.semester = '';
 			if (semester !== null)
 				params.semester = semester;
 			if (studiensemester_kurzbz)

@@ -8,12 +8,6 @@
     "watch": "rollup --watch -c"
   },
   "dependencies": {
-    "@vuepic/vue-datepicker": "^7.2.0",
-    "axios": "^1.6.8",
-    "primevue": "^3.29.1",
-    "tabulator-tables": "^5.5.2",
-    "vue": "^3.3.8",
-    "vue-router": "^4.1.3"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^5.1.0",
@@ -24,7 +18,7 @@
     "@rollup/plugin-replace": "^5.0.5",
     "@rollup/plugin-terser": "^0.4.4",
     "babel-plugin-transform-class-properties": "^6.24.1",
-    "glob": "^11.0.3",
+    "glob": "^13.0.6",
     "node-sass": "^9.0.0",
     "rollup": "^4.52.4",
     "rollup-plugin-postcss": "^4.0.2",
