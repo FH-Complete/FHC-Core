@@ -242,74 +242,89 @@ class Message_model extends DB_Model
 	 */
 	public function getMessagesForTable($person_id, $offset, $limit)
 	{
-		$sql_base = "
-			SELECT
+		$sql = <<<EOSQL
+			with filtered_messages as (
+				select
+					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
+				from
+					public.tbl_msg_message m
+				join
+					public.tbl_msg_recipient mr on mr.message_id = m.message_id
+				where
+					m.person_id = ?
+				group by
+					m.message_id, m.person_id, mr.person_id
+
+				union all
+
+				select
+					m.message_id, m.person_id as sender_id, mr.person_id as recipient_id
+				from
+					public.tbl_msg_message m
+				join
+					public.tbl_msg_recipient mr on mr.message_id = m.message_id
+				where
+					mr.person_id = ?
+				group by
+					m.message_id, m.person_id, mr.person_id
+
+			), lastmsgstatus as (
+				select
+					ms.*
+				from (
+						select
+							s.message_id, s.person_id, MAX(s.insertamum) as lastinserted
+						from
+							public.tbl_msg_status s
+						group by
+							s.message_id, s.person_id
+					) ls
+				join
+					public.tbl_msg_status ms on ms.message_id = ls.message_id and ms.person_id = ls.person_id and ms.insertamum = ls.lastinserted
+			)
+
+			select
+				(select count(*) from filtered_messages) as total_msgs,
 				m.message_id AS message_id,
 				m.subject AS subject,
 				m.body AS body,
 				m.insertamum AS insertamum,
 				m.relationmessage_id AS relationmessage_id,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
-				m.person_id as sender_id,
-				r.person_id as recipient_id,
-				MAX(ss.status) as status,
-				MAX(ss.insertamum) as statusdatum
-			FROM public.tbl_msg_message m
-				 JOIN public.tbl_msg_recipient r USING(message_id)
-				 JOIN public.tbl_msg_status ss ON(r.message_id = ss.message_id AND ss.person_id = r.person_id)
-			WHERE m.person_id = ?
-			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-			UNION ALL
-			SELECT
-				m.message_id AS message_id,
-				m.subject AS subject,
-				m.body AS body,
-				m.insertamum AS insertamum,
-				m.relationmessage_id AS relationmessage_id,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = m.person_id) as sender,
-				(SELECT COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'') || ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'') FROM public.tbl_person WHERE person_id = r.person_id) as recipient,
-				m.person_id as sender_id,
-				r.person_id as recipient_id,
-				MAX(ss.status) as status,
-				MAX(ss.insertamum) as statusdatum
-			FROM public.tbl_msg_recipient r
-				 JOIN public.tbl_msg_status ss USING(message_id, person_id)
-				 JOIN public.tbl_msg_message m USING(message_id)
-			WHERE r.person_id = ?
-			GROUP BY m.message_id, m.subject, m.body, m.insertamum, m.relationmessage_id, sender, recipient, sender_id, recipient_id
-				 ";
-		$sql = "
-			SELECT COUNT(*) AS count FROM (
-				" . $sql_base . "
-			) a
-				 ";
-
-		$parametersArray = array($person_id, $person_id);
-
-		$count = $this->execQuery($sql, $parametersArray);
-
-		if (isError($count))
-			return $count;
-
-		$count = ceil(current(getData($count))->count/$limit);
-		$sql = "
-			SELECT * FROM (
-				" . $sql_base . "
-			) a
-			ORDER BY insertamum DESC
-			LIMIT ?
-			OFFSET ?
-				 ";
+				(COALESCE(ps.titelpre,'') || ' ' || COALESCE(ps.vorname,'') || ' ' || COALESCE(ps.nachname,'') || ' ' || COALESCE(ps.titelpost,'')) as sender,
+				(COALESCE(pr.titelpre,'') || ' ' || COALESCE(pr.vorname,'') || ' ' || COALESCE(pr.nachname,'') || ' ' || COALESCE(pr.titelpost,'')) as recipient,
+				fm.sender_id,
+				fm.recipient_id,
+				ms.status,
+				ms.insertamum as statusdatum
+			from
+				filtered_messages fm
+			join
+				public.tbl_msg_message m on fm.message_id = m.message_id
+			join
+				lastmsgstatus ms on fm.message_id = ms.message_id and fm.recipient_id = ms.person_id
+			left join
+				public.tbl_person ps on ps.person_id = fm.sender_id
+			left join
+				public.tbl_person pr on pr.person_id = fm.recipient_id
+			order by
+				m.insertamum DESC
+			limit ?
+			offset ?;
+EOSQL;
 
 		$parametersArray = array($person_id, $person_id, $limit, $offset);
 
+		$count = 0;
 		$data = $this->execQuery($sql, $parametersArray);
 
 		if (isError($data))
 			return $data;
 
 		$data = getData($data);
+		if($data)
+		{
+			$count = ceil($data[0]->total_msgs / $limit);
+		}
 
 		return success(['data' => $data, 'count' => $count]);
 	}
