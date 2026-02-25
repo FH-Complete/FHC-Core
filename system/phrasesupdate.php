@@ -19088,6 +19088,27 @@ array(
 		)
 	),
 	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'error.opproject_does_not_exists',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es ist kein Openproject Projekt verknüpft.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Openproject project is linked.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+    //*******************	KVP end
+	array(
 		'app' => 'international',
 		'category' => 'international',
 		'phrase' => 'studiensemesterGeplant',
@@ -35023,6 +35044,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Upper date limit for the data loading of excuse notes',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentByLVATitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheiten der gesamten Lehrveranstaltung - alle LV-Teile',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances of the full course - all teaching units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolliertVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Kontrolliert von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Checked by',
 				'description' => '',
 				'insertvon' => 'system'
 			)
