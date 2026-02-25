@@ -3550,9 +3550,11 @@ function StudentZeugnisDokumentArchivieren()
 		case 'microcredentialzertifikat_1':
 		case 'microcredentialzertifikat_2':
 		case 'microcredentialzertifikat_3':
+		case 'microcredentialzertifikat_4':
 		case 'microcredential_1':
 		case 'microcredential_2':
 		case 'microcredential_3':
+		case 'microcredential_4':
 			xml = 'microcredential.xml.php';
 			break;
 			

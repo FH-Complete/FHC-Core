@@ -74,6 +74,16 @@ export default {
 				],
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
+				],
+				'microcredential.xml.php' : [
+					'microcredentialzertifikat_1',
+					'microcredentialzertifikat_2',
+					'microcredentialzertifikat_3',
+					'microcredentialzertifikat_4',
+					'microcredential_1',
+					'microcredential_2',
+					'microcredential_3',
+					'microcredential_4',
 				]
 			},
 			documentDropdownObject: {}
