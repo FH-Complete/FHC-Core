@@ -90,13 +90,6 @@ export default {
 			params: { searchString }
 		};
 	},
-	getPruefer(searchString) {
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/stv/abschlusspruefung/getPruefer',
-			params: { searchString }
-		};
-	},
 	getNoten() {
 		return {
 			method: 'get',

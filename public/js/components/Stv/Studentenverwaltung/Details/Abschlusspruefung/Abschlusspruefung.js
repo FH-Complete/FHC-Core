@@ -42,6 +42,16 @@ export default {
 			}
 			return this.student.map(e => e.uid);
 		},
+		studentNames() {
+			if (this.student.uid)
+			{
+				return [this.student.vorname + ' ' + this.student.nachname];
+			}
+
+			const array =  this.student.map(e => ' ' + e.vorname + ' ' + e.nachname + '(' + e.uid +')');
+
+			return array.toString();
+		},
 		studentKzs(){
 			if (this.student.uid)
 			{
@@ -60,7 +70,7 @@ export default {
 			}
 			let retval = this.isBerechtigtDocAndOdt.includes(this.stgInfo.oe_kurzbz);
 			return retval;
-		}
+		},
 	},
 	props: {
 		student: Object
@@ -260,7 +270,6 @@ export default {
 			arrNoten: [],
 			selectedVorsitz: null,
 			filteredMitarbeiter: [],
-			filteredPersons: [],
 			selectedPruefer1: null,
 			selectedPruefer2: null,
 			selectedPruefer3: null,
@@ -300,10 +309,50 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		actionNewAbschlusspruefung() {
-			this.resetForm();
-			this.statusNew = true;
-			this.$refs.finalexamModal.show();
 			this.setDefaultFormData();
+			this.statusNew = true;
+
+			//prepare local Storage
+			let STORAGE_KEY = 'finalExamDefaultData';
+			const id = '20260224_01';
+			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+			if (stored[id]) {
+				const data = stored[id];
+
+				this.formData.pruefungstyp_kurzbz = data.pruefungstyp_kurzbz;
+				this.formData.datum = data.datum;
+				this.formData.sponsion = data.sponsion;
+				this.formData.akadgrad_id = data.akadgrad_id;
+
+				if (data.vorsitz_uid) {
+					this.selectedVorsitz = {
+						mitarbeiter_uid: data.vorsitz_uid,
+						person_id: data.vorsitz_person_id,
+						label: data.vorsitz_label
+					};
+				}
+
+				if (data.pruefer1_person_id) {
+					this.selectedPruefer1 = {
+						person_id: data.pruefer1_person_id,
+						label: data.pruefer1_label
+					};
+				}
+				if (data.pruefer2_person_id) {
+					this.selectedPruefer2 = {
+						person_id: data.pruefer2_person_id,
+						label: data.pruefer2_label
+					};
+				}
+				if (data.pruefer3_person_id) {
+					this.selectedPruefer3 = {
+						person_id: data.pruefer3_person_id,
+						label: data.pruefer3_label
+					};
+				}
+			}
+			this.$refs.finalexamModal.show();
 		},
 		actionEditAbschlusspruefung(abschlusspruefung_id) {
 			this.resetForm();
@@ -350,6 +399,29 @@ export default {
 				.then(this.deleteAbschlusspruefung)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		saveOrUpdateLocalStorage(){
+			let STORAGE_KEY = 'finalExamDefaultData';
+
+			const id = '20260224_01';
+			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+
+			stored[id] = {
+				pruefungstyp_kurzbz: this.formData.pruefungstyp_kurzbz,
+				vorsitz_uid: this.selectedVorsitz?.mitarbeiter_uid || null,
+				vorsitz_person_id: this.selectedVorsitz?.person_id || null,
+				vorsitz_label: this.selectedVorsitz?.label || null,
+				pruefer1_person_id: this.selectedPruefer1?.person_id || null,
+				pruefer1_label: this.selectedPruefer1?.label || null,
+				pruefer2_person_id: this.selectedPruefer2?.person_id || null,
+				pruefer2_label: this.selectedPruefer2?.label || null,
+				pruefer3_person_id: this.selectedPruefer3?.person_id || null,
+				pruefer3_label: this.selectedPruefer3?.label || null,
+				akadgrad_id: this.formData.akadgrad_id,
+				datum: this.formData.datum,
+				sponsion: this.formData.sponsion
+			};
+			localStorage.setItem(STORAGE_KEY, JSON.stringify(stored));
+		},
 		addNewAbschlusspruefung() {
 			const dataToSend = {
 				uid: this.student.uid,
@@ -360,6 +432,8 @@ export default {
 				.call(ApiStvAbschlusspruefung.addNewAbschlusspruefung(dataToSend))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					//save formData fields in LocalStorage
+					this.saveOrUpdateLocalStorage();
 					this.hideModal('finalexamModal');
 					this.resetForm();
 				})
@@ -367,6 +441,26 @@ export default {
 				.finally(() => {
 					this.reload();
 				});
+		},
+		async addNewAbschlusspruefungMulti(){
+			try {
+				for (const student of this.studentUids) {
+
+					await this.$refs.formFinalExam.call(
+						ApiStvAbschlusspruefung.addNewAbschlusspruefung({
+							uid: student,
+							formData: this.formData
+						})
+					);
+				}
+				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+				//save formData fields in LocalStorage
+				this.saveOrUpdateLocalStorage();
+				this.hideModal('finalexamModal');
+				this.resetForm();
+			} catch (error) {
+				this.$fhcAlert.handleSystemError(error);
+			}
 		},
 		hideModal(modalRef){
 			this.$refs[modalRef].hide();
@@ -389,6 +483,9 @@ export default {
 				id: abschlusspruefung_id,
 				formData: this.formData
 			};
+			//uncomment if also save data in local storage for update
+			//this.saveOrUpdateLocalStorage();
+
 			return this.$refs.formFinalExam
 				.call(ApiStvAbschlusspruefung.updateAbschlusspruefung(dataToSend))
 				.then(response => {
@@ -430,7 +527,6 @@ export default {
 			this.selectedPruefer1 = null;
 			this.selectedPruefer2 = null;
 			this.selectedPruefer3 = null;
-
 		},
 		setDefaultFormData() {
 
@@ -481,33 +577,6 @@ export default {
 					}
 				});
 		},
-		searchPerson(event) {
-			if (this.abortController.persons) {
-				this.abortController.persons.abort();
-			}
-
-			this.abortController.persons = new AbortController();
-
-			return this.$api
-				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
-				.then(result => {
-					this.filteredPersons = [];
-					for (let person of result.data.retval) {
-						this.filteredPersons.push(
-							{
-								label: this.getPersonLabel(
-									person.titelpre,
-									person.nachname,
-									person.vorname,
-									person.titelpost,
-									person.person_uid
-								),
-								person_id: person.person_id
-							}
-						);
-					}
-				});
-		},
 	},
 	created() {
 		this.$api
@@ -539,7 +608,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(ApiStvAbschlusspruefung.getAkadGrade(this.student.studiengang_kz))
+			.call(ApiStvAbschlusspruefung.getAkadGrade(this.stg_kz))
 			.then(result => {
 				this.arrAkadGrad = result.data;
 			})
@@ -560,7 +629,8 @@ export default {
 	<div class="stv-details-abschlusspruefung h-100 pb-3">
 		<h4>{{this.$p.t('stv','tab_finalexam')}}</h4>
 
-		<div v-if="this.student.length">
+		<div v-if="this.student.length" class="d-flex gap-2">
+			<button class="btn btn-primary" @click="actionNewAbschlusspruefung()"> + {{$p.t('stv', 'tab_finalexam')}}</button>
 			<abschlusspruefung-dropdown
 				:showAllFormats="showAllFormats"
 				:studentUids="studentUids"
@@ -592,12 +662,14 @@ export default {
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('abschlusspruefung', 'abschluessPruefungBearbeiten')}}</p>
+				<small v-if="this.student.length" class="text-muted">{{studentNames}}</small>
 			</template>
 
-			<form-form v-if="!this.student.length" ref="formFinalExam" @submit.prevent>
+			<form-form ref="formFinalExam" @submit.prevent>
 
 				<legend>{{this.$p.t('global','details')}}</legend>
 				<p v-if="statusNew">[{{$p.t('ui', 'neu')}}]</p>
+
 				<div class="row mb-3">
 					<form-input
 						container-class="col-6 stv-details-abschlusspruefung-typ"
@@ -615,6 +687,7 @@ export default {
 						</option>
 					</form-input>
 					<form-input
+						v-if="!this.student.length"
 						container-class="col-6 stv-details-abschlusspruefung-note"
 						:label="$p.t('abschlusspruefung', 'notekommpruefung')"
 						type="select"
@@ -677,15 +750,16 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredPersons"
-						@complete="searchPerson"
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
 						:min-length="3"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
+						v-if="!this.student.length"
 						container-class="col-6 stv-details-abschlusspruefung-abschlussbeurteilung_kurzbz"
 						:label="$p.t('abschlusspruefung', 'abschlussbeurteilung')"
 						type="select"
@@ -711,8 +785,24 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredPersons" 
-						@complete="searchPerson"
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
+						:min-length="3"
+					>
+					</form-input>
+					<form-input
+						v-if="this.student.length"
+						type="autocomplete"
+						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
+						:label="$p.t('abschlusspruefung', 'pruefer3')"
+						name="pruefer3"
+						v-model="selectedPruefer3"
+						optionLabel="label"
+						optionValue="person_id"
+						dropdown
+						forceSelection
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
 						:min-length="3"
 					>
 					</form-input>
@@ -735,6 +825,7 @@ export default {
 						</option>
 					</form-input>
 					<form-input
+						v-if="!this.student.length"
 						type="autocomplete"
 						container-class="col-6 stv-details-abschlusspruefung-pruefer3"
 						:label="$p.t('abschlusspruefung', 'pruefer3')"
@@ -744,8 +835,8 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredPersons" 
-						@complete="searchPerson"
+						:suggestions="filteredMitarbeiter"
+						@complete="searchMitarbeiter"
 						:min-length="3"
 					>
 					</form-input>
@@ -792,6 +883,7 @@ export default {
 						>
 					</form-input>
 					<form-input
+						v-if="!this.student.length"
 						container-class="col-6 stv-details-abschlusspruefung-protokoll"
 						:label="$p.t('abschlusspruefung', 'protokoll')"
 						type="textarea"
@@ -803,7 +895,7 @@ export default {
 					</form-input>
 				</div>
 
-				<div class="row mb-3 col-6">
+				<div v-if="!this.student.length" class="row mb-3 col-6">
 					<div class="col">
 						<p >{{$p.t('abschlusspruefung', 'zurBeurteilung')}}</p>
 					</div>
@@ -820,8 +912,9 @@ export default {
 
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button v-if="statusNew" class="btn btn-primary" @click="addNewAbschlusspruefung()"> {{$p.t('ui', 'speichern')}}</button>
-					<button v-else class="btn btn-primary" @click="updateAbschlusspruefung(formData.abschlusspruefung_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-if="statusNew && !this.student.length" class="btn btn-primary" @click="addNewAbschlusspruefung()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-else-if="statusNew && this.student.length" class="btn btn-primary" @click="addNewAbschlusspruefungMulti(studentUids)"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-else class="btn btn-primary" @click="updateAbschlusspruefung(formData.abschlusspruefung_id)"> {{$p.t('ui', 'speichern')}}</button>
 			</template>
 
 		</bs-modal>
