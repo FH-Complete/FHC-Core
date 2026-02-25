@@ -495,11 +495,6 @@ class AbgabetoolJob extends JOB_Controller
 		// get all new or changed termine in interval
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
 		$retval = getData($result);
-
-		if(count($retval) == 0) {
-			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
-			return;
-		}
 		
 		// group changed/new abgaben for projektarbeiten
 		$projektarbeiten = [];
@@ -509,15 +504,27 @@ class AbgabetoolJob extends JOB_Controller
 			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
 				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
 
+				// check if the updatevon field is NOT the same as the student the projektarbeit is assigned to
+				// since uploading a file to a paabgabe is also putting updateamum & updatevon
+				// we have our own "student has uploaded a file" emailjob anyways
+				if($newOrChangedAbgabe->student_uid === $newOrChangedAbgabe->updatevon) {
+					continue;
+				}
+				
 				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
 				// initialize it as an empty array.
 				if (!isset($projektarbeiten[$projektarbeitId])) {
 					$projektarbeiten[$projektarbeitId] = [];
 				}
-
+				
 				// Add the current row to the array associated with its 'projektarbeit_id'.
 				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
 			}
+		}
+
+		if(count($projektarbeiten) == 0) {
+			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
 		}
 
 		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails

@@ -599,7 +599,18 @@ class Abgabe extends FHCAPI_Controller
 					'insertamum' => date('Y-m-d H:i:s')
 				)
 			);
-			$this->logLib->logInfoDB(array('paabgabe created',$result, getAuthUID(), getAuthPersonId()));
+			$this->logLib->logInfoDB(array('paabgabe created',array(
+				'projektarbeit_id' => $projektarbeit_id,
+				'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+				'fixtermin' => $fixtermin,
+				'datum' => $datum,
+				'kurzbz' => $kurzbz,
+				'note' => $note,
+				'beurteilungsnotiz' => $beurteilungsnotiz,
+				'upload_allowed' => $upload_allowed,
+				'insertvon' => getAuthUID(),
+				'insertamum' => date('Y-m-d H:i:s')
+			), getAuthUID(), getAuthPersonId()));
 		} else {
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
 			// only notiz has changed.
@@ -773,7 +784,16 @@ class Abgabe extends FHCAPI_Controller
 			$abgaben[]= getData($this->PaabgabeModel->load($dataAbgabe))[0];
 		}
 
-		$this->logLib->logInfoDB(array('serientermin angelegt',$res, getAuthUID(), getAuthPersonId()));
+		$this->logLib->logInfoDB(array('serientermin angelegt',array(
+				'projektarbeit_id' => $projektarbeit_id,
+				'paabgabetyp_kurzbz' => $paabgabetyp_kurzbz,
+				'fixtermin' => $fixtermin,
+				'datum' => $datum,
+				'kurzbz' => $kurzbz,
+				'upload_allowed' => $upload_allowed,
+				'insertvon' => getAuthUID(),
+				'insertamum' => date('Y-m-d H:i:s')
+			), getAuthUID(), getAuthPersonId()));
 
 		$this->terminateWithSuccess($abgaben);
 	}
