@@ -149,6 +149,44 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
+			name: 'search',
+			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/search/:searchstr`,
+			component: FhcStudentenverwaltung,
+			props(route) {
+				return {
+					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
+					url_mode: 'search',
+					url_prestudent_id: route.params.searchstr
+				};
+			},
+			beforeEnter(to, from, next) {
+				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
+				if (!isSemester) {
+					return next({name: 'index'});
+				}
+				next();
+			}
+		},
+		{
+			name: 'search_w_types',
+			path: `/${ciPath}/studentenverwaltung/:studiensemester_kurzbz/search/:types/:searchstr`,
+			component: FhcStudentenverwaltung,
+			props(route) {
+				return {
+					url_studiensemester_kurzbz: route.params.studiensemester_kurzbz,
+					url_mode: 'search',
+					url_prestudent_id: route.params.type + '/' + route.params.searchstr
+				};
+			},
+			beforeEnter(to, from, next) {
+				const isSemester = /^[WS]S\d{4}$/.test(to.params.studiensemester_kurzbz);
+				if (!isSemester) {
+					return next({name: 'index'});
+				}
+				next();
+			}
+		},
+		{
 			path: '/:pathMatch(.*)*',
 			redirect: {
 				name: 'index'

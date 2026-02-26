@@ -135,7 +135,8 @@ class Profil_update_model extends DB_Model
 				attachment_id,
 				UPPER(public.tbl_studiengang.typ || public.tbl_studiengang.kurzbz) AS studiengang,
 				COALESCE(of.orgform_kurzbz, public.tbl_studiengang.orgform_kurzbz) AS orgform,
-				NULL as oezuordnung
+				NULL as oezuordnung,
+				tbl_student.semester
 			FROM public.tbl_profil_update
 			JOIN public.tbl_profil_update_status ON public.tbl_profil_update_status.status_kurzbz = public.tbl_profil_update.status 
 			JOIN public.tbl_student ON public.tbl_student.student_uid=public.tbl_profil_update.uid
@@ -235,8 +236,11 @@ class Profil_update_model extends DB_Model
 	private function formatProfilRequest($request)
 	{
 		$request->requested_change = json_decode($request->requested_change);
+		$request->insertamum_iso = !is_null($request->insertamum) ? date_create($request->insertamum)->format('Y-m-d') : null;
 		$request->insertamum = !is_null($request->insertamum) ? date_create($request->insertamum)->format('d.m.Y') : null;
+		$request->updateamum_iso = !is_null($request->updateamum) ? date_create($request->updateamum)->format('Y-m-d') : null;
 		$request->updateamum = !is_null($request->updateamum) ? date_create($request->updateamum)->format('d.m.Y') : null;
+		$request->status_timestamp_iso = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('Y-m-d') : null;
 		$request->status_timestamp = !is_null($request->status_timestamp) ? date_create($request->status_timestamp)->format('d.m.Y') : null;
 	}
 

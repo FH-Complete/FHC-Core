@@ -16,6 +16,12 @@
  */
 
 export default {
+	configFilter() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/config/filter'
+		};
+	},
 	configStudent() {
 		return {
 			method: 'get',

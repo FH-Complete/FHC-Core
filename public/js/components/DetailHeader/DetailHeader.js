@@ -121,7 +121,8 @@ export default {
 						class="d-flex flex-column align-items-center h-100 position-relative d-inline-block"
 					>
 						<img
-						  class="d-block h-100 rounded"
+						  class="d-block rounded"
+						  style="height: 84px;"
 						  alt="Profilbild"
 						  :src="getFotoSrc(person.foto)"
 						/>
@@ -175,7 +176,8 @@ export default {
 				<div class="col-md-2 d-flex justify-content-start align-items-center w-30 pb-3 gap-3 position-relative"
 						style="max-height: 8rem; max-width: 6rem; overflow: hidden;">
 					<img
-					  class="d-block h-100 rounded"
+					  class="d-block rounded"
+					  style="height: 84px;"
 					  alt="Profilbild"
 					  :src="'data:image/jpeg;base64,' + headerDataMa.foto"
 					/>

@@ -30,6 +30,22 @@ export default {
 			from: 'hasAdminPermission',
 			default: false
 		},
+		hasZGVBakkPermission: {
+			from: 'hasZGVBakkPermission',
+			default: []
+		},
+		hasZGVMasterPermission: {
+			from: 'hasZGVMasterPermission',
+			default: []
+		},
+		hasZGVDoctorPermission: {
+			from: 'hasZGVDoctorPermission',
+			default: []
+		},
+		hasBismeldenPermission: {
+			from: 'hasBismeldenPermission',
+			default: false
+		},
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
@@ -73,6 +89,15 @@ export default {
 	computed: {
 		deltaLength() {
 			return Object.keys(this.deltaArray).length;
+		},
+		disableZgvBakk: function() {
+			return !this.hasZGVBakkPermission.includes(this.modelValue.studiengang_kz.toString());
+		},
+		disableZgvMaster: function() {
+			return !this.hasZGVMasterPermission.includes(this.modelValue.studiengang_kz.toString());
+		},
+		disableZgvDoctor: function() {
+			return !this.hasZGVDoctorPermission.includes(this.modelValue.studiengang_kz.toString());
 		}
 	},
 	watch: {
@@ -106,7 +131,7 @@ export default {
 	},
 
 	methods: {
-		loadPrestudent() {
+		async loadPrestudent() {
 			return this.$api
 				.call(ApiStvPrestudent.get(this.modelValue.prestudent_id, this.currentSemester))
 				.then(result => result.data)
@@ -154,8 +179,8 @@ export default {
 			)
 		},
 	},
-	created() {
-		this.loadPrestudent();
+	async created() {
+		await this.loadPrestudent();
 		this.$api
 			.call(ApiStvPrestudent.getBezeichnungZGV())
 			.then(result => result.data)
@@ -273,6 +298,7 @@ export default {
 						dropdown
 						name="zgv_code"
 						@complete="filterZgvs"
+						:disabled="disableZgvBakk"
 						>
 							<template #option="slotProps">
 								<div
@@ -336,6 +362,7 @@ export default {
 						dropdown
 						name="zgvmas_code"
 						@complete="filterMasterZgvs"
+						:disabled="disableZgvMaster"
 						>
 							<template #option="slotProps">
 								<div
@@ -400,6 +427,7 @@ export default {
 						dropdown
 						name="zgvdoktor_code"
 						@complete="filterDoktorZgvs"
+						:disabled="disableZgvDoctor"
 						>
 							<template #option="slotProps">
 								<div
@@ -601,6 +629,7 @@ export default {
 							type="checkbox"
 							v-model="data.bismelden"
 							name="bismelden"
+							:disabled="!hasBismeldenPermission"
 							>
 						</form-input>
 					</div>

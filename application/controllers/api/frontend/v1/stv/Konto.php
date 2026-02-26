@@ -239,7 +239,7 @@ class Konto extends FHCAPI_Controller
 				$data[$field] = $this->input->post($field);
 
 		if (defined('FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE') && isset(unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']])) {
-			$data['kostenstelle'] = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']];
+			$data['studiengang_kz'] = unserialize(FAS_BUCHUNGSTYP_FIXE_KOSTENSTELLE)[$data['buchungstyp_kurzbz']];
 		}
 
 		$result = [];
@@ -352,7 +352,7 @@ class Konto extends FHCAPI_Controller
 				continue;
 			}
 
-
+			
 			$result = $this->KontoModel->insert([
 				'person_id' => $buchung['person_id'],
 				'studiengang_kz' => $buchung['studiengang_kz'],
@@ -361,7 +361,7 @@ class Konto extends FHCAPI_Controller
 				'buchungstyp_kurzbz' => $buchung['buchungstyp_kurzbz'],
 				'credit_points' => $buchung['credit_points'],
 				'zahlungsreferenz' => $buchung['zahlungsreferenz'],
-				'betrag' => $betrag,
+				'betrag' => number_format($betrag, 2, '.', ''),
 				'buchungsdatum' => $buchungsdatum,
 				'mahnspanne' => '0',
 				'buchungsnr_verweis' => $buchung['buchungsnr'],

@@ -637,7 +637,7 @@ class ProfilUpdate extends FHCAPI_Controller
 				//? Send email to the Studiengangsassistentinnen
 				$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
 				$this->StudentModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_student.student_uid");
-				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id and public.tbl_student.studiengang_kz = public.tbl_prestudent.studiengang_kz");
 				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
 				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
 				$this->StudentModel->addGroupBy(["public.tbl_studiengang.email"]);
@@ -706,7 +706,13 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message)
 	{
-		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+		return $this->ProfilUpdateModel->update([$id], [
+			"status" => $status,
+			"status_timestamp" => "NOW()",
+			"status_message" => $status_message,
+			"updateamum" => "NOW()",
+			"updatevon" => getAuthUID()
+		]);
 	}
 	
 	private function updateRequestedChange($id, $requested_change)
@@ -716,13 +722,12 @@ class ProfilUpdate extends FHCAPI_Controller
 	
 	private function deleteOldVersionFile($dms_id)
 	{
+		if (!isset($dms_id)) {
+			return true;
+		}
+
 		// starting the transaction
 		$this->db->trans_start();
-		
-		
-		if (!isset($dms_id)) {
-			return;
-		}
 
 		//? delete the file from the profilUpdate first
 		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
@@ -777,13 +782,8 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
 		$res = $this->getDataOrTerminateWithError($res, $this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));	
-		$res = array_map(
-			function ($item) {
-				return $item->oe_kurzbz;
-			},
-			$res
-		);
-		return $res;
+		$oe = ($res[0])->oe_kurzbz;
+		return $oe;
 	}
 
 	private function handleAdresse($requested_change, $personID)

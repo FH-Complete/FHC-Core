@@ -31,6 +31,8 @@ export default{
 			changed: {},
 			internal_mitarbeiter_uid: null,
 			filteredLektor: [],
+			abortController: null,
+			selectedLektorLabel: ''
 		}
 	},
 	computed: {
@@ -63,7 +65,10 @@ export default{
 				this.internal_mitarbeiter_uid = newVal;
 
 				if (newVal === null)
+				{
 					this.data = null;
+					this.selectedLektorLabel = '';
+				}
 				else if (newVal !== undefined && this.lehreinheit_id !== undefined)
 					this.getLektorData();
 			}
@@ -99,9 +104,14 @@ export default{
 			return this.$api.call(ApiLektor.getLektorDaten(this.lehreinheit_id, this.internal_mitarbeiter_uid))
 				.then(result => {
 					this.data = result.data;
+					this.selectedLektorLabel = `${this.data.nachname} ${this.data.vorname} (${this.data.mitarbeiter_uid})`,
 					this.original = { ...this.data };
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		onLektorSelected(selectedLektor)
+		{
+			this.data.mitarbeiter_uid = selectedLektor.value.uid;
 		},
 		updateDaten()
 		{
@@ -139,17 +149,37 @@ export default{
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		searchLektor(event)
+		async searchLektor(event)
 		{
-			const query = event.query.toLowerCase().trim();
-			this.filteredLektor = this.dropdowns.lektor_array.filter(lektor => {
-				const fullName = `${lektor.vorname.toLowerCase()} ${lektor.nachname.toLowerCase()}`;
-				const reverseFullName = `${lektor.nachname.toLowerCase()} ${lektor.vorname.toLowerCase()}`;
-				return fullName.includes(query) || reverseFullName.includes(query) || lektor.uid.toLowerCase().includes(query);
-			}).map(lektor => ({
-				label: `${lektor.nachname} ${lektor.vorname} (${lektor.uid})`,
-				uid: lektor.uid
-			}));
+			const query = event.query.trim();
+
+			if (!query)
+			{
+				this.filteredLektor = [];
+				return;
+			}
+
+			if (query.length < 2)
+			{
+				return;
+			}
+
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.$api.call(ApiLektor.getLektorenSearch(query), { signal })
+				.then(result => {
+					this.filteredLektor = result.data.map(lektor => ({
+							label: `${lektor.nachname} ${lektor.vorname} (${lektor.uid})`,
+							uid: lektor.uid
+						})
+					)})
+				.catch(this.$fhcAlert.handleSystemError)
 		},
 
 	},
@@ -187,11 +217,12 @@ export default{
 						:disabled="data.vertrag_id !== null"
 						:suggestions="filteredLektor"
 						placeholder="Mitarbeiter hinzufügen"
-						v-model="data.mitarbeiter_uid"
+						v-model="selectedLektorLabel"
 						field="label"
 						container-class="col-3"
 						dropdown
 						@complete="searchLektor"
+						@item-select="onLektorSelected"
 						name="lektorautocomplete"
 					></form-input>
 					
@@ -231,7 +262,6 @@ export default{
 
 				</div>
 				<div class="row mb-3 d-flex align-items-end">
-					
 					<form-input
 						:label="data.default_stundensatz !== null 
 							? $p.t('lehre', 'stundensatz') + ' (' + $p.t('lehre', 'default') + ': ' + data.default_stundensatz + ')'
@@ -246,30 +276,23 @@ export default{
 						>
 					</form-input>
 					
-					<form-input
-						:label="$p.t('lehre', 'bismelden')"
-						type="checkbox"
-						container-class="col-3"
-						v-model="data.bismelden"
-						name="bismelden"
-						>
-					</form-input>
+					<div class="col-3 d-flex align-items-end">
+						<form-input
+							:label="$p.t('lehre', 'bismelden')"
+							type="checkbox"
+							v-model="data.bismelden"
+							name="bismelden"
+							>
+						</form-input>
+					</div>
 				</div>
 				
-				<div class="row mb-3">
-					<form-input
-						:label="$p.t('lehre', 'gesamtkosten')"
-						type="number"
-						name="gesamtkosten"
-						container-class="col-3"
-						readonly
-						v-model="berechneteGesamtkosten" 
-						:style="{ color: berechneteGesamtkosten <= 0 ? 'red' : 'black' }"
-						>
-					</form-input>
-					
+				<div class="d-flex mb-2 gap-2">
+					<span class="fw-bold">{{ $p.t('lehre', 'gesamtkosten') }}:</span>
+					<span :style="{ color: berechneteGesamtkosten <= 0 ? 'red' : 'black' }">
+						{{ berechneteGesamtkosten }} €
+					</span>
 				</div>
-				
 			</template>
 			
 		</fieldset>

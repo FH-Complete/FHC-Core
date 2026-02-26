@@ -316,8 +316,8 @@ class Lehrveranstaltung_model extends DB_Model
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
 			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_benutzer.uid,
-			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung
-
+			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung,
+			tbl_student.prestudent_id
 		FROM
 			campus.vw_student_lehrveranstaltung
 			JOIN public.tbl_benutzer USING(uid)
@@ -385,6 +385,37 @@ class Lehrveranstaltung_model extends DB_Model
 				ORDER BY lvleiter DESC, nachname, vorname";
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
+	}
+
+	/**
+	 * Get LV-Leitung of given Lehrveranstaltung ID and Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester
+	 * @return array|stdClass|null
+	 */
+	public function getLvLeitung($lehrveranstaltung_id, $studiensemester)
+	{
+		$params = [$lehrveranstaltung_id, $studiensemester];
+
+		$qry = "
+			SELECT
+				vorname, nachname, mitarbeiter_uid, lehrfunktion_kurzbz
+			FROM
+				lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				JOIN public.tbl_benutzer b ON b.uid = lema.mitarbeiter_uid
+				JOIN public.tbl_person p using (person_id) 
+			WHERE
+				tbl_lehreinheit.lehrveranstaltung_id= ?
+				AND tbl_lehreinheit.studiensemester_kurzbz = ?
+				AND lehrfunktion_kurzbz = 'LV-Leitung'
+            ORDER BY 
+                lema.insertamum DESC
+			LIMIT 1
+		";
+
+		return $this->execQuery($qry, $params);
 	}
 	/**
 	 * Gets all Leiter of Lehrveranstaltungsorganisationseinheit
@@ -1254,5 +1285,62 @@ class Lehrveranstaltung_model extends DB_Model
 		$params = array($lv_id, $lv_id);
 
 		return $this->execReadOnlyQuery($qry, $params);
+	}
+
+	/**
+	 * Gets Lehrveranstaltungen for a student, as needed for a Projektarbeit.
+	 * @param student_uid
+	 * @param studiengang_kz optional, all Lvs of this Studiengang will be included 
+	 * @param additional_lehrveranstaltung_id optional, this lv will be added to result
+	 * @return object success or error
+	 */
+	public function getLvsForProjektarbeit($student_uid, $studiengang_kz = null, $additional_lehrveranstaltung_id = null)
+	{
+		$params = array($student_uid, $student_uid);
+
+		$qry = "
+			SELECT *
+			FROM
+				lehre.tbl_lehrveranstaltung
+			WHERE
+				(
+					lehrveranstaltung_id IN (
+
+						SELECT
+							lehrveranstaltung_id
+						FROM
+							campus.vw_student_lehrveranstaltung
+						WHERE
+							uid=?
+
+						UNION
+
+						SELECT
+							lehrveranstaltung_id
+						FROM
+							lehre.tbl_zeugnisnote
+						WHERE
+							student_uid=?
+					)";
+
+		if (isset($studiengang_kz))
+		{
+			$params[] = $studiengang_kz;
+			$qry .= " OR (studiengang_kz = ? AND semester IS NOT NULL)";
+		}
+
+		if (isset($additional_lehrveranstaltung_id))
+		{
+			$params[] = $additional_lehrveranstaltung_id;
+			$qry .= " OR lehrveranstaltung_id = ?";
+		}
+
+		$qry .= "
+				)
+				AND projektarbeit = TRUE
+			ORDER BY
+				semester, bezeichnung";
+
+		return $this->execQuery($qry, $params);
 	}
 }
