@@ -298,7 +298,7 @@ function extendableApps($includes)
 
 				if(is_readable(FHCPATH . $extend_js))
 				{
-					array_push($includes['customJSModules'], $extend_js);
+					array_unshift($includes['customJSModules'], $extend_js);
 				}
 
 				if(is_readable(FHCPATH . $extend_css))
