@@ -363,6 +363,21 @@ if($result = $db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzb
 	}
 }
 
+if($result = $db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'PAANoSigAssSM'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "INSERT INTO public.tbl_vorlage (vorlage_kurzbz, bezeichnung, anmerkung, mimetype)
+				VALUES ('PAANoSigAssSM', 'PAANoSigAssSM', null, 'text/html')
+				ON CONFLICT (vorlage_kurzbz) DO NOTHING;";
+
+		if(!$db->db_query($qry))
+			echo '<strong>system.tbl_vorlage: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>system.tbl_vorlage PAANoSigAssSM hinzugefuegt";
+	}
+}
+
 if($result = $db->db_query("SELECT 1 FROM public.tbl_vorlage WHERE vorlage_kurzbz = 'QualGateNegativ'"))
 {
 	if($db->db_num_rows($result) === 0)
