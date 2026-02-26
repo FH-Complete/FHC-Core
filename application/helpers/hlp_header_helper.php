@@ -246,3 +246,81 @@ function generateSkipLink($skipID)
 	$toPrint.='" class="fhcSkipLink" aria-label="Skip to main content"></a>';
 	echo $toPrint;
 }
+
+/*
+ * Manipulate CI views includes Array to load
+ *   - public/js/FhcApps.js via customJSs and
+ *   - app customisation js and/or css from extensions via customJSModules
+ * if customJSModules contains at least one vuejs app and customisation files
+ * exist in extensions
+ */
+function extendableApps($includes)
+{
+	$start = microtime(true);
+	if(!isset($includes['customJSModules']))
+	{
+		return;
+	}
+
+	if(!is_array($includes['customJSModules']))
+	{
+		$includes['customJSModules'] = array($includes['customJSModules']);
+	}
+
+	$extensions = array();
+	$fsiterator = new FilesystemIterator(FHCPATH . 'application/extensions');
+	foreach ($fsiterator as $fsitem)
+	{
+		if(preg_match('/^FHC-Core-/', $fsitem->getBasename()))
+		{
+			$extensions[] = $fsitem->getBasename();
+		}
+	}
+
+	$appscount = 0;
+	foreach($includes['customJSModules'] as $item)
+	{
+		$matches = array();
+		if(preg_match('#^public/(extensions/FHC-Core-.+)?js/apps/(.*)\.js$#', $item, $matches))
+		{
+			$appscount++;
+
+			$fhcextension = $matches[1];
+			$app = $matches[2];
+
+			$extend_js_suffix = 'js/extend_app/' . $fhcextension . $app . '.js';
+			$extend_css_suffix = 'css/extend_app/' . $fhcextension . $app . '.css';
+
+			foreach($extensions as $extension)
+			{
+				$extend_js = 'public/extensions/' . $extension . '/' . $extend_js_suffix;
+				$extend_css = 'public/extensions/' . $extension . '/' . $extend_css_suffix;
+
+				if(is_readable(FHCPATH . $extend_js))
+				{
+					array_push($includes['customJSModules'], $extend_js);
+				}
+
+				if(is_readable(FHCPATH . $extend_css))
+				{
+					array_push($includes['customCSSs'], $extend_css);
+				}
+			}
+		}
+	}
+
+	if($appscount > 0)
+	{
+		if(!isset($includes['customJSs']))
+		{
+			$includes['customJSs'] = array();
+		}
+		elseif(!is_array($includes['customJSs']))
+		{
+			$includes['customJSs'] = array($includes['customJSs']);
+		}
+		array_push($includes['customJSs'], 'public/js/FhcApps.js');
+	}
+
+	return $includes;
+}
