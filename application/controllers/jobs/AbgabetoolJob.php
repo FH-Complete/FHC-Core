@@ -645,6 +645,11 @@ class AbgabetoolJob extends JOB_Controller
 			);
 			
 			$email = $betreuerRow->uid ? $betreuerRow->uid."@".DOMAIN : $betreuerRow->private_email;
+
+			if(!$email) {
+				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$data->person_id.'".');
+				continue;
+			}
 			
 			// send email with bundled info
 			sendSanchoMail(
@@ -768,6 +773,12 @@ class AbgabetoolJob extends JOB_Controller
 
 			$email = $data->uid ? $data->uid."@".DOMAIN : $data->private_email;
 
+			// in rare cases there are betreuer (often zweitbetreuer) without uid and without private email
+			if(!$email) {
+				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$data->person_id.'".');
+				continue;
+			}
+			
 			// send email with bundled info
 			sendSanchoMail(
 				'PaabgabeUpdatesBetSM',
