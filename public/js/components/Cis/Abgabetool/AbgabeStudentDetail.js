@@ -348,7 +348,7 @@ export const AbgabeStudentDetail = {
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>
 							<div class="d-flex flex-nowrap align-items-center w-100">
-								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
+								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -68px;">
 									<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>

@@ -44240,7 +44240,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4betreuerart',
+		'phrase' => 'c4betreuerartv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(

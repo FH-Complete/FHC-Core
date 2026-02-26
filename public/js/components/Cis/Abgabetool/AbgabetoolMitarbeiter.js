@@ -680,6 +680,11 @@ export const AbgabetoolMitarbeiter = {
 				termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 				termin.file = []
 				
+				// only set this if it has not been set yet and abgabetermin has a note (qgate)
+				if(!termin.noteBackend && termin.note) {
+					termin.noteBackend = termin.note
+				}
+				
 				// update 08-01-2026: everybody is allowed to do everything in client, critical checks happen at backend level
 				// termin.allowedToSave = true
 				

@@ -81,9 +81,9 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	methods: {
 		getNoteBezeichnung(termin){
-			if(termin.note?.bezeichnung) {
-				return termin.note?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
-			} else if(termin.bezeichnung?.benotbar === true && !termin.note) {
+			if(termin.noteBackend?.bezeichnung) {
+				return termin.noteBackend?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
+			} else if(termin.bezeichnung?.benotbar === true && !termin.noteBackend) {
 				return this.$capitalize(this.$p.t('abgabetool/c4notYetGraded'));
 			} else {
 				return ''
@@ -109,7 +109,10 @@ export const AbgabeMitarbeiterDetail = {
 						'allowedToDelete': true,
 						...res.data[0]
 					}
-					if(newTerminRes.note) newTerminRes.note = noteOpt
+					if(newTerminRes.note) {
+						newTerminRes.note = noteOpt
+						newTerminRes.noteBackend = noteOpt // certain UI elements should only reflect persisted state
+					}
 					newTerminRes.invertedFixtermin = !newTerminRes.fixtermin
 					const existingTerminRes = res.data[1]
 					
@@ -121,8 +124,6 @@ export const AbgabeMitarbeiterDetail = {
 						benotbar: abgabeOpt.benotbar
 					}
 					
-					
-					
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
 					if(!existingTerminRes){
 						newTerminRes.dateStyle = getDateStyleClass(newTerminRes, this.notenOptions)
@@ -130,6 +131,9 @@ export const AbgabeMitarbeiterDetail = {
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
+
+						const existingTerminResCurrObj = this.projektarbeit.abgabetermine.find(paa => paa.paabgabe_id == existingTerminRes.paabgabe_id)
+						existingTerminResCurrObj.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
 						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
@@ -742,16 +746,7 @@ export const AbgabeMitarbeiterDetail = {
 					<template #header>
 						<div class="d-flex flex-nowrap align-items-center w-100">
 			
-							<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
-<!--								<i v-if="getDateStyleClass(termin, notenOptions) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>-->
-<!--								<i v-else-if="getDateStyleClass(termin, notenOptions) == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>-->
-								
+							<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -68px;">	
 								<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 								<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 								<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>

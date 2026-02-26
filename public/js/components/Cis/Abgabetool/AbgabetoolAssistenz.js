@@ -831,6 +831,11 @@ export const AbgabetoolAssistenz = {
 				if(typeof termin.note !== 'object') {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 				}
+
+				// only set this if it has not been set yet and abgabetermin has a note (qgate)
+				if(!termin.noteBackend && termin.note) {
+					termin.noteBackend = termin.note
+				}
 				
 				termin.file = []
 
