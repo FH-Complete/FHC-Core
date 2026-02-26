@@ -210,12 +210,12 @@ export const AbgabetoolAssistenz = {
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList },
@@ -226,7 +226,7 @@ export const AbgabetoolAssistenz = {
 						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2026_02"
+				persistenceID: "abgabetool_2026_02_26"
 			},
 			abgabeTableEventHandlers: [
 			{
@@ -247,6 +247,10 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		handlePaUpdated(projektarbeit) {
+			this.checkAbgabetermineProjektarbeit(projektarbeit)
+			this.$refs.abgabeTable.tabulator.redraw(true)
+		},
 		getQGateStatusList() {
 			return [
 				this.$p.t('abgabetool/c4keinTerminVorhanden'),
@@ -309,11 +313,13 @@ export const AbgabetoolAssistenz = {
 			return false
 		},
 		sammelMailStudent(param) {
-			
-			const emails = this.selectedData
-				.map(row => `${row.student_uid}@${this.domain}`)
-				.join(',');
-			const uniqueRecipients = [...new Set(emails)];
+
+			const recipientList = [];
+			this.selectedData.forEach(d => {
+				recipientList.push(`${d.student_uid}@${this.domain}`)
+			})
+
+			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
 			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
 		},
@@ -362,7 +368,6 @@ export const AbgabetoolAssistenz = {
 			return false;
 		},
 		checkQualityGateStatus(projekt) {
-			// TODO: might refine the representation of these states and maybe refactor code a little
 			const qgate1Termine = []
 			const qgate2Termine = []
 			
@@ -382,7 +387,7 @@ export const AbgabetoolAssistenz = {
 			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
 			qgate1Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate1StatusRank = 5
@@ -404,7 +409,7 @@ export const AbgabetoolAssistenz = {
 
 			qgate2Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate2StatusRank = 5
@@ -1287,7 +1292,13 @@ export const AbgabetoolAssistenz = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<AbgabeDetail :projektarbeit="selectedProjektarbeit" :isFullscreen="detailIsFullscreen" :assistenzMode="true"></AbgabeDetail>
+				<AbgabeDetail 
+					:projektarbeit="selectedProjektarbeit" 
+					:isFullscreen="detailIsFullscreen" 
+					:assistenzMode="true"
+					@paUpdated="handlePaUpdated">
+				
+				</AbgabeDetail>
 				
 			</template>
 		</bs-modal>	
