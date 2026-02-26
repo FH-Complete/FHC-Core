@@ -1,5 +1,5 @@
 <?php
-	$includesArray = array(
+	$includesArray = extendableApps(array(
 		'title' => 'Logs Viewer',
 		'axios027' => true,
 		'bootstrap5' => true,
@@ -13,8 +13,8 @@
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'fhcApps' => array('LogsViewer/LogsViewer'),
-	);
+		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js'),
+	));
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>

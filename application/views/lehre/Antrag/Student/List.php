@@ -1,5 +1,5 @@
 <?php
-$sitesettings = array(
+$sitesettings = extendableApps(array(
 	'title' => 'Antrag auf Änderung des Studierendenstatus',
 	'cis' => true,
 	'vue3' => true,
@@ -8,14 +8,14 @@ $sitesettings = array(
 	'fontawesome6' => true,
 	'phrases' => array(
 	),
-	'fhcApps' => array('lehre/Antrag/Student'),
+	'customJSModules' => array('public/js/apps/lehre/Antrag/Student.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)
-);
+));
 
 if(defined('CIS4')){
 	$this->load->view(

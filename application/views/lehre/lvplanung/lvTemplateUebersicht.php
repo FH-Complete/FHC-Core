@@ -1,5 +1,5 @@
 <?php
-$includesArray = array(
+$includesArray = extendableApps(array(
 	'title' => 'LV Template Übersicht',
 	'vue3' => true,
 	'axios027' => true,
@@ -9,12 +9,12 @@ $includesArray = array(
 	'primevue3' => true,
 	'navigationcomponent' => true,
 	'filtercomponent' => true,
-	'fhcApps' => array('lehre/lvplanung/LvTemplates'),
+	'customJSModules' => array('public/js/apps/lehre/lvplanung/LvTemplates.js'),
 	'customCSSs' => array(
 	    'public/css/Fhc.css',
 	    'public/css/lvTemplateUebersicht.css'
 	)
-);
+));
 
 $this->load->view('templates/FHC-Header', $includesArray);
 ?>

@@ -1,9 +1,9 @@
 <?php
-$includesArray = array(
+$includesArray = extendableApps(array(
 	'title' => 'Documents',
 	'tabulator5' => true,
-	'fhcApps' => ['Cis/Documents']
-);
+	'customJSModules' => ['public/js/apps/Cis/Documents.js']
+));
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>

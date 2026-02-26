@@ -1,5 +1,5 @@
 <?php
-	$includesArray = array(
+	$includesArray = extendableApps(array(
 		'title' => 'LVVerwaltung',
 		'axios027' => true,
 		'bootstrap5' => true,
@@ -17,10 +17,10 @@
 			'public/css/Lvverwaltung.css'
 
 		],
-		'fhcApps' => [
-			'LVVerwaltung'
+		'customJSModules' => [
+			'public/js/apps/LVVerwaltung.js'
 		]
-	);
+	));
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 

@@ -1,18 +1,18 @@
 <?php 
-$includesArray = array(
+$includesArray = extendableApps(array(
     'title' => 'Profil Änderungen',
     'vue3' => true,
     'bootstrap5' => true,
     'fontawesome6'=> true,
     'axios027' => true,
     'tabulator5' => true,
-    'fhcApps' => array(
-		'Cis/ProfilUpdateRequests'
+    'customJSModules' => array(
+	'public/js/apps/Cis/ProfilUpdateRequests.js'
     ),
     'customCSSs' => array(
 	'public/css/components/FilterComponent.css','public/css/components/FormUnderline.css'
     )
-);
+));
 
 if(defined("CIS4"))
 {

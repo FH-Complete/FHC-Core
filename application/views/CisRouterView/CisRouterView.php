@@ -1,6 +1,6 @@
 <?php
 
-$includesArray = array(
+$includesArray = extendableApps(array(
 	'title' => 'Cis4',
 	'axios027' => true,
 	'bootstrap5' => true,
@@ -36,7 +36,7 @@ $includesArray = array(
 		'public/js/apps/Dashboard/Fhc.js'
 	),
 
-);
+));
 
 $this->load->view('templates/CISVUE-Header', $includesArray);
 ?>

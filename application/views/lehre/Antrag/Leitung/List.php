@@ -2,7 +2,7 @@
 
 use \DateTime as DateTime;
 
-$sitesettings = array(
+$sitesettings = extendableApps(array(
 	'title' => 'Anträge auf Änderung des Studierendenstatus',
 	'cis' => true,
 	'vue3' => true,
@@ -18,14 +18,14 @@ $sitesettings = array(
 		'lehre',
 		'person',
 	),
-	'fhcApps' => array('lehre/Antrag/Leitung'),
+	'customJSModules' => array('public/js/apps/lehre/Antrag/Leitung.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)
-);
+));
 
 $this->load->view(
 	'templates/FHC-Header',

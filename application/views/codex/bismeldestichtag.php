@@ -1,5 +1,5 @@
 <?php
-	$includesArray = array(
+	$includesArray = extendableApps(array(
 		'title' => 'Bismeldestichtage',
 		'axios027' => true,
 		'bootstrap5' => true,
@@ -10,8 +10,8 @@
 		'tabulator5' => true,
 		'customCSSs' => array('vendor/vuejs/vuedatepicker_css/main.css'),
 		'customJSs' => array('vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js'),
-		'fhcApps' => array('Bismeldestichtag/Bismeldestichtag')
-	);
+		'customJSModules' => array('public/js/apps/Bismeldestichtag/Bismeldestichtag.js')
+	));
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>

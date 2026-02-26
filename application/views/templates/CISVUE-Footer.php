@@ -5,9 +5,9 @@ $includesArray = array(
 	'bootstrap5' => true,
 	'fontawesome6' => true,
 	'axios027' => true,
-	'fhcApps' => array_merge([
-		'Cis'
-	], $fhcApps ?? []),
+	'customJSModules' => array_merge([
+		'public/js/apps/Cis.js'
+	], $customJSModules ?? []),
 	'customCSSs' => array_merge([
 		'public/css/Cis4/Cis.css'
 	], $customCSSs ?? [])

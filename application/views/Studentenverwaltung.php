@@ -1,5 +1,5 @@
 <?php
-	$includesArray = array(
+	$includesArray = extendableApps(array(
 		'title' => 'Studentenverwaltung',
 		'axios027' => true,
 		'bootstrap5' => true,
@@ -26,10 +26,10 @@
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
 			#'vendor/npm-asset/primevue/toast/toast.min.js'
 		],
-		'fhcApps' => [
-			'Studentenverwaltung'
+		'customJSModules' => [
+			'public/js/apps/Studentenverwaltung.js'
 		]
-	);
+	));
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>

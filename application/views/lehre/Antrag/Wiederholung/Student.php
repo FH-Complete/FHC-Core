@@ -1,5 +1,5 @@
 <?php
-$sitesettings = array(
+$sitesettings = extendableApps(array(
 	'title' => 'Antrag Wiederholung vom Studium',
 	'cis' => true,
 	'vue3' => true,
@@ -12,14 +12,14 @@ $sitesettings = array(
 		'lehre',
 		'global'
 	),
-	'fhcApps' => array('lehre/Antrag/Lvzuweisung'),
+	'customJSModules' => array('public/js/apps/lehre/Antrag/Lvzuweisung.js'),
 	'customCSSs' => array(
 		'public/css/Fhc.css',
 		'public/css/components/primevue.css',
 	),
 	'customJSs' => array(
 	)
-);
+));
 
 $this->load->view(
 	'templates/FHC-Header',
