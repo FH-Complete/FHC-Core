@@ -6,6 +6,7 @@ import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass } from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import {splitMailsHelper} from "../../../helpers/EmailHelpers.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -16,6 +17,7 @@ export const AbgabetoolMitarbeiter = {
 		Checkbox: primevue.checkbox,
 		Dropdown: primevue.dropdown,
 		Textarea: primevue.textarea,
+		TieredMenu: primevue.tieredmenu,
 		VueDatePicker,
 		FhcOverlay
 	},
@@ -48,6 +50,7 @@ export const AbgabetoolMitarbeiter = {
 			phrasenResolved: false,
 			turnitin_link: null,
 			old_abgabe_beurteilung_link: null,
+			BETREUER_SAMMELMAIL_BUTTON_STUDENT: null,
 			saving: false,
 			loading: false,
 			abgabeTypeOptions: null,
@@ -139,7 +142,6 @@ export const AbgabetoolMitarbeiter = {
 					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, headerFilter: false, headerSort: false, widthGrow: 1, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4kontakt'))),  field: 'mail', formatter: this.mailFormatter, widthGrow: 1, tooltip: false, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -151,12 +153,12 @@ export const AbgabetoolMitarbeiter = {
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList }, 
@@ -167,7 +169,7 @@ export const AbgabetoolMitarbeiter = {
 						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false}
 				],
 				persistence: false,
-				persistenceID: 'abgabeTableBetreuer2026-02-24'
+				persistenceID: 'abgabeTableBetreuer2026-02-26'
 			},
 			abgabeTableEventHandlers: [{
 				event: "tableBuilt",
@@ -203,6 +205,20 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		handlePaUpdated(projektarbeit) {
+			this.checkAbgabetermineProjektarbeit(projektarbeit)
+			this.$refs.abgabeTable.tabulator.redraw(true)
+		},
+		sammelMailStudent(param) {
+			
+			const recipientList = [];
+			this.selectedData.forEach(d => {
+				recipientList.push(`${d.student_uid}@${this.domain}`)
+			})
+			const uniqueRecipients = [...new Set(recipientList)];
+			const subject = ""; // empty subject line 
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+		},
 		getQGateStatusList() {
 			return [
 				this.$p.t('abgabetool/c4keinTerminVorhanden'),
@@ -375,7 +391,6 @@ export const AbgabetoolMitarbeiter = {
 			});
 		},
 		checkQualityGateStatus(projekt) {
-			// TODO: might refine the representation of these states and maybe refactor code a little
 			const qgate1Termine = []
 			const qgate2Termine = []
 
@@ -395,7 +410,7 @@ export const AbgabetoolMitarbeiter = {
 			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
 			qgate1Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate1StatusRank = 5
@@ -417,7 +432,7 @@ export const AbgabetoolMitarbeiter = {
 
 			qgate2Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate2StatusRank = 5
@@ -677,12 +692,13 @@ export const AbgabetoolMitarbeiter = {
 			}
 
 			pa.abgabetermine.forEach(termin => {
-				termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				const noteOpt = this.allowedNotenOptions.find(opt => opt.note == termin.note)
+				if(noteOpt) termin.note =  noteOpt
 				termin.file = []
 				
 				// only set this if it has not been set yet and abgabetermin has a note (qgate)
-				if(!termin.noteBackend && termin.note) {
-					termin.noteBackend = termin.note
+				if(!termin.noteBackend && noteOpt) {
+					termin.noteBackend = noteOpt
 				}
 				
 				// update 08-01-2026: everybody is allowed to do everything in client, critical checks happen at backend level
@@ -718,11 +734,6 @@ export const AbgabetoolMitarbeiter = {
 		detailFormatter(cell) {
 			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
 				'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
-		},
-		mailFormatter(cell) {
-			const val = cell.getValue()
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
 		beurteilungFormatter(cell) {
 			const val = cell.getValue()
@@ -828,6 +839,29 @@ export const AbgabetoolMitarbeiter = {
 		},
 	},
 	computed: {
+		emailItems() {
+			const menu = []
+
+			if(this.BETREUER_SAMMELMAIL_BUTTON_STUDENT){
+				menu.push({
+					label: this.$p.t('abgabetool/c4sendEmailStudierendev2', [this.uniqueStudentEmailCount]),
+					command: this.sammelMailStudent
+				})
+			}
+
+			return menu
+		},
+		uniqueStudentEmailCount() {
+			const emails = new Set();
+
+			this.selectedData.forEach(row => {
+				if (row.student_uid) {
+					emails.add(row.student_uid); // actually dont need domain for this
+				}
+			});
+
+			return emails.size;
+		},
 		getAllowedAbgabeTypeOptions() {
 			return this.abgabeTypeOptions.filter(opt => this.abgabetypenBetreuer.includes(opt.paabgabetyp_kurzbz))
 		}
@@ -840,6 +874,7 @@ export const AbgabetoolMitarbeiter = {
 			this.turnitin_link = res.data?.turnitin_link
 			this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link
 			this.abgabetypenBetreuer = res.data?.abgabetypenBetreuer
+			this.BETREUER_SAMMELMAIL_BUTTON_STUDENT = res.data?.BETREUER_SAMMELMAIL_BUTTON_STUDENT
 		}).catch(e => {
 			this.loading = false
 		})
@@ -952,7 +987,11 @@ export const AbgabetoolMitarbeiter = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<AbgabeDetail :projektarbeit="selectedProjektarbeit" :isFullscreen="detailIsFullscreen"></AbgabeDetail>
+				<AbgabeDetail 
+					:projektarbeit="selectedProjektarbeit" 
+					:isFullscreen="detailIsFullscreen"
+					@paUpdated="handlePaUpdated">
+				</AbgabeDetail>
 				
 			</template>
 		</bs-modal>	
@@ -988,7 +1027,17 @@ export const AbgabetoolMitarbeiter = {
 						<i class="fa fa-hourglass-end"></i>
 						{{ $p.t('abgabetool/showDeadlines') }}
 					</button>
-					
+					<button 
+						v-if="emailItems.length"
+						role="button"
+						@click="evt => $refs.menu.toggle(evt)"
+						class="btn btn-outline-secondary dropdown-toggle"
+						aria-haspopup="true"
+					>
+						<i class="fa fa-envelope"></i>
+					</button>
+					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
+
 				</template>
 			</core-filter-cmpt>
 		
