@@ -40,6 +40,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/divider/divider.min.js',
 		'vendor/npm-asset/primevue/password/password.js',
 		'vendor/npm-asset/primevue/multiselect/multiselect.js',
+		'vendor/npm-asset/primevue/tieredmenu/tieredmenu.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(

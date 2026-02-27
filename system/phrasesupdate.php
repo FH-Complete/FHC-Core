@@ -10872,7 +10872,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'First Assessor',
+				'text' => 'First Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -11512,7 +11512,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The second assessor’s assessment has been submitted and is part of the final grade.',
+				'text' => 'The second reviwer’s assessment has been submitted and is part of the final grade.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -11692,7 +11692,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Second Assessor',
+				'text' => 'Second Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -11712,7 +11712,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor',
+				'text' => 'Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12092,7 +12092,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'To assessment of second assessor',
+				'text' => 'To assessment of second reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12112,7 +12112,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'The assessment of the second assessor is not available yet.',
+				'text' => 'The assessment of the second reviewer is not available yet.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12192,7 +12192,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send token to Second Assessor',
+				'text' => 'Send token to Second Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12310,7 +12310,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Sending only possible after completion of assessment by Second Assessor',
+				'text' => 'Sending only possible after completion of assessment by Second Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12550,7 +12550,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor grade',
+				'text' => 'Reviewer grade',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12570,7 +12570,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor',
+				'text' => 'Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12610,7 +12610,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor type',
+				'text' => 'Reviewer type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -12630,7 +12630,7 @@ Any unusual occurrences
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'secondary assessor',
+				'text' => 'secondary reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -19087,6 +19087,27 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'kvp',
+		'phrase' => 'error.opproject_does_not_exists',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Es ist kein Openproject Projekt verknüpft.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "No Openproject project is linked.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+    //*******************	KVP end
 	array(
 		'app' => 'international',
 		'category' => 'international',
@@ -35028,6 +35049,46 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'studentByLVATitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Anwesenheiten der gesamten Lehrveranstaltung - alle LV-Teile',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Attendances of the full course - all teaching units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'anwesenheiten',
+		'category' => 'global',
+		'phrase' => 'kontrolliertVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' =>  'Kontrolliert von',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Checked by',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	//
 	// DIGITALE ANWESENHEITEN PHRASEN END
 	//
@@ -43359,7 +43420,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4betreuer',
+		'phrase' => 'c4betreuerv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43370,7 +43431,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Assessor",
+				'text' => "Reviewer",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -43639,7 +43700,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4zieldatum',
+		'phrase' => 'c4zieldatumv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43650,7 +43711,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Target date",
+				'text' => "Deadline",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -43679,7 +43740,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgabekurzbz',
+		'phrase' => 'c4abgabekurzbzv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43690,7 +43751,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "Short description of the submitted file",
+				'text' => "Short description of the submitted document",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44179,7 +44240,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4betreuerart',
+		'phrase' => 'c4betreuerartv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -44190,7 +44251,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor type',
+				'text' => 'Reviewer type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44955,7 +45016,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4betreuerEmailKontakt',
+		'phrase' => 'c4betreuerEmailKontaktv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -44966,7 +45027,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Email Assessor',
+				'text' => 'Email Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44995,7 +45056,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4downloadBeurteilungErstbetreuer',
+		'phrase' => 'c4downloadBeurteilungErstbetreuerv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45006,7 +45067,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Download evaluation of first assesor',
+				'text' => 'Download evaluation of first reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45015,7 +45076,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4downloadBeurteilungZweitbetreuer',
+		'phrase' => 'c4downloadBeurteilungZweitbetreuerv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45026,7 +45087,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Download evaluation of second assesor',
+				'text' => 'Download evaluation of second reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45450,7 +45511,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4erstbetreuer',
+		'phrase' => 'c4erstbetreuerv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45461,7 +45522,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'First Assessor',
+				'text' => 'First Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45470,7 +45531,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4zweitbetreuer',
+		'phrase' => 'c4zweitbetreuerv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45481,7 +45542,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Second Assessor',
+				'text' => 'Second Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45510,18 +45571,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailStudierende',
+		'phrase' => 'c4sendEmailStudierendev2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Studierende schicken',
+				'text' => 'Email an {0} Studierende schicken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to students',
+				'text' => 'Send Email to {0} students',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45530,18 +45591,58 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4sendEmailBetreuer',
+		'phrase' => 'c4sammelmailStudentBetreff',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Email an Betreuende schicken',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Send Email to assessors',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sendEmailBetreuerv3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Email an {0} Betreuende schicken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send Email to {0} reviewers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4sammelmailBetreuerBetreff',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Betreuungen Bachelorarbeit bzw. Master Thesis bei Studiengang {0}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Supervision of Bachelor's thesis or Master's thesis for degree program {0}",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45610,7 +45711,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fehlerMailBegutachter',
+		'phrase' => 'c4fehlerMailBegutachterv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45621,7 +45722,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Error sending E-Mail to first Assessor!',
+				'text' => 'Error sending E-Mail to first Reviewer!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45630,7 +45731,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fehlerMailZweitBegutachter',
+		'phrase' => 'c4fehlerMailZweitBegutachterv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45641,7 +45742,7 @@ array(
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Error sending E-Mail to second Assessor!',
+				'text' => 'Error sending E-Mail to second Reviewer!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -46328,6 +46429,206 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Not happened yet",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4deadlineExceeded',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nicht rechtzeitig abgegeben!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Deadline exceeded!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4missingSignatureNotification',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Abgabetool: Fehlende Signatur bei Endupload',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Submission tool: Missing signature at final upload',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4erstbetreuerTitelPre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ErstbetreuerIn Titel Pre',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Reviewer Title Pre',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4erstbetreuerVorname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ErstbetreuerIn Vorname',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Reviewer First Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4erstbetreuerNachname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ErstbetreuerIn Nachname',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Reviewer Last Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4erstbetreuerTitelPost',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ErstbetreuerIn Titel Post',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'First Reviewer Title Post',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitbetreuerTitelPre',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZweitbetreuerIn Titel Pre',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Second Reviewer Title Pre',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitbetreuerVorname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZweitbetreuerIn Vorname',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Second Reviewer First Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitbetreuerNachname',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZweitbetreuerIn Nachname',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Second Reviewer Last Name',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitbetreuerTitelPost',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'ZweitbetreuerIn Titel Post',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Second Reviewer Title Post',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55299,7 +55600,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'assessor',
+				'text' => 'reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55319,7 +55620,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Assessor',
+				'text' => 'Reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55339,7 +55640,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'assessor type',
+				'text' => 'reviewer type',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55539,7 +55840,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Deleting not possible, assessors were already assigned to this projekt work',
+				'text' => 'Deleting not possible, reviewers were already assigned to this projekt work',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55579,7 +55880,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Invalid project assessors',
+				'text' => 'Invalid project reviewers',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -55599,7 +55900,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Deleting not possible, project assessor has a contract already',
+				'text' => 'Deleting not possible, project reviewer has a contract already',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56039,7 +56340,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Edit assessor',
+				'text' => 'Edit reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56059,7 +56360,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Save assessor',
+				'text' => 'Save reviewer',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56199,7 +56500,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'project assessor short name',
+				'text' => 'project reviewer short name',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56239,7 +56540,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'This project assessor is already assigned',
+				'text' => 'This project reviewer is already assigned',
 				'description' => '',
 				'insertvon' => 'system'
 			)

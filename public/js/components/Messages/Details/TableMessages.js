@@ -243,6 +243,7 @@ export default {
 						title: this.$p.t('global', 'aktionen')
 												});
 						*/
+						this.$emit('tabulator_tablebuilt');
 					}
 				},
 				{
