@@ -1,5 +1,5 @@
 <?php
-$sitesettings = extendableApps(array(
+$sitesettings = array(
 	'title' => 'Antrag Wiederholung vom Studium',
 	'cis' => true,
 	'vue3' => true,
@@ -19,7 +19,7 @@ $sitesettings = extendableApps(array(
 	),
 	'customJSs' => array(
 	)
-));
+);
 
 $this->load->view(
 	'templates/FHC-Header',

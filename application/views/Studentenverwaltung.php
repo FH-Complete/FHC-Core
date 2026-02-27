@@ -1,5 +1,5 @@
 <?php
-	$includesArray = extendableApps(array(
+	$includesArray = array(
 		'title' => 'Studentenverwaltung',
 		'axios027' => true,
 		'bootstrap5' => true,
@@ -30,7 +30,7 @@
 		'customJSModules' => [
 			'public/js/apps/Studentenverwaltung.js'
 		]
-	));
+	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>

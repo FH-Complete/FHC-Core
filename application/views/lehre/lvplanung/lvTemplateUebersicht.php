@@ -1,5 +1,5 @@
 <?php
-$includesArray = extendableApps(array(
+$includesArray = array(
 	'title' => 'LV Template Übersicht',
 	'vue3' => true,
 	'axios027' => true,
@@ -14,7 +14,7 @@ $includesArray = extendableApps(array(
 	    'public/css/Fhc.css',
 	    'public/css/lvTemplateUebersicht.css'
 	)
-));
+);
 
 $this->load->view('templates/FHC-Header', $includesArray);
 ?>

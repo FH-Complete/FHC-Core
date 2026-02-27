@@ -1,5 +1,5 @@
 <?php
-$sitesettings = extendableApps(array(
+$sitesettings = array(
 	'title' => 'Antrag auf Änderung des Studierendenstatus',
 	'cis' => true,
 	'vue3' => true,
@@ -15,7 +15,7 @@ $sitesettings = extendableApps(array(
 	),
 	'customJSs' => array(
 	)
-));
+);
 
 if(defined('CIS4')){
 	$this->load->view(

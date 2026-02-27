@@ -1,5 +1,5 @@
 <?php 
-$includesArray = extendableApps(array(
+$includesArray = array(
     'title' => 'Profil Änderungen',
     'vue3' => true,
 	'primevue3' => true,
@@ -16,7 +16,7 @@ $includesArray = extendableApps(array(
     'customCSSs' => array(
 	'public/css/components/FilterComponent.css','public/css/components/FormUnderline.css'
     )
-));
+);
 
 if(defined("CIS4"))
 {
