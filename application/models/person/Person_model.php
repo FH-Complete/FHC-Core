@@ -425,13 +425,14 @@ class Person_model extends DB_Model
 		$qry = "SELECT
 			CONCAT(tp.vorname, ' ', tp.nachname) AS name,
 			ARRAY_AGG(DISTINCT b.uid ORDER BY b.uid) AS uids,
-			ARRAY_AGG(DISTINCT CONCAT(stg.typ, stg.kurzbz)) AS stg_oes
+			ARRAY_AGG(DISTINCT CONCAT(stg.typ, stg.kurzbz)) AS stg_oes,
+			s.semester
 		FROM public.tbl_student s
 				 JOIN public.tbl_benutzer b ON s.student_uid = b.uid
 				 JOIN public.tbl_person tp ON b.person_id = tp.person_id
 				 JOIN public.tbl_studiengang stg ON s.studiengang_kz = stg.studiengang_kz 
 		GROUP BY tp.vorname, tp.nachname, b.aktiv, b.person_id, s.semester
-		HAVING b.person_id = ? AND b.aktiv IS TRUE AND s.semester > 0;";
+		HAVING b.person_id = ? AND b.aktiv IS TRUE";
 		
 		return $this->execReadOnlyQuery($qry, [$person_id]);
 	}
