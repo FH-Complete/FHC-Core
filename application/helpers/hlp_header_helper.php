@@ -279,7 +279,6 @@ function absoluteJsImportUrl($relurl)
  */
 function extendableApps($includes)
 {
-	$start = microtime(true);
 	if(!isset($includes['customJSModules']))
 	{
 		return;
@@ -301,6 +300,7 @@ function extendableApps($includes)
 	}
 
 	$appscount = 0;
+	$tmpCustomJSModules = array();
 	foreach($includes['customJSModules'] as $item)
 	{
 		$matches = array();
@@ -321,7 +321,7 @@ function extendableApps($includes)
 
 				if(is_readable(FHCPATH . $extend_js))
 				{
-					array_unshift($includes['customJSModules'], $extend_js);
+					array_push($tmpCustomJSModules, $extend_js);
 				}
 
 				if(is_readable(FHCPATH . $extend_css))
@@ -330,7 +330,9 @@ function extendableApps($includes)
 				}
 			}
 		}
+		array_push($tmpCustomJSModules, $item);
 	}
+	$includes['customJSModules'] = $tmpCustomJSModules;
 
 	if($appscount > 0)
 	{
