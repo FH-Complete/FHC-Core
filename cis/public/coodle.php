@@ -1041,7 +1041,7 @@ function sendEmail($coodle_id)
 			."END:STANDARD\r\n"
 			."END:VTIMEZONE\r\n"
 			."BEGIN:VEVENT\r\n"
-			.$coodle->foldContentLine("ORGANIZER:MAILTO:".$erstellername." <".$coodle->ersteller_uid."@".DOMAIN)."\r\n"
+			.$coodle->foldContentLine("ORGANIZER:MAILTO:".$erstellername." <".$coodle->ersteller_uid."@".DOMAIN).">\r\n"
 			.rtrim($teilnehmer)."\r\n"
 			."DTSTART;TZID=Europe/Vienna:".$dtstart."\r\n"
 			."DTEND;TZID=Europe/Vienna:".$dtend."\r\n"
