@@ -148,20 +148,31 @@ export const Benotungstool = {
 			// AND the table actually has columns (to avoid saving empty states)
 			if (!this.stateRestored) return;
 			
-			
 			const rawLayout = table.getColumnLayout();
+			const filteredLayout = rawLayout.filter(col => {
+				if(this.notenTableOptions.columns.some(colDef => colDef.field === col.field)) return col
+				return null
+			})
+			
+			// TODO: if dynamic cols have sort/filter/headerfilter functionality filter them here before persisting
+			// into local storage
+			const rawSorters = table.getSorters()
+			
+			const rawFilters = table.getFilters()
+			
+			const rawHeaderFilters = table.getHeaderFilters()
 			const state = {
-				columns: rawLayout.map(col => ({
+				columns: filteredLayout.map(col => ({
 					field: col.field,
 					visible: col.visible,
 					width: col.width,
 				})),
-				sort: table.getSorters().map(s => ({
+				sort: rawSorters.map(s => ({
 					field: s.field,
 					dir: s.dir,
 				})),
-				filters: table.getFilters(),
-				headerFilters: table.getHeaderFilters()
+				filters: rawFilters,
+				headerFilters:  rawHeaderFilters
 			};
 
 			localStorage.setItem(this.persistenceID, JSON.stringify(state));
@@ -188,31 +199,20 @@ export const Benotungstool = {
 			table.on("renderComplete", () => {
 				if (this.stateRestored) return;
 
-				// restore layout first
-				if (saved?.columns && !this.colLayoutRestored) {
-					const layout = saved.columns.map(col => ({
-						field: col.field,
-						width: col.width,
-						visible: col.visible,
-						// add more if needed, but keep it simple
-					}));
+				// layout restore should be happening in setupData()
 
-					table.setColumnLayout(layout);
-					this.colLayoutRestored = true;
-				}
-				
 				if (saved?.filters && !this.filtersRestored) {
 					this.filtersRestored = true;
 					table.setFilter(saved.filters);
 				}
-				
+
 				if (saved?.headerFilters && !this.headerFiltersRestored) {
 					this.headerFiltersRestored = true;
 					saved.headerFilters.forEach(hf => {
 						table.setHeaderFilterValue(hf.field, hf.value);
 					});
 				}
-				
+
 				if (saved?.sort?.length && !this.sortRestored) {
 					this.sortRestored = true;
 					setTimeout(() => {
@@ -507,6 +507,9 @@ export const Benotungstool = {
 				}).finally(()=>{this.loading = false})
 		},
 		handleAddNewPruefungenResponse(res, uids) {
+			// in case we reload when changing lva_id or stsem to always consider local storage layout
+			this.colLayoutRestored = false;
+			
 			const pruefungen = res.data
 			uids.forEach(entry => {
 				const saved = pruefungen[entry.uid].savedPruefung?.[0]
@@ -518,6 +521,7 @@ export const Benotungstool = {
 				// check for extra pruefung (termin1) to add before
 				if(extra) {
 					student["Termin1"] = extra
+					student.pruefungen.push(extra) // push to pruefungen array for antritt evaluation
 				}
 
 				this.correctOldTerminTypenForStudent(student, saved)
@@ -545,6 +549,8 @@ export const Benotungstool = {
 
 				// recalculate student antritte
 				student.hoechsterAntritt = this.getAntrittCountStudent(student)
+				this.recalculateSelectable(student)
+				this.reformatStudentRow(student)
 			})
 
 			// add col to table
@@ -563,6 +569,7 @@ export const Benotungstool = {
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -577,9 +584,12 @@ export const Benotungstool = {
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
-					minWidth: 150,
+					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -588,13 +598,55 @@ export const Benotungstool = {
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 			// redraw table
 
+
+			// preemptively do the persistence part of columns already here so we get the merged definition before
+			// tabulator internal go to war with vue reactives
+			let colsUsed = null
+			const saved = this.loadState();
+			if (saved && saved.columns) {
+				// new columns map for lookup
+				const colMap = new Map(cols.map(c => [c.field, c]));
+
+				const restoredCols = [];
+
+				// add columns in the SAVED order, applying saved width/visibility
+				saved.columns.forEach(savedCol => {
+					const originalDef = colMap.get(savedCol.field);
+					if (originalDef) {
+						restoredCols.push({
+							...originalDef, // Keep formatters, calcs, etc.
+							width: savedCol.width,
+							visible: savedCol.visible
+						});
+						colMap.delete(savedCol.field); // Remove so we don't double-add
+					}
+				});
+
+				// append any NEW columns aka pruefungs cols
+				colMap.forEach((def) => {
+					restoredCols.push(def);
+				});
+
+				colsUsed = restoredCols;
+				this.colLayoutRestored = true;
+			}
+
 			this.loading = false
 
 			// TODO: find some solution so the tool does not appear "jumpy" after pruefung calls
-			
-			this.$refs.notenTable.tabulator.setColumns(cols)
+			const colsFinal = colsUsed ?? cols
+			this.$refs.notenTable.tabulator.setColumns(colsFinal)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
+		},
+		reformatStudentRow(student) {
+			const table = this.$refs.notenTable.tabulator
+			if(!table) return
+			
+			const row = table.rowManager.getRowFromDataObject(student)
+
+			const rowComponent = row.getComponent()
+			rowComponent.reformat()
 		},
 		correctOldTerminTypenForStudent(student, saved) {
 			// check if student has a preceding pruefung from same type and remove it since in this case 
@@ -681,20 +733,22 @@ export const Benotungstool = {
 				selectable: true,
 				selectableRangeMode: "click", // shift+click
 				selectablePersistence: false, // reset selection on table reload
-				selectableCheck: function(row, e){
-					const data = row.getData();
-
-					if(data['kommPruef']) return false
-					else if(data.hoechsterAntritt >= this.maxAntrittCount) return false // 3 pruefungen counted
-
-					return true;  // student can be selected to add pruefung
-				},
+				selectableCheck: this.selectableCheck,
 				rowHeight: 40,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: this.getColumnsDefinition(),
 				persistence: false,
 			}
 
+		},
+		selectableCheck(row, e) {
+			const data = row.getData();
+
+			if(data['kommPruef']) return false
+			else if(data.hoechsterAntritt >= this.maxAntrittCount) return false // 2 or 3 pruefungen counted
+
+			return true;  // student can be selected to add pruefung
+			
 		},
 		getColumnsDefinition() {
 			const columns = []
@@ -744,7 +798,9 @@ export const Benotungstool = {
 					handleClick: this.selectAllHandler
 				},
 				width: 50,
-				cssClass: 'sticky-col'
+				cssClass: 'sticky-col',
+				field: 'selectCol',
+				title: ''
 			})
 			columns.push({title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, cssClass: 'sticky-col'})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true})
@@ -836,6 +892,7 @@ export const Benotungstool = {
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4kommPruef'))),
 				field: 'kommPruef', widthGrow: 1,
 				formatter: this.pruefungFormatter,
+				sorter: this.pruefungSorter,
 				topCalc: this.terminCalcFunc,
 				topCalcFormatter: this.terminCalcFormatter,
 				hozAlign:"center", minWidth: 150, visible: false,
@@ -843,6 +900,13 @@ export const Benotungstool = {
 			})
 		
 			return columns
+		},
+		pruefungSorter(a, b, aRow, bRow, column, dir, params) {
+			if (a === null || typeof a === "undefined" || a === '') return -1;
+			if (b === null || typeof b === "undefined" || b === '') return 1;
+
+			// sort by notenvalue since pruefungen are in same date by column
+			return a.note - b.note
 		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
@@ -882,7 +946,16 @@ export const Benotungstool = {
 			
 			const notSelectable = data.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef') || data.hoechsterAntritt >= this.maxAntrittCount
 			if(notSelectable) {
-				row.getElement().children[0]?.children[0]?.remove()
+				const el = row.getElement()
+				el.children[0]?.children[0]?.remove()
+				
+				el.classList.remove("tabulator-selectable");
+				el.classList.add("tabulator-unselectable");
+			} else {
+				const el = row.getElement()
+
+				el.classList.add("tabulator-selectable");
+				el.classList.remove("tabulator-unselectable");
 			}
 		},
 		terminCalcFunc(entries) {
@@ -1095,6 +1168,7 @@ export const Benotungstool = {
 				colDiv.className = classParam ?? 'col-4';
 				colDiv.style.justifyContent = 'center';
 				colDiv.style.alignItems = 'center';
+				colDiv.style.alignContent = 'center';
 				colDiv.style.height = '100%';
 
 				if (typeof content === 'string') {
@@ -1107,13 +1181,6 @@ export const Benotungstool = {
 			}
 			
 			if(data[field]) {
-				// showing date in 
-				
-				// const dateParts = data[field].datum.split('-')
-				// const date = `${dateParts[2]}.${dateParts[1]}.${dateParts[0]}`
-				//
-				// // First column (date)
-				// rowDiv.appendChild(createCol(date, 'col-4 d-flex justify-content-center align-items-center'));
 
 				const noteDefEntry = data.note ? this.notenOptions.find(n => n.note == data[field].note) : null
 
@@ -1123,7 +1190,6 @@ export const Benotungstool = {
 				// no actions on kommPruef allowed
 				// no actions on termin1 aka pruefung 0 aka ursprüngliche note erlaubt
 				if(field === 'kommPruef' || field === "Termin1") { 
-					// rowDiv.appendChild(createCol('', 'col-4 d-flex justify-content-center align-items-center')); // append empty col4 to have formatting similar
 					return rowDiv
 				} 
 				
@@ -1153,8 +1219,8 @@ export const Benotungstool = {
 					this.openPruefungModal(data, null, field)
 				});
 
-				rowDiv.appendChild(createCol(button), 'col-4 d-flex justify-content-center align-items-center');
-
+				rowDiv.appendChild(createCol(button), 'col-4 d-flex justify-content-center align-content-center');
+				
 				return rowDiv;
 			} else {
 				return ''
@@ -1243,6 +1309,9 @@ export const Benotungstool = {
 			this.notenOptionsResolve = resolve
 		},
 		async setupData(data){
+			// in case we reload when changing lva_id or stsem to always consider local storage layout
+			this.colLayoutRestored = false;
+			
 			this.studenten = data[0] ?? []
 			this.studenten.forEach(s => {
 				s.pruefungen = []
@@ -1321,10 +1390,13 @@ export const Benotungstool = {
 					else s.teilnote += ('<span style="color: red;">'+g.text +'</span>'+ '<br/>')
 				})
 				
+				const vueThis = this
 				Object.defineProperty(s, 'selectable', {
 					get() {
 						const kP = s.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef')
-						return !(kP || s.hoechsterAntritt >= this.maxAntrittCount)
+						const maxAntrittReached = s.hoechsterAntritt >= vueThis.maxAntrittCount
+						return !(kP || maxAntrittReached)
+						
 					},
 					set() {
 						// empty setter so tabulator doesnt scream	
@@ -1342,11 +1414,13 @@ export const Benotungstool = {
 					field: "Termin1",
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					sorter: this.pruefungSorter,
 					topCalc: this.terminCalcFunc,
 					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -1370,11 +1444,13 @@ export const Benotungstool = {
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					sorter: this.pruefungSorter,
 					topCalc: this.terminCalcFunc,
 					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -1382,11 +1458,43 @@ export const Benotungstool = {
 
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 
+
+			// preemptively do the persistence part of columns already here so we get the merged definition before
+			// tabulator internal go to war with vue reactives
+			let colsUsed = null
+			const saved = this.loadState();
+			if (saved && saved.columns) {
+				// new columns map for lookup
+				const colMap = new Map(cols.map(c => [c.field, c]));
+
+				const restoredCols = [];
+
+				// add columns in the SAVED order, applying saved width/visibility
+				saved.columns.forEach(savedCol => {
+					const originalDef = colMap.get(savedCol.field);
+					if (originalDef) {
+						restoredCols.push({
+							...originalDef, // Keep formatters, calcs, etc.
+							width: savedCol.width,
+							visible: savedCol.visible
+						});
+						colMap.delete(savedCol.field); // Remove so we don't double-add
+					}
+				});
+
+				// append any NEW columns aka pruefungs cols
+				colMap.forEach((def) => {
+					restoredCols.push(def);
+				});
+
+				colsUsed = restoredCols;
+				this.colLayoutRestored = true;
+			}
+
+			const colsFinal = colsUsed ?? cols
 			this.loading = false
 			
-			console.log('setColumns', cols)
-			
-			this.$refs.notenTable.tabulator.setColumns(cols)
+			this.$refs.notenTable.tabulator.setColumns(colsFinal)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
 			this.$refs.notenTable.tabulator.redraw(true);
 		},
@@ -1567,6 +1675,9 @@ export const Benotungstool = {
 					
 					s.lv_note = res.data[1]?.note
 					
+					const oldScrollLeft = this.$refs.notenTable.tabulator.rowManager.scrollLeft
+					const oldScrollTop = this.$refs.notenTable.tabulator.rowManager.scrollTop
+
 					// add new pruefung to row
 					if(!this.pruefung) {			
 						this.handleAddNewTermin(res.data, s)
@@ -1579,17 +1690,18 @@ export const Benotungstool = {
 
 						// antritte might have changed due to different benotung
 						s.hoechsterAntritt = this.getAntrittCountStudent(s)
+						this.recalculateSelectable(s)
+						this.reformatStudentRow(s)
 					}
 					
-					const oldScrollLeft = this.$refs.notenTable.tabulator.rowManager.scrollLeft
-					const oldScrollTop = this.$refs.notenTable.tabulator.rowManager.scrollTop
+					
 					this.$refs.notenTable.tabulator.redraw(true)
 
 					Vue.nextTick(()=> {
 						const table = this.$refs.notenTable.tabulator.element.querySelector('.tabulator-tableholder')
 						if(table) {
 							table.scrollLeft = oldScrollLeft;
-							table.oldScrollTop = oldScrollTop;
+							table.scrollTop = oldScrollTop;
 						}
 					})
 
@@ -1602,12 +1714,15 @@ export const Benotungstool = {
 			this.$refs.modalContainerPruefung.hide()
 		},
 		handleAddNewTermin(data, student){
+			this.colLayoutRestored = false; // always keep persistence options in mind when modifying table cols dynamically
+			
 			const savedPruefung = data[0]
 			const extra = data[2]
 			
 			// check for extra pruefung (termin1) to add before
 			if(extra) {
 				student["Termin1"] = extra
+				student.pruefungen.push(extra) // push to pruefungen array for antritt evaluation
 			}
 
 			this.correctOldTerminTypenForStudent(student, savedPruefung)
@@ -1634,7 +1749,10 @@ export const Benotungstool = {
 			})
 			
 			// recalculate student antritte
+			
 			student.hoechsterAntritt = this.getAntrittCountStudent(student)
+			this.recalculateSelectable(student)
+			this.reformatStudentRow(student)
 			
 			// add col to table
 			const cols = [...this.notenTableOptions.columns.slice(0, -1)];
@@ -1647,11 +1765,13 @@ export const Benotungstool = {
 					field: "Termin1",
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					sorter: this.pruefungSorter,
 					topCalc: this.terminCalcFunc,
 					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -1666,9 +1786,13 @@ export const Benotungstool = {
 					field: date,
 					formatter: this.pruefungFormatter,
 					titleFormatter: this.pruefungTitleFormatter,
+					sorter: this.pruefungSorter,
+					topCalc: this.terminCalcFunc,
+					topCalcFormatter: this.terminCalcFormatter,
 					hozAlign:"center",
 					widthGrow: 1,
 					minWidth: 200,
+					width: 250,
 					visible: true,
 					tooltip: false
 				})
@@ -1676,11 +1800,58 @@ export const Benotungstool = {
 
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) cols.push(kommCol) // keep kommPruef Col as last
 
-			// set Cols
-			this.$refs.notenTable.tabulator.clearSort()
-			this.$refs.notenTable.tabulator.setColumns(cols)
-			this.$refs.notenTable.tabulator.redraw(true)
+
+			// preemptively do the persistence part of columns already here so we get the merged definition before
+			// tabulator internal go to war with vue reactives
+			let colsUsed = null
+			const saved = this.loadState();
+			if (saved && saved.columns) {
+				// new columns map for lookup
+				const colMap = new Map(cols.map(c => [c.field, c]));
+
+				const restoredCols = [];
+
+				// add columns in the SAVED order, applying saved width/visibility
+				saved.columns.forEach(savedCol => {
+					const originalDef = colMap.get(savedCol.field);
+					if (originalDef) {
+						restoredCols.push({
+							...originalDef, // Keep formatters, calcs, etc.
+							width: savedCol.width,
+							visible: savedCol.visible
+						});
+						colMap.delete(savedCol.field); // Remove so we don't double-add
+					}
+				});
+
+				// append any NEW columns aka pruefungs cols
+				colMap.forEach((def) => {
+					restoredCols.push(def);
+				});
+
+				colsUsed = restoredCols;
+				this.colLayoutRestored = true;
+			}
+
+
+			const colsFinal = colsUsed ?? cols
+			this.$refs.notenTable.tabulator.setColumns(colsFinal)
+			// this.$refs.notenTable.tabulator.redraw(true)
 			// redraw table outside this function
+		},
+		recalculateSelectable(student) {
+			const vueThis = this
+			Object.defineProperty(student, 'selectable', {
+				get() {
+					const kP = student.pruefungen?.find(p => p.pruefungstyp_kurzbz == 'kommPruef')
+					return !(kP || student.hoechsterAntritt >= vueThis.maxAntrittCount)
+				},
+				set() {
+					// empty setter so tabulator doesnt scream	
+				},
+				enumerable: true,
+				configurable: true
+			})
 		},
 		saveNoteneingabe() {
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
