@@ -85,6 +85,7 @@ export default {
 			configAllowUebernahmePunkte: this.config.allowUebernahmePunkte,
 			configUseReihungstestPunkte: this.config.useReihungstestPunkte,
 			configHasExcludedAreas: this.config.hasExcludedAreas,
+			configStvTagsEnabled: this.config.stvTagsEnabled,
 			appConfig: Vue.computed(() => this.appconfig),
 			hasZGVBakkPermission: this.permissions['student/editBakkZgv'],
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],

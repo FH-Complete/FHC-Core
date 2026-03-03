@@ -35,7 +35,11 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
-		}
+		},
+		tagsEnabled: {
+			from: 'configStvTagsEnabled',
+			default: false
+		},
 	},
 	props: {
 		selected: Array,
@@ -65,16 +69,6 @@ export default {
 				columns:[
 					{title:"UID", field:"uid", headerFilter: true},
 					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{
-						title: 'Tags',
-						field: 'tags',
-						tooltip: false,
-						headerFilter: "input",
-						headerFilterFunc: tagHeaderFilter,
-						headerFilterFuncParams: {field: 'tags'},
-						formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
-						width: 150,
-					},
 					{title:"Nachname", field:"nachname", headerFilter: true},
 					{title:"Vorname", field:"vorname", headerFilter: true},
 					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
@@ -278,6 +272,21 @@ export default {
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
 		},
+	},
+	created: function() {
+		if(this.tagsEnabled) {
+			const coltags = {
+				title: 'Tags',
+				field: 'tags',
+				tooltip: false,
+				headerFilter: "input",
+				headerFilterFunc: tagHeaderFilter,
+				headerFilterFuncParams: {field: 'tags'},
+				formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
+				width: 150,
+			};
+			this.tabulatorOptions.columns.splice(2, 0, coltags);
+		}
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -582,6 +591,7 @@ export default {
 
 			<template #actions>
 				<core-tag ref="tagComponent"
+					v-if="tagsEnabled"
 					:endpoint="tagEndpoint"
 					:values="selectedColumnValues"
 					@added="addedTag"

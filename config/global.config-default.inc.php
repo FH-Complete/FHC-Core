@@ -371,4 +371,6 @@ define('STATUS_VORRUECKEN_ANZEIGEN', true);
 //externe Ueberwachung im Testtool erlauben
 define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 
+//enable tags in StudVW
+define('STV_TAGS_ENABLED', false);
 ?>

@@ -48,6 +48,7 @@ $configArray = [
 	'allowUebernahmePunkte' => !defined('FAS_REIHUNGSTEST_PUNKTEUEBERNAHME') ? true : FAS_REIHUNGSTEST_PUNKTEUEBERNAHME,
 	'useReihungstestPunkte' => !defined('FAS_REIHUNGSTEST_PUNKTE') ? true : FAS_REIHUNGSTEST_PUNKTE,
 	'hasExcludedAreas' => defined('FAS_REIHUNGSTEST_EXCLUDE_GEBIETE') && !empty(FAS_REIHUNGSTEST_EXCLUDE_GEBIETE),
+	'stvTagsEnabled' => defined('STV_TAGS_ENABLED') ? STV_TAGS_ENABLED : false,
 ];
 ?>
 
