@@ -542,38 +542,6 @@ class Student extends FHCAPI_Controller
 
 		$this->_validate();
 
-		$this->form_validation->set_rules('nachname', 'Nachname', 'callback_requiredIfNotPersonId', [
-			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
-			'requiredIfNotPersonId' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date', [
-			'is_valid_date' => $this->p->t('ui', 'error_invalid_date')
-		]);
-		$this->form_validation->set_rules('address[func]', 'Address', 'required|integer|less_than[2]|greater_than[-2]');
-		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('address[gemeinde]', 'Gemeinde', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('address[ort]', 'Ort', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('address[address]', 'Adresse', 'callback_requiredIfAddressFunc', [
-			'requiredIfAddressFunc' => $this->p->t('ui', 'error_required')
-		]);
-		$this->form_validation->set_rules('email', 'E-Mail', 'valid_email');
-		$this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'required');
-		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'required');
-		$this->form_validation->set_rules('ausbildungssemester', 'Ausbildungssemester', 'required|integer|less_than[9]|greater_than[-1]');
-		// TODO(chris): validate studienplan with studiengang, semester and orgform?
-		// TODO(chris): validate person_id, studiengang_kz, studiensemester_kurzbz, orgform_kurzbz, nation, gemeinde, ort, geschlecht?
-
-		if (!$this->form_validation->run())
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-
 		// TODO(chris): This should be in a library
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
@@ -826,8 +794,8 @@ class Student extends FHCAPI_Controller
 		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
 			'requiredIfNotPersonId' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'geschlecht')])
 		]);
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', ['isValidDate', function($value) { return isValidDate($value); }], [
-			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_invalid_date')
 		]);
 		//$this->form_validation->set_rules('address[checked]', 'Address', 'required');
 		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
