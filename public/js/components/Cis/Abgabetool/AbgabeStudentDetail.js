@@ -334,7 +334,7 @@ export const AbgabeStudentDetail = {
 				<div class="col-8">
 					<p> {{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>
 					<p> {{$capitalize( $p.t('abgabetool/c4titel') ) }}: {{projektarbeit?.titel}}</p>
-					<p> {{$capitalize( $p.t('abgabetool/c4betreuer') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				</div>
 				<div class="col-4">
 					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
@@ -344,11 +344,11 @@ export const AbgabeStudentDetail = {
 			</div>
 			
 			<Accordion :multiple="true">
-				<template v-for="termin in this.projektarbeit?.abgabetermine">
+				<template v-for="termin in this.projektarbeit?.abgabetermine" :key="termin.paabgabe_id">
 					<AccordionTab :headerClass="termin.dateStyle + '-header'">
 						<template #header>
 							<div class="d-flex flex-nowrap align-items-center w-100">
-								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
+								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -68px;">
 									<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
 									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
 									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
@@ -414,7 +414,7 @@ export const AbgabeStudentDetail = {
 						
 						<div class="row mt-2">
 							<div class="col-12 col-md-3 align-content-center">
-								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 								<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
 							</div>
 							<div class="col-12 col-md-9">
@@ -423,7 +423,8 @@ export const AbgabeStudentDetail = {
 									:clearable="false"
 									:disabled="true"
 									:enable-time-picker="false"
-									:format="formatDate"
+									locale="de"
+									format="dd.MM.yyyy"
 									:text-input="true"
 									auto-apply>
 								</VueDatePicker>
@@ -454,7 +455,7 @@ export const AbgabeStudentDetail = {
 						</div>
 						
 						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
-							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbzv2') )}}</div>
 							<div class="col-12 col-md-9">
 								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" class="w-100" :disabled="true"></Textarea>
 							</div>
