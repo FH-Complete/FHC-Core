@@ -542,6 +542,7 @@ class Student extends FHCAPI_Controller
 
 		$this->_validate();
 
+		// TODO(chris): This should be in a library
 		$this->load->model('crm/Student_model', 'StudentModel');
 		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
@@ -793,8 +794,8 @@ class Student extends FHCAPI_Controller
 		$this->form_validation->set_rules('geschlecht', 'Geschlecht', 'callback_requiredIfNotPersonId', [
 			'requiredIfNotPersonId' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('person', 'geschlecht')])
 		]);
-		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', ['isValidDate', function($value) { return isValidDate($value); }], [
-			'isValidDate' => $this->p->t('ui', 'error_invalid_date')
+		$this->form_validation->set_rules('gebdatum', 'Geburtsdatum', 'is_valid_date', [
+			'is_valid_date' => $this->p->t('ui', 'error_invalid_date')
 		]);
 		//$this->form_validation->set_rules('address[checked]', 'Address', 'required');
 		$this->form_validation->set_rules('address[plz]', 'PLZ', 'callback_requiredIfAddressFunc', [
