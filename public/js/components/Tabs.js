@@ -226,7 +226,7 @@ export default {
 				v-for="tab in tabs"
 				:key="tab.key"
 				:header="tab.title + ((tab.value.showSuffix && tab.value.suffix !== '') ? ' ' + tab.value.suffix : '')"
-				:pt="{headerAction:{class: 'p-2'}}"
+				:pt="{headerAction:{class: 'px-2 py-1'}}"
 			>
 				<keep-alive>
 					<component
