@@ -608,8 +608,8 @@ export default {
 			</template>
 
 			<template #filter>
-				<div class="card">
-					<div class="card-body">
+				<div class="card mt-2">
+					<div class="card-body p-2">
 						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length"/>
 					</div>
 				</div>

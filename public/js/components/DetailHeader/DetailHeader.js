@@ -182,7 +182,7 @@ export default {
 		}
 	},
 	template: `
-		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
+		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<modal-upload-foto
 				v-if="person_id"
@@ -207,8 +207,8 @@ export default {
 					class="foto-container d-flex flex-column align-items-center h-100 position-relative d-inline-block"
 				>
 					<img
-					  class="d-block h-100 rounded"
-					  style="height: 84px;"
+					  class="d-block rounded"
+					  style="height: 75px;"
 					  alt="Profilbild"
 					  :src="getFotoSrc(person.foto)"
 					/>

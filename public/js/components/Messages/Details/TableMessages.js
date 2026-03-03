@@ -364,7 +364,7 @@ export default {
 
 			<div class="row">
 				<!--table-->
-				<div class="col-sm-6 pt-6">
+				<div class="col-sm-6 pt-1">
 					<core-filter-cmpt
 						ref="table"
 						:tabulator-options="tabulatorOptions"
@@ -380,9 +380,9 @@ export default {
 				</div>
 
 				<!--preview wysiwyg-window-->
-				<div class="col-sm-6 pt-6">
-				<br><br><br><br>
-					<div ref="preview">
+				<div class="col-sm-6 pt-5">
+					<div class="msg-preview-spacer pt-2" aria-hidden="true"></div>
+					<div ref="preview" class="bg-white">
 						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
 					</div>
 

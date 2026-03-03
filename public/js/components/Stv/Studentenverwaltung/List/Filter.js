@@ -109,7 +109,7 @@ export default {
 			:key="i"
 			v-model="filters[i]"
 			:filter-config="filterConfig"
-			class="mt-3"
+			class="mt-2"
 			@remove="remove(i)"
 		/>
 	</div>`
