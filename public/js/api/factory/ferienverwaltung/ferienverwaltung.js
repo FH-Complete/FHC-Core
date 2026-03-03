@@ -16,19 +16,49 @@
  */
 
 export default {
-	getFerien(studiengang_kz) {
+	getFerien(filterVonDatum, filterBisDatum) {
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/education/ferien/getFerien',
 			params: {
-				studiengang_kz
+				filterVonDatum,
+				filterBisDatum
 			}
+		};
+	},
+	getOe() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/education/ferien/getOe'
+		};
+	},
+	getStudienplaene(oe_kurzbz, vondatum, bisdatum) {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/education/ferien/getStudienplaene',
+			params: {
+				oe_kurzbz,
+				vondatum,
+				bisdatum
+			}
+		};
+	},
+	getFerientypen() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/education/ferien/getFerientypen'
 		};
 	},
 	getStg() {
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/education/ferien/getStg'
+		};
+	},
+	getDefaultVonBis() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/education/ferien/getDefaultVonBis'
 		};
 	},
 	insert(params) {

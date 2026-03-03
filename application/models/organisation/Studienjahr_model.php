@@ -53,11 +53,9 @@ class Studienjahr_model extends DB_Model
 	 * @param int $days
 	 * @return array|stdClass|null
 	 */
-	public function getLastOrAktStudienjahr($days = 60)
+	public function getLastOrAktStudienjahr($days = 0)
 	{
-		if (!is_numeric($days)) {
-			$days = 60;
-		}
+		$days = is_numeric($days) ? $this->escape($days) : 0;
 
 		$query = '
 			SELECT *
@@ -77,19 +75,25 @@ class Studienjahr_model extends DB_Model
 	 * @param int $days
 	 * @return array|stdClass|null
 	 */
-	public function getAktOrNextStudienjahr($days = 62)
+	public function getAktOrNextStudienjahr($days = 0)
 	{
-		if (!is_numeric($days)) {
-			$days = 62;
-		}
+		$days = is_numeric($days) ? $this->escape($days) : 0;
 
 		$query = '
-			SELECT *
-			FROM public.tbl_studienjahr
-			JOIN public.tbl_studiensemester using(studienjahr_kurzbz)
-			WHERE start < NOW() + \'' . $days . ' DAYS\'::INTERVAL
-			ORDER by start DESC
-			LIMIT 1
+				SELECT * FROM (
+					SELECT
+						jahr.*, MIN(sem.start) AS beginn,  MAX(sem.ende) AS ende
+					FROM
+						public.tbl_studienjahr jahr
+						JOIN public.tbl_studiensemester sem using(studienjahr_kurzbz)
+					GROUP BY
+						studienjahr_kurzbz
+				) jahre
+				WHERE
+					ende >= NOW() + \'' . $days . ' DAYS\'::INTERVAL
+				ORDER BY
+					ende
+				LIMIT 1
 		';
 
 		return $this->execQuery($query);

@@ -20,21 +20,21 @@ export default {
 	},
 	data() {
 		return {
-			studiengang_kz_list: [],
-			studiengang_kz: null,
+			filterVonDatum: null,
+			filterBisDatum: null,
 			loading: false,
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
-					ApiFerienverwaltung.getFerien(this.studiengang_kz)
+					ApiFerienverwaltung.getFerien(this.filterVonDatum, this.filterBisDatum)
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title:"Ferien Id", field:"ferien_id", visible: false},
-					{title:"Studiengang", field:"studiengang_kuerzel"},
+					{title:"Ferien Id", field:"ferien_id", visible: false, headerFilter: true},
 					{
 						title:"Datum von",
 						field:"vondatum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
@@ -51,6 +51,7 @@ export default {
 					{
 						title:"Datum bis",
 						field:"bisdatum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
@@ -64,7 +65,56 @@ export default {
 							});
 						}
 					},
-					{title:"Bezeichnung", field:"bezeichnung"},
+					{title:"Bezeichnung", field:"bezeichnung", headerFilter: true},
+					{title:"Organisationseinheit Kurzbezeichnung", field:"oe_kurzbz", visible: false, headerFilter: true},
+					{title:"Organisationseinheit", field:"oe_bezeichnung", headerFilter: true},
+					{title:"Studienplan", field:"studienplan_bezeichnung", visible: false, headerFilter: true},
+					{title:"Ferientyp Kurzbezeichnung", field:"ferientyp_kurzbz", visible: false, headerFilter: true},
+					{
+						title:"Mitarbeiterrelevant",
+						field:"mitarbeiterrelevant",
+						visible: false,
+						headerFilter: true,
+						hozAlign: "center",
+						formatter:'tickCross', formatterParams: {
+							tickElement: '<i class="fas fa-check text-success"></i>',
+							crossElement: '<i class="fas fa-times text-danger"></i>'
+						},
+						headerFilter:"tickCross", headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
+						headerFilterEmptyCheck:function(value){return value === null}
+					},
+					{
+						title:"Studierendenrelevant",
+						field:"studierendenrelevant",
+						visible: false,
+						headerFilter: true,
+						hozAlign: "center",
+						formatter:'tickCross', formatterParams: {
+							tickElement: '<i class="fas fa-check text-success"></i>',
+							crossElement: '<i class="fas fa-times text-danger"></i>'
+						},
+						headerFilter:"tickCross", headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
+						headerFilterEmptyCheck:function(value){return value === null}
+					},
+					{
+						title:"Lehre planbar",
+						field:"lehre",
+						visible: false,
+						headerFilter: true,
+						hozAlign: "center",
+						formatter:'tickCross', formatterParams: {
+							tickElement: '<i class="fas fa-check text-success"></i>',
+							crossElement: '<i class="fas fa-times text-danger"></i>'
+						},
+						headerFilter:"tickCross", headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
+						headerFilterEmptyCheck:function(value){return value === null}
+					},
 					{title:"Aktionen", field: "actions",
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
@@ -117,9 +167,6 @@ export default {
 						cm.getColumnByField('ferien_id').component.updateDefinition({
 							title: this.$p.t('ferien', 'ferien_id'),
 						});
-						cm.getColumnByField('studiengang_kuerzel').component.updateDefinition({
-							title: this.$p.t('ferien', 'studiengang_kuerzel'),
-						});
 						cm.getColumnByField('vondatum').component.updateDefinition({
 							title: this.$p.t('ferien', 'vondatum'),
 						});
@@ -150,50 +197,74 @@ export default {
 		//~ },
 		actionNew() {
 			this.$refs.modal.open();
-		},
-		loadByStg() {
-			this.reload();
 		}
 	},
 	created() {
-		this.loading = true;
+		//this.loading = true;
+		//~ this.$api
+			//~ .call(ApiFerienverwaltung.getOe())
+			//~ .then(result => {
+					//~ this.oeList = result.data;
+				//~ }
+			//~ )
+			//~ .catch(error => {
+				//~ if (error)
+					//~ this.$fhcAlert.handleSystemError(error);
+			//~ });
+
 		this.$api
-			.call(ApiFerienverwaltung.getStg())
+			.call(ApiFerienverwaltung.getDefaultVonBis())
 			.then(result => {
-					this.studiengang_kz_list = result.data;
-					this.loading = false;
+					this.filterVonDatum = result.data.defaultVon;
+					this.filterBisDatum = result.data.defaultBis;
 				}
 			)
 			.catch(error => {
 				if (error)
 					this.$fhcAlert.handleSystemError(error);
-				this.loading = false;
 			});
 	},
 	template: `
 	<div class="h-100 d-flex flex-column">
 		<div class="row justify-content-center">
-			<div class="col-lg-3">
-				<div class="input-group w-auto">
-					<select class="form-select" v-model="studiengang_kz">
-						<option selected="selected" :value="null">-- {{ $p.t('ferien/keineAuswahl') }} --</option>
-						<option value="All">-- {{ $p.t('ferien/alleStudiengaenge') }} --</option>
-						<option v-for="studiengang in studiengang_kz_list" :key="studiengang.studiengang_kz" :value="studiengang.studiengang_kz">
-							{{ studiengang.kuerzel }}
-						</option>
-					</select>
-					<button
-						class="btn btn-primary"
-						@click="loadByStg()"
-						:disabled="loading"
-						>
-						<i v-if="loading" class="fa fa-spinner fa-spin"></i>
-						{{ $p.t('ui/anzeigen') }}
-					</button>
-				</div>
+			<div class="col-5">
+				<form-input
+					type="DatePicker"
+					v-model="filterVonDatum"
+					name="filtervondatum"
+					:label="$p.t('ferien/vondatum')"
+					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
+					auto-apply
+					>
+				</form-input>
+			</div>
+			<div class="col-5">
+				<form-input
+					type="DatePicker"
+					v-model="filterBisDatum"
+					name="filterbisdatum"
+					:label="$p.t('ferien/bisdatum')"
+					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
+					auto-apply
+					>
+				</form-input>
+			</div>
+			<div class="col-1 align-self-end">
+				<button
+					class="btn btn-primary"
+					@click="reload()"
+					:disabled="loading"
+					>
+					<i v-if="loading" class="fa fa-spinner fa-spin"></i>
+					{{ $p.t('ui/anzeigen') }}
+				</button>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row mt-3">
 			<div class="col">
 				<core-filter-cmpt
 					ref="table"
@@ -208,7 +279,7 @@ export default {
 					@click:new="actionNew"
 					>
 				</core-filter-cmpt>
-				<ferien-modal ref="modal" :studiengang_kz_list="studiengang_kz_list" @saved="reload"></ferien-modal>
+				<ferien-modal ref="modal" @saved="reload"></ferien-modal>
 			</div>
 		</div>
 	</div>`

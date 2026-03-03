@@ -119,3 +119,64 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 			echo '<br>lehre.tbl_ferien: Primary Key tbl_ferien_pk (ferien_id) hinzugefügt';
 	}
 }
+
+if(!$result = @$db->db_query("SELECT oe_kurzbz FROM lehre.tbl_ferien LIMIT 1"))
+{
+	$qry = "ALTER TABLE lehre.tbl_ferien
+			ADD COLUMN IF NOT EXISTS oe_kurzbz VARCHAR(32),
+			ADD COLUMN IF NOT EXISTS studienplan_id SMALLINT DEFAULT NULL,
+			ADD CONSTRAINT tbl_ferien_studienplan_fk
+				FOREIGN KEY (studienplan_id)
+				REFERENCES lehre.tbl_studienplan(studienplan_id)
+				ON UPDATE CASCADE ON DELETE RESTRICT,
+			ADD CONSTRAINT tbl_ferien_oe_kurzbz_fk
+				FOREIGN KEY (oe_kurzbz)
+				REFERENCES public.tbl_organisationseinheit(oe_kurzbz)
+				ON UPDATE CASCADE ON DELETE RESTRICT,
+			ADD COLUMN IF NOT EXISTS insertamum timestamp DEFAULT NOW(),
+			ADD COLUMN IF NOT EXISTS insertvon VARCHAR(32),
+			ADD COLUMN IF NOT EXISTS updateamum timestamp,
+			ADD COLUMN IF NOT EXISTS updatevon VARCHAR(32)";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_ferien: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_ferien columns oe_kurzbz, studienplan_id, insertamum, insertvon, updateamum, updatevon hinzugefuegt';
+}
+
+// Creates table lehre.tbl_ferientyp if it doesn't exist and grants privileges
+if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_ferientyp WHERE 0 = 1'))
+{
+	$qry = 'CREATE TABLE lehre.tbl_ferientyp (
+				ferientyp_kurzbz VARCHAR(64),
+				beschreibung VARCHAR(256) NOT NULL,
+				mitarbeiter boolean NOT NULL,
+				studierende boolean NOT NULL,
+				lehre boolean NOT NULL
+			);
+
+			COMMENT ON TABLE lehre.tbl_ferientyp IS \'Typ-Tabelle zum Speichern von Informationen zu Ferien.\';
+			COMMENT ON COLUMN lehre.tbl_ferientyp.ferientyp_kurzbz IS \'Typ der Ferien.\';
+			COMMENT ON COLUMN lehre.tbl_ferientyp.mitarbeiter IS \'Ob die Ferien für MitarbeiterInnen relevant sind.\';
+			COMMENT ON COLUMN lehre.tbl_ferientyp.studierende IS \'Ob die Ferien für Studierende relevant sind.\';
+			COMMENT ON COLUMN lehre.tbl_ferientyp.lehre IS \'Ob Lehre in den Ferien verplant werden kann.\';
+
+			ALTER TABLE lehre.tbl_ferientyp ADD CONSTRAINT pk_tbl_ferientyp PRIMARY KEY (ferientyp_kurzbz);
+
+			ALTER TABLE lehre.tbl_ferien ADD COLUMN IF NOT EXISTS ferientyp_kurzbz VARCHAR(64) DEFAULT NULL;
+
+			ALTER TABLE lehre.tbl_ferien ADD CONSTRAINT tbl_lehre_ferien_ferientyp_kurzbz_fk FOREIGN KEY (ferientyp_kurzbz)
+			REFERENCES lehre.tbl_ferientyp (ferientyp_kurzbz) MATCH FULL
+			ON DELETE SET NULL ON UPDATE CASCADE;';
+
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_ferientyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_ferientyp table created';
+
+	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_ferientyp TO vilesci;';
+	if (!$db->db_query($qry))
+		echo '<strong>lehre.tbl_ferientyp: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_ferientyp';
+}
