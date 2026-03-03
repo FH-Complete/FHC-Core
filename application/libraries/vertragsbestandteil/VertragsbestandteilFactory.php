@@ -22,6 +22,7 @@ class VertragsbestandteilFactory
 	const VERTRAGSBESTANDTEIL_URLAUBSANSPRUCH = 'urlaubsanspruch';
 	const VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG = 'zeitaufzeichnung';
 	const VERTRAGSBESTANDTEIL_LEHRE = 'lehre';
+	const VERTRAGSBESTANDTEIL_LOHNGUIDE = 'lohnguide';
 	
 	public static function getVertragsbestandteil($data, $fromdb=false)
 	{
@@ -67,6 +68,11 @@ class VertragsbestandteilFactory
 			
 			case self::VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG:
 				$vertragsbestandteil = new VertragsbestandteilZeitaufzeichnung();
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_LOHNGUIDE:
+				$vertragsbestandteil = new VertragsbestandteilLohnguide();
 				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
 			
@@ -125,6 +131,12 @@ class VertragsbestandteilFactory
 				$CI->load->model('vertragsbestandteil/VertragsbestandteilZeitaufzeichnung_model',
 					'VertragsbestandteilZeitaufzeichnung_model');
 				$vertragsbestandteildbmodel = $CI->VertragsbestandteilZeitaufzeichnung_model;
+				break;
+
+			case self::VERTRAGSBESTANDTEIL_LOHNGUIDE:
+				$CI->load->model('vertragsbestandteil/VertragsbestandteilLohnguide_model',
+					'VertragsbestandteilLohnguide_model');
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilLohnguide_model;
 				break;
 
 			default:
