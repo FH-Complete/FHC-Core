@@ -78,11 +78,14 @@ class Noten extends FHCAPI_Controller
 		$this->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
 		$this->load->model('organisation/Erhalter_model', 'ErhalterModel');
 
+		$this->load->config('noten');
 		$this->load->helper('hlp_sancho_helper');
 
 	}
 
 	public function getCisConfig() {
+		$NOTEN_OHNE_ANTRITT = $this->config->item('NOTEN_OHNE_ANTRITT');
+		
 		$this->terminateWithSuccess(
 			array(
 				// Punkte bei der Noteneingabe anzeigen
@@ -92,33 +95,33 @@ class Noten extends FHCAPI_Controller
 				'CIS_GESAMTNOTE_UEBERSCHREIBEN' => CIS_GESAMTNOTE_UEBERSCHREIBEN,
 				
 				// only relevant in punkte calculation in backend
-//				'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
+				// 'CIS_GESAMTNOTE_GEWICHTUNG' => CIS_GESAMTNOTE_GEWICHTUNG,
 				
 				// this one should always be set true since fh prüfungsordnung requires at least 3 antritte (t1+t2+kP)
 				// send it anyway to use in maxAntritte calculation
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN2' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN2,
-			
-			
-				// TODO
+				
 				// should in 99% of cases be kept true to enable 4 antritte in total, but if a certain
-				// fh still works with 3 antritte per note this can limit the max number of pruefungen accordingly
+				// fh still works with 3 antritte per note this can limit the max number of antritte accordingly
 				'CIS_GESAMTNOTE_PRUEFUNG_TERMIN3' => CIS_GESAMTNOTE_PRUEFUNG_TERMIN3,
 				
 				// used to toggle availability of kommPruef type pruefungen
 				'CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF' => CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF,
 				
 				//technically exists but is never used, could be LE pendant to next flag
-//				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
+				// 'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_NOTE,
 			
 				// basically a toggle for "use teilnoten" and the source is always moodle
 				// setting this to false breaks legacy tool and if that was fixed it wouldnt render any table at all
 				// anyway so not sure why this even is a config at all. placebo at best
 				
-				// TODO: do we really need this?
+				// toggles availability of the teilnoten column... existas but do we really need this?
 				'CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE' => CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE,
 				
 				// send a mail when approving grades
-				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE
+				'CIS_GESAMTNOTE_FREIGABEMAIL_NOTE' => CIS_GESAMTNOTE_FREIGABEMAIL_NOTE,
+				
+				'NOTEN_OHNE_ANTRITT' => $NOTEN_OHNE_ANTRITT
 			)
 		);
 	}

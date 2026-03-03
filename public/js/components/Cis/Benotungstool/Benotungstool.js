@@ -377,8 +377,7 @@ export const Benotungstool = {
 				student = this.studenten.find(s => s.uid?.trim() === idTrimmed)
 			}
 			if(!student) {
-				// TODO: phrase
-				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoStudentFoundForIdInRow', [rowParts[0], rowNum]))
 				return
 			}
 
@@ -392,8 +391,7 @@ export const Benotungstool = {
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.notenOptions.find(n => n.note == note)
 				if(!notenOption.lehre) {
-					// TODO: phrasen
-					this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoGradeFoundForIdInRow', [rowParts[0], rowNum]))
 					return
 				}
 			}
@@ -410,15 +408,13 @@ export const Benotungstool = {
 				student = this.studenten.find(s => s.uid?.trim() === idTrimmed)
 			}
 			if(!student) {
-				// TODO: phrase
-				this.$fhcAlert.alertWarning('Kein Student gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+				this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoStudentFoundForIdInRow', [rowParts[0], rowNum]))
 				return
 			}
 
 			const datum = rowParts[1] // should be in 'dd.MM.yyyy'
 			if(!this.isValidDate_ddmmyyyy(datum)) {
-				// TODO: phrase
-				this.$fhcAlert.alertWarning('Ungültiges Datumformat für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + '. Bitte verwenden Sie das Format "DD.MM.YYYY". Die Zeile wurde übersprungen.')
+				this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importInvalidDateFoundForIdInRow', [rowParts[0], rowNum]))
 				return	
 			}
 			const datumParts = datum.split('.')
@@ -443,8 +439,7 @@ export const Benotungstool = {
 				// find notenoption and check if its allowed to use in lehre
 				const notenOption = this.notenOptions.find(n => n.note == note)
 				if(!notenOption.lehre) {
-					// TODO: phrasen
-					this.$fhcAlert.alertWarning('Keine gültige Note gefunden für ID ' + rowParts[0] + ' in Zeile Nr. ' + rowNum + ' Die Zeile wurde übersprungen.')
+					this.$fhcAlert.alertWarning(this.$p.t('benotungstool/c4importNoGradeFoundForIdInRow', [rowParts[0], rowNum]))
 					return
 				}
 			}
@@ -632,8 +627,7 @@ export const Benotungstool = {
 			}
 
 			this.loading = false
-
-			// TODO: find some solution so the tool does not appear "jumpy" after pruefung calls
+			
 			const colsFinal = colsUsed ?? cols
 			this.$refs.notenTable.tabulator.setColumns(colsFinal)
 			this.$refs.notenTable.tabulator.setData(this.studenten);
@@ -1694,9 +1688,7 @@ export const Benotungstool = {
 						this.reformatStudentRow(s)
 					}
 					
-					
 					this.$refs.notenTable.tabulator.redraw(true)
-
 					Vue.nextTick(()=> {
 						const table = this.$refs.notenTable.tabulator.element.querySelector('.tabulator-tableholder')
 						if(table) {
@@ -2006,9 +1998,9 @@ export const Benotungstool = {
 			const pLen = student.pruefungen.length
 			for(let i = 0; i < pLen; i++) {
 				const p = student.pruefungen[i]
-				
-				// TODO: CHECK AGAINST NOTEN OPTIONS
-				if(p.note != 9 && p.note != 17) pruefungsAntrittCount++
+
+				const isDefinedAsAntrittsloseNote = this.config.NOTEN_OHNE_ANTRITT.find(n_pk => n_pk == p.note)
+				if(!isDefinedAsAntrittsloseNote) pruefungsAntrittCount++
 			}
 
 			// when student never had to take an exam beyond the original benotung 
