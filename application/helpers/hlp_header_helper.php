@@ -189,7 +189,7 @@ function generateJSModulesInclude($JSModules)
 		for ($tmpJSsCounter = 0; $tmpJSsCounter < count($tmpJSs); $tmpJSsCounter++)
 		{
 			$item = $tmpJSs[$tmpJSsCounter];
-			if($use_bundled_javascript)
+			if($use_bundled_javascript && preg_match('#/js/apps/#', $item))
 			{
 				$item = preg_replace('#^public/#', 'public/dist/', $item);
 			}
