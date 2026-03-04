@@ -554,7 +554,8 @@ class lehreinheitmitarbeiter extends basis_db
 
 		$qry = '
 			WITH semester_sws_tbl AS (
-				SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden, stg.studiengang_kz
+				SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden,
+					stg.studiengang_kz, stg.melde_studiengang_kz, stg.lgartcode
 				FROM lehre.tbl_lehreinheitmitarbeiter lema
 					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung lv USING (lehrveranstaltung_id)
@@ -577,13 +578,17 @@ class lehreinheitmitarbeiter extends basis_db
 			SELECT
 				studiengang_kz,
 				studiensemester_kurzbz,
+				melde_studiengang_kz,
+				lgartcode,
 				sum(semesterstunden)				AS summe,
 				round(sum(semesterstunden) / 15, 2)	AS sws
 			FROM
 				semester_sws_tbl
 			GROUP BY
 				studiengang_kz,
-				studiensemester_kurzbz
+				studiensemester_kurzbz,
+				melde_studiengang_kz,
+				lgartcode
 			ORDER BY
 				studiengang_kz;
 		';
@@ -595,6 +600,8 @@ class lehreinheitmitarbeiter extends basis_db
 				$obj = new StdClass();
 				$obj->studiengang_kz = $row->studiengang_kz;
 				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
+				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
+				$obj->lgartcode = $row->lgartcode;
 				$obj->sws = $row->sws;
 				$this->result []= $obj;
 			}
