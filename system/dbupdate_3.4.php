@@ -91,6 +91,7 @@ require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
 require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
+require_once('dbupdate_3.4/70376_lohnguide.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -238,6 +239,11 @@ $tabellen=array(
 	"hr.tbl_valorisierung_instanz" => array("updateamum", "oe_kurzbz", "valorisierungsdatum", "valorisierung_kurzbz", "beschreibung", "ausgewaehlt", "updatevon", "valorisierung_instanz_id"),
 	"hr.tbl_valorisierung_instanz_methode" => array("valorisierung_instanz_id", "valorisierung_methode_kurzbz", "beschreibung", "valorisierung_methode_parameter"),
 	"hr.tbl_valorisierung_methode" => array("beschreibung", "valorisierung_methode_kurzbz"),
+	"hr.tbl_lohnguide_jobfamilie" => array("jobfamilie_kurzbz", "bezeichnung", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_modellfunktion" => array("modellfunktion_kurzbz", "bezeichnung", "jobfamilie_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_modellstelle" => array("modellstelle_kurzbz", "bezeichnung", "grade", "modellfunktion_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_fachrichtung" => array("fachrichtung_kurzbz", "bezeichnung", "aktiv", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),	
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
