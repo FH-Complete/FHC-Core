@@ -48901,7 +48901,7 @@ array(
 				'description' => '',
 				'insertvon' => 'system'
 			),
-			array(w
+			array(
 				'sprache' => 'English',
 				'text' => 'Teaching Assignments',
 				'description' => '',
@@ -48944,6 +48944,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Teaching Assignment Lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'extrakvverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrveranstaltung Verwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Course Management',
 				'description' => '',
 				'insertvon' => 'system'
 			)

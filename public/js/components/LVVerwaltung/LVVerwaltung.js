@@ -264,49 +264,61 @@ export default {
 			const semester = this.semester || '';
 			const uid = this.emp || '';
 
-			extraItems.push({
-				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-					+ 'content/statistik/lvplanung.xls.php'
-					+ '?studiengang_kz=' + studiengang_kz
-					+ '&studiensemester_kurzbz=' + studiensemester
-					+ '&semester=' + semester,
-				description: 'lehre/lvplanung',
-				requires: ['stg']
-			});
 
-			extraItems.push({
-				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-					+ 'content/statistik/lehrauftragsliste_gst.xls.php'
-					+ '?studiengang_kz=' + studiengang_kz
-					+ '&studiensemester_kurzbz=' + studiensemester
-					+ '&semester=' + semester,
-				description: 'lehre/lehrauftragsliste',
-				requires: ['stg']
-			});
-
-			extraItems.push({
-				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-					+ '&xsl=Lehrauftrag'
-					+ '&stg_kz=' + studiengang_kz
-					+ '&ss=' + studiensemester,
-				description: 'lehre/lehrauftraege',
-				requires: ['stg']
-			});
-
-			extraItems.push({
-				link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-					+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
-					+ '&xsl=Lehrauftrag'
-					+ '&stg_kz=' + studiengang_kz
-					+ '&ss=' + studiensemester
-					+ '&uid=' + uid,
-				description: 'lehre/lehrauftragslisteemp',
-				requires: ['emp']
-			});
+			extraItems.push(
+				{
+					description: 'lehre/berichte',
+					requires: ['stg'],
+					children: [
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lvplanung.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lvplanung',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/statistik/lehrauftragsliste_gst.xls.php'
+								+ '?studiengang_kz=' + studiengang_kz
+								+ '&studiensemester_kurzbz=' + studiensemester
+								+ '&semester=' + semester,
+							description: 'lehre/lehrauftragsliste',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester,
+							description: 'lehre/lehrauftraege',
+							requires: ['stg']
+						},
+						{
+							link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+								+ 'content/pdfExport.php?xml=lehrauftrag.xml.php'
+								+ '&xsl=Lehrauftrag'
+								+ '&stg_kz=' + studiengang_kz
+								+ '&ss=' + studiensemester
+								+ '&uid=' + uid,
+							description: 'lehre/lehrauftragslisteemp',
+							requires: ['emp']
+						}
+					]
+				},
+				{
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'vilesci/lehre/lehrveranstaltung.php'
+						+ '?stg_kz=' + studiengang_kz,
+					description: 'lehre/extrakvverwaltung',
+					requires: ['stg']
+				}
+			);
 
 			return extraItems;
-
 		}
 	},
 
@@ -349,29 +361,38 @@ export default {
 					</div>
 					<div class="offcanvas-body">
 						<app-menu app-identifier="lvv">
-							<li class="dropend">
-								<a
-									class="dropdown-toggle"
-									href="#"
-									role="button"
-									data-bs-toggle="dropdown"
-									aria-expanded="false"
-									data-bs-popper-config='{"strategy":"fixed"}'
-								>
-									{{ $p.t('lehre/berichte') }}
-								</a>
-								<ul class="dropdown-menu p-0">
-									<li
-										v-for="(item, key) in appMenuExtraItems"
-										:key="key"
+							<template v-for="(item, key) in appMenuExtraItems" :key="key">
+								<li v-if="item.children" class="dropend">
+									<a
+										class="dropdown-toggle" 
+										href="#"
+										role="button" 
+										data-bs-toggle="dropdown"
+										aria-expanded="false"
+										data-bs-popper-config='{"strategy":"fixed"}'
 									>
-										<a class="dropdown-item" :href="item.link" target="_blank" :class="{ disabled: isDisabled(item) }"
->
-											{{ $p.t(item.description) }}
-										</a>
-									</li>
-								</ul>
-							</li>
+										{{ $p.t(item.description) }}
+									</a>
+									<ul class="dropdown-menu p-0">
+										<li
+											v-for="(child, childKey) in item.children"
+											:key="childKey"
+										>
+											<a class="dropdown-item" :href="child.link" target="_blank" :class="{ disabled: isDisabled(child) }">
+												{{ $p.t(child.description) }}
+											</a>
+										</li>
+									</ul>
+								</li>
+								<li v-else>
+									<a 
+										:href="item.link" 
+										target="_blank" 
+										:class="{ disabled: isDisabled(item) }">
+										{{ $p.t(item.description) }}
+									</a>
+								</li>
+							</template>
 						</app-menu>
 					</div>
 				</aside>
