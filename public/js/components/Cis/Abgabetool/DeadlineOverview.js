@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import ApiAbgabe from '../../../api/factory/abgabe.js'
 
 export const DeadlineOverview = {
 	name: "DeadlineOverview",
@@ -25,19 +26,21 @@ export const DeadlineOverview = {
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
+			phrasenPromise: null,
+			phrasenResolved: false,
 			deadlineTableOptions: {
 				height: 700,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
-				placeholder: this.$p.t('global/noDataAvailable'),
+				placeholder: Vue.computed(() => this.$p.t('global/noDataAvailable')),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4zieldatum')), field: 'datum', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4fixtermin')), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'typ_bezeichnung', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabekurzbz')), field: 'kurzbz', formatter: this.centeredTextFormatter, widthGrow: 3},
-					{title: Vue.computed(() => this.$p.t('person/studentIn')), field: 'student', formatter: this.centeredTextFormatter, widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'semester', formatter: this.centeredTextFormatter, widthGrow: 1}
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zieldatum'))), field: 'datum', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4fixterminv4'))), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabetyp'))), field: 'typ_bezeichnung', formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabekurzbz'))), field: 'kurzbz', formatter: this.centeredTextFormatter, widthGrow: 3},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('person/studentIn'))), field: 'student', formatter: this.centeredTextFormatter, widthGrow: 2},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'semester', formatter: this.centeredTextFormatter, widthGrow: 1}
 				],
 				persistence: false,
 			},
@@ -84,7 +87,7 @@ export const DeadlineOverview = {
 			this.tableBuiltResolve = resolve
 		},
 		loadDeadlines() {
-			this.$fhcApi.factory.lehre.fetchDeadlines(this.person_uid_prop ??  null)
+			this.$api.call(ApiAbgabe.fetchDeadlines(this.person_uid_prop ??  null))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
@@ -109,7 +112,7 @@ export const DeadlineOverview = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.deadlineTableOptions.height = window.visualViewport.height - rect.top
+			this.deadlineTableOptions.height = window.visualViewport.height - rect.top - 30
 			this.$refs.deadlineTable.tabulator.setHeight(this.deadlineTableOptions.height)
 		},
 		async setupMounted() {
@@ -127,7 +130,8 @@ export const DeadlineOverview = {
 
 	},
 	created() {
-
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 	},
 	mounted() {
 		this.setupMounted()

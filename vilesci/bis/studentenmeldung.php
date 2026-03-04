@@ -930,26 +930,29 @@ function GenerateXMLStudentBlock($row)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Matrikelnummer ('".trim($row->matr_nr)."') ist nicht 8 Zeichen lang";
 	}
+	/* Alle SVNR Checks entfernt
 	if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
-	}
+	}*/
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 	}
+	/* Alle SVNR Checks entfernt
 	if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 	{
 		$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht (Nicht BIS-Relevant)";
-	}
+	}*/
 	if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$datum_obj->formatDatum($row->gebdatum,'d.m.Y').") nicht";
 	}
+	/* Alle SVNR Checks entfernt
 	if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 	{
 		$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
-	}
+	}*/
 	if($row->staatsbuergerschaft=='' || $row->staatsbuergerschaft==null)
 	{
 		$error_log.=(!empty($error_log)?', ':'')."Staatsb&uuml;rgerschaft ('".$row->staatsbuergerschaft."')";
@@ -1510,14 +1513,17 @@ function GenerateXMLStudentBlock($row)
 			<Vorname>" . $row->vorname . "</Vorname>
 			<Familienname>" . $row->nachname . "</Familienname>";
 
+		/* Alle SVNR Checks entfernt
 		if ($row->svnr != '')
 		{
 			$datei .= "
 			<SVNR>" . $row->svnr . "</SVNR>";
-		}
+		}*/
 
 		// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
-		if ($row->ersatzkennzeichen != '' && $row->svnr == null)
+		//  Alle SVNR Checks entfernt
+		// if ($row->ersatzkennzeichen != '' && $row->svnr == null)
+		if ($row->ersatzkennzeichen != '')
 		{
 			$datei .= "
 			<ErsKz>" . $row->ersatzkennzeichen . "</ErsKz>";

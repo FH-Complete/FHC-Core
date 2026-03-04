@@ -111,7 +111,7 @@ export default {
 				],
 				height: 'auto',
 				index: 'group_id',
-				persistenceID: 'stv-details-group-list'
+				persistenceID: 'stv-details-group-list-20260217'
 			};
 		}
 	},

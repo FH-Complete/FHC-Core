@@ -636,7 +636,7 @@ class Status extends FHCAPI_Controller
 
 		$this->load->library('PrestudentLib');
 
-		$this->prestudentlib->setFirstStudent(
+		$resFirstStudent = $this->prestudentlib->setFirstStudent(
 			$prestudent_id,
 			$lastAufgenommener->studiensemester_kurzbz,
 			$lastAufgenommener->ausbildungssemester,
@@ -645,9 +645,8 @@ class Status extends FHCAPI_Controller
 			$this->input->post('statusgrund_id')
 		);
 
-		$this->getDataOrTerminateWithError($result);
-
-		$this->db->trans_commit();
+		$this->db->trans_complete();
+		$this->getDataOrTerminateWithError($resFirstStudent);
 
 		return $this->outputJsonSuccess(true);
 	}

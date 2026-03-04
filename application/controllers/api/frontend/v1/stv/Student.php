@@ -108,6 +108,10 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('p.matr_nr');
 		$this->PrestudentModel->addSelect('p.anrede');
 		$this->PrestudentModel->addSelect('p.zugangscode');
+		if($this->permissionlib->isBerechtigt('student/bpk'))
+		{
+			$this->PrestudentModel->addSelect('p.bpk');
+		}
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(
@@ -136,14 +140,9 @@ class Student extends FHCAPI_Controller
 			);
 		}
 		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
+			"public.get_rolle_prestudent(public.tbl_prestudent.prestudent_id, "
+				. $this->PrestudentModel->escape($studiensemester_kurzbz)
+				. ")  AS statusofsemester"
 		);
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');

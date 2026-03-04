@@ -40,7 +40,7 @@ export default {
 				return this.$fhcAlert.alertError(this.$p.t('stv', 'error_combinePeople_samePerson'));
 			}
 
-			let linkCombinePeople = this.cisRoot + 'vilesci/stammdaten/personen_wartung.php?person_id_1=' + person1_id + '&person_id_2='+ person2_id;
+			let linkCombinePeople = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'vilesci/stammdaten/personen_wartung.php?person_id_1=' + person1_id + '&person_id_2='+ person2_id;
 			this.openLink(linkCombinePeople);
 		},
 		openLink(url) {
