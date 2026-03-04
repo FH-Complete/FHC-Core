@@ -147,6 +147,7 @@ export default {
 					if (row.getData().bnaktiv === false) {
 						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
+					row.getElement().draggable = true
 				},
 
 				ajaxRequestFunc: (url, config, params) => {
@@ -213,6 +214,10 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
+				},
+				{
+					event: 'rowMouseDown',
+					handler: this.handleMouseDown
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
@@ -226,7 +231,8 @@ export default {
 			selectedColumnValues: [],
 			tagEndpoint: ApiTag,
 			currentEndpoint: null,
-			headerFilterActive: false
+			headerFilterActive: false,
+			dragSource: []
 		}
 	},
 	computed: {
@@ -242,7 +248,9 @@ export default {
 				+ ': <strong>' + (this.count || 0) + '</strong>';
 		},
 		selectedDragObject() {
-			return this.selected.map(item => {
+			let items = this.dragSource?.length ? this.dragSource : this.selected;
+
+			return items.map(item => {
 				let type, id;
 				if (item.uid) {
 					type = 'student';
@@ -372,15 +380,6 @@ export default {
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
 
 			this.$emit('update:selected', data);
-
-			// set selected elements draggable
-			const tableEl = this.$refs.table?.$refs?.table;
-			if (tableEl) {
-				const oldDragables = tableEl.querySelectorAll('[draggable]');
-				for (const draggable of oldDragables)
-					draggable.removeAttribute('draggable');
-			}
-			rows.forEach(row => row.getElement().draggable = true);
 		},
 		autoSelectRows(data) {
 			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
@@ -450,6 +449,7 @@ export default {
 				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
 		dragCleanup(evt) {
+			this.dragSource = [];
 			if (evt.dataTransfer.dropEffect == 'none')
 				return; // aborted or wrong target
 			
@@ -548,7 +548,16 @@ export default {
 		},
 		handleHeaderFilter(filterActive){
 			this.headerFilterActive = filterActive;
-		}
+		},
+		handleMouseDown(e, row)
+		{
+			let data = row.getData();
+			let id = data.uid ?? data.prestudent_id ?? data.person_id;
+
+			const isAlreadySelected = this.selected?.some(row => (row.uid ?? row.prestudent_id ?? row.person_id) === id);
+
+			this.dragSource = (isAlreadySelected && this.selected?.length) ? this.selected : [data];
+		},
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
