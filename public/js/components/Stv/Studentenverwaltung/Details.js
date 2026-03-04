@@ -63,15 +63,23 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		reload() {
+		//TODO	delete console.log("in Details: reload ", this.$refs.tabs.$refs.current.uid);
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
+
+			//reload also header
 		}
 	},
 	created() {
 		this.loadConfig();
 	},
+	/*
+			test manu {{ students?.[0]?.uid }} {{ students?.[0]?.nachname }} {{ students?.[0]?.prestudent_id }} {{ students?.[0]?.person_id }}
+
+	 */
 	template: `
 	<div class="stv-details h-100 d-flex flex-column">
+		{{ students?.[0]?.uid }} 
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
 			{{$p.t('ui', 'chooseStudent')}}
 		</div>

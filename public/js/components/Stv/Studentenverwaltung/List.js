@@ -36,7 +36,8 @@ export default {
 		studiensemesterKurzbz: String
 	},
 	emits: [
-		'update:selected'
+		'update:selected',
+		'load-student'
 	],
 	data() {
 		function dateFormatter(cell)
@@ -168,9 +169,16 @@ export default {
 					event: 'dataProcessed',
 					handler: this.autoSelectRows
 				},
-				{
+/*				{
 					event: 'dataLoaded',
 					handler: data => this.count = data.length
+				},*/
+				{
+					event: "dataLoaded",
+					handler: (data) => {
+						this.count = data.length;
+						console.log("Datensätze geladen:", data.length);
+					}
 				},
 				{
 					event: 'dataFiltered',
@@ -187,7 +195,10 @@ export default {
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
-			currentEndpoint: null
+			currentEndpoint: null,
+			fallbackInProgress: false,
+			fallbackBlocked: false,
+			//fallbackBlockedOnce: false,
 		}
 	},
 	computed: {
@@ -245,8 +256,22 @@ export default {
 			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
 				this.translateTabulator();
 			}
+		},
+/*		lastSelected: {
+			handler(newVal, oldVal) {
+				console.log("selected changed:", {
+					old: oldVal.[0]?.uid ,
+					new: newVal
+				});
+			},
+			deep: true
+		},*/
+		lastSelected(newVal) {
+			const uids = newVal.map(s => s.uid);
+			console.log("watcher: Selected UIDs:", uids);
 		}
 	},
+
 	methods: {
 		translateTabulator() {
 			this.$p
@@ -326,8 +351,33 @@ export default {
 		},
 		rowSelectionChanged(data, rows) {
 			this.selectedcount = data.length;
-			this.lastSelected = this.selected;
+/*			console.log(this.selected);
+			console.log("---");
+			console.log(JSON.parse(JSON.stringify(Vue.toRaw(data))));*/
+
+			this.lastSelected = this.selected; //referenz wird gespreichert: besser mit echtem snapshot
+			// this.lastSelected = JSON.parse(JSON.stringify(data)); //dann gehts aber nicht
+			//console.log("List.js - row selection changed for fallback: " + this.lastSelected?.[0]?.uid + " " + this.lastSelected?.[0]?.prestudent_id);
+			//this.lastSelected = structuredClone(data);
+
+			//this.lastSelected = data.map(item => ({ ...Vue.toRaw(item) }));
 			this.$emit('update:selected', data);
+
+			this.$nextTick(() => {
+				this.lastSelected = this.selected;
+/*				console.log("List.js - row selection changed for fallback: "
+					+ this.lastSelected?.[0]?.uid + " "
+					+ this.lastSelected?.[0]?.prestudent_id
+				);*/
+			});
+
+			// Direkt die ausgewählten rows für fallback setzen
+			//this.lastSelected = data;
+
+			//console.log("last selected " + uid + " prestudent_id " +  this.lastSelected?.[0]?.prestudent_id);
+
+
+
 
 			// set selected elements draggable
 			const tableEl = this.$refs.table?.$refs?.table;
@@ -338,7 +388,7 @@ export default {
 			}
 			rows.forEach(row => row.getElement().draggable = true);
 		},
-		autoSelectRows(data) {
+/*		autoSelectRows(data) {
 			if (this.lastSelected) {
 				// NOTE(chris): reselect rows on refresh
 				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
@@ -354,13 +404,82 @@ export default {
 					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
 				}
 			}
+		},*/
+		autoSelectRows(data) { // version mit fallbacks
+			if (!this.lastSelected?.length) return;
+
+			const table = this.$refs.table.tabulator;
+
+			const validRows = this.lastSelected
+				.map(el => table.getRow(el.prestudent_id))
+				.filter(row => row);
+
+			if (validRows.length > 0) {
+				table.selectRow(validRows);
+
+				this.fallbackInProgress = false;
+
+			} else {
+
+				if (this.fallbackInProgress) return;
+
+				if(!this.fallbackBlocked)
+					this.fallbackInProgress = true;
+
+					console.log(" load lastSelected " + this.lastSelected[0].prestudent_id);
+					this.$emit("load-student", this.lastSelected[0]);
+			}
+				//this.updateUrlWithLastSelected(this.lastSelected[0].prestudent_id);
+
+		},
+/*		autoSelectRows() {
+			if (!this.lastSelected?.length) return;
+
+			const table = this.$refs.table?.tabulator;
+			if (!table) return;
+
+			const id = this.lastSelected[0]?.prestudent_id;
+			if (!id) return;
+
+			const row = table.getRow(id);
+
+			if (row) {
+				table.selectRow(id);
+			} else {
+				this.$emit("load-student", this.lastSelected[0]);
+			}
+		},*/
+		resetFallback_DEPR(){ //version mit timing problems
+			this.fallbackBlocked = true;   // nur einmalig blockieren
+			this.fallbackInProgress = false;
+			this.lastSelected = [];
+			//console.log("Resetting fallback, kein Row-Fallback wird ausgeführt");
+			//console.log("not active");
+
+/*			this.fallbackInProgress = true; // Setze true, damit autoSelectRows nichts mehr macht
+			// Optional: Tabulator Auswahl leeren
+
+			if (this.$refs.table?.tabulator) {
+				this.$refs.table.tabulator.deselectRow();
+			}*/
+		},
+		deselectDetails(){
+			//console.log("deselect unactivated");
+			this.$emit('update:selected', []);
 		},
 		updateFilter(filter) {
 			this.filter = filter;
 			this.updateUrl();
 		},
 		updateUrl(endpoint, first) {
-			this.lastSelected = first ? undefined : this.selected;
+
+		//	console.log("lastSelected", JSON.stringify(this.lastSelected));
+
+		//	const uid = this.lastSelected?.[0]?.uid;
+			//console.log("last selected " + uid + " prestudent_id " +  this.lastSelected?.[0]?.prestudent_id);
+
+			//here: remember lastSelected
+			//if undefined selection: reload with this instead of empty window
 
 			console.log('function param endpoint: ' + JSON.stringify(endpoint));
 			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
@@ -402,6 +521,8 @@ export default {
 				}
 			} else
 				this.$refs.table.tabulator.setData(endpoint.url, params, method);
+
+			//version mit request token
 		},
 		dragCleanup(evt) {
 			if (evt.dataTransfer.dropEffect == 'none')
@@ -477,6 +598,7 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
+	LS: {{ lastSelected?.[0]?.uid ?? '' }}
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"

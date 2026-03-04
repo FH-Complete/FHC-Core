@@ -79,7 +79,10 @@ export default {
 	},
 	watch: {
 		'studiensemesterKurzbz': function () {
+			debugger;
+
 			this.current = this.list.indexOf(this.studiensemesterKurzbz);
+			console.log("in studiensemester.js, current: ", this.current + " stdsem" + this.studiensemesterKurzbz);
 		}
 	},
 	created() {

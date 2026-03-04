@@ -7,6 +7,12 @@ export default {
 			from: 'configDomain',
 			default: 'technikum-wien.at'
 		},
+		currentSemester: {
+			from: 'currentSemester',
+		},
+		defaultSemester: {
+			from: 'defaultSemester',
+		},
 	},
 	props: {
 		headerData: {
@@ -51,6 +57,10 @@ export default {
 					console.error("Error loading department data:", error);
 				});
 		}
+
+		if(this.headerData){
+			this.getSemesterStati(this.headerData[0].prestudent_id);
+		}
 	},
 	watch: {
 		person_id: {
@@ -65,12 +75,32 @@ export default {
 			},
 			deep: true,
 		},
+		currentSemester: {
+			handler(newVal) {
+				if (newVal) {
+					console.log("currentSem " + newVal);
+
+			//		this.getSemesterStati(this.headerData[0].prestudent_id);
+					if(this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester))
+						console.log(this.currentSemester + " vorhanden");
+					else
+						console.log(this.currentSemester + " NICHT vorhanden");
+/*					this.getHeader(this.person_id);
+					this.loadDepartmentData(this.person_id).
+					then(() => {
+						this.getLeitungOrg(this.departmentData.oe_kurzbz);
+					});*/
+				}
+			},
+			deep: true,
+		},
 	},
 	data(){
 		return{
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
+			semesterStati: {}
 		};
 	},
 	methods: {
@@ -109,12 +139,22 @@ export default {
 			} else {
 				return 'data:image/jpeg;base64,' + foto;
 			}
+		},
+		getSemesterStati(prestudent_id){
+			console.log("in function " + prestudent_id);
+			return this.$api
+				.call(ApiDetailHeader.getSemesterStati(prestudent_id))
+				.then(result => {
+					this.semesterStati = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
+			{{currentSemester}} <br> {{defaultSemester}}
 					<div
 						v-for="person in headerData"
 						:key="person.person_id"
@@ -169,6 +209,8 @@ export default {
 					  </h5>
 
 					</div>
+					{{headerData[0].statusofsemester}}  {{headerData[0].semester}} {{headerData[0].verband}} {{headerData[0].gruppe}}
+					
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">

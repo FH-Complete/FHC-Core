@@ -89,7 +89,6 @@ export default {
 			hasZGVMasterPermission: this.permissions['student/editMakkZgv'],
 			hasZGVDoctorPermission: this.permissions['student/editDokZgv'],
 			hasBismeldenPermission: this.permissions['student/editBismelden'],
-
 		}
 	},
 	data() {
@@ -201,6 +200,7 @@ export default {
 				else
 				{
 					this.$refs.stvList.updateUrl();
+					console.log("Studverw: before reload details " + newVal + " " + oldVal);
 					this.$refs.details.reload();
 				}
 			}
@@ -268,6 +268,9 @@ export default {
 				);
 		},
 		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz }) {
+			//to ensure that details are cleared if verband has changed
+			this.deselectDetails();
+
 			let urlpath = String(link);
 			if (!urlpath.match(/\/prestudent/))
 			{
@@ -304,6 +307,8 @@ export default {
 		},
 		studiensemesterChanged(v) {
 			this.studiensemesterKurzbz = v;
+
+			console.log("Stv.js " + v);
 
 			this.$router.push({
 				params: {
@@ -420,7 +425,37 @@ export default {
 			this.$refs.searchbar.$refs.input.blur();
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
-		}
+		},
+/*		handleLoadStudent(student){
+			//let stringStud = JSON.stringify(student).map(s => s.uid);
+			let uids;
+
+			if (Array.isArray(student)) {
+				// mehrere Einträge
+				uids = student.map(s => s.uid);
+			} else if (student) {
+				// einzelnes Objekt
+				uids = [student.uid];
+			} else {
+				uids = [];
+			}
+			console.log("student lastSelected " + uids);
+			this.selected = [student];
+		},*/
+		handleLoadStudent(student) {
+			let studentsArray = Array.isArray(student) ? student : [student];
+			this.selected = studentsArray.map(s => Vue.toRaw(s)); // Proxies auflösen
+			const uids = this.selected.map(s => s.uid);
+			console.log("in handleLoadStudent student UIDs:", uids);
+		},
+		deselectDetails(){
+			//fallback löschen
+			//this.$refs.stvList.resetFallback();
+
+			//emit nicht necessary
+			this.$refs.stvList.deselectDetails();
+			//this.handleLoadStudent('');
+		},
 	},
 	created() {
 		if (!this.url_studiensemester_kurzbz) {
@@ -625,7 +660,7 @@ export default {
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<vertical-split>
 						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
+							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @load-student="handleLoadStudent"></stv-list>
 						</template>
 						<template #bottom>
 							<stv-details ref="details" :students="selected"></stv-details>
