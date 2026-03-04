@@ -75,11 +75,11 @@ export default {
 	},
 	/*
 			test manu {{ students?.[0]?.uid }} {{ students?.[0]?.nachname }} {{ students?.[0]?.prestudent_id }} {{ students?.[0]?.person_id }}
-
+		{{ students?.[0]?.uid }}
 	 */
 	template: `
 	<div class="stv-details h-100 d-flex flex-column">
-		{{ students?.[0]?.uid }} 
+
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
 			{{$p.t('ui', 'chooseStudent')}}
 		</div>

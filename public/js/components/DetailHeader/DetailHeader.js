@@ -81,15 +81,13 @@ export default {
 					console.log("currentSem " + newVal);
 
 			//		this.getSemesterStati(this.headerData[0].prestudent_id);
-					if(this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester))
-						console.log(this.currentSemester + " vorhanden");
+					if(!this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester)) {
+						this.noCurrentStatus = true;
+					}
 					else
-						console.log(this.currentSemester + " NICHT vorhanden");
-/*					this.getHeader(this.person_id);
-					this.loadDepartmentData(this.person_id).
-					then(() => {
-						this.getLeitungOrg(this.departmentData.oe_kurzbz);
-					});*/
+					{
+						this.noCurrentStatus = false;
+					}
 				}
 			},
 			deep: true,
@@ -100,7 +98,8 @@ export default {
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
-			semesterStati: {}
+			semesterStati: {},
+			noCurrentStatus: false
 		};
 	},
 	methods: {
@@ -154,7 +153,6 @@ export default {
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-3 gap-3" style="max-height:9rem; min-width: 37.5rem;">
 
 			<template v-if="typeHeader==='student'">
-			{{currentSemester}} <br> {{defaultSemester}}
 					<div
 						v-for="person in headerData"
 						:key="person.person_id"
@@ -202,15 +200,17 @@ export default {
 						<span>
 							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
 						</span>
-						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
-						 {{headerData[0].statusofsemester}}
+							<strong class="text-muted"> | Status </strong>
+						<span v-if="noCurrentStatus">
+							<strong class="text-danger">NO STATUS in {{currentSemester}}</strong>
+						</span>
+						 <span v-else>
+						 	{{headerData[0].statusofsemester}}
+						 </span>
 						<strong class="text-muted"> | {{$p.t('person', 'matrikelnummer')}} </strong>
 						  {{headerData[0].matr_nr}}
 					  </h5>
-
-					</div>
-					{{headerData[0].statusofsemester}}  {{headerData[0].semester}} {{headerData[0].verband}} {{headerData[0].gruppe}}
-					
+				</div>
 		</template>
 
 		<template v-if="typeHeader==='mitarbeiter'">
