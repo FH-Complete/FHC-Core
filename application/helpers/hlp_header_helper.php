@@ -113,6 +113,7 @@ function generateJSDataStorageObject($indexPage, $calledPath, $calledMethod)
 			'modes'=>$ci->config->item('theme_modes'),
 		],
 		'fhcomplete_build_version' => $ci->config->item('fhcomplete_build_version'),
+		'use_fhcomplete_build_version_in_path' => $ci->config->item('use_fhcomplete_build_version_in_path'),
 	);
 
 	$toPrint = "\n";
