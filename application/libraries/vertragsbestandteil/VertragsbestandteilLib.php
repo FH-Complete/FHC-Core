@@ -10,6 +10,7 @@ require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilKarenz.php';
+require_once __DIR__ . '/VertragsbestandteilLohnguide.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 require_once __DIR__ . '/OverlapChecker.php';
 

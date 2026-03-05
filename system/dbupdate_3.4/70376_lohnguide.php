@@ -334,4 +334,17 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_lohnguide 
 			echo 'hr.tbl_vertragsbestandteil_lohnguide wurde neu erstellt<br>';
 	}
 }
+
+if($result = $db->db_query("SELECT 1 FROM hr.tbl_vertragsbestandteiltyp WHERE vertragsbestandteiltyp_kurzbz = 'lohnguide'"))
+{
+	if($db->db_num_rows($result) === 0)
+	{
+		$qry = "insert into hr.tbl_vertragsbestandteiltyp (vertragsbestandteiltyp_kurzbz,bezeichnung,ueberlappend) values('lohnguide','Lohnguide',false)";
+
+		if(!$db->db_query($qry))
+			echo '<strong>Public Tabelle person: '.$db->db_last_error().'</strong><br>';
+		else
+			echo "<br>Vertragsbestandteiltyp 'lohnguide' hinzugefuegt";
+	}
+}
 		

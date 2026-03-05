@@ -3,6 +3,7 @@ namespace vertragsbestandteil;
 
 use Exception;
 use vertragsbestandteil\VertragsbestandteilStunden;
+use vertragsbestandteil\VertragsbestandteilLohnguide;
 
 /**
  * Description of VertragsbestandteilFactory

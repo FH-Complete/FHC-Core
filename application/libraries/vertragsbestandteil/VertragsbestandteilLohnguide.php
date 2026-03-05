@@ -12,6 +12,14 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 	protected $kommentar_person;
 	protected $kommentar_modellstelle;
 
+
+	public function __construct()
+	{
+		parent::__construct();
+		$this->setVertragsbestandteiltyp_kurzbz(
+			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_LOHNGUIDE);
+	}
+
 	public function getStellenbezeichnung()
 	{
 		return $this->stellenbezeichnung;
@@ -73,12 +81,7 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 	}
 
 	
-	public function __construct()
-	{
-		parent::__construct();
-		$this->setVertragsbestandteiltyp_kurzbz(
-			VertragsbestandteilFactory::VERTRAGSBESTANDTEIL_LOHNGUIDE);
-	}
+	
 	
 	public function hydrateByStdClass($data, $fromdb=false)
 	{
@@ -97,8 +100,8 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'stellenbezeichnung' => $this->getStellenbezeichnung(),
-			'fachrichtung' => $this->getFachrichtung_kurzbz(),
-			'modellstelle' => $this->getModellstelle_kurzbz(),
+			'fachrichtung_kurzbz' => $this->getFachrichtung_kurzbz(),
+			'modellstelle_kurzbz' => $this->getModellstelle_kurzbz(),
 			'kommentar_person' => $this->getKommentar_person(),
 			'kommentar_modellstelle' => $this->getKommentar_modellstelle(),
 		);
