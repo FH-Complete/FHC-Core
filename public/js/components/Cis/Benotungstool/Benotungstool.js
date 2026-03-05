@@ -9,6 +9,7 @@ import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
 import MobilityLegende from '../../Mobility/Legende.js';
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import {debounce} from "../../../helpers/debounce.js";
+import {centeredFormatter} from "../../../tabulator/formatter/centered.js";
 
 export const Benotungstool = {
 	name: "Benotungstool",
@@ -720,7 +721,8 @@ export const Benotungstool = {
 
 			return {
 				height: 700,
-				virtualDom: false,
+				virtualDom: true,
+				virtualDomBuffer: 5000,
 				index: 'uid',
 				layout: 'fitDataStretch',
 				placeholder: this.$capitalize(this.$p.t('global/noDataAvailable')),
@@ -728,7 +730,6 @@ export const Benotungstool = {
 				selectableRangeMode: "click", // shift+click
 				selectablePersistence: false, // reset selection on table reload
 				selectableCheck: this.selectableCheck,
-				rowHeight: 40,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: this.getColumnsDefinition(),
 				persistence: false,
@@ -796,13 +797,13 @@ export const Benotungstool = {
 				field: 'selectCol',
 				title: ''
 			})
-			columns.push({title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, cssClass: 'sticky-col'})
+			columns.push({title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, formatter: centeredFormatter, cssClass: 'sticky-col'})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', tooltip: false, widthGrow: 1})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', headerFilter: true, tooltip: false, widthGrow: 1})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', headerFilter: true, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', formatter: centeredFormatter, tooltip: false, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', formatter: centeredFormatter, headerFilter: true, tooltip: false, widthGrow: 1})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', formatter: centeredFormatter, headerFilter: true, widthGrow: 1})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', widthGrow: 1, formatter: this.percentFormatter})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', headerFilter: true, widthGrow: 1, visible: false})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', formatter: centeredFormatter, headerFilter: true, widthGrow: 1, visible: false})
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE) {
 				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4teilnoten'))), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true})
 			}
@@ -1668,10 +1669,9 @@ export const Benotungstool = {
 					s.freigegeben = this.checkFreigabe(s.freigabedatum, s.benotungsdatum, s.uid);
 					
 					s.lv_note = res.data[1]?.note
-					
 					const oldScrollLeft = this.$refs.notenTable.tabulator.rowManager.scrollLeft
 					const oldScrollTop = this.$refs.notenTable.tabulator.rowManager.scrollTop
-
+					
 					// add new pruefung to row
 					if(!this.pruefung) {			
 						this.handleAddNewTermin(res.data, s)
