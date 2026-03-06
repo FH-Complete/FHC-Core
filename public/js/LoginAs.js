@@ -42,8 +42,8 @@ const loginAsApp = Vue.createApp({
 			if (this.selectedUser != null)
 			{
 				this.$api
-					.call(ApiLogin.loginASByPersonId({
-						person_id: this.selectedUser.person_id
+					.call(ApiLogin.loginASByUid({
+						uid: this.selectedUser.uid
 					}))
 					.then((response) => {
 						location.reload();
