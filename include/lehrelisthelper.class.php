@@ -270,6 +270,8 @@ class LehreListHelper
 					} else if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->von > $stsemdatumvon || $row->von == '')) {
 						// if bis datum is not yet known but von is available already
 						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
+					} else if ($row->bisio_id != '' && $row->status != 'Incoming' && ($row->von <= $stsemdatumvon || $row->von == '') && ($row->bis == '' || $row->bis > $heute)){
+						$zusatz .= '(o)(ab '.$datum->formatDatum($row->von, 'd.m.Y').')';
 					}
 						
 
