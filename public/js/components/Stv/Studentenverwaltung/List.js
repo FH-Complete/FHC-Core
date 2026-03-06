@@ -324,10 +324,13 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data, rows) {
+		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedcount = data.length;
-			this.lastSelected = this.selected;
-			this.$emit('update:selected', data);
+
+			if(selected.length > 0 || deselected.length > 0){
+				this.lastSelected = this.selected;
+				this.$emit('update:selected', data);
+			}
 
 			// set selected elements draggable
 			const tableEl = this.$refs.table?.$refs?.table;
@@ -471,6 +474,10 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
+		},
+		clearSelection(){
+			this.lastSelected = [];
+			this.$emit('update:selected',[]);
 		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component

@@ -208,6 +208,7 @@ export default {
 		'url_studiengang': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.checkUrlStudiengang();
+				this.$refs.stvList.clearSelection();
 			}
 		},
 		'url_mode': function () {
@@ -420,7 +421,7 @@ export default {
 			this.$refs.searchbar.$refs.input.blur();
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
-		}
+		},
 	},
 	created() {
 		if (!this.url_studiensemester_kurzbz) {
