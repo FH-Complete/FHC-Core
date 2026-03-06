@@ -35,7 +35,6 @@ export default {
 		};
 	},
 	getSemesterStati(prestudent_id){
-		console.log("api" + prestudent_id);
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/detailheader/DetailHeader/getSemesterStati/' + prestudent_id,

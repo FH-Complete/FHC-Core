@@ -78,8 +78,6 @@ export default {
 		currentSemester: {
 			handler(newVal) {
 				if (newVal) {
-					console.log("currentSem " + newVal);
-
 			//		this.getSemesterStati(this.headerData[0].prestudent_id);
 					if(!this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester)) {
 						this.noCurrentStatus = true;
@@ -140,7 +138,6 @@ export default {
 			}
 		},
 		getSemesterStati(prestudent_id){
-			console.log("in function " + prestudent_id);
 			return this.$api
 				.call(ApiDetailHeader.getSemesterStati(prestudent_id))
 				.then(result => {

@@ -200,7 +200,6 @@ export default {
 				else
 				{
 					this.$refs.stvList.updateUrl();
-					console.log("Studverw: before reload details " + newVal + " " + oldVal);
 					this.$refs.details.reload();
 				}
 			}
@@ -307,8 +306,6 @@ export default {
 		},
 		studiensemesterChanged(v) {
 			this.studiensemesterKurzbz = v;
-
-			console.log("Stv.js " + v);
 
 			this.$router.push({
 				params: {
@@ -426,35 +423,15 @@ export default {
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
 		},
-/*		handleLoadStudent(student){
-			//let stringStud = JSON.stringify(student).map(s => s.uid);
-			let uids;
-
-			if (Array.isArray(student)) {
-				// mehrere Einträge
-				uids = student.map(s => s.uid);
-			} else if (student) {
-				// einzelnes Objekt
-				uids = [student.uid];
-			} else {
-				uids = [];
-			}
-			console.log("student lastSelected " + uids);
-			this.selected = [student];
-		},*/
 		handleLoadStudent(student) {
 			let studentsArray = Array.isArray(student) ? student : [student];
-			this.selected = studentsArray.map(s => Vue.toRaw(s)); // Proxies auflösen
+			this.selected = studentsArray.map(s => Vue.toRaw(s)); // Proxies
 			const uids = this.selected.map(s => s.uid);
-			console.log("in handleLoadStudent student UIDs:", uids);
 		},
 		deselectDetails(){
 			//fallback löschen
-			//this.$refs.stvList.resetFallback();
-
-			//emit nicht necessary
+			this.$refs.stvList.resetFallback();
 			this.$refs.stvList.deselectDetails();
-			//this.handleLoadStudent('');
 		},
 	},
 	created() {

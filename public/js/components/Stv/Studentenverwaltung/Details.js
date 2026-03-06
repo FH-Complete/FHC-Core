@@ -63,11 +63,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		reload() {
-		//TODO	delete console.log("in Details: reload ", this.$refs.tabs.$refs.current.uid);
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
-
-			//reload also header
 		}
 	},
 	created() {
