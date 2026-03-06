@@ -468,6 +468,8 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect("'' AS verband");
 		$this->PrestudentModel->addSelect("'' AS gruppe");
 		$this->addSelectPrioRel();
+		$query_studiensemester_kurzbz = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : '\'NULL\'';
+		$this->PrestudentModel->addSelect($query_studiensemester_kurzbz . ' as query_studiensemester_kurzbz');
 
 		$this->addFilter($studiensemester_kurzbz);
 
@@ -588,6 +590,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
 		$this->PrestudentModel->addSelect("'' AS priorisierung_relativ");
+		$this->PrestudentModel->addSelect($this->PrestudentModel->escape($studiensemester_kurzbz) . ' as query_studiensemester_kurzbz');
 
 
 		$where = [];
@@ -798,6 +801,7 @@ class Students extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect("COALESCE(v.semester::text, CASE WHEN public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN public.get_absem_prestudent(tbl_prestudent.prestudent_id, NULL)::text ELSE ''::text END) AS semester", false);
 		$this->PrestudentModel->addSelect('v.verband');
 		$this->PrestudentModel->addSelect('v.gruppe');
+		$this->PrestudentModel->addSelect($this->PrestudentModel->escape($studiensemester_kurzbz) . ' as query_studiensemester_kurzbz');
 
 		//add status per semester
 		$this->PrestudentModel->addSelect(
