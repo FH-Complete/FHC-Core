@@ -241,7 +241,7 @@ html.fs_huge {
 .stv .p-tabview .p-tabview-nav li .p-tabview-nav-link {
 	padding: 0.25rem .5rem;
 }
-
+/*
 .stv .p-tabview .p-tabview-panels {
 	background-color: #e5eff5;
 }
@@ -250,7 +250,7 @@ html.fs_huge {
 	background: #e5eff5;
 	border-color: #dee2e6 #dee2e6 #e5eff5 #dee2e6;
 }
-
+*/
 .stv-details-details-foto img {
 	max-height: 120px;
 }
