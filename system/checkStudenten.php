@@ -227,7 +227,7 @@ if ($db->db_query($qry))
  * 	Aktuelles Semester beim Studenten stimmt nicht mit dem Ausbildungssemester des aktuellen Status überein
  */
 
-$text .= "<br><br>Suche Studenten deren Semstern nicht mit dem
+$text .= "<br><br>Suche Studenten deren Semestern nicht mit dem
 Ausbildungssemesters des aktuellen Status übereinstimmt ... <br><br>";
 
 $student = new student();
@@ -350,7 +350,7 @@ $prestudentFirst = new prestudent();
 $prestudentSecond = new prestudent();
 $i = 0;
 
-// alle aktiven Studenten die im aktuellen Semster den Status Student haben
+// alle aktiven Studenten die im aktuellen Semester den Status Student haben
 $qry_student = "
 SELECT
 	distinct(student_uid), prestudent.prestudent_id, student.studiengang_kz studiengang

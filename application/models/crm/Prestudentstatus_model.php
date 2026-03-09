@@ -177,7 +177,7 @@ class Prestudentstatus_model extends DB_Model
 	 * @param prestudent_id ID of the Prestudent.
 	 * @param $status_kurzbz kurzbz of the status.
 	 * @param $ausbildungssemester ausbildungssemester of the status.
-	 * @param $studiensemester_kurzbz studiensemster of the status.
+	 * @param $studiensemester_kurzbz studiensemester of the status.
 	 *
 	 * @return result object with all the status entries
 	 */

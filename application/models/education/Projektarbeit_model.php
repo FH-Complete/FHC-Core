@@ -25,7 +25,7 @@ class Projektarbeit_model extends DB_Model
 	{
 		$qry = "SELECT
 					pa.*, tbl_projekttyp.bezeichnung,
-					tbl_projektarbeit.studiensemester_kurzbz, tbl_projektarbeit.lehrveranstaltung_id,
+					pa.studiensemester_kurzbz, pa.lehrveranstaltung_id,
 					tbl_firma.name AS firma_name,
 					(
 						SELECT

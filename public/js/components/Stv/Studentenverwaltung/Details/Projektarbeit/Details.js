@@ -5,6 +5,7 @@ import PvAutoComplete from "../../../../../../../index.ci.php/public/js/componen
 import ApiStvProjektarbeit from '../../../../../api/factory/stv/projektarbeit.js';
 
 export default {
+	name: 'ProjektarbeitDetails',
 	components: {
 		FormForm,
 		FormInput,
@@ -219,7 +220,8 @@ export default {
 			if (preparedFormData.projektarbeit_id == null) delete(preparedFormData.projektarbeit_id);
 			delete(preparedFormData.firma);
 			delete(preparedFormData.firma_name);
-			delete(preparedFormData.lehrveranstaltung_id);
+			
+			preparedFormData.studiensemester_kurzbz = this.studiensemester
 
 			return preparedFormData;
 		}
@@ -312,7 +314,6 @@ export default {
 						name="lehrveranstaltung_id"
 						@change="lvChanged($event)"
 						>
-						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
 						<option
 							v-for="lv in arrLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -329,7 +330,6 @@ export default {
 						name="studiensemester"
 						@change="studiensemesterChanged"
 						>
-						<option :value="null"> -- {{$p.t('fehlermonitoring', 'keineAuswahl')}} -- </option>
 						<option
 							v-for="sem in arrStudiensemester"
 							:key="sem.studiensemester_kurzbz"

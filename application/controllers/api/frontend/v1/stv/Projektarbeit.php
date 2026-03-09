@@ -91,11 +91,13 @@ class Projektarbeit extends FHCAPI_Controller
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id)) return $this->terminateWithError('Projektarbeit Id missing', self::ERROR_TYPE_GENERAL);
 
 		$this->ProjektarbeitModel->addSelect(
-			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, lehrveranstaltung_id, lehreinheit_id, 
+			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, 
+			lehre.tbl_projektarbeit.lehrveranstaltung_id, lehre.tbl_projektarbeit.studiensemester_kurzbz, lehre.tbl_projektarbeit.lehreinheit_id, 
 			firma_id, beginn, ende, gesperrtbis, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
 		);
-		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id', 'LEFT');
 		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id', 'LEFT');
 		$result = $this->ProjektarbeitModel->loadWhere(
 			array('projektarbeit_id' => $projektarbeit_id)
@@ -229,7 +231,7 @@ class Projektarbeit extends FHCAPI_Controller
 	}
 
 	/**
-	 * Get Lehrveranstaltungen by params, incling lehreinheiten for a specific Studiensemester..
+	 * Get Lehrveranstaltungen by params, including lehreinheiten for a specific Studiensemester..
 	 */
 	public function getLehrveranstaltungen()
 	{
@@ -239,7 +241,7 @@ class Projektarbeit extends FHCAPI_Controller
 		$additional_lehrveranstaltung_id = $this->input->get('additional_lehrveranstaltung_id');
 
 		if (!isset($student_uid)) $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Student UID']), self::ERROR_TYPE_GENERAL);
-		if (!isset($studiensemester_kurzbz)) $this->terminateWithError('Studiensemster missing', self::ERROR_TYPE_GENERAL);
+		if (!isset($studiensemester_kurzbz)) $this->terminateWithError('Studiensemester missing', self::ERROR_TYPE_GENERAL);
 
 		// get Lvs
 		$lvsResult = $this->LehrveranstaltungModel->getLvsForProjektarbeit($student_uid, $studiengang_kz, $additional_lehrveranstaltung_id);
@@ -316,9 +318,16 @@ class Projektarbeit extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Projekttyp'])
 		]);
 
-		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'required|is_natural', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehreinheit']),
+		$this->form_validation->set_rules('lehreinheit_id', 'Lehreinheit', 'is_natural', [
 			'is_natural' =>  $this->p->t('ui', 'error_fieldNotNumeric', ['field' => 'Lehreinheit'])
+		]);
+
+		$this->form_validation->set_rules('lehrveranstaltung_id', 'Lehrveranstaltung', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Lehrveranstaltung'])
+		]);
+
+		$this->form_validation->set_rules('studiensemester_kurzbz', 'Studiensemester', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => 'Studiensemester'])
 		]);
 
 		$this->form_validation->set_rules('beginn', 'Beginn', 'is_valid_date', [
@@ -350,6 +359,8 @@ class Projektarbeit extends FHCAPI_Controller
 			'projekttyp_kurzbz' => $formData['projekttyp_kurzbz'],
 			'firma_id' => $formData['firma_id'] ?? null,
 			'lehreinheit_id' => $formData['lehreinheit_id'],
+			'lehrveranstaltung_id' => $formData['lehrveranstaltung_id'],
+			'studiensemester_kurzbz' => $formData['studiensemester_kurzbz'],
 			'beginn' => isset($formData['beginn']) && !isEmptyString($formData['beginn']) ? $formData['beginn'] : null,
 			'ende' => isset($formData['ende']) && !isEmptyString($formData['ende']) ? $formData['ende'] : null,
 			'note' => $formData['note'] ?? null,

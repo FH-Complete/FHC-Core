@@ -2088,7 +2088,7 @@ class lehrveranstaltung extends basis_db
 	/**
 	 * lädt die Lehrveranstaltungen zum zugehörigen Mitarbeiter
 	 * @param String $uid User ID des Mitarbeiters
-	 * @param String $studiensemster_kurzbz Kurzbezeichnung des Studiensemesters
+	 * @param String $studiensemester_kurzbz Kurzbezeichnung des Studiensemesters
 	 */
 	public function getLVByMitarbeiter($uid, $studiensemester_kurzbz = null)
 	{

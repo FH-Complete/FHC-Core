@@ -177,7 +177,7 @@ class Studiensemester_model extends DB_Model
 	 */
 	public function getByDate($date)
 	{
-		// gets the studiensemster of a date or the next closest previous studiensemester if a date is not within a studiensemester
+		// gets the studiensemester of a date or the next closest previous studiensemester if a date is not within a studiensemester
 		$query = "
 			SELECT  studiensemester_kurzbz, start, ende
 			FROM	public.tbl_studiensemester

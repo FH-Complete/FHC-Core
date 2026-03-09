@@ -118,7 +118,7 @@ export default {
 					{title: "Titel", field: "titel"},
 					{title: "Gesamtnote", field: "note"},
 					{
-						title: "Abgabe Enduplad",
+						title: "Abgabe Endupload",
 						field: "abgabedatum",
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
