@@ -43,7 +43,6 @@ export const AbgabetoolMitarbeiter = {
 	},
 	data() {
 		return {
-			tableData: null,
 			abgabetypenBetreuer: null,
 			detailIsFullscreen: false,
 			phrasenPromise: null,
@@ -205,9 +204,23 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		redrawTableScrollSave() {
+			const table = this.$refs.abgabeTable.tabulator;
+			const scrollX = table.rowManager.scrollLeft;
+			const scrollY = table.rowManager.scrollTop;
+			this.$refs.abgabeTable.tabulator.redraw(true)
+
+			Vue.nextTick(()=> {
+				const tableholder = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+				if(tableholder) {
+					tableholder.scrollLeft = scrollX;
+					tableholder.scrollTop = scrollY;
+				}
+			})
+		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
-			this.$refs.abgabeTable.tabulator.redraw(true)
+			this.redrawTableScrollSave()
 		},
 		sammelMailStudent(param) {
 			
@@ -601,8 +614,7 @@ export const AbgabetoolMitarbeiter = {
 			this.showAll = showall
 			this.loading = true
 			this.loadProjektarbeiten(showall, () => {
-				this.$refs.abgabeTable?.tabulator.redraw(true)
-				this.$refs.abgabeTable?.tabulator.setSort([]);
+				this.redrawTableScrollSave()
 				this.loading = false
 			})
 		},
@@ -627,8 +639,7 @@ export const AbgabetoolMitarbeiter = {
 					const oldScrollTop = this.$refs.abgabeTable?.tabulator.rowManager.scrollTop
 					this.loading = true
 					this.loadProjektarbeiten(this.showAll, () => {
-						this.$refs.abgabeTable?.tabulator.redraw(true)
-						this.$refs.abgabeTable?.tabulator.setSort([]);
+						this.redrawTableScrollSave()
 						this.loading = false
 
 						Vue.nextTick(()=> {
@@ -762,11 +773,9 @@ export const AbgabetoolMitarbeiter = {
 		},
 		setupData(data){
 			
-			
-			this.projektarbeiten = data[0]
 			this.domain = data[1]
-			
-			this.tableData = data[0]?.retval?.map(projekt => {
+
+			this.projektarbeiten = data[0]?.retval?.map(projekt => {
 				this.checkAbgabetermineProjektarbeit(projekt)
 				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
@@ -787,7 +796,7 @@ export const AbgabetoolMitarbeiter = {
 			})
 			
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
-			this.$refs.abgabeTable.tabulator.setData(this.tableData);
+			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.$api.call(ApiAbgabe.getMitarbeiterProjektarbeiten(all))

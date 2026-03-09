@@ -50,8 +50,7 @@ class Paabgabe_model extends DB_Model
 					JOIN lehre.tbl_projektbetreuer USING(projektarbeit_id)
 					JOIN public.tbl_benutzer bn_student ON(tbl_projektarbeit.student_uid=bn_student.uid)
 					JOIN public.tbl_person person_student ON(bn_student.person_id=person_student.person_id)
-					JOIN lehre.tbl_lehreinheit ON(tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id)
-					JOIN lehre.tbl_lehrveranstaltung ON(tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id)
+					JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 					JOIN public.tbl_studiengang ON(tbl_lehrveranstaltung.studiengang_kz=tbl_studiengang.studiengang_kz)
 					JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 				WHERE
@@ -68,14 +67,13 @@ class Paabgabe_model extends DB_Model
 			   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
 			   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
 			   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
-			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
+			   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_projektarbeit.studiensemester_kurzbz,
 			   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
 		FROM campus.tbl_paabgabe
 				 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
 				 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
-				 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
-				 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
-				 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
+				 JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				 JOIN public.tbl_studiengang ON(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 				 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 				 JOIN public.tbl_person USING (person_id)
 		
@@ -93,7 +91,7 @@ class Paabgabe_model extends DB_Model
 					   campus.tbl_paabgabe.insertvon, campus.tbl_paabgabe.insertamum, campus.tbl_paabgabe.updatevon, campus.tbl_paabgabe.updateamum,
 					   campus.tbl_paabgabe.note, upload_allowed, beurteilungsnotiz, student_uid, tbl_projektarbeit.note, lehre.tbl_projektarbeit.titel,
 					   UPPER(tbl_studiengang.typ) as stgtyp, UPPER(tbl_studiengang.kurzbz) as stgkz, public.tbl_studiengang.studiengang_kz,
-					   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_lehreinheit.studiensemester_kurzbz,
+					   public.tbl_studiengang.oe_kurzbz as stg_oe_kurzbz, tbl_projektarbeit.studiensemester_kurzbz,
 					   lehre.tbl_projektbetreuer.betreuerart_kurzbz, lehre.tbl_projektbetreuer.person_id,
 					   public.tbl_person.anrede, public.tbl_person.titelpre, public.tbl_person.vorname, public.tbl_person.nachname, public.tbl_person.titelpost
 				
@@ -101,8 +99,7 @@ class Paabgabe_model extends DB_Model
 						 JOIN campus.tbl_paabgabetyp USING (paabgabetyp_kurzbz)
 						 JOIN lehre.tbl_projektarbeit USING (projektarbeit_id)
 						 JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)
-						 JOIN lehre.tbl_lehreinheit using(lehreinheit_id)
-						 JOIN lehre.tbl_lehrveranstaltung using(lehrveranstaltung_id)
+						 JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
 						 JOIN public.tbl_studiengang on(lehre.tbl_lehrveranstaltung.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 						 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 						 JOIN public.tbl_person ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
