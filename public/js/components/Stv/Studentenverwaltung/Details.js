@@ -8,6 +8,11 @@ import ApiStvApp from '../../../api/factory/stv/app.js';
 
 export default {
 	name: "DetailsPrestudent",
+	inject: {
+		currentSemester: {
+			from: 'currentSemester',
+		},
+	},
 	components: {
 		FhcTabs,
 		FhcHeader
@@ -21,6 +26,9 @@ export default {
 	props: {
 		students: Array
 	},
+	emits: [
+		'reloadStudent:students'
+	],
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
@@ -39,13 +47,30 @@ export default {
 					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
-		}
+		},
+/*		studiensemester(){
+			if(this.students)
+				return this.students.query_studiensemester_kurzbz;
+			else
+				return null;
+			//return this.students?[0].query_studiensemester_kurzbz || null;
+		},*/
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
 			if (n !== o && o !== undefined)
 				this.loadConfig();
+		},
+		currentSemester(newVal) {
+			if (
+				this.students &&
+				this.students.length > 0 &&
+				newVal !== this.students[0].query_studiensemester_kurzbz
+			) {
+				this.$emit('reloadStudent:students', this.students);
+			}
 		}
+
 	},
 	methods: {
 		loadConfig() {
@@ -65,7 +90,7 @@ export default {
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
-		}
+		},
 	},
 	created() {
 		this.loadConfig();

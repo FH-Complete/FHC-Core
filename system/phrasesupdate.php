@@ -56144,6 +56144,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Refactor Messages END
+	array(
+		'app' => 'core',
+		'category' => 'lehre',
+		'phrase' => 'textNoStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Status',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

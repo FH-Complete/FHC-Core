@@ -7,6 +7,9 @@ export default {
 			from: 'configDomain',
 			default: 'technikum-wien.at'
 		},
+		currentSemester: {
+			from: 'currentSemester',
+		},
 	},
 	props: {
 		headerData: {
@@ -51,6 +54,10 @@ export default {
 					console.error("Error loading department data:", error);
 				});
 		}
+
+		if(this.headerData){
+			this.getSemesterStati(this.headerData[0].prestudent_id);
+		}
 	},
 	watch: {
 		person_id: {
@@ -65,12 +72,27 @@ export default {
 			},
 			deep: true,
 		},
+		currentSemester: {
+			handler(newVal) {
+				if (newVal) {
+					if(!this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester)) {
+						this.noCurrentStatus = true;
+					}
+					else
+					{
+						this.noCurrentStatus = false;
+					}
+				}
+			},
+			deep: true,
+		},
 	},
 	data(){
 		return{
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
+			noCurrentStatus: false
 		};
 	},
 	methods: {
@@ -109,6 +131,14 @@ export default {
 			} else {
 				return 'data:image/jpeg;base64,' + foto;
 			}
+		},
+		getSemesterStati(prestudent_id){
+			return this.$api
+				.call(ApiDetailHeader.getSemesterStati(prestudent_id))
+				.then(result => {
+					this.semesterStati = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	template: `
@@ -149,11 +179,11 @@ export default {
 							{{headerData[0].person_id}}
 							<strong class="text-muted">| {{$p.t('lehre', 'studiengang')}} </strong>
 							 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
-							<strong v-if="headerData[0].semester" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
+							<strong v-if="headerData[0].semester != null" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
 							  {{headerData[0].semester}}
 							<strong v-if="headerData[0].verband" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
 							{{headerData[0].verband}}
-							<strong v-if="headerData[0].gruppe" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+							<strong v-if="headerData[0].gruppe !== ' ' && headerData[0].gruppe != null" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 							{{headerData[0].gruppe}}
 						 </h5>
 
@@ -162,12 +192,16 @@ export default {
 						<span>
 							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
 						</span>
-						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
-						 {{headerData[0].statusofsemester}}
+						<strong class="text-muted"> | Status </strong>
+						<span v-if="noCurrentStatus">
+							<strong class="text-danger">{{$p.t('lehre', 'textNoStatus')}}</strong>
+						</span>
+						 <span v-else>
+						 	{{headerData[0].statusofsemester}}
+						 </span>
 						<strong class="text-muted"> | {{$p.t('person', 'matrikelnummer')}} </strong>
 						  {{headerData[0].matr_nr}}
 					  </h5>
-
 					</div>
 		</template>
 
