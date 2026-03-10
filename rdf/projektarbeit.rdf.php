@@ -70,7 +70,7 @@ else
 function draw_content($row)
 {
 	global $rdf_url, $datum_obj;
-	$lehreinheit = new lehreinheit($row->lehreinheit_id);
+//	$lehreinheit = new lehreinheit($row->lehreinheit_id);
 	echo '
       <RDF:li>
          <RDF:Description id="'.$row->projektarbeit_id.'"  about="'.$rdf_url.'/'.$row->projektarbeit_id.'" >
@@ -80,8 +80,8 @@ function draw_content($row)
             <PROJEKTARBEIT:titel><![CDATA['.xmlclean($row->titel).']]></PROJEKTARBEIT:titel>
             <PROJEKTARBEIT:titel_english><![CDATA['.xmlclean($row->titel_english).']]></PROJEKTARBEIT:titel_english>
             <PROJEKTARBEIT:lehreinheit_id><![CDATA['.$row->lehreinheit_id.']]></PROJEKTARBEIT:lehreinheit_id>
-            <PROJEKTARBEIT:lehreinheit_stsem><![CDATA['.$lehreinheit->studiensemester_kurzbz.']]></PROJEKTARBEIT:lehreinheit_stsem>
-            <PROJEKTARBEIT:lehrveranstaltung_id><![CDATA['.$lehreinheit->lehrveranstaltung_id.']]></PROJEKTARBEIT:lehrveranstaltung_id>
+            <PROJEKTARBEIT:lehreinheit_stsem><![CDATA['.$row->studiensemester_kurzbz.']]></PROJEKTARBEIT:lehreinheit_stsem>
+            <PROJEKTARBEIT:lehrveranstaltung_id><![CDATA['.$row->lehrveranstaltung_id.']]></PROJEKTARBEIT:lehrveranstaltung_id>
             <PROJEKTARBEIT:student_uid><![CDATA['.$row->student_uid.']]></PROJEKTARBEIT:student_uid>
             <PROJEKTARBEIT:firma_id><![CDATA['.$row->firma_id.']]></PROJEKTARBEIT:firma_id>
             <PROJEKTARBEIT:note><![CDATA['.$row->note.']]></PROJEKTARBEIT:note>

@@ -37,6 +37,8 @@ class projektarbeit extends basis_db
 	public $titel;				// string
 	public $titel_english;		// string
 	public $lehreinheit_id;		// integer
+	public $lehrveranstaltung_id; // integer
+	public $studiensemester_kurzbz; // string
 	public $student_uid;		// integer
 	public $firma_id;			// integer
 	public $note;				// integer
@@ -129,6 +131,8 @@ class projektarbeit extends basis_db
 				$this->titel = $row->titel;
 				$this->titel_english = $row->titel_english;
 				$this->lehreinheit_id = $row->lehreinheit_id;
+				$this->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$this->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$this->student_uid = $row->student_uid;
 				$this->firma_id = $row->firma_id;
 				$this->note = $row->note;
@@ -261,12 +265,15 @@ class projektarbeit extends basis_db
 		{
 			//Neuen Datensatz einfuegen
 
-			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, student_uid, firma_id, note, punkte,
+			$qry='BEGIN; INSERT INTO lehre.tbl_projektarbeit (projekttyp_kurzbz, titel, lehreinheit_id, 
+				lehrveranstaltung_id, studiensemester_kurzbz, student_uid, firma_id, note, punkte,
 				beginn, ende, faktor, freigegeben, gesperrtbis, stundensatz, gesamtstunden, themenbereich, anmerkung,
 				insertamum, insertvon, updateamum, updatevon, titel_english, final) VALUES('.
 				 $this->db_add_param($this->projekttyp_kurzbz).', '.
 				 $this->db_add_param($this->titel).', '.
 				 $this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+				 $this->db_add_param($this->studiensemester_kurzbz).', '.
 				 $this->db_add_param($this->student_uid).', '.
 				 $this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 				 $this->db_add_param($this->note).', '.
@@ -301,6 +308,8 @@ class projektarbeit extends basis_db
 				'titel='.$this->db_add_param($this->titel).', '.
 				'titel_english='.$this->db_add_param($this->titel_english).', '.
 				'lehreinheit_id='.$this->db_add_param($this->lehreinheit_id, FHC_INTEGER).', '.
+				'lehrveranstaltung_id='.$this->db_add_param($this->lehrveranstaltung_id, FHC_INTEGER).', '.
+				'studiensemester_kurzbz='.$this->db_add_param($this->studiensemester_kurzbz).', '.
 				'student_uid='.$this->db_add_param($this->student_uid).', '.
 				'firma_id='.$this->db_add_param($this->firma_id, FHC_INTEGER).', '.
 				'note='.$this->db_add_param($this->note).', '.
@@ -406,6 +415,8 @@ class projektarbeit extends basis_db
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->student_uid = $row->student_uid;
 				$obj->firma_id = $row->firma_id;
 				$obj->note = $row->note;
@@ -470,6 +481,8 @@ class projektarbeit extends basis_db
 				$obj->titel = $row->titel;
 				$obj->titel_english = $row->titel_english;
 				$obj->lehreinheit_id = $row->lehreinheit_id;
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiensemester_kurzbz = $row->studiensemester_kurzbz;
 				$obj->student_uid = $row->student_uid;
 				$obj->firma_id = $row->firma_id;
 				$obj->note = $row->note;
@@ -534,7 +547,6 @@ class projektarbeit extends basis_db
 				pa.projekttyp_kurzbz
 			FROM
 				lehre.tbl_projektarbeit pa
-				JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 				JOIN public.tbl_studiensemester sem USING(studiensemester_kurzbz)
 				LEFT JOIN (
 					SELECT

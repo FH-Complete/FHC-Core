@@ -15,6 +15,9 @@ export default {
 	inject: {
 		defaultSemester: {
 			from: 'defaultSemester'
+		},
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	computed: {
@@ -96,8 +99,8 @@ export default {
 			this.formData.themenbereich = null;
 			this.formData.projekttyp_kurzbz = null;
 			this.formData.firma = null;
-			this.formData.lehrveranstaltung_id = null;
-			this.formData.lehreinheit_id = null;
+			// this.formData.lehrveranstaltung_id = null;
+			// this.formData.lehreinheit_id = null;
 			this.formData.beginn = null;
 			this.formData.ende = null;
 			this.formData.freigegeben = true;
@@ -110,7 +113,7 @@ export default {
 		getFormData(newProjektarbeit, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
 
 			this.additional_lehrveranstaltung_id = additional_lehrveranstaltung_id;
-			this.studiensemester = studiensemester_kurzbz || this.defaultSemester;
+			this.studiensemester = studiensemester_kurzbz || this.currentSemester;
 			this.newProjektarbeit = newProjektarbeit;
 
 			this.$api

@@ -480,7 +480,7 @@ class Projektarbeit_model extends DB_Model
 						LEFT JOIN public.tbl_benutzer student_benutzer ON (student_benutzer.uid = lehre.tbl_projektarbeit.student_uid)
 						LEFT JOIN public.tbl_person student_person ON (student_benutzer.person_id = student_person.person_id)
 						LEFT JOIN public.tbl_student on(student_benutzer.uid = public.tbl_student.student_uid)
-						LEFT JOIN lehre.tbl_lehrveranstaltung ON (lehrveranstaltung_id)
+						LEFT JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 						LEFT JOIN public.tbl_studiengang ON (public.tbl_student.studiengang_kz = public.tbl_studiengang.studiengang_kz)
 						LEFT JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 						LEFT JOIN lehre.tbl_projektbetreuer USING (projektarbeit_id)

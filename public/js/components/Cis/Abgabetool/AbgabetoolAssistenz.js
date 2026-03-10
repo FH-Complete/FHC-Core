@@ -688,10 +688,20 @@ export const AbgabetoolAssistenz = {
 				createButton('fa fa-folder-open', 'abgabetool/c4details', () => this.setDetailComponent(val)),
 				createButton('fa fa-timeline', 'abgabetool/c4termineTimeLine', () => this.openTimeline(val))
 			);
+			if(val.latestTerminWithUpload) {
+				actionButtons.append(
+					createButton('fa fa-download', 'abgabetool/c4downloadLatestAbgabe', () => this.downloadAbgabe(val.latestTerminWithUpload.paabgabe_id, val.student_uid, val.projektarbeit_id))
+				)
+			}
 
 			return actionButtons;
 		},
+		downloadAbgabe(paabgabe_id, student_uid, projektarbeit_id) {
+			const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}&projektarbeit_id=${projektarbeit_id}`;
 
+			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
+			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
+		},
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
 			// but actually just revert it after the fact
@@ -780,12 +790,15 @@ export const AbgabetoolAssistenz = {
 					projekt.note_bez = opt.bezeichnung
 				}
 				
+				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
+				
 				return {
 					...projekt,
 					abgabetermine: projekt.abgabetermine,
 					details: {
 						student_uid: projekt.student_uid,
 						projektarbeit_id: projekt.projektarbeit_id,
+						latestTerminWithUpload: latestTerminWithUpload ?? null
 					},
 					pkz: this.buildPKZ(projekt),
 					beurteilung: projekt.beurteilungLink ?? null,
@@ -798,6 +811,15 @@ export const AbgabetoolAssistenz = {
 					titel: projekt.titel
 				}
 			})
+		},
+		findLatestTerminWithUpload(projekt) {
+			const withAbgabedatumSorted = projekt?.abgabetermine?.filter(t => t.abgabedatum != null)?.sort((a,b) => a < b)
+			
+			if(withAbgabedatumSorted.length) {
+				return withAbgabedatumSorted[0]
+			}
+			
+			return null
 		},
 		createInfoString(data) {
 			let str = '';
@@ -1411,8 +1433,11 @@ export const AbgabetoolAssistenz = {
 		
 		<div id="abgabetable" style="max-height:40vw;">
 			<div class="row">
-				<div class="col-auto">
+				<div class="col-auto me-auto">
 					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
 				</div>
 				<div class="col-3">
 					<Dropdown
@@ -1428,7 +1453,11 @@ export const AbgabetoolAssistenz = {
 						</template>
 					</Dropdown>
 				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/note'))}}:</label>
+				</div>
 				<div class="col-3">
+					
 					<Dropdown
 						:placeholder="$p.t('lehre/note')" 
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 
