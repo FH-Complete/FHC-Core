@@ -179,6 +179,14 @@ export default {
 					handler: this.rowSelectionChanged
 				},
 				{
+					event: 'dataLoading',
+					handler: this.handleDataLoading
+				},
+				{
+					event: 'renderComplete',
+					handler: this.handleRenderComplete
+				},
+				{
 					event: 'dataProcessed',
 					handler: (data) => {
 						this.getAllRows()
@@ -226,7 +234,10 @@ export default {
 			tagEndpoint: ApiTag,
 			currentEndpoint: null,
 			headerFilterActive: false,
-			dragSource: []
+			dragSource: [],
+			oldScrollUrl: '',
+			oldScrollLeft: 0,
+			oldScrollTop: 0
 		}
 	},
 	computed: {
@@ -566,6 +577,24 @@ export default {
 			const isAlreadySelected = this.selected?.some(row => (row.uid ?? row.prestudent_id ?? row.person_id) === id);
 
 			this.dragSource = (isAlreadySelected && this.selected?.length) ? this.selected : [data];
+		},
+		handleDataLoading() {
+			this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
+			this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
+		},
+		handleRenderComplete() {
+			const table = this.$refs.table.tabulator.element.querySelector('.tabulator-tableholder');
+			if(table) {
+				const curAjaxUrl = this.$refs.table.tabulator.getAjaxUrl();
+				if(this.oldScrollUrl === curAjaxUrl) {
+					table.scrollLeft = this.oldScrollLeft;
+					table.scrollTop = this.oldScrollTop;
+				} else {
+					this.oldScrollLeft = table.scrollLeft;
+					this.oldScrollTop = table.scrollTop;
+				}
+				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
+			}
 		},
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
