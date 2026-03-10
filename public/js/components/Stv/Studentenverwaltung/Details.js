@@ -27,7 +27,7 @@ export default {
 		students: Array
 	},
 	emits: [
-		'reloadStudent:students'
+		'reload-students:students'
 	],
 	computed: {
 		appRoot() {
@@ -67,7 +67,7 @@ export default {
 				this.students.length > 0 &&
 				newVal !== this.students[0].query_studiensemester_kurzbz
 			) {
-				this.$emit('reloadStudent:students', this.students);
+				this.$emit('reload-students', this.students);
 			}
 		}
 

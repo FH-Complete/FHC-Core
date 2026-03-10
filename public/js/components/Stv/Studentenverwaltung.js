@@ -423,10 +423,19 @@ export default {
 			this.$refs.searchbar.hideresult();
 		},
 		handleReloadStudent(students){
-			this.$refs.stvList.updateUrl(
+			//TODO(Manu) check with Harald
+
+			this.$refs.details.reload(); //reload simply without updateUrl
+			//this.selected = students;
+
+/*			this.$refs.stvList.updateUrl(
 				ApiStv.students.uid(students[0].uid,'CURRENT_SEMESTER'),
 				true
-			);
+			);*/
+/*			this.$refs.stvList.updateUrl(
+				ApiStv.students.uid(students[0].uid,'CURRENT_SEMESTER'),
+				true
+			);*/
 		}
 	},
 	created() {
@@ -635,7 +644,7 @@ export default {
 							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
 						</template>
 						<template #bottom>
-							<stv-details ref="details" :students="selected" @reloadStudent:students="handleReloadStudent"></stv-details>
+							<stv-details ref="details" :students="selected" @reload-students="handleReloadStudent"></stv-details>
 						</template>
 					</vertical-split>
 				</main>
