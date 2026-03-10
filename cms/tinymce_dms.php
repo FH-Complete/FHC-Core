@@ -1040,6 +1040,8 @@ else
 		{
 			echo '<form action="'.$_SERVER['PHP_SELF'].'?kategorie_kurzbz='.$kategorie_kurzbz.'&page='.$page.'&dpp='.$dpp.'" method="POST" enctype="multipart/form-data">';
 		}
+		$tmp_date = date_create();
+		$gueltig_ab_date = $tmp_date->format('d.m.Y');
 		echo '
 				<input type="hidden" name="kategorie_kurzbz" id="kategorie_kurzbz" value="'.$kategorie_kurzbz.'">
 				<input type="hidden" name="dms_id" id="dms_id" value="">
@@ -1062,10 +1064,10 @@ else
 				</tr>
 				<tr>
 					<td>Gültig ab</td>
-					<td><input id="gueltig_ab" class="datepicker_datum" type="text" name="gueltig_ab" value=""></td>
+					<td><input id="gueltig_ab" class="datepicker_datum" type="text" name="gueltig_ab" value="'.$gueltig_ab_date.'"></td>
 				</tr>
 				<tr>
-                                        <td>Organisationseinheit: <br>(Upload, Ansicht, Änderungen)</td>
+                                        <td>Verantwortliche Organisationseinheit</td>
 					<td>
 						<select name="oe_kurzbz_verantwortlich">
                                                 	<option value="">-- Bitte Auswählen --</option>';
@@ -1662,7 +1664,7 @@ function drawRenameForm($dms_id, $version, $page = NULL, $dpp = NULL, $searching
 			<td><input id="gueltig_ab" class="datepicker_datum" type="text" name="gueltig_ab" value="'.$gueltig_ab_date.'"></td>
 		</tr>
 		<tr>
-                        <td>Organisationseinheit: <br>(Upload, Ansicht, Änderungen)</td>
+                        <td>Verantwortliche Organisationseinheit</td>
 			<td>
 				<select name="oe_kurzbz_verantwortlich">
                                 	<option value="">-- Bitte Auswählen --</option>';
