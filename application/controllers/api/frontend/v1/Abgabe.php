@@ -89,13 +89,15 @@ class Abgabe extends FHCAPI_Controller
 		$abgabetypenBetreuer = $this->config->item('ALLOWED_ABGABETYPEN_BETREUER');
 		$ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT');
 		$ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER');
+		$BETREUER_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('BETREUER_SAMMELMAIL_BUTTON_STUDENT');
 		
 		$ret = array(
 			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
 			'turnitin_link' => $turnitin_link,
 			'abgabetypenBetreuer' => $abgabetypenBetreuer,
 			'ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT' => $ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT,
-			'ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER' => $ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER
+			'ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER' => $ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER,
+			'BETREUER_SAMMELMAIL_BUTTON_STUDENT' => $BETREUER_SAMMELMAIL_BUTTON_STUDENT,
 		);
 		
 		$this->terminateWithSuccess($ret);

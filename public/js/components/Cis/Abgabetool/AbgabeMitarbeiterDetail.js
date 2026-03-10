@@ -17,6 +17,7 @@ export const AbgabeMitarbeiterDetail = {
 		Message: primevue.message,
 		VueDatePicker
 	},
+	emits: ['paUpdated'],
 	inject: [
 		'abgabeTypeOptions',
 		'abgabetypenBetreuer',
@@ -132,8 +133,8 @@ export const AbgabeMitarbeiterDetail = {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
 
-						const existingTerminResCurrObj = this.projektarbeit.abgabetermine.find(paa => paa.paabgabe_id == existingTerminRes.paabgabe_id)
-						existingTerminResCurrObj.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
+						termin.paabgabetyp_kurzbz = newTerminRes.paabgabetyp_kurzbz
+						termin.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
 						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
@@ -174,6 +175,8 @@ export const AbgabeMitarbeiterDetail = {
 					} else {
 						this.showAutomagicModalPhrase = false	
 					}
+					
+					this.$emit("paUpdated", this.projektarbeit)
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
@@ -257,6 +260,7 @@ export const AbgabeMitarbeiterDetail = {
 					// this.$p.t('global/tooltipLektorDeleteKontrolle', [this.$entryParams.permissions.kontrolleDeleteMaxReach ])
 					const deletedTerminIndex = this.projektarbeit.abgabetermine.findIndex(t => t.paabgabe_id === termin.paabgabe_id)
 					this.projektarbeit.abgabetermine.splice(deletedTerminIndex, 1)
+					this.$emit("paUpdated", this.projektarbeit)
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
