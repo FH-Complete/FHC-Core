@@ -130,3 +130,16 @@ $config['students_tab_order'] = [
 	'combinePeople',
 	'archive',
 ];
+
+$config['stv_prestudent_tags'] = [
+	'prioone' => ['readonly' => false],
+	'priotwo' => ['readonly' => true],
+	'hinweis' => ['readonly' => false],
+	'hinweis_assistenz' => ['readonly' => true],
+	'hinweis_kf' => ['readonly' => true],
+	'hinweis_lehrende' => ['readonly' => false],
+	'hinweis_stg_kf' => ['readonly' => true],
+	'finished_stg' => ['readonly' => true],
+	'finished_kf' => ['readonly' => true],
+	'inwork_kf' => ['readonly' => true],
+];
