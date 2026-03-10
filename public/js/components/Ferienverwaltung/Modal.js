@@ -13,16 +13,6 @@ export default {
 		FormValidation,
 		FormInput
 	},
-	props: {
-		//~ ferien_id: {
-			//~ type: Number,
-			//~ default: null
-		//~ }
-		//~ studiengang_kz_list: {
-			//~ type: Array,
-			//~ required: true
-		//~ }
-	},
 	data() {
 		return {
 			oeList: [],
@@ -39,13 +29,7 @@ export default {
 			this.$refs.form.clearValidation();
 			this.loading = true;
 
-			//~ let params = this.data;
 			let saveFunc = this.data.ferien_id ? ApiFerien.update : ApiFerien.insert;
-
-			//~ if (this.data.ferien_id) { // update
-				//~ params = { ...{ ferien_id: this.ferien_id }, ...this.data };
-				//~ let saveFunc = ApiFerien.update;
-			//~ }
 
 			this.$refs.form
 				.call(saveFunc(this.data))
@@ -62,6 +46,7 @@ export default {
 				});
 		},
 		open(data) {
+			this.$refs.form.clearValidation();
 			this.data = data ?? {
 				oe_kurzbz: null,
 				bezeichnung: '',
@@ -100,6 +85,8 @@ export default {
 			this.$refs.modal.show();
 		},
 		getStudienplaene() {
+			if (!this.data.oe_kurzbz) return;
+
 			this.$api
 			.call(ApiFerien.getStudienplaene(this.data.oe_kurzbz, this.data.vondatum, this.data.bisdatum))
 			.then(result => {

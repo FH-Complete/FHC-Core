@@ -26,6 +26,7 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
  */
 class Ferien extends FHCAPI_Controller
 {
+	const DEFAULT_BERECHTIGUNG = 'basis/ferien';
 	const DEFAULT_STUDIENGANG_KZ = 0;
 
 	/**
@@ -34,20 +35,23 @@ class Ferien extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getFerien' => 'basis/ferien:r',
-			'getDefaultVonBis' => 'basis/ferien:r',
-			'getOe' => 'basis/ferien:r',
-			'getStudienplaene' => 'basis/ferien:r',
-			'getFerientypen' => 'basis/ferien:r',
-			'getStg' => 'basis/ferien:r',
-			'insert' => 'basis/ferien:w',
-			'update' => 'basis/ferien:w',
-			'delete' => 'basis/ferien:w'
+			'getFerien' => self::DEFAULT_BERECHTIGUNG.':r',
+			'getDefaultVonBis' => self::DEFAULT_BERECHTIGUNG.':r',
+			'getOe' => self::DEFAULT_BERECHTIGUNG.':r',
+			'getStudienplaene' => self::DEFAULT_BERECHTIGUNG.':r',
+			'getFerientypen' => self::DEFAULT_BERECHTIGUNG.':r',
+			'getStg' => self::DEFAULT_BERECHTIGUNG.':r',
+			'insert' => self::DEFAULT_BERECHTIGUNG.':w',
+			'update' => self::DEFAULT_BERECHTIGUNG.':w',
+			'delete' => self::DEFAULT_BERECHTIGUNG.':w'
 		]);
 
 		// Load models
 		$this->load->model('organisation/Ferien_model', 'FerienModel');
 		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+
+		$this->load->library('PermissionLib');
+
 
 		// Load language phrases
 		$this->loadPhrases([
@@ -67,6 +71,12 @@ class Ferien extends FHCAPI_Controller
 
 		$filterVonDatum = $this->input->get('filterVonDatum');
 		$filterBisDatum = $this->input->get('filterBisDatum');
+
+		if (isset($filterVonDatum) && !isValidDate($filterVonDatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
+
+		if (isset($filterBisDatum) && !isValidDate($filterBisDatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
 
 		$this->FerienModel->addSelect(
 			'tbl_ferien.ferien_id, tbl_ferien.bezeichnung, tbl_ferien.vondatum, tbl_ferien.bisdatum,
@@ -106,7 +116,7 @@ class Ferien extends FHCAPI_Controller
 
 		$result = $this->StudienjahrModel->getAktOrNextStudienjahr(62);
 
-		if (isError($result)) $this->terminateWithError(getError($result));
+		if (isError($result)) return $this->terminateWithError(getError($result));
 
 		if (hasData($result))
 		{
@@ -141,25 +151,24 @@ class Ferien extends FHCAPI_Controller
 	public function getStudienplaene()
 	{
 		// check input
-		//~ $this->load->library('form_validation');
-
-		//~ $this->form_validation->set_rules('oe_kurzbz', 'Organisationseinheit', 'max_length[32]');
-		//~ $this->form_validation->set_rules('vondatum', 'Von Datum', 'is_valid_date');
-		//~ $this->form_validation->set_rules('bisdatum', 'Bis Datum', 'is_valid_date');
-
-		//~ if (!$this->form_validation->run())
-			//~ $this->terminateWithValidationErrors($this->form_validation->error_array());
-
 		$oe_kurzbz = $this->input->get('oe_kurzbz');
 		$vondatum = $this->input->get('vondatum');
 		$bisdatum = $this->input->get('bisdatum');
 
+		if (!isset($oe_kurzbz) || isEmptyString($oe_kurzbz))
+			return $this->terminateWithError($this->p->t('ferien', 'error_missingId', ['id' => 'Organisationseinheit']));
+
+		if (isset($vondatum) && !isValidDate($vondatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
+
+		if (isset($bisdatum) && !isValidDate($bisdatum))
+			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
+
 		// get Studiengang from Oe
 		$result = $this->StudiengangModel->loadWhere(['oe_kurzbz' => $oe_kurzbz]);
 
-
-		if (isError($result)) $this->terminateWithError(getError($result));
-		if (!hasData($result)) $this->terminateWithSuccess([]);
+		if (isError($result)) return $this->terminateWithError(getError($result));
+		if (!hasData($result)) return $this->terminateWithSuccess([]);
 		$studiengangKzArr = array_column(getData($result), 'studiengang_kz');
 
 		// load models
@@ -168,8 +177,8 @@ class Ferien extends FHCAPI_Controller
 
 		// get all Studiensemester in requested date range
 		$result = $this->StudiensemesterModel->getByDateRange($vondatum, $bisdatum);
-		if (isError($result)) $this->terminateWithError(getError($result));
-		if (!hasData($result)) $this->terminateWithSuccess([]);
+		if (isError($result)) return $this->terminateWithError(getError($result));
+		if (!hasData($result)) return $this->terminateWithSuccess([]);
 		$studiensemesterArr = array_column(getData($result), 'studiensemester_kurzbz');
 
 		$studienplaene = [];
@@ -191,8 +200,7 @@ class Ferien extends FHCAPI_Controller
 
 				$result = $this->StudienplanModel->loadWhere($whereArray);
 
-				//$result = $this->StudienplanModel->getStudienplaeneBySemester($studiengang_kz, $studiensemester_kurzbz);
-				if (isError($result)) $this->terminateWithError(getError($result));
+				if (isError($result)) return $this->terminateWithError(getError($result));
 				if (!hasData($result)) continue;
 
 				foreach (getData($result) as $studienplan)
@@ -234,7 +242,6 @@ class Ferien extends FHCAPI_Controller
 		$this->terminateWithSuccess($data);
 	}
 
-
 	/**
 	 * Add Ferien
 	 */
@@ -243,6 +250,10 @@ class Ferien extends FHCAPI_Controller
 		$this->_validate();
 
 		$data = $this->_getData();
+
+		// check permissions for new Ferien
+		if (!$this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, 'suid', $data['oe_kurzbz']))
+			return $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
 
 		// get studiengang_kz from oe, otherwise default kz
 		$this->StudiengangModel->addSelect('studiengang_kz');
@@ -272,13 +283,20 @@ class Ferien extends FHCAPI_Controller
 
 		$data = $this->_getData();
 
-		if (isEmptyArray($data)) $this->terminateWithSuccess(null);
+		// check permissions for existing Ferien
+		$this->_validateBerechtigung('suid', $id);
+
+		// check permissions for new Ferien
+		if (!$this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, 'suid', $data['oe_kurzbz']))
+			return $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
+
+		if (isEmptyArray($data)) return $this->terminateWithSuccess(null);
 
 		$data = array_merge($data, ['ferien_id' => $id, 'updateamum' => date('c'), 'updatevon' => getAuthUID()]);
 
 		$result = $this->FerienModel->update($id, $data);
 
-		if (isError($result)) $this->terminateWithError(getError($result));
+		if (isError($result)) return $this->terminateWithError(getError($result));
 
 		$this->terminateWithSuccess($id);
 	}
@@ -297,25 +315,12 @@ class Ferien extends FHCAPI_Controller
 
 		$ferien_id = $this->input->post('ferien_id');
 
+		$this->_validateBerechtigung('suid', $ferien_id);
+
 		$this->FerienModel->addSelect('ferien_id');
 		$result = $this->FerienModel->load($ferien_id);
 
-		if (!hasData($result))
-			$this->terminateWithError($this->p->t('ferien', 'error_missing', [
-				'ferien_id' => $ferien_id
-			]));
-
-		//~ $_POST['studiengang_kz'] = current($result)->studiengang_kz;
-
-		//~ $this->form_validation->set_rules('studiengang_kz', 'Studiengang', 'has_permissions_for_stg[admin:rw,assistenz:rw]');
-
-		//~ Events::trigger('konto_delete_validation', $this->form_validation);
-
-		//~ if (!$this->form_validation->run())
-			//~ $this->terminateWithValidationErrors($this->form_validation->error_array());
-
-
-		//Events::trigger('konto_delete', $ferien_id);
+		if (!hasData($result)) return $this->terminateWithError($this->p->t('ferien', 'error_missingId', ['ferien_id' => $ferien_id]));
 
 		$result = $this->getDataOrTerminateWithError($this->FerienModel->delete($ferien_id));
 
@@ -340,6 +345,38 @@ class Ferien extends FHCAPI_Controller
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
+	}
+
+	/**
+	 * Checks permission for oe of Ferien. Terminates if unauthorized.
+	 * @param typ permission type suid
+	 * @param ferien_id
+	 * @return void
+	 */
+	private function _validateBerechtigung($typ, $ferien_id)
+	{
+		if (isset($ferien_id))
+		{
+			$this->FerienModel->addSelect('tbl_ferien.oe_kurzbz, stg.oe_kurzbz AS studiengang_oe_kurzbz, studiengang_kz');
+			$this->FerienModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+			$result = $this->FerienModel->load($ferien_id);
+
+			if (isError($result)) return $this->terminateWithError(getError($result));
+
+			if (hasData($result))
+			{
+				$ferien = getData($result)[0];
+
+				if (isset($ferien->oe_kurzbz))
+					$berechtigung_oe_kurzbz = $ferien->oe_kurzbz;
+				elseif (isset($ferien->studiengang_oe_kurzbz))
+					$berechtigung_oe_kurzbz = $ferien->studiengang_oe_kurzbz;
+
+				if ($this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, $typ, $berechtigung_oe_kurzbz)) return;
+			}
+		}
+
+		return $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
 	}
 
 	/**

@@ -14,7 +14,7 @@ class Ferienverwaltung extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => ['admin:r', 'assistenz:r']
+				'index' => ['basis/ferien:r']
 			)
 		);
 

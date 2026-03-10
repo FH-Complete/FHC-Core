@@ -11,13 +11,6 @@ export default {
 		FormInput,
 		FerienModal
 	},
-	props: {
-		//modelValue: Object,
-		//~ config: {
-			//~ type: Object,
-			//~ default: {}
-		//~ }
-	},
 	data() {
 		return {
 			filterVonDatum: null,
@@ -126,7 +119,7 @@ export default {
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('person', 'ferien_edit');
 							button.addEventListener('click', (event) =>
-								this.$refs.modal.open(cell.getData())
+								this.$refs.modal.open(JSON.parse(JSON.stringify(cell.getData()))) // deep copy
 							);
 							container.append(button);
 
@@ -190,27 +183,11 @@ export default {
 		reload() {
 			this.$refs.table.reloadTable();
 		},
-		//~ updateData(data) {
-			//~ if (!data)
-				//~ return this.reload();
-			//~ //this.$refs.table.tabulator.updateOrAddData(data);
-		//~ },
 		actionNew() {
 			this.$refs.modal.open();
 		}
 	},
 	created() {
-		//this.loading = true;
-		//~ this.$api
-			//~ .call(ApiFerienverwaltung.getOe())
-			//~ .then(result => {
-					//~ this.oeList = result.data;
-				//~ }
-			//~ )
-			//~ .catch(error => {
-				//~ if (error)
-					//~ this.$fhcAlert.handleSystemError(error);
-			//~ });
 
 		this.$api
 			.call(ApiFerienverwaltung.getDefaultVonBis())
