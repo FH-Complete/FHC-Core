@@ -338,8 +338,10 @@ if ($typ == 'xls')
 	}
 	$anzahl_lvspalten = $spalte - 2;
 
-	$worksheet->write($zeile, ++$spalte, 'ECTS Summe', $format_bold);
-	$maxlength[$spalte] = 15;
+	$worksheet->write($zeile, ++$spalte, 'ECTS Summe zugeteilt', $format_bold);
+	$maxlength[$spalte] = 20;
+	$worksheet->write($zeile, ++$spalte, 'ECTS Summe gewichtet', $format_bold);
+	$maxlength[$spalte] = 20;
 	$worksheet->write($zeile, ++$spalte, 'Notendurchschnitt', $format_bold);
 	$maxlength[$spalte] = 15;
 	$worksheet->write($zeile, ++$spalte, "Gewichteter\nNotendurchschnitt", $format_bold_wrap);
@@ -421,6 +423,7 @@ if ($typ == 'xls')
 		$summe = 0;
 		$rowcount = 0;
 		$summeects = 0;
+		$total_ects = 0;
 		$gewichtetenote = 0;
 
 		while ($rowcount < $db->db_num_rows($result_lva))
@@ -433,6 +436,7 @@ if ($typ == 'xls')
 			{
 				$note = $noten[$row_lva->lehrveranstaltung_id];
 				$format = 0;
+				$total_ects += $row_lva->ects;
 
 				//wenn für die LV der Studierende eine Nachprüfung hat (z.B. 2 Termin, kommissionelle...)
 				if (isset($pruefungstypen[$row_lva->lehrveranstaltung_id]))
@@ -478,6 +482,7 @@ if ($typ == 'xls')
 				//Keine Note fuer diese LV vorhanden
 				if (in_array($row_lva->lehrveranstaltung_id, $zugeteilte_lvs))
 				{
+					$total_ects += $row_lva->ects;
 					$worksheet->write($zeile, ++$spalte, '', $format_colored_nichteingetragen);
 				}
 				else
@@ -495,6 +500,7 @@ if ($typ == 'xls')
 		if ($summeects != 0)
 			$gewichtetenote /= $summeects;
 
+		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $total_ects), $format_number);
 		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $summeects), $format_number);
 		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $schnitt), $format_number);
 		$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $gewichtetenote), $format_number);
@@ -536,6 +542,7 @@ if ($typ == 'xls')
 		$schnitt = $summe_schnitt / $anzahl_schnitt;
 	else
 		$schnitt = 0;
+	$worksheet->write($zeile, ++$spalte, '-', $format_bold_center);
 	$worksheet->write($zeile, ++$spalte, '-', $format_bold_center);
 	$worksheet->write($zeile, ++$spalte, sprintf("%.2f", $schnitt), $format_number);
 	if ($anzahlgewichtet != 0)
