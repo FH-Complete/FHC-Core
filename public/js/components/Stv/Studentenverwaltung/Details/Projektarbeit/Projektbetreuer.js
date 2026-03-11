@@ -135,7 +135,7 @@ export default {
 						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'projektarbeit', 'ui']);
 
 						const setHeader = (field, text) => {
-							const col = this.$refs.table.tabulator.getColumn(field);
+							const col = this.$refs.projektbetreuerTable.tabulator.getColumn(field);
 							if (!col) return;
 
 							const el = col.getElement();
