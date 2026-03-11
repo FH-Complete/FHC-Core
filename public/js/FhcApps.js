@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2023 fhcomplete.org
+ * Copyright (C) 2025 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,22 +15,36 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import LvTemplateUebersicht from '../../../lehre/lvplanung/LvTemplateUebersicht.js';
-import {CoreNavigationCmpt} from '../../../components/navigation/Navigation.js';
-import PluginsPhrasen from "../../../plugins/Phrasen.js";
 
+const FhcApps = (function() {
+	// Logic to extend app here (like adding components, plugins, ...)
 
-const lvTemplatesApp = Vue.createApp({
-	name: 'LvTemplatesApp',
-	components: {
-		CoreNavigationCmpt,
-		LvTemplateUebersicht
+	function makeExtendable(app) {
+		// apply extensions here
+		return app;
 	}
-});
 
-FhcApps.makeExtendable(lvTemplatesApp);
+	return {
+		makeExtendable
+	};
+})();
 
-lvTemplatesApp
-	.use(primevue.config.default,{zIndex: {overlay: 9999}})
-	.use(PluginsPhrasen)
-	.mount('#main')
+FhcApps.router = (() => {
+	const extraRoutes = [];
+
+	function addRoute(...route) {
+		extraRoutes.push(route);
+	}
+
+	function makeExtendable(router) {
+		while (extraRoutes.length) {
+			router.addRoute(...extraRoutes.shift());
+		}
+		router.replace(router.currentRoute.value.fullPath);
+	}
+
+	return {
+		addRoute,
+		makeExtendable
+	};
+})();
