@@ -144,7 +144,7 @@ export default {
 					type="select"
 					v-model="data.oe_kurzbz"
 					name="oe_kurzbz"
-					:label="$p.t('lehre/organisationseinheit')"
+					:label="$p.t('ferien/organisationseinheit')"
 					@change="getStudienplaene"
 					>
 					<option v-for="oe in oeList" :key="oe.oe_kurzbz" :value="oe.oe_kurzbz">
@@ -156,7 +156,7 @@ export default {
 					type="select"
 					v-model="data.studienplan_id"
 					name="studienplan_id"
-					:label="$p.t('lehre/studienplan')"
+					:label="$p.t('ferien/studienplan')"
 					>
 					<option :value="null">-- {{ $p.t('ui/keineAuswahl') }} --</option>
 					<option v-for="studienplan in studienplaeneList" :key="studienplan.studienplan_id" :value="studienplan.studienplan_id">

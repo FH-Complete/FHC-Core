@@ -72,10 +72,10 @@ class Ferien extends FHCAPI_Controller
 		$filterVonDatum = $this->input->get('filterVonDatum');
 		$filterBisDatum = $this->input->get('filterBisDatum');
 
-		if (isset($filterVonDatum) && !isValidDate($filterVonDatum))
+		if (isset($filterVonDatum) && !is_valid_date($filterVonDatum))
 			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
 
-		if (isset($filterBisDatum) && !isValidDate($filterBisDatum))
+		if (isset($filterBisDatum) && !is_valid_date($filterBisDatum))
 			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
 
 		$this->FerienModel->addSelect(
@@ -158,10 +158,10 @@ class Ferien extends FHCAPI_Controller
 		if (!isset($oe_kurzbz) || isEmptyString($oe_kurzbz))
 			return $this->terminateWithError($this->p->t('ferien', 'error_missingId', ['id' => 'Organisationseinheit']));
 
-		if (isset($vondatum) && !isValidDate($vondatum))
+		if (isset($vondatum) && !is_valid_date($vondatum))
 			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
 
-		if (isset($bisdatum) && !isValidDate($bisdatum))
+		if (isset($bisdatum) && !is_valid_date($bisdatum))
 			return $this->terminateWithError($this->p->t('ui', 'error_invalid_date'), self::ERROR_TYPE_GENERAL);
 
 		// get Studiengang from Oe
@@ -320,7 +320,7 @@ class Ferien extends FHCAPI_Controller
 		$this->FerienModel->addSelect('ferien_id');
 		$result = $this->FerienModel->load($ferien_id);
 
-		if (!hasData($result)) return $this->terminateWithError($this->p->t('ferien', 'error_missingId', ['ferien_id' => $ferien_id]));
+		if (!hasData($result)) return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['ferien_id' => $ferien_id]));
 
 		$result = $this->getDataOrTerminateWithError($this->FerienModel->delete($ferien_id));
 

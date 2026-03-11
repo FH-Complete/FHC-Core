@@ -158,7 +158,7 @@ export default {
 						let cm = this.$refs.table.tabulator.columnManager;
 
 						cm.getColumnByField('ferien_id').component.updateDefinition({
-							title: this.$p.t('ferien', 'ferien_id'),
+							title: this.$p.t('ferien', 'ferienId'),
 						});
 						cm.getColumnByField('vondatum').component.updateDefinition({
 							title: this.$p.t('ferien', 'vondatum'),
@@ -168,6 +168,27 @@ export default {
 						});
 						cm.getColumnByField('bezeichnung').component.updateDefinition({
 							title: this.$p.t('global', 'bezeichnung'),
+						});
+						cm.getColumnByField('oe_kurzbz').component.updateDefinition({
+							title: this.$p.t('ferien', 'oeKurzbezeichnung'),
+						});
+						cm.getColumnByField('oe_bezeichnung').component.updateDefinition({
+							title: this.$p.t('ferien', 'oeBezeichnung'),
+						});
+						cm.getColumnByField('studienplan_bezeichnung').component.updateDefinition({
+							title: this.$p.t('ferien', 'studienplanBezeichnung'),
+						});
+						cm.getColumnByField('ferientyp_kurzbz').component.updateDefinition({
+							title: this.$p.t('ferien', 'ferientypKurzbz'),
+						});
+						cm.getColumnByField('mitarbeiterrelevant').component.updateDefinition({
+							title: this.$p.t('ferien', 'mitarbeiterrelevant'),
+						});
+						cm.getColumnByField('studierendenrelevant').component.updateDefinition({
+							title: this.$p.t('ferien', 'studierendenrelevant'),
+						});
+						cm.getColumnByField('lehre').component.updateDefinition({
+							title: this.$p.t('ferien', 'lehrePlanbar'),
 						});
 						cm.getColumnByField('actions').component.updateDefinition({
 							title: this.$p.t('global', 'aktionen')
