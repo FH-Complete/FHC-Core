@@ -239,6 +239,7 @@ function StudentProjektarbeitDetailDisableFields(val)
 	document.getElementById('student-projektarbeit-button-speichern').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-projekttyp').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').disabled=val;
+	document.getElementById('student-projektarbeit-menulist-studiensemester').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-lehreinheit').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-firma').disabled=val;
 	document.getElementById('student-projektarbeit-menulist-note').disabled=val;
@@ -290,6 +291,7 @@ function StudentProjektarbeitResetFields()
 	document.getElementById('student-projektarbeit-menulist-firma').value='';
 	document.getElementById('student-projektarbeit-menulist-note').value='';
 	document.getElementById('student-projektarbeit-checkbox-final').checked=true;
+	document.getElementById('student-projektarbeit-menulist-studiensemester').value=getStudiensemester();
 
 	var stg_kz = document.getElementById('student-detail-menulist-studiengang_kz').value;
 
@@ -379,6 +381,7 @@ function StudentProjektarbeitAuswahl()
 	lehreinheit_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_id" ));
 	lehrveranstaltung_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehrveranstaltung_id" ));
 	lehreinheit_stsem = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#lehreinheit_stsem" ));
+	projektarbeit_stsem = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#projektarbeit_stsem" ));
 	student_uid = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#student_uid" ));
 	firma_id = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#firma_id" ));
 	note = getTargetHelper(dsource,subject,rdfService.GetResource( predicateNS + "#note" ));
@@ -420,7 +423,7 @@ function StudentProjektarbeitAuswahl()
 
 	// Lehreinheit Drop Down laden
 	var LeDropDown = document.getElementById('student-projektarbeit-menulist-lehreinheit');
-	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+lehreinheit_stsem+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehreinheit.rdf.php?lehrveranstaltung_id='+lehrveranstaltung_id+"&studiensemester_kurzbz="+projektarbeit_stsem+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LeDropDown.database.GetDataSources();
@@ -442,6 +445,7 @@ function StudentProjektarbeitAuswahl()
 	//Werte setzen
 	document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value=projektarbeit_id;
 	document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value=lehreinheit_stsem;
+	document.getElementById('student-projektarbeit-menulist-studiensemester').value=projektarbeit_stsem;
 	document.getElementById('student-projektarbeit-menulist-projekttyp').value=projekttyp_kurzbz;
 	document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value=lehrveranstaltung_id;
 	document.getElementById('student-projektarbeit-menulist-lehreinheit').value=lehreinheit_id;
@@ -539,6 +543,7 @@ function StudentProjektarbeitSpeichern()
 	projektarbeit_id = document.getElementById('student-projektarbeit-textbox-projektarbeit_id').value;
 	projekttyp_kurzbz = document.getElementById('student-projektarbeit-menulist-projekttyp').value;
 	lehrveranstaltung_id = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value;
+	studiensemester_kurzbz = document.getElementById('student-projektarbeit-menulist-studiensemester').value;
 	lehreinheit_id = document.getElementById('student-projektarbeit-menulist-lehreinheit').value;
 	titel = document.getElementById('student-projektarbeit-textbox-titel').value;
 	titel_english = document.getElementById('student-projektarbeit-textbox-titel_english').value;
@@ -585,12 +590,18 @@ function StudentProjektarbeitSpeichern()
 		return false;
 	}
 
-	if(lehreinheit_id=='')
+	if(lehrveranstaltung_id=='')
 	{
-		alert('Bitte einen LV-Teil auswaehlen');
+		alert('Bitte eine Lehrveranstaltung auswaehlen');
 		return false;
 	}
 
+	if(studiensemester_kurzbz=='')
+	{
+		alert('Bitte ein Studiensemester auswaehlen');
+		return false;
+	}
+	
 	if(isNaN(gesamtstunden))
 		gesamtstunden=0;
 
@@ -603,6 +614,8 @@ function StudentProjektarbeitSpeichern()
 	req.add('projekttyp_kurzbz', projekttyp_kurzbz );
 	req.add('titel', titel);
 	req.add('titel_english', titel_english);
+	req.add('lehrveranstaltung_id', lehrveranstaltung_id);
+	req.add('studiensemester_kurzbz', studiensemester_kurzbz);
 	req.add('lehreinheit_id', lehreinheit_id);
 	req.add('student_uid', student_uid);
 	req.add('firma_id', firma_id);
@@ -738,7 +751,7 @@ function StudentProjektarbeitLVAChange()
 	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
 
 	lehrveranstaltung_id = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung').value;
-	studiensemester_kurzbz = getStudiensemester();
+	studiensemester_kurzbz = document.getElementById('student-projektarbeit-menulist-studiensemester').value;
 
 	// Lehreinheit Drop Down laden
 	var LeDropDown = document.getElementById('student-projektarbeit-menulist-lehreinheit');
