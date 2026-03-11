@@ -22,11 +22,272 @@ class AbgabetoolJob extends JOB_Controller
 		$this->_ci->load->model('crm/Student_model', 'StudentModel');
 		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
 		$this->_ci->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
-
+		
+		$this->_ci->load->library('SignatureLib');
+		
 		$this->_ci->load->config('abgabe');
 		$this->loadPhrases([
 			'abgabetool'
 		]);
+		
+		
+	}
+	
+	// basically the notifyBetreuerMail function but email goes to assistenz
+	// and new abgaben are further evaluated for missing signature status
+	public function notifyAssistenzAboutMissingSignatureUploads() {
+		$this->_ci->logInfo('Start job FHC-Core->notifyAssistenzAboutMissingSignatureUploads');
+		
+		$interval = $this->_ci->config->item('PAABGABE_EMAIL_JOB_INTERVAL');
+		$relevantTypes = $this->_ci->config->item('RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ');
+
+		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSinceByAbgabedatum($interval, $relevantTypes);
+		$retval = getData($result);
+
+		// retval are paabgaben joined with projektarbeit and betreuer
+		if(count($retval) == 0) {
+			$this->logInfo("Keine Emails über neue Paabgaben an Assistenzen versandt");
+			return;
+		}
+
+		// group changed/new abgaben for projektarbeiten
+		$projektarbeiten = [];
+		foreach($retval as $abgabeWithNewUpload) {
+			// Check if the current item has a 'projektarbeit_id' field.
+			// Replace 'projektarbeit_id' with the actual key name if it's different.
+			if (isset($abgabeWithNewUpload->projektarbeit_id)) {
+				$projektarbeitId = $abgabeWithNewUpload->projektarbeit_id;
+
+				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
+				// initialize it as an empty array.
+				if (!isset($projektarbeiten[$projektarbeitId])) {
+					$projektarbeiten[$projektarbeitId] = [];
+				}
+				
+				// check signature for that abgabe, main point of this job
+				$this->checkAbgabeSignatur($abgabeWithNewUpload, $abgabeWithNewUpload->student_uid);
+				
+				// Add the current row to the array associated with its 'projektarbeit_id'.
+				$projektarbeiten[$projektarbeitId][] = $abgabeWithNewUpload;
+			}
+		}
+
+		// for each projektarbeit fetch their assistenz and same them in their own dictionary to avoid too many mails
+		$assistenzMap = [];
+		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
+		$projektarbeitBetreuerMap = [];
+		forEach($projektarbeiten as $projektarbeit_id => $abgaben) {
+
+			$assistenzResult = $this->_ci->OrganisationseinheitModel->getAssistenzForOE($abgaben[0]->stg_oe_kurzbz);
+
+			forEach($assistenzResult->retval as $assistenzRow) {
+				if (!isset($assistenzMap[$assistenzRow->person_id])) {
+					$assistenzMap[$assistenzRow->person_id] = [];
+				}
+
+				// Add the current $assistenzRow to the $assistenzMap as an array associated with its projektarbeit_id.
+				$assistenzMap[$assistenzRow->person_id][] = [$projektarbeit_id, $assistenzRow];
+			}
+
+			$betreuerResult = $this->_ci->ProjektbetreuerModel->getAllBetreuerOfProjektarbeit($projektarbeit_id);
+
+			forEach($betreuerResult->retval as $betreuerRow) {
+				if (!isset($projektarbeitBetreuerMap[$projektarbeit_id])) {
+					$projektarbeitBetreuerMap[$projektarbeit_id] = [];
+				}
+
+				// Add the current betreuerRow to the betreuerMap as an array associated with its projektarbeit_id.
+				$projektarbeitBetreuerMap[$projektarbeit_id][] = $betreuerRow;
+			}
+			
+		}
+
+		$count = 0;
+		foreach($assistenzMap as $assistenz_person_id => $tupelArr) {
+
+			$abgabenString = '<div style="font-family: Arial, sans-serif; color: #333;">';
+			$hasIssues = false; // Track if this assistant actually needs an email
+
+			foreach($tupelArr as $tupel) {
+				$projektarbeit_id = $tupel[0];
+				$assistenzRow = $tupel[1];
+
+				$betreuerArray = $projektarbeitBetreuerMap[$projektarbeit_id] ?? [];
+				$allAbgaben = $projektarbeiten[$projektarbeit_id];
+
+				// only keep abgaben that are not correctly signed
+				$issueAbgaben = array_filter($allAbgaben, function($abgabe) {
+					// We only care about cases where it's explicitly NOT true (false, error, or null)
+					return $abgabe->signatur !== true;
+				});
+
+				// if this specific project has no signature issues, skip to the next project
+				if(empty($issueAbgaben)) {
+					continue;
+				}
+
+				// If we reached here, we have at least one issue to report
+				$hasIssues = true;
+
+				// Format the Student Name (using the first available abgabe object)
+				$s = reset($issueAbgaben);
+				$nameParts = array_filter([$s->titelpre, $s->vorname, $s->nachname, $s->titelpost]);
+				$studentFullName = implode(' ', $nameParts);
+
+				// Format the Supervisors string
+				$betreuerStrings = [];
+				foreach($betreuerArray as $b) {
+					$bNameParts = array_filter([$b->titelpre, $b->vorname, $b->nachname, $b->titelpost]);
+					$bFullName = implode(' ', $bNameParts);
+					$betreuerStrings[] = "{$bFullName} ({$b->betreuerart_kurzbz})";
+				}
+				$allBetreuerFormatted = implode(', ', $betreuerStrings);
+
+				$projektarbeit_titel = $s->titel ?? 'Kein Titel vergeben';
+
+				// Project Header Section
+				$abgabenString .= "
+             <div style='margin-top: 25px; padding: 12px; background-color: #fff5f5; border-left: 4px solid #dc3545; border-bottom: 1px solid #fee;'>
+                <strong style='font-size: 16px; color: #b02a37;'>Projekt: {$projektarbeit_titel}</strong><br/>
+                <div style='margin-top: 5px; font-size: 14px;'>
+                   <strong>Studierende/r:</strong> {$studentFullName}
+                </div>
+                <div style='margin-top: 3px; font-size: 14px;'>
+                   <strong>Betreuer:</strong> {$allBetreuerFormatted}
+                </div>
+                <span style='color: #666; font-size: 12px;'>
+                   ID: {$projektarbeit_id} | Stg: {$s->stgtyp}{$s->stgkz} ({$s->studiensemester_kurzbz})
+                </span>
+             </div>";
+
+				// Start Table
+				$abgabenString .= '
+             <table style="width: 100%; border-collapse: collapse; margin-bottom: 25px;">
+                <thead>
+                   <tr style="background-color: #f8f9fa; text-align: left;">
+                      <th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 20%;">Datum</th>
+                      <th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 45%;">Abgabe/Bezeichnung</th>
+                      <th style="padding: 10px; border: 1px solid #ddd; font-size: 13px; width: 35%;">Status</th>
+                   </tr>
+                </thead>
+                <tbody>';
+
+				$printed = []; // lazy hack to avoid duplicate rows
+				foreach ($issueAbgaben as $abgabe) {
+					// if we had this paabgabe already (erstbetreuer/zweitbetreuer fetch achieves duplicates
+					if(in_array($abgabe->paabgabe_id, $printed)) {
+						continue; // skip this forEach iteration
+					}
+					
+					$printed[] = $abgabe->paabgabe_id;
+					
+					$abgabedatumFormatted = (new DateTime($abgabe->abgabedatum))->format('d.m.Y');
+
+					// label and color
+					if ($abgabe->signatur === false) {
+						$sigLabel = "FEHLENDE SIGNATUR";
+						$sigBg = "#dc3545";
+					} elseif ($abgabe->signatur === 'error') {
+						$sigLabel = "PRÜFUNG FEHLGESCHLAGEN";
+						$sigBg = "#fd7e14";
+					} else {
+						$sigLabel = "DATEI NICHT GEFUNDEN";
+						$sigBg = "#6c757d";
+					}
+
+					$abgabenString .= "
+                <tr>
+                   <td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; vertical-align: top;'>{$abgabedatumFormatted}</td>
+                   <td style='padding: 10px; border: 1px solid #ddd; font-size: 13px;'>
+                      <strong>{$abgabe->bezeichnung}</strong>
+                   </td>
+                   <td style='padding: 10px; border: 1px solid #ddd; font-size: 13px; text-align: center;'>
+                      <span style='color: #fff; background-color: {$sigBg}; padding: 3px 8px; border-radius: 3px; font-weight: bold; font-size: 11px;'>
+                        {$sigLabel}
+                      </span>
+                   </td>
+                </tr>";
+				}
+
+				$abgabenString .= '</tbody></table>';
+			}
+
+			$abgabenString .= '</div>';
+
+			// only send the email if at least one project had an issue
+			if ($hasIssues) {
+				$assistenzRow = $tupelArr[0][1];
+				$anrede = $assistenzRow->anrede;
+				$anredeFillString = $assistenzRow->anrede == "Herr" ? "r" : "";
+				$fullFormattedNameString = $assistenzRow->first;
+
+				$path = $this->_ci->config->item('URL_ASSISTENZ');
+				$url = CIS_ROOT . $path;
+
+				$body_fields = array(
+					'anrede' => $anrede,
+					'anredeFillString' => $anredeFillString,
+					'fullFormattedNameString' => $fullFormattedNameString,
+					'abgabenString' => $abgabenString,
+					'linkAbgabetool' => $url
+				);
+
+				$email = $assistenzRow->uid . "@" . DOMAIN;
+
+				sendSanchoMail(
+					'PAANoSigAssSM',
+					$body_fields,
+					$email,
+					$this->p->t('abgabetool', 'c4missingSignatureNotification')
+				);
+
+				$count++;
+			}
+		}
+
+		$this->_ci->logInfo($count . " Emails bezüglich fehlender Signaturen erfolgreich versandt");
+		$this->_ci->logInfo('End job FHC-Core->notifyAssistenzAboutMissingSignatureUploads');
+	}
+
+	/**
+	 * helper function to check the signature status of uploaded files for zwischenabgabe & endupload
+	 */
+	private function checkAbgabeSignatur($abgabe, $student_uid) {
+		$paabgabetypenToCheck = $this->config->item('SIGNATUR_CHECK_PAABGABETYPEN');
+
+		if(!in_array($abgabe->paabgabetyp_kurzbz, $paabgabetypenToCheck)) {
+			return;
+		}
+
+		if (!defined('SIGNATUR_URL')) {
+			$abgabe->signatur = 'error';
+			return;
+		}
+
+		$path = PAABGABE_PATH.$abgabe->paabgabe_id.'_'.$student_uid.'.pdf';
+
+		$signaturVorhanden = null; // if frontend receives null -> indicates no file found at path
+		if(file_exists($path)) {
+
+			// Check if the document is signed
+			$signList = SignatureLib::list($path);
+			if (is_array($signList) && count($signList) > 0)
+			{
+				// The document is signed
+				$signaturVorhanden = true;
+			}
+			elseif ($signList === null)
+			{
+				// frontend knows to handle it this way for signatures
+				$signaturVorhanden = 'error';
+			}
+			else
+			{
+				$signaturVorhanden = false;
+			}
+
+			$abgabe->signatur = $signaturVorhanden;
+		}
 	}
 
 	public function notifyAssistenzAboutChangedAbgaben() {
@@ -234,11 +495,6 @@ class AbgabetoolJob extends JOB_Controller
 		// get all new or changed termine in interval
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
 		$retval = getData($result);
-
-		if(count($retval) == 0) {
-			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
-			return;
-		}
 		
 		// group changed/new abgaben for projektarbeiten
 		$projektarbeiten = [];
@@ -248,15 +504,27 @@ class AbgabetoolJob extends JOB_Controller
 			if (isset($newOrChangedAbgabe->projektarbeit_id)) {
 				$projektarbeitId = $newOrChangedAbgabe->projektarbeit_id;
 
+				// check if the updatevon field is NOT the same as the student the projektarbeit is assigned to
+				// since uploading a file to a paabgabe is also putting updateamum & updatevon
+				// we have our own "student has uploaded a file" emailjob anyways
+				if($newOrChangedAbgabe->student_uid === $newOrChangedAbgabe->updatevon) {
+					continue;
+				}
+				
 				// If the 'projektarbeit_id' is not yet a key in $projektarbeiten, 
 				// initialize it as an empty array.
 				if (!isset($projektarbeiten[$projektarbeitId])) {
 					$projektarbeiten[$projektarbeitId] = [];
 				}
-
+				
 				// Add the current row to the array associated with its 'projektarbeit_id'.
 				$projektarbeiten[$projektarbeitId][] = $newOrChangedAbgabe;
 			}
+		}
+
+		if(count($projektarbeiten) == 0) {
+			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
 		}
 
 		// for each projektarbeit fetch their betreuer and save them in their own dictionary to avoid too many mails
@@ -377,6 +645,11 @@ class AbgabetoolJob extends JOB_Controller
 			);
 			
 			$email = $betreuerRow->uid ? $betreuerRow->uid."@".DOMAIN : $betreuerRow->private_email;
+
+			if(!$email) {
+				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$data->person_id.'".');
+				continue;
+			}
 			
 			// send email with bundled info
 			sendSanchoMail(
@@ -500,6 +773,12 @@ class AbgabetoolJob extends JOB_Controller
 
 			$email = $data->uid ? $data->uid."@".DOMAIN : $data->private_email;
 
+			// in rare cases there are betreuer (often zweitbetreuer) without uid and without private email
+			if(!$email) {
+				$this->_ci->logInfo('Could not send Email for Betreuer PersonID: "'.$data->person_id.'".');
+				continue;
+			}
+			
 			// send email with bundled info
 			sendSanchoMail(
 				'PaabgabeUpdatesBetSM',
