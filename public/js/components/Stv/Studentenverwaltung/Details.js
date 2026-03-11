@@ -2,6 +2,7 @@ import FhcTabs from "../../Tabs.js";
 import FhcHeader from "../../DetailHeader/DetailHeader.js";
 
 import ApiStvApp from '../../../api/factory/stv/app.js';
+import ApiStudent from '../../../api/factory/stv/students.js';
 
 // TODO(chris): alt & title
 // TODO(chris): phrasen
@@ -20,15 +21,13 @@ export default {
 	data() {
 		return {
 			configStudent: {},
-			configStudents: {}
+			configStudents: {},
+			localStudent: null
 		};
 	},
 	props: {
 		students: Array
 	},
-	emits: [
-		'reload-students:students'
-	],
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
@@ -48,27 +47,29 @@ export default {
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		},
-/*		studiensemester(){
-			if(this.students)
-				return this.students.query_studiensemester_kurzbz;
-			else
-				return null;
-			//return this.students?[0].query_studiensemester_kurzbz || null;
-		},*/
+		//for reloading component if data changes
+		headerKey() {
+			return this.students?.[0]?.uid || this.localStudent?.[0]?.uid ||  "empty";
+		}
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
 			if (n !== o && o !== undefined)
 				this.loadConfig();
 		},
+		//ohne zusätzlichen Watcher reload header und details
 		currentSemester(newVal) {
 			if (
 				this.students &&
 				this.students.length > 0 &&
 				newVal !== this.students[0].query_studiensemester_kurzbz
 			) {
-				this.$emit('reload-students', this.students);
+				console.log("studiensemester_kurzbz "  + this.students[0].query_studiensemester_kurzbz + " vs " + newVal);
+				this.reloadDataStudent();
 			}
+		},
+		headerKey(newVal){
+			this.reloadDataStudent();
 		}
 
 	},
@@ -91,10 +92,31 @@ export default {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
 		},
+		reloadDataStudent(){
+			//TODO(check)
+			this.localStudent = null;
+			const studentArr = this.students;
+
+			if (!studentArr || !studentArr.length) {
+				console.log("no data");
+				return;
+			}
+
+			console.log("uid " + studentArr[0].uid);
+
+			this.$api
+				.call(ApiStudent.uid(studentArr[0].uid, this.currentSemester))
+				.then(result => {
+					this.localStudent = result.data;
+				});
+		}
 	},
 	created() {
 		this.loadConfig();
 	},
+	/*	//TODO(remove)
+	* 		{{headerKey}} {{localStudent?.[0]?.uid}} <br> {{ students?.[0]?.uid }}
+	* */
 	template: `
 	<div class="stv-details h-100 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
@@ -102,7 +124,8 @@ export default {
 		</div>
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
-				:headerData="students"
+				:key="headerKey"
+				:headerData="localStudent || students"
 				typeHeader="student"
 			>
 			</fhc-header>
@@ -110,7 +133,7 @@ export default {
 				v-if="students.length == 1"
 				ref="tabs" 
 				:useprimevue="true"
-				:modelValue="students[0]"
+				:modelValue="localStudent[0] || students[0]"
 				:config="config"
 				:default="$route.params.tab"
 				style="flex: 1 1 0%; height: 0%"

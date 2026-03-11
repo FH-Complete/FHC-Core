@@ -422,12 +422,13 @@ export default {
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
 		},
-		handleReloadStudent(students){
-			//TODO(Manu) check with Harald
-
+		handleReloadStudent_DEPR(students){
+	//	@reload-students="handleReloadStudent"
+			//TODO(Manu) delete
 			this.$refs.details.reload(); //reload simply without updateUrl
 			//this.selected = students;
 
+			//analoge to url_studiensemester_kurzbz
 /*			this.$refs.stvList.updateUrl(
 				ApiStv.students.uid(students[0].uid,'CURRENT_SEMESTER'),
 				true
@@ -644,7 +645,7 @@ export default {
 							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></stv-list>
 						</template>
 						<template #bottom>
-							<stv-details ref="details" :students="selected" @reload-students="handleReloadStudent"></stv-details>
+							<stv-details ref="details" :students="selected"></stv-details>
 						</template>
 					</vertical-split>
 				</main>
