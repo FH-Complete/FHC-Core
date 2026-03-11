@@ -552,6 +552,36 @@ class lehreinheitmitarbeiter extends basis_db
 		$beginn = new DateTime($beginn);
 		$ende = new DateTime($ende);
 
+		// get relevant Studiensemester
+		$studiensemester_kurzbz_arr = [];
+
+		$qry = '
+			SELECT
+				studiensemester_kurzbz
+			FROM
+				public.tbl_studiensemester
+			WHERE
+				start BETWEEN
+				'. $this->db_add_param($beginn->format('Y-m-d')). ' AND
+				'. $this->db_add_param($ende->format('Y-m-d'));
+
+		if ($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				$studiensemester_kurzbz_arr[] = $row->studiensemester_kurzbz;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+
+		$lehrgaengeDistr = $this->_getLehrgaengeForDistribution($studiensemester_kurzbz_arr);
+
+		if (!is_array($studiensemester_kurzbz_arr) || empty($studiensemester_kurzbz_arr)) return true;
+
 		$qry = '
 			WITH semester_sws_tbl AS (
 				SELECT DISTINCT lehreinheit_id, studiensemester_kurzbz, lema.semesterstunden,
@@ -565,14 +595,11 @@ class lehreinheitmitarbeiter extends basis_db
 					JOIN public.tbl_studiengang stg ON stg.studiengang_kz = sto.studiengang_kz
 					JOIN public.tbl_studiensemester ss USING (studiensemester_kurzbz)
 				WHERE mitarbeiter_uid =  '. $this->db_add_param($uid). '
-					 AND (
-					 	ss.start BETWEEN
-					 	'. $this->db_add_param($beginn->format('Y-m-d')). ' AND
-					 	'. $this->db_add_param($ende->format('Y-m-d')). ')
+					AND ss.studiensemester_kurzbz IN ('.$this->implode4SQL($studiensemester_kurzbz_arr).')
 				-- nur lehre, die bisgemeldet wird
 					AND lema.bismelden
 				-- keine lehreinheiten ohne semesterstunden
-				AND lema.semesterstunden != 0
+					AND lema.semesterstunden != 0
 			)
 
 			SELECT
@@ -595,6 +622,8 @@ class lehreinheitmitarbeiter extends basis_db
 
 		if ($this->db_query($qry))
 		{
+			$additionalLehrgaenge = [];
+
 			while($row = $this->db_fetch_object())
 			{
 				$obj = new StdClass();
@@ -603,6 +632,66 @@ class lehreinheitmitarbeiter extends basis_db
 				$obj->melde_studiengang_kz = $row->melde_studiengang_kz;
 				$obj->lgartcode = $row->lgartcode;
 				$obj->sws = $row->sws;
+
+				if (isset($lehrgaengeDistr[$uid][$row->studiensemester_kurzbz]))
+				{
+					$lehrgaenge = $lehrgaengeDistr[$uid][$row->studiensemester_kurzbz];
+
+					foreach ($lehrgaenge as $lehreinheit_id => $lehrgangKzArr)
+					{
+						// wenn lehrgang gefunden, zusammenhängende Lehrgaenge holen und sws aufteilen
+						if (array_key_exists($row->studiengang_kz, $lehrgangKzArr))
+						{
+							foreach ($lehrgangKzArr as $studiengang_kz => $lehrgang)
+							{
+								// check: nur eine Studiengangsverknüpfung pro Mitarbeiter, Semester, und Referenzstudiengang
+								if (
+									$studiengang_kz == $row->studiengang_kz
+									|| isset(
+										$additionalLehrgaenge[$uid][$row->studiensemester_kurzbz][$row->studiengang_kz][$studiengang_kz]
+									)
+								) continue;
+
+								// Lehrgang erstellen
+								$lg = new StdClass();
+								$lg->mitarbeiter_uid = $uid;
+								$lg->melde_studiengang_kz = $lehrgang->melde_studiengang_kz;
+								$lg->lgartcode = $lehrgang->lgartcode;
+								$lg->studiengang_kz = $lehrgang->studiengang_kz;
+								$lg->studiensemester_kurzbz = $lehrgang->studiensemester_kurzbz;
+								$lg->summe = $row->summe;
+								$lg->sws = $row->sws;
+								// Lehrgang, der mit Ursprungsstudiengang aufgrund lehreinheit "verknüpft" ist, hinzufügen
+								$additionalLehrgaenge[$uid][$row->studiensemester_kurzbz][$row->studiengang_kz][$studiengang_kz] = $lg;
+							}
+						}
+					}
+
+					// ignorieren, wenn für den Studiengang keine verknüpften Lehrgaenge hat
+					if (isset($additionalLehrgaenge[$uid][$row->studiensemester_kurzbz][$row->studiengang_kz]))
+					{
+						$addLehrgaenge = $additionalLehrgaenge[$uid][$row->studiensemester_kurzbz][$row->studiengang_kz];
+
+						// sws Durchschnitt über alle verknuepften Lehrgaenge berechnet
+						$summeSws = $row->summe/(count($addLehrgaenge) + 1);
+						$sws = $row->sws/(count($addLehrgaenge) + 1);
+
+						// neue sws zuweisen
+						$obj->summe = $summeSws;
+						$obj->sws = $sws;
+
+						foreach ($addLehrgaenge as $conn_ws_studiengang_kz => $lehrgang)
+						{
+							// sws fuer jeden verknuepften Lehrgang zuweisen
+							$lehrgang->summe = $summeSws;
+							$lehrgang->sws = $sws;
+
+							// neue lehrgang sws hinzufuegen
+							$this->result [] = $lehrgang;
+						}
+					}
+				}
+
 				$this->result []= $obj;
 			}
 			return true;
@@ -660,6 +749,65 @@ class lehreinheitmitarbeiter extends basis_db
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get "connected" Lehrgaenge for equal sws distribution.
+	 * @param $studiensemester_kurzbz_arr all semester for which Lehrgaenge should be retrieved
+	 * @return object success or error
+	 */
+	private function _getLehrgaengeForDistribution($studiensemester_kurzbz_arr)
+	{
+		if (!is_array($studiensemester_kurzbz_arr) || empty($studiensemester_kurzbz_arr)) return [];
+
+		$qry = "
+			WITH gruppen AS (
+				SELECT
+					mitarbeiter_uid, lehreinheit_id, lehrveranstaltung_id, studiensemester_kurzbz, sem.start, sem.ende,
+					lehreinheitgruppe_id, studiengang_kz, melde_studiengang_kz, lgartcode
+				FROM
+					lehre.tbl_lehreinheitmitarbeiter lema
+					JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
+					JOIN lehre.tbl_lehreinheitgruppe legr USING (lehreinheit_id)
+					JOIN public.tbl_studiengang stg USING (studiengang_kz)
+					JOIN public.tbl_studiensemester sem USING (studiensemester_kurzbz)
+				WHERE
+					bismelden
+					AND stg.melderelevant
+					AND stg.typ = 'l'
+					AND le.studiensemester_kurzbz IN (".$this->implode4SQL($studiensemester_kurzbz_arr).")
+			)
+			SELECT
+				DISTINCT mitarbeiter_uid, studiensemester_kurzbz, lehreinheit_id, studiengang_kz, melde_studiengang_kz, lgartcode
+			FROM
+				gruppen gr
+			GROUP BY
+				mitarbeiter_uid, studiensemester_kurzbz, lehreinheit_id, studiengang_kz, melde_studiengang_kz, lgartcode
+			ORDER BY
+				mitarbeiter_uid, studiensemester_kurzbz, lehreinheit_id, studiengang_kz, melde_studiengang_kz, lgartcode";
+
+		$lehrgaengeDistributions = [];
+
+		if($this->db_query($qry))
+		{
+			while($row = $this->db_fetch_object())
+			{
+				// group by properties
+				$lehrgaengeDistributions
+					[$row->mitarbeiter_uid]
+					[$row->studiensemester_kurzbz]
+					[$row->lehreinheit_id]
+					[$row->studiengang_kz]
+					= $row;
+			}
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei der Datenbankabfrage';
+			return false;
+		}
+
+		return $lehrgaengeDistributions;
 	}
 
 }
