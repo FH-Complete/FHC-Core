@@ -334,6 +334,10 @@ const app = Vue.createApp({
 // kind of a bandaid for bad css on some pages to avoid horizontal scroll
 setScrollbarWidth();
 app.config.globalProperties.$capitalize = capitalize;
+
+FhcApps.router.makeExtendable(router);
+FhcApps.makeExtendable(app);
+
 app.use(router);
 app.use(primevue.config.default, {
 	zIndex: {

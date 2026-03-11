@@ -20,33 +20,123 @@ class NotizPerson extends Notiz_Controller
 			'isBerechtigt' => ['admin:r', 'assistenz:r'],
 			'getCountNotes' => ['admin:r', 'assistenz:r'],
 		]);
+
+		//Load Models
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
+		$this->load->model('crm/Student_model', 'StudentModel');
+
+		//Permission checks for allowed Oes
+		if ($this->router->method == 'addNewNotiz')
+		{
+			$json = $this->input->post('data');
+			$post_data = json_decode($json, true);
+			$person_id = $post_data['id'];
+
+			$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
+
+			if(!$person_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
+			}
+			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+		}
+
+		if ( $this->router->method == 'updateNotiz')
+		{
+			$json = $this->input->post('data');
+			$post_data = json_decode($json, true);
+			$notiz_id = $post_data['notiz_id'];
+
+			if(!$notiz_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Notiz ID']), self::ERROR_TYPE_GENERAL);
+			}
+
+			//get person_id
+			$result = $this->NotizzuordnungModel->loadWhere(['notiz_id' => $notiz_id]);
+
+			$data = $this->getDataOrTerminateWithError($result);
+			$person_id = current($data)->person_id;
+
+			$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
+			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+		}
+
+		if ($this->router->method == 'deleteNotiz' )
+		{
+			$notiz_id = $this->input->post('notiz_id');
+			$person_id = $this->input->post('id');
+
+			if(!$notiz_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Notiz ID']), self::ERROR_TYPE_GENERAL);
+			}
+
+			if(!$person_id)
+			{
+				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'person ID']), self::ERROR_TYPE_GENERAL);
+			}
+
+			$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
+			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+		}
 	}
 
 	public function isBerechtigt($id, $typeId)
 	{
 		if($typeId != "person_id")
 		{
-			return $this->terminateWithError($this->p->t('ui', 'error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui', 'error_typeNotizIdIncorrect'), self::ERROR_TYPE_GENERAL);
 		}
 
-		//TODO define permission
 		if (!$this->permissionlib->isBerechtigt('admin', 'suid') && !$this->permissionlib->isBerechtigt('assistenz', 'suid'))
 		{
 			$result =  $this->p->t('lehre', 'error_keineSchreibrechte');
-
-			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 
-		return $this->outputJsonSuccess(true);
+		$this->terminateWithSuccess("berechtigt in überschreibender Funktion");
 	}
 
-	public function loadDokumente()
+	//stv: if person has permission of one studiengang of person -> permission to add/update/delete Note
+	private function _checkIfBerechtigungForOneUidExists($person_id, $allowedStgs)
 	{
-		$notiz_id = $this->input->post('notiz_id');
+		//get all studentUids of person_id
+		$result = $this->BenutzerModel->loadWhere(['person_id' => $person_id]);
+		$data = $this->getDataOrTerminateWithError($result);
 
-		// TODO(chris): make CI variant of endpoint
-		$this->NotizModel->addSelect($this->NotizModel->escape(base_url('content/notizdokdownload.php?id=')) . ' || campus.tbl_dms_version.dms_id AS preview');
-		
-		return parent::loadDokumente();
+		$checkarray = [];
+		foreach ($data as $item)
+		{
+			//check if isStudent
+			$result = $this->StudentModel->isStudent($item->uid);
+
+			$isStudent = $this->getDataOrTerminateWithError($result);
+			if($isStudent)
+			{
+				$checkarray[]  = $this->_checkAllowedStgsFromUid($item->uid, $allowedStgs);
+			}
+
+		}
+		if (!in_array(1, $checkarray))
+			return $this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg'), self::ERROR_TYPE_GENERAL);
+	}
+
+	private function _checkAllowedStgsFromUid($student_uid, $allowedStgs)
+	{
+		$this->load->model('crm/Student_model', 'StudentModel');
+		$result = $this->StudentModel->loadWhere(['student_uid' => $student_uid]);
+
+		$data = $this->getDataOrTerminateWithError($result);
+		$studiengang_kz = current($data)->studiengang_kz;
+
+		if (!in_array($studiengang_kz, $allowedStgs))
+		{
+			return 0;
+		}
+		else
+		{
+			return 1;
+		}
 	}
 }
