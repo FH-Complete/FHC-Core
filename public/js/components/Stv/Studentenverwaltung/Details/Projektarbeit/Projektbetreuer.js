@@ -121,7 +121,6 @@ export default {
 				height: 'auto',
 				minHeight: '100',
 				selectable: true,
-				selectable: 1,
 				index: 'betreuer_id',
 				persistence:{
 					columns: true, //persist column layout

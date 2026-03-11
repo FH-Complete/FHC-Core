@@ -667,8 +667,10 @@ export const AbgabetoolMitarbeiter = {
 		setDetailComponent(details){
 			this.loading=true
 
-			const pa = this.projektarbeiten?.retval?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
+			const projektarbeiten = this.projektarbeiten?.retval ?? this.projektarbeiten
 
+			const pa = projektarbeiten.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
+			
 			let paIsBenotet = false
 			if(pa.note !== undefined && pa.note !== null) {
 				// check if the note is not defined as a non final projektarbeit note
