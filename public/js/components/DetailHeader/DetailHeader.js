@@ -306,7 +306,7 @@ export default {
 						</span>
 						<strong class="text-muted"> | Status </strong>
 						<span v-if="noCurrentStatus">
-							<strong class="text-danger">{{$p.t('lehre', 'textNoStatus')}}</strong>
+							<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
 						</span>
 				 		<span v-else>
 					 		{{headerData[0].statusofsemester}}

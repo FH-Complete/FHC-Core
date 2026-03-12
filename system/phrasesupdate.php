@@ -56951,18 +56951,18 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
-		'phrase' => 'textNoStatus',
+		'phrase' => 'textNoStatusInSem',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Status',
+				'text' => 'Kein Status im {sem}',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No status',
+				'text' => 'No status in {sem}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
