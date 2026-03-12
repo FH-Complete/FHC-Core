@@ -108,6 +108,10 @@ class Student extends FHCAPI_Controller
 		$this->PrestudentModel->addSelect('p.matr_nr');
 		$this->PrestudentModel->addSelect('p.anrede');
 		$this->PrestudentModel->addSelect('p.zugangscode');
+		if($this->permissionlib->isBerechtigt('student/bpk'))
+		{
+			$this->PrestudentModel->addSelect('p.bpk');
+		}
 
 		if (defined('ACTIVE_ADDONS') && strpos(ACTIVE_ADDONS, 'bewerbung') !== false) {
 			$this->PrestudentModel->addSelect(

@@ -46,7 +46,19 @@ export default {
 					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
-		}
+		},
+		tile_PersId(){
+			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
+			return tile;
+		},
+		tile_MatrNr(){
+			let tile = this.students[0].matr_nr != null ? this.students[0].matr_nr : '-';
+			return tile;
+		},
+		tile_PersKz(){
+			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
+			return tile;
+		},
 	},
 	watch: {
 		'$p.user_language.value'(n, o) {
@@ -89,23 +101,22 @@ export default {
 				this.$refs.tabs.$refs.current.reload();
 		},
 		reloadDataStudent(){
-			//TODO(check)
 			this.localStudent = null;
 			const studentArr = this.students;
 
 			if (!studentArr || !studentArr.length) {
-				console.log("no data");
 				return;
 			}
-
-			console.log("uid " + studentArr[0].uid);
 
 			this.$api
 				.call(ApiStudent.uid(studentArr[0].uid, this.currentSemester))
 				.then(result => {
 					this.localStudent = result.data;
 				});
-		}
+		},
+		reloadList() {
+			this.$emit('reload');
+		},
 	},
 	created() {
 		this.loadConfig();
@@ -118,8 +129,18 @@ export default {
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
 				:headerData="localStudent || students"
+				:currentSemester="currentSemester"
 				typeHeader="student"
+				@reload="reloadList"
+				fotoEditable
 			>
+				<template #uid>{{students[0].uid}}</template>
+				<template #titleAlphaTile>PersID</template>
+				<template #valueAlphaTile>{{tile_PersId}}</template>
+				<template #titleBetaTile>MatrNr</template>
+				<template #valueBetaTile>{{tile_MatrNr}}</template>
+				<template #titleGammaTile>PersKz</template>
+				<template #valueGammaTile>{{tile_PersKz}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"

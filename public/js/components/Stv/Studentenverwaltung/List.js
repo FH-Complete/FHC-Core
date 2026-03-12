@@ -1,5 +1,11 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ListNew from './List/New.js';
+import CoreTag from '../../Tag/Tag.js';
+import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
+import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
+import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
+
+import ApiTag from "../../../api/factory/stv/tag.js";
 import ListFilter from './List/Filter.js';
 
 import { capitalize } from '../../../helpers/StringHelpers.js';
@@ -11,6 +17,7 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		ListNew,
+		CoreTag,
 		ListFilter
 	},
 	directives: {
@@ -28,7 +35,11 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 			required: true
-		}
+		},
+		tagsEnabled: {
+			from: 'configStvTagsEnabled',
+			default: false
+		},
 	},
 	props: {
 		selected: Array,
@@ -36,7 +47,8 @@ export default {
 		studiensemesterKurzbz: String
 	},
 	emits: [
-		'update:selected'
+		'update:selected',
+		'filterActive'
 	],
 	data() {
 		function dateFormatter(cell)
@@ -123,11 +135,13 @@ export default {
 							"tristate":true, elementAttributes:{"value":"true"}
 						}, headerFilterEmptyCheck:function(value){return value === null}
 					},
+					{title:"Unruly", field:"unruly", visible:false},
 				],
 				rowFormatter(row) {
 					if (row.getData().bnaktiv === false) {
 						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
+					row.getElement().draggable = true
 				},
 
 				ajaxRequestFunc: (url, config, params) => {
@@ -154,10 +168,10 @@ export default {
 				layout: 'fitDataStretch',
 				layoutColumnsOnNewData: false,
 				height: '100%',
-				selectable: true,
-				selectableRangeMode: 'click',
+				selectableRows: true,
+				selectableRowsRangeMode: 'click',
 				index: 'prestudent_id',
-				persistenceID: 'stv-list'
+				persistenceID: 'stv-list',
 			},
 			tabulatorEvents: [
 				{
@@ -165,8 +179,19 @@ export default {
 					handler: this.rowSelectionChanged
 				},
 				{
+					event: 'dataLoading',
+					handler: this.handleDataLoading
+				},
+				{
+					event: 'renderComplete',
+					handler: this.handleRenderComplete
+				},
+				{
 					event: 'dataProcessed',
-					handler: this.autoSelectRows
+					handler: (data) => {
+						this.getAllRows()
+						this.autoSelectRows(data)
+					}
 				},
 				{
 					event: 'dataLoaded',
@@ -179,6 +204,22 @@ export default {
 				{
 					event: 'rowClick',
 					handler: this.handleRowClick // TODO(chris): this should be in the filter component
+				},
+				{
+					event: 'dataTreeRowExpanded',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: 'dataTreeRowCollapsed',
+					handler: (data) => {
+						this.getExpandedRows()
+					}
+				},
+				{
+					event: 'rowMouseDown',
+					handler: this.handleMouseDown
 				}
 			],
 			focusObj: null, // TODO(chris): this should be in the filter component
@@ -187,7 +228,16 @@ export default {
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
-			currentEndpoint: null
+			//tags
+			expanded: [],
+			selectedColumnValues: [],
+			tagEndpoint: ApiTag,
+			currentEndpoint: null,
+			headerFilterActive: false,
+			dragSource: [],
+			oldScrollUrl: '',
+			oldScrollLeft: 0,
+			oldScrollTop: 0
 		}
 	},
 	computed: {
@@ -203,7 +253,9 @@ export default {
 				+ ': <strong>' + (this.count || 0) + '</strong>';
 		},
 		selectedDragObject() {
-			return this.selected.map(item => {
+			let items = this.dragSource?.length ? this.dragSource : this.selected;
+
+			return items.map(item => {
 				let type, id;
 				if (item.uid) {
 					type = 'student';
@@ -238,6 +290,21 @@ export default {
 			let today = new Date().toLocaleDateString('en-GB')
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
+		},
+	},
+	created: function() {
+		if(this.tagsEnabled) {
+			const coltags = {
+				title: 'Tags',
+				field: 'tags',
+				tooltip: false,
+				headerFilter: "input",
+				headerFilterFunc: tagHeaderFilter,
+				headerFilterFuncParams: {field: 'tags'},
+				formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
+				width: 150,
+			};
+			this.tabulatorOptions.columns.splice(2, 0, coltags);
 		}
 	},
 	watch: {
@@ -332,17 +399,12 @@ export default {
 				this.$emit('update:selected', data);
 			}
 
-			// set selected elements draggable
-			const tableEl = this.$refs.table?.$refs?.table;
-			if (tableEl) {
-				const oldDragables = tableEl.querySelectorAll('[draggable]');
-				for (const draggable of oldDragables)
-					draggable.removeAttribute('draggable');
-			}
-			rows.forEach(row => row.getElement().draggable = true);
+			//for tags
+			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
 		},
 		autoSelectRows(data) {
-			if (this.lastSelected) {
+			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
 				// NOTE(chris): reselect rows on refresh
 				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
 				// TODO(chris): unselect current item if it's no longer in the table?
@@ -351,7 +413,7 @@ export default {
 
 				if (selected.length)
 					this.$refs.table.tabulator.selectRow(selected);
-			} else if(this.lastSelected === undefined) {
+			} else if(data && this.lastSelected === undefined) {
 				// NOTE(chris): select row if it's the only one (preferably only on startup)
 				if (data.length == 1) {
 					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
@@ -360,13 +422,14 @@ export default {
 		},
 		updateFilter(filter) {
 			this.filter = filter;
+			this.$emit('filterActive', filter);
 			this.updateUrl();
 		},
 		updateUrl(endpoint, first) {
 			this.lastSelected = first ? undefined : this.selected;
 
-			console.log('function param endpoint: ' + JSON.stringify(endpoint));
-			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));
+/*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
 			if( endpoint === undefined && this.currentEndpoint === null)
 			{
@@ -397,6 +460,7 @@ export default {
 			this.tabulatorOptions.ajaxURL = endpoint.url;
 			this.tabulatorOptions.ajaxParams = { ...params };
 			this.tabulatorOptions.ajaxConfig = {method};
+
 			if (!this.$refs.table.tableBuilt) {
 				if (this.$refs.table.tabulator) {
 					this.$refs.table.tabulator.on("tableBuilt", () => {
@@ -407,6 +471,7 @@ export default {
 				this.$refs.table.tabulator.setData(endpoint.url, params, method);
 		},
 		dragCleanup(evt) {
+			this.dragSource = [];
 			if (evt.dataTransfer.dropEffect == 'none')
 				return; // aborted or wrong target
 			
@@ -414,6 +479,14 @@ export default {
 		},
 		onKeydown(e) { // TODO(chris): this should be in the filter component
 			if (!this.focusObj)
+				return;
+
+			// Ignore typing inside editable elements
+			if (
+				e.target instanceof HTMLInputElement ||
+				e.target instanceof HTMLTextAreaElement ||
+				e.target.isContentEditable
+			)
 				return;
 
 			var next;
@@ -478,7 +551,57 @@ export default {
 		clearSelection(){
 			this.lastSelected = [];
 			this.$emit('update:selected',[]);
-		}
+		},
+		//methods tags
+		addedTag(addedTag)
+		{
+			addTagInTable(addedTag, this.allRows, 'prestudent_id')
+		},
+		deletedTag(deletedTag)
+		{
+			deleteTagInTable(deletedTag, this.allRows);
+		},
+		updatedTag(updatedTag)
+		{
+			updateTagInTable(updatedTag, this.allRows)
+		},
+		getAllRows() {
+			this.allRows = this.$refs.table.tabulator.getRows();
+		},
+		resetFilter(){
+			this.$refs.listfilter.resetFilter();
+			this.$refs.table.clearFilters();
+		},
+		handleHeaderFilter(filterActive){
+			this.headerFilterActive = filterActive;
+		},
+		handleMouseDown(e, row)
+		{
+			let data = row.getData();
+			let id = data.uid ?? data.prestudent_id ?? data.person_id;
+
+			const isAlreadySelected = this.selected?.some(row => (row.uid ?? row.prestudent_id ?? row.person_id) === id);
+
+			this.dragSource = (isAlreadySelected && this.selected?.length) ? this.selected : [data];
+		},
+		handleDataLoading() {
+			this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
+			this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
+		},
+		handleRenderComplete() {
+			const table = this.$refs.table.tabulator.element.querySelector('.tabulator-tableholder');
+			if(table) {
+				const curAjaxUrl = this.$refs.table.tabulator.getAjaxUrl();
+				if(this.oldScrollUrl === curAjaxUrl) {
+					table.scrollLeft = this.oldScrollLeft;
+					table.scrollTop = this.oldScrollTop;
+				} else {
+					this.oldScrollLeft = table.scrollLeft;
+					this.oldScrollTop = table.scrollTop;
+				}
+				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
+			}
+		},
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
@@ -506,11 +629,42 @@ export default {
 				:new-btn-label="$p.t('stv/action_new')"
 				@click:new="actionNewPrestudent"
 				@table-built="translateTabulator"
+				:useSelectionSpan="false"
+				@headerFilterOn="handleHeaderFilter"
 			>
+
+			<template #actions>
+				<core-tag ref="tagComponent"
+					v-if="tagsEnabled"
+					:endpoint="tagEndpoint"
+					:values="selectedColumnValues"
+					@added="addedTag"
+					@deleted="deletedTag"
+					@updated="updatedTag"
+					zuordnung_typ="prestudent_id"
+				></core-tag>
+			</template>
+
+			<template #actions v-if="filter.length || headerFilterActive">
+			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
+				<p class="text-danger mb-0">
+				  <strong>{{$p.t('filter','filterActive')}}</strong>
+				</p>
+
+				<button
+				  class="btn btn-outline-danger sm"
+				  :title="$p.t('filter/filterDelete')"
+				  @click="resetFilter"
+				>
+				 <span class="fa-solid fa-filter-circle-xmark"></span>
+				</button>
+			  </div>
+			</template>
+
 			<template #filter>
-				<div class="card">
-					<div class="card-body">
-						<list-filter @change="updateFilter" />
+				<div class="card mt-2">
+					<div class="card-body p-2">
+						<list-filter ref="listfilter" @change="updateFilter" :filterActive="filter.length"/>
 					</div>
 				</div>
 			</template>

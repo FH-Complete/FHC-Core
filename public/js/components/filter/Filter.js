@@ -48,7 +48,8 @@ export const CoreFilterCmpt = {
 		'nwNewEntry',
 		'click:new',
 		'tableBuilt',
-		'uuidDefined'
+		'uuidDefined',
+		'headerFilterOn'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -345,6 +346,7 @@ export const CoreFilterCmpt = {
 
 			this.tabulator.on("dataFiltered", filters => {
 				this.filterActive = filters.length > 0;
+				this.$emit("headerFilterOn", this.filterActive);
 			});
 		},
 		updateTabulator() {
@@ -377,9 +379,6 @@ export const CoreFilterCmpt = {
 				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
 			});
 		},
-		/**
-		 *
-		 */
 		getFilter() {
 			if (this.selectedFilter === null)
 				this.startFetchCmpt(
