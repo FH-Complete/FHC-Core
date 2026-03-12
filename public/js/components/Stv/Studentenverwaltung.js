@@ -422,22 +422,6 @@ export default {
 			this.$refs.searchbar.abort();
 			this.$refs.searchbar.hideresult();
 		},
-		handleReloadStudent_DEPR(students){
-	//	@reload-students="handleReloadStudent"
-			//TODO(Manu) delete
-			this.$refs.details.reload(); //reload simply without updateUrl
-			//this.selected = students;
-
-			//analoge to url_studiensemester_kurzbz
-/*			this.$refs.stvList.updateUrl(
-				ApiStv.students.uid(students[0].uid,'CURRENT_SEMESTER'),
-				true
-			);*/
-/*			this.$refs.stvList.updateUrl(
-				ApiStv.students.uid(students[0].uid,'CURRENT_SEMESTER'),
-				true
-			);*/
-		}
 	},
 	created() {
 		if (!this.url_studiensemester_kurzbz) {

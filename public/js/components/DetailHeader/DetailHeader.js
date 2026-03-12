@@ -145,7 +145,6 @@ getSemesterStati(prestudent_id){
 		.call(ApiDetailHeader.getSemesterStati(prestudent_id))
 		.then(result => {
 			this.semesterStati = result.data;
-			//console.log("getSemesterStati loaded for prestudent_id " + prestudent_id);
 		})
 		.catch(this.$fhcAlert.handleSystemError);
 }

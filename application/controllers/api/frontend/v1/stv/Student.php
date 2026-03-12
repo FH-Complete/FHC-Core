@@ -140,6 +140,7 @@ class Student extends FHCAPI_Controller
 				. $this->PrestudentModel->escape($studiensemester_kurzbz)
 				. ")  AS statusofsemester"
 		);
+		$this->PrestudentModel->addSelect($this->PrestudentModel->escape($studiensemester_kurzbz) . ' as query_studiensemester_kurzbz');
 
 		$this->PrestudentModel->addJoin('public.tbl_student s', 'prestudent_id', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_benutzer b', 'student_uid = uid', 'LEFT');

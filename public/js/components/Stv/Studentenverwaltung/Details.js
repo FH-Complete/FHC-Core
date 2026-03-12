@@ -46,10 +46,6 @@ export default {
 					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
-		},
-		//for reloading component if data changes
-		headerKey() {
-			return this.students?.[0]?.uid || this.localStudent?.[0]?.uid ||  "empty";
 		}
 	},
 	watch: {
@@ -57,21 +53,21 @@ export default {
 			if (n !== o && o !== undefined)
 				this.loadConfig();
 		},
-		//ohne zusätzlichen Watcher reload header und details
 		currentSemester(newVal) {
 			if (
-				this.students &&
-				this.students.length > 0 &&
+				Array.isArray(this.students) &&
+				this.students.length === 1 &&
 				newVal !== this.students[0].query_studiensemester_kurzbz
 			) {
-				console.log("studiensemester_kurzbz "  + this.students[0].query_studiensemester_kurzbz + " vs " + newVal);
 				this.reloadDataStudent();
 			}
+			else {
+				this.localStudent = null;
+			}
 		},
-		headerKey(newVal){
-			this.reloadDataStudent();
+		students() {
+			this.localStudent = null;
 		}
-
 	},
 	methods: {
 		loadConfig() {
@@ -114,9 +110,6 @@ export default {
 	created() {
 		this.loadConfig();
 	},
-	/*	//TODO(remove)
-	* 		{{headerKey}} {{localStudent?.[0]?.uid}} <br> {{ students?.[0]?.uid }}
-	* */
 	template: `
 	<div class="stv-details h-100 d-flex flex-column">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
@@ -124,16 +117,15 @@ export default {
 		</div>
 		<div v-else-if="configStudent && configStudents" class="d-flex flex-column h-100">
 			<fhc-header
-				:key="headerKey"
 				:headerData="localStudent || students"
 				typeHeader="student"
 			>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"
-				ref="tabs" 
+				ref="tabs"
 				:useprimevue="true"
-				:modelValue="localStudent[0] || students[0]"
+				:modelValue="(Array.isArray(localStudent) && localStudent[0]) || students[0]"
 				:config="config"
 				:default="$route.params.tab"
 				style="flex: 1 1 0%; height: 0%"
