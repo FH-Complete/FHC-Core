@@ -37,7 +37,7 @@ export default {
 	getSemesterStati(prestudent_id){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/detailheader/DetailHeader/getSemesterStati/' + prestudent_id,
+			url: 'api/frontend/v1/detailheader/detailheader/getSemesterStati/' + prestudent_id,
 		};
 	},
 }
