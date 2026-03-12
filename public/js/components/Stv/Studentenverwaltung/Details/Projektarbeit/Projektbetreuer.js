@@ -120,12 +120,12 @@ export default {
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',
-				selectable: true,
+				selectableRows: true,
 				index: 'betreuer_id',
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektbetreuer-2025121201'
+				persistenceID: 'stv-details-projektbetreuer-20260217'
 			},
 			tabulatorEvents: [
 				{
@@ -133,45 +133,33 @@ export default {
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'projektarbeit', 'ui']);
 
-						let cm = this.$refs.projektbetreuerTable.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.projektbetreuerTable.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('nachname').component.updateDefinition({
-							title: this.$p.t('person', 'nachname')
-						});
-						cm.getColumnByField('vorname').component.updateDefinition({
-							title: this.$p.t('person', 'vorname')
-						});
-						cm.getColumnByField('note').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'note')
-						});
-						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'punkte')
-						});
-						cm.getColumnByField('stunden').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'stunden')
-						});
-						cm.getColumnByField('stundensatz').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'stundensatz')
-						});
-						cm.getColumnByField('betreuerart_kurzbz').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'betreuerart_kurzbz')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-						cm.getColumnByField('vertrag_id').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'vertrag_id')
-						});
-						cm.getColumnByField('projektarbeit_id').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'projektarbeit_id')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'actions')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('nachname', this.$p.t('person', 'nachname'));
+						setHeader('vorname', this.$p.t('person', 'vorname'));
+						setHeader('note', this.$p.t('projektarbeit', 'note'));
+						setHeader('punkte', this.$p.t('projektarbeit', 'punkte'));
+						setHeader('stunden', this.$p.t('projektarbeit', 'stunden'));
+						setHeader('stundensatz', this.$p.t('projektarbeit', 'stundensatz'));
+						setHeader('betreuerart_kurzbz', this.$p.t('projektarbeit', 'betreuerart_kurzbz'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('vertrag_id', this.$p.t('projektarbeit', 'vertrag_id'));
+						setHeader('projektarbeit_id', this.$p.t('projektarbeit', 'projektarbeit_id'));
+						setHeader('actions', this.$p.t('global', 'actions'));
 
 						// Force layout recalculation for handling overflow text
 						this.$refs.projektbetreuerTable.tabulator.redraw(true);
-
 					}
 				},
 				{
