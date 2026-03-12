@@ -182,9 +182,13 @@ class projektarbeit extends basis_db
 		{
 			$this->errormsg='Projekttyp_kurzbz darf nicht NULL sein!';
 		}
-		if ($this->lehreinheit_id==null)
+		if ($this->lehrveranstaltung_id==null)
 		{
-			$this->errormsg='Lehreinheit_id darf nicht NULL sein!';
+			$this->errormsg='Lehrveranstaltung_id darf nicht NULL sein!';
+		}
+		if ($this->studiensemester_kurzbz==null)
+		{
+			$this->errormsg='Studiensemester_kurzbz darf nicht NULL sein!';
 		}
 		if(mb_strlen($this->projekttyp_kurzbz)>16)
 		{
@@ -461,11 +465,10 @@ class projektarbeit extends basis_db
 				FROM
 					lehre.tbl_projektarbeit
 				JOIN
-					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung
+					lehre.tbl_projekttyp USING (projekttyp_kurzbz), lehre.tbl_lehrveranstaltung
 
 				WHERE
-					tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+					tbl_projektarbeit.lehreinheit_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 					tbl_lehrveranstaltung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 					tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 

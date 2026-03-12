@@ -910,8 +910,8 @@ function StudentProjektbetreuerAuswahl()
 	document.getElementById('student-projektbetreuer-textbox-person_id').value=person_id;
 	document.getElementById('student-projektbetreuer-checkbox-neu').checked=false;
 
-	var lehreinheitstsem = document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value;
-	var default_stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, lehreinheitstsem);
+	var projektarbeitstsem = document.getElementById('student-projektarbeit-menulist-studiensemester').value;
+	var default_stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, projektarbeitstsem);
 
 	if (default_stundensatz != '')
 		default_stundensatz = 'Stundensatz (Default '+default_stundensatz+'):';
@@ -1423,9 +1423,10 @@ function StudentProjektbetreuerLoadStundensatz(person_id, studiensemester)
 function StudentProjektbetreuerLoadMitarbeiterDaten()
 {
 	var person_id = MenulistGetSelectedValue('student-projektbetreuer-menulist-person');
-	var lehreinheitstsem = document.getElementById('student-projektarbeit-textbox-lehreinheit_stsem').value;
+	var projektarbeitstsem = document.getElementById('student-projektarbeit-menulist-studiensemester').value;
 
-	var stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, lehreinheitstsem);
+
+	var stundensatz = StudentProjektbetreuerLoadStundensatz(person_id, projektarbeitstsem);
 
 	if (stundensatz != '')
 		default_stundensatz = 'Stundensatz (Default '+stundensatz+'):';

@@ -242,7 +242,7 @@ FROM
                     pa.lehreinheit_id,
                     lv.lehrveranstaltung_id,
                     lv.bezeichnung                                                                      AS "lv_bezeichnung",
-                    (pa.projektarbeit_id::text)                                                                 AS "projektarbeit_id",
+                    (pa.projektarbeit_id::text)                                                         AS "projektarbeit_id",
                     le.studiensemester_kurzbz,
                     stg.studiengang_kz,
                     upper(stg.typ || stg.kurzbz)                                                        AS "stg_typ_kurzbz",
@@ -270,7 +270,7 @@ FROM
                         ELSE (oe.organisationseinheittyp_kurzbz ||
                               \' \' || oe.bezeichnung)
                         END                                                                             AS "lv_oe_kurzbz",
-                    (nachname || \' \' || vorname)                                                        AS "lektor",
+                    (nachname || \' \' || vorname)                                                      AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
                     pb.stundensatz,
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
@@ -280,8 +280,8 @@ FROM
                 FROM
                     lehre.tbl_projektbetreuer                pb
                         JOIN lehre.tbl_projektarbeit         pa USING (projektarbeit_id)
-                        JOIN lehre.tbl_lehreinheit           le USING (lehreinheit_id)
-                        JOIN lehre.tbl_lehrveranstaltung     lv USING (lehrveranstaltung_id)
+                        JOIN lehre.tbl_lehrveranstaltung     lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
+                        JOIN lehre.tbl_lehreinheit           le ON (lv.lehrveranstaltung_id = le.lehrveranstaltung_id)
                         JOIN PUBLIC.tbl_organisationseinheit oe USING (oe_kurzbz)
                         JOIN PUBLIC.tbl_person               person USING (person_id)
                         LEFT JOIN lehre.tbl_vertrag          vertrag USING (vertrag_id)

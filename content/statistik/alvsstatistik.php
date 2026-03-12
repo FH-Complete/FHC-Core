@@ -107,13 +107,11 @@ SELECT
 FROM
 	lehre.tbl_projektarbeit,
 	lehre.tbl_lehrveranstaltung,
-	lehre.tbl_lehreinheit,
 	lehre.tbl_projektbetreuer,
 	public.tbl_person
 WHERE
 	tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
-	tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
-	tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
+	tbl_projektarbeit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 	tbl_projektbetreuer.person_id=tbl_person.person_id AND
 	tbl_projektbetreuer.stunden<>0 AND
 	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)."
