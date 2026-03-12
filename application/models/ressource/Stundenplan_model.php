@@ -477,7 +477,29 @@ class Stundenplan_model extends DB_Model
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
 						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
 
-					$query .="OR";
+					//add lehreinheiten directly from Stundenplan
+	/*				$query.=  "OR EXISTS (
+					SELECT 1
+					FROM lehre.tbl_stundenplan tsp
+					WHERE tsp.lehreinheit_id = sp.lehreinheit_id
+						AND tsp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)."
+						AND (tsp.semester = ".$this->escape($lehrverband->semester)." OR tsp.semester IS NULL)
+							AND (
+							tsp.verband = ".$this->escape($lehrverband->verband)."
+							OR tsp.verband IS NULL
+						OR tsp.verband = '0'
+						OR tsp.verband = ''
+							)
+							AND (
+							tsp.gruppe = ".$this->escape($lehrverband->gruppe)."
+							OR tsp.gruppe IS NULL
+						OR tsp.gruppe = '0'
+						OR tsp.gruppe = ''
+							)
+							AND tsp.gruppe_kurzbz IS NULL "; */
+
+					$query .= "OR";
+
 				}
 			}	
 		}
