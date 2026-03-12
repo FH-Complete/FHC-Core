@@ -55,6 +55,7 @@ class MailLib
 			$this->_mail->WordWrap = $this->_getEmailCfgItem('wordwrap');
 			$this->_mail->isHTML($this->_getEmailCfgItem('is_html'));			// html or text
 			$this->_mail->SMTPDebug = $this->_getEmailCfgItem('enable_debug');
+			$this->_mail->CharSet = 'UTF-8';
 
 			// Set the configuration properties with the standard configuration values
 			$this->email_number_to_sent = $this->_getEmailCfgItem('email_number_to_sent');

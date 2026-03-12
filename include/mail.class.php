@@ -16,9 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * Authors: Christian Paminger <christian.paminger@technikum-wien.at>,
- *          Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
- *          Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
- *			Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
+ *	  Andreas Oesterreicher <andreas.oesterreicher@technikum-wien.at>,
+ *	  Rudolf Hangl <rudolf.hangl@technikum-wien.at> and
+ *	  Gerald Simane-Sequens <gerald.simane-sequens@technikum-wien.at>
  */
 /**
  * Klasse Mail
@@ -27,6 +27,12 @@
  * Versendet ein Mail als Text, Html, CC und BCC Empfaenger,
  * Replyto und Attachments
  */
+
+include_once DOC_ROOT . 'vendor/autoload.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
 
 class mail
 {
@@ -40,6 +46,8 @@ class mail
 	public $htmlContent;
 	public $attachments;
 	public $errormsg;
+
+	private $_mail; // PHPMailer instance
 
 	/**
 	 * MAIL - Konstruktor
@@ -65,6 +73,30 @@ class mail
 	 */
 	public function send()
 	{
+		// PHPMailer configuration
+		try
+		{
+			$this->_mail = new PHPMailer(true);
+			$this->_mail->isSMTP();		 // Send using SMTP
+			$this->_mail->Host = 'localhost';       // Set the SMTP server to send through
+			$this->_mail->Port = 25;		// TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+			$this->_mail->SMTPAuth = false;	 // Enable SMTP authentication
+			$this->_mail->Username = '';	    // SMTP username
+			$this->_mail->Password = '';	    // SMTP password
+			$this->_mail->SMTPSecure = '';	  // Enable implicit TLS encryption
+			$this->_mail->Timeout = 1;	      // set the timeout (seconds)
+			$this->_mail->SMTPKeepAlive = false;    // Persistent SMTP connection
+			$this->_mail->Priority = 3;	     // 1 = High, 3 = Normal, 5 = low. When null, the header is not set at all.
+			$this->_mail->WordWrap = 76;
+			$this->_mail->isHTML(true);	     // html or text
+			$this->_mail->SMTPDebug = 0;	    // Disable debugging      
+			$this->_mail->CharSet = 'UTF-8';
+		}
+		catch(Exception $e)
+		{
+			return false;
+		}
+
 		//wenn MAIL_DEBUG gesetzt ist dann alles an diese Adresse schicken
 		if(MAIL_DEBUG!='')
 		{
@@ -82,68 +114,38 @@ class mail
 			$this->sender = MAIL_FROM;
 
 		// Header
-		$header = '';
-  		$header .= "From: {$this->sender}".$eol;
+		$this->_mail->setFrom($this->sender);
 
   		if (!empty($this->CC_recievers))
-			$header .= "CC: {$this->CC_recievers}".$eol;
+			$this->_mail->addCC($this->CC_recievers);
 		if (!empty($this->BCC_recievers))
-			$header .= "BCC: {$this->BCC_recievers}".$eol;
+			$this->_mail->addBCC($this->BCC_recievers);
 		if (!empty($this->replyTo))
-			$header .= "Reply-To: {$this->replyTo}".$eol;
-		if (!empty($this->replyTo))
-			$header .= "Return-Path: {$this->replyTo}".$eol;
-
-		$header .= 'X-Mailer: FHComplete V1'.$eol;
-	  	$header .= 'Mime-Version: 1.0'.$eol;
-		$header .= 'Precedence: bulk'.$eol;
-		$header .= 'Auto-Submitted: auto-generated'.$eol;
-		$header .= "Content-Type: multipart/related; boundary=\"$mime_boundary_mixed\"".$eol;
-		$header .= "Content-Transfer-Encoding: 8bit".$eol;
-
-		// Body
-		$mailbody = "";
-		$mailbody .= $eol;
-		$mailbody .= "--$mime_boundary_mixed".$eol;
-		$mailbody .= "Content-Type: multipart/alternative; boundary=\"$mime_boundary_alternative\"".$eol;
-		$mailbody .= $eol;
-		$mailbody .= "--$mime_boundary_alternative".$eol;
-		$mailbody .= "Content-Type: text/plain; charset={$this->textContent[1]}".$eol;
-		$mailbody .= "Content-Transfer-Encoding: {$this->textContent[2]}".$eol;
-		$mailbody .= $eol;
-		$mailbody .= $this->textContent[0];
-		$mailbody .= $eol;
-		$mailbody .= $eol;
-
-		if (!empty($this->htmlContent[0]))
 		{
-			$mailbody .= "--$mime_boundary_alternative".$eol;
-			$mailbody .= "Content-Type: text/html; charset={$this->htmlContent[1]}".$eol;
-			$mailbody .= "Content-Transfer-Encoding: {$this->htmlContent[2]}".$eol;
-			$mailbody .= $eol;
-			$mailbody .= $this->htmlContent[0];
-			$mailbody .= $eol;
-			$mailbody .= $eol;
+			$this->_mail->addReplyTo($this->replyTo);
+			$this->_mail->addCustomHeader('Return-Path', $this->replyTo);
 		}
-		$mailbody .= "--{$mime_boundary_alternative}--".$eol;
-		$mailbody .= $eol;
-		$mailbody .= "--$mime_boundary_mixed";
+
+		$this->_mail->addCustomHeader('X-Mailer', 'FHComplete V1');
+		$this->_mail->addCustomHeader('Mime-Version', '1.0');
+		$this->_mail->addCustomHeader('Precedence', 'bulk');
+		$this->_mail->addCustomHeader('Auto-Submitted', 'auto-generated');
+
+		$this->_mail->Body = $this->htmlContent[0];
+		$this->_mail->AltBody = $this->textContent[0];
 
 		// Attachments Plain
 		if (is_array($this->attachmentsplain) && (count($this->attachmentsplain) > 0))
 		{
 			foreach ($this->attachmentsplain as $attachment)
 			{
-				$dispo = 'attachment';
-				$mailbody .= $eol;
-				$mailbody .= "Content-Disposition: $dispo; filename={$attachment[2]}".$eol;
-				$mailbody .= "Content-Type: {$attachment[1]}; name={$attachment[2]}".$eol;
-
-				$mailbody .= 'Content-Transfer-Encoding: '.$attachment[3].$eol;
-				$mailbody .= $eol;
-				$mailbody .= $attachment[0];
-				$mailbody .= $eol;
-				$mailbody .= "--$mime_boundary_mixed";
+				$this->_mail->addStringAttachment(
+					$attachment[0], // File content
+					$attachment[2], // Name
+					$attachment[3], // Encoding
+					$attachment[1], // Type
+					'attachment'	// Disposition
+				);
 			}
 		}
 
@@ -152,31 +154,23 @@ class mail
 		{
 			foreach ($this->attachments as $attachment)
 			{
-				$dispo = empty($attachment[3]) ? 'attachment' : 'inline';
-				$mailbody .= $eol;
-				$mailbody .= "Content-Disposition: $dispo; filename={$attachment[2]}".$eol;
-				$mailbody .= "Content-Type: {$attachment[1]}; name={$attachment[2]}".$eol;
-				if (!empty($attachment[3]))
-				{
-					$mailbody .= "Content-ID: <{$attachment[3]}>".$eol;
-				}
-				$mailbody .= 'Content-Transfer-Encoding: base64'.$eol;
-				$mailbody .= $eol;
-				$mailbody .= $attachment[0];
-				$mailbody .= $eol;
-				$mailbody .= "--$mime_boundary_mixed";
+				$this->_mail->addStringEmbeddedImage(
+					$attachment[0], // File content
+					$attachment[3], // Content ID
+					$attachment[2], // Content name
+					PHPMailer::ENCODING_BASE64, // Encoding
+					$attachment[1], // Type
+					empty($attachment[3]) ? 'attachment' : 'inline'	// Disposition
+				);
 			}
 		}
-		$mailbody .= "--".$eol;
 
 		// Subject Encoding setzen
-		$subject = "=?UTF-8?B?".base64_encode($this->subject)."?=";
+		$this->_mail->Subject = $this->subject;
+		$this->_mail->addAddress($this->to);
 
 		// Senden
-		if(mail($this->to, $subject, $mailbody, $header))
-			return true;
-		else
-			return false;
+		return $this->_mail->send();
 	}
 
 	/**
