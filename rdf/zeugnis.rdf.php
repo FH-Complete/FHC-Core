@@ -215,11 +215,12 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						tbl_projekttyp.bezeichnung, projekttyp_kurzbz
 					FROM
 						lehre.tbl_projektarbeit
-						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+						JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+
 						JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 					WHERE
 						student_uid=".$db->db_add_param($uid_arr[$i])."
-						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
+						AND lehre.tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
 						AND projekttyp_kurzbz in('Bachelor', 'Diplom')
 					ORDER BY beginn ASC, projektarbeit_id ASC";
 
@@ -297,11 +298,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						//Firma fuer Berufspraktikum
 						$qry = "SELECT tbl_firma.name
 								FROM
-									lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung, public.tbl_firma
+									lehre.tbl_projektarbeit
+									JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+									JOIN lehre.tbl_lehrveranstaltung ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehrveranstaltung.lehrveranstaltung_id)
+									JOIN public.tbl_firma ON(lehre.tbl_projektarbeit.firma_id = public.tbl_firma.firma_id)
 								WHERE
-									tbl_projektarbeit.lehreinheit_id=tbl_lehreinheit.lehreinheit_id AND
-									tbl_lehreinheit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-									tbl_projektarbeit.firma_id = tbl_firma.firma_id AND
 									tbl_projektarbeit.student_uid=".$db->db_add_param($uid_arr[$i])." AND
 									tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)." AND
 									tbl_lehrveranstaltung.lehrveranstaltung_id=".$db->db_add_param($row->lehrveranstaltung_id);

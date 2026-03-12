@@ -931,7 +931,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						tbl_firma.name, lehrveranstaltung_id, firma_id
 					FROM
 						lehre.tbl_projektarbeit
-						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+						JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 						JOIN public.tbl_firma USING(firma_id)
 					WHERE
 						student_uid=".$db->db_add_param($uid_arr[$i])."
@@ -955,7 +955,8 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							lehrveranstaltung_id, titel, themenbereich, note, titel_english
 						FROM
 							lehre.tbl_projektarbeit
-							JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
+							JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+
 						WHERE
 							student_uid=".$db->db_add_param($uid_arr[$i])."
 							AND projekttyp_kurzbz in('Bachelor', 'Diplom')
@@ -1019,8 +1020,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					SELECT
 						studiensemester_kurzbz, ort, ects, semesterstunden, von, bis,
 						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws,
-						(SELECT titel_english FROM lehre.tbl_projektarbeit
-						WHERE lehreinheit_id=tbl_bisio.lehreinheit_id
+						(SELECT titel_english 
+						 FROM lehre.tbl_projektarbeit
+						 	JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+
+						WHERE lehre.tbl_lehreinheit.lehreinheit_id=tbl_bisio.lehreinheit_id
 						AND student_uid = ".$db->db_add_param($uid_arr[$i])." limit 1) as projektarbeitstitel
 					FROM
 						bis.tbl_bisio

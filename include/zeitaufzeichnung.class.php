@@ -748,14 +748,12 @@ or not exists
 			UNION
 			SELECT sum(pb.stunden) AS semstunden
 			FROM
-				lehre.tbl_projektarbeit pa,
-				lehre.tbl_projektbetreuer pb,
-				public.tbl_benutzer b,
-				lehre.tbl_lehreinheit l
-			JOIN
-				lehre.tbl_lehrveranstaltung lv using (lehrveranstaltung_id)
-			JOIN
-				public.tbl_studiengang s using (studiengang_kz)
+				lehre.tbl_projektarbeit pa 
+					JOIN lehre.tbl_projektbetreuer pb ON(pa.projektarbeit_id = pb.projektarbeit_id)
+					JOIN public.tbl_benutzer b ON(pb.person_id = b.person_id)
+					JOIN lehre.tbl_lehreinheit l ON(pa.lehrveranstaltung_id = l.lehrveranstaltung_id AND pa.studiensemester_kurzbz = l.studiensemester_kurzbz)
+					JOIN lehre.tbl_lehrveranstaltung lv ON (l.lehrveranstaltung_id = lv.lehrveranstaltung_id)
+					JOIN public.tbl_studiengang s USING (studiengang_kz)
 
 			WHERE
 				pa.lehreinheit_id = l.lehreinheit_id AND
