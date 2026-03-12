@@ -358,7 +358,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.tabulatorOptions.selectable || tabulatorOptions.selectableRows || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.tabulatorOptions.selectableRows || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 			this._setHeaderFilter()
