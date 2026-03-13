@@ -131,7 +131,8 @@ if ($uid == null)
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						student_uid=vw_student.uid AND
 						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
-						tbl_lehreinheit.lehreinheit_id=tbl_projektarbeit.lehreinheit_id AND
+						tbl_lehreinheit.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
+						tbl_lehreinheit.studiensemester_kurzbz=tbl_projektarbeit.studiensemester_kurzbz AND
 						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
@@ -428,8 +429,8 @@ function drawLehrauftrag($uid)
 				vertragsstatus_kurzbz
 			FROM lehre.tbl_projektbetreuer pb
 				JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
-				JOIN lehre.tbl_lehreinheit le USING (lehreinheit_id)
-				JOIN lehre.tbl_lehrveranstaltung           lv USING (lehrveranstaltung_id)
+				JOIN lehre.tbl_lehreinheit ON(pa.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND pa.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+				JOIN lehre.tbl_lehrveranstaltung           lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
 				JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
 				JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id
 				JOIN campus.vw_student student ON pa.student_uid = student.uid

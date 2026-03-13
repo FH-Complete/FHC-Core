@@ -715,10 +715,22 @@ function casDeleteMitarbeiter($db, $mitarbeiter_uid, $trans=true)
 	{
 		$qry = '
 			DELETE FROM lehre.tbl_projektbetreuer
-				WHERE projektarbeit_id IN (SELECT projektarbeit_id FROM lehre.tbl_projektarbeit
-					WHERE lehreinheit_id IN (SELECT lehreinheit_id FROM lehre.tbl_lehreinheit
-						WHERE lehrveranstaltung_id IN (SELECT lehrveranstaltung_id FROM lehre.tbl_lehrveranstaltung
-							WHERE koordinator='.$db->db_add_param($mitarbeiter_uid).')))';
+			WHERE projektarbeit_id IN (
+				SELECT projektarbeit_id 
+				FROM lehre.tbl_projektarbeit
+				WHERE lehre.tbl_projektarbeit.lehrveranstaltung_id 
+					IN (
+						SELECT lehrveranstaltung_id
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE koordinator = '.$db->db_add_param($mitarbeiter_uid).'
+					)
+					AND lehre.tbl_projektarbeit.studiensemester_kurzbz 
+					IN (
+						SELECT studiensemester_kurzbz 
+						FROM lehre.tbl_lehrveranstaltung
+						WHERE koordinator = '.$db->db_add_param($mitarbeiter_uid).')
+					)
+			)';
 		if(!$db->db_query($qry))
 			$error = true;
 	}
@@ -974,7 +986,14 @@ function casDeletePrestudent($db, $prestudent_id, $trans=true)
 	{
 		$qry = '
 			DELETE FROM lehre.tbl_projektbetreuer
-				WHERE projektarbeit_id IN (SELECT projektarbeit_id FROM lehre.tbl_projektarbeit WHERE student_uid IN (SELECT student_uid FROM tbl_student WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).'))';
+				WHERE projektarbeit_id IN (
+					SELECT projektarbeit_id 
+					FROM lehre.tbl_projektarbeit 
+					WHERE student_uid IN 
+				    	(
+				    	SELECT student_uid 
+				    	FROM tbl_student 
+				    	WHERE prestudent_id='.$db->db_add_param($prestudent_id, FHC_INTEGER).'))';
 		if(!$db->db_query($qry))
 			$error = true;
 	}

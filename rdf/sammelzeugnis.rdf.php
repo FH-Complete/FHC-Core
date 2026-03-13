@@ -126,7 +126,7 @@ if(isset($_REQUEST['xmlformat']) && $_REQUEST['xmlformat']=="xml")
 		
 		$qry_projektarbeit = "SELECT lehrveranstaltung_id, titel, themenbereich, note, titel_english 
 		FROM lehre.tbl_projektarbeit 
-		JOIN lehre.tbl_lehreinheit USING(lehreinheit_id) 
+			JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 		WHERE student_uid='$uid' 
 		AND projekttyp_kurzbz in('Bachelor', 'Diplom') 
 		ORDER BY beginn ASC, projektarbeit_id ASC;";
