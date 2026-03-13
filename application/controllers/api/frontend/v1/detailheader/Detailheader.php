@@ -9,10 +9,10 @@ class Detailheader extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getHeader' => ['vertrag/mitarbeiter:r'],
-			'getPersonAbteilung' => ['vertrag/mitarbeiter:r'],
-			'getLeitungOrg' => ['vertrag/mitarbeiter:r'],
-			'getSemesterStati' => ['admin:r', 'assistenz:r']
+			'getHeader' => self::PERM_LOGGED,
+			'getPersonAbteilung' => self::PERM_LOGGED,
+			'getLeitungOrg' => self::PERM_LOGGED,
+			'getSemesterStati' => self::PERM_LOGGED,
 		]);
 	}
 

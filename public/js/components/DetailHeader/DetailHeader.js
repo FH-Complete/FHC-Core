@@ -293,9 +293,9 @@ export default {
 						 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
 						<strong v-if="headerData[0].semester != null" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
 						  {{headerData[0].semester}}
-						<strong v-if="headerData[0].verband" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
+						<strong v-if="headerData[0].gruppe !== null && headerData[0].verband != ' '" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
 						{{headerData[0].verband}}
-						<strong v-if="headerData[0].gruppe !== ' ' && headerData[0].gruppe != null" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
 						{{headerData[0].gruppe}}
 					</h5>
 
