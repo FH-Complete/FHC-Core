@@ -136,7 +136,10 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM lehre.tbl_ferien LIMIT 1"))
 			ADD COLUMN IF NOT EXISTS insertamum timestamp DEFAULT NOW(),
 			ADD COLUMN IF NOT EXISTS insertvon VARCHAR(32),
 			ADD COLUMN IF NOT EXISTS updateamum timestamp,
-			ADD COLUMN IF NOT EXISTS updatevon VARCHAR(32)";
+			ADD COLUMN IF NOT EXISTS updatevon VARCHAR(32);
+			UPDATE lehre.tbl_ferien
+			SET oe_kurzbz = (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz = tbl_ferien.studiengang_kz)
+			WHERE oe_kurzbz IS NULL AND studiengang_kz IS NOT NULL;";
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_ferien: '.$db->db_last_error().'</strong><br>';

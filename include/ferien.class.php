@@ -24,6 +24,7 @@
  * @create 07-12-2006
  */
 require_once(dirname(__FILE__).'/basis_db.class.php');
+require_once(dirname(__FILE__).'/organisationseinheit.class.php');
 
 class ferien extends basis_db 
 {
@@ -62,8 +63,55 @@ class ferien extends basis_db
 			$this->errormsg = 'Studiengang_kz ist ungültig';
 			return false;
 		}
+
+		// get oe from studiengang
+		$sql_query="
+			SELECT
+				oe_kurzbz
+			FROM
+				public.tbl_studiengang
+			WHERE
+				studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER)."
+			ORDER BY
+				studiengang_kz";
 		
-		$sql_query="SELECT * FROM lehre.tbl_ferien WHERE studiengang_kz=0 OR studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER)." ORDER BY vondatum;";
+		if (!$this->db_query($sql_query))
+		{
+			$this->errormsg = $this->db_last_error();
+			return false;
+		}
+
+		$oe_kurzbz = '';
+		while ($row = $this->db_fetch_object())
+		{
+			$oe_kurzbz = $row->oe_kurzbz;
+		}
+
+		// get all parents oes
+		$organisationseinheit = new organisationseinheit();
+		$parents = $organisationseinheit->getParents($oe_kurzbz);
+
+		if (!$parents)
+		{
+			$this->errormsg = $parents->errormsg;
+			return false;
+		}
+
+		$sql_query="
+			SELECT
+				*
+			FROM
+				lehre.tbl_ferien
+			WHERE
+				(CASE
+					WHEN oe_kurzbz IS NOT NULL
+					THEN oe_kurzbz IN (".$this->implode4SQL($parents).")
+					ELSE
+					studiengang_kz=0
+					OR studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER)."
+				END)
+			ORDER BY
+				vondatum";
 		
 		if (!$this->db_query($sql_query))
 		{
