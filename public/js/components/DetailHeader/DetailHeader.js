@@ -1,11 +1,13 @@
 import ApiDetailHeader from "../../api/factory/detailHeader.js";
 import ApiHandleFoto from "../../api/factory/fotoHandling.js";
 import ModalUploadFoto from "./Modal/UploadFoto.js";
+import PvSkeleton from "../../../../index.ci.php/public/js/components/primevue/skeleton/skeleton.esm.min.js";
 
 export default {
 	name: 'DetailHeader',
 	components: {
-		ModalUploadFoto
+		ModalUploadFoto,
+		PvSkeleton
 	},
 	props: {
 		headerData: {
@@ -276,67 +278,76 @@ export default {
 					<small class="text-muted">{{person.uid}}</small>
 				</div>
 
-					<div v-if="headerData.length == 1">
-						<div class="d-flex align-items-center gap-3">
-							<h2 class="h4">
-								{{headerData[0].titelpre}}
-								{{headerData[0].vorname}}
-								{{headerData[0].nachname}}
-								<span v-if="headerData[0].titelpost">, </span>
-								{{headerData[0].titelpost}}
-							</h2>
-							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
-						</div>
+				<div v-if="headerData.length == 1">
+					<div class="d-flex align-items-center gap-3">
+						<h2 class="h4">
+							{{headerData[0].titelpre}}
+							{{headerData[0].vorname}}
+							{{headerData[0].nachname}}
+							<span v-if="headerData[0].titelpost">, </span>
+							{{headerData[0].titelpost}}
+						</h2>
+						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
+					</div>
 
-					<h5 class="h6" v-if="!semesterStatiLoading">
-						<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
-						 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
+				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
+					<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
+					 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
+					<template v-if="!semesterStatiLoading">
 						<strong v-if="headerData[0].semester != null" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
-						  {{headerData[0].semester}}
+							{{headerData[0].semester}}
 						<strong v-if="headerData[0].gruppe !== null && headerData[0].verband != ' '" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
-						{{headerData[0].verband}}
+							{{headerData[0].verband}}
 						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
-						{{headerData[0].gruppe}}
-					</h5>
+							{{headerData[0].gruppe}}
+					</template>
+					<template v-else>
+					<strong class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
+					  <pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					<strong class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
+						<pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					<strong class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+						<pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					</template>
+				</h5>
 
-					<h5 class="h6">
-						<strong class="text-muted">Email </strong>
-						<span>
-							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
-						</span>
-						<strong class="text-muted"> | Status </strong>
-						<span v-if="noCurrentStatus">
-							<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
-						</span>
-				 		<span v-else>
-					 		{{headerData[0].statusofsemester}}
-				 		</span>
-					  </h5>
-
-				</div>
-				<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
-					<div class="d-flex py-1">
-						<div class="px-2" style="min-width: 100px;">
-							<slot name="issues"></slot>
-						</div>
-						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueBetaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center">UID</h4>
-							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
-						</div>
+				<h5 class="h6">
+					<strong class="text-muted">Email </strong>
+					<span>
+						<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
+					</span>
+					<strong class="text-muted"> | Status </strong>
+					<span v-if="noCurrentStatus">
+						<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
+					</span>
+					<span v-else>
+						{{headerData[0].statusofsemester}}
+					</span>
+				</h5>
+			</div>
+			<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
+				<div class="d-flex py-1">
+					<div class="px-2" style="min-width: 100px;">
+						<slot name="issues"></slot>
+					</div>
+					<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
+						<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
+					</div>
+					<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
+						<h6 class="text-muted text-center"><slot name="valueBetaTile"></slot></h6>
+					</div>
+					<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
+						<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
+					</div>
+					<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center">UID</h4>
+						<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
 					</div>
 				</div>
+			</div>
 
 		</template>
 
