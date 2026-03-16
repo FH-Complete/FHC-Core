@@ -41,20 +41,20 @@ export default {
 		return {
 			tabulatorOptions: {
 				columns: [
-					{title: "Nachname", field: "nachname"},
-					{title: "Vorname", field: "vorname"},
-					{title: "Note", field: "note"},
-					{title: "Punkte", field: "punkte"},
-					{title: "Stunden", field: "stunden"},
-					{title: "Stundensatz", field: "stundensatz", visible: false},
-					{title: "Art", field: "betreuerart_kurzbz", visible: false},
-					{title: "Person ID", field: "person_id", visible: false},
-					{title: "Vertrag ID", field: "vertrag_id", visible: false},
-					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false},
+					{title: "Nachname", field: "nachname", widthGrow: 2},
+					{title: "Vorname", field: "vorname", widthGrow: 2},
+					{title: "Note", field: "note", widthGrow: 1},
+					{title: "Punkte", field: "punkte", widthGrow: 1},
+					{title: "Stunden", field: "stunden", widthGrow: 1},
+					{title: "Stundensatz", field: "stundensatz", visible: false, widthGrow: 1},
+					{title: "Art", field: "betreuerart_kurzbz", visible: false, widthGrow: 2},
+					{title: "Person ID", field: "person_id", visible: false, widthGrow: 1},
+					{title: "Vertrag ID", field: "vertrag_id", visible: false, widthGrow: 1},
+					{title: "Projektarbeit ID", field: "projektarbeit_id", visible: false, widthGrow: 1},
 					{
 						title: 'Aktionen',
 						field: 'actions',
-						minWidth: 150, // Ensures Action-buttons will be always fully displayed
+						minWidth: 100, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -116,7 +116,7 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitData',
+				layout: 'fitColumns',
 				layoutColumnsOnNewData: false,
 				height: 'auto',
 				minHeight: '100',

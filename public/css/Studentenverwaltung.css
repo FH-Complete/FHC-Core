@@ -281,3 +281,7 @@ html.fs_huge {
 }
 */
 /* slim ende */
+
+.fhc-xxl-modal {
+	min-width: 80vw;
+}

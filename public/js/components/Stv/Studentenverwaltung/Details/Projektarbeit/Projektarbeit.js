@@ -199,6 +199,8 @@ export default {
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
+							const AAAWidth = '44px';
+							const AAAHeight = '44px';
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
@@ -206,6 +208,8 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
+							button.style.minWidth = AAAWidth;
+							button.style.minHeight = AAAHeight;
 							button.addEventListener('click', (event) => {
 								let data = cell.getData();
 								this.editedProjektarbeit = data;
@@ -213,21 +217,23 @@ export default {
 							});
 							container.append(button);
 
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.innerHTML = '<i class="fa fa-users"></i>';
-							button.title = this.$p.t('projektarbeit', 'betreuerBearbeiten');
-							button.addEventListener('click', (event) => {
-								let data = cell.getData();
-								this.editedProjektarbeit = data;
-								this.actionEditBetreuer();
-							});
-							container.append(button);
+							// button = document.createElement('button');
+							// button.className = 'btn btn-outline-secondary btn-action';
+							// button.innerHTML = '<i class="fa fa-users"></i>';
+							// button.title = this.$p.t('projektarbeit', 'betreuerBearbeiten');
+							// button.addEventListener('click', (event) => {
+							// 	let data = cell.getData();
+							// 	this.editedProjektarbeit = data;
+							// 	this.actionEditBetreuer();
+							// });
+							// container.append(button);
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
+							button.style.minWidth = AAAWidth;
+							button.style.minHeight = AAAHeight;
 							button.addEventListener('click', () =>
 								this.actionDeleteProjektarbeit(cell.getData().projektarbeit_id)
 							);
@@ -280,9 +286,14 @@ export default {
 				.then(this.deleteProjektarbeit)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
+		saveProjektarbeit() {
+			if(this.statusNew) this.addNewProjektarbeit()
+			else this.updateProjektarbeit()
+		},
 		addNewProjektarbeit() {
 			this.$refs.projektarbeitDetails.addNewProjektarbeit()
 				.then((result) => {
+					console.log('res add new', result)
 					this.projektarbeitSaved();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -290,6 +301,7 @@ export default {
 		updateProjektarbeit() {
 			this.$refs.projektarbeitDetails.updateProjektarbeit()
 				.then((result) => {
+					console.log('res update', result)
 					this.projektarbeitSaved();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -308,7 +320,8 @@ export default {
 		projektarbeitSaved() {
 			this.reload();
 			this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
-			this.hideModal('projektarbeitModal');
+			if(!this.statusNew) this.hideModal('projektarbeitModal');
+			else this.statusNew = false
 		},
 		setDefaultStunden(projekttyp_kurzbz) {
 			this.$refs.projektbetreuer.setDefaultStunden(projekttyp_kurzbz);
@@ -358,46 +371,26 @@ export default {
 		</core-filter-cmpt>
 
 		<!--Modal: projektarbeitModal-->
-		<bs-modal ref="projektarbeitModal" dialog-class="modal-xl modal-dialog-scrollable" header-class="flex-wrap pb-0">
+		<bs-modal ref="projektarbeitModal" :dialog-class="(statusNew ? 'modal-xl ' : 'fhc-xxl-modal ' ) + 'modal-dialog-scrollable'" header-class="flex-wrap pb-0">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
 			</template>
 
-			<template #modal-header-content v-if="!statusNew">
-				<ul class="nav nav-tabs w-100 mt-3 msg_preview" id="pa_tabs" role="tablist">
-					<li class="nav-item" role="presentation">
-						<button class="nav-link" :class="activeTab == 'details' ? 'active' : ''" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab" aria-controls="details" aria-selected="true" @click="toggleMenu('details')">Details</button>
-					</li>
-					<li class="nav-item" role="presentation">
-						<button class="nav-link" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer-tab" data-bs-toggle="tab" data-bs-target="#betreuer" type="button" role="tab" aria-controls="betreuer" aria-selected="false" @click="toggleMenu('betreuer')">{{$p.t('projektarbeit', 'betreuerGross')}}</button>
-					</li>
-				</ul>
-			</template>
-
-			<div class="tab-content" id="pa_content">
-				<div class="tab-pane fade show" :class="activeTab == 'details' ? 'active' : ''" id="details" role="tabpanel" aria-labelledby="details-tab">
-					<div class="row">
-						<div class="col-12">
-							<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
-							</projektarbeit-details>
-						</div>
-					</div>
+			<div class="row" >
+				<div :class="statusNew ? 'col-12' : 'col-6'">
+					<projektarbeit-details ref="projektarbeitDetails" :student="student" @projekttyp-changed="setDefaultStunden">
+					</projektarbeit-details>
 				</div>
 
-				<div class="tab-pane fade show" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer" role="tabpanel" aria-labelledby="betreuer-tab">
-					<div class="row">
-						<div class="col-12">
-							<projektbetreuer ref="projektbetreuer" :config="config" @betreuer-saved="reload"></projektbetreuer>
-						</div>
-					</div>
+				<div :class="statusNew ? '' : 'col-6'" :style="statusNew ? 'display: none' : ''">
+					<projektbetreuer ref="projektbetreuer" :config="config" @betreuer-saved="reload"></projektbetreuer>
 				</div>
 			</div>
 
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-				<button v-if="statusNew" class="btn btn-primary" @click="addNewProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
-				<button v-if="!statusNew && activeTab == 'details'" class="btn btn-primary" @click="updateProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
+				<button class="btn btn-primary" @click="saveProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
 			</template>
 
 		</bs-modal>
