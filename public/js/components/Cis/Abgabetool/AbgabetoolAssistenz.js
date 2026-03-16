@@ -180,7 +180,7 @@ export const AbgabetoolAssistenz = {
 					// 	frozen: true,
 					// 	width: 40
 					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 100, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -645,7 +645,7 @@ export const AbgabetoolAssistenz = {
 			actionButtons.className = "d-flex gap-3"; // you can keep Bootstrap gap if loaded
 			actionButtons.style.display = "flex";
 			actionButtons.style.alignItems = "stretch"; // buttons stretch to full height
-			actionButtons.style.justifyContent = "center";
+			actionButtons.style.justifyContent = "start";
 			actionButtons.style.height = "100%"; // full grid cell height
 
 			const val = cell.getValue();
