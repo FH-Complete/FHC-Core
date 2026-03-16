@@ -45,7 +45,7 @@ export default {
 			type: String,
 			default: ''
 		},
-		isLoading: {
+		isLoading: { //if true, then parent isLoading
 			type: Boolean,
 			default: false
 		}
@@ -80,7 +80,7 @@ export default {
 		} else if (this.typeHeader === 'mitarbeiter') {
 			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
 				throw new Error(
-					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are requried.'
+					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are required.'
 				)
 			}
 			this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
@@ -114,7 +114,7 @@ export default {
 			semesterStatiLoading: false,
 			leitungOrgLoading: false,
 			departmentDataLoading: false,
-			headerDataLoading: false
+			headerDataMaLoading: false
 		};
 	},
 	methods: {
@@ -130,7 +130,7 @@ export default {
 				});
 		},
 		getHeader(person_id) {
-			this.headerDataLoading = true;
+			this.headerDataMaLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getHeader(person_id))
 				.then(result => {
@@ -138,7 +138,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					this.headerDataLoading = false;
+					this.headerDataMaLoading = false;
 				});
 		},
 		loadDepartmentData(mitarbeiter_uid) {
@@ -260,7 +260,6 @@ export default {
 			</modal-upload-foto>
 
 			<template v-if="typeHeader==='student'">
-
 				<div
 					v-for="person in headerData"
 					:key="person.person_id"
@@ -297,7 +296,7 @@ export default {
 				</div>
 
 				<div v-if="headerData.length == 1">
-					<div v-if="!headerDataLoading" class="d-flex align-items-center gap-3">
+					<div v-if="!isLoading" class="d-flex align-items-center gap-3">
 						<h2 class="h4">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
@@ -314,7 +313,7 @@ export default {
 
 				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
 					<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
-					<span v-if="!headerDataLoading">
+					<span v-if="!isLoading">
 					 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
 					 </span>
 					 <span v-else>
@@ -340,7 +339,7 @@ export default {
 
 				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
 					<strong class="text-muted">Email </strong>
-					<span v-if="!headerDataLoading">
+					<span v-if="!isLoading">
 						<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
 					</span>
 					<span v-else>
@@ -428,27 +427,51 @@ export default {
 
 				<!--show Ma-Details-->
 				<div class="col-md-9 text-nowrap mt-2">
-					<h4>{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}</h4>
-					<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong>
-						{{departmentData.bezeichnung}}
-					<span v-if="leitungData.uid"> | </span>
-					<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
-					<a href="#" @click.prevent="goToLeitung">
-						{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
-					</a>
-					<p>
-						<strong class="text-muted">Email </strong>
-						 <span v-if="headerDataMa && (headerDataMa.alias === undefined || headerDataMa.alias === null || headerDataMa.alias === '')">
-							<a :href="'mailto:' + mitarbeiter_uid + '@' + domain">
-							  {{ mitarbeiter_uid }}@{{ domain }}
+					<h4 v-if="!headerDataMaLoading">{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}</h4>
+					<h4 v-else><pv-skeleton width="15rem" height="2rem" borderRadius="16px"></pv-skeleton></h4>
+					<div class="d-flex align-items-center flex-wrap gap-1">
+						<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong>
+						<span v-if="!departmentDataLoading">
+							{{departmentData.bezeichnung}}
+						</span>
+						<span v-else>
+							<pv-skeleton width="12rem"></pv-skeleton>
+						</span>
+						<span v-if="leitungData.uid"> | </span>
+						<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
+						<span v-if="!leitungOrgLoading">
+							<a href="#" @click.prevent="goToLeitung">
+							{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
 							</a>
 						</span>
 						<span v-else>
-							<a :href="'mailto:'+headerDataMa?.alias+'@'+domain">{{headerDataMa.alias}}@{{domain}}</a>
+							<pv-skeleton width="5rem"></pv-skeleton>
 						</span>
-						<span v-if="headerDataMa?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerDataMa?.telefonklappe}}</span>
-					</p>
+					</div>
+
+					<div class="d-flex align-items-center gap-2 flex-nowrap">
+					  <div class="d-flex align-items-center gap-1">
+						<strong class="text-muted">Email</strong>
+						<template v-if="!headerDataMaLoading">
+						  <a :href="'mailto:' + (headerDataMa?.alias || mitarbeiter_uid) + '@' + domain">
+							{{ (headerDataMa?.alias || mitarbeiter_uid) + '@' + domain }}
+						  </a>
+						</template>
+						<pv-skeleton v-else width="10rem"></pv-skeleton>
+					  </div>
+
+					  <div v-if="headerDataMa?.telefonklappe" class="d-flex align-items-center gap-1">
+						<span>|</span>
+						<strong class="text-muted">DW</strong>
+						<template v-if="!headerDataMaLoading">
+						  {{ headerDataMa.telefonklappe }}
+						</template>
+						<pv-skeleton v-else width="4rem"></pv-skeleton>
+					  </div>
+					</div>
+
 					<slot name="tag"></slot>
+
 				</div>
 
 				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
@@ -458,20 +481,33 @@ export default {
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueGammaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueBetaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueAlphaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center">UID</h4>
-							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="uid"></slot>
+							</h6>
 						</div>
+
 					</div>
 				</div>
 

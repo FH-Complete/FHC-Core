@@ -48,7 +48,7 @@ export default {
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
 		},
 		isLoading() {
-			return this.students === null; //null-> loading, [] -> empty, [...] -> data, necessary for skeleton in tiles
+			return this.students === null; //null-> loading, [] -> empty, [...] -> data, necessary for skeleton in child
 		},
 		tile_PersId(){
 			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
