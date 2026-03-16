@@ -23,7 +23,8 @@ export default {
 				+ params.start_date + '/'
 				+ params.end_date + '/'
 				+ params.group_consecutiveHours + '/'
-				+ params.dbStundenplanTable
+				+ params.dbStundenplanTable + '/'
+				+ params.showLvsStundenplan
 		};
 	},
 	getStudiensemester(){

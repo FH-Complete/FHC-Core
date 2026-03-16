@@ -54,7 +54,10 @@ export default {
 						start_date: this.dataSem.start,
 						end_date: this.dataSem.ende,
 						group_consecutiveHours: true,
-						dbStundenplanTable: this.dbStundenplanTable})
+						dbStundenplanTable: this.dbStundenplanTable,
+						showLvsStundenplan: true
+					})
+
 				),
 				ajaxResponse: (url, params, response) => {
 					return response.data;

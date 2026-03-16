@@ -397,8 +397,8 @@ class Stundenplan_model extends DB_Model
 	 *
 	 * @return mixed
 	 */
-	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $isLvList=false, $db_stpl_table='stundenplan'){
-
+	public function getStundenplanQuery($start_date, $end_date, $semester, $gruppen, $studentlehrverbaende, $db_stpl_table='stundenplan', $showLvsStundenplan=false)
+	{
 		// helper function to check if either $gruppen or $studentlehrverbaende are empty for each semester
 		$emptyCheck = function($toBeCheckedArray) use ($semester){
 			$result = true;
@@ -454,12 +454,6 @@ class Stundenplan_model extends DB_Model
 			$query = substr($query, 0, -2);
 		}
 
-		//Condition for showLVList FHC4
-		if(!$isLvList)
-			$stringGroupLv =  "AND gruppe_kurzbz is null";
-		else
-			$stringGroupLv ="";
-
 		foreach($semester as $sem=>$semester_date_range)
 		{
 			foreach($semester_date_range as $sem_date => $sem_date_range)
@@ -477,29 +471,22 @@ class Stundenplan_model extends DB_Model
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
 						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
 
-					//add lehreinheiten directly from Stundenplan
-	/*				$query.=  "OR EXISTS (
-					SELECT 1
-					FROM lehre.tbl_stundenplan tsp
-					WHERE tsp.lehreinheit_id = sp.lehreinheit_id
-						AND tsp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)."
-						AND (tsp.semester = ".$this->escape($lehrverband->semester)." OR tsp.semester IS NULL)
-							AND (
-							tsp.verband = ".$this->escape($lehrverband->verband)."
-							OR tsp.verband IS NULL
-						OR tsp.verband = '0'
-						OR tsp.verband = ''
-							)
-							AND (
-							tsp.gruppe = ".$this->escape($lehrverband->gruppe)."
-							OR tsp.gruppe IS NULL
-						OR tsp.gruppe = '0'
-						OR tsp.gruppe = ''
-							)
-							AND tsp.gruppe_kurzbz IS NULL "; */
+					// Eintraege vom Stundenplan
+					if($showLvsStundenplan)
+					{
+						$query .= "
+							OR EXISTS (
+								SELECT 1
+								FROM lehre.tbl_stundenplan tsp
+								WHERE tsp.lehreinheit_id = sp.lehreinheit_id
+									AND tsp.studiengang_kz = " . $this->escape($lehrverband->studiengang_kz) . "
+									AND (tsp.semester = " . $this->escape($lehrverband->semester) . " OR tsp.semester IS NULL)
+										AND (tsp.verband = " . $this->escape($lehrverband->verband) . " OR tsp.verband IS NULL OR tsp.verband = '0' OR tsp.verband = '')
+										AND (tsp.gruppe = " . $this->escape($lehrverband->gruppe) . " OR tsp.gruppe IS NULL	OR tsp.gruppe = '0'	OR tsp.gruppe = '')
+										AND tsp.gruppe_kurzbz IS NULL)";
+					}
 
 					$query .= "OR";
-
 				}
 			}	
 		}

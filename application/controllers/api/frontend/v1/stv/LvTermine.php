@@ -60,8 +60,8 @@ class LvTermine extends FHCAPI_Controller
 				$semester_range,
 				$benutzer_gruppen,
 				$student_lehrverband,
-				true,
-				$dbStundenplanTable
+				$dbStundenplanTable,
+				true
 			);
 
 		if(!$stundenplan_query)
