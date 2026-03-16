@@ -2279,6 +2279,46 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'filter',
+		'phrase' => 'filterDelete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter zurücksetzen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'delete filter',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'filter',
+		'phrase' => 'filterActive',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Filter aktiv',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'filter active',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 	//****************************	 CORE/person
 	array(
@@ -3863,6 +3903,172 @@ $phrases = array(
 			)
 		)
 	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'geplZeitraum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'geplanter Zeitraum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'planned Period',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'bitteAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte auswählen...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'hinweisLehrende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis für Lehrende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note for Lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lehreinheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehreinheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lead',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Leitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lead',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'teamlead',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Team / Leitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Team / Lead',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'ausblick_lvplanung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausblick auf Ihre mögliche LV-Planung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preview of Your Potential Course Planning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'detailselfoverview',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<b>Achtung:</b> die vorliegenden Informationen stellen eine Vorabplanung dar und sind als Anfrage an Sie gedacht. <br /><br />
+						Die Beauftragung der tatsächlichen Lehrveranstaltungen erfolgt durch Ihre Kompetenzfeldleitung. <br /><br />
+					Ihre aktuell gültigen Lehraufträge und den LV Plan des aktuellen Semesters (Termine) finden Sie wie gewohnt unter „mein CIS“ -> „LV-Plan Hauptmenü“ bzw. „Lehrauftragsverwaltung“.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<b>Please note:</b> The information provided represents a preliminary planning and is intended as an inquiry to you.<br /><br />
+							The official assignment of the actual courses will be carried out by your Competence Field Manager.<br /><br />
+							Your currently valid teaching assignments and the course schedule for the current semester (dates) can be found as usual under “My CIS” → “Schedule Main Menu” or “Teaching Assignment Administration”',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 	array(
 		'app' => 'pep',
 		'category' => 'ui',
@@ -26131,6 +26337,27 @@ array(
 			)
 		)
 	),
+	//****************************	 FHC-Core-Notizcomponent
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_typeNotizIdIncorrect',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Id-Typ der Notiz ist nicht korrekt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Id type of note is incorrect',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	array(
 		'app' => 'core',
 		'category' => 'ui',
@@ -44665,9 +44892,9 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Für den gesamten Studiengang verbindlicher Termin.  
-				
-				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich, 
+				'text' => "Für den gesamten Studiengang verbindlicher Termin.
+
+				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich,
 				haben Studierende bei der Studiengangsassistenz um eine Korrektur dieses Termins anzusuchen.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -44858,7 +45085,7 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
-				
+
 				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -45188,6 +45415,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Download latest uploaded File',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4termineTimeLine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitstrahl Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timeline Deadlines',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -46669,6 +46916,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Timeline Deadlines',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4noZuordnungBetreuerStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No assignment or authorization found for the project!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -49650,6 +49917,667 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	// PROJEKTARBEITSBEURTEILUNG SS2025 ENDE ---------------------------------------------------------------------------
+	// CONTRACT MANAGEMENT START
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'addVertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Neuen Vertrag erstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add new contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'editVertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrag bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'deleteVertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrag löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'addStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragstatus hinzufügen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Add contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'editStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragstatus bearbeiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Edit contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'deleteStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragstatus löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'deleteLehrauftrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehrauftrag löschen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Delete teaching assignment',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'datum_vertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'contract date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertrag_urfassung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrags-Urfassung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'original version of the contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'filter_offeneVertraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur offene Verträge anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only open contracts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'error_addOrUpdateLehrauftraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Hinzufügen bzw. Aktualisieren von Lehraufträgen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error while adding or updating teaching assignments',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'error_insertOrUpdateStatusVertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Hinzufügen bzw. Aktualisieren des Vertragsstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error while adding or updating the contract status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'error_statusVorhanden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Status bereits vorhanden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Status already existing',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragErstellen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrag erstellen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Create contract',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragDetails',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragdetails',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract Details',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragStatus',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsstatus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract Status',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_fieldNotValidDate',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Das Eingabefeld {field} hat kein gültiges Datumsformat',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The input field {field} does not have a valid date format',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'text_explainLehrauftrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Die folgenden Lehraufträge sind noch keinem Vertrag zugeordnet. Markieren Sie die Lehraufträge um diese dem Vertrag zuzuordnen:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The following teaching assignments have not yet been assigned to a contract. Mark the teaching assignments to assign them to the contract:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'text_addLehrauftrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Folgende Lehraufträge werden hinzugefügt:',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'The following teaching assignments will be added:',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsverwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract management',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'nurAktiveMaAnzeigen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Nur aktive Mitarbeiter:innen anzeigen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Show only active employees',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'printHonorarvertrag',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Honorarvertrag drucken',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Print fee agreement',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'alertMindestensZweiVertraege',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte mindestens 2 Verträge auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select at least 2 contracts!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'alertOnlyApprovedContracts',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle Verträge müssen genehmigt sein.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All contracts must be approved.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsarten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsarten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Types of Contracts',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'idsDienstverhaeltnisse',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'IDs Dienstverhältnis',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'IDs employment relationship',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragstyp',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragstyp',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract Type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsdatum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsdatum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract Date',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsdatum_iso',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsdatum Iso',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract Date Iso',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'vertrag_id',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertrag ID',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract ID',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsstunden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Vertragsstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract hours',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'vertragsstunden_studiensemester',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'vertragsstunden Studiensemester',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Contract hours study semester',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'vertrag',
+		'phrase' => 'abgerechnet',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'abgerechnet',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'billed',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// CONTRACT MANAGEMENT END
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
@@ -53657,6 +54585,88 @@ and represent the current state of research on the topic. The prescribed citatio
 		)
 	),
 	//****************************	 CORE/search end
+	//****************************	 DetailHeader start
+	array(
+		'app' => 'core',
+		'category' => 'header',
+		'phrase' => 'error_fotoupload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Speichern des Fotos',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error saving photo',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'successFotoUpload',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Foto erfolgreich hochgeladen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Photoupload successful',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'header',
+		'phrase' => 'alert_chooseFoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte zuerst ein Bild auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select an image first!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'header',
+		'phrase' => 'error_noPhoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Kein Bild empfangen',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No picture received',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 DetailHeader end
 	array(
 		'app' => 'core',
 		'category' => 'lehre',
@@ -56184,6 +57194,28 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Refactor Messages END
+	//
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'error_noLehrverbandAssigned',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has no assignment to any teaching association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 );
 
 

@@ -99,6 +99,7 @@ export default {
 			this.formData.themenbereich = null;
 			this.formData.projekttyp_kurzbz = null;
 			this.formData.firma = null;
+			// dont reset these form fields for UX reasons
 			// this.formData.lehrveranstaltung_id = null;
 			// this.formData.lehreinheit_id = null;
 			this.formData.beginn = null;

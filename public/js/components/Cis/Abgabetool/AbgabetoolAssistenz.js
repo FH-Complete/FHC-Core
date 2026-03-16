@@ -180,7 +180,7 @@ export const AbgabetoolAssistenz = {
 					// 	frozen: true,
 					// 	width: 40
 					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 100, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -226,7 +226,7 @@ export const AbgabetoolAssistenz = {
 						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2026_02_26"
+				persistenceID: "abgabetool_2026_03_16"
 			},
 			abgabeTableEventHandlers: [
 			{
@@ -659,7 +659,7 @@ export const AbgabetoolAssistenz = {
 			actionButtons.className = "d-flex gap-3"; // you can keep Bootstrap gap if loaded
 			actionButtons.style.display = "flex";
 			actionButtons.style.alignItems = "stretch"; // buttons stretch to full height
-			actionButtons.style.justifyContent = "center";
+			actionButtons.style.justifyContent = "start";
 			actionButtons.style.height = "100%"; // full grid cell height
 
 			const val = cell.getValue();
@@ -702,6 +702,7 @@ export const AbgabetoolAssistenz = {
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
+
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
 			// but actually just revert it after the fact
@@ -789,7 +790,7 @@ export const AbgabetoolAssistenz = {
 					// TODO: mehrsprachig englisch
 					projekt.note_bez = opt.bezeichnung
 				}
-				
+
 				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
 				
 				return {
@@ -1457,7 +1458,6 @@ export const AbgabetoolAssistenz = {
 					<label class="col-form-label">{{$capitalize($p.t('lehre/note'))}}:</label>
 				</div>
 				<div class="col-3">
-					
 					<Dropdown
 						:placeholder="$p.t('lehre/note')" 
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 

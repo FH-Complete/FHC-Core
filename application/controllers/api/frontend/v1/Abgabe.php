@@ -511,10 +511,11 @@ class Abgabe extends FHCAPI_Controller
 			return $projektarbeit->projektarbeit_id;
 		};
 		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
-
-		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
-		$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
 		
+		if(count($projektarbeiten_ids) > 0) {
+			$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+			$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		}
 		
 		forEach($projektarbeiten->retval as $pa) {
 			
