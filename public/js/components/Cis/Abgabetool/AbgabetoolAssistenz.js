@@ -226,7 +226,7 @@ export const AbgabetoolAssistenz = {
 						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2026_02_26"
+				persistenceID: "abgabetool_2026_03_16"
 			},
 			abgabeTableEventHandlers: [
 			{
