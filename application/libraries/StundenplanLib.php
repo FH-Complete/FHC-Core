@@ -382,11 +382,7 @@ class StundenplanLib
 
 		$tz = new DateTimeZone($this->_ci->config->item('timezone'));
 
-		$ferienEvents = $this->_ci->FerienModel->execReadOnlyQuery("
-		SELECT * 
-		FROM lehre.tbl_ferien
-		WHERE (bisdatum >= ? AND vondatum < ?) AND (studiengang_kz = 0 OR studiengang_kz = ?)
-		", [$start_date, $end_date, $studiengang_kz]);
+		$ferienEvents = $this->_ci->FerienModel->getByDateRange($start_date, $end_date, $studiengang_kz);
 
 		if (isError($ferienEvents))
 			return $ferienEvents;
