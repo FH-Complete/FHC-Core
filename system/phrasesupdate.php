@@ -44892,9 +44892,9 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Für den gesamten Studiengang verbindlicher Termin.  
-				
-				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich, 
+				'text' => "Für den gesamten Studiengang verbindlicher Termin.
+
+				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich,
 				haben Studierende bei der Studiengangsassistenz um eine Korrektur dieses Termins anzusuchen.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -45085,7 +45085,7 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
-				
+
 				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -57174,6 +57174,28 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Refactor Messages END
+	//
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'error_noLehrverbandAssigned',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has no assignment to any teaching association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
 );
 
 
