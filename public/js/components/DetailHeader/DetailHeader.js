@@ -44,6 +44,10 @@ export default {
 		currentSemester: {
 			type: String,
 			default: ''
+		},
+		isLoading: {
+			type: Boolean,
+			default: false
 		}
 	},
 	computed: {
@@ -107,7 +111,10 @@ export default {
 			leitungData: {},
 			isFetchingIssues: false,
 			noCurrentStatus: false,
-			semesterStatiLoading: false
+			semesterStatiLoading: false,
+			leitungOrgLoading: false,
+			departmentDataLoading: false,
+			headerDataLoading: false
 		};
 	},
 	methods: {
@@ -123,29 +130,40 @@ export default {
 				});
 		},
 		getHeader(person_id) {
+			this.headerDataLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getHeader(person_id))
 				.then(result => {
 					this.headerDataMa = result.data;
-
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.headerDataLoading = false;
+				});
 		},
 		loadDepartmentData(mitarbeiter_uid) {
+			this.departmentDataLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getPersonAbteilung(mitarbeiter_uid))
 				.then(result => {
 					this.departmentData = result.data;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.departmentDataLoading = false;
+				});
 		},
 		getLeitungOrg(oekurzbz){
+			this.leitungOrgLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getLeitungOrg(oekurzbz))
 				.then(result => {
 					this.leitungData = result.data;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.leitungOrgLoading = false;
+				});
 		},
 		async goToLeitung() {
 			this.loadHeaderData(this.leitungData.person_id, this.leitungData.uid);
@@ -205,7 +223,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					this.semesterStatiLoading = false
+					this.semesterStatiLoading = false;
 				});
 		},
 		setNoCurrentStatus() {
@@ -279,7 +297,7 @@ export default {
 				</div>
 
 				<div v-if="headerData.length == 1">
-					<div class="d-flex align-items-center gap-3">
+					<div v-if="!headerDataLoading" class="d-flex align-items-center gap-3">
 						<h2 class="h4">
 							{{headerData[0].titelpre}}
 							{{headerData[0].vorname}}
@@ -289,10 +307,19 @@ export default {
 						</h2>
 						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 					</div>
+					<div v-else class="d-flex align-items-center gap-3">
+						<pv-skeleton width="15rem" height="2rem" borderRadius="16px"></pv-skeleton>
+						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
+					</div>
 
 				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
 					<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
+					<span v-if="!headerDataLoading">
 					 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
+					 </span>
+					 <span v-else>
+					 	<pv-skeleton width="10rem"></pv-skeleton>
+					 </span>
 					<template v-if="!semesterStatiLoading">
 						<strong v-if="headerData[0].semester != null" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
 							{{headerData[0].semester}}
@@ -311,10 +338,13 @@ export default {
 					</template>
 				</h5>
 
-				<h5 class="h6">
+				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
 					<strong class="text-muted">Email </strong>
-					<span>
+					<span v-if="!headerDataLoading">
 						<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
+					</span>
+					<span v-else>
+						<pv-skeleton width="10rem"></pv-skeleton>
 					</span>
 					<strong class="text-muted"> | Status </strong>
 					<span v-if="noCurrentStatus">
@@ -332,19 +362,31 @@ export default {
 					</div>
 					<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
-						<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueGammaTile"></slot>
+						</h6>
 					</div>
 					<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
-						<h6 class="text-muted text-center"><slot name="valueBetaTile"></slot></h6>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueBetaTile"></slot>
+						</h6>
 					</div>
 					<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
-						<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueAlphaTile"></slot>
+						</h6>
 					</div>
 					<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
 						<h4 class="mb-1 text-center">UID</h4>
-						<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="uid"></slot>
+						</h6>
 					</div>
 				</div>
 			</div>
