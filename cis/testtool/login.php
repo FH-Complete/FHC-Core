@@ -142,7 +142,9 @@ if (isset($_REQUEST['prestudent']))
 		}
 		if ($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
-			if ($rt->freigeschaltet)
+			$pruefling_registered = new Pruefling();
+			$registered = $pruefling_registered->personRegisteredRT($ps->person_id, $rt->reihungstest_id, $ps->prestudent_id);
+			if ($rt->freigeschaltet && $registered)
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
@@ -282,7 +284,14 @@ if (isset($_REQUEST['prestudent']))
 			}
 			else
 			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				if (!$registered)
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtRegistriert').'</div>';
+				}
+				else
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				}
 			}
 		}
 		else

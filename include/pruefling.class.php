@@ -597,5 +597,31 @@ class pruefling extends basis_db
 			return false;
 		}
 	}
+
+	public function personRegisteredRT($person_id, $reihungstest_id, $prestudent_id)
+	{
+		$qry = "SELECT tbl_prestudent.prestudent_id
+				FROM public.tbl_rt_person
+					JOIN public.tbl_prestudent ON tbl_prestudent.person_id = tbl_rt_person.person_id
+					JOIN public.tbl_prestudentstatus ON tbl_prestudent.prestudent_id = tbl_prestudentstatus.prestudent_id AND status_kurzbz = 'Bewerber'
+						AND tbl_prestudentstatus.studienplan_id = tbl_rt_person.studienplan_id
+				WHERE tbl_rt_person.person_id = " . $this->db_add_param($person_id) . "
+					AND tbl_rt_person.rt_id = " . $this->db_add_param($reihungstest_id) . "
+					AND tbl_prestudent.prestudent_id = " . $this->db_add_param($prestudent_id) . "
+				LIMIT 1";
+
+		if($result = $this->db_query($qry))
+		{
+			if ($this->db_num_rows($result) == 0)
+				return false;
+			else
+				return true;
+		}
+		else
+		{
+			$this->errormsg = 'Fehler bei einer Abfrage';
+			return false;
+		}
+	}
 }
 ?>

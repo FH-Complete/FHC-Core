@@ -17,6 +17,7 @@ $this->phrasen['testtool/basic']='Basic';
 $this->phrasen['testtool/basisgebiete']='Basic test';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='The entrance examination assigned has not yet been activated.';
+$this->phrasen['testtool/reihungstestNichtRegistriert']='You are not registered for the placement test.';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='The placement test you are assigned to could not be loaded. Please contact the placement test supervisior.';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Your date of birth does not correspond to the data we have. Please speak to the supervisor. ';
 $this->phrasen['testtool/home']='Home';
