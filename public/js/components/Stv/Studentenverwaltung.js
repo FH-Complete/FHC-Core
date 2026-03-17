@@ -214,8 +214,7 @@ export default {
 					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
 						+ 'content/statistik/lvplanung.php?'
 						+ '&studiengang_kz=' + studiengang_kz
-						+ '&semester=' + semester
-						+ '&orgform_kurzbz=' + orgform,
+						+ '&semester=' + semester,
 					description: 'stv/lvplanung_html'
 				});
 			}
