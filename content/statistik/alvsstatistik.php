@@ -114,7 +114,7 @@ WHERE
 	tbl_projektarbeit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
 	tbl_projektbetreuer.person_id=tbl_person.person_id AND
 	tbl_projektbetreuer.stunden<>0 AND
-	tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($stsem)."
+	tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($stsem)."
 GROUP BY studiengang_kz,geschlecht";
 
 if(!$result = $db->db_query($qry))
