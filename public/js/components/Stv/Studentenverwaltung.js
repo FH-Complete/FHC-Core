@@ -192,6 +192,35 @@ export default {
 			}
 
 			return extraItems;
+		},
+		appMenuLvPlanungItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined && this.selected_semester !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+				const semester = String(this.selected_semester);
+				const orgform = this.selected_orgform || '';
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.xls.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&studiensemester_kurzbz=' + this.studiensemesterKurzbz
+						+ '&orgform_kurzbz=' + orgform,
+					description: 'stv/lvplanung_xls'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&orgform_kurzbz=' + orgform,
+					description: 'stv/lvplanung_html'
+				});
+			}
+
+			return extraItems;
 		}
 	},
 	watch: {
@@ -621,6 +650,29 @@ export default {
 								<ul class="dropdown-menu p-0">
 									<li
 										v-for="(item, key) in appMenuExtraItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li class="dropend">
+								<a
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									:class="{ disabled: !appMenuExtraItems.length }"
+									data-bs-popper-config='{"strategy":"fixed"}'
+								>
+									{{ $p.t('stv/lvplanung') }}
+								</a>
+								<ul class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuLvPlanungItems"
 										:key="key"
 									>
 										<a class="dropdown-item" :href="item.link" target="_blank">
