@@ -170,6 +170,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 51,
 					'requiredPermissions' => 'vertrag/mitarbeiter:r'
+				),
+				'studierendenverwaltung' => array(
+					'link' => site_url('studentenverwaltung'),
+					'description' => 'Studierendenverwaltung',
+					'expand' => true,
+					'sort' => 52,
+					'requiredPermissions' => ['admin:r', 'assistenz:r']
 				)
 			)
 		),
