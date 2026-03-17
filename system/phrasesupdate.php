@@ -57255,6 +57255,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'RTVerwaltung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Reihungstestverwaltung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Administration Placement Test',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 
 );
 
