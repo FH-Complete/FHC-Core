@@ -211,7 +211,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 
 				$qry_proj = "
 					SELECT
-						lehrveranstaltung_id, titel, themenbereich, note, titel_english,
+						lehre.tbl_projektarbeit.lehrveranstaltung_id, titel, themenbereich, note, titel_english,
 						tbl_projekttyp.bezeichnung, projekttyp_kurzbz
 					FROM
 						lehre.tbl_projektarbeit
