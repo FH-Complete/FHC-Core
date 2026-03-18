@@ -53,6 +53,11 @@ export default {
 								section.widgets.push(widget);
 							}
 						});
+						this.funktionen.forEach(funktion => {
+							if(funktion.funktion_kurzbz === section_name && funktion.has_preset < 1) {
+								funktion.has_preset = 1;
+							}
+						});
 					})
 					.catch(this.$fhcAlert.handleSystemError);
 			})
@@ -151,30 +156,36 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 
+		},
+		loadFunktionen() {
+			this.$api
+				.call(ApiDashboardAdmin.loadFunktionen(this.dashboard))
+				.then(result => {
+					this.funktionen = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
-		this.$api
-			.call(ApiDashboardAdmin.loadFunktionen())
-			.then(result => {
-				//console.log(result);
-				result.data.forEach(funktion => {
-					this.funktionen[funktion.funktion_kurzbz] = funktion.beschreibung;
-				});
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+		this.loadFunktionen();
 	},
 	watch: {
 		dashboard() {
 			// TODO(chris): this should be done without a watcher
 			this.loadSections({target:this.$refs.funktionenList});
+			this.loadFunktionen();
 		}
 	},
 	template: `<div class="dashboard-admin-presets">
 		<div class="row">
 			<div class="col-3">
 				<select ref="funktionenList" style="height:30em" class="form-control" multiple @input="loadSections">
-					<option v-for="name,id in funktionen" :key="id" :value="id">{{ name }}</option>
+					<option
+						v-for="funktion in funktionen"
+						:key="funktion.funktion_kurzbz"
+						:value="funktion.funktion_kurzbz"
+						:class="(funktion.has_preset > 0) ? 'fw-bold' : ''"
+					>{{ funktion.beschreibung }}</option>
 				</select>
 			</div>
 			<div class="col-9">

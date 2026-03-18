@@ -55,10 +55,11 @@ export default {
 			params
 		};
 	},
-	loadFunktionen(){
+	loadFunktionen(dashboard_kurzbz){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/funktionen'
+			url: 'api/frontend/v1/dashboard/DashboardAdmin/funktionen?db='
+				+ encodeURIComponent(dashboard_kurzbz)
 		};
 	},
 	addWidgetsToPreset(params){

@@ -205,18 +205,63 @@ class DashboardAdmin extends FHCAPI_Controller
 	//Presets
 	public function funktionen()
 	{
-		$this->FunktionModel->addSelect('funktion_kurzbz, beschreibung');
-		$this->FunktionModel->addOrder('beschreibung', 'ASC');
-		$result = $this->FunktionModel->loadWhere(array('aktiv' => true));
+		$dashboard_kurzbz = $this->input->get('db');
+		if(!$dashboard_kurzbz)
+		{
+			$this->terminateWithError('missing query parameter db');
+		}
+		$sql = <<<EOSQL
+			with
+			dashboard_presets as (
+					select
+						*
+					from
+						dashboard.tbl_dashboard_preset dp
+					join
+						dashboard.tbl_dashboard d on d.dashboard_id = dp.dashboard_id
+					where
+						d.dashboard_kurzbz = {$this->db->escape($dashboard_kurzbz)}
+			),
+			general as 	(
+				select
+					'general' as funktion_kurzbz,
+					'Allgemein' as beschreibung
+			)
+
+			(
+				select
+					f.funktion_kurzbz,
+					f.beschreibung,
+					count(p.preset_id) as has_preset
+				from
+					general f
+				left join
+					dashboard_presets p on p.funktion_kurzbz is null
+				group by
+					f.funktion_kurzbz, f.beschreibung
+			)
+			union ALL
+			(
+				select
+					f.funktion_kurzbz,
+					f.beschreibung,
+					count(p.preset_id) as has_preset
+				from
+					public.tbl_funktion f
+				left join
+					dashboard_presets p on p.funktion_kurzbz = f.funktion_kurzbz
+				group by
+					f.funktion_kurzbz, f.beschreibung
+				order by
+					f.beschreibung asc
+			)
+EOSQL;
+		$result = $this->FunktionModel->execReadOnlyQuery($sql);
 
 		if (isError($result))
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 
 		$funktionen = getData($result) ?: [];
-		array_unshift($funktionen, (object) array(
-			'funktion_kurzbz' => 'general',
-			'beschreibung' => 'Allgemein'
-		));
 		$this->terminateWithSuccess($funktionen);
 	}
 

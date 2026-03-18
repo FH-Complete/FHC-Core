@@ -4,7 +4,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  */
-class DashboardDemo extends Auth_Controller
+class DashboardAdmin extends Auth_Controller
 {
     private $_uid;  // uid of the logged user
 
@@ -16,8 +16,8 @@ class DashboardDemo extends Auth_Controller
         // Set required permissions
         parent::__construct(
             array(
-                'index' => 'dashboard/benutzer:r',
-                'admin' => 'dashboard/admin:rw'
+                'index' => 'dashboard/admin:rw',
+				'preview' => 'dashboard/admin:r',
             )
         );
 
@@ -33,15 +33,14 @@ class DashboardDemo extends Auth_Controller
     // Public methods
 	public function index()
 	{
-		$this->load->view('dashboard/dashboard_demo.php', []);
+        $this->load->view('dashboard/dashboard_admin.php', []);
 	}
 
-    // -----------------------------------------------------------------------------------------------------------------
-    // Public methods
-    public function admin()
-    {
-        $this->load->view('dashboard/dashboard_demo_admin.php', []);
-    }
+	public function preview()
+	{
+		$dashboard_kurzbz = $this->input->get('db') ?? 'CIS';
+		$this->load->view('dashboard/dashboard_preview.php', ['dashboard_kurzbz' => $dashboard_kurzbz]);
+	}
 
     // -----------------------------------------------------------------------------------------------------------------
     // Private methods
