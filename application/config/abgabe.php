@@ -26,7 +26,9 @@ $config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_ASSISTENZ'] = ['end'];
 $config['RELEVANT_PAABGABETYPEN_SAMMELMAIL_STUDENT'] = ['qualgate1', 'qualgate2', 'zwischen', 'note', 'abstract', 'end', 'enda'];
 //$config['ALLOWED_NOTEN_ABGABETOOL'] = ['Bestanden', 'Nicht bestanden'];
 $config['ALLOWED_NOTEN_ABGABETOOL'] = [10, 14]; // tbl_note pk
-
+// benotete projektarbeiten sperren weitere terminanlage & bearbeitung, diese noten sind ausnahmen dieser Regel
+// wie zB "Nicht beurteilt" & "Noch nicht eingetragen"
+$config['NONFINAL_NOTEN_ABGABETOOL'] = [9];
 $config['beurteilung_link_fallback'] = 'addons/fhtw/content/projektbeurteilung/projektbeurteilungDocumentExport.php?projektarbeit_id=?&betreuerart_kurzbz=?&person_id=?';
 
 $config['PROJEKTARBEITSBEURTEILUNG_MAIL_BASELINK_ERSTBEGUTACHTER'] = 'index.ci.php/extensions/FHC-Core-Projektarbeitsbeurteilung/ProjektarbeitsbeurteilungErstbegutachter';
@@ -36,3 +38,8 @@ $config['SIGNATUR_CHECK_PAABGABETYPEN'] = ['end'];
 
 // to be used as "https://moodle.technikum-wien.at/course/view.php?idnumber=dl{$stg_kz}" for stg specific moodle routing
 $config['STG_MOODLE_LINK'] = 'https://moodle.technikum-wien.at/course/view.php?idnumber=dl';
+
+$config['ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT'] = true;
+$config['ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER'] = true;
+
+$config['BETREUER_SAMMELMAIL_BUTTON_STUDENT'] = true;

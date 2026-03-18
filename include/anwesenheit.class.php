@@ -489,7 +489,7 @@ class anwesenheit extends basis_db
 					gesamt AS gesamtstunden, 
 					anwesend, 
 					nichtanwesend, 
-					trunc(100-(nichtanwesend/gesamt)*100,2) AS prozent
+					CASE WHEN gesamt = 0 THEN 100.00 ELSE trunc(100-(nichtanwesend/(gesamt))*100,2) END AS prozent
 
 				FROM(
 					SELECT 
@@ -499,9 +499,10 @@ class anwesenheit extends basis_db
 					lehrveranstaltung_id, 
 					bezeichnung, 
 					student_uid, 
-					COUNT(stundenplan_id) AS gesamt, 
-					CASE WHEN anwesend.summe IS NULL THEN 0 ELSE anwesend.summe END AS anwesend, 
-					CASE WHEN nichtanwesend.summe IS NULL THEN 0 ELSE nichtanwesend.summe END AS nichtanwesend
+					--COUNT(stundenplan_id) AS gesamts, 
+					COALESCE(anwesend.summe, 0) + COALESCE(nichtanwesend.summe, 0) AS gesamt,
+					COALESCE(anwesend.summe, 0) AS anwesend, 
+					COALESCE(nichtanwesend.summe, 0) AS nichtanwesend
 					
 					FROM
 					(
