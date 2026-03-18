@@ -470,12 +470,12 @@ class Stundenplan_model extends DB_Model
 				}
 				foreach($studentlehrverbaende[$sem_date] as $key=>$lehrverband)
 				{
-					$query .= "((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
+					$query .= "(((sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND sp.gruppe = ".$this->escape($lehrverband->gruppe)." AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer den ganzen Verband
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND sp.verband = ".$this->escape($lehrverband->verband)." AND (sp.gruppe is null OR sp.gruppe='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)." AND ".$this->escape($sem_date_range->ende).")";
 					// Eintraege fuer das ganze Semester
 					$query .= "OR (sp.studiengang_kz = ".$this->escape($lehrverband->studiengang_kz)." AND sp.semester = ".$this->escape($lehrverband->semester)." AND (sp.verband is null OR sp.verband='') AND sp.datum BETWEEN ".$this->escape($sem_date_range->start)
-						." AND ".$this->escape($sem_date_range->ende).")". $stringGroupLv. ")";
+						." AND ".$this->escape($sem_date_range->ende).")) AND gruppe_kurzbz is null)";
 
 					$query .="OR";
 				}
@@ -534,5 +534,54 @@ class Stundenplan_model extends DB_Model
 		$query = $this->db->get_compiled_select('lehre.vw_stundenplan sp');
 
 		return $this->execQuery($query, [$uid, $uid]);
+	}
+
+	/**
+	 * Get Stundenplantermine for given Lehreinheit.
+	 *
+	 * @param $lehreinheit_id
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLe($lehreinheit_id)
+	{
+		$qry = '
+			SELECT DISTINCT
+			    datum
+			FROM 
+		       	lehre.vw_stundenplan
+			WHERE 
+				lehreinheit_id = ?
+			ORDER BY 
+			    datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehreinheit_id]);
+	}
+
+	/**
+	 * Get Stundenplantermine for given Lehrveranstaltung of given Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getTermineByLv($lehrveranstaltung_id, $studiensemester_kurzbz)
+	{
+		$qry = '
+		  	SELECT DISTINCT
+				datum
+	   		FROM
+	   		    lehre.vw_stundenplan
+	  		WHERE 
+	  		    lehreinheit_id IN (
+					SELECT lehreinheit_id
+					FROM lehre.tbl_lehreinheit 
+					WHERE lehrveranstaltung_id = ?
+					AND studiensemester_kurzbz = ?
+				)    
+	   		ORDER BY datum ASC
+		';
+
+		return $this->execQuery($qry, [$lehrveranstaltung_id, $studiensemester_kurzbz]);
 	}
 }

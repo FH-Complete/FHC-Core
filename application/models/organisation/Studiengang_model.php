@@ -657,37 +657,7 @@ class Studiengang_model extends DB_Model
 		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 		$this->load->model('person/Person_model', 'PersonModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
-
-		$addEmailProperty= function(&$benutzerfunktionen){
-			if(count($benutzerfunktionen) && defined('DOMAIN'))
-			{
-				$benutzerfunktionen = array_map(function($benutzer)
-				{
-					$benutzer->email = $benutzer->alias."@".DOMAIN;
-					return $benutzer;
-				},$benutzerfunktionen) ;
-			}
-
-		};
-		$addFotoProperty= function(&$collection){
-			$collection = array_map(function($item){
-				$person_id = $this->PersonModel->getByUid($item->uid);
-				if(isError($person_id))
-					return error($person_id);
-				$person_id = current(getData($person_id))->person_id;
-				$this->PersonModel->addSelect('foto');
-				$foto = $this->PersonModel->loadWhere(array('person_id'=>$person_id));
-				if(isError($foto))
-					return error($foto);	
-				$foto = current(getData($foto))->foto;
-				$item->foto = $foto;
-				return $item;
-			},$collection);
-		};
 		
-
-		$this->load->model('crm/Student_model', 'StudentModel');
-
 		$student = $this->StudentModel->loadWhere(['student_uid' => getAuthUID()]);
 		if (isError($student))
 			return error($student);
@@ -712,7 +682,7 @@ class Studiengang_model extends DB_Model
 		$stg_ltg = array_values(array_filter($stg_ltg, function($stg_leitung){
 			return $stg_leitung->aktiv;
 		}));
-		$addFotoProperty($stg_ltg);
+		$this->addFotoProperty($stg_ltg);
 
 		$gf_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('gLtg', $stg_obj->oe_kurzbz);
 		if (isError($gf_ltg))
@@ -721,8 +691,8 @@ class Studiengang_model extends DB_Model
 		$gf_ltg = array_values(array_filter($gf_ltg, function($gf_leitung){
 			return $gf_leitung->aktiv;
 		}));
-		$addEmailProperty($gf_ltg);
-		$addFotoProperty($gf_ltg);
+		$this->addEmailProperty($gf_ltg);
+		$this->addFotoProperty($gf_ltg);
 
 		$stv_ltg = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stvLtg', $stg_obj->oe_kurzbz);
 		if (isError($stv_ltg))
@@ -731,8 +701,8 @@ class Studiengang_model extends DB_Model
 		$stv_ltg = array_values(array_filter($stv_ltg, function($stv_leitung){
 			return $stv_leitung->aktiv;
 		}));
-		$addEmailProperty($stv_ltg);
-		$addFotoProperty($stv_ltg);
+		$this->addEmailProperty($stv_ltg);
+		$this->addFotoProperty($stv_ltg);
 
 		$ass = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
 		if (isError($ass))
@@ -741,8 +711,8 @@ class Studiengang_model extends DB_Model
 		$ass = array_values(array_filter($ass, function($assistenz){
 			return $assistenz->aktiv;
 		}));
-		$addEmailProperty($ass);
-		$addFotoProperty($ass);
+		$this->addEmailProperty($ass);
+		$this->addFotoProperty($ass);
 
 		$hochschulvertr = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('hsv');
 		if (isError($hochschulvertr))
@@ -751,7 +721,7 @@ class Studiengang_model extends DB_Model
 		$hochschulvertr = array_values(array_filter($hochschulvertr, function($hochschul_vertreter){
 			return $hochschul_vertreter->aktiv;
 		}));
-		$addEmailProperty($hochschulvertr);
+		$this->addEmailProperty($hochschulvertr);
 
 
 		$stdv = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('stdv', $stg_obj->oe_kurzbz);
@@ -761,7 +731,7 @@ class Studiengang_model extends DB_Model
 		$stdv = array_values(array_filter($stdv, function($std_vertreter){
 			return $std_vertreter->aktiv;
 		}));
-		$addEmailProperty($stdv);
+		$this->addEmailProperty($stdv);
 
 
 		$jahrgangsvertr = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('jgv', $stg_obj->oe_kurzbz, $semester);
@@ -771,7 +741,7 @@ class Studiengang_model extends DB_Model
 		$jahrgangsvertr = array_values(array_filter($jahrgangsvertr, function($jahrgang_vertreter){
 			return $jahrgang_vertreter->aktiv;
 		}));
-		$addEmailProperty($jahrgangsvertr);
+		$this->addEmailProperty($jahrgangsvertr);
 
 
 		$result_object = new stdClass();
@@ -800,5 +770,142 @@ class Studiengang_model extends DB_Model
 		WHERE aktiv = TRUE AND studiengang_kz = ? AND orgform_kurzbz = ? AND tbl_lehreinheit.studiensemester_kurzbz IN ?';
 
 		return $this->execReadOnlyQuery($qry, array($studiengang_kz, $orgform_kurzbz, $studiensemester_kurzbz));
+	}
+
+	/**
+	 * Get active Studiengänge with Kuerzel by given Studiengang-Kennzahlen.
+	 * Helpful to easily get Studiengänge the user is entitled for.
+	 *
+	 * @param $studiengang_kz_arr
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null	Returns one row per Studiengang. Not considering the Orgforms.
+	 */
+	public function getByStgs($studiengang_kz_arr, $studiensemester_kurzbz)
+	{
+		if (is_numeric($studiengang_kz_arr))
+		{
+			$studiengang_kz_arr = [$studiengang_kz_arr];
+		}
+
+		$qry = '
+			SELECT
+				DISTINCT stg.*, UPPER(typ::varchar(1) || kurzbz) AS kuerzel
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz IN ?
+				AND stplsem.studiensemester_kurzbz = ?
+			ORDER BY
+				stg.kurzbzlang
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz_arr, $studiensemester_kurzbz]);
+	}
+
+	/**
+	 * Get OrgForms of given Studiengang and Studiensemester.
+	 *
+	 * @param $studiengang_kz
+	 * @param $studiensemester_kurzbz
+	 * @return array|stdClass|null
+	 */
+	public function getOrgformsByStg($studiengang_kz, $studiensemester_kurzbz)
+	{
+		$qry = '
+			SELECT
+				stpl.orgform_kurzbz
+			FROM
+				public.tbl_studiengang stg
+				JOIN lehre.tbl_studienordnung sto USING(studiengang_kz)
+				JOIN lehre.tbl_studienplan stpl USING(studienordnung_id)
+				JOIN lehre.tbl_studienplan_semester stplsem USING(studienplan_id)
+			WHERE
+				stg.studiengang_kz = ?
+				AND stg.aktiv = TRUE
+				AND stplsem.studiensemester_kurzbz = ?
+			GROUP BY
+				stpl.orgform_kurzbz
+			ORDER BY
+				CASE stpl.orgform_kurzbz
+					WHEN \'VZ\' THEN 1
+					WHEN \'BB\' THEN 2
+					WHEN \'DUA\' THEN 3
+					ELSE 4
+				END,
+				stpl.orgform_kurzbz; 
+		';
+
+		return $this->execQuery($qry, [$studiengang_kz, $studiensemester_kurzbz]);
+	}
+	
+	public function getStudiengaengeFiltered($allowed_stg) {
+		$query ="SELECT DISTINCT
+					public.tbl_studiengang.studiengang_kz,
+					public.tbl_studiengang.bezeichnung,
+					public.tbl_studiengang.kurzbzlang,
+					public.tbl_studiengang.orgform_kurzbz
+				FROM public.tbl_studiengang JOIN lehre.tbl_studienordnung USING(studiengang_kz)
+					JOIN lehre.tbl_studienplan USING(studienordnung_id)
+					JOIN lehre.tbl_studienplan_semester USING(studienplan_id)
+				WHERE public.tbl_studiengang.aktiv = true
+				
+				AND public.tbl_studiengang.studiengang_kz IN ?
+				ORDER BY public.tbl_studiengang.kurzbzlang";
+
+		return $this->execReadOnlyQuery($query, [$allowed_stg]);
+	}
+	
+	public function getAssistenzForStudiengangKZ($stg_kz) {
+		$this->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
+		
+		$stg_obj = $this->load($stg_kz);
+		if(isError($stg_obj))
+			return error($stg_obj);
+		if(getData($stg_obj))
+		{
+			$stg_obj = current(getData($stg_obj));
+		}
+
+		$ass = $this->BenutzerfunktionModel->getBenutzerFunktionenDetailed('ass', $stg_obj->oe_kurzbz);
+		if (isError($ass))
+			return $ass;
+		$ass = getData($ass) ?: [];
+		$ass = array_values(array_filter($ass, function($assistenz){
+			return $assistenz->aktiv;
+		}));
+		
+		$this->addEmailProperty($ass);
+		
+		return success($ass);
+	}
+	
+	private function addEmailProperty(&$benutzerfunktionen) {
+		if(count($benutzerfunktionen) && defined('DOMAIN'))
+		{
+			$benutzerfunktionen = array_map(function($benutzer)
+			{
+				$benutzer->email = $benutzer->alias."@".DOMAIN;
+				return $benutzer;
+			},$benutzerfunktionen) ;
+		}
+	}
+	
+	private function addFotoProperty (&$collection) {
+		$collection = array_map(function($item){
+			$person_id = $this->PersonModel->getByUid($item->uid);
+			if(isError($person_id))
+				return error($person_id);
+			$person_id = current(getData($person_id))->person_id;
+			$this->PersonModel->addSelect('foto');
+			$foto = $this->PersonModel->loadWhere(array('person_id'=>$person_id));
+			if(isError($foto))
+				return error($foto);
+			$foto = current(getData($foto))->foto;
+			$item->foto = $foto;
+			return $item;
+		},$collection);
 	}
 }

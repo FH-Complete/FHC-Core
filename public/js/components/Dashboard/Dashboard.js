@@ -151,10 +151,6 @@ export default {
 				db: this.dashboard
 			}
 		}).then(res => {
-			res.data.retval.forEach(widget => {
-				widget.arguments = JSON.parse(widget.arguments);
-				widget.setup = JSON.parse(widget.setup);
-			});
 			this.widgets = res.data.retval;
 		}).catch(err => console.error('ERROR:', err));
 

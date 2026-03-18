@@ -142,6 +142,9 @@ const app = Vue.createApp({
         }
     }
 });
+
+FhcApps.makeExtendable(app);
+
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

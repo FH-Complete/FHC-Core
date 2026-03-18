@@ -636,7 +636,7 @@ class Status extends FHCAPI_Controller
 
 		$this->load->library('PrestudentLib');
 
-		$this->prestudentlib->setFirstStudent(
+		$resFirstStudent = $this->prestudentlib->setFirstStudent(
 			$prestudent_id,
 			$lastAufgenommener->studiensemester_kurzbz,
 			$lastAufgenommener->ausbildungssemester,
@@ -645,9 +645,8 @@ class Status extends FHCAPI_Controller
 			$this->input->post('statusgrund_id')
 		);
 
-		$this->getDataOrTerminateWithError($result);
-
-		$this->db->trans_commit();
+		$this->db->trans_complete();
+		$this->getDataOrTerminateWithError($resFirstStudent);
 
 		return $this->outputJsonSuccess(true);
 	}
@@ -1078,6 +1077,24 @@ class Status extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
+	protected function checkForCriticalChangesBis($oldstatus)
+	{
+		$changedFields = array();
+		$allowedFields = array('anmerkung', 'statusgrund_id');
+		$oldstatus_array = get_object_vars($oldstatus);
+		foreach($oldstatus_array as $key => $oldValue)
+		{
+			$newValue = $this->input->post($key);
+			if( $newValue !== $oldValue )
+			{
+				$changedFields[] = $key;
+			}
+		}
+		$criticalFieldsChanged = array_diff($changedFields, $allowedFields);
+		$hasCriticalChangesBis = count($criticalFieldsChanged) > 0 ? true : false;
+		return $hasCriticalChangesBis;
+	}
+
 	/**
 	 * Updates a status entry
 	 *
@@ -1102,6 +1119,7 @@ class Status extends FHCAPI_Controller
 
 		$oldstatus = current($oldstatus);
 
+		$hasCriticalChangesBis = $this->checkForCriticalChangesBis($oldstatus);
 
 		$isBerechtigtNoStudstatusCheck =  $this->permissionlib->isBerechtigt('student/keine_studstatuspruefung');
 		$isBerechtigtBasisPrestudentstatus = $this->permissionlib->isBerechtigt('basis/prestudentstatus');
@@ -1111,7 +1129,6 @@ class Status extends FHCAPI_Controller
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz') ?: $oldstatus->studiensemester_kurzbz;
 		$ausbildungssemester = $this->input->post('ausbildungssemester') ?: $oldstatus->ausbildungssemester;
 		$datum = $this->input->post('datum') ?: $oldstatus->datum;
-
 
 		//Form Validation
 		$this->load->library('form_validation');
@@ -1135,9 +1152,15 @@ class Status extends FHCAPI_Controller
 			$this->p->t('global', 'datum'),
 			[
 				'is_valid_date',
-				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck) {
+				['meldestichtag_not_exceeded', function ($value) use ($isBerechtigtNoStudstatusCheck, $hasCriticalChangesBis){
 					if ($isBerechtigtNoStudstatusCheck)
-						return true; // Skip if access right says so
+					{
+						return true; // Skip if access right says so*/
+					}
+					if (!$hasCriticalChangesBis) {
+						return true; // Skip if no critical changes were made
+					}
+
 					if (!$value)
 						return true; // Error will be handled by the required statement above
 

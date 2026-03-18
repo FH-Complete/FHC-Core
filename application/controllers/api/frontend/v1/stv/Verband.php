@@ -215,6 +215,7 @@ class Verband extends FHCAPI_Controller
 					$this->StudienordnungModel->addDistinct();
 					$this->StudienordnungModel->addSelect("CONCAT(studiengang_kz, '/', p.orgform_kurzbz) AS link");
 					$this->StudienordnungModel->addSelect("p.orgform_kurzbz AS name");
+					$this->StudienordnungModel->addSelect("studiengang_kz AS stg_kz");
 
 					$this->StudienordnungModel->addJoin('lehre.tbl_studienplan p', 'studienordnung_id');
 

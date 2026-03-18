@@ -56,6 +56,7 @@ export default {
 	},
 	data() {
 		return {
+			tablebuilt: false,
 			isVisibleDiv: false,
 			messageId: null
 		}
@@ -139,8 +140,10 @@ export default {
 		},
 		resetMessageId(){
 			this.messageId = null;
+		},
+		tableBuilt: function() {
+			this.tablebuilt = true;
 		}
-
 	},
 	template: `
 	<div class="core-messages h-100 pb-3">
@@ -155,6 +158,7 @@ export default {
 		</form>
 
 		<message-modal
+			v-if="tablebuilt || id.length > 1"
 			ref="modalMsg"
 			:type-id="typeId"
 			:id="id"
@@ -166,8 +170,9 @@ export default {
 		</message-modal>
 		
 		<!--in same page-->
-		<div v-show="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
+		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
+				v-if="tablebuilt || id.length > 1"
 				ref="templateNewDivMessage"
 				:type-id="typeId"
 				:id="id"
@@ -187,6 +192,7 @@ export default {
 				:openMode="openMode"
 				@newMessage="handleMessage"		
 				@replyToMessage="handleMessage"
+				@tabulator_tablebuilt="tableBuilt"
 			>		
 			</table-messages>
 		</div>
