@@ -205,12 +205,19 @@ class DashboardAdmin extends FHCAPI_Controller
 	//Presets
 	public function funktionen()
 	{
-		$result = $this->FunktionModel->load();
+		$this->FunktionModel->addSelect('funktion_kurzbz, beschreibung');
+		$this->FunktionModel->addOrder('beschreibung', 'ASC');
+		$result = $this->FunktionModel->loadWhere(array('aktiv' => true));
 
 		if (isError($result))
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 
-		$this->terminateWithSuccess(getData($result) ?: []);
+		$funktionen = getData($result) ?: [];
+		array_unshift($funktionen, (object) array(
+			'funktion_kurzbz' => 'general',
+			'beschreibung' => 'Allgemein'
+		));
+		$this->terminateWithSuccess($funktionen);
 	}
 
 	public function addWidgetsToPreset()
