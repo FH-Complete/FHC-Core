@@ -53,7 +53,6 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
-			tableData: null,
 			studiensemesterOptions: null,
 			allSem: null,
 			curSem: null,
@@ -185,7 +184,7 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgform'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
@@ -210,20 +209,34 @@ export const AbgabetoolAssistenz = {
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncPrevTermin,
+						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncNextTermin,
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList },
-						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						field: 'qgate1Status',
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG1'
+						},
+						widthGrow: 1, width: 220, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList },
-						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						field: 'qgate2Status', 
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG2'
+						},
+						widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
 				persistenceID: "abgabetool_2026_03_16"
@@ -247,6 +260,61 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		shortLongTitleFormatter(cell, formatterParams, onRendered) {
+			const longForm = cell.getValue()
+			const shortForm = formatterParams?.shortForm
+			
+			if(longForm && shortForm) {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>`
+			} else {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>`
+			}
+		
+		},
+		toolTipFuncPrevTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			return this.mapDateStyleToTabulatorTooltip(data.prevTermin.dateStyle);
+		},
+		toolTipFuncNextTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			return this.mapDateStyleToTabulatorTooltip(data.nextTermin.dateStyle);
+		},
+		mapDateStyleToTabulatorTooltip(dateStyleString) {
+			switch(dateStyleString) {
+				case 'bestanden':
+					return this.$p.t('abgabetool/c4tooltipBestanden')
+				break;
+				case 'nichtbestanden':
+					return this.$p.t('abgabetool/c4tooltipNichtBestanden')
+				break;
+				case 'beurteilungerforderlich':
+					return this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')
+				break;
+				case 'verspaetet':
+					return this.$p.t('abgabetool/c4tooltipVerspaetet')
+				break;
+				case 'abgegeben':
+					return this.$p.t('abgabetool/c4tooltipAbgegeben')
+				break;
+				case 'verpasst':
+					return this.$p.t('abgabetool/c4tooltipVerpasst')
+				break;
+				case 'abzugeben':
+					return this.$p.t('abgabetool/c4tooltipAbzugeben')
+				break;
+				case 'standard':
+					return this.$p.t('abgabetool/c4tooltipStandardv2')
+				break;
+				default: return ''
+			}
+		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
 			this.$refs.abgabeTable.tabulator.redraw(true)
@@ -428,6 +496,32 @@ export const AbgabetoolAssistenz = {
 					projekt.qgate2StatusRank = 1
 				}
 			})
+			
+			// set shorthand statuscode once real status has been determined
+			projekt.qgate1StatusShort = this.mapRankToShortStatus(projekt.qgate1StatusRank)
+			projekt.qgate2StatusShort = this.mapRankToShortStatus(projekt.qgate2StatusRank)
+		},
+		mapRankToShortStatus(rank) {
+				switch(rank){
+					case 0: // kein termin vorhanden
+						return '--'
+						break;
+					case 1: // noch nicht stattgefunden
+						return 'o'
+						break;
+					case 2: // noch nicht abgegeben
+						return '?'
+						break;
+					case 3: // noch nicht benotet
+						return '~'
+						break;
+					case 4: // negativ benotet
+						return '-'
+						break;
+					case 5: // positiv benotet
+						return '+'
+						break;
+				}
 		},
 		getItemBezeichnung(item){
 			if(!item.bezeichnung) return ''
@@ -901,37 +995,37 @@ export const AbgabetoolAssistenz = {
 			this.$refs.drawer.show()
 		},
 		centeredTextFormatter(cell) {
-			const val = cell.getValue()
-			if(!val) return
+			const longForm = cell.getValue()
+			if(!longForm) return
+			const data = cell.getData()
+			const entry = Object.entries(data).find(entry => entry[1] == longForm)
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<p style="max-width: 100%; overflow-wrap: break-word; word-break: break-word; white-space: normal; margin: 0px; text-align: center">'+val+'</p></div>'
+			// shortFormKey must have same keyname as longForm but with 'Short' appended 
+			const shortForm = data[entry[0]+'Short']
+
+			if(shortForm && longForm) {
+				return `<div style="display: flex; justify-content: start; align-items: center; height: 100%; width: 100%;">
+				<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>
+				</div>`;
+			} else {
+				return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+					'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">'+longForm+'</p></div>'
+			}
 		},
 		detailFormatter(cell) {
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
 				'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
-		},
-		mailFormatter(cell) {
-			const val = cell.getValue()
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
-		},
-		timelineFormatter() {
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a><i class="fa fa-timeline" style="color:#00649C"></i></a></div>'
-		},
-		beurteilungFormatter(cell) {
-			const val = cell.getValue()
-			if(val) {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
-			} else return '-'
 		},
 		pkzTextFormatter(cell) {
 			const val = cell.getValue()
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</a></div>'
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
 		},
 		abgabterminFormatter(cell) {
 			const val = cell.getValue()
@@ -968,14 +1062,14 @@ export const AbgabetoolAssistenz = {
 				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
 				
 				return '<div style="display: flex; height: 100%">' +
-					'<div class=' + val.dateStyle + "-header" + ' style="width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+					'<div class=' + val.dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
 						icon +
 					'</div>' + 
 					'<div style="margin-left: 4px;">' +
-						'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
+						'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
 					'</div>'+
 					'</div>'
-
+				
 			} else {
 				return ''
 			}
@@ -1001,14 +1095,13 @@ export const AbgabetoolAssistenz = {
 			return projekt.zweitbetreuer_full_name ?? ''
 		},
 		async setupData(data){
-			this.projektarbeiten = data[0]
 			this.domain = data[1]
-			
-			this.tableData = this.mapProjekteToTableData(this.projektarbeiten)
+
+			this.projektarbeiten = this.mapProjekteToTableData(data[0])
 
 			await this.tableBuiltPromise
 			
-			this.$refs.abgabeTable.tabulator.setData(this.tableData);
+			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
