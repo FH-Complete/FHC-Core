@@ -24,7 +24,7 @@ export default {
 			.then(result => {
 				this.$emit('assignWidgets', result.data.map(el => ({
 					...el,
-					...{setup:JSON.parse(el.setup),arguments:JSON.parse(el.arguments),allowed:!!el.allowed}
+					allowed: !!el.allowed
 				})));
 			})
 			.catch(this.$fhcAlert.handleSystemError);
