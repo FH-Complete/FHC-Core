@@ -167,7 +167,12 @@ export const AbgabetoolMitarbeiter = {
 						titleFormatterParams: {
 							shortForm: 'QG1'
 						},
-						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate1Status
+						}
+					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList },
@@ -175,7 +180,12 @@ export const AbgabetoolMitarbeiter = {
 						titleFormatterParams: {
 							shortForm: 'QG2'
 						},
-						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false}
+						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate2Status
+						}
+					}
 				],
 				persistence: false,
 				persistenceID: 'abgabeTableBetreuer2026-02-26'
