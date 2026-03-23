@@ -123,7 +123,7 @@ class User extends FHCAPI_Controller
 		$uid = $this->authlib->getAuthObj()->username;
 		
 		$override = $this->dashboardlib->getOverride($dashboard_kurzbz, $uid);
-		if (empty($override))
+		if (!$override)
 			show_404();
 		
 		$override_decoded = json_decode($override->override, true);
