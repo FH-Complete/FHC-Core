@@ -4,6 +4,7 @@ import DashboardAdminWidgets from "./Admin/Widgets.js";
 import DashboardAdminPresets from "./Admin/Presets.js";
 
 import ApiDashboardAdmin from "../../api/factory/dashboard/dashboardAdmin.js";
+import ApiDashboardWidget from "../../api/factory/dashboard/widget.js";
 
 export default {
 	name: 'DashboardAdmin',
@@ -14,7 +15,8 @@ export default {
 	},
 	provide() {
 		return {
-			adminMode: true
+			adminMode: true,
+			widgetsSetup: Vue.computed(() => this.dashboards[this.current] ? this.dashboards[this.current].widgetSetup : null)
 		};
 	},
 	data() {
@@ -93,6 +95,14 @@ export default {
 			.call(ApiDashboardAdmin.getAllDashboards())
 			.then(result => {
 				this.dashboards = result.data.retval;
+				for (const dashboard of this.dashboards) {
+					this.$api
+						.call(ApiDashboardWidget.list(dashboard.dashboard_id))
+						.then(res => {
+							dashboard.widgetSetup = res.data;
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
