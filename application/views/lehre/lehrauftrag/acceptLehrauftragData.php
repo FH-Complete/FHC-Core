@@ -268,8 +268,8 @@ FROM
                 FROM
                     lehre.tbl_projektbetreuer                      pb
                         JOIN lehre.tbl_projektarbeit               pa USING (projektarbeit_id)
+                        JOIN lehre.tbl_lehreinheit                 le ON (le.lehrveranstaltung_id = pa.lehrveranstaltung_id AND le.studiensemester_kurzbz = pa.studiensemester_kurzbz)
                         JOIN lehre.tbl_lehrveranstaltung           lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
-                        JOIN lehre.tbl_lehreinheit                 le ON (lv.lehrveranstaltung_id = le.lehrveranstaltung_id)
                         JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
                         JOIN PUBLIC.tbl_person                     person USING (person_id)
                         LEFT JOIN lehre.tbl_vertrag                vertrag USING (vertrag_id)

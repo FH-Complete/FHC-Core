@@ -402,7 +402,7 @@ function StudentProjektarbeitAuswahl()
 
 	//Lehrveranstaltung DropDown laden
 	var LvDropDown = document.getElementById('student-projektarbeit-menulist-lehrveranstaltung');
-	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid='+student_uid+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
+	url='<?php echo APP_ROOT;?>rdf/lehrveranstaltung.rdf.php?uid='+student_uid+"&stg_kz="+stg_kz+"&projektarbeit=true&withlv="+lehrveranstaltung_id+"&"+gettimestamp();
 
 	//Alte DS entfernen
 	var oldDatasources = LvDropDown.database.GetDataSources();

@@ -9,6 +9,7 @@ import ProjektarbeitDetails from "./Details.js";
 import Projektbetreuer from "./Projektbetreuer.js";
 
 export default {
+	name: 'Projektarbeit',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -199,8 +200,6 @@ export default {
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150, // Ensures Action-buttons will be always fully displayed
 						formatter: (cell, formatterParams, onRendered) => {
-							const AAAWidth = '44px';
-							const AAAHeight = '44px';
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
 
@@ -208,8 +207,6 @@ export default {
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'bearbeiten');
-							button.style.minWidth = AAAWidth;
-							button.style.minHeight = AAAHeight;
 							button.addEventListener('click', (event) => {
 								let data = cell.getData();
 								this.editedProjektarbeit = data;
@@ -217,23 +214,10 @@ export default {
 							});
 							container.append(button);
 
-							// button = document.createElement('button');
-							// button.className = 'btn btn-outline-secondary btn-action';
-							// button.innerHTML = '<i class="fa fa-users"></i>';
-							// button.title = this.$p.t('projektarbeit', 'betreuerBearbeiten');
-							// button.addEventListener('click', (event) => {
-							// 	let data = cell.getData();
-							// 	this.editedProjektarbeit = data;
-							// 	this.actionEditBetreuer();
-							// });
-							// container.append(button);
-
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'loeschen');
-							button.style.minWidth = AAAWidth;
-							button.style.minHeight = AAAHeight;
 							button.addEventListener('click', () =>
 								this.actionDeleteProjektarbeit(cell.getData().projektarbeit_id)
 							);
@@ -270,6 +254,7 @@ export default {
 		actionEditProjektarbeit() {
 			this.statusNew = false;
 			this.toggleMenu('details');
+			this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditBetreuer() {
@@ -293,7 +278,11 @@ export default {
 		addNewProjektarbeit() {
 			this.$refs.projektarbeitDetails.addNewProjektarbeit()
 				.then((result) => {
-					console.log('res add new', result)
+					if(result?.data?.length) {
+						this.editedProjektarbeit = result.data[0]
+						this.$refs.projektarbeitDetails.setFormData(this.editedProjektarbeit)
+						this.toggleMenu('betreuer');
+					}
 					this.projektarbeitSaved();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -334,22 +323,22 @@ export default {
 		},
 		toggleMenu(tabId) {
 			this.activeTab = tabId;
-			if (this.statusNew == false) {
-				switch(tabId) {
-					case 'details':
-						this.$refs.projektarbeitDetails.getFormData(
-							this.statusNew, this.editedProjektarbeit?.studiensemester_kurzbz, this.editedProjektarbeit?.lehrveranstaltung_id
-						);
-						this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit?.projektarbeit_id);
-						break;
-					case 'betreuer':
-						this.$refs.projektbetreuer.getFormData(
-							this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
-						);
-						this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
-						break;
-				}
+			if (this.statusNew == false && tabId == 'details') {
+
+				this.$refs.projektarbeitDetails.getFormData(
+					this.statusNew, this.editedProjektarbeit?.studiensemester_kurzbz, this.editedProjektarbeit?.lehrveranstaltung_id
+				);
+				this.$refs.projektarbeitDetails.loadProjektarbeit(this.editedProjektarbeit?.projektarbeit_id);
+			} else if (tabId == 'betreuer') {
+				this.$refs.projektbetreuer.getFormData(
+					this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
+				);
+				this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
 			}
+		},
+		resetFormData() {
+			this.$refs.projektarbeitDetails.resetForm()
+			this.$refs.projektbetreuer.resetForm()
 		}
 	},
 	template: `
@@ -371,7 +360,9 @@ export default {
 		</core-filter-cmpt>
 
 		<!--Modal: projektarbeitModal-->
-		<bs-modal ref="projektarbeitModal" :dialog-class="(statusNew ? 'modal-xl ' : 'fhc-xxl-modal ' ) + 'modal-dialog-scrollable'" header-class="flex-wrap pb-0">
+		<bs-modal ref="projektarbeitModal" :dialog-class="(statusNew ? 'modal-xl ' : 'fhc-xxl-modal ' ) + 'modal-dialog-scrollable'" 
+			header-class="flex-wrap pb-0"
+			@hideBsModal="resetFormData">
 			<template #title>
 				<p v-if="statusNew" class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitAnlegen')}}</p>
 				<p v-else class="fw-bold mt-3">{{$p.t('projektarbeit', 'projektarbeitBearbeiten')}}</p>
@@ -389,7 +380,7 @@ export default {
 			</div>
 
 			<template #footer>
-				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
+				<button type="button" class="btn btn-secondary" @click="resetFormData" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
 				<button class="btn btn-primary" @click="saveProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
 			</template>
 
