@@ -195,11 +195,11 @@ class DashboardLib
 	{
 		foreach ($addwigets as $widget)
 		{
-			if(!isset($widget->widgetid))
+			if(!isset($widget['widgetid']))
 			{
-				$widget->widgetid = $this->generateWidgetId($dashboard_kurzbz);
+				$widget['widgetid'] = $this->generateWidgetId($dashboard_kurzbz);
 			}
-			$this->addWidgetToWidgets($widgets, $section, $widget, $widget->widgetid);
+			$this->addWidgetToWidgets($widgets, $section, $widget, $widget['widgetid']);
 		}
 	}
 	
