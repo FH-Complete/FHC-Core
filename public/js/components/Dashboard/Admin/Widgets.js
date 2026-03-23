@@ -1,4 +1,4 @@
-import ApiDashboardAdmin from "../../../api/factory/dashboard/dashboardAdmin.js";
+import ApiDashboardWidget from "../../../api/factory/dashboard/Widget.js";
 
 export default {
 	emits: [
@@ -12,25 +12,16 @@ export default {
 	methods: {
 		sendChange(widget_id) {
 			let allow = !this.widgets.find(el => el.widget_id == widget_id).allowed;
-			const params = {
-				dashboard_id: this.dashboard_id,
-				widget_id,
-				action: allow ? 'add' : 'delete'
-			};
 
 			this.$api
-				.call(ApiDashboardAdmin.setWidgetAllowed(params))
+				.call(ApiDashboardWidget.setAllowed(this.dashboard_id, widget_id, allow))
 				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
 		this.$api
-			.call(ApiDashboardAdmin.getAllWidgets(this.dashboard_id))
+			.call(ApiDashboardWidget.list(this.dashboard_id))
 			.then(result => {
-/*				console.log(result.data.map(el => ({
-						...el,
-						...{setup:JSON.parse(el.setup),arguments:JSON.parse(el.arguments),allowed:!!el.allowed}
-				})));*/
 				this.$emit('assignWidgets', result.data.map(el => ({
 					...el,
 					...{setup:JSON.parse(el.setup),arguments:JSON.parse(el.arguments),allowed:!!el.allowed}

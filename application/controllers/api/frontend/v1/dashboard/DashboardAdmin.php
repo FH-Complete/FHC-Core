@@ -32,11 +32,6 @@ class DashboardAdmin extends FHCAPI_Controller
 			'createDashboard'				=> 'dashboard/admin:rw',
 			'updateDashboard'				=> 'dashboard/admin:rw',
 			'deleteDashboard'				=> 'dashboard/admin:rw',
-			'loadWidget'					=> ['dashboard/benutzer:r', 'dashboard/admin:r'],
-			'getAllWidgets'					=> 'dashboard/admin:r',
-			'getWidgetsForDashboard'		=> ['dashboard/benutzer:rw', 'dashboard/admin:r'],
-			'setWidgetAllowed'				=> 'dashboard/admin:rw',
-
 			'index'							=> 'dashboard/benutzer:r',
 			'dummy'							=> 'dashboard/benutzer:r',
 			'genWidgetId'					=> 'dashboard/benutzer:rw',
@@ -154,52 +149,6 @@ class DashboardAdmin extends FHCAPI_Controller
 			return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess($result);
-	}
-
-	public function getAllWidgets()
-	{
-		$dashboard_id = $this->input->get('dashboard_id');
-		if(!$dashboard_id)
-		{
-			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Dashboard ID']), self::ERROR_TYPE_GENERAL);
-		}
-		//$this->terminateWithError($dashboard_id);
-		$result = $this->WidgetModel->getWithAllowedForDashboard($dashboard_id);
-
-		if (isError($result))
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-
-		$this->terminateWithSuccess(getData($result) ?: []);
-	}
-
-	public function setWidgetAllowed()
-	{
-		$dashboard_id = $this->input->post('dashboard_id');
-		$widget_id = $this->input->post('widget_id');
-		$action = $this->input->post('action');
-
-		if ($action == 'add')
-		{
-			$result = $this->DashboardWidgetModel->insert([
-				'dashboard_id' => $dashboard_id,
-				'widget_id' => $widget_id
-			]);
-		}
-		elseif ($action == 'delete')
-		{
-			$result = $this->DashboardWidgetModel->delete([
-				'dashboard_id' => $dashboard_id,
-				'widget_id' => $widget_id
-			]);
-		}
-		else
-		{
-			$this->terminateWithError("action value invalid", self::ERROR_TYPE_GENERAL);
-		}
-		if (isError($result))
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-
-		$this->terminateWithSuccess(getData($result) ?: []);
 	}
 
 	//Presets

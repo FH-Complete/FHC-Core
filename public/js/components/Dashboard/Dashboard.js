@@ -2,6 +2,8 @@ import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
+import ApiDashboardWidget from '../../api/factory/dashboard/widget.js';
+
 export default {
 	name: 'Dashboard',
 	components: {
@@ -25,14 +27,14 @@ export default {
 	data() {
 		return {
 			sections: [],
-			widgets: null,
+			widgetsSetup: null,
 			editMode: false,
 		}
 	},
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
-			widgetsSetup: Vue.computed(() => this.widgets),
+			widgetsSetup: Vue.computed(() => this.widgetsSetup),
 			timezone: Vue.computed(() => this.viewData.timezone)
 		}
 	},
@@ -43,17 +45,6 @@ export default {
 	},
 	methods: {
 		widgetAdd(section_name, widget) {
-			if (this.widgets === null) {
-				axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {params:{
-					db: this.dashboard
-				}}).then(res => {
-					res.data.retval.forEach(widget => {
-						widget.arguments = JSON.parse(widget.arguments);
-						widget.setup = JSON.parse(widget.setup);
-					});
-					this.widgets = res.data.retval;
-				}).catch(err => console.error('ERROR:', err));
-			}
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
 				widget.id = 'loading_' + String((new Date()).valueOf());
@@ -143,13 +134,13 @@ export default {
 	},
 	created() {
 		this.$p.loadCategory('dashboard');
-		axios.get(this.apiurl + '/Widget/getWidgetsForDashboard', {
-			params: {
-				db: this.dashboard
-			}
-		}).then(res => {
-			this.widgets = res.data.retval;
-		}).catch(err => console.error('ERROR:', err));
+
+		this.$api
+			.call(ApiDashboardWidget.listAllowed(this.dashboard))
+			.then(res => {
+				this.widgetsSetup = res.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 
 		axios.get(this.apiurl + '/Config', {params:{
 			db: this.dashboard
@@ -186,6 +177,6 @@ export default {
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
 		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="widgets"></dashboard-widget-picker>
+		<dashboard-widget-picker ref="widgetpicker" :widgets="widgetsSetup"></dashboard-widget-picker>
 	</div>`
 }

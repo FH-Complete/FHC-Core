@@ -1,5 +1,5 @@
 import BsModal from "../Bootstrap/Modal.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
 export default {
@@ -142,8 +142,14 @@ export default {
 			this.isLoading = false;
 		},
 	},
+	setup() {
+		const { actions } = useCachedWidgetLoader();
+		return {
+			loadWidget: actions.load
+		};
+	},
 	async created() {
-		this.widget = await CachedWidgetLoader.loadWidget(this.id);
+		this.widget = await this.loadWidget(this.id);
 		let component = (await import(this.widget.setup.file)).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;
 		this.component = "widget" + this.widget.widget_id;

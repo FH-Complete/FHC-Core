@@ -41,20 +41,6 @@ export default {
 			url: 'api/frontend/v1/dashboard/DashboardAdmin/getAllDashboards'
 		};
 	},
-	getAllWidgets(dashboard_id){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/getAllWidgets',
-			params: {dashboard_id}
-		};
-	},
-	setWidgetAllowed(params){
-		return {
-			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/setWidgetAllowed',
-			params
-		};
-	},
 	loadFunktionen(dashboard_kurzbz){
 		return {
 			method: 'get',
