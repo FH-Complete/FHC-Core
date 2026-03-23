@@ -71,7 +71,6 @@ class User extends FHCAPI_Controller
 
 	public function addWidget()
 	{
-		$this->terminateWithValidationErrors(['test' => 'Test']);
 		$this->load->library('form_validation');
 
 		$this->form_validation->set_rules('dashboard', 'Dashboard', 'required');
