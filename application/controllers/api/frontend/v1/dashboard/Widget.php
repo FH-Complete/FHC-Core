@@ -111,24 +111,24 @@ class Widget extends FHCAPI_Controller
 	{
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('dashboard', 'Dashboard', 'required');
-		$this->form_validation->set_rules('widget', 'Widget', 'required');
-		$this->form_validation->set_rules('allowed', 'Allowed', 'required|is_bool');
+		$this->form_validation->set_rules('dashboard_id', 'Dashboard', 'required');
+		$this->form_validation->set_rules('widget_id', 'Widget', 'required');
+		$this->form_validation->set_rules('allowed', 'Allowed', 'is_bool');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		$data = [
-			'dashboard_id' => $this->input->post('dashboard'),
-			'widget_id' => $this->input->post('widget')
+			'dashboard_id' => $this->input->post('dashboard_id'),
+			'widget_id' => $this->input->post('widget_id')
 		];
 
 		$this->load->model('dashboard/Dashboard_Widget_model', 'DashboardWidgetModel');
 		
 		if ($this->input->post('allowed'))
-			$result = $this->DashoardWidgetModel->insert($data);
+			$result = $this->DashboardWidgetModel->insert($data);
 		else
-			$result = $this->DashoardWidgetModel->delete($data);
+			$result = $this->DashboardWidgetModel->delete($data);
 
 		$data = $this->getDataOrTerminateWithError($result);
 
