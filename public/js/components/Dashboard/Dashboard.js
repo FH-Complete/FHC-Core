@@ -3,6 +3,7 @@ import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
 import ApiDashboardWidget from '../../api/factory/dashboard/widget.js';
+import ApiDashboardUser from '../../api/factory/dashboard/user.js';
 
 export default {
 	name: 'Dashboard',
@@ -26,9 +27,10 @@ export default {
 	},
 	data() {
 		return {
-			sections: [],
+			widgets: [],
+			originalWidgets: {},
 			widgetsSetup: null,
-			editMode: false,
+			editMode: false
 		}
 	},
 	provide() {
@@ -38,98 +40,83 @@ export default {
 			timezone: Vue.computed(() => this.viewData.timezone)
 		}
 	},
-	computed: {
-		apiurl() {
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard';
-		}
-	},
 	methods: {
 		widgetAdd(section_name, widget) {
-			this.$refs.widgetpicker.getWidget().then(widget_id => {
-				widget.widget = widget_id;
-				widget.id = 'loading_' + String((new Date()).valueOf());
-				let loading = {...widget};
-				loading.loading = true;
-				this.sections.forEach(section => {
-					if (section.name == section_name)
-						section.widgets.push(loading);
-				});
-				
-				axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
-					db: this.dashboard,
-					funktion_kurzbz: section_name,
-					widgets: [widget]
-				}).then(result => {
-					let newId = Object.keys(result.data.retval.data[section_name].widgets).pop();
-					widget.id = newId;
-					this.sections.forEach(section => {
-						if (section.name == section_name) {
-							section.widgets.splice(section.widgets.indexOf(loading),1);
-							section.widgets.push(widget);
-						}
-					});
-				}).catch(error => {
-					console.error('ERROR: ', error);
-					alert('ERROR: ' + error.response.data.retval);
-				});
-			}).catch(() => {});
+			// TODO(chris): remove section_name? (change order of params => get rid of it)
+			this.$refs.widgetpicker
+				.getWidget()
+				.then(widget_id => {
+					widget.widget = widget_id;
+					widget.id = 'loading_' + String((new Date()).valueOf());
+					let loading = { ...widget };
+					loading.loading = true;
+					this.widgets.push(loading);
+					
+					this.$api
+						.call(ApiDashboardUser.addWidget(this.dashboard, widget))
+						.then(result => {
+							widget.id = result.data;
+							this.widgets.splice(this.widgets.indexOf(loading), 1);
+							this.widgets.push(widget);
+							this.originalWidgets[widget.id] = structuredClone(ObjectUtils.deepToRaw(widget));
+						})
+						.catch(this.$fhcAlert.handleSystemError);
+				})
+				.catch(() => {});
 		},
 		widgetUpdate(section_name, payload) {
 			payload = payload[section_name];
 			for (var k in payload) {
-				for (var i in this.sections) {
-					if (this.sections[i].name == section_name) {
-						for (var wid in this.sections[i].widgets) {
-							if (this.sections[i].widgets[wid].id == k) {
-								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
-								// NOTE(chris): remove internal props
-								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1,preset:1})
-									if (payload[k][prop])
-										delete payload[k][prop];
-								break;
-							}
-						}
+				for (var wid in this.widgets) {
+					if (this.widgets[wid].id == k) {
+						payload[k] = ObjectUtils.mergeDeep(this.widgets[wid], payload[k]);
+						// NOTE(chris): remove internal props
+						for (var prop of ['_x','_y','_w','_h','index','id','preset'])
+							if (payload[k][prop])
+								delete payload[k][prop];
 						break;
 					}
 				}
 				payload[k].widgetid = k;
 			}
-			axios.post(this.apiurl + '/Config/addWidgetsToUserOverride', {
-				db: this.dashboard,
-				funktion_kurzbz: section_name,
-				widgets: payload
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name) {
-						section.widgets.forEach((widget, i) => {
-							if (payload[widget.id]) {
-								payload[widget.id].id = widget.id;
-								payload[widget.id].index = widget.index;
-								section.widgets[i] = payload[widget.id];
+			this.$api
+				.call(Object.entries(payload).map(([key, widget]) => [key, ApiDashboardUser.addWidget(this.dashboard, widget)]))
+				.then(result => {
+					const failed = result
+						.filter(o => o.status == 'rejected')
+						.map(o => o.reason.config.errorHeader);
+
+					this.widgets.forEach((widget, i) => {
+						if (failed.includes(widget.id)) {
+							this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
+							/** NOTE(chris): if you wanna hide or unhide a
+							 * preset and it fails: switch around the hidden
+							 * value to revert it properly (checkboxes can't
+							 * really handle it otherwise)
+							 */
+							if (payload[widget.id].hidden !== undefined) {
+								this.widgets[i].hidden = payload[widget.id].hidden;
+								this.$nextTick(() => {
+									this.widgets[i] = structuredClone(ObjectUtils.deepToRaw(this.originalWidgets[widget.id]));
+								});
 							}
-						});
-					}
-				});
-			}).catch(error => {
-				// TODO(chris): revert placement on failure
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
+						} else if (payload[widget.id]) {
+							payload[widget.id].id = widget.id;
+							payload[widget.id].index = widget.index;
+							this.widgets[i] = payload[widget.id];
+							this.originalWidgets[widget.id] = structuredClone(ObjectUtils.deepToRaw(this.widgets[i]));
+						}
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		widgetRemove(section_name, id) {
-			axios.post(this.apiurl + '/Config/removeWidgetFromUserOverride', {
-				db: this.dashboard,
-				funktion_kurzbz: section_name,
-				widgetid: id
-			}).then(() => {
-				this.sections.forEach(section => {
-					if (section.name == section_name)
-						section.widgets = section.widgets.filter(widget => widget.id != id);
-				});
-			}).catch(error => {
-				console.error('ERROR: ', error);
-				alert('ERROR: ' + error.response.data.retval);
-			});
+			this.$api
+				.call(ApiDashboardUser.removeWidget(this.dashboard, id))
+				.then(() => {
+					this.widgets = this.widgets.filter(widget => widget.id != id);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		}
 	},
 	created() {
@@ -142,33 +129,28 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
-		axios.get(this.apiurl + '/Config', {params:{
-			db: this.dashboard
-		}}).then(res => {
-			for (var name in res.data.retval) {
-				let widgets = [];
-				let remove = [];
-				for (var wid in res.data.retval[name].widgets) {
-					res.data.retval[name].widgets[wid].id = wid;
-					if (res.data.retval[name].widgets[wid].custom || res.data.retval[name].widgets[wid].preset)
-						widgets.push(res.data.retval[name].widgets[wid]);
-					else
+		this.$api
+			.call(ApiDashboardUser.get(this.dashboard))
+			.then(res => {
+				const widgets = [];
+				const remove = [];
+
+				for (var wid in res.data.general.widgets) {
+					let widget = res.data.general.widgets[wid];
+					widget.id = wid;
+					if (widget.custom || widget.preset) {
+						widgets.push(widget);
+						this.originalWidgets[wid] = structuredClone(widget);
+					} else {
 						remove.push(wid);
+					}
 				}
-				this.sections.push({
-					name: name,
-					widgets: widgets
-				});
-				remove.forEach(wid => this.widgetRemove(name, wid));
-			}
-			this.sections = this.sections.sort((section1, section2) => {
-				if(section1.name == 'custom')
-					return 1;
-				if (section2.name == 'custom')
-					return -1;
-				return section2.widgets.length - section1.widgets.length;
-			});
-		}).catch(err => console.error('ERROR:', err));
+
+				remove.forEach(wid => this.widgetRemove('general', wid));
+
+				this.widgets = widgets;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="core-dashboard">
@@ -176,7 +158,7 @@ export default {
 			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
-		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
+		<dashboard-section :seperator="0" name="general" :widgets="widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgetsSetup"></dashboard-widget-picker>
 	</div>`
 }

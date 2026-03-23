@@ -32,15 +32,9 @@ class DashboardAdmin extends FHCAPI_Controller
 			'createDashboard'				=> 'dashboard/admin:rw',
 			'updateDashboard'				=> 'dashboard/admin:rw',
 			'deleteDashboard'				=> 'dashboard/admin:rw',
-			'index'							=> 'dashboard/benutzer:r',
-			'dummy'							=> 'dashboard/benutzer:r',
-			'genWidgetId'					=> 'dashboard/benutzer:rw',
 			'addWidgetsToPreset'			=> 'dashboard/admin:rw',
 			'removeWidgetFromPreset'		=> 'dashboard/admin:rw',
-			'addWidgetsToUserOverride'		=> 'dashboard/benutzer:rw',
-			'removeWidgetFromUserOverride'	=> 'dashboard/benutzer:rw',
 			'funktionen'					=> 'dashboard/admin:r',
-			'preset'						=> 'dashboard/admin:r',
 			'presetBatch'					=> 'dashboard/admin:r'
 		]);
 
