@@ -80,7 +80,10 @@ export default {
 				payload[k].widgetid = k;
 			}
 			this.$api
-				.call(Object.entries(payload).map(([key, widget]) => [key, ApiDashboardUser.addWidget(this.dashboard, widget)]))
+				.call(Object.entries(payload).map(([key, widget]) => [
+					key,
+					ApiDashboardUser.addWidget(this.dashboard, widget)
+				]))
 				.then(result => {
 					const failed = result
 						.filter(o => o.status == 'rejected')

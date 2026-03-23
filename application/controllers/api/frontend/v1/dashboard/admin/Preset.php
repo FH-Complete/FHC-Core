@@ -30,7 +30,7 @@ class Preset extends FHCAPI_Controller
 		parent::__construct([
 			'list'					=> 'dashboard/admin:r',
 			'getBatch'				=> 'dashboard/admin:r',
-			'addWidgets'			=> 'dashboard/admin:rw',
+			'addWidget'				=> 'dashboard/admin:rw',
 			'removeWidget'			=> 'dashboard/admin:rw'
 		]);
 
@@ -132,25 +132,29 @@ class Preset extends FHCAPI_Controller
 		return $this->terminateWithSuccess($result);
 	}
 
-	public function addWidgets()
+	public function addWidget()
 	{
 		$this->load->library('form_validation');
 
-		$this->form_validation->set_rules('db', 'Dashboard', 'required');
+		$this->form_validation->set_rules('dashboard', 'Dashboard', 'required');
 		$this->form_validation->set_rules('funktion_kurzbz', 'Funktion', 'required');
+		$this->form_validation->set_rules('widget[widget]', 'Widget', 'required');
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$dashboard_kurzbz = $this->input->post('db');
+		$dashboard_kurzbz = $this->input->post('dashboard');
 		$funktion_kurzbz = $this->input->post('funktion_kurzbz');
-		$widgets = $this->input->post('widgets') ?: [];
+		$widget = $this->input->post('widget');
+
+		if (!isset($widget['widgetid']))
+			$widget['widgetid'] = $this->dashboardlib->generateWidgetId($dashboard_kurzbz);
 
 		$preset = $this->dashboardlib->getPresetOrCreateEmptyPreset($dashboard_kurzbz, $funktion_kurzbz);
 
 		$preset_decoded = json_decode($preset->preset, true);
 		
-		$this->dashboardlib->addWidgetsToWidgets($preset_decoded, $dashboard_kurzbz, $funktion_kurzbz, $widgets);
+		$this->dashboardlib->addWidgetsToWidgets($preset_decoded, $dashboard_kurzbz, $funktion_kurzbz, [$widget]);
 
 		$preset->preset = json_encode($preset_decoded);
 
@@ -158,7 +162,7 @@ class Preset extends FHCAPI_Controller
 
 		$this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($preset_decoded);
+		$this->terminateWithSuccess($widget['widgetid']);
 	}
 
 	public function removeWidget()

@@ -58,7 +58,7 @@ export default {
 	addWidgetsToPreset(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/admin/preset/addWidgets',
+			url: 'api/frontend/v1/dashboard/admin/preset/addWidget',
 			params
 		};
 	},

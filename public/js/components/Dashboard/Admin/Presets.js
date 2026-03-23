@@ -26,6 +26,7 @@ export default {
 		widgetAdd(section_name, widget) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				widget.id = 'loading_' + String((new Date()).valueOf());
 				delete widget.custom;
 				widget.preset = 1;
 				let loading = {...widget};
@@ -36,15 +37,15 @@ export default {
 				});
 
 				const params = {
-					db: this.dashboard,
+					dashboard: this.dashboard,
 					funktion_kurzbz: section_name,
-					widgets: [widget]
+					widget
 				};
 
 				return this.$api
 					.call(ApiDashboardAdmin.addWidgetsToPreset(params))
 					.then(result => {
-						let newId = Object.keys(result.data[section_name].widgets).pop();
+						let newId = result.data;
 						widget.id = newId;
 						widget.custom = 1;
 						this.sections.forEach(section => {
@@ -66,34 +67,29 @@ export default {
 		widgetUpdate(section_name, payload) {
 			payload = payload[section_name];
 			for (var k in payload) {
-				for (var i in this.sections) {
-					if (this.sections[i].name == section_name) {
-						for (var wid in this.sections[i].widgets) {
-							if (this.sections[i].widgets[wid].id == k) {
-								payload[k] = ObjectUtils.mergeDeep(this.sections[i].widgets[wid], payload[k]);
-								// NOTE(chris): remove internal props
-								for (var prop in {_x:1,_y:1,_w:1,_h:1,index:1,id:1})
-									if (payload[k][prop])
-										delete payload[k][prop];
-								break;
-							}
-						}
+				const section = this.sections.find(section => section.name == section_name);
+				for (var wid in section.widgets) {
+					if (section.widgets[wid].id == k) {
+						payload[k] = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						// NOTE(chris): remove internal props
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id'])
+							if (payload[k][prop])
+								delete payload[k][prop];
 						break;
 					}
 				}
 				payload[k].widgetid = k;
 				delete payload[k].custom;
 			}
-
-			//TODO(manu) test
-			const params = {
-				db: this.dashboard,
-				funktion_kurzbz: section_name,
-				widgets: payload
-			};
-
-			return this.$api
-				.call(ApiDashboardAdmin.addWidgetsToPreset(params))
+			this.$api
+				.call(Object.entries(payload).map(([key, widget]) => [
+					key,
+					ApiDashboardAdmin.addWidgetsToPreset({
+						dashboard: this.dashboard,
+						funktion_kurzbz: section_name,
+						widget
+					})
+				]))
 				.then(result => {
 					this.sections.forEach(section => {
 						if (section.name == section_name) {
