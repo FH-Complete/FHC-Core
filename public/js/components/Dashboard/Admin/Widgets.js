@@ -1,4 +1,4 @@
-import ApiDashboardWidget from "../../../api/factory/dashboard/Widget.js";
+import ApiDashboardWidget from "../../../api/factory/dashboard/widget.js";
 
 export default {
 	emits: [
