@@ -41,32 +41,32 @@ export default {
 			url: 'api/frontend/v1/dashboard/DashboardAdmin/getAllDashboards'
 		};
 	},
-	loadFunktionen(dashboard_kurzbz){
+	loadFunktionen(dashboard_kurzbz) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/funktionen?db='
+			url: 'api/frontend/v1/dashboard/admin/preset/list/'
 				+ encodeURIComponent(dashboard_kurzbz)
 		};
 	},
-	addWidgetsToPreset(params){
+	presetBatch(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/addWidgetsToPreset',
+			url: 'api/frontend/v1/dashboard/admin/preset/getBatch',
 			params
 		};
 	},
-	removeWidgetFromPreset(params){
+	addWidgetsToPreset(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/removeWidgetFromPreset',
+			url: 'api/frontend/v1/dashboard/admin/preset/addWidgets',
 			params
 		};
 	},
-	presetBatch(params){
+	removeWidgetFromPreset(params) {
 		return {
-			method: 'get',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/presetBatch',
+			method: 'post',
+			url: 'api/frontend/v1/dashboard/admin/preset/removeWidget',
 			params
 		};
-	},
+	}
 }

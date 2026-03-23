@@ -57220,66 +57220,6 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'dashboard',
-		'phrase' => 'error_savePreset',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Voreinstellung konnten nicht gespeichert werden.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Preset could not be saved.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'dashboard',
-		'phrase' => 'error_presetAndFunctionNotFound',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Voreinstellung für Dashboard {dashboard} und Funktion {funktion} nicht gefunden.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Preset for dashboard {dashboard} and function {funktion} not found.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'dashboard',
-		'phrase' => 'error_deleteWidget',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Widget konnte nicht entfernt werden',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'failed to remove widget',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'dashboard',
 		'phrase' => 'success_savePreset',
 		'insertvon' => 'system',
 		'phrases' => array(
