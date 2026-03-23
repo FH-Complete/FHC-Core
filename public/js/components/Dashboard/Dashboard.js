@@ -2,8 +2,6 @@ import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
-import ApiDashboard from '../../api/factory/cis/dashboard.js';
-
 export default {
 	name: 'Dashboard',
 	components: {
@@ -20,7 +18,7 @@ export default {
 			type: Object,
 			required: true,
 			validator(value) {
-				return value && value.name && value.uid && value.timezone
+				return value && value.name && value.timezone
 			}
 		}
 	},
@@ -29,7 +27,6 @@ export default {
 			sections: [],
 			widgets: null,
 			editMode: false,
-			viewDataInternal: this.viewData
 		}
 	},
 	provide() {
@@ -182,16 +179,10 @@ export default {
 			});
 		}).catch(err => console.error('ERROR:', err));
 	},
-	async beforeMount() {
-		if (!this.viewData.name || !this.viewData.uid) {
-			const res = await this.$api.call(ApiDashboard.getViewData());
-			this.viewDataInternal = res.data
-		}	
-	},
 	template: `
 	<div class="core-dashboard">
-		<h3 v-show="viewDataInternal?.name">
-			{{ $p.t('global/personalGreeting', [ viewDataInternal?.name ]) }}
+		<h3>
+			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
 		<dashboard-section v-for="(section, index) in sections" :key="section.name" :seperator="index" :name="section.name" :widgets="section.widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
