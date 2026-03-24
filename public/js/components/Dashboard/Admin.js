@@ -3,7 +3,7 @@ import DashboardAdminEdit from "./Admin/Edit.js";
 import DashboardAdminWidgets from "./Admin/Widgets.js";
 import DashboardAdminPresets from "./Admin/Presets.js";
 
-import ApiDashboardAdmin from "../../api/factory/dashboard/dashboardAdmin.js";
+import ApiDashboardBoard from "../../api/factory/dashboard/board.js";
 import ApiDashboardWidget from "../../api/factory/dashboard/widget.js";
 
 export default {
@@ -41,7 +41,7 @@ export default {
 						dashboard_kurzbz: name
 					};
 					return this.$api
-						.call(ApiDashboardAdmin.addDashboard(params))
+						.call(ApiDashboardBoard.add(params))
 						.then(response =>{
 							this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
@@ -58,7 +58,7 @@ export default {
 		},
 		dashboardUpdate(dashboard) {
 			return this.$api
-				.call(ApiDashboardAdmin.updateDashboard(dashboard))
+				.call(ApiDashboardBoard.update(dashboard))
 				.then(response =>{
 
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
@@ -71,7 +71,7 @@ export default {
 		},
 		dashboardDelete(dashboard_id) {
 			return this.$api
-				.call(ApiDashboardAdmin.deleteDashboard(dashboard_id))
+				.call(ApiDashboardBoard.delete(dashboard_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 
@@ -92,7 +92,7 @@ export default {
 	},
 	created() {
 		this.$api
-			.call(ApiDashboardAdmin.getAllDashboards())
+			.call(ApiDashboardBoard.list())
 			.then(result => {
 				this.dashboards = result.data.retval;
 				for (const dashboard of this.dashboards) {

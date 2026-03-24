@@ -1,7 +1,7 @@
 import DashboardSection from "../Section.js";
 import DashboardWidgetPicker from "../Widget/Picker.js";
 import ObjectUtils from "../../../helpers/ObjectUtils.js";
-import ApiDashboardAdmin from "../../../api/factory/dashboard/dashboardAdmin.js";
+import ApiDashboardPreset from "../../../api/factory/dashboard/preset.js";
 
 export default {
 	components: {
@@ -43,7 +43,7 @@ export default {
 				};
 
 				return this.$api
-					.call(ApiDashboardAdmin.addWidgetsToPreset(params))
+					.call(ApiDashboardPreset.addWidget(params))
 					.then(result => {
 						let newId = result.data;
 						widget.id = newId;
@@ -84,7 +84,7 @@ export default {
 			this.$api
 				.call(Object.entries(payload).map(([key, widget]) => [
 					key,
-					ApiDashboardAdmin.addWidgetsToPreset({
+					ApiDashboardPreset.addWidget({
 						dashboard: this.dashboard,
 						funktion_kurzbz: section_name,
 						widget
@@ -113,7 +113,7 @@ export default {
 				widgetid: id
 			};
 			return this.$api
-				.call(ApiDashboardAdmin.removeWidgetFromPreset(params))
+				.call(ApiDashboardPreset.removeWidget(params))
 				.then(result => {
 					this.sections.forEach(section => {
 						if (section.name == section_name)
@@ -133,7 +133,7 @@ export default {
 			};
 
 			return this.$api
-				.call(ApiDashboardAdmin.presetBatch(params))
+				.call(ApiDashboardPreset.getBatch(params))
 				.then(result => {
 					if (this.tmpLoading !== funktionen.join('###'))
 						return; // NOTE(chris): prevent race condition
@@ -155,7 +155,7 @@ export default {
 		},
 		loadFunktionen() {
 			this.$api
-				.call(ApiDashboardAdmin.loadFunktionen(this.dashboard))
+				.call(ApiDashboardPreset.list(this.dashboard))
 				.then(result => {
 					this.funktionen = result.data;
 				})
