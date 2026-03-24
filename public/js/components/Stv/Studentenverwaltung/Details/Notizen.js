@@ -18,7 +18,7 @@ export default {
 	template: `
 	<div class="stv-details-notizen h-100 pb-3">
 
-<!--	Test Version classicFas for enter with one click vs popupModal-->
+<!--	Test Version popupModal-->
 	<core-notiz
 		class="overflow-hidden"
 		:endpoint="endpoint"
@@ -32,17 +32,15 @@ export default {
 		@reload="$emit('update:suffix')"
 		tabulator-persistence-id="stv-notiz-20260217"
 		>
-</core-notiz>
+	</core-notiz>
 
 <!--		
 ---------------------------------------------------------------------------------------------
 -------------------- DESCRIPTION FOR PARAMETER PROPS ----------------------------------------
 ---------------------------------------------------------------------------------------------
 
-endpoint: for corecontroller: eg: :endpoint="$fhcApi.factory.notiz.person"
-
-import ApiNotiz[...] from '../../../../api/factory/notiz/[...].js';
-[...]: prestudent, mitarbeiter, bestellung, lehreinheit, projekt, projektphase, projekttask, anrechnung
+endpoints for coreControllers: prestudent, mitarbeiter, bestellung, lehreinheit, projekt, projektphase, projekttask, anrechnung
+import ApiNotiz[...] from '../../../../api/factory/notiz/[...].js'; 
 
 for extensions: write own controller extending core NotizController
 
@@ -60,7 +58,7 @@ showDocument: if true: section with documentHandling will be displayed
 
 showTinyMCE: if true: section with WYSIWYG Editor for Text will be displayed
 
-visibleColumns: list, which fields shoult be showed as default in filter component
+visibleColumns: list, which fields should be shown as default in filter component
 		fullVersion: :visibleColumns="['titel','text','bearbeiter','verfasser','von','bis','dokumente','erledigt','notiz_id','notizzuordnung_id','id','lastupdate']"
 		
 
