@@ -1029,8 +1029,8 @@ function _generateXML($person_arr)
 			else
 				$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
 
-			$xml .= '<SommersemesterSWS><![CDATA['. $lehre->SommersemesterSWS. ']]></SommersemesterSWS>';
-			$xml .= '<WintersemesterSWS><![CDATA['. $lehre->WintersemesterSWS. ']]></WintersemesterSWS>';
+			$xml .= '<SommersemesterSWS><![CDATA['. number_format($lehre->SommersemesterSWS, 2, '.', ''). ']]></SommersemesterSWS>';
+			$xml .= '<WintersemesterSWS><![CDATA['. number_format($lehre->WintersemesterSWS, 2, '.', ''). ']]></WintersemesterSWS>';
 			$xml .= '</Lehre>';
 		}
 
