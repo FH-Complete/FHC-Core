@@ -186,7 +186,8 @@ class DocsboxLib
 					}
 					// Just started or still working on it
 					elseif ($getStatusResponse->body->status == self::STATUS_WORKING
-						|| $getStatusResponse->body->status == self::STATUS_STARTED)
+						|| $getStatusResponse->body->status == self::STATUS_STARTED
+						|| $getStatusResponse->body->status == self::STATUS_QUEUED)
 					{
 						// go on!
 					}
