@@ -143,6 +143,7 @@ foreach($ps->result as $row)
 			<ROLLE:updatevon><![CDATA['.$row->updatevon.']]></ROLLE:updatevon>
 			<ROLLE:stichtagsaktiv><![CDATA['.$stichtagsaktiv.']]></ROLLE:stichtagsaktiv>
 			<ROLLE:aktiv><![CDATA['.$aktiv.']]></ROLLE:aktiv>
+			<ROLLE:fgm><![CDATA['.$row->fgm.']]></ROLLE:fgm>
       	</RDF:Description>
       </RDF:li>
 	';
