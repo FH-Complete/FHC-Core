@@ -14,58 +14,58 @@
 */
 
 export default {
+	getAllDashboards() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/dashboard/board/list'
+		};
+	},
 	addDashboard(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/createDashboard',
+			url: 'api/frontend/v1/dashboard/board/create',
 			params
 		};
 	},
 	updateDashboard(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/updateDashboard',
+			url: 'api/frontend/v1/dashboard/board/update',
 			params
 		};
 	},
 	deleteDashboard(dashboard_id) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/deleteDashboard',
+			url: 'api/frontend/v1/dashboard/board/delete',
 			params: { dashboard_id }
-		};
-	},
-	getAllDashboards(){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/dashboard/DashboardAdmin/getAllDashboards'
 		};
 	},
 	loadFunktionen(dashboard_kurzbz) {
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/dashboard/admin/preset/list/'
+			url: 'api/frontend/v1/dashboard/preset/list/'
 				+ encodeURIComponent(dashboard_kurzbz)
 		};
 	},
 	presetBatch(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/admin/preset/getBatch',
+			url: 'api/frontend/v1/dashboard/preset/getBatch',
 			params
 		};
 	},
 	addWidgetsToPreset(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/admin/preset/addWidget',
+			url: 'api/frontend/v1/dashboard/preset/addWidget',
 			params
 		};
 	},
 	removeWidgetFromPreset(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/dashboard/admin/preset/removeWidget',
+			url: 'api/frontend/v1/dashboard/preset/removeWidget',
 			params
 		};
 	}
