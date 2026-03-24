@@ -24,6 +24,7 @@ class NotizPerson extends Notiz_Controller
 		//Load Models
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('crm/Student_model', 'StudentModel');
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
 
 		//Permission checks for allowed Oes
 		if ($this->router->method == 'addNewNotiz')
@@ -38,7 +39,7 @@ class NotizPerson extends Notiz_Controller
 			{
 				return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Person ID']), self::ERROR_TYPE_GENERAL);
 			}
-			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+			$this->_checkIfBerechtigungForOnePrestudentExists($person_id, $allowedStgs);
 		}
 
 		if ( $this->router->method == 'updateNotiz')
@@ -59,7 +60,7 @@ class NotizPerson extends Notiz_Controller
 			$person_id = current($data)->person_id;
 
 			$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
-			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+			$this->_checkIfBerechtigungForOnePrestudentExists($person_id, $allowedStgs);
 		}
 
 		if ($this->router->method == 'deleteNotiz' )
@@ -78,7 +79,7 @@ class NotizPerson extends Notiz_Controller
 			}
 
 			$allowedStgs = $this->permissionlib->getSTG_isEntitledFor('assistenz') ?: [];
-			$this->_checkIfBerechtigungForOneUidExists($person_id, $allowedStgs);
+			$this->_checkIfBerechtigungForOnePrestudentExists($person_id, $allowedStgs);
 		}
 	}
 
@@ -99,44 +100,20 @@ class NotizPerson extends Notiz_Controller
 	}
 
 	//stv: if person has permission of one studiengang of person -> permission to add/update/delete Note
-	private function _checkIfBerechtigungForOneUidExists($person_id, $allowedStgs)
+	private function _checkIfBerechtigungForOnePrestudentExists($person_id, $allowedStgs)
 	{
-		//get all studentUids of person_id
-		$result = $this->BenutzerModel->loadWhere(['person_id' => $person_id]);
+		$result = $this->PrestudentModel->loadWhere(['person_id' => $person_id]);
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$checkarray = [];
 		foreach ($data as $item)
 		{
-			//check if isStudent
-			$result = $this->StudentModel->isStudent($item->uid);
-
-			$isStudent = $this->getDataOrTerminateWithError($result);
-			if($isStudent)
+			if(in_array($item->studiengang_kz, $allowedStgs))
 			{
-				$checkarray[]  = $this->_checkAllowedStgsFromUid($item->uid, $allowedStgs);
+				return true;
 			}
-
 		}
-		if (!in_array(1, $checkarray))
-			return $this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg'), self::ERROR_TYPE_GENERAL);
-	}
 
-	private function _checkAllowedStgsFromUid($student_uid, $allowedStgs)
-	{
-		$this->load->model('crm/Student_model', 'StudentModel');
-		$result = $this->StudentModel->loadWhere(['student_uid' => $student_uid]);
-
-		$data = $this->getDataOrTerminateWithError($result);
-		$studiengang_kz = current($data)->studiengang_kz;
-
-		if (!in_array($studiengang_kz, $allowedStgs))
-		{
-			return 0;
-		}
-		else
-		{
-			return 1;
-		}
+		$this->terminateWithError($this->p->t('ui', 'error_keineBerechtigungStg'), self::ERROR_TYPE_GENERAL);
 	}
 }

@@ -121,7 +121,6 @@ export default {
 				height: 'auto',
 				minHeight: '100',
 				selectableRows: true,
-				selectableRows: 1,
 				index: 'betreuer_id',
 				persistence:{
 					columns: true, //persist column layout
@@ -135,7 +134,7 @@ export default {
 						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'projektarbeit', 'ui']);
 
 						const setHeader = (field, text) => {
-							const col = this.$refs.table.tabulator.getColumn(field);
+							const col = this.$refs.projektbetreuerTable.tabulator.getColumn(field);
 							if (!col) return;
 
 							const el = col.getElement();

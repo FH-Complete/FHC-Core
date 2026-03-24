@@ -71,7 +71,6 @@ export default {
 							:mitarbeiter_uid="this.mitarbeiter_uid"
 							typeHeader="mitarbeiter"
 							:domain="config.domain"
-							fotoEditable
 							@redirectToLeitung="handleSelection"
 						>
 							<template #uid>{{tile_MaUid}}</template>

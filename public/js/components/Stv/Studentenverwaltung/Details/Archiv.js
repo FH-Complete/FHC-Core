@@ -225,18 +225,32 @@ export default {
 			return events;
 		},
 		studentUids() {
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.uid);
+			}
+			else if (this.modelValue.uid)
 			{
 				return [this.modelValue.uid];
 			}
-			return this.modelValue.map(e => e.uid);
+			else
+			{
+				return [];
+			}
 		},
 		studentKzs(){
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.studiengang_kz);
+			}
+			else if (typeof this.modelValue.studiengang_kz !== 'undefined')
 			{
 				return [this.modelValue.studiengang_kz];
 			}
-			return this.modelValue.map(e => e.studiengang_kz);
+			else
+			{
+				return [];
+			}
 		},
 		stg_kz(){
 			return this.studentKzs[0];

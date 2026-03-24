@@ -798,6 +798,10 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									class="sortDirectionIndicator"
 									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon" />
 								<splitter class="tree-splitter"/>
+								<treecol id="student-prestudent-tree-rolle-fgm" label="FGM" flex="1" hidden="true" persist="hidden, width, ordinal"
+									class="sortDirectionIndicator"
+									sort="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#fgm" />
+								<splitter class="tree-splitter"/>
 							</treecols>
 
 							<template>
@@ -823,6 +827,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#insertvon"/>
 												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updateamum"/>
 												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#updatevon"/>
+												<treecell properties="Aktiv_rdf:http://www.technikum-wien.at/prestudentrolle/rdf#aktiv rdf:http://www.technikum-wien.at/prestudentrolle/rdf#stichtagsaktiv" label="rdf:http://www.technikum-wien.at/prestudentrolle/rdf#fgm"/>
 											</treerow>
 										</treeitem>
 									</treechildren>
