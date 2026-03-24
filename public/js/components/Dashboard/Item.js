@@ -70,6 +70,14 @@ export default {
 		ready() {
 			return this.component && this.arguments !== null;
 		},
+		visible: {
+			get() {
+				return !this.hidden;
+			},
+			set(value) {
+				this.$emit('remove', this.hidden);
+			}
+		}
 	},
 	methods: {
 		unpin(){
@@ -191,7 +199,7 @@ export default {
 			</a>
 			<Transition>
 				<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
+					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" v-model="visible" :value="true">
 				</div>
 			</Transition>
 		</div>
