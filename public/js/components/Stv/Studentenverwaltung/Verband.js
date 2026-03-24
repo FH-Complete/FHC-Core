@@ -358,6 +358,7 @@ export default {
 						v-if="['semester', 'verband', 'gruppe', 'gruppe_kurzbz'].some(key => node.data.hasOwnProperty(key))"
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
+						:data-cy="'student-collection-'+node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
 						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
 					>
@@ -367,6 +368,7 @@ export default {
 						v-else
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
+						:data-cy="'stg-node-'+node.data.studiengang_kz"
 						v-drag-click="() => toggleTreeNode(node)"
 					>
 						{{ node.data.name }}
@@ -383,6 +385,7 @@ export default {
 						v-if="favorites.on || favorites.list.length"
 						href="#"
 						@click.prevent="filterFav"
+						data-cy="favorite-icon-header"
 					>
 						<i
 							:class="favorites.on ? 'fa-solid' : 'fa-regular'"
@@ -398,6 +401,7 @@ export default {
 						data-link-fav-add
 						@click.prevent="markFav(node)"
 						@keydown.enter.stop.prevent="markFav(node)"
+						:data-cy="'favorite-icon-'+node.data.studiengang_kz"
 					>
 						<i
 							:class="favorites.list.includes(node.data.link + '') ? 'fa-solid' : 'fa-regular'"
