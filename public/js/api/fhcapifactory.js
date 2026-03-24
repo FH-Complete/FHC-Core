@@ -40,6 +40,7 @@ import studiengang from "./studiengang.js";
 import menu from "./menu.js";
 import dashboard from "./dashboard.js";
 import authinfo from "./authinfo.js";
+import vertraege from "./vertraege.js";
 import studium from "./studium.js";
 import language from "./language.js";
 
@@ -70,6 +71,7 @@ export default {
     menu,
     authinfo,
     studium,
-    language
+    language,
+    vertraege
 };
 
