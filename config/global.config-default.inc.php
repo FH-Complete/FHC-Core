@@ -368,10 +368,13 @@ define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
 // Gibt an, ob in der StudVW der Status vorgerueckt werden kann
 define('STATUS_VORRUECKEN_ANZEIGEN', true);
 
-//externe Ueberwachung im Testtool erlauben
+// Externe Ueberwachung im Testtool erlauben
 define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
 
 // Defines which organisation is the root of the organisation tree hierarchy for the whole "FHComplete"
 define('FHC_OE_ROOT', 'etw');
+
+// Enable tags in StudVW
+define('STV_TAGS_ENABLED', false);
 
 ?>

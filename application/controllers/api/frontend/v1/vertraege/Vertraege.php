@@ -26,9 +26,6 @@ class Vertraege extends FHCAPI_Controller
 			'deleteLehrauftrag' =>['vertrag/mitarbeiter:w'],
 			'deleteBetreuung' =>['vertrag/mitarbeiter:w'],
 			'getMitarbeiter' => ['vertrag/mitarbeiter:r'],
-			'getHeader' => ['vertrag/mitarbeiter:r'],
-			'getPersonAbteilung' => ['vertrag/mitarbeiter:r'],
-			'getLeitungOrg' => ['vertrag/mitarbeiter:r'],
 		]);
 
 		//Load Models and Libraries
@@ -241,7 +238,7 @@ class Vertraege extends FHCAPI_Controller
 			}
 		}
 		$this->db->trans_complete();
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($vertrag_id);
 	}
 
 	public function updateContract()
@@ -358,7 +355,7 @@ class Vertraege extends FHCAPI_Controller
 		}
 		$this->db->trans_complete();
 
-		$this->terminateWithSuccess(true);
+		$this->terminateWithSuccess($vertrag_id);
 	}
 
 	public function loadContract($vertrag_id)
@@ -683,38 +680,5 @@ class Vertraege extends FHCAPI_Controller
 			}
 		}
 		return $this->terminateWithSuccess(getData($result));
-	}
-
-	public function getPersonAbteilung($mitarbeiter_uid)
-	{
-		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
-
-		$result = $this->Mitarbeitermodel->getPersonAbteilung($mitarbeiter_uid);
-
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(current($data));
-	}
-
-	public function getLeitungOrg($oekurzbz)
-	{
-		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
-
-		$result = $this->Mitarbeitermodel->getLeitungOrg($oekurzbz);
-
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(current($data));
-	}
-
-	public function getHeader($person_id)
-	{
-		$this->load->model('ressource/Mitarbeiter_model', 'Mitarbeitermodel');
-
-		$result = $this->Mitarbeitermodel->getHeader($person_id);
-
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(current($data));
 	}
 }
