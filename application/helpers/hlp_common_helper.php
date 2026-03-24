@@ -91,7 +91,7 @@ function var_dump_to_error_log($parameter)
 	var_dump($parameter); // KEEP IT!!!
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
-	error_log(str_replace("\n", '', $ob_get_contents)); // KEEP IT!!!
+	error_log(str_replace("\n", '', $ob_get_contents) . ', referer: ' . "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']); // KEEP IT!!!
 }
 
 /**
@@ -408,22 +408,6 @@ function findResource($path, $resource, $subdir = false, $extraDir = null)
 	return null;
 }
 
-/**
- * check if String can be converted to a date
- */
-function isValidDate($dateString)
-{
-	try
-	{
-		return (new DateTime($dateString)) !== false;
-	}
-	catch(Exception $e)
-	{
-		return false;
-	}
-}
-
-
 // ------------------------------------------------------------------------
 // PHP functions that don't exist in older versions
 // ------------------------------------------------------------------------
@@ -446,7 +430,8 @@ if (!function_exists('array_is_list')) {
 // ------------------------------------------------------------------------
 
 /**
- * check if string can be converted to a date
+ * Check if the provided parameter is a string containing a valid date
+ * NOTE: the name is in the "snake case" format because othewise the CI form validation _cannot_ use it
  */
 function is_valid_date($dateString)
 {
