@@ -19,7 +19,7 @@ const app = Vue.createApp({
 		return {
 			// TODO(chris): move those two into the components that need it
 			renderers: Vue.computed(() => this.renderers),
-			timezone: 'Europe/Vienna'
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone
 		};
 	},
 	created() {
