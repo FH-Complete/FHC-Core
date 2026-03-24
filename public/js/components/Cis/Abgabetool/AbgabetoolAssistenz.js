@@ -53,6 +53,9 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
+			count: 0,
+			filteredcount: 0,
+			selectedcount: 0,
 			studiensemesterOptions: null,
 			allSem: null,
 			curSem: null,
@@ -265,7 +268,12 @@ export const AbgabetoolAssistenz = {
 					})
 					
 					this.selectedData = data
+					this.selectedcount = data.length;
 				}
+			},
+			{
+				event: 'dataFiltered',
+				handler: (filters, rows) => this.filteredcount = rows.length
 			}
 			]};
 	},
@@ -1108,7 +1116,8 @@ export const AbgabetoolAssistenz = {
 			this.domain = data[1]
 
 			this.projektarbeiten = this.mapProjekteToTableData(data[0])
-
+			this.count = this.projektarbeiten.length
+			
 			await this.tableBuiltPromise
 			
 			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
@@ -1165,6 +1174,17 @@ export const AbgabetoolAssistenz = {
 		},
 	},
 	computed: {
+		countsToHTML() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
 		emailItems() {
 			const menu = []
 			
@@ -1583,6 +1603,7 @@ export const AbgabetoolAssistenz = {
 				:title="''"  
 				@uuidDefined="handleUuidDefined"
 				ref="abgabeTable"
+				:description="countsToHTML"
 				:newBtnShow="true"
 				:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
 				:newBtnDisabled="!selectedData.length"
