@@ -40,7 +40,9 @@ export default {
 ---------------------------------------------------------------------------------------------
 
 endpoint: for corecontroller: eg: :endpoint="$fhcApi.factory.notiz.person"
-(...prestudent, ...mitarbeiter, ...bestellung, ...lehreinheit, ...projekt, ...projektphase, ...projekttask, ...anrechnung)
+
+import ApiNotiz[...] from '../../../../api/factory/notiz/[...].js';
+[...]: prestudent, mitarbeiter, bestellung, lehreinheit, projekt, projektphase, projekttask, anrechnung
 
 for extensions: write own controller extending core NotizController
 
@@ -76,7 +78,7 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ---------------------------------------------------------------------------------------------
 
 		<core-notiz
-			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
+			:endpoint="endpoint"
 			ref="formc"
 			type-id="uid"
 			:id= "'ma0068'"
@@ -89,7 +91,7 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 		</core-notiz>
 		
 		<core-notiz
-			:endpoint="$fhcApi.factory.notiz.prestudent"
+			:endpoint="endpoint"
 			ref="formc"
 			type-id="prestudent_id"
 			:id="modelValue.prestudent_id"
@@ -102,7 +104,7 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 		</core-notiz>
 				
 		<core-notiz
-			:endpoint="$fhcApi.factory.notiz.projekt"
+			:endpoint="endpoint"
 			ref="formc"
 			type-id="projekt_kurzbz"
 			:id="'EA74'" 
