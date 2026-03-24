@@ -97,6 +97,14 @@ class User extends FHCAPI_Controller
 				$override_decoded['general']['widgets'] = [];
 
 		$override_decoded['general']['widgets'][$widget['widgetid']] = $widget;
+
+		// NOTE(chris): remove doubles in other funktionen
+		foreach ($override_decoded as $funktion => $array) {
+			if ($funktion == 'general')
+				continue;
+			if (isset($array['widgets']) && isset($array['widgets'][$widget['widgetid']]))
+				unset($override_decoded[$funktion]['widgets'][$widget['widgetid']]);
+		}
 		
 		$override->override = json_encode($override_decoded);
 				
