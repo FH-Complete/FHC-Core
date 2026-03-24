@@ -276,6 +276,8 @@ class Message_model extends DB_Model
 							s.message_id, s.person_id, MAX(s.insertamum) as lastinserted
 						from
 							public.tbl_msg_status s
+						join
+							filtered_messages fm on fm.message_id = s.message_id and fm.recipient_id = s.person_id
 						group by
 							s.message_id, s.person_id
 					) ls
