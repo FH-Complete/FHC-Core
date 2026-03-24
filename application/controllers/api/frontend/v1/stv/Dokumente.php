@@ -755,7 +755,13 @@ class Dokumente extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
-		return hasData($data) ? getData($data)[0]->student_uid : null;
+		if(!(is_array($data) && count($data) > 0))
+		{
+			return null;
+		}
+		$student = current($data);
+
+		return $student->student_uid;
 	}
 
 	private function _loadPrestudentFromUid($studentUid)
