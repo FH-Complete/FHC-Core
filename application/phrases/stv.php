@@ -2616,4 +2616,28 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'stv',
+  'phrase' => 'error_noLehrverbandAssigned',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Student has no assignment to any teaching association',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );

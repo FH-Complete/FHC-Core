@@ -163,6 +163,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 50,
 					'requiredPermissions' => 'lehre/gruppenmanager:r'
+				),
+				'vertragsverwaltung' => array(
+					'link' => site_url('vertragsverwaltung'),
+					'description' => 'Vertragsverwaltung',
+					'expand' => true,
+					'sort' => 51,
+					'requiredPermissions' => 'vertrag/mitarbeiter:r'
 				)
 			)
 		),
@@ -342,6 +349,18 @@ $config['navigation_menu']['system/issues/Issues/*'] = array(
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
 	),
+
+);
+
+$config['navigation_menu']['vertragsverwaltung/*'] = array(
+	'vertragsverwaltung' => array(
+		'link' => site_url('vertragsverwaltung'),
+		'description' => 'Vertragsverwaltung',
+		'icon' => 'home',
+		'sort' => 100,
+		'target' => '_blank',
+		'requiredPermissions' => array('vertrag/mitarbeiter:r')
+	)
 );
 
 $config['navigation_menu']['apps'] = [

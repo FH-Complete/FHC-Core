@@ -2,8 +2,8 @@ import AbgabeDetail from "./AbgabeStudentDetail.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { getDateStyleClass} from "./getDateStyleClass.js";
 
-const today = new Date()
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
 	components: {
@@ -48,61 +48,6 @@ export const AbgabetoolStudent = {
 		};
 	},
 	methods: {
-		dateDiffInDays(datumParam) {
-			let datum = datumParam
-			if(datumParam instanceof Date && !isNaN(datum.getTime()))
-			{
-				const year = datumParam.getFullYear();
-				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
-				const day = datumParam.getDate();
-				const pad = (num) => String(num).padStart(2, '0');
-				datum = `${year}-${pad(month)}-${pad(day)}`
-			}
-
-			const dateToday = luxon.DateTime.now().startOf('day');
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-			const duration = dateDatum.diff(dateToday, 'days');
-
-			return duration.values.days;
-		},
-		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if(Number.isInteger(termin.note)) {
-					const opt = this.notenOptions.find(opt => opt.note == termin.note)
-					if(opt.positiv) return 'bestanden'
-				}
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
-		},
 		checkQualityGatesStrict(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
@@ -155,7 +100,9 @@ export const AbgabetoolStudent = {
 			return qgate1positiv && qgate2positiv
 		},
 		isPastDate(date) {
-			return new Date(date) < new Date(Date.now())	
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
+			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
+			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
 			this.loading = true
@@ -173,8 +120,8 @@ export const AbgabetoolStudent = {
 						// old assumed production logic when qgates are required
 						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
 						
-						// new larifari we want qgates but they are optional fhtw mode
-						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesOptional(pa.abgabetermine)
+						const inTime = termin.fixtermin ? !this.isPastDate(termin.datum) : true
+						termin.allowedToUpload = inTime && this.checkQualityGatesOptional(pa.abgabetermine)
 
 
 						// development purposes
@@ -193,7 +140,7 @@ export const AbgabetoolStudent = {
 					
 					
 					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
-					termin.dateStyle = this.getDateStyleClass(termin)
+					termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 				})
 				
 				pa.betreuer = this.buildBetreuer(pa)
@@ -383,7 +330,7 @@ export const AbgabetoolStudent = {
 	</div>
 	
 	<Accordion :multiple="true" :activeIndex="activeTabIndex">
-		<template v-for="projektarbeit in projektarbeiten">
+		<template v-for="projektarbeit in projektarbeiten" :key="projektarbeit.projektarbeit_id">
 			<AccordionTab>
 				
 				<template #header>
@@ -409,11 +356,11 @@ export const AbgabetoolStudent = {
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
 						<button v-if="projektarbeit.beurteilung1" @click="handleDownloadBeurteilung1(projektarbeit)" class="btn btn-primary">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
 						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary" style="margin-left: 4px;">
-							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuer') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
 					</div>
 				</div>
@@ -432,13 +379,13 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuer') ) }}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuerv2') ) }}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.betreuerart_kurzbz ? projektarbeit.betreuer : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontakt') )}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontaktv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>
