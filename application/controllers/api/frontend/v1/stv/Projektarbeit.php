@@ -104,9 +104,11 @@ class Projektarbeit extends FHCAPI_Controller
 			lehre.tbl_projektarbeit.lehrveranstaltung_id, lehreinheit_id, 
 			firma_id, beginn, ende, gesperrtbis, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
 		);
-		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id', 'LEFT');
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehre.tbl_projektarbeit.lehrveranstaltung_id = lv.lehrveranstaltung_id');
 		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id', 'LEFT');
+		
+		
 		return $this->ProjektarbeitModel->loadWhere(
 			array('projektarbeit_id' => $projektarbeit_id)
 		);
