@@ -12,22 +12,22 @@ html {
   font-size: .875em;
 }
 html.fs_xx-small {
-	font-size: .5em;
+	font-size: .625em;
 }
 html.fs_x-small {
-	font-size: .625em;
+	font-size: .6875em;
 }
 html.fs_small {
 	font-size: .75em;
 }
 html.fs_normal {
-  font-size: .875em;
+	font-size: .8125em;
 }
 html.fs_big {
-  font-size: 1em;
+	font-size: .875em;
 }
 html.fs_huge {
-	font-size: 1.125em;
+	font-size: 1em;
 }
 
 #appMenu {
@@ -74,6 +74,12 @@ html.fs_huge {
 	color: var(--gray-500);
 }
 
+/* Aufnahme Termine: background color green*/
+.stv-details-admission-table .row-green{
+    background-color: lightgreen !important;
+    //color: var(--green-200);
+}
+
 /* Dropdown Toolbar Interessent, submenu */
 .dropend .dropdown-toggle.d-flex::after {
 	height: 0;
@@ -115,6 +121,15 @@ html.fs_huge {
 		transform: none;
 		position: inherit;
 		z-index: 1;
+	}
+
+	.sidebar-collapsed #sidebarMenu {
+		display: none !important;
+	}
+
+	.sidebar-collapsed .container-fluid > .row > main {
+		flex: 0 0 100%;
+		max-width: 100%;
 	}
 }
 
@@ -168,7 +183,7 @@ html.fs_huge {
 }
 
 .has-filter .fa-filter {
-	color: var(--bs-success);
+	color: var(--bs-danger);
 }
 .override_filtercmpt_actions_style div.d-flex.align-items-baseline {
 	align-items: end !important;
@@ -185,3 +200,84 @@ html.fs_huge {
 .tiny-90 div.tox.tox-tinymce {
 	height: 90% !important;
 }
+
+/* slim begin */
+.stv .form-label {
+	margin-bottom: .15rem;
+	font-weight: bold;
+}
+
+.stv .form-control,
+.stv .form-select,
+.stv .input-group-text {
+	padding-top: .15rem;
+	padding-bottom: .15rem;
+}
+
+:root {
+	--bs-body-line-height: 1.2;
+}
+
+.stv .tabulator-row .tabulator-cell,
+.stv .tabulator-header-filter input {
+	padding-top: 1px !important;
+	padding-bottom: 1px !important;
+}
+
+.stv .tabulator-row {
+	min-height: 18px;
+}
+
+.stv .btn {
+	--bs-btn-padding-y: 0.25rem;
+	--bs-btn-line-height: 1.2;
+}
+
+.stv .p-button.p-button-icon-only {
+	padding-top: 0;
+	padding-bottom: 0;
+}
+
+.stv .p-tabview .p-tabview-nav li .p-tabview-nav-link {
+	padding: 0.25rem .5rem;
+}
+/*
+.stv .p-tabview .p-tabview-panels {
+	background-color: #e5eff5;
+}
+
+.stv .p-tabview .p-tabview-nav li.p-highlight .p-tabview-nav-link {
+	background: #e5eff5;
+	border-color: #dee2e6 #dee2e6 #e5eff5 #dee2e6;
+}
+*/
+.stv-details-details-foto img {
+	max-height: 120px;
+}
+
+.stv .tabulator-row .tabulator-frozen,
+.stv .tabulator-row .tabulator-cell {
+	border-bottom: none;
+}
+
+/*
+.stv .p-treetable .p-treetable-thead > tr > th,
+.stv .p-treetable .p-treetable-tbody > tr {
+	background-color: #e5eff5;
+}
+
+.stv .p-treetable .p-treetable-tbody > tr.p-highlight {
+	background: #007bff;
+	color: #fff;
+}
+
+.stv .p-treetable.p-treetable-hoverable-rows .p-treetable-tbody > tr:not(.p-highlight):hover {
+	background: #fff;
+	color: #212529;
+}
+
+.tabulator-row.tabulator-row-even .tabulator-cell {
+	background-color: #e5eff5;
+}
+*/
+/* slim ende */

@@ -42,5 +42,7 @@ const logsViewerApp = Vue.createApp({
 	}
 });
 
+FhcApps.makeExtendable(logsViewerApp);
+
 logsViewerApp.use(PluginsPhrasen).mount('#main');
 
