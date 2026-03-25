@@ -14,14 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import VueDatePicker from '../vueDatepicker.js.php'
 import CoreSearchbar from "../searchbar/searchbar.js";
+import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
 import FhcCalendar from "../Calendar/Tempus.js";
 import FhcCoursepicker from "../Tempus/Coursepicker.js";
-import ApiKalender from '../../api/factory/kalender.js';
+import LectureSelection from "../Tempus/LectureSelection.js";
+import ParkingSlot from "../Tempus/ParkingSlot.js";
+import ApiKalender from '../../api/factory/tempus/kalender.js';
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiRenderers from '../../api/factory/renderers.js';
+import ApiTempusConfig  from '../../api/factory/tempus/config.js';
+import AppMenu from "../AppMenu.js";
+import drop from '../../directives/drop.js';
+import AppConfig from "../AppConfig.js";
+
+import BsModal from "../Bootstrap/Modal.js";
+
+
+import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
+import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 
 export default {
 	name: "Tempus",
@@ -29,7 +41,14 @@ export default {
 		CoreSearchbar,
 		VerticalSplit,
 		FhcCalendar,
-		FhcCoursepicker
+		FhcCoursepicker,
+		LectureSelection,
+		ParkingSlot,
+		AppConfig,
+		AppMenu,
+		NavLanguage,
+		BsModal,
+		StvVerband
 	},
 	props: {
 		defaultSemester: String,
@@ -39,19 +58,28 @@ export default {
 		cisRoot: String,
 		activeAddons: String, // semicolon separated list of active addons
 		viewData: Object,
+		logoutUrl: String,
+		avatarUrl: String
+	},
+	directives: {
+		drop
 	},
 	provide() {
 		return {
 			cisRoot: this.cisRoot,
 			defaultSemester: this.defaultSemester,
-			$reloadList: () => {
-				this.$refs.stvList.reload();
-			},
+			currentSemester: this.defaultSemester,
 			renderers: Vue.computed(() => this.renderers),
+			appConfig: Vue.computed(() => this.appconfig),
+			contextMenuActions: Vue.computed(() => this.contextMenuActions),
 		}
 	},
 	data() {
 		return {
+			appconfig: {},
+			configEndpoints: ApiTempusConfig,
+			endpoint: ApiStudiengangTree,
+			raumVorschlaege: [],
 			selected: [],
 			searchbaroptions: {
 				origin: 'tempus',
@@ -60,7 +88,8 @@ export default {
 				types: [
 					//"student",
 					"raum",
-					//"mitarbeiter"
+					"mitarbeiter",
+					"mitarbeiter_ohne_zuordnung"
 				],
 				actions: {
 					raum: {
@@ -70,7 +99,17 @@ export default {
 						},
 						childactions: [
 						]
-					}
+					},
+					employee: {
+						defaultaction: {
+							type: "function",
+							action: (data) => {
+								this.setEmp(data);
+							}
+						},
+						childactions: [
+						]
+					},
 				}
 			},
 			lv_id: null,
@@ -86,98 +125,379 @@ export default {
 				geschlechter: []
 			},
 			renderers: null,
-			ort_kurzbz: 'EDV_A5.08',
+			ort_kurzbz: null,
+			view: 'room',
+			parkedKeys: new Set(),
+			lecturers: [],
+			overlayCache: [],
+			extraBackgrounds: [],
+			lastRange: null,
+			stg: null,
+			show_stg: null,
+			semester: null,
+			studiensemester_kurzbz: null,
+			raumModal: {
+				show: false,
+				loading: false,
+				vorschlaege: [],
+				event: null
+			},
 		}
-	},
-	methods: {
-		setOrt: function(data)
-		{
-			// Wenn bei der Suche ein Ort ausgewaehlt wird, dann wir der Ort gesetzt und ein Reload getriggert durch den watcher
-			this.ort_kurzbz = data.ort_kurzbz;
-		},
-		handleChangeDate() {
-		},
-		handleChangeMode() {
-		},
-		searchfunction(params) {
-			return this.$api.call(ApiSearchbar.search(params));
-		},
-		getPromiseFunc(start, end) {
-			return [
-				this.$api.call(ApiKalender.getRoomplan(this.ort_kurzbz, '2025-10-01','2025-10-30')),//start.toISODate(), end.toISODate())),
-			];
-		},
-		parkingdrop: function(evt)
-		{
-			evt.preventDefault();
-			var data = JSON.parse(evt.dataTransfer.getData("text"));
-			alert('parked Data:'+data.id);
-			console.log(data);
-		},
-		dropHandler: function(event, start, end)
-		{
-			let day = start.date.toFormat('yyyy-MM-dd');
-			let time = start.date.toFormat('hh:mm');
-
-			let dropdata = JSON.parse(event.dataTransfer.getData('text'))
-
-			if(dropdata.type=='kalender')
-			{
-				let kalender_id = dropdata.id;
-
-				Promise.allSettled([
-					this.$api.call(ApiKalender.updateKalenderEvent(kalender_id, this.ort_kurzbz, day+' '+time, null))
-				]).then((result) => {
-					let promise_events = [];
-					result.forEach((promise_result) => {
-						if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success")
-						{
-							// TODO - reload
-						}
-					})
-				});
-			}
-			else if(dropdata.type=='lehreinheit')
-			{
-				// TODO Calculate end time
-				let lehreinheit_id = dropdata.id;
-				let start_time =  day+' '+time;
-				let end_time = start.date.plus({ minutes: 45 }).toFormat('yyyy-MM-dd hh:mm');
-				alert("mode:"+dropdata.mode);
-
-				Promise.allSettled([
-					this.$api.call(ApiKalender.addKalenderEvent(lehreinheit_id, this.ort_kurzbz, start_time, end_time))
-				]).then((result) => {
-					let promise_events = [];
-					result.forEach((promise_result) => {
-						if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-
-							// TODO - reload
-						}
-					})
-				});
-			}
-			else
-			{
-				alert("Unbekannte Daten gedroppt");
-			}
-		},
-		onRightClick: function(evt) {
-			this.$refs.EventContextMenu.show(evt);
-		}
-	},
-	watch: {
-	  ort_kurzbz: function (newValue, oldValue) {
-		  // Raumansicht laden wenn der Ort geaendert wird
-	  }
 	},
 	computed: {
+		contextMenuActions() {
+			return {
+				lehreinheit: [
+					{
+						label: 'Raumauswahl',
+						icon: 'fa-solid fa-door-open',
+						action: this.openRaumauswahl
+					}
+				]
+			};
+		},
 		currentDay() {
 			return luxon.DateTime.now().setZone(this.config.timezone).toISODate();
 		},
 		currentMode() {
 			return 'week';
 		},
+		visibleLecturerUids() {
+			if (!this.lecturers.length)
+				return null;
+			return this.lecturers.filter(lecture => lecture.showEvents).map(lecture => lecture.uid);
+		}
+	},
+	methods: {
+		async openRaumauswahl(orig) {
+			if (!orig?.lehreinheit_id)
+				return;
+			this.raumModal = orig;
+
+			await this.$api.call(ApiKalender.getRaumvorschlag(
+				orig.isostart,
+				orig.isoend,
+				orig.lehreinheit_id[0]
+			)).then(result => {
+
+				this.raumVorschlaege = result.data ?? [];
+				this.$refs.raumModal.show();
+
+			});
+
+		},
+		async selectRaum(ort_kurzbz) {
+			const orig = this.raumModal;
+			await this.$api.call(
+				ApiKalender.updateKalenderEvent(orig.kalender_id, {
+					ort_kurzbz,
+					start_time: orig.von,
+					end_time: orig.bis
+				})).then(() => this.$refs.raumModal.hide());
+			this.$refs.calendar.resetEventLoader();
+		},
+		setOrt: function(data)
+		{
+			this.ort_kurzbz = data.ort_kurzbz;
+			this.$refs.calendar.resetEventLoader();
+		},
+		onSelectVerband({link, name})
+		{
+			let stg = null;
+			let semester = null;
+			let studiensemester_kurzbz = this.selectedStudiensemester;
+			this.show_stg = name
+			if (typeof link === 'number')
+				stg = link;
+			else if (typeof link === 'string')
+			{
+				[stg, semester] = link.split('/');
+			}
+			this.stg = stg;
+			if (semester !== null)
+				this.semester = semester;
+			if (studiensemester_kurzbz)
+				this.studiensemester_kurzbz = studiensemester_kurzbz;
+
+			this.$refs.calendar.resetEventLoader();
+		},
+		setEmp: function(data)
+		{
+			const uid = data.uid;
+			const label = data.name;
+			if (!this.lecturers.some(l => l.uid === uid))
+			{
+				this.lecturers.push({
+					uid,
+					label,
+					showEvents: true,
+					overlays: { blocks: true, wishes: true },
+				});
+			}
+
+			this.$refs.calendar.resetEventLoader();
+			if (this.lastRange)
+				this.handleRange(this.lastRange);
+		},
+		handleChangeDate() {
+			console.log("handleChangeDate");
+		},
+		handleChangeMode() {
+			console.log("handleChangeMode")
+		},
+		searchfunction(params) {
+			return this.$api.call(ApiSearchbar.search(params));
+		},
+		getPromiseFunc(start, end) {
+			const hasRoom = !!this.ort_kurzbz;
+			const hasLektoren = this.lecturers.length > 0;
+			const hasStg = !!this.stg;
+
+			const filter = {};
+
+			if (hasRoom)
+				filter.ort = this.ort_kurzbz;
+			if (hasStg)
+				filter.stg = this.stg;
+			if (hasLektoren)
+				filter.uid = this.lecturers.map(l => l.uid);
+
+			return [this.$api.call(ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()))];
+		},
+		toDateTime(value, timezone){
+			if (luxon.DateTime.isDateTime(value)) return value;
+
+			if (value?.date?.isValid)
+				return value.date;
+
+			if (typeof value === 'number')
+				return luxon.DateTime.fromMillis(value, { zone: timezone });
+
+			if (value instanceof Date)
+				return luxon.DateTime.fromJSDate(value, { zone: timezone });
+
+			if (typeof value === 'string')
+				return luxon.DateTime.fromISO(value, { zone: timezone });
+
+			return luxon.DateTime.invalid("invalid datetime");
+		},
+		getLastEndOfSameDay(startDT, ends) {
+			if (!ends?.length) return null;
+
+			const dayKey = startDT.toISODate();
+			let lastSameDay = null;
+
+			for (const end of ends) {
+				const dt = luxon.DateTime.isDateTime(end) ? end : luxon.DateTime.fromISO(String(end), { zone: startDT.zoneName });
+
+				if (!dt.isValid)
+					continue;
+
+				if (dt.toISODate() === dayKey)
+					lastSameDay = dt;
+			}
+
+			return lastSameDay;
+		},
+		clampEndToGrid(startDT, durationMin, ends) {
+			const calculatedEnd = startDT.plus({ minutes: durationMin });
+
+			const lastGridEndSameDay = this.getLastEndOfSameDay(startDT, ends);
+
+			if (!lastGridEndSameDay)
+				return calculatedEnd;
+
+			return calculatedEnd > lastGridEndSameDay ? lastGridEndSameDay : calculatedEnd;
+		},
+		dropHandler(payload) {
+			const { item, start, end } = payload;
+
+			if (!item?.length)
+				return alert("Keine Daten gedroppt");
+
+			const obj = item[0];
+			if (!obj?.type)
+				return alert("Unbekannter Drop-Typ");
+
+			const startDT = luxon.DateTime.fromISO(start);
+			const endDT = luxon.DateTime.fromISO(end);
+
+			if (!startDT.isValid || !endDT.isValid)
+				return alert("Ungültiges Datum");
+
+			const start_time = startDT.toFormat('yyyy-MM-dd HH:mm');
+			const end_time = endDT.toFormat('yyyy-MM-dd HH:mm');
+
+
+			if (obj.type === 'lehreinheit')
+			{
+				this.$api.call(
+					ApiKalender.addKalenderEvent(
+						obj.orig.lehreinheit_id,
+						this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+						start_time,
+						end_time
+					)
+				).then(() => {
+					this.$refs.calendar.resetEventLoader();
+				});
+			}
+			else if (obj.type === 'kalender')
+			{
+				let updatedInfos = {
+					ort_kurzbz: this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+					start_time: start_time,
+					end_time: end_time
+				}
+
+				this.$api.call(
+					ApiKalender.updateKalenderEvent(
+						obj.orig.kalender_id,
+						updatedInfos
+					)
+				).then(() => {
+					this.$refs.parking.unpark({
+						type: obj.type,
+						id: obj.orig.kalender_id
+					});
+					this.$refs.calendar.resetEventLoader();
+				});
+			}
+			else
+			{
+				alert("Unbekannter Drop-Typ: " + obj.type);
+			}
+		},
+		handleRange(range) {
+			if (!range?.start || !range?.end)
+				return;
+
+			if (this.currentMode === 'week')
+			{
+				//Workaround because, updateRange is emitting 2 times
+				const startDay = range.start.startOf('day');
+				const endDay = range.end.startOf('day');
+
+				const days = Math.round(endDay.diff(startDay, 'days').days) + 1;
+				if (days > 8)
+					return;
+			}
+
+			this.lastRange = range;
+
+			const key = `${range.start.toISODate()}_${range.end.toISODate()}_${this.currentMode}`;
+
+			for (const lect of this.lecturers)
+			{
+				this.getOverlays(lect.uid, range, key);
+			}
+
+			this.rebuildExtraBackgrounds();
+		},
+
+		getOverlays(uid, range, rangeKey)
+		{
+			if (!this.overlayCache[uid])
+				this.overlayCache[uid] = {};
+
+			let entry = this.overlayCache[uid][rangeKey];
+
+			if (entry?.loaded || entry?.loading)
+				return;
+
+			entry = this.overlayCache[uid][rangeKey] = {
+				blocks: [],
+				wishes: [],
+				loading: true,
+				loaded: false
+			};
+
+			const promises = [];
+			const lect = this.lecturers.find(lecture => lecture.uid === uid);
+
+			if (lect.overlays.wishes)
+			{
+				promises.push(
+					this.$api.call(ApiKalender.getLektorZeitwuensche(uid, range.start.toISODate(), range.end.toISODate()))
+						.then(result => {
+							entry.wishes = (result.data || []).map(zeitwunsch => ({
+								class: `bg-lecturer-wish bg-uid-${uid} wish-w-${zeitwunsch.gewicht}`,
+								start: zeitwunsch.isostart,
+								end: zeitwunsch.isoend,
+								label: zeitwunsch.label
+							}));
+						})
+				);
+			}
+
+			if (lect.overlays.blocks)
+			{
+				promises.push(
+					this.$api.call(ApiKalender.getLektorZeitsperren(uid, range.start.toISODate(), range.end.toISODate()))
+						.then(result => {
+							entry.blocks = (result.data || []).map(zeitsperre => ({
+								class: `bg-lecturer-block bg-uid-${uid}`,
+								start: zeitsperre.isostart,
+								end: zeitsperre.isoend,
+								label: zeitsperre.label
+							}));
+						})
+				);
+			}
+
+			Promise.allSettled(promises).then(() => {
+				entry.loading = false;
+				entry.loaded = true;
+				this.rebuildExtraBackgrounds();
+			});
+		},
+
+		rebuildExtraBackgrounds() {
+			if (!this.lastRange)
+				return;
+
+			const key = `${this.lastRange.start.toISODate()}_` + `${this.lastRange.end.toISODate()}_` + `${this.currentMode}`;
+			let res = [];
+
+			for (let lect of this.lecturers)
+			{
+				const entry = this.overlayCache[lect.uid]?.[key];
+				if (!entry)
+					continue;
+
+				if (lect.overlays.blocks)
+					res.push(...(entry.blocks || []));
+
+				if (lect.overlays.wishes)
+					res.push(...(entry.wishes || []));
+			}
+
+			this.extraBackgrounds = res;
+		},
+
+		removeLecturer(uid)
+		{
+			this.lecturers = this.lecturers.filter(lecture => lecture.uid !== uid);
+			delete this.overlayCache[uid];
+			this.$refs.calendar.resetEventLoader();
+		},
+		clearOrt() {
+			this.ort_kurzbz = null;
+			this.$refs.calendar.resetEventLoader();
+		},
+		clearStg() {
+			this.stg = null;
+			this.show_stg = null;
+			this.$refs.calendar.resetEventLoader();
+		}
+	},
+	watch: {
+		lecturers: {
+			deep: true,
+			handler() {
+				this.rebuildExtraBackgrounds();
+			}
+		}
 	},
 	async created()
 	{
@@ -219,69 +539,183 @@ export default {
 				}
 			});
 	},
-	mounted() {
-
-
-	},
 	template: `
 	<div class="tempus">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
-			<a class="navbar-brand col-md-4 col-lg-3 col-xl-2 me-0 px-3">Tempus</a>
-			<div class="collapse navbar-collapse" id="navbarSupportedContent">
-			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
-				<li class="nav-item">
-					<a class="nav-link" href="#">Config</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="#">Issues</a>
-				</li>
-				<li class="nav-item dropdown">
-					<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-						Reports
-					</a>
-					<ul class="dropdown-menu">
-						<li><a class="dropdown-item" href="#">AZG Verletzungen</a></li>
-						<li><a class="dropdown-item" href="#">Raumauslastung</a></li>
-						<li><hr class="dropdown-divider"></li>
-						<li><a class="dropdown-item" href="#">LektorInnenliste</a></li>
-					</ul>
-				</li>
-			</ul>
+			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
+				<button
+					class="btn btn-outline-light border-0 m-1 collapsed"
+					type="button"
+					data-bs-toggle="offcanvas"
+					data-bs-target="#appMenu"
+					aria-controls="appMenu"
+					aria-expanded="false"
+					:aria-label="$p.t('ui/toggle_nav')"
+				>
+					<span class="svg-icon svg-icon-apps"></span>
+				</button>
+				<a class="navbar-brand me-0" :href="tempusRoot">Tempus</a>
 			</div>
-			<core-searchbar :searchoptions="searchbaroptions" :searchfunction=searchfunction class="searchbar w-100"></core-searchbar>
+			<button
+				class="btn btn-outline-light border-0 d-md-none m-1 collapsed"
+				type="button"
+				data-bs-toggle="offcanvas"
+				data-bs-target="#sidebarMenu"
+				aria-controls="sidebarMenu"
+				aria-expanded="false"
+				:aria-label="$p.t('ui/toggle_nav')"
+			>
+				<span class="fa-solid fa-table-list"></span>
+			</button>
+			<core-searchbar
+				ref="searchbar"
+				:searchoptions="searchbaroptions"
+				:searchfunction="searchfunction"
+				class="searchbar position-relative w-100"
+				show-btn-submit
+			></core-searchbar>
+			<div id="nav-user" class="dropdown">
+				<button
+					id="nav-user-btn"
+					class="btn btn-link rounded-0 py-0"
+					type="button"
+					data-bs-toggle="dropdown"
+					data-bs-target="#nav-user-menu"
+					aria-expanded="false"
+					aria-controls="nav-user-menu"
+				>
+					<img
+						:src="avatarUrl"
+						:alt="$p.t('profilUpdate/profilBild')"
+						class="bg-light avatar rounded-circle border border-light"
+					/>
+				</button>
+				<ul
+					ref="navUserDropdown"
+					class="dropdown-menu dropdown-menu-dark dropdown-menu-end rounded-0 text-center m-0"
+					aria-labelledby="nav-user-btn"
+				>
+					<li>
+						<button
+							type="button"
+							class="dropdown-item"
+							data-bs-toggle="modal"
+							data-bs-target="#configModal"
+						>
+							{{ $p.t('ui/settings') }}
+						</button>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<nav-language
+							item-class="dropdown-item border-left-dark"
+						/>
+					</li>
+					<li><hr class="dropdown-divider m-0"/></li>
+					<li>
+						<a class="dropdown-item" :href="logoutUrl">
+							{{ $p.t('ui/logout') }}
+						</a>
+					</li>
+				</ul>
+			</div>
 		</header>
 		<div class="container-fluid overflow-hidden heightfull">
 			<div class="row h-100">
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+				<aside id="appMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+					<div class="offcanvas-header">
+						Tempus
+						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+					</div>
+					<div class="offcanvas-body">
+						<app-menu app-identifier="tempus" />
+					</div>
+				</aside>
+				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<div style="float: left">
-						<fhc-coursepicker></fhc-coursepicker>
-						<div id="parkinglot" ondragover="event.preventDefault();" @drop="parkingdrop">
-							<br />
-							<i class="fa-solid fa-square-parking"></i><br />
-							<span>Drag here to park</span>
+				
+					<div class="room-selection" v-if="ort_kurzbz">
+						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
+							<span><i class="fa-solid fa-door-open me-2"></i>{{ ort_kurzbz }}</span>
+							<button
+								type="button"
+								class="btn btn-sm btn-link text-danger p-0"
+								@click="clearOrt"
+								title="Raum entfernen"
+							>
+								<i class="fa-solid fa-xmark"></i>
+							</button>
 						</div>
-						<br />
-						Raum <input type="text" v-model="ort_kurzbz">
+					</div>
+					
+					<div class="room-selection" v-if="show_stg">
+						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
+							<span><i class="fa-solid fa-university me-2"></i>{{ show_stg }}</span>
+							<button
+								type="button"
+								class="btn btn-sm btn-link text-danger p-0"
+								@click="clearStg"
+								title="STG entfernen"
+							>
+								<i class="fa-solid fa-xmark"></i>
+							</button>
+						</div>
+					</div>
+					<lecture-selection
+							v-if="lecturers.length"
+							:lecturers="lecturers"
+							@remove="removeLecturer"
+						></lecture-selection>
+					<div class="overflow-auto flex-grow-1 d-flex flex-column gap-2" style="min-height: 0">
+						<div class="verband-selection">
+							<stv-verband :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+						</div>
+						<fhc-coursepicker></fhc-coursepicker>
+						<parking-slot
+							ref="parking"
+							v-model:parked-keys="parkedKeys"
+						></parking-slot>
 					</div>
 				</nav>
-
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-				<fhc-calendar
-					ref="calendar"
-					:timezone="config.timezone"
-					:get-promise-func="getPromiseFunc"
-					:date="currentDay"
-					:mode="currentMode"
-					@drop="dropHandler"
-					@update:date="handleChangeDate"
-					@update:mode="handleChangeMode"
-					class="responsive-calendar"
-				/>
+					<fhc-calendar
+						ref="calendar"
+						:timezone="config.timezone"
+						:get-promise-func="getPromiseFunc"
+						:date="currentDay"
+						:mode="currentMode"
+						:parkedEvents="parkedKeys"
+						:visible-lecturers="visibleLecturerUids"
+						@drop="dropHandler"
+						@update:date="handleChangeDate"
+						@update:mode="handleChangeMode"
+						:extra-backgrounds="extraBackgrounds"
+						@update:range="handleRange"
+						class="responsive-calendar"
+					/>
 				</main>
 			</div>
 		</div>
+		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
+
+		<bs-modal ref="raumModal" class="bootstrap-prompt">
+			<template #title>Raumauswahl</template>
+			<template #default>
+				<ul v-if="raumVorschlaege.length" class="list-group">
+					<li
+						v-for="raum in raumVorschlaege"
+						:key="raum.ort_kurzbz"
+						class="list-group-item list-group-item-action"
+						style="cursor:pointer"
+						@click="selectRaum(raum.ort_kurzbz)"
+					>
+						<i class="fa-solid fa-door-open me-2"></i>{{ raum.ort_kurzbz }}
+					</li>
+				</ul>
+				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
+			</template>
+		</bs-modal>
 	</div>`
 };
