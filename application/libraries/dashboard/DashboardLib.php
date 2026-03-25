@@ -37,7 +37,9 @@ class DashboardLib
 	
 	public function getDashboardByKurzbz($dashboard_kurzbz)
 	{
-		$result = $this->_ci->DashboardModel->getDashboardByKurzbz($dashboard_kurzbz);
+		$result = $this->_ci->DashboardModel->loadWhere([
+			'dashboard_kurzbz' => $dashboard_kurzbz
+		]);
 
 		if (hasData($result))
 		{
