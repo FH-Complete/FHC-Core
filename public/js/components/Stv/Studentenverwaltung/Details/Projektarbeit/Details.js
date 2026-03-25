@@ -111,6 +111,10 @@ export default {
 			this.formData.anmerkung = null;
 			this.$refs.formDetails.clearValidation();
 		},
+		setFormData(projektarbeit) {
+			this.formData = projektarbeit;
+			if (this.formData.firma_id) this.formData.firma = {firma_id: this.formData.firma_id, name: this.formData.firma_name};
+		},
 		getFormData(newProjektarbeit, studiensemester_kurzbz, additional_lehrveranstaltung_id) {
 
 			this.additional_lehrveranstaltung_id = additional_lehrveranstaltung_id;
