@@ -193,7 +193,8 @@ class PlausicheckProducerLib
 	 */
 	public function producePlausicheckIssue($fehler_kurzbz, $params)
 	{
-		if (!isset($this->_fehlerLibMappings[$fehler_kurzbz])) return error("Mapping for Fehler " . $fehler_kurzbz . " was not found");
+		//if (!isset($this->_fehlerLibMappings[$fehler_kurzbz])) return error("Mapping for Fehler " . $fehler_kurzbz . " was not found");
+		if (!isset($this->_fehlerLibMappings[$fehler_kurzbz])) return success(null);
 
 		$mapping = $this->_fehlerLibMappings[$fehler_kurzbz];
 
@@ -232,5 +233,14 @@ class PlausicheckProducerLib
 
 		// call the function for checking for issue production
 		return $this->_ci->{$lowercaseLibName}->{self::EXECUTE_PLAUSI_CHECK_METHOD_NAME}($params);
+	}
+
+	/**
+	 * Get fehler kurzbz -> library mappings.
+	 * @return array with fehler kurzbz as key and fehlerinfo as values
+	 */
+	public function getFehlerMappings()
+	{
+		return $this->_fehlerLibMappings;
 	}
 }

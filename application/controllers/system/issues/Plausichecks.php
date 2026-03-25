@@ -5,6 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Plausichecks extends Auth_Controller
 {
 	const GENERIC_ISSUE_OCCURED_TEXT = 'Issue aufgetreten';
+	const APPS = ['core'];
 
 	public function __construct()
 	{
@@ -16,7 +17,7 @@ class Plausichecks extends Auth_Controller
 		);
 
 		// Load libraries
-		$this->load->library('issues/PlausicheckProducerLib', array('apps' => 'core'));
+		$this->load->library('issues/PlausicheckProducerLib', array('apps' => self::APPS));
 		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
@@ -47,33 +48,30 @@ class Plausichecks extends Auth_Controller
 		// issues array for passing issue texts
 		$allIssues = array();
 
-		// all fehler kurzbz which are going to be checked
-		$fehlerKurzbz = !isEmptyString($fehler_kurzbz) ? array($fehler_kurzbz) : $this->plausicheckdefinitionlib->getFehlerKurzbz();
+		$fehler_kurzbz_arr = isEmptyString($fehler_kurzbz) ? array_keys($this->plausicheckproducerlib->getFehlerMappings()) : [$fehler_kurzbz];
+
+		$this->FehlerModel->addOrder('fehler_kurzbz, fehlercode');
+		$this->FehlerModel->db->where_in('fehler_kurzbz', $fehler_kurzbz_arr);
+		$fehlerRes = $this->FehlerModel->load();
+
+		if (isError($fehlerRes)) $this->terminateWithJsonError(getError($fehlerRes));
+		if (!hasData($fehlerRes)) return $this->outputJsonSuccess([]);
+
+		// all fehler which are going to be checked
+		$fehlerArr = getData($fehlerRes);
 
 		// set Studiengang to null if not passed
 		if (isEmptyString($studiengang_kz)) $studiengang_kz = null;
 
 		// get the data returned by Plausicheck
-		foreach ($fehlerKurzbz as $fehler_kurzbz)
+		foreach ($fehlerArr as $fehler)
 		{
-			// get Text and fehlercode of the Fehler
-			$this->FehlerModel->addSelect('fehlercode, fehlertext, fehlertyp_kurzbz');
-			$fehlerRes = $this->FehlerModel->loadWhere(array('fehler_kurzbz' => $fehler_kurzbz));
-
-			if (isError($fehlerRes)) $this->terminateWithJsonError(getError($fehlerRes));
-
-			// do not check error if no data
-			if (!hasData($fehlerRes)) continue;
-
-			// get the error data
-			$fehler = getData($fehlerRes)[0];
-
 			// initialize issue array
-			$allIssues[$fehler_kurzbz] = array('fehlercode' => $fehler->fehlercode, 'data' => array());
+			$allIssues[$fehler->fehler_kurzbz] = array('fehlercode' => $fehler->fehlercode, 'data' => array());
 
 			// execute the check
 			$plausicheckRes = $this->plausicheckproducerlib->producePlausicheckIssue(
-				$fehler_kurzbz,
+				$fehler->fehler_kurzbz,
 				array(
 					'studiensemester_kurzbz' => $studiensemester_kurzbz,
 					'studiengang_kz' => $studiengang_kz
@@ -104,7 +102,7 @@ class Plausichecks extends Auth_Controller
 						{
 							// replace placeholder with params, if present
 							if (count($fehlertext_params) != substr_count($fehlerText, '%s'))
-								$this->terminateWithJsonError('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehler_kurzbz);
+								$this->terminateWithJsonError('Wrong number of parameters for Fehlertext, fehler_kurzbz ' . $fehler->fehler_kurzbz);
 
 							$fehlerText = vsprintf($fehlerText, $fehlertext_params);
 						}
@@ -115,7 +113,7 @@ class Plausichecks extends Auth_Controller
 						$issueObj = new StdClass();
 						$issueObj->fehlertext = $fehlerText;
 						$issueObj->type = $fehlerTyp;
-						$allIssues[$fehler_kurzbz]['data'][] = $issueObj;
+						$allIssues[$fehler->fehler_kurzbz]['data'][] = $issueObj;
 					}
 					else // if no issue text found, use generic text
 					{
@@ -154,7 +152,7 @@ class Plausichecks extends Auth_Controller
 
 		if (isError($studiengaengeRes)) show_error(getError($studiengaengeRes));
 
-		$fehlerKurzbz = $this->plausicheckdefinitionlib->getFehlerKurzbz();
+		$fehlerKurzbz = array_keys($this->plausicheckproducerlib->getFehlerMappings());
 
 		$db = new DB_Model();
 
@@ -165,7 +163,9 @@ class Plausichecks extends Auth_Controller
 			FROM
 				system.tbl_fehler
 			WHERE
-				fehler_kurzbz IN ?',
+				fehler_kurzbz IN ?
+			ORDER BY
+				fehler_kurzbz, fehlercode',
 			array($fehlerKurzbz)
 		);
 

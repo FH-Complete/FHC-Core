@@ -414,6 +414,7 @@ $tabellen=array(
 	"system.tbl_extensions" => array("extension_id","name","version","description","license","url","core_version","dependencies","enabled"),
 	"system.tbl_fehler" => array("fehlercode","fehler_kurzbz","fehlercode_extern","fehlertext","fehlertyp_kurzbz","app","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_fehlertyp" => array("fehlertyp_kurzbz","bezeichnung_mehrsprachig"),
+	"system.tbl_fehler_app" => array("fehlercode","app","insertamum","insertvon"),
 	"system.tbl_fehler_konfiguration" => array("konfigurationstyp_kurzbz","fehlercode","konfiguration","insertamum","insertvon","updateamum","updatevon"),
 	"system.tbl_fehler_konfigurationsdatentyp" => array("konfigurationsdatentyp"),
 	"system.tbl_fehler_konfigurationstyp" => array("konfigurationstyp_kurzbz","beschreibung","konfigurationsdatentyp","app"),

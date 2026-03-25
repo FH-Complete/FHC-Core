@@ -10,7 +10,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'ZGV Datum in Zukunft',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => array('core'),
-		'producerLibName' => null,
+		'producerLibName' => 'ZgvDatumInZukunft',
 		'resolverLibName' => 'CORE_ZGV_0001',
 		'producerIsResolver' => false
 	),
@@ -21,7 +21,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'ZGV Datum vor Geburtsdatum',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'ZgvDatumVorGeburtsdatum',
 		'resolverLibName' => 'CORE_ZGV_0002',
 		'producerIsResolver' => false
 	),
@@ -32,7 +32,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'ZGV Masterdatum in Zukunft',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'ZgvMasterDatumInZukunft',
 		'resolverLibName' => 'CORE_ZGV_0003',
 		'producerIsResolver' => false
 	),
@@ -43,7 +43,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'ZGV Masterdatum vor Zgvdatum',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'ZgvMasterDatumVorZgvdatum',
 		'resolverLibName' => 'CORE_ZGV_0004',
 		'producerIsResolver' => false
 	),
@@ -54,7 +54,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'ZGV Masterdatum vor Geburtsdatum',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'ZgvMasterDatumVorGeburtsdatum',
 		'resolverLibName' => 'CORE_ZGV_0005',
 		'producerIsResolver' => false
 	),
@@ -65,7 +65,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Kein Aufenthaltszweck gefunden',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'KeinAufenthaltszweckPlausi',
 		'resolverLibName' => 'CORE_INOUT_0001',
 		'producerIsResolver' => false
 	),
@@ -76,7 +76,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Es sind %s Aufenthaltszwecke eingetragen (max. 1 Zweck für Incomings)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'ZuVieleZweckeIncomingPlausi',
 		'resolverLibName' => 'CORE_INOUT_0002',
 		'producerIsResolver' => false
 	),
@@ -87,7 +87,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Aufenthaltszweckcode ist %s (für Incomings ist nur Zweck 1, 2, 3 erlaubt)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'FalscherIncomingZweckPlausi',
 		'resolverLibName' => 'CORE_INOUT_0003',
 		'producerIsResolver' => false
 	),
@@ -98,7 +98,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Keine Aufenthaltsfoerderung angegeben (bei Outgoings >= 29 Tage Monat im Ausland muss mind. 1 gemeldet werden)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'OutgoingAufenthaltfoerderungfehltPlausi',
 		'resolverLibName' => 'CORE_INOUT_0004',
 		'producerIsResolver' => false
 	),
@@ -109,7 +109,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Angerechnete ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'OutgoingAngerechneteEctsFehlenPlausi',
 		'resolverLibName' => 'CORE_INOUT_0005',
 		'producerIsResolver' => false
 	),
@@ -120,7 +120,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Erworbene ECTS fehlen (Meldepflicht bei Outgoings >= 29 Tage Monat im Ausland)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'OutgoingErworbeneEctsFehlenPlausi',
 		'resolverLibName' => 'CORE_INOUT_0006',
 		'producerIsResolver' => false
 	),
@@ -280,17 +280,17 @@ $config['fehler'] = array(
 		'resolverLibName' => 'CORE_STUDENTSTATUS_0007',
 		'producerIsResolver' => false
 	),
-	array(
-		'fehlercode' => 'CORE_STUDENTSTATUS_0008',
-		'fehler_kurzbz' => 'StudienplanUngueltig',
-		'fehlercode_extern' => null,
-		'fehlertext' => 'Studienplan %s ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)',
-		'fehlertyp_kurzbz' => 'error',
-		'app' => 'core',
-		'producerLibName' => 'StudienplanUngueltig',
-		'resolverLibName' => 'CORE_STUDENTSTATUS_0008',
-		'producerIsResolver' => false
-	),
+	//~ array(
+		//~ 'fehlercode' => 'CORE_STUDENTSTATUS_0008',
+		//~ 'fehler_kurzbz' => 'StudienplanUngueltig',
+		//~ 'fehlercode_extern' => null,
+		//~ 'fehlertext' => 'Studienplan %s ist im Ausbildungssemester %s nicht gültig (prestudent_id %s)',
+		//~ 'fehlertyp_kurzbz' => 'error',
+		//~ 'app' => 'core',
+		//~ 'producerLibName' => 'StudienplanUngueltig',
+		//~ 'resolverLibName' => 'CORE_STUDENTSTATUS_0008',
+		//~ 'producerIsResolver' => false
+	//~ ),
 	array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0009',
 		'fehler_kurzbz' => 'FalscheAnzahlAbschlusspruefungen',
@@ -324,17 +324,17 @@ $config['fehler'] = array(
 		'resolverLibName' => 'CORE_STUDENTSTATUS_0011',
 		'producerIsResolver' => false
 	),
-	array(
-		'fehlercode' => 'CORE_STUDENTSTATUS_0012',
-		'fehler_kurzbz' => 'BewerberNichtZumRtAngetreten',
-		'fehlercode_extern' => null,
-		'fehlertext' => 'Bewerber nicht zum Reihungstest angetreten (prestudent_id %s)',
-		'fehlertyp_kurzbz' => 'warning',
-		'app' => 'core',
-		'producerLibName' => 'BewerberNichtZumRtAngetreten',
-		'resolverLibName' => 'CORE_STUDENTSTATUS_0012',
-		'producerIsResolver' => false
-	),
+	//~ array(
+		//~ 'fehlercode' => 'CORE_STUDENTSTATUS_0012',
+		//~ 'fehler_kurzbz' => 'BewerberNichtZumRtAngetreten',
+		//~ 'fehlercode_extern' => null,
+		//~ 'fehlertext' => 'Bewerber nicht zum Reihungstest angetreten (prestudent_id %s)',
+		//~ 'fehlertyp_kurzbz' => 'warning',
+		//~ 'app' => 'core',
+		//~ 'producerLibName' => 'BewerberNichtZumRtAngetreten',
+		//~ 'resolverLibName' => 'CORE_STUDENTSTATUS_0012',
+		//~ 'producerIsResolver' => false
+	//~ ),
 	array(
 		'fehlercode' => 'CORE_STUDENTSTATUS_0013',
 		'fehler_kurzbz' => 'AktSemesterNull',
@@ -430,7 +430,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Geburtsnation nicht vorhanden',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'GeburtsnationFehlt',
 		'resolverLibName' => 'CORE_PERSON_0005',
 		'producerIsResolver' => false
 	),
@@ -441,7 +441,7 @@ $config['fehler'] = array(
 		'fehlertext' => 'Personkennung fehlt (vBpk AS, vBpk BF oder Ersatzkennzeichen fehlt)',
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
-		'producerLibName' => null,
+		'producerLibName' => 'UhstatPersonkennungFehltCore',
 		'resolverLibName' => 'CORE_PERSON_0006',
 		'producerIsResolver' => false
 	)
