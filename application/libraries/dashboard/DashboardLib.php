@@ -68,8 +68,11 @@ class DashboardLib
 				return $right->funktion_kurzbz;
 			}, $rights));
 		
-		$this->_ci->DashboardPresetModel->db->where_in('funktion_kurzbz', $funktion_kurzbzs);
-		$this->_ci->DashboardPresetModel->db->or_where('funktion_kurzbz IS NULL');
+		$this->_ci->DashboardPresetModel->db
+			->group_start()
+				->where_in('funktion_kurzbz', $funktion_kurzbzs)
+				->or_where('funktion_kurzbz IS NULL')
+			->group_end();
 
 		$this->_ci->DashboardPresetModel->addOrder('funktion_kurzbz', 'DESC');
 		
