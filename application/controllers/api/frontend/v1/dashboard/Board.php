@@ -40,11 +40,22 @@ class Board extends FHCAPI_Controller
 
 	public function list()
 	{
+		$this->DashboardModel->addSelect('dashboard_id');
+		$this->DashboardModel->addSelect('dashboard_kurzbz');
+		$this->DashboardModel->addSelect('tbl_dashboard.beschreibung');
+		$this->DashboardModel->addSelect("(
+			SELECT json_agg(w.*) 
+			FROM dashboard.tbl_widget w 
+			JOIN dashboard.tbl_dashboard_widget dw 
+			USING(widget_id) 
+			WHERE dw.dashboard_id=tbl_dashboard.dashboard_id
+		) AS \"widgetSetup\"");
+
 		$result = $this->DashboardModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($data);
 	}
 
 	public function create()
@@ -82,7 +93,7 @@ class Board extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($data);
 	}
 
 	public function delete()
@@ -116,6 +127,6 @@ class Board extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess($data);
 	}
 }

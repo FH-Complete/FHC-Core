@@ -4,7 +4,6 @@ import DashboardAdminWidgets from "./Admin/Widgets.js";
 import DashboardAdminPresets from "./Admin/Presets.js";
 
 import ApiDashboardBoard from "../../api/factory/dashboard/board.js";
-import ApiDashboardWidget from "../../api/factory/dashboard/widget.js";
 
 export default {
 	name: 'DashboardAdmin',
@@ -16,7 +15,7 @@ export default {
 	provide() {
 		return {
 			adminMode: true,
-			widgetsSetup: Vue.computed(() => this.dashboards[this.current] ? this.dashboards[this.current].widgetSetup : null)
+			widgetsSetup: Vue.computed(() => this.dashboard ? this.dashboard.widgetSetup : null)
 		};
 	},
 	data() {
@@ -59,7 +58,7 @@ export default {
 		dashboardUpdate(dashboard) {
 			return this.$api
 				.call(ApiDashboardBoard.update(dashboard))
-				.then(response =>{
+				.then(response => {
 
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 
@@ -74,34 +73,22 @@ export default {
 				.call(ApiDashboardBoard.delete(dashboard_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-
-				})
-				.catch(this.$fhcAlert.handleSystemError)
-				.finally(() => {
 					this.current = -1;
 					this.dashboards = this.dashboards.filter(el => el.dashboard_id != dashboard_id);
-				});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		assignWidgets(widgets) {
 			this.widgets = widgets;
-			/*while (this.widgets.length)
-				this.widgets.pop();
-			for (var i in widgets)
-				this.widgets.push(widgets[i]);*/
 		}
 	},
 	created() {
 		this.$api
 			.call(ApiDashboardBoard.list())
 			.then(result => {
-				this.dashboards = result.data.retval;
+				this.dashboards = result.data;
 				for (const dashboard of this.dashboards) {
-					this.$api
-						.call(ApiDashboardWidget.list(dashboard.dashboard_id))
-						.then(res => {
-							dashboard.widgetSetup = res.data;
-						})
-						.catch(this.$fhcAlert.handleSystemError);
+					dashboard.widgetSetup = JSON.parse(dashboard.widgetSetup);
 				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
