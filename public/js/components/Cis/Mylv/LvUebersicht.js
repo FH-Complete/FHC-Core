@@ -2,6 +2,7 @@ import BsModal from "../../Bootstrap/Modal.js";
 import LvMenu from "./LvMenu.js";
 
 import ApiAddons from '../../../api/factory/addons.js';
+import ApiCisStudium from '../../../api/factory/cis/studium.js';
 
 export default  {
   
@@ -63,7 +64,8 @@ export default  {
 
 			// check lv evaluierung info
 			if (this.studium_studiensemester) {
-				this.$fhcApi.factory.studium.getLvEvaluierungInfo(this.studium_studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+				this.$api
+					.call(ApiCisStudium.getLvEvaluierungInfo(this.studium_studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id))
 					.then(data => data.data)
 					.then(res => {
 						this.lvEvaluierungMessage = res.message;
@@ -72,7 +74,8 @@ export default  {
 
 			// check if the lv has lvplan entries for this studiensemester
 			if (this.studiensemester && this.event) {
-				return this.$fhcApi.factory.studium.getLvPlanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id)
+				return this.$api
+					.call(ApiCisStudium.getLvPlanForStudiensemester(this.studiensemester, this.event.lehreinheit_id ?? this.event.lehrveranstaltung_id))
 					.then(data => data.data)
 					.then(res => {
 						if (Array.isArray(res) && res.length > 0) {
