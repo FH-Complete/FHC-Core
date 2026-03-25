@@ -52,7 +52,7 @@ export default {
 			
 			let url = this.res.content_url;
 			if (url.substr(0, 16) == '../index.ci.php/')
-				url = this.$fhcApi.getUri(url.substr(16));
+				url = this.$api.getUri(url.substr(16));
 			else if (url.substr(0, 3) == '../')
 				url = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/\/+$/, '') + url.substr(2);
 			return '<a href="' + url + '">' + url + '</a>';
