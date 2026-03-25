@@ -57196,6 +57196,87 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 
+	// ### Phrases Dashboard Admin START
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'deleteInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mit dieser Aktion werden auch alle Voreinstellungen der verbundenen Widgets gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This action will also delete all presets of the connected widgets.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'success_savePreset',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung erfolgreich aktualisiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset successfully updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'alert_deleteWidget',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sind Sie sicher, dass Sie dieses Widget löschen möchten?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Are you sure you want to delete this widget?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Möchten Sie wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### Phrases Dashboard Admin END
 );
 
 
