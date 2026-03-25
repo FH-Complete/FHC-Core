@@ -306,7 +306,8 @@ export default {
 				});
 		},
 		deleteFile(akte_id){
-			return this.$fhcApi.factory.stv.documents.deleteFile(akte_id)
+			return this.$api
+				.call(ApiStvDocuments.deleteFile(akte_id))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 				})

@@ -60,7 +60,6 @@ export default {
 		};
 	},
 	deleteFile(akte_id){
-		console.log("in deleteFile " + akte_id);
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/dokumente/deleteAkte/' + akte_id,
