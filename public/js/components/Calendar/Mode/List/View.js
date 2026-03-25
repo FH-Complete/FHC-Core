@@ -1,7 +1,8 @@
 import LabelDay from '../../Base/Label/Day.js';
 import LabelDow from '../../Base/Label/Dow.js';
 
-import CalDnd from '../../../../directives/Calendar/DragAndDrop.js';
+import draggable from '../../../../directives/draggable.js';
+
 import CalClick from '../../../../directives/Calendar/Click.js';
 
 // TODO(chris): drag and drop
@@ -13,7 +14,7 @@ export default {
 		LabelDow
 	},
 	directives: {
-		CalDnd,
+		draggable,
 		CalClick
 	},
 	inject: {
@@ -86,7 +87,7 @@ export default {
 					v-else
 					class="event"
 					:draggable="draggable(event)"
-					v-cal-dnd:draggable="event"
+					v-draggable="event.orig"
 					v-cal-click:event="event.orig"
 				>
 					<slot :event="event.orig" mode="list" />

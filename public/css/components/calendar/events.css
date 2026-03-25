@@ -2,6 +2,10 @@
 	cursor: pointer;
 	font-size: var(--fhc-calendar-fontsize-event, .875rem);
 }
+.event--parked {
+	opacity: 0.45 !important;
+}
+
 .fhc-calendar-mode-day .fhc-calendar-base-grid-line,
 .fhc-calendar-mode-week .fhc-calendar-base-grid-line {
 	padding: 0 var(--fhc-calendar-gap-events, var(--fhc-calendar-gap, 1px));
@@ -69,3 +73,36 @@
 .fhc-calendar-base .event > *:hover {
 	filter: brightness(120%);
 }
+
+.fhc-resize-bar {
+	align-items: center;
+	justify-content: center;
+
+	height: 15px;
+	flex: 0 0 12px;
+	cursor: ns-resize;
+	position: relative;
+
+	visibility: hidden;
+	pointer-events: none;
+}
+
+.fhc-resize-bar--top {
+	margin-bottom: -16px;
+}
+.fhc-resize-bar--bottom {
+	margin-top: -16px;
+}
+
+.fhc-calendar-base-grid-line-event:hover > .fhc-resize-bar {
+	visibility: visible;
+	pointer-events: auto;
+}
+.fhc-calendar-base-grid-line-event.event:hover {
+	z-index: 50;
+}
+.fhc-resize-bar {
+	z-index: 2;
+}
+
+

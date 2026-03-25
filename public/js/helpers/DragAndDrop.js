@@ -5,10 +5,12 @@
 const TYPE_DEFINITION = {
 	lehreinheit: {
 		id: "lehreinheit_id",
-		dragIcon: "fa-solid fa-chalkboard-user",
 		extras: [
 			"stundenblockung"
 		]
+	},
+	kalender: {
+		id: "kalender_id",
 	},
 	vevent: {
 		id: "uid",
@@ -53,11 +55,15 @@ function isValidDragObject(value) {
 		if (!Object.prototype.hasOwnProperty.call(value, 'values'))
 			return false;
 
+
 		if (!VALID_TYPES.includes(value.type.substr(0, value.type.length-11)))
 			return false;
+
 	} else {
+
 		if (!Object.prototype.hasOwnProperty.call(value, 'id'))
 			return false;
+
 
 		if (!VALID_TYPES.includes(value.type))
 			return false;
@@ -182,10 +188,10 @@ function convertToValidDragObject(data, strict) {
 	const found = Object.entries(TYPE_DEFINITION).find(([ , typedef ]) => {
 		if (!Object.prototype.hasOwnProperty.call(data, typedef.id))
 			return false;
-		if (typedef.extras) {
+		/*if (typedef.extras) {
 			if (!typedef.extras.every(extra => Object.prototype.hasOwnProperty.call(data, extra)))
 				return false;
-		}
+		}*/
 		return true;
 	});
 
@@ -198,13 +204,16 @@ function convertToValidDragObject(data, strict) {
 	const newData = {};
 	newData.type = type;
 	newData.id = data[typedef.id];
-	if (typedef.extras)
-		typedef.extras.forEach(extra => newData[extra] = data[extra]);
+
+	/*if (typedef.extras)
+		typedef.extras.forEach(extra => newData[extra] = data[extra]);*/
 
 	return newData;
 }
 
 function setTransferData(event, validDragObject, setDragImage = false) {
+
+
 	if (setDragImage) {
 		const dragItems = Array.isArray(validDragObject) ? validDragObject : [ validDragObject ];
 		const dragElements = dragItems.map(item => {
@@ -246,9 +255,9 @@ function setTransferData(event, validDragObject, setDragImage = false) {
 		});
 	}
 	if (Array.isArray(validDragObject)) {
+
 		return validDragObject.forEach(data => setTransferData(event, data));
 	}
-	
 	event.dataTransfer.setData('application/fhc-' + validDragObject.type, JSON.stringify(validDragObject));
 }
 
@@ -267,16 +276,16 @@ function eventHasTypes(event, allowedTypes, strict) {
 	allowedTypes = allowedTypes.map(type => 'application/fhc-' + type);
 
 	const dataTypes = [...event.dataTransfer.types];
-	
+
 	// NOTE(chris): if dragging across browsers the dataTransfer object is
 	// set to a default one without data. Since we do not support dragging
 	// across browsers (yet) we return false which will disallow dropping.
 	if (!dataTypes.length)
 		return false;
-	
+
 	if (!strict)
 		return allowedTypes.some(type => [...event.dataTransfer.types].includes(type));
-	
+
 	return [...event.dataTransfer.types].every(type => allowedTypes.includes(type));
 }
 

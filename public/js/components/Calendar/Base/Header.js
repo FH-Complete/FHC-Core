@@ -24,7 +24,8 @@ export default {
 		btnMonth: Boolean,
 		btnWeek: Boolean,
 		btnDay: Boolean,
-		btnList: Boolean
+		btnList: Boolean,
+		btnTableList: Boolean
 	},
 	emits: [
 		"next",
@@ -86,6 +87,16 @@ export default {
 						class="btn btn-outline-secondary"
 						:class="{active: mode === 'list'}"
 						@click="clickMode($event, 'list')"
+					>
+						<i class="fa fa-table-list"></i>
+					</button>
+					
+					<button
+						v-if="btnTableList"
+						type="button"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'tableList'}"
+						@click="clickMode($event, 'tableList')"
 					>
 						<i class="fa fa-table-list"></i>
 					</button>

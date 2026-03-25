@@ -1,7 +1,8 @@
 import GridLine from './Grid/Line.js';
 import GridLineEvent from './Grid/Line/Event.js';
 
-import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
+import drop from '../../../directives/drop.js';
+import { useResizeHandler } from '../../../helpers/Tempus/ResizeHandler.js';
 
 export default {
 	name: "CalendarGrid",
@@ -10,12 +11,17 @@ export default {
 		GridLineEvent
 	},
 	directives: {
-		CalDnd
+		drop
 	},
 	inject: {
 		originalEvents: "events",
 		originalBackgrounds: "backgrounds",
-		dropAllowed: "dropAllowed"
+		dropAllowed: "dropAllowed",
+		onDrop: "onDrop",
+		timeGrid: {
+			from: "timeGrid",
+			default: () => []
+		}
 	},
 	provide() {
 		return {
@@ -57,10 +63,10 @@ export default {
 	},
 	data() {
 		return {
-			dragging: false,
 			resizeObserver: null,
 			mutationObserver: null,
-			userScroll: true
+			userScroll: true,
+			isDragging: false
 		};
 	},
 	computed: {
@@ -262,7 +268,9 @@ export default {
 				mouseFrac = mouse / this.$refs.body.offsetHeight;
 			}
 
-			return dayTimestamp + this.start + Math.floor((this.end - this.start) * mouseFrac);
+			let rawTimestamp = dayTimestamp + this.start + Math.floor((this.end - this.start) * mouseFrac);
+			let fiveMinutes = 5 * 60 * 1000;
+			return Math.round(rawTimestamp / fiveMinutes) * fiveMinutes;
 		},
 
 		/* SCROLLING */
@@ -308,7 +316,157 @@ export default {
 			} else {
 				this.$refs.scroller.scrollTo(0, 0);
 			}
-		}
+		},
+		calculateNettoDuration(start, end) {
+			const startDay = start.startOf('day');
+			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
+
+			let nettoDuration = luxon.Duration.fromMillis(0);
+
+			for (const block of blocks)
+			{
+				const blockStart = startDay.plus(block.start);
+				const blockEnd = startDay.plus(block.end);
+
+				const overlapStart = blockStart > start ? blockStart : start;
+				const overlapEnd = blockEnd < end ? blockEnd : end;
+
+				if (overlapStart < overlapEnd) {
+					nettoDuration = nettoDuration.plus(overlapEnd.diff(overlapStart));
+				}
+			}
+
+			return nettoDuration;
+		},
+
+		calculateDropEnd(dropStart, durationMs) {
+			const duration = luxon.Duration.fromMillis(durationMs);
+			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
+			let accumulated = luxon.Duration.fromMillis(0);
+
+			for (const block of blocks)
+			{
+				const blockStart = dropStart.startOf('day').plus(block.start);
+				const blockEnd = dropStart.startOf('day').plus(block.end);
+
+				if (blockEnd <= dropStart) continue;
+
+				const relevantStart = blockStart > dropStart ? blockStart : dropStart;
+				const relevantDuration = blockEnd.diff(relevantStart);
+
+				accumulated = accumulated.plus(relevantDuration);
+
+				if (accumulated >= duration)
+				{
+					const overflow = accumulated.minus(duration);
+					return blockEnd.minus(overflow);
+				}
+			}
+
+			const lastBlock = blocks[blocks.length - 1];
+			return dropStart.startOf('day').plus(lastBlock.end);
+		},
+
+		onDropSnap(evt, items, date, part) {
+			let obj = items?.[0];
+			if (!obj?.orig) return;
+
+			const dayStr = evt?.currentTarget?.dataset?.day;
+			const dropDay = dayStr ? luxon.DateTime.fromISO(dayStr) : date;
+
+			const dropStart = dropDay.plus(part.start || part);
+
+			let nettoDuration = this._getNettoDurationForDrop(obj);
+			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
+
+			this.onDrop?.({
+				item: [obj],
+				start: dropStart.toISO(),
+				end: dropEnd.toISO()
+			});
+		},
+
+		_getNettoDurationForDrop(obj) {
+
+			if (!obj?.orig)
+				return luxon.Duration.fromObject({ minutes: 45 });
+
+			if (obj.orig.isostart && obj.orig.isoend)
+			{
+				let s = luxon.DateTime.fromISO(obj.orig.isostart);
+				let e = luxon.DateTime.fromISO(obj.orig.isoend);
+				if (s.isValid && e.isValid)
+					return this.calculateNettoDuration(s, e);
+			}
+
+			if (obj.type === 'lehreinheit')
+			{
+				let blockung = Number(obj.orig.blockung ?? 1);
+				if (!Number.isFinite(blockung) || blockung <= 0) blockung = 1;
+
+				let blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
+				let firstBlock = blocks[0];
+
+				let bStart = luxon.Duration.fromISO(firstBlock.start);
+				let bEnd   = luxon.Duration.fromISO(firstBlock.end);
+
+				let blockMinutes = bEnd.minus(bStart).as('minutes');
+				if (!Number.isFinite(blockMinutes) || blockMinutes <= 0) blockMinutes = 45;
+
+				return luxon.Duration.fromObject({ minutes: blockung * blockMinutes });
+			}
+
+			return luxon.Duration.fromObject({ minutes: 45 });
+		},
+		onDropFree(evt, items, date)
+		{
+			let obj = items?.[0];
+			if (!obj?.orig)
+				return;
+
+			const timestamp = this.getTimestampFromMouse(evt, date);
+			const dropStart = luxon.DateTime.fromMillis(timestamp);
+
+			let nettoDuration = this._getNettoDurationForDrop(obj);
+			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
+
+
+			this.onDrop?.({
+				item: items,
+				start: dropStart.toISO(),
+				end: dropEnd.toISO()
+			});
+		},
+		handleResizeStart({ edge, evt, el, event })
+		{
+			const gridEl = this.$refs.body;
+
+			if (!gridEl)
+				return;
+
+			this.resizeHandler.startResize(edge, evt, {
+				el,
+				gridEl,
+				event,
+				timeGrid: this.timeGrid,
+				onEnd: ({ event, newStart, newEnd }) => {
+					const orig = event?.orig;
+					if (!orig || !newStart || !newEnd)
+						return;
+
+					this.onDrop?.({
+						item: [{ type: 'kalender', id: orig.kalender_id, orig }],
+						start: newStart,
+						end: newEnd
+					});
+				}
+			});
+		},
+	},
+	setup()
+	{
+		const resizeHandler = useResizeHandler();
+		return { resizeHandler };
 	},
 	beforeUnmount() {
 		this.disableAutoScroll();
@@ -382,11 +540,11 @@ export default {
 					ref="body"
 					class="grid-body"
 					style="display:grid;grid-template-rows:subgrid;grid-template-columns:subgrid"
+					@dragenter="isDragging = true"
+					@dragleave.self="isDragging = false"
+					@dragend="isDragging = false"
+					@drop="isDragging = false"
 					:style="'grid-' + axisCol + ':2/-1;grid-' + axisRow + ':1/-1'"
-					v-cal-dnd:dropcage
-					@calendar-dragenter="dragging = true"
-					@calendar-dragleave="dragging = false"
-					@dragover="dropAllowed ? $event.preventDefault() : null"
 				>
 					<template
 						v-for="(date, index) in axisMain"
@@ -401,9 +559,11 @@ export default {
 						>
 							<slot name="part-body" v-bind="{ index, part }" />
 							<div
-								v-if="snapToGrid && dragging"
-								style="position:absolute;inset:0;z-index:1"
-								v-cal-dnd:dropzone.once="{date: date.plus(part.start || part), ends: ends.slice(ends.findIndex(end => end > date))}"
+								v-if="snapToGrid"
+								style="position:absolute;inset:0"
+								:style="{ zIndex: isDragging ? 10 : 1 }"
+								:data-day="date.toFormat('yyyy-MM-dd')"
+								v-drop:move.lehreinheit-collection.kalender-collection="(evt, item) => onDropSnap(evt, item, date, part)"
 							></div>
 						</div>
 						<grid-line
@@ -413,6 +573,7 @@ export default {
 							:events="eventsNormal[index]"
 							:backgrounds="backgrounds[index]"
 							style="position:relative"
+							@resize-start="handleResizeStart"
 							:style="'grid-' + axisRow + ':1/-1;grid-' + axisCol + ':' + (1+index)"
 						>
 							<template #event="slot">
@@ -420,9 +581,10 @@ export default {
 							</template>
 							<template #dropzone>
 								<div
-									v-if="!snapToGrid && dragging"
-									style="position:absolute;inset:0;z-index:1"
-									v-cal-dnd:dropzone="evt => getTimestampFromMouse(evt, date)"
+									v-if="!snapToGrid"
+									style="position:absolute;inset:0"
+									:style="{ zIndex: isDragging ? 10 : 1 }"
+									v-drop:move.lehreinheit-collection.kalender-collection="(evt, item) => onDropFree(evt, item, date)"
 								></div>
 							</template>
 						</grid-line>

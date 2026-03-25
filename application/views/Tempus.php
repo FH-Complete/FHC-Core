@@ -5,9 +5,9 @@
 		'bootstrap5' => true,
 		'fontawesome6' => true,
 		'vue3' => true,
-		'vuedatepicker11' => true,
 		'primevue3' => true,
 		'tabulator5' => true,
+		'vuedatepicker11' => true,
 		'phrases' => array(
 			'global',
 			'ui',
@@ -17,7 +17,9 @@
 			'public/css/components/vue-datepicker.css',
 			'public/css/components/primevue.css',
 			'public/css/components/calendar.css',
-			'public/css/Tempus.css'
+			'public/css/Tempus.css',
+			'public/css/Studentenverwaltung.css',
+			'public/css/components/function.css'
 		],
 		'customJSs' => [
 			#'vendor/npm-asset/primevue/tree/tree.min.js',
@@ -37,6 +39,8 @@
 			active-addons="<?= defined('ACTIVE_ADDONS') ? ACTIVE_ADDONS : ''; ?>"
 			tempus-root="<?= site_url('Tempus'); ?>"
 			cis-root="<?= CIS_ROOT; ?>"
+			avatar-url="<?= site_url('Cis/Pub/bild/person/' . getAuthPersonId()); ?>"
+			logout-url="<?= site_url('Cis/Auth/logout'); ?>"
 			:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 			:config="<?=  htmlspecialchars(json_encode($variables)); ?>"
 			>

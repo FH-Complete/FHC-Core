@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2025 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +15,24 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import FhcTempus from "../components/Tempus/Tempus.js";
-
-import Phrasen from "../plugins/Phrasen.js";
-
-
-const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-
-const router = VueRouter.createRouter({
-	history: VueRouter.createWebHistory(),
-	routes: [
-		{ path: `/${ciPath}/Tempus`, component: FhcTempus },
-	]
-});
-
-const app = Vue.createApp();
-
-app
-	.use(router)
-	.use(primevue.config.default, {
-		zIndex: {
-			overlay: 1100
-		}
-	})
-	.use(Phrasen)
-	.mount('#main');
+export default {
+	get() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/tempus/config/get'
+		};
+	},
+	getHeader() {
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/tempus/config/getHeader'
+		};
+	},
+	set(params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/tempus/config/set',
+			params
+		};
+	}
+};

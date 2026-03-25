@@ -31,7 +31,7 @@ export default {
 						this.event.lektor.slice(0, 3).map(lektor => lektor.kurzbz).join("\n")
 						+ "\n" + this.$p.t('lehre/weitereLektoren', [this.event.lektor.length - 3])
 					].join(": "));
-				} else {console.log(this.event.lektor);
+				} else {
 					tooltipArray.push([
 						this.$p.t('lehre/lektor'),
 						this.event.lektor.map(lektor => lektor.kurzbz).join("\n")
@@ -64,7 +64,7 @@ export default {
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
-		<div class="event-text" v-tooltip="tooltipString">
+		<div class="event-text">
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span

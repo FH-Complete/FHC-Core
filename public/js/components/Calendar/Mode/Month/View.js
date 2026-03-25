@@ -36,7 +36,9 @@ export default {
 					}
 				}
 				return events;
-			})
+			}),
+			draggableEvents: () => false,
+			resizableEvents: () => false
 		};
 	},
 	inject: {

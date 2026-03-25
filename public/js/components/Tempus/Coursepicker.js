@@ -1,55 +1,71 @@
-import ApiCoursePicker from '../../api/factory/coursepicker.js';
+import FormInput from '../Form/Input.js';
+import draggable from "../../directives/draggable.js";
+import ApiCoursePicker from '../../api/factory/tempus/coursepicker.js';
 
 export default {
 	components: {
+		FormInput
 	},
-	provide() {
-		return {
-		};
+	directives: {
+		draggable
 	},
 	data() {
 		return {
-			courses: null
+			searchparam: '',
+			courses: null,
+			abortController: null,
 		}
 	},
-	props: {
-
-	},
-	computed: {
-	},
 	methods: {
-		loadCourses: function(){
+		async loadCourses() {
 
-			Promise.allSettled([
-				 this.$api.call(ApiCoursePicker.getCourses("test")),
-			]).then((result) => {
-				let promise_events = [];
-				result.forEach((promise_result) => {
-					if (promise_result.status === 'fulfilled' && promise_result.value.meta.status === "success") {
-						let data = promise_result.value.data;
-						if (data && data.forEach) {
+			const query = (this.searchparam ?? '').trim();
 
-							data.forEach((entry, i) => {
-								entry.showname = entry.studiengang_kurzbz+entry.semester+' - ' + entry.kurzbz + ' ' + entry.lektoren.toString();
-								entry.tag = '';
-								entry.mode = 'single';
-							});
+			if (!query)
+			{
+				this.courses = [];
+				return;
+			}
+
+			if (query.length < 3)
+				return;
+
+			if (this.abortController)
+			{
+				this.abortController.abort();
+			}
+
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.$api.call(ApiCoursePicker.search(query), { signal })
+				.then(result => {
+					this.courses = result.data.map(entry => ({
+						lehreinheit_id: entry.lehreinheit_id,
+						lektoren: entry.lektor,
+						studiengang: entry.studiengang,
+						semester: entry.semester,
+						stundenblockung: entry.stundenblockung,
+						wochenrythmus: entry.wochenrythmus,
+						showname: `${entry.lehrfach} ${entry.lehrform}`,
+						orig: {
+							type: 'lehreinheit',
+							lehreinheit_id: entry.lehreinheit_id,
+							blockung: entry.stundenblockung,
+							entry,
 						}
-						promise_events = promise_events.concat(data);
-					}
+					}));
 				})
-				this.courses = promise_events;
-
-			});
+				.catch(this.$fhcAlert.handleSystemError)
 		},
-		dragstart: function(evt, course) {
-			const transferdata = {
+		dragLehreinheitCollection(course) {
+			const orig = course.orig;
+			return {
 				type: 'lehreinheit',
-				id: course.lehreinheit_id,
-				mode: course.mode
+				id: orig.lehreinheit_id,
+				orig: orig,
+				stundenblockung: course.stundenblockung,
 			};
-
-			event.dataTransfer.setData('text', JSON.stringify(transferdata));
 		},
 		keydown: function(evt, course) {
 
@@ -64,26 +80,43 @@ export default {
 					course.mode = 'multi';
 					break
 			}
-
 		}
-
 	},
-	created() {
-		this.loadCourses();
-		//document.addEventListener('keydown', function () { console.log("a"); });
-	},
-	mounted() {
-	},
-	template: /*html*/`
-	<div ref="container" class="fhc-coursechooser">
-		<div id="coursechooser">
-			<span id="coursechooserheader">Course</span>
-			<input type="text" placeholder="Search"/>
-			<div v-for="course in courses" class="eckerl" draggable="true" @dragstart="dragstart(event, course)" tabindex="0" @keyup="keydown($event, course)">
-				{{course.showname}}
-				{{course.tag}}
-			</div>
-			<span id="coursechooserfooter">Drag & Drop on Calender</span>
+	template: `
+	<div class="course-picker">
+		<div class="p-2">
+			<form-input
+				:label="$p.t('ui', 'suche')"
+				type="text"
+				v-model="searchparam"
+				@input="loadCourses"
+			/>
 		</div>
-	</div>`
+		<div class="overflow-auto px-2 pb-2 flex-grow-1">
+			<div
+				v-for="course in courses"
+				:key="course.lehreinheit_id"
+				class="course-picker-row"
+				v-draggable:move.noimage="dragLehreinheitCollection(course)"
+				tabindex="0"
+			>
+				<div class="d-flex justify-content-between align-items-start">
+					<span class="fw-semibold small">{{ course.showname }}</span>
+				</div>
+				<div class="text-muted">
+					<span>{{ course.studiengang }} - {{ course.semester }}</span>
+				</div>
+				<div class="text-muted">
+					<span>{{ course.lektoren }}</span>
+				</div>
+				<div class="text-muted">
+					<span>WR: {{ course.wochenrythmus }} Bl: {{ course.stundenblockung }}</span>
+				</div>
+			</div>
+		</div>
+		<div class="mt-auto px-2 py-2 small text-muted border-top">
+			Drag & Drop on Calendar
+		</div>
+	</div>
+`
 }

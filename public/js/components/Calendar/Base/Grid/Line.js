@@ -74,6 +74,7 @@ export default {
 			:key="i"
 			:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
 			:event="event"
+			@resize-start="$emit('resize-start', $event)"
 		>
 			<template v-slot="slot">
 				<slot name="event" v-bind="slot" />

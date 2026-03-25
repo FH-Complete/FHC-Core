@@ -39,6 +39,7 @@ export default {
 			case "list":
 				return [this.convertedDate.startOf('day').ts, this.convertedDate.startOf('day').plus({ days: this.listLength }).ts - 1];
 			case "week":
+			case "tableList":
 				return [this.convertedDate.startOf('week', { useLocaleWeeks: true }).ts, this.convertedDate.endOf('week', { useLocaleWeeks: true }).ts];
 			case "day":
 				return this.convertedDate;
@@ -51,6 +52,7 @@ export default {
 			case "month":
 				return this.date.toLocaleString({ month: 'long', year: 'numeric' });
 			case "week":
+			case "tableList":
 				var year = this.date.localWeekYear;
 				var week = this.date.toFormat('nn');
 				return this.$p.t('calendar/year_kw', { year, week });
@@ -76,6 +78,7 @@ export default {
 				break;
 			case "list":
 			case "week":
+			case "tableList":
 				date = luxon.DateTime.fromJSDate(value[0]).setZone(this.timezone, { keepLocalTime: true }).setLocale(this.locale);
 				break;
 			case "day":
@@ -96,7 +99,7 @@ export default {
 		@update:model-value="update"
 		:format="() => title"
 		:month-picker="mode == 'month'"
-		:week-picker="mode == 'week'"
+		:week-picker="mode == 'week' || mode == 'tableList'"
 		:range="mode == 'list' ? { autoRange: listLength - 1 } : false"
 		:text-input="mode == 'day'"
 		:week-start="weekStart"

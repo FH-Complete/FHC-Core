@@ -30,7 +30,8 @@ export default {
 		function onStart(evt) {
 			const value = el.dataset.fhcDraggableValue;
 			if (value) {
-				setTransferData(evt, JSON.parse(value), true);
+				let disableImage = binding.modifiers?.noimage === true;
+				setTransferData(evt, JSON.parse(value), !disableImage);
 				if (el.dataset.fhcEffectAllowed)
 					evt.dataTransfer.effectAllowed = el.dataset.fhcEffectAllowed;
 

@@ -1,23 +1,31 @@
-import BaseDraganddrop from './Base/DragAndDrop.js';
 import BaseHeader from './Base/Header.js';
 import BaseSlider from './Base/Slider.js';
 import BsModal from '../Bootstrap/Modal.js';
 
 import CalClick from '../../directives/Calendar/Click.js';
+import DragClick from '../../directives/dragClick.js';
+import Draggable from '../../directives/draggable.js';
+import Drop from '../../directives/drop.js';
 
 export default {
 	name: "CalendarBase",
 	components: {
-		BaseDraganddrop,
 		BaseHeader,
 		BaseSlider,
 		BsModal
 	},
 	directives: {
-		CalClick
+		CalClick,
+		DragClick,
+		Draggable,
+		Drop
 	},
 	provide() {
 		return {
+			events: Vue.computed(() => this.convertedEvents),
+			backgrounds: Vue.computed(() => this.convertedBackgrounds),
+			dropAllowed: Vue.computed(() => !!this.onDrop),
+			onDrop: Vue.computed(() => this.onDrop || null),
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
 			timeGrid: Vue.computed(() => this.timeGrid),
@@ -40,6 +48,17 @@ export default {
 					return item => this.dropableEvents.includes(item.type);
 				if (this.dropableEvents instanceof Function)
 					return this.dropableEvents;
+
+				return () => true;
+			}),
+			resizableEvents: Vue.computed(() => {
+				if (!this.resizableEvents)
+					return () => false;
+
+				if (Array.isArray(this.resizableEvents))
+					return event => this.resizableEvents.includes(event.type);
+				if (this.resizableEvents instanceof Function)
+					return this.resizableEvents;
 
 				return () => true;
 			}),
@@ -93,9 +112,14 @@ export default {
 			type: Boolean,
 			default: undefined
 		},
+		btnTableList: {
+			type: Boolean,
+			default: undefined
+		},
 		timeGrid: Array,
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
+		resizableEvents: [Boolean, Array, Function],
 		onDragover: Function,
 		onDrop: Function
 	},
@@ -240,9 +264,7 @@ export default {
 				break;
 			}
 		},
-		onDropItem(evt, start, end) {
-			this.$emit('drop', evt, start, end);
-		},
+
 		showEventModal(eventObj) {
 			this.modalEvent = eventObj;
 			this.$refs.modal.show();
@@ -263,11 +285,7 @@ export default {
 	},
 	template: /* html */`
 	<div class="fhc-calendar-base h-100">
-		<base-draganddrop
-			class="card h-100"
-			:events="convertedEvents"
-			:backgrounds="convertedBackgrounds"
-			@drop="onDropItem"
+		<div class="card h-100"
 			v-cal-click:container
 			@cal-click-default.capture="handleClickDefaults"
 		>
@@ -282,6 +300,7 @@ export default {
 				:btn-week="!!modes['week'] && (btnWeek || (showBtns && btnWeek !== false))"
 				:btn-month="!!modes['month'] && (btnMonth || (showBtns && btnMonth !== false))"
 				:btn-list="!!modes['list'] && (btnList || (showBtns && btnList !== false))"
+				:btn-table-list="!!modes['tableList'] && (btnTableList || (showBtns && btnTableList !== false))"
 				:mode-options="modeOptions ? modeOptions[cMode] : undefined"
 			>
 				<slot name="actions" />
@@ -293,11 +312,12 @@ export default {
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"
+				@drop="$emit('drop', $event)"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
 			</component>
-		</base-draganddrop>
+		</div>
 		<bs-modal ref="modal" dialog-class="modal-lg" body-class="" @hidden-bs-modal="onModalHidden">
 			<template #title>
 				<slot v-if="modalEvent" v-bind="{mode: 'eventheader', event: modalEvent.event}" />

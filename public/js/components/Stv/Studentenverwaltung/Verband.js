@@ -131,7 +131,7 @@ export default {
 		},
 		onSelectTreeNode(node) {
 			if (node.data.link)
-				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz, semester: node.data.semester, orgform_kurzbz: node.data.orgform_kurzbz});
+				this.$emit('selectVerband', {link: node.data.link, studiengang_kz: node.data.stg_kz, semester: node.data.semester, orgform_kurzbz: node.data.orgform_kurzbz, name: node.data.name});
 		},
 		mapNodesToNoSemReloadNodes(result, node) {
 			if (node.data.no_sem_reload)
