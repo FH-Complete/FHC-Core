@@ -59,8 +59,8 @@ class User extends FHCAPI_Controller
 		$defaultconfig = $this->dashboardlib->getDefaultConfig($dashboard->dashboard_id);
 		$userconfig = $this->dashboardlib->getUserConfig($dashboard->dashboard_id, $uid);
 
-		$defaultconfig_squashed = $defaultconfig ? call_user_func_array('array_merge_recursive', $defaultconfig) : [];
-		$userconfig_squashed = $userconfig ? call_user_func_array('array_merge_recursive', $userconfig) : [];
+		$defaultconfig_squashed = $defaultconfig ? call_user_func_array('array_replace_recursive', $defaultconfig) : [];
+		$userconfig_squashed = $userconfig ? call_user_func_array('array_replace_recursive', $userconfig) : [];
 
 		$mergedconfig = array_replace_recursive($defaultconfig_squashed, $userconfig_squashed);
 
