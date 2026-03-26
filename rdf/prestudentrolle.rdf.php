@@ -144,6 +144,7 @@ foreach($ps->result as $row)
 			<ROLLE:stichtagsaktiv><![CDATA['.$stichtagsaktiv.']]></ROLLE:stichtagsaktiv>
 			<ROLLE:aktiv><![CDATA['.$aktiv.']]></ROLLE:aktiv>
 			<ROLLE:fgm><![CDATA['.$row->fgm.']]></ROLLE:fgm>
+			<ROLLE:faktiv><![CDATA['.($row->faktiv?'Ja':'Nein').']]></ROLLE:faktiv>
       	</RDF:Description>
       </RDF:li>
 	';
