@@ -511,10 +511,11 @@ class Abgabe extends FHCAPI_Controller
 			return $projektarbeit->projektarbeit_id;
 		};
 		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
-
-		$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
-		$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
 		
+		if(count($projektarbeiten_ids) > 0) {
+			$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+			$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		}
 		
 		forEach($projektarbeiten->retval as $pa) {
 			
@@ -846,9 +847,10 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
-		$email = $this->getDataOrTerminateWithError($result, 'general');
-		
-		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		if(count($result->retval) > 0) {
+			$email = getData($result);
+			return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		} else return '';
 
 	}
 

@@ -495,6 +495,10 @@ class AbgabetoolJob extends JOB_Controller
 		// get all new or changed termine in interval
 		$result = $this->_ci->PaabgabeModel->findAbgabenNewOrUpdatedSince($interval, $relevantTypes);
 		$retval = getData($result);
+		if(!$retval) {
+			$this->_ci->logInfo("Keine Emails an Betreuer über neue oder veränderte Termine versandt");
+			return;
+		}
 		
 		// group changed/new abgaben for projektarbeiten
 		$projektarbeiten = [];
@@ -557,6 +561,8 @@ class AbgabetoolJob extends JOB_Controller
 			$anredeFillString = $data->anrede == "Herr" ? "r" : "";
 			$fullFormattedNameString = $data->first;
 
+			$relevantCounter = 0; // workaround to check if a betreuer needs to have any notification about relevant
+			// abgaben at all to avoid sending empty emails since we filter on certain conditions
 			forEach($tupelArr as $tupel) {
 				$projektarbeit_id = $tupel[0];
 				$betreuerRow = $tupel[1];
@@ -574,6 +580,8 @@ class AbgabetoolJob extends JOB_Controller
 				if(count($relevantAbgaben) == 0) {
 					continue;
 				}
+
+				$relevantCounter++;
 
 				// format the Student Name
 				$s = $relevantAbgaben[0];
@@ -632,6 +640,11 @@ class AbgabetoolJob extends JOB_Controller
 
 			// done with building the change list, now send it
 			$betreuerRow = $tupelArr[0][1];
+			
+			if($relevantCounter == 0) {
+				$this->_ci->logInfo('No Relevant Abgaben to notify Betreuer PersonID: "'.$betreuerRow->person_id.'".');
+				continue;
+			}
 			
 			$path = $this->_ci->config->item('URL_MITARBEITER');
 			$url = CIS_ROOT.$path;

@@ -430,16 +430,16 @@ export default {
 
 		fhcApiAxios.interceptors.response.use(
 			response => {
-				if (response.config?.errorHandling == 'off'
-					|| response.config?.errorHandling === false
-					|| response.config?.errorHandling == 'fail')
+				const errorConfig = get_error_handler(response.config);
+
+				if (!errorConfig.success)
 					return clean_return_value(response);
 
-				// NOTE(chris): loop through errors
-				if (response.data.errors)
-					response.data.errors = response.data.errors.filter(
-						err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$api._defaultErrorHandlers[err.type])(err, response.config)
-					);
+				const errors = popHandleableErrors(errorConfig, response.data.errors);
+
+				for (var type in errors) {
+					errorConfig.handler[type](errors[type]);
+				}
 
 				return clean_return_value(response);
 			},

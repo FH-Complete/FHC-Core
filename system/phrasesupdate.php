@@ -3906,6 +3906,172 @@ $phrases = array(
 	array(
 		'app' => 'pep',
 		'category' => 'ui',
+		'phrase' => 'geplZeitraum',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'geplanter Zeitraum',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'planned Period',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'bitteAuswaehlen',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte auswählen...',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select...',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'hinweisLehrende',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis für Lehrende',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note for Lecturers',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lehreinheiten',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Lehreinheiten',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Teaching Units',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'lead',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Leitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Lead',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'teamlead',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Team / Leitung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Team / Lead',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'ausblick_lvplanung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ausblick auf Ihre mögliche LV-Planung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preview of Your Potential Course Planning',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
+		'phrase' => 'detailselfoverview',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '<b>Achtung:</b> die vorliegenden Informationen stellen eine Vorabplanung dar und sind als Anfrage an Sie gedacht. <br /><br />
+						Die Beauftragung der tatsächlichen Lehrveranstaltungen erfolgt durch Ihre Kompetenzfeldleitung. <br /><br />
+					Ihre aktuell gültigen Lehraufträge und den LV Plan des aktuellen Semesters (Termine) finden Sie wie gewohnt unter „mein CIS“ -> „LV-Plan Hauptmenü“ bzw. „Lehrauftragsverwaltung“.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '<b>Please note:</b> The information provided represents a preliminary planning and is intended as an inquiry to you.<br /><br />
+							The official assignment of the actual courses will be carried out by your Competence Field Manager.<br /><br />
+							Your currently valid teaching assignments and the course schedule for the current semester (dates) can be found as usual under “My CIS” → “Schedule Main Menu” or “Teaching Assignment Administration”',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	array(
+		'app' => 'pep',
+		'category' => 'ui',
 		'phrase' => 'werksvertragsects',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -44726,9 +44892,9 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Für den gesamten Studiengang verbindlicher Termin.  
-				
-				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich, 
+				'text' => "Für den gesamten Studiengang verbindlicher Termin.
+
+				Liegt ein Termin in der Vergangenheit, kann nichts mehr hochgeladen werden. Ist es dennoch erforderlich,
 				haben Studierende bei der Studiengangsassistenz um eine Korrektur dieses Termins anzusuchen.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -44919,7 +45085,7 @@ array(
 			array(
 				'sprache' => 'German',
 				'text' => "Verspätete Projektabgabe ist bei Terminen, welche von der Studiengangsassistenz für den gesamten Studiengang fixiert wurden nicht erlaubt!
-				
+
 				Um einen Endupload durchführen zu können, müssen Sie ein positiv benotetes Quality Gate 1 & Quality Gate 2 in der relevanten Projektarbeit absolviert haben.",
 				'description' => '',
 				'insertvon' => 'system'
@@ -45229,6 +45395,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Download File',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4downloadLatestAbgabe',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Zuletzt getätigte Abgabe herunterladen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Download latest uploaded File',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4termineTimeLine',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Zeitstrahl Termine',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Timeline Deadlines',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -46690,6 +46896,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Second Reviewer Title Post',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4noZuordnungBetreuerStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'No assignment or authorization found for the project!',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -56948,6 +57174,109 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Refactor Messages END
+	//
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'error_noLehrverbandAssigned',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Student has no assignment to any teaching association',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+
+	// ### Phrases Dashboard Admin START
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'deleteInfo',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Mit dieser Aktion werden auch alle Voreinstellungen der verbundenen Widgets gelöscht.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This action will also delete all presets of the connected widgets.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'success_savePreset',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Voreinstellung erfolgreich aktualisiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Preset successfully updated',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'alert_deleteWidget',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Sind Sie sicher, dass Sie dieses Widget löschen möchten?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Are you sure you want to delete this widget?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'confirm_delete',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Möchten Sie wirklich löschen?',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Do you really want to delete?',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// ### Phrases Dashboard Admin END
 );
 
 
