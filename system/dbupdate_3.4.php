@@ -92,6 +92,7 @@ require_once('dbupdate_3.4/68744_StV_settings.php');
 require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
 require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
+require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
