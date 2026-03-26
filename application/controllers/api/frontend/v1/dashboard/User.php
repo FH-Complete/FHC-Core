@@ -48,25 +48,9 @@ class User extends FHCAPI_Controller
 		
 		$uid = $this->authlib->getAuthObj()->username;
 
-		/*$mergedconfig = $this->dashboardlib->getMergedConfig($dashboard->dashboard_id, $uid);
+		$mergedconfig = $this->dashboardlib->getMergedUserConfig($dashboard->dashboard_id, $uid);
 
-		$this->terminateWithSuccess([
-			'general' => call_user_func_array(
-				'array_merge_recursive',
-				$mergedconfig
-			)
-		]);*/
-		$defaultconfig = $this->dashboardlib->getDefaultConfig($dashboard->dashboard_id);
-		$userconfig = $this->dashboardlib->getUserConfig($dashboard->dashboard_id, $uid);
-
-		$defaultconfig_squashed = $defaultconfig ? call_user_func_array('array_replace_recursive', $defaultconfig) : [];
-		$userconfig_squashed = $userconfig ? call_user_func_array('array_replace_recursive', $userconfig) : [];
-
-		$mergedconfig = array_replace_recursive($defaultconfig_squashed, $userconfig_squashed);
-
-		$this->terminateWithSuccess([
-			DashboardLib::SECTION_IF_FUNKTION_KURZBZ_IS_NULL => $mergedconfig
-		]);
+		$this->terminateWithSuccess($mergedconfig);
 	}
 
 	public function addWidget()
@@ -87,25 +71,11 @@ class User extends FHCAPI_Controller
 			$widget['widgetid'] = $this->dashboardlib->generateWidgetId($dashboard_kurzbz);
 
 		$override = $this->dashboardlib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);
-		
+
 		$override_decoded = json_decode($override->override, true);
 
-		if (!isset($override_decoded['general']) || !is_array($override_decoded['general']))
-			$override_decoded['general'] = [];
+		$override_decoded[$widget['widgetid']] = $widget;
 
-		 if (!isset($override_decoded['general']['widgets']))
-				$override_decoded['general']['widgets'] = [];
-
-		$override_decoded['general']['widgets'][$widget['widgetid']] = $widget;
-
-		// NOTE(chris): remove doubles in other funktionen
-		foreach ($override_decoded as $funktion => $array) {
-			if ($funktion == 'general')
-				continue;
-			if (isset($array['widgets']) && isset($array['widgets'][$widget['widgetid']]))
-				unset($override_decoded[$funktion]['widgets'][$widget['widgetid']]);
-		}
-		
 		$override->override = json_encode($override_decoded);
 				
 		$result = $this->dashboardlib->insertOrUpdateOverride($override);
@@ -135,18 +105,10 @@ class User extends FHCAPI_Controller
 		
 		$override_decoded = json_decode($override->override, true);
 
-		foreach (array_keys($override_decoded) as $k) {
-			if (!isset($override_decoded[$k]["widgets"])) {
-				unset($override_decoded[$k]);
-				continue;
-			}
-			if (isset($override_decoded[$k]["widgets"][$widget_id])) {
-				unset($override_decoded[$k]["widgets"][$widget_id]);
-			}
-			if (!$override_decoded[$k]["widgets"]) {
-				unset($override_decoded[$k]);
-			}
-		}
+		if (!isset($override_decoded[$widget_id]))
+			show_404();
+		
+		unset($override_decoded[$widget_id]);
 
 		$override->override = json_encode($override_decoded);
 				

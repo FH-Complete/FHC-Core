@@ -138,8 +138,8 @@ export default {
 				const widgets = [];
 				const remove = [];
 
-				for (var wid in res.data.general.widgets) {
-					let widget = res.data.general.widgets[wid];
+				for (var wid in res.data) {
+					let widget = res.data[wid];
 					widget.id = wid;
 					if (widget.custom || widget.preset) {
 						widgets.push(widget);
