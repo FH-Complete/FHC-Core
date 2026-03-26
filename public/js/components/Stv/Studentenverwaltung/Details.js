@@ -86,7 +86,7 @@ export default {
 		this.loadConfig();
 	},
 	template: `
-	<div class="stv-details h-100 d-flex flex-column">
+	<div class="stv-details h-100 d-flex flex-column" data-cy="stv-details">
 		<div v-if="!students?.length" class="justify-content-center d-flex h-100 align-items-center">
 			{{$p.t('ui', 'chooseStudent')}}
 		</div>
@@ -108,6 +108,7 @@ export default {
 			<fhc-tabs
 				v-if="students.length == 1"
 				ref="tabs" 
+				data-cy="stv-details-tabs"
 				:useprimevue="true"
 				:modelValue="students[0]"
 				:config="config"
@@ -116,7 +117,17 @@ export default {
 				@changed="reload"
 				>
 				</fhc-tabs>
-			<fhc-tabs v-else ref="tabs" :useprimevue="true" :modelValue="students" :config="config" :default="$route.params.tab" style="flex: 1 1 0%; height: 0%" @changed="reload"></fhc-tabs>
+			<fhc-tabs 
+				v-else 
+				ref="tabs"
+				data-cy="stv-details-tabs" 
+				:useprimevue="true" 
+				:modelValue="students" 
+				:config="config" 
+				:default="$route.params.tab" 
+				style="flex: 1 1 0%; height: 0%" 
+				@changed="reload">	
+			</fhc-tabs>
 		</div>
 		<div v-else>
 			Loading...

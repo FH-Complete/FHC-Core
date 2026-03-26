@@ -508,7 +508,7 @@ export default {
 		this.handlePersonUrl();
 	},
 	template: /* html */`
-		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }">
+		<div class="stv" :class="{ 'sidebar-collapsed': sidebarCollapsed }" data-cy="studentenverwaltung">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -632,14 +632,14 @@ export default {
 						</app-menu>
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
+				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100" data-cy="stv-sidebar">
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
 					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
+				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10" data-cy="stv-main">
 					<vertical-split>
 						<template #top>
 							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>

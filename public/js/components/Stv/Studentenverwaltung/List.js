@@ -142,6 +142,10 @@ export default {
 						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
 					row.getElement().draggable = true
+					// data-cy for Cypress e2e: prefer prestudent_id, fall back to uid or person_id
+					const d = row.getData();
+					const id = d.prestudent_id ?? d.uid ?? d.person_id ?? 'unknown';
+					row.getElement().setAttribute('data-cy', 'student-row-' + id);
 				},
 
 				ajaxRequestFunc: (url, config, params) => {
@@ -600,11 +604,12 @@ export default {
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">
+	<div class="stv-list h-100 pt-3" data-cy="stv-list">
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
 			tabindex="0"
+			data-cy="stv-list-table-container"
 			@focusin="onFocus"
 			@keydown="onKeydown"
 			v-draggable:copyLink.capture="selectedDragObject"

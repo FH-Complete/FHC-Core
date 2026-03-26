@@ -13,7 +13,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="stv-details-multistatus h-100">
+	<div class="stv-details-multistatus h-100" data-cy="stv-tab-multistatus">
 		<tbl-multi-status :model-value="modelValue" :config="config"></tbl-multi-status>
 	</div>
 	`

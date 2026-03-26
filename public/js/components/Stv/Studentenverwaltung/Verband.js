@@ -61,6 +61,15 @@ export default {
 		},
 		noSemReloadNodes() {
 			return this.nodes.reduce(this.mapNodesToNoSemReloadNodes, []);
+		},
+		colPt() {
+			return {
+				rowToggler: ( options ) => {
+					return {
+						'data-cy': `tree-toggle-${options?.parent?.props?.node?.key ?? 'unknown'}`
+					}
+				}
+			}
 		}
 	},
 	watch: {
@@ -319,7 +328,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: /* html */`
-	<div class="overflow-auto" tabindex="-1">
+	<div class="overflow-auto" tabindex="-1" data-cy="stv-verband-tree">
 		<pv-treetable
 			ref="tree"
 			class="stv-verband p-treetable-sm"
@@ -339,6 +348,7 @@ export default {
 				field="name"
 				expander
 				class="text-break"
+				:pt="colPt"
 			>
 				<template #header>
 					<div class="text-right">
@@ -349,6 +359,7 @@ export default {
 								v-model="filters['global']"
 								class="form-control ps-5"
 								placeholder="Search"
+								data-cy="verband-search"
 							>
 						</div>
 					</div>
@@ -358,7 +369,7 @@ export default {
 						v-if="['semester', 'verband', 'gruppe', 'gruppe_kurzbz'].some(key => node.data.hasOwnProperty(key))"
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
-						:data-cy="'student-collection-'+node.data.studiengang_kz"
+						:data-cy="'student-collection-'+node.key"
 						v-drag-click="() => toggleTreeNode(node)"
 						v-drop:link-strict.student-collection="(evt, students) => dropStudents(node, students)"
 					>
@@ -368,7 +379,7 @@ export default {
 						v-else
 						:data-tree-item-key="node.key"
 						:title="node.data.studiengang_kz"
-						:data-cy="'stg-node-'+node.data.studiengang_kz"
+						:data-cy="'stg-node-label-'+node.key"
 						v-drag-click="() => toggleTreeNode(node)"
 					>
 						{{ node.data.name }}

@@ -152,6 +152,7 @@ export default{
 								button.className = 'btn btn-outline-secondary btn-action';
 								button.innerHTML = '<i class="fa fa-forward"></i>';
 								button.title = this.$p.t('ui', 'btn_statusVorruecken');
+								button.setAttribute('data-cy', 'status-btn-advance');
 								button.addEventListener('click', () =>
 									this.actionAdvanceStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 								);
@@ -164,6 +165,7 @@ export default{
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-check"></i>';
 							button.title = this.$p.t('ui', 'btn_confirmStatus');
+							button.setAttribute('data-cy', 'status-btn-confirm');
 							button.addEventListener('click', () =>
 								this.actionConfirmStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -175,6 +177,7 @@ export default{
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
 							button.title = this.$p.t('ui', 'btn_editStatus');
+							button.setAttribute('data-cy', 'status-btn-edit');
 							button.addEventListener('click', () =>
 								this.actionEditStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -186,6 +189,7 @@ export default{
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
 							button.title = this.$p.t('ui', 'btn_deleteStatus');
+							button.setAttribute('data-cy', 'status-btn-delete');
 							button.addEventListener('click', () =>
 								this.actionDeleteStatus(data.status_kurzbz, data.studiensemester_kurzbz, data.ausbildungssemester)
 							);
@@ -204,6 +208,11 @@ export default{
 					{
 						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
 					}
+					// data-cy: unique per status entry for Cypress assertions
+					const stdsem = rowData.studiensemester_kurzbz ?? 'unknown';
+					const status = rowData.status_kurzbz ?? 'unknown';
+					const sem    = rowData.ausbildungssemester ?? '0';
+					row.getElement().setAttribute('data-cy', `status-row-${stdsem}-${status}-${sem}`);
 				},
 				layout: 'fitDataStretchFrozen',
 				layoutColumnsOnNewData: false,
@@ -393,7 +402,7 @@ export default{
 			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
-	<div class="stv-multistatus h-100 pt-3">			
+	<div class="stv-multistatus h-100 pt-3" data-cy="stv-multistatus">			
 		<status-modal
 			ref="test"
 			:meldestichtag="new Date(dataMeldestichtag)"
@@ -405,6 +414,7 @@ export default{
 		<core-filter-cmpt
 			v-if="!this.modelValue.length"
 			ref="table"
+			data-cy="stv-multistatus-table"
 			:tabulator-options="tabulatorOptions"
 			:tabulator-events="tabulatorEvents"
 			table-only
