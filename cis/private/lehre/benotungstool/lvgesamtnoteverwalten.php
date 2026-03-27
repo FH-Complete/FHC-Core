@@ -1377,7 +1377,7 @@ if (defined("CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE") && CIS_GESAMTNOTE_PRUEFUNG
 		}
 	}
 
-	
+	$anzahlChanged = 0;
 	foreach ($grades as $uid => $data)
 	//Ausgabe Array
 	{
