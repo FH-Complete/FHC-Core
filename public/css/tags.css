@@ -75,6 +75,10 @@
 	text-decoration: line-through;
 }
 
+.tag_auto {
+	border: 2px solid #8BCF8A;
+}
+
 .display_all {
 	background-color: darkgrey !important;
 	border: none;

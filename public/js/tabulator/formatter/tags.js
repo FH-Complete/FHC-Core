@@ -38,6 +38,9 @@ export function tagFormatter(cell, tagComponent)
 			tagElement.className = "tag " + tag.style;
 			if (tag.done) tagElement.className += " tag_done";
 
+			//TODO automated styling
+			if (tag.automatisiert) tagElement.className += " tag_done";
+
 			tagElement.addEventListener('click', (event) => {
 				event.stopPropagation();
 				event.preventDefault();

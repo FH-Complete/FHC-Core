@@ -139,7 +139,34 @@ $config['stv_prestudent_tags'] = [
 	'hinweis_kf' => ['readonly' => true],
 	'hinweis_lehrende' => ['readonly' => false],
 	'hinweis_stg_kf' => ['readonly' => true],
-	'finished_stg' => ['readonly' => true],
-	'finished_kf' => ['readonly' => true],
-	'inwork_kf' => ['readonly' => true],
+	'finished_stg' => ['readonly' => false],
+	'finished_kf' => ['readonly' => false],
+	'inwork_kf' => ['readonly' => false],
+	'dd_auto' => ['readonly' => false],
+	'wh_auto' => ['readonly' => false],
+	'prewh_auto' => ['readonly' => false],
+	'out_auto' => ['readonly' => false],
+	'zgv_auto' => ['readonly' => false],
+	'wiedereinstieg_auto' => ['readonly' => false],
+	'stbtr_erh_auto' => ['readonly' => false],
+	'beitr_befr_auto' => ['readonly' => false],
+	'jgv_auto' => ['readonly' => false],
+	'nachteilausgl_auto' => ['readonly' => false],
 ];
+
+//TODO(manu) check ob das besser als param für job übergeben werden soll
+$config['stv_automatic_tags'] = [
+	'dd_auto',
+	'wh_auto',
+	'out_auto',
+	'prewh_auto',
+	'zgv_auto',
+	'wiedereinstieg_auto',
+	'stbtr_erh_auto',
+	'beitr_befr_auto',
+	'jgv_auto',
+	'nachteilausgl_auto'
+];
+
+$config['stv_stgs_to_tag'] = ['254'];
+
