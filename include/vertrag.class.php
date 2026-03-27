@@ -536,12 +536,12 @@ class vertrag extends basis_db
 		UNION
 		SELECT
 			'Betreuung' as type,
-			tbl_projektarbeit.lehreinheit_id as lehreinheit_id,
+			NULL as lehreinheit_id,
 			null as mitarbeiter_uid,
 			null::integer as pruefung_id,
 			projektarbeit_id,
 			(tbl_projektbetreuer.stunden*tbl_projektbetreuer.stundensatz) as betrag,
-			tbl_lehreinheit.studiensemester_kurzbz,
+			tbl_projektarbeit.studiensemester_kurzbz,
 			tbl_projektbetreuer.betreuerart_kurzbz,
 			(SELECT nachname || ' ' || vorname FROM public.tbl_person JOIN public.tbl_benutzer USING(person_id) WHERE uid=tbl_projektarbeit.student_uid)
 			as bezeichnung,
@@ -550,7 +550,6 @@ class vertrag extends basis_db
 		FROM
 			lehre.tbl_projektbetreuer
 			JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
-			JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 			JOIN lehre.tbl_vertrag USING (vertrag_id)
 		WHERE
 			vertrag_id=".$this->db_add_param($vertrag_id, FHC_INTEGER).";";

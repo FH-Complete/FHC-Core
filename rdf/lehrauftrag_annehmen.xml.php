@@ -427,7 +427,6 @@ function drawLehrauftrag($uid)
 				vertragsstatus_kurzbz
 			FROM lehre.tbl_projektbetreuer pb
 				JOIN lehre.tbl_projektarbeit pa USING (projektarbeit_id)
-				JOIN lehre.tbl_lehreinheit ON(pa.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND pa.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 				JOIN lehre.tbl_lehrveranstaltung           lv ON (pa.lehrveranstaltung_id = lv.lehrveranstaltung_id)
 				JOIN PUBLIC.tbl_organisationseinheit       oe USING (oe_kurzbz)
 				JOIN public.tbl_benutzer benutzer ON pb.person_id = benutzer.person_id
@@ -437,7 +436,7 @@ function drawLehrauftrag($uid)
 			WHERE pb.vertrag_id IS NOT NULL
 				AND vvst.vertragsstatus_kurzbz = \'akzeptiert\'
 				AND benutzer.uid = '.$db->db_add_param($uid).'
-				AND le.studiensemester_kurzbz = '.$db->db_add_param($ss);
+				AND pa.studiensemester_kurzbz = '.$db->db_add_param($ss);
 
 	if ($studiengang_kz != '')
 	{
