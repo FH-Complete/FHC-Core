@@ -79,7 +79,7 @@ $db = new basis_db();
 //Daten holen
 $qry = "SELECT * FROM (
 		SELECT
-			tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
+			tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
 			tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
 			tbl_mitarbeiter.fixangestellt,
 			tbl_lehreinheitmitarbeiter.stundensatz as stundensatz,
@@ -103,22 +103,20 @@ if($semester!='')
 //Projektsbetreuungen
 $qry.= " UNION
 		 SELECT
-		 	tbl_lehreinheit.*, tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
+		 	tbl_person.vorname, tbl_person.nachname, tbl_person.titelpre,
 		 	tbl_mitarbeiter.personalnummer, tbl_person.person_id, tbl_mitarbeiter.mitarbeiter_uid,
 			tbl_mitarbeiter.fixangestellt,
 			0 as stundensatz,
 			0 as semesterstunden
 		 FROM
-		 	lehre.tbl_lehreinheit, lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer,
+		 	lehre.tbl_projektarbeit, lehre.tbl_projektbetreuer,
 		 	public.tbl_mitarbeiter, public.tbl_benutzer, lehre.tbl_lehrveranstaltung, public.tbl_person
 		 WHERE
 		 	tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid AND
 		 	tbl_benutzer.person_id = tbl_projektbetreuer.person_id AND
 		 	tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id AND
-		 	tbl_projektarbeit.lehrveranstaltung_id = tbl_lehreinheit.lehrveranstaltung_id AND
-			tbl_projektarbeit.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz AND
-		 	tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
-		 	tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+		 	tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+			tbl_projektarbeit.studiensemester_kurzbz = ".$db->db_add_param($semester_aktuell)." AND
 		 	tbl_lehrveranstaltung.studiengang_kz = ".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 		 	tbl_person.person_id = tbl_projektbetreuer.person_id";
 if($semester!='')
