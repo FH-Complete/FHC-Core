@@ -44,7 +44,7 @@ export function tagFormatter(cell, tagComponent)
 			tagElement.addEventListener('click', (event) => {
 				event.stopPropagation();
 				event.preventDefault();
-				tagComponent.editTag(tag.id);
+				tagComponent.editTag(tag.id)
 			});
 
 			container.appendChild(tagElement);
