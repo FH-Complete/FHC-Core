@@ -124,17 +124,15 @@ if ($uid == null)
 					SELECT
 						tbl_benutzer.uid as mitarbeiter_uid
 					FROM
-						lehre.tbl_projektbetreuer, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,
+						lehre.tbl_projektbetreuer, lehre.tbl_lehrveranstaltung,
 						public.tbl_benutzer, lehre.tbl_projektarbeit, campus.vw_student, public.tbl_mitarbeiter
 					WHERE
 						tbl_projektbetreuer.person_id=tbl_benutzer.person_id AND
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						student_uid=vw_student.uid AND
 						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
-						tbl_lehreinheit.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
-						tbl_lehreinheit.studiensemester_kurzbz=tbl_projektarbeit.studiensemester_kurzbz AND
-						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
-						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
+						tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
+						tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 						tbl_projektbetreuer.stunden!='0'
 					) as mitarbeiter ORDER BY mitarbeiter_uid";
