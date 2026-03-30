@@ -1,5 +1,3 @@
-// TODO(chris): Comments
-
 import GridItem from './Grid/Item.js';
 import GridLogic from '../../composables/GridLogic.js';
 
@@ -12,6 +10,12 @@ export default {
 	name: 'Grid',
 	components: {
 		GridItem,
+	},
+	inject: {
+		sectionName: {
+			type: String,
+			default: '',
+		}
 	},
 	props: {
 		cols: Number,
@@ -26,7 +30,7 @@ export default {
 			type: Number,
 			default: 0
 		},
-		additionalRow:{
+		additionalRow: {
 			type: Boolean,
 			default: false,
 		}
@@ -50,18 +54,12 @@ export default {
 			permUpdates: [],
 			positionUpdates: null,
 			fixedPositionUpdates: null,
-			draggedOffset: [0,0],
+			draggedOffset: [0, 0],
 			draggedItem: null,
 			draggedNode: null,
 			reorderedItems:[],
 			clonedWidget:null,
-		}
-	},
-	inject:{
-		sectionName: {
-			type: String,
-			default: '',
-		},
+		};
 	},
 	computed: {
 		additionalRowComputed: {
@@ -86,7 +84,7 @@ export default {
 			});	
 			return items
 		},
-		items_placeholders(){
+		items_placeholders() {
 			let placeholders = [];
 			let col_max = this.cols;
 			let rows_max = this.rows;
@@ -133,7 +131,6 @@ export default {
 					return this.grid ? (this.grid.h+1) : 1;
 			}
 			return this.grid ? this.grid.h : 1;
-			
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
@@ -218,14 +215,12 @@ export default {
 				return false;
 			return this.grid.isFreeSlot(this.x, this.y);
 		},
-		widgetSetup(){
-			if (!this.widgetsSetup)
-				return;
-			return this.widgetsSetup.reduce((acc, ele) => { 
-				acc[ele.widget_id] =ele;
-				return acc;
-			} ,{});
-		},
+		currentItems() {
+			if (this.mode != 1 && this.mode != 2 && this.active)
+				return this.placedItems_withPlaceholders;
+
+			return this.placedItems;
+		}
 	},
 	watch: {
 		active(active) {
@@ -256,22 +251,22 @@ export default {
 		}
 	},
 	methods: {
-		needsReordering(item){
+		needsReordering(item) {
 			if (!item?.data?.place[this.cols]){
 				return true;
 			}
 			return false;
 		},
-		toggleDraggedItemOverlay(condition){
-			if(!this.draggedNode)
+		toggleDraggedItemOverlay(condition) {
+			if (!this.draggedNode)
 				return;
-			if(condition){
+			if (condition) {
 				this.draggedNode.firstElementChild.classList.add("dashboard-item-overlay");
-			}else{
+			} else {
 				this.draggedNode.firstElementChild.classList.remove("dashboard-item-overlay");
 			}
 		},
-		dragging(event){
+		dragging(event) {
 			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
 				
@@ -313,7 +308,7 @@ export default {
 			sortedItems.forEach(item => {
 				let freeSlots = this.grid.getFreeSlots();
 				
-				if(this.needsReordering(item)){
+				if (this.needsReordering(item)) {
 					let firstFreeSlot = freeSlots.shift();
 					if (!firstFreeSlot) {
 						item.x = 0;
@@ -354,7 +349,6 @@ export default {
 			return result;
 		},
 		convertGridResultToUpdate(input, output, baseArray) {
-			
 			if (!input)
 				return;
 			if (!baseArray)
@@ -373,13 +367,6 @@ export default {
 					result.h = item.h;
 				output[item.index] = result;
 			});
-		},
-		mouseLeave() {
-			/* if (this.mode == MODE_IDLE) {
-				this.x = -1;
-				this.y = -1;
-				
-			}  */
 		},
 		updateCursor(evt) {
 			if (!this.active) {
@@ -415,7 +402,6 @@ export default {
 			}
 		},
 		startMove(evt, item) {
-			
 			if (!this.active)
 				return;
 			
@@ -458,7 +444,7 @@ export default {
 			if (!this.active)
 				return this.dragCancel();
 			this.checkPinnedWidgetAnimation();
-			if(this.mode == MODE_RESIZE){
+			if (this.mode == MODE_RESIZE) {
 				this.checkWidgetSizeLimitAnimation();
 			}
 			if (this.updateCursor(evt)) {
@@ -505,7 +491,6 @@ export default {
 			this.draggedItem = null;
 			this.$emit('draggedItem',null);
 			this.draggedNode = null;
-			
 		},
 		dragEnd() {
 			this.removeWidgetClones();
@@ -554,14 +539,14 @@ export default {
 			this.additionalRowComputed = false;
 			this.$emit('newItem', this.x, this.y);
 		},
-		updateCursorOnMouseMove(evt){
-			if(this.mode == MODE_IDLE){
+		updateCursorOnMouseMove(evt) {
+			if(this.mode == MODE_IDLE) {
 				this.updateCursor(evt);
 			}
 		},
-		checkPinnedWidgetAnimation(){
-			let itemAtPosition=[];
-			switch(this.mode){
+		checkPinnedWidgetAnimation() {
+			let itemAtPosition = [];
+			switch (this.mode) {
 				case MODE_RESIZE:
 					for (let x = this.draggedItem.x; x <= this.x; x++) {
 						for (let y = this.draggedItem.y; y <= this.y; y++) {
@@ -580,9 +565,9 @@ export default {
 			
 			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
 				ele.classList.remove("denied-dragging-animation");
-			})
+			});
 
-			itemAtPosition.forEach(item=>{
+			itemAtPosition.forEach(item => {
 				if (item.place[this.cols] && item.place[this.cols].pinned) {
 					let pinnedWidget = document.getElementById(item.widgetid);
 					let pinNode = pinnedWidget.querySelector("[pinned='true']");
@@ -590,10 +575,9 @@ export default {
 						pinNode.classList.add("denied-dragging-animation");
 					}
 				}	
-			})
+			});
 		},
 		checkWidgetSizeLimitAnimation() {
-
 			let draggedItemSetup = this.itemsSetup[this.draggedItem.data.widget];
 			let draggedItemMaxWidth = draggedItemSetup.width.max ?? draggedItemSetup.width;
 			let draggedItemMinWidth = draggedItemSetup.width.min ?? draggedItemSetup.width;
@@ -603,7 +587,7 @@ export default {
 
 			let width_after_resize = this.x - this.draggedItem.x + 1; 
 			let height_after_resize = this.y - this.draggedItem.y + 1; 
-			if(  
+			if (
 				(width_after_resize > 0 && (width_after_resize > draggedItemMaxWidth
 				|| width_after_resize < draggedItemMinWidth)
 				)
@@ -611,26 +595,26 @@ export default {
 				(height_after_resize > 0 && (height_after_resize > draggedItemMaxHeight
 				|| height_after_resize < draggedItemMinHeight)
 				)
-			){
+			) {
 				draggedItemNode.classList.add("border-danger");
-			}else{
+			} else {
 				draggedItemNode.classList.remove("border-danger");
 			}
 		},
-		removeWidgetClones(){
+		removeWidgetClones() {
 			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
 			for (let i = 0; i < widgetClones.length; i++) {
 				this.$refs.container.removeChild(widgetClones[i]);
 			}
 		},
-		mouseDown(){
+		mouseDown() {
 			this.mode = MODE_MOUSE_DOWN;
 		},
 		mouseUp() {
 			this.mode = MODE_IDLE;
 		},
 	},
-	template: `
+	template: /* html */`
 	<div
 		ref="container"
 		class="drop-grid position-relative h-0"
@@ -638,24 +622,16 @@ export default {
 		@touchmove="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
-		@drop="dragEnd($event)"
+		@drop="dragEnd"
 		@mousemove="updateCursorOnMouseMove"
-		@mouseleave="mouseLeave">
-		<TransitionGroup tag="div">
+	>
+		<TransitionGroup>
 			<grid-item
 				ref="gridItems"
-				v-for="(item,index) in ((mode != 1 && mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item, index) in currentItems"
 				:key="item.data.id"
-				:item="item"
-				@start-move="startMove"
-				@mouse-down="mouseDown"
-				@mouse-up="mouseUp"
-				@start-resize="startResize"
-				@dragging="dragging"
-				@end-drag="dragEnd"
-				@touch-end="dragEnd();mouseUp();"
-				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
+				:item="item"
 				:active="active"
 				:style="{
 					zIndex: item.resizeOverlay ? 1 : 'auto',
@@ -666,29 +642,24 @@ export default {
 					paddingTop: 'var(--fhc-dg-item-padding-top)',
 					paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
 					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
-				}">
+				}"
+				@start-move="startMove"
+				@mouse-down="mouseDown"
+				@mouse-up="mouseUp"
+				@start-resize="startResize"
+				@dragging="dragging"
+				@end-drag="dragEnd"
+				@touch-end="dragEnd();mouseUp();"
+				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
+			>
 				<template v-slot="item">
-					<slot v-bind="{...item, ...item.data, index:index}" :x="item.x" :y="item.y" ></slot>
+					<slot
+						v-bind="{ ...item, ...item.data, index: index }"
+						:x="item.x"
+						:y="item.y"
+					></slot>
 				</template>
 			</grid-item>
 		</TransitionGroup>
-		
 	</div>`
 }
-
-/*
-OLD VERSION - ON HOVER
-<div
-	v-if="showEmptyTileHover"
-	class="position-absolute d-flex justify-content-center align-items-center"
-	:style="{
-		cursor: 'pointer',
-		top: 'calc(' + y + ' * var(--fhc-dg-row-height))',
-		left: 'calc(' + x + ' * var(--fhc-dg-col-width))',
-		width: 'var(--fhc-dg-col-width)',
-		height: 'var(--fhc-dg-row-height)'
-	}"
-	@click="emptyTileClicked">
-	<slot :x="x" :y="y" name="empty-tile-hover"></slot>
-</div>
-*/

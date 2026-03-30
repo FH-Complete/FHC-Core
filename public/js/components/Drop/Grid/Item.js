@@ -1,9 +1,5 @@
 export default {
 	name:'GridItem',
-	components: {
-	},
-	inject: {
-	},
 	props: {
 		item: Object,
 		active: Boolean
@@ -15,18 +11,14 @@ export default {
 		"startResize",
 		"dragging",
 		"endDrag",
-		"dropDrag",
-		"item",
 		"touchStart",
-		"touchEnd",
+		"touchEnd"
 	],
 	data() {
 		return {
 			dragAction: '',
 			dragging: false
-		}
-	},
-	computed: {
+		};
 	},
 	methods: {
 		registerDragAction(evt) {
@@ -42,16 +34,15 @@ export default {
 				}
 			}
 		},
-		tryDragStart(evt, item) {
+		tryDragStart(evt) {
 			let dragAction = this.dragAction || evt.target.getAttribute('drag-action');
 			if (dragAction) {
 				this.dragging = true;
 				if (dragAction == 'move')
-					return this.$emit('startMove', evt, item);
+					return this.$emit('startMove', evt, this.item);
 				else if (dragAction == 'resize')
-					return this.$emit('startResize', evt, item);
+					return this.$emit('startResize', evt, this.item);
 			}
-			//evt.preventDefault();
 		},
 		touchDragEnd(evt) {
 			if (!this.dragging)
@@ -59,30 +50,32 @@ export default {
 			this.dragging = false;
 			this.$emit('touchEnd', evt);
 		},
-		touchStart(event){
+		touchStart(event) {
 			this.$emit('touchStart', event); 
 			this.registerDragAction(event); 
-			this.tryDragStart(event, this.item);
+			this.tryDragStart(event);
 		},
-		touchMove(event){
-			if(this.dragging){
+		touchMove(event) {
+			if (this.dragging){
 				event.preventDefault();
 				this.$emit('dragging', event);
 			}
 		}
 		
 	},
-	template: `
-	<div class="drop-grid-item"
+	template: /* html */`
+	<div
+		class="drop-grid-item"
+		:draggable="active && !item.placeholder"
 		@mousedown="registerDragAction"
 		@mouseup="$emit('mouseUp', $event)"
 		@touchstart="touchStart"
 		@touchend="touchDragEnd"
-		@dragstart="tryDragStart($event, item)"
-		@drag="$emit('dragging',$event)"
+		@dragstart="tryDragStart"
+		@drag="$emit('dragging', $event)"
 		@touchmove="touchMove"
 		@dragend="$emit('endDrag', $event); dragging = false"
-		:draggable="active && !item.placeholder">
+	>
 		<slot v-bind="item"></slot>
 	</div>`
 }
