@@ -11,12 +11,6 @@ export default {
 	components: {
 		GridItem,
 	},
-	inject: {
-		sectionName: {
-			type: String,
-			default: '',
-		}
-	},
 	props: {
 		cols: Number,
 		items: Array,
@@ -37,7 +31,6 @@ export default {
 	},
 	emits: [
 		"rearrangeItems",
-		"newItem",
 		"gridHeight",
 		"draggedItem",
 		"update:additionalRow"
@@ -51,7 +44,6 @@ export default {
 			mode: MODE_IDLE,
 			grid: null,
 			dragGrid: null,
-			permUpdates: [],
 			positionUpdates: null,
 			fixedPositionUpdates: null,
 			draggedOffset: [0, 0],
@@ -123,8 +115,11 @@ export default {
 			}
 			return placeholders;
 		},
-		placedItems_withPlaceholders() {
-			return [...this.placedItems, ...this.items_placeholders];
+		currentItems() {
+			if (this.mode != 1 && this.mode != 2 && this.active)
+				return [ ...this.placedItems, ...this.items_placeholders ];
+
+			return this.placedItems;
 		},
 		rows() {
 			if (this.additionalRowComputed) {
@@ -209,17 +204,6 @@ export default {
 				}
 			})
 			return [...mappedPlacedItems, ...temporaryResizeItems];
-		},
-		showEmptyTileHover() {
-			if (!this.active || !this.grid || this.mode != MODE_IDLE || this.x < 0 || this.y < 0 || this.x >= this.cols || this.y >= this.rows)
-				return false;
-			return this.grid.isFreeSlot(this.x, this.y);
-		},
-		currentItems() {
-			if (this.mode != 1 && this.mode != 2 && this.active)
-				return this.placedItems_withPlaceholders;
-
-			return this.placedItems;
 		}
 	},
 	watch: {
@@ -436,7 +420,6 @@ export default {
 		dragOver(evt) {
 			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
 				this.dragCancel();
-				
 			}
 			if (!this.active)
 				return this.dragCancel();
@@ -532,10 +515,6 @@ export default {
 			}
 			return updated;
 		},
-		emptyTileClicked() {
-			this.additionalRowComputed = false;
-			this.$emit('newItem', this.x, this.y);
-		},
 		updateCursorOnMouseMove(evt) {
 			if (this.mode == MODE_IDLE) {
 				this.updateCursor(evt);
@@ -609,7 +588,7 @@ export default {
 		},
 		mouseUp() {
 			this.mode = MODE_IDLE;
-		},
+		}
 	},
 	template: /* html */`
 	<div
