@@ -10,6 +10,7 @@ import Vertrag from "./Vertrag.js";
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
 export default {
+	name: 'ProjektarbeitBetreuer',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -218,10 +219,8 @@ export default {
 					);
 
 				if (idx >= 0) { // if betreuer found
-
 					// set currently edited betreuer (deep copy)
 					this.formData = JSON.parse(JSON.stringify(projektbetreuerListe[idx]));
-
 					// set download link
 					if (this.formData.beurteilungDownloadLink !== null) this.beurteilungDownloadLink = this.formData.beurteilungDownloadLink;
 
@@ -257,6 +256,7 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		getFormData(projekttyp_kurzbz) {
+			console.log('getFormData')
 			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
@@ -363,6 +363,7 @@ export default {
 		},
 		// add the betreuer selected in automomplete to betreuer liste
 		getFormDataWithBetreuer() {
+			console.log('getFormDataWithBetreuer')
 			let preparedFormData = this.formData;
 
 			preparedFormData.projektarbeit_id = this.projektarbeit_id;

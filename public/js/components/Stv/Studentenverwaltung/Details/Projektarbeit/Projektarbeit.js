@@ -254,6 +254,9 @@ export default {
 		actionEditProjektarbeit() {
 			this.statusNew = false;
 			this.toggleMenu('details');
+			this.$refs.projektbetreuer.getFormData(
+				this.editedProjektarbeit ? this.editedProjektarbeit.projekttyp_kurzbz : null
+			);
 			this.$refs.projektbetreuer.getProjektbetreuer(this.editedProjektarbeit?.projektarbeit_id, this.editedProjektarbeit?.studiensemester_kurzbz);
 			this.$refs.projektarbeitModal.show();
 		},
