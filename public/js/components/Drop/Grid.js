@@ -386,13 +386,14 @@ export default {
 			if (!this.active)
 				return;
 			
-			this.mode = MODE_MOVE;
-			
-			this.draggedItem = item;
-			
-			this.$emit('draggedItem', item);
 			// workaround for chrome fireing event dragend when styles are manipulated during dragging
 			setTimeout(() => {
+				this.mode = MODE_MOVE;
+				this.updateCursor(evt);
+				this.draggedItem = item;
+				
+				this.$emit('draggedItem', item);
+
 				this.draggedNode = evt.target.closest(".drop-grid-item");
 				//clones the widget for the drag Image
 				
@@ -402,19 +403,26 @@ export default {
 				clone.classList.add("widgetClone");
 				this.$refs.container.appendChild(clone);
 				const hiddenWidget = clone.querySelector("[style='display: none;']");
-				hiddenWidget.style.removeProperty("display");
+				if (hiddenWidget)
+					hiddenWidget.style.removeProperty("display");
 				this.clonedWidget = clone;
+
+				this.draggedOffset = [item.x - this.x, item.y - this.y];
 			}, 0);
 
-			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
 		startResize(evt, item) {
 			if (!this.active)
 				return;
-			this.mode = MODE_RESIZE;
-			this.draggedItem = item;
-			this.$emit('draggedItem', item);
+			
+			// workaround for chrome fireing event dragend when styles are manipulated during dragging
+			setTimeout(() => {
+				this.mode = MODE_RESIZE;
+				this.draggedItem = item;
+				this.$emit('draggedItem', item);
+			}, 0);
+			
 			this._dragStart(evt);
 		},
 		dragOver(evt) {
@@ -515,11 +523,6 @@ export default {
 			}
 			return updated;
 		},
-		updateCursorOnMouseMove(evt) {
-			if (this.mode == MODE_IDLE) {
-				this.updateCursor(evt);
-			}
-		},
 		checkPinnedWidgetAnimation() {
 			let itemAtPosition = [];
 			switch (this.mode) {
@@ -599,7 +602,6 @@ export default {
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
 		@drop="dragEnd"
-		@mousemove="updateCursorOnMouseMove"
 	>
 		<TransitionGroup>
 			<grid-item
@@ -626,7 +628,7 @@ export default {
 				@dragging="dragging"
 				@end-drag="dragEnd"
 				@touch-end="dragEnd();mouseUp();"
-				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
+				@touch-start="mouseDown"
 			>
 				<template v-slot="item">
 					<slot
