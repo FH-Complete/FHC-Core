@@ -37,25 +37,49 @@ export default {
 		"loading",
 		"item_data",
 		"place",
-		"setup",
+		"resizeLimits",
 		"dragstate",
 		"resizeOverlay"
 	],
 	computed: {
-		maxHeight() {
-			if (Object.prototype.toString.call(this.setup?.height) == "[object Number]") {
-				return this.setup?.height;
+		isResizeableHorizontal() {
+			if (this.resizeLimits.width === undefined)
+				return true;
+
+			if (Object.prototype.toString.call(this.resizeLimits.width) == "[object Number]")
+				return false;
+
+			if (this.resizeLimits.width.min === undefined) {
+				if (this.resizeLimits.width.max === undefined)
+					return true;
+				return this.resizeLimits.width.max > 1;
 			}
-			return this.setup?.height?.max;
+
+			if (this.resizeLimits.width.max === undefined)
+				return true;
+
+			return this.resizeLimits.width.max > this.resizeLimits.width.min;
 		},
-		maxWidth() {
-			if (Object.prototype.toString.call(this.setup?.width) == "[object Number]") {
-				return this.setup?.width;
+		isResizeableVertical() {
+			if (this.resizeLimits.height === undefined)
+				return true;
+
+			if (Object.prototype.toString.call(this.resizeLimits.height) == "[object Number]")
+				return false;
+
+			if (this.resizeLimits.height.min === undefined) {
+				if (this.resizeLimits.height.max === undefined)
+					return true;
+				return this.resizeLimits.height.max > 1;
 			}
-			return this.setup?.width?.max;
+
+			if (this.resizeLimits.height.max === undefined)
+				return true;
+
+			return this.resizeLimits.height.max > this.resizeLimits.height.min;
 		},
 		isResizeable() {
-			return this.maxWidth > 1 || this.maxHeight > 1;
+			return this.isResizeableVertical || this.isResizeableHorizontal;
 		},
 		isPinned() {
 			return this.place?.pinned ? true : false;
@@ -213,52 +237,52 @@ export default {
 				</template>
 			</bs-modal>
 			<height-transition>
-				<div v-if="editMode && isResizeable && !isPinned " class="card-footer d-flex justify-content-end p-0">
-					<template v-if="maxWidth < 2">
-						<span
-							type="button"
-							drag-action="resize"
-							class="col-auto px-1 cursor-ns-resize"
-							draggable="true"
-							aria-label="resize widget"
-							v-tooltip="{showDelay:1000, value:'resize widget'}"
-						>
-							<i
-								class="fa-solid fa-up-down pe-2"
-								aria-hidden="true"
-							></i>
-						</span>
-					</template>
-					<template v-else-if="maxHeight < 2">
-						<span
-							type="button"
-							drag-action="resize"
-							class="col-auto px-1 cursor-ew-resize"
-							draggable="true"
-							aria-label="resize widget"
-							v-tooltip="{showDelay:1000, value:'resize widget'}"
-						>
-							<i
-								class="fa-solid fa-left-right pe-2"
-								aria-hidden="true"
-							></i>
-						</span>
-					</template>
-					<template v-else>
-						<span
-							type="button"
-							drag-action="resize"
-							class="col-auto px-1 cursor-nw-resize"
-							draggable="true"
-							aria-label="resize widget"
-							v-tooltip="{showDelay:1000, value:'resize widget'}"
-						>
-							<i
-								class="fa-solid fa-up-right-and-down-left-from-center mirror-x"
-								aria-hidden="true"
-							></i>
-						</span>
-					</template>
+				<div
+					v-if="editMode && isResizeable && !isPinned"
+					class="card-footer d-flex justify-content-end p-0"
+				>
+					<span
+						v-if="!isResizeableHorizontal"
+						type="button"
+						drag-action="resize"
+						class="col-auto px-1 cursor-ns-resize"
+						draggable="true"
+						aria-label="resize widget"
+						v-tooltip="{showDelay:1000, value:'resize widget'}"
+					>
+						<i
+							class="fa-solid fa-up-down pe-2"
+							aria-hidden="true"
+						></i>
+					</span>
+					<span
+						v-else-if="!isResizeableVertical"
+						type="button"
+						drag-action="resize"
+						class="col-auto px-1 cursor-ew-resize"
+						draggable="true"
+						aria-label="resize widget"
+						v-tooltip="{showDelay:1000, value:'resize widget'}"
+					>
+						<i
+							class="fa-solid fa-left-right pe-2"
+							aria-hidden="true"
+						></i>
+					</span>
+					<span
+						v-else
+						type="button"
+						drag-action="resize"
+						class="col-auto px-1 cursor-nw-resize"
+						draggable="true"
+						aria-label="resize widget"
+						v-tooltip="{showDelay:1000, value:'resize widget'}"
+					>
+						<i
+							class="fa-solid fa-up-right-and-down-left-from-center mirror-x"
+							aria-hidden="true"
+						></i>
+					</span>
 				</div>
 			</height-transition>
 		</div>

@@ -52,12 +52,13 @@ export default {
 		}
 	},
 	computed: {
-		computedWidgetsSetup(){
-			if(!this.widgetsSetup) return {};
-			return this.widgetsSetup.reduce((acc, setup)=>{
+		computedWidgetsSetup() {
+			if (!this.widgetsSetup)
+				return {};
+			return this.widgetsSetup.reduce((acc, setup) => {
 				acc[setup.widget_id] = setup.setup;
 				return acc;
-			},{})
+			}, {});
 		},
 		editModeIsActive() {
 			return (this.editMode || this.adminMode) && !this.configOpened	
@@ -240,17 +241,15 @@ export default {
 					:hidden="item.hidden"
 					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
-					:setup="computedWidgetsSetup[item.widget]"
+					:resize-limits="computedWidgetsSetup[item.widget]"
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)"
 					@config-opened="handleConfigOpened"
 					@config-closed="handleConfigClosed"
 					@pinItem="updatePositions($event,true)"
-					@unPinItem="updatePositions">
-				</dashboard-item>
-				
+					@unPinItem="updatePositions"
+				></dashboard-item>
 			</template>
-			
 		</drop-grid>
 	</div>`
 }
