@@ -56,7 +56,7 @@ export default {
 			this.tryDragStart(event);
 		},
 		touchMove(event) {
-			if (this.dragging){
+			if (this.dragging) {
 				event.preventDefault();
 				this.$emit('dragging', event);
 			}

@@ -32,7 +32,7 @@ export default {
 		},
 		additionalRow: {
 			type: Boolean,
-			default: false,
+			default: false
 		}
 	},
 	emits: [
@@ -57,8 +57,8 @@ export default {
 			draggedOffset: [0, 0],
 			draggedItem: null,
 			draggedNode: null,
-			reorderedItems:[],
-			clonedWidget:null,
+			reorderedItems: [],
+			clonedWidget: null,
 		};
 	},
 	computed: {
@@ -73,7 +73,7 @@ export default {
 		items_hashmap() {
 			let items = {};
 			this.items.forEach(item => {
-				if (this.reorderedItems.length > 0 && this.needsReordering(item)){
+				if (this.reorderedItems.length > 0 && this.needsReordering(item)) {
 						let rearrangedPosition = this.reorderedItems.filter(widget => widget.data.widgetid == item.widgetid)?.pop();
 						if (rearrangedPosition) {			
 							item.x = rearrangedPosition.x;
@@ -128,7 +128,7 @@ export default {
 		},
 		rows() {
 			if (this.additionalRowComputed) {
-					return this.grid ? (this.grid.h+1) : 1;
+				return this.grid ? (this.grid.h+1) : 1;
 			}
 			return this.grid ? this.grid.h : 1;
 		},
@@ -252,7 +252,7 @@ export default {
 	},
 	methods: {
 		needsReordering(item) {
-			if (!item?.data?.place[this.cols]){
+			if (!item?.data?.place[this.cols]) {
 				return true;
 			}
 			return false;
@@ -267,7 +267,7 @@ export default {
 			}
 		},
 		dragging(event) {
-			if(this.mode == MODE_MOVE){
+			if (this.mode == MODE_MOVE) {
 				this.toggleDraggedItemOverlay(true);
 				
 				const containerRect = this.$refs.container.getBoundingClientRect();
@@ -292,13 +292,11 @@ export default {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
 			let sortedItems = [...items].sort((a, b) => {
-				if(this.needsReordering(a) && this.needsReordering(b)){
+				if (this.needsReordering(a) && this.needsReordering(b)) {
 					return 0;
-				}
-				else if(this.needsReordering(a)){
+				} else if (this.needsReordering(a)) {
 					return 999;
-				}
-				else if(this.needsReordering(b)){
+				} else if (this.needsReordering(b)) {
 					return -999;
 				}
 				
@@ -313,12 +311,11 @@ export default {
 					if (!firstFreeSlot) {
 						item.x = 0;
 						item.y = this.grid.h;
-					}else{
+					} else {
 						item.x = firstFreeSlot.x;
 						item.y = firstFreeSlot.y;
 					}
 					reorderedItems.push(item);
-					
 				}
 				if (item.x + item.w > this.cols) {
 					let targetW = this.cols-item.x,
@@ -496,7 +493,7 @@ export default {
 			this.removeWidgetClones();
 			this.toggleDraggedItemOverlay(false);
 			
-			if (this.mode == MODE_IDLE){
+			if (this.mode == MODE_IDLE) {
 				return;
 			}
 			// clean up unused classes
@@ -540,7 +537,7 @@ export default {
 			this.$emit('newItem', this.x, this.y);
 		},
 		updateCursorOnMouseMove(evt) {
-			if(this.mode == MODE_IDLE) {
+			if (this.mode == MODE_IDLE) {
 				this.updateCursor(evt);
 			}
 		},
