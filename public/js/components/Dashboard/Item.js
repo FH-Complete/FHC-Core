@@ -161,6 +161,7 @@ export default {
 						type="button"
 						drag-action="move"
 						class="col-auto mx-2 px-2 cursor-move"
+						draggable="true"
 						aria-label="move widget"
 						v-tooltip="{showDelay:1000, value:'move widget'}"
 					>
@@ -218,6 +219,7 @@ export default {
 							type="button"
 							drag-action="resize"
 							class="col-auto px-1 cursor-ns-resize"
+							draggable="true"
 							aria-label="resize widget"
 							v-tooltip="{showDelay:1000, value:'resize widget'}"
 						>

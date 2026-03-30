@@ -66,7 +66,6 @@ export default {
 	template: /* html */`
 	<div
 		class="drop-grid-item"
-		:draggable="active && !item.placeholder"
 		@mousedown="registerDragAction"
 		@mouseup="$emit('mouseUp', $event)"
 		@touchstart="touchStart"
