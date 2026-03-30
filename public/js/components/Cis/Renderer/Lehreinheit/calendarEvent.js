@@ -64,7 +64,7 @@ export default {
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
-		<div class="event-text">
+		<div class="event-text" v-tooltip="tooltipString">
 			<span class="event-topic">{{ event.topic }}</span>
 			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span

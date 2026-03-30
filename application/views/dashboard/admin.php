@@ -8,9 +8,15 @@ $this->load->view(
 		'axios027' => true,
 		'restclient' => true,
 		'vue3' => true,
-		'customJSModules' => ['public/js/apps/DashboardAdmin.js'],
+		'primevue3' => true,
+		'vuedatepicker11' => true,
+		'customJSs' => [
+			'vendor/moment/luxonjs/luxon.min.js'
+		],
+		'customJSModules' => ['public/js/apps/Dashboard/Admin.js'],
 		'customCSSs' => [
-			'public/css/components/dashboard.css'
+			'public/css/components/dashboard.css',
+			'public/css/components/primevue.css',
 		],
 		'navigationcomponent' => true
 	)
@@ -25,7 +31,7 @@ $this->load->view(
 			<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
 				<h1 class="h2">Dashboard</h1>
 			</div>
-			<dashboard-admin dashboard="CIS" apiurl="<?= site_url('dashboard'); ?>"></dashboard-admin>
+			<dashboard-admin></dashboard-admin>
 		</div>
 	</div>
 

@@ -279,4 +279,12 @@ class Student_model extends DB_Model
 	{
 		return $student_uid . '@' . DOMAIN;
 	}
+	
+	public function getEmailAnredeForStudentUID($student_uid) {
+		$qry = "SELECT anrede, titelpre, vorname, vornamen, nachname, titelpost
+				FROM campus.vw_student 
+				WHERE uid = ?";
+
+		return $this->execReadOnlyQuery($qry, array($student_uid));
+	}
 }
