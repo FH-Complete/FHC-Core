@@ -256,7 +256,6 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		getFormData(projekttyp_kurzbz) {
-			console.log('getFormData')
 			// default Stundensätze from config
 			this.defaultFormDataValues.stunden = this.getDefaultStunden(projekttyp_kurzbz);
 			this.defaultFormDataValues.stundensatz = this.config.defaultProjektbetreuerStundensatz;
@@ -363,7 +362,6 @@ export default {
 		},
 		// add the betreuer selected in automomplete to betreuer liste
 		getFormDataWithBetreuer() {
-			console.log('getFormDataWithBetreuer')
 			let preparedFormData = this.formData;
 
 			preparedFormData.projektarbeit_id = this.projektarbeit_id;

@@ -931,12 +931,11 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						tbl_firma.name, lehrveranstaltung_id, firma_id
 					FROM
 						lehre.tbl_projektarbeit
-						JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 						JOIN public.tbl_firma USING(firma_id)
 					WHERE
 						student_uid=".$db->db_add_param($uid_arr[$i])."
 						AND projekttyp_kurzbz in('Praktikum', 'Praxis')
-						AND tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+						AND tbl_projektarbeit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 					ORDER BY beginn ASC, projektarbeit_id ASC;";
 
 					if($result_praktikum = $db->db_query($qry))
@@ -952,15 +951,15 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					// Aber kein Auslandssemester war, sonst wirds spaeter hinzugefügt
 					$qry = "
 						SELECT
-							lehrveranstaltung_id, titel, themenbereich, note, titel_english
+							lehre.tbl_projektarbeit.lehrveranstaltung_id, titel, themenbereich, note, titel_english
 						FROM
 							lehre.tbl_projektarbeit
-							JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
+							LEFT JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 
 						WHERE
 							student_uid=".$db->db_add_param($uid_arr[$i])."
 							AND projekttyp_kurzbz in('Bachelor', 'Diplom')
-							AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+							AND lehre.tbl_projektarbeit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 							AND NOT EXISTS(SELECT 1
 								FROM bis.tbl_bisio
 								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -1022,10 +1021,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						universitaet, lehrveranstaltung_id, tbl_lehrveranstaltung.sws,
 						(SELECT titel_english 
 						 FROM lehre.tbl_projektarbeit
-						 	JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
-
-						WHERE lehre.tbl_lehreinheit.lehreinheit_id=tbl_bisio.lehreinheit_id
-						AND student_uid = ".$db->db_add_param($uid_arr[$i])." limit 1) as projektarbeitstitel
+						 WHERE lehre.tbl_projektarbeit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id
+						   AND lehre.tbl_projektarbeit.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz
+						   AND student_uid = ".$db->db_add_param($uid_arr[$i])."
+						 LIMIT 1) as projektarbeitstitel
 					FROM
 						bis.tbl_bisio
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)

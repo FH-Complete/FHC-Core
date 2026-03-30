@@ -466,13 +466,11 @@ class projektarbeit extends basis_db
 					lehre.tbl_projektarbeit
 				JOIN lehre.tbl_projekttyp USING (projekttyp_kurzbz)
 				JOIN lehre.tbl_lehrveranstaltung ON (lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehrveranstaltung.lehrveranstaltung_id)
-				JOIN lehre.tbl_lehreinheit ON (lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 
 				WHERE
 					tbl_projektarbeit.lehrveranstaltung_id=tbl_lehrveranstaltung.lehrveranstaltung_id AND
-					tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 					tbl_lehrveranstaltung.studiengang_kz=".$this->db_add_param($studiengang_kz, FHC_INTEGER)." AND
-					tbl_lehreinheit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
+					tbl_projektarbeit.studiensemester_kurzbz=".$this->db_add_param($studiensemester_kurzbz);
 
 		if($this->db_query($qry))
 		{
