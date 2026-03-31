@@ -1,11 +1,15 @@
 import ApiDetailHeader from "../../api/factory/detailHeader.js";
 import ApiHandleFoto from "../../api/factory/fotoHandling.js";
 import ModalUploadFoto from "./Modal/UploadFoto.js";
+import CoreTag from "../Tag/Tag.js";
+import ApiTag from "../../api/factory/stv/tag.js";
+import { idTagFormatter } from "../Tag/tagFormatter.js";
 
 export default {
 	name: 'DetailHeader',
 	components: {
-		ModalUploadFoto
+		ModalUploadFoto,
+		CoreTag
 	},
 	props: {
 		headerData: {
@@ -40,6 +44,12 @@ export default {
 			}
 		}
 	},
+	inject: {
+		tagsEnabled: {
+			from: 'configStvTagsEnabled',
+			default: false
+		},
+	},
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
@@ -61,13 +71,23 @@ export default {
 		hasTileUIDSlot() {
 			return !!this.$slots.uid
 		},
-
+		prestudentIds() {
+			if (this.headerData[0].prestudent_id)
+			{
+				return [this.headerData[0].prestudent_id];
+			}
+		},
 	},
 	created(){
 		if (this.typeHeader === 'student') {
 			if (!this.headerData) {
 				throw new Error('[DetailHeader] "headerData" is required.')
 			}
+
+			if(this.tagsEnabled) {
+				this.loadTagsAndRender(this.headerData[0].prestudent_id);
+		}
+
 		} else if (this.typeHeader === 'mitarbeiter') {
 			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
 				throw new Error(
@@ -86,13 +106,23 @@ export default {
 			},
 			deep: true,
 		},
+		headerData: {
+			handler(newVal) {
+				if(this.tagsEnabled) {
+					this.loadTagsAndRender(this.headerData[0].prestudent_id);
+				}
+			},
+			deep: true,
+		}
 	},
 	data(){
 		return{
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
-			isFetchingIssues: false
+			isFetchingIssues: false,
+			tagEndpoint: ApiTag,
+			tagData: null,
 		};
 	},
 	methods: {
@@ -179,7 +209,41 @@ export default {
 			} else {
 				return 'data:image/jpeg;base64,' + foto;
 			}
-		}
+		},
+		//methods tags
+		async loadTagsAndRender(prestudent_id) {
+				await this.getAllTags(prestudent_id);
+
+				const container = idTagFormatter(
+					prestudent_id,
+					this.tagData,
+					this.$refs.tagComponent,
+					'prestudent_id'
+				);
+
+			this.$refs.tagWrapper.innerHTML = '';
+			this.$refs.tagWrapper.appendChild(container);
+		},
+		getAllTags(prestudent_id){
+			return this.$api
+				.call(ApiTag.getAllTagsPrestudent({prestudent_id}))
+				.then(result => {
+					this.tagData = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addedTag(addedTag)
+		{
+			this.reload();
+		},
+		deletedTag(id)
+		{
+			this.reload();
+		},
+		updatedTag(updatedTag)
+		{
+			this.reload();
+		},
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">
@@ -245,6 +309,15 @@ export default {
 								<span v-if="headerData[0].titelpost">, </span>
 								{{headerData[0].titelpost}}
 							</h2>
+							<core-tag ref="tagComponent"
+								v-if="tagsEnabled"
+								:endpoint="tagEndpoint"
+								:values="prestudentIds"
+								@added="addedTag"
+								@deleted="deletedTag"
+								@updated="updatedTag"
+								zuordnung_typ="prestudent_id"
+							></core-tag>
 							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 						</div>
 
@@ -267,6 +340,7 @@ export default {
 						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
 						 {{headerData[0].statusofsemester}}
 					  </h5>
+					  <div ref="tagWrapper"></div>
 
 				</div>
 				<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">

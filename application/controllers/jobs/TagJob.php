@@ -8,6 +8,8 @@ class TagJob extends JOB_Controller
 {
 
 	const BATCHUSER = 'sftest';
+	const SEMESTER = 'SS2024'; //docker
+	//TODO semester
 
 	/**
 	 * API constructor
@@ -21,8 +23,6 @@ class TagJob extends JOB_Controller
 
 		// Library
 		$this->load->library('TagLib');
-
-		// Tag-Helper
 
 		// Load Models
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
@@ -103,7 +103,7 @@ class TagJob extends JOB_Controller
 			print_r(PHP_EOL . "create Tags wiederholer " . PHP_EOL);
 			$result = $this->PrestudentstatusModel-> loadWhere(array(
 				'statusgrund_id' => 16,
-				'studiensemester_kurzbz' => 'SS2026'
+				'studiensemester_kurzbz' => self::SEMESTER
 			));
 			$data = $result->retval;
 			$ids = array_map(function($item) {
@@ -126,7 +126,7 @@ class TagJob extends JOB_Controller
 
 			$result = $this->PrestudentstatusModel-> loadWhere(array(
 				'statusgrund_id' => 15,
-				'studiensemester_kurzbz' => 'SS2026'
+				'studiensemester_kurzbz' => self::SEMESTER
 			));
 			$data = $result->retval;
 			$ids = array_map(function($item) {
@@ -204,7 +204,7 @@ class TagJob extends JOB_Controller
 	/**
 	 * delete All Automatic Tags
 	 */
-	public function deleteAllAutomatedTags()
+	public function deleteAutomatedTags()
 	{
 		print_r( PHP_EOL . "Start Job delete ALL Automated Tags" . PHP_EOL);
 	//	$this->NotizModel->select('notiz_id');

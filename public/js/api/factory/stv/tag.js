@@ -51,4 +51,13 @@ export default {
 			params: data
 		};
 	},
+
+	//TODO expand to other types
+	getAllTagsPrestudent(prestudent_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/Tags/getAllTags',
+			params: prestudent_id
+		};
+	}
 };

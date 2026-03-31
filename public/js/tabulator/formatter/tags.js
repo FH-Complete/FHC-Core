@@ -1,5 +1,13 @@
 export function tagFormatter(cell, tagComponent)
 {
+	//TODO readOnlyComponents nicht in der TagComponent enthalten
+	//console.log(JSON.stringify(tagComponent));
+	const mappedData = tagComponent.tags.map(tag => ({
+		typ_kurzbz: tag.tag_typ_kurzbz,
+		automatisiert: tag.automatisiert
+	}));
+
+
 	let tags = cell.getValue();
 	if (!tags) return;
 
@@ -32,14 +40,29 @@ export function tagFormatter(cell, tagComponent)
 
 		tagsToShow.forEach(tag => {
 			if (!tag) return;
+
 			let tagElement = document.createElement('span');
 			tagElement.innerText = tag.beschreibung;
 			tagElement.title = tag.notiz;
 			tagElement.className = "tag " + tag.style;
 			if (tag.done) tagElement.className += " tag_done";
 
-			//TODO automated styling
-			if (tag.automatisiert) tagElement.className += " tag_done";
+			const tagDef = mappedData.find(t => t.typ_kurzbz === tag.typ_kurzbz);
+
+			if (tagDef?.automatisiert)
+				tagElement.className += " tag_auto";
+
+/*			TODO delete Testoutputs
+			if (!tagDef) {
+				console.log(tag.typ_kurzbz + " nicht in TagComponent enthalten");
+				tagElement.className += " tag_auto";
+			}
+			else if (tagDef?.automatisiert) {
+				console.log(tag.typ_kurzbz + " ist automatisiert");
+				tagElement.className += " tag_auto";
+			} else
+				console.log (tag.typ_kurzbz + " nicht automatisiert");
+*/
 
 			tagElement.addEventListener('click', (event) => {
 				event.stopPropagation();
