@@ -26,19 +26,21 @@ export const DeadlineOverview = {
 			tabulatorUuid: Vue.ref(0),
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
+			phrasenPromise: null,
+			phrasenResolved: false,
 			deadlineTableOptions: {
 				height: 700,
 				index: 'projektarbeit_id',
 				layout: 'fitColumns',
-				placeholder: this.$p.t('global/noDataAvailable'),
+				placeholder: Vue.computed(() => this.$p.t('global/noDataAvailable')),
 				columns: [
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4zieldatum')), field: 'datum', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4fixtermin')), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabetyp')), field: 'typ_bezeichnung', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4abgabekurzbz')), field: 'kurzbz', formatter: this.centeredTextFormatter, widthGrow: 3},
-					{title: Vue.computed(() => this.$p.t('person/studentIn')), field: 'student', formatter: this.centeredTextFormatter, widthGrow: 2},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4stg')), field: 'stg', formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$p.t('abgabetool/c4sem')), field: 'semester', formatter: this.centeredTextFormatter, widthGrow: 1}
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zieldatumv2'))), field: 'datum', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4fixterminv4'))), field: 'fixterminstring', formatter: this.centeredTextFormatter, widthGrow: 1, tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabetyp'))), field: 'typ_bezeichnung', formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabekurzbzv2'))), field: 'kurzbz', formatter: this.centeredTextFormatter, widthGrow: 3},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('person/studentIn'))), field: 'student', formatter: this.centeredTextFormatter, widthGrow: 2},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', formatter: this.centeredTextFormatter,widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'semester', formatter: this.centeredTextFormatter, widthGrow: 1}
 				],
 				persistence: false,
 			},
@@ -128,7 +130,8 @@ export const DeadlineOverview = {
 
 	},
 	created() {
-
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 	},
 	mounted() {
 		this.setupMounted()

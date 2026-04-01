@@ -35,7 +35,11 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
 		'vendor/moment/luxonjs/luxon.min.js',
 		'vendor/npm-asset/primevue/password/password.min.js',
-		'vendor/npm-asset/primevue/multiselect/multiselect.min.js'
+		'vendor/npm-asset/primevue/multiselect/multiselect.min.js',
+		'vendor/npm-asset/primevue/timeline/timeline.min.js',
+		'vendor/npm-asset/primevue/inplace/inplace.min.js',
+		'vendor/npm-asset/primevue/message/message.min.js',
+		'vendor/npm-asset/primevue/tieredmenu/tieredmenu.js',
 	),
 	'customJSModules' => array(
 		'public/js/apps/Dashboard/Fhc.js',

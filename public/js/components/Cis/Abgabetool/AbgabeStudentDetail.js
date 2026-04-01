@@ -2,8 +2,8 @@ import Upload from '../../../components/Form/Upload/Dms.js';
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
 
-const today = new Date()
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
 	components: {
@@ -15,9 +15,12 @@ export const AbgabeStudentDetail = {
 		Textarea: primevue.textarea,
 		Accordion: primevue.accordion,
 		AccordionTab: primevue.accordiontab,
-		VueDatePicker
+		Message: primevue.message,
+		Inplace: primevue.inplace,
+		VueDatePicker,
+		FhcOverlay
 	},
-	inject: ['notenOptions', 'isMobile', 'isViewMode'],
+	inject: ['notenOptions', 'isMobile', 'isViewMode', 'moodle_link'],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -46,61 +49,30 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	methods: {
+		getNoteBezeichnung(termin){
+			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
+			
+			if(noteOpt?.bezeichnung) {
+				return noteOpt?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
+			} else if(noteOpt?.benotbar === true && !termin.note) {
+				return this.$capitalize(this.$p.t('abgabetool/c4notYetGraded'));
+			} else {
+				return ''
+			}
+		},
 		async validate(termin, endupload = false) {
 			if(!termin.file.length) {
-				this.$fhcAlert.alertWarning(this.$p.t('global/warningChooseFile'));
+				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningChooseFile')));
 				return false
 			}
 			
-			// TODO: define these
 			if(endupload) {
-				// check these input fields for length of entry
-				if(this.form['abstract'].length < 100 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningShortAbstract'),
-					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['abstract_en'].length < 100 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningShortAbstractEn'),
-					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['schlagwoerter'].length < 50 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningShortSchlagwoerter'),
-					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['schlagwoerter_en'].length < 50 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningShortSchlagwoerterEn'),
-					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
-					rejectClass: 'btn btn-outline-secondary'
-				}) === false) {
-					return false
-				}
-
-				if(this.form['seitenanzahl'] <= 5 && await this.$fhcAlert.confirm({
-					message: this.$p.t('abgabetool/warningSmallSeitenanzahl'),
-					acceptLabel: this.$p.t('abgabetool/c4AcceptAndProceed'),
-					acceptClass: 'btn btn-danger',
-					rejectLabel: this.$p.t('abgabetool/c4Cancel'),
-					rejectClass: 'btn btn-outline-secondary'
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/confirmEnduploadSpeichern'),
+					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+					acceptClass: 'p-button-primary',
+					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+					rejectClass: 'p-button-secondary'
 				}) === false) {
 					return false
 				}
@@ -110,7 +82,7 @@ export const AbgabeStudentDetail = {
 		},
 		async triggerEndupload() {
 			
-			if (!await this.validate(this.enduploadTermin))
+			if (!await this.validate(this.enduploadTermin, true))
 			{
 				return false;
 			}
@@ -144,7 +116,10 @@ export const AbgabeStudentDetail = {
 			this.$refs.modalContainerEnduploadZusatzdaten.hide()
 		},
 		downloadAbgabe(termin) {
-			this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
+			const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${termin.paabgabe_id}&student_uid=${this.projektarbeit.student_uid}&projektarbeit_id=${this.projektarbeit.projektarbeit_id}`;
+
+			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
+			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
 		formatDate(dateParam) {
 			const date = new Date(dateParam)
@@ -155,7 +130,7 @@ export const AbgabeStudentDetail = {
 			const day = padZero(date.getDate());
 			const year = date.getFullYear();
 
-			return `${day}.${month}.${year}`;
+			return `${day}.${month}.${year}`
 		},
 		async upload(termin) {
 
@@ -165,7 +140,7 @@ export const AbgabeStudentDetail = {
 				return false;
 			}
 			
-			if(termin.bezeichnung === 'Endupload') {
+			if(termin.bezeichnung?.paabgabetyp_kurzbz === 'end') {
 				// open endupload form modal for further inputs
 				this.enduploadTermin = termin
 				this.$refs.modalContainerEnduploadZusatzdaten.show()
@@ -192,13 +167,16 @@ export const AbgabeStudentDetail = {
 		},
 		handleUploadRes(res, termin) {
 			if(res.meta.status == "success") {
-				this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4fileUploadSuccess'))
+				this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4fileUploadSuccessv3')))
 
 				// update 'abgabedatum' for successful upload -> shows the pdf icon and date once set
 				termin.abgabedatum = new Date().toISOString().split('T')[0];
+				if(res?.data?.signatur !== undefined) {
+					termin.signatur = res.data.signatur
+				}
 				
 			} else {
-				this.$fhcAlert.alertError(this.$p.t('abgabetool/c4fileUploadError'))
+				this.$fhcAlert.alertError(this.$capitalize(this.$p.t('abgabetool/c4fileUploadErrorv3')))
 			}
 			
 			if(res.meta.signaturInfo) {
@@ -207,32 +185,6 @@ export const AbgabeStudentDetail = {
 			
 			
 		},
-		dateDiffInDays(datum, today){
-			const oneDayMs = 1000 * 60 * 60 * 24
-			return Math.round((new Date(datum) - new Date(today)) / oneDayMs)
-		},
-		getDateStyle(termin, mode) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-			
-			// https://wiki.fhcomplete.info/doku.php?id=cis:abgabetool_fuer_studierende
-			if (termin.abgabedatum === null) {
-				if(datum < today) {
-					return 'verpasst-header'
-				} else if (datum > today && this.dateDiffInDays(datum, today) <= 12) {
-					return 'abzugeben-header'
-				} else {
-					return 'standard-header'
-				}
-			} else if(abgabedatum > datum) {
-				return 'verspaetet-header'
-			} else {
-				return 'abgegeben-header'
-			}
-		},
-		openBeurteilungLink(link) {
-			window.open(link, '_blank')
-		},
 		getOptionLabel(option) {
 			return option.sprache
 		},
@@ -240,14 +192,6 @@ export const AbgabeStudentDetail = {
 			const noteOpt = this.notenOptions.find(opt => opt.note == termin.note)
 			return noteOpt ? noteOpt.bezeichnung : ''
 		},
-		getAccTabHeaderForTermin(termin) {
-			let tabTitle = ''
-
-			const datumFormatted = this.formatDate(termin.datum)
-			tabTitle += termin.bezeichnung + ' ' + datumFormatted
-			
-			return tabTitle
-		}
 	},
 	watch: {
 		projektarbeit(newVal) {
@@ -259,14 +203,36 @@ export const AbgabeStudentDetail = {
 			this.form.schlagwoerter_en = newVal.schlagwoerter_en ?? ''
 			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter ?? ''
 			this.form.seitenanzahl = newVal.seitenanzahl ?? 1
+			
 		}
 	},
 	computed: {
+		getMoodleLink() {
+			return this.moodle_link + this.projektarbeit.studiengang_kz	
+		},
+		getMessagePtStyle() {
+			// adjust outer spacing and internal padding to appear similar to doenload button in size
+			return {
+				root: {
+					style: {
+						margin: '0px'
+					}
+				},
+				wrapper: {
+					style: {
+						padding: '6px'
+					}
+				}
+			}
+		},
 		getEid() {
-			return this.$p.t('abgabetool/c4eidesstattlicheErklaerung')
+			return this.$capitalize(this.$p.t('abgabetool/c4eidesstattlicheErklaerung'))
+		},
+		allowedToSaveZusatzdaten() {
+			return this.form.schlagwoerter.length > 0 && this.form.schlagwoerter_en.length > 0 && this.form.abstract.length > 0 && this.form.abstract_en.length > 0 && this.form.seitenanzahl > 0
 		},
 		getAllowedToSendEndupload() {
-			return !this.eidAkzeptiert
+			return this.eidAkzeptiert && this.allowedToSaveZusatzdaten
 		},
 		qualityGateTerminAvailable() {
 			let qgatefound = false
@@ -277,102 +243,262 @@ export const AbgabeStudentDetail = {
 				}
 			})
 			return qgatefound
-		}
+		},
+		getTooltipVerspaetet() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipVerspaetet')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipVerpasst() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipVerpasst')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbzugeben() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipAbzugeben')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipStandard() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipStandardv2')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbgegeben() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipAbgegeben')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipFixtermin() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipFixtermin')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipAbgabeDetected() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipAbgabeDetected')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipNotAllowedToUpload() {
+			if(this.isViewMode) {
+				return {
+					value: this.$capitalize(this.$p.t('abgabetool/c4studentAbgabeNotAllowedInViewMode')),
+					class: "custom-tooltip"
+				}
+			} else {
+				return {
+					value: this.$capitalize(this.$p.t('abgabetool/c4studentAbgabeNotAllowedRegular')),
+					class: "custom-tooltip"
+				}
+			}
+		},
+		getTooltipBeurteilungerforderlich() {
+			return {
+				value: this.$capitalize(this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipBestanden'),
+				class: "custom-tooltip"
+			}
+		},
+		getTooltipNichtBestanden() {
+			return {
+				value: this.$p.t('abgabetool/c4tooltipNichtBestanden'),
+				class: "custom-tooltip"
+			}
+		},
 	},
 	created() {
-
+		
 	},
 	mounted() {
 
 	},
 	template: `
-		<div id="loadingOverlay" v-show="loading" style="position: absolute; width: 100vw; height: 100vh; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.5); z-index: 99999999999;">
-			<i class="fa-solid fa-spinner fa-pulse fa-5x"></i>
-		</div>
-
+		<FhcOverlay :active="loading"></FhcOverlay>
 
 		<div v-if="projektarbeit">
 		
-			<h5>{{$p.t('abgabetool/c4abgabeStudentenbereich')}}</h5>
+			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
 			<div class="row">
-				<p> {{projektarbeit?.betreuer}}</p>
-				<p> {{projektarbeit?.titel}}</p>
+				<div class="col-8">
+					<p> {{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4titel') ) }}: {{projektarbeit?.titel}}</p>
+					<p> {{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
+				</div>
+				<div class="col-4">
+					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
+						<a :href="getMoodleLink" target="_blank">Moodle</a>
+					</p>
+				</div>
 			</div>
 			
-			<Accordion :multiple="true" :activeIndex="[0]">
-				<template v-for="termin in this.projektarbeit?.abgabetermine">
-					<AccordionTab :header="getAccTabHeaderForTermin(termin)" :headerClass="getDateStyle(termin)">
-						<div class="row">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fixtermin')}}</div>
-							<div class="col-8 col-md-9">
-								<Checkbox 
-									disabled
-									v-model="termin.fixtermin"
-									:binary="true" 
-									:pt="{ root: { class: 'ml-auto' }}"
-								>
-								</Checkbox>
-<!--								<i v-if="termin.fixtermin" class="fa-solid fa-2x fa-circle-check fhc-bullet-red"></i>-->
-<!--								<i v-else="" class="fa-solid fa-2x fa-circle-xmark fhc-bullet-green"></i>-->
-							</div>
+			<Accordion :multiple="true">
+				<template v-for="termin in this.projektarbeit?.abgabetermine" :key="termin.paabgabe_id">
+					<AccordionTab :headerClass="termin.dateStyle + '-header'">
+						<template #header>
+							<div class="d-flex flex-nowrap align-items-center w-100">
+								<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -68px;">
+									<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
+									<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
+									<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
+									<i v-else-if="termin.dateStyle == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
+									<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
+									<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
+									<i v-else-if="termin.dateStyle == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
+									<i v-else-if="termin.dateStyle == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
+							
+								</div>
+								<div class="text-start px-2" style="min-width: 150px; max-width: 300px; margin-left: 40px">
+									<span>{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}</span>
+								</div>
+								<div class="text-start px-2" style="min-width: 100px;">
+									<span>{{ formatDate(termin.datum) }}</span>
+								</div>
+								<div class="px-1">
+									<i v-if="termin?.fixtermin" v-tooltip.right="getTooltipFixtermin" class="fa-solid fa-lock"></i>
+									<i v-if="termin?.abgabedatum && isMobile" v-tooltip.right="getTooltipAbgabeDetected" class="fa-solid fa-file"></i>
+								</div>
+								<div v-if="termin?.abgabedatum && !isMobile" class="px-1">
+									<i v-tooltip.right="getTooltipAbgabeDetected" class="fa-solid fa-file"></i>
+								</div>
+								<div class="flex-grow-1 text-end pe-2">
+									<span class="fw-bold">{{getNoteBezeichnung(termin)}}</span>
+								</div>
+							</div>				
+						</template>
+						
+						<div v-if="isMobile" class="row mt-2 align-items-center">						
+							<Inplace
+								closable
+								:closeButtonProps="{
+									style: {
+										position: 'relative',
+										bottom: '100px',
+										left: '80%',
+										zIndex: 1
+									}
+								}"
+							>
+								<template #display>{{ $capitalize($p.t('abgabetool/c4tapForTooltipInfo'))}}</template>
+								<template #content>
+									<div class="col-auto">
+										<div class="row">
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4abgabeZeitstatus')) }}</div>
+											<div class="col-12 col-md-9">{{$p.t('abgabetool/c4tooltip' + $capitalize(termin?.dateStyle) )}}</div>
+										</div>
+										<div class="row">
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4fixterminv4')) }}</div>
+											<div class="col-12 col-md-9">{{!termin?.fixtermin}}</div>
+										</div>
+										<div class="row">
+											<div class="col-12 col-md-3 fw-bold align-content-center">{{ $capitalize($p.t('abgabetool/c4fileUploaded')) }}</div>
+											<div class="col-12 col-md-9">{{termin?.abgabedatum !== null}}</div>
+										</div>
+									</div>
+								</template>
+							</Inplace>
+
+						
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4zieldatum')}}</div>
-							<div class="col-8 col-md-9">
+							<div class="col-12 col-md-3 align-content-center">
+								<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
+								<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
+							</div>
+							<div class="col-12 col-md-9">
 								<VueDatePicker
 									v-model="termin.datum"
 									:clearable="false"
 									:disabled="true"
 									:enable-time-picker="false"
-									:format="formatDate"
+									locale="de"
+									format="dd.MM.yyyy"
 									:text-input="true"
 									auto-apply>
 								</VueDatePicker>
-<!--								<i class="position-absolute abgabe-zieldatum-overlay fa-solid fa-2x" :class="getDateStyle(termin, 'icon')"></i>-->
 							</div>
 						</div>
 						
 						<div class="row mt-2">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabetyp')}}</div>
-							<div class="col-8 col-md-9">
-								{{ termin.bezeichnung }}
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
+							<div class="col-12 col-md-9">
+								{{ termin ? $p.t('abgabetool/c4paatyp' + termin.paabgabetyp_kurzbz) : '' }}
 							</div>
 						</div>
 						
-						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4note')}}</div>
-							<div class="col-8 col-md-9">
-								<div v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'" class="col-1 d-flex justify-content-start align-items-start">
+						<div class="row mt-2" v-if="termin.note">
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
+							<div class="col-12 col-md-9">
+								<div class="col-auto d-flex justify-content-start align-items-start">
 									{{ getTerminNoteBezeichnung(termin) }}
 								</div>
 							</div>
 						</div>
 						
-						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabekurzbz')}}</div>
-							<div class="col-8 col-md-9">
-								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" :rows=" isMobile ? 2 : 4" :cols=" isMobile ? 25 : 90" :disabled="true"></Textarea>
+						<div class="row mt-2" v-if="termin.paabgabetyp_kurzbz === 'qualgate1' || termin.paabgabetyp_kurzbz === 'qualgate2'">
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
+							<div class="col-12 col-md-9">
+								<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" disabled></Textarea>
 							</div>
 						</div>
 						
-						<div class="row mt-2">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4abgabedatum')}}</div>
-							<div class="col-8 col-md-9">
-								{{ termin.abgabedatum?.split("-").reverse().join(".") }}
-								<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
-									<a> {{$p.t('abgabetool/c4downloadAbgabe')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
-								</button>
+						<div v-if="termin.kurzbz && termin.kurzbz.length > 0" class="row mt-2">
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbzv2') )}}</div>
+							<div class="col-12 col-md-9">
+								<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" rows="1" class="w-100" :disabled="true"></Textarea>
 							</div>
 						</div>
 						
 						<div class="row mt-2" v-if="termin.upload_allowed">
-							<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4fileupload')}}</div>
-							<div class="col-8 col-md-9">
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabedatum') )}}</div>
+							<div class="col-12 col-md-9">
+							<template v-if="termin?.abgabedatum">
 								<div class="row">
+									<div style="width:100px; align-content: center;">
+										<h6>{{ termin.abgabedatum?.split("-").reverse().join(".") }}</h6>
+									</div>
+									
+									<div class="col-auto">
+										<button v-if="termin?.abgabedatum" @click="downloadAbgabe(termin)" class="btn btn-primary">
+											<a> {{$capitalize($p.t('abgabetool/c4downloadAbgabe') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+										</button>
+									</div>	
+									<template v-if="termin.paabgabetyp_kurzbz == 'end'">	
+										<div v-if="termin?.signatur !== undefined && termin?.signatur !== null" class="col-auto">
+											<Message v-if="termin?.signatur == true" severity="success" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4signaturGefunden') }} </Message>
+											<Message v-else-if="termin?.signatur == false" severity="error" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4keineSignatur') }} </Message>
+											<Message v-else-if="termin?.signatur == 'error'" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4signaturServerError') }} </Message>
+										</div>
+<!--										<div v-else class="col-auto">-->
+<!--											<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>-->
+<!--										</div>-->
+									</template>
+								</div>					
+							</template>
+							<template v-else>
+								{{ $capitalize( $p.t('abgabetool/c4nochNichtsAbgegeben') )}}
+							</template>
+							</div>
+						</div>
+						
+						<div class="row mt-2" v-if="termin.upload_allowed">
+							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4fileupload') )}}</div>
+							<div class="col-12 col-md-9">
+								<div class="row" v-if="termin?.allowedToUpload">
 									<div class="col-12 col-sm-6 mb-2">
 										<Upload 
-											:disabled="!termin?.allowedToUpload || isViewMode" 
 											accept=".pdf" 
 											v-model="termin.file"
 										></Upload>
@@ -381,9 +507,27 @@ export const AbgabeStudentDetail = {
 										<button 
 											class="btn btn-primary border-0 w-100" 
 											@click="upload(termin)" 
-											:disabled="!termin.allowedToUpload || isViewMode"
 										>
-											{{$p.t('abgabetool/c4upload')}}
+											{{$capitalize( $p.t('abgabetool/c4upload') )}}
+											<i class="fa-solid fa-upload"></i>
+										</button>
+									</div>
+								</div>
+								<div class="row" v-else-if="!termin?.allowedToUpload || isViewMode" v-tooltip.right="getTooltipNotAllowedToUpload">
+									<div class="col-12 col-sm-6 mb-2">
+										<Upload 
+											disabled
+											accept=".pdf" 
+											v-model="termin.file"
+										></Upload>
+									</div>
+									<div class="col-12 col-sm-6">
+										<button 
+											class="btn btn-primary border-0 w-100" 
+											@click="upload(termin)" 
+											disabled
+										>
+											{{$capitalize( $p.t('abgabetool/c4upload') )}}
 											<i class="fa-solid fa-upload"></i>
 										</button>
 									</div>
@@ -393,6 +537,11 @@ export const AbgabeStudentDetail = {
 					</AccordionTab>
 				</template>
 			</Accordion>
+			
+			<div v-if="projektarbeit?.abgabetermine.length == 0" style="display:flex; justify-content: center; align-content: center;">
+				<h5>{{ $capitalize( $p.t('abgabetool/c4keineAbgabetermineGefunden') )}}</h5>
+			</div>
+			
 		 </div>
 	 	
 	 	<bs-modal 
@@ -401,7 +550,7 @@ export const AbgabeStudentDetail = {
 	 		dialogClass="bordered-modal modal-lg">
 			<template v-slot:title>
 				<div>
-					{{$p.t('abgabetool/c4enduploadZusatzdaten')}}
+					{{$capitalize( $p.t('abgabetool/c4enduploadZusatzdaten') )}}
 				</div>
 				<div class="row mb-3 align-items-start">
 					
@@ -410,13 +559,13 @@ export const AbgabeStudentDetail = {
 				</div>
 				<div class="row mb-3 align-items-start">
 					
-					<p class="ml-4 mr-4">{{$p.t('abgabetool/c4titel')}}: {{ projektarbeit?.titel }}</p>
+					<p class="ml-4 mr-4">{{$capitalize( $p.t('abgabetool/c4titel') )}}: {{ projektarbeit?.titel }}</p>
 				
 				</div>
 			</template>
 			<template v-slot:default>
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4Sprache')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4Sprache') )}}</div>
 					<div class="row">
 						<Dropdown 
 							:style="{'width': '100%'}"
@@ -437,37 +586,37 @@ export const AbgabeStudentDetail = {
 <!--				-->
 <!--				</div>-->
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4schlagwoerterGer')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterGer') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter"></Textarea>
+						<Textarea v-model="form.schlagwoerter" class="w-100"></Textarea>
 					</div>
 				</div>
 				
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4schlagwoerterEng')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4schlagwoerterEng') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.schlagwoerter_en"></Textarea>
+						<Textarea v-model="form.schlagwoerter_en" class="w-100"></Textarea>
 					</div>
 				</div>
 				
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4abstractGer')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractGer') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.abstract" rows="10" maxlength="5000"></Textarea>
+						<Textarea v-model="form.abstract" rows="10" maxlength="5000" class="w-100"></Textarea>
 						<p>{{ form.abstract?.length ? form.abstract.length : 0 }} / 5000 characters</p>
 					</div>
 				</div>
 
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4abstractEng')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4abstractEng') )}}</div>
 					<div class="row">
-						<Textarea v-model="form.abstract_en" rows="10" maxlength="5000"></Textarea>
+						<Textarea v-model="form.abstract_en" rows="10" maxlength="5000" class="w-100"></Textarea>
 						<p>{{ form.abstract_en?.length ? form.abstract_en.length : 0 }} / 5000 characters</p>
 					</div>				
 				</div>
 				
 				<div class="row mb-3 align-items-start">
-					<div class="row">{{$p.t('abgabetool/c4seitenanzahl')}}</div>
+					<div class="row">{{$capitalize( $p.t('abgabetool/c4seitenanzahl') )}}</div>
 					<div class="row">
 						<InputNumber 
 							v-model="form.seitenanzahl"
@@ -480,7 +629,7 @@ export const AbgabeStudentDetail = {
 					<div v-html="getEid"></div>
 					<div class="row">
 						<div class="col-9"></div>
-						<div class="col-2"><p>{{ $p.t('abgabetool/c4gelesenUndAkzeptiert') }}</p></div>
+						<div class="col-2"><p>{{$capitalize( $p.t('abgabetool/c4gelesenUndAkzeptiert') )}}</p></div>
 						<div class="col-1">
 							
 							<Checkbox 
@@ -495,7 +644,8 @@ export const AbgabeStudentDetail = {
 				
 			</template>
 			<template v-slot:footer>
-				<button class="btn btn-primary" :disabled="getAllowedToSendEndupload" @click="triggerEndupload">{{$p.t('ui/hochladen')}}</button>
+				<div v-show="!allowedToSaveZusatzdaten">{{ $p.t('abgabetool/c4zusatzdatenausfuellen') }}</div>
+				<button class="btn btn-primary" :disabled="!getAllowedToSendEndupload" @click="triggerEndupload">{{$capitalize( $p.t('ui/hochladen') )}}</button>
 			</template>
 		</bs-modal>
 	 	

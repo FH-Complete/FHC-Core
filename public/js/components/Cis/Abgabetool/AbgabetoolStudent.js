@@ -1,7 +1,8 @@
 import AbgabeDetail from "./AbgabeStudentDetail.js";
-import VerticalSplit from "../../verticalsplit/verticalsplit.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
+import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { getDateStyleClass} from "./getDateStyleClass.js";
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
@@ -10,13 +11,13 @@ export const AbgabetoolStudent = {
 		AccordionTab: primevue.accordiontab,
 		BsModal,
 		AbgabeDetail,
-		VerticalSplit
+		FhcOverlay
 	},
-	inject: ['isMobile'],
 	provide() {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions),
-			isViewMode: Vue.computed(() => this.isViewMode)
+			isViewMode: Vue.computed(() => this.isViewMode),
+			moodle_link: Vue.computed(() => this.moodle_link)
 		}
 	},
 	props: {
@@ -34,16 +35,20 @@ export const AbgabetoolStudent = {
 	},
 	data() {
 		return {
+			activeTabIndex: [0],
+			abgabeTypeOptions: null,
+			phrasenPromise: null,
+			phrasenResolved: false,
+			loading: false,
 			notenOptions: null,
-			domain: '',
-			student_uid: null,
 			detail: null,
 			projektarbeiten: null,
-			selectedProjektarbeit: null
+			selectedProjektarbeit: null,
+			moodle_link: null
 		};
 	},
 	methods: {
-		checkQualityGates(termine) {
+		checkQualityGatesStrict(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
 			
@@ -60,37 +65,92 @@ export const AbgabetoolStudent = {
 
 			return qgate1Passed && qgate2Passed
 		},
+		checkQualityGatesOptional(termine) {
+			const qgate1found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate1')
+			const qgate2found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate2')
+			
+			let qgate1positiv = true
+			if(qgate1found) {
+				qgate1positiv = false
+
+				termine.forEach(t => {
+					const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
+					if(noteOption && noteOption.positiv) {
+						if (t.paabgabetyp_kurzbz == 'qualgate1') {
+							qgate1positiv = true
+						}
+					}
+				})
+			}
+
+			let qgate2positiv = true
+			if(qgate2found) {
+				qgate2positiv = false
+
+				termine.forEach(t => {
+					const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
+					if(noteOption && noteOption.positiv) {
+						if (t.paabgabetyp_kurzbz == 'qualgate2') {
+							qgate2positiv = true
+						}
+					}
+				})
+			}
+
+			return qgate1positiv && qgate2positiv
+		},
 		isPastDate(date) {
-			return new Date(date) < new Date(Date.now())	
+			const deadline = luxon.DateTime.fromISO(date, { zone: 'Europe/Vienna' }).endOf('day');
+			const nowInVienna = luxon.DateTime.now().setZone('Europe/Vienna');
+			return nowInVienna > deadline;
 		},
 		setDetailComponent(details){
+			this.loading = true
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
+				
+				const paIsBenotet = pa.note !== null
+				
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
 					termin.allowedToUpload = false
-					// termin.datum = '2025-10-16'
-					// TODO: fixtermin logic?
-					if(termin.paabgabetyp_kurzbz == 'enda') {
+					
+					if(termin.paabgabetyp_kurzbz == 'end') {
+						// old assumed production logic when qgates are required
+						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
 						
-						termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGates(pa.abgabetermine)
-					} else if(termin.paabgabetyp_kurzbz == 'qualgate1' || termin.paabgabetyp_kurzbz == 'qualgate2') {
-						termin.allowedToUpload = termin.upload_allowed
+						const inTime = termin.fixtermin ? !this.isPastDate(termin.datum) : true
+						termin.allowedToUpload = inTime && this.checkQualityGatesOptional(pa.abgabetermine)
+
+
+						// development purposes
+						// termin.allowedToUpload = this.checkQualityGatesStrict(pa.abgabetermine)
+						// termin.allowedToUpload = true
+
+					} else if(termin.fixtermin) {
+						termin.allowedToUpload = !this.isPastDate(termin.datum)
 					} else {
-						termin.allowedToUpload = true
+						// this could confuse people since we should dont show people this flag
+						termin.allowedToUpload = termin.upload_allowed 
 					}
 
+					// blocks client upload button if projektarbeitet is already beurteilt und thus further abgaben on any termin should be blocked
+					if(paIsBenotet) termin.allowedToUpload = false
+					
+					
+					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
+					termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 				})
+				
 				pa.betreuer = this.buildBetreuer(pa)
 				pa.student_uid = this.student_uid
-
+				
 				this.selectedProjektarbeit = pa
 
 				this.$refs.modalContainerAbgabeDetail.show()
-				// this.$refs.verticalsplit.showBoth()
 				
-			})
+			}).finally(()=>{this.loading=false})
 		},
 		centeredTextFormatter(cell) {
 			const val = cell.getValue()
@@ -122,29 +182,18 @@ export const AbgabetoolStudent = {
 			} else return '-'
 		},
 		buildMailToLink(projekt) {
-			if(projekt.mitarbeiter_uid) { // standard
-				return 'mailto:' + projekt.mitarbeiter_uid +'@'+ this.domain
-			} else { // private
-				return 'mailto:' + projekt.email
-			}
+			// should always be "projekt.mitarbeiter_uid +'@'+ this.domain", built in backend
+			return 'mailto:' + projekt.email
 		},
 		buildBetreuer(abgabe) {
-			return abgabe.betreuerart_beschreibung + ': ' + (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
+			return (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		async setupData(data){
 			// this.projektarbeiten = data[0]
-			this.domain = data[1]
-			this.student_uid = data[2]
-			this.projektarbeiten = data[0] ?? null
-			if(!this.projektarbeiten) return
-			this.projektarbeiten = this.projektarbeiten.map(projekt => {
+			const projektarbeiten = data[0] ?? null
+			if(!projektarbeiten) return
+			this.projektarbeiten = projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
-				
-				if (projekt.babgeschickt || projekt.zweitbetreuer_abgeschickt) {
-					// mode = 'beurteilungDownload' // build dl link for both betreuer documents
-					projekt.beurteilungLink = FHC_JS_DATA_STORAGE_OBJECT.app_root + 'cis/private/pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz='+projekt.betreuerart_kurzbz+'&projektarbeit_id='+projekt.projektarbeit_id+'&person_id=' + projekt.bperson_id
-
-				}
 				
 				return {
 					...projekt,
@@ -155,7 +204,8 @@ export const AbgabetoolStudent = {
 						betreuerart_kurzbz: projekt.betreuerart_kurzbz,
 						mode
 					},
-					beurteilung: projekt.beurteilungLink ?? null,
+					beurteilung1: projekt.downloadLink1 ?? null,
+					beurteilung2: projekt.downloadLink2 ?? null,
 					sem: projekt.studiensemester_kurzbz,
 					stg: projekt.kurzbzlang,
 					mail: this.buildMailToLink(projekt),
@@ -164,10 +214,10 @@ export const AbgabetoolStudent = {
 					titel: projekt.titel
 				}
 			})
-			
+
 		},
 		loadProjektarbeiten() {
-			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid_prop || this.viewData?.uid || null))
+			this.$api.call(ApiAbgabe.getStudentProjektarbeiten(this.student_uid))
 				.then(res => {
 					if(res?.data) this.setupData(res.data)
 				})
@@ -186,7 +236,7 @@ export const AbgabetoolStudent = {
 		getAccTabHeaderForProjektarbeit(projektarbeit) {
 			let title = ''
 			
-			title += projektarbeit.titel
+			title += projektarbeit.titel ?? this.$p.t('abgabetool/keinTitel')
 			
 			return title
 		},
@@ -203,8 +253,11 @@ export const AbgabetoolStudent = {
 				return ''
 			}
 		},
-		handleDownloadBeurteilung(projektarbeit) {
-			window.open(projektarbeit.beurteilung)
+		handleDownloadBeurteilung1(projektarbeit) {
+			window.open(projektarbeit.beurteilung1)
+		},
+		handleDownloadBeurteilung2(projektarbeit) {
+			window.open(projektarbeit.beurteilung2)
 		}
 	},
 	watch: {
@@ -213,50 +266,76 @@ export const AbgabetoolStudent = {
 	computed: {
 		isViewMode() {
 			return this.student_uid !== this.viewData.uid
+		},
+		student_uid() {
+			return this.student_uid_prop || this.viewData?.uid || null
 		}
 	},
 	async created() {
+		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
+		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
+		
 		this.loading = true
 		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		await this.$api.call(ApiAbgabe.getNoten()).then(res => {
-			this.notenOptions = res.data
+			if(res.meta.status == 'success') {
+				this.notenOptions = res.data[0]
+
+				this.allowedNotenOptions = this.notenOptions.filter(
+					opt => res.data[1].includes(opt.note)
+				)
+			}
+		}).finally(() => {
+			this.loading = false
+		})
+
+		// fetch abgabetypen options
+		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
+			this.abgabeTypeOptions = res.data
 		}).catch(e => {
 			this.loading = false
 		})
 
+		// fetch config to avoid hard coded links
+		this.$api.call(ApiAbgabe.getConfigStudent()).then(res => {
+			this.moodle_link = res.data?.moodle_link
+		}).catch(e => {
+			this.loading = false
+		})
 	},
 	mounted() {
 		this.setupMounted()
 	},
 	template: `
+<template v-if="phrasenResolved">
+	<FhcOverlay :active="loading"></FhcOverlay>
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
-		dialogClass="modal-fullscreen">
+		dialogClass="modal-xl" :allowFullscreenExpand="true">
 		<template v-slot:title>
 			<div>
-				{{$p.t('abgabetool/c4abgabeStudentDetailTitle')}}
+				{{$capitalize( $p.t('abgabetool/c4abgabeStudentDetailTitle') )}}
 			</div>
 		</template>
 		<template v-slot:default>
 			<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
-			
 		</template>
 	</bs-modal>
 	
-	<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+	<h2>{{$capitalize( $p.t('abgabetool/abgabetoolTitle') )}}</h2>
 	<hr>
 	
 	<div v-if="projektarbeiten === null">
-		{{$p.t('abgabetool/c4abgabeStudentNoProjectsFound')}}
+		{{$capitalize( $p.t('abgabetool/c4abgabeStudentNoProjectsFound') )}}
 	</div>
 	
-	<Accordion :multiple="true" :activeIndex="[0]">
-		<template v-for="projektarbeit in projektarbeiten">
+	<Accordion :multiple="true" :activeIndex="activeTabIndex">
+		<template v-for="projektarbeit in projektarbeiten" :key="projektarbeit.projektarbeit_id">
 			<AccordionTab>
 				
 				<template #header>
 					<div class="d-flex row w-100">
-						<div class="col-6 text-start">
+						<div class="text-start" :class="projektarbeit.note != null ? 'col-6' : 'col-12'">
 							<span>{{getAccTabHeaderForProjektarbeit(projektarbeit)}}</span>
 						</div>
 						<div class="col-6 text-end">
@@ -266,30 +345,33 @@ export const AbgabetoolStudent = {
 				</template>
 				
 				<div class="row">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4details')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4details') )}}</div>
 					<div class="col-8 col-md-9">
 						<button @click="setDetailComponent(projektarbeit.details)" class="btn btn-primary">
-							{{$p.t('abgabetool/c4projektdetailsOeffnen')}} <a><i class="fa fa-folder-open"></i></a>
+							{{$capitalize( $p.t('abgabetool/c4projektdetailsOeffnen') )}} <a><i class="fa fa-folder-open"></i></a>
 						</button>
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4beurteilung')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4beurteilung') )}}</div>
 					<div class="col-8 col-md-9">
-						<button v-if="projektarbeit.beurteilung" @click="handleDownloadBeurteilung(projektarbeit)" class="btn btn-primary">
-							<a> {{$p.t('abgabetool/c4downloadBeurteilung')}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+						<button v-if="projektarbeit.beurteilung1" @click="handleDownloadBeurteilung1(projektarbeit)" class="btn btn-primary">
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungErstbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
 						</button>
-						<a v-else>{{$p.t('abgabetool/c4nobeurteilungVorhanden')}}</a>
+						<a v-else>{{$capitalize( $p.t('abgabetool/c4nobeurteilungVorhanden') )}}</a>
+						<button v-if="projektarbeit.beurteilung2" @click="handleDownloadBeurteilung2(projektarbeit)" class="btn btn-primary" style="margin-left: 4px;">
+							<a> {{$capitalize( $p.t('abgabetool/c4downloadBeurteilungZweitbetreuerv2') )}} <i class="fa fa-file-pdf" style="margin-left:4px; cursor: pointer;"></i></a>
+						</button>
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4sem')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4sem') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.sem }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4stg')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4stg') )}}</div>
 					<div class="col-8 col-md-9">
 						<div class="col-1 d-flex justify-content-start align-items-start">
 							{{ projektarbeit.stg }}
@@ -297,31 +379,31 @@ export const AbgabetoolStudent = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuer')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit?.betreuerart_kurzbz ? $capitalize( $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) ) : $capitalize( $p.t('abgabetool/c4betreuerv2') ) }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.betreuer }}
+						{{ projektarbeit.betreuerart_kurzbz ? projektarbeit.betreuer : '' }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4betreuerEmailKontakt')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4betreuerEmailKontaktv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<a :href="getMailLink(projektarbeit)"><i class="fa fa-envelope" style="color:#00649C"></i></a>
 					</div>
 				</div>
-				<div v-if="projektarbeit.zweitbetreuer" class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz}}</div>
+				<div v-if="projektarbeit.zweitbetreuer_person_id || projektarbeit.zweitbetreuer" class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{ projektarbeit.zweitbetreuer_betreuerart_kurzbz ? $p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz) : '' }}</div>
 					<div class="col-8 col-md-9">
-						{{ projektarbeit.zweitbetreuer_betreuerart_beschreibung}}: {{ projektarbeit.zweitbetreuer?.first }}
+						{{ projektarbeit.zweitbetreuer?.first }}
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4projekttyp')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4projekttyp') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.projekttypbezeichnung }}					
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold">{{$p.t('abgabetool/c4titel')}}</div>
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4titel') )}}</div>
 					<div class="col-8 col-md-9">
 						{{ projektarbeit.titel }}	
 					</div>
@@ -329,7 +411,7 @@ export const AbgabetoolStudent = {
 			</AccordionTab>
 		</template>
 	</Accordion>
-	
+</template>
     `,
 };
 

@@ -22,6 +22,12 @@ export default {
 			url: '/api/frontend/v1/Studiensemester/getStudiensemester'
 		};
 	},
+	getAllStudiensemesterAndAktOrNext() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/organisation/Studiensemester/getAllStudiensemesterAndAktOrNext',
+		};
+	},
 	getAll(order = null, start = null)
 	{
 		return {

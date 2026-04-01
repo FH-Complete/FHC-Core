@@ -70,13 +70,43 @@ export default {
 						field: 'benotungsdatum',
 						title: this.$p.t('stv/grades_gradingdate'),
 						visible: this.optionalTabulatorOptions?.visibleColumns?.benotungsdatum ?? false,
-						headerFilter: this.optionalTabulatorOptions?.headerFilter?.benotungsdatum || this.optionalTabulatorOptions?.headerFilter || false
+						headerFilter: this.optionalTabulatorOptions?.headerFilter?.benotungsdatum || this.optionalTabulatorOptions?.headerFilter || false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
 					},
 					{
 						field: 'freigabedatum',
 						title: this.$p.t('stv/grades_approvaldate'),
 						visible: this.optionalTabulatorOptions?.visibleColumns?.freigabedatum ?? false,
-						headerFilter: this.optionalTabulatorOptions?.headerFilter?.freigabedatum || this.optionalTabulatorOptions?.headerFilter || false
+						headerFilter: this.optionalTabulatorOptions?.headerFilter?.freigabedatum || this.optionalTabulatorOptions?.headerFilter || false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
 					},
 					{
 						field: 'studiensemester_kurzbz',

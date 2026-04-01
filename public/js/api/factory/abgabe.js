@@ -5,6 +5,12 @@ export default {
 			url: '/api/frontend/v1/Abgabe/getConfig'
 		};
 	},
+	getConfigStudent() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getConfigStudent'
+		};
+	},
 	getStudentProjektarbeiten(uid) {
 		return {
 			method: 'get',
@@ -35,11 +41,6 @@ export default {
 			config: {Headers: { "Content-Type": "multipart/form-data" }}
 		};
 	},
-	getStudentProjektarbeitAbgabeFile(paabgabe_id, student_uid) {
-		const url = `/Cis/Abgabetool/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}`;
-
-		window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
-	},
 	getMitarbeiterProjektarbeiten(all) {
 		return {
 			method: 'get',
@@ -48,13 +49,23 @@ export default {
 		};
 	},
 	postProjektarbeitAbgabe(termin) {
+		
+		let dateString = termin.datum
+		if(termin.datum instanceof Date) {
+			const year = termin.datum.getFullYear();
+			const month = String(termin.datum.getMonth() + 1).padStart(2, '0');
+			const day = String(termin.datum.getDate()).padStart(2, '0');
+
+			dateString = `${year}-${month}-${day}`
+		}
+		
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postProjektarbeitAbgabe',
 			params: { 
 				paabgabe_id: termin.paabgabe_id,
 				paabgabetyp_kurzbz: termin.bezeichnung.paabgabetyp_kurzbz,
-				datum: termin.datum,
+				datum: dateString,
 				note: termin.note_pk,
 				upload_allowed: !!termin.upload_allowed,
 				beurteilungsnotiz: termin.beurteilungsnotiz ?? '',
@@ -73,11 +84,11 @@ export default {
 			params: { paabgabe_id }
 		};
 	},
-	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids) {
+	postSerientermin(datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, upload_allowed, projektarbeit_ids, fixtermin) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/Abgabe/postSerientermin',
-			params: { datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, projektarbeit_ids }
+			params: { datum, paabgabetyp_kurzbz, bezeichnung, kurzbz, upload_allowed, projektarbeit_ids, fixtermin }
 		};
 	},
 	fetchDeadlines(person_id) {
@@ -100,4 +111,34 @@ export default {
 			url: '/api/frontend/v1/Abgabe/getNoten'
 		};
 	},
+	getProjektarbeitenForStudiengang(studiengang_kz, benotet = 0) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getProjektarbeitenForStudiengang',
+			params: { studiengang_kz, benotet }
+		};
+	},
+	// TODO: this could also very well be generic info api
+	getStudiengaenge() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Abgabe/getStudiengaenge'
+		};
+	},
+	postStudentProjektarbeitZusatzdaten(formData) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/postStudentProjektarbeitZusatzdaten',
+			params: formData,
+			config: {Headers: { "Content-Type": "multipart/form-data" }}
+		};
+	},
+	getSignaturStatusForProjektarbeitAbgaben(paabgabe_ids, student_uid) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/getSignaturStatusForProjektarbeitAbgaben',
+			params: {paabgabe_ids, student_uid},
+
+		};
+	}
 };

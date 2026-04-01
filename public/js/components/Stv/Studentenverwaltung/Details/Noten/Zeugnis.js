@@ -158,14 +158,14 @@ export default {
 			}
 
 			const columns = [
-				{ 
+				{
 					field: 'zeugnis',
 					title: this.$p.t('stv/grades_zeugnis'),
 					formatter: 'tickCross',
 					visible: this.optionalTabulatorOptions?.visibleColumns?.zeugnis ?? true,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.zeugnis || this.optionalTabulatorOptions?.zeugnis || false
 				},
-				{ 
+				{
 					field: 'lehrveranstaltung_bezeichnung',
 					title: this.$p.t('lehre/lehrveranstaltung'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_bezeichnung ?? true,
@@ -173,28 +173,57 @@ export default {
 
 				},
 					gradeField,
-				{ 
+				{
 					field: 'uebernahmedatum',
 					title: this.$p.t('stv/grades_takeoverdate'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.uebernahmedatum ?? false,
-					headerFilter: this.optionalTabulatorOptions?.headerFilter?.uebernahmedatum || this.optionalTabulatorOptions?.uebernahmedatum || false
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.uebernahmedatum || this.optionalTabulatorOptions?.uebernahmedatum || false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
+
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}
 
 				},
-				{ 
+				{
 					field: 'benotungsdatum',
 					title: this.$p.t('stv/grades_gradingdate'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.benotungsdatum ?? false,
-					headerFilter: this.optionalTabulatorOptions?.headerFilter?.benotungsdatum || this.optionalTabulatorOptions?.benotungsdatum || false
+					headerFilter: this.optionalTabulatorOptions?.headerFilter?.benotungsdatum || this.optionalTabulatorOptions?.benotungsdatum || false,
+					formatter: function (cell) {
+						const dateStr = cell.getValue();
+						if (!dateStr) return "";
 
+						const date = new Date(dateStr);
+						return date.toLocaleString("de-DE", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit",
+							second: "2-digit",
+							hour12: false
+						});
+					}
 				},
-				{ 
+				{
 					field: 'studiensemester_kurzbz',
 					title: this.$p.t('lehre/studiensemester'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.studiensemester_kurzbz ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiensemester_kurzbz || this.optionalTabulatorOptions?.studiensemester_kurzbz || false
 
 				},
-				{ 
+				{
 					field: 'note_number',
 					title: this.$p.t('stv/grades_numericgrade'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.note_number ?? false,
@@ -202,91 +231,91 @@ export default {
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.note_number || this.optionalTabulatorOptions?.note_number || false
 
 				},
-				{ 
+				{
 					field: 'lehrveranstaltung_id',
 					title: this.$p.t('lehre/lehrveranstaltung_id'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_id ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrveranstaltung_id || this.optionalTabulatorOptions?.lehrveranstaltung_id || false
 
 				},
-				{ 
+				{
 					field: 'studiengang',
 					title: this.$p.t('lehre/studiengang'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang || this.optionalTabulatorOptions?.studiengang || false
 
 				},
-				{ 
+				{
 					field: 'studiengang_kz',
 					title: this.$p.t('lehre/studiengangskennzahlLehre'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_kz ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_kz || this.optionalTabulatorOptions?.studiengang_kz || false
 
 				},
-				{ 
+				{
 					field: 'studiengang_lv',
 					title: this.$p.t('stv/grades_studiengang_lv'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_lv ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_lv || this.optionalTabulatorOptions?.studiengang_lv || false
 
 				},
-				{ 
+				{
 					field: 'studiengang_kz_lv',
 					title: this.$p.t('stv/grades_studiengang_kz_lv'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.studiengang_kz_lv ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.studiengang_kz_lv || this.optionalTabulatorOptions?.studiengang_kz_lv || false
 
 				},
-				{ 
+				{
 					field: 'semester_lv',
 					title: this.$p.t('stv/grades_semester_lv'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.semester_lv ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.semester_lv || this.optionalTabulatorOptions?.semester_lv || false
 
 				},
-				{ 
+				{
 					field: 'ects_lv',
 					title: this.$p.t('lehre/ects'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.ects_lv ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.ects_lv || this.optionalTabulatorOptions?.ects_lv || false
 
 				},
-				{ 
+				{
 					field: 'lehrform',
 					title: this.$p.t('lehre/lehrform'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrform ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.lehrform || this.optionalTabulatorOptions?.lehrform || false
 
 				},
-				{ 
+				{
 					field: 'kurzbz',
 					title: this.$p.t('lehre/kurzbz'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.kurzbz ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.kurzbz || this.optionalTabulatorOptions?.kurzbz || false
 
 				},
-				{ 
+				{
 					field: 'punkte',
 					title: this.$p.t('stv/grades_points'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.punkte ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.punkte || this.optionalTabulatorOptions?.punkte || false
 
 				},
-				{ 
+				{
 					field: 'vorname',
 					title: this.$p.t('person/vorname'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.vorname ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.vorname || this.optionalTabulatorOptions?.vorname || false
 
 				},
-				{ 
+				{
 					field: 'nachname',
 					title: this.$p.t('person/nachname'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.nachname ?? false,
 					headerFilter: this.optionalTabulatorOptions?.headerFilter?.nachname || this.optionalTabulatorOptions?.nachname || false
 
 				},
-				{ 
+				{
 					field: 'lehrveranstaltung_bezeichnung_english',
 					title: this.$p.t('stv/grades_lehrveranstaltung_bezeichnung_english'),
 					visible: this.optionalTabulatorOptions?.visibleColumns?.lehrveranstaltung_bezeichnung_english ?? false,

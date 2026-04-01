@@ -242,6 +242,8 @@ export default {
 						field="notiz"
 						:readonly="tagData.readonly || readonly"
 						placeholder="Notiz..."
+						@keyup.stop=""
+						@keydown.stop=""
 					></form-input>
 					<button
 						type="button" 
