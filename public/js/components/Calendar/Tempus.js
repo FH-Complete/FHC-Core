@@ -54,13 +54,18 @@ export default {
 		extraBackgrounds: {
 			type: Array,
 			default: () => []
-		}
+		},
+		visibleStatus: {
+			type: Array,
+			default: () => ['all']
+		},
 	},
 	emits: [
 		"update:date",
 		"update:mode",
 		"update:range",
-		"drop"
+		"drop",
+		"resize"
 	],
 
 	data() {
@@ -80,8 +85,7 @@ export default {
 				}
 			},
 			teachingunits: null,
-			visibleStatusArray: [],
-			visibleStatus: []
+			showRaster: true,
 		};
 	},
 	computed: {
@@ -132,25 +136,6 @@ export default {
 		},
 	},
 	methods: {
-		toggleStatus(status) {
-			if (status === 'all')
-			{
-				this.visibleStatus = ['all'];
-				return;
-			}
-
-			this.visibleStatus = this.visibleStatus.filter(visibleStatus => visibleStatus !== 'all');
-
-			let found = this.visibleStatus.indexOf(status);
-
-			if (found === -1)
-				this.visibleStatus.push(status);
-			else
-				this.visibleStatus.splice(found, 1);
-
-			if (this.visibleStatus.length < 1)
-				this.visibleStatus.push('all');
-		},
 		eventStyle(event) {
 			if (!event.farbe)
 				return undefined;
@@ -162,6 +147,9 @@ export default {
 		},
 		ondrop(payload){
 			this.$emit('drop', payload);
+		},
+		onresize(payload){
+			this.$emit('resize', payload);
 		},
 		resetEventLoader() {
 			this.reset();
@@ -176,6 +164,14 @@ export default {
 		Vue.watch(lv, newValue => {
 			context.emit('update:lv', newValue);
 		});
+
+		const bcc = new BroadcastChannel('fhc-dnd');
+		bcc.onmessage = e => {
+			if (e.data === 'dropped')
+			{
+				reset()
+			}
+		};
 
 		return {
 			rangeInterval,
@@ -195,11 +191,6 @@ export default {
 					end: el.ende
 				}));
 			});
-		this.$api.call(ApiTempusConfig.getHeader())
-			.then(res => {
-				this.visibleStatusArray = res.data.visible_status
-				this.visibleStatus = ['all']
-			});
 	},
 	template: /* html */`
 	<fhc-calendar
@@ -213,11 +204,12 @@ export default {
 		:locale="$p.user_locale.value"
 		:events="visibleEvents || []"
 		:backgrounds="backgrounds"
-		:time-grid="teachingunits"
+		:time-grid="showRaster ? teachingunits : null"
 		show-btns
 		:draggable-events="true"
 		:resizable-events="true"
 		:on-drop="ondrop"
+		:on-resize="onresize"
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
 		@update:range="updateRange"
@@ -246,17 +238,14 @@ export default {
 			</div>
 		</template>
 		<template #actions>
-			<slot>
-				<button
-					v-for="(status, key) in visibleStatusArray"
-					:key="key"
-					class="btn btn-sm me-1"
-					:class="visibleStatus.includes(key) ? 'btn-secondary' : 'btn-outline-secondary'"
-					@click="toggleStatus(key)"
-				>
-					{{ status }}
-				</button>
-			</slot>
+			<div 
+				class="d-flex align-items-center gap-2" 
+				style="cursor:pointer"
+				@click="showRaster = !showRaster"
+			>
+				<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
+				<span class="form-check-label">Stundenraster</span>
+			</div>
 		</template>
 	</fhc-calendar>`
 }

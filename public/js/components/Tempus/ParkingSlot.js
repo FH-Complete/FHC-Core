@@ -64,7 +64,7 @@ export default {
 				class="parkingslot"
 				v-drop:move.kalender-collection="(evt, item) => park(evt, item)"
 			>
-				<i class="fa-solid fa-square-parking"></i>
+				<i v-if="!parked.length" class="fa-solid fa-square-parking"></i>
 				<event-card
 					class="parkingevent"
 					v-for="parkedEvent in parked"

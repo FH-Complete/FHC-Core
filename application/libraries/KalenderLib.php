@@ -5,9 +5,6 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class KalenderLib
 {
 	private $_ci;
-	/**
-	 * Loads model OrganisationseinheitModel
-	 */
 	public function __construct()
 	{
 		$this->_ci =& get_instance();
@@ -453,8 +450,8 @@ class KalenderLib
 	{
 		return $this->_ci->KalenderOrtModel->insert(
 			array (
-				'kalender_id'=>$kalender_id,
-				'ort_kurzbz'=>$ort_kurzbz
+				'kalender_id' => $kalender_id,
+				'ort_kurzbz' => $ort_kurzbz
 			)
 		);
 	}

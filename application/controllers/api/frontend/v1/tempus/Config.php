@@ -27,6 +27,11 @@ class Config extends FHCAPI_Controller
 
 	public function get()
 	{
+
+		$language = getUserLanguage() == 'German' ? 0 : 1;
+
+		$this->_ci->KalenderStatusModel->addSelect('*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS status');
+		$this->_ci->KalenderStatusModel->addOrder('sort');
 		$visible_status = $this->_ci->KalenderStatusModel->load();
 
 		$visible_status = getData($visible_status);
@@ -34,28 +39,32 @@ class Config extends FHCAPI_Controller
 		$config['visible_status'] = [
 			"type" => "select",
 			"label" => $this->p->t('ui', 'status'),
-			"multiple" => true,
 			"value" => 'all'
 		];
+
+
 		foreach ($visible_status as $status)
 		{
-			$config['visible_status']['options'][$status->status_kurzbz] = $status->status_kurzbz;
+			$config['visible_status']['options'][$status->status_kurzbz] = $status->status;
 		}
 
 		$this->terminateWithSuccess($config);
 	}
 	public function getHeader()
 	{
+		$language = getUserLanguage() == 'German' ? 0 : 1;
+
+		$this->_ci->KalenderStatusModel->addSelect('*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS status');
+		$this->_ci->KalenderStatusModel->addOrder('sort');
 		$visible_status = $this->_ci->KalenderStatusModel->load();
 
 		$visible_status = getData($visible_status);
 
-
-		$config['visible_status']['all'] = 'all';
+		$config['visible_status']['all'] = 'Alle';
 
 		foreach ($visible_status as $status)
 		{
-			$config['visible_status'][$status->status_kurzbz] = $status->bezeichnung;
+			$config['visible_status'][$status->status_kurzbz] = $status->status;
 		}
 
 		$this->terminateWithSuccess($config);

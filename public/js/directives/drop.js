@@ -54,10 +54,12 @@ export default {
 			if (res instanceof Promise) {
 				res.then(r => {
 					bcc.postMessage('release');
+					bcc.postMessage('dropped');
 					return r;
 				});
 			} else {
 				bcc.postMessage('release');
+				bcc.postMessage('dropped');
 			}
 		}
 

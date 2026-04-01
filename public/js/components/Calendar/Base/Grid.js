@@ -18,6 +18,7 @@ export default {
 		originalBackgrounds: "backgrounds",
 		dropAllowed: "dropAllowed",
 		onDrop: "onDrop",
+		onResize: "onResize",
 		timeGrid: {
 			from: "timeGrid",
 			default: () => []
@@ -454,7 +455,7 @@ export default {
 					if (!orig || !newStart || !newEnd)
 						return;
 
-					this.onDrop?.({
+					this.onResize?.({
 						item: [{ type: 'kalender', id: orig.kalender_id, orig }],
 						start: newStart,
 						end: newEnd

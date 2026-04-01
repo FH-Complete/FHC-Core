@@ -39,4 +39,5 @@ app
 		}
 	})
 	.use(Phrasen)
+	.directive('tooltip', primevue.tooltip)
 	.mount('#main');

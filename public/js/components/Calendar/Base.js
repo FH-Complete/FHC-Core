@@ -63,7 +63,8 @@ export default {
 				return () => true;
 			}),
 			hasDragoverFunc: Vue.computed(() => this.onDragover),
-			mode: Vue.computed(() => this.mode)
+			mode: Vue.computed(() => this.mode),
+			onResize: Vue.computed(() => this.onResize || null),
 		};
 	},
 	props: {
@@ -121,7 +122,8 @@ export default {
 		dropableEvents: [Boolean, Array, Function],
 		resizableEvents: [Boolean, Array, Function],
 		onDragover: Function,
-		onDrop: Function
+		onDrop: Function,
+		onResize: Function
 	},
 	emits: [
 		"click:next",
@@ -212,7 +214,7 @@ export default {
 	},
 	watch: {
 		sDate(n, o) {
-			if (this.sDate.isValid && !this.sDate.hasSame(this.internalDate, 'day'))
+			if (this.sDate.isValid && (!this.internalDate || !this.sDate.hasSame(this.internalDate, 'day')))
 				this.internalDate = this.sDate;
 		},
 		sMode() {

@@ -34,6 +34,7 @@ import BsModal from "../Bootstrap/Modal.js";
 
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
 import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
+import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
 
 export default {
 	name: "Tempus",
@@ -48,7 +49,9 @@ export default {
 		AppMenu,
 		NavLanguage,
 		BsModal,
-		StvVerband
+		StvVerband,
+		StvStudiensemester,
+		Multiselect: primevue.multiselect,
 	},
 	props: {
 		defaultSemester: String,
@@ -115,7 +118,6 @@ export default {
 			lv_id: null,
 			events: null,
 			minimized: false,
-			calendarDate: luxon.DateTime.local(), //new CalendarDate(new Date()),
 			currentlySelectedEvent: null,
 			//currentDay: new Date(),
 			studiensemesterKurzbz: this.defaultSemester,
@@ -142,6 +144,10 @@ export default {
 				vorschlaege: [],
 				event: null
 			},
+			visibleStatusArray: {},
+			visibleStatus: ['all'],
+			selectedStudiensemester: this.studiensemester_kurzbz ?? this.defaultSemester,
+			calendarDate: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
 		}
 	},
 	computed: {
@@ -166,7 +172,15 @@ export default {
 			if (!this.lecturers.length)
 				return null;
 			return this.lecturers.filter(lecture => lecture.showEvents).map(lecture => lecture.uid);
-		}
+		},
+		visibleStatusOptions() {
+			return Object.entries(this.visibleStatusArray).map(([key, label]) => ({ key, label }));
+		},
+		visibleStatusValue() {
+			if (this.visibleStatus.includes('all'))
+				return this.visibleStatusOptions.filter(visibleStatus => visibleStatus.key === 'all');
+			return this.visibleStatus.map(status => ({ key: status, label: this.visibleStatusArray[status] }));
+		},
 	},
 	methods: {
 		async openRaumauswahl(orig) {
@@ -201,11 +215,14 @@ export default {
 			this.ort_kurzbz = data.ort_kurzbz;
 			this.$refs.calendar.resetEventLoader();
 		},
+		onSelectVerbandAndClose(payload) {
+			this.onSelectVerband(payload);
+			bootstrap.Offcanvas.getOrCreateInstance(this.$refs.verbandMenu).hide();
+		},
 		onSelectVerband({link, name})
 		{
 			let stg = null;
 			let semester = null;
-			let studiensemester_kurzbz = this.selectedStudiensemester;
 			this.show_stg = name
 			if (typeof link === 'number')
 				stg = link;
@@ -216,8 +233,7 @@ export default {
 			this.stg = stg;
 			if (semester !== null)
 				this.semester = semester;
-			if (studiensemester_kurzbz)
-				this.studiensemester_kurzbz = studiensemester_kurzbz;
+
 
 			this.$refs.calendar.resetEventLoader();
 		},
@@ -239,11 +255,41 @@ export default {
 			if (this.lastRange)
 				this.handleRange(this.lastRange);
 		},
-		handleChangeDate() {
-			console.log("handleChangeDate");
+		jumpToKw(kw) {
+			const num = parseInt(kw);
+			if (!num)
+				return;
+
+			const date = luxon.DateTime.fromObject({
+				weekYear: luxon.DateTime.now().setZone(this.config.timezone).weekYear,
+				weekNumber: num,
+				weekday: 1,
+			}, { zone: this.config.timezone });
+			this.calendarDate = date.toISODate();
+		},
+		handleChangeDate(newDate) {
+			if (newDate && luxon.DateTime.isDateTime(newDate) && newDate.isValid)
+				this.calendarDate = newDate.toISODate();
 		},
 		handleChangeMode() {
 			console.log("handleChangeMode")
+		},
+		toggleStatus(selected) {
+			if (!selected || selected.length === 0) {
+				this.visibleStatus = ['all'];
+				return;
+			}
+			const hasAll = selected.includes('all');
+			const hadAll = this.visibleStatus.includes('all');
+
+			if (hasAll && !hadAll)
+			{
+				this.visibleStatus = ['all'];
+				return;
+			}
+			this.visibleStatus = selected.filter(k => k !== 'all');
+			if (this.visibleStatus.length === 0)
+				this.visibleStatus = ['all'];
 		},
 		searchfunction(params) {
 			return this.$api.call(ApiSearchbar.search(params));
@@ -309,9 +355,64 @@ export default {
 
 			return calculatedEnd > lastGridEndSameDay ? lastGridEndSameDay : calculatedEnd;
 		},
+		_parseDates(start, end)
+		{
+			const startDT = luxon.DateTime.fromISO(start);
+			const endDT = luxon.DateTime.fromISO(end);
+
+			if (!startDT.isValid || !endDT.isValid)
+			{
+				alert("Ungültiges Datum");
+				return null;
+			}
+
+			return {
+				startDT,
+				endDT,
+				start_time: startDT.toFormat('yyyy-MM-dd HH:mm'),
+				end_time: endDT.toFormat('yyyy-MM-dd HH:mm'),
+			};
+		},
+
+		_updateKalenderEvent(obj, startDT, endDT, start_time, end_time, onSuccess)
+		{
+			const origStart = luxon.DateTime.fromISO(obj.orig.isostart);
+			const origEnd = luxon.DateTime.fromISO(obj.orig.isoend);
+
+			if (origStart.toMillis() === startDT.toMillis() && origEnd.toMillis() === endDT.toMillis())
+				return;
+
+			const updatedInfos = {
+				ort_kurzbz: this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
+				start_time,
+				end_time,
+			};
+
+			this.$api.call(ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos))
+				.then(() => {
+					if (onSuccess)
+						onSuccess();
+				});
+		},
+
+		resizeHandler(payload) {
+			const { item, start, end } = payload;
+			const obj = item[0];
+			if (!obj?.orig?.kalender_id)
+				return alert("Kein gültiges Kalender-Event zum Resizen");
+
+			const dates = this._parseDates(start, end);
+
+			if (!dates)
+				return;
+
+			this._updateKalenderEvent(obj, dates.startDT, dates.endDT, dates.start_time, dates.end_time, () => {
+				this.$refs.calendar.resetEventLoader();
+			});
+		},
+
 		dropHandler(payload) {
 			const { item, start, end } = payload;
-
 			if (!item?.length)
 				return alert("Keine Daten gedroppt");
 
@@ -319,18 +420,12 @@ export default {
 			if (!obj?.type)
 				return alert("Unbekannter Drop-Typ");
 
-			const startDT = luxon.DateTime.fromISO(start);
-			const endDT = luxon.DateTime.fromISO(end);
+			const dates = this._parseDates(start, end);
+			if (!dates) return;
 
-			if (!startDT.isValid || !endDT.isValid)
-				return alert("Ungültiges Datum");
+			const { startDT, endDT, start_time, end_time } = dates;
 
-			const start_time = startDT.toFormat('yyyy-MM-dd HH:mm');
-			const end_time = endDT.toFormat('yyyy-MM-dd HH:mm');
-
-
-			if (obj.type === 'lehreinheit')
-			{
+			if (obj.type === 'lehreinheit') {
 				this.$api.call(
 					ApiKalender.addKalenderEvent(
 						obj.orig.lehreinheit_id,
@@ -338,29 +433,13 @@ export default {
 						start_time,
 						end_time
 					)
-				).then(() => {
-					this.$refs.calendar.resetEventLoader();
-				});
+				);
 			}
 			else if (obj.type === 'kalender')
 			{
-				let updatedInfos = {
-					ort_kurzbz: this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
-					start_time: start_time,
-					end_time: end_time
-				}
-
-				this.$api.call(
-					ApiKalender.updateKalenderEvent(
-						obj.orig.kalender_id,
-						updatedInfos
-					)
-				).then(() => {
-					this.$refs.parking.unpark({
-						type: obj.type,
-						id: obj.orig.kalender_id
-					});
-					this.$refs.calendar.resetEventLoader();
+				this._updateKalenderEvent(obj, startDT, endDT, start_time, end_time, () =>
+				{
+					this.$refs.parking.unpark({ type: obj.type, id: obj.orig.kalender_id });
 				});
 			}
 			else
@@ -538,6 +617,12 @@ export default {
 					this.renderers[rendertype].calendarEvent = calendarEvent;
 				}
 			});
+
+		this.$api.call(ApiTempusConfig.getHeader())
+			.then(res => {
+				this.visibleStatusArray = res.data.visible_status;
+				this.visibleStatus = ['all'];
+			});
 	},
 	template: `
 	<div class="tempus">
@@ -632,10 +717,42 @@ export default {
 					</div>
 				</aside>
 				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100 d-flex flex-column">
-					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+					<div class="sidebar-icons d-flex flex-row align-items-start py-2 gap-1 ps-2">
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							data-bs-toggle="offcanvas"
+							data-bs-target="#verbandMenu"
+							aria-controls="verbandMenu"
+							aria-expanded="false"
+							title="Verband"
+						>
+							<span class="fa-solid fa-university"></span>
+						</button>
+						<button
+							class="btn btn-outline-secondary"
+							type="button"
+							data-bs-toggle="offcanvas"
+							data-bs-target="#verbandMenu"
+							aria-controls="verbandMenu"
+							aria-expanded="false"
+							title="Verband"
+						>
+							<span class="fa-solid fa-door-open"></span>
+						</button>
 					</div>
-				
+					<div class="px-2 py-1 w-100">
+						<Multiselect
+							:model-value="visibleStatusValue"
+							@update:model-value="val => toggleStatus(val.map(o => o.key))"
+							option-label="label"
+							:options="visibleStatusOptions"
+							placeholder="Status filtern"
+							:hide-selected="false"
+							:show-toggle-all="false"
+							class="w-100"
+						/>
+					</div>
 					<div class="room-selection" v-if="ort_kurzbz">
 						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
 							<span><i class="fa-solid fa-door-open me-2"></i>{{ ort_kurzbz }}</span>
@@ -667,28 +784,31 @@ export default {
 							v-if="lecturers.length"
 							:lecturers="lecturers"
 							@remove="removeLecturer"
-						></lecture-selection>
-					<div class="overflow-auto flex-grow-1 d-flex flex-column gap-2" style="min-height: 0">
-						<div class="verband-selection">
-							<stv-verband :endpoint="endpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-						</div>
-						<fhc-coursepicker></fhc-coursepicker>
+					></lecture-selection>
+					<div class="d-flex flex-column flex-grow-1" style="min-height: 0">
 						<parking-slot
 							ref="parking"
 							v-model:parked-keys="parkedKeys"
 						></parking-slot>
+						
+						<fhc-coursepicker :stg="stg" @select-lecturer="setEmp" @select-kw="jumpToKw" :studiensemester="selectedStudiensemester"></fhc-coursepicker>
+
 					</div>
+					<stv-studiensemester v-model:studiensemester-kurzbz="selectedStudiensemester"></stv-studiensemester>
+
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
 					<fhc-calendar
 						ref="calendar"
 						:timezone="config.timezone"
 						:get-promise-func="getPromiseFunc"
-						:date="currentDay"
+						:visible-status="visibleStatus"
+						:date="calendarDate"
 						:mode="currentMode"
 						:parkedEvents="parkedKeys"
 						:visible-lecturers="visibleLecturerUids"
 						@drop="dropHandler"
+						@resize="resizeHandler"
 						@update:date="handleChangeDate"
 						@update:mode="handleChangeMode"
 						:extra-backgrounds="extraBackgrounds"
@@ -699,6 +819,15 @@ export default {
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
+		<div id="verbandMenu" ref="verbandMenu" class="offcanvas offcanvas-start col-md p-md-0 h-100" tabindex="-1">
+			<div class="offcanvas-header justify-content-end px-1 d-md-none">
+				<h5 class="offcanvas-title" id="verbandMenuLabel">
+					<i class="fa-solid fa-university me-2"></i>Verband
+				</h5>
+				<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+			</div>
+			<stv-verband :endpoint="endpoint" @select-verband="onSelectVerbandAndClose" class="col" style="height:0%"></stv-verband>
+		</div>
 
 		<bs-modal ref="raumModal" class="bootstrap-prompt">
 			<template #title>Raumauswahl</template>

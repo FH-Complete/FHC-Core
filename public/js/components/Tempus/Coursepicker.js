@@ -9,54 +9,96 @@ export default {
 	directives: {
 		draggable
 	},
+	props: {
+		stg: {
+			type: [String, Number],
+			default: null,
+		},
+		studiensemester: {
+			type: String,
+			default: null
+		},
+	},
+	emits: ['select-lecturer', 'select-kw'],
 	data() {
 		return {
 			searchparam: '',
-			courses: null,
+			allCourses: [],
 			abortController: null,
 		}
 	},
-	methods: {
-		async loadCourses() {
-
-			const query = (this.searchparam ?? '').trim();
-
+	computed: {
+		courses() {
+			const query = (this.searchparam ?? '').trim().toLowerCase();
 			if (!query)
-			{
-				this.courses = [];
+				return this.allCourses;
+
+			return this.allCourses.filter(course =>
+				course.showname.toLowerCase().includes(query) ||
+				course.lektoren?.some(l =>
+					l.name.toLowerCase().includes(query) ||
+					l.kurzbz.toLowerCase().includes(query)
+				)
+			);
+		}
+	},
+	watch: {
+		stg(val) {
+			this.searchparam = '';
+			this.loadCoursesByStg(val);
+		},
+		studiensemester() {
+			if (this.stg)
+				this.loadCoursesByStg(this.stg);
+		},
+	},
+	methods: {
+		async loadCoursesByStg(stg) {
+			if (!stg) {
+				this.allCourses = [];
 				return;
 			}
 
-			if (query.length < 3)
-				return;
-
-			if (this.abortController)
-			{
-				this.abortController.abort();
-			}
-
-			this.abortController = new AbortController();
-			const signal = this.abortController.signal;
-
-			this.$api.call(ApiCoursePicker.search(query), { signal })
+			this.$api.call(ApiCoursePicker.getByStg(this.stg, this.studiensemester))
 				.then(result => {
-					this.courses = result.data.map(entry => ({
-						lehreinheit_id: entry.lehreinheit_id,
-						lektoren: entry.lektor,
-						studiengang: entry.studiengang,
-						semester: entry.semester,
-						stundenblockung: entry.stundenblockung,
-						wochenrythmus: entry.wochenrythmus,
-						showname: `${entry.lehrfach} ${entry.lehrform}`,
+					this.allCourses = result.data.map(e => ({
+						lvnr: e.lvnr.join(' '),
+						unr: e.unr,
+						lektoren: e.lektoren,
+						lehrfach_id: e.lehrfach_id,
+						studiengang_kz: e.studiengang_kz,
+						fachbereich_kurzbz: e.fachbereich_kurzbz,
+						semester: e.semester,
+						verband: e.verband,
+						gruppe: e.gruppe,
+						gruppe_kurzbz: e.gruppe_kurzbz,
+						raumtyp: e.raumtyp,
+						raumtypalternativ: e.raumtypalternativ,
+						semesterstunden: e.planstunden,
+						stundenblockung: e.stundenblockung,
+						wochenrythmus: e.wochenrythmus,
+						verplant: e.verplant,
+						offenestunden: e.offenestunden,
+						start_kw: e.start_kw,
+						anmerkung: e.anmerkung,
+						studiensemester_kurzbz: e.studiensemester_kurzbz,
+						lehrfach: e.lehrfach,
+						lehrform: e.lehrform,
+						lehrfach_bez: e.lehrfach_bez,
+						lehrfach_farbe: e.lehrfach_farbe,
+						lehrverband: e.lehrverband.join(' '),
+						lehreinheit_id: e.lehreinheit_id,
+						lem: e.lem,
+						showname: `${e.lehrfach} ${e.lehrform}`,
 						orig: {
 							type: 'lehreinheit',
-							lehreinheit_id: entry.lehreinheit_id,
-							blockung: entry.stundenblockung,
-							entry,
+							lehreinheit_id: e.lehreinheit_id[0],
+							blockung: e.stundenblockung,
+							entry: e,
 						}
 					}));
 				})
-				.catch(this.$fhcAlert.handleSystemError)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		dragLehreinheitCollection(course) {
 			const orig = course.orig;
@@ -80,19 +122,25 @@ export default {
 					course.mode = 'multi';
 					break
 			}
+		},
+		selectLecturer: function(lektor) {
+			this.$emit('select-lecturer', lektor);
 		}
 	},
 	template: `
-	<div class="course-picker">
+	<div class="course-picker d-flex flex-column h-100">
 		<div class="p-2">
-			<form-input
-				:label="$p.t('ui', 'suche')"
-				type="text"
-				v-model="searchparam"
-				@input="loadCourses"
-			/>
-		</div>
-		<div class="overflow-auto px-2 pb-2 flex-grow-1">
+				<form-input
+					:label="$p.t('ui', 'suche')"
+					type="text"
+					v-model="searchparam"
+				/>
+			</div>
+		<div v-if="!stg" class="d-flex flex-column align-items-center justify-content-center text-center text-muted py-5 px-3 h-100">
+			<span class="small fw-semibold mb-1">Keine Lehreinheiten</span>
+			<span class="small">Wähle einen Studiengang, um Lehreinheiten anzuzeigen.</span>
+		 </div>
+		<div v-else class="overflow-auto px-2 pb-2 flex-grow-1">
 			<div
 				v-for="course in courses"
 				:key="course.lehreinheit_id"
@@ -100,22 +148,35 @@ export default {
 				v-draggable:move.noimage="dragLehreinheitCollection(course)"
 				tabindex="0"
 			>
-				<div class="d-flex justify-content-between align-items-start">
-					<span class="fw-semibold small">{{ course.showname }}</span>
+				<div class="d-flex gap-1">
+					<span class="fw-semibold small w-50" :tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
+					<span class="fw-semibold small w-50" :tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
 				</div>
-				<div class="text-muted">
-					<span>{{ course.studiengang }} - {{ course.semester }}</span>
+				<div class="d-flex gap-1 text-muted">
+					<span class="w-50" :tooltip="course.anmerkung">{{ course.lehrverband }}</span>
+					<span 
+						style="cursor:pointer"
+						class="text-decoration-underline w-50"
+						@click.stop="$emit('select-kw', course.start_kw)">KW: {{ course.start_kw }}
+					</span>
 				</div>
-				<div class="text-muted">
-					<span>{{ course.lektoren }}</span>
+				<div class="d-flex gap-1 text-muted">
+					<span
+						v-for="(lektor, i) in course.lektoren"
+						:key="lektor.uid"
+						style="cursor:pointer"
+						class="text-decoration-underline w-50"
+						@click.stop="selectLecturer(lektor)">
+							{{ lektor.kurzbz }}
+						<span v-if="i < course.lektoren.length - 1"><br /></span>
+					</span>
+					<span class="w-50">WR: {{ course.wochenrythmus }} Bl: {{ course.stundenblockung }}</span>
 				</div>
-				<div class="text-muted">
-					<span>WR: {{ course.wochenrythmus }} Bl: {{ course.stundenblockung }}</span>
+				<div class="d-flex gap-1 text-muted">
+					<span class="w-50">Offen: {{ course.offenestunden }}</span>
+					<span class="w-50">{{ course.semesterstunden }}</span>
 				</div>
 			</div>
-		</div>
-		<div class="mt-auto px-2 py-2 small text-muted border-top">
-			Drag & Drop on Calendar
 		</div>
 	</div>
 `
