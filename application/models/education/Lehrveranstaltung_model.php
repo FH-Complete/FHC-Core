@@ -1260,6 +1260,39 @@ class Lehrveranstaltung_model extends DB_Model
 		";
 	}
 
+	/**
+	 * Gets lehrveranstaltungen of Studienplan of a certain lva_id set
+	 * used if a bigger set of lva id is already available and it needs to be checked against a certain studienplan aswell
+	 * @param $studienplan_id ID des Studienplans
+	 * @param $lva_ids LVA_ID welche abgegleicht werden sollen
+	 * @return array|null
+	 */
+	public function getLvsByStudienplanByLvaIDs($studienplan_id, $lva_ids)
+	{
+		$params = array($studienplan_id, $lva_ids);
+
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+			tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+			tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+			tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+			tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+			tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+			tbl_studienplan_lehrveranstaltung.curriculum,
+			tbl_studienplan_lehrveranstaltung.export,
+			tbl_studienplan_lehrveranstaltung.genehmigung
+		FROM lehre.tbl_lehrveranstaltung
+		JOIN lehre.tbl_studienplan_lehrveranstaltung
+		USING(lehrveranstaltung_id)
+		WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ? 
+			AND tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id IN ?
+		";
+
+		$qry .= " ORDER BY stpllv_sort, semester, sort";
+
+		return $this->execQuery($qry, $params);
+	}
+
 	public function getAllOe($lv_id)
 	{
 		$qry = "SELECT DISTINCT oe_kurzbz

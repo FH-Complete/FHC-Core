@@ -954,7 +954,6 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 							lehre.tbl_projektarbeit.lehrveranstaltung_id, titel, themenbereich, note, titel_english
 						FROM
 							lehre.tbl_projektarbeit
-							LEFT JOIN lehre.tbl_lehreinheit ON(lehre.tbl_projektarbeit.lehrveranstaltung_id = lehre.tbl_lehreinheit.lehrveranstaltung_id AND lehre.tbl_projektarbeit.studiensemester_kurzbz = lehre.tbl_lehreinheit.studiensemester_kurzbz)
 
 						WHERE
 							student_uid=".$db->db_add_param($uid_arr[$i])."
@@ -972,6 +971,10 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 						while($row_thesis = $db->db_fetch_object($result_thesis))
 						{
 							$bezeichnung.= ": \"".$row_thesis->titel."\"";
+							// hier sollt nicht $titel_english verwendet werden, da in der projektarbeitsbeurteilung ein
+							// feature zum aktualisieren des projektarbeit titel existiert und nur das feld 'titel' editiert.
+							// um divergente thesisnamen zu vermeiden wird in beiden Fällen der (ohnehin öfters englische) Wert
+							// aus 'titel' verwendet.
 							$bezeichnung_englisch.= ": \"".$row_thesis->titel."\"";
 						}
 					}

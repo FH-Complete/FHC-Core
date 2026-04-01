@@ -3,7 +3,7 @@ if (! defined('DB_NAME')) exit('No direct script access allowed');
 
 $cols_to_add = [
 	'lehrveranstaltung_id'   => "INTEGER",
-	'studiensemester_kurzbz' => "INTEGER"
+	'studiensemester_kurzbz' => "VARCHAR(16)"
 ];
 
 foreach ($cols_to_add as $col => $type) {
