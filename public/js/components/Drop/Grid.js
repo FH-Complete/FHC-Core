@@ -43,9 +43,8 @@ export default {
 			clientY: 0,
 			mode: MODE_IDLE,
 			grid: null,
-			dragGrid: null,
-			positionUpdates: null,
-			fixedPositionUpdates: null,
+			tempPositionUpdates: null,
+			correctedPositionUpdates: null,
 			draggedOffset: [0, 0],
 			draggedItem: null,
 			draggedNode: null,
@@ -153,39 +152,39 @@ export default {
 			);
 		},
 		prePlacedItems() {
-			if (!this.fixedPositionUpdates)
+			if (!this.correctedPositionUpdates)
 				return this.indexedItems;
 			return this.indexedItems.map(item => {
-				if (!this.fixedPositionUpdates[item.index])
+				if (!this.correctedPositionUpdates[item.index])
 					return item;
 				return {
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
-					x: this.fixedPositionUpdates[item.index].x === undefined ? item.x : this.fixedPositionUpdates[item.index].x,
-					y: this.fixedPositionUpdates[item.index].y === undefined ? item.y : this.fixedPositionUpdates[item.index].y,
-					w: this.fixedPositionUpdates[item.index].w === undefined ? item.w : this.fixedPositionUpdates[item.index].w,
-					h: this.fixedPositionUpdates[item.index].h === undefined ? item.h : this.fixedPositionUpdates[item.index].h
+					x: this.correctedPositionUpdates[item.index].x === undefined ? item.x : this.correctedPositionUpdates[item.index].x,
+					y: this.correctedPositionUpdates[item.index].y === undefined ? item.y : this.correctedPositionUpdates[item.index].y,
+					w: this.correctedPositionUpdates[item.index].w === undefined ? item.w : this.correctedPositionUpdates[item.index].w,
+					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h
 				};
 			});
 		},
 		placedItems() {
-			if (!this.positionUpdates)
+			if (!this.tempPositionUpdates)
 				return this.prePlacedItems;
 			let mappedPlacedItems= this.prePlacedItems.map(item => {
-				if (!this.positionUpdates[item.index] )
+				if (!this.tempPositionUpdates[item.index] )
 					return item;
-				let height_diff = this.positionUpdates[item.index]?.h - item.h;
-				let width_diff = this.positionUpdates[item.index]?.w - item.w;
+				let height_diff = this.tempPositionUpdates[item.index]?.h - item.h;
+				let width_diff = this.tempPositionUpdates[item.index]?.w - item.w;
 				return {
-					resize: this.positionUpdates[item.index]?.resize,
+					resize: this.tempPositionUpdates[item.index]?.resize,
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
-					x: this.positionUpdates[item.index].x === undefined ? item.x : this.positionUpdates[item.index].x,
-					y: this.positionUpdates[item.index].y === undefined ? item.y : this.positionUpdates[item.index].y,
-					w: width_diff>0?item.w:this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
-					h: height_diff > 0 ?item.h:this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h
+					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
+					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
+					w: width_diff>0?item.w:this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
+					h: height_diff > 0 ?item.h:this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
 					
 				};
 			});
@@ -195,8 +194,8 @@ export default {
 				if(item.resize){
 					let newItem = {
 						...item,
-						w:this.positionUpdates[item.index].w === undefined ? item.w : this.positionUpdates[item.index].w,
-						h:this.positionUpdates[item.index].h === undefined ? item.h : this.positionUpdates[item.index].h,
+						w:this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
+						h:this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h,
 						resizeOverlay:true,
 						blank:true,
 					};
@@ -226,7 +225,7 @@ export default {
 
 				const updated = this.createNewGrid(value);
 
-				this.fixedPositionUpdates = updated;
+				this.correctedPositionUpdates = updated;
 				if (updated.length)
 					this.$emit('rearrangeItems', updated.filter(v => v));
 			},
@@ -397,6 +396,8 @@ export default {
 				this.draggedNode = evt.target.closest(".drop-grid-item");
 				//clones the widget for the drag Image
 				
+				// NOTE(chris): this is the element that follows the mouse while dragging
+				// equivalent to the ghost image
 				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
 
 				clone.style.zIndex = 5;
@@ -439,7 +440,7 @@ export default {
 				switch(this.mode) {
 					case MODE_MOVE: {
 						evt.preventDefault();
-						this.dragGrid = new GridLogic(this.grid);
+						const dragGrid = new GridLogic(this.grid);
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
@@ -453,17 +454,17 @@ export default {
 							this.draggedOffset[1] += y;
 							y = 0;
 						}
-						this.positionUpdates= this.dragGrid.move(this.draggedItem, x, y);
+						this.tempPositionUpdates= dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
 						evt.preventDefault();
-						this.dragGrid = new GridLogic(this.grid);
+						const dragGrid = new GridLogic(this.grid);
 						let w = Math.min(this.cols - this.draggedItem.x, Math.max(1, this.x - this.draggedItem.x + 1));
 						let h = Math.max(1, this.y - this.draggedItem.y + 1);
 						if (this.resizeLimit)
 							[w, h] = this.resizeLimit(this.draggedItem.data, w, h);
-						this.positionUpdates = this.dragGrid.resize(this.draggedItem, w, h);
+						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
 						break;
 					}
 				}
@@ -474,7 +475,7 @@ export default {
 			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
-			this.positionUpdates = null;
+			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
 			this.$emit('draggedItem',null);
@@ -499,8 +500,8 @@ export default {
 
 			this.mode = MODE_IDLE;
 			let updated = [];
-			this.convertGridResultToUpdate(this.positionUpdates, updated);
-			updated = this._updateFixedPositions(updated);
+			this.convertGridResultToUpdate(this.tempPositionUpdates, updated);
+			updated = this._updateCorrectedPositions(updated);
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
 
@@ -508,18 +509,18 @@ export default {
 			this.draggedNode = null;
 			this.$emit('draggedItem', null);
 		},
-		_updateFixedPositions(updated) {
+		_updateCorrectedPositions(updated) {
 			updated.forEach((item, index) => {
-				if (!this.fixedPositionUpdates[index])
-					this.fixedPositionUpdates[index] = item;
+				if (!this.correctedPositionUpdates[index])
+					this.correctedPositionUpdates[index] = item;
 				else
-					this.fixedPositionUpdates[index] = {...this.fixedPositionUpdates[index], ...item};
+					this.correctedPositionUpdates[index] = {...this.correctedPositionUpdates[index], ...item};
 			});
 			let additionalUpdates = this.createNewGrid(this.prePlacedItems);
 			if (additionalUpdates.length) {
 				// NOTE(chris): this should never happen but it's here for safety
 				additionalUpdates.forEach((item, index) => updated[index] = item);
-				return this._updateFixedPositions(updated);
+				return this._updateCorrectedPositions(updated);
 			}
 			return updated;
 		},
