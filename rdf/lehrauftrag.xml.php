@@ -127,9 +127,8 @@ if ($uid == null)
 						tbl_projektarbeit.projektarbeit_id=tbl_projektbetreuer.projektarbeit_id AND
 						student_uid=vw_student.uid AND
 						tbl_benutzer.uid = tbl_mitarbeiter.mitarbeiter_uid AND
-						tbl_lehreinheit.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
-						tbl_lehreinheit.studiensemester_kurzbz=tbl_projektarbeit.studiensemester_kurzbz AND
-						tbl_lehreinheit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
+						tbl_lehrveranstaltung.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id AND
+						tbl_projektarbeit.studiensemester_kurzbz=".$db->db_add_param($ss)." AND
 						tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id AND
 						tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER)." AND
 						tbl_projektbetreuer.stunden!='0'
@@ -395,31 +394,23 @@ function drawLehrauftrag($uid)
 				,tbl_projektbetreuer.stunden
 				,tbl_projektbetreuer.stundensatz
 				,tbl_lehrveranstaltung.semester
-				,vorname
-				,nachname
-				,vw_student.studiengang_kz
+				,campus.vw_student.vorname
+				,campus.vw_student.nachname
+				,tbl_student.studiengang_kz
 				,projekttyp_kurzbz
-				,lehrfach.oe_kurzbz
+				,lehre.tbl_lehrveranstaltung.oe_kurzbz
 			FROM lehre.tbl_projektbetreuer
-				,lehre.tbl_lehreinheit
-				,lehre.tbl_lehrveranstaltung AS lehrfach
-				,lehre.tbl_lehrveranstaltung
-				,public.tbl_organisationseinheit
-				,public.tbl_benutzer
-				,lehre.tbl_projektarbeit
-				,campus.vw_student
-			WHERE tbl_projektbetreuer.person_id = tbl_benutzer.person_id
-				AND tbl_benutzer.uid = ".$db->db_add_param($uid)."
-				AND tbl_projektarbeit.projektarbeit_id = tbl_projektbetreuer.projektarbeit_id
-				AND student_uid = vw_student.uid
-				AND tbl_organisationseinheit.oe_kurzbz = tbl_lehrveranstaltung.oe_kurzbz
-				AND tbl_lehreinheit.lehrveranstaltung_id=tbl_projektarbeit.lehrveranstaltung_id 
-				AND	tbl_lehreinheit.studiensemester_kurzbz=tbl_projektarbeit.studiensemester_kurzbz 	
-				AND tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id
-				AND tbl_lehreinheit.studiensemester_kurzbz = ".$db->db_add_param($ss)."
-				AND tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id";
+				JOIN lehre.tbl_projektarbeit USING(projektarbeit_id)
+				JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+				JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+				JOIN public.tbl_benutzer USING (person_id)
+				JOIN public.tbl_student ON (tbl_projektarbeit.student_uid = tbl_student.student_uid)
+				JOIN campus.vw_student ON (campus.vw_student.uid = tbl_student.student_uid)
+			WHERE tbl_benutzer.uid = ".$db->db_add_param($uid)."
+				AND lehre.tbl_projektarbeit.studiensemester_kurzbz = ".$db->db_add_param($ss);
+				
 	if ($studiengang_kz != '')
-		$qry .= " AND tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
+		$qry .= " AND lehre.tbl_lehrveranstaltung.studiengang_kz=".$db->db_add_param($studiengang_kz, FHC_INTEGER);
 	if ($result = $db->db_query($qry))
 	{
 		while ($row = $db->db_fetch_object($result))
