@@ -86,7 +86,7 @@ export default {
 				if(!item?.widgetid && item?.id){
 					item.widgetid = item.id;
 				}
-				return { ...item, reorder: false, ...(item.place[this.gridWidth] || { reorder: true, ...{ x: 0, y: 0, w: 1, h: 1 } })};
+				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 }) };
 			});
 			return placedItems;
 			
@@ -234,7 +234,7 @@ export default {
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
-					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,reorder:item.reorder,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
+					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"
 					:loading="item.loading"
 					:config="item.config"
 					:custom="item.custom"
