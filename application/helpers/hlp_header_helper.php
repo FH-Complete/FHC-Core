@@ -269,3 +269,199 @@ function absoluteJsImportUrl($relurl)
 	}
 	return $url;
 }
+
+/*
+ * Manipulate CI views includes Array to load
+ *   - public/js/FhcApps.js via customJSs and
+ *   - app customisation js and/or css from extensions via customJSModules
+ * if customJSModules contains at least one vuejs app and customisation files
+ * exist in extensions
+ */
+class ExtendableAppsHelper
+{
+	private static $instance = null;
+
+	protected $extensions;
+
+	protected $customCSSs;
+	protected $customJSs;
+	protected $customJSModules;
+
+	protected $initialised;
+	protected $appscount;
+
+	protected $extCustomCSSs;
+	protected $extCustomJSs;
+	protected $extCustomJSModules;
+
+	private function __construct()
+	{
+		$this->extensions = array();
+		$this->customCSSs = null;
+		$this->customJSs = null;
+		$this->customJSModules = null;
+
+		$this->initialised = false;
+		$this->appscount = 0;
+
+		$this->extCustomCSSs = null;
+		$this->extCustomJSs = null;
+		$this->extCustomJSModules = null;
+	}
+
+	public static function getInstance()
+	{
+		if(self::$instance === null)
+		{
+			self::$instance = new ExtendableAppsHelper();
+		}
+		return self::$instance;
+	}
+
+	public function init($customCSSs, $customJSs, $customJSModules)
+	{
+		if($this->initialised)
+		{
+			return;
+		}
+
+		$this->customCSSs = $customCSSs;
+		$this->customJSs = $customJSs;
+		$this->customJSModules = $customJSModules;
+		$this->initialised = true;
+
+		if(!isset($this->customJSModules))
+		{
+			return;
+		}
+
+		if(!is_array($this->customJSModules))
+		{
+			$this->customJSModules = array($this->customJSModules);
+		}
+
+		if(count($this->customJSModules) < 1)
+		{
+			return;
+		}
+
+		$this->buildExtensionsList();
+		$this->prepareExtendedArrays();
+	}
+
+	public function getCustomCSSs()
+	{
+		if(is_null($this->extCustomCSSs))
+		{
+			return $this->customCSSs;
+		}
+		return $this->extCustomCSSs;
+	}
+
+	public function getCustomJSs()
+	{
+		if(is_null($this->extCustomJSs))
+		{
+			return $this->customJSs;
+		}
+		return $this->extCustomJSs;
+	}
+
+	public function getCustomJSModules()
+	{
+		if(is_null($this->extCustomJSModules))
+		{
+			return $this->customJSModules;
+		}
+		return $this->extCustomJSModules;
+	}
+
+	protected function buildExtensionsList()
+	{
+		$this->extensions = array();
+		$fsiterator = new FilesystemIterator(FHCPATH . 'application/extensions');
+		foreach ($fsiterator as $fsitem)
+		{
+			if(preg_match('/^FHC-Core-/', $fsitem->getBasename()))
+			{
+				$this->extensions[] = $fsitem->getBasename();
+			}
+		}
+	}
+
+	protected function prepareExtendedArrays()
+	{
+		$this->appscount = 0;
+		$this->initExtCustomCSSs();
+		$this->extCustomJSModules = array();
+		foreach($this->customJSModules as $item)
+		{
+			$matches = array();
+			if(preg_match('#^public/(extensions/FHC-Core-.+)?js/apps/(.*)\.js$#', $item, $matches))
+			{
+				$this->appscount++;
+
+				$fhcextension = $matches[1];
+				$app = $matches[2];
+
+				$extend_js_suffix = 'js/extend_app/' . $fhcextension . $app . '.js';
+				$extend_css_suffix = 'css/extend_app/' . $fhcextension . $app . '.css';
+
+				foreach($this->extensions as $extension)
+				{
+					$extend_js = 'public/extensions/' . $extension . '/' . $extend_js_suffix;
+					$extend_css = 'public/extensions/' . $extension . '/' . $extend_css_suffix;
+
+					if(is_readable(FHCPATH . $extend_js))
+					{
+						array_push($this->extCustomJSModules, $extend_js);
+					}
+
+					if(is_readable(FHCPATH . $extend_css))
+					{
+						array_push($this->extCustomCSSs, $extend_css);
+					}
+				}
+			}
+			array_push($this->extCustomJSModules, $item);
+		}
+
+		if($this->appscount > 0)
+		{
+			$this->addFhcAppsJs();
+		}
+	}
+
+	protected function initExtCustomCSSs()
+	{
+		if(!isset($this->customCSSs))
+		{
+			$this->extCustomCSSs = array();
+		}
+		elseif(!is_array($this->customCSSs))
+		{
+			$this->extCustomCSSs = array($this->customCSSs);
+		}
+		else
+		{
+			$this->extCustomCSSs = $this->customCSSs;
+		}
+	}
+
+	protected function addFhcAppsJs()
+	{
+		if(!isset($this->customJSs))
+		{
+			$this->extCustomJSs = array();
+		}
+		elseif(!is_array($this->customJSs))
+		{
+			$this->extCustomJSs = array($this->customJSs);
+		}
+		else
+		{
+			$this->extCustomJSs = $this->customJSs;
+		}
+		array_push($this->extCustomJSs, 'public/js/FhcApps.js');
+	}
+}

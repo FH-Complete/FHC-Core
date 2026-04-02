@@ -19,19 +19,19 @@ export default {
 	getHeader(person_id){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getHeader/' + person_id,
+			url: 'api/frontend/v1/detailheader/detailheader/getHeader/' + person_id,
 		};
 	},
 	getPersonAbteilung(mitarbeiter_uid){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getPersonAbteilung/' + mitarbeiter_uid,
+			url: 'api/frontend/v1/detailheader/detailheader/getPersonAbteilung/' + mitarbeiter_uid,
 		};
 	},
 	getLeitungOrg(oekurzbz){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/vertraege/vertraege/getLeitungOrg/' + oekurzbz,
+			url: 'api/frontend/v1/detailheader/detailheader/getLeitungOrg/' + oekurzbz,
 		};
 	},
 }

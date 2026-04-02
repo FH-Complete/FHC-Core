@@ -354,8 +354,10 @@ class Projektarbeit_model extends DB_Model
 				   student_person.nachname as student_nachname,
 				   tbl_student.matrikelnr, tbl_lehreinheit.studiensemester_kurzbz,
 				   betreuer_benutzer.uid as betreuer_benutzer_uid,
+				   betreuer_person.titelpre as betreuer_titelpre,
 				   betreuer_person.vorname as betreuer_vorname,
 				   betreuer_person.nachname as betreuer_nachname,
+				   betreuer_person.titelpost as betreuer_titelpost,
 				   lehre.tbl_projektbetreuer.betreuerart_kurzbz as betreuerart,
 				   lehre.tbl_projektbetreuer.person_id as betreuer_person_id,
 				   lehre.tbl_projektarbeit.sprache               as sprache,
@@ -415,6 +417,50 @@ class Projektarbeit_model extends DB_Model
 					   LIMIT 1
 				   )
 					   as zweitbetreuer_full_name,
+			       (
+					   SELECT titelpre
+					   FROM public.tbl_person
+								JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
+					   LIMIT 1
+				   )
+					   as zweitbetreuer_titelpre,
+			       (
+					   SELECT vorname
+					   FROM public.tbl_person
+								JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
+					   LIMIT 1
+				   )
+					   as zweitbetreuer_vorname,
+			       (
+					   SELECT nachname
+					   FROM public.tbl_person
+								JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
+					   LIMIT 1
+				   )
+					   as zweitbetreuer_nachname,
+			       (
+					   SELECT titelpost
+					   FROM public.tbl_person
+								JOIN lehre.tbl_projektbetreuer ON (lehre.tbl_projektbetreuer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_benutzer ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
+								LEFT JOIN public.tbl_mitarbeiter ON (public.tbl_benutzer.uid = public.tbl_mitarbeiter.mitarbeiter_uid)
+					   WHERE projektarbeit_id = tbl_projektarbeit.projektarbeit_id
+						 AND betreuerart_kurzbz IN ('Zweitbetreuer', 'Zweitbegutachter', 'Senatsmitglied')
+					   LIMIT 1
+				   )
+					   as zweitbetreuer_titelpost,
 			       (
 					   SELECT
 						   COALESCE(tbl_studienplan.orgform_kurzbz,
