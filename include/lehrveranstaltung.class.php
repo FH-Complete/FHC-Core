@@ -2911,5 +2911,176 @@ class lehrveranstaltung extends basis_db
 		return null;
 
 	}
+
+	/**
+	 * Filtert die geladenen Lehrveranstaltungen gegen den aktuellen Studienplan des Studenten.
+	 * Ermittelt den Studienplan über den Prestudent-Status (aktuellster Eintrag) und gleicht
+	 * die vorhandenen IDs mit der Tabelle tbl_studienplan_lehrveranstaltung ab.
+	 * Die interne Liste wird nur bei gefundenen Treffern aktualisiert.
+	 *
+	 * @param string $student_uid Student uid.
+	 * @return bool True bei erfolgreicher Abwicklung oder leeren Ausgangsdaten, False bei Datenbankfehlern.
+	 */
+	public function checkLvaAgainstStudentCurrentStudienplan($student_uid) {
+		$qryStudent = "SELECT prestudent_id FROM tbl_student WHERE student_uid = ".$this->db_add_param($student_uid)."";
+		
+		if($result = $this->db_query($qryStudent))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$prestudent_id = $row->prestudent_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der des aktuellen studienplan für studenten über prestudent';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+		
+		$qryHistory = "SELECT studienplan_id
+					   FROM public.tbl_prestudentstatus 
+					   WHERE prestudent_id = ".$this->db_add_param($prestudent_id)."
+					   ORDER BY public.tbl_prestudentstatus.datum DESC";
+		if($result = $this->db_query($qryHistory))
+		{
+			if($row = $this->db_fetch_object($result))
+			{
+				$studienplan_id = $row->studienplan_id;
+			}
+			else
+			{
+				$this->errormsg = 'Fehler beim Ermitteln der des aktuellen studienplan für studenten über prestudentstatus';
+				return false;
+			}
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+
+		// needs to have lva_ids from previous query in this context
+		$lvsIDs = array_column($this->lehrveranstaltungen, 'lehrveranstaltung_id');
+
+		if (empty($lvsIDs)) {
+			// exit without modifying object state if no lva_id to query by are found 
+			return true; 
+		}
+		
+		$ids = $this->db_implode4SQL($lvsIDs);
+		
+		$qry = "SELECT tbl_lehrveranstaltung.*,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id,
+				tbl_studienplan_lehrveranstaltung.semester as stpllv_semester,
+				tbl_studienplan_lehrveranstaltung.pflicht as stpllv_pflicht,
+				tbl_studienplan_lehrveranstaltung.koordinator as stpllv_koordinator,
+				tbl_studienplan_lehrveranstaltung.studienplan_lehrveranstaltung_id_parent,
+				tbl_studienplan_lehrveranstaltung.sort stpllv_sort,
+				tbl_studienplan_lehrveranstaltung.curriculum,
+				tbl_studienplan_lehrveranstaltung.export,
+				tbl_studienplan_lehrveranstaltung.genehmigung
+			FROM lehre.tbl_lehrveranstaltung
+			JOIN lehre.tbl_studienplan_lehrveranstaltung
+			USING(lehrveranstaltung_id)
+			WHERE tbl_studienplan_lehrveranstaltung.studienplan_id = ".$this->db_add_param($studienplan_id)."
+				AND tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id IN (".$ids.");";
+
+		if($result = $this->db_query($qry))
+		{
+			// reset the lva array and fill it with the new set
+			$temp_lvas = array();
+			while($row = $this->db_fetch_object($result))
+			{
+				$obj = new lehrveranstaltung();
+
+				$obj->lehrveranstaltung_id = $row->lehrveranstaltung_id;
+				$obj->studiengang_kz = $row->studiengang_kz;
+				$obj->bezeichnung = $row->bezeichnung;
+				$obj->kurzbz = $row->kurzbz;
+				$obj->lehrform_kurzbz = $row->lehrform_kurzbz;
+				$obj->semester = $row->semester;
+				$obj->ects = $row->ects;
+				$obj->semesterstunden = $row->semesterstunden;
+				$obj->anmerkung = $row->anmerkung;
+				$obj->lehre = $this->db_parse_bool($row->lehre);
+				$obj->lehreverzeichnis = $row->lehreverzeichnis;
+				$obj->aktiv = $this->db_parse_bool($row->aktiv);
+				$obj->ext_id = $row->ext_id;
+				$obj->insertamum = $row->insertamum;
+				$obj->insertvon = $row->insertvon;
+				$obj->planfaktor = $row->planfaktor;
+				$obj->planlektoren = $row->planlektoren;
+				$obj->planpersonalkosten = $row->planpersonalkosten;
+				$obj->plankostenprolektor = $row->plankostenprolektor;
+				$obj->updateamum = $row->updateamum;
+				$obj->updatevon = $row->updatevon;
+				$obj->sprache = $row->sprache;
+				$obj->sort = $row->sort;
+				$obj->incoming = $row->incoming;
+				$obj->zeugnis = $this->db_parse_bool($row->zeugnis);
+				$obj->projektarbeit = $this->db_parse_bool($row->projektarbeit);
+				$obj->koordinator = $row->koordinator;
+				$obj->bezeichnung_english = $row->bezeichnung_english;
+				$obj->orgform_kurzbz = $row->orgform_kurzbz;
+				$obj->lehrtyp_kurzbz = $row->lehrtyp_kurzbz;
+				$obj->lehrmodus_kurzbz = $row->lehrmodus_kurzbz;
+				$obj->oe_kurzbz = $row->oe_kurzbz;
+				$obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
+				$obj->anzahlsemester = $row->anzahlsemester;
+				$obj->semesterwochen = $row->semesterwochen;
+				$obj->lvnr = $row->lvnr;
+				$obj->semester_alternativ = $row->semester_alternativ;
+				$obj->farbe = $row->farbe;
+				$obj->lehrveranstaltung_template_id = $row->lehrveranstaltung_template_id;
+				$obj->stpllv_sort = $row->stpllv_sort;
+				$obj->benotung = $this->db_parse_bool($row->benotung);
+				$obj->lvinfo = $this->db_parse_bool($row->lvinfo);
+				$obj->lehrauftrag = $this->db_parse_bool($row->lehrauftrag);
+				$obj->evaluierung = $this->db_parse_bool($row->evaluierung);
+
+				$obj->bezeichnung_arr['German'] = $row->bezeichnung;
+				$obj->bezeichnung_arr['English'] = $row->bezeichnung_english;
+				if ($obj->bezeichnung_arr['English'] == '')
+					$obj->bezeichnung_arr['English'] = $obj->bezeichnung_arr['German'];
+
+				$obj->sws = $row->sws;
+				$obj->lvs = $row->lvs;
+				$obj->alvs = $row->alvs;
+				$obj->lvps = $row->lvps;
+				$obj->las = $row->las;
+
+				$obj->stpllv_semester = $row->stpllv_semester;
+				$obj->stpllv_pflicht = $this->db_parse_bool($row->stpllv_pflicht);
+				$obj->stpllv_koordinator = $row->stpllv_koordinator;
+				$obj->studienplan_lehrveranstaltung_id = $row->studienplan_lehrveranstaltung_id;
+				$obj->studienplan_lehrveranstaltung_id_parent = $row->studienplan_lehrveranstaltung_id_parent;
+				$obj->curriculum = $this->db_parse_bool($row->curriculum);
+				$obj->export = $this->db_parse_bool($row->export);
+				$obj->genehmigung = $this->db_parse_bool($row->genehmigung);
+				$obj->new = false;
+
+				$temp_lvas[] = $obj;
+			}
+			
+			// Only update the class property if we actually found matching records.
+			// If $temp_lvas is empty, $this->lehrveranstaltungen remains unchanged.
+			if (!empty($temp_lvas)) {
+				$this->lehrveranstaltungen = $temp_lvas;
+			}
+
+			return true;
+		}
+		else
+		{
+			$this->errormsg='Fehler bei Datenbankabfrage ' .$this->db_last_error();
+			return false;
+		}
+		
+	}
 }
 ?>
