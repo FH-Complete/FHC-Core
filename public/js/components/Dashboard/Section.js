@@ -156,6 +156,16 @@ export default {
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };
+				
+				if (!revert) {
+					// NOTE(chris): move to last line
+					update[item.id].place = [];
+					let y = this.gridHeight;
+					if (this.additionalRow)
+						y--;
+					update[item.id].place[this.gridWidth] = { x: 0, y };
+				}
+				
 				this.updatePreset(update);
 			}
 		},
