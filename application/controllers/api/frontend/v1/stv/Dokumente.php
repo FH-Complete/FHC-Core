@@ -753,6 +753,10 @@ class Dokumente extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
+		if(!(is_array($data) && count($data) > 0))
+		{
+			return null;
+		}
 		$student = current($data);
 
 		return $student->student_uid;
