@@ -1,11 +1,11 @@
-import FhcSearchbar from "../components/searchbar/searchbar.js";
-import CisMenu from "../components/Cis/Menu.js";
-import PluginsPhrasen from '../plugins/Phrasen.js';
-import ApiSearchbar from '../api/factory/searchbar.js';
-import Theme from "../plugins/Theme.js";
+import FhcSearchbar from "../../components/searchbar/searchbar.js";
+import CisMenu from "../../components/Cis/Menu.js";
+import PluginsPhrasen from '../../plugins/Phrasen.js';
+import ApiSearchbar from '../../api/factory/searchbar.js';
+import Theme from "../../plugins/Theme.js";
 
 const app = Vue.createApp({
-    name: 'CisApp',
+    name: 'CisMenuApp',
     components: {
         FhcSearchbar,
         CisMenu
