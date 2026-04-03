@@ -41,8 +41,7 @@ class UhstatPersonkennungFehltCore extends PlausiChecker
 			foreach ($prestudents as $prestudent)
 			{
 				$results[] = array(
-					'person_id' => $prestudent->person_id,
-					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz
+					'person_id' => $prestudent->person_id
 					//'fehlertext_params' => array('person_id' => $prestudent->person_id),
 					//'resolution_params' => array('person_id' => $prestudent->person_id)
 				);
@@ -71,7 +70,7 @@ class UhstatPersonkennungFehltCore extends PlausiChecker
 
 		$qry = "
 			SELECT
-				DISTINCT ON (person_id) prestudent_id, person_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz
+				DISTINCT ON (person_id) prestudent_id, person_id
 			FROM
 				public.tbl_prestudent pre
 				JOIN public.tbl_person pers USING(person_id)

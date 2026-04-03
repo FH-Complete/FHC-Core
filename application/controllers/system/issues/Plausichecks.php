@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Plausichecks extends Auth_Controller
 {
 	const GENERIC_ISSUE_OCCURED_TEXT = 'Issue aufgetreten';
-	const APPS = ['core'];
+	const APPS = ['core', 'dvuh'];
 
 	public function __construct()
 	{
