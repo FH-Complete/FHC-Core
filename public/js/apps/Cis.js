@@ -1,26 +1,26 @@
-import FhcDashboard from '../../components/Dashboard/Dashboard.js';
-import PluginsPhrasen from '../../plugins/Phrasen.js';
-import Theme from '../../plugins/Theme.js';
-import contrast from '../../directives/contrast.js';
-import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
-import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
-import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
-import MylvStudent from "../../components/Cis/Mylv/Student.js";
-import Profil from "../../components/Cis/Profil/Profil.js";
-import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
-import CmsNews from "../../components/Cis/Cms/News.js";
-import CmsContent from "../../components/Cis/Cms/Content.js";
-import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
-import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
-import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
-import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
-import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
-import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
-import Studium from "../../components/Cis/Studium/Studium.js";
+import FhcDashboard from '../components/Dashboard/Dashboard.js';
+import PluginsPhrasen from '../plugins/Phrasen.js';
+import Theme from '../plugins/Theme.js';
+import contrast from '../directives/contrast.js';
+import {setScrollbarWidth} from "../helpers/CssVarCalcHelpers.js";
+import LvPlan from "../components/Cis/LvPlan/Lehrveranstaltung.js";
+import MyLvPlan from "../components/Cis/LvPlan/Personal.js";
+import MylvStudent from "../components/Cis/Mylv/Student.js";
+import Profil from "../components/Cis/Profil/Profil.js";
+import Raumsuche from "../components/Cis/Raumsuche/Raumsuche.js";
+import CmsNews from "../components/Cis/Cms/News.js";
+import CmsContent from "../components/Cis/Cms/Content.js";
+import Info from "../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
+import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../components/Cis/Mylv/RoomInformation.js";
+import AbgabetoolStudent from "../components/Cis/Abgabetool/AbgabetoolStudent.js";
+import AbgabetoolMitarbeiter from "../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
+import AbgabetoolAssistenz from "../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
+import DeadlineOverview from "../components/Cis/Abgabetool/DeadlineOverview.js";
+import Studium from "../components/Cis/Studium/Studium.js";
 
-import ApiRenderers from '../../api/factory/renderers.js';
-import ApiRouteInfo from '../../api/factory/routeinfo.js';
-import {capitalize} from "../../helpers/StringHelpers.js";
+import ApiRenderers from '../api/factory/renderers.js';
+import ApiRouteInfo from '../api/factory/routeinfo.js';
+import {capitalize} from "../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -227,7 +227,7 @@ const router = VueRouter.createRouter({
 })
 
 const app = Vue.createApp({
-	name: 'FhcApp',
+	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
 		renderers: null,
