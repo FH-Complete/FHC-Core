@@ -38,7 +38,7 @@ class Vertragsbestandteil_model extends DB_Model
 				s.wochenstunden, s.teilzeittyp_kurzbz,
 				u.tage,
 				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice,
-				lg.stellenbezeichnung, lg.fachrichtung_kurzbz, lg.modellstelle_kurzbz, lg.kommentar_person, lg.kommentar_modellstelle
+				lg.stellenbezeichnung, lg.vordienstzeit, lg.fachrichtung_kurzbz, lg.modellstelle_kurzbz, lg.kommentar_person, lg.kommentar_modellstelle
 			FROM
 				hr.tbl_vertragsbestandteil v
 			LEFT JOIN

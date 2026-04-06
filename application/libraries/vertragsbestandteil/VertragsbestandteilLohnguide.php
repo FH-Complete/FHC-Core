@@ -7,6 +7,7 @@ use vertragsbestandteil\VertragsbestandteilFactory;
 class VertragsbestandteilLohnguide extends Vertragsbestandteil
 {
 	protected $stellenbezeichnung;
+	protected $vordienstzeit;
 	protected $fachrichtung_kurzbz;
 	protected $modellstelle_kurzbz;
 	protected $kommentar_person;
@@ -29,6 +30,18 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 	{
 		$this->markDirty('stellenbezeichnung', $this->stellenbezeichnung, $stellenbezeichnung);
 		$this->stellenbezeichnung = $stellenbezeichnung;
+		return $this;
+	}
+
+	public function getVordienstzeit()
+	{
+		return $this->vordienstzeit;
+	}
+
+	public function setVordienstzeit($vordienstzeit): self
+	{
+		$this->markDirty('vordienstzeit', $this->vordienstzeit, $vordienstzeit);
+		$this->vordienstzeit = $vordienstzeit;
 		return $this;
 	}
 
@@ -89,6 +102,7 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 		$this->fromdb = $fromdb;
 		isset($data->fachrichtung_kurzbz) && $this->setFachrichtung_kurzbz($data->fachrichtung_kurzbz);
 		isset($data->stellenbezeichnung) && $this->setStellenbezeichnung($data->stellenbezeichnung);
+		isset($data->vordienstzeit) && $this->setVordienstzeit($data->vordienstzeit);
 		isset($data->modellstelle_kurzbz) && $this->setModellstelle_kurzbz($data->modellstelle_kurzbz);
 		isset($data->kommentar_person) && $this->setKommentar_person($data->kommentar_person);
 		isset($data->kommentar_modellstelle) && $this->setKommentar_modellstelle($data->kommentar_modellstelle);
@@ -100,6 +114,7 @@ class VertragsbestandteilLohnguide extends Vertragsbestandteil
 		$tmp = array(
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'stellenbezeichnung' => $this->getStellenbezeichnung(),
+			'vordienstzeit' => $this->getVordienstzeit(),
 			'fachrichtung_kurzbz' => $this->getFachrichtung_kurzbz(),
 			'modellstelle_kurzbz' => $this->getModellstelle_kurzbz(),
 			'kommentar_person' => $this->getKommentar_person(),
