@@ -310,6 +310,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		$qry = "
 CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_lohnguide (
     vertragsbestandteil_id integer NOT NULL,
+	vordienstzeit int,
     stellenbezeichnung varchar(255),
     fachrichtung_kurzbz character varying(32) NOT NULL,
     modellstelle_kurzbz character varying(32) NOT NULL,
@@ -345,6 +346,25 @@ if($result = $db->db_query("SELECT 1 FROM hr.tbl_vertragsbestandteiltyp WHERE ve
 			echo '<strong>Public Tabelle person: '.$db->db_last_error().'</strong><br>';
 		else
 			echo "<br>Vertragsbestandteiltyp 'lohnguide' hinzugefuegt";
+	}
+}
+
+
+if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE column_name='vordienstzeit' AND table_name='tbl_vertragsbestandteil_lohnguide' AND table_schema='hr'"))
+{
+	if ($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			ALTER TABLE 
+				hr.tbl_vertragsbestandteil_lohnguide 
+			ADD COLUMN 
+				vordienstzeit int;
+		";
+		if (! $db->db_query($qry))
+			echo '<strong>Lohnguide: ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo 'Spalte vordienstzeit wurde in hr.tbl_vertragsbestandteil_lohnguide neu erstellt<br>';
+		
 	}
 }
 		
