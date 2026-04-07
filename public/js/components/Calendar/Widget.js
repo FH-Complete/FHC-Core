@@ -1,6 +1,7 @@
 import FhcCalendar from "./Base.js";
 
 import { useEventLoader } from '../../composables/EventLoader.js';
+import { useRenderers } from '../../composables/Renderers.js';
 
 import ModeList from '../Calendar/Mode/List.js';
 
@@ -9,9 +10,6 @@ export default {
 	components: {
 		FhcCalendar
 	},
-	inject: [
-		"renderers"
-	],
 	props: {
 		timezone: {
 			type: String,
@@ -59,10 +57,12 @@ export default {
 		const rangeInterval = Vue.ref(null);
 		
 		const { events } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { renderers } = useRenderers();
 
 		return {
 			rangeInterval,
-			events
+			events,
+			renderers
 		};
 	},
 	template: /* html */`

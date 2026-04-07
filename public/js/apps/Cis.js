@@ -18,7 +18,6 @@ import AbgabetoolAssistenz from "../components/Cis/Abgabetool/AbgabetoolAssisten
 import DeadlineOverview from "../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../components/Cis/Studium/Studium.js";
 
-import ApiRenderers from '../api/factory/renderers.js';
 import ApiRouteInfo from '../api/factory/routeinfo.js';
 import {capitalize} from "../helpers/StringHelpers.js";
 
@@ -229,8 +228,7 @@ const router = VueRouter.createRouter({
 const app = Vue.createApp({
 	name: 'CisApp',
 	data: () => ({
-		appSideMenuEntries: {},
-		renderers: null,
+		appSideMenuEntries: {}
 	}),
 	components: {},
 	computed: {
@@ -243,7 +241,6 @@ const app = Vue.createApp({
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			renderers: Vue.computed(() => this.renderers),
 			isMobile: this.isMobile
 		}	
 	},
@@ -281,46 +278,6 @@ const app = Vue.createApp({
 				
 			}
 		}
-	},
-	async created(){
-		
-		await this.$api
-			.call(ApiRenderers.loadRenderers())
-			.then(res => res.data)
-			.then(data => {
-				for (let rendertype of Object.keys(data)) {
-					let modalTitle = null;
-					let modalContent = null;
-					let calendarEvent = null;
-					if (data[rendertype].modalTitle)
-						modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
-					if (data[rendertype].modalContent) 	
-						modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
-					if (data[rendertype].calendarEvent) 	
-						calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
-
-					if (data[rendertype].calendarEventStyles){
-						var head = document.head;
-						if(!head.querySelector(`link[href="${data[rendertype].calendarEventStyles}"]`)){
-							var link = document.createElement("link");
-							link.type = "text/css";
-							link.rel = "stylesheet";
-							link.href = data[rendertype].calendarEventStyles;
-							head.appendChild(link);
-						}
-					}
-
-					if(this.renderers === null) {
-						this.renderers = {};
-					}
-					if (!this.renderers[rendertype]) {
-						this.renderers[rendertype] = {}
-					}
-					this.renderers[rendertype].modalTitle = modalTitle;
-					this.renderers[rendertype].modalContent = modalContent;
-					this.renderers[rendertype].calendarEvent = calendarEvent;
-				}
-			});
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);

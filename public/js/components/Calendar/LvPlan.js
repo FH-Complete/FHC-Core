@@ -3,6 +3,7 @@ import FhcCalendar from "./Base.js";
 import ApiLvPlan from '../../api/factory/lvPlan.js';
 
 import { useEventLoader } from '../../composables/EventLoader.js';
+import { useRenderers } from '../../composables/Renderers.js';
 
 import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
@@ -13,9 +14,6 @@ export default {
 	components: {
 		FhcCalendar
 	},
-	inject: [
-		"renderers"
-	],
 	props: {
 		timezone: {
 			type: String,
@@ -99,10 +97,13 @@ export default {
 			context.emit('update:lv', newValue);
 		});
 
+		const { renderers } = useRenderers();
+
 		return {
 			rangeInterval,
 			events,
-			lv
+			lv,
+			renderers
 		};
 	},
 	created() {
