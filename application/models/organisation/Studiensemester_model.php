@@ -242,6 +242,30 @@ class Studiensemester_model extends DB_Model
 		return $this->loadWhere(['uid' => $student_uid, 'v.lehre' => true]);
 	}
 
+	public function getWhereMitarbeiterHasLvs($uid) {
+		// first order by year with last 2 letter from right,
+		// then order by WS/SS inside the years
+		// query it asc so the ordering magic in cis4 turns it around again
+		$qry = "WITH unique_semesters AS (
+				SELECT DISTINCT ON (studiensemester_kurzbz)
+					studiensemester_kurzbz, 
+					start, 
+					ende, 
+					bezeichnung, 
+					studienjahr_kurzbz
+				FROM lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+				JOIN public.tbl_studiensemester USING(studiensemester_kurzbz)
+				WHERE mitarbeiter_uid = ?
+			)
+			SELECT * FROM unique_semesters
+			ORDER BY 
+				RIGHT(studiensemester_kurzbz, 2) ASC,
+				LEFT(studiensemester_kurzbz, 2) ASC;";
+		
+		return $this->execReadOnlyQuery($qry, [$uid]);
+	}
+
 	public function getAktAndFutureSemester()
 	{
 		$query = 'SELECT studiensemester_kurzbz

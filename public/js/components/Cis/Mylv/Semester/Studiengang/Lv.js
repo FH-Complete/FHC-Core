@@ -9,13 +9,14 @@ import ApiAddons from '../../../../../api/factory/addons.js';
 // TODO(chris): L10n
 
 export default {
+	name: 'Lv',
 	components:{
 		LvUebersicht,
 	},
 	mixins: [
 		Phrasen
 	],
-	inject: ['studien_semester'],
+	inject: ['studien_semester', 'type'],
 	props: {
 		lehrveranstaltung_id: Number,
 		bezeichnung: String,
@@ -152,12 +153,16 @@ export default {
 		}
 	},
 	created() {
-		this.$api
-			.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))
-			.then(res => res.data)
-			.then(pruefungen => {
-				this.pruefungenData = pruefungen;
-			}); 
+		// TODO: check if this isnt a race condition in disguise
+		if(this.type == 'student') {
+			this.$api
+				.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))
+				.then(res => res.data)
+				.then(pruefungen => {
+					this.pruefungenData = pruefungen;
+				});
+		}
+		
 	},
 	mounted() {
 		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
@@ -204,7 +209,7 @@ export default {
 				</div>
 			</template>
 		</div>
-		<div v-if="!emptyMenu" class="card-footer">
+		<div v-if="!emptyMenu && type == 'student'" class="card-footer">
 			<div class="row">
 				<!-- template for the LV if there are multiple pruefungen -->
 				<template v-if="LvHasPruefungenInformation">

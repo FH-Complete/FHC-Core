@@ -4,7 +4,7 @@ import LvMenu from "./LvMenu.js";
 import ApiAddons from '../../../api/factory/addons.js';
 
 export default  {
-  
+	name: 'LvUebersicht',
     props:{
         event:{
             type:Object,

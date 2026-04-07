@@ -2,6 +2,7 @@ import MylvSemesterStudiengangLv from "./Studiengang/Lv.js";
 import Phrasen from "../../../../mixins/Phrasen.js";
 
 export default {
+	name: 'Studiengang',
 	components: {
 		MylvSemesterStudiengangLv
 	},

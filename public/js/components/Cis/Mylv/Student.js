@@ -5,6 +5,7 @@ import Phrasen from "../../../mixins/Phrasen.js";
 // TODO(chris): phrase: next & prev +aria-label
 
 export default {
+	name: 'Student',
 	components: {
 		MylvSemester
 	},
@@ -16,8 +17,14 @@ export default {
 			firstLoad: true,
 			studiensemester: null,
 			lvs: {},
+			type: null,
 			currentSemester: null
 		};
+	},
+	provide() {
+		return {
+			type: Vue.computed(() => this.type)
+		}
 	},
 	computed: {
 		ready() {
@@ -32,7 +39,8 @@ export default {
 					lvs: null
 				};
 				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Lvs/' + this.currentSemester).then(res => {
-					this.lvs[this.currentSemester].lvs = res.data.retval || [];
+					this.lvs[this.currentSemester].lvs = res.data.retval[0] || [];
+					this.type = res.data.retval[1] // student or employee
 					this.firstLoad = false;
 				});
 			}
