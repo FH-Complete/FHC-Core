@@ -151,7 +151,7 @@ export default {
 								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}
 							</a>
 							
-							<div v-if="menuItem.c4_moodle_links?.length || menuItem.c4_linkList?.length" class="dropdown">
+							<div v-if="(menuItem.c4_moodle_links?.length || menuItem.c4_linkList?.length) && menuItem.c4_link" class="dropdown">
 								<button 
 									class="btn btn-sm dropdown-toggle dropdown-toggle-split border-0" 
 									type="button" 
