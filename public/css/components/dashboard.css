@@ -17,12 +17,6 @@
 	--fhc-dashboard-section-info-color-hover: var(--fhc-primary-highlight, #005585);
 }
 
-@media(max-width: 577px) {
-	:root {
-		--fhc-dashboard-grid-size: 1;
-	}
-}
-
 .core-dashboard a {
 	color: var(--fhc-dashboard-link);
 }
@@ -72,16 +66,6 @@
 .alert-danger .form-check-input:checked {
 	border-color: var(--fhc-dashboard-danger);
 	background-color: var(--fhc-dashboard-danger);
-}
-
-:root {
-	--fhc-dashboard-grid-size: 4;
-}
-
-@media(max-width: 1400px) {
-	:root {
-		--fhc-dashboard-grid-size: 4;
-	}
 }
 
 @media(max-width: 1200px) {
