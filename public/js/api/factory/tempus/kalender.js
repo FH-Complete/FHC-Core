@@ -8,6 +8,46 @@ export default {
 			params: { ...filter, start_date, end_date }
 		};
 	},
+	getPlanLecturer(start_date, end_date)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getPlanLecturer',
+			params: { start_date, end_date }
+		};
+	},
+	getPlanStudent(start_date, end_date)
+	{
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getPlanStudent',
+			params: { start_date, end_date }
+		};
+	},
+
+	syncToLecturer(kalender_id)
+	{
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/syncToLecturer',
+			params: { kalender_id }
+		};
+	},
+	syncToStudent(kalender_id)
+	{
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/syncToStudent',
+			params: { kalender_id }
+		};
+	},
+	sync()
+	{
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/sync',
+		};
+	},
 	getLektorZeitsperren(emp, start_date, end_date) {
 		return {
 			method: 'get',
@@ -47,6 +87,21 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlag',
 			params: { start_date, end_date, lehreinheit_id}
+		};
+	},
+
+	getHistory(kalender_id) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getHistory',
+			params: { kalender_id }
+		};
+	},
+	deleteEntry(kalender_id) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/tempus/Kalender/deleteEntry',
+			params: { kalender_id }
 		};
 	},
 

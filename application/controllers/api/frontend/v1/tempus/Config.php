@@ -56,6 +56,7 @@ class Config extends FHCAPI_Controller
 
 		$this->_ci->KalenderStatusModel->addSelect('*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS status');
 		$this->_ci->KalenderStatusModel->addOrder('sort');
+		$this->_ci->KalenderStatusModel->db->where_not_in('status_kurzbz', array('archived', 'deleted'));
 		$visible_status = $this->_ci->KalenderStatusModel->load();
 
 		$visible_status = getData($visible_status);

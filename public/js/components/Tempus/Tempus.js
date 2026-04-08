@@ -148,6 +148,8 @@ export default {
 			visibleStatus: ['all'],
 			selectedStudiensemester: this.studiensemester_kurzbz ?? this.defaultSemester,
 			calendarDate: luxon.DateTime.now().setZone(this.config.timezone).toISODate(),
+			historyEntries: [],
+			previewRole: 'planer'
 		}
 	},
 	computed: {
@@ -158,7 +160,27 @@ export default {
 						label: 'Raumauswahl',
 						icon: 'fa-solid fa-door-open',
 						action: this.openRaumauswahl
-					}
+					},
+					{
+						label: 'Sync to Lektor',
+						icon: 'fa-solid fa-chalkboard-user',
+						action: (orig) => this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
+					},
+					{
+						label: 'Sync to Student',
+						icon: 'fa-solid fa-user-graduate',
+						action: (orig) => this.$api.call(ApiKalender.syncToStudent(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
+					},
+					{
+						label: 'History',
+						icon: 'fa-solid fa-clock-rotate-left',
+						action: this.openHistory
+					},
+					{
+						label: 'Delete',
+						icon: 'fa-solid fa-calendar-xmark',
+						action: this.deleteEntry
+					},
 				]
 			};
 		},
@@ -196,9 +218,29 @@ export default {
 
 				this.raumVorschlaege = result.data ?? [];
 				this.$refs.raumModal.show();
-
 			});
+		},
+		async deleteEntry(orig)
+		{
+			if (!orig?.kalender_id)
+				return;
 
+			await this.$api.call(ApiKalender.deleteEntry(
+				orig?.kalender_id
+			)).then(result => {
+				this.$refs.calendar.resetEventLoader();
+			});
+		},
+		async openHistory(orig)
+		{
+			if (!orig?.kalender_id)
+				return;
+			await this.$api.call(ApiKalender.getHistory(
+				orig.kalender_id
+			)).then(result => {
+				this.historyEntries = result.data ?? [];
+				this.$refs.historyModel.show();
+			});
 		},
 		async selectRaum(ort_kurzbz) {
 			const orig = this.raumModal;
@@ -308,6 +350,12 @@ export default {
 			if (hasLektoren)
 				filter.uid = this.lecturers.map(l => l.uid);
 
+			if (this.previewRole === 'lektor')
+				return [this.$api.call(ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()))];
+
+			if (this.previewRole === 'student')
+				return [this.$api.call(ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()))];
+
 			return [this.$api.call(ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()))];
 		},
 		toDateTime(value, timezone){
@@ -396,6 +444,8 @@ export default {
 		},
 
 		resizeHandler(payload) {
+			if (this.previewRole !== 'planer') //TODO (david) testzweck
+				return;
 			const { item, start, end } = payload;
 			const obj = item[0];
 			if (!obj?.orig?.kalender_id)
@@ -412,6 +462,8 @@ export default {
 		},
 
 		dropHandler(payload) {
+			if (this.previewRole !== 'planer') //TODO (david) testzweck
+				return;
 			const { item, start, end } = payload;
 			if (!item?.length)
 				return alert("Keine Daten gedroppt");
@@ -568,6 +620,10 @@ export default {
 			this.stg = null;
 			this.show_stg = null;
 			this.$refs.calendar.resetEventLoader();
+		},
+		triggerSync()
+		{
+			this.$api.call(ApiKalender.sync()).then(this.$refs.calendar.resetEventLoader())
 		}
 	},
 	watch: {
@@ -752,6 +808,36 @@ export default {
 							:show-toggle-all="false"
 							class="w-100"
 						/>
+						
+						<div class="d-flex gap-1 py-1">
+							<button
+								class="btn btn-sm"
+								:class="previewRole === 'planer' ? 'btn-dark' : 'btn-outline-dark'"
+								@click="previewRole = 'planer'; $refs.calendar.resetEventLoader()"
+							>
+								<i class="fa-solid fa-pen-ruler me-1"></i>Planer
+							</button>
+							<button
+								class="btn btn-sm"
+								:class="previewRole === 'lektor' ? 'btn-primary' : 'btn-outline-primary'"
+								@click="previewRole = 'lektor'; $refs.calendar.resetEventLoader()"
+							>
+								<i class="fa-solid fa-chalkboard-user me-1"></i>Lektor
+							</button>
+							<button
+								class="btn btn-sm"
+								:class="previewRole === 'student' ? 'btn-success' : 'btn-outline-success'"
+								@click="previewRole = 'student'; $refs.calendar.resetEventLoader()"
+							>
+								<i class="fa-solid fa-user-graduate me-1"></i>Student
+							</button>
+							<button
+								class="btn btn-sm btn-outline-danger"
+								@click="triggerSync"
+							>
+								<i class="fa-solid fa-rotate me-1"></i>Sync
+							</button>
+						</div>
 					</div>
 					<div class="room-selection" v-if="ort_kurzbz">
 						<div class="fw-semibold px-2 d-flex align-items-center justify-content-between">
@@ -844,6 +930,30 @@ export default {
 					</li>
 				</ul>
 				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>
+			</template>
+		</bs-modal>
+		
+		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg">
+			<template #title>History</template>
+			<template #default>
+				<table v-if="historyEntries.length" class="table table-bordered table-hover">
+					<thead class="table-light">
+						<tr>
+							<th>Von</th>
+							<th>Bis</th>
+							<th>Status</th>
+							<th>Ort</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="entry in historyEntries" :key="entry.id">
+							<td>{{ entry.von }}</td>
+							<td>{{ entry.bis }}</td>
+							<td>{{ entry.status_kurzbz }}</td>
+							<td>{{ entry.ort }}</td>
+						</tr>
+					</tbody>
+				</table>
 			</template>
 		</bs-modal>
 	</div>`

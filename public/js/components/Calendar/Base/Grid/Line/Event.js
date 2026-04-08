@@ -86,7 +86,6 @@ export default {
 			});
 		},
 		onRightClick(evt) {
-
 			this.contextMenu.show = true;
 			this.contextMenu.x = evt.clientX;
 			this.contextMenu.y = evt.clientY;

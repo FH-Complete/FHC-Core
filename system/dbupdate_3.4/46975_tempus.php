@@ -78,12 +78,15 @@ if(!$result = @$db->db_query("SELECT kalender_id FROM lehre.tbl_kalender LIMIT 1
 	COMMENT ON TABLE lehre.tbl_kalender_status IS 'Calender visibility Status';
 
 	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'planning', E'planning', E'{\"In Planung\", \"Planning\"}', 1);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'tosync', E'tosync', E'{\"Zu synchronisieren\", \"To sync\"}', 2);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'todelete', E'todelete', E'{\"Zu löschen\", \"To delete\"}', 3);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_lektor', E'Sichtbar für Lektoren', E'{\"Sichtbar für Lektoren\", \"Visible for lecturers\"}', 4);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'deleted', E'deleted', E'{\"Gelöscht\", \"Deleted\"}', 5);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'archived', E'archived', E'{\"Archiviert\", \"Archived\"}', 6);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_student', E'Sichtbar für Studierende', E'{\"Sichtbar für Studierende\", \"Visible for students\"}', 7);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'tosync_lektor', E'tosync_lektor', E'{\"Zu synchronisieren Lektoren\", \"To sync lecturers\"}', 2);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_lektor', E'Sichtbar für Lektoren', E'{\"Sichtbar für Lektoren\", \"Visible for lecturers\"}', 3);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'tosync_student', E'tosync_lektor', E'{\"Zu synchronisieren Studierende\", \"To sync students\"}', 4);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_student', E'Sichtbar für Studierende', E'{\"Sichtbar für Studierende\", \"Visible for students\"}', 5);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'todelete', E'todelete', E'{\"Zu löschen\", \"To delete\"}', 6);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'deleted', E'deleted', E'{\"Gelöscht\", \"Deleted\"}', 7);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'archived', E'archived', E'{\"Archiviert\", \"Archived\"}', 8);
+
+	
 
 	ALTER TABLE lehre.tbl_kalender ADD CONSTRAINT tbl_kalender_status_fk FOREIGN KEY (status_kurzbz)
 	REFERENCES lehre.tbl_kalender_status (status_kurzbz) MATCH FULL
