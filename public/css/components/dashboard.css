@@ -2,7 +2,7 @@
 @import './dashboard/news.css';
 @import './dashboard/LvPlan.css';
 
-:root{
+:root {
 	--fhc-dashboard-danger: var(--fhc-danger, #842029);
 	--fhc-dashboard-grid-size: 4;
 	--fhc-dashboard-link: var(--fhc-link, #0a57ca);
@@ -23,16 +23,16 @@
 	}
 }
 
-.core-dashboard a{
+.core-dashboard a {
 	color: var(--fhc-dashboard-link);
 }
 
-@media (max-width: 576px){
+@media (max-width: 576px) {
 	.widget-icon {
 		max-height: 250px;
 		object-fit: cover;
 	}
-	.widget-icon-container{
+	.widget-icon-container {
 		max-width: 250px;
 		margin-left: auto;
 		margin-right: auto;
@@ -49,7 +49,7 @@
 	cursor:pointer;
 }
 
-.dashboard-section > .newGridRow{
+.dashboard-section > .newGridRow {
 	position:absolute;
 	width:20px;
 	height:20px;
@@ -139,11 +139,11 @@
 	position: relative;
 }
 
-.dashboard-item-overlay{
+.dashboard-item-overlay {
 	background-color: var(--fhc-dashboard-item-overlay-background);
 }
 
-.dashboard-item-overlay::before{
+.dashboard-item-overlay::before {
 	position:absolute;
 	content:"";
 	top:0.25rem;
@@ -154,19 +154,19 @@
 	opacity: 0.5;
 }
 
-#deleteBookmark i{
+#deleteBookmark i {
 	color: var(--fhc-dashboard-danger);
 }
 
-.pin:hover{
+.pin:hover {
 	cursor: pointer;
 }
 
-.pin[pinned]:hover{
+.pin[pinned]:hover {
 	color: var(--fhc-dashboard-pin-pinned-hover-color);
 }
 
-.section-info{
+.section-info {
 	color: var(--fhc-dashboard-section-info-color);
 	cursor:pointer;
 }
@@ -204,13 +204,13 @@
 
 }
 
-.hiddenWidget{
+.hiddenWidget {
 	background: var(--fhc-disabled-background);
 	opacity: 40%;
 }
 
 .hiddenWidget .card,
 .hiddenWidget .card-body,
-.hiddenWidget .card-body *{
+.hiddenWidget .card-body * {
 	background: inherit !important;
 }
