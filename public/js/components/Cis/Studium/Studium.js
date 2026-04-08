@@ -2,6 +2,7 @@ import LvUebersicht from "../Mylv/LvUebersicht.js";
 
 
 export default {
+	name: 'Studium',
 	data(){
 		return {
 			studienSemester :[],

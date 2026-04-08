@@ -1,7 +1,6 @@
 import LvPruefungen from "./Lv/Pruefungen.js";
 import LvInfo from "./Lv/Info.js";
 import Phrasen from "../../../../../mixins/Phrasen.js";
-import LvUebersicht from "../../LvUebersicht.js";
 
 import ApiLehre from '../../../../../api/factory/lehre.js';
 import ApiAddons from '../../../../../api/factory/addons.js';
@@ -10,15 +9,12 @@ import ApiAddons from '../../../../../api/factory/addons.js';
 
 export default {
 	name: 'Lv',
-	components:{
-		LvUebersicht,
-	},
 	mixins: [
 		Phrasen
 	],
 	inject: ['studien_semester', 'type'],
 	props: {
-		lehrveranstaltung_id: Number,
+		lehrveranstaltung_id: [Number, String],
 		bezeichnung: String,
 		bezeichnung_eng: String,
 		module: String,
@@ -66,12 +62,6 @@ export default {
 		emptyMenu(){
 			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
 		},
-		bodyStyle() {return {};
-			/*const bodyStyle = {};
-			if (this.farbe)
-				bodyStyle['background-color'] = '#' + this.farbe;
-			return bodyStyle;*/
-		},
 		grade() {
 			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
 			if(this.benotung && this.znotebez?.length) {
@@ -85,7 +75,6 @@ export default {
 		},
 	},
 	methods: {
-		
 		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester) {
 			return this.$api
 				.call(ApiAddons.getLvMenu(lehrveranstaltung_id, studien_semester))
@@ -97,26 +86,16 @@ export default {
 					this.menu = [];
 				});
 		},
-
+		c4_target(menuItem) {
+			if (menuItem.c4_moodle_links?.length > 0) return null;
+			return menuItem.c4_target ?? null;
+		},
 		c4_link(menuItem) {
 			if (!menuItem) return null;
 			if (Array.isArray(menuItem.c4_moodle_links) && menuItem.c4_moodle_links.length) {
 				return '#';
-			}
-			else {
+			} else {
 				return menuItem.c4_link ?? null;
-			}
-		},
-		openLvOption(menuItem){
-			if (menuItem.id == "core_menu_mailanstudierende"){
-				window.location.href = menuItem.c4_link;
-			} else if (menuItem.id == "core_menu_digitale_anwesenheitslisten") {
-				window.location.href = menuItem.c4_link;
-			} else{
-				this.preselectedMenuItem = menuItem;
-				Vue.nextTick(() => {
-					this.$refs.lvUebersicht.show();
-				});
 			}
 		},
 		openPruefungen() {
@@ -127,24 +106,6 @@ export default {
 				pruefungenData: this.pruefungenData, 
 				bezeichnung: this.bezeichnung
 			});
-		},
-		openInfos() {
-			if (!this.info) {
-				this.info = true;
-				// TODO(chris): load all this params on ajax?
-				LvInfo.popup({
-					lehrveranstaltung_id: this.lehrveranstaltung_id, 
-					bezeichnung: this.bezeichnung,
-					bezeichnung_eng: this.bezeichnung_eng,
-					studiengang_kuerzel: this.studiengang_kuerzel,
-					semester: this.semester,
-					studien_semester: this.studien_semester,
-					orgform_kurzbz: this.orgform_kurzbz,
-					sprache: this.sprache,
-					ects: this.ects,
-					incoming: this.incoming
-				}).then(() => this.info = false).catch(() => this.info = false);
-			}
 		}
 	},
 	watch:{
@@ -162,44 +123,57 @@ export default {
 					this.pruefungenData = pruefungen;
 				});
 		}
-		
 	},
 	mounted() {
 		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
 	},
-	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
-		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
-			lehrveranstaltung_id: lehrveranstaltung_id,
-			studiensemester_kurzbz:studien_semester,
-			lehrfach_bez:studien_semester,
-			stg_kurzbzlang:studien_semester,
-		}"/>
-
+	template: /*html*/`
+	<div class="mylv-semester-studiengang-lv card">
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
 			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
 			<h6 class="mb-0">{{$p.user_language.value === 'English' ? bezeichnung_eng : bezeichnung}}</h6>
 		</div>
-		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
+		<div v-if="!emptyMenu" class="card-body ">
 			<template v-if="menu">
 				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
-						<div class="d-flex flex-row"  :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null">
+					<li :type="menuItem.c4_link ? 'button' : null" 
+						v-for="(menuItem, index) in menu" :key="index" class="list-group-item border-0 " >
+						<div class="d-flex flex-row">
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a
+							<a :id="menuItem.name"
 							class="fhc-body text-decoration-none text-truncate"
-							:id="'moodle_links_'+lehrveranstaltung_id"
-							:class="{ 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:class="{ 'unavailable':!menuItem.c4_link }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
 								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}
 							</a>
+							
+							<div v-if="menuItem.c4_moodle_links?.length || menuItem.c4_linkList?.length" class="dropdown">
+								<button 
+									class="btn btn-sm dropdown-toggle dropdown-toggle-split border-0" 
+									type="button" 
+									data-bs-toggle="dropdown" 
+									aria-expanded="false">
+									<span class="visually-hidden">Toggle Dropdown</span>
+								</button>
+					
+								<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu dropdown-menu p-0">
+									<li v-for="item in menuItem.c4_moodle_links" :key="item.url">
+									   <a class="dropdown-item border-bottom" :href="item.url" target="#">{{ item.lehrform }}</a>
+									</li>
+								</ul>
+								
+								<ul v-else class="dropdown-menu dropdown-menu p-0">
+									<li v-for="([text, link], i) in menuItem.c4_linkList" :key="i">
+									   <a class="dropdown-item border-bottom" :href="link" target="#">{{ text }}</a>
+									</li>
+								</ul>
 							</div>
-							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
-								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
-							</ul>
+				
+					   </div>
 					</li>
 				</ul>
 			</template>

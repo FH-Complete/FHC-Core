@@ -13,12 +13,13 @@ class Mylv extends Auth_Controller
 	 */
 	public function __construct()
 	{
+		
 		parent::__construct([
-			'Student' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Studiensemester' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Lvs' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Info' => ['student/anrechnung_beantragen:r','user:r'], // TODO(chris): permissions?
-			'Pruefungen' => ['student/anrechnung_beantragen:r','user:r'] // TODO(chris): permissions?
+			'Student' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
+			'Studiensemester' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
+			'Lvs' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
+			'Info' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'], // TODO(chris): permissions?
+			'Pruefungen' => ['student/anrechnung_beantragen:r','user:r', 'basis/cis:r'] // TODO(chris): permissions?
 		]);
 	}
 
@@ -48,7 +49,6 @@ class Mylv extends Auth_Controller
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
 		$isMitarbeiter = getData($this->MitarbeiterModel->isMitarbeiter(getAuthUID())) ?? false;
-		$isStudent = getData($this->StudentModel->isStudent(getAuthUID())) ?? false;
 		if($isMitarbeiter) {
 			$result = $this->StudiensemesterModel->getWhereMitarbeiterHasLvs(getAuthUID());
 
@@ -56,7 +56,7 @@ class Mylv extends Auth_Controller
 				return $this->outputJsonError(getError($result));
 
 			$this->outputJsonSuccess(getData($result));
-		} else if($isStudent) { // $isStudent
+		} else if(getData($this->StudentModel->isStudent(getAuthUID())) ?? false) { // $isStudent
 			$result = $this->StudiensemesterModel->getWhereStudentHasLvs(getAuthUID());
 
 			if (isError($result))
@@ -83,14 +83,14 @@ class Mylv extends Auth_Controller
 			if (isError($result))
 				return $this->outputJsonError(getError($result));
 
-			$this->outputJsonSuccess([getData($result), 'employee']);
+			$this->outputJsonSuccess(getData($result));
 		} else if(getData($this->StudentModel->isStudent(getAuthUID())) ?? false) { // $isStudent
 			$result = $this->LehrveranstaltungModel->getLvsByStudentWithGrades(getAuthUID(), $studiensemester_kurzbz, getUserLanguage());
 
 			if (isError($result))
 				return $this->outputJsonError(getError($result));
 
-			$this->outputJsonSuccess([getData($result), 'student']);
+			$this->outputJsonSuccess(getData($result));
 		} else {
 			$this->outputJsonError('neither student or mitarbeiter');
 		}

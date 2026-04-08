@@ -5,7 +5,7 @@ import Phrasen from "../../../mixins/Phrasen.js";
 // TODO(chris): phrase: next & prev +aria-label
 
 export default {
-	name: 'Student',
+	name: 'MyLv',
 	components: {
 		MylvSemester
 	},
@@ -17,7 +17,6 @@ export default {
 			firstLoad: true,
 			studiensemester: null,
 			lvs: {},
-			type: null,
 			currentSemester: null
 		};
 	},
@@ -26,7 +25,13 @@ export default {
 			type: Vue.computed(() => this.type)
 		}
 	},
+	inject: ['isStudent', 'isMitarbeiter'],
 	computed: {
+		type() {
+			if(this.isStudent) return 'student'
+			if(this.isMitarbeiter) return 'employee'
+			return null
+		},
 		ready() {
 			return this.studiensemester !== null && (!this.firstLoad || this.current.lvs !== null);
 		},
@@ -39,8 +44,7 @@ export default {
 					lvs: null
 				};
 				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Lvs/' + this.currentSemester).then(res => {
-					this.lvs[this.currentSemester].lvs = res.data.retval[0] || [];
-					this.type = res.data.retval[1] // student or employee
+					this.lvs[this.currentSemester].lvs = res.data.retval || [];
 					this.firstLoad = false;
 				});
 			}
@@ -107,7 +111,7 @@ export default {
 
 	<h2>{{$p.t('lehre/myLV')}}</h2>
 	<hr>
-	<div class="mylv-student" v-if="ready">
+	<div class="mylv" v-if="ready">
 		<div v-if="currentSemester" class="row justify-content-center mb-3">
 			<div class="col-auto d-none">
 				<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
@@ -131,7 +135,7 @@ export default {
 		</div>
 		<mylv-semester v-bind="current"/>
 	</div>
-	<div class="mylv-student text-center" v-else>
+	<div class="mylv text-center" v-else>
 		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 	</div>`
 };

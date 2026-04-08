@@ -5,7 +5,7 @@ import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
 import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
-import MylvStudent from "../../components/Cis/Mylv/Student.js";
+import Mylv from "../../components/Cis/Mylv/MyLv.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
@@ -21,6 +21,7 @@ import Studium from "../../components/Cis/Studium/Studium.js";
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
+import ApiAuthinfo from "../../api/factory/authinfo.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 
@@ -149,7 +150,7 @@ const router = VueRouter.createRouter({
 		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
-			component: MylvStudent,
+			component: Mylv,
 			props: true,
 		},
 		{
@@ -231,6 +232,9 @@ const app = Vue.createApp({
 	data: () => ({
 		appSideMenuEntries: {},
 		renderers: null,
+		uid: '',
+		isStudent: null,
+		isMitarbeiter: null
 	}),
 	components: {},
 	computed: {
@@ -244,7 +248,10 @@ const app = Vue.createApp({
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			renderers: Vue.computed(() => this.renderers),
-			isMobile: this.isMobile
+			isMobile: this.isMobile,
+			uid: Vue.computed(() => this.uid),
+			isStudent: Vue.computed(() => this.isStudent),
+			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
 		}	
 	},
 	methods: {
@@ -320,6 +327,14 @@ const app = Vue.createApp({
 					this.renderers[rendertype].modalContent = modalContent;
 					this.renderers[rendertype].calendarEvent = calendarEvent;
 				}
+			});
+
+		await this.$api
+			.call(ApiAuthinfo.getAuthInfo())
+			.then(res => {
+				this.uid = res.data.uid;
+				this.isMitarbeiter = res.data.isMitarbeiter;
+				this.isStudent = res.data.isStudent;
 			});
 	},
 	mounted() {
