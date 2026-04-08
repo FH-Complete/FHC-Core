@@ -15,7 +15,6 @@ export default {
 		propsViewData: Object
 	},
 	data() {
-		const now = luxon.DateTime.now().setZone(this.viewData.timezone);
 		return {
 			studiensemester_kurzbz: null,
 			studiensemester_start: null,
@@ -26,7 +25,7 @@ export default {
 	},
 	computed:{
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 		},
 		currentMode() {
 			return this.propsViewData?.mode || DEFAULT_MODE_LVPLAN;
@@ -35,7 +34,7 @@ export default {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)
 				return false;
 			
-			const opts = { zone: this.viewData.timezone };
+			const opts = { zone: FHC_JS_DATA_STORAGE_OBJECT.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
 				.toUnixInteger();
@@ -115,7 +114,6 @@ export default {
 		<fhc-calendar
 			ref="calendar"
 			v-model:lv="lv"
-			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"

@@ -27,7 +27,7 @@ export default {
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
-				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+				return luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
@@ -47,7 +47,7 @@ export default {
 				return;
 			}
 
-			const opts = { zone: this.viewData.timezone };
+			const opts = { zone: FHC_JS_DATA_STORAGE_OBJECT.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
 				.toUnixInteger();
@@ -124,7 +124,6 @@ export default {
 		<hr>
 		<fhc-calendar
 			ref="calendar"
-			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"

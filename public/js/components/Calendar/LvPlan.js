@@ -15,10 +15,6 @@ export default {
 		FhcCalendar
 	},
 	props: {
-		timezone: {
-			type: String,
-			required: true
-		},
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
 			default: luxon.DateTime.local()
@@ -39,6 +35,7 @@ export default {
 	],
 	data() {
 		return {
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 			modes: {
 				day: Vue.markRaw(ModeDay),
 				week: Vue.markRaw(ModeWeek),

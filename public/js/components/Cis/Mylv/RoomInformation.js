@@ -15,7 +15,7 @@ export default {
 	},
 	computed: {
 		currentDay() {
-			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 		},
 		currentMode() {
 			return this.propsViewData?.mode || DEFAULT_MODE_RAUMINFO;
@@ -51,7 +51,6 @@ export default {
 		<hr>
 		<fhc-calendar 
 			ref="calendar"
-			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"

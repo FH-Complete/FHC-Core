@@ -21,7 +21,7 @@ export default {
 			type: Object,
 			required: true,
 			validator(value) {
-				return value && value.name && value.timezone
+				return value && value.name
 			}
 		}
 	},
@@ -36,8 +36,7 @@ export default {
 	provide() {
 		return {
 			editMode: Vue.computed(()=>this.editMode),
-			widgetsSetup: Vue.computed(() => this.widgetsSetup),
-			timezone: Vue.computed(() => this.viewData.timezone)
+			widgetsSetup: Vue.computed(() => this.widgetsSetup)
 		}
 	},
 	methods: {

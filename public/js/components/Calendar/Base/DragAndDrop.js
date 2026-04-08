@@ -20,7 +20,8 @@ export default {
 	},
 	inject: {
 		mode: "mode",
-		dropableEvents: "dropableEvents"
+		dropableEvents: "dropableEvents",
+		timezone: "timezone"
 	},
 	props: {
 		events: Array,
