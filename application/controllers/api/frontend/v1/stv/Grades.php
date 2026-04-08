@@ -60,7 +60,8 @@ class Grades extends FHCAPI_Controller
 	{
 		$this->load->model('codex/Note_model', 'NoteModel');
 
-		$this->NoteModel->addOrder('note');
+		$this->NoteModel->addOrder('notenwert', 'ASC');
+		$this->NoteModel->addOrder('bezeichnung', 'ASC');
 		
 		$result = $this->NoteModel->load();
 

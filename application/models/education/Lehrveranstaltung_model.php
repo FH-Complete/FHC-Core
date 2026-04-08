@@ -316,8 +316,8 @@ class Lehrveranstaltung_model extends DB_Model
 			(SELECT status_kurzbz FROM public.tbl_prestudentstatus WHERE prestudent_id=tbl_student.prestudent_id ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1) as status,
 			tbl_bisio.bisio_id, tbl_bisio.von, tbl_bisio.bis, tbl_student.studiengang_kz AS stg_kz_student,
 			tbl_zeugnisnote.note, tbl_mitarbeiter.mitarbeiter_uid, tbl_person.matr_nr, tbl_benutzer.uid,
-			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung
-
+			UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as kuerzel, tbl_studiengang.orgform_kurzbz, vw_student_lehrveranstaltung.semester, vw_student_lehrveranstaltung.studiensemester_kurzbz, vw_student_lehrveranstaltung.bezeichnung,
+			tbl_student.prestudent_id
 		FROM
 			campus.vw_student_lehrveranstaltung
 			JOIN public.tbl_benutzer USING(uid)
@@ -385,6 +385,37 @@ class Lehrveranstaltung_model extends DB_Model
 				ORDER BY lvleiter DESC, nachname, vorname";
 
 		return $this->execQuery($query, array($lehrveranstaltung_id, $studiensemester_kurzbz));
+	}
+
+	/**
+	 * Get LV-Leitung of given Lehrveranstaltung ID and Studiensemester.
+	 *
+	 * @param $lehrveranstaltung_id
+	 * @param $studiensemester
+	 * @return array|stdClass|null
+	 */
+	public function getLvLeitung($lehrveranstaltung_id, $studiensemester)
+	{
+		$params = [$lehrveranstaltung_id, $studiensemester];
+
+		$qry = "
+			SELECT
+				vorname, nachname, mitarbeiter_uid, lehrfunktion_kurzbz
+			FROM
+				lehre.tbl_lehreinheit
+				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
+				JOIN public.tbl_benutzer b ON b.uid = lema.mitarbeiter_uid
+				JOIN public.tbl_person p using (person_id) 
+			WHERE
+				tbl_lehreinheit.lehrveranstaltung_id= ?
+				AND tbl_lehreinheit.studiensemester_kurzbz = ?
+				AND lehrfunktion_kurzbz = 'LV-Leitung'
+            ORDER BY 
+                lema.insertamum DESC
+			LIMIT 1
+		";
+
+		return $this->execQuery($qry, $params);
 	}
 	/**
 	 * Gets all Leiter of Lehrveranstaltungsorganisationseinheit

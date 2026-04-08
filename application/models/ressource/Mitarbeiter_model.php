@@ -209,7 +209,7 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
 			SELECT
-			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe
+			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe, personalnummer, mitarbeiter_uid
 			FROM
 				public.tbl_person
 				JOIN public.tbl_benutzer b USING(person_id)
@@ -363,14 +363,14 @@ class Mitarbeiter_model extends DB_Model
 			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 
 		$qry = "
-			SELECT " . $returnwert . "  
-			FROM 
+			SELECT " . $returnwert . "
+			FROM
 				public.tbl_mitarbeiter ma
-			JOIN 
+			JOIN
 				public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
-			JOIN 
+			JOIN
 				public.tbl_person p on (p.person_id = b.person_id)
-			WHERE 
+			WHERE
 				lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
@@ -393,14 +393,14 @@ class Mitarbeiter_model extends DB_Model
 	public function getMitarbeiterFromLV($lehrveranstaltung_id)
 	{
 		$qry = "SELECT DISTINCT
-				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
-			FROM 
+				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid
+			FROM
 				lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
-			WHERE 
+			WHERE
 				lehrveranstaltung_id= ?
-			AND 
-				mitarbeiter_uid=uid 
-			AND 
+			AND
+				mitarbeiter_uid=uid
+			AND
 				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		$parametersArray = array($lehrveranstaltung_id);

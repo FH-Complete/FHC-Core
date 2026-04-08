@@ -240,7 +240,7 @@ class filter extends basis_db
 								{
 									//$value->value = preg_replace('/(.*?)selected=.selected./', '$1', $value->value);
 									//$value->value = preg_replace('/(.*?)\s*[selected=?selected?]/', '$1', $value->value);
-									//$value->value = preg_replace('/(.*?)\s*selected="selected"\s*/', '${1}', $value->value);
+									//$value->value = preg_replace('/(.*?)\s*selected="selected"\s*/', '$[1]', $value->value);
 									//$value->value = preg_replace('/^\s*selected=.*?selected.*?\s*/', ' ', $value->value);
 									//$value->value = str_replace('selected=', '', $value->value);
 

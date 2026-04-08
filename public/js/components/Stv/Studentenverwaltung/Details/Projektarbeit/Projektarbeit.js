@@ -47,37 +47,35 @@ export default {
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'ui', 'projektarbeit']);
+						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'ui', 'projektarbeit']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'typ')
-						});
-						cm.getColumnByField('titel').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'titel')
-						});
-						cm.getColumnByField('beginn').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'beginn')
-						});
-						cm.getColumnByField('ende').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'ende')
-						});
-						cm.getColumnByField('freigegeben').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'freigegeben')
-						});
-						cm.getColumnByField('gesperrtbis').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'gesperrtBis')
-						});
-						cm.getColumnByField('themenbereich').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'themenbereich')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'anmerkung')
-						});
-						cm.getColumnByField('firma_id').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'firmaId')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('projekttyp_kurzbz', this.$p.t('projektarbeit', 'typ_kurzbz'));
+						setHeader('bezeichnung', this.$p.t('projektarbeit', 'typ'));
+						setHeader('studiensemester_kurzbz', this.$p.t('lehre', 'studiensemester'));
+						setHeader('titel', this.$p.t('projektarbeit', 'titel'));
+						setHeader('note', this.$p.t('projektarbeit', 'gesamtnote'));
+						setHeader('beginn', this.$p.t('projektarbeit', 'beginn'));
+						setHeader('ende', this.$p.t('projektarbeit', 'ende'));
+						setHeader('freigegeben', this.$p.t('projektarbeit', 'freigegeben'));
+						setHeader('gesperrtbis', this.$p.t('projektarbeit', 'gesperrtBis'));
+						setHeader('themenbereich', this.$p.t('projektarbeit', 'themenbereich'));
+						setHeader('anmerkung', this.$p.t('projektarbeit', 'anmerkung'));
+						setHeader('firma_id', this.$p.t('projektarbeit', 'firmaId'));
+						setHeader('abgabedatum', this.$p.t('projektarbeit', 'abgabeEndupload'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
 					}
 				},
 			],
@@ -101,6 +99,7 @@ export default {
 					{title: "Typ Kurzbz", field: "projekttyp_kurzbz", visible: false},
 					{title: "Studiensemester", field: "studiensemester_kurzbz"},
 					{title: "Titel", field: "titel"},
+					{title: "Gesamtnote", field: "note"},
 					{
 						title: "Abgabe Enduplad",
 						field: "abgabedatum",
@@ -183,6 +182,7 @@ export default {
 					{title: "Anmerkung", field: "anmerkung", visible: false},
 					{title: "Lehreinheit ID", field: "lehreinheit_id", visible: false},
 					{title: "Student UID", field: "student_uid", visible: false},
+					{title: "Projektbetreuer", field: "projektbetreuer"},
 					{
 						title:"Final",
 						field:"final",
@@ -240,15 +240,15 @@ export default {
 						frozen: true
 					},
 				],
-				//layout: 'fitDataFill',
+				layout: 'fitDataStretchFrozen',
 				height: 'auto',
 				minHeight: '200',
-				selectable: 1,
+				selectableRows: 1,
 				index: 'projektarbeit_id',
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektarbeit'
+				persistenceID: 'stv-details-projektarbeit-20260217'
 			}
 			return options;
 		}
@@ -258,7 +258,7 @@ export default {
 			this.statusNew = true;
 			this.editedProjektarbeit = null;
 			this.toggleMenu('details');
-			this.$refs.projektarbeitDetails.getFormData(this.statusNew);
+			this.$refs.projektarbeitDetails.getFormData(this.statusNew, null, null);
 			this.$refs.projektarbeitModal.show();
 		},
 		actionEditProjektarbeit() {
@@ -388,7 +388,7 @@ export default {
 				<div class="tab-pane fade show" :class="activeTab == 'betreuer' ? 'active' : ''" id="betreuer" role="tabpanel" aria-labelledby="betreuer-tab">
 					<div class="row">
 						<div class="col-12">
-							<projektbetreuer ref="projektbetreuer" :config="config"></projektbetreuer>
+							<projektbetreuer ref="projektbetreuer" :config="config" @betreuer-saved="reload"></projektbetreuer>
 						</div>
 					</div>
 				</div>
@@ -396,8 +396,8 @@ export default {
 
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{$p.t('ui', 'abbrechen')}}</button>
-					<button v-if="statusNew" class="btn btn-primary" @click="addNewProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
-					<button v-if="!statusNew && activeTab == 'details'" class="btn btn-primary" @click="updateProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-if="statusNew" class="btn btn-primary" @click="addNewProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
+				<button v-if="!statusNew && activeTab == 'details'" class="btn btn-primary" @click="updateProjektarbeit()"> {{$p.t('ui', 'speichern')}}</button>
 			</template>
 
 		</bs-modal>

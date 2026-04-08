@@ -1,5 +1,5 @@
 import BsModal from "../Bootstrap/Modal.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
 export default {
@@ -70,6 +70,14 @@ export default {
 		ready() {
 			return this.component && this.arguments !== null;
 		},
+		visible: {
+			get() {
+				return !this.hidden;
+			},
+			set(value) {
+				this.$emit('remove', this.hidden);
+			}
+		}
 	},
 	methods: {
 		unpin(){
@@ -142,9 +150,15 @@ export default {
 			this.isLoading = false;
 		},
 	},
+	setup() {
+		const { actions } = useCachedWidgetLoader();
+		return {
+			loadWidget: actions.load
+		};
+	},
 	async created() {
-		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import("../" + this.widget.setup.file)).default;
+		this.widget = await this.loadWidget(this.id);
+		let component = (await import(this.widget.setup.file)).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;
 		this.component = "widget" + this.widget.widget_id;
 		this.arguments = { ...this.widget.arguments, ...this.config };
@@ -185,7 +199,7 @@ export default {
 			</a>
 			<Transition>
 				<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
+					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" v-model="visible" :value="true">
 				</div>
 			</Transition>
 		</div>

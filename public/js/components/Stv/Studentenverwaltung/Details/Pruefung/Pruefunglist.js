@@ -29,12 +29,56 @@ export default{
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			pruefungData: {},
+			listTypesExam: [],
+			listLvsAndLes: [],
+			listLvsAndMas: [],
+			listLvs: [],
+			listLes: [],
+			listMas: [],
+			listMarks: [],
+			zeugnisData: [],
+			filter: false,
+			statusNew: true,
+			isStartDropDown: false,
+			isFilterSet: false,
+			showHint: false,
+		}
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvExam.getPruefungen(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
+				layout: 'fitDataStretchFrozen',
+				layoutColumnsOnNewData: false,
+				height: 'auto',
+				index: 'pruefung_id',
+				persistenceID: 'stv-details-pruefung-list-20260217',
+				persistence: {
+					sort: true,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false
+				},
+				selectableRows: true,
 				columns: [
-					{title: "Datum", field: "format_datum"},
+					{title: "Datum", field: "datum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}},
 					{title: "Lehrveranstaltung", field: "lehrveranstaltung_bezeichnung"},
 					{title: "Note", field: "note_bezeichnung"},
 					{title: "Anmerkung", field: "anmerkung"},
@@ -46,8 +90,6 @@ export default{
 					{title: "Punkte", field: "punkte", visible: false},
 					{
 						title: 'Aktionen', field: 'actions',
-						minWidth: 150,
-						maxWidth: 150,
 						formatter: (cell, formatterParams, onRendered) => {
 							let container = document.createElement('div');
 							container.className = "d-flex gap-2";
@@ -89,74 +131,44 @@ export default{
 						},
 						frozen: true
 					}],
-				layout: 'fitDataStretchFrozen',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				index: 'pruefung_id',
-				persistenceID: 'stv-details-pruefung-list'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async () => {
 						await this.$p.loadCategory(['fristenmanagement', 'global', 'lehre', 'exam', 'ui']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('format_datum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('lehrveranstaltung_bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'lehrveranstaltung')
-						});
-						cm.getColumnByField('note_bezeichnung').component.updateDefinition({
-							title: this.$p.t('lehre', 'note')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('pruefungstyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('punkte').component.updateDefinition({
-							title: this.$p.t('exam', 'punkte')
-						});
-						cm.getColumnByField('pruefung_id').component.updateDefinition({
-							title: this.$p.t('ui', 'pruefung_id')
-						});
-						cm.getColumnByField('lehreinheit_id').component.updateDefinition({
-							title: this.$p.t('global', 'lehreinheit_id')
-						});
-						cm.getColumnByField('mitarbeiter_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'mitarbeiter_uid')
-						});
-						cm.getColumnByField('student_uid').component.updateDefinition({
-							title: this.$p.t('ui', 'student_uid')
-						});
-						//Uncaught TypeError: e.element.after is not a function
-						/*	cm.getColumnByField('actions').component.updateDefinition({
-								title: this.$p.t('global', 'actions')
-							});*/
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('datum', this.$p.t('global', 'datum'));
+						setHeader('lehrveranstaltung_bezeichnung', this.$p.t('lehre', 'lehrveranstaltung'));
+						setHeader('note_bezeichnung', this.$p.t('lehre', 'note'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('pruefungstyp_kurzbz', this.$p.t('global', 'typ'));
+						setHeader('punkte', this.$p.t('exam', 'punkte'));
+						setHeader('pruefung_id', this.$p.t('ui', 'pruefung_id'));
+						setHeader('lehreinheit_id', this.$p.t('global', 'lehreinheit_id'));
+						setHeader('mitarbeiter_uid', this.$p.t('ui', 'mitarbeiter_uid'));
+						setHeader('student_uid', this.$p.t('ui', 'student_uid'));
 					}
-				}
-			],
-			pruefungData: {},
-			listTypesExam: [],
-			listLvsAndLes: [],
-			listLvsAndMas: [],
-			listLvs: [],
-			listLes: [],
-			listMas: [],
-			listMarks: [],
-			zeugnisData: [],
-			checkData:[],
-			filter: false,
-			statusNew: true,
-			isStartDropDown: false,
-			isFilterSet: false,
-			showHint: false,
-		}
-	},
-	computed:{
+				},
+			];
+			return events;
+		},
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehrveranstaltung_id == this.pruefungData.lehrveranstaltung_id);
 		},
@@ -181,7 +193,7 @@ export default{
 
 			this.pruefungData.student_uid = this.uid;
 			this.pruefungData.note = 9;
-			this.pruefungData.datum = new Date();
+			this.pruefungData.datum = luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 			this.pruefungData.pruefungstyp_kurzbz = null;
 			if(lv_id){
 				this.pruefungData.lehrveranstaltung_id = lv_id;
@@ -193,7 +205,7 @@ export default{
 			this.isStartDropDown = false;
 			this.loadPruefung(pruefung_id).then(() => {
 				this.pruefungData.note = 9;
-				this.pruefungData.datum = new Date();
+				this.pruefungData.datum = luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 				this.pruefungData.pruefungstyp_kurzbz = null;
 				this.pruefungData.anmerkung = null;
 				this.prepareDropdowns();
@@ -229,9 +241,8 @@ export default{
 			return this.$refs.examData
 				.call(ApiStvExam.addPruefung(this.pruefungData))
 				.then(response => {
-					this.checkData = response.data;
-					if (this.checkData === 2 || this.checkData === 5)
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
+					if (response.data)
+						this.$fhcAlert.alertDefault('info', 'Info', response.data, true);
 					else
 						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('pruefungModal');
@@ -243,12 +254,13 @@ export default{
 				});
 		},
 		updatePruefung(pruefung_id){
-			this.checkChangeAfterExamDate();
 			return this.$refs.examData
 				.call(ApiStvExam.updatePruefung(pruefung_id, this.pruefungData))
 				.then(response => {
-					this.checkData = response.data;
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+					if (response.data)
+						this.$fhcAlert.alertDefault('info', 'Info', response.data, true);
+					else
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.hideModal('pruefungModal');
 					this.resetModal();
 				}).catch(this.$fhcAlert.handleSystemError)
@@ -265,27 +277,6 @@ export default{
 			}
 			else
 				this.showHint = false;
-		},
-		checkChangeAfterExamDate() {
-			const data = {
-				student_uid: this.pruefungData.student_uid,
-				studiensemester_kurzbz: this.pruefungData.studiensemester_kurzbz,
-				lehrveranstaltung_id: this.pruefungData.lehrveranstaltung_id
-			};
-			return this.$api
-				.call(ApiStvExam.checkZeugnisnoteLv(data))
-				.then(result => {
-					this.zeugnisData = result.data;
-					let checkDate = this.zeugnisData[0].uebernahmedatum === '' ||
-					this.zeugnisData[0].benotungsdatum > this.zeugnisData[0].uebernahmedatum
-						? this.zeugnisData[0].benotungsdatum
-						: this.zeugnisData[0].uebernahmedatum;
-					if (checkDate >= this.pruefungData.datum
-						&& this.pruefungData.note !== this.zeugnisData[0].note) {
-						this.$fhcAlert.alertInfo(this.$p.t('exam', 'hinweis_changeAfterExamDate'));
-					}
-				})
-				.catch(this.$fhcAlert.handleSystemError);
 		},
 		deletePruefung(pruefung_id) {
 			return this.$api
@@ -534,6 +525,7 @@ export default{
 					container-class="mb-3"
 					type="DatePicker"
 					v-model="pruefungData.datum"
+					model-type="yyyy-MM-dd"
 					name="datum"
 					:label="$p.t('global/datum')"
 					auto-apply

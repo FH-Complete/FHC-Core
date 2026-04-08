@@ -611,7 +611,7 @@ class Students extends FHCAPI_Controller
 			if (!$verband && !$gruppe && $orgform_kurzbz !== null) {
 				$this->PrestudentModel->db->where(
 					"(
-						SELECT orgform_kurzbz 
+						SELECT orgform_kurzbz
 						FROM public.tbl_prestudentstatus 
 						WHERE prestudent_id=tbl_prestudent.prestudent_id 
 						AND studiensemester_kurzbz=" . $this->PrestudentModel->escape($studiensemester_kurzbz) . " 
@@ -626,7 +626,7 @@ class Students extends FHCAPI_Controller
 		$this->addFilter($studiensemester_kurzbz);
 
 		$result = $this->PrestudentModel->loadWhere($where);
-		
+
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
@@ -766,6 +766,81 @@ class Students extends FHCAPI_Controller
 	}
 
 	/**
+	 * @param string		$studiensemester_kurzbz
+	 *
+	 * @return void
+	 */
+	public function search($studiensemester_kurzbz)
+	{
+		$this->addMeta('ci_method', __FUNCTION__);
+		$this->addMeta('ci_params', array(
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
+
+		$this->load->library('SearchLib', [ 'config' => 'searchstv' ]);
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('searchstr', 'searchstr', 'required');
+		$this->form_validation->set_rules('types[]', 'types', 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$result = $this->searchlib->search($this->input->post('searchstr'), $this->input->post('types'));
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+
+		$this->load->model('crm/Prestudent_model', 'PrestudentModel');
+
+		$this->prepareQuery($studiensemester_kurzbz);
+
+		$this->PrestudentModel->addSelect("COALESCE(v.semester::text, CASE WHEN public.get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) IN ('Aufgenommener', 'Bewerber', 'Wartender', 'interessent') THEN public.get_absem_prestudent(tbl_prestudent.prestudent_id, NULL)::text ELSE ''::text END) AS semester", false);
+		$this->PrestudentModel->addSelect('v.verband');
+		$this->PrestudentModel->addSelect('v.gruppe');
+
+		//add status per semester
+		$this->PrestudentModel->addSelect(
+			"public.get_rolle_prestudent(public.tbl_prestudent.prestudent_id, "
+				. $this->PrestudentModel->escape($studiensemester_kurzbz)
+				. ")  AS statusofsemester"
+		);
+
+		$this->addSelectPrioRel();
+
+		$this->addFilter($studiensemester_kurzbz);
+
+		$prestudent_ids = [];
+		$student_uids = [];
+			$this->addMeta('data', $data);
+		foreach ($data as $row) {
+			$dataset = json_decode($row->data);
+			if ($row->type == 'prestudent') {
+				$prestudent_ids[] = $dataset->prestudent_id;
+			} elseif ($row->type == 'student') {
+				$student_uids[] = $dataset->uid;
+			}
+		}
+
+		if ($prestudent_ids && $student_uids) {
+			$this->PrestudentModel->db->where_in('tbl_prestudent.prestudent_id', $prestudent_ids);
+			$this->PrestudentModel->db->or_where_in('s.student_uid', $student_uids);
+		} elseif ($prestudent_ids) {
+			$this->PrestudentModel->db->where_in('tbl_prestudent.prestudent_id', $prestudent_ids);
+		} elseif ($student_uids) {
+			$this->PrestudentModel->db->where_in('s.student_uid', $student_uids);
+		} else {
+			$this->terminateWithSuccess([]);
+		}
+
+		$result = $this->PrestudentModel->load();
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
+	}
+
+	/**
 	 * @param string|null	$studiensemester_kurzbz
 	 * @param string		$type
 	 *
@@ -775,6 +850,45 @@ class Students extends FHCAPI_Controller
 	{
 		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
+		$this->load->config('stv');
+
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$tags = $this->config->item('stv_prestudent_tags');
+
+			$whereTags = '';
+			if (is_array($tags) && !isEmptyArray($tags)) {
+				$tags = array_keys($tags);
+
+				foreach ($tags as $key => $tag) {
+					$tags[$key] = $this->db->escape($tag);
+				}
+				$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
+			}
+			$subQueryTag = "
+			  (
+				SELECT
+				  tag.prestudent_id,
+				  COALESCE(json_agg(tag ORDER BY tag.done), '[]'::json) AS tags
+				FROM (
+				  SELECT DISTINCT ON (n.notiz_id)
+					n.notiz_id AS id,
+					nt.typ_kurzbz,
+					array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+					n.text AS notiz,
+					nt.style,
+					n.erledigt AS done,
+					nz.prestudent_id
+				  FROM public.tbl_notizzuordnung AS nz
+					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
+					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz "
+				. $whereTags .
+				"
+				) AS tag
+				GROUP BY tag.prestudent_id
+			  ) AS tag_data_agg
+			";
+		}
 
 		$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
@@ -797,8 +911,17 @@ class Students extends FHCAPI_Controller
 			AND ps.studiensemester_kurzbz=public.get_stdsem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ') 
 			AND ps.ausbildungssemester=public.get_absem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ')', 'LEFT');
 
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$this->PrestudentModel->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
+		}
+
 
 		$this->PrestudentModel->addSelect("b.uid");
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$this->PrestudentModel->addSelect('tag_data_agg.tags');
+		}
 		$this->PrestudentModel->addSelect('titelpre');
 		$this->PrestudentModel->addSelect('nachname');
 		$this->PrestudentModel->addSelect('vorname');
@@ -817,14 +940,9 @@ class Students extends FHCAPI_Controller
 
 		//add status per semester
 		$this->PrestudentModel->addSelect(
-			"(
-				SELECT status_kurzbz
-				FROM public.tbl_prestudentstatus pss
-				WHERE pss.prestudent_id = public.tbl_prestudent.prestudent_id
-				  AND pss.studiensemester_kurzbz = " . $this->PrestudentModel->escape($studiensemester_kurzbz) . "
-				ORDER BY GREATEST(pss.datum, '0001-01-01') DESC
-				LIMIT 1
-				) AS statusofsemester"
+			"public.get_rolle_prestudent(public.tbl_prestudent.prestudent_id, "
+				. $this->PrestudentModel->escape($studiensemester_kurzbz)
+				. ")  AS statusofsemester"
 		);
 
 		$this->PrestudentModel->addSelect('UPPER(stg.typ || stg.kurzbz) AS studiengang');
@@ -861,6 +979,7 @@ class Students extends FHCAPI_Controller
 
 		$this->PrestudentModel->addSelect('mentor');
 		$this->PrestudentModel->addSelect('b.aktiv AS bnaktiv');
+		$this->PrestudentModel->addSelect('unruly');
 
 		$this->PrestudentModel->db->where_in('tbl_prestudent.studiengang_kz', $this->allowedStgs);
 

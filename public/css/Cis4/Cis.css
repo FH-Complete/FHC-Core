@@ -855,3 +855,9 @@ html {
 	background-color: var(--fhc-secondary);
 	
 }
+
+.bordered-modal {
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 0.5rem;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}

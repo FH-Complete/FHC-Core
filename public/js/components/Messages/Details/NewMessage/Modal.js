@@ -4,6 +4,8 @@ import FormInput from '../../../Form/Input.js';
 import ListBox from "../../../../../../index.ci.php/public/js/components/primevue/listbox/listbox.esm.min.js";
 import DropdownComponent from "../../../VorlagenDropdown/VorlagenDropdown.js";
 
+import ApiMessages from '../../../../api/factory/messages/messages.js';
+
 export default {
 	name: "ModalNewMessages",
 	components: {
@@ -14,13 +16,9 @@ export default {
 		ListBox
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: String,
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		messageId: {
@@ -43,6 +41,8 @@ export default {
 			vorlagen: [],
 			recipientsArray: [],
 			defaultRecipient: null,
+			defaultRecipients: [],
+			defaultRecipientString: null,
 			editor: null,
 			fieldsUser: [],
 			fieldsPerson: [],
@@ -56,7 +56,6 @@ export default {
 			previewText: null,
 			previewBody: "",
 			replyData: null,
-			uid: null,
 		}
 	},
 	methods: {
@@ -111,34 +110,28 @@ export default {
 		},
 		sendMessage() {
 			const data = new FormData();
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
-			const merged = {
-				...this.formData,
-				...params
-			};
-			data.append('data', JSON.stringify(merged));
+			data.append('data', JSON.stringify(this.formData));
+			data.append('ids', JSON.stringify(this.id));
 
 			return this.$refs.formMessage
-				.call(this.endpoint.sendMessageFromModalContext(this.uid, data))
+				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideModal('modalNewMessage');
 					this.resetForm();
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-						//this.resetForm();
-						//closeModal
-						//closewindwo
+
+					//just emit if no multitasking
+					if(this.id.length == 1){
 						this.$emit('reloadTable');
+						}
 					}
 				);
 		},
 		getDataVorlage(vorlage_kurzbz){
 			return this.$api
-				.call(this.endpoint.getDataVorlage(vorlage_kurzbz))
+				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
@@ -146,17 +139,17 @@ export default {
 		},
 		getPreviewText(){
 			const data = new FormData();
-
 			data.append('data', JSON.stringify(this.formData.body));
+			data.append('ids', JSON.stringify(this.id));
+
 			return this.$api
-				.call(this.endpoint.getPreviewText({
-					id: this.id,
-					type_id: this.typeId}, data))
+				.call(ApiMessages.getPreviewText(
+					this.typeId, data))
 				.then(response => {
-					this.previewText = response.data;
+					const previews = response.data;
+					this.previewText = previews[this.defaultRecipient];
 				}).catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
-					//this.resetForm();
 					//closeModal
 					//closewindwo
 				});
@@ -171,7 +164,7 @@ export default {
 				this.editor.save();
 
 			} else {
-				console.error("Editor instance is not available.");
+				console.error(this.$p.t('messages', 'errorEditorNotAvailable'));
 			}
 		},
 		resetForm(){
@@ -180,6 +173,7 @@ export default {
 				body: null,
 				subject: null,
 			};
+
 			this.$emit('resetMessageId');
 
 			if (this.editor) {
@@ -200,18 +194,6 @@ export default {
 			this.getPreviewText().then(() => {
 				this.previewBody = this.previewText;
 			});
-		},
-		getUid(id, typeId){
-			const params = {
-				id: id,
-				type_id: typeId
-			};
-			this.$api
-				.call(this.endpoint.getUid(params))
-				.then(result => {
-					this.uid = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
 		},
 		show(){
 			this.$refs.modalNewMessage.show();
@@ -245,7 +227,7 @@ export default {
 				if (!newMessageId) return;
 
 				try {
-					const result = await this.$api.call(this.endpoint.getReplyData(newMessageId));
+					const result = await this.$api.call(ApiMessages.getReplyData(newMessageId));
 					this.replyData = result.data;
 
 					if (this.replyData.length > 0) {
@@ -260,15 +242,9 @@ export default {
 		}
 	},
 	created(){
-		this.getUid(this.id, this.typeId);
-
 		if(this.typeId == 'person_id' || this.typeId == 'mitarbeiter_uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMessageVarsPerson(params))
+				.call(ApiMessages.getMessageVarsPerson(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPerson = result.data;
 					const person = this.fieldsPerson[0];
@@ -281,12 +257,8 @@ export default {
 		}
 
 		if(this.typeId == 'prestudent_id' || this.typeId == 'uid'){
-			const params = {
-				id: this.id,
-				type_id: this.typeId
-			};
 			this.$api
-				.call(this.endpoint.getMsgVarsPrestudent(params))
+				.call(ApiMessages.getMsgVarsPrestudent(this.id, this.typeId))
 				.then(result => {
 					this.fieldsPrestudent = result.data;
 					const prestudent = this.fieldsPrestudent[0];
@@ -299,7 +271,7 @@ export default {
 		}
 
 		this.$api
-			.call(this.endpoint.getMsgVarsLoggedInUser())
+			.call(ApiMessages.getMsgVarsLoggedInUser())
 			.then(result => {
 				this.fieldsUser = result.data;
 				const user = this.fieldsUser;
@@ -311,21 +283,18 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(this.endpoint.getNameOfDefaultRecipient({
-				id: this.id,
-				type_id: this.typeId}))
+			.call(ApiMessages.getNameOfDefaultRecipients(this.id, this.typeId))
 			.then(result => {
-				this.defaultRecipient = result.data;
-				this.recipientsArray.push({
-					'uid': this.uid,
-					'details': this.defaultRecipient});
+				this.defaultRecipients = result.data;
+				this.defaultRecipientString =  Object.values(this.defaultRecipients).join("; ");
+
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 
 		//case of reply
 		if(this.messageId) {
 			this.$api
-				.call(this.endpoint.getReplyData(this.messageId))
+				.call(ApiMessages.getReplyData(this.messageId))
 				.then(result => {
 					this.replyData = result.data;
 					this.formData.subject = this.replyData[0].replySubject;
@@ -381,7 +350,7 @@ export default {
 									type="text"
 									name="recipient"
 									:label="$p.t('messages/recipient')"
-									v-model="defaultRecipient"
+									v-model="defaultRecipientString"
 									disabled
 								>
 								</form-input>
@@ -502,17 +471,17 @@ export default {
 								>
 									<option :value="null">{{ $p.t('messages', 'recipient') }}...</option>
 									<option
-										v-for="recipient in recipientsArray"
-										:key="recipient.uid"
-										:value="recipient.uid" 
-										>{{recipient.details}}
+										v-for="(name, id) in defaultRecipients"
+										  :key="id" 
+										  :value="Number(id)"
+										> {{name}}
 									</option>
 								</form-input>
 							</div>
 
 							<div class="col-md-2 mt-4">
 								<br>
-								<button type="button" class="btn btn-secondary" @click="showPreview()">{{ $p.t('ui', 'btnAktualisieren') }}</button>
+								<button type="button" class="btn btn-secondary" @click="showPreview(defaultRecipient)">{{ $p.t('ui', 'btnAktualisieren') }}</button>
 							</div>
 						</form-form>
 

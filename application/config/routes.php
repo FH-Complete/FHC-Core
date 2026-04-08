@@ -68,6 +68,13 @@ $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
 $route['Cis/OverviewLvPlan/.*'] = 'Cis/OverviewLvPlan/index/$1';
 
+$route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
+$route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';
+$route['Abgabetool/Mitarbeiter'] = 'Cis/Abgabetool/Mitarbeiter';
+$route['Abgabetool/Student'] = 'Cis/Abgabetool/Student';
+$route['Abgabetool/Student/(:any)'] = 'Cis/Abgabetool/Student/$1';
+$route['Abgabetool/Deadlines'] = 'Cis/Abgabetool/Deadlines';
+
 // Studierendenverwaltung List Routes
 $route['api/frontend/v1/stv/[sS]tudents/inout'] = 'api/frontend/v1/stv/Students/index';
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})'] = 'api/frontend/v1/stv/Students/index';
