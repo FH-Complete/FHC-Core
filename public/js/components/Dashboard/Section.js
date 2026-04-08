@@ -12,7 +12,7 @@ export default {
 		WidgetIcon,
 	},
 	inject: {
-		widgetsSetup:{
+		widgetsSetup: {
 			type: Array,
 			default: [],
 		},
@@ -41,7 +41,7 @@ export default {
 			gridHeight: null,
 			draggedItem:null,
 			additionalRow:false,
-		}
+		};
 	},
 	provide() {
 		return {
@@ -49,7 +49,7 @@ export default {
 				this.editModeIsActive
 			),	
 			sectionName: Vue.computed(() => this.name),	
-		}
+		};
 	},
 	computed: {
 		computedWidgetsSetup() {
@@ -88,34 +88,29 @@ export default {
 				}
 				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 }) };
 			});
+
 			return placedItems;
-			
-		},
-		
+		}
 	},
 	methods: {
-		sectionNameTranslation(){
-			switch(this.name){
+		sectionNameTranslation() {
+			switch (this.name) {
 				case "general": 
-					return this.$p.t('dashboard',this.name); 
-					break;
+					return this.$p.t('dashboard', this.name); 
 				case "custom":
-					return this.$p.t('dashboard',this.name);
-					break;
+					return this.$p.t('dashboard', this.name);
 				default:
 					return this.name;
-					break;
 			}
 		},
-		showSectionInformation(){
-			if (this.name == "general"){
-				return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
-			}
-			else if(this.name == "custom"){
-				return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
-			}
-			else{
-				return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
+		showSectionInformation() {
+			switch (this.name) {
+				case "general": 
+					return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
+				case "custom":
+					return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
+				default:
+					return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
 			}
 		},
 		handleConfigOpened() {
@@ -226,16 +221,40 @@ export default {
 			self.gridWidth = parseInt(window.getComputedStyle(cont).getPropertyValue('--fhc-dashboard-grid-size'));
 		});
 	},
-	template: `
-	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
+	template: /* html */`
+	<div
+		class="dashboard-section position-relative pb-3 border-bottom"
+		ref="container"
+		:style="getSectionStyle"
+	>
 		<h4 v-if="editModeIsActive" class=" mb-2">
 			<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-			{{sectionNameTranslation()}}:
+			{{ sectionNameTranslation() }}:
 		</h4>
-		<button v-tooltip="$p.t('dashboard','addLine')" v-if="!additionalRow && editModeIsActive" @click="additionalRow=true" class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center">+</button>
-		<drop-grid v-model:cols="gridWidth" v-model:additionalRow="additionalRow" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+		<button
+			v-tooltip="$p.t('dashboard','addLine')"
+			v-if="!additionalRow && editModeIsActive"
+			@click="additionalRow=true"
+			class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center"
+		>+</button>
+		<drop-grid
+			v-model:cols="gridWidth"
+			v-model:additional-row="additionalRow"
+			:items="items"
+			:items-setup="computedWidgetsSetup"
+			:active="editModeIsActive"
+			:resize-limit="checkResizeLimit"
+			:margin-for-extra-row=".01"
+			@dragged-item="draggedItem=$event"
+			@rearrange-items="updatePositions"
+			@grid-height="gridHeight=$event"
+		>
 			<template #default="item">
-				<div v-if="item.placeholder" class="empty-tile-hover" @pointerdown="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
+				<div
+					v-if="item.placeholder"
+					class="empty-tile-hover"
+					@pointerdown="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"
+				></div>
 				<dashboard-item 
 					v-else
 					:id="item.widget"
