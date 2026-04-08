@@ -63,9 +63,6 @@ export default {
 		editModeIsActive() {
 			return (this.editMode || this.adminMode) && !this.configOpened	
 		},
-		getSectionStyle() {
-			return 'margin-bottom: 8px;';
-		},
 		items() {
 			// reuses the nearest placement of the widget from another viewport 
 			/* const computeNearestPlace = (item, gridWidth) =>{
@@ -223,9 +220,8 @@ export default {
 	},
 	template: /* html */`
 	<div
-		class="dashboard-section position-relative pb-3 border-bottom"
+		class="dashboard-section position-relative pb-3 mb-3 border-bottom"
 		ref="container"
-		:style="getSectionStyle"
 	>
 		<h4 v-if="editModeIsActive" class=" mb-2">
 			<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
