@@ -194,7 +194,7 @@ class TagLib
 				],
 				array(
 					'updateamum' => date('Y-m-d H:i:s'),
-					'updatevon' => 'Manually',
+					'updatevon' => getAuthUID(),
 				));
 
 			if (isError($resultUpdateNotiz))
@@ -208,10 +208,10 @@ class TagLib
 			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
 				'titel' => 'TAG',
 				'text' => 'AUTOMATED TAG',
-				'verfasser_uid' => self::BATCHUSER, //has to be an uid //TODO (auth UID)
+				'verfasser_uid' => getAuthUID(),
 				'erledigt' => false,
 				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => 'Manually',
+				'insertvon' => getAuthUID(),
 				'typ' => $tag
 			));
 
