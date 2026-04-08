@@ -131,8 +131,10 @@ export default {
 			return {
 				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
 				'--fhc-dg-col-width': 100/this.cols + '%',
-				'--fhc-dg-item-padding-horizontal': '0.25%',
-				'--fhc-dg-item-padding-top': '0.5%',
+				'--fhc-dg-item-padding':
+					'var(--fhc-dg-item-py, var(--fhc-dg-item-p, .25%))' +
+					' ' +
+					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
 				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
 			}
 		},
@@ -618,9 +620,7 @@ export default {
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
 					height: 'calc(' + item.h + ' * var(--fhc-dg-row-height))',
-					paddingTop: 'var(--fhc-dg-item-padding-top)',
-					paddingLeft: 'var(--fhc-dg-item-padding-horizontal)',
-					paddingRight: 'var(--fhc-dg-item-padding-horizontal)'
+					padding: 'var(--fhc-dg-item-padding)'
 				}"
 				@start-move="startMove"
 				@mouse-down="mouseDown"
