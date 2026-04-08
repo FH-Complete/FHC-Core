@@ -52,11 +52,19 @@ export default {
 		};
 	},
 
-	//TODO expand to other types
+	//TODO check if necessary to expand to other idTypes
 	getAllTagsPrestudent(prestudent_id){
 		return {
 			method: 'get',
 			url: 'api/frontend/v1/stv/Tags/getAllTags',
+			params: prestudent_id
+		};
+	},
+
+	rebuildTagsPrestudent(prestudent_id){
+		return {
+			method: 'get',
+			url: 'api/frontend/v1/stv/Tags/rebuildTagsPrestudent',
 			params: prestudent_id
 		};
 	}

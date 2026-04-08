@@ -123,6 +123,7 @@ export default {
 			isFetchingIssues: false,
 			tagEndpoint: ApiTag,
 			tagData: null,
+			rebuildData: null
 		};
 	},
 	methods: {
@@ -244,6 +245,17 @@ export default {
 		{
 			this.reload();
 		},
+		rebuildPrestudentTags(){
+			const prestudent_id = this.headerData[0].prestudent_id;
+			return this.$api
+				.call(ApiTag.rebuildTagsPrestudent({prestudent_id}))
+				.then(result => {
+					this.rebuildData = result.data;
+					console.log("Rebuild manually triggered");
+					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">
@@ -318,6 +330,10 @@ export default {
 								@updated="updatedTag"
 								zuordnung_typ="prestudent_id"
 							></core-tag>
+							<div>
+								<button v-if="tagsEnabled" @click="rebuildPrestudentTags">
+								<i class="fa-solid fa-refresh"></i></button>
+							</div>
 							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 						</div>
 

@@ -20,6 +20,7 @@ class Tag_Controller extends FHCAPI_Controller
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
 			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsPrestudent' => self::BERECHTIGUNG_KURZBZ,
 		];
 
 		$merged_permissions = array_merge($default_permissions, $permissions);
@@ -27,6 +28,10 @@ class Tag_Controller extends FHCAPI_Controller
 		parent::__construct($merged_permissions);
 
 		$this->_setAuthUID();
+
+		// Library
+		$this->load->library('TagLib');
+
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -278,7 +283,6 @@ class Tag_Controller extends FHCAPI_Controller
 	public function getAllTags($readonly_tags = false){
 		$language = $this->_getLanguageIndex();
 		$prestudent_id = $this->input->get('prestudent_id');
-		//	$this->terminateWithError("id:  " . $prestudent_id, self::ERROR_TYPE_GENERAL);
 
 		//TODO check for readonly: necessary?
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
@@ -328,6 +332,17 @@ class Tag_Controller extends FHCAPI_Controller
 
 
 		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz) : array());
+	}
+
+	public function rebuildTagsPrestudent()
+	{
+		$prestudent_id = $this->input->get('prestudent_id');
+
+		$result = $this->taglib->rebuildTagsForPrestudent($prestudent_id);
+		if (isError($result))
+			return error ('Error occurred during updateAutomatedTags');
+
+		$this->terminateWithSuccess($result);
 	}
 
 	private function _setAuthUID()

@@ -144,7 +144,7 @@ $config['stv_prestudent_tags'] = [
 	'inwork_kf' => ['readonly' => false],
 	'dd_auto' => ['readonly' => false],
 	'wh_auto' => ['readonly' => false],
-	'prewh_auto' => ['readonly' => true], //when readonly kein rendering für automatisierte tags
+	'prewh_auto' => ['readonly' => false], //when readonly kein rendering für automatisierte tags
 	'out_auto' => ['readonly' => false],
 	'zgv_auto' => ['readonly' => false],
 	'wiedereinstieg_auto' => ['readonly' => false],
