@@ -41761,7 +41761,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fehlerAktualitaetProjektarbeit ',
+		'phrase' => 'c4fehlerAktualitaetProjektarbeit',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
