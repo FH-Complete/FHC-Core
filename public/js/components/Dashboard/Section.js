@@ -86,7 +86,9 @@ export default {
 				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 }) };
 			});
 
-			return placedItems;
+			if (this.editModeIsActive)
+				return placedItems;
+			return placedItems.filter(item => !item.hidden);
 		}
 	},
 	methods: {
