@@ -330,8 +330,12 @@ export default {
 								@updated="updatedTag"
 								zuordnung_typ="prestudent_id"
 							></core-tag>
-							<div>
-								<button v-if="tagsEnabled" @click="rebuildPrestudentTags">
+							<div
+								role="button"
+								v-if="tagsEnabled"
+								@click="rebuildPrestudentTags"
+								class="btn btn-outline btn-light mb-1"
+								title="Automatische Tags neu laden">
 								<i class="fa-solid fa-refresh"></i></button>
 							</div>
 							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
