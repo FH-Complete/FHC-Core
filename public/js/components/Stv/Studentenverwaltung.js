@@ -18,6 +18,7 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import HorizontalSplit from "../horizontalsplit/horizontalsplit.js";
 import AppMenu from "../AppMenu.js";
 import AppConfig from "../AppConfig.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
@@ -37,6 +38,7 @@ export default {
 		CoreSearchbar,
 		NavLanguage,
 		VerticalSplit,
+		HorizontalSplit,
 		AppMenu,
 		AppConfig,
 		StvVerband,
@@ -235,6 +237,10 @@ export default {
 					}
 				}
 			}
+		},
+		sidebarCollapsed(newVal) {
+			if(newVal) this.$refs.hSplit.collapseLeft()
+			else this.$refs.hSplit.showBoth()
 		}
 	},
 	methods: {
@@ -632,23 +638,30 @@ export default {
 						</app-menu>
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
-				</nav>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-					<vertical-split>
-						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
-						</template>
-						<template #bottom>
-							<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
-						</template>
-					</vertical-split>
-				</main>
+				<horizontal-split ref="hSplit" :defaultRatio="[15, 85]">
+					<template #left>
+						<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100  w-100">
+							<div class="offcanvas-header justify-content-end px-1 d-md-none">
+								<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+							</div>
+							<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+							<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+						</nav>
+					</template>
+					<template #right>
+						<main>
+							<vertical-split :defaultRatio="[50, 50]">
+								<template #top>
+									<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
+								</template>
+								<template #bottom>
+									<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
+								</template>
+							</vertical-split>
+						</main>
+					</template>
+				</horizontal-split>
+				
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
