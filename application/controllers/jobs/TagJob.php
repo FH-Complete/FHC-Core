@@ -37,6 +37,23 @@ class TagJob extends JOB_Controller
 		]);
 	}
 
+	public function pocTagLibs()
+	{
+		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
+		//echo $this->NotiztypModel->db->last_query();
+		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+		print_r($automatedTags);
+
+		foreach($automatedTags as $autoTag)
+		{
+			$taglib = strtolower(basename($autoTag->taglib));
+			$this->load->library($autoTag->taglib);
+
+			$ids = $this->$taglib->getZuordnungIds(array('studiensemester_kurzbz' => 'SS2026'));
+			print_r($ids);
+		}
+	}
+
 	public function rebuildAutomatedTags()
 	{
 		print_r( PHP_EOL . "Start Job rebuild" . PHP_EOL);
