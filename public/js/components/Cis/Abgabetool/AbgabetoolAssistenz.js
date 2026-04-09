@@ -85,7 +85,7 @@ export const AbgabetoolAssistenz = {
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
-				datum: new Date(),
+				datum: new Date().toISOString().split('T')[0],
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -832,7 +832,7 @@ export const AbgabetoolAssistenz = {
 			this.saving = true
 			this.serienTermin.fixtermin = !this.serienTermin.invertedFixtermin
 			this.$api.call(ApiAbgabe.postSerientermin(
-				this.serienTermin.datum.toISOString(),
+				this.serienTermin.datum,
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
@@ -1385,6 +1385,7 @@ export const AbgabetoolAssistenz = {
 							:clearable="false"
 							locale="de"
 							format="dd.MM.yyyy"
+							model-type="yyyy-MM-dd"
 							:enable-time-picker="false"
 							:text-input="true"
 							auto-apply>
