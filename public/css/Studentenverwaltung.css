@@ -2,6 +2,7 @@
 @import './SvgIcons.css';
 @import './components/searchbar/searchbar.css';
 @import './components/verticalsplit.css';
+@import './components/horizontalsplit.css';
 @import './components/FilterComponent.css';
 @import './components/Tabs.css';
 @import './components/Notiz.css';
