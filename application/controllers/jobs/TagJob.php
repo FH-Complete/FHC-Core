@@ -8,7 +8,7 @@ class TagJob extends JOB_Controller
 {
 
 	const BATCHUSER = 'sftest';
-	const SEMESTER = 'WS2025'; //docker
+	const SEMESTER = 'SS2026'; //docker
 	//TODO semester
 
 	/**
@@ -49,12 +49,98 @@ class TagJob extends JOB_Controller
 			$taglib = strtolower(basename($autoTag->taglib));
 			$this->load->library($autoTag->taglib);
 
-			$ids = $this->$taglib->getZuordnungIds(array('studiensemester_kurzbz' => 'SS2026'));
+			$ids = $this->$taglib->getZuordnungIds(array('studiensemester_kurzbz' => self::SEMESTER));
+			print_r($ids);
+		}
+	}
+
+	public function loadTagLibs()
+	{
+		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
+		//echo $this->NotiztypModel->db->last_query();
+		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+		print_r($automatedTags);
+
+		foreach($automatedTags as $autoTag)
+		{
+			// getPath: must not be lost
+			$filePath = APPPATH . 'libraries/' . $autoTag->taglib . '.php'; // APPPATH = application/
+
+			if(file_exists($filePath)) {
+				require_once($filePath);
+			} else {
+				echo "File not found: " . $filePath;
+				continue;
+			}
+
+			// className without PATH (basename)
+			$className = basename($autoTag->taglib);
+
+			$obj = new $className();
+			$ids = $obj->getZuordnungIds(['studiensemester_kurzbz' => self::SEMESTER]);
+
+			$kurz_bz = $autoTag->typ_kurzbz;
+
+			echo PHP_EOL . $className . ": ";
+			echo PHP_EOL . $kurz_bz . ": ";
 			print_r($ids);
 		}
 	}
 
 	public function rebuildAutomatedTags()
+	{
+		print_r( PHP_EOL . "Start Job rebuild" . PHP_EOL);
+		$automaticTags = $this->config->item('stv_automatic_tags');
+		print_r( implode( ", ", $automaticTags) . PHP_EOL);
+
+		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
+		//echo $this->NotiztypModel->db->last_query();
+		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+		print_r($automatedTags);
+
+
+		foreach($automatedTags as $autoTag)
+		{
+			// getPath: must not be lost
+			$filePath = APPPATH . 'libraries/' . $autoTag->taglib . '.php'; // APPPATH = application/
+
+			if(file_exists($filePath)) {
+				require_once($filePath);
+			} else {
+				echo "File not found: " . $filePath . PHP_EOL;
+				continue;
+			}
+
+			$kurz_bz = $autoTag->typ_kurzbz;
+			// className without PATH (basename)
+			$className = basename($autoTag->taglib);
+
+			$obj = new $className();
+			$ids = $obj->getZuordnungIds(['studiensemester_kurzbz' => self::SEMESTER]);
+
+			$idsArray = $ids->prestudent_id;
+
+			$result = $this->taglib->updateAutomatedTags($kurz_bz, $idsArray);
+			$data = $result->retval;
+			if (isError($result))
+				return error ('Error occurred during updateAutomatedTags');
+
+			print_r(PHP_EOL ."ALL TAGS " . $kurz_bz . " " . count($data[0]) . " TO ADD " . count($data[1]) . " TO RECYLE: " . count($data[2]) .  " TO DELETE: " . count($data[3]));
+
+
+			print_r( PHP_EOL . "Count Recycled: ");
+			print_r($data[4]);
+			print_r( PHP_EOL . "Count Added: ");
+			print_r($data[6]);
+			print_r( PHP_EOL . "Count Deleted: ");
+			print_r($data[8] . PHP_EOL . PHP_EOL);
+
+		}
+		print_r( PHP_EOL . "End Job rebuild" . PHP_EOL);
+
+	}
+
+	public function rebuildAutomatedTags_DEPR()
 	{
 		print_r( PHP_EOL . "Start Job rebuild" . PHP_EOL);
 		$automaticTags = $this->config->item('stv_automatic_tags');

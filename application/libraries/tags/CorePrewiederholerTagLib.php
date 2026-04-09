@@ -1,10 +1,10 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of prewh_auto
  *
  * @author bambi
  */
-class CoreWiederholerTagLib
+class CorePrewiederholerTagLib
 {
 	protected $ci;
 
@@ -25,7 +25,7 @@ class CoreWiederholerTagLib
 
 		$semester = $params['studiensemester_kurzbz'];
 		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
+			'statusgrund_id' => 15,
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
@@ -51,7 +51,7 @@ class CoreWiederholerTagLib
 		$prestudent_id = $params['prestudent_id'];
 
 		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
+			'statusgrund_id' => 15,
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
@@ -62,4 +62,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }

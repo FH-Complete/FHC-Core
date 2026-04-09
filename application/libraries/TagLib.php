@@ -18,7 +18,7 @@ class TagLib
 {
 	const BATCHUSER = 'sftest';
 	const TYP_ZUORDNUNG = 'prestudent_id';
-	const SEMESTER = 'WS2025';
+	const SEMESTER = 'SS2026';
 
 	/**
 	 * Object initialization
@@ -233,11 +233,67 @@ class TagLib
 
 	}
 
-/*
- * main function for rebuild Tags for single prestudent
- * manually triggered
- * */
+	/*
+	 * main function for rebuild Tags for single prestudent
+	 * manually triggered
+	 * */
 	public function rebuildTagsForPrestudent($prestudent_id)
+	{
+		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
+		//echo $this->NotiztypModel->db->last_query();
+		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+		print_r($automatedTags);
+
+		$return = [];
+
+		foreach($automatedTags as $autoTag)
+		{
+			// getPath: must not be lost
+			$filePath = APPPATH . 'libraries/' . $autoTag->taglib . '.php'; // APPPATH = application/
+
+			if (file_exists($filePath)) {
+				require_once($filePath);
+			} else {
+				echo "File not found: " . $filePath;
+				continue;
+			}
+
+			// className without PATH (basename)
+			$className = basename($autoTag->taglib);
+
+			$obj = new $className();
+			$criteriaIsSet = $obj->isCriteriaSetFor([
+				'prestudent_id' => $prestudent_id,
+				'studiensemester_kurzbz' => self::SEMESTER
+				]);
+			//$return = $this->_ci->PrestudentstatusModel->db->last_query();
+			$kurz_bz = $autoTag->typ_kurzbz;
+
+		//	$return[$kurz_bz] = $criteriaIsSet;
+
+			if($criteriaIsSet)
+			{
+				$result = $this->updateAutomatedTagsForPrestudent($kurz_bz, $prestudent_id);
+				if (isError($result))
+					return error ('Error occurred during updateAutomatedTags' . $kurz_bz);
+
+				else
+					$return[$kurz_bz] = $result;
+			}
+			else {
+				$result = $this->checkForDelete($kurz_bz, $prestudent_id);
+				if($result != null)
+					$return[$kurz_bz] = $result;
+			}
+
+		}
+
+
+		return success($return);
+
+	}
+
+	public function rebuildTagsForPrestudentDEPR($prestudent_id)
 	{
 		$automaticTags = $this->_ci->config->item('stv_automatic_tags');
 		$return = [];
@@ -259,8 +315,6 @@ class TagLib
 					$return[$tag] = $result;
 			}
 		}
-
-
 		return success($return);
 
 	}
@@ -304,7 +358,7 @@ class TagLib
 		return $return;
 	}
 
-	public function isCriteriaSetFor($tag, $prestudent_id)
+	public function isCriteriaSetFor_DEPR($tag, $prestudent_id)
 	{
 		//TODO(finish list)
 		if($tag == 'wh_auto')
