@@ -47226,6 +47226,66 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widgetFromGeneralSection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieses Widget ist für das Dashboard vordefiniert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This is a predefined widget of this dashboard',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widgetFromCustomSection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieses Widget wurde von Ihnen hinzugefügt',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This widget has been added by you',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'dashboard',
+		'phrase' => 'widgetFromFunktionSection',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Dieses Widget wurde hinzugefügt weil Sie der "{0}" Funktion zugewiesen wurden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'This widget has been added because you have been assigned to the "{0}" function',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 // CIS4 phrases from legacy code end
 // FHC4 Phrases Abschlusspruefung
 	array(

@@ -52,6 +52,26 @@ export default {
 		};
 	},
 	computed: {
+		sectionNameTranslation() {
+			switch (this.name) {
+				case "general": 
+					return this.$p.t('dashboard', this.name); 
+				case "custom":
+					return this.$p.t('dashboard', this.name);
+				default:
+					return this.name;
+			}
+		},
+		showSectionInformation() {
+			switch (this.name) {
+				case "general": 
+					return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
+				case "custom":
+					return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
+				default:
+					return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
+			}
+		},
 		computedWidgetsSetup() {
 			if (!this.widgetsSetup)
 				return {};
@@ -92,26 +112,6 @@ export default {
 		}
 	},
 	methods: {
-		sectionNameTranslation() {
-			switch (this.name) {
-				case "general": 
-					return this.$p.t('dashboard', this.name); 
-				case "custom":
-					return this.$p.t('dashboard', this.name);
-				default:
-					return this.name;
-			}
-		},
-		showSectionInformation() {
-			switch (this.name) {
-				case "general": 
-					return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
-				case "custom":
-					return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
-				default:
-					return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
-			}
-		},
 		handleConfigOpened() {
 			this.configOpened = true
 		},
@@ -225,9 +225,9 @@ export default {
 		class="dashboard-section position-relative pb-3 mb-3 border-bottom"
 		ref="container"
 	>
-		<h4 v-if="editModeIsActive" class=" mb-2">
-			<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-			{{ sectionNameTranslation() }}:
+		<h4 v-if="adminMode" class=" mb-2">
+			<i v-tooltip="showSectionInformation" class="fa-solid fa-circle-info section-info"></i>
+			{{ sectionNameTranslation }}:
 		</h4>
 		<button
 			v-tooltip="$p.t('dashboard','addLine')"
@@ -269,6 +269,7 @@ export default {
 					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
 					:resize-limits="computedWidgetsSetup[item.widget]"
+					:source="adminMode ? null : item.source || 'custom'"
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)"
 					@config-opened="handleConfigOpened"

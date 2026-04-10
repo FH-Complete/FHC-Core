@@ -39,9 +39,22 @@ export default {
 		"place",
 		"resizeLimits",
 		"dragstate",
-		"resizeOverlay"
+		"resizeOverlay",
+		"source"
 	],
 	computed: {
+		sourceInfoTooltip() {
+			switch (this.source) {
+				case null:
+					return '';
+				case 'general':
+					return this.$p.t('dashboard', 'widgetFromGeneralSection');
+				case 'custom':
+					return this.$p.t('dashboard', 'widgetFromCustomSection');
+				default:
+					return this.$p.t('dashboard', 'widgetFromFunktionSection', [this.source]);
+			}
+		},
 		isResizeableHorizontal() {
 			if (this.resizeLimits.width === undefined)
 				return true;
@@ -193,6 +206,13 @@ export default {
 					</span>
 				</Transition>
 				<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
+				<div
+					v-if="source"
+					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
+					class="col-auto me-2"
+				>
+					<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+				</div>
 				<template v-if="isPinned">
 					<div type="button" role="button" v-if="editMode" pinned="true" @click="unpin" title="unpin item" aria-label="unpin item" class="pin cursor-pointer col-auto me-2">
 						<i class="fa-solid fa-thumbtack " aria-hidden="true"></i>
@@ -207,8 +227,8 @@ export default {
 					</div>
 				</template>
 				<a type="button" v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" aria-label="widget link" v-tooltip="{showDelay:1000, value:'widget link'}" class="col-auto ms-auto">
-	          		<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
-	          	</a>
+					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
+				</a>
 				<a type="button" v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig" aria-label="configure widget" v-tooltip="{showDelay:1000,value:'configure widget'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></a>
 				<a type="button" v-if="custom && editMode" class="col-auto px-1" aria-label="delete widget" v-tooltip="{showDelay:1000,value:'delete widget'}" href="#" @click.prevent="$emit('remove')">
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
