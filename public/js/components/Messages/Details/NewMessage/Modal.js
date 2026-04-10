@@ -133,6 +133,7 @@ export default {
 			return this.$api
 				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
+					this.editor.setContent(response.data.text);
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
 				}).catch(this.$fhcAlert.handleSystemError);
@@ -203,24 +204,6 @@ export default {
 		},
 	},
 	watch: {
-		'formData.body': {
-			handler(newVal) {
-				const tinymcsVal = this.editor.getContent();
-
-				if (newVal && tinymcsVal != newVal) {
-					//Inhalt des Editors aktualisieren
-					this.editor.setContent(newVal);
-				}
-			}
-		},
-		'formData.vorlage_kurzbz': {
-			handler(newVal){
-				if (newVal && newVal != null) {
-					this.formData.subject = newVal;
-					return this.getDataVorlage(newVal);
-				}
-			}
-		},
 		messageId: {
 			immediate: true,
 			handler: async function (newMessageId) {
