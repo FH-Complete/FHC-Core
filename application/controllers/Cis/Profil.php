@@ -87,9 +87,9 @@ class Profil extends Auth_Controller
 	}
 
 	/**
-	 * checks whether a specific userID is a mitarbeiter or not (foreword declaration of the function isMitarbeiter in Mitarbeiter_model.php)
+	 * checks whether a specific userID is a student or not (foreword declaration of the function isStudent in Student_model.php)
 	 * @access public
-	 * @param  $uid the userID used to check if it is a mitarbeiter
+	 * @param  $uid the userID used to check if it is a student
 	 * @return boolean 
 	 */
 	public function isStudent($uid)
@@ -119,7 +119,7 @@ class Profil extends Auth_Controller
 	}
 
 	/**
-	 * gets the adressen that are marked as zustell from the currenlty logged in user
+	 * gets the adressen that are marked as zustell from the currently logged in user
 	 * @access public
 	 * @return array a list of adresse_id's 
 	 */

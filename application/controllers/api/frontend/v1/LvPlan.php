@@ -16,7 +16,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-if (! defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 use CI3_Events as Events;
 use \DateTime as DateTime;
@@ -33,8 +34,8 @@ class LvPlan extends FHCAPI_Controller
 
 		parent::__construct([
 			'getRoomplan' => self::PERM_LOGGED,
-            'Stunden' => self::PERM_LOGGED,
-            'getReservierungen' => self::PERM_LOGGED,
+			'Stunden' => self::PERM_LOGGED,
+			'getReservierungen' => self::PERM_LOGGED,
 			'LvPlanEvents' => self::PERM_LOGGED,
 			'eventsPersonal' => self::PERM_LOGGED,
 			'eventsLv' => self::PERM_LOGGED,
@@ -49,8 +50,8 @@ class LvPlan extends FHCAPI_Controller
 
 		]);
 
-        $this->load->library('LogLib');
-        $this->loglib->setConfigs(array(
+		$this->load->library('LogLib');
+		$this->loglib->setConfigs(array(
 			'classIndex' => 5,
 			'functionIndex' => 5,
 			'lineIndex' => 4,
@@ -58,17 +59,17 @@ class LvPlan extends FHCAPI_Controller
 			'dbExecuteUser' => 'RESTful API'
 		));
 
-        $this->load->library('form_validation');
+		$this->load->library('form_validation');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
 	/**
-     * fetches LvPlan and Moodle events together
-     * @access public
-     *
-     */
+	 * fetches LvPlan and Moodle events together
+	 * @access public
+	 *
+	 */
 	public function LvPlanEvents()
 	{
 		$hasLv = $this->input->post('lv_id');
@@ -95,16 +96,17 @@ class LvPlan extends FHCAPI_Controller
 		// storing the post parameter in local variables
 		$start_date = $this->input->post('start_date', true);
 		$end_date = $this->input->post('end_date', true);
+		$uid = $this->input->post('uid', true);
 
 		// fetching lvplan events
-		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date);
+		$result = $this->stundenplanlib->getEventsUser($start_date, $end_date, $uid);
 		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
 		// fetching moodle events
-		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date);
+		$moodleEvents = $uid ? [] : $this->fetchMoodleEvents($start_date, $end_date);
 
 		// fetching ferien events
-		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date);
+		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
 
 
 		$this->terminateWithSuccess(array_merge(
@@ -128,15 +130,11 @@ class LvPlan extends FHCAPI_Controller
 		$this->form_validation->set_rules('end_date', "end_date", "required");
 		//$this->form_validation->set_rules('stg_kz', "stg_kz", "required"); //no validation show empty calendar
 
-		if (!$this->form_validation->run())
-		{
+		if (!$this->form_validation->run()) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 			$stgOrgEvents = [];
 			$ferienEvents = [];
-		}
-
-		else
-		{
+		} else {
 			$start_date = $this->input->post('start_date', true);
 			$end_date = $this->input->post('end_date', true);
 			$stg_kz = $this->input->post('stg_kz', true);
@@ -170,7 +168,7 @@ class LvPlan extends FHCAPI_Controller
 		$this->form_validation->set_rules('start_date', "start_date", "required");
 		$this->form_validation->set_rules('end_date', "end_date", "required");
 		$this->form_validation->set_rules('lv_id', "lv_id", "required|integer");
-		
+
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
@@ -193,40 +191,42 @@ class LvPlan extends FHCAPI_Controller
 	}
 
 	//TODO: delete this function if we don't use the old calendar export endpoints anymore
-	public function studiensemesterDateInterval($date){
-		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		$studiensemester =$this->StudiensemesterModel->getByDate(date_format(date_create($date),'Y-m-d'));
-		$studiensemester =current($this->getDataOrTerminateWithError($studiensemester));
+	public function studiensemesterDateInterval($date)
+	{
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$studiensemester = $this->StudiensemesterModel->getByDate(date_format(date_create($date), 'Y-m-d'));
+		$studiensemester = current($this->getDataOrTerminateWithError($studiensemester));
 		$this->terminateWithSuccess($studiensemester);
 	}
 
-	public function getLvPlanForStudiensemester($studiensemester,$lvid){
+	public function getLvPlanForStudiensemester($studiensemester, $lvid)
+	{
 		$this->load->library('StundenplanLib');
-		$this->load->model('organisation/Studiensemester_model','StudiensemesterModel');
-		
-		$studiensemester_result = $this->StudiensemesterModel->loadWhere(["studiensemester_kurzbz"=>$studiensemester]);
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+
+		$studiensemester_result = $this->StudiensemesterModel->loadWhere(["studiensemester_kurzbz" => $studiensemester]);
 		$studiensemester_result = current($this->getDataOrTerminateWithError($studiensemester_result));
 		$timespan_start = new DateTime($studiensemester_result->start);
 		$timespan_ende = new DateTime($studiensemester_result->ende);
-		$lvplan = $this->stundenplanlib->getStundenplan(date_format($timespan_start, 'Y-m-d'),date_format($timespan_ende, 'Y-m-d'), $lvid);
+		$lvplan = $this->stundenplanlib->getStundenplan(date_format($timespan_start, 'Y-m-d'), date_format($timespan_ende, 'Y-m-d'), $lvid);
 		$this->terminateWithSuccess($lvplan);
-		
-	}
-		
 
-    /**
-     * fetches Stunden layout from database
-     * @access public
-     *
-     */
-    public function Stunden()
+	}
+
+
+	/**
+	 * fetches Stunden layout from database
+	 * @access public
+	 *
+	 */
+	public function Stunden()
 	{
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
 
 		$this->StundeModel->addOrder('stunde', 'ASC');
 		$stunden = $this->StundeModel->load();
 
-        $stunden = $this->getDataOrTerminateWithError($stunden);
+		$stunden = $this->getDataOrTerminateWithError($stunden);
 
 		$this->terminateWithSuccess($stunden);
 	}
@@ -257,10 +257,10 @@ class LvPlan extends FHCAPI_Controller
 		$roomplan_data = $this->stundenplanlib->getRoomplan($ort_kurzbz, $start_date, $end_date);
 
 		$roomplan_data = $this->getDataOrTerminateWithError($roomplan_data);
-		
+
 		$this->terminateWithSuccess($roomplan_data);
 	}
-	
+
 	/**
 	 * gets the reservierungen of a room if the ort_kurzbz parameter is
 	 * supplied otherwise gets the reservierungen of the lvplan of a student
@@ -273,25 +273,27 @@ class LvPlan extends FHCAPI_Controller
 	{
 		$this->form_validation->set_rules('start_date', "StartDate", "required");
 		$this->form_validation->set_rules('end_date', "EndDate", "required");
-		
+
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
 		// storing the post parameter in local variables
 		$start_date = $this->input->post('start_date', true);
 		$end_date = $this->input->post('end_date', true);
+		$uid = $this->input->post('uid', true);
 
 		// get data
 		$this->load->library('StundenplanLib');
 
-		$result = $this->stundenplanlib->getReservierungen($start_date, $end_date, $ort_kurzbz);
+		$result = $this->stundenplanlib->getReservierungen($start_date, $end_date, $ort_kurzbz, $uid);
 
 		$result = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($result);
 	}
 
-	public function getLehreinheitStudiensemester($lehreinheit_id){
+	public function getLehreinheitStudiensemester($lehreinheit_id)
+	{
 		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->LehreinheitModel->addSelect(["studiensemester_kurzbz"]);
 		$result = $this->LehreinheitModel->load($lehreinheit_id);
@@ -336,7 +338,7 @@ class LvPlan extends FHCAPI_Controller
 
 	public function getStudiengaenge()
 	{
-		$this->load->model('organisation/Studiengang_model','StudiengangModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
 
 		$this->StudiengangModel->addOrder('typ');
 		$this->StudiengangModel->addOrder('kurzbz');
@@ -349,19 +351,19 @@ class LvPlan extends FHCAPI_Controller
 		return $this->terminateWithSuccess($data);
 	}
 
-	public function getLehrverband($studiengang_kz, $semester=null, $verband=null)
+	public function getLehrverband($studiengang_kz, $semester = null, $verband = null)
 	{
-		$this->load->model('organisation/Lehrverband_model','LehrverbandModel');
+		$this->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 
 		$where = [
 			'aktiv' => true,
 			'studiengang_kz' => $studiengang_kz,
 		];
 
-		if ($semester !== null  && $semester !== 'null' && $semester !== 'undefined') {
+		if ($semester !== null && $semester !== 'null' && $semester !== 'undefined') {
 			$where['semester'] = $semester;
 		}
-		if ($verband !== null  && $verband !== 'null' && $verband !== 'undefined') {
+		if ($verband !== null && $verband !== 'null' && $verband !== 'undefined') {
 			$where['verband'] = $verband;
 		}
 
@@ -388,19 +390,19 @@ class LvPlan extends FHCAPI_Controller
 		$this->load->config('calendar');
 
 		$tz = new DateTimeZone($this->config->item('timezone'));
-		
+
 		$start = new DateTime($start_date);
 		$start->setTimezone($tz);
-		
+
 		$end = new DateTime($end_date);
 		$end->setTimezone($tz);
 		$end->modify('+1 day -1 second');
-		
+
 		$moodle_events = [];
-		
+
 		Events::trigger(
 			'moodleCalendarEvents',
-			function & () use (&$moodle_events) {
+			function &() use (&$moodle_events) {
 				return $moodle_events;
 			},
 			[
@@ -420,7 +422,7 @@ class LvPlan extends FHCAPI_Controller
 	 * @param string		$end_date
 	 * @return array
 	 */
-	private function fetchFerienEvents($start_date, $end_date)
+	private function fetchFerienEvents($start_date, $end_date, $uid = null)
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->load->model('education/Studentlehrverband_model', 'StudentLehrverbandModel');
@@ -432,7 +434,7 @@ class LvPlan extends FHCAPI_Controller
 			$studentsemester_kurzbz = current($currentStudiensemester)->studiensemester_kurzbz;
 
 			$studiengang = $this->StudentLehrverbandModel->loadWhere([
-				"student_uid" => getAuthUID(),
+				"student_uid" => $uid ?? getAuthUID(),
 				"studiensemester_kurzbz" => $studentsemester_kurzbz
 			]);
 			$studiengang = $this->getDataOrTerminateWithError($studiengang);

@@ -18,10 +18,10 @@ class Reservierung_model extends DB_Model
 	 * 
 	 * @return stdClass
 	 */
-	public function getReservierungen($start_date, $end_date, $ort_kurzbz = null)
+	public function getReservierungen($start_date, $end_date, $ort_kurzbz = null, $uid = null)
 	{
-		
-		$lvplan_reservierungen_query="SELECT r.* , stund.beginn, stund.ende,
+
+		$lvplan_reservierungen_query = "SELECT r.* , stund.beginn, stund.ende,
 			CASE
 				WHEN r.gruppe_kurzbz IS NOT NULL THEN r.gruppe_kurzbz 
 				ELSE CONCAT(UPPER(studg.typ),UPPER(studg.kurzbz),'-',COALESCE(CAST(r.semester AS varchar),'/'),COALESCE(CAST(r.verband AS varchar),'/')) 
@@ -35,7 +35,7 @@ class Reservierung_model extends DB_Model
 			LEFT JOIN public.tbl_studiensemester ss2 ON slv.studiensemester_kurzbz = ss2.studiensemester_kurzbz AND ss2.start <=r.datum AND ss2.ende >= r.datum 
 			WHERE datum >= ? AND datum <= ? AND (ss1.studiensemester_kurzbz IS NOT NULL
 			OR ss2.studiensemester_kurzbz IS NOT NULL)";
-		
+
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
 			CASE
 				WHEN res.gruppe_kurzbz IS NOT NULL THEN res.gruppe_kurzbz 
@@ -46,9 +46,9 @@ class Reservierung_model extends DB_Model
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.ort_kurzbz = ? AND datum >= ? AND datum <= ?";
 
-		$subquery = is_null($ort_kurzbz)? $lvplan_reservierungen_query:$raum_reservierungen_query;
-		
-		$query_result= $this->execReadOnlyQuery("
+		$subquery = is_null($ort_kurzbz) ? $lvplan_reservierungen_query : $raum_reservierungen_query;
+
+		$query_result = $this->execReadOnlyQuery("
 		SELECT 
 		'reservierung' as type, beginn, ende, datum,
 		COALESCE(titel, beschreibung) as topic,
@@ -59,15 +59,15 @@ class Reservierung_model extends DB_Model
 		
 		FROM 
 		(
-			". $subquery ."
+			" . $subquery . "
 		) AS subquery
 
 		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
 		
 		ORDER BY datum, beginn
-		", is_null($ort_kurzbz) ?[getAuthUID(), getAuthUID(),$start_date,$end_date]: [$ort_kurzbz, $start_date, $end_date]);
+		", is_null($ort_kurzbz) ? [$uid ?? getAuthUID(), $uid ?? getAuthUID(), $start_date, $end_date] : [$ort_kurzbz, $start_date, $end_date]);
 
-		
+
 		return $query_result;
 	}
 
@@ -76,7 +76,7 @@ class Reservierung_model extends DB_Model
 	 *
 	 * @return stdClass
 	 */
-	public function getReservierungenMitarbeiter($start_date, $end_date)
+	public function getReservierungenMitarbeiter($start_date, $end_date, $uid = null)
 	{
 
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
@@ -91,8 +91,8 @@ class Reservierung_model extends DB_Model
 
 		$subquery = $raum_reservierungen_query;
 
-		
-		$query_result= $this->execReadOnlyQuery("
+
+		$query_result = $this->execReadOnlyQuery("
 		SELECT 
 		'reservierung' as type, beginn, ende, datum,
 		COALESCE(titel, beschreibung) as topic,
@@ -103,13 +103,13 @@ class Reservierung_model extends DB_Model
 		
 		FROM 
 		(
-			". $subquery ."
+			" . $subquery . "
 		) AS subquery
 
 		GROUP BY datum, beginn, ende, ort_kurzbz, titel, beschreibung
 		
 		ORDER BY datum, beginn
-		", [getAuthUID(), $start_date, $end_date]);
+		", [$uid ?? getAuthUID(), $start_date, $end_date]);
 
 
 		return $query_result;
@@ -129,9 +129,9 @@ class Reservierung_model extends DB_Model
 		$this->addJoin('public.tbl_studiensemester ss2', 'slv.studiensemester_kurzbz=ss2.studiensemester_kurzbz AND ss2.start<=r.datum AND ss2.ende>=r.datum', 'LEFT');
 		$this->db->or_where('ss1.studiensemester_kurzbz IS NOT NULL', null, false);
 		$this->db->or_where('ss2.studiensemester_kurzbz IS NOT NULL', null, false);
-		
+
 		$query = $this->db->get_compiled_select('campus.vw_reservierung r');
-		
+
 		return $this->execQuery($query, [$uid, $uid]);
 	}
 

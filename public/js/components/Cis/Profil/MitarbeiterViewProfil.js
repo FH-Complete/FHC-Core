@@ -1,9 +1,9 @@
 import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
-import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
 
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
@@ -11,10 +11,10 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		Mailverteiler,
-		QuickLinks,
 		RoleInformation,
 		ProfilEmails,
 		ProfilInformation,
+		QuickLinks,
 	},
 	inject: ["collapseFunction", "language"],
 	data() {
@@ -90,6 +90,18 @@ export default {
 					},
 				],
 			},
+			quickLinks: [
+				{
+					icon: "fa-calendar-days",
+					phrase: "lehre/stundenplan",
+					action: () => {
+						this.$router.push({
+      					  	name: "OtherLvPlan",
+      					  	params: { otherUid: this.$props.data.username },
+      					})
+					},
+				}
+			],
 		};
 	},
 
@@ -242,7 +254,7 @@ export default {
                 </div>
                 <!-- START OF THE SECOND PROFIL INFORMATION ROW -->
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
-            </div  >
+            </div>
             <!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
             <div class="row">
                 <!-- FIRST TABLE -->
@@ -256,26 +268,22 @@ export default {
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
             <!-- VISIBLE UNTIL VIEWPORT MD -->
-            <!--TODO: uncomment when implemented
-                <div  class="row d-none d-md-block mb-3">
-                  <div class="col">
-                
-                   <quick-links :title="$p.t('profil','quickLinks')" ></quick-links>
-                
-                  </div>
-                </div>
-                -->
-            <div  class="row">
-                <div class="col">
-                    <!-- MAILVERTEILER -->
-                    <mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
-                </div>
-            </div>
-            <!-- END OF SIDE PANEL -->
-        </div>
+			<div v-if="quickLinks.length" class="row mb-4">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<!-- MAILVERTEILER -->
+					<mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
+				</div>
+			</div>
+			<!-- END OF SIDE PANEL -->
+		</div>
         <!-- END OF CONTAINER ROW-->
-    </div>
-    <!-- END OF CONTAINER -->
+	</div>
+	<!-- END OF CONTAINER -->
 </div>
 `,
 };

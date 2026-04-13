@@ -30,11 +30,11 @@ export default {
 			params: { start_date, end_date, lv_id }
 		};
 	},
-	eventsPersonal(start_date, end_date) {
+	eventsPersonal(start_date, end_date, uid = null) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/lvPlan/eventsPersonal',
-			params: { start_date, end_date }
+			params: { start_date, end_date, uid }
 		};
 	},
 	eventsLv(lv_id, start_date, end_date) {
@@ -57,11 +57,11 @@ export default {
 			params: { start_date, end_date }
 		};
 	},
-	getLvPlanReservierungen(start_date, end_date) {
+	getLvPlanReservierungen(start_date, end_date, uid = null) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/LvPlan/getReservierungen',
-			params: { start_date, end_date }
+			params: { start_date, end_date, uid }
 		};
 	},
 	getLehreinheitStudiensemester(lehreinheit_id) {
@@ -118,5 +118,4 @@ export default {
 			url: `/api/frontend/v1/lvPlan/getLehrverband/${stg_kz}/${sem}/${verband}`
 		}
 	},
-
 };

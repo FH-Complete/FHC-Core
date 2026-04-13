@@ -40,13 +40,16 @@ class StundenplanLib
 	 * @return stdClass
 	 * @access public
 	 */
-	public function getEventsUser($start, $end)
+	public function getEventsUser($start, $end, $uid = null)
 	{
 		$this->_ci =& get_instance();
 
 		$this->_ci->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 
-		$uid = getAuthUID();
+		if (!$uid) {
+			$uid = getAuthUID();
+		}
+		
 		if (is_null($uid))
 			return error("No UID");
 		
@@ -217,7 +220,7 @@ class StundenplanLib
 	 * @param string	$ort_kurzbz
 	 * @return stdClass
 	 */
-	public function getReservierungen($start_date, $end_date, $ort_kurzbz = '')
+	public function getReservierungen($start_date, $end_date, $ort_kurzbz = '', $uid = null)
 	{
 		$this->_ci =& get_instance();
 
@@ -228,14 +231,14 @@ class StundenplanLib
 		$this->_ci->load->model('ressource/Reservierung_model', 'ReservierungModel');
 		$this->_ci->load->model('ressource/Stundenplan_model', 'StundenplanModel');
 
-		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter(getAuthUID()));
+		$is_mitarbeiter = getData($this->_ci->MitarbeiterModel->isMitarbeiter($uid ?? getAuthUID()));
 
 		if ($is_mitarbeiter && empty($ort_kurzbz)) {
 			// request for personal lvplan show only reservations of logged in user
-			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date);
+			$reservierungen = $this->_ci->ReservierungModel->getReservierungenMitarbeiter($start_date, $end_date, $uid);
 		} else {
 			// querying the reservierungen
-			$reservierungen = $this->_ci->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz);
+			$reservierungen = $this->_ci->ReservierungModel->getReservierungen($start_date, $end_date, $ort_kurzbz, $uid);
 		}
 		
 		if (isError($reservierungen))

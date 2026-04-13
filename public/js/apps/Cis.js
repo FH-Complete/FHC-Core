@@ -33,7 +33,20 @@ const app = Vue.createApp({
 										"/Cis/Profil/View/"+data.uid;
 							}
 						},
-                        childactions: []
+                        childactions: [
+							{
+                                label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
+                                icon: "fas fa-calendar-days",
+                                type: "link",
+                                action: function(data) {
+									const uid = JSON.parse(data.data).uid;
+									const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/Cis/OtherLvPlan/' + uid;
+									return link;
+                                }
+                            }
+						]
 					},
 					student: {
 						defaultaction: {
@@ -44,7 +57,20 @@ const app = Vue.createApp({
 
 							}
 						},
-						childactions: []
+						childactions: [
+							{
+                                label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
+                                icon: "fas fa-calendar-days",
+                                type: "link",
+                                action: function(data) {
+									const uid = JSON.parse(data.data).uid;
+									const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+										FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+										'/Cis/OtherLvPlan/' + uid;
+									return link;
+                                }
+                            }
+						]
 					},
                     room: {
                         defaultaction: {

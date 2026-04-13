@@ -103,7 +103,18 @@ export default {
 					},
 				],
 			},
-
+			quickLinks: [
+				{
+					icon: "fa-calendar-days",
+					phrase: "lehre/stundenplan",
+					action: () => {
+						this.$router.push({
+      					  	name: "OtherLvPlan",
+      					  	params: { otherUid: this.$props.data.username },
+      					})
+					},
+				}
+			],
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableMaProfilBetriebsmittel",
 				persistence: {
@@ -331,12 +342,6 @@ export default {
     <edit-profil v-if="showModal" ref="editModal" :isMitarbeiter="true" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
         <div  class="d-md-none col-12 ">
-            <!--TODO: uncomment when implemented
-                <div class="row mb-3">
-                           <div class="col">
-                           <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
-                           </div>
-                         </div>-->
             <!-- Bearbeiten Button -->
             <div v-if="isEditable" class="row mb-3 ">
                 <div class="col">
@@ -465,17 +470,11 @@ export default {
         </div>
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-            <!--TODO: uncomment when implemented
-                <div  class="row d-none d-md-block mb-3">
-                           
-                           <div class="col">
-                            
-                               <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
-                              
-                                 
-                             
-                             </div>
-                           </div>-->
+			<div v-if="quickLinks.length" class="row mb-4">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
             <!-- Bearbeiten Button -->
             <div class="row d-none d-md-block ">
                 <div class="col mb-3">
