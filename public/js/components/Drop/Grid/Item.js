@@ -6,15 +6,8 @@ export default {
 	},
 	emits: [
 		"startMove",
-		"startResize",
-		"dragging",
-		"endDrag"
+		"startResize"
 	],
-	data() {
-		return {
-			dragging: false
-		};
-	},
 	methods: {
 		tryDragStart(evt) {
 			let dragAction = evt.target.getAttribute('drag-action');
@@ -28,12 +21,7 @@ export default {
 		
 	},
 	template: /* html */`
-	<div
-		class="drop-grid-item"
-		@dragstart="tryDragStart"
-		@drag="$emit('dragging', $event)"
-		@dragend="$emit('endDrag', $event)"
-	>
+	<div class="drop-grid-item" @dragstart="tryDragStart">
 		<slot v-bind="item"></slot>
 	</div>`
 }

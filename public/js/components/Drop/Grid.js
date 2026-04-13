@@ -616,8 +616,8 @@ export default {
 				}"
 				@start-move="startMove"
 				@start-resize="startResize"
-				@dragging="dragging"
-				@end-drag="dragEnd"
+				@drag="dragging"
+				@dragend="dragEnd"
 			>
 				<template v-slot="item">
 					<slot
