@@ -4,7 +4,6 @@ import GridLogic from '../../composables/GridLogic.js';
 const MODE_IDLE = 0;
 const MODE_MOVE = 1;
 const MODE_RESIZE = 2;
-const MODE_MOUSE_DOWN = 3;
 
 export default {
 	name: 'Grid',
