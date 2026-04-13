@@ -1,8 +1,7 @@
 export default {
 	name:'GridItem',
 	props: {
-		item: Object,
-		active: Boolean
+		item: Object
 	},
 	emits: [
 		"startMove",

@@ -605,7 +605,6 @@ export default {
 				:key="item.data.id"
 				class="position-absolute"
 				:item="item"
-				:active="active"
 				:style="{
 					zIndex: item.resizeOverlay ? 1 : 'auto',
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
