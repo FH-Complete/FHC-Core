@@ -250,7 +250,7 @@ export default {
 				this.draggedNode.firstElementChild.classList.remove("dashboard-item-overlay");
 			}
 		},
-		dragging(event) {
+		moveGhostImage(event) {
 			if (this.mode == MODE_MOVE) {
 				this.toggleDraggedItemOverlay(true);
 				
@@ -614,7 +614,7 @@ export default {
 				}"
 				@start-move="startMove"
 				@start-resize="startResize"
-				@drag="dragging"
+				@drag="moveGhostImage"
 				@dragend="dragEnd"
 			>
 				<template v-slot="item">
