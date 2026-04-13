@@ -13,7 +13,7 @@ class IssueChecker extends FHCAPI_Controller
 	protected $errors = [];
 	protected $infos = [];
 
-	public function __construct($permissions)
+	public function __construct($permissions = [])
 	{
 		$default_permissions = [
 			'checkPerson' => self::DEFAULT_PERMISSION,

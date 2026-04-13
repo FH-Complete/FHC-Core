@@ -19,12 +19,14 @@ class OrgformStgUngleichOrgformPrestudent extends PlausiChecker
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
 		$prestudentRes = $this->getOrgformStgUngleichOrgformPrestudent(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			null,
+			$person_id,
 			$exkludierte_studiengang_kz
 		);
 
@@ -70,6 +72,7 @@ class OrgformStgUngleichOrgformPrestudent extends PlausiChecker
 		$studiensemester_kurzbz,
 		$studiengang_kz = null,
 		$prestudent_id = null,
+		$person_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
 		$params = array($studiensemester_kurzbz);
@@ -114,6 +117,12 @@ class OrgformStgUngleichOrgformPrestudent extends PlausiChecker
 		{
 			$qry .= " AND prestudent.prestudent_id = ?";
 			$params[] = $prestudent_id;
+		}
+
+		if (isset($person_id))
+		{
+			$qry .= " AND prestudent.person_id = ?";
+			$params[] = $person_id;
 		}
 
 		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))

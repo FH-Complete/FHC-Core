@@ -97,7 +97,7 @@ class UhstatPersonkennungFehltCore extends PlausiChecker
 
 		if (isset($person_id))
 		{
-			$qry .= " AND pre.person_id = ?";
+			$qry .= " AND pers.person_id = ?";
 			$params[] = $person_id;
 		}
 

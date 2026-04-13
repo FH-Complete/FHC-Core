@@ -20,12 +20,14 @@ class KeinAufenthaltszweckPlausi extends PlausiChecker
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 		$bisio_id = isset($params['bisio_id']) ? $params['bisio_id'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
 		$prestudentRes = $this->_getKeinAufenthaltszweck(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			$bisio_id,
+			$person_id,
 			$exkludierte_studiengang_kz
 		);
 
@@ -63,6 +65,7 @@ class KeinAufenthaltszweckPlausi extends PlausiChecker
 		$studiensemester_kurzbz = null,
 		$studiengang_kz = null,
 		$bisio_id = null,
+		$person_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
 
@@ -102,6 +105,12 @@ class KeinAufenthaltszweckPlausi extends PlausiChecker
 		if (isset($bisio_id))
 		{
 			$qry .= " AND bisio.bisio_id = ?";
+			$params[] = $bisio_id;
+		}
+
+		if (isset($person_id))
+		{
+			$qry .= " AND pre.person_id = ?";
 			$params[] = $bisio_id;
 		}
 
