@@ -95,18 +95,7 @@ export default {
 					},
 				],
 			},
-			quickLinks: [
-				{
-					icon: "fa-calendar-days",
-					phrase: "lehre/stundenplan",
-					action: () => {
-						this.$router.push({
-      					  	name: "OtherLvPlan",
-      					  	params: { otherUid: this.$props.data.username },
-      					})
-					},
-				}
-			],
+			quickLinks: [],
 		};
 	},
 

@@ -90,23 +90,12 @@ export default {
 					},
 				],
 			},
-			quickLinks: [
-				{
-					icon: "fa-calendar-days",
-					phrase: "lehre/stundenplan",
-					action: () => {
-						this.$router.push({
-      					  	name: "OtherLvPlan",
-      					  	params: { otherUid: this.$props.data.username },
-      					})
-					},
-				}
-			],
+			quickLinks: [],
 		};
 	},
 
 	//? this is the prop passed to the dynamic component with the custom data of the view
-	props: ["data"],
+	props: ["data", "permissions"],
 	methods: {
 		funktionenTableBuilt: function () {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
@@ -201,6 +190,21 @@ export default {
 			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
 			this.preloadedPhrasen.loaded = true;
 		});
+
+		if (this.$props.permissions["basis/other_lv_plan"]) {
+			this.quickLinks.push(
+				{
+					icon: "fa-calendar-days",
+					phrase: "lehre/stundenplan",
+					action: () => {
+						this.$router.push({
+      					  	name: "OtherLvPlan",
+      					  	params: { otherUid: this.$props.data.username },
+      					})
+					},
+				}
+			);
+		}
 	},
 
 	template: /*html*/ `

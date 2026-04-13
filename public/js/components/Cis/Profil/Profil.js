@@ -379,7 +379,7 @@ export const Profil = {
 		}
 	},
 	created() {
-		this.load()
+		this.load();
 	},
 	template: `
 	<div>
@@ -388,7 +388,7 @@ export const Profil = {
 		</div>
 		<div v-else>
             <loading ref="loadingModalRef" :timeout="0"></loading>
-            <component  :is="view" :data="data" :editData="filteredEditData" ></component>
+            <component  :is="view" :data="data" :permissions="$props.viewData.permissions" :editData="filteredEditData" ></component>
 		</div>
 	</div>`,
 }

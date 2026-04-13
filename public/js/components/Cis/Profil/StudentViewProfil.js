@@ -5,22 +5,6 @@ import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
 
 export default {
-	data() {
-		return {
-			quickLinks: [
-				{
-					icon: "fa-calendar-days",
-					phrase: "lehre/stundenplan",
-					action: () => {
-						this.$router.push({
-      					  	name: "OtherLvPlan",
-      					  	params: { otherUid: this.$props.data.username },
-      					})
-					},
-				}
-			],
-		};
-	},
 	components: {
 		Mailverteiler,
 		ProfilEmails,
@@ -28,16 +12,17 @@ export default {
 		ProfilInformation,
 		QuickLinks,
 	},
-
-	props: ["data"],
+	props: ["data", "permissions"],
+	data() {
+		return {
+			quickLinks: [],
+		};
+	},
 	provide() {
 		return {
 			studiengang_kz: Vue.computed({ get: () => this.data.studiengang_kz }),
 		}
 	},
-	
-	methods: {},
-
 	computed: {
 		fotoStatus() {
 			return this.data?.fotoStatus ?? null;
@@ -100,6 +85,23 @@ export default {
 				}
 			};
 		},
+	},
+	methods: {},
+	created() {
+		if (this.$props.permissions["basis/other_lv_plan"]) {
+			this.quickLinks.push(
+				{
+					icon: "fa-calendar-days",
+					phrase: "lehre/stundenplan",
+					action: () => {
+						this.$router.push({
+      					  	name: "OtherLvPlan",
+      					  	params: { otherUid: this.$props.data.username },
+      					})
+					},
+				}
+			);
+		}
 	},
 	template: /*html*/ ` 
 

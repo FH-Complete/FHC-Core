@@ -118,4 +118,10 @@ export default {
 			url: `/api/frontend/v1/lvPlan/getLehrverband/${stg_kz}/${sem}/${verband}`
 		}
 	},
+	checkPermissionOtherLvPlan(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/lvPlan/permissionOtherLvPlan',
+		}
+	}
 };

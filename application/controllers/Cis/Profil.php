@@ -79,6 +79,9 @@ class Profil extends Auth_Controller
 		$viewData = array (
 			'uid' => $uid,
 			'profil_data'=>$profil_data,
+			'permissions' => [
+				'basis/other_lv_plan' => $this->permissionlib->isBerechtigt(('basis/other_lv_plan')),
+			]
 		);
 		if($uid == getAuthUID()){
 			$viewData['editable'] = true;

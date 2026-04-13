@@ -47,7 +47,7 @@ class LvPlan extends FHCAPI_Controller
 			'fetchFerienEvents' => self::PERM_LOGGED,
 			'getStudiengaenge' => self::PERM_LOGGED,
 			'getLehrverband' => self::PERM_LOGGED,
-
+			'permissionOtherLvPlan' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -376,6 +376,16 @@ class LvPlan extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess($data);
+	}
+
+	/**
+	 * Checks if the current user has permission to view other users' timetables
+	 *
+	 * @return void
+	 */
+	public function permissionOtherLvPlan()
+	{
+		$this->terminateWithSuccess($this->permissionlib->isBerechtigt('basis/other_lv_plan'));
 	}
 
 	/**
