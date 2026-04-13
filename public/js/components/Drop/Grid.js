@@ -31,7 +31,6 @@ export default {
 	emits: [
 		"rearrangeItems",
 		"gridHeight",
-		"draggedItem",
 		"update:additionalRow"
 	],
 	data() {
@@ -380,8 +379,6 @@ export default {
 				this.updateCursor(evt);
 				this.draggedItem = item;
 				
-				this.$emit('draggedItem', item);
-
 				//clones the widget for the drag Image
 				
 				// NOTE(chris): this is the element that follows the mouse while dragging
@@ -409,7 +406,6 @@ export default {
 			setTimeout(() => {
 				this.mode = MODE_RESIZE;
 				this.draggedItem = item;
-				this.$emit('draggedItem', item);
 			}, 0);
 			
 			this._dragStart(evt);
@@ -465,7 +461,6 @@ export default {
 			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
-			this.$emit('draggedItem',null);
 		},
 		dragEnd() {
 			this.removeWidgetClones();
@@ -491,7 +486,6 @@ export default {
 				this.$emit('rearrangeItems', updated.filter(v => v));
 
 			this.draggedItem = null;
-			this.$emit('draggedItem', null);
 		},
 		_updateCorrectedPositions(updated) {
 			updated.forEach((item, index) => {

@@ -125,6 +125,11 @@
 	position: relative;
 }
 
+.drop-grid-item-resize > .dashboard-item > *,
+.drop-grid-item-move > .dashboard-item > * {
+	display: none;
+}
+
 .drop-grid-item-move > .dashboard-item {
 	background-color: var(--fhc-dashboard-item-overlay-background);
 }

@@ -39,8 +39,7 @@ export default {
 			configOpened: false,
 			gridWidth: 1,
 			gridHeight: null,
-			draggedItem:null,
-			additionalRow:false,
+			additionalRow:false
 		};
 	},
 	provide() {
@@ -243,7 +242,6 @@ export default {
 			:active="editModeIsActive"
 			:resize-limit="checkResizeLimit"
 			:margin-for-extra-row=".01"
-			@dragged-item="draggedItem=$event"
 			@rearrange-items="updatePositions"
 			@grid-height="gridHeight=$event"
 		>
@@ -256,7 +254,6 @@ export default {
 				<dashboard-item 
 					v-else
 					:id="item.widget"
-					:dragstate="item.blank || (item.widgetid && item.widgetid == draggedItem?.data.widgetid)"
 					:resizeOverlay="item.resizeOverlay"
 					:widgetID="item.id"
 					:width="item.w"
