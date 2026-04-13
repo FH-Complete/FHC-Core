@@ -588,12 +588,6 @@ export default {
 			for (let i = 0; i < widgetClones.length; i++) {
 				this.$refs.container.removeChild(widgetClones[i]);
 			}
-		},
-		mouseDown() {
-			this.mode = MODE_MOUSE_DOWN;
-		},
-		mouseUp() {
-			this.mode = MODE_IDLE;
 		}
 	},
 	template: /* html */`
@@ -601,8 +595,6 @@ export default {
 		ref="container"
 		class="drop-grid position-relative h-0"
 		:style="gridStyle"
-		@touchmove="dragOver"
-		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
 		@drop="dragEnd"
 	>
@@ -623,13 +615,9 @@ export default {
 					padding: 'var(--fhc-dg-item-padding)'
 				}"
 				@start-move="startMove"
-				@mouse-down="mouseDown"
-				@mouse-up="mouseUp"
 				@start-resize="startResize"
 				@dragging="dragging"
 				@end-drag="dragEnd"
-				@touch-end="dragEnd();mouseUp();"
-				@touch-start="mouseDown"
 			>
 				<template v-slot="item">
 					<slot

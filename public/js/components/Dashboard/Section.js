@@ -251,7 +251,7 @@ export default {
 				<div
 					v-if="item.placeholder"
 					class="empty-tile-hover"
-					@pointerdown="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"
+					@click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"
 				></div>
 				<dashboard-item 
 					v-else
