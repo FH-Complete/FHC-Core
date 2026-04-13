@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f4f0af4586f46f97d8b6092c1ac0fb3a",
+    "content-hash": "869cbc35bd1ba90ab90934fcb41b0f51",
     "packages": [
         {
             "name": "afarkas/html5shiv",
@@ -803,6 +803,16 @@
             },
             "abandoned": true,
             "time": "2018-03-09T06:07:41+00:00"
+        },
+        {
+            "name": "drag-drop-touch-js/dragdroptouch",
+            "version": "2.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/drag-drop-touch-js/dragdroptouch.git",
+                "reference": "master"
+            },
+            "type": "library"
         },
         {
             "name": "easyrdf/easyrdf",

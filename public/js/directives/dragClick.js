@@ -1,5 +1,12 @@
 import { bindDragEnterLeave } from '../helpers/DragAndDrop.js';
 
+import { enableDragDropTouch } from "../../../vendor/drag-drop-touch-js/dragdroptouch/dist/drag-drop-touch.esm.min.js";
+
+if (!document.dragDropTouchActive) {
+	enableDragDropTouch();
+	document.dragDropTouchActive = true;
+}
+
 export default {
 	mounted(el, binding) {
 		const delay = parseInt(binding.arg) || 300;

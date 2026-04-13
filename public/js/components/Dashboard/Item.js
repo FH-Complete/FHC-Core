@@ -2,6 +2,13 @@ import BsModal from "../Bootstrap/Modal.js";
 import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
+import { enableDragDropTouch } from "../../../../vendor/drag-drop-touch-js/dragdroptouch/dist/drag-drop-touch.esm.min.js";
+
+if (!document.dragDropTouchActive) {
+	enableDragDropTouch();
+	document.dragDropTouchActive = true;
+}
+
 export default {
 	name: 'Item',
 	components: {

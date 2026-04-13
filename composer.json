@@ -73,6 +73,18 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "drag-drop-touch-js/dragdroptouch",
+				"version": "2.0.3",
+				"source": {
+					"url": "https://github.com/drag-drop-touch-js/dragdroptouch.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "fgelinas/timepicker",
 				"version": "0.3.3",
 				"source": {
@@ -451,6 +463,8 @@
 		"dapphp/securimage": "3.6.7",
 
 		"easyrdf/easyrdf": "0.9.*",
+
+		"drag-drop-touch-js/dragdroptouch": "*",
 
 		"fgelinas/timepicker": "0.3.3",
 		"fortawesome/font-awesome4": "4.7.*",
