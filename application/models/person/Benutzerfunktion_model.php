@@ -261,6 +261,42 @@ class Benutzerfunktion_model extends DB_Model
     }
 
 
+	/**
+	 * Get active Kompetenzfeldleitung bei UID.
+	 *
+	 * @param $uid
+	 * @return array|stdClass|null
+	 */
+	public function getKFLByUID($uid)
+	{
+		$query = '
+            SELECT
+			  	bf.uid,
+				bf.oe_kurzbz,
+  				oe.organisationseinheittyp_kurzbz
+            FROM
+			  	public.tbl_benutzerfunktion bf
+				JOIN public.tbl_organisationseinheit oe USING (oe_kurzbz)
+  				JOIN public.tbl_benutzer b USING (uid)
+            WHERE
+                b.uid = ?
+              	AND b.aktiv = TRUE
+                AND funktion_kurzbz = \'Leitung\'
+               	AND organisationseinheittyp_kurzbz = \'Kompetenzfeld\'
+              	AND (datum_von IS NULL OR datum_von <= now())
+              	AND (datum_bis IS NULL OR datum_bis >= now())
+        ';
+
+		$parameters_array = array();
+		if (is_string($uid))
+		{
+			$parameters_array[] = $uid;
+		}
+
+		return $this->execQuery($query, $parameters_array);
+	}
+
+
 	public function insertBenutzerfunktion($Json)
 	{
 		unset($Json['benutzerfunktion_id']);
