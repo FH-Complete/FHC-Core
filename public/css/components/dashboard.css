@@ -117,7 +117,8 @@
 	cursor: move !important;
 }
 
-.draggedItem {
+.drop-grid-item-resize > .dashboard-item,
+.drop-grid-item-move > .dashboard-item {
 	height: 100%;
 	width: 100%;
 	background-color: var(--fhc-dashboard-draggeditem-background);
