@@ -404,14 +404,17 @@ class Lehrveranstaltung_model extends DB_Model
 			SELECT
 				vorname, nachname, mitarbeiter_uid, lehrfunktion_kurzbz
 			FROM
-				lehre.tbl_lehreinheit
+				lehre.tbl_lehreinheit le
 				JOIN lehre.tbl_lehreinheitmitarbeiter lema USING (lehreinheit_id)
 				JOIN public.tbl_benutzer b ON b.uid = lema.mitarbeiter_uid
 				JOIN public.tbl_person p using (person_id) 
 			WHERE
-				tbl_lehreinheit.lehrveranstaltung_id= ?
-				AND tbl_lehreinheit.studiensemester_kurzbz = ?
+				le.lehrveranstaltung_id= ?
+				AND le.studiensemester_kurzbz = ?
 				AND lehrfunktion_kurzbz = 'LV-Leitung'
+				AND lema.mitarbeiter_uid NOT like '_Dummy%' 
+			  	AND b.aktiv = TRUE 
+			  	AND p.aktiv = TRUE
             ORDER BY 
                 lema.insertamum DESC
 			LIMIT 1
