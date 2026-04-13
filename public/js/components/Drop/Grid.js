@@ -46,7 +46,6 @@ export default {
 			correctedPositionUpdates: null,
 			draggedOffset: [0, 0],
 			draggedItem: null,
-			draggedNode: null,
 			reorderedItems: [],
 			clonedWidget: null,
 		};
@@ -241,19 +240,8 @@ export default {
 			}
 			return false;
 		},
-		toggleDraggedItemOverlay(condition) {
-			if (!this.draggedNode)
-				return;
-			if (condition) {
-				this.draggedNode.firstElementChild.classList.add("dashboard-item-overlay");
-			} else {
-				this.draggedNode.firstElementChild.classList.remove("dashboard-item-overlay");
-			}
-		},
 		moveGhostImage(event) {
 			if (this.mode == MODE_MOVE) {
-				this.toggleDraggedItemOverlay(true);
-				
 				const containerRect = this.$refs.container.getBoundingClientRect();
 				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
 				
@@ -394,7 +382,6 @@ export default {
 				
 				this.$emit('draggedItem', item);
 
-				this.draggedNode = evt.target.closest(".drop-grid-item");
 				//clones the widget for the drag Image
 				
 				// NOTE(chris): this is the element that follows the mouse while dragging
@@ -474,17 +461,14 @@ export default {
 		dragCancel() {
 			this.removeWidgetClones();
 			this.additionalRowComputed = false;
-			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
 			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0],
 			this.draggedItem = null;
 			this.$emit('draggedItem',null);
-			this.draggedNode = null;
 		},
 		dragEnd() {
 			this.removeWidgetClones();
-			this.toggleDraggedItemOverlay(false);
 			
 			if (this.mode == MODE_IDLE) {
 				return;
@@ -507,7 +491,6 @@ export default {
 				this.$emit('rearrangeItems', updated.filter(v => v));
 
 			this.draggedItem = null;
-			this.draggedNode = null;
 			this.$emit('draggedItem', null);
 		},
 		_updateCorrectedPositions(updated) {
@@ -603,6 +586,10 @@ export default {
 				v-for="(item, index) in currentItems"
 				:key="item.data.id"
 				class="position-absolute"
+				:class="{
+					'drop-grid-item-move': item.index == draggedItem?.index && mode == 1,
+					'drop-grid-item-resize': item.index == draggedItem?.index && mode == 2
+				}"
 				:item="item"
 				:style="{
 					zIndex: item.resizeOverlay ? 1 : 'auto',
