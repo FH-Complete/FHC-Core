@@ -194,7 +194,7 @@ export default {
 		v-else-if="!hidden || editMode"
 		:id="widgetID"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
-		:class="{'hiddenWidget':hidden, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}"
+		:class="{'hidden-widget':hidden, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}"
 	>
 		<div class="h-100 card border-0">
 			<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">

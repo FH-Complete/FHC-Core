@@ -195,13 +195,13 @@
 
 }
 
-.hiddenWidget {
+.hidden-widget {
 	background: var(--fhc-disabled-background);
 	opacity: 40%;
 }
 
-.hiddenWidget .card,
-.hiddenWidget .card-body,
-.hiddenWidget .card-body * {
+.hidden-widget .card,
+.hidden-widget .card-body,
+.hidden-widget .card-body * {
 	background: inherit !important;
 }
