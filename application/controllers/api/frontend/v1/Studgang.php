@@ -26,7 +26,8 @@ class Studgang extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getStudiengangInfo'=> self::PERM_LOGGED,
+			'getAllStudiengange'=> self::PERM_LOGGED,
+			'getAllDegreePrograms'=> self::PERM_LOGGED,
 
 		]);
 
@@ -42,6 +43,14 @@ class Studgang extends FHCAPI_Controller
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	public function getAllDegreePrograms()
+	{
+		$this->load->model('organisation/Studiengang_model', "StudiengangModel");
+		$class_schedule_res = $this->StudiengangModel->load();
+		$class_schedule_res = $this->getDataOrTerminateWithError($class_schedule_res);
+		$this->terminateWithSuccess($class_schedule_res);
+	}
 
 	public function getStudiengangInfo(){
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID());
