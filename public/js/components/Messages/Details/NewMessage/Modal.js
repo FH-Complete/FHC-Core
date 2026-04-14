@@ -214,6 +214,7 @@ export default {
 					this.replyData = result.data;
 
 					if (this.replyData.length > 0) {
+						this.editor.setContent(this.replyData[0].replyBody);
 						this.formData.subject = this.replyData[0].replySubject;
 						this.formData.body = this.replyData[0].replyBody;
 						this.formData.relationmessage_id = newMessageId;
@@ -273,19 +274,6 @@ export default {
 
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-
-		//case of reply
-		if(this.messageId) {
-			this.$api
-				.call(ApiMessages.getReplyData(this.messageId))
-				.then(result => {
-					this.replyData = result.data;
-					this.formData.subject = this.replyData[0].replySubject;
-					this.formData.body = this.replyData[0].replyBody;
-					this.formData.relationmessage_id = this.messageId;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
 	},
 	async mounted() {
 		this.initTinyMCE();

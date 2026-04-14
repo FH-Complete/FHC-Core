@@ -82,8 +82,8 @@ export default {
 				this.$refs.modalMsg.show();
 			}
 			else if (this.openMode == "inSamePage"){
-				console.log("in same Page");
 				this.isVisibleDiv = true;
+
 				if(messageId)
 					this.$refs.templateNewDivMessage.loadReplyData(messageId);
 				else
@@ -170,7 +170,7 @@ export default {
 		</message-modal>
 		
 		<!--in same page-->
-		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
+		<div v-show="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
 				v-if="tablebuilt || id.length > 1"
 				ref="templateNewDivMessage"

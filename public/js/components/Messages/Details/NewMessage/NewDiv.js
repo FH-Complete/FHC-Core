@@ -198,6 +198,18 @@ export default {
 				this.previewBody = this.previewText;
 			});
 		},
+		loadReplyData(messageId){
+			this.$api
+				.call(ApiMessages.getReplyData(messageId))
+				.then(result => {
+					this.replyData = result.data;
+					this.editor.setContent(this.replyData[0].replyBody);
+					this.formData.subject = this.replyData[0].replySubject;
+					this.formData.body = this.replyData[0].replyBody;
+					this.formData.relationmessage_id = messageId;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
 	created(){
 		const missingparamsmsgs = [];
@@ -268,15 +280,7 @@ export default {
 
 		//case of reply
 		if(this.messageId) {
-			this.$api
-				.call(ApiMessages.getReplyData(this.messageId))
-				.then(result => {
-					this.replyData = result.data;
-					this.formData.subject = this.replyData[0].replySubject;
-					this.formData.body = this.replyData[0].replyBody;
-					this.formData.relationmessage_id = this.messageId;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+			this.loadReplyData(this.messageId);
 		}
 
 	},
