@@ -50,7 +50,7 @@ export default {
 	},
 	computed: {
 		sizeLimits() {
-			return Object.fromEntries(Object.entries(this.itemsSetup).map(([type, setup]) => {
+			return Object.fromEntries(Object.entries(this.itemsSetup).map(([type, { setup }]) => {
 				const result = {}; // work on a copy
 				if (setup.height === undefined)
 					result.height = { min: 1, max: undefined };

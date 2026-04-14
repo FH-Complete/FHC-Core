@@ -1,5 +1,4 @@
 import BsModal from "../Bootstrap/Modal.js";
-import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
 import { enableDragDropTouch } from "../../../../vendor/drag-drop-touch-js/dragdroptouch/dist/drag-drop-touch.esm.min.js";
@@ -18,7 +17,6 @@ export default {
 	data: () => ({
 		component: "",
 		arguments: null,
-		widget: null,
 		tmpConfig: {},
 		isLoading: false,
 		hasConfig: false,
@@ -44,7 +42,7 @@ export default {
 		"loading",
 		"item_data",
 		"place",
-		"resizeLimits",
+		"widgetTemplate",
 		"resizeOverlay",
 		"source"
 	],
@@ -62,40 +60,40 @@ export default {
 			}
 		},
 		isResizeableHorizontal() {
-			if (this.resizeLimits.width === undefined)
+			if (this.widgetTemplate.setup.width === undefined)
 				return true;
 
-			if (Object.prototype.toString.call(this.resizeLimits.width) == "[object Number]")
+			if (Object.prototype.toString.call(this.widgetTemplate.setup.width) == "[object Number]")
 				return false;
 
-			if (this.resizeLimits.width.min === undefined) {
-				if (this.resizeLimits.width.max === undefined)
+			if (this.widgetTemplate.setup.width.min === undefined) {
+				if (this.widgetTemplate.setup.width.max === undefined)
 					return true;
-				return this.resizeLimits.width.max > 1;
+				return this.widgetTemplate.setup.width.max > 1;
 			}
 
-			if (this.resizeLimits.width.max === undefined)
+			if (this.widgetTemplate.setup.width.max === undefined)
 				return true;
 
-			return this.resizeLimits.width.max > this.resizeLimits.width.min;
+			return this.widgetTemplate.setup.width.max > this.widgetTemplate.setup.width.min;
 		},
 		isResizeableVertical() {
-			if (this.resizeLimits.height === undefined)
+			if (this.widgetTemplate.setup.height === undefined)
 				return true;
 
-			if (Object.prototype.toString.call(this.resizeLimits.height) == "[object Number]")
+			if (Object.prototype.toString.call(this.widgetTemplate.setup.height) == "[object Number]")
 				return false;
 
-			if (this.resizeLimits.height.min === undefined) {
-				if (this.resizeLimits.height.max === undefined)
+			if (this.widgetTemplate.setup.height.min === undefined) {
+				if (this.widgetTemplate.setup.height.max === undefined)
 					return true;
-				return this.resizeLimits.height.max > 1;
+				return this.widgetTemplate.setup.height.max > 1;
 			}
 
-			if (this.resizeLimits.height.max === undefined)
+			if (this.widgetTemplate.setup.height.max === undefined)
 				return true;
 
-			return this.resizeLimits.height.max > this.resizeLimits.height.min;
+			return this.widgetTemplate.setup.height.max > this.widgetTemplate.setup.height.min;
 		},
 		isResizeable() {
 			return this.isResizeableVertical || this.isResizeableHorizontal;
@@ -155,7 +153,7 @@ export default {
 		},
 		sendChangeConfig(config) {
 			for (var k in config) {
-				if (this.widget.arguments[k] == config[k]) {
+				if (this.widgetTemplate.arguments[k] == config[k]) {
 					delete config[k];
 				}
 			}
@@ -164,24 +162,17 @@ export default {
 	},
 	watch: {
 		config() {
-			this.arguments = { ...this.widget?.arguments, ...this.config };
+			this.arguments = { ...this.widgetTemplate?.arguments, ...this.config };
 			this.tmpConfig = { ...this.arguments };
 			this.$refs.config && this.$refs.config.hide();
 			this.isLoading = false;
 		},
 	},
-	setup() {
-		const { actions } = useCachedWidgetLoader();
-		return {
-			loadWidget: actions.load
-		};
-	},
 	async created() {
-		this.widget = await this.loadWidget(this.id);
-		let component = (await import(this.widget.setup.file)).default;
-		this.$options.components["widget" + this.widget.widget_id] = component;
-		this.component = "widget" + this.widget.widget_id;
-		this.arguments = { ...this.widget.arguments, ...this.config };
+		let component = (await import(this.widgetTemplate.setup.file)).default;
+		this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
+		this.component = "widget" + this.widgetTemplate.widget_id;
+		this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
 		this.tmpConfig = { ...this.arguments };
 	},
 	template: /*html*/ `
@@ -197,7 +188,7 @@ export default {
 		:class="{'hidden-widget':hidden, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}"
 	>
 		<div class="h-100 card border-0">
-			<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
+			<div v-if="widgetTemplate" class="card-header d-flex ps-0 pe-2 align-items-center">
 				<Transition>
 					<span
 						v-if="editMode && !isPinned"
@@ -211,7 +202,7 @@ export default {
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
 				</Transition>
-				<span class="col mx-2 px-2">{{ widget.setup.name }}</span>
+				<span class="col mx-2 px-2">{{ widgetTemplate.setup.name }}</span>
 				<div
 					v-if="source"
 					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
@@ -232,7 +223,7 @@ export default {
 						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
 					</div>
 				</template>
-				<a type="button" v-if="widget.setup.cis4link" :href="getWidgetC4Link(widget)" aria-label="widget link" v-tooltip="{showDelay:1000, value:'widget link'}" class="col-auto ms-auto">
+				<a type="button" v-if="widgetTemplate.setup.cis4link" :href="getWidgetC4Link(widgetTemplate)" aria-label="widget link" v-tooltip="{showDelay:1000, value:'widget link'}" class="col-auto ms-auto">
 					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
 				</a>
 				<a type="button" v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig" aria-label="configure widget" v-tooltip="{showDelay:1000,value:'configure widget'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></a>
@@ -251,13 +242,13 @@ export default {
 			<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 			<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
 				<template v-slot:title>
-					{{ widget ? 'Config for ' + widget.setup.name : '' }}
+					{{ widgetTemplate ? 'Config for ' + widgetTemplate.setup.name : '' }}
 				</template>
 				<template v-slot:default>
 					<component v-if="ready && !isLoading" :is="component" v-model:shared-data="sharedData" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
 					<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
 				</template>
-				<template v-if="!widget?.setup?.hideFooter" v-slot:footer>
+				<template v-if="!widgetTemplate?.setup?.hideFooter" v-slot:footer>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 					<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
 				</template>

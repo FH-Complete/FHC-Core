@@ -70,11 +70,11 @@ export default {
 					return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
 			}
 		},
-		computedWidgetsSetup() {
+		indexedWidgetsTemplates() {
 			if (!this.widgetsSetup)
 				return {};
 			return this.widgetsSetup.reduce((acc, setup) => {
-				acc[setup.widget_id] = setup.setup;
+				acc[setup.widget_id] = setup;
 				return acc;
 			}, {});
 		},
@@ -204,7 +204,7 @@ export default {
 			v-model:cols="gridWidth"
 			v-model:additional-row="additionalRow"
 			:items="items"
-			:items-setup="computedWidgetsSetup"
+			:items-setup="indexedWidgetsTemplates"
 			:active="editModeIsActive"
 			:margin-for-extra-row=".01"
 			@rearrange-items="updatePositions"
@@ -230,7 +230,7 @@ export default {
 					:hidden="item.hidden"
 					:editMode="editModeIsActive"
 					:place="item.place[gridWidth]"
-					:resize-limits="computedWidgetsSetup[item.widget]"
+					:widget-template="indexedWidgetsTemplates[item.widget]"
 					:source="adminMode ? null : item.source || 'custom'"
 					@change="saveConfig($event, item)"
 					@remove="removeWidget(item, $event)"
