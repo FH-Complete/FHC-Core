@@ -466,14 +466,21 @@ export default {
 					case MODE_RESIZE: {
 						evt.preventDefault();
 						const dragGrid = new GridLogic(this.grid);
-						let w = Math.min(this.cols - this.draggedItem.x, Math.max(1, this.x - this.draggedItem.x + 1));
-						let h = Math.max(1, this.y - this.draggedItem.y + 1);
+						const targetW = this.x - this.draggedItem.x + 1;
+						const targetH = this.y - this.draggedItem.y + 1;
+						let w = Math.min(this.cols - this.draggedItem.x, targetW);
+						let h = targetH;
 
 						[ w, h ] = this.cropSizeToAllowed(this.draggedItem.data.widget, w, h);
 
+						let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
+						if (w !== targetW || h !== targetH) {
+							draggedItemNode.classList.add("border-danger");
+						} else {
+							draggedItemNode.classList.remove("border-danger");
+						}
+
 						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
-						
-						this.checkWidgetSizeLimitAnimation();
 						
 						break;
 					}
@@ -561,26 +568,6 @@ export default {
 				}	
 			});
 		},
-		isSizeAllowed(type, w, h) {
-			if (w < 1 || h < 1)
-				return false;
-			
-			const setup = this.sizeLimits[type];
-
-			if (!setup)
-				return false;
-
-			if (w < setup.width.min)
-				return false;
-			if (h < setup.height.min)
-				return false;
-			if (setup.width.max !== undefined && w > setup.width.max)
-				return false;
-			if (setup.width.max !== undefined && h > setup.height.max)
-				return false;
-
-			return true;
-		},
 		cropSizeToAllowed(type, w, h) {
 			if (w < 1)
 				w = 1;
@@ -602,22 +589,6 @@ export default {
 				h = setup.height.max;
 			
 			return [w, h];
-		},
-		checkWidgetSizeLimitAnimation() {
-			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
-
-			let width_after_resize = this.x - this.draggedItem.x + 1;
-			let height_after_resize = this.y - this.draggedItem.y + 1;
-
-			if (!this.isSizeAllowed(
-				this.draggedItem.data.widget,
-				width_after_resize,
-				height_after_resize
-			)) {
-				draggedItemNode.classList.add("border-danger");
-			} else {
-				draggedItemNode.classList.remove("border-danger");
-			}
 		},
 		removeWidgetClones() {
 			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
