@@ -18,7 +18,6 @@ import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssis
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
-import OverviewLvPlan from "../../components/Cis/LvPlan/OverviewLvPlan.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
