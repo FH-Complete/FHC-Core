@@ -29562,7 +29562,8 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),	array(
+	),
+	array(
 		'app' => 'core',
 		'category' => 'profil',
 		'phrase' => 'sem_short',
@@ -29577,6 +29578,126 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'sem',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Persönlichen LV-Plan abonnieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Subscribe to personal schedule',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync_instructions',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Anleitung LV-Plan Synchronisation',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Instructions for synchronizing your schedule',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync_cal_dav',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'CalDAV URL (Android, Thunderbird, CalDAV-Synchronizer)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'CalDAV URL (Android, Thunderbird, CalDAV-Synchronizer)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync_cal_dav_principal',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'CalDAV Principal URL (MacOS, iOS)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'CalDAV Principal URL (MacOS, iOS)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync_i_cal',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'iCAL URL (Google)',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'iCAL URL (Google)',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'calendar_sync_clipboard_copy_confirmation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'URL in die Zwischenablage kopiert.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'URL copied to clipboard.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -57420,6 +57541,28 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### 		LvPlanStgOrg 		END 		###
+	// DMS-Link Phrasen Start
+	array(
+		'app' => 'core',
+		'category' => 'DMS-Link',
+		'phrase' => 'lvplanSyncFAQ',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '7188',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '7188',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	// DMS-Link Phrasen End
 );
 
 

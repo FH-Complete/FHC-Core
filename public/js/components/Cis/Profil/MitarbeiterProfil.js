@@ -9,6 +9,7 @@ import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
+import CalendarSync from "./ProfilComponents/CalendarSync.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
@@ -26,6 +27,7 @@ export default {
 		ProfilEmails,
 		RoleInformation,
 		ProfilInformation,
+		CalendarSync,
 	},
 
 	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
@@ -160,6 +162,7 @@ export default {
 	props: {
 		data: Object,
 		editData: Object,
+		calendarSyncUrls: Array,
 	},
 	
 	methods: {
@@ -313,7 +316,6 @@ export default {
 		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
-
 	},
 	watch: {
 		'data.funktionen'(newVal) {
@@ -489,12 +491,17 @@ export default {
                     <ausweis-status :data="data.zutrittsdatum"></ausweis-status>
                 </div>
             </div>
-            <div  class="row">
+            <div class="row mb-3">
                 <div class="col">
                     <!-- MAILVERTEILER -->
                     <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
                 </div>
             </div>
+			<div class="row">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
         </div>
     </div>
 </div>

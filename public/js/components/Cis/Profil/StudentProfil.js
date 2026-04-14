@@ -9,6 +9,7 @@ import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 import FetchProfilUpdates from "./ProfilComponents/FetchProfilUpdates.js";
 import EditProfil from "./ProfilModal/EditProfil.js";
 import QuickLinks from "./ProfilComponents/QuickLinks.js";
+import CalendarSync from "./ProfilComponents/CalendarSync.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
@@ -26,6 +27,7 @@ export default {
 		FetchProfilUpdates,
 		EditProfil,
 		QuickLinks,
+		CalendarSync,
 	},
 	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
 	data() {
@@ -102,6 +104,7 @@ export default {
 	props: {
 		data: Object,
 		editData: Object,
+		calendarSyncUrls: Array,
 	},
 	provide() {
 		return {
@@ -426,13 +429,18 @@ export default {
 				</div>
 			</div>
 			<!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
-			<div  class="row">
+            <div class="row mb-3">
 				<div class="col">
 					<!-- HIER SIND DIE MAILVERTEILER -->
 					<mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 				</div>
             <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
             </div>
+			<div class="row">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
         <!-- END OF SIDE PANEL -->
         </div>
     <!-- END OF CONTAINER ROW-->
