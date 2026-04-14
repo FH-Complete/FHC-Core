@@ -16,6 +16,12 @@
  */
 
 export default {
+  getAllDegreePrograms() {
+    return {
+      method: "get",
+      url: "/api/frontend/v1/Studgang/getAllDegreePrograms",
+    };
+  },
 	studiengangInformation() {
 		return {
 			method: 'get',
