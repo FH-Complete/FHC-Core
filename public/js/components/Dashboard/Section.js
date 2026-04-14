@@ -1,7 +1,6 @@
 import BsConfirm from "../Bootstrap/Confirm.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
-import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import WidgetIcon from "./Widget/WidgetIcon.js"
 
 export default {
@@ -117,32 +116,6 @@ export default {
 		handleConfigClosed() {
 			this.configOpened = false
 		},
-		checkResizeLimit(item, w, h) {
-			// NOTE(chris): widgets needs to be loaded for this to work
-			let widget = this.widgetState[item.widget];
-			if (widget) {
-				let minmaxW = { ...widget.setup.width };
-				if (minmaxW.max)
-					minmaxW.min = minmaxW.min || 1;
-				else
-					minmaxW = { min: minmaxW, max: minmaxW };
-				if (w < minmaxW.min)
-					w = minmaxW.min; 
-				if (w > minmaxW.max)
-					w = minmaxW.max;
-
-				let minmaxH = { ...widget.setup.height };
-				if (minmaxH.max)
-					minmaxH.min = minmaxH.min || 1;
-				else
-					minmaxH = { min: minmaxH, max: minmaxH };
-				if (h < minmaxH.min)
-					h = minmaxH.min;
-				if (h > minmaxH.max)
-					h = minmaxH.max;
-			}
-			return [w, h];
-		},
 		removeWidget(item, revert) {
 			if (item.custom) {
 				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', this.name, item.id));
@@ -203,13 +176,6 @@ export default {
 			this.$emit('widgetUpdate', this.name, payload);
 		}
 	},
-	setup() {
-		const { state: widgetState } = useCachedWidgetLoader();
-
-		return {
-			widgetState
-		};
-	},
 	mounted() {
 		let self = this;
 		let cont = self.$refs.container;
@@ -240,7 +206,6 @@ export default {
 			:items="items"
 			:items-setup="computedWidgetsSetup"
 			:active="editModeIsActive"
-			:resize-limit="checkResizeLimit"
 			:margin-for-extra-row=".01"
 			@rearrange-items="updatePositions"
 			@grid-height="gridHeight=$event"

@@ -14,7 +14,6 @@ export default {
 		cols: Number,
 		items: Array,
 		itemsSetup: Object,
-		resizeLimit: Function,
 		active: {
 			type: Boolean,
 			default: true
@@ -50,6 +49,32 @@ export default {
 		};
 	},
 	computed: {
+		sizeLimits() {
+			return Object.fromEntries(Object.entries(this.itemsSetup).map(([type, setup]) => {
+				const result = {}; // work on a copy
+				if (setup.height === undefined)
+					result.height = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.height))
+					result.height = { min: setup.height, max: setup.height };
+				else
+					result.height = {
+						min: setup.height.min ?? 1,
+						max: setup.height.max
+					};
+
+				if (setup.width === undefined)
+					result.width = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.width))
+					result.width = { min: setup.width, max: setup.width };
+				else
+					result.width = {
+						min: setup.width.min ?? 1,
+						max: setup.width.max
+					};
+
+				return [type, result];
+			}));
+		},
 		additionalRowComputed: {
 			get() {
 				return this.additionalRow;
@@ -291,11 +316,9 @@ export default {
 				if (item.x + item.w > this.cols) {
 					let targetW = this.cols-item.x,
 						targetX = undefined;
-					if (this.resizeLimit) {
-						[targetW] = this.resizeLimit(item.data, targetW, item.h);
-					}
-					if (targetW < 1)
-						targetW = 1;
+
+					[ targetW ] = this.cropSizeToAllowed(item.data.widget, targetW, item.h);
+
 					if (targetW > this.cols)
 						targetW = this.cols;
 					if (item.x + targetW > this.cols) {
@@ -416,10 +439,9 @@ export default {
 			}
 			if (!this.active)
 				return this.dragCancel();
+
 			this.checkPinnedWidgetAnimation();
-			if (this.mode == MODE_RESIZE) {
-				this.checkWidgetSizeLimitAnimation();
-			}
+
 			if (this.updateCursor(evt)) {
 				switch(this.mode) {
 					case MODE_MOVE: {
@@ -446,9 +468,13 @@ export default {
 						const dragGrid = new GridLogic(this.grid);
 						let w = Math.min(this.cols - this.draggedItem.x, Math.max(1, this.x - this.draggedItem.x + 1));
 						let h = Math.max(1, this.y - this.draggedItem.y + 1);
-						if (this.resizeLimit)
-							[w, h] = this.resizeLimit(this.draggedItem.data, w, h);
+
+						[ w, h ] = this.cropSizeToAllowed(this.draggedItem.data.widget, w, h);
+
 						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
+						
+						this.checkWidgetSizeLimitAnimation();
+						
 						break;
 					}
 				}
@@ -535,25 +561,59 @@ export default {
 				}	
 			});
 		},
+		isSizeAllowed(type, w, h) {
+			if (w < 1 || h < 1)
+				return false;
+			
+			const setup = this.sizeLimits[type];
+
+			if (!setup)
+				return false;
+
+			if (w < setup.width.min)
+				return false;
+			if (h < setup.height.min)
+				return false;
+			if (setup.width.max !== undefined && w > setup.width.max)
+				return false;
+			if (setup.width.max !== undefined && h > setup.height.max)
+				return false;
+
+			return true;
+		},
+		cropSizeToAllowed(type, w, h) {
+			if (w < 1)
+				w = 1;
+			if (h < 1)
+				h = 1;
+
+			const setup = this.sizeLimits[type];
+
+			if (!setup)
+				return [w, h];
+
+			if (w < setup.width.min)
+				w = setup.width.min;
+			if (h < setup.height.min)
+				h = setup.height.min;
+			if (setup.width.max && w > setup.width.max)
+				w = setup.width.max;
+			if (setup.height.max && h > setup.height.max)
+				h = setup.height.max;
+			
+			return [w, h];
+		},
 		checkWidgetSizeLimitAnimation() {
-			let draggedItemSetup = this.itemsSetup[this.draggedItem.data.widget];
-			let draggedItemMaxWidth = draggedItemSetup.width.max ?? draggedItemSetup.width;
-			let draggedItemMinWidth = draggedItemSetup.width.min ?? draggedItemSetup.width;
-			let draggedItemMaxHeight = draggedItemSetup.height.max ?? draggedItemSetup.height;
-			let draggedItemMinHeight = draggedItemSetup.height.min ?? draggedItemSetup.height;
 			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
 
-			let width_after_resize = this.x - this.draggedItem.x + 1; 
-			let height_after_resize = this.y - this.draggedItem.y + 1; 
-			if (
-				(width_after_resize > 0 && (width_after_resize > draggedItemMaxWidth
-				|| width_after_resize < draggedItemMinWidth)
-				)
-				||
-				(height_after_resize > 0 && (height_after_resize > draggedItemMaxHeight
-				|| height_after_resize < draggedItemMinHeight)
-				)
-			) {
+			let width_after_resize = this.x - this.draggedItem.x + 1;
+			let height_after_resize = this.y - this.draggedItem.y + 1;
+
+			if (!this.isSizeAllowed(
+				this.draggedItem.data.widget,
+				width_after_resize,
+				height_after_resize
+			)) {
 				draggedItemNode.classList.add("border-danger");
 			} else {
 				draggedItemNode.classList.remove("border-danger");
