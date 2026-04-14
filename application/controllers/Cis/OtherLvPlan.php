@@ -14,7 +14,7 @@ class OtherLvPlan extends Auth_Controller
     public function __construct()
     {
         parent::__construct([
-            'index' => ['basis/cis:r']
+            'index' => ['basis/other_lv_plan:r']
         ]);
 
         // Load Config
