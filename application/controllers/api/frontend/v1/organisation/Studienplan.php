@@ -20,8 +20,17 @@ class Studienplan extends FHCAPI_Controller
 	{
 		// TODO(chris): access!
 		parent::__construct([
+			'getAllStudyPlans' => self::PERM_LOGGED,
 			'getBySemester' => self::PERM_LOGGED
 		]);
+	}
+
+	public function getAllStudyPlans()
+	{
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+		$result = $this->StudienplanModel->load();
+		$studien_plan_result = $this->getDataOrTerminateWithError($result);
+		$this->terminateWithSuccess($studien_plan_result);
 	}
 
 	public function getBySemester()
