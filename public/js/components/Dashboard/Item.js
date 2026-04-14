@@ -39,7 +39,7 @@ export default {
 		"custom",
 		"hidden",
 		"editMode",
-		"loading",
+		"loading", // widget got added and is waiting for backend to save in db
 		"item_data",
 		"place",
 		"widgetTemplate",
@@ -176,18 +176,16 @@ export default {
 		this.tmpConfig = { ...this.arguments };
 	},
 	template: /*html*/ `
-	<div v-if="loading">
-		<div class="d-flex justify-content-center align-items-center h-100">
-			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
-		</div>
-	</div>
 	<div
-		v-else-if="!hidden || editMode"
+		v-if="!hidden || editMode"
 		:id="widgetID"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
 		:class="{'hidden-widget':hidden, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}"
 	>
-		<div class="h-100 card border-0">
+		<div v-if="loading" class="d-flex justify-content-center align-items-center h-100">
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+		</div>
+		<div v-else class="h-100 card border-0">
 			<div v-if="widgetTemplate" class="card-header d-flex ps-0 pe-2 align-items-center">
 				<Transition>
 					<span
