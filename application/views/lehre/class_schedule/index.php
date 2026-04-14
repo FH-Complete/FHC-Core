@@ -1,0 +1,40 @@
+<?php
+$includesArray = array(
+	'title' => 'Unterrichtszeiten der Studiengänge',
+	'vue3' => true,
+	'axios027' => true,
+	'bootstrap5' => true,
+	'tabulator5' => true,
+	'fontawesome6' => true,
+	'primevue3' => true,
+	'navigationcomponent' => true,
+	'filtercomponent' => true,
+    'customJSs' => array(
+		'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js',
+		'vendor/moment/luxonjs/luxon.min.js'
+	),
+	'customJSModules' => array(
+		'public/js/apps/lehre/ClassScheduleApp.js'
+	),
+	'customCSSs' => array(
+	    'public/css/components/vue-datepicker.css',
+        'public/css/components/primevue.css',
+		'public/css/components/verticalsplit.css',
+		'public/extensions/FHC-Core-Developer/css/FhcMain.css'
+	)
+);
+
+$this->load->view('templates/FHC-Header', $includesArray);
+?>
+
+<div id="main">
+	
+	<router-view
+		cis-root="<?= CIS_ROOT; ?>"
+		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
+	>
+	</router-view>
+</div>
+
+<?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
+

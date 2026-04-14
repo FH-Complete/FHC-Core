@@ -119,6 +119,9 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'a
 // // (studiensemester_kurzbz)/person/(person_id)
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
 
+
+$route['lehre/ClassSchedule/(:any)/(:any)'] = 'lehre/ClassSchedule/index';
+
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
