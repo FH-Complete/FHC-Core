@@ -211,16 +211,6 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/Cis/OverviewLvPlan`,
-			name: 'OverviewLvPlan',
-			component: OverviewLvPlan,
-			props(route) {
-				return {
-					propsViewData: route.params
-				};
-			}
-		},
-		{
       		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
       		name: "OtherLvPlan",
       		component: OtherLvPlan,

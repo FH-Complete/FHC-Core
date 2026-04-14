@@ -65,9 +65,8 @@ $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
-//Routes for Lvplan Verband and page for dropdown Stg/Semester/Verband/Gruppe
+//Route for LV Plan Stg/Semester/Verband/Gruppe
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
-$route['Cis/OverviewLvPlan/.*'] = 'Cis/OverviewLvPlan/index/$1';
 
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';
