@@ -305,7 +305,6 @@ const app = Vue.createApp({
 		}
 	},
 	async created(){
-		
 		await this.$api
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)
