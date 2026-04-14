@@ -158,6 +158,20 @@ export default {
 				}
 			}
 			this.$emit("change", config);
+		},
+		async initializeComponent() {
+			if (
+				this.widgetTemplate
+				&& this.widgetTemplate.setup
+				&& this.widgetTemplate.widget_id
+				&& this.widgetTemplate.arguments
+			) {
+				let component = (await import(this.widgetTemplate.setup.file)).default;
+				this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
+				this.component = "widget" + this.widgetTemplate.widget_id;
+				this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
+				this.tmpConfig = { ...this.arguments };
+			}
 		}
 	},
 	watch: {
@@ -167,13 +181,12 @@ export default {
 			this.$refs.config && this.$refs.config.hide();
 			this.isLoading = false;
 		},
+		widgetTemplate() {
+			this.initializeComponent();
+		}
 	},
-	async created() {
-		let component = (await import(this.widgetTemplate.setup.file)).default;
-		this.$options.components["widget" + this.widgetTemplate.widget_id] = component;
-		this.component = "widget" + this.widgetTemplate.widget_id;
-		this.arguments = { ...this.widgetTemplate.arguments, ...this.config };
-		this.tmpConfig = { ...this.arguments };
+	created() {
+		this.initializeComponent();
 	},
 	template: /*html*/ `
 	<div
