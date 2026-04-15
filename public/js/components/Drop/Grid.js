@@ -45,7 +45,7 @@ export default {
 			draggedOffset: [0, 0],
 			draggedItem: null,
 			reorderedItems: [],
-			clonedWidget: null,
+			clonedWidget: null
 		};
 	},
 	computed: {
@@ -158,7 +158,7 @@ export default {
 					' ' +
 					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
 				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
-			}
+			};
 		},
 		indexedItems() {
 			return this.items.map(
@@ -460,7 +460,8 @@ export default {
 							this.draggedOffset[1] += y;
 							y = 0;
 						}
-						this.tempPositionUpdates= dragGrid.move(this.draggedItem, x, y);
+						
+						this.tempPositionUpdates = dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
