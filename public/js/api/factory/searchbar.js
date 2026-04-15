@@ -36,5 +36,12 @@ export default {
 			url: '/api/frontend/v1/searchbar/searchStv',
 			params
 		};
+	},
+	searchPV(params) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/searchbar/searchPV',
+			params
+		};
 	}
 };

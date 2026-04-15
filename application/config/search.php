@@ -45,7 +45,7 @@ $config['person'] = [
 			'field' => 'kontakt',
 			'join' => [
 				'table' => "public.tbl_kontakt",
-				'on' => "kontakttyp IN ('telefon', 'so.tel', 'mobil') AND tbl_kontakt.person_id = tbl_person.person_id"
+				'on' => "kontakttyp IN ('telefon', 'so.tel', 'mobil', 'firmenhandy') AND tbl_kontakt.person_id = tbl_person.person_id"
 			],
 			"1-n" => true
 		],
@@ -360,6 +360,10 @@ $config['employee'] = [
 			'comparison' => 'equals',
 			'field' => "mitarbeiter_uid"
 		],
+		'personalnummer' => [
+			'comparison' => 'equal-int',
+			'field' => "personalnummer"
+		],
 		'vorname' => [
 			'alias' => ['firstname'],
 			'comparison' => 'similar',
@@ -415,12 +419,27 @@ $config['employee'] = [
 		'tel' => [
 			'alias' => ['phone', 'telefon'],
 			'comparison' => 'similar',
-			'field' => "TRIM(COALESCE(kontakt, '') || ' ' || COALESCE(telefonklappe, ''))",
+			'field' => 'kontakt',
+			'prepare' => "employee_tel (mitarbeiter_uid, kontakt) AS (
+				SELECT m.mitarbeiter_uid,
+					   TRIM(COALESCE(k.kontakt, '') || ' ' || COALESCE(m.telefonklappe, ''))
+				FROM public.tbl_mitarbeiter m
+				LEFT JOIN public.tbl_kontakt k
+					ON k.standort_id = m.standort_id
+					AND k.kontakttyp = 'telefon'
+				UNION
+				SELECT m.mitarbeiter_uid, k.kontakt
+				FROM public.tbl_mitarbeiter m
+				JOIN public.tbl_benutzer b ON b.uid = m.mitarbeiter_uid
+				JOIN public.tbl_kontakt k
+					ON k.person_id = b.person_id
+					AND k.kontakttyp IN ('telefon', 'so.tel', 'mobil', 'firmenhandy')
+			)",
 			'join' => [
-				'table' => "public.tbl_kontakt",
-				'on' => "kontakttyp = 'telefon' AND tbl_kontakt.standort_id = tbl_mitarbeiter.standort_id"
+				'table' => "employee_tel",
+				'using' => "mitarbeiter_uid"
 			],
-			"1-n" => true
+			'1-n' => true
 		],
 		'pid' => [
 			'alias' => ['person_id'],
@@ -471,6 +490,7 @@ $config['employee'] = [
 	],
 	'resultfields' => [
 		"b.uid",
+		"m.personalnummer",
 		"p.person_id",
 		"(p.vorname || ' ' || p.nachname) AS name",
 		"ARRAY(
@@ -512,7 +532,6 @@ $config['employee'] = [
 		) k ON (k.standort_id = m.standort_id)"
 ];
 
-// TODO(chris): move to searchpv21.php
 $config['unassigned_employee'] = $config['employee'];
 $config['unassigned_employee']['alias'] = ['mitarbeiter_ohne_zuordnung'];
 $config['unassigned_employee']['prepare'] = "unassigned_employee AS (
@@ -524,7 +543,7 @@ $config['unassigned_employee']['prepare'] = "unassigned_employee AS (
 		AND (datum_von IS NULL OR datum_von <= NOW())
 		AND (datum_bis IS NULL OR datum_bis >= NOW())
 	)
-	WHERE tbl_benutzerfunktion.bezeichnung IS NULL
+	WHERE tbl_benutzerfunktion.uid IS NULL
 	UNION
 	SELECT tbl_mitarbeiter.*
 	FROM public.tbl_mitarbeiter
@@ -534,10 +553,10 @@ $config['unassigned_employee']['prepare'] = "unassigned_employee AS (
 		AND (datum_von IS NULL OR datum_von <= NOW())
 		AND (datum_bis IS NULL OR datum_bis >= NOW())
 	)
-	WHERE tbl_benutzerfunktion.bezeichnung IS NULL
+	WHERE tbl_benutzerfunktion.uid IS NULL
 )";
 $config['unassigned_employee']['table'] = "unassigned_employee";
-$config['unassigned_employee']['searchfields']['tel']['join']['on'] = "
+$config['unassigned_employee']['searchfields']['tel'] = "
 	kontakttyp = 'telefon' 
 	AND tbl_kontakt.standort_id = unassigned_employee.standort_id
 ";

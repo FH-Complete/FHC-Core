@@ -7,6 +7,7 @@ $CI =& get_instance();
 
 
 $config['employee'] = $CI->config->item('employee', 'search');
+unset($config['employee']['searchfields']['tel']);
 $config['employee']['resultjoin'] = "
 		JOIN public.tbl_mitarbeiter m USING (mitarbeiter_uid)
 		JOIN public.tbl_benutzer b ON (b.uid = m.mitarbeiter_uid AND b.aktiv = true)
