@@ -1,29 +1,36 @@
-let __widgets = {};
-let __widgetsStarted = {};
-let __path = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/dashboard/Widget';
+import ApiWidget from "../../api/factory/dashboard/widget.js";
 
-export default {
-	getWidget(id) {
-		return __widgets[id];
-	},
-	loadWidget(id) {
-		if (__widgets[id])
-			return Promise.resolve(__widgets[id]);
-		if (__widgetsStarted[id])
-			return __widgetsStarted[id];
-		if (!__path)
-			return Promise.reject('Widget could not be loaded because there is no path yet!');
+const promises = Vue.ref([]);
+const stateRef = Vue.ref([]);
+const state = Vue.readonly(stateRef);
 
-		__widgetsStarted[id] = new Promise((resolve, reject) => {
-			axios.get(__path, {params:{id}}).then(res => {
-				__widgets[id] = res.data.retval;
-				__widgetsStarted[id] = undefined;
-				resolve(__widgets[id]);
-			}).catch(error => reject(error.response.data.retval.error));
-		});
-		return __widgetsStarted[id];
-	},
-	setPath(path) {
-		__path = path;
+export function useCachedWidgetLoader() {
+	const $api = Vue.inject('$api');
+	const $fhcAlert = Vue.inject('$fhcAlert');
+
+	function load(id) {
+		if (state.value[id])
+			return Promise.resolve(state.value[id]);
+
+		if (!promises.value[id])
+			promises.value[id] = new Promise((resolve, reject) => {
+				$api
+					.call(ApiWidget.get(id))
+					.then(res => {
+						stateRef.value[id] = res.data;
+						promises.value[id] = undefined;
+						resolve(state.value[id]);
+					})
+					.catch($fhcAlert.handleSystemError);
+			});
+
+		return promises.value[id];
 	}
+
+	return {
+		state,
+		actions: {
+			load
+		}
+	};
 }
