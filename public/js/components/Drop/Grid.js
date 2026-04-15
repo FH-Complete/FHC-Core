@@ -487,13 +487,18 @@ export default {
 				}
 			}
 		},
+		_cleanupDragging() {
+			if (this.draggedItem) {
+				this.draggedItem = null;
+			}
+		},
 		dragCancel() {
 			this.removeWidgetClones();
 			this.additionalRowComputed = false;
 			this.mode = MODE_IDLE;
 			this.tempPositionUpdates = null;
-			this.draggedOffset = [0,0],
-			this.draggedItem = null;
+			this.draggedOffset = [0,0];
+			this._cleanupDragging();
 		},
 		dragEnd() {
 			this.removeWidgetClones();
@@ -518,7 +523,7 @@ export default {
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
 
-			this.draggedItem = null;
+			this._cleanupDragging();
 		},
 		_updateCorrectedPositions(updated) {
 			updated.forEach((item, index) => {
