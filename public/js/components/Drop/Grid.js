@@ -625,7 +625,6 @@ export default {
 				:class="item.classes"
 				:item="item"
 				:style="{
-					zIndex: item.resizeOverlay ? 1 : 'auto',
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',
