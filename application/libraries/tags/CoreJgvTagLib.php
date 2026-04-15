@@ -1,17 +1,17 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of jgv_auto (Jahrgangsvertretung)
  *
- * @author bambi
+ * @author ma0068
  */
-class CoreWiederholerTagLib
+class CoreJgvTagLib
 {
 	protected $ci;
 
 	public function __construct()
 	{
 		$this->ci = get_instance();
-		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->ci->load->model('person/Benutzerfunktion_model', 'BenutzerfunktionModel');
 	}
 
 	public function getZuordnungIds(array $params)
@@ -24,10 +24,9 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
-			'studiensemester_kurzbz' => $semester
-		));
+
+		$result = $this->ci->BenutzerfunktionModel->getPrestudentsOfJgv($semester);
+
 		$data = $result->retval;
 		$ids = array_map(function($item) {
 			return $item->prestudent_id;
@@ -48,11 +47,8 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
-		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
-			'studiensemester_kurzbz' => $semester,
-			'prestudent_id' => $prestudent_id
-		));
+		$result = $this->ci->BenutzerfunktionModel->isJgv($semester, $prestudent_id);
+
 		if(hasData($result))
 		{
 			return true;
@@ -60,4 +56,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }

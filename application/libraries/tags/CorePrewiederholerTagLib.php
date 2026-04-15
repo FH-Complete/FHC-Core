@@ -42,9 +42,7 @@ class CorePrewiederholerTagLib
 	{
 		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
 		{
-			return (object) array(
-				'isSet' => false
-			);
+			return false;
 		}
 
 		$semester = $params['studiensemester_kurzbz'];

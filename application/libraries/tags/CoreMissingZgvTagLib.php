@@ -1,17 +1,17 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of zgv_auto
  *
- * @author bambi
+ * @author ma0068
  */
-class CoreWiederholerTagLib
+class CoreMissingZgvTagLib
 {
 	protected $ci;
 
 	public function __construct()
 	{
 		$this->ci = get_instance();
-		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->ci->load->model('crm/Prestudent_model', 'PrestudentModel');
 	}
 
 	public function getZuordnungIds(array $params)
@@ -24,10 +24,17 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
+
+		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+		$result = $this->ci->PrestudentModel-> loadWhere(array(
+			'bn.aktiv' => true, //check if necessary
+			'zgvdatum' => null,
+			'typ' => 'b',
 			'studiensemester_kurzbz' => $semester
 		));
+
 		$data = $result->retval;
 		$ids = array_map(function($item) {
 			return $item->prestudent_id;
@@ -48,8 +55,13 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
-		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
+		$this->ci->PrestudentModel->addJoin('public.tbl_prestudentstatus', 'prestudent_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_benutzer bn', 'person_id');
+		$this->ci->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
+		$result = $this->ci->PrestudentModel->loadWhere(array(
+			'bn.aktiv' => true, //check if necessary
+			'zgvdatum' => null,
+			'typ' => 'b',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
@@ -60,4 +72,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }

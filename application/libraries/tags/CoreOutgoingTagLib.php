@@ -1,17 +1,17 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of out_auto
  *
- * @author bambi
+ * @author ma0068
  */
-class CoreWiederholerTagLib
+class CoreOutgoingTagLib
 {
 	protected $ci;
 
 	public function __construct()
 	{
 		$this->ci = get_instance();
-		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->ci->load->model('codex/Bisio_model', 'BisioModel');
 	}
 
 	public function getZuordnungIds(array $params)
@@ -24,10 +24,9 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
-			'studiensemester_kurzbz' => $semester
-		));
+
+		$result = $this->ci->BisioModel->getOutgoingsOfSemester($semester);
+
 		$data = $result->retval;
 		$ids = array_map(function($item) {
 			return $item->prestudent_id;
@@ -48,11 +47,7 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
-		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
-			'studiensemester_kurzbz' => $semester,
-			'prestudent_id' => $prestudent_id
-		));
+		$result = $this->ci->BisioModel->isPrestudentOutgoing($semester, $prestudent_id);
 		if(hasData($result))
 		{
 			return true;
@@ -60,4 +55,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }

@@ -90,14 +90,10 @@ class TagJob extends JOB_Controller
 	public function rebuildAutomatedTags()
 	{
 		print_r( PHP_EOL . "Start Job rebuild" . PHP_EOL);
-		$automaticTags = $this->config->item('stv_automatic_tags');
-		print_r( implode( ", ", $automaticTags) . PHP_EOL);
 
 		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
-		//echo $this->NotiztypModel->db->last_query();
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
-		print_r($automatedTags);
-
+		//print_r($automatedTags);
 
 		foreach($automatedTags as $autoTag)
 		{
@@ -125,15 +121,12 @@ class TagJob extends JOB_Controller
 			if (isError($result))
 				return error ('Error occurred during updateAutomatedTags');
 
-			print_r(PHP_EOL ."ALL TAGS " . $kurz_bz . " " . count($data[0]) . " TO ADD " . count($data[1]) . " TO RECYLE: " . count($data[2]) .  " TO DELETE: " . count($data[3]));
-
-
-			print_r( PHP_EOL . "Count Recycled: ");
-			print_r($data[4]);
-			print_r( PHP_EOL . "Count Added: ");
-			print_r($data[6]);
-			print_r( PHP_EOL . "Count Deleted: ");
-			print_r($data[8] . PHP_EOL . PHP_EOL);
+			//Output with Summary and Details
+			print_r(PHP_EOL . "-- TAG  " . $result->retval['input']['tag'] . " --");
+			print_r( PHP_EOL . "Count Recycled: " . $result->retval['summary']['recycled']);
+			print_r(PHP_EOL . "Count Added: ".  $result->retval['summary']['added']);
+			print_r(PHP_EOL . "Count Deleted: ".  $result->retval['summary']['deleted']);
+			print_r(PHP_EOL);
 
 		}
 		print_r( PHP_EOL . "End Job rebuild" . PHP_EOL);

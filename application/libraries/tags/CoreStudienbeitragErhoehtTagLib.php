@@ -1,17 +1,17 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of dd_auto
  *
- * @author bambi
+ * @author ma0068
  */
-class CoreWiederholerTagLib
+class CoreStudienbeitragErhoehtTagLib
 {
 	protected $ci;
 
 	public function __construct()
 	{
 		$this->ci = get_instance();
-		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->ci->load->model('crm/Konto_model', 'KontoModel');
 	}
 
 	public function getZuordnungIds(array $params)
@@ -24,8 +24,10 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
+
+		$this->ci->KontoModel->addJoin('public.tbl_prestudent', 'person_id');
+		$result = $this->ci->KontoModel-> loadWhere(array(
+			'buchungstyp_kurzbz' => 'StudiengebuehrErhoeht',
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
@@ -48,11 +50,13 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
-		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
+		$this->ci->KontoModel->addJoin('public.tbl_prestudent', 'person_id');
+		$result = $this->ci->KontoModel-> loadWhere(array(
+			'buchungstyp_kurzbz' => 'StudiengebuehrErhoeht',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
+
 		if(hasData($result))
 		{
 			return true;
@@ -60,4 +64,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }

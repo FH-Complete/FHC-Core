@@ -163,8 +163,28 @@ class TagLib
 			$deleted[] = $value;
 		}
 
-		return success([$allTags, $toAdd, $toRecycle, $toDelete, $countRecyled, $retagged, $countAdded, $tagged, $countDeleted, $deleted]);
-
+		return success([
+			'input' => [
+				'tag' => $tag,
+				'prestudentIds' => $prestudentIds,
+			],
+			'summary' => [
+				'recycled' => $countRecyled,
+				'added' => $countAdded,
+				'deleted' => $countDeleted,
+			],
+			'details' => [
+				'existingTags' => $allTags,
+				'toAdd' => $toAdd,
+				'toRecycle' => $toRecycle,
+				'toDelete' => $toDelete,
+			],
+			'results' => [
+				'retaggedNotizIds' => $retagged,
+				'newTags' => $tagged,
+				'deletedNotizIds' => $deleted,
+			]
+		]);
 	}
 
 	public function updateAutomatedTagsForPrestudent($tag, $prestudent_id)

@@ -1,17 +1,17 @@
 <?php
 /**
- * Description of wh_auto
+ * Description of dd_auto
  *
- * @author bambi
+ * @author ma0068
  */
-class CoreWiederholerTagLib
+class CoreDoubleDegreeTagLib
 {
 	protected $ci;
 
 	public function __construct()
 	{
 		$this->ci = get_instance();
-		$this->ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+		$this->ci->load->model('codex/Mobilitaet_model', 'MobilitaetModel');
 	}
 
 	public function getZuordnungIds(array $params)
@@ -24,8 +24,10 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
-			'statusgrund_id' => 16,
+
+		$this->ci->MobilitaetModel->addJoin('bis.tbl_gsprogramm', 'gsprogramm_id');
+		$result = $this->ci->MobilitaetModel-> loadWhere(array(
+			'gsprogrammtyp_kurzbz' => 'Double',
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
@@ -48,8 +50,9 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
-		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
-			'statusgrund_id' => 16,
+		$this->ci->MobilitaetModel->addJoin('bis.tbl_gsprogramm', 'gsprogramm_id');
+		$result = $this->ci->MobilitaetModel->loadWhere(array(
+			'gsprogrammtyp_kurzbz' => 'Double',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
@@ -60,4 +63,5 @@ class CoreWiederholerTagLib
 		else
 			return false;
 	}
+
 }
