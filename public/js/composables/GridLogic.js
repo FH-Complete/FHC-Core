@@ -91,7 +91,7 @@ class GridLogic {
 
 				return result;
 			} else {
-				console.error('FATAL', "can't arrange item on grid");
+				return null;
 			}
 		}
 	}
@@ -151,7 +151,9 @@ class GridLogic {
 		}
 		
 		const updates = this.add(currItem, prefer);
-		updates[item.index] = {index: item.index, x, y};
+		if (updates)
+			updates[item.index] = {index: item.index, x, y};
+		
 		return updates;
 	}
 	resize(item, w, h) {
