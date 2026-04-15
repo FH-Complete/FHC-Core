@@ -84,12 +84,14 @@ export default {
 			else if (this.openMode == "inSamePage"){
 				this.isVisibleDiv = true;
 
-				if(messageId)
-					this.$refs.templateNewDivMessage.loadReplyData(messageId);
-				else
-					this.$refs.templateNewDivMessage.resetForm();
+				this.$nextTick(() => {
+					if(messageId)
+						this.$refs.templateNewDivMessage.loadReplyData(messageId);
+					else
+						this.$refs.templateNewDivMessage.resetForm();
 
-				this.$refs.templateNewDivMessage.showTemplate();
+					this.$refs.templateNewDivMessage.showTemplate();
+				});
 			}
 			else
 				console.log("no valid openMode");
@@ -170,7 +172,7 @@ export default {
 		</message-modal>
 		
 		<!--in same page-->
-		<div v-show="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
+		<div v-if="isVisibleDiv" class="overflow-auto m-3" style="max-height: 500px; border: 1px solid #ccc;">
 			<form-only
 				v-if="tablebuilt || id.length > 1"
 				ref="templateNewDivMessage"
