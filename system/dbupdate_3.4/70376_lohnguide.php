@@ -368,23 +368,6 @@ if ($result = $db->db_query("SELECT * FROM information_schema.columns WHERE colu
 	}
 }
 
-if ($result = $db->db_query("SELECT * FROM hr.tbl_gehaltstyp WHERE gehaltstyp_kurzbz='ueberstundenpauschale'"))
-{
-	if ($db->db_num_rows($result) == 0)
-	{
-		$qry = "
-		INSERT INTO hr.tbl_gehaltstyp
-		    (gehaltstyp_kurzbz, bezeichnung, valorisierung, sort, aktiv, lvexport)
-		VALUES
-		    ('ueberstundenpauschale','Überstundenpauschale', true, 8, true);
-		";
-
-		if (! $db->db_query($qry))
-			echo '<strong>Gehaltstyp: ' . $db->db_last_error() . '</strong><br>';
-		else
-			echo 'Gehaltstyp "Überstundenpauschale" erstellt.<br />';
-	}
-}
 
 if ($result = $db->db_query("SELECT * FROM hr.tbl_gehaltstyp WHERE gehaltstyp_kurzbz='ueberstundenpauschale'"))
 {
