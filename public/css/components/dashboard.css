@@ -130,10 +130,12 @@
 	display: none;
 }
 
+.drop-grid-item-sizechanged > .dashboard-item,
 .drop-grid-item-move > .dashboard-item {
 	background-color: var(--fhc-dashboard-item-overlay-background);
 }
 
+.drop-grid-item-sizechanged > .dashboard-item::before,
 .drop-grid-item-move > .dashboard-item::before {
 	position: absolute;
 	content: "";
@@ -143,6 +145,12 @@
 	bottom: .25rem;
 	border: 4px dashed var(--fhc-dashboard-item-overly-border-color);
 	opacity: .5;
+}
+
+.drop-grid-item-oversized > .dashboard-item {
+	/* Bootstrap: border-danger */
+	--bs-border-opacity: 1;
+	border-color: rgba(var(--bs-danger-rgb), var(--bs-border-opacity)) !important;
 }
 
 #deleteBookmark i {

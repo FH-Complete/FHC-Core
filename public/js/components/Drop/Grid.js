@@ -137,8 +137,30 @@ export default {
 			return placeholders;
 		},
 		currentItems() {
-			if (this.mode != 1 && this.mode != 2 && this.active)
+			if (this.mode == MODE_IDLE && this.active)
 				return [ ...this.placedItems, ...this.items_placeholders ];
+
+			if (this.mode != MODE_IDLE && this.draggedItem) {
+				// add classes to dragged item
+				const draggedItemIndex = this.placedItems.findIndex(item => item.index == this.draggedItem.index);
+				const modifiedDraggedItem = {
+					...this.placedItems[draggedItemIndex],
+					classes: []
+				};
+
+				if (this.mode == MODE_MOVE) {
+					modifiedDraggedItem.classes.push('drop-grid-item-move');
+				}
+				if (this.mode == MODE_RESIZE) {
+					modifiedDraggedItem.classes.push('drop-grid-item-resize');
+					if (this.draggedItem.oversized)
+						modifiedDraggedItem.classes.push('drop-grid-item-oversized')
+					else if (this.placedItems[draggedItemIndex].resize)
+						modifiedDraggedItem.classes.push('drop-grid-item-sizechanged')
+				}
+
+				return this.placedItems.toSpliced(draggedItemIndex, 1, modifiedDraggedItem);
+			}
 
 			return this.placedItems;
 		},
@@ -195,11 +217,10 @@ export default {
 		placedItems() {
 			if (!this.tempPositionUpdates)
 				return this.prePlacedItems;
-			let mappedPlacedItems= this.prePlacedItems.map(item => {
-				if (!this.tempPositionUpdates[item.index] )
+			return this.prePlacedItems.map(item => {
+				if (!this.tempPositionUpdates[item.index])
 					return item;
-				let height_diff = this.tempPositionUpdates[item.index]?.h - item.h;
-				let width_diff = this.tempPositionUpdates[item.index]?.w - item.w;
+
 				return {
 					resize: this.tempPositionUpdates[item.index]?.resize,
 					index: item.index,
@@ -207,26 +228,11 @@ export default {
 					data: item.data,
 					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
 					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
-					w: width_diff>0?item.w:this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
-					h: height_diff > 0 ?item.h:this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
+					w: this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
+					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
 					
 				};
 			});
-
-			let temporaryResizeItems = [];
-			mappedPlacedItems.forEach(item=>{
-				if(item.resize){
-					let newItem = {
-						...item,
-						w:this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
-						h:this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h,
-						resizeOverlay:true,
-						blank:true,
-					};
-					temporaryResizeItems.push(newItem)
-				}
-			})
-			return [...mappedPlacedItems, ...temporaryResizeItems];
 		}
 	},
 	watch: {
@@ -474,15 +480,12 @@ export default {
 
 						[ w, h ] = this.cropSizeToAllowed(this.draggedItem.data.widget, w, h);
 
-						let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
-						if (w !== targetW || h !== targetH) {
-							draggedItemNode.classList.add("border-danger");
-						} else {
-							draggedItemNode.classList.remove("border-danger");
-						}
+						this.draggedItem.oversized = (w !== targetW || h !== targetH);
+
+						if (this.draggedItem.oversized)
+							[ w, h ] = [ this.draggedItem.w, this.draggedItem.h ];
 
 						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
-						
 						break;
 					}
 				}
@@ -490,6 +493,8 @@ export default {
 		},
 		_cleanupDragging() {
 			if (this.draggedItem) {
+				const draggedItem = this.indexedItems.find(item => item.index == this.draggedItem.index);
+				delete draggedItem.classes;
 				this.draggedItem = null;
 			}
 		},
@@ -617,10 +622,7 @@ export default {
 				v-for="(item, index) in currentItems"
 				:key="item.data.id"
 				class="position-absolute"
-				:class="{
-					'drop-grid-item-move': item.index == draggedItem?.index && mode == 1,
-					'drop-grid-item-resize': item.index == draggedItem?.index && mode == 2
-				}"
+				:class="item.classes"
 				:item="item"
 				:style="{
 					zIndex: item.resizeOverlay ? 1 : 'auto',
