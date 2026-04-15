@@ -23,29 +23,31 @@ export default {
     </div>
     <div class="card-body">
         <div class="d-flex flex-column gap-3">
-            <span>
-                <a
-                    target="_blank"
-                    :href="syncInstructionsUrlWithoutParam + $p.t('DMS-Link/lvplanSyncFAQ')"
-                    class="fhc-link-color"
-                >
+            <a
+                target="_blank"
+                :href="syncInstructionsUrlWithoutParam + $p.t('DMS-Link/lvplanSyncFAQ')"
+                class="fhc-link-color d-flex flex-row gap-2 align-items-center"
+            >
+                <span>
+                    <i class="fa-solid fa-up-right-from-square ms-2"></i>
+                </span>
+                <span>
                     {{ $p.t("profil/calendar_sync_instructions") }}
-                </a>
-                <i class="fa-solid fa-up-right-from-square ms-2"></i>
-            </span>
-            <ul>
-                <li v-for="syncUrl in $props.calendarSyncUrls" :key="syncUrl.identifier">
-                    <a 
-                        @click.prevent="copyUrlToClipboard(syncUrl.url)"
-                        @contextmenu.prevent="copyUrlToClipboard(syncUrl.url)"
-                        href="#"
-                        class="fhc-link-color"
-                    >
-                        {{ $p.t(syncUrl.labelPhrase) }}
-                    </a>
-                    <i class="fa-regular fa-copy ms-2"></i>
-                </li>
-            </ul>
+                </span>
+            </a>
+            <a
+                v-for="syncUrl in $props.calendarSyncUrls"
+                :key="syncUrl.identifier"
+                @click.prevent="copyUrlToClipboard(syncUrl.url)"
+                @contextmenu.prevent="copyUrlToClipboard(syncUrl.url)"
+                href="#"
+                class="fhc-link-color d-flex flex-row gap-2 align-items-center"
+            >
+                <span>
+                    <i class="fa-regular fa-copy ms-2 text-decoration-none"></i>
+                </span>
+                    {{ $p.t(syncUrl.labelPhrase) }}
+            </a>
         </div>
     </div>
 </div>`,
