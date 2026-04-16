@@ -156,7 +156,7 @@ class GridLogic {
 		
 		const updates = this.add(currItem);
 		if(updates)
-			updates[item.index] = { index: item.index, w, h, x: item.x, y: item.y, resize:true };
+			updates[item.index] = { index: item.index, w, h, x: item.x, y: item.y };
 
 		return updates;
 	}

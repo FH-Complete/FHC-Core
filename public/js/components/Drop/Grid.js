@@ -164,7 +164,6 @@ export default {
 					return item;
 
 				return {
-					resize: this.tempPositionUpdates[item.index]?.resize,
 					index: item.index,
 					weight: item.weight,
 					data: item.data,
@@ -195,7 +194,7 @@ export default {
 					modifiedDraggedItem.classes.push('drop-grid-item-resize');
 					if (this.draggedItem.oversized)
 						modifiedDraggedItem.classes.push('drop-grid-item-oversized')
-					else if (this.placedItems[draggedItemIndex].resize)
+					else if (this.tempPositionUpdates?.length)
 						modifiedDraggedItem.classes.push('drop-grid-item-sizechanged')
 				}
 
