@@ -3,6 +3,7 @@ import FormInput from "../Form/Input.js";
 import BsModal from '../Bootstrap/Modal.js';
 
 export default {
+	name: 'TagComponent',
 	components: {
 		CoreForm,
 		FormInput,

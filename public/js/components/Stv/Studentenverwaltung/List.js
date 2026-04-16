@@ -637,22 +637,23 @@ export default {
 					@updated="updatedTag"
 					zuordnung_typ="prestudent_id"
 				></core-tag>
-			</template>
 
-			<template #actions v-if="filter.length || headerFilterActive">
-			  <div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
-				<p class="text-danger mb-0">
-				  <strong>{{$p.t('filter','filterActive')}}</strong>
-				</p>
+				<template v-if="filter.length || headerFilterActive">
+				<div class="d-flex justify-content-center align-items-center gap-2 ps-4 position-absolute start-50 translate-middle-x">
+					<p class="text-danger mb-0">
+						<strong>{{$p.t('filter','filterActive')}}</strong>
+					</p>
 
-				<button
-				  class="btn btn-outline-danger sm"
-				  :title="$p.t('filter/filterDelete')"
-				  @click="resetFilter"
-				>
-				 <span class="fa-solid fa-filter-circle-xmark"></span>
-				</button>
-			  </div>
+					<button
+						class="btn btn-outline-danger sm"
+						:title="$p.t('filter/filterDelete')"
+						@click="resetFilter"
+					>
+						<span class="fa-solid fa-filter-circle-xmark"></span>
+					</button>
+				</div>
+				</template>
+
 			</template>
 
 			<template #filter>
