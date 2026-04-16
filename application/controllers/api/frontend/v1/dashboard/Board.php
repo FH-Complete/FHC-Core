@@ -55,6 +55,16 @@ class Board extends FHCAPI_Controller
 
 		$data = $this->getDataOrTerminateWithError($result);
 
+		$data = array_map(function ($dashboard) {
+			$tmpSetups = json_decode($dashboard->widgetSetup);
+			$tmpSetups = array_map(function ($widget) {
+				$widget->setup->file = absoluteJsImportUrl($widget->setup->file);
+				return $widget;
+			}, $tmpSetups);
+			$dashboard->widgetSetup = $tmpSetups;
+			return $dashboard;
+		}, $data);
+
 		$this->terminateWithSuccess($data);
 	}
 

@@ -87,9 +87,6 @@ export default {
 			.call(ApiDashboardBoard.list())
 			.then(result => {
 				this.dashboards = result.data;
-				for (const dashboard of this.dashboards) {
-					dashboard.widgetSetup = JSON.parse(dashboard.widgetSetup);
-				}
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
