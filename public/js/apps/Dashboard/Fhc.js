@@ -4,7 +4,7 @@ import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
-import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
+import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
 import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";

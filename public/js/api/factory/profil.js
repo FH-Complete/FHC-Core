@@ -17,7 +17,7 @@
 
 export default {
 	
-	profilViewData(uid) {
+	getProfilViewData(uid = null) {
 		let url = "/api/frontend/v1/Profil/profilViewData";
 		if(uid){
 			url += `/${uid}`;

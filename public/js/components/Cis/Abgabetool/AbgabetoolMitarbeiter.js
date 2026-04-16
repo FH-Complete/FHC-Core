@@ -31,16 +31,6 @@ export const AbgabetoolMitarbeiter = {
 			old_abgabe_beurteilung_link: Vue.computed(() => this.old_abgabe_beurteilung_link)
 		}
 	},
-	props: {
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({name: '', uid: ''}),
-			validator(value) {
-				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
-			}
-		}
-	},
 	data() {
 		return {
 			tableData: null,

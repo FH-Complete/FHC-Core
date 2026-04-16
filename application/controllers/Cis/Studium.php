@@ -29,10 +29,7 @@ class Studium extends Auth_Controller
 	 */
 	public function index()
 	{
-		$viewData = array(
-
-		);
-		$this->load->view('CisRouterView/CisRouterView.php',['viewData' => $viewData, 'route' => 'studium']);
+		$this->load->view('CisRouterView/CisRouterView.php',['route' => 'studium']);
 	}
 
 

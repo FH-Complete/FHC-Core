@@ -42,14 +42,6 @@ export const AbgabetoolAssistenz = {
 		stg_kz_prop: {
 			default: null
 		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({name: '', uid: ''}),
-			validator(value) {
-				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
-			}
-		}
 	},
 	data() {
 		return {

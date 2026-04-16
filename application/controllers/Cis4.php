@@ -31,16 +31,6 @@ class Cis4 extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->model('person/Person_model', 'PersonModel');
-		$personData = getData($this->PersonModel->getByUid(getAuthUID()))[0];
-
-		$viewData = array(
-			'uid' => getAuthUID(),
-			'name' => $personData->vorname,
-			'person_id' => $personData->person_id,
-			'timezone' => $this->config->item('timezone'),
-		);
-
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'FhcDashboard']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'FhcDashboard']);
 	}
 }

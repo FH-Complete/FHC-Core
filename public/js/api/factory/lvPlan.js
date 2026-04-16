@@ -16,6 +16,12 @@
  */
 
 export default {
+	getMyLvPlanViewData() {
+		return {
+			method: 'get',
+			url: `/api/frontend/v1/LvPlan/myLvPlanViewData`,
+		};
+	},
 	getRoomInfo(ort_kurzbz, start_date, end_date) {
 		return {
 			method: 'post',

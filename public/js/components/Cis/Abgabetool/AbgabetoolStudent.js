@@ -3,6 +3,7 @@ import ApiAbgabe from '../../../api/factory/abgabe.js'
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass} from "./getDateStyleClass.js";
+import ApiAuthinfo from "../../../api/factory/authinfo.js";
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
@@ -24,14 +25,6 @@ export const AbgabetoolStudent = {
 		student_uid_prop: {
 			default: null
 		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({uid: ''}),
-			validator(value) {
-				return value && value.uid
-			}
-		}
 	},
 	data() {
 		return {
@@ -44,8 +37,17 @@ export const AbgabetoolStudent = {
 			detail: null,
 			projektarbeiten: null,
 			selectedProjektarbeit: null,
-			moodle_link: null
+			moodle_link: null,
+			uid: null,
 		};
+	},
+	computed: {
+		isViewMode() {
+			return this.student_uid !== this.uid
+		},
+		student_uid() {
+			return this.student_uid_prop || this.uid || null
+		}
 	},
 	methods: {
 		checkQualityGatesStrict(termine) {
@@ -258,18 +260,11 @@ export const AbgabetoolStudent = {
 		},
 		handleDownloadBeurteilung2(projektarbeit) {
 			window.open(projektarbeit.beurteilung2)
-		}
-	},
-	watch: {
-
-	},
-	computed: {
-		isViewMode() {
-			return this.student_uid !== this.viewData.uid
 		},
-		student_uid() {
-			return this.student_uid_prop || this.viewData?.uid || null
-		}
+		async fetchAuthUID() {
+			const authIdResponse = await this.$api.call(ApiAuthinfo.getAuthUID());
+			this.uid = authIdResponse.data.uid;
+		},
 	},
 	async created() {
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
@@ -302,6 +297,8 @@ export const AbgabetoolStudent = {
 		}).catch(e => {
 			this.loading = false
 		})
+
+		await this.fetchAuthUID();
 	},
 	mounted() {
 		this.setupMounted()

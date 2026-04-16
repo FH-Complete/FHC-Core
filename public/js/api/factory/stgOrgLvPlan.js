@@ -16,10 +16,10 @@
  */
 
 export default {
-	getOtherLvPlanViewData(uid) {
+	getStgOrgLvPlanViewData(uid) {
 		return {
 			method: 'get',
-			url: `/api/frontend/v1/OtherLvPlan/otherLvPlanViewData/${uid}`,
+			url: `/api/frontend/v1/StgOrgLvPlan/stgOrgLvPlanViewData`,
 		};
 	},
 };
