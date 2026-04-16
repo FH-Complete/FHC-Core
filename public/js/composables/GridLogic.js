@@ -23,30 +23,18 @@ class GridLogic {
 		const i = y*this.w + x;
 		return !this.grid[i] && this.grid[i] !== 0;
 	}
-	getMaxY(){
-		return this.data.reduce((acc, item) => { 
-			if (item?.y > acc) {
-				 acc = item.y; 
-			} 
-			return acc; 
-		}, 0);
-	}
 	getFreeSlots() {
 		const freeSlots = [];
-		let biggestY = this.getMaxY();
-		let totalSpaces = this.w * (biggestY+1);
-		for(let i=0; i < totalSpaces; i++){
-			if (!this.grid[i] && this.grid[i] !== 0){
-				this.grid[i] = undefined;
-			}
-		}
-		for(let i =0; i < this.grid.length; i++){
-			if (!this.grid[i] && this.grid[i] !== 0){
+		let i = this.w * this.h;
+
+		while (i--) {
+			if (!this.grid[i] && this.grid[i] !== 0) {
 				let x = i % this.w;
 				let y = Math.floor(i / this.w);
 				freeSlots.push({x, y});
 			}
 		}
+
 		return freeSlots;
 	}
 	add(item, prefer) {
