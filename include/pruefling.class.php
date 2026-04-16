@@ -597,8 +597,7 @@ class pruefling extends basis_db
 			return false;
 		}
 	}
-
-	public function personRegisteredRT($person_id, $reihungstest_id, $prestudent_id)
+	public function personAlreadyInRT($person_id, $reihungstest_id, $prestudent_id)
 	{
 		$qry = "SELECT tbl_prestudent.prestudent_id
 				FROM public.tbl_rt_person
@@ -607,7 +606,7 @@ class pruefling extends basis_db
 						AND tbl_prestudentstatus.studienplan_id = tbl_rt_person.studienplan_id
 				WHERE tbl_rt_person.person_id = " . $this->db_add_param($person_id) . "
 					AND tbl_rt_person.rt_id = " . $this->db_add_param($reihungstest_id) . "
-					AND tbl_prestudent.prestudent_id = " . $this->db_add_param($prestudent_id) . "
+					AND tbl_prestudent.prestudent_id != " . $this->db_add_param($prestudent_id) . "
 				LIMIT 1";
 
 		if($result = $this->db_query($qry))
