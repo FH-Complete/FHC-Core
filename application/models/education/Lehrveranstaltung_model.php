@@ -1355,6 +1355,7 @@ class Lehrveranstaltung_model extends DB_Model
 					lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
 					lehre.tbl_lehrveranstaltung.bezeichnung,
 					lehre.tbl_lehrveranstaltung.bezeichnung_english as bezeichnung_eng,
+					lehre.tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
 					lehre.tbl_lehrveranstaltung.farbe,
 					lehre.tbl_lehrveranstaltung.lvinfo,
 					lehre.tbl_lehrveranstaltung.benotung,

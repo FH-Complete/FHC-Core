@@ -12,7 +12,11 @@ export default {
 	},
 	props: {
 		semester: [String, Number],
-		lvs: Array
+		lvs: Array,
+		mode: {
+			type: String,
+			default: 'Cards'
+		}
 	},
 	computed: {
 		ready() { return this.lvs !== null; },

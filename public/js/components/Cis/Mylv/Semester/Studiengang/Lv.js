@@ -15,6 +15,7 @@ export default {
 	inject: ['studien_semester', 'type'],
 	props: {
 		lehrveranstaltung_id: [Number, String],
+		semesterstunden: [Number, String],
 		bezeichnung: String,
 		bezeichnung_eng: String,
 		module: String,
@@ -199,6 +200,13 @@ export default {
 						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</span>
 				</template>
+			</div>
+		</div>
+		<div v-else-if="!emptyMenu && type == 'employee'" class="card-footer">
+			<div class="row">
+				<div class="col-auto">
+					<span class="ps-1">{{ $p.t('lehre/semesterstunden') }}: {{ semesterstunden }}</span>
+				</div>
 			</div>
 		</div>
 	</div>`
