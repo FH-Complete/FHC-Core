@@ -120,7 +120,8 @@ class GridLogic {
 		// checks if target contains widget with the same high and width
 		let occupiersData = occupiers.map(occupier => this.data[occupier]);
 		let occupiersFrame = occupiersData.map(occupier => occupier.frame).flat();
-		if (!occupiersFrame.some(frame => !currItem.frame.includes(frame)) && !occupiersFrame.some(frame => originalFrame.includes(frame))){
+		if (occupiersFrame.every(frame => currItem.frame.includes(frame))) {
+			// every slot of all items in the target zone is inside said zone
 			let replaceUpdate = [];
 			let newOccupierFrames = [];
 			for(let f of originalFrame){
