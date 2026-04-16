@@ -108,58 +108,19 @@ export default {
 			}));
 		},
 		// item pipeline
-		items_hashmap() { // helper
-			let items = {};
-			this.items.forEach(item => {
-				if (this.reorderedItems.length > 0 && this.needsReordering(item)) {
-						let rearrangedPosition = this.reorderedItems.filter(widget => widget.data.widgetid == item.widgetid)?.pop();
-						if (rearrangedPosition) {			
-							item.x = rearrangedPosition.x;
-							item.y = rearrangedPosition.y;
-						}
-				}
-				items[`x${item.x}y${item.y}`] = item;
-			});	
-			return items
-		},
 		items_placeholders() { // empty tiles
-			let placeholders = [];
-			let col_max = this.cols;
-			let rows_max = this.rows;
-
-			// occupied hashmap to keep track of the occupied cells
-			let occupied = {};
-
-			for (let y = 0; y < rows_max; y++) {
-				for (let x = 0; x < col_max; x++) {
-					// skip current position if it was registered as occupied
-					if (Object.keys(occupied).length && occupied[`x${x}y${y}`]) {
-						continue;
+			return this.grid.getFreeSlots().map((item, index) => {
+				return {
+					x: item.x,
+					y: item.y,
+					h: 1,
+					w: 1,
+					placeholder: true,
+					data: {
+						id: 'placeholder_' + index
 					}
-					let current_item = this.items_hashmap[`x${x}y${y}`];
-					if (current_item) {
-						//calculate the occupied cells from the width and the height from the items 
-						let width = current_item.w;
-						let height = current_item.h;
-						let max_x = x + width - 1;
-						let max_y = y + height - 1;
-						if(x != max_x || y != max_y){
-							for (let occupied_y = y; occupied_y <= max_y; occupied_y++) {
-								for (let occupied_x = x; occupied_x <= max_x; occupied_x++) {
-									if (occupied_x != x || occupied_y != y) {
-										occupied[`x${occupied_x}y${occupied_y}`]=true;
-									}
-								}
-							}
-						}
-					}
-					else {
-						placeholders.push({ x: x, y: y, w: 1, h: 1, placeholder: true, 
-							data: { id: 'placeholder_' + String(placeholders.length).padStart(4, "0") } });
-					}
-				}
-			}
-			return placeholders;
+				};
+			});
 		},
 		indexedItems() { // indexed
 			return this.items.map(
