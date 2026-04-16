@@ -140,7 +140,7 @@ class GridLogic {
 		
 		const updates = this.add(currItem, prefer);
 		if (updates)
-			updates[item.index] = {index: item.index, x, y};
+			updates[item.index] = { index: item.index, x, y, w: item.w, h: item.h };
 		
 		return updates;
 	}
@@ -156,7 +156,7 @@ class GridLogic {
 		
 		const updates = this.add(currItem);
 		if(updates)
-			updates[item.index] = {index: item.index, w, h, x:item.x, y:item.y, resize:true};
+			updates[item.index] = { index: item.index, w, h, x: item.x, y: item.y, resize:true };
 
 		return updates;
 	}
