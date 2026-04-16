@@ -63,6 +63,7 @@ class AktiverStudentstatusOhneKontobuchung extends PlausiChecker
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param person_id int if check is to be executed only for one person
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */

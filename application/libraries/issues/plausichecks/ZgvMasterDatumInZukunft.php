@@ -54,7 +54,7 @@ class ZgvMasterDatumInZukunft extends PlausiChecker
 	}
 
 	/**
-	 * Prestudent should have a final status.
+	 * ZGV master date should be in the past.
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent

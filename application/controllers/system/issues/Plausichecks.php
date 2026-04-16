@@ -5,7 +5,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 class Plausichecks extends Auth_Controller
 {
 	const GENERIC_ISSUE_OCCURED_TEXT = 'Issue aufgetreten';
-	const APPS = ['core', 'dvuh'];
+	const APPS = ['core', 'dvuh', 'bis'];
 
 	public function __construct()
 	{
@@ -18,7 +18,6 @@ class Plausichecks extends Auth_Controller
 
 		// Load libraries
 		$this->load->library('issues/PlausicheckProducerLib', array('apps' => self::APPS));
-		$this->load->library('issues/PlausicheckDefinitionLib');
 		$this->load->library('WidgetLib');
 
 		// Load models

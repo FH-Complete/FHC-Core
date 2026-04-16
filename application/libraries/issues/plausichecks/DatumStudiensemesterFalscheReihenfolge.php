@@ -51,6 +51,7 @@ class DatumStudiensemesterFalscheReihenfolge extends PlausiChecker
 	 * Status Dates and status studysemester dates should be in correct order.
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param person_id int if check is to be executed only for one person
 	 * @param exkludierte_studiengang_kz array if check is to be executed only for certain Studiengaenge
 	 * @return success with prestudents or error
 	 */

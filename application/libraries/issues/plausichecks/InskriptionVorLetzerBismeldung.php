@@ -61,7 +61,7 @@ class InskriptionVorLetzerBismeldung extends PlausiChecker
 
 	/**
 	 * Students of a semester shouldn't start studies before the date of Bismeldung.
-	 * e.g. If student studies in WS2022 datum of status shouldn't be before 15.4.2020
+	 * e.g. If student studies in WS2022 datum of status shouldn't be before 15.4.2022
 	 * e.g. If student studies in SS2022 datum of status shouldn't be before 15.11.2022
 	 * @param studiensemester_kurzbz string check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
@@ -78,6 +78,8 @@ class InskriptionVorLetzerBismeldung extends PlausiChecker
 	) {
 		// get Bismeldedatum
 		$datumBis = $this->_getBisdateFromSemester($studiensemester_kurzbz);
+
+		if (!$datumBis) return success([]);
 
 		$params = array($datumBis, $studiensemester_kurzbz, $datumBis);
 
@@ -141,17 +143,16 @@ class InskriptionVorLetzerBismeldung extends PlausiChecker
 	 */
 	private function _getBisdateFromSemester($studiensemester_kurzbz)
 	{
-		$semesterYear = substr($studiensemester_kurzbz, 2, 6);
-		$semesterType = substr($studiensemester_kurzbz, 0, 2);
+		$bisdate = null;
 
-		if ($semesterType == 'SS')
-		{
-			return date_format(date_create(($semesterYear - 1)."-11-15"), 'Y-m-d');
-		}
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$prevSemester = $this->_ci->StudiensemesterModel->getPreviousFrom($studiensemester_kurzbz);
+		if (!hasData($prevSemester)) return null;
+		$prevSemester = getData($prevSemester)[0]->studiensemester_kurzbz;
 
-		if ($semesterType == 'WS')
-		{
-			return date_format(date_create($semesterYear."-04-15"), 'Y-m-d');
-		}
+		$this->_ci->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
+		$bisDate = $this->_ci->BismeldestichtagModel->getLastReachedMeldestichtag($prevSemester);
+		if (!hasData($bisDate)) return null;
+		return getData($bisDate)[0]->meldestichtag;
 	}
 }

@@ -20,12 +20,14 @@ class FalscherIncomingZweckPlausi extends PlausiChecker
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 		$bisio_id = isset($params['bisio_id']) ? $params['bisio_id'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
 		$prestudentRes = $this->_getFalscherIncomingZweck(
 			$studiensemester_kurzbz,
 			$studiengang_kz,
 			$bisio_id,
+			$person_id,
 			$exkludierte_studiengang_kz
 		);
 
@@ -52,10 +54,11 @@ class FalscherIncomingZweckPlausi extends PlausiChecker
 	}
 
 	/**
-	 * Prestudent should have a final status.
+	 * Incomings should have the correct Zweck.
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param bisio_id int if check is to be executed only for one prestudent
+	 * @param person_id int if check is to be executed only for one person
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
@@ -63,6 +66,7 @@ class FalscherIncomingZweckPlausi extends PlausiChecker
 		$studiensemester_kurzbz = null,
 		$studiengang_kz = null,
 		$bisio_id = null,
+		$person_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
 
@@ -108,6 +112,12 @@ class FalscherIncomingZweckPlausi extends PlausiChecker
 		{
 			$qry .= " AND zwecke.bisio_id = ?";
 			$params[] = $bisio_id;
+		}
+
+		if (isset($person_id))
+		{
+			$qry .= " AND zwecke.person_id = ?";
+			$params[] = $person_id;
 		}
 
 		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))

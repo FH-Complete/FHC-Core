@@ -1,4 +1,6 @@
 import IssueList from './IssueList.js';
+import DefaultIssueCheckerEndpoint from '../../api/factory/issueChecker.js';
+import DefaultIssueListEndpoint from '../../api/factory/issueList.js';
 
 export default {
 	name: 'IssueChecker',
@@ -19,11 +21,13 @@ export default {
 		},
 		endpoint: {
 			type: Object,
-			required: true
+			required: true,
+			default: DefaultIssueCheckerEndpoint
 		},
 		issueListEndpoint: {
 			type: Object,
-			required: true
+			required: true,
+			default: DefaultIssueListEndpoint
 		},
 		issueListStyle: {
 			type: Object
@@ -47,6 +51,9 @@ export default {
 	computed: {
 	},
 	watch: {
+			person_id() {
+				this.countPersonOpenIssues();
+		}
 	},
 	mounted() {
 		this.countPersonOpenIssues();

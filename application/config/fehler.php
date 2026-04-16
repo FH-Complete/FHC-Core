@@ -431,8 +431,8 @@ $config['fehler'] = array(
 		'fehlertyp_kurzbz' => 'error',
 		'app' => 'core',
 		'producerLibName' => 'GeburtsnationFehlt',
-		'resolverLibName' => 'CORE_PERSON_0005',
-		'producerIsResolver' => false
+		'resolverLibName' => null,
+		'producerIsResolver' => true
 	),
 	array(
 		'fehlercode' => 'CORE_PERSON_0006',

@@ -54,7 +54,7 @@ class OutgoingAufenthaltfoerderungfehltPlausi extends PlausiChecker
 	}
 
 	/**
-	 * Prestudent should have a final status.
+	 * Student with mobility should have Aufenthaltsfoerderung.
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param bisio_id int if check is to be executed only for one prestudent

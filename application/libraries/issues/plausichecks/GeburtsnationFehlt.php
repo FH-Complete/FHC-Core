@@ -51,17 +51,17 @@ class GeburtsnationFehlt extends PlausiChecker
 	}
 
 	/**
-	 * Prestudent should have a final status.
+	 * Geburtsnation is missing.
 	 * @param studiensemester_kurzbz string if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
-	 * @param prestudent_id int if check is to be executed only for one prestudent
+	 * @param person_id int if check is to be executed only for one person
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
 	private function _getGeburtsnationFehlt(
 		$studiensemester_kurzbz = null,
 		$studiengang_kz = null,
-		$prestudent_id = null,
+		$person_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
 		$params = array();
@@ -91,10 +91,10 @@ class GeburtsnationFehlt extends PlausiChecker
 			$params[] = $studiengang_kz;
 		}
 
-		if (isset($prestudent_id))
+		if (isset($person_id))
 		{
-			$qry .= " AND pre.prestudent_id = ?";
-			$params[] = $prestudent_id;
+			$qry .= " AND pre.person_id = ?";
+			$params[] = $person_id;
 		}
 
 		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))
