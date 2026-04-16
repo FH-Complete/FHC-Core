@@ -33,7 +33,6 @@ class LvPlan extends FHCAPI_Controller
 	{
 
 		parent::__construct([
-			'myLvPlanViewData' => self::PERM_LOGGED,
 			'getRoomplan' => self::PERM_LOGGED,
 			'Stunden' => self::PERM_LOGGED,
 			'getReservierungen' => self::PERM_LOGGED,

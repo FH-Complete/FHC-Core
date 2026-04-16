@@ -27,7 +27,7 @@ class Cis4FhcApi extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getViewData' => self::PERM_LOGGED,
+			'dashboardViewData' => self::PERM_LOGGED,
 		]);
 		
 	}
