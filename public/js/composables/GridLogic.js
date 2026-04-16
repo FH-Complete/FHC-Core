@@ -113,7 +113,7 @@ class GridLogic {
 		let occupiers = this.getItemsInFrame(currItem.frame);
 		
 		// does not update if the target conatins pinned widgets
-		if (occupiers.some(frame => this.data[frame]?.data.place[this.w]?.pinned)) {
+		if (occupiers.some(frame => this.data[frame]?.pinned)) {
 			return [];
 		}
 		
