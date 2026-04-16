@@ -34,21 +34,53 @@ export default {
 	],
 	data() {
 		return {
-			x: -1,
-			y: -1,
-			clientX:0,
-			clientY: 0,
-			mode: MODE_IDLE,
+			// gridlogic
 			grid: null,
 			tempPositionUpdates: null,
 			correctedPositionUpdates: null,
+			// dragging
+			mode: MODE_IDLE,
 			draggedOffset: [0, 0],
 			draggedItem: null,
-			reorderedItems: [],
-			clonedWidget: null
+			clonedWidget: null, // ghost image
+			// tile coordinates while dragging
+			x: -1,
+			y: -1,
+			// mouse coordinates while dragging
+			clientX: 0,
+			clientY: 0,
+			reorderedItems: [] // holds items that have no inital place
 		};
 	},
 	computed: {
+		// gridlogic
+		rows() {
+			if (this.additionalRowComputed) {
+				return this.grid ? (this.grid.h+1) : 1;
+			}
+			return this.grid ? this.grid.h : 1;
+		},
+		additionalRowComputed: {
+			get() {
+				return this.additionalRow;
+			},
+			set(value) {
+				this.$emit('update:additionalRow', value);
+			}
+		},
+		gridStyle() {
+			const addH = this.active ? this.marginForExtraRow : 0;
+			return {
+				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
+				'--fhc-dg-col-width': 100/this.cols + '%',
+				'--fhc-dg-item-padding':
+					'var(--fhc-dg-item-py, var(--fhc-dg-item-p, .25%))' +
+					' ' +
+					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
+				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
+			};
+		},
+		// dragging
 		sizeLimits() {
 			return Object.fromEntries(Object.entries(this.itemsSetup).map(([type, { setup }]) => {
 				const result = {}; // work on a copy
@@ -75,15 +107,8 @@ export default {
 				return [type, result];
 			}));
 		},
-		additionalRowComputed: {
-			get() {
-				return this.additionalRow;
-			},
-			set(value) {
-				this.$emit('update:additionalRow', value);
-			}
-		},
-		items_hashmap() {
+		// item pipeline
+		items_hashmap() { // helper
 			let items = {};
 			this.items.forEach(item => {
 				if (this.reorderedItems.length > 0 && this.needsReordering(item)) {
@@ -97,7 +122,7 @@ export default {
 			});	
 			return items
 		},
-		items_placeholders() {
+		items_placeholders() { // empty tiles
 			let placeholders = [];
 			let col_max = this.cols;
 			let rows_max = this.rows;
@@ -136,7 +161,59 @@ export default {
 			}
 			return placeholders;
 		},
-		currentItems() {
+		indexedItems() { // indexed
+			return this.items.map(
+				(item, index) => {
+					return {
+						index: index,
+						x: item.x,
+						y: item.y,
+						w: item.w,
+						h: item.h,
+						weight: item.weight || 0,
+						data: item
+					}
+				}
+			);
+		},
+		prePlacedItems() { // indexed & corrected
+			if (!this.correctedPositionUpdates)
+				return this.indexedItems;
+			return this.indexedItems.map(item => {
+				if (!this.correctedPositionUpdates[item.index])
+					return item;
+				return {
+					index: item.index,
+					weight: item.weight,
+					data: item.data,
+					x: this.correctedPositionUpdates[item.index].x === undefined ? item.x : this.correctedPositionUpdates[item.index].x,
+					y: this.correctedPositionUpdates[item.index].y === undefined ? item.y : this.correctedPositionUpdates[item.index].y,
+					w: this.correctedPositionUpdates[item.index].w === undefined ? item.w : this.correctedPositionUpdates[item.index].w,
+					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h
+				};
+			});
+		},
+		placedItems() { // indexed & corrected & dragging
+			if (!this.tempPositionUpdates)
+				return this.prePlacedItems;
+			return this.prePlacedItems.map(item => {
+				if (!this.tempPositionUpdates[item.index])
+					return item;
+
+				return {
+					resize: this.tempPositionUpdates[item.index]?.resize,
+					index: item.index,
+					weight: item.weight,
+					data: item.data,
+					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
+					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
+					w: this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
+					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
+					
+				};
+			});
+		},
+		currentItems() { // final items with classes
 			if (this.mode == MODE_IDLE && this.active)
 				return [ ...this.placedItems, ...this.items_placeholders ];
 
@@ -163,76 +240,6 @@ export default {
 			}
 
 			return this.placedItems;
-		},
-		rows() {
-			if (this.additionalRowComputed) {
-				return this.grid ? (this.grid.h+1) : 1;
-			}
-			return this.grid ? this.grid.h : 1;
-		},
-		gridStyle() {
-			const addH = this.active ? this.marginForExtraRow : 0;
-			return {
-				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
-				'--fhc-dg-col-width': 100/this.cols + '%',
-				'--fhc-dg-item-padding':
-					'var(--fhc-dg-item-py, var(--fhc-dg-item-p, .25%))' +
-					' ' +
-					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
-				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
-			};
-		},
-		indexedItems() {
-			return this.items.map(
-				(item, index) => {
-					return {
-						index: index,
-						x: item.x,
-						y: item.y,
-						w: item.w,
-						h: item.h,
-						weight: item.weight || 0,
-						data: item
-					}
-				}
-			);
-		},
-		prePlacedItems() {
-			if (!this.correctedPositionUpdates)
-				return this.indexedItems;
-			return this.indexedItems.map(item => {
-				if (!this.correctedPositionUpdates[item.index])
-					return item;
-				return {
-					index: item.index,
-					weight: item.weight,
-					data: item.data,
-					x: this.correctedPositionUpdates[item.index].x === undefined ? item.x : this.correctedPositionUpdates[item.index].x,
-					y: this.correctedPositionUpdates[item.index].y === undefined ? item.y : this.correctedPositionUpdates[item.index].y,
-					w: this.correctedPositionUpdates[item.index].w === undefined ? item.w : this.correctedPositionUpdates[item.index].w,
-					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h
-				};
-			});
-		},
-		placedItems() {
-			if (!this.tempPositionUpdates)
-				return this.prePlacedItems;
-			return this.prePlacedItems.map(item => {
-				if (!this.tempPositionUpdates[item.index])
-					return item;
-
-				return {
-					resize: this.tempPositionUpdates[item.index]?.resize,
-					index: item.index,
-					weight: item.weight,
-					data: item.data,
-					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
-					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
-					w: this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
-					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
-					
-				};
-			});
 		}
 	},
 	watch: {
@@ -264,32 +271,35 @@ export default {
 		}
 	},
 	methods: {
+		// helpers
+		convertGridResultToUpdate(input, output, baseArray) {
+			if (!input)
+				return;
+			if (!baseArray)
+				baseArray = this.indexedItems;
+			input.forEach(item => {
+				let result = {
+					item: baseArray[item.index].data
+				};
+				if (item.x !== undefined)
+					result.x = item.x;
+				if (item.y !== undefined)
+					result.y = item.y;
+				if (item.w !== undefined)
+					result.w = item.w;
+				if (item.h !== undefined)
+					result.h = item.h;
+				output[item.index] = result;
+			});
+		},
+		// has item an initial place
 		needsReordering(item) {
 			if (!item?.data?.place[this.cols]) {
 				return true;
 			}
 			return false;
 		},
-		moveGhostImage(event) {
-			if (this.mode == MODE_MOVE) {
-				const containerRect = this.$refs.container.getBoundingClientRect();
-				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
-				
-				let desiredTop = this.clientY - 20;
-				let desiredLeft = this.clientX - 15;
-				
-				const minTop = 0;
-				const maxTop = containerRect.height - clonedWidgetRect.height;
-				const minLeft = 0;
-				const maxLeft = containerRect.width - clonedWidgetRect.width;
-				
-				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
-				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
-				
-				this.clonedWidget.style.top = `${constrainedTop}px`;
-				this.clonedWidget.style.left = `${constrainedLeft}px`;
-			}
-		},
+		// gridlogic
 		createNewGrid(items) {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
@@ -345,52 +355,22 @@ export default {
 			this.grid.clearWeights();
 			return result;
 		},
-		convertGridResultToUpdate(input, output, baseArray) {
-			if (!input)
-				return;
-			if (!baseArray)
-				baseArray = this.indexedItems;
-			input.forEach(item => {
-				let result = {
-					item: baseArray[item.index].data
-				};
-				if (item.x !== undefined)
-					result.x = item.x;
-				if (item.y !== undefined)
-					result.y = item.y;
-				if (item.w !== undefined)
-					result.w = item.w;
-				if (item.h !== undefined)
-					result.h = item.h;
-				output[item.index] = result;
+		_updateCorrectedPositions(updated) {
+			updated.forEach((item, index) => {
+				if (!this.correctedPositionUpdates[index])
+					this.correctedPositionUpdates[index] = item;
+				else
+					this.correctedPositionUpdates[index] = {...this.correctedPositionUpdates[index], ...item};
 			});
-		},
-		updateCursor(evt) {
-			if (!this.active) {
-				this.x = this.y = -1;
-				return false;
+			let additionalUpdates = this.createNewGrid(this.prePlacedItems);
+			if (additionalUpdates.length) {
+				// NOTE(chris): this should never happen but it's here for safety
+				additionalUpdates.forEach((item, index) => updated[index] = item);
+				return this._updateCorrectedPositions(updated);
 			}
-			const addH = this.active ? this.marginForExtraRow : 0;
-			const rect = this.$refs.container.getBoundingClientRect();
-			
-			if (!evt.clientX && !evt.clientY && evt.touches){
-				evt.clientX = evt.touches[0].clientX;
-				evt.clientY = evt.touches[0].clientY;
-			}
-
-			this.clientX = (evt.clientX - rect.left);
-			this.clientY = (evt.clientY - rect.top);
-			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
-			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
-			
-			if (this.x == gridX && this.y == gridY)
-				return false;
-			
-			this.x = gridX;
-			this.y = gridY;
-
-			return true;
+			return updated;
 		},
+		// dragging
 		_dragStart(evt, item) {
 			if (evt.dataTransfer) {
 				evt.dataTransfer.setDragImage(evt.target, -99999, -99999);
@@ -438,6 +418,32 @@ export default {
 			}, 0);
 			
 			this._dragStart(evt);
+		},
+		updateCursor(evt) {
+			if (!this.active) {
+				this.x = this.y = -1;
+				return false;
+			}
+			const addH = this.active ? this.marginForExtraRow : 0;
+			const rect = this.$refs.container.getBoundingClientRect();
+			
+			if (!evt.clientX && !evt.clientY && evt.touches){
+				evt.clientX = evt.touches[0].clientX;
+				evt.clientY = evt.touches[0].clientY;
+			}
+
+			this.clientX = (evt.clientX - rect.left);
+			this.clientY = (evt.clientY - rect.top);
+			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
+			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+			
+			if (this.x == gridX && this.y == gridY)
+				return false;
+			
+			this.x = gridX;
+			this.y = gridY;
+
+			return true;
 		},
 		dragOver(evt) {
 			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
@@ -491,6 +497,12 @@ export default {
 				}
 			}
 		},
+		removeWidgetClones() {
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
+			}
+		},
 		_cleanupDragging() {
 			if (this.draggedItem) {
 				const draggedItem = this.indexedItems.find(item => item.index == this.draggedItem.index);
@@ -531,20 +543,25 @@ export default {
 
 			this._cleanupDragging();
 		},
-		_updateCorrectedPositions(updated) {
-			updated.forEach((item, index) => {
-				if (!this.correctedPositionUpdates[index])
-					this.correctedPositionUpdates[index] = item;
-				else
-					this.correctedPositionUpdates[index] = {...this.correctedPositionUpdates[index], ...item};
-			});
-			let additionalUpdates = this.createNewGrid(this.prePlacedItems);
-			if (additionalUpdates.length) {
-				// NOTE(chris): this should never happen but it's here for safety
-				additionalUpdates.forEach((item, index) => updated[index] = item);
-				return this._updateCorrectedPositions(updated);
+		moveGhostImage(event) {
+			if (this.mode == MODE_MOVE) {
+				const containerRect = this.$refs.container.getBoundingClientRect();
+				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
+				
+				let desiredTop = this.clientY - 20;
+				let desiredLeft = this.clientX - 15;
+				
+				const minTop = 0;
+				const maxTop = containerRect.height - clonedWidgetRect.height;
+				const minLeft = 0;
+				const maxLeft = containerRect.width - clonedWidgetRect.width;
+				
+				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
+				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
+				
+				this.clonedWidget.style.top = `${constrainedTop}px`;
+				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
-			return updated;
 		},
 		checkPinnedWidgetAnimation() {
 			let itemAtPosition = [];
@@ -600,12 +617,6 @@ export default {
 				h = setup.height.max;
 			
 			return [w, h];
-		},
-		removeWidgetClones() {
-			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
-			for (let i = 0; i < widgetClones.length; i++) {
-				this.$refs.container.removeChild(widgetClones[i]);
-			}
 		}
 	},
 	template: /* html */`
