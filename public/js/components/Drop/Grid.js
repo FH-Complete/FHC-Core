@@ -131,6 +131,7 @@ export default {
 						y: item.y,
 						w: item.w,
 						h: item.h,
+						pinned: item.pinned,
 						weight: item.weight || 0,
 						data: item
 					}
@@ -150,7 +151,8 @@ export default {
 					x: this.correctedPositionUpdates[item.index].x === undefined ? item.x : this.correctedPositionUpdates[item.index].x,
 					y: this.correctedPositionUpdates[item.index].y === undefined ? item.y : this.correctedPositionUpdates[item.index].y,
 					w: this.correctedPositionUpdates[item.index].w === undefined ? item.w : this.correctedPositionUpdates[item.index].w,
-					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h
+					h: this.correctedPositionUpdates[item.index].h === undefined ? item.h : this.correctedPositionUpdates[item.index].h,
+					pinned: item.pinned
 				};
 			});
 		},
@@ -169,8 +171,8 @@ export default {
 					x: this.tempPositionUpdates[item.index].x === undefined ? item.x : this.tempPositionUpdates[item.index].x,
 					y: this.tempPositionUpdates[item.index].y === undefined ? item.y : this.tempPositionUpdates[item.index].y,
 					w: this.tempPositionUpdates[item.index].w === undefined ? item.w : this.tempPositionUpdates[item.index].w,
-					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h
-					
+					h: this.tempPositionUpdates[item.index].h === undefined ? item.h : this.tempPositionUpdates[item.index].h,
+					pinned: item.pinned
 				};
 			});
 		},

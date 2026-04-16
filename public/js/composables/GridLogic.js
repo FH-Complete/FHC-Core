@@ -84,7 +84,7 @@ class GridLogic {
 		}
 	}
 	move(item, x, y) {
-		if (item.data.place[this.w]?.pinned)
+		if (item.pinned)
 			return [];
 		if (item.x == x && item.y == y)
 			return [];
@@ -195,13 +195,13 @@ class GridLogic {
 		let targetframe;
 		switch(dir) {
 			case DIR_UP:
-				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].y - amount < 0)
+				if (this.data[index].pinned || this.data[index].y - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-this.w*amount);
 				move.y = -amount;
 				break;
 			case DIR_DOWN:
-				if (this.data[index].data?.place[this.w]?.pinned)
+				if (this.data[index].pinned)
 					return false;
 				if (this.data[index].y + this.data[index].h + amount > this.h)
 					cost += .4;
@@ -209,13 +209,13 @@ class GridLogic {
 				move.y = amount;
 				break;
 			case DIR_LEFT:
-				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].x - amount < 0)
+				if (this.data[index].pinned || this.data[index].x - amount < 0)
 					return false;
 				targetframe = this.data[index].frame.map(i => i-amount);
 				move.x = -amount;
 				break;
 			case DIR_RIGHT:
-				if (this.data[index].data?.place[this.w]?.pinned || this.data[index].x + this.data[index].w + amount > this.w)
+				if (this.data[index].pinned || this.data[index].x + this.data[index].w + amount > this.w)
 					return false;
 				targetframe = this.data[index].frame.map(i => i+amount);
 				move.x = amount;
