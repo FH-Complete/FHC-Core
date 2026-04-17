@@ -39,7 +39,11 @@ export function idTagFormatter (id, tagData, tagComponent, typeId)
 
 		tagsToShow.forEach(tag => {
 			let tagElement = document.createElement('span');
-			tagElement.innerText = tag.beschreibung;
+
+			if(tag.automatisiert)
+				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
+			else
+				tagElement.innerText = tag.beschreibung;
 			tagElement.title = tag.notiz;
 			tagElement.className = "tag " + tag.style;
 

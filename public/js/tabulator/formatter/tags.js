@@ -1,7 +1,5 @@
 export function tagFormatter(cell, tagComponent)
 {
-	//TODO readOnlyComponents nicht in der TagComponent enthalten
-	//console.log(JSON.stringify(tagComponent));
 	const mappedData = tagComponent.tags.map(tag => ({
 		typ_kurzbz: tag.tag_typ_kurzbz,
 		automatisiert: tag.automatisiert
@@ -40,7 +38,6 @@ export function tagFormatter(cell, tagComponent)
 
 		tagsToShow.forEach(tag => {
 			if (!tag) return;
-
 			let tagElement = document.createElement('span');
 			tagElement.innerText = tag.beschreibung;
 			tagElement.title = tag.notiz;
@@ -49,20 +46,10 @@ export function tagFormatter(cell, tagComponent)
 
 			const tagDef = mappedData.find(t => t.typ_kurzbz === tag.typ_kurzbz);
 
-			if (tagDef?.automatisiert)
+			if (!tagDef && tag.typ_kurzbz.includes("_auto") || tagDef?.automatisiert) {
 				tagElement.className += " tag_auto";
-
-/*			TODO delete Testoutputs
-			if (!tagDef) {
-				console.log(tag.typ_kurzbz + " nicht in TagComponent enthalten");
-				tagElement.className += " tag_auto";
+				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
 			}
-			else if (tagDef?.automatisiert) {
-				console.log(tag.typ_kurzbz + " ist automatisiert");
-				tagElement.className += " tag_auto";
-			} else
-				console.log (tag.typ_kurzbz + " nicht automatisiert");
-*/
 
 			tagElement.addEventListener('click', (event) => {
 				event.stopPropagation();
