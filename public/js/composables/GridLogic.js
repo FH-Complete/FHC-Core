@@ -122,10 +122,13 @@ class GridLogic {
 		const targetAndItemOverlap = this.getItemFrame(item).some(frame => currItem.frame.includes(frame))
 		if (!targetAndItemOverlap) {
 
-		// checks if target contains widget with the same high and width
 		let occupiersData = occupiers.map(occupier => this.data[occupier]);
-		let occupiersFrame = occupiersData.map(occupier => occupier.frame).flat();
-		if (occupiersFrame.every(frame => currItem.frame.includes(frame))) {
+			// checks if target contains widget with the same high and width
+			// so swapping is possible
+			const occupiersFrame = occupiers.map(occupier => this.data[occupier].frame).flat();
+			const occupiersInsideMovingItem = occupiersFrame.every(frame => currItem.frame.includes(frame));
+
+			if (occupiersInsideMovingItem) {
 			// every slot of all items in the target zone is inside said zone
 			let replaceUpdate = [];
 			let newOccupierFrames = [];
