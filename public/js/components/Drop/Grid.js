@@ -428,10 +428,11 @@ export default {
 				return this.dragCancel();
 
 			if (this.updateCursor(evt)) {
+				const targetCoordinates = {};
+				const dragGrid = new GridLogic(this.grid);
+
 				switch(this.mode) {
 					case MODE_MOVE: {
-						evt.preventDefault();
-						const dragGrid = new GridLogic(this.grid);
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
@@ -446,12 +447,15 @@ export default {
 							y = 0;
 						}
 						
+						targetCoordinates.x = x;
+						targetCoordinates.y = y;
+						targetCoordinates.w = this.draggedItem.w;
+						targetCoordinates.h = this.draggedItem.h;
+
 						this.tempPositionUpdates = dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
-						evt.preventDefault();
-						const dragGrid = new GridLogic(this.grid);
 						const targetW = this.x - this.draggedItem.x + 1;
 						const targetH = this.y - this.draggedItem.y + 1;
 						let w = Math.min(this.cols - this.draggedItem.x, targetW);
@@ -464,30 +468,24 @@ export default {
 						if (this.draggedItem.oversized)
 							[ w, h ] = [ this.draggedItem.w, this.draggedItem.h ];
 
+						targetCoordinates.x = this.draggedItem.x;
+						targetCoordinates.y = this.draggedItem.y;
+						targetCoordinates.w = w;
+						targetCoordinates.h = h;
+
 						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
 						break;
 					}
 				}
 				// check for blocking pinned widgets
-				const itemCoord = {};
-				switch (this.mode) {
-					case MODE_RESIZE:
-						itemCoord.x = this.draggedItem.x;
-						itemCoord.y = this.draggedItem.y;
-						itemCoord.w = this.x - this.draggedItem.x + 1;
-						itemCoord.h = this.y - this.draggedItem.y + 1;
-						break;
-					case MODE_MOVE:
-						itemCoord.x = this.x;
-						itemCoord.y = this.y;
-						itemCoord.w = this.draggedItem.w;
-						itemCoord.h = this.draggedItem.h;
-						break;
+				if (!this.tempPositionUpdates?.length) {
+					const frame = this.grid.getItemFrame(targetCoordinates);
+					const itemsAtPosition = this.grid.getItemsInFrame(frame);
+					this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
 				}
-				const frame = this.grid.getItemFrame(itemCoord);
-				const itemsAtPosition = this.grid.getItemsInFrame(frame);
-				this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
 			}
+			if (this.tempPositionUpdates?.length)
+				evt.preventDefault();
 		},
 		_cleanupDragging() {
 			this.mode = MODE_IDLE;
@@ -569,7 +567,7 @@ export default {
 		ref="container"
 		class="drop-grid position-relative h-0"
 		:style="gridStyle"
-		@dragover.prevent="dragOver"
+		@dragover="dragOver"
 		@drop="dragEnd"
 	>
 		<TransitionGroup>
