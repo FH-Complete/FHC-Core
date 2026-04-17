@@ -174,7 +174,7 @@
 	color: var(--fhc-dashboard-section-info-color-hover);
 }
 
-.denied-dragging-animation {
+.drop-grid-item-blocker [pinned='true'] {
 	animation: wiggle 0.5s linear;
 	color: var(--fhc-dashboard-denied-dragging-animation-color) !important;
 }

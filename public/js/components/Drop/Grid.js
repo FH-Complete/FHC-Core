@@ -198,7 +198,20 @@ export default {
 						modifiedDraggedItem.classes.push('drop-grid-item-sizechanged')
 				}
 
-				return this.placedItems.toSpliced(draggedItemIndex, 1, modifiedDraggedItem);
+				let currentItems = this.placedItems.toSpliced(draggedItemIndex, 1, modifiedDraggedItem);
+
+				if (!this.tempPositionUpdates?.length && this.draggedItem.blockers) {
+					this.draggedItem.blockers.forEach(index => {
+						const blockerIndex = this.placedItems.findIndex(item => item.index == index);
+						const modifiedBlocker = {
+							...this.placedItems[blockerIndex],
+							classes: ['drop-grid-item-blocker']
+						};
+						currentItems.splice(blockerIndex, 1, modifiedBlocker);
+					});
+				}
+
+				return currentItems;
 			}
 
 			return this.placedItems;
@@ -485,15 +498,6 @@ export default {
 			if (this.mode == MODE_IDLE) {
 				return;
 			}
-			// clean up unused classes
-			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
-			draggedItemNode.classList.remove("border-danger");
-			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
-				ele.classList.remove("denied-dragging-animation");
-			})
-			
-			//if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
-				//return this.dragCancel();
 
 			this.mode = MODE_IDLE;
 			let updated = [];
@@ -525,7 +529,6 @@ export default {
 			}
 		},
 		checkPinnedWidgetAnimation() {
-			let itemAtPosition = [];
 			const itemCoord = {};
 			switch (this.mode) {
 				case MODE_RESIZE:
@@ -543,23 +546,7 @@ export default {
 			}
 			const frame = this.grid.getItemFrame(itemCoord);
 			const itemsAtPosition = this.grid.getItemsInFrame(frame);
-			const blockersAtPosition = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
-
-			itemAtPosition = blockersAtPosition.map(index => this.indexedItems[index].data);
-			
-			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
-				ele.classList.remove("denied-dragging-animation");
-			});
-
-			itemAtPosition.forEach(item => {
-				if (item.place[this.cols] && item.place[this.cols].pinned) {
-					let pinnedWidget = document.getElementById(item.widgetid);
-					let pinNode = pinnedWidget.querySelector("[pinned='true']");
-					if (!pinNode.classList.contains("denied-dragging-animation")) {
-						pinNode.classList.add("denied-dragging-animation");
-					}
-				}	
-			});
+			this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
 		},
 		cropSizeToAllowed(type, w, h) {
 			if (w < 1)
