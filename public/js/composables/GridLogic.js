@@ -275,9 +275,6 @@ class GridLogic {
 				frame.push(i + item.x + (j + item.y) * this.w);
 		return frame;
 	}
-	getSingleFramePosition(frame){
-		return { x: frame % this.w, y: Math.floor(frame / this.w)};
-	}
 	debug() {
 		return this.grid;
 	}
