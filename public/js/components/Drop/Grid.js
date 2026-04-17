@@ -414,8 +414,6 @@ export default {
 			if (!this.active)
 				return this.dragCancel();
 
-			this.checkPinnedWidgetAnimation();
-
 			if (this.updateCursor(evt)) {
 				switch(this.mode) {
 					case MODE_MOVE: {
@@ -457,6 +455,7 @@ export default {
 						break;
 					}
 				}
+				this.checkPinnedWidgetAnimation();
 			}
 		},
 		removeWidgetClones() {
