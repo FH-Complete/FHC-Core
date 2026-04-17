@@ -459,8 +459,8 @@ export default {
 
 						[ w, h ] = this.cropSizeToAllowed(this.draggedItem.data.widget, w, h);
 
+						// check resize limits
 						this.draggedItem.oversized = (w !== targetW || h !== targetH);
-
 						if (this.draggedItem.oversized)
 							[ w, h ] = [ this.draggedItem.w, this.draggedItem.h ];
 
@@ -468,7 +468,25 @@ export default {
 						break;
 					}
 				}
-				this.checkPinnedWidgetAnimation();
+				// check for blocking pinned widgets
+				const itemCoord = {};
+				switch (this.mode) {
+					case MODE_RESIZE:
+						itemCoord.x = this.draggedItem.x;
+						itemCoord.y = this.draggedItem.y;
+						itemCoord.w = this.x - this.draggedItem.x + 1;
+						itemCoord.h = this.y - this.draggedItem.y + 1;
+						break;
+					case MODE_MOVE:
+						itemCoord.x = this.x;
+						itemCoord.y = this.y;
+						itemCoord.w = this.draggedItem.w;
+						itemCoord.h = this.draggedItem.h;
+						break;
+				}
+				const frame = this.grid.getItemFrame(itemCoord);
+				const itemsAtPosition = this.grid.getItemsInFrame(frame);
+				this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
 			}
 		},
 		_cleanupDragging() {
@@ -522,26 +540,6 @@ export default {
 				this.clonedWidget.style.top = `${constrainedTop}px`;
 				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
-		},
-		checkPinnedWidgetAnimation() {
-			const itemCoord = {};
-			switch (this.mode) {
-				case MODE_RESIZE:
-					itemCoord.x = this.draggedItem.x;
-					itemCoord.y = this.draggedItem.y;
-					itemCoord.w = this.x - this.draggedItem.x + 1;
-					itemCoord.h = this.y - this.draggedItem.y + 1;
-					break;
-				case MODE_MOVE:
-					itemCoord.x = this.x;
-					itemCoord.y = this.y;
-					itemCoord.w = this.draggedItem.w;
-					itemCoord.h = this.draggedItem.h;
-					break;
-			}
-			const frame = this.grid.getItemFrame(itemCoord);
-			const itemsAtPosition = this.grid.getItemsInFrame(frame);
-			this.draggedItem.blockers = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
 		},
 		cropSizeToAllowed(type, w, h) {
 			if (w < 1)
