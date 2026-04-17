@@ -116,7 +116,12 @@ class GridLogic {
 		if (occupiers.some(frame => this.data[frame]?.pinned)) {
 			return [];
 		}
-		
+
+		// checks if target contains moving widgets start position
+		// so swapping should be avoided
+		const targetAndItemOverlap = this.getItemFrame(item).some(frame => currItem.frame.includes(frame))
+		if (!targetAndItemOverlap) {
+
 		// checks if target contains widget with the same high and width
 		let occupiersData = occupiers.map(occupier => this.data[occupier]);
 		let occupiersFrame = occupiersData.map(occupier => occupier.frame).flat();
@@ -137,6 +142,7 @@ class GridLogic {
 			replaceUpdate[item.index] = { index: item.index, x, y };
 			
 			return replaceUpdate;
+			}
 		}
 		
 		const updates = this.add(currItem, prefer);
