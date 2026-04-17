@@ -85,9 +85,6 @@ export default {
 			}
 			return this.searchoptions.types;
 		},
-		isSearchShown() {
-			return !this.isMobile ? true : this.isSearchShownInMobileView;
-		},
 	},
 	template: /*html*/ `
 		<form
@@ -101,24 +98,22 @@ export default {
 			<span
 				v-if="isMobile"
 				@click="toggleIsSearchShownInMobileView()"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target=".multi-collapse"
-				aria-expanded="false"
-				aria-controls="searchbar-collapsible header-options-collapsible user-menu-collapsible"
 			 	class="d-flex flex-row align-items-center ps-3 pe-1"
 			>
 				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
 				<i v-else class="fa-solid fa-magnifying-glass"></i>
 			</span>
+
 			<div
-				:class="{'collapse multi-collapse collapse-horizontal': isMobile}"
-				class="flex-grow-1"
-				id="searchbar-collapsible"
+				:class="{'flex-grow-1': !isMobile}"
+				:style="!isMobile ? '' : (isSearchShownInMobileView ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : 'width: 0px; overflow-x: hidden;')"
+				style="transition: width 0.5s;"
 			>
 				<div
+					:style="!isMobile ? '' : (isSearchShownInMobileView ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : 'width: 150px;')"
+					style="transition: width 0.5s;"
+					:class="{open: showresult, closed: showresult, 'px-3': isMobile && isSearchShownInMobileView}"
 					ref="searchbox"
-					:class="{open: showresult, closed: showresult, 'px-2': isMobile}"
 					class="h-100 input-group me-2 searchbar_searchbox"
 				>
 					<span class="input-group-text">
@@ -157,7 +152,6 @@ export default {
             	        <i class="fas fa-filter"></i>
             	    </button>
             	</div>
-
             	<div v-show="showresult"
             	     class="searchbar_results" tabindex="-1">
             	  <div class="searchbar_results_scroller" ref="result">
@@ -503,20 +497,15 @@ export default {
 			}
 			return this.searchoptions.actions[res.type];
 		},
-		expandSearch() {
-			this.isSearchShownInMobileView = true;
-			this.$emit("isSearchShownInMobileViewUpdated", {
-				isSearchShownInMobileView: true,
-			});
-		},
-		minimizeSearch() {
-			this.isSearchShownInMobileView = false;
-			this.$emit("isSearchShownInMobileViewUpdated", {
-				isSearchShownInMobileView: false,
-			});
-		},
 		toggleIsSearchShownInMobileView() {
 			this.isSearchShownInMobileView = !this.isSearchShownInMobileView;
+			this.$emit("isSearchShownInMobileViewUpdated", {
+				isSearchShownInMobileView: this.isSearchShownInMobileView,
+			});
+		},
+		getMaxWidthOfSearchbarInMobileView() {
+			// body width - hardcoded chevron width; necessary for accurate width transition
+			return (document.querySelector("body").getBoundingClientRect().width - 27) + "px";
 		},
 	},
 };
