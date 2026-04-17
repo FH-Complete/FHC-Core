@@ -34,7 +34,6 @@ export default {
 		},
 		showBtnSubmit: Boolean,
 	},
-	emits: ["isSearchShownInMobileViewUpdated"],
 	provide() {
 		return {
 			query: Vue.computed(() => this.lastQuery),
@@ -98,6 +97,11 @@ export default {
 			<span
 				v-if="isMobile"
 				@click="toggleIsSearchShownInMobileView()"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target=".multi-collapse"
+				aria-controls="header-searchbar-collapsible header-options-collapsible header-usermenu-collapsible"
+				aria-expanded="false"
 			 	class="d-flex flex-row align-items-center ps-3 pe-1"
 			>
 				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
@@ -105,16 +109,14 @@ export default {
 			</span>
 
 			<div
-				:class="{'flex-grow-1': !isMobile}"
-				:style="!isMobile ? '' : (isSearchShownInMobileView ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : 'width: 0px; overflow-x: hidden;')"
-				style="transition: width 0.5s;"
+				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
+				id="header-searchbar-collapsible"
 			>
 				<div
-					:style="!isMobile ? '' : (isSearchShownInMobileView ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : 'width: 150px;')"
-					style="transition: width 0.5s;"
-					:class="{open: showresult, closed: showresult, 'px-3': isMobile && isSearchShownInMobileView}"
+					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
 					ref="searchbox"
 					class="h-100 input-group me-2 searchbar_searchbox"
+					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : ''"
 				>
 					<span class="input-group-text">
 						<i class="fa-solid fa-magnifying-glass color-white"></i>
@@ -499,9 +501,6 @@ export default {
 		},
 		toggleIsSearchShownInMobileView() {
 			this.isSearchShownInMobileView = !this.isSearchShownInMobileView;
-			this.$emit("isSearchShownInMobileViewUpdated", {
-				isSearchShownInMobileView: this.isSearchShownInMobileView,
-			});
 		},
 		getMaxWidthOfSearchbarInMobileView() {
 			// body width - hardcoded chevron width; necessary for accurate width transition
