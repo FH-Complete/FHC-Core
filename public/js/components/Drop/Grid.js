@@ -527,22 +527,26 @@ export default {
 		},
 		checkPinnedWidgetAnimation() {
 			let itemAtPosition = [];
+			const itemCoord = {};
 			switch (this.mode) {
 				case MODE_RESIZE:
-					for (let x = this.draggedItem.x; x <= this.x; x++) {
-						for (let y = this.draggedItem.y; y <= this.y; y++) {
-							this.items.forEach(item => {
-								if (item.x == x && item.y == y) {
-									itemAtPosition.push(item);
-								}
-							});
-						}
-					}
+					itemCoord.x = this.draggedItem.x;
+					itemCoord.y = this.draggedItem.y;
+					itemCoord.w = this.x - this.draggedItem.x + 1;
+					itemCoord.h = this.y - this.draggedItem.y + 1;
 					break;
 				case MODE_MOVE:
-					itemAtPosition = this.items.filter(item=>item.x == this.x && item.y == this.y);
+					itemCoord.x = this.x;
+					itemCoord.y = this.y;
+					itemCoord.w = this.draggedItem.w;
+					itemCoord.h = this.draggedItem.h;
 					break;
 			}
+			const frame = this.grid.getItemFrame(itemCoord);
+			const itemsAtPosition = this.grid.getItemsInFrame(frame);
+			const blockersAtPosition = itemsAtPosition.filter(index => this.indexedItems[index].pinned);
+
+			itemAtPosition = blockersAtPosition.map(index => this.indexedItems[index].data);
 			
 			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
 				ele.classList.remove("denied-dragging-animation");
