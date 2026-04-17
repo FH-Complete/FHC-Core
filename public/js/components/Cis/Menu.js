@@ -121,15 +121,15 @@ export default {
 		id="header-options-collapsible"
 		class="collapse multi-collapse collapse-horizontal show"
 	>
-	<div
-		class="d-flex flex-row align-items-center gap-2 h-100"
-	>
-		<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<span v-if="isMobile" class="d-flex flex-row align-items-center">
-			<theme-switch></theme-switch>
-		</span>
+		<div
+			class="d-flex flex-row align-items-center gap-2 h-100"
+		>
+			<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<span v-if="isMobile" class="d-flex flex-row align-items-center">
+				<theme-switch></theme-switch>
+			</span>
 		</div>
 	</div>
 	<fhc-searchbar
