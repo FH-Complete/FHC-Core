@@ -97,88 +97,91 @@ export default {
 			action="javascript:void(0);"
 			@focusin="searchfocusin"
 			@focusout="searchfocusout"
-		> 
+		>
 			<span
-				v-if="isMobile && !isSearchShown"
-				@click="expandSearch()"
-			 	class="d-flex flex-row align-items-center"
+				v-if="isMobile"
+				@click="toggleIsSearchShownInMobileView()"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target=".multi-collapse"
+				aria-expanded="false"
+				aria-controls="searchbar-collapsible header-options-collapsible user-menu-collapsible"
+			 	class="d-flex flex-row align-items-center ps-3 pe-1"
 			>
-				<i class="fa-solid fa-magnifying-glass"></i>
+				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
+				<i v-else class="fa-solid fa-magnifying-glass"></i>
 			</span>
 			<div
-				v-if="isSearchShown"
-				ref="searchbox"
-				class="h-100 input-group me-2 searchbar_searchbox"
-				:class="showresult ? 'open' : 'closed'"
+				:class="{'collapse multi-collapse collapse-horizontal': isMobile}"
+				class="flex-grow-1"
+				id="searchbar-collapsible"
 			>
-				<span
-					v-if="isMobile"
-					@click="minimizeSearch()"
-					class="input-group-text">
-					<i class="fa-solid fa-chevron-left"></i>
-				</span>
-				<span
-					v-else
-					class="input-group-text">
-					<i class="fa-solid fa-magnifying-glass color-white"></i>
-				</span>
-                <input
-                	ref="input"
-                    @keyup="search"
-                    @focus="showsearchresult"
-                    v-model="searchsettings.searchstr"
-                    class="form-control searchbar_input"
-                    type="search"
-                    :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
-                    :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
-                >
-				<button
-					v-if="showBtnSubmit"
-					type="submit"
-					class="btn btn-primary"
-					:title="$p.t('search/submit')"
-					:aria-label="$p.t('search/submit')"
+				<div
+					ref="searchbox"
+					:class="{open: showresult, closed: showresult, 'px-2': isMobile}"
+					class="h-100 input-group me-2 searchbar_searchbox"
 				>
-					<i class="fas fa-search"></i>
-				</button>
-                <button
-                    data-bs-toggle="collapse"
-                    data-bs-target="#searchSettings"
-                    aria-expanded="false"
-                    aria-controls="searchSettings"
-                    ref="settingsbutton"
-                    class="searchbar_setting_btn btn btn-secondary"
-                    type="button"
-                    :title="$p.t('search/button_filter_label')"
-                    :aria-label="$p.t('search/button_filter_label')"
-                >
-                    <i class="fas fa-filter"></i>
-                </button>
-            </div>
+					<span class="input-group-text">
+						<i class="fa-solid fa-magnifying-glass color-white"></i>
+					</span>
+            	    <input
+            	    	ref="input"
+            	        @keyup="search"
+            	        @focus="showsearchresult"
+            	        v-model="searchsettings.searchstr"
+            	        class="form-control searchbar_input"
+            	        type="search"
+            	        :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+            	        :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+            	    >
+					<button
+						v-if="showBtnSubmit"
+						type="submit"
+						class="btn btn-primary"
+						:title="$p.t('search/submit')"
+						:aria-label="$p.t('search/submit')"
+					>
+						<i class="fas fa-search"></i>
+					</button>
+            	    <button
+            	        data-bs-toggle="collapse"
+            	        data-bs-target="#searchSettings"
+            	        aria-expanded="false"
+            	        aria-controls="searchSettings"
+            	        ref="settingsbutton"
+            	        class="searchbar_setting_btn btn btn-secondary"
+            	        type="button"
+            	        :title="$p.t('search/button_filter_label')"
+            	        :aria-label="$p.t('search/button_filter_label')"
+            	    >
+            	        <i class="fas fa-filter"></i>
+            	    </button>
+            	</div>
 
-            <div v-show="showresult"
-                 class="searchbar_results" tabindex="-1">
-              <div class="searchbar_results_scroller" ref="result">
-                <div class="searchbar_results_wrapper" ref="results">
-                  <div v-if="searching">
-                    <i class="fas fa-spinner fa-spin fa-2x"></i>
-                  </div>
-                  <div v-else-if="this.error !== null">{{ error }}</div>
-                  <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
-                  <template v-else v-for="res in searchresult">
-                    <component
-                        v-if="isValidRenderer(res.renderer)"
-                        :is="res.renderer"
-                        :mode="searchmode"
-                        :res="res"
-                        :actions="getActions(res)"
-                        @actionexecuted="hideresult"
-                    ></component>
-                    <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
-                  </template>
-                </div>
-              </div>
-            </div>
+            	<div v-show="showresult"
+            	     class="searchbar_results" tabindex="-1">
+            	  <div class="searchbar_results_scroller" ref="result">
+            	    <div class="searchbar_results_wrapper" ref="results">
+            	      <div v-if="searching">
+            	        <i class="fas fa-spinner fa-spin fa-2x"></i>
+            	      </div>
+            	      <div v-else-if="this.error !== null">{{ error }}</div>
+            	      <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
+            	      <template v-else v-for="res in searchresult">
+            	        <component
+            	            v-if="isValidRenderer(res.renderer)"
+            	            :is="res.renderer"
+            	            :mode="searchmode"
+            	            :res="res"
+            	            :actions="getActions(res)"
+            	            @actionexecuted="hideresult"
+            	        ></component>
+            	        <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
+            	      </template>
+            	    </div>
+            	  </div>
+            	</div>
+			</div>
 
 			<div
 				id="searchSettings"
@@ -511,6 +514,9 @@ export default {
 			this.$emit("isSearchShownInMobileViewUpdated", {
 				isSearchShownInMobileView: false,
 			});
+		},
+		toggleIsSearchShownInMobileView() {
+			this.isSearchShownInMobileView = !this.isSearchShownInMobileView;
 		},
 	},
 };
