@@ -65,18 +65,21 @@ class InaktiverStudentAktiverStatus extends PlausiChecker
 	 * @return success with prestudents or error
 	 */
 	public function getInaktiverStudentAktiverStatus(
-		$studiensemester_kurzbz,
+		$studiensemester_kurzbz = null,
 		$studiengang_kz = null,
 		$prestudent_id = null,
 		$person_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
-		$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
-		$aktStudiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
+		if (!isset($studiensemester_kurzbz))
+		{
+			$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+			$aktStudiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
 
-		if (isError($aktStudiensemesterRes)) return $aktStudiensemesterRes;
+			if (isError($aktStudiensemesterRes)) return $aktStudiensemesterRes;
 
-		$studiensemester_kurzbz = hasData($aktStudiensemesterRes) ? getData($aktStudiensemesterRes)[0]->studiensemester_kurzbz : '';
+			$studiensemester_kurzbz = hasData($aktStudiensemesterRes) ? getData($aktStudiensemesterRes)[0]->studiensemester_kurzbz : '';
+		}
 
 		$params = array($studiensemester_kurzbz);
 

@@ -43,7 +43,7 @@ class ZuVieleZweckeIncomingPlausi extends PlausiChecker
 				$results[] = array(
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
-					//'fehlertext_params' => array('bisio_id' => $prestudent->bisio_id),
+					'fehlertext_params' => array('anzahl' => $prestudent->anzahl),
 					'resolution_params' => array('bisio_id' => $prestudent->bisio_id)
 				);
 			}
@@ -81,8 +81,8 @@ class ZuVieleZweckeIncomingPlausi extends PlausiChecker
 		$qry = "
 		SELECT * FROM (
 			SELECT
-				DISTINCT ON (bisio_id) prestudent_id, person_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz, zw.zweck_code, stg.studiengang_kz,
-				bisio.bisio_id, COUNT(zw.zweck_code) OVER (PARTITION BY bisio_id) AS anzahl
+				DISTINCT ON (bisio_id) prestudent_id, person_id, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz, stg.studiengang_kz,
+				bisio.bisio_id, (SELECT count(*) FROM bis.tbl_bisio_zweck WHERE bisio_id = bisio.bisio_id) AS anzahl
 			FROM
 				public.tbl_prestudent pre
 				JOIN public.tbl_student stud USING (prestudent_id)
@@ -91,7 +91,6 @@ class ZuVieleZweckeIncomingPlausi extends PlausiChecker
 				JOIN public.tbl_studiensemester sem ON status.studiensemester_kurzbz = sem.studiensemester_kurzbz
 				JOIN public.tbl_studiengang stg ON pre.studiengang_kz = stg.studiengang_kz
 				JOIN bis.tbl_bisio bisio ON stud.student_uid = bisio.student_uid
-				JOIN bis.tbl_bisio_zweck zw USING (bisio_id)
 			WHERE
 				stg.melderelevant
 				AND pre.bismelden
