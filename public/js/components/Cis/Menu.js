@@ -28,8 +28,10 @@ export default {
 			urlMatchRankings:[],
 			navUserDropdown:null,
 			menuOpen:true,
+			isSearchShownInMobileView: false,
         };
     },
+	inject: ["isMobile"],
 	provide(){
 		return{
 			setActiveEntry: this.setActiveEntry,
@@ -58,7 +60,10 @@ export default {
 		},
 		site_url(){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-		}
+		},
+		areHeaderOptionsShown() {
+			return !this.isSearchShownInMobileView || !this.isMobile;
+		},
 	},
 	methods: {
 		fetchMenu() {
@@ -112,10 +117,21 @@ export default {
 		});
 	},
     template: /*html*/`
-	<button id="nav-main-btn" class="navbar-toggler rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-	<fhc-searchbar ref="searchbar" id="nav-search" class="fhc-searchbar w-100 py-1 py-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
+	<button v-if="areHeaderOptionsShown" id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+   	</button>
+	<span v-if="isMobile && areHeaderOptionsShown" class="d-flex flex-row align-items-center px-2">
+		<theme-switch></theme-switch>
+	</span>
+	<fhc-searchbar
+		@isSearchShownInMobileViewUpdated="isSearchShownInMobileView = $event.isSearchShownInMobileView"
+		:searchoptions="searchbaroptions"
+		:searchfunction="searchfunction"
+		:class="{'px-2': isMobile}"
+		ref="searchbar"
+		id="nav-search"
+		class="fhc-searchbar w-100 py-1 py-lg-2"
+	></fhc-searchbar>
     <div id="nav-logo" class="d-none d-lg-block">
 		<div class="d-flex h-100 justify-content-between">
 			<a :href="rootUrl">
@@ -124,7 +140,7 @@ export default {
 			<theme-switch></theme-switch>
 		</div>
     </div>
-	<div id="nav-user">
+	<div v-if="areHeaderOptionsShown" id="nav-user">
 		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
 			<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
 		</button>
