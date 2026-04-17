@@ -122,29 +122,29 @@ class GridLogic {
 		const targetAndItemOverlap = this.getItemFrame(item).some(frame => currItem.frame.includes(frame))
 		if (!targetAndItemOverlap) {
 
-		let occupiersData = occupiers.map(occupier => this.data[occupier]);
+			let occupiersData = occupiers.map(occupier => this.data[occupier]);
 			// checks if target contains widget with the same high and width
 			// so swapping is possible
 			const occupiersFrame = occupiers.map(occupier => this.data[occupier].frame).flat();
 			const occupiersInsideMovingItem = occupiersFrame.every(frame => currItem.frame.includes(frame));
 
 			if (occupiersInsideMovingItem) {
-			// every slot of all items in the target zone is inside said zone
-			let replaceUpdate = [];
-			let newOccupierFrames = [];
-			for(let f of originalFrame){
-				if(newOccupierFrames.includes(f)){
-					continue;
+				// every slot of all items in the target zone is inside said zone
+				let replaceUpdate = [];
+				let newOccupierFrames = [];
+				for(let f of originalFrame){
+					if(newOccupierFrames.includes(f)){
+						continue;
+					}
+					let occ = occupiersData.shift();
+					if(occ){
+						newOccupierFrames = [...newOccupierFrames, ...this.getItemFrame({ ...occ, ...this.getSingleFramePosition(f) })];
+						replaceUpdate[occ.index] = { index: occ.index, ...this.getSingleFramePosition(f)}
+					}
 				}
-				let occ = occupiersData.shift();
-				if(occ){
-					newOccupierFrames = [...newOccupierFrames, ...this.getItemFrame({ ...occ, ...this.getSingleFramePosition(f) })];
-					replaceUpdate[occ.index] = { index: occ.index, ...this.getSingleFramePosition(f)}
-				}
-			}
-			replaceUpdate[item.index] = { index: item.index, x, y };
-			
-			return replaceUpdate;
+				replaceUpdate[item.index] = { index: item.index, x, y };
+				
+				return replaceUpdate;
 			}
 		}
 		
