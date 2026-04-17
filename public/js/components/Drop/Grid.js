@@ -108,7 +108,7 @@ export default {
 			}));
 		},
 		// item pipeline
-		items_placeholders() { // empty tiles
+		placeholders() { // empty tiles
 			return this.grid.getFreeSlots().map((item, index) => {
 				return {
 					x: item.x,
@@ -177,7 +177,7 @@ export default {
 		},
 		currentItems() { // final items with classes
 			if (this.mode == MODE_IDLE && this.active)
-				return [ ...this.placedItems, ...this.items_placeholders ];
+				return [ ...this.placedItems, ...this.placeholders ];
 
 			if (this.mode != MODE_IDLE && this.draggedItem) {
 				// add classes to dragged item
