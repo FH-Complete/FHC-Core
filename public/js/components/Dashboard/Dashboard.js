@@ -124,10 +124,10 @@ export default {
 			this.userFirstName = viewData?.name;
 		}
 	},
-	created() {
+	async created() {
 		this.$p.loadCategory('dashboard');
 
-		this.fetchViewData();
+		await this.fetchViewData();
 
 		this.$api
 			.call(ApiDashboardWidget.listAllowed(this.dashboard))
