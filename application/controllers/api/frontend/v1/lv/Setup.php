@@ -47,22 +47,22 @@ class Setup extends FHCAPI_Controller
 	{
 		$tabs['details'] = array (
 			'title' =>  'Details',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Details.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Details.js'),
 			'config' => []
 		);
 		$tabs['gruppen'] = array (
 			'title' =>  'Gruppen',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Gruppen.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Gruppen.js'),
 			'config' => []
 		);
 		$tabs['lektor'] = array (
 			'title' =>  'LektorInnenzuteilung',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Lektor.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Lektor.js'),
 			'config' => []
 		);
 		$tabs['notiz'] = array (
 			'title' =>  'Notizen',
-			'component' => APP_ROOT . 'public/js/components/LVVerwaltung/Tabs/Notiz.js',
+			'component' => absoluteJsImportUrl('public/js/components/LVVerwaltung/Tabs/Notiz.js'),
 			'config' => []
 		);
 		$this->terminateWithSuccess($tabs);

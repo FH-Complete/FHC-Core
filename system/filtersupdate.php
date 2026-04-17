@@ -531,6 +531,29 @@ $filters = array(
 	),
 	array(
 		'app' => 'infocenter',
+		'dataset_name' => 'onboarding',
+		'filter_kurzbz' => 'InfoCenterOnboarding',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Electronic Onboarding - Alle",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "LockUser"},
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
 		'dataset_name' => 'aufgenommen',
 		'filter_kurzbz' => 'InfoCenterAufgenommenAlle',
 		'description' => '{Alle}',
@@ -1395,14 +1418,14 @@ $filters = array(
 						{"name": "PersonId"},
 						{"name": "Vorname"},
 						{"name": "Nachname"},
-						{"name": "EMail"}, 
-						{"name": "Unternehmen"}, 
-						{"name": "Vertragsart"}, 
-						{"name": "DV_von"}, 
-						{"name": "DV_bis"}, 
-						{"name": "Wochenstunden"}, 
-						{"name": "WS_von"}, 
-						{"name": "WS_bis"}, 
+						{"name": "EMail"},
+						{"name": "Unternehmen"},
+						{"name": "Vertragsart"},
+						{"name": "DV_von"},
+						{"name": "DV_bis"},
+						{"name": "Wochenstunden"},
+						{"name": "WS_von"},
+						{"name": "WS_bis"},
 						{"name": "Standardkostenstelle"},
 						{"name": "DV_status"}
 					],
@@ -1433,14 +1456,14 @@ $filters = array(
 						{"name": "PersonId"},
 						{"name": "Vorname"},
 						{"name": "Nachname"},
-						{"name": "EMail"}, 
-						{"name": "Unternehmen"}, 
-						{"name": "Vertragsart"}, 
-						{"name": "DV_von"}, 
-						{"name": "DV_bis"}, 
-						{"name": "Wochenstunden"}, 
-						{"name": "WS_von"}, 
-						{"name": "WS_bis"}, 
+						{"name": "EMail"},
+						{"name": "Unternehmen"},
+						{"name": "Vertragsart"},
+						{"name": "DV_von"},
+						{"name": "DV_bis"},
+						{"name": "Wochenstunden"},
+						{"name": "WS_von"},
+						{"name": "WS_bis"},
 						{"name": "Standardkostenstelle"},
 						{"name": "DV_status"}
 					],
@@ -1471,14 +1494,14 @@ $filters = array(
 					{"name": "PersonId"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "EMail"}, 
-					{"name": "Unternehmen"}, 
-					{"name": "Vertragsart"}, 
-					{"name": "DV_von"}, 
-					{"name": "DV_bis"}, 
-					{"name": "Wochenstunden"}, 
-					{"name": "WS_von"}, 
-					{"name": "WS_bis"}, 
+					{"name": "EMail"},
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
+					{"name": "Wochenstunden"},
+					{"name": "WS_von"},
+					{"name": "WS_bis"},
 					{"name": "Standardkostenstelle"},
 					{"name": "DV_status"}
 				],
@@ -1509,14 +1532,14 @@ $filters = array(
 					{"name": "PersonId"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "EMail"}, 
-					{"name": "Unternehmen"}, 
-					{"name": "Vertragsart"}, 
-					{"name": "DV_von"}, 
-					{"name": "DV_bis"}, 
-					{"name": "Wochenstunden"}, 
-					{"name": "WS_von"}, 
-					{"name": "WS_bis"}, 
+					{"name": "EMail"},
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
+					{"name": "Wochenstunden"},
+					{"name": "WS_von"},
+					{"name": "WS_bis"},
 					{"name": "Standardkostenstelle"},
 					{"name": "DV_status"}
 				],
@@ -1547,10 +1570,10 @@ $filters = array(
 					{"name": "PersonId"},
 					{"name": "Vorname"},
 					{"name": "Nachname"},
-					{"name": "Unternehmen"}, 
-					{"name": "Vertragsart"}, 
-					{"name": "DV_von"}, 
-					{"name": "DV_bis"}, 
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
 					{"name": "Disziplinaere_Zuordnung"},
 					{"name": "DV_status"}
 				],
@@ -1558,7 +1581,63 @@ $filters = array(
 			}',
 		'oe_kurzbz' => null,
 	),
-
+	array(
+		'app' => 'core',
+		'dataset_name' => 'vertragsverwaltung',
+		'filter_kurzbz' => 'VertragsverwaltungAktiv',
+		'description' => '{Aktive Mitarbeiter}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Aktive Mitarbeiter",
+				"columns": [
+					{"name": "uid"},
+					{"name": "person_id"},
+					{"name": "nachname"},
+					{"name": "vorname"},
+					{"name": "aktiv"},
+					{"name": "gebdatum"},
+					{"name": "unternehmen"},
+					{"name": "vertragsarten"},
+					{"name": "ids"}
+				],
+				"filters": [
+					{
+						"name": "aktiv",
+						"option": "",
+						"operation": "equal",
+						"condition": "true"
+					}
+					]
+			}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'vertragsverwaltung',
+		'filter_kurzbz' => 'VertragsverwaltungAlle',
+		'description' => '{Alle Mitarbeiter}',
+		'sort' => 1,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle Mitarbeiter",
+				"columns": [
+					{"name": "uid"},
+					{"name": "person_id"},
+					{"name": "nachname"},
+					{"name": "vorname"},
+					{"name": "aktiv"},
+					{"name": "gebdatum"},
+					{"name": "unternehmen"},
+					{"name": "vertragsarten"},
+					{"name": "ids"}
+				],
+				"filters": []
+			}',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array

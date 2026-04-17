@@ -254,22 +254,16 @@ EOSQL;
 	return $dvs;
     }
 
-	public function existsDienstverhaeltnis($mitarbeiter_uid, $start, $ende = null, $vertragsart_kurzbz = null)
+	public function existsDienstverhaeltnis($mitarbeiter_uid, $start, $ende, $vertragsart_kurzbz)
 	{
 		$this->addOrder('von', 'DESC');
 		$this->db->where('mitarbeiter_uid', $mitarbeiter_uid);
-		if (!is_null($vertragsart_kurzbz))
-			$this->db->where('vertragsart_kurzbz', $this->escape($vertragsart_kurzbz));
-
+		$this->db->where('vertragsart_kurzbz', $vertragsart_kurzbz);
 		$this->db->where('von <=', $ende);
-
-		if (!is_null($ende))
-		{
-			$this->db->group_start();
-			$this->db->where('bis >=', $start);
-			$this->db->or_where('bis IS NULL', null, false);
-			$this->db->group_end();
-		}
+		$this->db->group_start();
+		$this->db->where('bis >=', $start);
+		$this->db->or_where('bis IS NULL', null, false);
+		$this->db->group_end();
 
 		$this->addLimit(1);
 		return $this->load();

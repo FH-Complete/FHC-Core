@@ -374,7 +374,7 @@ class Lehreinheitgruppe_model extends DB_Model
 			return success('Group assigned successfully to Lehreinheit');
 		}
 		else
-			return error('Group already assigned');
+			return error($this->p->t('lehre', 'grpbereitszugeteilt'));
 	}
 
 	public function deleteGroup($lehreinheit_id, $lehreinheitgruppe_id)
@@ -401,7 +401,7 @@ class Lehreinheitgruppe_model extends DB_Model
 		$stundenplan_result = $this->loadWhere(array('tbl_lehreinheitgruppe.lehreinheitgruppe_id' => $lehreinheitgruppe_id));
 
 		if (hasData($stundenplan_result))
-			return error('Gruppe already verplant');
+			return error($this->p->t('lehre', 'grpbereitsverplant'));
 
 		$delete_result = $this->delete($lehreinheitgruppe_id);
 
