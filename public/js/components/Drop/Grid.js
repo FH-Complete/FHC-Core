@@ -471,35 +471,30 @@ export default {
 				this.checkPinnedWidgetAnimation();
 			}
 		},
-		removeWidgetClones() {
-			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
-			for (let i = 0; i < widgetClones.length; i++) {
-				this.$refs.container.removeChild(widgetClones[i]);
-			}
-		},
 		_cleanupDragging() {
+			this.mode = MODE_IDLE;
 			if (this.draggedItem) {
 				const draggedItem = this.indexedItems.find(item => item.index == this.draggedItem.index);
 				delete draggedItem.classes;
 				this.draggedItem = null;
 			}
+			// removeWidgetClones
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
+			}
 		},
 		dragCancel() {
-			this.removeWidgetClones();
 			this.additionalRowComputed = false;
-			this.mode = MODE_IDLE;
 			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0];
 			this._cleanupDragging();
 		},
 		dragEnd() {
-			this.removeWidgetClones();
-			
 			if (this.mode == MODE_IDLE) {
 				return;
 			}
 
-			this.mode = MODE_IDLE;
 			let updated = [];
 			this.convertGridResultToUpdate(this.tempPositionUpdates, updated);
 			updated = this._updateCorrectedPositions(updated);
