@@ -48,8 +48,7 @@ export default {
 			y: -1,
 			// mouse coordinates while dragging
 			clientX: 0,
-			clientY: 0,
-			reorderedItems: [] // holds items that have no inital place
+			clientY: 0
 		};
 	},
 	computed: {
@@ -289,7 +288,6 @@ export default {
 				
 				return a.weight > b.weight;
 			}); 
-			let reorderedItems = [];
 			sortedItems.forEach(item => {
 				let freeSlots = this.grid.getFreeSlots();
 				
@@ -302,7 +300,6 @@ export default {
 						item.x = firstFreeSlot.x;
 						item.y = firstFreeSlot.y;
 					}
-					reorderedItems.push(item);
 				}
 				if (item.x + item.w > this.cols) {
 					let targetW = this.cols-item.x,
@@ -326,7 +323,6 @@ export default {
 				item.frame = this.grid.getItemFrame(item);
 				this.convertGridResultToUpdate(this.grid.add(item), result, items);
 			});
-			this.reorderedItems = reorderedItems;
 			this.grid.clearWeights();
 			return result;
 		},
