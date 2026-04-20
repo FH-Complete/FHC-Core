@@ -119,7 +119,19 @@ class Lehrveranstaltung extends FHCAPI_Controller
 			if (hasData($lehreinheiten_data))
 			{
 				$lehreinheiten = getData($lehreinheiten_data);
-				$rowData->_children = $lehreinheiten;
+
+				if (!isset($row->_children))
+				{
+					$row->_children = $lehreinheiten;
+				}
+				else
+				{
+					if (!is_array($row->_children))
+					{
+						$row->_children = [$row->_children];
+					}
+					$row->_children = array_merge($row->_children, $lehreinheiten);
+				}
 			}
 
 			if (!isEmptyString($row->studienplan_lehrveranstaltung_id_parent))

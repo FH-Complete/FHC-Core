@@ -209,7 +209,7 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$qry = "
 			SELECT
-			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe
+			  titelpre, vorname, nachname, titelpost, foto, foto_sperre, person_id, alias, telefonklappe, personalnummer, mitarbeiter_uid
 			FROM
 				public.tbl_person
 				JOIN public.tbl_benutzer b USING(person_id)
@@ -353,27 +353,33 @@ class Mitarbeiter_model extends DB_Model
 	{
 		$filter = strtoLower($filter);
 
+		$returnwert = "p.person_id, p.nachname, p.vorname, p.titelpost,  p.titelpre";
+
 		if ($mode == "mitAkadGrad")
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 		elseif ($mode == "ohneMaUid")
-			$returnwert = "p.person_id, CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
+			$returnwert .= ", CONCAT(p.nachname, ' ', p.vorname, ' ', p.titelpost, ' ', p.titelpre) as mitarbeiter";
 		else
-			$returnwert = "ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
+			$returnwert .= ", ma.mitarbeiter_uid, CONCAT(p.nachname, ' ', p.vorname, ' (', ma.mitarbeiter_uid , ')') as mitarbeiter";
 
 		$qry = "
-			SELECT " . $returnwert . "  
-			FROM 
+			SELECT " . $returnwert . "
+			FROM
 				public.tbl_mitarbeiter ma
-			JOIN 
+			JOIN
 				public.tbl_benutzer b on (ma.mitarbeiter_uid = b.uid)
-			JOIN 
+			JOIN
 				public.tbl_person p on (p.person_id = b.person_id)
-			WHERE 
+			WHERE
 				lower (p.nachname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
 				lower (p.vorname) LIKE '%". $this->db->escape_like_str($filter)."%'
 			OR
-				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'";
+				(ma.mitarbeiter_uid) LIKE '%". $this->db->escape_like_str($filter)."%'
+			OR
+				lower(vorname || ' ' || nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			ORDER BY
+				p.nachname, p.vorname, b.uid, p.person_id";
 
 		return $this->execQuery($qry);
 	}
@@ -387,14 +393,14 @@ class Mitarbeiter_model extends DB_Model
 	public function getMitarbeiterFromLV($lehrveranstaltung_id)
 	{
 		$qry = "SELECT DISTINCT
-				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid 
-			FROM 
+				lehrveranstaltung_id, uid, vorname, wahlname, vornamen, nachname, titelpre, titelpost, kurzbz, mitarbeiter_uid
+			FROM
 				lehre.tbl_lehreinheitmitarbeiter, campus.vw_mitarbeiter, lehre.tbl_lehreinheit
-			WHERE 
+			WHERE
 				lehrveranstaltung_id= ?
-			AND 
-				mitarbeiter_uid=uid 
-			AND 
+			AND
+				mitarbeiter_uid=uid
+			AND
 				tbl_lehreinheitmitarbeiter.lehreinheit_id=tbl_lehreinheit.lehreinheit_id;";
 
 		$parametersArray = array($lehrveranstaltung_id);
