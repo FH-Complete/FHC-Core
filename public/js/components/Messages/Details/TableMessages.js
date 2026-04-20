@@ -195,7 +195,7 @@ export default {
 						],
 						formatter: (cell, formatterParams) => {
 							const key = formatterParams[cell.getValue()];
-							return this.$p.t('messages', key);
+							return this.$p?.t?.('messages', key) || key;
 						},
 					},
 					{
@@ -307,6 +307,7 @@ export default {
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
 
+						this.$refs.table.tabulator.redraw(true); //for immediate translation of status
 						const setHeader = (field, text) => {
 							const col = this.$refs.table.tabulator.getColumn(field);
 							if (!col) return;
