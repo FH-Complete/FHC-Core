@@ -21,5 +21,20 @@ export default {
 			method: 'get',
 			url: `/api/frontend/v1/LvMenu/getLvMenu/${lvid}/${studiensemester_kurzbz}`
 		};
+	},
+	getMultipleLvMenu(lvas, studiensemester_kurzbz) {
+		// format params for backend bulk function
+		const lvMenuOptionList = lvas.map(lva => {
+			return {
+				lvid: lva.lehrveranstaltung_id,
+				studiensemester_kurzbz
+			}
+		})
+		
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/LvMenu/getMultipleLvMenu`,
+			params: { lvMenuOptionList }
+		};
 	}
 };

@@ -70,8 +70,8 @@ export const Raumsuche =  {
 				handler: async () => {
 					this.tableBuiltResolve()
 				}
-			}
-			]};
+			}]
+		};
 	},
 	methods: {
 		tableResolve(resolve) {

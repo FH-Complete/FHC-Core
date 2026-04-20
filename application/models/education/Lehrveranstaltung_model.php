@@ -1346,32 +1346,33 @@ class Lehrveranstaltung_model extends DB_Model
 
 	// used for cis4 mylv mitarbeiter
 	public function getLvsByMitarbeiterInSemester($mitarbeiter_uid, $sem_kurzbz) {
-		$qry = "SELECT 
-					public.tbl_studiengang.studiengang_kz,
-					lehre.tbl_lehrveranstaltung.semester,
-					public.tbl_studiengang.bezeichnung as sg_bezeichnung,
-					public.tbl_studiengang.english as sg_bezeichnung_eng,
-					UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as studiengang_kuerzel,
-					lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
-					lehre.tbl_lehrveranstaltung.bezeichnung,
-					lehre.tbl_lehrveranstaltung.bezeichnung_english as bezeichnung_eng,
-					lehre.tbl_lehreinheitmitarbeiter.semesterstunden as semesterstunden,
-					lehre.tbl_lehrveranstaltung.farbe,
-					lehre.tbl_lehrveranstaltung.lvinfo,
-					lehre.tbl_lehrveranstaltung.benotung,
-					lehre.tbl_lehrveranstaltung.orgform_kurzbz,
-					lehre.tbl_lehrveranstaltung.sprache,
-					lehre.tbl_lehrveranstaltung.ects,
-					lehre.tbl_lehrveranstaltung.incoming
-				FROM
-					lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
-										  JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-										  JOIN public.tbl_studiengang USING(studiengang_kz)
-										  JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
-				WHERE
-					tbl_lehreinheit.studiensemester_kurzbz = ?
-				  AND mitarbeiter_uid = ?
-				ORDER BY studiengang_kuerzel, lehre.tbl_lehrveranstaltung.semester, lehre.tbl_lehrveranstaltung.bezeichnung";
+		$qry = "SELECT * FROM (
+					SELECT DISTINCT ON (lehre.tbl_lehrveranstaltung.lehrveranstaltung_id) 
+						public.tbl_studiengang.studiengang_kz,
+						lehre.tbl_lehrveranstaltung.semester,
+						public.tbl_studiengang.bezeichnung as sg_bezeichnung,
+						public.tbl_studiengang.english as sg_bezeichnung_eng,
+						UPPER(tbl_studiengang.typ::varchar(1) || tbl_studiengang.kurzbz) as studiengang_kuerzel,
+						lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
+						lehre.tbl_lehrveranstaltung.bezeichnung,
+						lehre.tbl_lehrveranstaltung.bezeichnung_english as bezeichnung_eng,
+						TRUNC(lehre.tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden,
+						lehre.tbl_lehrveranstaltung.farbe,
+						lehre.tbl_lehrveranstaltung.lvinfo,
+						lehre.tbl_lehrveranstaltung.benotung,
+						lehre.tbl_lehrveranstaltung.orgform_kurzbz,
+						lehre.tbl_lehrveranstaltung.sprache,
+						lehre.tbl_lehrveranstaltung.ects,
+						lehre.tbl_lehrveranstaltung.incoming
+					FROM
+						lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+											  JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+											  JOIN public.tbl_studiengang USING(studiengang_kz)
+											  JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
+					WHERE
+						tbl_lehreinheit.studiensemester_kurzbz = ?
+					  AND mitarbeiter_uid = ?) as distincted_by_lva_id
+				ORDER BY studiengang_kuerzel, semester, bezeichnung";
 		
 		return $this->execReadOnlyQuery($qry, [$sem_kurzbz, $mitarbeiter_uid]);
 	}

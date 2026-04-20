@@ -12,11 +12,7 @@ export default {
 	},
 	props: {
 		semester: [String, Number],
-		lvs: Array,
-		mode: {
-			type: String,
-			default: 'Cards'
-		}
+		lvs: Array
 	},
 	computed: {
 		ready() { return this.lvs !== null; },
@@ -41,7 +37,8 @@ export default {
 			return this.lvs.filter(lv => lv.studiengang_kz == studiengang.studiengang_kz && lv.semester == studiengang.semester);
 		}
 	},
-	template: `<div class="mylv-semester" v-if="ready">
+	template: `
+	<div class="mylv-semester" v-if="ready">
 		<mylv-semester-studiengang v-for="studiengang in studiengaenge" :key="studiengang.studiengang_kz" v-bind="studiengang" :lvs="lvsForStudiengang(studiengang)"/>
 	</div>
 	<div class="mylv-semester text-center" v-else>

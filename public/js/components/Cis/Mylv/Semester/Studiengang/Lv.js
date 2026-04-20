@@ -1,6 +1,4 @@
 import LvPruefungen from "./Lv/Pruefungen.js";
-import LvInfo from "./Lv/Info.js";
-import Phrasen from "../../../../../mixins/Phrasen.js";
 
 import ApiLehre from '../../../../../api/factory/lehre.js';
 import ApiAddons from '../../../../../api/factory/addons.js';
@@ -9,9 +7,6 @@ import ApiAddons from '../../../../../api/factory/addons.js';
 
 export default {
 	name: 'Lv',
-	mixins: [
-		Phrasen
-	],
 	inject: ['studien_semester', 'type'],
 	props: {
 		lehrveranstaltung_id: [Number, String],
@@ -115,7 +110,6 @@ export default {
 		}
 	},
 	created() {
-		// TODO: check if this isnt a race condition in disguise
 		if(this.type == 'student') {
 			this.$api
 				.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))

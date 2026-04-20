@@ -32,7 +32,8 @@ export default {
 			return lv.benotung ? lv.znote || lv.lvnote || null : null;
 		}
 	},
-	template: `<div class="card mb-3">
+	template: `
+	<div class="card mb-3">
 		<div class="card-body">
 			<h4 class="card-title mb-3">{{$p.user_language.value === 'English' ? sg_bezeichnung_eng : bezeichnung}} - {{kuerzel}}
 				<small>{{semester}}.{{$p.t('lehre/semester')}}</small>
