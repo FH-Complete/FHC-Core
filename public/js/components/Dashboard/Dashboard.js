@@ -70,7 +70,7 @@ export default {
 					if (this.widgets[wid].id == k) {
 						payload[k] = ObjectUtils.mergeDeep(this.widgets[wid], payload[k]);
 						// NOTE(chris): remove internal props
-						for (var prop of ['_x','_y','_w','_h','index','id','preset'])
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'preset'])
 							if (payload[k][prop])
 								delete payload[k][prop];
 						break;

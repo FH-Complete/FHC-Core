@@ -146,26 +146,26 @@ export default {
 				
 				let item = {...update.item};
 				if (!item.placeholder) {
-				if (!item.place[this.gridWidth])
-					item.place[this.gridWidth] = {x: 0, y: 0, w: 1, h: 1};
-				delete item.x;
-				delete item.y;
-				delete item.w;
-				delete item.h;
-				delete item.place[this.gridWidth].pinned;
-				if (update.x !== undefined)
-					item.place[this.gridWidth].x = update.x;
-				if (update.y !== undefined)
-					item.place[this.gridWidth].y = update.y;
-				if (update.w !== undefined)
-					item.place[this.gridWidth].w = update.w;
-				if (update.h !== undefined)
-					item.place[this.gridWidth].h = update.h;
-				if (pinned){
-					item.place[this.gridWidth].pinned = true;
-				}
+					if (!item.place[this.gridWidth])
+						item.place[this.gridWidth] = {x: 0, y: 0, w: 1, h: 1};
+					delete item.x;
+					delete item.y;
+					delete item.w;
+					delete item.h;
+					delete item.place[this.gridWidth].pinned;
+					if (update.x !== undefined)
+						item.place[this.gridWidth].x = update.x;
+					if (update.y !== undefined)
+						item.place[this.gridWidth].y = update.y;
+					if (update.w !== undefined)
+						item.place[this.gridWidth].w = update.w;
+					if (update.h !== undefined)
+						item.place[this.gridWidth].h = update.h;
+					if (pinned) {
+						item.place[this.gridWidth].pinned = true;
+					}
 
-				result[item.id] = item;
+					result[item.id] = item;
 				}
 			});
 			this.updatePreset(result);
