@@ -17,14 +17,12 @@ export default {
 			studiensemester: null,
 			lvs: {},
 			currentSemester: null,
-			lvMenues: null,
 			mode: 'table' // TODO: load from local storage
 		};
 	},
 	provide() {
 		return {
 			type: Vue.computed(() => this.type),
-			lvMenues: Vue.computed(() => this.lvMenues)
 		}
 	},
 	inject: ['isStudent', 'isMitarbeiter'],
@@ -50,7 +48,14 @@ export default {
 					this.firstLoad = false;
 
 					this.$api.call(ApiAddons.getMultipleLvMenu(this.lvs[this.currentSemester].lvs, this.currentSemester)).then(res => {
-						this.lvMenues = res.data
+						if(res.data) {
+							Object.entries(res.data).forEach((entry) => {
+								// entry[0] -> key -> lvid
+								// entry[1] -> value -> menu
+								const lv = this.lvs[this.currentSemester].lvs.find(lv => lv.lehrveranstaltung_id == entry[0])
+								lv.menu = entry[1]
+							})
+						}
 					})
 
 				})

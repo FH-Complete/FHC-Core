@@ -67,7 +67,7 @@ class LvMenu extends FHCAPI_Controller
 		$lvMenuOptionList = $this->input->post('lvMenuOptionList', true);
 		$result =[];
 		foreach($lvMenuOptionList as $lvMenuOptions){
-			$lvMenu = $this->getLvMenu($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
+			$lvMenu = $this->getLvMenuInternal($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
 			
 			$result[$lvMenuOptions['lvid']]=$lvMenu;
 		}
