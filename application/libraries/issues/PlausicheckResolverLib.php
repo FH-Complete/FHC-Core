@@ -19,7 +19,7 @@ class PlausicheckResolverLib
 
 	private $_ci; // ci instance
 	private $_extensionName; // name of extension
-	private $_fehlercodes = []; // name of extension
+	private $_fehlercodes = []; // fehlercodes to resolve
 	private $_apps = []; // apps for which issues should be resolved
 	private $_codeLibMappings = []; // mappings for issues which explicitly defined resolver
 	private $_defaultIssueParams = ['issue_id' => 'issue_id', 'issue_person_id' => 'person_id', 'issue_oe_kurzbz' => 'oe_kurzbz'];
