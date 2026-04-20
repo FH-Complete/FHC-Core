@@ -23,14 +23,6 @@ export default {
 				this.$p.t('person/ort'),
 				this.event.ort_kurzbz
 			].join(": "));
-
-			this.event.lektor = [
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-				this.event.lektor[0],
-			];
 			
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {
@@ -39,7 +31,7 @@ export default {
 						this.event.lektor.slice(0, 3).map(lektor => lektor.kurzbz).join("\n")
 						+ "\n" + this.$p.t('lehre/weitereLektoren', [this.event.lektor.length - 3])
 					].join(": "));
-				} else {console.log(this.event.lektor);
+				} else {;
 					tooltipArray.push([
 						this.$p.t('lehre/lektor'),
 						this.event.lektor.map(lektor => lektor.kurzbz).join("\n")

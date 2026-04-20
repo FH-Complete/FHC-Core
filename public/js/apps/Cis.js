@@ -50,7 +50,7 @@ const app = Vue.createApp({
                         defaultaction: {
                             type: "link",
 							renderif: function(data) {
-								if(data.content_id === "N/A"){
+								if(data.content_id === null){
 									return false;
 								}
 								return true;
@@ -79,7 +79,7 @@ const app = Vue.createApp({
                                 icon: "fas fa-info-circle",
                                 type: "link",
                                 renderif: function(data) {
-									if(data.content_id === "N/A"){
+									if(data.content_id === null){
 										return false;
 									}
 									return true;
@@ -142,6 +142,9 @@ const app = Vue.createApp({
         }
     }
 });
+
+FhcApps.makeExtendable(app);
+
 app.use(primevue.config.default, {
 	zIndex: {
 		overlay: 9000,

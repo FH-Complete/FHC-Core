@@ -1,5 +1,5 @@
 import BsModal from "../Bootstrap/Modal.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import HeightTransition from "../Tranistion/HeightTransition.js";
 
 export default {
@@ -70,6 +70,14 @@ export default {
 		ready() {
 			return this.component && this.arguments !== null;
 		},
+		visible: {
+			get() {
+				return !this.hidden;
+			},
+			set(value) {
+				this.$emit('remove', this.hidden);
+			}
+		}
 	},
 	methods: {
 		unpin(){
@@ -142,9 +150,15 @@ export default {
 			this.isLoading = false;
 		},
 	},
+	setup() {
+		const { actions } = useCachedWidgetLoader();
+		return {
+			loadWidget: actions.load
+		};
+	},
 	async created() {
-		this.widget = await CachedWidgetLoader.loadWidget(this.id);
-		let component = (await import("../" + this.widget.setup.file)).default;
+		this.widget = await this.loadWidget(this.id);
+		let component = (await import(this.widget.setup.file)).default;
 		this.$options.components["widget" + this.widget.widget_id] = component;
 		this.component = "widget" + this.widget.widget_id;
 		this.arguments = { ...this.widget.arguments, ...this.config };
@@ -156,7 +170,7 @@ export default {
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
 	</div>
-	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="{'draggedItem':dragstate, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}">
+	<div v-else-if="!hidden || editMode" :id="widgetID" class="dashboard-item card overflow-hidden h-100 position-relative" :class="{'hiddenWidget':hidden, 'draggedItem':dragstate, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}">
 	<div v-show="!dragstate" class="h-100 card border-0">
 		<div v-if="widget" class="card-header d-flex ps-0 pe-2 align-items-center">
 			<Transition>
@@ -185,7 +199,7 @@ export default {
 			</a>
 			<Transition>
 				<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" :checked="!hidden" @input="$emit('remove', hidden)">
+					<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" v-model="visible" :value="true">
 				</div>
 			</Transition>
 		</div>

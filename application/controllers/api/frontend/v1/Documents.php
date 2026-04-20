@@ -208,7 +208,6 @@ class Documents extends FHCAPI_Controller
 		$this->load->model('system/Vorlage_model', 'VorlageModel');
 
 		$result = $this->VorlageModel->load($xsl);
-		$this->addMeta("ress", $result);
 		$vorlage = current($this->getDataOrTerminateWithError($result));
 		if (!$vorlage)
 			show_404();
@@ -221,7 +220,7 @@ class Documents extends FHCAPI_Controller
 			'gedruckt' => true,
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUID(),
-			'uid' => $this->input->post_get('uid') ?: '',
+			'uid' => $this->input->post_get('uid') ?: null,
 			'archiv' => true,
 			'signiert' => !!$sign_user,
 			'stud_selfservice' => $vorlage->stud_selfservice
@@ -251,6 +250,9 @@ class Documents extends FHCAPI_Controller
 					'studiensemester_kurzbz' => $ss,
 					'student_uid' => $akteData['uid']
 				]);
+
+				if (!hasData($result)) $this->terminateWithError($this->p->t("stv", "error_noLehrverbandAssigned"));
+
 				$res = current($this->getDataOrTerminateWithError($result));
 
 				$studiengang_kz = $res->studiengang_kz;
@@ -332,6 +334,7 @@ class Documents extends FHCAPI_Controller
 			if ($prestudent_id) {
 				$this->load->model('crm/prestudent_model', 'PrestudentModel');
 				$this->PrestudentModel->addJoin('public.tbl_studiengang', 'studiengang_kz', 'LEFT');
+				$this->PrestudentModel->addSelect('tbl_prestudent.*, UPPER(typ || kurzbz) AS kuerzel');
 				$result = $this->PrestudentModel->load($prestudent_id);
 				$prestudent = current($this->getDataOrTerminateWithError($result));
 
@@ -442,6 +445,10 @@ class Documents extends FHCAPI_Controller
 			'betreuerart_kurzbz',
 			'studiensemester_kurzbz'
 		] as $key) {
+			if (in_array($xsl, array('Ausbildungsver', 'AusbVerEng')) && $key === 'uid')
+			{
+				continue;
+			}
 			$value = $this->input->post_get($key);
 			if ($value !== null)
 				$params .= '&' . $key . '=' . urlencode($value);

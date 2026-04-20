@@ -34,7 +34,7 @@ export default {
 			url: '/api/frontend/v1/studstatus/leitung/getHistory/' + antrag_id
 		};
 	},
-	getPrestudents(query, signal) {
+	getPrestudents(query) {
 		return {
 			method: 'post',
 			url: '/api/frontend/v1/studstatus/leitung/getPrestudents',

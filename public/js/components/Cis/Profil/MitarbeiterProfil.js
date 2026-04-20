@@ -11,6 +11,7 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
 export default {
 	components: {
@@ -40,7 +41,7 @@ export default {
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
@@ -74,18 +75,24 @@ export default {
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.gueltigVonPhrase),
 						field: "Gültig_von",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.gueltigBisPhrase),
 						field: "Gültig_bis",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.wochenstundenPhrase),
@@ -102,7 +109,7 @@ export default {
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
@@ -138,9 +145,12 @@ export default {
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.ausgabedatumPhrase),
 						field: "Ausgegeben_am",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 				],
 			}
@@ -167,11 +177,11 @@ export default {
 				this.$api
 					.call(ApiProfilUpdate.selectProfilRequest())
 					.then((request) => {
-						if (!request.error && request) {
+						if (!request.error && request.data) {
 							this.data.profilUpdates = request.data;
 							this.data.profilUpdates.sort(this.sortProfilUpdates);
 						} else {
-							console.error("Error when fetching profile updates: " + res.data);
+							console.error("Error when fetching profile updates: " + request);
 						}
 					})
 					.catch((err) => {
@@ -211,6 +221,15 @@ export default {
 		setTableColumnTitles() { // reevaluates computed phrasen
 			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
+		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
 		}
 	},
 
@@ -309,7 +328,7 @@ export default {
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form"  >
-    <edit-profil v-if="showModal" ref="editModal" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
+    <edit-profil v-if="showModal" ref="editModal" :isMitarbeiter="true" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
         <div  class="d-md-none col-12 ">
             <!--TODO: uncomment when implemented

@@ -116,7 +116,7 @@ class GridLogic {
 				prefer = DIR_RIGHT;
 		}
 
-		const originalFrame = [...item.frame];
+		const originalFrame = Array.isArray(item.frame) ? [...item.frame] : [item.frame];
 
 		const currItem = {...item};
 		currItem.x = x;
@@ -146,6 +146,7 @@ class GridLogic {
 				}
 			}
 			replaceUpdate[item.index] = { index: item.index, x, y };
+			
 			return replaceUpdate;
 		}
 		

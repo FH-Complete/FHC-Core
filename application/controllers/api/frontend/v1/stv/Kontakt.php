@@ -52,6 +52,7 @@ class Kontakt extends FHCAPI_Controller
 		// Extra Permissionchecks
 		$permsMa = [];
 		$permsStud = [];
+		$permsDefault = null;
 		switch ($this->router->method) {
 			case 'getBankverbindung':
 			case 'loadBankverbindung':
@@ -68,7 +69,7 @@ class Kontakt extends FHCAPI_Controller
 			case 'getKontakte':
 			case 'loadAddress':
 			case 'loadContact':
-				$permsMa = $permsStud = ['admin:r', 'assistenz:r'];
+				$permsMa = $permsStud = $permsDefault = ['admin:r', 'assistenz:r'];
 				break;
 			case 'addNewAddress':
 			case 'addNewContact':
@@ -76,7 +77,7 @@ class Kontakt extends FHCAPI_Controller
 			case 'updateContact':
 			case 'deleteAddress':
 			case 'deleteContact':
-				$permsMa = $permsStud = ['admin:rw', 'assistenz:rw'];
+				$permsMa = $permsStud = $permsDefault = ['admin:rw', 'assistenz:rw'];
 				break;
 		}
 		if ($this->router->method == 'getAdressen'
@@ -91,7 +92,7 @@ class Kontakt extends FHCAPI_Controller
 			if (is_null($person_id) || !ctype_digit((string)$person_id))
 				$this->terminateWithError( $this->p->t('ui', 'ungueltigeParameter'), self::ERROR_TYPE_GENERAL);
 
-			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud, $permsDefault);
 		} elseif ($this->router->method == 'loadAddress'
 			|| $this->router->method == 'loadContact'
 			|| $this->router->method == 'loadBankverbindung'
@@ -135,7 +136,7 @@ class Kontakt extends FHCAPI_Controller
 
 			$person_id = current($data)->person_id;
 			
-			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud);
+			$this->checkPermissionsForPerson($person_id, $permsMa, $permsStud, $permsDefault);
 		}
 	}
 	public function getAdressen($person_id)
@@ -434,7 +435,10 @@ class Kontakt extends FHCAPI_Controller
 		$this->FirmaModel->addJoin('public.tbl_firma f', 'ON (f.firma_id = st.firma_id)', 'LEFT');
 		$this->KontakttypModel->addJoin('public.tbl_kontakttyp kt', 'ON (public.tbl_kontakt.kontakttyp = kt.kontakttyp)');
 		$result = $this->KontaktModel->loadWhere(
-			array('person_id' => $person_id)
+			array(
+				'person_id' => $person_id,
+				'public.tbl_kontakt.kontakttyp !=' => 'hidden'
+			)
 		);
 
 		if (isError($result))
@@ -442,20 +446,18 @@ class Kontakt extends FHCAPI_Controller
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
 		$this->terminateWithSuccess((getData($result) ?: []));
+
 	}
 
 	public function getKontakttypen()
 	{
 		$this->load->model('person/Kontakttyp_model', 'KontakttypModel');
+		$this->KontakttypModel->addOrder('beschreibung', 'ASC');
+		$result = $this->KontakttypModel->loadWhere(array('kontakttyp !=' => 'hidden'));
 
-		$result = $this->KontakttypModel->load();
-		if (isError($result)) {
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-		else
-		{
-			$this->terminateWithSuccess(getData($result) ?: []);
-		}
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 	public function loadContact()

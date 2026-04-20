@@ -573,8 +573,7 @@ class ProfilUpdate extends FHCAPI_Controller
 	{
 		// early return if no status has been passed as argument
 		if (!isset($status)) {
-			echo json_encode($this->ProfilUpdateModel->getProfilUpdateWithPermission());
-			return;
+			$this->terminateWithSuccess($this->ProfilUpdateModel->getProfilUpdateWithPermission());
 		}
 
 		// get the sprache of the user
@@ -587,7 +586,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$status = hasData($status) ? getData($status)[0]->status_kurzbz : null;
 			$res = $this->ProfilUpdateModel->getProfilUpdateWithPermission(isset($status) ? ['status' => $status] : null);
 
-			echo json_encode($res);
+			$this->terminateWithSuccess($res);
 		}
 	}
 
@@ -638,9 +637,10 @@ class ProfilUpdate extends FHCAPI_Controller
 				//? Send email to the Studiengangsassistentinnen
 				$this->StudentModel->addSelect(["public.tbl_studiengang.email"]);
 				$this->StudentModel->addJoin("public.tbl_benutzer", "public.tbl_benutzer.uid = public.tbl_student.student_uid");
-				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id");
+				$this->StudentModel->addJoin("public.tbl_prestudent", "public.tbl_benutzer.person_id = public.tbl_prestudent.person_id and public.tbl_student.studiengang_kz = public.tbl_prestudent.studiengang_kz");
 				$this->StudentModel->addJoin("public.tbl_prestudentstatus", "public.tbl_prestudentstatus.prestudent_id = public.tbl_prestudent.prestudent_id");
 				$this->StudentModel->addJoin("public.tbl_studiengang", "public.tbl_studiengang.studiengang_kz = public.tbl_prestudent.studiengang_kz");
+				$this->StudentModel->addGroupBy(["public.tbl_studiengang.email"]);
 				//* check if the benutzer itself is active
 				//* check if the student status is Student or Diplomand (active students)
 				$this->StudentModel->db->where_in("public.tbl_prestudentstatus.status_kurzbz", ['Student', 'Diplomand']);
@@ -657,8 +657,10 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		$mail_res = [];
 		//? sending email
-		foreach ($emails as $email) {
-			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => APP_ROOT . 'Cis/ProfilUpdate/id/' . $profil_update_id], $email, ("Profil Änderung von " . $uid)));
+		foreach ($emails as $email)
+		{
+			$href = $this->config->item('cis_vilesci_base_url') . $this->config->item('cis_vilesci_index_page') . '/Cis/ProfilUpdate/id/' . $profil_update_id;
+			array_push($mail_res, sendSanchoMail("profil_update", ['uid' => $uid, 'topic' => $topic, 'href' => $href], $email, ("Profil Änderung von " . $uid)));
 		}
 		foreach ($mail_res as $m_res) {
 			if (!$m_res) {
@@ -681,21 +683,21 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		function languageQuery($language)
 		{
-			return "select index from public.tbl_sprache where sprache = '" + $language + "'";
+			return "select index from public.tbl_sprache where sprache = '" . $language . "'";
 		}
 
 		$this->ProfilUpdateStatusModel->addSelect(["bezeichnung_mehrsprachig[(" . languageQuery('German') . ")] as status_de", "bezeichnung_mehrsprachig[(" . languageQuery('English') . ")] as status_en"]);
 		
 		$status_translation = $this->ProfilUpdateStatusModel->loadWhere(["status_kurzbz" => $status]);
-		
 		if (isError($status_translation)) {
 			$this->terminateWithError($this->p->t('profilUpdate', 'ProfilUpdateStatusTranslationError'));
 		}
 
 		$status_translation = hasData($status_translation) ? getData($status_translation)[0] : null;
-
-		if (isset($status_translation)) {
-			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => APP_ROOT . 'Cis/Profil'], $email, ("Profil Änderung " . $this->p->t('profilUpdate', 'pending')));
+		if (isset($status_translation))
+		{
+			$href = $this->config->item('cis_base_url') . $this->config->item('cis_index_page') . '/Cis/Profil';
+			$mail_res = sendSanchoMail("profil_update_response", ['topic' => $topic, 'status_de' => $status_translation->status_de, 'status_en' => $status_translation->status_en, 'href' => $href], $email, ("Profil Änderung " . $status_translation->status_de . ' / Profile Update ' . $status_translation->status_en));
 			if (!$mail_res) {
 				$this->addError($this->p->t('profilUpdate', 'profilUpdate_email_error'));
 			}
@@ -704,7 +706,13 @@ class ProfilUpdate extends FHCAPI_Controller
 
 	private function setStatusOnUpdateRequest($id, $status, $status_message)
 	{
-		return $this->ProfilUpdateModel->update([$id], ["status" => $status, "status_timestamp" => "NOW()", "status_message" => $status_message]);
+		return $this->ProfilUpdateModel->update([$id], [
+			"status" => $status,
+			"status_timestamp" => "NOW()",
+			"status_message" => $status_message,
+			"updateamum" => "NOW()",
+			"updatevon" => getAuthUID()
+		]);
 	}
 	
 	private function updateRequestedChange($id, $requested_change)
@@ -714,13 +722,12 @@ class ProfilUpdate extends FHCAPI_Controller
 	
 	private function deleteOldVersionFile($dms_id)
 	{
+		if (!isset($dms_id)) {
+			return true;
+		}
+
 		// starting the transaction
 		$this->db->trans_start();
-		
-		
-		if (!isset($dms_id)) {
-			return;
-		}
 
 		//? delete the file from the profilUpdate first
 		$profilUpdateFileDelete = $this->ProfilUpdateModel->removeFileFromProfilUpdate($dms_id);
@@ -775,13 +782,8 @@ class ProfilUpdate extends FHCAPI_Controller
 
 		$res = $this->StudentModel->execReadOnlyQuery($query, [$student_uid]);
 		$res = $this->getDataOrTerminateWithError($res, $this->p->t('profilUpdate', 'profilUpdate_loadingOE_error'));	
-		$res = array_map(
-			function ($item) {
-				return $item->oe_kurzbz;
-			},
-			$res
-		);
-		return $res;
+		$oe = ($res[0])->oe_kurzbz;
+		return $oe;
 	}
 
 	private function handleAdresse($requested_change, $personID)
@@ -811,7 +813,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$insert_adresse_id = $insertID;
 			$insert_adresse_id = $this->getDataOrTerminateWithError($insert_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
 			if ($insert_adresse_id) {
-				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id);
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $insert_adresse_id, $personID);
 			}
 		}
 		//! DELETE
@@ -823,12 +825,33 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 		//! UPDATE
 		else {
-			$requested_change['updateamum'] = "NOW()";
-			$requested_change['updatevon'] = getAuthUID();
-			$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
-			$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
-			$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id);
+			$curadresse_res = $this->AdresseModel->load($adresse_id);
+			$curadresse = ($this->getDataOrTerminateWithError($curadresse_res))[0];
 
+			if($curadresse->heimatadresse)
+			{
+				$tmpadresse = array_merge((array) $curadresse, $requested_change);
+				unset($tmpadresse["adresse_id"]);
+				$tmpadresse['insertamum'] = "NOW()";
+				$tmpadresse['insertvon'] = getAuthUID();
+				$tmpadresse['person_id'] = $personID;
+				unset($tmpadresse["heimatadresse"]);
+				unset($tmpadresse["updateamum"]);
+				unset($tmpadresse["updatevon"]);
+
+				$tmpadresse_res = $this->AdresseModel->insert($tmpadresse);
+				$tmpadresse_id = $this->getDataOrTerminateWithError($tmpadresse_res, $this->p->t('profilUpdate', 'profilUpdate_insertAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $tmpadresse_id, $personID);
+			}
+			else
+			{
+				$requested_change['updateamum'] = "NOW()";
+				$requested_change['updatevon'] = getAuthUID();
+
+				$update_adresse_id = $this->AdresseModel->update($adresse_id, $requested_change);
+				$update_adresse_id = $this->getDataOrTerminateWithError($update_adresse_id, $this->p->t('profilUpdate', 'profilUpdate_updateAdresse_error'));
+				$this->handleDupplicateZustellAdressen($requested_change['zustelladresse'], $update_adresse_id, $personID);
+			}
 		}
 		return $insertID ?? null;
 	}
@@ -850,7 +873,7 @@ class ProfilUpdate extends FHCAPI_Controller
 			$insert_kontakt_id = $insertID;
 			$insert_kontakt_id = $this->getDataOrTerminateWithError($insert_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_insertKontakt_error'));
 			if ($insert_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $insert_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		//! DELETE
@@ -867,18 +890,18 @@ class ProfilUpdate extends FHCAPI_Controller
 			$update_kontakt_id = $this->KontaktModel->update($kontakt_id, $requested_change);
 			$update_kontakt_id = $this->getDataOrTerminateWithError($update_kontakt_id, $this->p->t('profilUpdate', 'profilUpdate_updateKontakt_error'));
 			if ($update_kontakt_id) {
-				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id);
+				$this->handleDupplicateZustellKontakte($requested_change['zustellung'], $update_kontakt_id, $requested_change['kontakttyp'], $personID);
 			}
 		}
 		return isset($insertID) ? $insertID : null;
 	}
 
-	private function handleDupplicateZustellAdressen($zustellung, $adresse_id)
+	private function handleDupplicateZustellAdressen($zustellung, $adresse_id, $person_id)
 	{
 		if ($zustellung) {
 			$this->PersonModel->addSelect("public.tbl_adresse.adresse_id");
 			$this->PersonModel->addJoin("public.tbl_adresse", "public.tbl_adresse.person_id = public.tbl_person.person_id");
-			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustelladresse" => TRUE]);
+			$zustellAdressenArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $person_id, "zustelladresse" => TRUE]);
 			if (isError($zustellAdressenArray)) {
 				$this->terminateWithError($this->p->t('profilUpdate', 'profilUpdate_loadingZustellAdressen_error'));
 			}
@@ -891,6 +914,8 @@ class ProfilUpdate extends FHCAPI_Controller
 					return $adresse->adresse_id != $adresse_id;
 				});
 	
+				$this->addMeta('bhzustelladressen', $zustellAdressenArray);
+
 				// remove the zustelladresse from all other zustelladressen
 				foreach ($zustellAdressenArray as $adresse) {
 					$this->AdresseModel->update($adresse->adresse_id, ["zustelladresse" => FALSE]);
@@ -900,12 +925,16 @@ class ProfilUpdate extends FHCAPI_Controller
 		}
 	}
 
-	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id)
+	private function handleDupplicateZustellKontakte($zustellung, $kontakt_id, $kontakttyp, $person_id)
 	{
 		if ($zustellung) {
 			$this->PersonModel->addSelect("public.tbl_kontakt.kontakt_id");
 			$this->PersonModel->addJoin("public.tbl_kontakt", "public.tbl_kontakt.person_id = public.tbl_person.person_id");
-			$zustellKontakteArray = $this->PersonModel->loadWhere(["public.tbl_person.person_id" => $this->pid, "zustellung" => TRUE]);
+			$zustellKontakteArray = $this->PersonModel->loadWhere([
+				"public.tbl_person.person_id" => $person_id,
+				"zustellung" => TRUE,
+				"kontakttyp" => $kontakttyp
+			]);
 			if (!isSuccess($zustellKontakteArray)) {
 				return error($this->p->t('profilUpdate', 'profilUpdate_loadingZustellkontakte_error'));
 			}

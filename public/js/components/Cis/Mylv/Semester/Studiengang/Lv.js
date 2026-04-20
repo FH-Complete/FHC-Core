@@ -19,6 +19,7 @@ export default {
 	props: {
 		lehrveranstaltung_id: Number,
 		bezeichnung: String,
+		bezeichnung_eng: String,
 		module: String,
 		farbe: String,
 		lvinfo: Boolean,
