@@ -3,6 +3,8 @@ import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import WidgetIcon from "./Widget/WidgetIcon.js"
 
+import ObjectUtils from "../../helpers/ObjectUtils.js";
+
 export default {
 	name: 'Section',
 	components: {
@@ -144,7 +146,7 @@ export default {
 			let result = {};
 			updated.forEach(update => {
 				
-				let item = {...update.item};
+				let item = structuredClone(ObjectUtils.deepToRaw(update.item));
 				if (!item.placeholder) {
 					if (!item.place[this.gridWidth])
 						item.place[this.gridWidth] = {x: 0, y: 0, w: 1, h: 1};
