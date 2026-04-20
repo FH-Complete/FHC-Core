@@ -96,7 +96,6 @@ export default {
 		>
 			<span
 				v-if="isMobile"
-				@click="toggleIsSearchShownInMobileView()"
 				type="button"
 				data-bs-toggle="collapse"
 				data-bs-target=".multi-collapse"
@@ -252,6 +251,17 @@ export default {
 				"No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.",
 			);
 		}
+
+		document
+			.getElementById("header-searchbar-collapsible")
+			.addEventListener("show.bs.collapse", (e) => {
+				this.isSearchShownInMobileView = true;
+			});
+		document
+			.getElementById("header-searchbar-collapsible")
+			.addEventListener("hidden.bs.collapse", (e) => {
+				this.isSearchShownInMobileView = false;
+			});
 	},
 	updated() {
 		if (this.showresult) {
@@ -499,12 +509,13 @@ export default {
 			}
 			return this.searchoptions.actions[res.type];
 		},
-		toggleIsSearchShownInMobileView() {
-			this.isSearchShownInMobileView = !this.isSearchShownInMobileView;
-		},
 		getMaxWidthOfSearchbarInMobileView() {
-			// body width - hardcoded chevron width; necessary for accurate width transition
-			return (document.querySelector("body").getBoundingClientRect().width - 27) + "px";
+			// body width - hardcoded chevron width; necessary for accurate collapse transition transition
+			return (
+				document.querySelector("body").getBoundingClientRect().width -
+				27 +
+				"px"
+			);
 		},
 	},
 };
