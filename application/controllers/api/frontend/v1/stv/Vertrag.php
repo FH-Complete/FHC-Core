@@ -76,9 +76,7 @@ class Vertrag extends FHCAPI_Controller
 
 		if (isError($allOe)) $this->terminateWithError(getError($allOe), self::ERROR_TYPE_GENERAL);
 
-		$allOe = hasData($allOe) ? getData($allOe) : [];
-
-		$this->addMeta('oe', $allOe);
+		$allOe = hasData($allOe) ? array_column(getData($allOe), 'oe_kurzbz') : [];
 
 		// * then check if the user has permissions to cancel the corresponding lv-organisational units
 		if (!$this->permissionlib->isBerechtigtMultipleOe('admin', $allOe, 'suid') &&

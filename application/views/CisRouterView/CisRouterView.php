@@ -35,6 +35,7 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/timeline/timeline.min.js',
 		'vendor/npm-asset/primevue/inplace/inplace.min.js',
 		'vendor/npm-asset/primevue/message/message.min.js',
+		'vendor/npm-asset/primevue/tieredmenu/tieredmenu.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(

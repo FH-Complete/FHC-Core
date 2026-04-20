@@ -49,50 +49,33 @@ export default {
 					handler: async() => {
 						await this.$p.loadCategory(['global', 'person', 'lehre', 'stv', 'ui', 'projektarbeit']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('projekttyp_kurzbz').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'typ_kurzbz')
-						});
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'typ')
-						});
-						cm.getColumnByField('studiensemester_kurzbz').component.updateDefinition({
-							title: this.$p.t('lehre', 'studiensemester')
-						});
-						cm.getColumnByField('titel').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'titel')
-						});
-						cm.getColumnByField('note').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'gesamtnote')
-						});
-						cm.getColumnByField('beginn').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'beginn')
-						});
-						cm.getColumnByField('ende').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'ende')
-						});
-						cm.getColumnByField('freigegeben').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'freigegeben')
-						});
-						cm.getColumnByField('gesperrtbis').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'gesperrtBis')
-						});
-						cm.getColumnByField('themenbereich').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'themenbereich')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'anmerkung')
-						});
-						cm.getColumnByField('firma_id').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'firmaId')
-						});
-						cm.getColumnByField('abgabedatum').component.updateDefinition({
-							title: this.$p.t('projektarbeit', 'abgabeEndupload')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('projekttyp_kurzbz', this.$p.t('projektarbeit', 'typ_kurzbz'));
+						setHeader('bezeichnung', this.$p.t('projektarbeit', 'typ'));
+						setHeader('studiensemester_kurzbz', this.$p.t('lehre', 'studiensemester'));
+						setHeader('titel', this.$p.t('projektarbeit', 'titel'));
+						setHeader('note', this.$p.t('projektarbeit', 'gesamtnote'));
+						setHeader('beginn', this.$p.t('projektarbeit', 'beginn'));
+						setHeader('ende', this.$p.t('projektarbeit', 'ende'));
+						setHeader('freigegeben', this.$p.t('projektarbeit', 'freigegeben'));
+						setHeader('gesperrtbis', this.$p.t('projektarbeit', 'gesperrtBis'));
+						setHeader('themenbereich', this.$p.t('projektarbeit', 'themenbereich'));
+						setHeader('anmerkung', this.$p.t('projektarbeit', 'anmerkung'));
+						setHeader('firma_id', this.$p.t('projektarbeit', 'firmaId'));
+						setHeader('abgabedatum', this.$p.t('projektarbeit', 'abgabeEndupload'));
+						setHeader('actions', this.$p.t('global', 'aktionen'));
 					}
 				},
 			],
@@ -260,12 +243,12 @@ export default {
 				layout: 'fitDataStretchFrozen',
 				height: 'auto',
 				minHeight: '200',
-				selectable: 1,
+				selectableRows: 1,
 				index: 'projektarbeit_id',
 				persistence:{
 					columns: true, //persist column layout
 				},
-				persistenceID: 'stv-details-projektarbeit-2025112401'
+				persistenceID: 'stv-details-projektarbeit-20260217'
 			}
 			return options;
 		}

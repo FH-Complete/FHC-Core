@@ -200,7 +200,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',
@@ -226,7 +227,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',

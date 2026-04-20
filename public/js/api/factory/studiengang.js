@@ -16,10 +16,17 @@
  */
 
 export default {
-	getAllStudiensemesterAndAktOrNext() {
+	studiengangInformation() {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/Studiensemester/getStudiengangInfo'
+			url: '/api/frontend/v1/Studgang/getStudiengangInfo'
 		};
 	},
+	getStudiengangByKz(studiengang_kz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/organisation/StudiengangEP/getStudiengangByKz',
+			params: { studiengang_kz }
+		};
+	}
 };

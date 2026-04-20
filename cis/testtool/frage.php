@@ -581,14 +581,14 @@ if($frage->frage_id!='')
 			else
 				$value=$p->t('testtool/blaettern').' &gt;&gt;';
 
-			echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item'>$value</a>";
+			echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$nextfrage' class='Item' style='padding-left: 5px'>$value</a>";
 		}
 		else
 		{
 			if(!$demo)
 			{
 				//Wenns der letzte Eintrag ist, wieder zum ersten springen
-				echo " <a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
+				echo "<a href='$PHP_SELF?gebiet_id=$gebiet_id' class='Item' style='padding-left: 5px'>".$p->t('testtool/blaettern')." &gt;&gt;</a>";
 			}
 		}
 	}
