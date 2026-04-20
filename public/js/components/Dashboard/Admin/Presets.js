@@ -16,6 +16,7 @@ export default {
 		return {
 			funktionen: {},
 			sections: [],
+			selectedFunktionen: [],
 			tmpLoading: ''
 		};
 	},
@@ -26,8 +27,7 @@ export default {
 	},
 	watch: {
 		dashboard() {
-			// TODO(chris): this should be done without a watcher
-			this.loadSections({target:this.$refs.funktionenList});
+			this.loadSections();
 			this.loadFunktionen();
 		}
 	},
@@ -129,8 +129,8 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		loadSections(evt) {
-			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
+		loadSections() {
+			let funktionen = this.selectedFunktionen;
 			this.sections = [];
 			this.tmpLoading = funktionen.join('###');
 
@@ -176,11 +176,11 @@ export default {
 		<div class="row">
 			<div class="col-3">
 				<select
-					ref="funktionenList"
-					style="height:30em"
+					v-model="selectedFunktionen"
 					class="form-control"
+					style="height:30em"
 					multiple
-					@input="loadSections"
+					@change="loadSections"
 				>
 					<option
 						v-for="funktion in funktionen"
