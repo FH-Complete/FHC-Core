@@ -39,27 +39,51 @@ export default {
 					return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid));
 			}
 			return Object.fromEntries(Object.entries(this.configStudents).filter(([ , value ]) => !value.showOnlyWithUid && !value.showOnlyWithUid));
+		},
+		tile_PersId(){
+			let tile = this.students[0].person_id != null ? this.students[0].person_id : '-';
+			return tile;
+		},
+		tile_MatrNr(){
+			let tile = this.students[0].matr_nr != null ? this.students[0].matr_nr : '-';
+			return tile;
+		},
+		tile_PersKz(){
+			let tile = this.students[0].matrikelnr != null ? this.students[0].matrikelnr : '-';
+			return tile;
+		},
+	},
+	watch: {
+		'$p.user_language.value'(n, o) {
+			if (n !== o && o !== undefined)
+				this.loadConfig();
 		}
 	},
 	methods: {
+		loadConfig() {
+			this.$api
+				.call(ApiStvApp.configStudent())
+				.then(result => {
+					this.configStudent = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+			this.$api
+				.call(ApiStvApp.configStudents())
+				.then(result => {
+					this.configStudents = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		reload() {
 			if (this.$refs.tabs?.$refs?.current?.reload)
 				this.$refs.tabs.$refs.current.reload();
-		}
+		},
+		reloadList() {
+			this.$emit('reload');
+		},
 	},
 	created() {
-		this.$api
-			.call(ApiStvApp.configStudent())
-			.then(result => {
-				this.configStudent = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-		this.$api
-			.call(ApiStvApp.configStudents())
-			.then(result => {
-				this.configStudents = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+		this.loadConfig();
 	},
 	template: `
 	<div class="stv-details h-100 d-flex flex-column">
@@ -70,7 +94,16 @@ export default {
 			<fhc-header
 				:headerData="students"
 				typeHeader="student"
+				@reload="reloadList"
+				fotoEditable
 			>
+				<template #uid>{{students[0].uid}}</template>
+				<template #titleAlphaTile>PersID</template>
+				<template #valueAlphaTile>{{tile_PersId}}</template>
+				<template #titleBetaTile>MatrNr</template>
+				<template #valueBetaTile>{{tile_MatrNr}}</template>
+				<template #titleGammaTile>PersKz</template>
+				<template #valueGammaTile>{{tile_PersKz}}</template>
 			</fhc-header>
 			<fhc-tabs
 				v-if="students.length == 1"

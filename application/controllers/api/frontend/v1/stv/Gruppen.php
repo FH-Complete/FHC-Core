@@ -147,7 +147,8 @@ class Gruppen extends FHCAPI_Controller
 			'lehre' => true,
 			'sichtbar' => true,
 			'aktiv' => true,
-			'direktinskription' => false
+			'direktinskription' => false,
+			'generiert' => false
 		]);
 
 		$data = $this->getDataOrTerminateWithError($result);

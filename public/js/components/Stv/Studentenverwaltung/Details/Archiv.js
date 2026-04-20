@@ -74,6 +74,16 @@ export default {
 				],
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
+				],
+				'microcredential.xml.php' : [
+					'microcredentialzertifikat_1',
+					'microcredentialzertifikat_2',
+					'microcredentialzertifikat_3',
+					'microcredentialzertifikat_4',
+					'microcredential_1',
+					'microcredential_2',
+					'microcredential_3',
+					'microcredential_4',
 				]
 			},
 			documentDropdownObject: {}
@@ -91,12 +101,24 @@ export default {
 				ajaxResponse: (url, params, response) => response.data,
 				layout:"fitDataTable",
 				index: 'akte_id',
-				persistenceID: 'stv-details-archiv',
+				persistenceID: 'stv-details-archiv-20260217',
 				columns: [
 					{title: "Akte Id", field: "akte_id", visible: false},
 					{title: this.$p.t('stv', 'archiv_title'), field: "titel"},
 					{title: this.$p.t('stv', 'archiv_description'), field: "bezeichnung"},
-					{title: this.$p.t('stv', 'archiv_creation_date'), field: "erstelltam"},
+					{title: this.$p.t('stv', 'archiv_creation_date'), field: "erstelltam",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}},
 					{
 						title: this.$p.t('stv', 'archiv_signiert'),
 						field: "signiert",
@@ -117,7 +139,22 @@ export default {
 							crossElement: '<i class="fa fa-xmark text-danger"></i>'
 						},
 					},
-					{title: this.$p.t('stv', 'archiv_accepted_on_at'), field: "akzeptiertamum"},
+					{title: this.$p.t('stv', 'archiv_accepted_on_at'), field: "akzeptiertamum",
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}},
 					{
 						title: this.$p.t('stv', 'archiv_gedruckt'),
 						field: "gedruckt",
@@ -198,18 +235,32 @@ export default {
 			return events;
 		},
 		studentUids() {
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.uid);
+			}
+			else if (this.modelValue.uid)
 			{
 				return [this.modelValue.uid];
 			}
-			return this.modelValue.map(e => e.uid);
+			else
+			{
+				return [];
+			}
 		},
 		studentKzs(){
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.studiengang_kz);
+			}
+			else if (typeof this.modelValue.studiengang_kz !== 'undefined')
 			{
 				return [this.modelValue.studiengang_kz];
 			}
-			return this.modelValue.map(e => e.studiengang_kz);
+			else
+			{
+				return [];
+			}
 		},
 		stg_kz(){
 			return this.studentKzs[0];

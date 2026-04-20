@@ -41,7 +41,7 @@ export default {
 			dropdowns: this.dropdowns,
 			configShowVertragsdetails: this.config.showVertragsdetails,
 			configShowGewichtung: this.config.showGewichtung,
-			lehreinheitAnmerkungDefault: this.config.lehreinheitAnmerkungDefault,
+			lehreinheitAnmerkungDefault: (this.config.lehreinheitAnmerkungDefault || '').replace(/\\n/g, '\n'),
 			lehreinheitRaumtypDefault: this.config.lehreinheitRaumtypDefault,
 			lehreinheitRaumtypAlternativeDefault: this.config.lehreinheitRaumtypAlternativeDefault,
 
@@ -82,9 +82,6 @@ export default {
 				sprachen_array: [],
 				lehrform_array: [],
 				raumtyp_array: [],
-				lektor_array: [],
-				gruppen_array: [],
-				benutzer_array: [],
 			},
 			selectedStudiengang: '',
 			searchbaroptions: {
@@ -127,6 +124,10 @@ export default {
 					? `${this.stg}/${this.semester}`
 					: this.stg;
 			}
+			else
+			{
+				this.selectedStudiengang = '';
+			}
 			this.filter = filter;
 		},
 		handleRowClicked(data)
@@ -166,6 +167,7 @@ export default {
 			const routeName = this.filter.emp ? 'byEmp' : 'byStg';
 			const params = { stg };
 
+			params.semester = '';
 			if (semester !== null)
 				params.semester = semester;
 			if (studiensemester_kurzbz)
@@ -186,6 +188,13 @@ export default {
 
 				this.$router.replace({ name: 'byStg', params: newParams });
 			}
+		},
+		resetStgFilter()
+		{
+			const newParams = { ...this.filter, activeFilter: 'emp' };
+			delete newParams.stg;
+			this.selectedStudiengang = '';
+			this.$router.replace({ name: 'byEmp', params: newParams });
 		},
 		searchfunction(params) {
 			return this.$api.call(ApiSearchbar.search(params));
@@ -227,24 +236,6 @@ export default {
 		this.$api.call(ApiLektor.getLehrfunktionen())
 			.then(result => {
 				this.dropdowns.lehrfunktion_array = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		this.$api.call(ApiLektor.getLektoren())
-			.then(result => {
-				this.dropdowns.lektor_array = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		this.$api.call(ApiGruppe.getAll())
-			.then(result => {
-				this.dropdowns.gruppen_array = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		this.$api.call(ApiGruppe.getBenutzer())
-			.then(result => {
-				this.dropdowns.benutzer_array = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
@@ -307,12 +298,25 @@ export default {
 								:filter="filter"
 							>
 								<template #filterzuruecksetzen v-if="filter.activeFilter === 'employee'">
-									<button type="button" 
-										class="btn btn-outline-secondary btn-action"
-										title="Mitarbeiter Filter entfernen"
-										@click="resetEmployeeFilter">
+									<span class="fw-bold small">
+									[{{ $p.t('lehre', 'lektor') }}: {{ filter.emp || '' }}
+									<button type="button"
+											class="btn btn-outline-secondary btn-action btn-sm ms-1"
+											:title="$p.t('ui', 'filterdelete')"
+											@click="resetEmployeeFilter">
 										<i class="fa fa-xmark"></i>
 									</button>
+									<template v-if="filter.stg">
+										| Stg: {{ filter.stg }}
+										<button type="button"
+											class="btn btn-outline-secondary btn-action btn-sm ms-1"
+											:title="$p.t('ui', 'filterdelete')"
+											@click="resetStgFilter">
+											<i class="fa fa-xmark"></i>
+										</button>
+									</template>
+									]
+								  </span>
 								</template>
 							</lv-table>
 						</template>
