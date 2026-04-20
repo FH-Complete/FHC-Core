@@ -28,6 +28,8 @@ const lvTemplatesApp = Vue.createApp({
 	}
 });
 
+FhcApps.makeExtendable(lvTemplatesApp);
+
 lvTemplatesApp
 	.use(primevue.config.default,{zIndex: {overlay: 9999}})
 	.use(PluginsPhrasen)

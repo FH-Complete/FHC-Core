@@ -200,7 +200,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',
@@ -226,7 +227,8 @@ class Config extends FHCAPI_Controller
 					'type' => 'select',
 					'values' => $buchungstyp_kurzbz_plus_all,
 					'value_key' => 'buchungstyp_kurzbz',
-					'label_key' => 'beschreibung'
+					'label_key' => 'beschreibung',
+					'default' => 'all'
 				],
 				'samestg' => [
 					'type' => 'bool',
@@ -504,7 +506,7 @@ class Config extends FHCAPI_Controller
 		{
 			$result['combinePeople'] = [
 				'title' => $this->p->t('stv', 'tab_combine_people'),
-				'component' => './Stv/Studentenverwaltung/Details/CombinePeople.js',
+				'component' => absoluteJsImportUrl('public/js/components/Stv/Studentenverwaltung/Details/CombinePeople.js'),
 				'config' => $config['combinePeople']
 			];
 		}

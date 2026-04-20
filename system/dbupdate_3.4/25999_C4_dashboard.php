@@ -39,7 +39,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'hallowelt', 
 				'Hallo Welt Widget', 
 				'{"css": "d-flex justify-content-center align-items-center h-100", "title": "Hallo Welt"}'::jsonb,
-				'{"file": "DashboardWidget/Default.js", "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Farben-Testbild.svg", "name": "Hallo Welt", "width": {"max": 99}, "height": {"max": 99}, "hideFooter": false}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/Default.js", "icon": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Farben-Testbild.svg", "name": "Hallo Welt", "width": {"max": 99}, "height": {"max": 99}, "hideFooter": false}'::jsonb
 			);
 EOWHW;
 
@@ -71,7 +71,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'news', 
 				'News Widget', 
 				'{}'::jsonb,
-				'{"file": "DashboardWidget/News.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "News", "width": {"max": 4, "min": 1}, "height": {"max": 2, "min": 1}, "cis4link": "/CisVue/Cms/news", "hideFooter": false}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/News.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "News", "width": {"max": 4, "min": 1}, "height": {"max": 2, "min": 1}, "cis4link": "/CisVue/Cms/news", "hideFooter": false}'::jsonb
 			);
 EOWHW;
 
@@ -103,7 +103,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'url', 
 				'Bookmark Widget', 
 				'{}'::jsonb,
-				'{"file": "DashboardWidget/Url.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Bookmark", "width": 1, "height": {"max": 2, "min": 1}, "hideFooter": true}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/Url.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Bookmark", "width": 1, "height": {"max": 2, "min": 1}, "hideFooter": true}'::jsonb
 			);
 EOWHW;
 
@@ -135,7 +135,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'ampel', 
 				'Ampel Widget', 
 				'{}'::jsonb,
-				'{"file": "DashboardWidget/Ampel.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Ampel", "width": 1, "height": {"max": 2, "min": 1}, "hideFooter": false}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/Ampel.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Ampel", "width": 1, "height": {"max": 2, "min": 1}, "hideFooter": false}'::jsonb
 			);
 EOWHW;
 
@@ -162,7 +162,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				widget_kurzbz = 'lvplan', 
 				beschreibung = 'LV-Plan Widget', 
 				arguments = '{"bodyClass": "p-0"}'::jsonb, 
-				setup = '{"file": "DashboardWidget/LvPlan.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "LV-Plan", "width": {"max": 4, "min": 1}, "height": {"max": 3, "min": 1}, "cis4link": "/Cis/LvPlan", "hideFooter": false}'::jsonb 
+				setup = '{"file": "public/js/components/DashboardWidget/LvPlan.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "LV-Plan", "width": {"max": 4, "min": 1}, "height": {"max": 3, "min": 1}, "cis4link": "/Cis/LvPlan", "hideFooter": false}'::jsonb 
 			WHERE
 				widget_kurzbz = 'stundenplan';
 EOWHW;
@@ -195,7 +195,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'lvplan', 
 				'LV-Plan Widget', 
 				'{"bodyClass": "p-0"}'::jsonb,
-				'{"file": "DashboardWidget/LvPlan.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "LV-Plan", "width": {"max": 4, "min": 1}, "height": {"max": 3, "min": 1}, "cis4link": "/Cis/LvPlan", "hideFooter": false}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/LvPlan.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "LV-Plan", "width": {"max": 4, "min": 1}, "height": {"max": 3, "min": 1}, "cis4link": "/Cis/LvPlan", "hideFooter": false}'::jsonb
 			);
 EOWHW;
 
@@ -227,7 +227,7 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 				'studiengang', 
 				'Das Studiengang-Widget enthält Informationen über den Studiengang eines Studenten.', 
 				'{}'::jsonb,
-				'{"file": "DashboardWidget/Studiengang.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Studiengang", "width": {"max": 2, "min": 1}, "height": {"max": 4, "min": 1}, "hideFooter": true}'::jsonb
+				'{"file": "public/js/components/DashboardWidget/Studiengang.js", "icon": "/skin/images/fh_technikum_wien_illustration_klein.png", "name": "Studiengang", "width": {"max": 2, "min": 1}, "height": {"max": 4, "min": 1}, "hideFooter": true}'::jsonb
 			);
 EOWHW;
 
