@@ -189,19 +189,16 @@ export default {
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_html'
 				});
-				extraItems.push({
-					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
-						+ 'index.ci.php/person/gradelist/index/'
-						+ '&student_uid=' + 'mb24b025',
-					description: 'Studienverlauf'
-				});
 			}
 
 			return extraItems;
 		},
-/*		linkGradeList(){
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/mb24b025');
-		}*/
+		selected_uid(){
+			return this.selected?.[this.selected.length - 1]?.uid ?? null;
+		},
+		linkGradeList(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/' + this.selected_uid
+		},
 	},
 	watch: {
 		'url_studiensemester_kurzbz': function (newVal, oldVal) {
@@ -440,6 +437,9 @@ export default {
 		},
 		deleteCustomFilter(){
 			this.$refs.stvList.resetFilter();
+		},
+		showAlertNoSelectedStudent(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
 		}
 	},
 	created() {
@@ -639,8 +639,11 @@ export default {
 								</ul>
 							</li>
 							<li>
-								<a :href="linkGradeList" target="_blank">
-									Studienverlauf
+								<a v-if="selected_uid" :href="linkGradeList" target="_blank">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else href="#" @click.prevent="showAlertNoSelectedStudent">
+									{{ $p.t('stv/studienverlauf') }}
 								</a>
 							</li>
 						</app-menu>
