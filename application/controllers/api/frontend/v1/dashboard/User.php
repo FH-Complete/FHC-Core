@@ -70,6 +70,9 @@ class User extends FHCAPI_Controller
 		if (!isset($widget['widgetid']))
 			$widget['widgetid'] = $this->dashboardlib->generateWidgetId($dashboard_kurzbz);
 
+		if (isset($widget['source']))
+			unset($widget['source']);
+
 		$override = $this->dashboardlib->getOverrideOrCreateEmptyOverride($dashboard_kurzbz, $uid);
 
 		$override_decoded = json_decode($override->override, true);
