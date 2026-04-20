@@ -46,7 +46,7 @@ export default {
 			const currentStg = this.listStg.find(
 				item => item.studiengang_kz === this.formData.stgkz
 			);
-			return currentStg.max_semester;
+			return currentStg?.max_semester;
 		},
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))

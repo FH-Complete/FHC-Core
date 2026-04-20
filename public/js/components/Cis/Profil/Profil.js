@@ -4,8 +4,8 @@ import ViewStudentProfil from "./StudentViewProfil.js";
 import ViewMitarbeiterProfil from "./MitarbeiterViewProfil.js";
 import Loading from "../../Loader.js";
 
-import ApiProfil from '../../../api/factory/profil.js';
-import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
+import ApiProfil from "../../../api/factory/profil.js";
+import ApiProfilUpdate from "../../../api/factory/profilUpdate.js";
 
 Vue.$collapseFormatter = function (data) {
 	//data - an array of objects containing the column title and value for each cell
@@ -35,7 +35,7 @@ Vue.$collapseFormatter = function (data) {
 };
 
 export const Profil = {
-	name: 'Profil',
+	name: "Profil",
 	components: {
 		StudentProfil,
 		MitarbeiterProfil,
@@ -46,11 +46,11 @@ export const Profil = {
 	props: {
 		uid: {
 			type: String,
-			required:false,
+			required: false,
 		},
 		viewData: {
 			type: Object,
-		}
+		},
 	},
 	data() {
 		return {
@@ -67,12 +67,12 @@ export const Profil = {
 	},
 	provide() {
 		return {
-			isEditable: Vue.computed(()=>this.isEditable),
+			isEditable: Vue.computed(() => this.isEditable),
 			profilUpdateStates: Vue.computed(() =>
-				this.profilUpdateStates ? this.profilUpdateStates : false
+				this.profilUpdateStates ? this.profilUpdateStates : false,
 			),
 			profilUpdateTopic: Vue.computed(() =>
-				this.profilUpdateTopic ? this.profilUpdateTopic : false
+				this.profilUpdateTopic ? this.profilUpdateTopic : false,
 			),
 			setLoading: (newValue) => {
 				this.loading = newValue;
@@ -130,8 +130,12 @@ export const Profil = {
 				//? if they have the same status the insert date is used for ordering
 				if (ele1.status === ele2.status) {
 					result =
-						new Date(ele2.insertamum.split(".").reverse().join("-")) -
-						new Date(ele1.insertamum.split(".").reverse().join("-"));
+						new Date(
+							ele2.insertamum.split(".").reverse().join("-"),
+						) -
+						new Date(
+							ele1.insertamum.split(".").reverse().join("-"),
+						);
 				}
 				return result;
 			},
@@ -157,11 +161,11 @@ export const Profil = {
 				.catch((error) => {
 					console.error(error);
 				});
-			
-			
+
 			this.$api
-				.call(ApiProfil.profilViewData(this.$route.params.uid??null))
-				.then((response) => response.data).then(data=>{
+				.call(ApiProfil.profilViewData(this.$route.params.uid ?? null))
+				.then((response) => response.data)
+				.then((data) => {
 					this.view = data?.profil_data.view;
 					this.data = data?.profil_data.data;
 					this.isEditable = data?.editable ?? false;
@@ -169,8 +173,6 @@ export const Profil = {
 				.catch((error) => {
 					console.error(error);
 				});
-			
-			
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -186,7 +188,7 @@ export const Profil = {
 						})
 						.map((adresse) => {
 							return adresse.requested_change.adresse_id;
-						})
+						}),
 				);
 			}
 
@@ -197,8 +199,9 @@ export const Profil = {
 					.every((adresse) =>
 						this.data.profilUpdates.some(
 							(update) =>
-								update.requested_change.adresse_id == adresse.adresse_id
-						)
+								update.requested_change.adresse_id ==
+								adresse.adresse_id,
+						),
 					)
 			) {
 				adressenArray = adressenArray.concat(
@@ -208,12 +211,11 @@ export const Profil = {
 						})
 						.map((adr) => {
 							return adr.adresse_id;
-						})
+						}),
 				);
 			}
 
 			return [...new Set(adressenArray)];
-			
 		},
 		zustellKontakteCount() {
 			if (!this.data || !this.data.kontakte) {
@@ -226,14 +228,17 @@ export const Profil = {
 				kontakteArray = kontakteArray.concat(
 					this.data.profilUpdates
 						.filter((update) => {
-							return update.status === 'Pending' && update.requested_change.zustellung;
+							return (
+								update.status === "Pending" &&
+								update.requested_change.zustellung
+							);
 						})
 						.map((kontant) => {
 							return {
-										kontakt_id: kontant.requested_change.kontakt_id,
-										kontakttyp: kontant.requested_change.kontakttyp
-								};
-						})
+								kontakt_id: kontant.requested_change.kontakt_id,
+								kontakttyp: kontant.requested_change.kontakttyp,
+							};
+						}),
 				);
 			}
 
@@ -244,8 +249,10 @@ export const Profil = {
 					.every((kontakt) =>
 						this.data.profilUpdates.some(
 							(update) =>
-								update.status === 'Pending' && update.requested_change.kontakt_id == kontakt.kontakt_id
-						)
+								update.status === "Pending" &&
+								update.requested_change.kontakt_id ==
+									kontakt.kontakt_id,
+						),
 					)
 			) {
 				kontakteArray = kontakteArray.concat(
@@ -255,10 +262,10 @@ export const Profil = {
 						})
 						.map((kon) => {
 							return {
-										kontakt_id: kon.kontakt_id,
-										kontakttyp: kon.kontakttyp
-								};
-						})
+								kontakt_id: kon.kontakt_id,
+								kontakttyp: kon.kontakttyp,
+							};
+						}),
 				);
 			}
 
@@ -266,7 +273,6 @@ export const Profil = {
 		},
 	},
 	computed: {
-		
 		filteredEditData() {
 			if (!this.data) {
 				return;
@@ -330,8 +336,12 @@ export const Profil = {
 								// excludes all contacts that are already used in pending profil update requests
 								return !this.data.profilUpdates?.some(
 									(update) =>
-										update.status === this.profilUpdateStates["Pending"] &&
-										update.requested_change?.kontakt_id === item.kontakt_id
+										update.status ===
+											this.profilUpdateStates[
+												"Pending"
+											] &&
+										update.requested_change?.kontakt_id ===
+											item.kontakt_id,
 								);
 							})
 							.map((kontakt) => {
@@ -347,12 +357,18 @@ export const Profil = {
 						topic: this.profilUpdateTopic?.["Private Adressen"],
 						data: this.data.adressen
 							?.filter((item) => {
-								return !this.data.profilUpdates?.some((update) => {
-									return (
-										update.status === this.profilUpdateStates["Pending"] &&
-										update.requested_change?.adresse_id == item.adresse_id
-									);
-								});
+								return !this.data.profilUpdates?.some(
+									(update) => {
+										return (
+											update.status ===
+												this.profilUpdateStates[
+													"Pending"
+												] &&
+											update.requested_change
+												?.adresse_id == item.adresse_id
+										);
+									},
+								);
 							})
 							.map((adresse) => {
 								return {
@@ -374,12 +390,12 @@ export const Profil = {
 				this.$refs.loadingModalRef.hide();
 			}
 		},
-		uid (newVal, oldVal) {
-			this.load()
-		}
+		uid(newVal, oldVal) {
+			this.load();
+		},
 	},
 	created() {
-		this.load()
+		this.load();
 	},
 	template: `
 	<div>
@@ -388,9 +404,14 @@ export const Profil = {
 		</div>
 		<div v-else>
             <loading ref="loadingModalRef" :timeout="0"></loading>
-            <component  :is="view" :data="data" :editData="filteredEditData" ></component>
+            <component
+				:is="view"
+				:data="data"
+				:editData="filteredEditData"
+				:permissions="$props.viewData.permissions"
+				:calendarSyncUrls="$props.viewData.calendarSyncUrls"></component>
 		</div>
 	</div>`,
-}
+};
 
-export default Profil
+export default Profil;

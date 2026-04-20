@@ -18,7 +18,7 @@ import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssis
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
-import OverviewLvPlan from "../../components/Cis/LvPlan/OverviewLvPlan.js";
+import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
@@ -210,15 +210,15 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
-			path: `/Cis/OverviewLvPlan`,
-			name: 'OverviewLvPlan',
-			component: OverviewLvPlan,
-			props(route) {
-				return {
+      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
+      		name: "OtherLvPlan",
+      		component: OtherLvPlan,
+      		props(route) {
+        		return {
 					propsViewData: route.params
-				};
-			}
-		},
+        		};
+      		}
+    	},
 		{
 			path: `/Cis4`,
 			name: 'Cis4',
@@ -305,7 +305,6 @@ const app = Vue.createApp({
 		}
 	},
 	async created(){
-		
 		await this.$api
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)

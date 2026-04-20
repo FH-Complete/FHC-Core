@@ -142,7 +142,6 @@ export default {
 					</tr>
 				</tbody>
 		</table>
-		
-		<lv-menu :containerStyles="['p-0']" :rowStyles="['m-0']" v-if="lvMenu.length" :menu="lvMenu" />
+		<lv-menu v-if="lvMenu.length && $route.name === 'MyLvPlan'" :containerStyles="['p-0']" :rowStyles="['m-0']" :menu="lvMenu" />
 	</div>`,
 }
