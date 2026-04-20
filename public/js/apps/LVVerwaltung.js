@@ -89,7 +89,11 @@ const router = VueRouter.createRouter({
 	]
 });
 
+FhcApps.router.makeExtendable(router);
+
 const app = Vue.createApp();
+
+FhcApps.makeExtendable(app);
 
 app
 	.use(router)

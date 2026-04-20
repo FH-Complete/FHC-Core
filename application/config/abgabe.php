@@ -41,3 +41,5 @@ $config['STG_MOODLE_LINK'] = 'https://moodle.technikum-wien.at/course/view.php?i
 
 $config['ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT'] = true;
 $config['ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER'] = true;
+
+$config['BETREUER_SAMMELMAIL_BUTTON_STUDENT'] = true;

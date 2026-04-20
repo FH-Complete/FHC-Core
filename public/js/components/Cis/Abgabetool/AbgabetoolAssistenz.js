@@ -180,7 +180,7 @@ export const AbgabetoolAssistenz = {
 					// 	frozen: true,
 					// 	width: 40
 					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 150, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 100, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
@@ -210,12 +210,12 @@ export const AbgabetoolAssistenz = {
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 220, tooltip: false},
+						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
 						headerFilter: 'list',
 						headerFilterParams: { valuesLookup: this.getQGateStatusList },
@@ -226,7 +226,7 @@ export const AbgabetoolAssistenz = {
 						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2026_02"
+				persistenceID: "abgabetool_2026_03_16"
 			},
 			abgabeTableEventHandlers: [
 			{
@@ -247,6 +247,10 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		handlePaUpdated(projektarbeit) {
+			this.checkAbgabetermineProjektarbeit(projektarbeit)
+			this.$refs.abgabeTable.tabulator.redraw(true)
+		},
 		getQGateStatusList() {
 			return [
 				this.$p.t('abgabetool/c4keinTerminVorhanden'),
@@ -309,11 +313,13 @@ export const AbgabetoolAssistenz = {
 			return false
 		},
 		sammelMailStudent(param) {
-			
-			const emails = this.selectedData
-				.map(row => `${row.student_uid}@${this.domain}`)
-				.join(',');
-			const uniqueRecipients = [...new Set(emails)];
+
+			const recipientList = [];
+			this.selectedData.forEach(d => {
+				recipientList.push(`${d.student_uid}@${this.domain}`)
+			})
+
+			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
 			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
 		},
@@ -362,7 +368,6 @@ export const AbgabetoolAssistenz = {
 			return false;
 		},
 		checkQualityGateStatus(projekt) {
-			// TODO: might refine the representation of these states and maybe refactor code a little
 			const qgate1Termine = []
 			const qgate2Termine = []
 			
@@ -382,7 +387,7 @@ export const AbgabetoolAssistenz = {
 			// reuse luxon calculated diffMs (termin.datum in relation to today) from previous datestyle check 
 			qgate1Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate1Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate1StatusRank = 5
@@ -404,7 +409,7 @@ export const AbgabetoolAssistenz = {
 
 			qgate2Termine.forEach(qgate => {
 				if(qgate.note != null && projekt.qgate1StatusRank <= 5) {
-					const noteOpt = this.notenOptions.find(opt => opt.note == qgate.note)
+					const noteOpt = typeof qgate.note !== 'object' ? this.notenOptions.find(opt => opt.note == qgate.note) : qgate.note
 					if(noteOpt.positiv) {
 						projekt.qgate2Status = this.$p.t('abgabetool/c4positivBenotet')
 						projekt.qgate2StatusRank = 5
@@ -619,7 +624,7 @@ export const AbgabetoolAssistenz = {
 			actionButtons.className = "d-flex gap-3"; // you can keep Bootstrap gap if loaded
 			actionButtons.style.display = "flex";
 			actionButtons.style.alignItems = "stretch"; // buttons stretch to full height
-			actionButtons.style.justifyContent = "center";
+			actionButtons.style.justifyContent = "start";
 			actionButtons.style.height = "100%"; // full grid cell height
 
 			const val = cell.getValue();
@@ -649,7 +654,19 @@ export const AbgabetoolAssistenz = {
 				createButton('fa fa-timeline', 'abgabetool/c4termineTimeLine', () => this.openTimeline(val))
 			);
 
+			if(val.latestTerminWithUpload) {
+				actionButtons.append(
+					createButton('fa fa-download', 'abgabetool/c4downloadLatestAbgabe', () => this.downloadAbgabe(val.latestTerminWithUpload.paabgabe_id, val.student_uid, val.projektarbeit_id))
+				)
+			}
+
 			return actionButtons;
+		},
+		downloadAbgabe(paabgabe_id, student_uid, projektarbeit_id) {
+			const url = `/api/frontend/v1/Abgabe/getStudentProjektarbeitAbgabeFile?paabgabe_id=${paabgabe_id}&student_uid=${student_uid}&projektarbeit_id=${projektarbeit_id}`;
+
+			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
+			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
 		},
 
 		undoSelection(cell) {
@@ -754,6 +771,8 @@ export const AbgabetoolAssistenz = {
 					// TODO: mehrsprachig englisch
 					projekt.note_bez = opt.bezeichnung
 				}
+
+				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
 				
 				return {
 					...projekt,
@@ -761,6 +780,7 @@ export const AbgabetoolAssistenz = {
 					details: {
 						student_uid: projekt.student_uid,
 						projektarbeit_id: projekt.projektarbeit_id,
+						latestTerminWithUpload: latestTerminWithUpload ?? null
 					},
 					pkz: this.buildPKZ(projekt),
 					beurteilung: projekt.beurteilungLink ?? null,
@@ -773,6 +793,15 @@ export const AbgabetoolAssistenz = {
 					titel: projekt.titel
 				}
 			})
+		},
+		findLatestTerminWithUpload(projekt) {
+			const withAbgabedatumSorted = projekt?.abgabetermine?.filter(t => t.abgabedatum != null)?.sort((a,b) => a < b)
+
+			if(withAbgabedatumSorted.length) {
+				return withAbgabedatumSorted[0]
+			}
+
+			return null
 		},
 		createInfoString(data) {
 			let str = '';
@@ -1265,7 +1294,13 @@ export const AbgabetoolAssistenz = {
 				</div>
 			</template>
 			<template v-slot:default>
-				<AbgabeDetail :projektarbeit="selectedProjektarbeit" :isFullscreen="detailIsFullscreen" :assistenzMode="true"></AbgabeDetail>
+				<AbgabeDetail 
+					:projektarbeit="selectedProjektarbeit" 
+					:isFullscreen="detailIsFullscreen" 
+					:assistenzMode="true"
+					@paUpdated="handlePaUpdated">
+				
+				</AbgabeDetail>
 				
 			</template>
 		</bs-modal>	
@@ -1380,8 +1415,11 @@ export const AbgabetoolAssistenz = {
 		
 		<div id="abgabetable" style="max-height:40vw;">
 			<div class="row">
-				<div class="col-auto">
+				<div class="col-auto me-auto">
 					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
 				</div>
 				<div class="col-3">
 					<Dropdown
@@ -1396,6 +1434,9 @@ export const AbgabetoolAssistenz = {
 							<div> {{ option.kurzbzlang }} {{ option.bezeichnung }} </div>
 						</template>
 					</Dropdown>
+				</div>
+				<div class="col-auto">
+					<label class="col-form-label">{{$capitalize($p.t('lehre/note'))}}:</label>
 				</div>
 				<div class="col-3">
 					<Dropdown
