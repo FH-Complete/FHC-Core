@@ -189,10 +189,19 @@ export default {
 						+ '&orgform=' + orgform,
 					description: 'stv/grade_report_html'
 				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'index.ci.php/person/gradelist/index/'
+						+ '&student_uid=' + 'mb24b025',
+					description: 'Studienverlauf'
+				});
 			}
 
 			return extraItems;
-		}
+		},
+/*		linkGradeList(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/mb24b025');
+		}*/
 	},
 	watch: {
 		'url_studiensemester_kurzbz': function (newVal, oldVal) {
@@ -628,6 +637,11 @@ export default {
 										</a>
 									</li>
 								</ul>
+							</li>
+							<li>
+								<a :href="linkGradeList" target="_blank">
+									Studienverlauf
+								</a>
 							</li>
 						</app-menu>
 					</div>
