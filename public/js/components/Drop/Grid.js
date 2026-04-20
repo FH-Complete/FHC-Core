@@ -270,62 +270,55 @@ export default {
 				output[item.index] = result;
 			});
 		},
-		// has item an initial place
-		needsReordering(item) {
-			if (!item?.data?.place[this.cols]) {
-				return true;
-			}
-			return false;
-		},
 		// gridlogic
 		createNewGrid(items) {
 			this.grid = new GridLogic(this.cols);
 			const result = [];
-			let sortedItems = [...items].sort((a, b) => {
-				if (this.needsReordering(a) && this.needsReordering(b)) {
-					return 0;
-				} else if (this.needsReordering(a)) {
-					return 999;
-				} else if (this.needsReordering(b)) {
-					return -999;
-				}
-				
-				return a.weight > b.weight;
-			}); 
+			const sortedItems = [...items].sort((a, b) => a.weight > b.weight);
 			sortedItems.forEach(item => {
-				let freeSlots = this.grid.getFreeSlots();
-				
-				if (this.needsReordering(item)) {
-					let firstFreeSlot = freeSlots.shift();
-					if (!firstFreeSlot) {
-						item.x = 0;
-						item.y = this.grid.h;
-					} else {
-						item.x = firstFreeSlot.x;
-						item.y = firstFreeSlot.y;
-					}
+				const target = { ...item };
+
+				if (target.x === undefined && target.y == undefined) {
+					target.x = 0;
+					target.y = 0;
+					const setup = this.sizeLimits[target.data.widget];
+					target.w = setup.width.min;
+					target.h = setup.height.min;
 				}
-				if (item.x + item.w > this.cols) {
-					let targetW = this.cols-item.x,
+
+				if (target.x + target.w > this.cols) {
+					let targetW = this.cols - target.x,
 						targetX = undefined;
 
-					[ targetW ] = this.cropSizeToAllowed(item.data.widget, targetW, item.h);
+					[ targetW ] = this.cropSizeToAllowed(target.data.widget, targetW, target.h);
 
 					if (targetW > this.cols)
 						targetW = this.cols;
-					if (item.x + targetW > this.cols) {
+					if (target.x + targetW > this.cols) {
 						targetX = this.cols - targetW;
 					}
-					if (targetW == item.w)
+					if (targetW == target.w)
 						targetW = undefined;
-					result[item.index] = {
-						item: item.data,
-						x: targetX,
-						w: targetW
-					};
+
+					if (targetX !== undefined)
+						target.x = targetX;
+					if (targetW !== undefined)
+						target.w = targetW;
 				}
-				item.frame = this.grid.getItemFrame(item);
-				this.convertGridResultToUpdate(this.grid.add(item), result, items);
+
+				target.frame = this.grid.getItemFrame(target);
+				this.convertGridResultToUpdate(this.grid.add(target), result, items);
+				
+				['x', 'y', 'h', 'w'].forEach(prop => {
+					if (target[prop] === item[prop])
+						return;
+					
+					if (!result[target.index])
+						result[target.index] = { item: target.data };
+
+					if (result[target.index][prop] === undefined)
+						result[target.index][prop] = target[prop];
+				});
 			});
 			this.grid.clearWeights();
 			return result;

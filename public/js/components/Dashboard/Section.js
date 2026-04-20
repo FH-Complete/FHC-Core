@@ -103,7 +103,20 @@ export default {
 				if(!item?.widgetid && item?.id){
 					item.widgetid = item.id;
 				}
-				return { ...item, ...(item.place[this.gridWidth] || { x: 0, y: 0, w: 1, h: 1 }) };
+
+				let weight = 5;
+				if (!item.source)
+					weight = 6;
+				else if (item.source == 'general')
+					weight = 4;
+
+				let placement = item.place[this.gridWidth];
+				if (!placement) {
+					weight -= 3;
+					placement = {};
+				}
+
+				return { ...item, ...placement, weight };
 			});
 
 			if (this.editModeIsActive)
@@ -155,6 +168,7 @@ export default {
 					delete item.w;
 					delete item.h;
 					delete item.place[this.gridWidth].pinned;
+					delete item.weight;
 					if (update.x !== undefined)
 						item.place[this.gridWidth].x = update.x;
 					if (update.y !== undefined)

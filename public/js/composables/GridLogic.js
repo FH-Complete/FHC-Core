@@ -71,7 +71,9 @@ class GridLogic {
 					result[move.index] = {
 						index: currItem.index,
 						x: currItem.x,
-						y: currItem.y
+						y: currItem.y,
+						w: currItem.w,
+						h: currItem.h
 					};
 				});
 				item.frame.forEach(f => this.grid[f] = item.index);
