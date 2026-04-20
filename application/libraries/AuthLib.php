@@ -64,7 +64,7 @@ class AuthLib
 		{
 			// - The uid must be NOT an empty string
 			// - The current user should NOT be already logged as the given uid
-			if (!isEmptyString($uid) && $this->getAuthObj()->username != $uid)
+			if (!isEmptyString($uid) && $this->getAuthObj()->{self::AO_USERNAME} != $uid)
 			{
 				$this->_ci->load->library('PermissionLib'); // Loads permissions library
 
@@ -75,8 +75,28 @@ class AuthLib
 					$loginAS = $this->_createAuthObjByPerson(array('uid' => $uid));
 					if (isSuccess($loginAS))
 					{
+						$authObj = getData($loginAS); // get the authenticate object
+
 						// Store the new authentication object in authentication session
-						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, getData($loginAS));
+						setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj);
+
+						$authObjOrigin = getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN);
+
+						// Load the LogLib
+						$this->_ci->load->library('LogLib');
+						// Setup the LogLib
+						$this->_ci->loglib->setConfigs(
+							array(
+								'dbLogType' => 'API', // required
+								'dbExecuteUser' => $authObjOrigin->{self::AO_USERNAME}, // current logged user
+								'requestId' => 'API'
+							)
+						);
+						// Log into the database
+						$this->_ci->loglib->logInfoDB(
+							'The user "'.$authObjOrigin->{self::AO_USERNAME}.'" has changed identity with the user "'.$authObj->{self::AO_USERNAME}.
+							'" and person id '.$authObj->{self::AO_PERSON_ID}
+						);
 					}
 				}
 				else
@@ -105,7 +125,7 @@ class AuthLib
 		{
 			// - The person id must be a number
 			// - The current user should NOT be already logged as the given person id
-			if (is_numeric($person_id) && $this->getAuthObj()->person_id != $person_id)
+			if (is_numeric($person_id) && $this->getAuthObj()->{self::AO_PERSON_ID} != $person_id)
 			{
 				$this->_ci->load->library('PermissionLib'); // Loads permissions library
 
@@ -124,6 +144,24 @@ class AuthLib
 							{
 								// Store the new authentication object in authentication session
 								setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObj);
+
+								$authObjOrigin = getSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ_ORIGIN);
+
+								// Load the LogLib
+								$this->_ci->load->library('LogLib');
+								// Setup the LogLib
+								$this->_ci->loglib->setConfigs(
+									array(
+										'dbLogType' => 'API', // required
+										'dbExecuteUser' => $authObjOrigin->{self::AO_USERNAME}, // current logged user
+										'requestId' => 'API'
+									)
+								);
+								// Log into the database
+								$this->_ci->loglib->logInfoDB(
+									'The user "'.$authObjOrigin->{self::AO_USERNAME}.'" has changed identity with the user "'.$authObj->{self::AO_USERNAME}.
+									'" and person id '.$authObj->{self::AO_PERSON_ID}
+								);
 							}
 							else // if does NOT have permissions
 							{
@@ -172,6 +210,22 @@ class AuthLib
 			// The LoginAs account is logged out
 			// The user is again connected with its real account
 			setSessionElement(self::SESSION_NAME, self::SESSION_AUTH_OBJ, $authObjOrigin);
+
+			// Load the LogLib
+			$this->_ci->load->library('LogLib');
+			// Setup the LogLib
+			$this->_ci->loglib->setConfigs(
+				array(
+					'dbLogType' => 'API', // required
+					'dbExecuteUser' => $authObjOrigin->{self::AO_USERNAME}, // current logged user
+					'requestId' => 'API'
+				)
+			);
+			// Log into the database
+			$this->_ci->loglib->logInfoDB(
+				'The user "'.$authObjOrigin->{self::AO_USERNAME}.'" has logout from the user "'.$authObj->{self::AO_USERNAME}.
+				'" and person id '.$authObj->{self::AO_PERSON_ID}
+			);
 		}
 	}
 
@@ -608,3 +662,4 @@ class AuthLib
 		return $finalUserBasicDataByUID;
 	}
 }
+
