@@ -26,7 +26,7 @@ export default {
 		internMail(event) {
 			if (this.internMails.length)
 			{
-				splitMailsHelper(this.privateMails, event, null, this.$fhcAlert, this.$p)
+				splitMailsHelper(this.internMails, event, null, this.$fhcAlert, this.$p)
 			}
 		},
 		privateMail(event) {

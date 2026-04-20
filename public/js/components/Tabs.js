@@ -219,13 +219,14 @@ export default {
 			:scrollable="true"
 			:lazy="true"
 			:activeIndex="calcActiveIndex"
-			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll', style: 'flex: 1 1 auto;'}}"
+			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll p-2', style: 'flex: 1 1 auto;'}}"
 			@tab-click="handleTabClick"
 		>
 			<tabpanel
 				v-for="tab in tabs"
 				:key="tab.key"
 				:header="tab.title + ((tab.value.showSuffix && tab.value.suffix !== '') ? ' ' + tab.value.suffix : '')"
+				:pt="{headerAction:{class: 'px-2 py-1'}}"
 			>
 				<keep-alive>
 					<component

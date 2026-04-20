@@ -1,8 +1,8 @@
 import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import { getDateStyleClass } from "./getDateStyleClass.js";
 
-const today = new Date()
 export const AbgabeMitarbeiterDetail = {
 	name: "AbgabeMitarbeiterDetail",
 	components: {
@@ -17,6 +17,7 @@ export const AbgabeMitarbeiterDetail = {
 		Message: primevue.message,
 		VueDatePicker
 	},
+	emits: ['paUpdated'],
 	inject: [
 		'abgabeTypeOptions',
 		'abgabetypenBetreuer',
@@ -81,9 +82,9 @@ export const AbgabeMitarbeiterDetail = {
 	},
 	methods: {
 		getNoteBezeichnung(termin){
-			if(termin.note?.bezeichnung) {
-				return termin.note?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
-			} else if(termin.bezeichnung?.benotbar === true && !termin.note) {
+			if(termin.noteBackend?.bezeichnung) {
+				return termin.noteBackend?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
+			} else if(termin.bezeichnung?.benotbar === true && !termin.noteBackend) {
 				return this.$capitalize(this.$p.t('abgabetool/c4notYetGraded'));
 			} else {
 				return ''
@@ -109,7 +110,10 @@ export const AbgabeMitarbeiterDetail = {
 						'allowedToDelete': true,
 						...res.data[0]
 					}
-					if(newTerminRes.note) newTerminRes.note = noteOpt
+					if(newTerminRes.note) {
+						newTerminRes.note = noteOpt
+						newTerminRes.noteBackend = noteOpt // certain UI elements should only reflect persisted state
+					}
 					newTerminRes.invertedFixtermin = !newTerminRes.fixtermin
 					const existingTerminRes = res.data[1]
 					
@@ -121,14 +125,17 @@ export const AbgabeMitarbeiterDetail = {
 						benotbar: abgabeOpt.benotbar
 					}
 					
-					
-					
 					// only insert new abgabe if we actually created a new one, not when saving/editing existing
 					if(!existingTerminRes){
+						newTerminRes.dateStyle = getDateStyleClass(newTerminRes, this.notenOptions)
 						this.projektarbeit.abgabetermine.push(newTerminRes)
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
+
+						termin.paabgabetyp_kurzbz = newTerminRes.paabgabetyp_kurzbz
+						termin.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
+						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
 					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
@@ -168,6 +175,8 @@ export const AbgabeMitarbeiterDetail = {
 					} else {
 						this.showAutomagicModalPhrase = false	
 					}
+					
+					this.$emit("paUpdated", this.projektarbeit)
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
@@ -251,6 +260,7 @@ export const AbgabeMitarbeiterDetail = {
 					// this.$p.t('global/tooltipLektorDeleteKontrolle', [this.$entryParams.permissions.kontrolleDeleteMaxReach ])
 					const deletedTerminIndex = this.projektarbeit.abgabetermine.findIndex(t => t.paabgabe_id === termin.paabgabe_id)
 					this.projektarbeit.abgabetermine.splice(deletedTerminIndex, 1)
+					this.$emit("paUpdated", this.projektarbeit)
 				} else if(res?.meta?.status == 'error'){
 					this.$fhcAlert.alertError()
 				}
@@ -269,75 +279,6 @@ export const AbgabeMitarbeiterDetail = {
 
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 			// this.$api.call(ApiAbgabe.getStudentProjektarbeitAbgabeFile(termin.paabgabe_id, this.projektarbeit.student_uid))
-		},
-		convertDateToIsoString(date) {
-			// 1. Check if it is a Date object AND if the date value is valid (not 'Invalid Date')
-			if (param instanceof Date && !isNaN(param.getTime())) {
-				const year = param.getFullYear();
-				// getMonth() is 0-indexed, so we add 1.
-				const month = param.getMonth() + 1;
-				const day = param.getDate();
-		
-				// Helper to pad single-digit numbers with a leading zero
-				const pad = (num) => String(num).padStart(2, '0');
-		
-				// Return the formatted string: YYYY-MM-DD
-				return `${year}-${pad(month)}-${pad(day)}`;
-			}
-		
-			// If it's not a valid Date, return the original parameter
-			return param;
-		},
-		dateDiffInDays(datumParam){
-			let datum = datumParam
-			if(datumParam instanceof Date && !isNaN(datum.getTime()))
-			{
-				const year = datumParam.getFullYear();
-				const month = datumParam.getMonth() + 1;	// getMonth() is 0-indexed
-				const day = datumParam.getDate();
-				const pad = (num) => String(num).padStart(2, '0');
-				datum = `${year}-${pad(month)}-${pad(day)}`	
-			}
-			
-			const dateToday = luxon.DateTime.now().startOf('day');
-			const dateDatum = luxon.DateTime.fromISO(datum).startOf('day');
-			const duration = dateDatum.diff(dateToday, 'days');
-			
-			return duration.values.days;
-		},
-		getDateStyleClass(termin) {
-			const datum = new Date(termin.datum)
-			const abgabedatum = new Date(termin.abgabedatum)
-
-			termin.diffindays = this.dateDiffInDays(termin.datum)
-
-			const isLate = termin.abgabedatum && abgabedatum > datum;
-
-			// GRADE STATUS
-			if (termin.note) {
-				if (termin.note.positiv) return 'bestanden';
-				return 'nichtbestanden';
-			}
-
-			// ACTION REQUIRED FOR GRADE
-			if (termin.bezeichnung?.benotbar && datum < today) {
-				return 'beurteilungerforderlich';
-			}
-
-			// SUBMISSION STATUS
-			if (termin.upload_allowed) {
-				if (termin.abgabedatum) {
-					return isLate ? 'verspaetet' : 'abgegeben';
-				}
-
-				// no submission yet
-				if (datum < today) return 'verpasst';
-				if (termin.diffindays <= 12) return 'abzugeben';
-				return 'standard';
-			}
-
-			// GENERIC STATUS
-			return datum < today ? 'verpasst' : 'standard';
 		},
 		openBeurteilungLink(link) {
 			window.open(link, '_blank')
@@ -396,6 +337,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		formatDate(dateParam) {
+			// unsafe for datepickers, dont use there
 			const date = new Date(dateParam)
 			// handle missing leading 0
 			const padZero = (num) => String(num).padStart(2, '0');
@@ -476,7 +418,6 @@ export const AbgabeMitarbeiterDetail = {
 				termin.kurzbz = ''
 			}
 		}
-			
 	},
 	computed: {
 		getAllowedToCreateNewTermin() {
@@ -626,7 +567,6 @@ export const AbgabeMitarbeiterDetail = {
 			return ''
 		},
 		getProjektarbeitStudent(){
-
 			if(this.projektarbeit?.student) return this.$capitalize(this.$p.t('person/student')) + ': ' + this.projektarbeit.student
 
 			return ''
@@ -671,7 +611,6 @@ export const AbgabeMitarbeiterDetail = {
 			this.form.schlagwoerter_en = newVal.schlagwoerter_en ?? ''
 			this.form.kontrollschlagwoerter = newVal.kontrollschlagwoerter ?? ''
 			this.form.seitenanzahl = newVal.seitenanzahl ?? 1
-			
 		},
 	},
 	created() {
@@ -709,13 +648,14 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<VueDatePicker
 							v-model="newTermin.datum"
 							:clearable="false"
 							:enable-time-picker="false"
-							:format="formatDate"
+							locale="de"
+							format="dd.MM.yyyy"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -746,7 +686,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 				</div>
 				<div class="row mt-2">
-					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+					<div class="col-4 col-md-3 fw-bold align-content-center">{{ $capitalize( $p.t('abgabetool/c4abgabekurzbzv2') )}}</div>
 					<div class="col-8 col-md-9">
 						<Textarea style="margin-bottom: 4px;" v-model="newTermin.kurzbz" rows="1" class="w-100"></Textarea>
 					</div>
@@ -766,8 +706,8 @@ export const AbgabeMitarbeiterDetail = {
 				<p> {{getProjektarbeitStudent}}</p>
 				<p> {{getProjektarbeitTitel}}</p>
 				<template v-if="assistenzMode">
-					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{ projektarbeit.betreuerart ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart)) : $capitalize( $p.t('abgabetool/c4betreuer') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
-					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{ projektarbeit?.zweitbetreuer_betreuerart_kurzbz ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)) : $capitalize( $p.t('abgabetool/c4zweitbetreuer') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.erstbetreuer_full_name"> {{ projektarbeit.betreuerart ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart)) : $capitalize( $p.t('abgabetool/c4betreuerv2') )}}: {{projektarbeit?.erstbetreuer_full_name}}</p>
+					<p v-if="projektarbeit?.zweitbetreuer_full_name"> {{ projektarbeit?.zweitbetreuer_betreuerart_kurzbz ? $capitalize($p.t('abgabetool/c4betrart' + projektarbeit.zweitbetreuer_betreuerart_kurzbz)) : $capitalize( $p.t('abgabetool/c4zweitbetreuerv2') )}}: {{projektarbeit?.zweitbetreuer_full_name}}</p>
 				</template>
 				<template v-else>
 					<p v-if="projektarbeit?.betreuer"> {{$capitalize($p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz))}}: {{projektarbeit?.betreuer?.first}}</p>
@@ -805,20 +745,20 @@ export const AbgabeMitarbeiterDetail = {
 			</div>
 		</div>
 		<Accordion :multiple="true">
-			<template v-for="termin in this.projektarbeit?.abgabetermine">
-				<AccordionTab :headerClass="getDateStyleClass(termin) + '-header'">
+			<template v-for="termin in this.projektarbeit?.abgabetermine" :key="termin.paabgabe_id">
+				<AccordionTab :headerClass="termin.dateStyle + '-header'">
 					<template #header>
 						<div class="d-flex flex-nowrap align-items-center w-100">
 			
-							<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -66px;">
-								<i v-if="getDateStyleClass(termin) == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
-								<i v-else-if="getDateStyleClass(termin) == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
+							<div class="flex-shrink-0 d-flex align-items-center justify-content-center" style="width: 36px; height: 36px; margin-left: -68px;">	
+								<i v-if="termin.dateStyle == 'verspaetet'" v-tooltip.right="getTooltipVerspaetet" class="fa-solid fa-triangle-exclamation"></i>
+								<i v-else-if="termin.dateStyle == 'verpasst'" v-tooltip.right="getTooltipVerpasst" class="fa-solid fa-calendar-xmark"></i>
+								<i v-else-if="termin.dateStyle == 'abzugeben'" v-tooltip.right="getTooltipAbzugeben" class="fa-solid fa-hourglass-half"></i>
+								<i v-else-if="termin.dateStyle == 'standard'" v-tooltip.right="getTooltipStandard" class="fa-solid fa-clock"></i>
+								<i v-else-if="termin.dateStyle == 'abgegeben'" v-tooltip.right="getTooltipAbgegeben" class="fa-solid fa-paperclip"></i>
+								<i v-else-if="termin.dateStyle == 'beurteilungerforderlich'" v-tooltip.right="getTooltipBeurteilungerforderlich" class="fa-solid fa-list-check"></i>
+								<i v-else-if="termin.dateStyle == 'bestanden'" v-tooltip.right="getTooltipBestanden" class="fa-solid fa-check"></i>
+								<i v-else-if="termin.dateStyle == 'nichtbestanden'" v-tooltip.right="getTooltipNichtBestanden" class="fa-solid fa-circle-exclamation"></i>
 							
 							</div>
 					
@@ -855,7 +795,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					<div class="row mt-2">
 						<div class="col-12 col-md-3 align-content-center">
-							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatum') )}}</div>
+							<div class="row fw-bold" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4zieldatumv2') )}}</div>
 							<div class="row fw-light" style="margin-left: 2px">{{$capitalize( $p.t('abgabetool/c4abgabeuntil2359') )}}</div>
 						</div>
 						<div class="col-12 col-md-9">
@@ -864,7 +804,8 @@ export const AbgabeMitarbeiterDetail = {
 								:clearable="false"
 								:disabled="!termin.allowedToSave"
 								:enable-time-picker="false"
-								:format="formatDate"
+								locale="de"
+								format="dd.MM.yyyy"
 								:text-input="true"
 								auto-apply>
 							</VueDatePicker>
@@ -916,7 +857,7 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					
 					<div class="row mt-2">
-						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbz') )}}</div>
+						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabekurzbzv2') )}}</div>
 						<div class="col-12 col-md-9">
 							<Textarea style="margin-bottom: 4px;" v-model="termin.kurzbz" class="w-100" rows="1" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
@@ -931,7 +872,9 @@ export const AbgabeMitarbeiterDetail = {
 											v-model="termin.abgabedatum"
 											:clearable="false"
 											:disabled="true"
-											:format="formatDate">
+											locale="de"
+											format="dd.MM.yyyy"
+											>
 										</VueDatePicker>
 									</div>
 
