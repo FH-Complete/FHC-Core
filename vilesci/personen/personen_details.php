@@ -125,6 +125,7 @@ $verband = (isset($_POST['verband'])?$_POST['verband']:'');
 $gruppe = (isset($_POST['gruppe'])?$_POST['gruppe']:'');
 $dms_id_lichtbild = '';
 
+$is_mitarbeiter = false;
 if($uid!='')
 {
 	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE uid=".$db->db_add_param($uid)."
@@ -144,7 +145,17 @@ if($uid!='')
 	else
 		die('Fehler beim Ermitteln der UID');
 }
-
+else if ($person_id !='')
+{
+	$qry = "SELECT person_id, true as mitarbeiter FROM campus.vw_mitarbeiter WHERE person_id=".$db->db_add_param($person_id);
+	if($result = $db->db_query($qry))
+	{
+		if($row = $db->db_fetch_object($result))
+		{
+			$is_mitarbeiter = ($row->mitarbeiter=='t'?true:false);
+		}
+	}
+}
 if(isset($_POST['saveperson']))
 {
 	if(!$rechte->isBerechtigt('student/stammdaten', null, 'su') && !$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'su'))
@@ -163,7 +174,8 @@ if(isset($_POST['saveperson']))
 	$person->gebdatum = $geburtsdatum;
 	$person->gebort = $geburtsort;
 	$person->geburtsnation = $geburtsnation;
-	$person->svnr = $svnr;
+	if ($is_mitarbeiter)
+		$person->svnr = $svnr;
 	$person->ersatzkennzeichen = $ersatzkennzeichen;
 	$person->gebzeit = $geburtszeit;
 	$person->staatsbuergerschaft = $staatsbuergerschaft;
@@ -332,7 +344,8 @@ if(!$error_person_save)
 	$geburtsdatum = $person->gebdatum;
 	$geburtsort = $person->gebort;
 	$geburtsnation = $person->geburtsnation;
-	$svnr = $person->svnr;
+	if ($is_mitarbeiter)
+		$svnr = $person->svnr;
 	$ersatzkennzeichen = $person->ersatzkennzeichen;
 	$geburtszeit = $person->gebzeit;
 	$staatsbuergerschaft = $person->staatsbuergerschaft;
@@ -398,10 +411,16 @@ foreach ($nation->nation as $row_nation)
 echo "</SELECT>
 	</td>
 </tr>
-<tr>
-	<td>SVNR</td>
-	<td><input type='text' name='svnr' value='".$svnr."'/></td>
-	<td>Ersatzkennzeichen</td>
+<tr>";
+
+if ($is_mitarbeiter)
+{
+	echo "<td>SVNR</td>
+	<td><input type='text' name='svnr' value='".$svnr."'/></td>";
+}
+
+echo
+	"<td>Ersatzkennzeichen</td>
 	<td><input type='text' name='ersatzkennzeichen' value='".$ersatzkennzeichen."'/></td>
 	<td>Geburtszeit</td>
 	<td><input type='text' name='geburtszeit' value='".$geburtszeit."'/></td>

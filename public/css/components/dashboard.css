@@ -203,3 +203,14 @@
 	}
 
 }
+
+.hiddenWidget{
+	background: var(--fhc-disabled-background);
+	opacity: 40%;
+}
+
+.hiddenWidget .card,
+.hiddenWidget .card-body,
+.hiddenWidget .card-body *{
+	background: inherit !important;
+}

@@ -1,6 +1,6 @@
 import { replaceRelativeLegacyLink } from "../../../../helpers/LegacyLinkReplaceHelper.js"
 export default {
-	name: "GeneralComponent",
+	name: "NewsContentType",
 	props:{
 	  content:{
 		  type:String,
