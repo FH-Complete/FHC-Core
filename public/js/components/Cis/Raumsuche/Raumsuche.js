@@ -192,7 +192,7 @@ export const Raumsuche =  {
 	<h1 class="h3">{{$p.t('rauminfo/roomSearch')}}</h1>
 	<hr>
 	<div class="row">
-		<div class="col-12 col-lg-2 pb-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="datum"
@@ -207,7 +207,7 @@ export const Raumsuche =  {
 				>
 			</VueDatePicker>
 		</div>
-		<div class="col-12 col-lg-1 pb-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="von"
@@ -221,7 +221,7 @@ export const Raumsuche =  {
 				>
 			</VueDatePicker>
 		</div>
-		<div class="col-12 col-lg-1 pb-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="bis"
@@ -235,7 +235,7 @@ export const Raumsuche =  {
 			</VueDatePicker>
 		</div>
 		
-		<div class="col-12 col-lg-3 pb-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-3">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
@@ -244,14 +244,14 @@ export const Raumsuche =  {
 		</div>
 		
 
-		<div class="col-12 col-lg-3 pb-2">
+		<div :class="{'pb-2': isMobile}" class="col-12 col-lg-3">
 			<InputNumber v-model="anzahl" 
 			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
 			inputId="anzahlInput" :min="1" :max="1000" 
 			:style="{'width': '100%'}"
 			/>
 		</div>
-		<div class="col-12 col-lg-2 pb-2">
+		<div class="col-12 col-lg-2">
 			<button class="btn btn-primary border-0" @click="search">{{ $p.t('rauminfo/roomSearch') }} <i class="fa fa-magnifying-glass"></i></button>
 		</div>
 	</div>
