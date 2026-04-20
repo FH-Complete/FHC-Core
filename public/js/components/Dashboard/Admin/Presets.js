@@ -17,7 +17,7 @@ export default {
 			funktionen: {},
 			sections: [],
 			selectedFunktionen: [],
-			tmpLoading: ''
+			abortController: null
 		};
 	},
 	computed: {
@@ -130,20 +130,21 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		loadSections() {
-			let funktionen = this.selectedFunktionen;
-			this.sections = [];
-			this.tmpLoading = funktionen.join('###');
-
 			const params = {
 				db: this.dashboard,
-				funktionen
+				funktionen: this.selectedFunktionen
 			};
 
+			if (this.abortController)
+				this.abortController.abort();
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.sections = [];
+			
 			return this.$api
-				.call(ApiDashboardPreset.getBatch(params))
+				.call(ApiDashboardPreset.getBatch(params), { signal })
 				.then(result => {
-					if (this.tmpLoading !== funktionen.join('###'))
-						return; // NOTE(chris): prevent race condition
 					for (var section in result.data) {
 						let widgets = [];
 						for (var wid in result.data[section]) {
