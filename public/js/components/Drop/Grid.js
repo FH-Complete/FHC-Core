@@ -218,28 +218,27 @@ export default {
 	},
 	watch: {
 		active(active) {
-			if (!active)
+			if (!active && this.mode != MODE_IDLE)
 				this.dragCancel();
 		},
-		cols() {
-			this.dragCancel();
+		cols(value, oldValue) {
+			if (value == oldValue)
+				return;
+
+			this.reinitGrid();
 		},
 	    rows: {
-			handler(value) {
+			handler(value, oldValue) {
+				if (value == oldValue)
+					return;
+
 				this.$emit('gridHeight', value);
 			},
 			immediate: true
 		},
 		indexedItems: {
 			handler(value) {
-				if (this.mode != MODE_IDLE)
-					this.dragCancel();
-
-				const updated = this.createNewGrid(value);
-
-				this.correctedPositionUpdates = updated;
-				if (updated.length)
-					this.$emit('rearrangeItems', updated.filter(v => v));
+				this.reinitGrid();
 			},
 			immediate: true,
 			deep: true
@@ -247,6 +246,18 @@ export default {
 	},
 	methods: {
 		// helpers
+		reinitGrid() {
+			if (this.mode != MODE_IDLE)
+				this.dragCancel();
+
+			const updated = this.createNewGrid(this.indexedItems);
+
+			this.correctedPositionUpdates = updated;
+			if (updated.length)
+				updated = updated.filter(v => v);
+			if (updated.length)
+				this.$emit('rearrangeItems', updated);
+		},
 		convertGridResultToUpdate(input, output, baseArray) {
 			if (!input)
 				return;
