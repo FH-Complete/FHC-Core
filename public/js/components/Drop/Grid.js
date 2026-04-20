@@ -26,12 +26,17 @@ export default {
 			type: Number,
 			default: 0
 		},
+		additionalRow:{
+			type: Boolean,
+			default: false,
+		}
 	},
 	emits: [
 		"rearrangeItems",
 		"newItem",
 		"gridHeight",
 		"draggedItem",
+		"update:additionalRow"
 	],
 	data() {
 		return {
@@ -48,7 +53,6 @@ export default {
 			draggedOffset: [0,0],
 			draggedItem: null,
 			draggedNode: null,
-			additionalRow: null,
 			reorderedItems:[],
 			clonedWidget:null,
 		}
@@ -60,6 +64,14 @@ export default {
 		},
 	},
 	computed: {
+		additionalRowComputed: {
+			get() {
+				return this.additionalRow;
+			},
+			set(value) {
+				this.$emit('update:additionalRow', value);
+			}
+		},
 		items_hashmap() {
 			let items = {};
 			this.items.forEach(item => {
@@ -117,10 +129,11 @@ export default {
 			return [...this.placedItems, ...this.items_placeholders];
 		},
 		rows() {
-			if ((this.mode == MODE_MOVE || this.mode == MODE_RESIZE) && this.dragGrid){
-				return this.dragGrid.h;
+			if (this.additionalRowComputed) {
+					return this.grid ? (this.grid.h+1) : 1;
 			}
 			return this.grid ? this.grid.h : 1;
+			
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
@@ -261,8 +274,23 @@ export default {
 		dragging(event){
 			if(this.mode == MODE_MOVE){
 				this.toggleDraggedItemOverlay(true);
-				this.clonedWidget.style.top = `${this.clientY-20}px`;
-				this.clonedWidget.style.left = `${this.clientX-15}px`;
+				
+				const containerRect = this.$refs.container.getBoundingClientRect();
+				const clonedWidgetRect = this.clonedWidget.getBoundingClientRect();
+				
+				let desiredTop = this.clientY - 20;
+				let desiredLeft = this.clientX - 15;
+				
+				const minTop = 0;
+				const maxTop = containerRect.height - clonedWidgetRect.height;
+				const minLeft = 0;
+				const maxLeft = containerRect.width - clonedWidgetRect.width;
+				
+				const constrainedTop = Math.max(minTop, Math.min(maxTop, desiredTop));
+				const constrainedLeft = Math.max(minLeft, Math.min(maxLeft, desiredLeft));
+				
+				this.clonedWidget.style.top = `${constrainedTop}px`;
+				this.clonedWidget.style.left = `${constrainedLeft}px`;
 			}
 		},
 		createNewGrid(items) {
@@ -347,17 +375,11 @@ export default {
 			});
 		},
 		mouseLeave() {
-			if (this.mode == MODE_IDLE) {
+			/* if (this.mode == MODE_IDLE) {
 				this.x = -1;
 				this.y = -1;
-				if (this.additionalRow !== null) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h>gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
-			}
+				
+			}  */
 		},
 		updateCursor(evt) {
 			if (!this.active) {
@@ -366,32 +388,20 @@ export default {
 			}
 			const addH = this.active ? this.marginForExtraRow : 0;
 			const rect = this.$refs.container.getBoundingClientRect();
-
-			if (!evt.clientX && !evt.clientY && evt.touches) {
+			
+			if (!evt.clientX && !evt.clientY && evt.touches){
 				evt.clientX = evt.touches[0].clientX;
 				evt.clientY = evt.touches[0].clientY;
 			}
 
 			this.clientX = (evt.clientX - rect.left);
 			this.clientY = (evt.clientY - rect.top);
-
 			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
 			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+			
 			if (this.x == gridX && this.y == gridY)
 				return false;
 			
-			if (this.mode == MODE_IDLE) {
-				if (this.additionalRow === null && this.y == this.rows-1 && gridY == this.rows) {
-					this.additionalRow = this.grid.h;
-					this.grid.h += 1;
-				} else if (this.additionalRow !== null && gridY != this.rows - 1) {
-					let gridHeight = this.grid.getMaxY() + 1;
-					if(this.grid.h > gridHeight){
-						this.grid.h = gridHeight;
-					}
-					this.additionalRow = null;
-				}
-			}
 			this.x = gridX;
 			this.y = gridY;
 
@@ -405,22 +415,30 @@ export default {
 			}
 		},
 		startMove(evt, item) {
+			
 			if (!this.active)
 				return;
 			
 			this.mode = MODE_MOVE;
 			
-			this.grid.h += 1;
 			this.draggedItem = item;
-			this.$emit('draggedItem',item);
-			this.draggedNode = evt.target;
-			//clones the widget for the drag Image
-			let clone = evt.target.cloneNode(true);
-			clone.style.zIndex = 5;
-			clone.classList.add("widgetClone");
-			this.$refs.container.appendChild(clone);
-			this.clonedWidget = clone;
 			
+			this.$emit('draggedItem', item);
+			// workaround for chrome fireing event dragend when styles are manipulated during dragging
+			setTimeout(() => {
+				this.draggedNode = evt.target.closest(".drop-grid-item");
+				//clones the widget for the drag Image
+				
+				let clone = evt.target.closest(".drop-grid-item")?.cloneNode(true);
+
+				clone.style.zIndex = 5;
+				clone.classList.add("widgetClone");
+				this.$refs.container.appendChild(clone);
+				const hiddenWidget = clone.querySelector("[style='display: none;']");
+				hiddenWidget.style.removeProperty("display");
+				this.clonedWidget = clone;
+			}, 0);
+
 			this.draggedOffset = [item.x - this.x, item.y - this.y];
 			this._dragStart(evt, item);
 		},
@@ -429,15 +447,13 @@ export default {
 				return;
 			this.mode = MODE_RESIZE;
 			this.draggedItem = item;
+			this.$emit('draggedItem', item);
 			this._dragStart(evt);
 		},
 		dragOver(evt) {
-			if ((this.y + 1) > this.grid?.h && this.mode == MODE_MOVE) {
-				this.positionUpdates = this.positionUpdates.filter(item => {
-					return item.widgetid == this.draggedItem.data.widgetid;
-				})
-				this.dragEnd();
+			if ((this.y + 1) > this.rows && (this.mode == MODE_MOVE || this.mode == MODE_RESIZE)) {
 				this.dragCancel();
+				
 			}
 			if (!this.active)
 				return this.dragCancel();
@@ -453,17 +469,17 @@ export default {
 						let x = this.x + this.draggedOffset[0];
 						let y = this.y + this.draggedOffset[1];
 						if (x < 0) {
-							this.draggedOffset[0] -= x;
+							this.draggedOffset[0] += x;
 							x = 0;
 						} else if (x + this.draggedItem.w > this.cols) {
 							this.draggedOffset[0] += this.cols - this.draggedItem.w - x;
 							x = this.cols - this.draggedItem.w;
 						}
 						if (y < 0) {
-							this.draggedOffset[1] -= y;
+							this.draggedOffset[1] += y;
 							y = 0;
 						}
-						this.positionUpdates = this.dragGrid.move(this.draggedItem, x, y);
+						this.positionUpdates= this.dragGrid.move(this.draggedItem, x, y);
 						break;
 					}
 					case MODE_RESIZE: {
@@ -480,6 +496,8 @@ export default {
 			}
 		},
 		dragCancel() {
+			this.removeWidgetClones();
+			this.additionalRowComputed = false;
 			this.toggleDraggedItemOverlay(false);
 			this.mode = MODE_IDLE;
 			this.positionUpdates = null;
@@ -490,27 +508,32 @@ export default {
 			
 		},
 		dragEnd() {
-			if (this.mode == MODE_IDLE)
+			this.removeWidgetClones();
+			this.toggleDraggedItemOverlay(false);
+			
+			if (this.mode == MODE_IDLE){
 				return;
+			}
 			// clean up unused classes
 			let draggedItemNode = document.getElementById(this.draggedItem.data.widgetid);
 			draggedItemNode.classList.remove("border-danger");
 			Array.from(document.getElementsByClassName("denied-dragging-animation"))?.forEach(ele => {
 				ele.classList.remove("denied-dragging-animation");
 			})
-			let widgetClones = document.getElementsByClassName("widgetClone");
-			for(let widget of widgetClones){
-				this.$refs.container.removeChild(widget);
-			}
 			
-			if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
-				return this.dragCancel();
+			//if (!this.active || this.x < 0 || this.y < 0 || this.x >= this.cols)
+				//return this.dragCancel();
+
 			this.mode = MODE_IDLE;
 			let updated = [];
 			this.convertGridResultToUpdate(this.positionUpdates, updated);
 			updated = this._updateFixedPositions(updated);
 			if (updated.length)
 				this.$emit('rearrangeItems', updated.filter(v => v));
+
+			this.draggedItem = null;
+			this.draggedNode = null;
+			this.$emit('draggedItem', null);
 		},
 		_updateFixedPositions(updated) {
 			updated.forEach((item, index) => {
@@ -528,6 +551,7 @@ export default {
 			return updated;
 		},
 		emptyTileClicked() {
+			this.additionalRowComputed = false;
 			this.$emit('newItem', this.x, this.y);
 		},
 		updateCursorOnMouseMove(evt){
@@ -593,6 +617,12 @@ export default {
 				draggedItemNode.classList.remove("border-danger");
 			}
 		},
+		removeWidgetClones(){
+			let widgetClones = Array.from(document.getElementsByClassName("widgetClone"));
+			for (let i = 0; i < widgetClones.length; i++) {
+				this.$refs.container.removeChild(widgetClones[i]);
+			}
+		},
 		mouseDown(){
 			this.mode = MODE_MOUSE_DOWN;
 		},
@@ -605,16 +635,16 @@ export default {
 		ref="container"
 		class="drop-grid position-relative h-0"
 		:style="gridStyle"
-		@touchmove.prevent="dragOver"
+		@touchmove="dragOver"
 		@touchend="dragCancel"
 		@dragover.prevent="dragOver"
-		@drop="dragEnd"
+		@drop="dragEnd($event)"
 		@mousemove="updateCursorOnMouseMove"
 		@mouseleave="mouseLeave">
 		<TransitionGroup tag="div">
 			<grid-item
 				ref="gridItems"
-				v-for="(item,index) in ((mode != 1 || mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
+				v-for="(item,index) in ((mode != 1 && mode != 2) && active ? placedItems_withPlaceholders : placedItems)"
 				:key="item.data.id"
 				:item="item"
 				@start-move="startMove"
@@ -622,13 +652,13 @@ export default {
 				@mouse-up="mouseUp"
 				@start-resize="startResize"
 				@dragging="dragging"
-				@end-drag="dragCancel"
-				@drop-drag="dragEnd"
-				@touchEvent="updateCursorOnMouseMove"
+				@end-drag="dragEnd"
+				@touch-end="dragEnd();mouseUp();"
+				@touch-start="updateCursorOnMouseMove($event); mouseDown();"
 				class="position-absolute"
 				:active="active"
 				:style="{
-					zIndex: item.resizeOverlay ? -5 : 'auto',
+					zIndex: item.resizeOverlay ? 1 : 'auto',
 					top: 'calc(' + item.y + ' * var(--fhc-dg-row-height))',
 					left: 'calc(' + item.x + ' * var(--fhc-dg-col-width))',
 					width: 'calc(' + item.w + ' * var(--fhc-dg-col-width))',

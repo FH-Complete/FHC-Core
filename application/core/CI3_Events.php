@@ -35,7 +35,7 @@ class CI3_Events
 			});
 			self::$eventsSorted[$event] = true;
 		}
-		
+
 		foreach (self::$events[$event] as $conf) {
 			$conf[1](...$args);
 		}
@@ -48,9 +48,6 @@ class CI3_Events
 require_once(APPPATH.'config/Events.php');
 
 $active_addons_array = explode(";", ACTIVE_ADDONS);
-
-// Load Events from FHC core
-require_once APPPATH.'core/Events.php';
 
 foreach (scandir(APPPATH.'config/extensions') as $dir)
 	if ($dir[0] != '.' && file_exists(APPPATH.'config/extensions/'.$dir.'/Events.php'))

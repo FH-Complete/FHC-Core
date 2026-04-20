@@ -1,0 +1,442 @@
+import {CoreFilterCmpt} from "../../filter/Filter.js";
+import FormForm from '../../Form/Form.js';
+
+import ApiMessages from "../../../api/factory/messages/messages.js"
+
+export default {
+	name: "TableMessages",
+	components: {
+		CoreFilterCmpt,
+		FormForm,
+	},
+	inject: {
+		cisRoot: {
+			from: 'cisRoot'
+		},
+	},
+	props: {
+		typeId: String,
+		id: {
+			type: Array,
+			required: true
+		},
+		messageLayout: String,
+		openMode: String
+	},
+	data(){
+		return {
+			previewBody: "",
+			open: false,
+			personId: null,
+			layoutColumnsOnNewData:	false,
+			height: '400',
+		}
+	},
+	methods: {
+		actionDeleteMessage(message_id){
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? message_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteMessage)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteMessage(message_id){
+			return this.$api
+				.call(ApiMessages.deleteMessage(message_id))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		actionNewMessage(){
+			this.$emit('newMessage', this.id, this.typeId);
+		},
+		actionReplyToMessage(message_id){
+			this.$emit('replyToMessage', this.id, this.typeId, message_id);
+		},
+		reload() {
+			this.$refs.table.reloadTable();
+		},
+		buildTreemap(messages) {
+			if (!messages || !messages.data || messages.data.length === 0)
+			{
+				if(this.tabulatorOptions.pagination)
+				{
+					return {data: [], last_page: 0};
+				}
+				else
+				{
+					return [];
+				}
+			}
+
+			const last_page = messages.meta.count;
+			messages = messages.data;
+			const messageMap = new Map();
+			const messageNested = [];
+			const remainingMessages = new Set(messages);
+
+			//save all Data in Map
+			messages.forEach(msg => messageMap.set(msg.message_id, msg));
+
+			let iteration = 0;
+			let changes = true;
+
+			// do until each relationmessage_id finds message_id (not sensitive to order)
+			while (changes) {
+				changes = false;
+				iteration++;
+
+				remainingMessages.forEach(msg => {
+					if (msg.relationmessage_id === null) {
+						messageNested.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					} else if (messageMap.has(msg.relationmessage_id)) {
+
+						const parent = messageMap.get(msg.relationmessage_id);
+
+						if (!parent.children) {
+							parent.children = [];
+						}
+						parent.children.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					}
+				});
+
+				// to avoid endless loop
+				if (iteration > messages.length) break;
+			}
+
+			if(this.tabulatorOptions.pagination)
+			{
+				return {data: messageNested, last_page: last_page};
+			}
+			else
+			{
+				return messageNested;
+			}
+		},
+		loadAjaxCall(url, config, params){
+			return this.$api.call(
+				ApiMessages.getMessages(params)
+			);
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: this.loadAjaxCall,
+				ajaxParams: () => {
+					return {
+						id: this.id,
+						type: this.typeId
+					};
+				},
+				ajaxResponse: (url, params, response) => this.buildTreemap(response),
+				layout: 'fitDataStretchFrozen',
+				index: 'message_id',
+				persistenceID: 'core-message-20260217',
+				selectableRows: 1,
+				selectableRowsRangeMode: 'click',
+				columns: [
+					{title: "subject", field: "subject", headerFilter: true},
+					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
+					{title: "message_id", field: "message_id", visible: false, headerFilter: true},
+					{
+						title: "Datum",
+						field: "insertamum",
+						headerFilter: true,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
+						}
+					},
+					{title: "sender", field: "sender", headerFilter: true},
+					{title: "recipient", field: "recipient", headerFilter: true},
+					{title: "senderId", field: "sender_id", headerFilter: true},
+					{title: "recipientId", field: "recipient_id", headerFilter: true},
+					{title: "Relationmessage ID", field: "relationmessage_id", headerFilter: true},
+					{
+						title: "Status",
+						field: "status",
+						headerFilter: true,
+						formatterParams: [
+							"unread",
+							"read",
+							"archived",
+							"deleted"
+						],
+						formatter: (cell, formatterParams) => {
+							const key = formatterParams[cell.getValue()];
+							return this.$p.t('messages', key);
+						},
+					},
+					{
+						title: "letzte Änderung",
+						field: "statusdatum",
+						headerFilter: true,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							const date = new Date(dateStr); // Convert to Date object
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								hour12: false
+							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
+						}
+					},
+					{
+						title: 'Aktionen', field: 'actions',
+						width: 100,
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							if (this.personId != cell.getData().sender_id) {
+								button.disabled = true;
+								button.style = "visibility: hidden";
+								button.ariaHidden = true;
+							}
+
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('global', 'reply');
+							button.innerHTML = '<i class="fa fa-reply"></i>';
+							button.addEventListener(
+								'click',
+								(event) =>
+									this.actionReplyToMessage(cell.getData().message_id)
+							);
+
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('ui', 'loeschen');
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener(
+								'click',
+								() =>
+									this.actionDeleteMessage(cell.getData().message_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					}
+				],
+				pagination: false,
+				paginationMode: "remote",
+				paginationSize: 15,
+				paginationInitialPage: 1,
+				dataTree: true,
+				headerSort: true,
+				dataTreeChildField: "children",
+				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
+				dataTreeChildIndent: 15,
+				dataTreeStartExpanded: false,
+				locale: 'de',
+				"langs": {
+					"de":{ //German language definition
+						"data":{
+							"loading":"Lädt", //data loader text
+							"error":"Fehler", //data error text
+						},
+						"pagination":{
+							"first":"Erste",
+							"first_title":"Erste Seite",
+							"last":"Letzte",
+							"last_title":"Letzte Seite",
+							"prev":"Vorige",
+							"prev_title":"Vorige Seite",
+							"next":"Nächste",
+							"next_title":"Nächste Seite",
+							"all":"Alle"
+						},
+					},
+				}
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
+				{
+					event: 'tableBuilt',
+					handler: async() => {
+						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
+
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('subject', this.$p.t('global', 'betreff'));
+						setHeader('body', this.$p.t('messages', 'body'));
+						setHeader('message_id', this.$p.t('messages', 'message_id'));
+						setHeader('insertamum', this.$p.t('global', 'datum'));
+						setHeader('sender', this.$p.t('messages', 'sender'));
+						setHeader('recipient', this.$p.t('messages', 'recipient'));
+						setHeader('sender_id', this.$p.t('messages', 'senderId'));
+						setHeader('recipient_id', this.$p.t('messages', 'recipientId'));
+						setHeader('statusdatum', this.$p.t('notiz', 'letzte_aenderung'));
+
+						this.$refs.table.tabulator.rowManager.getDisplayRows();
+						this.$emit('tabulator_tablebuilt');
+					}
+				},
+				{
+					event: 'rowClick',
+					handler: (e, row) => {
+						const selectedMessage = row.getData().message_id;
+						const body = row.getData().body;
+						this.previewBody = body;
+					}
+				},
+			];
+			return events;
+		},
+	},
+	mounted() {
+		// change to target="_blank"
+		/*		this.$nextTick(() => {
+					const links = document.querySelectorAll('.preview a');
+					links.forEach(link => {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
+					});
+				});*/
+	},
+	created(){
+		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
+			const params = {
+				id: this.id,
+				type_id: this.typeId
+			};
+			this.$api
+				.call(ApiMessages.getPersonId(params))
+				.then(result => {
+					this.personId = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
+
+	},
+	template: `
+	<div class="messages-detail-table">
+	
+		<!--View Studierendenverwaltung-->
+		<div v-if="messageLayout=='twoColumnsTableLeft'">
+
+			<div class="row">
+				<!--table-->
+				<div class="col-sm-6 pt-1">
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						new-btn-show
+						:new-btn-label="this.$p.t('global', 'nachricht')"
+						@click:new="actionNewMessage"
+						>
+					</core-filter-cmpt>
+				</div>
+
+				<!--preview wysiwyg-window-->
+				<div class="col-sm-6 pt-5">
+					<div class="msg-preview-spacer pt-2" aria-hidden="true"></div>
+					<div ref="preview" class="bg-white">
+						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+					</div>
+
+				</div>
+
+			</div>
+		</div>
+
+		<!--View Infocenter-->
+		<div v-if="messageLayout=='listTableTop'">
+
+				<!--table-->
+				<div class="col-sm-12 pt-6">
+					<core-filter-cmpt
+						ref="table"
+						:tabulator-options="tabulatorOptions"
+						:tabulator-events="tabulatorEvents"
+						table-only
+						:side-menu="false"
+						reload
+						:reload-btn-infotext="this.$p.t('table', 'reload')"
+						new-btn-show
+						:new-btn-label="this.$p.t('global', 'nachricht')"
+						@click:new="actionNewMessage"
+						>
+					</core-filter-cmpt>
+				</div>
+
+				<!--preview wysiwyg-window-->
+				<div class="col-sm-12">
+
+					<div ref="preview">
+						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
+					</div>
+
+				</div>
+		</div>
+
+	</div>
+	`
+
+}

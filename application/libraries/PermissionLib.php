@@ -50,6 +50,7 @@ class PermissionLib
 	const LOGINAS_PERSONIDS_BLACKLIST = 'permission_loginas_personids_blacklist';
 
 	private $_ci; // CI instance
+	private $access_rights; // current users access rights
 	private static $bb; // benutzerberechtigung
 
 	/**
@@ -61,6 +62,8 @@ class PermissionLib
 		// Loads CI instance
 		$this->_ci =& get_instance();
 
+		$this->access_rights = null;
+
 		$this->_ci->config->load('permission'); // Loads permission configuration
 
 		// If it's NOT called from command line
@@ -69,8 +72,10 @@ class PermissionLib
 			// API Caller rights initialization
 			$authObj = $this->_ci->authlib->getAuthObj();
 			self::$bb = new benutzerberechtigung();
-			if ($authObj)
+			if ($authObj) {
 				self::$bb->getBerechtigungen($authObj->{AuthLib::AO_USERNAME});
+				$this->access_rights = self::$bb->berechtigungen;
+			}
 		}
 	}
 
@@ -339,6 +344,16 @@ class PermissionLib
             return false;
         }
     }
+
+	/**
+	 * Returns the access rights for the current user
+	 *
+	 * @return array|null
+	 */
+	public function getAccessRights()
+	{
+		return $this->access_rights;
+	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods

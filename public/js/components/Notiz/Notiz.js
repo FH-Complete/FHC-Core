@@ -1,5 +1,4 @@
 import VueDatePicker from '../vueDatepicker.js.php';
-import PvAutoComplete from "../../../../index.ci.php/public/js/components/primevue/autocomplete/autocomplete.esm.min.js";
 import FormUploadDms from '../Form/Upload/Dms.js';
 import {CoreFilterCmpt} from "../filter/Filter.js";
 import BsModal from "../Bootstrap/Modal.js";
@@ -11,7 +10,6 @@ export default {
 	components: {
 		CoreFilterCmpt,
 		VueDatePicker,
-		PvAutoComplete,
 		FormUploadDms,
 		FormForm,
 		FormInput,
@@ -42,209 +40,14 @@ export default {
 		showErweitert: Boolean,
 		showDocument: Boolean,
 		showTinyMce: Boolean,
-		visibleColumns: Array
+		visibleColumns: Array,
+		tabulatorPersistenceId: {
+			type: String,
+			default: 'core-notiz'
+		}
 	},
 	data() {
 		return {
-			tabulatorOptions: {
-				ajaxURL: 'dummy',
-				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
-				ajaxParams: () => {
-					return {
-						id: this.id,
-						type: this.typeId
-					};
-				},
-				ajaxResponse: (url, params, response) => response.data,
-				columns: [
-					{
-						title: "Titel",
-						field: "titel",
-						width: 100,
-						tooltip:function(e, cell, onRendered){
-							var el = document.createElement("div");
-							el.style.backgroundColor = "white";
-							el.style.color = "black";
-							el.style.fontWeight = "bold";
-							el.style.padding = "5px";
-							el.style.border = "1px solid black";
-							el.style.borderRadius = "5px";
-
-							el.innerText = cell.getValue();
-
-							el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
-
-							return el;
-						},
-					},
-					{
-						title: "Text",
-						field: "text_stripped",
-						width: 250,
-						tooltip:function(e, cell, onRendered){
-							var el = document.createElement("div");
-							el.style.backgroundColor = "white";
-							el.style.color = "black";
-							el.style.fontWeight = "bold";
-							el.style.padding = "5px";
-							el.style.border = "1px solid black";
-							el.style.borderRadius = "5px";
-
-							el.innerText = cell.getValue();
-
-							return el;
-						},
-					},
-					{title: "VerfasserIn", field: "verfasser_uid", width: 124, visible: false},
-					{title: "BearbeiterIn", field: "bearbeiter_uid", width: 126, visible: false},
-					{title: "Start", field: "start_format", width: 86, visible: false},
-					{title: "Ende", field: "ende_format", width: 86, visible: false},
-					{title: "Dokumente", field: "countdoc", width: 100, visible: false},
-					{
-						title: "Erledigt",
-						field: "erledigt",
-						width: 97,
-						visible: false,
-						formatter:"tickCross",
-						hozAlign:"center",
-						formatterParams: {
-							tickElement: '<i class="fa fa-check text-success"></i>',
-							crossElement: '<i class="fa fa-xmark text-danger"></i>'
-						}
-					},
-					{title: "Notiz_id", field: "notiz_id", width: 92, visible: false},
-					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: false},
-					{title: "type_id", field: "type_id", width: 164, visible: false},
-					{title: "extension_id", field: "id", width: 135, visible: false},
-					{
-						title: "letzte Änderung", 
-						field: "lastupdate",
-						width: 146,
-						visible: false,
-						formatter: function (cell) {
-							const dateStr = cell.getValue();
-							if (!dateStr) return "";
-
-							const date = new Date(dateStr);
-							return date.toLocaleString("de-DE", {
-								day: "2-digit",
-								month: "2-digit",
-								year: "numeric",
-								hour: "2-digit",
-								minute: "2-digit",
-								second: "2-digit",
-								hour12: false
-							});
-						}
-					},
-					{
-						title: 'Aktionen', field: 'actions',
-						width: 100,
-						formatter: (cell, formatterParams, onRendered) => {
-							let container = document.createElement('div');
-							container.className = "d-flex gap-2";
-
-							let button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('ui', 'notiz_edit');
-							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.addEventListener(
-								'click',
-								(event) =>
-									this.actionEditNotiz(cell.getData().notiz_id)
-							);
-							container.append(button);
-
-							button = document.createElement('button');
-							button.className = 'btn btn-outline-secondary btn-action';
-							button.title = this.$p.t('notiz', 'notiz_delete');
-							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.addEventListener(
-								'click',
-								() =>
-									this.actionDeleteNotiz(cell.getData().notiz_id)
-							);
-							container.append(button);
-
-							return container;
-						},
-						frozen: true
-					}],
-				layout: 'fitColumns',
-				layoutColumnsOnNewData: false,
-				height: '250',
-				selectableRangeMode: 'click',
-				selectable: true,
-				index: 'notiz_id',
-				persistenceID: 'core-notiz'
-			},
-			tabulatorEvents: [
-				{
-					event: 'tableBuilt',
-					handler: async () => {
-
-						await this.$p.loadCategory(['notiz', 'global', 'ui']);
-
-						let cm = this.$refs.table.tabulator.columnManager;
-
-						cm.getColumnByField('verfasser_uid').component.updateDefinition({
-							title: this.$p.t('notiz', 'verfasser'),
-							visible: this.showVariables.showVerfasser
-						});
-						cm.getColumnByField('titel').component.updateDefinition({
-							title: this.$p.t('global', 'titel'),
-							//visible: this.showVariables.showTitel
-						});
-						cm.getColumnByField('text_stripped').component.updateDefinition({
-							title: this.$p.t('global', 'text'),
-							//visible: this.showVariables.showText
-						});
-						cm.getColumnByField('bearbeiter_uid').component.updateDefinition({
-							title: this.$p.t('notiz', 'bearbeiter'),
-							visible: this.showVariables.showBearbeiter
-						});
-						cm.getColumnByField('start_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigVon'),
-							visible: this.showVariables.showVon
-						});
-						cm.getColumnByField('ende_format').component.updateDefinition({
-							title: this.$p.t('global', 'gueltigBis'),
-							visible: this.showVariables.showBis
-						});
-						cm.getColumnByField('countdoc').component.updateDefinition({
-							title: this.$p.t('notiz', 'document'),
-							visible: this.showVariables.showDokumente
-						});
-						cm.getColumnByField('erledigt').component.updateDefinition({
-							title: this.$p.t('notiz', 'erledigt'),
-							visible: this.showVariables.showErledigt
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung'),
-							visible: this.showVariables.showLastupdate
-						});
-						cm.getColumnByField('notiz_id').component.updateDefinition({
-							visible: this.showVariables.showNotiz_id,
-							title: this.$p.t('ui', 'notiz_id')
-						});
-						cm.getColumnByField('notizzuordnung_id').component.updateDefinition({
-							visible: this.showVariables.showNotizzuordnung_id,
-							title: this.$p.t('ui', 'notizzuordnung_id')
-						});
-						cm.getColumnByField('type_id').component.updateDefinition({
-							visible: this.showVariables.showType_id,
-							title: this.$p.t('ui', 'type_id')
-						});
-						cm.getColumnByField('id').component.updateDefinition({
-							visible: this.showVariables.showId,
-							title: this.$p.t('ui', 'extension_id')
-						});
-						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});
-					}
-				}
-			],
 			notizen: [],
 			multiupload: true,
 			mitarbeiter: [],
@@ -254,6 +57,7 @@ export default {
 			editor: null,
 			notizData: {
 				typeId: this.typeId,
+				id: this.id,
 				titel: null,
 				statusNew: true,
 				text: '',
@@ -281,6 +85,202 @@ export default {
 				showId: false,
 				showLastupdate: false
 			},
+			currentVerfasserUid: null
+		}
+	},
+	computed: {
+		tabulatorOptions: function() {
+			return {
+				ajaxURL: 'dummy',
+				ajaxRequestFunc: () => this.$api.call(this.endpoint.getNotizen(this.id, this.typeId)),
+				ajaxParams: () => {
+					return {
+						id: this.id,
+						type: this.typeId
+					};
+				},
+				ajaxResponse: (url, params, response) => response.data,
+				columns: [
+					{
+						title: "Titel",
+						field: "titel",
+						width: 100,
+						visible: this.showVariables.showTitel,
+						tooltip:function(e, cell, onRendered){
+							var el = document.createElement("div");
+							el.style.backgroundColor = "white";
+							el.style.color = "black";
+							el.style.fontWeight = "bold";
+							el.style.padding = "5px";
+							el.style.border = "1px solid black";
+							el.style.borderRadius = "5px";
+
+							el.innerText = cell.getValue();
+
+							el.innerText = cell.getColumn().getField() + " - " + cell.getValue();
+
+							return el;
+						},
+					},
+					{
+						title: "Text",
+						field: "text_stripped",
+						width: 250,
+						formatter: "html",
+						//clipContents: true,
+						visible: this.showVariables.showText,
+						tooltip:function(e, cell, onRendered){
+							var el = document.createElement("div");
+							el.style.backgroundColor = "white";
+							el.style.color = "black";
+							el.style.fontWeight = "bold";
+							el.style.padding = "5px";
+							el.style.border = "1px solid black";
+							el.style.borderRadius = "5px";
+
+							el.innerText = cell.getValue();
+
+							return el;
+						},
+					},
+					{title: "VerfasserIn", field: "verfasser", width: 124, visible: this.showVariables.showVerfasser},
+					{title: "BearbeiterIn", field: "bearbeiter", width: 126, visible: this.showVariables.showBearbeiter},
+					{title: "Verfasser UID", field: "verfasser_uid", width: 124, visible: false},
+					{title: "Bearbeiter UID", field: "bearbeiter_uid", width: 126, visible: false},
+					{title: "Start", field: "start_format", width: 86, visible: this.showVariables.showVon},
+					{title: "Ende", field: "ende_format", width: 86, visible: this.showVariables.showBis},
+					{title: "Dokumente", field: "countdoc", width: 100, visible: this.showVariables.showDokumente},
+					{
+						title: "Erledigt",
+						field: "erledigt",
+						width: 97,
+						visible: this.showVariables.showErledigt,
+						formatter:"tickCross",
+						hozAlign:"center",
+						formatterParams: {
+							tickElement: '<i class="fa fa-check text-success"></i>',
+							crossElement: '<i class="fa fa-xmark text-danger"></i>'
+						}
+					},
+					{title: "Notiz_id", field: "notiz_id", width: 92, visible: this.showVariables.showNotiz_id},
+					{title: "Notizzuordnung_id", field: "notizzuordnung_id", width: 164, visible: this.showVariables.showNotizzuordnung_id},
+					{title: "type_id", field: "type_id", width: 164, visible: this.showVariables.showType_id},
+					{title: "extension_id", field: "id", width: 135, visible: this.showVariables.showId},
+					{
+						title: "letzte Änderung",
+						field: "lastupdate",
+						width: 146,
+						visible: this.showVariables.showLastupdate,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit",
+								second: "2-digit",
+								hour12: false
+							});
+						}
+					},
+					{
+						title: 'Aktionen', field: 'actions',
+						width: 100,
+						formatter: (cell, formatterParams, onRendered) => {
+							let container = document.createElement('div');
+							container.className = "d-flex gap-2";
+
+							let button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('notiz', 'notiz_edit');
+							button.innerHTML = '<i class="fa fa-edit"></i>';
+							button.addEventListener(
+								'click',
+								(event) =>
+									this.actionEditNotiz(cell.getData().notiz_id)
+							);
+							container.append(button);
+
+							button = document.createElement('button');
+							button.className = 'btn btn-outline-secondary btn-action';
+							button.title = this.$p.t('notiz', 'notiz_delete');
+							button.innerHTML = '<i class="fa fa-xmark"></i>';
+							button.addEventListener(
+								'click',
+								() =>
+									this.actionDeleteNotiz(cell.getData().notiz_id)
+							);
+							container.append(button);
+
+							return container;
+						},
+						frozen: true
+					}],
+				layout: 'fitDataStretchFrozen',
+				layoutColumnsOnNewData: false,
+				//responsiveLayout: "collapse",
+				maxHeight: '200px',
+				index: 'notiz_id',
+				persistenceID: this.tabulatorPersistenceId,
+				persistence: {
+					sort: true,
+					columns: ["width", "visible", "frozen"],
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				}
+			};
+		},
+		tabulatorEvents: function () {
+			return [
+				{
+					event: 'tableBuilt',
+					handler: async () => {
+
+						//to avoid js error
+						if (!this.$refs.table) return;
+
+						await this.$p.loadCategory(['notiz', 'global', 'ui']);
+
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('verfasser', this.$p.t('notiz', 'verfasser'));
+						setHeader('verfasser_uid', this.$p.t('ui', 'verfasser_uid'));
+						setHeader('titel', this.$p.t('global', 'titel'));
+						setHeader('bearbeiter', this.$p.t('notiz', 'bearbeiter'));
+						setHeader('bearbeiter_uid', this.$p.t('ui', 'bearbeiter_uid'));
+						setHeader('start_format', this.$p.t('global', 'gueltigVon'));
+						setHeader('ende_format', this.$p.t('global', 'gueltigBis'));
+						setHeader('countdoc', this.$p.t('notiz', 'document'));
+						setHeader('erledigt', this.$p.t('notiz', 'erledigt'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('notiz_id', this.$p.t('ui', 'notiz_id'));
+						setHeader('notizzuordnung_id', this.$p.t('ui', 'notizzuordnung_id'));
+						setHeader('type_id', this.$p.t('ui', 'type_id'));
+						setHeader('id', this.$p.t('ui', 'extension_id'));
+						setHeader('text_stripped', this.$p.t('global', 'text'));
+
+						// Force layout recalculation for handling overflow text
+						this.$refs.table.tabulator.redraw(true);
+					}
+				}
+			];
 		}
 	},
 	methods: {
@@ -308,8 +308,6 @@ export default {
 					this.notizData.bis = this.notizen.ende;
 					this.notizData.document = this.notizen.dms_id;
 					this.notizData.erledigt = this.notizen.erledigt;
-					this.notizData.verfasser = this.notizen.verfasser_uid;
-					this.notizData.intVerfasser = this.notizen.verfasser_uid;
 					this.notizData.intBearbeiter = this.notizen.bearbeiter_uid;
 					this.notizData.bearbeiter = this.notizen.bearbeiter_uid;
 				}
@@ -332,6 +330,7 @@ export default {
 		},
 		addNewNotiz() {
 			const formData = new FormData();
+			this.notizData.id = this.id;
 
 			formData.append('data', JSON.stringify(this.notizData));
 			Object.entries(this.notizData.anhang).forEach(([k, v]) => formData.append(k, v));
@@ -347,6 +346,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -359,6 +359,7 @@ export default {
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					this.reload();
+					this.$emit('reload');
 					this.resetFormData();
 				})
 				.catch(this.$fhcAlert.handleSystemError)
@@ -373,6 +374,7 @@ export default {
 					this.notizData = result.data;
 					this.notizData.typeId = this.typeId;
 					this.notizData.anhang = [];
+					this.currentVerfasserUid = result.data.verfasser_uid;
 					return result;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
@@ -402,6 +404,7 @@ export default {
 						this.$refs.NotizModal.hide();
 					}
 					this.reload();
+					this.$emit('reload');
 				})
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
@@ -425,16 +428,17 @@ export default {
 				bis: null,
 				document: null,
 				erledigt: false,
-				verfasser: this.uid,
 				bearbeiter: null,
-				anhang: []
+				anhang: [],
 			};
+			this.currentVerfasserUid = this.uid
 		},
 		getUid() {
 			return this.$api
 				.call(this.endpoint.getUid())
 				.then(result => {
-					this.notizData.intVerfasser = result.data;
+					this.currentVerfasserUid = result.data;
+					this.uid = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -446,7 +450,6 @@ export default {
 				});
 		},
 		initTinyMCE() {
-
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
@@ -484,15 +487,15 @@ export default {
 				const columnToShow = "show" + column.charAt(0).toUpperCase() + column.slice(1);
 				this.showVariables[columnToShow] = true;
 			});
-		},
+		}
 	},
 	created() {
 		this.initializeShowVariables();
 		this.getUid();
 	},
 	async mounted() {
-		if(this.showTinyMce){
-			this.initTinyMCE();
+		if (this.showTinyMce) {
+			await this.initTinyMCE();
 		}
 	},
 	watch: {
@@ -518,28 +521,22 @@ export default {
 			},
 			deep: true
 		},
-		'notizData.intVerfasser': {
-			handler(newVal) {
-				if (typeof newVal === 'object') {
-					this.notizData.verfasser = newVal.mitarbeiter_uid;
-				}
-			},
-			deep: true
-		},
+
 		id() {
 			this.reload();
 		}
 	},
-	beforeDestroy() {
-		if(this.showTinyMce) {
-			this.editor.destroy();
+	beforeUnmount() {
+		if (this.editor && tinymce.get(this.editor.id)) {
+			tinymce.get(this.editor.id).remove();
+			this.editor = null;
 		}
 	},
 	template: `
 	<div class="core-notiz">
 	
 		<div v-if="notizLayout=='classicFas'">
-		
+
 			<core-filter-cmpt
 				ref="table"
 				:tabulator-options="tabulatorOptions"
@@ -553,21 +550,18 @@ export default {
 				>
 			</core-filter-cmpt>
 			
-			<br>
 		
-			<form-form ref="formNotiz" @submit.prevent class="row pt-3">
-				<br><br>
+			<form-form ref="formNotiz" @submit.prevent class="row">
+
 				<div class="pt-2">
-					<div class="row mb-3">
-						<div class="col-sm-7">
-							<span class="small">[{{notizData.typeId}}]</span>
-						</div>
-					</div>
 					
-					<div class="row mb-3">
+					<div class="row mt-4 mb-1">
 						<div class="col-sm-7">
-							<p v-if="notizData.statusNew" class="fw-bold"> {{$p.t('notiz','notiz_new')}}</p>
-							<p v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</p>
+							<p>
+								<span v-if="notizData.statusNew" class="fw-bold">{{$p.t('notiz','notiz_new')}}</span>
+								<span v-else class="fw-bold">{{$p.t('notiz','notiz_edit')}}</span>
+								<span class="small"> [{{notizData.typeId}}]</span>
+							</p>
 						</div>
 					</div>
 		
@@ -627,24 +621,23 @@ export default {
 					<div class="row mb-3">
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','verfasser')}}</label>
 											
-						<div v-if="notizData.verfasser_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.verfasser_uid">
-						</div>
-						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intVerfasser" optionLabel="mitarbeiter"  :suggestions="filteredMitarbeiter" @complete="search" minLength="3"/>
+						<div class="col-sm-3">
+							<input type="text" readonly="readonly" class="form-control" id="name" v-model="currentVerfasserUid">
 						</div>
 						
 						<label for="von" class="form-label col-sm-1">{{$p.t('global','gueltigVon')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="von"
-								v-model="notizData.start"
-								clearable="false"
+							<form-input
+								type="DatePicker"
+								v-model="notizData['start']"
+								name="von"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy"></vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 					
@@ -652,26 +645,35 @@ export default {
 						<label for="bis" class="form-label col-sm-2">{{$p.t('notiz','bearbeiter')}}</label>
 						
 						<div v-if="notizData.bearbeiter_uid" class="col-sm-3">
-							<input type="text" :readonly="readonly" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
+							<input type="text" class="form-control" id="name" v-model="notizData.bearbeiter_uid">
 						</div>
 						
 						<div v-else class="col-sm-3">
-							<PvAutoComplete v-model="notizData.intBearbeiter" optionLabel="mitarbeiter" :suggestions="filteredMitarbeiter" @complete="search" minlength="3"/>
+							<form-input
+								type="autocomplete"
+								v-model="notizData.intBearbeiter"
+								:suggestions="filteredMitarbeiter" 
+								@complete="search" 
+								optionLabel="mitarbeiter"
+								minlength="3"
+							>
+							</form-input>
 						</div>
 						
 						
 						<label for="bis" class="form-label col-sm-1">{{$p.t('global','gueltigBis')}}</label>
 						<div class="col-sm-3">
-							<vue-date-picker
-								id="bis"
+							<form-input
+								type="DatePicker"
 								v-model="notizData.ende"
-								clearable="false"
+								name="bis"
 								auto-apply
 								:enable-time-picker="false"
 								format="dd.MM.yyyy"
+								preview-format="dd.MM.yyyy"
 								:teleport="true"
-								preview-format="dd.MM.yyyy">
-							</vue-date-picker>
+								>
+							</form-input>
 						</div>
 					</div>
 										
@@ -689,9 +691,13 @@ export default {
 						<p class="small">{{notizData.lastupdate}}</p>
 					</div>
 				</div>
-				
-				<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
-				<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+				<div class="row">
+					<div class="text-end">
+						<button v-if="notizData.statusNew"  type="button" class="btn btn-primary" @click="addNewNotiz()"> {{$p.t('studierendenantrag', 'btn_new')}}</button>
+						<button v-else type="button" class="btn btn-primary" @click="updateNotiz(notizData.notiz_id)"> {{$p.t('ui', 'speichern')}}</button>
+					</div>
+				</div>
+
 			</form-form>
 		</div>
 
@@ -811,28 +817,15 @@ export default {
 							
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"
@@ -977,25 +970,12 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
-									>
-								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
 								
@@ -1164,33 +1144,21 @@ export default {
 					
 							<div class="row mb-3">
 								<form-input 
-									v-if="notizData.verfasser_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'verfasser')"
 									type="text"
-									v-model="notizData.verfasser_uid"
-									name="titel"
+									readonly="readonly"
+									v-model="currentVerfasserUid"
+									name="verfasser"
 									>
 								</form-input>
-						
-								<form-input
-									v-else
-									container-class="col-6"
-									:label="$p.t('notiz', 'verfasser')"
-									type="autocomplete"
-									v-model="notizData.intVerfasser"
-									:suggestions="filteredMitarbeiter" 
-									@complete="search" 
-									optionLabel="mitarbeiter"
-									minLength="3"
-									>
-								</form-input>
-								
+					
 								<form-input
 									v-if="notizData.bearbeiter_uid"
 									container-class="col-6"
 									:label="$p.t('notiz', 'bearbeiter')"
 									v-model="notizData.bearbeiter_uid"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>
@@ -1204,6 +1172,7 @@ export default {
 									:suggestions="filteredMitarbeiter" 
 									@complete="search" 
 									optionLabel="mitarbeiter"
+									name="bearbeiter"
 									minlength="3"
 									>
 								</form-input>	
@@ -1247,6 +1216,7 @@ export default {
 					table-only
 					:side-menu="false"
 					reload
+					:reload-btn-infotext="this.$p.t('table', 'reload')"
 					new-btn-show
 					:new-btn-label="this.$p.t('global', 'notiz')"
 					@click:new="actionNewNotiz"

@@ -8,6 +8,7 @@ async function callPermissionUrl($api, url) {
 }
 
 export default {
+	name: 'ZeugnisDocuments',
 	components: {
 		PvTieredMenu: primevue.tieredmenu
 	},

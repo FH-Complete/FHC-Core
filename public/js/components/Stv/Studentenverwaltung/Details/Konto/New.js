@@ -17,8 +17,8 @@ export default {
 		lists: {
 			from: 'lists'
 		},
-		defaultSemester: {
-			from: 'defaultSemester'
+		currentSemester: {
+			from: 'currentSemester'
 		}
 	},
 	props: {
@@ -38,7 +38,7 @@ export default {
 	data() {
 		return {
 			loading: false,
-			data: {}
+			data: {},
 		};
 	},
 	computed: {
@@ -47,7 +47,7 @@ export default {
 		},
 		activeBuchungstypen() {
 			return this.lists.buchungstypen.filter(e => e.aktiv);
-		}
+		},
 	},
 	methods: {
 		save() {
@@ -89,7 +89,7 @@ export default {
 				buchungsdatum: new Date(),
 				buchungstext: '',
 				mahnspanne: 30,
-				studiensemester_kurzbz: this.defaultSemester,
+				studiensemester_kurzbz: this.currentSemester,
 				credit_points: null,
 				anmerkung: ''
 			};
@@ -144,9 +144,12 @@ export default {
 					name="buchungsdatum"
 					:label="$p.t('konto/buchungsdatum')"
 					:enable-time-picker="false"
+					text-input
+					format="dd.MM.yyyy"
 					auto-apply
 					>
 				</form-input>
+
 				<form-input
 					v-model="data.buchungstext"
 					name="buchungstext"

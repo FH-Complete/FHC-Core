@@ -61,6 +61,20 @@ export default {
 			params: dms
 		};
 	},
+	updateProfilbild(dms) {
+		return {
+			method: 'post',
+			url: `/api/frontend/v1/ProfilUpdate/updateProfilbild`,
+			params: dms
+		};
+	},
+	getProfilUpdateWithPermission(filter) {
+		const url_filter = (filter !== '') ? '/' + encodeURIComponent(filter) : '';
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/ProfilUpdate/getProfilUpdateWithPermission' + url_filter
+		};
+	},
 	getProfilRequestFiles(requestID) {
 		return {
 			method: 'get',

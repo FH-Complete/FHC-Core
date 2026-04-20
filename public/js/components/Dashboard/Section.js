@@ -1,8 +1,7 @@
 import BsConfirm from "../Bootstrap/Confirm.js";
-import SectionModal from "../Bootstrap/Alert.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import WidgetIcon from "./Widget/WidgetIcon.js"
 
 export default {
@@ -41,6 +40,7 @@ export default {
 			gridWidth: 1,
 			gridHeight: null,
 			draggedItem:null,
+			additionalRow:false,
 		}
 	},
 	provide() {
@@ -108,13 +108,13 @@ export default {
 		},
 		showSectionInformation(){
 			if (this.name == "general"){
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardGeneralSectionDescription')); 
+				return this.$p.t('dashboard', 'dashboardGeneralSectionDescription'); 
 			}
 			else if(this.name == "custom"){
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardCustomSectionDescription'));
+				return this.$p.t('dashboard', 'dashboardCustomSectionDescription');
 			}
 			else{
-				SectionModal.popup(this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]));
+				return this.$p.t('dashboard', 'dashboardSectionDescription', [this.name]);
 			}
 		},
 		handleConfigOpened() {
@@ -125,23 +125,23 @@ export default {
 		},
 		checkResizeLimit(item, w, h) {
 			// NOTE(chris): widgets needs to be loaded for this to work
-			let widget = CachedWidgetLoader.getWidget(item.widget);
+			let widget = this.widgetState[item.widget];
 			if (widget) {
-				let minmaxW = widget.setup.width;
+				let minmaxW = { ...widget.setup.width };
 				if (minmaxW.max)
 					minmaxW.min = minmaxW.min || 1;
 				else
-					minmaxW = {min:minmaxW,max:minmaxW};
+					minmaxW = { min: minmaxW, max: minmaxW };
 				if (w < minmaxW.min)
 					w = minmaxW.min; 
 				if (w > minmaxW.max)
 					w = minmaxW.max;
 
-				let minmaxH = widget.setup.height;
+				let minmaxH = { ...widget.setup.height };
 				if (minmaxH.max)
 					minmaxH.min = minmaxH.min || 1;
 				else
-					minmaxH = {min:minmaxH,max:minmaxH};
+					minmaxH = { min: minmaxH, max: minmaxH };
 				if (h < minmaxH.min)
 					h = minmaxH.min;
 				if (h > minmaxH.max)
@@ -151,7 +151,7 @@ export default {
 		},
 		removeWidget(item, revert) {
 			if (item.custom) {
-				BsConfirm.popup('Are you sure you want to delete this widget?').then(() => this.$emit('widgetRemove', this.name, item.id));
+				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', this.name, item.id));
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };
@@ -199,6 +199,13 @@ export default {
 			this.$emit('widgetUpdate', this.name, payload);
 		}
 	},
+	setup() {
+		const { state: widgetState } = useCachedWidgetLoader();
+
+		return {
+			widgetState
+		};
+	},
 	mounted() {
 		let self = this;
 		let cont = self.$refs.container;
@@ -209,18 +216,20 @@ export default {
 		});
 	},
 	template: `
-	<h4 v-if="editModeIsActive" class=" mb-0">
-		<i @click="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
-		{{sectionNameTranslation()}}:
-	</h4>
 	<div class="dashboard-section position-relative pb-3 border-bottom" ref="container" :style="getSectionStyle">
-		<drop-grid v-model:cols="gridWidth" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
+		<h4 v-if="editModeIsActive" class=" mb-2">
+			<i v-tooltip="showSectionInformation(name)" class="fa-solid fa-circle-info section-info" ></i>
+			{{sectionNameTranslation()}}:
+		</h4>
+		<button v-tooltip="$p.t('dashboard','addLine')" v-if="!additionalRow && editModeIsActive" @click="additionalRow=true" class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center">+</button>
+		<drop-grid v-model:cols="gridWidth" v-model:additionalRow="additionalRow" :items="items" :itemsSetup="computedWidgetsSetup" :active="editModeIsActive" :resize-limit="checkResizeLimit" :margin-for-extra-row=".01" @draggedItem="draggedItem=$event" @rearrange-items="updatePositions" @gridHeight="gridHeight=$event" >
 			<template #default="item">
-				<div v-if="item.placeholder" class="empty-tile-hover" @click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
-				<div v-else-if="item.blank || (item.widgetid && item.widgetid == draggedItem?.data.widgetid)" :class="{'dashboard-item-overlay':item.resizeOverlay}" class="dashboard-item card overflow-hidden h-100 position-relative draggedItem" ></div>
+				<div v-if="item.placeholder" class="empty-tile-hover" @pointerdown="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"></div>
 				<dashboard-item 
 					v-else
 					:id="item.widget"
+					:dragstate="item.blank || (item.widgetid && item.widgetid == draggedItem?.data.widgetid)"
+					:resizeOverlay="item.resizeOverlay"
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"

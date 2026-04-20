@@ -235,7 +235,6 @@ function draw_content_liste($row)
 			<STUDENT:vorname><![CDATA['.$row->vorname.']]></STUDENT:vorname>
 			<STUDENT:nachname><![CDATA['.$row->nachname.']]></STUDENT:nachname>
 			<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
-			<STUDENT:svnr>'.($row->svnr==''?'&#xA0;':'<![CDATA['.$row->svnr.']]>').'</STUDENT:svnr>
 			<STUDENT:ersatzkennzeichen>'.($row->ersatzkennzeichen==''?'&#xA0;':'<![CDATA['.$row->ersatzkennzeichen.']]>').'</STUDENT:ersatzkennzeichen>
 			<STUDENT:geburtsdatum><![CDATA['.$datum_obj->convertISODate($row->gebdatum).']]></STUDENT:geburtsdatum>
 			<STUDENT:geburtsdatum_iso><![CDATA['.$row->gebdatum.']]></STUDENT:geburtsdatum_iso>
@@ -280,12 +279,32 @@ function draw_content($row)
 	$status='';
 
 	$mail_privat = '';
-	$qry_mail = "SELECT kontakt FROM public.tbl_kontakt WHERE kontakttyp='email' AND person_id=".$db->db_add_param($row->person_id)." AND zustellung=true ORDER BY kontakt_id DESC LIMIT 1";
+	$mail_unverifiziert = '';
+
+	$qry_mail = "
+		SELECT
+			DISTINCT ON (kontakttyp) kontakt, kontakttyp
+		FROM
+			public.tbl_kontakt
+		WHERE
+			zustellung=TRUE
+			AND kontakttyp IN ('email', 'email_unverifiziert')
+			AND person_id = ".$db->db_add_param($row->person_id)."
+		ORDER BY
+			kontakttyp, kontakt_id DESC";
+
 	if($db->db_query($qry_mail))
 	{
 		if($row_mail = $db->db_fetch_object())
 		{
-			$mail_privat = $row_mail->kontakt;
+			if ($row_mail->kontakttyp == 'email')
+			{
+				$mail_privat = $row_mail->kontakt;
+			}
+			elseif ($row_mail->kontakttyp == 'email_unverifiziert')
+			{
+				$mail_unverifiziert = $row_mail->kontakt;
+			}
 		}
 	}
 
@@ -349,7 +368,6 @@ function draw_content($row)
 			<STUDENT:gebzeit><![CDATA['.$row->gebzeit.']]></STUDENT:gebzeit>
 			<STUDENT:anmerkungen>'.($row->anmerkungen==''?'&#xA0;':'<![CDATA['.$row->anmerkungen.']]>').'</STUDENT:anmerkungen>
 			<STUDENT:anrede><![CDATA['.$row->anrede.']]></STUDENT:anrede>
-			<STUDENT:svnr><![CDATA['.$row->svnr.']]></STUDENT:svnr>
 			<STUDENT:ersatzkennzeichen><![CDATA['.$row->ersatzkennzeichen.']]></STUDENT:ersatzkennzeichen>
 			<STUDENT:familienstand><![CDATA['.$row->familienstand.']]></STUDENT:familienstand>
 			<STUDENT:geschlecht><![CDATA['.$row->geschlecht.']]></STUDENT:geschlecht>
@@ -368,7 +386,7 @@ function draw_content($row)
 			<STUDENT:mail_privat><![CDATA['.$mail_privat.']]></STUDENT:mail_privat>
 			<STUDENT:mail_intern><![CDATA['.(isset($row->uid)?$row->uid.'@'.DOMAIN:'').']]></STUDENT:mail_intern>
 			<STUDENT:zugangscode><![CDATA['.$row->zugangscode.']]></STUDENT:zugangscode>
-			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.$mail_privat.']]></STUDENT:link_bewerbungstool>
+			<STUDENT:link_bewerbungstool><![CDATA['.CIS_ROOT.'addons/bewerbung/cis/registration.php?code='.$row->zugangscode.'&emailAdresse='.($mail_privat == '' ? $mail_unverifiziert : $mail_privat).'&keepEmailUnverified=true]]></STUDENT:link_bewerbungstool>
 			<STUDENT:bpk><![CDATA['.$row->bpk.']]></STUDENT:bpk>
 
 			<STUDENT:aktiv><![CDATA['.$aktiv.']]></STUDENT:aktiv>
@@ -470,7 +488,6 @@ function draw_empty_content()
 			<STUDENT:gebzeit><![CDATA[]]></STUDENT:gebzeit>
 			<STUDENT:anmerkungen><![CDATA[]]></STUDENT:anmerkungen>
 			<STUDENT:anrede><![CDATA[]]></STUDENT:anrede>
-			<STUDENT:svnr><![CDATA[]]></STUDENT:svnr>
 			<STUDENT:ersatzkennzeichen><![CDATA[]]></STUDENT:ersatzkennzeichen>
 			<STUDENT:familienstand><![CDATA[]]></STUDENT:familienstand>
 			<STUDENT:geschlecht><![CDATA[]]></STUDENT:geschlecht>
@@ -647,7 +664,7 @@ if($xmlformat=='rdf')
 		$sql_query="
 		SELECT
 			p.person_id, tbl_student.prestudent_id, tbl_benutzer.uid, titelpre, titelpost,vorname, wahlname, vornamen, geschlecht,
-			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen,svnr, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
+			nachname, gebdatum, tbl_prestudent.anmerkung,ersatzkennzeichen, tbl_student.matrikelnr, p.anmerkung as anmerkungen,
 			tbl_studentlehrverband.semester, tbl_studentlehrverband.verband, tbl_studentlehrverband.gruppe,
 			tbl_student.studiengang_kz, aufmerksamdurch_kurzbz, mentor, public.tbl_benutzer.aktiv AS bnaktiv,
 			(	SELECT kontakt
@@ -985,8 +1002,7 @@ if($xmlformat=='rdf')
 						$qry .= "	prestudent_id = ".$db->db_add_param($searchItems_string_orig).";";
 					else
 						$qry .= "	matrikelnr = ".$db->db_add_param($searchItems_string_orig)." OR
-									matr_nr = ".$db->db_add_param($searchItems_string_orig)." OR
-									svnr = ".$db->db_add_param($searchItems_string_orig).";";
+									matr_nr = ".$db->db_add_param($searchItems_string_orig).";";
 				}
 				if($result = $db->db_query($qry))
 				{
@@ -1282,7 +1298,6 @@ else
 				<lv_studiengang_art><![CDATA['.$lv_studiengang_art.']]></lv_studiengang_art>
 				<anrede><![CDATA['.$student->anrede.']]></anrede>
 				<geschlecht><![CDATA['.$student->geschlecht.']]></geschlecht>
-				<svnr><![CDATA['.$student->svnr.']]></svnr>
 				<ersatzkennzeichen><![CDATA['.$student->ersatzkennzeichen.']]></ersatzkennzeichen>
 				<familienstand><![CDATA['.$student->familienstand.']]></familienstand>
 				<rektor><![CDATA['.$rektor.']]></rektor>
