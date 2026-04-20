@@ -232,7 +232,11 @@ export default {
 		},
 		indexedItems: {
 			handler(value) {
-				this.dragCancel();
+				if (!value?.length)
+					return;
+				
+				if (this.mode != MODE_IDLE)
+					this.dragCancel();
 
 				const updated = this.createNewGrid(value);
 
