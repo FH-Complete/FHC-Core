@@ -232,9 +232,6 @@ export default {
 		},
 		indexedItems: {
 			handler(value) {
-				if (!value?.length)
-					return;
-				
 				if (this.mode != MODE_IDLE)
 					this.dragCancel();
 
