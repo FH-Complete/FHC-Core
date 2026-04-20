@@ -110,6 +110,8 @@ export default {
 			<div
 				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
 				id="header-searchbar-collapsible"
+				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
+				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
 			>
 				<div
 					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
@@ -251,17 +253,6 @@ export default {
 				"No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.",
 			);
 		}
-
-		document
-			.getElementById("header-searchbar-collapsible")
-			.addEventListener("show.bs.collapse", (e) => {
-				this.isSearchShownInMobileView = true;
-			});
-		document
-			.getElementById("header-searchbar-collapsible")
-			.addEventListener("hidden.bs.collapse", (e) => {
-				this.isSearchShownInMobileView = false;
-			});
 	},
 	updated() {
 		if (this.showresult) {
