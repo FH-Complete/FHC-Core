@@ -23,7 +23,7 @@ export default {
 		}
 	},
 	methods: {
-		widgetAdd(section_name, widget) {
+		widgetAdd(widget, section_name) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
 				widget.id = 'loading_' + String((new Date()).valueOf());
@@ -64,8 +64,7 @@ export default {
 			})
 			.catch(() => {});
 		},
-		widgetUpdate(section_name, payload) {
-			payload = payload[section_name];
+		widgetUpdate(payload, section_name) {
 			for (var k in payload) {
 				const section = this.sections.find(section => section.name == section_name);
 				for (var wid in section.widgets) {
@@ -105,7 +104,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		widgetRemove(section_name, id) {
+		widgetRemove(id, section_name) {
 			const params = {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,

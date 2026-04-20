@@ -133,7 +133,7 @@ export default {
 		},
 		removeWidget(item, revert) {
 			if (item.custom) {
-				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', this.name, item.id));
+				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', item.id, this.name));
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };
@@ -187,9 +187,7 @@ export default {
 			this.updatePreset(result);
 		},
 		updatePreset(update) {
-			let payload = {};
-			payload[this.name] = update;
-			this.$emit('widgetUpdate', this.name, payload);
+			this.$emit('widgetUpdate', update, this.name);
 		}
 	},
 	mounted() {
@@ -230,7 +228,7 @@ export default {
 				<div
 					v-if="item.placeholder"
 					class="empty-tile-hover"
-					@click="$emit('widgetAdd', name, { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 })"
+					@click="$emit('widgetAdd', { widget: 1, config: {}, place: {[gridWidth]: {x:item.x,y:item.y,w:1,h:1}}, custom: 1 }, name)"
 				></div>
 				<dashboard-item 
 					v-else

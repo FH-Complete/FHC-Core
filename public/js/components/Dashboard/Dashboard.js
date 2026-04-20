@@ -40,8 +40,7 @@ export default {
 		}
 	},
 	methods: {
-		widgetAdd(section_name, widget) {
-			// TODO(chris): remove section_name? (change order of params => get rid of it)
+		widgetAdd(widget) {
 			this.$refs.widgetpicker
 				.getWidget()
 				.then(widget_id => {
@@ -63,8 +62,7 @@ export default {
 				})
 				.catch(() => {});
 		},
-		widgetUpdate(section_name, payload) {
-			payload = payload[section_name];
+		widgetUpdate(payload) {
 			for (var k in payload) {
 				for (var wid in this.widgets) {
 					if (this.widgets[wid].id == k) {
@@ -112,7 +110,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		widgetRemove(section_name, id) {
+		widgetRemove(id) {
 			this.$api
 				.call(ApiDashboardUser.removeWidget(this.dashboard, id))
 				.then(() => {
@@ -148,7 +146,7 @@ export default {
 					}
 				}
 
-				remove.forEach(wid => this.widgetRemove('general', wid));
+				remove.forEach(wid => this.widgetRemove(wid));
 
 				this.widgets = widgets;
 			})
@@ -160,7 +158,7 @@ export default {
 			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
 			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
-		<dashboard-section :seperator="0" name="general" :widgets="widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
+		<dashboard-section :seperator="0" name="general" :widgets="widgets" @widget-add="widgetAdd" @widget-update="widgetUpdate" @widget-remove="widgetRemove"></dashboard-section>
 		<dashboard-widget-picker ref="widgetpicker" :widgets="widgetsSetup"></dashboard-widget-picker>
 	</div>`
 }
