@@ -12,14 +12,23 @@ export default {
 		dashboard: String,
 		widgets: Array
 	},
-	data: () => ({
-		funktionen: {},
-		sections: [],
-		tmpLoading: ''
-	}),
+	data() {
+		return {
+			funktionen: {},
+			sections: [],
+			tmpLoading: ''
+		};
+	},
 	computed: {
 		pickerWidgets() {
 			return this.widgets.filter(widget => widget.allowed);
+		}
+	},
+	watch: {
+		dashboard() {
+			// TODO(chris): this should be done without a watcher
+			this.loadSections({target:this.$refs.funktionenList});
+			this.loadFunktionen();
 		}
 	},
 	methods: {
@@ -149,7 +158,6 @@ export default {
 					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-
 		},
 		loadFunktionen() {
 			this.$api
@@ -163,17 +171,17 @@ export default {
 	created() {
 		this.loadFunktionen();
 	},
-	watch: {
-		dashboard() {
-			// TODO(chris): this should be done without a watcher
-			this.loadSections({target:this.$refs.funktionenList});
-			this.loadFunktionen();
-		}
-	},
-	template: `<div class="dashboard-admin-presets">
+	template: /* html */`
+	<div class="dashboard-admin-presets">
 		<div class="row">
 			<div class="col-3">
-				<select ref="funktionenList" style="height:30em" class="form-control" multiple @input="loadSections">
+				<select
+					ref="funktionenList"
+					style="height:30em"
+					class="form-control"
+					multiple
+					@input="loadSections"
+				>
 					<option
 						v-for="funktion in funktionen"
 						:key="funktion.funktion_kurzbz"
@@ -183,9 +191,20 @@ export default {
 				</select>
 			</div>
 			<div class="col-9">
-				<dashboard-section v-for="section in sections" :key="section.name" :name="section.name" :widgets="section.widgets" @widget-add="widgetAdd" @widget-update="widgetUpdate" @widget-remove="widgetRemove"></dashboard-section>
+				<dashboard-section
+					v-for="section in sections"
+					:key="section.name"
+					:name="section.name"
+					:widgets="section.widgets"
+					@widget-add="widgetAdd"
+					@widget-update="widgetUpdate"
+					@widget-remove="widgetRemove"
+				></dashboard-section>
 			</div>
 		</div>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="pickerWidgets"></dashboard-widget-picker>
+		<dashboard-widget-picker
+			ref="widgetpicker"
+			:widgets="pickerWidgets"
+		></dashboard-widget-picker>
 	</div>`
 }
