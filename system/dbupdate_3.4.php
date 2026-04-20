@@ -27,6 +27,7 @@ require_once('dbupdate_3.4/example.php');
 require_once('dbupdate_3.4/example2.php');
 ...
 */
+//require_once('dbupdate_3.4/25003_notenimport_nachpruefung.php');
 require_once('dbupdate_3.4/dbupdate_dashboard.php');
 require_once('dbupdate_3.4/26173_index_webservicelog.php');
 require_once('dbupdate_3.4/24682_reihungstest_zugangscode_fuer_login.php');
@@ -77,7 +78,22 @@ require_once('dbupdate_3.4/55614_perm_verwaltetoe.php');
 require_once('dbupdate_3.4/25999_C4_dashboard.php');
 require_once('dbupdate_3.4/61730_Dashboard_Anpassungen.php');
 require_once('dbupdate_3.4/40128_search.php');
+require_once('dbupdate_3.4/63394_Variablenbeschraenkung.php');
+require_once('dbupdate_3.4/63436_cis4_iframe_component.php');
+require_once('dbupdate_3.4/60882_lehrfaecherverteilung_favorites.php');
 require_once('dbupdate_3.4/66982_berufsschule.php');
+require_once('dbupdate_3.4/40314_electronic_onboarding_anbindung_ida.php');
+require_once('dbupdate_3.4/47972_pruefungsverwaltung_ects_angabe.php');
+require_once('dbupdate_3.4/62063_lv_evaluierung.php');
+require_once('dbupdate_3.4/67490_studstatus_suche_abort_controller_haengt.php');
+require_once('dbupdate_3.4/61164_abgabetool_quality_gates.php');
+require_once('dbupdate_3.4/69065_Projektarbeiten_Firmen_verwalten.php');
+require_once('dbupdate_3.4/68744_StV_settings.php');
+require_once('dbupdate_3.4/62889_reihungstest_ueberwachung_mit_constructor.php');
+require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
+require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
+require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
+require_once('dbupdate_3.4/70376_lohnguide.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -156,12 +172,12 @@ $tabellen=array(
 	"campus.tbl_news"  => array("news_id","uid","studiengang_kz","fachbereich_kurzbz","semester","betreff","text","datum","verfasser","updateamum","updatevon","insertamum","insertvon","datum_bis","content_id"),
 	"campus.tbl_notenschluessel"  => array("lehreinheit_id","note","punkte"),
 	"campus.tbl_notenschluesseluebung"  => array("uebung_id","note","punkte"),
-	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung"),
-	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum"),
+	"campus.tbl_paabgabetyp"  => array("paabgabetyp_kurzbz","bezeichnung","aktiv","upload_allowed_default","benotbar"),
+	"campus.tbl_paabgabe"  => array("paabgabe_id","projektarbeit_id","paabgabetyp_kurzbz","fixtermin","datum","kurzbz","abgabedatum", "insertvon","insertamum","updatevon","updateamum","note","upload_allowed","beurteilungsnotiz"),
 	"campus.tbl_pruefungsfenster" => array("pruefungsfenster_id","studiensemester_kurzbz","oe_kurzbz","start","ende"),
 	"campus.tbl_pruefung" => array("pruefung_id","mitarbeiter_uid","studiensemester_kurzbz","pruefungsfenster_id","pruefungstyp_kurzbz","titel","beschreibung","methode","einzeln","storniert","insertvon","insertamum","updatevon","updateamum","pruefungsintervall"),
-	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur"),
-	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum"),
+	"campus.tbl_pruefungstermin" => array("pruefungstermin_id","pruefung_id","von","bis","teilnehmer_max","teilnehmer_min","anmeldung_von","anmeldung_bis","ort_kurzbz","sammelklausur", "anderer_raum"),
+	"campus.tbl_pruefungsanmeldung" => array("pruefungsanmeldung_id","uid","pruefungstermin_id","lehrveranstaltung_id","status_kurzbz","wuensche","reihung","kommentar","statusupdatevon","statusupdateamum","anrechnung_id","pruefungstyp_kurzbz","insertamum", "ects"),
 	"campus.tbl_pruefungsstatus" => array("status_kurzbz","bezeichnung"),
 	"campus.tbl_reservierung"  => array("reservierung_id","ort_kurzbz","studiengang_kz","uid","stunde","datum","titel","beschreibung","semester","verband","gruppe","gruppe_kurzbz","veranstaltung_id","insertamum","insertvon"),
 	"campus.tbl_studierendenantrag" => array("studierendenantrag_id","prestudent_id","studiensemester_kurzbz","datum","typ","insertamum","insertvon","datum_wiedereinstieg","grund","dms_id"),
@@ -225,6 +241,11 @@ $tabellen=array(
 	"hr.tbl_valorisierung_instanz" => array("updateamum", "oe_kurzbz", "valorisierungsdatum", "valorisierung_kurzbz", "beschreibung", "ausgewaehlt", "updatevon", "valorisierung_instanz_id"),
 	"hr.tbl_valorisierung_instanz_methode" => array("valorisierung_instanz_id", "valorisierung_methode_kurzbz", "beschreibung", "valorisierung_methode_parameter"),
 	"hr.tbl_valorisierung_methode" => array("beschreibung", "valorisierung_methode_kurzbz"),
+	"hr.tbl_lohnguide_jobfamilie" => array("jobfamilie_kurzbz", "bezeichnung", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_modellfunktion" => array("modellfunktion_kurzbz", "bezeichnung", "jobfamilie_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_modellstelle" => array("modellstelle_kurzbz", "bezeichnung", "grade", "modellfunktion_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_lohnguide_fachrichtung" => array("fachrichtung_kurzbz", "bezeichnung", "aktiv", "insertvon", "insertamum", "updatevon", "updateamum"),
+	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),	
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
@@ -245,7 +266,7 @@ $tabellen=array(
 	"lehre.tbl_lehrmittel" => array("lehrmittel_kurzbz","beschreibung","ort_kurzbz"),
 	"lehre.tbl_lehrmodus" => array("lehrmodus_kurzbz","bezeichnung_mehrsprachig","aktiv"),
 	"lehre.tbl_lehrtyp" => array("lehrtyp_kurzbz","bezeichnung"),
-	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id"),
+	"lehre.tbl_lehrveranstaltung"  => array("lehrveranstaltung_id","kurzbz","bezeichnung","lehrform_kurzbz","studiengang_kz","semester","sprache","ects","semesterstunden","anmerkung","lehre","lehreverzeichnis","aktiv","planfaktor","planlektoren","planpersonalkosten","plankostenprolektor","koordinator","sort","zeugnis","projektarbeit","updateamum","updatevon","insertamum","insertvon","ext_id","bezeichnung_english","orgform_kurzbz","incoming","lehrtyp_kurzbz","oe_kurzbz","raumtyp_kurzbz","anzahlsemester","semesterwochen","lvnr","farbe","semester_alternativ","old_lehrfach_id","sws","lvs","alvs","lvps","las","benotung","lvinfo","lehrauftrag","lehrmodus_kurzbz","lehrveranstaltung_template_id", "evaluierung"),
 	"lehre.tbl_lehrveranstaltung_kompatibel" => array("lehrveranstaltung_id","lehrveranstaltung_id_kompatibel"),
 	"lehre.tbl_lvangebot" => array("lvangebot_id","lehrveranstaltung_id","studiensemester_kurzbz","gruppe_kurzbz","incomingplaetze","gesamtplaetze","anmeldefenster_start","anmeldefenster_ende","insertamum","insertvon","updateamum","updatevon"),
 	"lehre.tbl_lvregel" => array("lvregel_id","lvregeltyp_kurzbz","operator","parameter","lvregel_id_parent","lehrveranstaltung_id","studienplan_lehrveranstaltung_id","insertamum","insertvon","updateamum","updatevon"),
@@ -350,7 +371,7 @@ $tabellen=array(
 	"public.tbl_profil_update_status" => array("status_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_profil_update_topic" => array("topic_kurzbz","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_raumtyp"  => array("raumtyp_kurzbz","beschreibung","kosten","aktiv"),
-	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode"),
+	"public.tbl_reihungstest"  => array("reihungstest_id","studiengang_kz","ort_kurzbz","anmerkung","datum","uhrzeit","updateamum","updatevon","insertamum","insertvon","ext_id","freigeschaltet","max_teilnehmer","oeffentlich","studiensemester_kurzbz","aufnahmegruppe_kurzbz","stufe","anmeldefrist","zugangs_ueberpruefung","zugangscode", "externe_ueberwachung"),
 	"public.tbl_rueckstellung" => array("rueckstellung_id","person_id","status_kurzbz","datum_bis","insertamum","insertvon"),
 	"public.tbl_rueckstellung_status" => array("status_kurzbz", "bezeichnung_mehrsprachig", "sort", "aktiv"),
 	"public.tbl_rt_ort" => array("rt_id","ort_kurzbz","uid"),

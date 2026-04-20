@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 /**
  * This controller operates between (interface) the JS (GUI) and the back-end
  * Provides data to the ajax get calls about addresses
@@ -111,7 +113,7 @@ class Pruefung extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'global', 'ui','lehre'
+			'global', 'ui', 'lehre', 'exam'
 		]);
 	}
 
@@ -172,174 +174,11 @@ class Pruefung extends FHCAPI_Controller
 	 *
 	 * @param lehrveranstaltung_id, student_uid, lehreinheit_id
 	 *
-	 * @return values on success
-	 * 			retval 0: pruefung inserted
-	 * 			reval 1: pruefung and zeugnisnote inserted
-	 * 			retval 2: pruefung inserted, no insert Zeugnisnote
-	 * 					(change after date of examination)
-	 * 			retval 3: pruefung of type Termin2 inserted
-	 * 						and pruefung of type Termin1 as well
-	 *			retval 5: prueufungen Termin 2 and 1 inserted
-	 * 						and no insert Zeugnisnote (change after date of examination)
+	 * @return void
 	 */
 	public function insertPruefung()
 	{
-		$authUID = getAuthUID();
-
-		$this->load->library('form_validation');
-
-		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')]),
-		]);
-		$this->form_validation->set_rules('lehreinheit_id', $this->p->t('lehre', 'lehreinheit'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
-		]);
-		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
-		]);
-		$this->form_validation->set_rules(
-			'datum',
-			$this->p->t('global', 'datum'),
-			['is_valid_date']
-		);
-
-		if ($this->form_validation->run() == false)
-		{
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		}
-
-		//calculate studiensemester_kurzbz this from lehreinheit (case newPruefung)
-		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz');
-		if (!$studiensemester_kurzbz)
-		{
-			$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
-
-			$result = $this->LehreinheitModel->load($this->input->post('lehreinheit_id'));
-
-			$lehreinheit = $this->getDataOrTerminateWithError($result);
-			$studiensemester_kurzbz = current($lehreinheit)->studiensemester_kurzbz;
-
-			if (isError($result))
-			{
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$result = $this->PruefungModel->insert([
-			'lehreinheit_id' => $this->input->post('lehreinheit_id'),
-			'student_uid' => $this->input->post('student_uid'),
-			'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
-			'datum' => $this->input->post('datum'),
-			'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-			'note' => $this->input->post('note'),
-			'anmerkung' => $this->input->post('anmerkung'),
-			'insertamum' => date('c'),
-			'insertvon' => $authUID,
-		]);
-
-		$this->getDataOrTerminateWithError($result);
-
-		//check if existing zeugnisnote
-		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
-
-		$result = $this->ZeugnisnoteModel->loadWhere(array(
-			'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
-			'student_uid' => $this->input->post('student_uid'),
-			'studiensemester_kurzbz' => $studiensemester_kurzbz));
-
-		if (isError($result))
-		{
-			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		}
-
-		if (!hasData($result))
-		{
-			//insert zeugnisnote, if not existing
-			$result = $this->ZeugnisnoteModel->insert(array(
-				'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
-				'student_uid' => $this->input->post('student_uid'),
-				'studiensemester_kurzbz' => $studiensemester_kurzbz,
-				'note' => $this->input->post('note'),
-				'uebernahmedatum' => date('c'),
-				'benotungsdatum' => $this->input->post('datum'),
-				'insertamum' => date('c'),
-				'insertvon' =>  $authUID
-			));
-
-			if (isError($result))
-			{
-				$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-			}
-			$this->terminateWithSuccess(1);
-		}
-
-		$return_code = 0;
-
-		//handling Termin1 if not existing
-		if($this->input->post('pruefungstyp_kurzbz') == "Termin2")
-		{
-			$resultP = $this->PruefungModel->loadWhere(array(
-				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
-				'student_uid' => $this->input->post('student_uid'),
-				'pruefungstyp_kurzbz' => 'Termin1'));
-
-			if (isError($resultP))
-			{
-				$this->terminateWithError(getError($resultP), self::ERROR_TYPE_GENERAL);
-			}
-			if(!hasData($resultP))
-			{
-				//check if existing Zeugnisnote
-				$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
-				$this->ZeugnisnoteModel->addJoin('lehre.tbl_lehreinheit', 'lehrveranstaltung_id');
-
-				$resultP = $this->ZeugnisnoteModel->loadWhere(array(
-					'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
-					'student_uid' => $this->input->input->post('student_uid'),
-					'lehre.tbl_zeugnisnote.studiensemester_kurzbz' => $studiensemester_kurzbz));
-				if (isError($resultP))
-				{
-					$this->terminateWithError(getError($resultP), self::ERROR_TYPE_GENERAL);
-				}
-				if (!hasData($resultP))
-				{
-					$this->terminateWithError("Zeugnisnote existiert nicht", self::ERROR_TYPE_GENERAL);
-				}
-				$dataNote = current(getData($resultP));
-
-				$resultN = $this->PruefungModel->insert([
-					'lehreinheit_id' => $this->input->post('lehreinheit_id'),
-					'student_uid' => $this->input->post('student_uid'),
-					'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
-					'datum' => $dataNote->benotungsdatum,
-					'pruefungstyp_kurzbz' => 'Termin1',
-					'note' => $dataNote->note,
-					'punkte' => $dataNote->punkte,
-					'anmerkung' => 'automatisiert aus Zeugnisnote erstellt',
-					'insertamum' => date('c'),
-					'insertvon' => $authUID,
-				]);
-
-				if (isError($resultN)) {
-					$this->terminateWithError(getError($resultN), self::ERROR_TYPE_GENERAL);
-				}
-				$return_code = 3;
-			}
-		}
-
-		$note = current(getData($result));
-		$uebernahmedatum = new DateTime($note->uebernahmedatum);
-		$benotungsdatum = new DateTime($note->benotungsdatum);
-
-		$checkDate = $uebernahmedatum  === '' || $benotungsdatum  > $uebernahmedatum
-			? $benotungsdatum
-			: $uebernahmedatum;
-
-		if ($checkDate >= $this->input->post('datum') && $note !== $note->note)
-		{
-			$this->terminateWithSuccess($return_code + 2);
-		}
-		$this->terminateWithSuccess($return_code + 2);
+		$this->insertOrUpdatePruefung();
 	}
 
 	/**
@@ -348,8 +187,6 @@ class Pruefung extends FHCAPI_Controller
 	 * @param pruefung_id
 	 *
 	 * @return success or error
-	 *
-	 * no impact on lehre.tbl_zeugnisnote
 	 */
 	public function updatePruefung($pruefung_id)
 	{
@@ -359,48 +196,7 @@ class Pruefung extends FHCAPI_Controller
 		if (!$oldpruefung)
 			show_404(); // Pruefung that should be updated does not exist
 
-		$authUID = getAuthUID();
-
-		$this->load->library('form_validation');
-
-		$this->form_validation->set_rules('lehrveranstaltung_id', $this->p->t('lehre', 'lehrveranstaltung'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehrveranstaltung')]),
-		]);
-		$this->form_validation->set_rules('lehreinheit_id', $this->p->t('lehre', 'lehreinheit'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
-		]);
-		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
-		]);
-		$this->form_validation->set_rules(
-			'datum',
-			$this->p->t('global', 'datum'),
-			['is_valid_date']
-		);
-
-		if ($this->form_validation->run() == false)
-		{
-			$this->terminateWithValidationErrors($this->form_validation->error_array());
-		}
-
-		$result = $this->PruefungModel->update(
-			[
-				'pruefung_id' => $pruefung_id
-			],
-			[	'lehreinheit_id' => $this->input->post('lehreinheit_id'),
-				'student_uid' =>  $this->input->post('student_uid'),
-				'mitarbeiter_uid' =>  $this->input->post('mitarbeiter_uid'),
-				'note' => $this->input->post('note'),
-				'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
-				'datum' => $this->input->post('datum'),
-				'anmerkung' => $this->input->post('anmerkung'),
-				'updatevon' => $authUID,
-				'updateamum' => date('c'),
-			]
-		);
-		$this->getDataOrTerminateWithError($result);
-
-		return $this->outputJsonSuccess(true);
+		$this->insertOrUpdatePruefung($pruefung_id);
 	}
 
 	/**
@@ -573,5 +369,199 @@ class Pruefung extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess($data);
+	}
+
+	protected function insertOrUpdatePruefung($pruefung_id=null)
+	{
+		$authUID = getAuthUID();
+
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules('lehreinheit_id', $this->p->t('lehre', 'lehreinheit'), 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('lehre', 'lehreinheit')]),
+		]);
+		$this->form_validation->set_rules('pruefungstyp_kurzbz', $this->p->t('lehre', 'pruefung'), 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' => $this->p->t('global', 'typ')]),
+		]);
+		$this->form_validation->set_rules(
+			'datum',
+			$this->p->t('global', 'datum'),
+			['is_valid_date']
+		);
+
+		if ($this->form_validation->run() == false)
+		{
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+		}
+
+		$this->load->model('education/Zeugnisnote_model', 'ZeugnisnoteModel');
+
+		$this->PruefungModel->db->trans_start();
+
+		if ($this->input->post('pruefungstyp_kurzbz') == "Termin2")
+		{
+			//Wenn ein 2. Termin angelegt wird, und kein 1. Termin vorhanden ist,
+			//dann wird auch ein 1. Termin angelegt mit der derzeitigen Zeugnisnote
+			$resultP = $this->PruefungModel->loadWhere(array(
+				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+				'student_uid' => $this->input->post('student_uid'),
+				'pruefungstyp_kurzbz' => 'Termin1'));
+
+			$termin1 = $this->getDataOrTerminateWithError($resultP);
+			if (!$termin1)
+			{
+				//check if existing Zeugnisnote
+				$this->ZeugnisnoteModel->addJoin('lehre.tbl_lehreinheit', 'lehrveranstaltung_id');
+
+				$this->ZeugnisnoteModel->db->where(
+					'lehre.tbl_zeugnisnote.studiensemester_kurzbz',
+					'lehre.tbl_lehreinheit.studiensemester_kurzbz',
+					false
+				);
+				$resultP = $this->ZeugnisnoteModel->loadWhere(array(
+					'lehrveranstaltung_id' => $this->input->post('lehrveranstaltung_id'),
+					'student_uid' => $this->input->post('student_uid')
+				));
+
+				$zeugnisnoten = $this->getDataOrTerminateWithError($resultP);
+				if ($zeugnisnoten)
+				{
+					$zeugnisnote = current($zeugnisnoten);
+
+					$resultN = $this->PruefungModel->insert([
+						'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+						'student_uid' => $this->input->post('student_uid'),
+						'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
+						'datum' => $zeugnisnote->benotungsdatum,
+						'pruefungstyp_kurzbz' => 'Termin1',
+						'note' => $zeugnisnote->note,
+						'punkte' => $zeugnisnote->punkte,
+						'anmerkung' => 'automatisiert aus Zeugnisnote erstellt',
+						'insertamum' => date('c'),
+						'insertvon' => $authUID,
+					]);
+
+					$this->getDataOrTerminateWithError($resultN);
+				}
+				//Wenn keine Zeugnisnote vorhanden ist, dann wird kein
+				//1.Termin angelegt
+			}
+		}
+
+		if(intval($pruefung_id) > 0)
+		{
+			$result = $this->PruefungModel->update(
+				[
+					'pruefung_id' => $pruefung_id
+				],
+				[	'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+					'student_uid' =>  $this->input->post('student_uid'),
+					'mitarbeiter_uid' =>  $this->input->post('mitarbeiter_uid'),
+					'note' => $this->input->post('note'),
+					'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+					'datum' => $this->input->post('datum'),
+					'anmerkung' => $this->input->post('anmerkung'),
+					'updatevon' => $authUID,
+					'updateamum' => date('c'),
+				]
+			);
+		}
+		else
+		{
+			$result = $this->PruefungModel->insert([
+				'lehreinheit_id' => $this->input->post('lehreinheit_id'),
+				'student_uid' => $this->input->post('student_uid'),
+				'mitarbeiter_uid' => $this->input->post('mitarbeiter_uid'),
+				'datum' => $this->input->post('datum'),
+				'pruefungstyp_kurzbz' => $this->input->post('pruefungstyp_kurzbz'),
+				'note' => $this->input->post('note'),
+				'anmerkung' => $this->input->post('anmerkung'),
+				'insertamum' => date('c'),
+				'insertvon' => $authUID,
+				'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null
+			]);
+		}
+
+		$this->getDataOrTerminateWithError($result);
+
+		//get studiensemester_kurzbz and lehreveranstaltung_id from lehreinheit
+		$this->load->model('education/Lehreinheit_model', 'LehreinheitModel');
+
+		$result = $this->LehreinheitModel->load($this->input->post('lehreinheit_id'));
+
+		$lehreinheiten = $this->getDataOrTerminateWithError($result);
+
+		if (!$lehreinheiten) {
+			$this->terminateWithValidationErrors([
+				'lehreinheit_id' => $this->p->t('ui', 'error_fieldNotFound', [
+					'field' => $this->p->t('lehre', 'lehreinheit')
+				])
+			]);
+		}
+		$lehreinheit = current($lehreinheiten);
+		$studiensemester_kurzbz = $lehreinheit->studiensemester_kurzbz;
+		$lehrveranstaltung_id = $lehreinheit->lehrveranstaltung_id;
+
+		//check if existing zeugnisnote
+		$result = $this->ZeugnisnoteModel->loadWhere(array(
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'student_uid' => $this->input->post('student_uid'),
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		));
+
+		$zeugnisnoten = $this->getDataOrTerminateWithError($result);
+
+		if (!$zeugnisnoten)
+		{
+			//insert zeugnisnote, if not existing
+			$result = $this->ZeugnisnoteModel->insert(array(
+				'lehrveranstaltung_id' => $lehrveranstaltung_id,
+				'student_uid' => $this->input->post('student_uid'),
+				'studiensemester_kurzbz' => $studiensemester_kurzbz,
+				'note' => $this->input->post('note'),
+				'uebernahmedatum' => date('c'),
+				'benotungsdatum' => $this->input->post('datum'),
+				'insertamum' => date('c'),
+				'insertvon' =>  $authUID,
+				'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null
+			));
+
+			$this->getDataOrTerminateWithError($result);
+
+			$this->PruefungModel->db->trans_complete();
+			$this->terminateWithSuccess();
+		}
+
+		$note = current($zeugnisnoten);
+		$uebernahmedatum = new DateTime($note->uebernahmedatum);
+		$benotungsdatum = new DateTime($note->benotungsdatum);
+		$pruefungsdatum = new DateTime($this->input->post('datum'));
+
+		$checkDate = $note->uebernahmedatum === '' || $benotungsdatum > $uebernahmedatum
+			? $benotungsdatum
+			: $uebernahmedatum;
+
+		if ($checkDate > $pruefungsdatum && $this->input->post('note') !== $note->note)
+		{
+			$this->PruefungModel->db->trans_complete();
+			$this->terminateWithSuccess($this->p->t('exam', 'hinweis_changeAfterExamDate'));
+		}
+
+		//update zeugnisnote, if existing and valid datum
+		$result = $this->ZeugnisnoteModel->update([
+			'lehrveranstaltung_id' => $lehrveranstaltung_id,
+			'student_uid' => $this->input->post('student_uid'),
+			'studiensemester_kurzbz' => $studiensemester_kurzbz
+		], [
+			'note' => $this->input->post('note'),
+			'uebernahmedatum' => date('c'),
+			'benotungsdatum' => $this->input->post('datum'),
+			'updateamum' => date('c'),
+			'updatevon' =>  $authUID,
+			'punkte' => $this->input->post('punkte') ? str_replace(',', '.', $this->input->post('punkte')) : null
+		]);
+
+		$this->PruefungModel->db->trans_complete();
+		$this->terminateWithSuccess();
 	}
 }

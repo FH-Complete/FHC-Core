@@ -316,7 +316,7 @@ export default {
 	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid"
-		style="display:grid;width:100%;height:100%"
+		style="display:grid;width:100%;height:100%;overflow:auto"
 		:style="'grid-template-' + axisRow + 's:auto' + (allDayEvents ? ' auto ' : ' ') + '1fr;grid-template-' + axisCol + 's:auto ' + styleGridCols"
 	>
 		<div

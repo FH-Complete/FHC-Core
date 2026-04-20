@@ -88,6 +88,18 @@ export default {
 				if (isMitarbeiter) {
 					content["isMitarbeiter"] = isMitarbeiter;
 				}
+
+				const filesFromDatabase =
+					await this.$api
+						.call(ApiProfilUpdate.getProfilRequestFiles(
+							updateRequest.profil_update_id
+						))
+						.then((res) => {
+							return res.data;
+						});
+
+				files = filesFromDatabase;
+				content["files"] = files;
 			}
 
 			//? adds the status information if the profil update request was rejected or accepted

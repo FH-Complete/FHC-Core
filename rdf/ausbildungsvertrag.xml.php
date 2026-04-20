@@ -332,6 +332,12 @@ foreach($prestudent_arr as $prest_id)
 					{
 						$studiengangbezeichnung = $studienordnung->__get('studiengangbezeichnung');
 						$studiengangbezeichnung_englisch = $studienordnung->__get('studiengangbezeichnung_englisch');
+						$akadgrad = new akadgrad();
+						if ($akadgrad->load($studienordnung->__get('akadgrad_id')))
+						{
+							$akadgrad_titel_studienordnung = $akadgrad->titel;
+							$akadgrad_kurzbz_studienordnung = $akadgrad->akadgrad_kurzbz;
+						}
 					}
 				}
 				$studiengang_bezeichnung = empty($studiengangbezeichnung) ? $studiengang->bezeichnung : $studiengangbezeichnung;
@@ -428,6 +434,8 @@ foreach($prestudent_arr as $prest_id)
 
 					//Wenn Quereinsteiger stimmt studiengang_maxsemester nicht mit der tatsaechlichen Ausbildungsdauer ueberein
 					$student_maxsemester = ($studiengang->max_semester-$ausbildungssemester)+1;
+
+					// TODO: where to get semester duration for master Lehrgaenge?
 					echo "\t\t<student_maxsemester>".$student_maxsemester."</student_maxsemester>\n";
 					echo "\t\t<student_anzahljahre>".($student_maxsemester/2)."</student_anzahljahre>\n";
 
@@ -452,6 +460,8 @@ foreach($prestudent_arr as $prest_id)
 
 					echo "\t\t<akadgrad>".$akadgrad_titel."</akadgrad>\n";
 					echo "\t\t<akadgrad_kurzbz>".$akadgrad_kurzbz."</akadgrad_kurzbz>\n";
+					echo "\t\t<akadgrad_studienordnung>".($akadgrad_titel_studienordnung ?? '')."</akadgrad_studienordnung>\n";
+					echo "\t\t<akadgrad_kurzbz_studienordnung>".($akadgrad_kurzbz_studienordnung ?? '')."</akadgrad_kurzbz_studienordnung>\n";
 
 					echo "\t\t<datum_aktuell>".$datum_aktuell."</datum_aktuell>\n";
 
