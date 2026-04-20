@@ -72,14 +72,13 @@ export default {
 					if (section.widgets[wid].id == k) {
 						payload[k] = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
 						// NOTE(chris): remove internal props
-						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id'])
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'custom'])
 							if (payload[k][prop])
 								delete payload[k][prop];
 						break;
 					}
 				}
 				payload[k].widgetid = k;
-				delete payload[k].custom;
 			}
 			this.$api
 				.call(Object.entries(payload).map(([key, widget]) => [
