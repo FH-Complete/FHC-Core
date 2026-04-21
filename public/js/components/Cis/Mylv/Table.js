@@ -19,13 +19,16 @@ export default {
 			mylvTableOptions: {
 				height: Vue.ref(400),
 				index: 'lehrveranstaltung_id',
-				layout: 'fitDataStretch',
+				layout: 'fitData',
 				placeholder: this.$p.t('global/noDataAvailable'),
 				columns: [
 					{title: Vue.computed(() => this.$p.t('lehre/studiengang')), field: 'sg_bezeichnung', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('global/bezeichnung')), field: 'bezeichnung', widthGrow: 2},
 					{title: Vue.computed(() => this.$p.t('lehre/orgform')), field: 'orgform_kurzbz', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('lehre/kurzbz')), field: 'studiengang_kuerzel', widthGrow: 1},
+					{title: Vue.computed(() => this.$p.t('lehre/semesterstunden')), field: 'semesterstunden', 
+						bottomCalc: this.semesterstundenCalc, bottomCalcFormatter: this.semesterstundenCalcFormatter, bottomCalcParams: this.semesterstundenParamLookup,
+						widthGrow: 1, visible: true},
 					{title: Vue.computed(() => this.$p.t('global/actions')), headerSort: false,
 						field: 'menu', formatter: this.actionFormatter, widthGrow: 1, tooltip: this.spoofingFunc}
 				],
@@ -47,6 +50,22 @@ export default {
 		
 	},
 	methods: {
+		semesterstundenCalcFormatter(cell) {
+
+			return cell.getValue()
+		},
+		semesterstundenParamLookup (values, data) {
+			const first = data[0]
+			debugger
+			return first ? first.anwesenheit + ' %' : ''
+		},
+		semesterstundenCalc(values, data) {
+			let sum = 0
+			values.forEach(val => {
+				sum += Number(val)
+			})
+			return sum
+		},
 		spoofingFunc() {
 			// intentionally send empty tooltip info so tabulator tooltip doesnt get rendered but hover event propagates
 			// to individual button tooltips
@@ -84,34 +103,109 @@ export default {
 					str.length > limit + 3 ? `${str.slice(0, limit)}...` : str;
 				
 				data.menu.forEach((lvLink) => {
-					let button = document.createElement('button');
-					button.className = 'btn btn-outline-secondary btn-action';
-					if (!lvLink.c4_link) {
-						button.classList.add('unavailable');
-					}
-					const icon = lvLink.c4_icon2 ?? 'fa-solid fa-pen-to-square'
-					button.id = lvLink.name
-					button.innerHTML =  '<i class="'+icon+'"></i>';
-					
-					button.title = lvLink.phrase ? this.$p.t(lvLink.phrase) : lvLink.name;
-					button.innerHTML += '<span style="margin-left: 2px;">'+abbreviate(button.title)+'</span>';
-					button.addEventListener('click', (event) => {
-						// replicate a tag here
-						event.preventDefault();
-						const url = this.c4_link(lvLink);
-						if (url) {
-							const target = lvLink.c4_target || '_blank';
+					// render dropdown if we have a link and some some linklist
+					const hasDropdown = (lvLink.c4_moodle_links?.length || lvLink.c4_linkList?.length) && lvLink.c4_link;
 
-							if (target === '_blank') {
-								window.open(url, '_blank', 'noopener,noreferrer');
+					if (hasDropdown) {
+						// button group
+						const group = document.createElement('div');
+						group.className = 'btn-group';
+
+						// main action button
+						const button = document.createElement('a');
+						button.className = 'fhc-body text-decoration-none text-truncate';
+						if (!lvLink.c4_link) button.classList.add('unavailable');
+						button.id = lvLink.name;
+
+						const icon = lvLink.c4_icon2 ?? 'fa-solid fa-pen-to-square';
+						const label = lvLink.phrase ? this.$p.t(lvLink.phrase) : lvLink.name;
+						button.title = label;
+						button.innerHTML = `<i class="${icon}"></i><span style="margin-left:2px;">${abbreviate(label)}</span>`;
+
+						button.addEventListener('click', (event) => {
+							event.preventDefault();
+							const url = this.c4_link(lvLink);
+							if (url) {
+								const target = lvLink.c4_target || '_blank';
+								if (target === '_blank') {
+									window.open(url, '_blank', 'noopener,noreferrer');
+								} else {
+									window.location.href = url;
+								}
 							} else {
-								window.location.href = url;
+								console.warn("Link is unavailable for:", lvLink.name);
 							}
-						} else {
-							console.warn("Link is unavailable for:", lvLink.name);
+						});
+
+						// toggle button
+						const toggle = document.createElement('button');
+						toggle.className = 'btn btn-sm dropdown-toggle dropdown-toggle-split border-0';
+						toggle.type = 'button';
+						toggle.dataset.bsToggle = 'dropdown'; // uses absolute position which gets clipped by tabulator
+						toggle.ariaExpanded = 'false';
+						toggle.innerHTML = '<span class="visually-hidden">Toggle Dropdown</span>';
+
+						// dropdown menu
+						const dropMenu = document.createElement('ul');
+						dropMenu.className = 'dropdown-menu dropdown-menu p-0';
+						dropMenu.style.zIndex = 9999 // over 9000
+						dropMenu.style.position = 'fixed'
+						
+						// moodle links have priority to be dropdown items but both can be!
+						const items = lvLink.c4_moodle_links?.length
+							? lvLink.c4_moodle_links.map(item => ({ text: item.lehrform, href: item.url }))
+							: lvLink.c4_linkList.map(([text, link]) => ({ text, href: link }));
+
+						for(let i = 0; i < 10; i++) {
+							items.push({text: 'puffer', href: 'www.google.com'})
 						}
-					});
-					container.append(button);
+						
+						items.forEach(({ text, href }) => {
+							const li = document.createElement('li');
+							const a = document.createElement('a');
+							a.className = 'dropdown-item border-bottom';
+							a.href = href;
+							a.target = '#';
+							a.textContent = text;
+							li.appendChild(a);
+							dropMenu.appendChild(li);
+						});
+
+						group.appendChild(button);
+						group.appendChild(toggle);
+						group.appendChild(dropMenu);
+						container.appendChild(group);
+						
+					} else {
+						// action button only
+						const button = document.createElement('a');
+						button.className = 'fhc-body text-decoration-none text-truncate';
+						if (!lvLink.c4_link) button.classList.add('unavailable');
+						button.id = lvLink.name;
+
+						const icon = lvLink.c4_icon2 ?? 'fa-solid fa-pen-to-square';
+						const label = lvLink.phrase ? this.$p.t(lvLink.phrase) : lvLink.name;
+						button.title = label;
+						button.innerHTML = `<i class="${icon}"></i><span style="margin-left:2px;">${abbreviate(label)}</span>`;
+
+						button.addEventListener('click', (event) => {
+							event.preventDefault();
+							const url = this.c4_link(lvLink);
+							if (url) {
+								const target = lvLink.c4_target || '_blank';
+								if (target === '_blank') {
+									window.open(url, '_blank', 'noopener,noreferrer');
+								} else {
+									window.location.href = url;
+								}
+							} else {
+								console.warn("Link is unavailable for:", lvLink.name);
+							}
+						});
+
+						container.appendChild(button);
+					}
+
 				})
 				
 			}
@@ -142,7 +236,7 @@ export default {
 		}
 	},
 	created() {
-		this.phrasenPromise = this.$p.loadCategory(['global'])
+		this.phrasenPromise = this.$p.loadCategory(['global', 'lehre', 'lvinfo'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})	
 	},
 	mounted() {
@@ -161,7 +255,7 @@ export default {
 		}
 	},
 	template: `
-	<div class="mylv-semester" v-if="ready">
+	<div class="mylv-semester-table" v-if="ready">
 		 <core-filter-cmpt
 			v-if="phrasenResolved"
 			@uuidDefined="handleUuidDefined"

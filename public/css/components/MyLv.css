@@ -6,3 +6,8 @@
 	color: var(--fhc-myLv-disabled) !important;
 	cursor: default;
 }
+
+/* adjustment to have bs5 dropdownmenus rendered properly over a tabulator table */
+.mylv-semester-table .tabulator-cell {
+	overflow: unset;
+}
