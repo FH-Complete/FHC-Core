@@ -1,4 +1,10 @@
-// TODO(chris): Comments
+/**
+ * This class arranges rectangular items on a grid with a defined width and
+ * a potential infinite height. It calculates repositioning of already placed
+ * items if a new item would overlap one or more of said placed items.
+ * This can be manipulated by adding weights to the items or by defining an
+ * item as pinned.
+ */
 
 const DIR_UP = 0;
 const DIR_LEFT = 1;
