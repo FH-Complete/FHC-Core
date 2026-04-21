@@ -50,7 +50,7 @@ export default {
 			<button
 				class="btn btn-primary"
 				@click="$emit('change', {
-					dashboard_id
+					dashboard_id,
 					dashboard_kurzbz: kurzbz,
 					beschreibung: desc
 				})"
