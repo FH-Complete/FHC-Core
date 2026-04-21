@@ -1356,7 +1356,6 @@ class Lehrveranstaltung_model extends DB_Model
 						lehre.tbl_lehrveranstaltung.lehrveranstaltung_id,
 						lehre.tbl_lehrveranstaltung.bezeichnung,
 						lehre.tbl_lehrveranstaltung.bezeichnung_english as bezeichnung_eng,
-						TRUNC(lehre.tbl_lehreinheitmitarbeiter.semesterstunden) as semesterstunden,
 						lehre.tbl_lehrveranstaltung.farbe,
 						lehre.tbl_lehrveranstaltung.lvinfo,
 						lehre.tbl_lehrveranstaltung.benotung,
@@ -1371,9 +1370,18 @@ class Lehrveranstaltung_model extends DB_Model
 											  JOIN lehre.tbl_lehrveranstaltung as lehrfach ON(tbl_lehreinheit.lehrfach_id=lehrfach.lehrveranstaltung_id)
 					WHERE
 						tbl_lehreinheit.studiensemester_kurzbz = ?
-					  AND mitarbeiter_uid = ?) as distincted_by_lva_id
+					AND mitarbeiter_uid = ?) as distincted_by_lva_id
+					JOIN (
+						SELECT lehrveranstaltung_id, TRUNC(SUM(lehre.tbl_lehreinheitmitarbeiter.semesterstunden)) as semesterstunden
+						FROM lehre.tbl_lehreinheit
+								 JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
+								 JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
+						WHERE tbl_lehreinheit.studiensemester_kurzbz = ?
+							AND mitarbeiter_uid = ?
+						GROUP BY lehrveranstaltung_id
+					) semesterstundenAggregatedSubquery USING(lehrveranstaltung_id)
 				ORDER BY studiengang_kuerzel, semester, bezeichnung";
 		
-		return $this->execReadOnlyQuery($qry, [$sem_kurzbz, $mitarbeiter_uid]);
+		return $this->execReadOnlyQuery($qry, [$sem_kurzbz, $mitarbeiter_uid, $sem_kurzbz, $mitarbeiter_uid]);
 	}
 }
