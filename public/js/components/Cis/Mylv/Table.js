@@ -79,7 +79,7 @@ export default {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
 		},
-		actionFormatter(cell, formatterParams, onRendered) {
+		actionFormatter(cell) {
 			let container = document.createElement('div');
 			container.className = "d-flex gap-2";
 
@@ -138,8 +138,6 @@ export default {
 						// dropdown menu
 						const dropMenu = document.createElement('ul');
 						dropMenu.className = 'dropdown-menu dropdown-menu p-0';
-						dropMenu.style.zIndex = 9999 // over 9000
-						dropMenu.style.position = 'fixed'
 						
 						// moodle links have priority to be dropdown items but both can be!
 						const items = lvLink.c4_moodle_links?.length
