@@ -105,7 +105,7 @@ export default {
 			});
 	},
 	template: /*html*/ `
-	<div :class="{'overflow-y-scroll pb-3': isMobile}" class="overflow-x-hidden">
+	<div :class="{'pb-3': isMobile}" class="overflow-x-hidden">
   		<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
 		<hr/>
 		<pagination
