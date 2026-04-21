@@ -30,6 +30,10 @@ const TYPE_DEFINITION = {
 	prestudent: {
 		id: "prestudent_id",
 		dragIcon: "fa-solid fa-user-graduate text-muted"
+	},
+	calendar_selector_overlay: {
+		id: "calendar_selector_overlay_id",
+		dragIcon: "fa-solid fa-calendar-plus"
 	}
 	// TODO: IMPLEMENT OTHER TYPES
 };

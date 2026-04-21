@@ -1,4 +1,3 @@
-import { CoreFilterCmpt } from "../filter/Filter.js";
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 
 import BsModal from "../Bootstrap/Modal.js";
@@ -6,7 +5,7 @@ import CoreForm from "../Form/Form.js";
 import FormInput from "../Form/Input.js";
 
 export default {
-  name: "ClassScheduleValidityPeriodForm",
+  name: "ClassScheduleTypeModal",
   components: {
     BsModal,
     CoreForm,
@@ -43,6 +42,7 @@ export default {
           { lang: "de", value: "" },
           { lang: "en", value: "" },
         ],
+        backgroundColor: "#ffffff",
       },
       classScheduleTypes: [],
     };
@@ -80,6 +80,7 @@ export default {
             isActive: this.classTimeSlotTypeFormData.isActive,
             shortCode: this.classTimeSlotTypeFormData.shortCode,
             descriptions: this.classTimeSlotTypeFormData.descriptions,
+            backgroundColor: this.classTimeSlotTypeFormData.backgroundColor,
           }),
         )
         .then((response) => {
@@ -102,6 +103,7 @@ export default {
             value: desc.value,
           }),
         ),
+        backgroundColor: classScheduleType.hintergrundfarbe || "#ffffff",
       };
     },
     updateClassTimeSlotType() {
@@ -112,6 +114,7 @@ export default {
             {
               isActive: this.classTimeSlotTypeFormData.isActive,
               descriptions: this.classTimeSlotTypeFormData.descriptions,
+              backgroundColor: this.classTimeSlotTypeFormData.backgroundColor,
             },
           ),
         )
@@ -163,13 +166,14 @@ export default {
           { lang: "de", value: "" },
           { lang: "en", value: "" },
         ],
+        backgroundColor: "#ffffff",
       };
     },
   },
   async created() {
     await this.getAllClassScheduleTypes();
   },
-  template: `
+  template: /* html */`
   <bs-modal ref="classScheduleTypeModal" size="md" @hideBsModal="() => { $emit('hideBsModal'); resetClassTimeSlotTypeForm(); }">
 			<template #title>
 				<p v-if="hasLehreUnterrichtszeitenTypWPermission"  class="fw-bold mt-3">{{$p.t('ui', 'editClassTimeSlotTypeModalTitle')}}</p>
@@ -193,18 +197,27 @@ export default {
         <div v-else class="row mb-3">
           <p class="mb-0"><span class="fw-bold">{{$p.t('ui/shortName')}}:</span> {{editedClassScheduleType.unterrichtszeitentyp_kurzbz}}</p>
         </div>
-        <div class="row mb-3">
+        <div class="row">
 					<form-input
             v-for="description in classTimeSlotTypeFormData.descriptions"
             :key="description.lang"
-						type="textarea"
+						v-model="description.value"
 						:name="description.lang"  
 						:label="$p.t('ui/description') + ' (' + description.lang + ')'"
-						v-model="description.value"
+						type="textarea"
+            class="mb-3"
 						>
 					</form-input>
 				</div>
-
+        <div class="row mb-3">
+					<form-input
+						type="text"
+						name="backgroundColor"  
+						:label="$p.t('ui/backgroundColor')"
+						v-model="classTimeSlotTypeFormData.backgroundColor"
+						>
+					</form-input>
+				</div>
         <div class="row mb-3">
           <div class="col d-flex align-items-center justify-content-end">
             <form-input
@@ -217,8 +230,8 @@ export default {
           </div>
 				</div>
         <div class="col d-flex justify-content-end gap-2">
-          <button type="button" class="btn btn-primary" @click="isEditInProgress ? updateClassTimeSlotType() : createClassTimeSlotType()">{{$p.t('ui', 'speichern')}}</button>
           <button type="button" class="btn btn-secondary" @click="hideClassTimeSlotTypeForm">{{$p.t('ui', 'abbrechen')}}</button>
+          <button type="button" class="btn btn-primary" @click="isEditInProgress ? updateClassTimeSlotType() : createClassTimeSlotType()">{{$p.t('ui', 'speichern')}}</button>
         </div>
 			</core-form>
       <div class="row mb-3">
@@ -233,7 +246,9 @@ export default {
             class=" shadow-sm p-2 mb-2 bg-body rounded"
             >
             <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge bg-secondary me-2">
+              <span 
+                :style="{ backgroundColor: classScheduleType.hintergrundfarbe }"
+                class="badge me-2 text-black">
                 {{classScheduleType.unterrichtszeitentyp_kurzbz}}
               </span>
               <div v-if="hasLehreUnterrichtszeitenTypWPermission" class="d-flex justify-content-between align-items-center gap-2">

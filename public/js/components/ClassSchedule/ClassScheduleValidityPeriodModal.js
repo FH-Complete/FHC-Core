@@ -1,11 +1,11 @@
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
-import ApiStudiengang from "../../../js/api/factory/studiengang.js";
+import ApiStudienPlan from "../../../js/api/factory/studienplan.js";
+import ApiOrganizationalUnit from "../../../js/api/factory/organizationalUnit.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 import CoreForm from "../Form/Form.js";
 import FormInput from "../Form/Input.js";
 import FormValidation from "../Form/Validation.js";
-import ApiStudienPlan from "../../../js/api/factory/studienplan.js";
 
 export default {
   name: "ClassScheduleValidityPeriodModal",
@@ -47,7 +47,7 @@ export default {
           let validityPeriodData = response.data[0];
           this.classTimeSlotValidityPeriodFormData = {
             id: validityPeriodData.unterrichtszeitengueltigkeit_id,
-            degreeProgramShortcode: validityPeriodData.oe_kurzbz,
+            organizationalUnitShortCode: validityPeriodData.oe_kurzbz,
             studyPlanId: validityPeriodData.studienplan_id,
             classTimeSlotTypeShortcode:
               validityPeriodData.unterrichtszeitentyp_kurzbz,
@@ -71,12 +71,12 @@ export default {
     return {
       isFormVisible: false,
       isEditInProgress: false,
-      degreePrograms: [],
+      organizationalUnits: [],
       studyPlans: [],
       classTimeSlotTypes: [],
       classTimeSlotValidityPeriodFormData: {
         id: null,
-        degreeProgramShortcode: null,
+        organizationalUnitShortCode: null,
         studyPlanId: null,
         classTimeSlotTypeShortcode: null,
         validityPeriodFrom: null,
@@ -138,7 +138,7 @@ export default {
       this.$refs.classTimeSlotValidityPeriodData?.clearValidation();
       this.classTimeSlotValidityPeriodFormData = {
         id: null,
-        degreeProgramShortcode: null,
+        organizationalUnitShortCode: null,
         studyPlanId: null,
         classTimeSlotTypeShortcode: null,
         validityPeriodFrom: null,
@@ -149,15 +149,15 @@ export default {
     },
   },
   async created() {
-    let getAllDegreeProgramsResponse = await this.$api.call(
-      ApiStudiengang.getAllDegreePrograms(),
+    let getAllOrganizationalUnitsResponse = await this.$api.call(
+      ApiOrganizationalUnit.getAllOrganizationalUnits(),
     );
-    if (getAllDegreeProgramsResponse.meta.status === "success") {
-      this.degreePrograms = getAllDegreeProgramsResponse.data;
+    if (getAllOrganizationalUnitsResponse.meta.status === "success") {
+      this.organizationalUnits = getAllOrganizationalUnitsResponse.data;
     } else {
       console.error(
-        "Error fetching degree programs:",
-        getAllDegreeProgramsResponse.meta.message,
+        "Error fetching organizational units:",
+        getAllOrganizationalUnitsResponse.meta.message,
       );
     }
 
@@ -208,16 +208,16 @@ export default {
       <div class="row mb-3">
         <form-input
           type="select"
-          name="degreeProgramShortcode"  
-          :label="$p.t('lehre/studiengang') + ' *'"
-          v-model="classTimeSlotValidityPeriodFormData.degreeProgramShortcode"
+          name="organizationalUnitShortCode"  
+          :label="$p.t('lehre/organisationseinheit') + ' *'"
+          v-model="classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"
           >
           <option
-            v-for="degreeProgram in degreePrograms"
-            :key="degreeProgram.studiengang_kz"
-            :value="degreeProgram.studiengang_kz"
+            v-for="organizationalUnit in organizationalUnits"
+            :key="organizationalUnit.oe_kurzbz"
+            :value="organizationalUnit.oe_kurzbz"
             >
-            {{degreeProgram.kurzbzlang}} - {{degreeProgram.bezeichnung}})
+            {{organizationalUnit.bezeichnung}}
           </option>
         </form-input>
       </div>

@@ -1,21 +1,17 @@
-import { CoreFilterCmpt } from "../filter/Filter.js";
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 
 import BsModal from "../Bootstrap/Modal.js";
-import CoreForm from "../Form/Form.js";
-import FormInput from "../Form/Input.js";
 import ClassScheduleValidityPeriodForm from "./ClassScheduleValidityPeriodForm.js";
 import ClassScheduleValidityPeriodModal from "./ClassScheduleValidityPeriodModal.js";
+import ClassScheduleCalendarSelector from "./ClassScheduleCalendarSelector.js";
 
 export default {
   name: "ClassScheduleValidityPeriodOverview",
   components: {
     BsModal,
-    CoreForm,
-    FormInput,
-    CoreFilterCmpt,
     ClassScheduleValidityPeriodForm,
     ClassScheduleValidityPeriodModal,
+    ClassScheduleCalendarSelector,
   },
   data: () => {
     return {
@@ -106,13 +102,8 @@ export default {
       this.isClassTimeSlotFormVisible = true;
     },
     async editClassTimeSlotsForValidityPeriodPerGroup(groupIdentifikator) {
-      console.log("Editing class time slots for group:", groupIdentifikator);
       await this.fetchClassTimeSlots();
-      console.log(
-        this.classTimeSlots.filter(
-          (group) => group.groupIdentifikator === groupIdentifikator,
-        ),
-      );
+
       this.editedClassTimeSlots =
         this.classTimeSlots
           .filter(
@@ -127,8 +118,8 @@ export default {
               classTimeSlotTypeShortcode: slot.unterrichtszeitentyp_kurzbz,
             };
           }) || [];
-      console.log(this.editedClassTimeSlots);
-      this.showClassTimeSlotForm();
+
+          this.showClassTimeSlotForm();
     },
     deleteClassTimeSlotsForValidityPeriodPerGroup(groupIdentifikator) {
       let isDeletionConfirmed = confirm(
@@ -238,7 +229,7 @@ export default {
 
     this.fetchClassTimeSlots();
   },
-  template: `
+  template: /* html */`
    <div class="container mt-4">
     <div class='mb-5'>
       <div class="d-flex align-items-center justify-content-between mb-2">
@@ -276,96 +267,26 @@ export default {
         <h4>{{ $p.t("ui", "classScheduleValidityPeriodTimeSlots") }}</h4>
       </div>
       <div v-if="classTimeSlots && Object.keys(classTimeSlots).length > 0">
-          <div v-for="(classTimeSlotsPerWeek, index) in classTimeSlots" :key="index" class="row border-top rounded p-2 mt-4 mb-2">
-            <div class="col-12 d-flex align-items-center justify-content-end gap-2">
-                <a class="ml-auto" @click="editClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-edit fs-5"></i></a>
-                <a class="ml-auto" @click="deleteClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-trash text-danger fs-5"></i></a>
-            </div>
-            <div class="col">
-                <h3>Monday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 1)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Tuesday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 2)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Wednesday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 3)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                 <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Thursday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 4)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                 <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Friday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 5)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                 <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Saturday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 6)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                 <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
-            <div class="col">
-                <h3>Sunday</h3>
-                <div v-for="(classTimeSlot, innerIndex) in classTimeSlotsPerWeek.slots.filter(slot => slot.wochentag === 7)" :key="innerIndex" class="d-flex align-items-center mb-2">
-                 <p 
-                  class='p-2 m-0 rounded'
-                  :style="{backgroundColor: getClassTimeSlotBackgroundColor(classTimeSlot)}"
-                  :title="getClassTimeSlotType(classTimeSlot) ? getClassTimeSlotType(classTimeSlot).bezeichnung_mehrsprachig.find(desc => desc.lang === 'de').value : ''"
-                  >
-                    {{ classTimeSlot.uhrzeit_von }} - {{ classTimeSlot.uhrzeit_bis }}
-                </p>
-                </div>
-            </div>
+        <div v-for="(classTimeSlotsPerWeek, index) in classTimeSlots" :key="index" class="row border-top rounded p-2 mt-4 mb-2 pt-1 pb-5">
+          <div class="col-12 d-flex align-items-center justify-content-end gap-2">
+              <a class="ml-auto" @click="editClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-edit fs-5"></i></a>
+              <a class="ml-auto" @click="deleteClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-trash text-danger fs-5"></i></a>
           </div>
+          <class-schedule-calendar-selector
+            :class-time-slot-types="this.classTimeSlotTypes" 
+            :edited-overlays="classTimeSlotsPerWeek.slots.map((slot) => {
+              return {
+                databaseId: slot.id,
+                id: slot.identifier,
+                weekday: slot.wochentag,
+                type: slot.unterrichtszeitentyp_kurzbz,
+                startTime: slot.uhrzeit_von,
+                endTime: slot.uhrzeit_bis,
+              };
+            })"
+            :isPreviewMode="true"
+          />
+        </div>
       </div>
       <div v-else class="d-flex align-items-center justify-content-center border rounded p-4 mt-4">
           <p>{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>

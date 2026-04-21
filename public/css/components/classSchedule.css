@@ -1,0 +1,24 @@
+.fhc-pointer-events-none {
+  pointer-events: none;
+}
+
+.fhc-pointer-events-all {
+  pointer-events: all;
+}
+
+.fhc-cursor-pointer {
+  cursor: pointer;
+}
+
+.fhc-resize-vertical {
+  cursor: ns-resize;  
+}
+
+.fhc-drag-handle:hover {
+  cursor: grab;
+  color: #000;
+}
+
+.fhc-w-fit {
+  width: fit-content;
+}

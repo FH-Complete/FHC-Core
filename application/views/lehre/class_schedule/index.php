@@ -9,18 +9,19 @@ $includesArray = array(
 	'primevue3' => true,
 	'navigationcomponent' => true,
 	'filtercomponent' => true,
+	'vuedatepicker11' => true,
     'customJSs' => array(
-		'vendor/vuejs/vuedatepicker_js/vue-datepicker.iife.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/lehre/ClassScheduleApp.js'
 	),
 	'customCSSs' => array(
-	    'public/css/components/vue-datepicker.css',
         'public/css/components/primevue.css',
 		'public/css/components/verticalsplit.css',
-		'public/extensions/FHC-Core-Developer/css/FhcMain.css'
+		'public/extensions/FHC-Core-Developer/css/FhcMain.css',
+		'public/css/components/calendar.css',
+		'public/css/components/classSchedule.css'
 	)
 );
 

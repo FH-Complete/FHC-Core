@@ -63,17 +63,19 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten LIMIT 1"
 
 	$db->db_query("ALTER TABLE lehre.tbl_unterrichtszeiten ALTER COLUMN unterrichtszeit_id SET DEFAULT nextval('lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id');");
 
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten';
-
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten TO web;';
+	
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_unterrichtszeiten TO web;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten';
+
+	$qry = 'GRANT USAGE ON lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id TO web;';
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten';
+
 
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten TO vilesci;';
 	if(!$db->db_query($qry))
@@ -92,31 +94,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten LIMIT 1"
 		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten';
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten';
-
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_unterrichtszeiten_unterrichtszeit_id TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten';
 }
 
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_typ LIMIT 1"))
@@ -138,25 +115,26 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_typ LIMI
 	else
 		echo '<br>lehre.tbl_unterrichtszeiten_typ table created';
 
-	$db->db_query('CREATE SEQUENCE IF NOT EXISTS lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz
+	$db->db_query('CREATE SEQUENCE IF NOT EXISTS lehre.seq_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz
      INCREMENT BY 1
      NO MAXVALUE
      NO MINVALUE
      CACHE 1;');
 
-	$db->db_query("ALTER TABLE lehre.tbl_unterrichtszeiten_typ ALTER COLUMN unterrichtszeitentyp_kurzbz SET DEFAULT nextval('lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz');");
+	$db->db_query("ALTER TABLE lehre.tbl_unterrichtszeiten_typ ALTER COLUMN unterrichtszeitentyp_kurzbz SET DEFAULT nextval('lehre.seq_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz');");
 
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_typ TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_typ';
-
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_typ TO web;';
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_unterrichtszeiten_typ TO web;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_typ';
+
+	$qry = 'GRANT USAGE ON lehre.seq_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO web;';
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_typ';
+
 
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_typ TO vilesci;';
 	if(!$db->db_query($qry))
@@ -164,42 +142,17 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_typ LIMI
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_typ';
 
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO vilesci;';
+	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO vilesci;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_typ';
 
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO vilesci;';
+	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO vilesci;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_typ';
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_typ';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_typ';
-
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_typ';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_tbl_unterrichtszeiten_typ_unterrichtszeitentyp_kurzbz TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_typ: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_typ';
 
 
 	$qry = "
@@ -225,10 +178,10 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_gueltigk
 			"unterrichtszeitengueltigkeit_id" BIGINT NOT NULL,
 			"gueltig_von" DATE NOT NULL,
 			"gueltig_bis" DATE NOT NULL,
-			"oe_kurzbz" INTEGER NOT NULL,
+			"oe_kurzbz" VARCHAR(32) NOT NULL,
 			"ausbildungssemester" SMALLINT,
 			"anmerkung" TEXT,
-			"unterrichtszeitentyp_kurzbz" VARCHAR(32) NOT NULL,
+			"unterrichtszeitentyp_kurzbz" VARCHAR(32),
 			"studienplan_id" INTEGER,
 			"insertamum" TIMESTAMP WITH TIME ZONE DEFAULT now(),
 			"insertvon" VARCHAR(32),
@@ -241,25 +194,26 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_gueltigk
 	else
 		echo '<br>lehre.tbl_unterrichtszeiten_gueltigkeit table created';
 
-	$db->db_query('CREATE SEQUENCE IF NOT EXISTS lehre.seq
+	$db->db_query('CREATE SEQUENCE IF NOT EXISTS lehre.seq_tbl_unterrichtszeiten_gueltigkeit_unterrichtszeitengueltigkeit_id
      INCREMENT BY 1
      NO MAXVALUE
      NO MINVALUE
      CACHE 1;');
 
-	$db->db_query("ALTER TABLE lehre.tbl_unterrichtszeiten_gueltigkeit ALTER COLUMN unterrichtszeitengueltigkeit_id SET DEFAULT nextval('lehre.seq');");
+	$db->db_query("ALTER TABLE lehre.tbl_unterrichtszeiten_gueltigkeit ALTER COLUMN unterrichtszeitengueltigkeit_id SET DEFAULT nextval('lehre.seq_tbl_unterrichtszeiten_gueltigkeit_unterrichtszeitengueltigkeit_id');");
 
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_gueltigkeit TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
-
-	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_gueltigkeit TO web;';
+	$qry = 'GRANT SELECT ON TABLE lehre.tbl_unterrichtszeiten_gueltigkeit TO web;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
+
+	$qry = 'GRANT USAGE ON lehre.seq_tbl_unterrichtszeiten_gueltigkeit_unterrichtszeitengueltigkeit_id TO web;';
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
+
 
 	$qry = 'GRANT SELECT, UPDATE, INSERT, DELETE ON TABLE lehre.tbl_unterrichtszeiten_gueltigkeit TO vilesci;';
 	if(!$db->db_query($qry))
@@ -267,42 +221,17 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_gueltigk
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
 
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq TO vilesci;';
+	$qry = 'GRANT USAGE, INSERT ON lehre.seq_tbl_unterrichtszeiten_gueltigkeit_unterrichtszeitengueltigkeit_id TO vilesci;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
 
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq TO vilesci;';
+	$qry = 'GRANT USAGE, UPDATE ON lehre.seq_tbl_unterrichtszeiten_gueltigkeit_unterrichtszeitengueltigkeit_id TO vilesci;';
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>Granted privileges to <strong>vilesci</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq TO web;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>web</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
-
-
-	$qry = 'GRANT USAGE, INSERT ON lehre.seq TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
-
-	$qry = 'GRANT USAGE, UPDATE ON lehre.seq TO admin;';
-	if(!$db->db_query($qry))
-		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
-	else
-		echo '<br>Granted privileges to <strong>admin</strong> on lehre.tbl_unterrichtszeiten_gueltigkeit';
 }
 
 
@@ -355,7 +284,7 @@ $result = $db->db_query("SELECT constraint_name FROM information_schema.table_co
 	WHERE table_name='tbl_unterrichtszeiten_gueltigkeit' AND constraint_type='FOREIGN KEY' AND constraint_name='fk_oe_kurzbz'");
 if($db->db_num_rows($result)==0)
 {
-	$qry = "ALTER TABLE lehre.tbl_unterrichtszeiten_gueltigkeit ADD CONSTRAINT fk_oe_kurzbz FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_studiengang(studiengang_kz);";
+	$qry = "ALTER TABLE lehre.tbl_unterrichtszeiten_gueltigkeit ADD CONSTRAINT fk_oe_kurzbz FOREIGN KEY(oe_kurzbz) REFERENCES public.tbl_organisationseinheit(oe_kurzbz);";
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_unterrichtszeiten_gueltigkeit: '.$db->db_last_error().'</strong><br>';
 	else

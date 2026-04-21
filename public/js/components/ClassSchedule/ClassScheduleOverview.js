@@ -232,7 +232,7 @@ export default {
         this.phrasesLoaded = true;
       });
   },
-  template: `
+  template: /* html */`
   <div class="container mt-4">
     <h1 class='mb-5'>{{ $p.t("ui", "classScheduleOverviewHeading") }}</h1>
     <div class="row mb-3">

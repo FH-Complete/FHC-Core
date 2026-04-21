@@ -1,19 +1,11 @@
-import { CoreFilterCmpt } from "../filter/Filter.js";
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 
-import BsModal from "../Bootstrap/Modal.js";
-import CoreForm from "../Form/Form.js";
-import FormInput from "../Form/Input.js";
-import ClassScheduleValidityPeriodFormTimeSlot from "./ClassScheduleValidityPeriodFormTimeSlot.js";
+import ClassScheduleCalendarSelector from "./ClassScheduleCalendarSelector.js";
 
 export default {
   name: "ClassScheduleValidityPeriodForm",
   components: {
-    BsModal,
-    CoreForm,
-    FormInput,
-    CoreFilterCmpt,
-    ClassScheduleValidityPeriodFormTimeSlot,
+    ClassScheduleCalendarSelector,
   },
   props: {
     classTimeSlotValidityPeriod: {
@@ -30,18 +22,23 @@ export default {
   watch: {
     editedClassTimeSlots: {
       handler(newVal) {
-        console.log("editedClassTimeSlots changed:", newVal);
-        this.classTimeSlots = JSON.parse(JSON.stringify(newVal));
-        console.log(
-          "classTimeSlots updated from editedClassTimeSlots:",
-          this.classTimeSlots,
-        );
+        this.editedOverlays = newVal.map((slot) => {
+          return {
+            databaseId: slot.id,
+            id: slot.identifier,
+            weekday: slot.wochentag,
+            type: slot.unterrichtszeitentyp_kurzbz,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+          };
+        });
       },
       immediate: true,
     },
   },
   data: () => {
     return {
+      editedOverlays: [],
       classTimeSlots: [],
       classTimeSlotTypes: [],
     };
@@ -74,55 +71,48 @@ export default {
           ),
       );
     },
-    createClassTimeSlots() {
-      return this.$refs.classTimeSlotData
-        .call(
-          ApiClassSchedule.createClassTimeSlotsForValidityPeriod(
-            this.id,
-            this.$props.classTimeSlotValidityPeriod
-              .unterrichtszeitengueltigkeit_id,
-            {
-              classTimeSlots: this.classTimeSlots,
-            },
-          ),
-        )
-        .then((response) => {
-          this.$fhcAlert.alertSuccess(this.$p.t("ui", "successSave"));
-          this.classTimeSlots = [];
-          this.$emit("classTimeSlotsCreated");
-        })
-        .catch((error) => {
-          console.error(
-            "Error creating class time slot validity period:",
-            error,
-          );
-          this.$fhcAlert.handleSystemError(error);
-        });
+    async createClassTimeSlots() {
+      let response = await this.$api.call(
+        ApiClassSchedule.createClassTimeSlotsForValidityPeriod(
+          this.id,
+          this.$props.classTimeSlotValidityPeriod
+            .unterrichtszeitengueltigkeit_id,
+          {
+            unterrichtszeiten: this.classTimeSlots,
+          },
+        ),
+      );
+      if (response.meta.status === "success") {
+        this.$fhcAlert.alertSuccess(this.$p.t("ui", "successSave"));
+        this.classTimeSlots = [];
+        this.$emit("classTimeSlotsCreated");
+      } else {
+        console.error("Error creating class time slot validity period:", error);
+        this.$fhcAlert.handleSystemError(error);
+      }
     },
-    editClassTimeSlots() {
-      return this.$refs.classTimeSlotData
-        .call(
-          ApiClassSchedule.editClassTimeSlotsForValidityPeriod(
-            this.id,
-            this.$props.classTimeSlotValidityPeriod
-              .unterrichtszeitengueltigkeit_id,
-            {
-              classTimeSlots: this.classTimeSlots,
-            },
-          ),
-        )
-        .then((response) => {
-          this.$fhcAlert.alertSuccess(this.$p.t("ui", "successSave"));
-          this.classTimeSlots = [];
-          this.$emit("classTimeSlotsEdited");
-        })
-        .catch((error) => {
-          console.error(
-            "Error editing class time slot validity period:",
-            error,
-          );
-          this.$fhcAlert.handleSystemError(error);
-        });
+    async editClassTimeSlots() {
+      let response = await this.$api.call(
+        ApiClassSchedule.editClassTimeSlotsForValidityPeriod(
+          this.id,
+          this.$props.classTimeSlotValidityPeriod
+            .unterrichtszeitengueltigkeit_id,
+          {
+            unterrichtszeiten: this.classTimeSlots,
+          },
+        ),
+      );
+      if (response.meta.status === "success") {
+        this.$fhcAlert.alertSuccess(this.$p.t("ui", "successSave"));
+        this.classTimeSlots = [];
+        this.$emit("classTimeSlotsEdited");
+      } else {
+        console.error(
+          "Error editing class time slot validity period:",
+          response.meta.message,
+        );
+        this.$fhcAlert.handleSystemError(response.meta.message);
+      }
     },
     getWeekdayNumberFromDay(day) {
       const days = {
@@ -135,6 +125,18 @@ export default {
         sunday: 7,
       };
       return days[day.toLowerCase()] || null;
+    },
+    handleOverlaysChanged(newOverlays) {
+      this.classTimeSlots = newOverlays.map((overlay) => {
+        return {
+          id: overlay.databaseId || null,
+          identifier: overlay.id,
+          wochentag: overlay.weekday,
+          startTime: overlay.startingTimeSlot.split("-")[0],
+          endTime: overlay.endingTimeSlot.split("-")[1],
+          classTimeSlotTypeShortcode: overlay.type,
+        };
+      });
     },
   },
   async created() {
@@ -163,79 +165,19 @@ export default {
     }
   },
   template: `
-  <core-form ref="classTimeSlotData" class="shadow rounded p-2 row g-3">	
-    <div class="d-flex gap-2">
-      <div class="col">
-        <div class="d-flex align-items-center gap-2">
-          <h3>Monday</h3>
-          <a class="ml-auto" @click="addClassTimeSlotPerDay('monday')"><i class="fa fa-plus-circle fs-4"></i></a>
-        </div>
-        <class-schedule-validity-period-form-time-slot
-          v-for="(timeSlot, index) in classTimeSlots.filter(slot => slot.wochentag === 1)" 
-          :key="index" 
-          :class-time-slot-types="classTimeSlotTypes"
-          @removeClassTimeSlot="removeClassTimeSlotPerDay('monday', timeSlot.identifier)"
-          v-model="timeSlot"
-        />
-      </div>
-      <div class="col">
-        <div class="d-flex align-items-center gap-2">
-          <h3>Tuesday</h3>
-          <a class="ml-auto" @click="addClassTimeSlotPerDay('tuesday')"><i class="fa fa-plus-circle fs-4"></i></a>
-        </div>
-        <class-schedule-validity-period-form-time-slot
-          v-for="(timeSlot, index) in classTimeSlots.filter(slot => slot.wochentag === 2)" 
-          :key="index" 
-          :class-time-slot-types="classTimeSlotTypes"
-          @removeClassTimeSlot="removeClassTimeSlotPerDay('tuesday', timeSlot.identifier)"
-          v-model="timeSlot"
-        />
-      </div>
-      <div class="col">
-        <div class="d-flex align-items-center gap-2">
-          <h3>Wednesday</h3>
-          <a class="ml-auto" @click="addClassTimeSlotPerDay('wednesday')"><i class="fa fa-plus-circle fs-4"></i></a>
-        </div>
-        <class-schedule-validity-period-form-time-slot
-          v-for="(timeSlot, index) in classTimeSlots.filter(slot => slot.wochentag === 3)" 
-          :key="index" 
-          :class-time-slot-types="classTimeSlotTypes"
-          @removeClassTimeSlot="removeClassTimeSlotPerDay('wednesday', timeSlot.identifier)"
-          v-model="timeSlot"
-        />
-      </div>
-      <div class="col">
-        <div class="d-flex align-items-center gap-2">
-          <h3>Thursday</h3>
-          <a class="ml-auto" @click="addClassTimeSlotPerDay('thursday')"><i class="fa fa-plus-circle fs-4"></i></a>
-        </div>
-        <class-schedule-validity-period-form-time-slot
-          v-for="(timeSlot, index) in classTimeSlots.filter(slot => slot.wochentag === 4)" 
-          :key="index" 
-          :class-time-slot-types="classTimeSlotTypes"
-          @removeClassTimeSlot="removeClassTimeSlotPerDay('thursday', timeSlot.identifier)"
-          v-model="timeSlot"
-        />
-      </div>
-      <div class="col">
-        <div class="d-flex align-items-center gap-2">
-          <h3>Friday</h3>
-          <a class="ml-auto" @click="addClassTimeSlotPerDay('friday')"><i class="fa fa-plus-circle fs-4"></i></a>
-        </div>
-        <class-schedule-validity-period-form-time-slot
-          v-for="(timeSlot, index) in classTimeSlots.filter(slot => slot.wochentag === 5)" 
-          :key="index" 
-          :class-time-slot-types="classTimeSlotTypes"
-          @removeClassTimeSlot="removeClassTimeSlotPerDay('friday', timeSlot.identifier)"
-          v-model="timeSlot"
-        />
-      </div>
+  <div class='row'>
+    <div class='col-12'>
+      <class-schedule-calendar-selector 
+        :class-time-slot-types="this.classTimeSlotTypes" 
+        :edited-overlays="this.editedOverlays"
+        @overlaysChanged="handleOverlaysChanged"
+      />
     </div>
     <div class="col-12 d-flex justify-content-end gap-2">
       <button type="button" class="btn btn-secondary" @click="hideForm">{{$p.t('ui', 'abbrechen')}}</button>
       <button v-if="!areClassTimeSlotsEdited" type="button" class="btn btn-primary" @click="createClassTimeSlots">{{$p.t('ui', 'speichern')}}</button>
       <button v-else type="button" class="btn btn-primary" @click="editClassTimeSlots">{{$p.t('ui', 'btnAktualisieren')}}</button>
     </div>
-  </core-form>
+  </div>
   `,
 };
