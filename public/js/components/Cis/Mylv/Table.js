@@ -27,8 +27,7 @@ export default {
 					{title: Vue.computed(() => this.$p.t('lehre/orgform')), field: 'orgform_kurzbz', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('lehre/kurzbz')), field: 'studiengang_kuerzel', widthGrow: 1},
 					{title: Vue.computed(() => this.$p.t('lehre/semesterstunden')), field: 'semesterstunden', 
-						bottomCalc: this.semesterstundenCalc, bottomCalcFormatter: this.semesterstundenCalcFormatter, bottomCalcParams: this.semesterstundenParamLookup,
-						widthGrow: 1, visible: true},
+						bottomCalc: this.semesterstundenCalc, widthGrow: 1, visible: true},
 					{title: Vue.computed(() => this.$p.t('global/actions')), headerSort: false,
 						field: 'menu', formatter: this.actionFormatter, widthGrow: 1, tooltip: this.spoofingFunc}
 				],
@@ -50,15 +49,6 @@ export default {
 		
 	},
 	methods: {
-		semesterstundenCalcFormatter(cell) {
-
-			return cell.getValue()
-		},
-		semesterstundenParamLookup (values, data) {
-			const first = data[0]
-			debugger
-			return first ? first.anwesenheit + ' %' : ''
-		},
 		semesterstundenCalc(values, data) {
 			let sum = 0
 			values.forEach(val => {
