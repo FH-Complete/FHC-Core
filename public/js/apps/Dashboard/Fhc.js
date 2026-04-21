@@ -233,7 +233,6 @@ const app = Vue.createApp({
 		renderers: null,
 	}),
 	components: {},
-	inject: ["isMobile"],
 	computed: {
 		isMobile() {
 			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
