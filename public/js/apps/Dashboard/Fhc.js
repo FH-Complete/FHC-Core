@@ -17,6 +17,8 @@ import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMit
 import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
+import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
+import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 
 import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
@@ -199,6 +201,26 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
+			path: `/Cis/StgOrgLvPlan/:mode?/:focus_date?/:stgkz?/:sem?/:verband?/:gruppe?`,
+			name: 'StgOrgLvPlan',
+			component: StgOrgLvPlan,
+			props(route) {
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
+      		name: "OtherLvPlan",
+      		component: OtherLvPlan,
+      		props(route) {
+        		return {
+					propsViewData: route.params
+        		};
+      		}
+    	},
+		{
 			path: `/Cis4`,
 			name: 'Cis4',
 			component: FhcDashboard,
@@ -284,7 +306,6 @@ const app = Vue.createApp({
 		}
 	},
 	async created(){
-		
 		await this.$api
 			.call(ApiRenderers.loadRenderers())
 			.then(res => res.data)

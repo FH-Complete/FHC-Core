@@ -101,12 +101,15 @@ export default {
 		updateRange(rangeInterval) {
 			this.rangeInterval = rangeInterval;
 			this.$emit('update:range', rangeInterval);
+		},
+		resetEventLoader() {
+			this.reset();
 		}
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
 		
-		const { events, lv } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
 		Vue.watch(lv, newValue => {
 			context.emit('update:lv', newValue);
@@ -115,7 +118,8 @@ export default {
 		return {
 			rangeInterval,
 			events,
-			lv
+			lv,
+			reset
 		};
 	},
 	created() {

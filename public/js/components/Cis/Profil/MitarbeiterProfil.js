@@ -9,6 +9,7 @@ import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
+import CalendarSync from "./ProfilComponents/CalendarSync.js";
 
 import ApiProfilUpdate from '../../../api/factory/profilUpdate.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
@@ -26,6 +27,7 @@ export default {
 		ProfilEmails,
 		RoleInformation,
 		ProfilInformation,
+		CalendarSync,
 	},
 
 	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
@@ -103,7 +105,7 @@ export default {
 					},
 				],
 			},
-
+			quickLinks: [],
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableMaProfilBetriebsmittel",
 				persistence: {
@@ -160,6 +162,7 @@ export default {
 	props: {
 		data: Object,
 		editData: Object,
+		calendarSyncUrls: Array,
 	},
 	
 	methods: {
@@ -313,7 +316,6 @@ export default {
 		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
-
 	},
 	watch: {
 		'data.funktionen'(newVal) {
@@ -331,12 +333,6 @@ export default {
     <edit-profil v-if="showModal" ref="editModal" :isMitarbeiter="true" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
         <div  class="d-md-none col-12 ">
-            <!--TODO: uncomment when implemented
-                <div class="row mb-3">
-                           <div class="col">
-                           <quick-links :title="$p.t('profil','quickLinks')" :mobile="true"></quick-links>
-                           </div>
-                         </div>-->
             <!-- Bearbeiten Button -->
             <div v-if="isEditable" class="row mb-3 ">
                 <div class="col">
@@ -465,17 +461,11 @@ export default {
         </div>
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-            <!--TODO: uncomment when implemented
-                <div  class="row d-none d-md-block mb-3">
-                           
-                           <div class="col">
-                            
-                               <quick-links :title="$p.t('profil','quickLinks')"></quick-links>
-                              
-                                 
-                             
-                             </div>
-                           </div>-->
+			<div v-if="quickLinks.length" class="row mb-4">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
             <!-- Bearbeiten Button -->
             <div class="row d-none d-md-block ">
                 <div class="col mb-3">
@@ -501,12 +491,17 @@ export default {
                     <ausweis-status :data="data.zutrittsdatum"></ausweis-status>
                 </div>
             </div>
-            <div  class="row">
+            <div class="row mb-3">
                 <div class="col">
                     <!-- MAILVERTEILER -->
                     <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
                 </div>
             </div>
+			<div class="row">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
         </div>
     </div>
 </div>
