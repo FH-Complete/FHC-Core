@@ -3,7 +3,8 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
-export const DEFAULT_MODE_LVPLAN = 'Week'
+export const DEFAULT_MODE_LVPLAN_MOBILE = 'List';
+export const DEFAULT_MODE_LVPLAN_DESKTOP = 'Week';
 
 export default {
 	name: 'LvPlan',
@@ -24,12 +25,14 @@ export default {
 			lv: null
 		};
 	},
+	inject: ["isMobile"],
 	computed:{
 		currentDay() {
 			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
 		},
 		currentMode() {
-			return this.propsViewData?.mode || DEFAULT_MODE_LVPLAN;
+			const defaultMode = this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP;
+			return this.propsViewData?.mode || defaultMode;
 		},
 		downloadLinks() {
 			if (!this.studiensemester_start || !this.studiensemester_ende || !this.uid)

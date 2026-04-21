@@ -93,7 +93,7 @@ export default {
 	mounted() {
 		this.$emit('update:range', this.range);
 	},
-	template: `
+	template: /*html*/ `
 	<div
 		class="fhc-calendar-mode-list flex-grow-1 position-relative"
 		@cal-click-default.capture="handleClickDefaults"

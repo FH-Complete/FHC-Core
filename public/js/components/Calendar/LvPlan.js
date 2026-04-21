@@ -7,6 +7,7 @@ import { useEventLoader } from '../../composables/EventLoader.js';
 import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
+import ModeList from './Mode/List.js';
 
 export default {
 	name: "CalendarLvPlan",
@@ -14,7 +15,8 @@ export default {
 		FhcCalendar
 	},
 	inject: [
-		"renderers"
+		"renderers",
+		"isMobile",
 	],
 	props: {
 		timezone: {
@@ -27,7 +29,7 @@ export default {
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Day'
 		},
 		getPromiseFunc: {
 			type: Function,
@@ -41,11 +43,6 @@ export default {
 	],
 	data() {
 		return {
-			modes: {
-				day: Vue.markRaw(ModeDay),
-				week: Vue.markRaw(ModeWeek),
-				month: Vue.markRaw(ModeMonth)
-			},
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
@@ -53,6 +50,9 @@ export default {
 				},
 				week: {
 					collapseEmptyDays: false
+				},
+				list: {
+					length: 7
 				}
 			},
 			teachingunits: null
@@ -77,7 +77,20 @@ export default {
 					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
 				}
 			];
-		}
+		},
+		modes() {
+			let modes = {
+				day: Vue.markRaw(ModeDay),
+				month: Vue.markRaw(ModeMonth)
+			};
+			if (this.isMobile) {
+				modes.list = Vue.markRaw(ModeList);
+			} else {
+				modes.week = Vue.markRaw(ModeWeek);
+			}
+
+			return modes;
+		},
 	},
 	methods: {
 		eventStyle(event) {
@@ -136,6 +149,13 @@ export default {
 	>
 		<template v-slot="{ event, mode }">
 			<div
+				v-if="!event"
+				class="h-100 d-flex justify-content-center align-items-center"
+			>
+				{{ $p.t('lehre/noLvFound') }}
+			</div>
+			<div
+				v-else
 				:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
