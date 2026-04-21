@@ -155,20 +155,22 @@ export default {
 			payload[item.id] = { config };
 			this.updatePreset(payload);
 		},
-		updatePositions(updated, pinned=false) {
+		updatePositions(updated) {
 			let result = {};
 			updated.forEach(update => {
-				
 				let item = structuredClone(ObjectUtils.deepToRaw(update.item));
+
 				if (!item.placeholder) {
 					if (!item.place[this.gridWidth])
-						item.place[this.gridWidth] = {x: 0, y: 0, w: 1, h: 1};
+						item.place[this.gridWidth] = { x: 0, y: 0, w: 1, h: 1 };
+					
 					delete item.x;
 					delete item.y;
 					delete item.w;
 					delete item.h;
-					delete item.place[this.gridWidth].pinned;
+					delete item.pinned;
 					delete item.weight;
+
 					if (update.x !== undefined)
 						item.place[this.gridWidth].x = update.x;
 					if (update.y !== undefined)
@@ -177,9 +179,8 @@ export default {
 						item.place[this.gridWidth].w = update.w;
 					if (update.h !== undefined)
 						item.place[this.gridWidth].h = update.h;
-					if (pinned) {
-						item.place[this.gridWidth].pinned = true;
-					}
+					if (update.pinned !== undefined)
+						item.place[this.gridWidth].pinned = update.pinned;
 
 					result[item.id] = item;
 				}
@@ -250,8 +251,8 @@ export default {
 					@remove="removeWidget(item, $event)"
 					@config-opened="handleConfigOpened"
 					@config-closed="handleConfigClosed"
-					@pinItem="updatePositions($event,true)"
-					@unPinItem="updatePositions"
+					@pin-item="updatePositions"
+					@un-pin-item="updatePositions"
 				></dashboard-item>
 			</template>
 		</drop-grid>

@@ -118,11 +118,11 @@ export default {
 			// Unpinning is only possible in edit mode
 			if (!this.editMode)
 				return;
-			let result = { item: this.item_data, x: this.item_data.x, y: this.item_data.y };
+			let result = { item: this.item_data, pinned: false };
 			this.$emit('unPinItem', [result]);
 		},
 		pinItem() {
-			let result = { item: this.item_data, x: this.item_data.x, y: this.item_data.y };
+			let result = { item: this.item_data, pinned: true };
 			this.$emit('pinItem', [result]);
 		},
 		getWidgetC4Link(widget) {

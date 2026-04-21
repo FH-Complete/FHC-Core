@@ -74,6 +74,12 @@ export default {
 						break;
 					}
 				}
+				if (payload[k].place) {
+					Object.values(payload[k].place).forEach(place => {
+						if (place.pinned === false)
+							delete place.pinned;
+					});
+				}
 				payload[k].widgetid = k;
 			}
 			this.$api
