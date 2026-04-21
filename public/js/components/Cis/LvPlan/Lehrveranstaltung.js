@@ -31,7 +31,7 @@ export default {
 			let validModes = ['day', 'month'];
 			validModes.push(this.isMobile ? 'list' : 'week');
 
-			const defaultMode = this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP;
+			const defaultMode = this.isMobile ? DEFAULT_MODE_LVPLAN_MOBILE : DEFAULT_MODE_LVPLAN_DESKTOP;
 
 			if (!this.propsViewData?.mode || !validModes.includes(this.propsViewData?.mode.toLowerCase()))
 				return defaultMode;

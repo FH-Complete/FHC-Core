@@ -31,7 +31,7 @@ export default {
 			return this.propsViewData?.focus_date || luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
 		},
 		currentMode() {
-			const defaultMode = this.isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP;
+			const defaultMode = this.isMobile ? DEFAULT_MODE_LVPLAN_MOBILE : DEFAULT_MODE_LVPLAN_DESKTOP;
 			return this.propsViewData?.mode || defaultMode;
 		},
 		downloadLinks() {
