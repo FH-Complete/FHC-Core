@@ -47,16 +47,32 @@ export default {
 					this.lvs[this.currentSemester].lvs = res.data.retval || [];
 					this.firstLoad = false;
 
-					this.$api.call(ApiAddons.getMultipleLvMenu(this.lvs[this.currentSemester].lvs, this.currentSemester)).then(res => {
-						if(res.data) {
-							Object.entries(res.data).forEach((entry) => {
-								// entry[0] -> key -> lvid
-								// entry[1] -> value -> menu
-								const lv = this.lvs[this.currentSemester].lvs.find(lv => lv.lehrveranstaltung_id == entry[0])
-								lv.menu = entry[1]
-							})
-						}
+					// pretty slow to load all at once if one lva has a weird moodle / lvinfo situation 
+					// that multiplies the loadtime for everything by a factor of 3-5
+					
+					// this.$api.call(ApiAddons.getMultipleLvMenu(this.lvs[this.currentSemester].lvs, this.currentSemester)).then(res => {
+					// 	if(res.data) {
+					// 		Object.entries(res.data).forEach((entry) => {
+					// 			// entry[0] -> key -> lvid
+					// 			// entry[1] -> value -> menu
+					// 			const lv = this.lvs[this.currentSemester].lvs.find(lv => lv.lehrveranstaltung_id == entry[0])
+					// 			lv.menu = entry[1]
+					// 		})
+					// 	}
+					// })
+					this.lvs[this.currentSemester].lvs.forEach(lv=>{
+
+						this.$api.call(ApiAddons.getLvMenu(lv.lehrveranstaltung_id, this.currentSemester)).then(res => {
+							if(res.data) {
+								
+								const lvProp = this.lvs[this.currentSemester].lvs.find(lv2 => lv2.lehrveranstaltung_id == lv.lehrveranstaltung_id)
+								lvProp.menu = res.data
+								
+							}
+						})
+						
 					})
+					
 
 				})
 			}

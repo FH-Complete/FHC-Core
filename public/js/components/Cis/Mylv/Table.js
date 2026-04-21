@@ -237,6 +237,16 @@ export default {
 				if(this.$refs.mylvTable) {
 					console.log('watcher inside if ref table clause')
 					this.$refs.mylvTable.tabulator.setData(newVal);
+
+					const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
+					const tableDataSet = document.getElementById('filterTableDataset' + tableID);
+					if(!tableDataSet) return
+					const rect = tableDataSet.getBoundingClientRect();
+
+					const h = window.visualViewport.height - rect.top - 100
+					if(this.$refs.mylvTable) {
+						this.$refs.mylvTable.$refs.table.style.setProperty('height', h+'px')
+					}
 				}
 			},
 			deep: true
