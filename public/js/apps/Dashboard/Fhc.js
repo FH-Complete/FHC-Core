@@ -232,6 +232,7 @@ const app = Vue.createApp({
 		appSideMenuEntries: {},
 		renderers: null,
 	}),
+	components: {},
 	computed: {
 		isMobile() {
 			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
@@ -239,7 +240,6 @@ const app = Vue.createApp({
 			return smallScreen;// && touchCapable;
 		},
 	},
-	components: {},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
