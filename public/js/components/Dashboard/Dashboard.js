@@ -35,7 +35,7 @@ export default {
 	},
 	provide() {
 		return {
-			editMode: Vue.computed(()=>this.editMode),
+			editMode: Vue.computed(() => this.editMode),
 			widgetsSetup: Vue.computed(() => this.widgetsSetup)
 		}
 	},
@@ -152,13 +152,28 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="core-dashboard">
 		<h3>
 			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
-			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
+			<button
+				class="btn ms-2"
+				aria-label="edit dashboard"
+				v-tooltip="{ showDelay: 1000, value: 'edit dashboard' }"
+				@click="editMode = !editMode"
+			><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
-		<dashboard-section :seperator="0" name="general" :widgets="widgets" @widget-add="widgetAdd" @widget-update="widgetUpdate" @widget-remove="widgetRemove"></dashboard-section>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="widgetsSetup"></dashboard-widget-picker>
+		<dashboard-section
+			name="general"
+			:seperator="0"
+			:widgets="widgets"
+			@widget-add="widgetAdd"
+			@widget-update="widgetUpdate"
+			@widget-remove="widgetRemove"
+		></dashboard-section>
+		<dashboard-widget-picker
+			ref="widgetpicker"
+			:widgets="widgetsSetup"
+		></dashboard-widget-picker>
 	</div>`
 }
