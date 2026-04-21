@@ -44,6 +44,8 @@ class GridLogic {
 		return freeSlots;
 	}
 	add(item, prefer) {
+		if (!item.frame)
+			item.frame = this.getItemFrame(item);
 		let occupiers = this.getItemsInFrame(item.frame);
 		if (!occupiers.length) {
 			item.frame.forEach(f => this.grid[f] = item.index);
