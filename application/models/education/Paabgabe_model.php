@@ -79,14 +79,8 @@ class Paabgabe_model extends DB_Model
 				 JOIN public.tbl_benutzer ON (public.tbl_benutzer.uid = student_uid)
 				 JOIN public.tbl_person USING (person_id)
 		
-		WHERE (
-			(campus.tbl_paabgabe.insertamum >= CURRENT_DATE - INTERVAL ? 
-				AND campus.tbl_paabgabe.insertamum < CURRENT_DATE
-			)
-			OR 
-			(campus.tbl_paabgabe.updateamum >= CURRENT_DATE - INTERVAL ? 
-					AND campus.tbl_paabgabe.updateamum < CURRENT_DATE
-			)
+		WHERE campus.tbl_paabgabe.insertamum::date = CURRENT_DATE - INTERVAL ?
+			OR campus.tbl_paabgabe.updateamum::date = CURRENT_DATE - INTERVAL ?
 			AND campus.tbl_paabgabe.paabgabetyp_kurzbz IN ?";
 		
 		return $this->execQuery($query, [$interval, $interval, $relevantTypes]);
@@ -114,8 +108,7 @@ class Paabgabe_model extends DB_Model
 						 JOIN public.tbl_person ON (public.tbl_benutzer.person_id = public.tbl_person.person_id)
 				
 				WHERE campus.tbl_paabgabe.abgabedatum IS NOT NULL 
-				AND campus.tbl_paabgabe.abgabedatum >= CURRENT_DATE - INTERVAL ?
-				AND campus.tbl_paabgabe.abgabedatum < CURRENT_DATE";
+				AND campus.tbl_paabgabe.abgabedatum = CURRENT_DATE - INTERVAL ?";
 		
 		if($relevantTypes !== null) {
 			$query .= " AND campus.tbl_paabgabe.paabgabetyp_kurzbz IN ?";
