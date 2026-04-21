@@ -165,7 +165,6 @@ export default {
 		</h3>
 		<dashboard-section
 			name="general"
-			:seperator="0"
 			:widgets="widgets"
 			@widget-add="widgetAdd"
 			@widget-update="widgetUpdate"
