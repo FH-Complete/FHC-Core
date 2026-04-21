@@ -233,11 +233,18 @@ const app = Vue.createApp({
 		renderers: null,
 	}),
 	components: {},
-	inject: ["isMobile"],
+	computed: {
+		isMobile() {
+			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
+			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+			return smallScreen;// && touchCapable;
+		},
+	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			renderers: Vue.computed(() => this.renderers),
+			isMobile: this.isMobile,
 		}	
 	},
 	methods: {
