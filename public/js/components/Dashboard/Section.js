@@ -245,7 +245,6 @@ export default {
 				<dashboard-item 
 					v-else
 					:id="item.widget"
-					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
 					:item_data="{config:item.config, custom:item.custom, h:item.h, w:item.w,id:item.id,place:item.place,widget:item.widget,widgetid:item.widgetid,x:item.x,y:item.y}"

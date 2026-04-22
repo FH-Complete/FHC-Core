@@ -32,7 +32,6 @@ export default {
 	],
 	props: [
 		"id",
-		"widgetID",
 		"config",
 		"width",
 		"height",
@@ -190,7 +189,6 @@ export default {
 	template: /*html*/ `
 	<div
 		v-if="!hidden || editMode"
-		:id="widgetID"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
 		:class="{'hidden-widget':hidden, [arguments?.className]:arguments && arguments.className}"
 	>
