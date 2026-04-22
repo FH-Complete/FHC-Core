@@ -43,7 +43,6 @@ export default {
 		"item_data",
 		"place",
 		"widgetTemplate",
-		"resizeOverlay",
 		"source"
 	],
 	computed: {
@@ -193,7 +192,7 @@ export default {
 		v-if="!hidden || editMode"
 		:id="widgetID"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
-		:class="{'hidden-widget':hidden, 'dashboard-item-overlay':resizeOverlay, [arguments?.className]:arguments && arguments.className}"
+		:class="{'hidden-widget':hidden, [arguments?.className]:arguments && arguments.className}"
 	>
 		<div v-if="loading" class="d-flex justify-content-center align-items-center h-100">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>

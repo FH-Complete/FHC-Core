@@ -245,7 +245,6 @@ export default {
 				<dashboard-item 
 					v-else
 					:id="item.widget"
-					:resizeOverlay="item.resizeOverlay"
 					:widgetID="item.id"
 					:width="item.w"
 					:height="item.h"
