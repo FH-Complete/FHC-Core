@@ -108,7 +108,7 @@ export default {
 		},
 		// item pipeline
 		placeholders() { // empty tiles
-			return this.grid.getFreeSlots().map((item, index) => {
+			let placeholders = this.grid.getFreeSlots().map((item, index) => {
 				return {
 					x: item.x,
 					y: item.y,
@@ -120,6 +120,22 @@ export default {
 					}
 				};
 			});
+
+			if (this.additionalRowComputed) {
+				for (var x = 0; x < this.cols; x++)
+					placeholders.push({
+						x,
+						y: this.grid.h,
+						h: 1,
+						w: 1,
+						placeholder: true,
+						data: {
+							id: 'placeholder_' + placeholders.length
+						}
+					});
+			}
+
+			return placeholders;
 		},
 		indexedItems() { // indexed
 			return this.items.map(
