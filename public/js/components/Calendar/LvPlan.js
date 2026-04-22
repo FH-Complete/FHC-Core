@@ -36,6 +36,11 @@ export default {
 			required: true
 		}
 	},
+	provide() {
+		return {
+			shouldCompactEvents: Vue.computed(() => this.$props.mode === "Month" && this.isMobile)
+		}
+	},
 	emits: [
 		"update:date",
 		"update:mode",
