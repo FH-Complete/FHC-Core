@@ -57,6 +57,14 @@ class GridLogic {
 			
 			item.frame.forEach(f => intermGrid.grid[f] = -1);
 
+			intermGrid.data.forEach(currItem => {
+				if (currItem.pinned) {
+					if (!currItem.frame)
+						currItem.frame = intermGrid.getItemFrame(currItem);
+					currItem.frame.forEach(f => intermGrid.grid[f] = -1);
+				}
+			});
+
 			const possiblities = intermGrid.tryMoving(occupiers, prefer);
 			if (possiblities.length) {
 				const bestOption = possiblities.sort((a,b) => {
