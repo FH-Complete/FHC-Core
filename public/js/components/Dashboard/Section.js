@@ -209,6 +209,7 @@ export default {
 	<div
 		class="dashboard-section position-relative pb-3 mb-3 border-bottom"
 		ref="container"
+		:class="{ 'edit-active': editModeIsActive }"
 	>
 		<h4 v-if="adminMode" class=" mb-2">
 			<i v-tooltip="showSectionInformation" class="fa-solid fa-circle-info section-info"></i>
@@ -226,7 +227,6 @@ export default {
 			:items="items"
 			:items-setup="indexedWidgetsTemplates"
 			:active="editModeIsActive"
-			:margin-for-extra-row=".01"
 			@rearrange-items="updatePositions"
 			@grid-height="gridHeight=$event"
 		>

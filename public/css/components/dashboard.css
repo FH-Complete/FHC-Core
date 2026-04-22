@@ -43,6 +43,15 @@
 	cursor: pointer;
 }
 
+.dashboard-section.edit-active {
+	/**
+	 * replaces margin for extra row
+	 * 10% equals 0.1 of 100%
+	 * 1rem equals the padding of pb-3 that is overwritten here
+	 */
+	padding-bottom: calc(10% / var(--fhc-dashboard-grid-size) + 1rem) !important;
+}
+
 .dashboard-section > .newGridRow {
 	position: absolute;
 	width: 20px;

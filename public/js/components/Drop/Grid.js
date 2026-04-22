@@ -18,10 +18,6 @@ export default {
 			type: Boolean,
 			default: true
 		},
-		marginForExtraRow: {
-			type: Number,
-			default: 0
-		},
 		additionalRow: {
 			type: Boolean,
 			default: false
@@ -64,15 +60,14 @@ export default {
 			return this.grid ? this.grid.h : 1;
 		},
 		gridStyle() {
-			const addH = this.active ? this.marginForExtraRow : 0;
 			return {
-				'--fhc-dg-row-height': 100/(this.rows + addH) + '%',
+				'--fhc-dg-row-height': 100/this.rows + '%',
 				'--fhc-dg-col-width': 100/this.cols + '%',
 				'--fhc-dg-item-padding':
 					'var(--fhc-dg-item-py, var(--fhc-dg-item-p, .25%))' +
 					' ' +
 					'var(--fhc-dg-item-px, var(--fhc-dg-item-p, .25%))',
-				'padding-bottom': 100 * (this.rows + addH)/this.cols + '%'
+				'padding-bottom': 100 * this.rows/this.cols + '%'
 			};
 		},
 		// dragging
@@ -412,7 +407,6 @@ export default {
 				this.x = this.y = -1;
 				return false;
 			}
-			const addH = this.active ? this.marginForExtraRow : 0;
 			const rect = this.$refs.container.getBoundingClientRect();
 			
 			if (!evt.clientX && !evt.clientY && evt.touches){
@@ -423,7 +417,7 @@ export default {
 			this.clientX = (evt.clientX - rect.left);
 			this.clientY = (evt.clientY - rect.top);
 			const gridX = Math.floor(this.cols * (evt.clientX - rect.left) / this.$refs.container.clientWidth);
-			const gridY = Math.floor((this.rows + addH) * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
+			const gridY = Math.floor(this.rows * (evt.clientY - rect.top) / this.$refs.container.clientHeight);
 			
 			if (this.x == gridX && this.y == gridY)
 				return false;
