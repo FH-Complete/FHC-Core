@@ -211,12 +211,12 @@ export default {
 		});
 	},
 	template: /* html */`
-	<div
+	<section
 		class="dashboard-section position-relative pb-3 mb-3 border-bottom"
 		ref="container"
 		:class="{ 'edit-active': editModeIsActive }"
 	>
-		<h4 v-if="adminMode" class=" mb-2">
+		<h4 v-if="adminMode" class="mb-2">
 			<i v-tooltip="showSectionInformation" class="fa-solid fa-circle-info section-info"></i>
 			{{ sectionNameTranslation }}:
 		</h4>
@@ -267,7 +267,7 @@ export default {
 				></dashboard-item>
 			</template>
 		</drop-grid>
-	</div>`
+	</section>`
 }
 
 /*
