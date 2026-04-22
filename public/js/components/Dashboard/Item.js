@@ -213,7 +213,7 @@ export default {
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
 				</Transition>
-				<h5 class="col mx-2 px-2">{{ widgetTemplate.setup.name }}</h5>
+				<h5 class="col mx-2 my-0 px-2">{{ widgetTemplate.setup.name }}</h5>
 				<div
 					v-if="source"
 					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
