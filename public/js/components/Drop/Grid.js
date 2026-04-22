@@ -502,6 +502,10 @@ export default {
 			}
 		},
 		dragCancel() {
+			if (this.mode == MODE_IDLE) {
+				return;
+			}
+
 			this.additionalRowComputed = false;
 			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0];
@@ -589,7 +593,7 @@ export default {
 				@start-move="startMove"
 				@start-resize="startResize"
 				@drag="moveGhostImage"
-				@dragend="dragEnd"
+				@dragend="dragCancel"
 			>
 				<template v-slot="item">
 					<slot
