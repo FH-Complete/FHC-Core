@@ -1,7 +1,7 @@
 import BsConfirm from "../Bootstrap/Confirm.js";
 import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
-import CachedWidgetLoader from "../../composables/Dashboard/CachedWidgetLoader.js";
+import { useCachedWidgetLoader } from "../../composables/Dashboard/CachedWidgetLoader.js";
 import WidgetIcon from "./Widget/WidgetIcon.js"
 
 export default {
@@ -125,23 +125,23 @@ export default {
 		},
 		checkResizeLimit(item, w, h) {
 			// NOTE(chris): widgets needs to be loaded for this to work
-			let widget = CachedWidgetLoader.getWidget(item.widget);
+			let widget = this.widgetState[item.widget];
 			if (widget) {
-				let minmaxW = widget.setup.width;
+				let minmaxW = { ...widget.setup.width };
 				if (minmaxW.max)
 					minmaxW.min = minmaxW.min || 1;
 				else
-					minmaxW = {min:minmaxW,max:minmaxW};
+					minmaxW = { min: minmaxW, max: minmaxW };
 				if (w < minmaxW.min)
 					w = minmaxW.min; 
 				if (w > minmaxW.max)
 					w = minmaxW.max;
 
-				let minmaxH = widget.setup.height;
+				let minmaxH = { ...widget.setup.height };
 				if (minmaxH.max)
 					minmaxH.min = minmaxH.min || 1;
 				else
-					minmaxH = {min:minmaxH,max:minmaxH};
+					minmaxH = { min: minmaxH, max: minmaxH };
 				if (h < minmaxH.min)
 					h = minmaxH.min;
 				if (h > minmaxH.max)
@@ -151,7 +151,7 @@ export default {
 		},
 		removeWidget(item, revert) {
 			if (item.custom) {
-				BsConfirm.popup('Are you sure you want to delete this widget?').then(() => this.$emit('widgetRemove', this.name, item.id));
+				BsConfirm.popup(this.$p.t('dashboard', 'alert_deleteWidget')).then(() => this.$emit('widgetRemove', this.name, item.id));
 			} else {
 				let update = {};
 				update[item.id] = { hidden: !revert };
@@ -198,6 +198,13 @@ export default {
 			payload[this.name] = update;
 			this.$emit('widgetUpdate', this.name, payload);
 		}
+	},
+	setup() {
+		const { state: widgetState } = useCachedWidgetLoader();
+
+		return {
+			widgetState
+		};
 	},
 	mounted() {
 		let self = this;
