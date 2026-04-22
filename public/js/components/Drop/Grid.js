@@ -50,14 +50,15 @@ export default {
 	computed: {
 		// gridlogic
 		rows() {
-			if (this.additionalRow) {
-				if (this.overwriteRows !== null)
-					return this.overwriteRows + 1;
-				return this.grid ? (this.grid.h+1) : 1;
-			}
-			if (this.overwriteRows !== null)
+			const gridH = this.grid?.h || 1;
+
+			if (this.overwriteRows !== null && this.overwriteRows > gridH)
 				return this.overwriteRows;
-			return this.grid ? this.grid.h : 1;
+			
+			if (this.additionalRow)
+				return this.grid ? gridH + 1 : 1;
+			
+			return gridH;
 		},
 		gridStyle() {
 			return {
