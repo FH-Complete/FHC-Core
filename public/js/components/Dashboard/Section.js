@@ -3,6 +3,8 @@ import DropGrid from '../Drop/Grid.js'
 import DashboardItem from "./Item.js";
 import WidgetIcon from "./Widget/WidgetIcon.js"
 
+import dragClick from '../../directives/dragClick.js';
+
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
 export default {
@@ -11,6 +13,9 @@ export default {
 		DropGrid,
 		DashboardItem,
 		WidgetIcon,
+	},
+	directives: {
+		dragClick
 	},
 	inject: {
 		widgetsSetup: {
@@ -218,8 +223,9 @@ export default {
 		<button
 			v-tooltip="$p.t('dashboard','addLine')"
 			v-if="!additionalRow && editModeIsActive"
-			@click="additionalRow=true"
 			class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center"
+			@click="additionalRow=true"
+			v-drag-click="() => additionalRow=true"
 		>+</button>
 		<drop-grid
 			v-model:cols="gridWidth"
