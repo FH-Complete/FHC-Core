@@ -29,8 +29,7 @@ export default {
 	},
 	emits: [
 		"rearrangeItems",
-		"gridHeight",
-		"update:additionalRow"
+		"gridHeight"
 	],
 	data() {
 		return {
@@ -55,7 +54,7 @@ export default {
 	computed: {
 		// gridlogic
 		rows() {
-			if (this.additionalRowComputed) {
+			if (this.additionalRow) {
 				if (this.overwriteRows !== null)
 					return this.overwriteRows + 1;
 				return this.grid ? (this.grid.h+1) : 1;
@@ -63,14 +62,6 @@ export default {
 			if (this.overwriteRows !== null)
 				return this.overwriteRows;
 			return this.grid ? this.grid.h : 1;
-		},
-		additionalRowComputed: {
-			get() {
-				return this.additionalRow;
-			},
-			set(value) {
-				this.$emit('update:additionalRow', value);
-			}
 		},
 		gridStyle() {
 			const addH = this.active ? this.marginForExtraRow : 0;
@@ -126,7 +117,7 @@ export default {
 				};
 			});
 
-			if (this.additionalRowComputed) {
+			if (this.additionalRow) {
 				for (var x = 0; x < this.cols; x++)
 					placeholders.push({
 						x,
@@ -531,7 +522,6 @@ export default {
 				return;
 			}
 
-			this.additionalRowComputed = false;
 			this.tempPositionUpdates = null;
 			this.draggedOffset = [0,0];
 			this._cleanupDragging();

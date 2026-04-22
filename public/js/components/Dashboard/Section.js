@@ -40,7 +40,7 @@ export default {
 			configOpened: false,
 			gridWidth: 1,
 			gridHeight: null,
-			additionalRow:false
+			additionalRow: false
 		};
 	},
 	provide() {
@@ -122,6 +122,11 @@ export default {
 			if (this.editModeIsActive)
 				return placedItems;
 			return placedItems.filter(item => !item.hidden);
+		}
+	},
+	watch: {
+		items() {
+			this.additionalRow = false;
 		}
 	},
 	methods: {
@@ -217,7 +222,7 @@ export default {
 		>+</button>
 		<drop-grid
 			v-model:cols="gridWidth"
-			v-model:additional-row="additionalRow"
+			:additional-row="additionalRow"
 			:items="items"
 			:items-setup="indexedWidgetsTemplates"
 			:active="editModeIsActive"
