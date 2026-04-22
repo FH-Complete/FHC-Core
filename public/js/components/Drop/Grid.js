@@ -42,6 +42,7 @@ export default {
 			mode: MODE_IDLE,
 			draggedOffset: [0, 0],
 			draggedItem: null,
+			overwriteRows: null,
 			clonedWidget: null, // ghost image
 			// tile coordinates while dragging
 			x: -1,
@@ -55,8 +56,12 @@ export default {
 		// gridlogic
 		rows() {
 			if (this.additionalRowComputed) {
+				if (this.overwriteRows !== null)
+					return this.overwriteRows + 1;
 				return this.grid ? (this.grid.h+1) : 1;
 			}
+			if (this.overwriteRows !== null)
+				return this.overwriteRows;
 			return this.grid ? this.grid.h : 1;
 		},
 		additionalRowComputed: {
@@ -470,6 +475,7 @@ export default {
 						targetCoordinates.h = this.draggedItem.h;
 
 						this.tempPositionUpdates = dragGrid.move(this.draggedItem, x, y);
+						this.overwriteRows = dragGrid.h;
 						break;
 					}
 					case MODE_RESIZE: {
@@ -491,6 +497,7 @@ export default {
 						targetCoordinates.h = h;
 
 						this.tempPositionUpdates = dragGrid.resize(this.draggedItem, w, h);
+						this.overwriteRows = dragGrid.h;
 						break;
 					}
 				}
@@ -506,6 +513,8 @@ export default {
 		},
 		_cleanupDragging() {
 			this.mode = MODE_IDLE;
+			this.overwriteRows = null;
+			
 			if (this.draggedItem) {
 				const draggedItem = this.indexedItems.find(item => item.index == this.draggedItem.index);
 				delete draggedItem.classes;
