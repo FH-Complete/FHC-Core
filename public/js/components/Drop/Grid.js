@@ -578,9 +578,9 @@ export default {
 		}
 	},
 	template: /* html */`
-	<div
+	<ul
 		ref="container"
-		class="drop-grid position-relative h-0"
+		class="drop-grid position-relative h-0 list-unstyled"
 		:style="gridStyle"
 		@dragover="dragOver"
 		@drop="dragEnd"
@@ -614,5 +614,5 @@ export default {
 				</template>
 			</grid-item>
 		</TransitionGroup>
-	</div>`
+	</ul>`
 }

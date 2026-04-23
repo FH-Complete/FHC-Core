@@ -20,7 +20,7 @@ export default {
 		
 	},
 	template: /* html */`
-	<div class="drop-grid-item" @dragstart="tryDragStart">
+	<li class="drop-grid-item" @dragstart="tryDragStart">
 		<slot v-bind="item"></slot>
-	</div>`
+	</li>`
 }
