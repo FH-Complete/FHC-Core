@@ -46,6 +46,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				responsiveLayoutCollapseStartOpen: false,
 				columns: [
 					{
 						title:
@@ -56,21 +57,24 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.bezeichnungPhrase),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.organisationseinheitPhrase),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 1,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.gueltigVonPhrase),
@@ -81,7 +85,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 4,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.gueltigBisPhrase),
@@ -92,14 +97,16 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 3,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.wochenstundenPhrase),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 				],
 			},
@@ -115,6 +122,7 @@ export default {
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
 				data: [{betriebsmittel: "", Nummer: "", Ausgegeben_am: ""}],
+				responsiveLayoutCollapseStartOpen: false,
 				columns: [
 					{
 						title:
@@ -125,14 +133,16 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
+						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.inventarnummerPhrase),
@@ -140,7 +150,8 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
 						title: Vue.computed(() => this.preloadedPhrasen.ausgabedatumPhrase),
@@ -150,7 +161,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			}
@@ -164,11 +176,11 @@ export default {
 	
 	methods: {
 		betriebsmittelTableBuilt: function () {
-			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
+			// this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		funktionenTableBuilt: function () {
-			this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
+			// this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 		hideEditProfilModal: function () {
