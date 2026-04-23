@@ -217,6 +217,7 @@ export default {
 				v-if="widgetTemplate"
 				class="card-header d-flex ps-0 pe-2 align-items-center"
 			>
+				<!-- move handle -->
 				<Transition>
 					<span
 						v-if="editMode && !isPinned"
@@ -230,9 +231,11 @@ export default {
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
 				</Transition>
+				<!-- TITLE -->
 				<h4 class="col mb-0 fs-6 lh-base">
 					{{ widgetTemplate.setup.name }}
 				</h4>
+				<!-- source info -->
 				<div
 					v-if="source"
 					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
@@ -240,6 +243,7 @@ export default {
 				>
 					<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
 				</div>
+				<!-- pin button -->
 				<template v-if="isPinned">
 					<div
 						v-if="editMode"
@@ -251,10 +255,10 @@ export default {
 						pinned="true"
 						@click="unpin"
 					>
-						<i class="fa-solid fa-thumbtack " aria-hidden="true"></i>
+						<i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
 					</div>
 					<div v-else class="col-auto me-2">
-						<i class="fa-solid fa-thumbtack "></i>
+						<i class="fa-solid fa-thumbtack"></i>
 					</div>
 				</template>
 				<template v-else>
@@ -270,6 +274,7 @@ export default {
 						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
 					</div>
 				</template>
+				<!-- widget link -->
 				<a
 					v-if="widgetTemplate.setup.cis4link"
 					:href="getWidgetC4Link(widgetTemplate)"
@@ -279,6 +284,7 @@ export default {
 				>
 					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
 				</a>
+				<!-- config button -->
 				<a
 					v-if="hasConfig"
 					href="#"
@@ -289,6 +295,7 @@ export default {
 				>
 					<i class="fa-solid fa-gear" aria-hidden="true"></i>
 				</a>
+				<!-- delete button -->
 				<a
 					v-if="custom && editMode"
 					href="#"
@@ -299,9 +306,18 @@ export default {
 				>
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
 				</a>
+				<!-- hide button -->
 				<Transition>
 					<div v-if="!custom && editMode" class="col-auto px-1 form-switch">
-						<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" v-model="visible" :value="true">
+						<input
+							type="checkbox"
+							role="switch"
+							v-model="visible"
+							class="form-check-input ms-0"
+							:value="true"
+							aria-label="toggle widget"
+							id="flexSwitchCheckChecked"
+						>
 					</div>
 				</Transition>
 			</header>
