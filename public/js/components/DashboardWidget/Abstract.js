@@ -5,7 +5,9 @@ export default {
 		"height",
 		"configMode",
 		"sharedData",
-		"widgetInfo"
+		"widgetInfo",
+		"widgetId",
+		"item_data"
 	],
 	emits: [
 		"setConfig",

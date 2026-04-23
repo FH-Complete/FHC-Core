@@ -23,12 +23,14 @@ $includesArray = array(
 		'public/css/components/FormUnderline.css',
 		'public/css/components/abgabetool/abgabe.css',
 		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css',
+		'public/css/Cis4/Studium.css'
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
 		'vendor/npm-asset/primevue/accordiontab/accordiontab.min.js',
 		'vendor/npm-asset/primevue/checkbox/checkbox.min.js',
+		'vendor/npm-asset/primevue/chips/chips.min.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.min.js',
 		'vendor/npm-asset/primevue/inputnumber/inputnumber.min.js',
 		'vendor/npm-asset/primevue/speeddial/speeddial.min.js',
 		'vendor/npm-asset/primevue/textarea/textarea.min.js',
