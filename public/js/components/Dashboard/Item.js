@@ -332,7 +332,7 @@ export default {
 					:config="arguments"
 					:width="width"
 					:height="height"
-					:widget-id="widgetID" 
+					:widget-id="item_data.id" 
 					:item_data="item_data"
 					@setConfig="setConfig"
 					@change="changeConfigManually"

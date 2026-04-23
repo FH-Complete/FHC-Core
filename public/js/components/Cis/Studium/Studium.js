@@ -1,6 +1,6 @@
 import LvUebersicht from "../Mylv/LvUebersicht.js";
 
-import ApiCisStudium from '../../../api/factory/cis/studium';
+import ApiCisStudium from '../../../api/factory/cis/studium.js';
 
 export default {
 	data(){
