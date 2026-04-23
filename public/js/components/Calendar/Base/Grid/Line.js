@@ -52,14 +52,14 @@ export default {
 
 			if (this.shouldCompactEvents && this.compactibleEventTypes?.length) {
 				formattedEvents =
-					this.compactEventsForMobileView(formattedEvents, this.compactibleEventTypes);
+					this.compactEvents(formattedEvents, this.compactibleEventTypes);
 			}
 
 			return formattedEvents;
 		},
 	},
 	methods: {
-		compactEventsForMobileView(events, compactibleEventTypes) {
+		compactEvents(events, compactibleEventTypes) {
 			let formattedEvents = events
 				.filter(
 					(event) =>
