@@ -176,11 +176,9 @@ export default {
 	
 	methods: {
 		betriebsmittelTableBuilt: function () {
-			// this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		funktionenTableBuilt: function () {
-			// this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 		hideEditProfilModal: function () {

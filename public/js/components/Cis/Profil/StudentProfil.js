@@ -117,11 +117,9 @@ export default {
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
-			// this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
-			// this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
