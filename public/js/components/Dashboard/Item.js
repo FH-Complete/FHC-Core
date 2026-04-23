@@ -225,6 +225,7 @@ export default {
 						drag-action="move"
 						class="col-auto mx-2 px-2 cursor-move"
 						draggable="true"
+						aria-hidden="true"
 						aria-label="move widget"
 						v-tooltip="{showDelay:1000, value:'move widget'}"
 					>
@@ -251,13 +252,14 @@ export default {
 						role="button"
 						class="pin cursor-pointer col-auto me-2"
 						title="unpin item"
+						aria-hidden="true"
 						aria-label="unpin item"
 						pinned="true"
 						@click="unpin"
 					>
 						<i class="fa-solid fa-thumbtack" aria-hidden="true"></i>
 					</div>
-					<div v-else class="col-auto me-2">
+					<div v-else class="col-auto me-2" aria-hidden="true">
 						<i class="fa-solid fa-thumbtack"></i>
 					</div>
 				</template>
@@ -268,6 +270,7 @@ export default {
 						role="button"
 						class="col-auto me-2 pin"
 						title="pin item"
+						aria-hidden="true"
 						aria-label="pin item"
 						@click="pinItem"
 					>
@@ -383,6 +386,7 @@ export default {
 						class="col-auto px-1"
 						:class="resizeClasses.button"
 						draggable="true"
+						aria-hidden="true"
 						aria-label="resize widget"
 						v-tooltip="{ showDelay: 1000, value: 'resize widget' }"
 					>
