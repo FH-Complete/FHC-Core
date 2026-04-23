@@ -21,7 +21,7 @@ export default {
 			type: Object,
 			required: true,
 			validator(value) {
-				return value && value.name && value.timezone
+				return value && value.name
 			}
 		}
 	},
@@ -35,14 +35,12 @@ export default {
 	},
 	provide() {
 		return {
-			editMode: Vue.computed(()=>this.editMode),
-			widgetsSetup: Vue.computed(() => this.widgetsSetup),
-			timezone: Vue.computed(() => this.viewData.timezone)
+			editMode: Vue.computed(() => this.editMode),
+			widgetsSetup: Vue.computed(() => this.widgetsSetup)
 		}
 	},
 	methods: {
-		widgetAdd(section_name, widget) {
-			// TODO(chris): remove section_name? (change order of params => get rid of it)
+		widgetAdd(widget) {
 			this.$refs.widgetpicker
 				.getWidget()
 				.then(widget_id => {
@@ -64,18 +62,23 @@ export default {
 				})
 				.catch(() => {});
 		},
-		widgetUpdate(section_name, payload) {
-			payload = payload[section_name];
+		widgetUpdate(payload) {
 			for (var k in payload) {
 				for (var wid in this.widgets) {
 					if (this.widgets[wid].id == k) {
 						payload[k] = ObjectUtils.mergeDeep(this.widgets[wid], payload[k]);
 						// NOTE(chris): remove internal props
-						for (var prop of ['_x','_y','_w','_h','index','id','preset'])
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'preset'])
 							if (payload[k][prop])
 								delete payload[k][prop];
 						break;
 					}
+				}
+				if (payload[k].place) {
+					Object.values(payload[k].place).forEach(place => {
+						if (place.pinned === false)
+							delete place.pinned;
+					});
 				}
 				payload[k].widgetid = k;
 			}
@@ -113,7 +116,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		widgetRemove(section_name, id) {
+		widgetRemove(id) {
 			this.$api
 				.call(ApiDashboardUser.removeWidget(this.dashboard, id))
 				.then(() => {
@@ -138,8 +141,8 @@ export default {
 				const widgets = [];
 				const remove = [];
 
-				for (var wid in res.data.general.widgets) {
-					let widget = res.data.general.widgets[wid];
+				for (var wid in res.data) {
+					let widget = res.data[wid];
 					widget.id = wid;
 					if (widget.custom || widget.preset) {
 						widgets.push(widget);
@@ -149,19 +152,33 @@ export default {
 					}
 				}
 
-				remove.forEach(wid => this.widgetRemove('general', wid));
+				remove.forEach(wid => this.widgetRemove(wid));
 
 				this.widgets = widgets;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="core-dashboard">
 		<h3>
 			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
-			<button style="margin-left: 8px;" class="btn" @click="editMode = !editMode" aria-label="edit dashboard" v-tooltip="{showDelay:1000,value:'edit dashboard'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
+			<button
+				class="btn ms-2"
+				aria-label="edit dashboard"
+				v-tooltip="{ showDelay: 1000, value: 'edit dashboard' }"
+				@click="editMode = !editMode"
+			><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>
-		<dashboard-section :seperator="0" name="general" :widgets="widgets" @widgetAdd="widgetAdd" @widgetUpdate="widgetUpdate" @widgetRemove="widgetRemove"></dashboard-section>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="widgetsSetup"></dashboard-widget-picker>
+		<dashboard-section
+			name="general"
+			:widgets="widgets"
+			@widget-add="widgetAdd"
+			@widget-update="widgetUpdate"
+			@widget-remove="widgetRemove"
+		></dashboard-section>
+		<dashboard-widget-picker
+			ref="widgetpicker"
+			:widgets="widgetsSetup"
+		></dashboard-widget-picker>
 	</div>`
 }

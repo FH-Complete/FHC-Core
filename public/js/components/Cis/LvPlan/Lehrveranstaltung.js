@@ -22,7 +22,7 @@ export default {
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
-				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+				return luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
@@ -95,7 +95,6 @@ export default {
 		<fhc-calendar
 			v-else-if="lv"
 			ref="calendar"
-			:timezone="viewData.timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"

@@ -1,14 +1,14 @@
 import ApiDashboardWidget from "../../../api/factory/dashboard/widget.js";
 
 export default {
-	emits: [
-		"change",
-		"assignWidgets"
-	],
 	props: {
 		dashboard_id: Number,
 		widgets: Array
 	},
+	emits: [
+		"change",
+		"assignWidgets"
+	],
 	methods: {
 		sendChange(widget_id) {
 			let allow = !this.widgets.find(el => el.widget_id == widget_id).allowed;
@@ -29,11 +29,27 @@ export default {
 			})
 			.catch(this.$fhcAlert.handleSystemError);
 	},
-	template: `
+	template: /* html */`
 	<div class="dashboard-admin-widgets">
-		<div v-for="widget in widgets" :key="widget.widget_id" class="form-check form-switch">
-			<input class="form-check-input" type="checkbox" role="switch" :id="'dashboard-admin-widgets-' + widget.widget_id" v-model="widget.allowed" @input.prevent="sendChange(widget.widget_id)">
-			<label class="form-check-label" :for="'dashboard-admin-widgets-' + widget.widget_id">{{(widget.setup && widget.setup.name) || widget.widget_kurzbz}}</label>
+		<div
+			v-for="widget in widgets"
+			:key="widget.widget_id"
+			class="form-check form-switch"
+		>
+			<input
+				:id="'dashboard-admin-widgets-' + widget.widget_id"
+				v-model="widget.allowed"
+				class="form-check-input"
+				type="checkbox"
+				role="switch"
+				@input.prevent="sendChange(widget.widget_id)"
+			>
+			<label
+				class="form-check-label"
+				:for="'dashboard-admin-widgets-' + widget.widget_id"
+			>
+				{{ (widget.setup && widget.setup.name) || widget.widget_kurzbz }}
+			</label>
 		</div>
 	</div>`
 }

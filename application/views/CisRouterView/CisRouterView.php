@@ -41,7 +41,7 @@ $includesArray = array(
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
-		'public/js/apps/Dashboard/Fhc.js',
+		'public/js/apps/Cis.js',
 	),
 
 );

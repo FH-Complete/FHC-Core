@@ -1,6 +1,7 @@
 import FhcCalendar from "./Base.js";
 
 import { useEventLoader } from '../../composables/EventLoader.js';
+import { useRenderers } from '../../composables/Renderers.js';
 
 import ModeList from '../Calendar/Mode/List.js';
 
@@ -9,22 +10,17 @@ export default {
 	components: {
 		FhcCalendar
 	},
-	inject: [
-		"renderers"
-	],
 	props: {
-		timezone: {
-			type: String,
-			required: true
-		},
 		getPromiseFunc: {
 			type: Function,
 			required: true
 		}
 	},
 	data() {
+		const timezone = FHC_JS_DATA_STORAGE_OBJECT.timezone;
 		return {
-			now: luxon.DateTime.now().setZone(this.timezone),
+			timezone,
+			now: luxon.DateTime.now().setZone(timezone),
 			modes: {
 				list: Vue.markRaw(ModeList)
 			},
@@ -59,10 +55,12 @@ export default {
 		const rangeInterval = Vue.ref(null);
 		
 		const { events } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { renderers } = useRenderers();
 
 		return {
 			rangeInterval,
-			events
+			events,
+			renderers
 		};
 	},
 	template: /* html */`

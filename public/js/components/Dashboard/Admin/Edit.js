@@ -1,15 +1,15 @@
 import BsConfirm from '../../Bootstrap/Confirm.js';
 
 export default {
-	emits: [
-		"change",
-		"delete"
-	],
 	props: {
 		dashboard_id: Number,
 		dashboard_kurzbz: String,
 		beschreibung: String
 	},
+	emits: [
+		"change",
+		"delete"
+	],
 	data() {
 		return {
 			kurzbz: this.dashboard_kurzbz,
@@ -18,22 +18,43 @@ export default {
 	},
 	methods: {
 		sendDelete() {
-			BsConfirm.popup(this.$p.t('ui', 'confirm_delete') + " " + this.$p.t('ui', 'deleteInfo'))
-				.then(() => this.$emit('delete', this.dashboard_id)).catch();
+			BsConfirm
+				.popup(this.$p.t('ui', 'confirm_delete') + " " + this.$p.t('ui', 'deleteInfo'))
+				.then(() => this.$emit('delete', this.dashboard_id))
+				.catch();
 		}
 	},
-	template: `<div class="dashboard-admin-edit px-3">
+	template: /* html */`
+	<div class="dashboard-admin-edit px-3">
 		<div class="mb-3">
 			<label for="dashboard-admin-edit-kurzbz">Kurz Bezeichnung</label>
-			<input id="dashboard-admin-edit-kurzbz" type="text" class="form-control" v-model="kurzbz">
+			<input
+				id="dashboard-admin-edit-kurzbz"
+				v-model="kurzbz"
+				type="text"
+				class="form-control"
+			>
 		</div>
 		<div class="mb-3">
 			<label for="dashboard-admin-edit-beschreibung">Beschreibung</label>
-			<textarea id="dashboard-admin-edit-beschreibung" class="form-control" v-model="desc"></textarea>
+			<textarea
+				id="dashboard-admin-edit-beschreibung"
+				v-model="desc"
+				class="form-control"
+			></textarea>
 		</div>
 		<div>
-			<button class="btn btn-danger" @click="sendDelete">{{this.$p.t('ui', 'loeschen')}}</button>
-			<button class="btn btn-primary" @click="$emit('change', {dashboard_id,dashboard_kurzbz:kurzbz,beschreibung:desc})">{{this.$p.t('ui', 'btnAktualisieren')}}</button>
+			<button class="btn btn-danger" @click="sendDelete">
+				{{ this.$p.t('ui', 'loeschen') }}
+			</button>
+			<button
+				class="btn btn-primary"
+				@click="$emit('change', {
+					dashboard_id,
+					dashboard_kurzbz: kurzbz,
+					beschreibung: desc
+				})"
+			>{{ this.$p.t('ui', 'btnAktualisieren') }}</button>
 		</div>
 	</div>`
 }
