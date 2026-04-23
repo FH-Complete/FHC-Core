@@ -21,69 +21,71 @@ export default {
 		dms,
 		cms,
 		mergedStudent,
-		mergedPerson
+		mergedPerson,
 	},
-    props: {
-    	searchoptions: {
-    		type: Object,
-    		required: true
-    	},
-    	searchfunction: {
-    		type: Function,
-    		required: true
-    	},
-    	showBtnSubmit: Boolean
-    },
-    provide() {
-        return {
-            query: Vue.computed(() => this.lastQuery)
-        };
-    },
-    data: function() {
-      return {
-        searchtimer: null,
-        hidetimer: null,
-        searchsettings: {
-            searchstr: this.getSearchStr(),
-            types: this.getInitiallySelectedTypes(),
-        },
-        searchresult: [],
-        searchmode: '',
-        showresult: false,  
-        searching: false,
-        error: null,
-            abortController: null,
+	props: {
+		searchoptions: {
+			type: Object,
+			required: true,
+		},
+		searchfunction: {
+			type: Function,
+			required: true,
+		},
+		showBtnSubmit: Boolean,
+	},
+	provide() {
+		return {
+			query: Vue.computed(() => this.lastQuery),
+		};
+	},
+	inject: ["isMobile"],
+	data: function () {
+		return {
+			searchtimer: null,
+			hidetimer: null,
+			searchsettings: {
+				searchstr: this.getSearchStr(),
+				types: this.getInitiallySelectedTypes(),
+			},
+			searchresult: [],
+			searchmode: "",
+			showresult: false,
+			searching: false,
+			error: null,
+			abortController: null,
 			settingsDropdown: null,
-            lastQuery: ''
-      };
-    },
+			lastQuery: "",
+			isSearchShownInMobileView: false,
+		};
+	},
 	computed: {
 		searchTypesPlaceholder() {
 			if (!this.searchsettings.types.length) {
-				return Object.values(this.typeLabels).join(' / ');
+				return Object.values(this.typeLabels).join(" / ");
 			}
-			return this.searchsettings.types.map(type => this.typeLabels[type]).join(' / ');
+			return this.searchsettings.types
+				.map((type) => this.typeLabels[type])
+				.join(" / ");
 		},
 		types() {
-			if (!this.searchoptions.types)
-				return [];
+			if (!this.searchoptions.types) return [];
 			if (Array.isArray(this.searchoptions.types))
 				return this.searchoptions.types;
 			return Object.keys(this.searchoptions.types);
 		},
 		typeLabels() {
-			if (!this.searchoptions.types)
-				return {};
+			if (!this.searchoptions.types) return {};
 			if (Array.isArray(this.searchoptions.types)) {
 				return this.searchoptions.types.reduce((res, type) => {
 					res[type] = type;
-					return res
+					return res;
 				}, {});
 			}
 			return this.searchoptions.types;
-		}
+		},
 	},
-	template: /*html*/`
+	template: /*html*/ `
 		<form
 			ref="searchform"
 			class="d-flex me-3"
@@ -92,80 +94,91 @@ export default {
 			@focusin="searchfocusin"
 			@focusout="searchfocusout"
 		>
-			<div
-				ref="searchbox"
-				class="h-100 input-group me-2 searchbar_searchbox"
-				:class="showresult ? 'open' : 'closed'"
+			<span
+				v-if="isMobile"
+				type="button"
+				data-bs-toggle="collapse"
+				data-bs-target=".multi-collapse"
+				aria-controls="header-searchbar-collapsible header-options-collapsible header-usermenu-collapsible"
+				aria-expanded="false"
+			 	class="d-flex flex-row align-items-center ps-3 pe-1"
 			>
-				<span class="input-group-text">
-					<i class="fa-solid fa-magnifying-glass"></i>
-				</span>
-                <input
-                	ref="input"
-                    @keyup="search"
-                    @focus="showsearchresult"
-                    v-model="searchsettings.searchstr"
-                    class="form-control searchbar_input"
-                    type="search"
-                    :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
-                    :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
-                >
-				<button
-					v-if="searchsettings.searchstr"
-					type="button"
-					class="searchbar_input_clear btn btn-outline-secondary"
-					@click="clearInput"
-					@focusin.stop
-				>
-					<i class="fas fa-close"></i>
-				</button>
-				<button
-					v-if="showBtnSubmit"
-					type="submit"
-					class="btn btn-primary"
-					:title="$p.t('search/submit')"
-					:aria-label="$p.t('search/submit')"
-				>
-					<i class="fas fa-search"></i>
-				</button>
-                <button
-                    data-bs-toggle="collapse"
-                    data-bs-target="#searchSettings"
-                    aria-expanded="false"
-                    aria-controls="searchSettings"
-                    ref="settingsbutton"
-                    class="searchbar_setting_btn btn btn-secondary"
-                    type="button"
-                    :title="$p.t('search/button_filter_label')"
-                    :aria-label="$p.t('search/button_filter_label')"
-                >
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
+				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
+				<i v-else class="fa-solid fa-magnifying-glass"></i>
+			</span>
 
-            <div v-show="showresult"
-                 class="searchbar_results" tabindex="-1">
-              <div class="searchbar_results_scroller" ref="result">
-                <div class="searchbar_results_wrapper" ref="results">
-                  <div v-if="searching">
-                    <i class="fas fa-spinner fa-spin fa-2x"></i>
-                  </div>
-                  <div v-else-if="this.error !== null">{{ error }}</div>
-                  <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
-                  <template v-else v-for="res in searchresult">
-                    <component
-                        v-if="isValidRenderer(res.renderer)"
-                        :is="res.renderer"
-                        :mode="searchmode"
-                        :res="res"
-                        :actions="getActions(res)"
-                        @actionexecuted="hideresult"
-                    ></component>
-                    <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
-                  </template>
-                </div>
-              </div>
-            </div>
+			<div
+				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
+				id="header-searchbar-collapsible"
+				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
+				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
+			>
+				<div
+					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
+					ref="searchbox"
+					class="h-100 input-group me-2 searchbar_searchbox"
+					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : ''"
+				>
+					<span class="input-group-text">
+						<i class="fa-solid fa-magnifying-glass color-white"></i>
+					</span>
+            	    <input
+            	    	ref="input"
+            	        @keyup="search"
+            	        @focus="showsearchresult"
+            	        v-model="searchsettings.searchstr"
+            	        class="form-control searchbar_input"
+            	        type="search"
+            	        :placeholder="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+            	        :aria-label="$p.t('search/input_search_label', { types: searchTypesPlaceholder })"
+            	    >
+					<button
+						v-if="showBtnSubmit"
+						type="submit"
+						class="btn btn-primary"
+						:title="$p.t('search/submit')"
+						:aria-label="$p.t('search/submit')"
+					>
+						<i class="fas fa-search"></i>
+					</button>
+            	    <button
+            	        data-bs-toggle="collapse"
+            	        data-bs-target="#searchSettings"
+            	        aria-expanded="false"
+            	        aria-controls="searchSettings"
+            	        ref="settingsbutton"
+            	        class="searchbar_setting_btn btn btn-secondary"
+            	        type="button"
+            	        :title="$p.t('search/button_filter_label')"
+            	        :aria-label="$p.t('search/button_filter_label')"
+            	    >
+            	        <i class="fas fa-filter"></i>
+            	    </button>
+            	</div>
+            	<div v-show="showresult"
+            	     class="searchbar_results" tabindex="-1">
+            	  <div class="searchbar_results_scroller" ref="result">
+            	    <div class="searchbar_results_wrapper" ref="results">
+            	      <div v-if="searching">
+            	        <i class="fas fa-spinner fa-spin fa-2x"></i>
+            	      </div>
+            	      <div v-else-if="this.error !== null">{{ error }}</div>
+            	      <div v-else-if="searchresult.length < 1">{{  $p.t('search/error_no_results') }}</div>
+            	      <template v-else v-for="res in searchresult">
+            	        <component
+            	            v-if="isValidRenderer(res.renderer)"
+            	            :is="res.renderer"
+            	            :mode="searchmode"
+            	            :res="res"
+            	            :actions="getActions(res)"
+            	            @actionexecuted="hideresult"
+            	        ></component>
+            	        <div v-else class="searchbar-result text-danger fw-bold">{{ $p.t('search/error_unknown_type', res) }}</div>
+            	      </template>
+            	    </div>
+            	  </div>
+            	</div>
+			</div>
 
 			<div
 				id="searchSettings"
@@ -207,34 +220,42 @@ export default {
             </div>
 		</form>
     `,
-    watch:{
-		'searchsettings.searchstr': function (newSearchValue) {
-			if(this.searchoptions.origin){
-				sessionStorage.setItem(`${this.searchoptions.origin}_searchstr`,newSearchValue);
+	watch: {
+		"searchsettings.searchstr": function (newSearchValue) {
+			if (this.searchoptions.origin) {
+				sessionStorage.setItem(
+					`${this.searchoptions.origin}_searchstr`,
+					newSearchValue,
+				);
 			}
 		},
-		'searchsettings.types'(newValue) {
+		"searchsettings.types"(newValue) {
 			if (Array.isArray(newValue) && newValue.length === 0) {
 				this.searchsettings.types = [...this.types];
 			}
 			// stores the search types in the localstorage, only if the newValue is also an array
 			if (Array.isArray(newValue) && this.searchoptions.origin) {
-				localStorage.setItem(`${this.searchoptions.origin}_searchtypes`, JSON.stringify(newValue));
+				localStorage.setItem(
+					`${this.searchoptions.origin}_searchtypes`,
+					JSON.stringify(newValue),
+				);
 			}
 			this.search();
-		}
-    },
-	mounted(){
+		},
+	},
+	mounted() {
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {
-			toggle: false
+			toggle: false,
 		});
 
-		if (!this.searchoptions.origin){
-			console.warn("No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.");
+		if (!this.searchoptions.origin) {
+			console.warn(
+				"No origin defined in the searchoptions for the searchbar, please define the origin property in the searchbaroptions to allow reliable storage of searchstr and searchtypes accross applications.",
+			);
 		}
 	},
 	updated() {
-		if(this.showresult) {
+		if (this.showresult) {
 			Vue.nextTick(() => {
 				this.calcSearchResultHeight();
 			});
@@ -249,32 +270,34 @@ export default {
 		getInitiallySelectedTypes() {
 			let result = false;
 			if (this.searchoptions.origin) {
-				let localStorageValue = localStorage.getItem(`${this.searchoptions.origin}_searchtypes`);
+				let localStorageValue = localStorage.getItem(
+					`${this.searchoptions.origin}_searchtypes`,
+				);
 				if (localStorageValue) {
 					result = JSON.parse(localStorageValue);
 				}
 			}
-			if (result)
-				return result;
-			if (!this.searchoptions.types)
-				return [];
+			if (result) return result;
+			if (!this.searchoptions.types) return [];
 			if (Array.isArray(this.searchoptions.types))
 				return [...this.searchoptions.types];
 			return Object.keys(this.searchoptions.types);
 		},
-		getSearchStr: function(){
-			if (!this.searchoptions.origin)
-				return '';
-			return sessionStorage.getItem(`${this.searchoptions.origin}_searchstr`) ?? '';
+		getSearchStr: function () {
+			if (!this.searchoptions.origin) return "";
+			return (
+				sessionStorage.getItem(
+					`${this.searchoptions.origin}_searchstr`,
+				) ?? ""
+			);
 		},
-		checkSettingsVisibility: function(event) {
+		checkSettingsVisibility: function (event) {
 			// hides the settings collapsible if the user clicks somewhere else
-			if (!this.$refs.settings.contains(event.target))
-			{
+			if (!this.$refs.settings.contains(event.target)) {
 				this.settingsDropdown.hide();
 			}
 		},
-		handleShowSettings: function() {
+		handleShowSettings: function () {
 			// adds the event listener checkSettingsVisibility only when the collapsible is shown
 			document.addEventListener("click", this.checkSettingsVisibility);
 		},
@@ -282,183 +305,208 @@ export default {
 			// removes the event listener checkSettingsVisibility when the collapsible is hidden
 			document.removeEventListener("click", this.checkSettingsVisibility);
 		},
-		calcSearchResultHeight: function() {
+		calcSearchResultHeight: function () {
 			const rect = this.$refs.results.getBoundingClientRect();
-			if( rect.height > 0 && rect.height < (window.innerHeight * 0.8) ) {
-				this.$refs.result.style.height = Math.ceil(rect.height + 16) + 'px';
+			if (rect.height > 0 && rect.height < window.innerHeight * 0.8) {
+				this.$refs.result.style.height =
+					Math.ceil(rect.height + 16) + "px";
 			} else {
-				this.$refs.result.style.height = Math.floor(window.innerHeight * 0.8) + 'px';
+				this.$refs.result.style.height =
+					Math.floor(window.innerHeight * 0.8) + "px";
 			}
 		},
-        calcSearchResultExtent: function() {
-			if(!this.showresult) {
+		calcSearchResultExtent: function () {
+			if (!this.showresult) {
 				return;
 			}
-			if(this.searchoptions?.calcheightonly === undefined 
-				|| this.searchoptions.calcheightonly === false) {
+			if (
+				this.searchoptions?.calcheightonly === undefined ||
+				this.searchoptions.calcheightonly === false
+			) {
 				var rect = this.$refs.searchbox.getBoundingClientRect();
-				this.$refs.result.style.top = Math.floor(rect.bottom + 3) + 'px';
-				this.$refs.result.style.right = Math.floor(rect.right) + 'px';
-				this.$refs.result.style.width = Math.floor(rect.width) + 'px';
+				this.$refs.result.style.top =
+					Math.floor(rect.bottom + 3) + "px";
+				this.$refs.result.style.right = Math.floor(rect.right) + "px";
+				this.$refs.result.style.width = Math.floor(rect.width) + "px";
 			}
-            this.calcSearchResultHeight();
-        },
-        search: function() {
-            if(this.searchoptions?.nolivesearch === true) return;
+			this.calcSearchResultHeight();
+		},
+		search: function () {
+			if (this.searchoptions?.nolivesearch === true) return;
 
-            this.abort();
-            if( this.searchsettings.searchstr.length >= 2 ) {
-                this.calcSearchResultExtent();
-                this.searchtimer = setTimeout(
-                    this.callsearchapi,
-                    500
-                );
-            } else {                
-                this.showresult = false;
-            }
-        },
-        abort() {
-            if (this.searchtimer !== null) {
-                clearTimeout(this.searchtimer);
-            }
-            if (this.abortController) {
-                this.abortController.abort();
-                this.abortController = null;
-            }
-            this.searchresult = [];
-        },
-        callsearchapi: function() {
-            this.error = null;
-            this.searchresult.splice(0, this.searchresult.length);
-            this.searching = true;
-            this.showsearchresult();
-            if(this.searchsettings.types.length === 0) {
-                this.error = this.$p.t('search/error_missing_type');
-                this.searching = false;
-                return;
-            }
-
-            if (this.abortController)
-                this.abortController.abort();
-            this.abortController = new AbortController();
-
-            this.searchfunction(this.searchsettings, { timeout: 50000, signal: this.abortController.signal })
-            .then(response=>{
-                if (!response.data) {
-                    this.error = this.$p.t('search/error_general');
-                } else {
-                    let res = response.data.map(el => el.data ? {...el, ...JSON.parse(el.data)} : el);
-                    this.lastQuery = response.meta.searchstring;
-                    if (this.searchoptions.mergeResults) {
-                        let counter = 0;
-                        let mergeTypes = [];
-                        let mergedType = 'merged-';
-                        let mergeKey = '';
-
-                        switch (this.searchoptions.mergeResults) {
-                        case 'student':
-                            mergeTypes = ['student', 'prestudent'];
-                            mergedType += this.searchoptions.mergeResults;
-                            mergeKey = 'uid';
-                            break;
-                        case 'person':
-                            mergeTypes = ['person', 'employee', 'student', 'prestudent'];
-                            mergedType += this.searchoptions.mergeResults;
-                            mergeKey = 'person_id';
-                            break;
-                        }
-
-                        if (mergeTypes.length) {
-                            res = Object.values(res.reduce((a, c) => {
-                                if (!mergeTypes.includes(c.renderer)) {
-                                    a['nomerge' + counter++] = c;
-                                } else if (c[mergeKey] === null) {
-                                    a['nomerge' + counter++] = c;
-                                } else if (a[c[mergeKey]] === undefined) {
-                                    a[c[mergeKey]] = {
-                                        rank: c.rank,
-                                        renderer: mergedType,
-                                        type: mergedType,
-                                        list: [c]
-                                    };
-                                } else {
-                                    a[c[mergeKey]].list.push(c);
-                                    if (c.rank > a[c[mergeKey]].rank)
-                                        a[c[mergeKey]].rank = c.rank;
-                                }
-                                return a;
-                            }, {})).sort((a, b) => b.rank - a.rank);
-                        }
-                    }
-                    this.searchresult = res;
-                    this.searchmode = response.meta.mode;
-                }
-                this.searching = false;
-                this.retry = 0;
-            })
-            .catch(error=> {
-                if (error.code == "ERR_CANCELED") {
-                    return this.retry = 0;
-                }
-                if (error.code == "ECONNABORTED" && this.retry) {
-                    this.retry--;
-                    return this.callsearchapi();
-                }
-
-                this.error = this.$p.t('search/error_general', error);
-                this.searching = false;
-                this.retry = 0;
-            });
-        },
-        refreshsearch: function() {
-          this.search();
-          this.togglesettings();
-        },
-        hideresult: function() {
-            this.showresult = false;
-            window.removeEventListener('resize', this.calcSearchResultExtent);
-        },
-        showsearchresult: function() {
-            if(this.searchoptions?.nolivesearch === true) return;
-
-            if( this.searchsettings.searchstr.length >= 2 ) {
-                this.showresult = true;
-                window.addEventListener('resize', this.calcSearchResultExtent);
+			this.abort();
+			if (this.searchsettings.searchstr.length >= 2) {
 				this.calcSearchResultExtent();
-            }
-        },
-        searchfocusin: function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if( this.hidetimer !== null ) {
-                clearTimeout(this.hidetimer);
-            }
-			if (this.searchsettings.searchstr.length >= 2
-				&& this.searchresult.length === 0) {
+				this.searchtimer = setTimeout(this.callsearchapi, 500);
+			} else {
+				this.showresult = false;
+			}
+		},
+		abort() {
+			if (this.searchtimer !== null) {
+				clearTimeout(this.searchtimer);
+			}
+			if (this.abortController) {
+				this.abortController.abort();
+				this.abortController = null;
+			}
+			this.searchresult = [];
+		},
+		callsearchapi: function () {
+			this.error = null;
+			this.searchresult.splice(0, this.searchresult.length);
+			this.searching = true;
+			this.showsearchresult();
+			if (this.searchsettings.types.length === 0) {
+				this.error = this.$p.t("search/error_missing_type");
+				this.searching = false;
+				return;
+			}
+
+			if (this.abortController) this.abortController.abort();
+			this.abortController = new AbortController();
+
+			this.searchfunction(this.searchsettings, {
+				timeout: 50000,
+				signal: this.abortController.signal,
+			})
+				.then((response) => {
+					if (!response.data) {
+						this.error = this.$p.t("search/error_general");
+					} else {
+						let res = response.data.map((el) =>
+							el.data ? { ...el, ...JSON.parse(el.data) } : el,
+						);
+						this.lastQuery = response.meta.searchstring;
+						if (this.searchoptions.mergeResults) {
+							let counter = 0;
+							let mergeTypes = [];
+							let mergedType = "merged-";
+							let mergeKey = "";
+
+							switch (this.searchoptions.mergeResults) {
+								case "student":
+									mergeTypes = ["student", "prestudent"];
+									mergedType +=
+										this.searchoptions.mergeResults;
+									mergeKey = "uid";
+									break;
+								case "person":
+									mergeTypes = [
+										"person",
+										"employee",
+										"student",
+										"prestudent",
+									];
+									mergedType +=
+										this.searchoptions.mergeResults;
+									mergeKey = "person_id";
+									break;
+							}
+
+							if (mergeTypes.length) {
+								res = Object.values(
+									res.reduce((a, c) => {
+										if (!mergeTypes.includes(c.renderer)) {
+											a["nomerge" + counter++] = c;
+										} else if (c[mergeKey] === null) {
+											a["nomerge" + counter++] = c;
+										} else if (
+											a[c[mergeKey]] === undefined
+										) {
+											a[c[mergeKey]] = {
+												rank: c.rank,
+												renderer: mergedType,
+												type: mergedType,
+												list: [c],
+											};
+										} else {
+											a[c[mergeKey]].list.push(c);
+											if (c.rank > a[c[mergeKey]].rank)
+												a[c[mergeKey]].rank = c.rank;
+										}
+										return a;
+									}, {}),
+								).sort((a, b) => b.rank - a.rank);
+							}
+						}
+						this.searchresult = res;
+						this.searchmode = response.meta.mode;
+					}
+					this.searching = false;
+					this.retry = 0;
+				})
+				.catch((error) => {
+					if (error.code == "ERR_CANCELED") {
+						return (this.retry = 0);
+					}
+					if (error.code == "ECONNABORTED" && this.retry) {
+						this.retry--;
+						return this.callsearchapi();
+					}
+
+					this.error = this.$p.t("search/error_general", error);
+					this.searching = false;
+					this.retry = 0;
+				});
+		},
+		refreshsearch: function () {
+			this.search();
+			this.togglesettings();
+		},
+		hideresult: function () {
+			this.showresult = false;
+			window.removeEventListener("resize", this.calcSearchResultExtent);
+		},
+		showsearchresult: function () {
+			if (this.searchoptions?.nolivesearch === true) return;
+
+			if (this.searchsettings.searchstr.length >= 2) {
+				this.showresult = true;
+				window.addEventListener("resize", this.calcSearchResultExtent);
+				this.calcSearchResultExtent();
+			}
+		},
+		searchfocusin: function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			if (this.hidetimer !== null) {
+				clearTimeout(this.hidetimer);
+			}
+			if (
+				this.searchsettings.searchstr.length >= 2 &&
+				this.searchresult.length === 0
+			) {
 				this.search();
 			}
-        },
-        searchfocusout: function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            this.hidetimer = setTimeout(
-                this.hideresult,
-                100
-            );
-        },
-        dash2camelCase(string) {
-            return string.replace(/-([a-z])/g, g => g[1].toUpperCase());
-        },
-        isValidRenderer(renderer) {
-            const camelCaseRenderer = this.dash2camelCase(renderer);
-            return Object.keys(this.$.components).includes(camelCaseRenderer);
-        },
+		},
+		searchfocusout: function (e) {
+			e.preventDefault();
+			e.stopPropagation();
+			this.hidetimer = setTimeout(this.hideresult, 100);
+		},
+		dash2camelCase(string) {
+			return string.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+		},
+		isValidRenderer(renderer) {
+			const camelCaseRenderer = this.dash2camelCase(renderer);
+			return Object.keys(this.$.components).includes(camelCaseRenderer);
+		},
 		getActions(res) {
-			let actions = this.searchoptions.actions[this.dash2camelCase(res.renderer)];
+			let actions =
+				this.searchoptions.actions[this.dash2camelCase(res.renderer)];
 			if (actions) {
 				return actions;
 			}
 			return this.searchoptions.actions[res.type];
-		}
-    }
+		},
+		getMaxWidthOfSearchbarInMobileView() {
+			// body width - hardcoded chevron width; necessary for accurate collapse transition transition
+			return (
+				document.querySelector("body").getBoundingClientRect().width -
+				27 +
+				"px"
+			);
+		},
+	},
 };

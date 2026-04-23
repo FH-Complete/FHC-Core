@@ -259,12 +259,12 @@ const app = Vue.createApp({
 			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
 			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
 			return smallScreen;// && touchCapable;
-		}	
+		},	
 	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			isMobile: this.isMobile
+			isMobile: this.isMobile,
 		}	
 	},
 	methods: {

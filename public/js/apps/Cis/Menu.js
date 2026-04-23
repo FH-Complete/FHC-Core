@@ -136,6 +136,18 @@ const app = Vue.createApp({
             }
         };
     },
+	computed: {
+		isMobile() {
+			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
+			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
+			return smallScreen;// && touchCapable;
+		},
+	},
+	provide() {
+		return {
+			isMobile: this.isMobile
+		}
+	},
     methods: {
         searchfunction: function(searchsettings) {
         	return this.$api.call(ApiSearchbar.searchCis(searchsettings));
