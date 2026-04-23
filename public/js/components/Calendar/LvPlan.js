@@ -169,6 +169,13 @@ export default {
 	>
 		<template v-slot="{ event, mode }">
 			<div
+				v-if="!event"
+				class="h-100 d-flex justify-content-center align-items-center"
+			>
+				{{ $p.t('lehre/noLvFound') }}
+			</div>
+			<div
+				v-else
 				:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
 				:type="mode == 'day' ? 'button' : undefined"
  				:style="eventStyle(event)"
