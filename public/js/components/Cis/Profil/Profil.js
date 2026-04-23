@@ -398,7 +398,7 @@ export const Profil = {
 		this.load();
 	},
 	template: `
-	<div>
+	<div class="pb-4">
 		<div v-if="notFoundUID">
 			<h3>Es wurde keine Person mit der UID {{this.notFoundUID}} gefunden</h3>
 		</div>
