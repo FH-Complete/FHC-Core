@@ -26,17 +26,24 @@ class CoreStudienbeitragErhoehtTagLib
 		$semester = $params['studiensemester_kurzbz'];
 
 		$this->ci->KontoModel->addJoin('public.tbl_prestudent', 'person_id');
+		$this->ci->KontoModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$result = $this->ci->KontoModel-> loadWhere(array(
 			'buchungstyp_kurzbz' => 'StudiengebuehrErhoeht',
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$konto_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => $item->start,
+				'bis' => $item->ende
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $konto_data
 		);
 	}
 

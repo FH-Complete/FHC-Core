@@ -24,17 +24,24 @@ class CoreWiederholerTagLib
 		}
 
 		$semester = $params['studiensemester_kurzbz'];
+
+		$this->ci->PrestudentstatusModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
 		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
 			'statusgrund_id' => 16,
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$wiederholer_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => $item->start,
+				'bis' => $item->ende
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $wiederholer_data
 		);
 	}
 

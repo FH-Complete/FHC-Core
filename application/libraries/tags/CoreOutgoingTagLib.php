@@ -28,19 +28,25 @@ class CoreOutgoingTagLib
 		$result = $this->ci->BisioModel->getOutgoingsOfSemester($semester);
 
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$outgoing_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => $item->von,
+				'bis' => $item->bis
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $outgoing_data
 		);
+
+
 	}
 
 	public function isCriteriaSetFor(array $params)
 	{
-		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
-		{
+		if (!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz'])) {
 			return false;
 		}
 
@@ -48,12 +54,68 @@ class CoreOutgoingTagLib
 		$prestudent_id = $params['prestudent_id'];
 
 		$result = $this->ci->BisioModel->isPrestudentOutgoing($semester, $prestudent_id);
-		if(hasData($result))
-		{
+
+		if (hasData($result)) {
 			return true;
+		} else
+			return false;
+		}
+
+/*		if(hasData($result))
+		{
+			return array(
+				$result
+			);
+
+			var_dump($result);
+			die();
+
+			$row = $result->data->retval[0] ?? null;
+			return [
+				'prestudent_id' => $row->prestudent_id, //trying to get property of non-object
+				'von' => $row->von, //trying to get property of non-object
+				'bis' => $row->bis //trying to get property of non-object
+			];
+
+
+			return current($result);//-> warum retvall = []
+			return getData($result); //-> warum retvall = []
+
+			$row = $result->data->retval[0] ?? null;
+			$row = $result->data->retval[0] ?? null;
+			return [
+				'prestudent_id' => $row->prestudent_id,
+				'von' => $row->von,
+				'bis' => $row->bis
+			];
 		}
 		else
-			return false;
-	}
+			return false;*/
+
+		//return $result;
+/*		if(hasData($result))
+		{
+			$data = $result->retval;
+			return $result;
+			return [
+				'prestudent_id' => $data->prestudent_id,
+				'von' => $data->von,
+				'bis' => $data->bis
+			];
+		}
+		else
+			return [
+				'prestudent_id' => $prestudent_id,
+				'von' => null,
+				'bis' => null
+			];*/
+
+/*		return (object) array(
+			'data' => $data
+		);*/
+
+	//	return $data;
+
+	//}
 
 }

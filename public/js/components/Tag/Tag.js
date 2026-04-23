@@ -45,7 +45,9 @@ export default {
 				insertvon: "",
 				updateamum: "",
 				updatevon: "",
-				response: ""
+				response: "",
+				start: "",
+				ende: ""
 			},
 			mode: "create"
 		};
@@ -88,6 +90,10 @@ export default {
 			this.tagData.bearbeiter = item.bearbeiter;
 			this.tagData.verfasser = item.verfasser;
 			this.tagData.readonly = item.readonly;
+			//add for automated tags
+			this.tagData.automatisiert = item.automatisiert;
+			this.tagData.start = this.formatDateTimeDay(item.start);
+			this.tagData.ende = this.formatDateTimeDay(item.ende);
 
 			if (item && item.notiz_id)
 			{
@@ -202,6 +208,14 @@ export default {
 				second: "2-digit"
 			});
 		},
+		formatDateTimeDay: (dateString) => {
+			if (!dateString) return null;
+			return new Date(dateString).toLocaleString('de-AT', {
+				year: "numeric",
+				month: "2-digit",
+				day: "2-digit",
+			});
+		},
 		async copy (){
 			await navigator.clipboard.writeText(this.tagData.notiz);
 		}
@@ -258,6 +272,15 @@ export default {
 						<br />
 						<span v-if="tagData.bearbeiter && tagData.insertamum !== tagData.updateamum">
 							{{ $p.t('notiz', 'tag_bearbeiter', { 0: tagData.bearbeiter, 1: tagData.updateamum }) }}
+						</span>
+						<span v-if="tagData.start || tagData.ende" >
+							gültig
+						</span>
+						<span v-if="tagData.start">
+							von {{tagData.start}}
+						</span>
+						<span v-if="tagData.ende">
+							bis {{tagData.ende}}
 						</span>
 					</div>
 				</div>

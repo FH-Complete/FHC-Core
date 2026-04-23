@@ -46,6 +46,7 @@ export function tagFormatter(cell, tagComponent)
 
 			const tagDef = mappedData.find(t => t.typ_kurzbz === tag.typ_kurzbz);
 
+			//todo: check trigger manually after creation of manual automatic tag
 			if (!tagDef && tag.typ_kurzbz.includes("_auto") || tagDef?.automatisiert) {
 				tagElement.className += " tag_auto";
 				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;

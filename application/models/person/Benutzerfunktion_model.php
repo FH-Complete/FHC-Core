@@ -323,7 +323,7 @@ class Benutzerfunktion_model extends DB_Model
 	public function getPrestudentsOfJgv($semester)
 	{
 		$query = "
-			SELECT DISTINCT ps.prestudent_id
+			SELECT DISTINCT ps.prestudent_id, bf.datum_von, bf.datum_bis
 			FROM public.tbl_benutzerfunktion bf
 			JOIN public.tbl_benutzer bn USING (uid)
 			JOIN public.tbl_prestudent ps USING (person_id)

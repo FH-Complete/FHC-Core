@@ -76,7 +76,9 @@ class Tag_Controller extends FHCAPI_Controller
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
 			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
-			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
 			"
 		);
 		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
@@ -315,7 +317,9 @@ class Tag_Controller extends FHCAPI_Controller
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
 			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
-			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
 			"
 		);
 		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');

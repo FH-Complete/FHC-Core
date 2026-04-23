@@ -26,17 +26,24 @@ class CoreDoubleDegreeTagLib
 		$semester = $params['studiensemester_kurzbz'];
 
 		$this->ci->MobilitaetModel->addJoin('bis.tbl_gsprogramm', 'gsprogramm_id');
+		$this->ci->MobilitaetModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$result = $this->ci->MobilitaetModel-> loadWhere(array(
 			'gsprogrammtyp_kurzbz' => 'Double',
 			'studiensemester_kurzbz' => $semester
 		));
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$doubledegree_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => $item->start,
+				'bis' => $item->ende
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $doubledegree_data
 		);
 	}
 

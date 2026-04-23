@@ -36,13 +36,19 @@ class CoreMissingZgvTagLib
 		));
 
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$zgvmissing_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => null,
+				'bis' => null
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $zgvmissing_data
 		);
+
 	}
 
 	public function isCriteriaSetFor(array $params)

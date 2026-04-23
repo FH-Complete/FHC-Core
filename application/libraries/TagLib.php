@@ -48,18 +48,49 @@ class TagLib
 
 	}
 
-	public function updateAutomatedTags($tag, $prestudentIds)
+	public function updateAutomatedTags($tag, $inputData)
 	{
+		/*
+		$inputData expected pattern
+
+		[
+			[
+				'prestudent_id' => 123456,
+				'von' => '2026-04-01',
+				'bis' => '2026-06-30'
+			],
+			...
+		]
+		*/
+
+		// ---------------------------------
+		// prepare input
+		// ---------------------------------
+		$zeitraum = [];
+		$prestudentIds = [];
+
+		foreach ($inputData as $row) {
+			$pid = $row['prestudent_id'];
+
+			$prestudentIds[] = $pid;
+
+			$zeitraum[$pid] = [
+				'von' => $row['von'] ?? null,
+				'bis' => $row['bis'] ?? null
+			];
+		}
+
 		$prestudentIds = array_unique($prestudentIds);
 
-		$toRecycle = [];
-		$toAdd = [];
-		$toDelete = [];
+		// ---------------------------------
+		// load existing tags
+		// ---------------------------------
 		$allTags = [];
 
 		$this->_ci->NotizModel->addSelect('nz.notiz_id');
 		$this->_ci->NotizModel->addSelect('prestudent_id');
 		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
+
 		$resultAllTags = $this->_ci->NotizModel->loadWhere([
 			'typ' => $tag
 		]);
@@ -72,117 +103,143 @@ class TagLib
 			}
 		}
 
+		// ---------------------------------
+		// map the data
+		// ---------------------------------
+		$toRecycle = [];
+		$toAdd = [];
+		$toDelete = [];
 
-		foreach ($prestudentIds as $value)
-		{
-			if (isset($allTags[$value])) {
-				// if already existing: recyceln: nothing to do
-				$toRecycle[$value] = $allTags[$value] ;
+		foreach ($prestudentIds as $pid) {
+			if (isset($allTags[$pid])) {
+				$toRecycle[$pid] = $allTags[$pid];
 			} else {
-				$toAdd[] = $value;
+				$toAdd[] = $pid;
 			}
 		}
 
-		foreach ($allTags as $prestudent_id => $notiz_id) {
-			if (!in_array($prestudent_id, $prestudentIds)) {
-				$toDelete[$prestudent_id] = $notiz_id;
+		foreach ($allTags as $pid => $notizId) {
+			if (!in_array($pid, $prestudentIds)) {
+				$toDelete[$pid] = $notizId;
 			}
 		}
 
-		//RECYCLE: Just insert new update Date
-		$countRecyled = 0;
+		// ---------------------------------
+		// recycle (update existing)
+		// ---------------------------------
+		$countRecycled = 0;
 		$retagged = [];
-		foreach ($toRecycle as $value)
-		{
-			//TODO(Manu) refactor for recycle, add
-			$resultUpdateNotiz = $this->_ci->NotizModel->update(
+
+		foreach ($toRecycle as $pid => $notizId) {
+
+			$result = $this->_ci->NotizModel->update(
+				['notiz_id' => $notizId],
 				[
-					'notiz_id' => $value
-				],
-				array(
-				'updateamum' => date('Y-m-d H:i:s'),
-				'updatevon' => 'BatchJobTagUpdate',
-			));
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => 'BatchJobTagUpdate',
+					'start' => $zeitraum[$pid]['von'],
+					'ende' => $zeitraum[$pid]['bis']
+				]
+			);
 
-			if (isError($resultUpdateNotiz))
-				return error ('Error occurred update Result ' . $value);
+			if (isError($result)) {
+				return error('Error updating tag ' . $notizId);
+			}
 
-			$countRecyled++;
-			$retagged[] = $resultUpdateNotiz->retval;
+			$countRecycled++;
+			$retagged[] = $notizId;
 		}
 
-		//ADD: Create new Tags
+		// ---------------------------------
+		// ADD
+		// ---------------------------------
 		$countAdded = 0;
 		$tagged = [];
-		foreach ($toAdd as $value)
-		{
-			//TODO(Manu) refactor for recycle, add
-			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
+
+		foreach ($toAdd as $pid) {
+
+			$resultInsert = $this->_ci->NotizModel->insert([
 				'titel' => 'TAG',
 				'text' => 'AUTOMATED TAG',
-				'verfasser_uid' => self::BATCHUSER, //has to be an uid
+				'verfasser_uid' => self::BATCHUSER,
 				'erledigt' => false,
 				'insertamum' => date('Y-m-d H:i:s'),
 				'insertvon' => 'BatchJobTagAdd',
-				'typ' => $tag
-			));
+				'typ' => $tag,
+				'start' => $zeitraum[$pid]['von'],
+				'ende' => $zeitraum[$pid]['bis']
+			]);
 
-			if (isError($resultInsertNotiz))
-				return error ('Error occurred insert Result ' . $value);
+			if (isError($resultInsert)) {
+				return error('Error inserting tag for prestudent ' . $pid);
+			}
 
-			$resultInsertZuordnung = $this->_ci->NotizzuordnungModel->insert(array(
-				'notiz_id' => $resultInsertNotiz->retval,
-				self::TYP_ZUORDNUNG => $value
-			));
+			$notizId = $resultInsert->retval;
 
-			if (isError($resultInsertZuordnung))
-				return error ('Error occurred insert Zuordnung' . $value);
+			$resultZuordnung = $this->_ci->NotizzuordnungModel->insert([
+				'notiz_id' => $notizId,
+				self::TYP_ZUORDNUNG => $pid
+			]);
+
+			if (isError($resultZuordnung)) {
+				return error('Error inserting relation for prestudent ' . $pid);
+			}
 
 			$countAdded++;
-			$tagged[$resultInsertNotiz->retval] = $value;
+			$tagged[$notizId] = $pid;
 		}
 
-		//DELETE OLD Tags, no more valid
+		// ---------------------------------
+		// delete
+		// ---------------------------------
 		$countDeleted = 0;
 		$deleted = [];
-		foreach ($toDelete as $value)
-		{
+
+		foreach ($toDelete as $pid => $notizId) {
+
 			$result = $this->_ci->NotizzuordnungModel->delete([
-				'notiz_id' => $value
+				'notiz_id' => $notizId
 			]);
-			if (isError($result))
-				return error ('Error occurred delete Notizzuordnung' . $notiz_id);
+
+			if (isError($result)) {
+				return error('Error deleting relation ' . $notizId);
+			}
 
 			$result = $this->_ci->NotizModel->delete([
-				'notiz_id' => $notiz_id
+				'notiz_id' => $notizId
 			]);
-			if (isError($result))
-				return error ('Error occurred delete Notiz' . $notiz_id);
+
+			if (isError($result)) {
+				return error('Error deleting note ' . $notizId);
+			}
 
 			$countDeleted++;
-			$deleted[] = $value;
+			$deleted[] = $notizId;
 		}
 
+		// ---------------------------------
+		// return
+		// ---------------------------------
 		return success([
 			'input' => [
 				'tag' => $tag,
-				'prestudentIds' => $prestudentIds,
+				'prestudentIds' => $prestudentIds
 			],
 			'summary' => [
-				'recycled' => $countRecyled,
+				'recycled' => $countRecycled,
 				'added' => $countAdded,
-				'deleted' => $countDeleted,
+				'deleted' => $countDeleted
 			],
 			'details' => [
 				'existingTags' => $allTags,
 				'toAdd' => $toAdd,
 				'toRecycle' => $toRecycle,
-				'toDelete' => $toDelete,
+				'toDelete' => $toDelete
 			],
 			'results' => [
 				'retaggedNotizIds' => $retagged,
 				'newTags' => $tagged,
-				'deletedNotizIds' => $deleted,
+				'deletedNotizIds' => $deleted
 			]
 		]);
 	}
@@ -248,14 +305,11 @@ class TagLib
 
 			$return = ['added' => $resultInsertNotiz->retval];
 		}
-
 		return success($return);
-
 	}
 
 	/*
 	 * main function for rebuild Tags for single prestudent
-	 * manually triggered
 	 * */
 	public function rebuildTagsForPrestudent($prestudent_id)
 	{
@@ -285,11 +339,11 @@ class TagLib
 			$criteriaIsSet = $obj->isCriteriaSetFor([
 				'prestudent_id' => $prestudent_id,
 				'studiensemester_kurzbz' => self::SEMESTER
-				]);
+			]);
 			//$return = $this->_ci->PrestudentstatusModel->db->last_query();
 			$kurz_bz = $autoTag->typ_kurzbz;
 
-		//	$return[$kurz_bz] = $criteriaIsSet;
+			//	$return[$kurz_bz] = $criteriaIsSet;
 
 			if($criteriaIsSet)
 			{
@@ -309,32 +363,6 @@ class TagLib
 		}
 
 
-		return success($return);
-
-	}
-
-	public function rebuildTagsForPrestudentDEPR($prestudent_id)
-	{
-		$automaticTags = $this->_ci->config->item('stv_automatic_tags');
-		$return = [];
-
-		foreach ($automaticTags as $tag)
-		{
-			if($this->isCriteriaSetFor($tag, $prestudent_id))
-			{
-				$result = $this->updateAutomatedTagsForPrestudent($tag, $prestudent_id);
-				if (isError($result))
-					return error ('Error occurred during updateAutomatedTags' . $tag);
-
-				else
-					$return[$tag] = $result;
-			}
-			else {
-				$result = $this->checkForDelete($tag, $prestudent_id);
-				if($result != null)
-					$return[$tag] = $result;
-			}
-		}
 		return success($return);
 
 	}
@@ -378,40 +406,4 @@ class TagLib
 		return $return;
 	}
 
-	public function isCriteriaSetFor_DEPR($tag, $prestudent_id)
-	{
-		//TODO(finish list)
-		if($tag == 'wh_auto')
-		{
-			$result = $this->_ci->PrestudentstatusModel->loadWhere(array(
-				'statusgrund_id' => 16,
-				'studiensemester_kurzbz' => self::SEMESTER,
-				'prestudent_id' => $prestudent_id
-			));
-			if(hasData($result))
-			{
-				return true;
-			}
-			else
-				return false;
-		}
-
-		if($tag == 'prewh_auto')
-		{
-			$result = $this->_ci->PrestudentstatusModel->loadWhere(array(
-				'statusgrund_id' => 15,
-				'studiensemester_kurzbz' => self::SEMESTER,
-				'prestudent_id' => $prestudent_id
-			));
-			if(hasData($result))
-			{
-				return true;
-			}
-			else
-				return false;
-		}
-
-		return false;
-
-	}
 }

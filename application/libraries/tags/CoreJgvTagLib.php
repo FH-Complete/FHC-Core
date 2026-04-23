@@ -28,12 +28,17 @@ class CoreJgvTagLib
 		$result = $this->ci->BenutzerfunktionModel->getPrestudentsOfJgv($semester);
 
 		$data = $result->retval;
-		$ids = array_map(function($item) {
-			return $item->prestudent_id;
+
+		$jgv_data = array_map(function($item) {
+			return [
+				'prestudent_id' => $item->prestudent_id,
+				'von' => $item->datum_von,
+				'bis' => $item->datum_bis
+			];
 		}, $data);
 
 		return (object) array(
-			'prestudent_id' => $ids
+			'data' => $jgv_data
 		);
 	}
 
