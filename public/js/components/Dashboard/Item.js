@@ -96,6 +96,20 @@ export default {
 		isResizeable() {
 			return this.isResizeableVertical || this.isResizeableHorizontal;
 		},
+		resizeClasses() {
+			const classes = {
+				icon: 'fa-up-right-and-down-left-from-center mirror-x',
+				button: 'cursor-nw-resize'
+			};
+			if (!this.isResizeableHorizontal) {
+				classes.icon = 'fa-up-down pe-2';
+				classes.button = 'cursor-ns-resize';
+			} else if (!this.isResizeableVertical) {
+				classes.icon = 'fa-left-right pe-2';
+				classes.button = 'cursor-ew-resize';
+			}
+			return classes;
+		},
 		isPinned() {
 			return this.place?.pinned ? true : false;
 		},
@@ -349,44 +363,17 @@ export default {
 					class="card-footer d-flex justify-content-end p-0"
 				>
 					<span
-						v-if="!isResizeableHorizontal"
 						type="button"
 						drag-action="resize"
-						class="col-auto px-1 cursor-ns-resize"
+						class="col-auto px-1"
+						:class="resizeClasses.button"
 						draggable="true"
 						aria-label="resize widget"
-						v-tooltip="{showDelay:1000, value:'resize widget'}"
+						v-tooltip="{ showDelay: 1000, value: 'resize widget' }"
 					>
 						<i
-							class="fa-solid fa-up-down pe-2"
-							aria-hidden="true"
-						></i>
-					</span>
-					<span
-						v-else-if="!isResizeableVertical"
-						type="button"
-						drag-action="resize"
-						class="col-auto px-1 cursor-ew-resize"
-						draggable="true"
-						aria-label="resize widget"
-						v-tooltip="{showDelay:1000, value:'resize widget'}"
-					>
-						<i
-							class="fa-solid fa-left-right pe-2"
-							aria-hidden="true"
-						></i>
-					</span>
-					<span
-						v-else
-						type="button"
-						drag-action="resize"
-						class="col-auto px-1 cursor-nw-resize"
-						draggable="true"
-						aria-label="resize widget"
-						v-tooltip="{showDelay:1000, value:'resize widget'}"
-					>
-						<i
-							class="fa-solid fa-up-right-and-down-left-from-center mirror-x"
+							class="fa-solid"
+							:class="resizeClasses.icon"
 							aria-hidden="true"
 						></i>
 					</span>
