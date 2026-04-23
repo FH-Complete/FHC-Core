@@ -187,16 +187,22 @@ export default {
 		this.initializeComponent();
 	},
 	template: /*html*/ `
-	<div
+	<article
 		v-if="!hidden || editMode"
 		class="dashboard-item card overflow-hidden h-100 position-relative"
-		:class="{'hidden-widget':hidden, [arguments?.className]:arguments && arguments.className}"
+		:class="{
+			'hidden-widget': hidden,
+			[arguments?.className]: arguments && arguments.className
+		}"
 	>
 		<div v-if="loading" class="d-flex justify-content-center align-items-center h-100">
 			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
-		<div v-else class="h-100 card border-0">
-			<div v-if="widgetTemplate" class="card-header d-flex ps-0 pe-2 align-items-center">
+		<template v-else>
+			<header
+				v-if="widgetTemplate"
+				class="card-header d-flex ps-0 pe-2 align-items-center"
+			>
 				<Transition>
 					<span
 						v-if="editMode && !isPinned"
@@ -210,7 +216,9 @@ export default {
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
 				</Transition>
-				<h5 class="col mx-2 my-0 px-2">{{ widgetTemplate.setup.name }}</h5>
+				<h4 class="col mb-0 fs-6 lh-base">
+					{{ widgetTemplate.setup.name }}
+				</h4>
 				<div
 					v-if="source"
 					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
@@ -219,7 +227,16 @@ export default {
 					<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
 				</div>
 				<template v-if="isPinned">
-					<div type="button" role="button" v-if="editMode" pinned="true" @click="unpin" title="unpin item" aria-label="unpin item" class="pin cursor-pointer col-auto me-2">
+					<div
+						v-if="editMode"
+						type="button"
+						role="button"
+						class="pin cursor-pointer col-auto me-2"
+						title="unpin item"
+						aria-label="unpin item"
+						pinned="true"
+						@click="unpin"
+					>
 						<i class="fa-solid fa-thumbtack " aria-hidden="true"></i>
 					</div>
 					<div v-else class="col-auto me-2">
@@ -227,15 +244,45 @@ export default {
 					</div>
 				</template>
 				<template v-else>
-					<div type="button" role="button" v-if="editMode"  class="col-auto me-2 pin" @click="pinItem" aria-label="pin item" title="pin item">
+					<div
+						v-if="editMode"
+						type="button"
+						role="button"
+						class="col-auto me-2 pin"
+						title="pin item"
+						aria-label="pin item"
+						@click="pinItem"
+					>
 						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
 					</div>
 				</template>
-				<a type="button" v-if="widgetTemplate.setup.cis4link" :href="getWidgetC4Link(widgetTemplate)" aria-label="widget link" v-tooltip="{showDelay:1000, value:'widget link'}" class="col-auto ms-auto">
+				<a
+					v-if="widgetTemplate.setup.cis4link"
+					:href="getWidgetC4Link(widgetTemplate)"
+					class="col-auto ms-auto"
+					aria-label="widget link"
+					v-tooltip="{ showDelay: 1000, value: 'widget link' }"
+				>
 					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
 				</a>
-				<a type="button" v-if="hasConfig" class="col-auto px-1" href="#" @click.prevent="openConfig" aria-label="configure widget" v-tooltip="{showDelay:1000,value:'configure widget'}"><i class="fa-solid fa-gear" aria-hidden="true"></i></a>
-				<a type="button" v-if="custom && editMode" class="col-auto px-1" aria-label="delete widget" v-tooltip="{showDelay:1000,value:'delete widget'}" href="#" @click.prevent="$emit('remove')">
+				<a
+					v-if="hasConfig"
+					href="#"
+					class="col-auto px-1"
+					aria-label="configure widget"
+					v-tooltip="{ showDelay: 1000, value: 'configure widget' }"
+					@click.prevent="openConfig"
+				>
+					<i class="fa-solid fa-gear" aria-hidden="true"></i>
+				</a>
+				<a
+					v-if="custom && editMode"
+					href="#"
+					class="col-auto px-1"
+					aria-label="delete widget"
+					v-tooltip="{ showDelay: 1000, value: 'delete widget' }"
+					@click.prevent="$emit('remove')"
+				>
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
 				</a>
 				<Transition>
@@ -243,22 +290,57 @@ export default {
 						<input class="form-check-input ms-0" type="checkbox" role="switch" aria-label="toggle widget" id="flexSwitchCheckChecked" v-model="visible" :value="true">
 					</div>
 				</Transition>
-			</div>
+			</header>
 			<div v-if="ready" class="card-body overflow-hidden p-0">
-				<component :is="component" v-model:shared-data="sharedData" :config="arguments" :width="width" :height="height" @setConfig="setConfig" @change="changeConfigManually"></component>
+				<component
+					:is="component"
+					v-model:shared-data="sharedData"
+					:config="arguments"
+					:width="width"
+					:height="height"
+					@setConfig="setConfig"
+					@change="changeConfigManually"
+				></component>
 			</div>
-			<div v-else class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
-			<bs-modal v-if="hasConfig" ref="config" @hideBsModal="handleHideBsModal" @showBsModal="handleShowBsModal">
+			<div
+				v-else
+				class="card-body overflow-hidden text-center d-flex flex-column justify-content-center"
+			>
+				<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+			</div>
+			<bs-modal
+				v-if="hasConfig"
+				ref="config"
+				@hideBsModal="handleHideBsModal"
+				@showBsModal="handleShowBsModal"
+			>
 				<template v-slot:title>
 					{{ widgetTemplate ? 'Config for ' + widgetTemplate.setup.name : '' }}
 				</template>
 				<template v-slot:default>
-					<component v-if="ready && !isLoading" :is="component" v-model:shared-data="sharedData" :config="tmpConfig" @change="changeConfig" :configMode="true"></component>
-					<div v-else class="text-center"><i class="fa-solid fa-spinner fa-pulse fa-3x"></i></div>
+					<component
+						:is="component"
+						v-if="ready && !isLoading"
+						v-model:shared-data="sharedData"
+						:config="tmpConfig"
+						@change="changeConfig"
+						:configMode="true"
+					></component>
+					<div v-else class="text-center">
+						<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
+					</div>
 				</template>
 				<template v-if="!widgetTemplate?.setup?.hideFooter" v-slot:footer>
-					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-					<button type="button" class="btn btn-primary" @click="changeConfig">Save changes</button>
+					<button
+						type="button"
+						class="btn btn-secondary"
+						data-bs-dismiss="modal"
+					>Close</button>
+					<button
+						type="button"
+						class="btn btn-primary"
+						@click="changeConfig"
+					>Save changes</button>
 				</template>
 			</bs-modal>
 			<height-transition>
@@ -310,6 +392,6 @@ export default {
 					</span>
 				</div>
 			</height-transition>
-		</div>
-	</div>`,
+		</template>
+	</article>`,
 };

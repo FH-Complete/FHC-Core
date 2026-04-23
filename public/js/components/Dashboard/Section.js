@@ -216,10 +216,10 @@ export default {
 		ref="container"
 		:class="{ 'edit-active': editModeIsActive }"
 	>
-		<h4 v-if="adminMode" class="mb-2">
+		<h3 v-if="adminMode" class="h4">
 			<i v-tooltip="showSectionInformation" class="fa-solid fa-circle-info section-info"></i>
 			{{ sectionNameTranslation }}:
-		</h4>
+		</h3>
 		<button
 			v-tooltip="$p.t('dashboard','addLine')"
 			v-if="!additionalRow && editModeIsActive"
