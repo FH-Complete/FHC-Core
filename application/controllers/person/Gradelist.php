@@ -198,7 +198,7 @@ class Gradelist extends Auth_Controller
 			if (!isset($row_noten->found))
 			{
 				$result_lv = $this->LehrveranstaltungModel->load($row_noten->lehrveranstaltung_id);
-				$result_stg = $this->StudiengangModel->load($result_lv->retval[0]->studiengang_kz);
+
 				$courses['semester'][$row_noten->studiensemester_kurzbz]['lvs_nonstpl'][] = array(
 					'lehrveranstaltung_id' => $row_noten->lehrveranstaltung_id,
 					'lehrtyp_kurzbz' => $result_lv->retval[0]->lehrtyp_kurzbz,
@@ -212,8 +212,7 @@ class Gradelist extends Auth_Controller
 					'semester' => $result_lv->retval[0]->semester,
 					'note' => $row_noten->note,
 					'datum' => $row_noten->benotungsdatum,
-					'zugeordnet' => true,
-					'studiengang_kurzbz' => $result_stg->retval[0]->kurzbzlang
+					'zugeordnet' => true
 				);
 				if(!isset($courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl']))
 					$courses['semester'][$row_noten->studiensemester_kurzbz]['data']['ectssumme_nonstpl'] = 0;
