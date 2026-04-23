@@ -227,7 +227,7 @@ export default {
 						draggable="true"
 						aria-hidden="true"
 						aria-label="move widget"
-						v-tooltip="{showDelay:1000, value:'move widget'}"
+						v-tooltip="{ showDelay: 1000, value: 'move widget' }"
 					>
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
@@ -239,8 +239,9 @@ export default {
 				<!-- source info -->
 				<div
 					v-if="source"
-					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
 					class="col-auto me-2"
+					:aria-label="sourceInfoTooltip"
+					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
 				>
 					<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
 				</div>

@@ -221,7 +221,7 @@ export default {
 			{{ sectionNameTranslation }}:
 		</h3>
 		<button
-			v-tooltip="$p.t('dashboard','addLine')"
+			v-tooltip="$p.t('dashboard/addLine')"
 			v-if="!additionalRow && editModeIsActive"
 			class="btn btn-outline-secondary rounded-circle newGridRow d-flex justify-content-center align-items-center"
 			@click="additionalRow=true"
