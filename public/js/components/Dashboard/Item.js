@@ -226,8 +226,8 @@ export default {
 						class="col-auto mx-2 px-2 cursor-move"
 						draggable="true"
 						aria-hidden="true"
-						aria-label="move widget"
-						v-tooltip="{showDelay:1000, value:'move widget'}"
+						:aria-label="$p.t('dashboard/widget_move')"
+						v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_move') }"
 					>
 						<i class="fa-solid fa-grip-vertical" aria-hidden="true"></i>
 					</span>
@@ -239,8 +239,9 @@ export default {
 				<!-- source info -->
 				<div
 					v-if="source"
-					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
 					class="col-auto me-2"
+					:aria-label="sourceInfoTooltip"
+					v-tooltip="{ class: 'w-100', value: sourceInfoTooltip }"
 				>
 					<i class="fa-solid fa-circle-info" aria-hidden="true"></i>
 				</div>
@@ -251,9 +252,9 @@ export default {
 						type="button"
 						role="button"
 						class="pin cursor-pointer col-auto me-2"
-						title="unpin item"
+						:title="$p.t('dashboard/widget_unpin')"
 						aria-hidden="true"
-						aria-label="unpin item"
+						:aria-label="$p.t('dashboard/widget_unpin')"
 						pinned="true"
 						@click="unpin"
 					>
@@ -269,9 +270,9 @@ export default {
 						type="button"
 						role="button"
 						class="col-auto me-2 pin"
-						title="pin item"
+						:title="$p.t('dashboard/widget_pin')"
 						aria-hidden="true"
-						aria-label="pin item"
+						:aria-label="$p.t('dashboard/widget_pin')"
 						@click="pinItem"
 					>
 						<i class="fa-solid fa-thumbtack" aria-hidden="true" style="color:lightgray;"></i>
@@ -282,8 +283,8 @@ export default {
 					v-if="widgetTemplate.setup.cis4link"
 					:href="getWidgetC4Link(widgetTemplate)"
 					class="col-auto ms-auto"
-					aria-label="widget link"
-					v-tooltip="{ showDelay: 1000, value: 'widget link' }"
+					:aria-label="$p.t('dashboard/widget_link')"
+					v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_link') }"
 				>
 					<i class="fa fa-arrow-up-right-from-square me-1" aria-hidden="true"></i>
 				</a>
@@ -292,8 +293,8 @@ export default {
 					v-if="hasConfig"
 					href="#"
 					class="col-auto px-1"
-					aria-label="configure widget"
-					v-tooltip="{ showDelay: 1000, value: 'configure widget' }"
+					:aria-label="$p.t('dashboard/widget_configure')"
+					v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_configure') }"
 					@click.prevent="openConfig"
 				>
 					<i class="fa-solid fa-gear" aria-hidden="true"></i>
@@ -303,8 +304,8 @@ export default {
 					v-if="custom && editMode"
 					href="#"
 					class="col-auto px-1"
-					aria-label="delete widget"
-					v-tooltip="{ showDelay: 1000, value: 'delete widget' }"
+					:aria-label="$p.t('dashboard/widget_delete')"
+					v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_delete') }"
 					@click.prevent="$emit('remove')"
 				>
 					<i class="fa-solid fa-trash" aria-hidden="true"></i>
@@ -318,7 +319,7 @@ export default {
 							v-model="visible"
 							class="form-check-input ms-0"
 							:value="true"
-							aria-label="toggle widget"
+							:aria-label="$p.t('dashboard/widget_toggle_visibility')"
 						>
 					</div>
 				</Transition>
@@ -350,7 +351,7 @@ export default {
 				@showBsModal="handleShowBsModal"
 			>
 				<template v-slot:title>
-					{{ widgetTemplate ? 'Config for ' + widgetTemplate.setup.name : '' }}
+					{{ widgetTemplate ? $p.t('dashboard/widget_config_title', widgetTemplate.setup) : '' }}
 				</template>
 				<template v-slot:default>
 					<component
@@ -370,12 +371,12 @@ export default {
 						type="button"
 						class="btn btn-secondary"
 						data-bs-dismiss="modal"
-					>Close</button>
+					>{{ $p.t('ui/schliessen') }}</button>
 					<button
 						type="button"
 						class="btn btn-primary"
 						@click="changeConfig"
-					>Save changes</button>
+					>{{ $p.t('ui/speichern') }}</button>
 				</template>
 			</bs-modal>
 			<height-transition>
@@ -390,8 +391,8 @@ export default {
 						:class="resizeClasses.button"
 						draggable="true"
 						aria-hidden="true"
-						aria-label="resize widget"
-						v-tooltip="{ showDelay: 1000, value: 'resize widget' }"
+						:aria-label="$p.t('dashboard/widget_resize')"
+						v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/widget_resize') }"
 					>
 						<i
 							class="fa-solid"
