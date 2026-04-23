@@ -373,7 +373,7 @@ export default {
 				</template>
 			</bs-modal>
 			<height-transition>
-				<div
+				<footer
 					v-if="editMode && isResizeable && !isPinned"
 					class="card-footer d-flex justify-content-end p-0"
 				>
@@ -392,7 +392,7 @@ export default {
 							aria-hidden="true"
 						></i>
 					</span>
-				</div>
+				</footer>
 			</height-transition>
 		</template>
 	</article>`,
