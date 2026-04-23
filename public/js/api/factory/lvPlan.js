@@ -123,5 +123,11 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/lvPlan/permissionOtherLvPlan',
 		}
-	}
+	},
+	getCompactibleEventTypes(){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/lvPlan/compactibleEventTypes',
+		}
+	},
 };

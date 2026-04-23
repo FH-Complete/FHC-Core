@@ -12,7 +12,7 @@ export default {
 		LineEvent,
 		LineBackground,
 	},
-	inject: ["axisRow", "shouldCompactEvents"],
+	inject: ["axisRow", "shouldCompactEvents", "compactibleEventTypes"],
 	props: {
 		date: {
 			type: luxon.DateTime,
@@ -50,27 +50,27 @@ export default {
 				return event;
 			});
 
-			if (this.shouldCompactEvents) {
+			if (this.shouldCompactEvents && this.compactibleEventTypes?.length) {
 				formattedEvents =
-					this.compactEventsForMobileView(formattedEvents);
+					this.compactEventsForMobileView(formattedEvents, this.compactibleEventTypes);
 			}
 
 			return formattedEvents;
 		},
 	},
 	methods: {
-		compactEventsForMobileView(events) {
+		compactEventsForMobileView(events, compactibleEventTypes) {
 			let formattedEvents = events
 				.filter(
 					(event) =>
-						!["lehreinheit", "reservierung"].includes(event.type),
+						!compactibleEventTypes.includes(event.type),
 				)
 				.map((event) => {
 					event.display = "default";
 					return event;
 				});
 			let eventsToBeCompacted = events.filter((event) =>
-				["lehreinheit", "reservierung"].includes(event.type),
+				compactibleEventTypes.includes(event.type),
 			);
 			let compactedEvents = [];
 
