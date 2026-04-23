@@ -23,7 +23,7 @@ export default {
 		},
 		mode: {
 			type: String,
-			default: 'Day'
+			default: 'Week'
 		},
 		getPromiseFunc: {
 			type: Function,
