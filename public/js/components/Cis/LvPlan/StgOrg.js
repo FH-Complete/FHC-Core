@@ -3,6 +3,7 @@ import FormInput from '../../Form/Input.js';
 import FhcCalendar from "../../Calendar/LvPlan.js";
 
 import ApiLvPlan from '../.././../api/factory/lvPlan.js';
+import ApiStgOrgLvPlan from '../.././../api/factory/stgOrgLvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
 export const DEFAULT_MODE_LVPLAN = 'Week';
@@ -15,7 +16,6 @@ export default {
 		FhcCalendar,
 	},
 	props: {
-		viewData: Object,
 		propsViewData: Object
 	},
 	data() {
@@ -38,7 +38,8 @@ export default {
 			listSem: [1,2,3,4,5,6,7,8,9,10],
 			listVerband: [],
 			listGroup: [],
-			rangeIntervalFirst: null
+			rangeIntervalFirst: null,
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 		};
 	},
 	computed: {
@@ -50,7 +51,7 @@ export default {
 		},
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
-				return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
+				return luxon.DateTime.now().setZone(this.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
@@ -70,7 +71,7 @@ export default {
 				return;
 			}
 
-			const opts = { zone: this.viewData.timezone };
+			const opts = { zone: this.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
 				.toUnixInteger();
@@ -139,7 +140,7 @@ export default {
 				params,
 			});
 
-			this.$refs['calendar'].resetEventLoader();
+			this.$refs['calendar']?.resetEventLoader();
 		},
 		loadListSem(){
 			if(!this.listSem)
@@ -209,24 +210,26 @@ export default {
 				this.$api.call(ApiLvPlan.eventsStgOrg(start, end, this.formData.stgkz, this.formData.sem, this.formData.verband, this.formData.gruppe))
 			];
 		},
+		async fetchAuthInfo() {
+			const authInfoResponse = await this.$api.call(ApiAuthinfo.getAuthInfo());
+
+			const authInfo = authInfoResponse.data;
+			this.uid = authInfo.uid;
+			this.isMitarbeiter = authInfo.isMitarbeiter;
+			this.isStudent = authInfo.isStudent;
+		},
+		async fetchViewData() {
+			const viewDataResponse = await this.$api.call(ApiStgOrgLvPlan.getStgOrgLvPlanViewData());
+
+			const viewData = viewDataResponse.data;
+			this.listStg = viewData.studiengaenge;
+		},
 	},
-	created(){
-		this.$api
-			.call(ApiAuthinfo.getAuthInfo())
-			.then(res => {
-				this.uid = res.data.uid;
-				this.isMitarbeiter = res.data.isMitarbeiter;
-				this.isStudent = res.data.isStudent;
-			});
+	async created(){
+		await this.fetchAuthInfo();
+    	await this.fetchViewData();
 
-		this.$api
-			.call(ApiLvPlan.getStudiengaenge())
-			.then(result => {
-				this. listStg = result.data;
-			})
-			.catch(this.$fhcAlert.handleSystemError);
-
-		if(this.propsViewData) {
+		if (this.propsViewData) {
 			this.formData.stgkz = this.propsViewData.stgkz ? this.propsViewData.stgkz: null;
 			this.formData.sem = this.propsViewData.sem ? this.propsViewData.sem: null;
 			this.formData.verband = this.propsViewData.verband ? this.propsViewData.verband: null;
@@ -309,37 +312,39 @@ export default {
 	 		</form-form>
 	 	</div>
 
-		<fhc-calendar
-			v-show="propsViewData && propsViewData.stgkz"
-			ref="calendar"
-			v-model:lv="formData"
-			:timezone="viewData.timezone"
-			:get-promise-func="getPromiseFunc"
-			:date="currentDay"
-			:mode="currentMode"
-			@update:date="handleChangeDate"
-			@update:mode="handleChangeMode"
-			@update:range="updateRange"
-			class="responsive-calendar"
-		>
-			<div
-				v-if="downloadLinks"
-				class="d-flex gap-1 justify-items-start"
+		<template v-if="timezone">
+			<fhc-calendar
+				v-if="propsViewData && propsViewData.stgkz"
+				ref="calendar"
+				v-model:lv="formData"
+				:timezone="timezone"
+				:get-promise-func="getPromiseFunc"
+				:date="currentDay"
+				:mode="currentMode"
+				@update:date="handleChangeDate"
+				@update:mode="handleChangeMode"
+				@update:range="updateRange"
+				class="responsive-calendar"
+			>
+				<div
+					v-if="downloadLinks"
+					class="d-flex gap-1 justify-items-start"
 				>
-				<div v-for="{ title, icon, link } in downloadLinks">
-					<a
-						:href="link"
-						:aria-label="title"
-						class="py-1 btn btn-outline-secondary"
-					>
-						<div class="d-flex flex-column">
-							<i aria-hidden="true" :class="icon"></i>
-							<span style="font-size:.5rem">{{ title }}</span>
-						</div>
-					</a>
+					<div v-for="{ title, icon, link } in downloadLinks">
+						<a
+							:href="link"
+							:aria-label="title"
+							class="py-1 btn btn-outline-secondary"
+						>
+							<div class="d-flex flex-column">
+								<i aria-hidden="true" :class="icon"></i>
+								<span style="font-size:.5rem">{{ title }}</span>
+							</div>
+						</a>
+					</div>
 				</div>
-			</div>
-		</fhc-calendar>
+			</fhc-calendar>
+		</template>
 	</div>
 	`,
 

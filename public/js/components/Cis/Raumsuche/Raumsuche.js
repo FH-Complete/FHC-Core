@@ -3,9 +3,6 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
 export const Raumsuche =  {
 	name: "Raumsuche",
-	props: {
-		
-	},
 	components: {
 		VueDatePicker,
 		CoreFilterCmpt,

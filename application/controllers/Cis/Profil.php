@@ -55,16 +55,7 @@ class Profil extends Auth_Controller
 	 */
 	public function index()
 	{
-
-		$this->load->library('ProfilLib');
-		$profil_data = $this->profillib->getView(getAuthUID());
-		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
-		$viewData = array(
-			'editable' => true,
-			'profil_data' => $profil_data,
-			'calendarSyncUrls' => $this->getCalendarSyncUrlData(),
-		);
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'profilIndex']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'profilIndex']);
 	}
 
 	/**
@@ -74,20 +65,7 @@ class Profil extends Auth_Controller
 	 */
 	public function View($uid)
 	{
-		$this->load->library('ProfilLib');
-		$profil_data = $this->profillib->getView($uid);
-		$profil_data = hasData($profil_data) ? getData($profil_data) : null;
-		$viewData = array(
-			'uid' => $uid,
-			'profil_data' => $profil_data,
-			'permissions' => [
-				'basis/other_lv_plan' => $this->permissionlib->isBerechtigt(('basis/other_lv_plan')),
-			]
-		);
-		if ($uid == getAuthUID()) {
-			$viewData['editable'] = true;
-		}
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'profilViewUid']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'profilViewUid']);
 	}
 
 	/**
@@ -753,31 +731,5 @@ class Profil extends Auth_Controller
 		//? formats date from 01-01-2000 to 01.01.2000
 		$zutrittskarte_ausgegebenam = str_replace("-", ".", $zutrittskarte_ausgegebenam);
 		return $zutrittskarte_ausgegebenam;
-	}
-
-	/**
-	 * gets the identifier, phrase, and url for each calendar sync option
-	 * @access private
-	 * @return array array of arrays, where each child array is a sync option
-	 */
-	private function getCalendarSyncUrlData()
-	{
-		return [
-			[
-				"identifier" => "cal_dav",
-				"labelPhrase" => "profil/calendar_sync_cal_dav",
-				"url" => APP_ROOT . "webdav/lvplan.php/calendars/" . $this->uid . "/LVPlan-" . $this->uid,
-			],
-			[
-				"identifier" => "cal_dav_principal",
-				"labelPhrase" => "profil/calendar_sync_cal_dav_principal",
-				"url" => APP_ROOT . "webdav/lvplan.php/principals/" . $this->uid,
-			],
-			[
-				"identifier" => "i_cal",
-				"labelPhrase" => "profil/calendar_sync_i_cal",
-				"url" => APP_ROOT . "webdav/google.php?cal=" . encryptData($this->uid, LVPLAN_CYPHER_KEY) . "&" . microtime(true),
-			],
-		];
 	}
 }

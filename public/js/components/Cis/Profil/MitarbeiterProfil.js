@@ -105,7 +105,6 @@ export default {
 					},
 				],
 			},
-			quickLinks: [],
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableMaProfilBetriebsmittel",
 				persistence: {
@@ -298,6 +297,11 @@ export default {
 					value: this.data.ort_kurzbz
 				}
 			};
+		},
+		quickLinks() {
+			let quickLinks = [];
+			//
+			return quickLinks;
 		},
 	},
 

@@ -9,196 +9,209 @@ import ApiAuthinfo from "../../../api/factory/authinfo.js";
 export const DEFAULT_MODE_LVPLAN = "Week";
 
 export default {
-  name: "OtherLvPlan",
-  components: {
-    FormForm,
-    FormInput,
-    FhcCalendar,
-  },
-  props: {
-    viewData: Object,
-    propsViewData: Object,
-  },
-  data() {
-    return {
-      localProps: {},
-      studiensemester_kurzbz: null,
-      studiensemester_start: null,
-      studiensemester_ende: null,
-      isOtherPersonMitarbeiter: false,
-      isOtherPersonStudent: false,
-      currentStgBezeichnung: null,
-      listVerband: [],
-      listGroup: [],
-      rangeIntervalFirst: null,
-      otherPersonData: {
-        fullName: "",
-        photo: "",
-      },
-    };
-  },
-  computed: {
-    currentDay() {
-      if (
-        !this.propsViewData?.focus_date ||
-        isNaN(new Date(this.propsViewData?.focus_date))
-      )
-        return luxon.DateTime.now().setZone(this.viewData.timezone).toISODate();
-      return this.propsViewData?.focus_date;
-    },
-    currentMode() {
-      if (
-        !this.propsViewData?.mode ||
-        !["day", "week", "month"].includes(
-          this.propsViewData?.mode.toLowerCase(),
-        )
-      )
-        return DEFAULT_MODE_LVPLAN;
-      return this.propsViewData?.mode;
-    },
-    downloadLinks() {
-      if (
-        !this.studiensemester_start ||
-        !this.studiensemester_ende ||
-        !this.propsViewData.otherUid
-      )
-        return false;
+	name: "OtherLvPlan",
+	components: {
+		FormForm,
+		FormInput,
+		FhcCalendar,
+	},
+	props: {
+		propsViewData: Object,
+	},
+	data() {
+		return {
+			localProps: {},
+			studiensemester_kurzbz: null,
+			studiensemester_start: null,
+			studiensemester_ende: null,
+			isOtherPersonMitarbeiter: false,
+			isOtherPersonStudent: false,
+			currentStgBezeichnung: null,
+			listVerband: [],
+			listGroup: [],
+			rangeIntervalFirst: null,
+			otherPersonData: {
+				fullName: "",
+				photo: "",
+			},
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+		};
+	},
+	computed: {
+		currentDay() {
+			if (
+				!this.propsViewData?.focus_date ||
+				isNaN(new Date(this.propsViewData?.focus_date))
+			)
+				return luxon.DateTime.now().setZone(this.timezone).toISODate();
+			return this.propsViewData?.focus_date;
+		},
+		currentMode() {
+			if (
+				!this.propsViewData?.mode ||
+				!["day", "week", "month"].includes(
+					this.propsViewData?.mode.toLowerCase(),
+				)
+			)
+				return DEFAULT_MODE_LVPLAN;
+			return this.propsViewData?.mode;
+		},
+		downloadLinks() {
+			if (
+				!this.studiensemester_start ||
+				!this.studiensemester_ende ||
+				!this.propsViewData.otherUid
+			)
+				return false;
 
-      const type = this.isOtherPersonStudent
-        ? "student"
-        : this.isOtherPersonMitarbeiter
-          ? "lektor"
-          : null;
+			const type = this.isOtherPersonStudent
+				? "student"
+				: this.isOtherPersonMitarbeiter
+					? "lektor"
+					: null;
 
-      if (!type) return;
+			if (!type) return;
 
-      const opts = { zone: this.viewData.timezone };
-      const start = luxon.DateTime.fromISO(
-        this.studiensemester_start,
-        opts,
-      ).toUnixInteger();
-      const ende = luxon.DateTime.fromISO(
-        this.studiensemester_ende,
-        opts,
-      ).toUnixInteger();
+			const opts = { zone: this.timezone };
+			const start = luxon.DateTime.fromISO(
+				this.studiensemester_start,
+				opts,
+			).toUnixInteger();
+			const ende = luxon.DateTime.fromISO(
+				this.studiensemester_ende,
+				opts,
+			).toUnixInteger();
 
-      const download_link =
-        FHC_JS_DATA_STORAGE_OBJECT.app_root +
-        "cis/private/lvplan/stpl_kalender.php" +
-        "?type=" +
-        type +
-        "&pers_uid=" +
-        this.propsViewData.otherUid +
-        "&begin=" +
-        start +
-        "&ende=" +
-        ende;
+			const download_link =
+				FHC_JS_DATA_STORAGE_OBJECT.app_root +
+				"cis/private/lvplan/stpl_kalender.php" +
+				"?type=" +
+				type +
+				"&pers_uid=" +
+				this.propsViewData.otherUid +
+				"&begin=" +
+				start +
+				"&ende=" +
+				ende;
 
-      return [
-        {
-          title: "excel",
-          icon: "fa-solid fa-file-excel",
-          link: download_link + "&format=excel",
-        },
-        {
-          title: "csv",
-          icon: "fa-solid fa-file-csv",
-          link: download_link + "&format=csv",
-        },
-        {
-          title: "ical1",
-          icon: "fa-regular fa-calendar",
-          link: download_link + "&format=ical&version=1&target=ical",
-        },
-        {
-          title: "ical2",
-          icon: "fa-regular fa-calendar",
-          link: download_link + "&format=ical&version=2&target=ical",
-        },
-      ];
-    },
-    get_image_base64_src: function () {
-      if (!this.otherPersonData.photo?.length) {
-        return "";
-      }
-      return "data:image/jpeg;base64," + this.otherPersonData.photo;
-    },
-  },
-  watch: {
-    "propsViewData.otherUid": {
-      handler() {
-        this.$router.go();
-      },
-    },
-  },
-  methods: {
-    handleChangeDate(day, newMode) {
-      return this.handleChangeMode(newMode, day);
-    },
-    handleChangeMode(newMode, day) {
-      const mode = newMode[0].toUpperCase() + newMode.slice(1);
-      const focus_date = day.toISODate();
+			return [
+				{
+					title: "excel",
+					icon: "fa-solid fa-file-excel",
+					link: download_link + "&format=excel",
+				},
+				{
+					title: "csv",
+					icon: "fa-solid fa-file-csv",
+					link: download_link + "&format=csv",
+				},
+				{
+					title: "ical1",
+					icon: "fa-regular fa-calendar",
+					link: download_link + "&format=ical&version=1&target=ical",
+				},
+				{
+					title: "ical2",
+					icon: "fa-regular fa-calendar",
+					link: download_link + "&format=ical&version=2&target=ical",
+				},
+			];
+		},
+		get_image_base64_src: function () {
+			if (!this.otherPersonData.photo?.length) {
+				return "";
+			}
+			return "data:image/jpeg;base64," + this.otherPersonData.photo;
+		},
+	},
+	watch: {
+		"propsViewData.otherUid": {
+			handler() {
+				this.$router.go();
+			},
+		},
+	},
+	methods: {
+		handleChangeDate(day, newMode) {
+			return this.handleChangeMode(newMode, day);
+		},
+		handleChangeMode(newMode, day) {
+			const mode = newMode[0].toUpperCase() + newMode.slice(1);
+			const focus_date = day.toISODate();
 
-      this.$router.push({
-        name: "OtherLvPlan",
-        params: {
-          mode,
-          focus_date,
-        },
-      });
-    },
-    updateRange(rangeInterval) {
-      this.$api
-        .call(
-          ApiLvPlan.studiensemesterDateInterval(
-            rangeInterval.end.startOf("week").toISODate(),
-          ),
-        )
-        .then((res) => {
-          this.studiensemester_kurzbz = res.data.studiensemester_kurzbz;
-          this.studiensemester_start = res.data.start;
-          this.studiensemester_ende = res.data.ende;
-        });
-    },
-    getPromiseFunc(start, end) {
-      return [
-        this.$api.call(
-          ApiLvPlan.eventsPersonal(
-            start.toISODate(),
-            end.toISODate(),
-            this.propsViewData.otherUid,
-          ),
-        ),
-        this.$api.call(
-          ApiLvPlan.getLvPlanReservierungen(
-            start.toISODate(),
-            end.toISODate(),
-            this.propsViewData.otherUid,
-          ),
-        ),
-      ];
-    },
-  },
-  async created() {
-    const authInfoResponse = await this.$api.call(ApiAuthinfo.getAuthInfo());
-    const authId = authInfoResponse.data.uid;
-    if (authId === this.propsViewData.otherUid) {
-      this.$router.push({ name: "MyLvPlan" });
-    }
+			this.$router.push({
+				name: "OtherLvPlan",
+				params: {
+					mode,
+					focus_date,
+				},
+			});
+		},
+		updateRange(rangeInterval) {
+			this.$api
+				.call(
+					ApiLvPlan.studiensemesterDateInterval(
+						rangeInterval.end.startOf("week").toISODate(),
+					),
+				)
+				.then((res) => {
+					this.studiensemester_kurzbz =
+						res.data.studiensemester_kurzbz;
+					this.studiensemester_start = res.data.start;
+					this.studiensemester_ende = res.data.ende;
+				});
+		},
+		getPromiseFunc(start, end) {
+			return [
+				this.$api.call(
+					ApiLvPlan.eventsPersonal(
+						start.toISODate(),
+						end.toISODate(),
+						this.propsViewData.otherUid,
+					),
+				),
+				this.$api.call(
+					ApiLvPlan.getLvPlanReservierungen(
+						start.toISODate(),
+						end.toISODate(),
+						this.propsViewData.otherUid,
+					),
+				),
+			];
+		},
+		async fetchViewData() {
+			const viewDataResponse = await this.$api.call(
+				ApiOtherLvPlan.getOtherLvPlanViewData(
+					this.propsViewData.otherUid,
+				),
+			);
 
-    const userDataResponse = await this.$api.call(
-      ApiOtherLvPlan.getBasicUserAttributesForLvPlanDisplay(
-        this.propsViewData.otherUid,
-      ),
-    );
+			const viewData = viewDataResponse.data;
 
-    const userData = userDataResponse.data;
-    this.isOtherPersonMitarbeiter = !!userData.is_mitarbeiter;
-    this.isOtherPersonStudent = !!userData.is_student;
-    this.otherPersonData.fullName = userData.vorname + " " + userData.nachname;
-    this.otherPersonData.photo = userData.foto;
-  },
-  template: `
+			this.isOtherPersonMitarbeiter =
+				!!viewData?.user_data?.is_mitarbeiter;
+			this.isOtherPersonStudent = !!viewData?.user_data?.is_student;
+			this.otherPersonData.fullName =
+				viewData?.user_data?.vorname +
+				" " +
+				viewData?.user_data?.nachname;
+			this.otherPersonData.photo = viewData?.user_data?.foto;
+		},
+		async redirectToMyLvPlanIfAuthUid() {
+			const authInfoResponse = await this.$api.call(
+				ApiAuthinfo.getAuthInfo(),
+			);
+			const authId = authInfoResponse.data.uid;
+			if (authId === this.propsViewData.otherUid) {
+				this.$router.push({ name: "MyLvPlan" });
+			}
+		},
+	},
+	async created() {
+		await this.redirectToMyLvPlanIfAuthUid();
+		await this.fetchViewData();
+	},
+	template: `
     <div class="d-flex flex-column h-100">
         <h2>
             <div class="d-flex flex-row justify-content-between align-items-center">
@@ -215,8 +228,9 @@ export default {
 		</h2>
 		<hr>
         <fhc-calendar
+			v-if="timezone"
             ref="calendar"
-            :timezone="viewData.timezone"
+            :timezone="timezone"
             :get-promise-func="getPromiseFunc"
             :date="currentDay"
             :mode="currentMode"

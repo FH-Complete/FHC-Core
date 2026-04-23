@@ -2,6 +2,7 @@ import DashboardSection from "./Section.js";
 import DashboardWidgetPicker from "./Widget/Picker.js";
 import ObjectUtils from "../../helpers/ObjectUtils.js";
 
+import ApiDashboard from '../../api/factory/cis/dashboard.js';
 import ApiDashboardWidget from '../../api/factory/dashboard/widget.js';
 import ApiDashboardUser from '../../api/factory/dashboard/user.js';
 
@@ -17,26 +18,22 @@ export default {
 			required: true,
 			default: 'CIS'
 		},
-		viewData: {
-			type: Object,
-			required: true,
-			validator(value) {
-				return value && value.name
-			}
-		}
 	},
 	data() {
 		return {
 			widgets: [],
 			originalWidgets: {},
 			widgetsSetup: null,
-			editMode: false
+			editMode: false,
+			timezone: null,
+			userFirstName: null,
 		}
 	},
 	provide() {
 		return {
 			editMode: Vue.computed(() => this.editMode),
-			widgetsSetup: Vue.computed(() => this.widgetsSetup)
+			widgetsSetup: Vue.computed(() => this.widgetsSetup),
+			timezone: this.timezone
 		}
 	},
 	methods: {
@@ -123,10 +120,18 @@ export default {
 					this.widgets = this.widgets.filter(widget => widget.id != id);
 				})
 				.catch(this.$fhcAlert.handleSystemError);
+		},
+		async fetchViewData() {
+			let viewDataResult = await this.$api.call(ApiDashboard.getViewData());
+			const viewData = viewDataResult.data;
+			this.timezone = viewData?.timezone;
+			this.userFirstName = viewData?.name;
 		}
 	},
-	created() {
+	async created() {
 		this.$p.loadCategory('dashboard');
+
+		await this.fetchViewData();
 
 		this.$api
 			.call(ApiDashboardWidget.listAllowed(this.dashboard))
@@ -161,7 +166,7 @@ export default {
 	template: /* html */`
 	<div class="core-dashboard">
 		<h3>
-			{{ $p.t('global/personalGreeting', [ viewData?.name ]) }}
+			{{ userFirstName ? $p.t('global/personalGreeting', [ userFirstName ]) : '' }}
 			<button
 				class="btn ms-2"
 				aria-label="edit dashboard"

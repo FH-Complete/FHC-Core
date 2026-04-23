@@ -97,7 +97,6 @@ export default {
 					},
 				],
 			},
-			quickLinks: [],
 		};
 	},
 
@@ -243,6 +242,11 @@ export default {
 					value: this.data.gruppe.trim()
 				}
 			};
+		},
+		quickLinks() {
+			let quickLinks = [];
+			//
+			return quickLinks;
 		},
 	},
 	created() {

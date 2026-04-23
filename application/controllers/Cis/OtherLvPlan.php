@@ -29,11 +29,6 @@ class OtherLvPlan extends Auth_Controller
      */
     public function index()
     {
-
-        $viewData = array(
-            'timezone' => $this->config->item('timezone')
-        );
-
-        $this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'OtherLvPlan']);
+        $this->load->view('CisRouterView/CisRouterView.php', ['route' => 'OtherLvPlan']);
     }
 }

@@ -28,11 +28,8 @@ class OtherLvPlan extends FHCAPI_Controller
     public function __construct()
     {
         parent::__construct([
-            'getBasicUserAttributesForLvPlanDisplay' => self::PERM_LOGGED,
+            'otherLvPlanViewData' => ['basis/other_lv_plan:r'],
         ]);
-
-        $this->load->library('PermissionLib');
-        $this->load->library('form_validation');
 
         $this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
         $this->load->model('person/Benutzer_model', 'BenutzerModel');
@@ -43,12 +40,11 @@ class OtherLvPlan extends FHCAPI_Controller
     // Public methods
 
     /**
-     * retrieves basic user attributes necessary for LV Plan display
+     * retrieves viewData for other lv plan view
      * @access public
-     * @param  $uid the userID for which basic attributes are retrieved
-     * @return stdClass consisting of basic user attributes 
+     * @param  $uid the userID for which the other lv plan is being viewed
      */
-    public function getBasicUserAttributesForLvPlanDisplay($uid)
+    public function otherLvPlanViewData($uid)
     {
         $isMitarbeiterResult = $this->MitarbeiterModel->isMitarbeiter($uid);
         $isMitarbeiter = getData($isMitarbeiterResult);
@@ -59,16 +55,18 @@ class OtherLvPlan extends FHCAPI_Controller
         $personResult = $this->BenutzerModel->load([$uid]);
         $person = hasData($personResult) ? getData($personResult) : null;
 
-        $result = [
-            "username" => $uid,
-            "is_student" => $isStudent,
-            "is_mitarbeiter" => $isMitarbeiter,
-            "foto" => $person[0]->foto,
-            "vorname" => $person[0]->vorname,
-            "nachname" => $person[0]->nachname,
+        $viewData = [
+            "user_data" => [
+                "username" => $uid,
+                "is_student" => $isStudent,
+                "is_mitarbeiter" => $isMitarbeiter,
+                "foto" => $person[0]->foto,
+                "vorname" => $person[0]->vorname,
+                "nachname" => $person[0]->nachname,
+            ],
         ];
 
-        $this->terminateWithSuccess($result);
+        $this->terminateWithSuccess($viewData);
     }
 
     // -----------------------------------------------------------------------------------------------------------------

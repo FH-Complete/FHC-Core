@@ -11,7 +11,6 @@ export default {
 		FhcCalendar
 	},
 	props: {
-		viewData: Object, // NOTE(chris): this is inherited from router-view
 		propsViewData: Object
 	},
 	data() {
@@ -21,13 +20,14 @@ export default {
 			studiensemester_ende: null,
 			uid: null,
 			isMitarbeiter: false,
-			isStudent: false
+			isStudent: false,
+			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 		};
 	},
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
-				return luxon.DateTime.now().setZone(FHC_JS_DATA_STORAGE_OBJECT.timezone).toISODate();
+				return luxon.DateTime.now().setZone(this.timezone).toISODate();
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
@@ -47,7 +47,7 @@ export default {
 				return;
 			}
 
-			const opts = { zone: FHC_JS_DATA_STORAGE_OBJECT.timezone };
+			const opts = { zone: this.timezone };
 			const start = luxon.DateTime
 				.fromISO(this.studiensemester_start, opts)
 				.toUnixInteger();
@@ -102,16 +102,18 @@ export default {
 				this.$api.call(ApiLvPlan.eventsPersonal(start.toISODate(), end.toISODate())),
 				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
 			];
-		}
+		},
+		async fetchAuthInfo() {
+			const authInfoResponse = await this.$api.call(ApiAuthinfo.getAuthInfo());
+			
+			const authInfo = authInfoResponse.data;
+			this.uid = authInfo.uid;
+			this.isMitarbeiter = authInfo.isMitarbeiter;
+			this.isStudent = authInfo.isStudent;
+		},
 	},
-	created() {
-		this.$api
-			.call(ApiAuthinfo.getAuthInfo())
-			.then(res => {
-				this.uid = res.data.uid;
-				this.isMitarbeiter = res.data.isMitarbeiter;
-				this.isStudent = res.data.isStudent;
-			});
+	async created() {
+		await this.fetchAuthInfo();
 	},
 	template: /*html*/`
 	<div class="cis-lvplan-personal d-flex flex-column h-100">
@@ -123,7 +125,9 @@ export default {
 		</h2>
 		<hr>
 		<fhc-calendar
+			v-if="timezone"
 			ref="calendar"
+			:timezone="timezone"
 			:get-promise-func="getPromiseFunc"
 			:date="currentDay"
 			:mode="currentMode"

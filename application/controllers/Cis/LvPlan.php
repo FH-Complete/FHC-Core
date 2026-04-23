@@ -28,12 +28,6 @@ class LvPlan extends Auth_Controller
 	 */
 	public function index()
 	{
-		
-		$viewData = array(
-			'uid'=>getAuthUID(),
-			'timezone' => $this->config->item('timezone')
-		);
-		
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'LvPlan']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'LvPlan']);
 	}
 }

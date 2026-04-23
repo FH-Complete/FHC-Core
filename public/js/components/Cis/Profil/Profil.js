@@ -48,9 +48,6 @@ export const Profil = {
 			type: String,
 			required: false,
 		},
-		viewData: {
-			type: Object,
-		},
 	},
 	data() {
 		return {
@@ -62,7 +59,9 @@ export const Profil = {
 			data: null,
 			// notfound is null by default, but contains an UID if no user exists with that UID
 			notFoundUID: null,
-			isEditable: this.viewData.editable ?? false,
+			isEditable: false,
+			authPermissions: null,
+			calendarSyncUrls: [],
 		};
 	},
 	provide() {
@@ -143,6 +142,8 @@ export const Profil = {
 	},
 	methods: {
 		async load() {
+			await this.fetchViewData();
+
 			// fetch profilUpdateStates to provide them to children components
 			await this.$api
 				.call(ApiProfilUpdate.getStatus())
@@ -161,18 +162,20 @@ export const Profil = {
 				.catch((error) => {
 					console.error(error);
 				});
+		},
+		async fetchViewData() {
+			let viewDataResult = await this.$api.call(
+				ApiProfil.getProfilViewData(this.$route.params.uid ?? null),
+			);
 
-			this.$api
-				.call(ApiProfil.profilViewData(this.$route.params.uid ?? null))
-				.then((response) => response.data)
-				.then((data) => {
-					this.view = data?.profil_data.view;
-					this.data = data?.profil_data.data;
-					this.isEditable = data?.editable ?? false;
-				})
-				.catch((error) => {
-					console.error(error);
-				});
+			const data = viewDataResult.data;
+			if (!data) return;
+
+			this.view = data.profil_data.view;
+			this.isEditable = data.profil_data.editable;
+			this.data = data.profil_data.data;
+			this.calendarSyncUrls = data.calendar_sync_urls ?? [];
+			this.authPermissions = data.permissions;
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
@@ -408,8 +411,8 @@ export const Profil = {
 				:is="view"
 				:data="data"
 				:editData="filteredEditData"
-				:permissions="$props.viewData.permissions"
-				:calendarSyncUrls="$props.viewData.calendarSyncUrls"></component>
+				:permissions="authPermissions"
+				:calendarSyncUrls="calendarSyncUrls"></component>
 		</div>
 	</div>`,
 };

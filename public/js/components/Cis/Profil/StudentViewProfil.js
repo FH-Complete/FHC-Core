@@ -14,14 +14,14 @@ export default {
 	},
 	props: ["data", "permissions"],
 	data() {
-		return {
-			quickLinks: [],
-		};
+		return {};
 	},
 	provide() {
 		return {
-			studiengang_kz: Vue.computed({ get: () => this.data.studiengang_kz }),
-		}
+			studiengang_kz: Vue.computed({
+				get: () => this.data.studiengang_kz,
+			}),
+		};
 	},
 	computed: {
 		fotoStatus() {
@@ -43,65 +43,61 @@ export default {
 				foto: this.data.foto,
 			};
 		},
-
 		personEmails() {
 			return this.data?.emails ? this.data.emails : [];
 		},
-
 		roleInformation() {
 			if (!this.data) {
 				return {};
 			}
 
-
 			return {
 				geburtsdatum: {
-					label: `${this.$p.t('profil','Geburtsdatum')}`,
-					value: this.data.gebdatum
+					label: `${this.$p.t("profil", "Geburtsdatum")}`,
+					value: this.data.gebdatum,
 				},
 				geburtsort: {
-					label: `${this.$p.t('profil','Geburtsort')}`,
-					value: this.data.gebort
+					label: `${this.$p.t("profil", "Geburtsort")}`,
+					value: this.data.gebort,
 				},
 				personenkennzeichen: {
-					label: `${this.$p.t('person','personenkennzeichen')}`,
-					value: this.data.personenkennzeichen
+					label: `${this.$p.t("person", "personenkennzeichen")}`,
+					value: this.data.personenkennzeichen,
 				},
 				studiengang: {
-					label: `${this.$p.t('lehre','studiengang')}`,
-					value: this.data.studiengang
+					label: `${this.$p.t("lehre", "studiengang")}`,
+					value: this.data.studiengang,
 				},
 				semester: {
-					label: `${this.$p.t('lehre','semester')}`,
-					value: this.data.semester
+					label: `${this.$p.t("lehre", "semester")}`,
+					value: this.data.semester,
 				},
 				verband: {
-					label: `${this.$p.t('lehre','lehrverband')}`,
-					value: this.data.verband
+					label: `${this.$p.t("lehre", "lehrverband")}`,
+					value: this.data.verband,
 				},
 				gruppe: {
-					label: `${this.$p.t('lehre','gruppe')}`,
-					value: this.data.gruppe.trim()
-				}
+					label: `${this.$p.t("lehre", "gruppe")}`,
+					value: this.data.gruppe.trim(),
+				},
 			};
 		},
-	},
-	methods: {},
-	created() {
-		if (this.$props.permissions["basis/other_lv_plan"]) {
-			this.quickLinks.push(
-				{
+		quickLinks() {
+			let quickLinks = [];
+			if (this.$props.permissions && this.$props.permissions["basis/other_lv_plan"]) {
+				quickLinks.push({
 					icon: "fa-calendar-days",
 					phrase: "lehre/stundenplan",
 					action: () => {
 						this.$router.push({
-      					  	name: "OtherLvPlan",
-      					  	params: { otherUid: this.$props.data.username },
-      					})
+							name: "OtherLvPlan",
+							params: { otherUid: this.$props.data.username },
+						});
 					},
-				}
-			);
-		}
+				});
+			}
+			return quickLinks;
+		},
 	},
 	template: /*html*/ ` 
 
