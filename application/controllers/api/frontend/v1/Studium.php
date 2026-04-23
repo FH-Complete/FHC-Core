@@ -230,6 +230,8 @@ class Studium extends FHCAPI_Controller
 		$studienplaene = array_map(function($studienplan){
 			$orgform = current($this->getDataOrTerminateWithError($this->OrgformModel->loadWhere(["orgform_kurzbz" => $studienplan->orgform_kurzbz])));
 			$studienplan->orgform_bezeichnung = $orgform->bezeichnung;
+			// bezeichnung_mehrsprachig
+			$studienplan->orgform_bezeichnung_english = $orgform->bezeichnung_mehrsprachig[1];
 			return $studienplan;
 		},$studienplaene);
 		return $studienplaene;
