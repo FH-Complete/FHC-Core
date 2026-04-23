@@ -11,7 +11,7 @@ import Raumsuche from "../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../components/Cis/Cms/News.js";
 import CmsContent from "../components/Cis/Cms/Content.js";
 import Info from "../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
-import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../components/Cis/Mylv/RoomInformation.js";
+import RoomInformation, {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from "../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import AbgabetoolAssistenz from "../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
@@ -24,6 +24,7 @@ import ApiRouteInfo from '../api/factory/routeinfo.js';
 import {capitalize} from "../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
@@ -86,7 +87,7 @@ const router = VueRouter.createRouter({
 					name: "RoomInformation",
 					params: { // in this case always populate other params since they are not optional
 						ort_kurzbz: to.params.ort_kurzbz,
-						mode: DEFAULT_MODE_RAUMINFO,
+						mode: isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP,
 						focus_date: new Date().toISOString().split("T")[0]
 					},
 				};
@@ -103,7 +104,7 @@ const router = VueRouter.createRouter({
 				const mode = route.params.mode &&
 				validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
 					? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
-					: DEFAULT_MODE_RAUMINFO;
+					: (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP);
 
 				// default to today date if not provided
 				const d = new Date(route.params.focus_date)

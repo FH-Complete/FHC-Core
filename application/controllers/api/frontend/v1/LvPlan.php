@@ -48,6 +48,7 @@ class LvPlan extends FHCAPI_Controller
 			'getStudiengaenge' => self::PERM_LOGGED,
 			'getLehrverband' => self::PERM_LOGGED,
 			'permissionOtherLvPlan' => self::PERM_LOGGED,
+			'compactibleEventTypes' => self::PERM_LOGGED,
 		]);
 
 		$this->load->library('LogLib');
@@ -391,6 +392,16 @@ class LvPlan extends FHCAPI_Controller
 	public function permissionOtherLvPlan()
 	{
 		$this->terminateWithSuccess($this->permissionlib->isBerechtigt('basis/other_lv_plan'));
+	}
+
+	/**
+	 * get event types which can be compacted in lv plan display
+	 *
+	 * @return void
+	 */
+	public function compactibleEventTypes()
+	{
+		$this->terminateWithSuccess(["lehreinheit", "reservierung"]);
 	}
 
 	/**

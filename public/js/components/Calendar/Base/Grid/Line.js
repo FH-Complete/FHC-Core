@@ -1,5 +1,5 @@
-import LineEvent from './Line/Event.js';
-import LineBackground from './Line/Background.js';
+import LineEvent from "./Line/Event.js";
+import LineBackground from "./Line/Background.js";
 
 /**
  * TODO(chris):
@@ -10,54 +10,117 @@ export default {
 	name: "GridLine",
 	components: {
 		LineEvent,
-		LineBackground
+		LineBackground,
 	},
-	inject: {
-		axisRow: "axisRow"
-	},
+	inject: ["axisRow", "shouldCompactEvents", "compactibleEventTypes"],
 	props: {
 		date: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
 		start: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
 		end: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
 		events: {
 			type: Array,
-			default: []
+			default: [],
 		},
 		backgrounds: {
 			type: Array,
-			default: []
-		}
+			default: [],
+		},
 	},
 	computed: {
-		eventsWithRowInfo() {
-			const events = [];
-			this.events.forEach(event => {
-				const rows = [1, -1];
+		formattedEvents() {
+			let formattedEvents = this.events.map((event) => {
+				event.rows = [1, -1];
 				if (event.startsHere) {
-					rows[0] = 't_' + event.start.diff(this.date).toMillis();
+					event.rows[0] =
+						"t_" + event.start.diff(this.date).toMillis();
 				}
 				if (event.endsHere) {
-					rows[1] = 't_' + event.end.diff(this.date).toMillis();
+					event.rows[1] = "t_" + event.end.diff(this.date).toMillis();
 				}
 
-				events.push({
-					...event,
-					rows
-				});
+				return event;
 			});
-			return events;
-		}
+
+			if (this.shouldCompactEvents && this.compactibleEventTypes?.length) {
+				formattedEvents =
+					this.compactEvents(formattedEvents, this.compactibleEventTypes);
+			}
+
+			return formattedEvents;
+		},
 	},
-	template: /* html */`
+	methods: {
+		compactEvents(events, compactibleEventTypes) {
+			let formattedEvents = events
+				.filter(
+					(event) =>
+						!compactibleEventTypes.includes(event.type),
+				)
+				.map((event) => {
+					event.display = "default";
+					return event;
+				});
+			let eventsToBeCompacted = events.filter((event) =>
+				compactibleEventTypes.includes(event.type),
+			);
+			let compactedEvents = [];
+
+			eventsToBeCompacted.forEach((event) => {
+				let existingCompactedEvent = compactedEvents.find(
+					(compactedEvent) =>
+						event.rows[0] === compactedEvent.rows[0] &&
+						event.rows[1] === compactedEvent.rows[1],
+				);
+
+				if (!existingCompactedEvent) {
+					compactedEvents.push({
+						events: [
+							{
+								farbe: event.orig.farbe,
+							},
+						],
+						rows: event.rows,
+					});
+				} else {
+					existingCompactedEvent.events.push({
+						farbe: event.orig.farbe,
+					});
+				}
+			});
+
+			compactedEvents.forEach((compactedEvent) => {
+				if (compactedEvent.events.length < 4) {
+					formattedEvents.push({
+						display: "compacted",
+						...compactedEvent,
+					});
+				} else {
+					formattedEvents.push({
+						display: "compacted",
+						events: compactedEvent.events.slice(0, 3),
+						rows: compactedEvent.rows,
+					});
+					formattedEvents.push({
+						display: "compactedExtra",
+						events: compactedEvent.events.slice(3),
+						rows: compactedEvent.rows,
+					});
+				}
+			});
+
+			return formattedEvents;
+		},
+	},
+	template: /* html */ `
 	<div
 		class="fhc-calendar-base-grid-line"
 		style="position:relative;display:grid;grid-auto-flow:dense"
@@ -69,17 +132,37 @@ export default {
 			:end="end"
 			:background="bg"
 		></line-background>
-		<line-event
-			v-for="(event, i) in eventsWithRowInfo"
-			:key="i"
-			:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
-			:event="event"
-		>
-			<template v-slot="slot">
-				<slot name="event" v-bind="slot" />
-			</template>
-		</line-event>
+		<template v-for="(event, i) in formattedEvents" :key="i">
+			<line-event
+				v-if="!event.display || event.display === 'default'"
+				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
+				:event="event"
+			>
+				<template v-slot="slot">
+					<slot name="event" v-bind="slot" />
+				</template>
+			</line-event>
+			<div
+				v-else-if="event.display === 'compacted'"
+				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
+				class="d-flex flex-row justify-content-center gap-1 align-items-center"
+			>
+				<i
+					v-for="(subEvent, subEventIndex) in event.events"
+					:key="subEventIndex"
+					class="fa-solid fa-circle fa-2xs"
+					:style="subEvent.farbe ? {color: '#' + subEvent.farbe} : {}"
+				></i>
+			</div>
+			<div
+				v-else-if="event.display === 'compactedExtra'"
+				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
+				class="w-100 d-flex flex-row justify-content-center"
+			>
+				{{"+" + event.events.length}}
+			</div>
+		</template>
 		<slot name="dropzone" />
 	</div>
-	`
-}
+	`,
+};

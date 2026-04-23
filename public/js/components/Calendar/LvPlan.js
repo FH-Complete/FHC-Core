@@ -8,12 +8,14 @@ import { useRenderers } from '../../composables/Renderers.js';
 import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
+import ModeList from './Mode/List.js';
 
 export default {
 	name: "CalendarLvPlan",
 	components: {
 		FhcCalendar
 	},
+	inject: ["isMobile"],
 	props: {
 		date: {
 			type: [Date, String, Number, luxon.DateTime],
@@ -21,12 +23,22 @@ export default {
 		},
 		mode: {
 			type: String,
-			default: 'Week'
+			default: 'Day'
 		},
 		getPromiseFunc: {
 			type: Function,
 			required: true
 		}
+	},
+	provide() {
+		return {
+			shouldCompactEvents: Vue.computed(
+				() => this.$props.mode === "Month" && this.isMobile,
+			),
+			compactibleEventTypes: Vue.computed(
+				() => this.compactibleEventTypes,
+			),
+		};
 	},
 	emits: [
 		"update:date",
@@ -36,11 +48,6 @@ export default {
 	data() {
 		return {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
-			modes: {
-				day: Vue.markRaw(ModeDay),
-				week: Vue.markRaw(ModeWeek),
-				month: Vue.markRaw(ModeMonth)
-			},
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
@@ -48,9 +55,13 @@ export default {
 				},
 				week: {
 					collapseEmptyDays: false
-				}
+				},
+				list: {
+					length: 7,
+				},
 			},
-			teachingunits: null
+			teachingunits: null,
+			compactibleEventTypes: [],
 		};
 	},
 	computed: {
@@ -72,7 +83,20 @@ export default {
 					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
 				}
 			];
-		}
+		},
+		modes() {
+			let modes = {
+				day: Vue.markRaw(ModeDay),
+				month: Vue.markRaw(ModeMonth),
+			};
+			if (this.isMobile) {
+				modes.list = Vue.markRaw(ModeList);
+			} else {
+				modes.week = Vue.markRaw(ModeWeek);
+			}
+
+			return modes;
+		},
 	},
 	methods: {
 		eventStyle(event) {
@@ -86,7 +110,21 @@ export default {
 		},
 		resetEventLoader() {
 			this.reset();
-		}
+		},
+		async getStunden() {
+			let stundenResponse = await this.$api.call(ApiLvPlan.getStunden());
+			this.teachingunits = stundenResponse.data.map((el) => ({
+				id: el.stunde,
+				start: el.beginn,
+				end: el.ende,
+			}));
+		},
+		async getCompactibleEventTypes() {
+			let compactibleEventTypesResponse = await this.$api.call(
+				ApiLvPlan.getCompactibleEventTypes(),
+			);
+			this.compactibleEventTypes = compactibleEventTypesResponse.data;
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
@@ -107,16 +145,9 @@ export default {
 			renderers
 		};
 	},
-	created() {
-		this.$api
-			.call(ApiLvPlan.getStunden())
-			.then(res => {
-				return this.teachingunits = res.data.map(el => ({
-					id: el.stunde,
-					start: el.beginn,
-					end: el.ende
-				}));
-			});
+	async created() {
+		await this.getStunden();
+		await this.getCompactibleEventTypes();
 	},
 	template: /* html */`
 	<fhc-calendar

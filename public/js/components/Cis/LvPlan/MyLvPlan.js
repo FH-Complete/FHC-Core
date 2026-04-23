@@ -3,7 +3,8 @@ import FhcCalendar from "../../Calendar/LvPlan.js";
 import ApiLvPlan from '../../../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
-export const DEFAULT_MODE_LVPLAN = 'Week'
+export const DEFAULT_MODE_LVPLAN_DESKTOP = "Week";
+export const DEFAULT_MODE_LVPLAN_MOBILE = "List";
 
 export default {
 	name: 'LvPlanPersonal',
@@ -24,6 +25,7 @@ export default {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 		};
 	},
+	inject: ["isMobile"],
 	computed:{
 		currentDay() {
 			if (!this.propsViewData?.focus_date || isNaN(new Date(this.propsViewData?.focus_date)))
@@ -31,8 +33,18 @@ export default {
 			return this.propsViewData?.focus_date;
 		},
 		currentMode() {
-			if (!this.propsViewData?.mode || !['day', 'week', 'month'].includes(this.propsViewData?.mode.toLowerCase()))
-				return DEFAULT_MODE_LVPLAN;
+			let validModes = ["day", "month"];
+			validModes.push(this.isMobile ? "list" : "week");
+
+			const defaultMode = this.isMobile
+				? DEFAULT_MODE_LVPLAN_MOBILE
+				: DEFAULT_MODE_LVPLAN_DESKTOP;
+
+			if (
+				!this.propsViewData?.mode ||
+				!validModes.includes(this.propsViewData?.mode.toLowerCase())
+			)
+				return defaultMode;
 			return this.propsViewData?.mode;
 		},
 		downloadLinks() {
