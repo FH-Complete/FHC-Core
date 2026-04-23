@@ -316,7 +316,6 @@ export default {
 							class="form-check-input ms-0"
 							:value="true"
 							aria-label="toggle widget"
-							id="flexSwitchCheckChecked"
 						>
 					</div>
 				</Transition>
