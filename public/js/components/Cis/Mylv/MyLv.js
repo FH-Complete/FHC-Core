@@ -17,7 +17,7 @@ export default {
 			studiensemester: null,
 			lvs: {},
 			currentSemester: null,
-			mode: 'table' // TODO: load from local storage
+			mode: localStorage.getItem('myLvaDefaultMode') ?? 'cards'
 		};
 	},
 	provide() {
@@ -46,20 +46,7 @@ export default {
 				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Lvs/' + this.currentSemester).then(res => {
 					this.lvs[this.currentSemester].lvs = res.data.retval || [];
 					this.firstLoad = false;
-
-					// pretty slow to load all at once if one lva has a weird moodle / lvinfo situation 
-					// that multiplies the loadtime for everything by a factor of 3-5
 					
-					// this.$api.call(ApiAddons.getMultipleLvMenu(this.lvs[this.currentSemester].lvs, this.currentSemester)).then(res => {
-					// 	if(res.data) {
-					// 		Object.entries(res.data).forEach((entry) => {
-					// 			// entry[0] -> key -> lvid
-					// 			// entry[1] -> value -> menu
-					// 			const lv = this.lvs[this.currentSemester].lvs.find(lv => lv.lehrveranstaltung_id == entry[0])
-					// 			lv.menu = entry[1]
-					// 		})
-					// 	}
-					// })
 					this.lvs[this.currentSemester].lvs.forEach(lv=>{
 
 						this.$api.call(ApiAddons.getLvMenu(lv.lehrveranstaltung_id, this.currentSemester)).then(res => {
@@ -108,6 +95,7 @@ export default {
 	},
 	methods: {
 		clickMode(evt, mode) {
+			localStorage.setItem('myLvaDefaultMode', mode)
 			this.mode = mode
 		},
 		prevSem() {

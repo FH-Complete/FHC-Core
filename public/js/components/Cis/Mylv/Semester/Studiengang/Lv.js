@@ -28,13 +28,13 @@ export default {
 		ects: String,
 		incoming: Number,
 		positiv: Boolean,
-		note_index: String
+		note_index: String,
+		menu: [Array, String]
 	},
 	data: () => {
 		return {
 			pruefungenData: null,
 			info: null,
-			menu: null,
 			preselectedMenuItem: null,
 		}
 	},
@@ -104,11 +104,6 @@ export default {
 			});
 		}
 	},
-	watch:{
-		studien_semester(newValue){
-			this.fetchMenu(this.lehrveranstaltung_id, newValue);
-		}
-	},
 	created() {
 		if(this.type == 'student') {
 			this.$api
@@ -118,9 +113,6 @@ export default {
 					this.pruefungenData = pruefungen;
 				});
 		}
-	},
-	mounted() {
-		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
 	},
 	template: /*html*/`
 	<div class="mylv-semester-studiengang-lv card">

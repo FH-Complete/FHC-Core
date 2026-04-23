@@ -62,6 +62,10 @@ class LvMenu extends FHCAPI_Controller
 
 	/**
 	 * alternative function to get multiple lvMenus with a single http request
+	 * not yet working as intended as the menu_lv.inc.php scripts called by the
+	 * lvMenuBuild event have logic coupled to require_once import which results in
+	 * a wrong logic after the first invocation -> faulty results for lvinfo, moodle
+	 * and several others
 	 */
 	public function getMultipleLvMenu(){
 		$lvMenuOptionList = $this->input->post('lvMenuOptionList', true);
