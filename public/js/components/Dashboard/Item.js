@@ -232,7 +232,7 @@ export default {
 					</span>
 				</Transition>
 				<!-- TITLE -->
-				<h4 class="col mb-0 fs-6 lh-base">
+				<h4 class="col mb-0 mx-2 px-2 fs-6 lh-base">
 					{{ widgetTemplate.setup.name }}
 				</h4>
 				<!-- source info -->
