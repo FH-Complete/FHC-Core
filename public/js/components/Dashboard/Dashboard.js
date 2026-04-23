@@ -165,7 +165,7 @@ export default {
 			<button
 				class="btn ms-2"
 				aria-label="edit dashboard"
-				v-tooltip="{ showDelay: 1000, value: 'edit dashboard' }"
+				v-tooltip="{ showDelay: 1000, value: $p.t('dashboard/edit') }"
 				@click="editMode = !editMode"
 			><i class="fa-solid fa-gear" aria-hidden="true"></i></button>
 		</h3>

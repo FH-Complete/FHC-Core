@@ -27,7 +27,7 @@ export default {
 	template: /* html */`
 	<div class="dashboard-admin-edit px-3">
 		<div class="mb-3">
-			<label for="dashboard-admin-edit-kurzbz">Kurz Bezeichnung</label>
+			<label for="dashboard-admin-edit-kurzbz">{{ $p.t('dashboard/kurzbz') }}</label>
 			<input
 				id="dashboard-admin-edit-kurzbz"
 				v-model="kurzbz"
@@ -36,7 +36,7 @@ export default {
 			>
 		</div>
 		<div class="mb-3">
-			<label for="dashboard-admin-edit-beschreibung">Beschreibung</label>
+			<label for="dashboard-admin-edit-beschreibung">{{ $p.t('global/beschreibung') }}</label>
 			<textarea
 				id="dashboard-admin-edit-beschreibung"
 				v-model="desc"

@@ -40,11 +40,11 @@ export default {
 			:dialog-class="{ 'modal-fullscreen-sm-down': 1, 'modal-xl': widgets && widgets.length > 0 }"
 			@hiddenBsModal="close"
 		>
-			<template v-slot:title>Create new widget</template>
+			<template v-slot:title>{{ $p.t('dashboard/createWidget') }}</template>
 			<template v-slot:default>
 				<div v-if="widgets" class="row g-2">
 					<div v-if="!widgets.length">
-						No Widgets available
+						{{ $p.t('dashboard/noWidgetsAvailable') }}
 					</div>
 					<div
 						v-for="widget in widgets"
