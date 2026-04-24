@@ -346,7 +346,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		getTagFilter(widget_id){
+		getTagFilter(widget_id) {
 			this.$api
 				.call(ApiBookmark.getTagFilter(widget_id, this.sectionName))
 				.then((res) => res.data)
@@ -388,94 +388,153 @@ export default {
 
 
 	template: /*html*/ `
-    <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
+	<div class="widgets-url w-100 h-100 overflow-auto p-3">
 
 		<div class="d-flex mt-2">
-		  <button class="btn btn-outline-secondary btn-sm flex-grow-1 me-2" @click="openCreateModal">
-			{{$p.t('bookmark','newLink')}}
-		  </button>
-		  <button v-if="selectedFilters.length" class="btn btn-secondary btn-sm" :title="this.$p.t('bookmark/editFilter')" @click="openFilterModal">
-			<i class="fa-solid fa-filter-circle-xmark"></i>
-		  </button>  
-		  <button v-else class="btn btn-outline-secondary btn-sm" :title="this.$p.t('bookmark/filterByTags')" @click="openFilterModal">
-			<i class="fa-solid fa-filter"></i>
-		  </button>
+			<button
+				class="btn btn-outline-secondary btn-sm flex-grow-1 me-2"
+				@click="openCreateModal"
+			>
+				{{ $p.t('bookmark', 'newLink') }}
+			</button>
+			<button
+				v-if="selectedFilters.length"
+				class="btn btn-secondary btn-sm"
+				:title="$p.t('bookmark/editFilter')"
+				@click="openFilterModal"
+			>
+				<i class="fa-solid fa-filter-circle-xmark"></i>
+			</button>  
+			<button
+				v-else
+				class="btn btn-outline-secondary btn-sm"
+				:title="$p.t('bookmark/filterByTags')"
+				@click="openFilterModal"
+			>
+				<i class="fa-solid fa-filter"></i>
+			</button>
 		</div>
 
-            <template v-if="sharedFiltered">
+		<template v-if="sharedFiltered">
 
-                <template v-if="!emptyBookmarks">
-					<div v-for="link in sharedFiltered" :key="link.id" class="d-flex mt-2">
-						<a target="_blank" :href="link.url" class="me-1">
-							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
+			<template v-if="!emptyBookmarks">
+				<div
+					v-for="link in sharedFiltered"
+					:key="link.id"
+					class="d-flex mt-2"
+				>
+					<a target="_blank" :href="link.url" class="me-1">
+						<i
+							class="fa fa-solid fa-arrow-up-right-from-square me-1"
+							aria-hidden="true"
+						></i>
+						{{ link.title }}
+					</a>
+					<span
+						v-if="hasTags(link)"
+						:title="hasTags(link)"
+						style="color: silver;"
+					>
+						<i
+							class="fa fa-solid fa-tag text-gray-500"
+							aria-hidden="true"
+						></i>
+					</span>
+
+					<div class="ms-auto">
+						<!--EDIT BOOKMARK-->
+						<a
+							type="button"
+							href="#"
+							@click.prevent="openEditModal(link)"
+							aria-label="edit bookmark"
+							:title="$p.t('bookmark/editBookmark')"
+						>
+							<i class="fa fa-edit me-1" aria-hidden="true"></i>
 						</a>
-						<span
-							v-if="hasTags(link)"
-							 :title="hasTags(link)"
-							 style="color: silver;"
-							>
-								<i class="fa fa-solid fa-tag text-gray-500" aria-hidden="true"></i>
-							</span>
-
-						<div class="ms-auto">
-							<!--EDIT BOOKMARK-->
-							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" :title="this.$p.t('bookmark/editBookmark')">
-								<i class="fa fa-edit me-1" aria-hidden="true"></i>
-							</a>
-							<!--DELETE BOOKMARK-->
-							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" :title="this.$p.t('bookmark/deleteBookmark')" @click.prevent="removeLink(link.bookmark_id)">
-								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
-							</a>
-							<!--SORT BOOKMARKS-->
-							<a
-								v-if="sharedFiltered.length > 1"
-								type="button"
-								id="downsortBookmark"
-								href="#"
-								aria-label="sortdown bookmark"
-								:title="this.$p.t('bookmark/sortDownwards')"
-								@click.prevent="sortDown(link.bookmark_id)"
-								>
-								<i :class="[ 'fa', 'fa-arrow-down', 'me-1', link.sort === maxSort ? 'text-light pointer-events-none' : '' ]"></i>
-							</a>
-							<a
-								v-if="sharedFiltered.length > 1"
-								type="button"
-								id="upsortBookmark"
-								href="#"
-								aria-label="sortup bookmark"
-								:title="this.$p.t('bookmark/sortToTop')"
-								@click.prevent="sortUp(link.bookmark_id)"
-								>
-								<i :class="[ 'fa', 'fa-arrow-up', 'me-1', link.sort === minSort ? 'text-light pointer-events-none' : '' ]"></i>
-							</a>
-						</div>
+						<!--DELETE BOOKMARK-->
+						<a
+							type="button"
+							id="deleteBookmark"
+							href="#"
+							aria-label="delete bookmark"
+							:title="$p.t('bookmark/deleteBookmark')"
+							@click.prevent="removeLink(link.bookmark_id)"
+						>
+							<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
+						</a>
+						<!--SORT BOOKMARKS-->
+						<a
+							v-if="sharedFiltered.length > 1"
+							type="button"
+							id="downsortBookmark"
+							href="#"
+							aria-label="sortdown bookmark"
+							:title="$p.t('bookmark/sortDownwards')"
+							@click.prevent="sortDown(link.bookmark_id)"
+						>
+							<i
+								class="fa fa-arrow-down me-1"
+								:class="{ 'text-light pointer-events-none': link.sort === maxSort }"
+							></i>
+						</a>
+						<a
+							v-if="sharedFiltered.length > 1"
+							type="button"
+							id="upsortBookmark"
+							href="#"
+							aria-label="sortup bookmark"
+							:title="$p.t('bookmark/sortToTop')"
+							@click.prevent="sortUp(link.bookmark_id)"
+						>
+							<i
+								class="fa fa-arrow-up me-1"
+								:class="{ 'text-light pointer-events-none': link.sort === minSort }"
+							></i>
+						</a>
 					</div>
-                </template>
+				</div>
+			</template>
 
-                <div v-else class="d-flex mt-2">
-                    <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
-                </div>
+			<div v-else class="d-flex mt-2">
+				<span>{{ $p.t('bookmark', 'emptyBookmarks') }}</span>
+			</div>
 
 
-            <template v-else>
-                <p v-for="i in 4" class="placeholder-glow">
-                    <span class="placeholder" :class="{'col-9' : true}"></span>
-                </p>
-            </template>
-            
-         </template>
+			<template v-else>
+				<p v-for="i in 4" class="placeholder-glow">
+					<span class="placeholder col-9"></span>
+				</p>
+			</template>
+
+		</template>
 	</div>
 	<!--EDIT MODAL-->
 	<teleport to="body">
-		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
+		<bs-modal
+			ref="editModal"
+			@hide-bs-modal="bookmark_id=null; clearInputs();"
+		>
 			<template #title>
-				<h2>{{$p.t('bookmark','editLink')}}</h2>
+				<h2>{{ $p.t('bookmark', 'editLink') }}</h2>
 			</template>
 			<template #default>
 
-				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
+				<form-input
+					:label="$p.t('profil', 'Titel')"
+					:title="$p.t('profil','Titel')"
+					id="editTitle"
+					v-model="title_input"
+					name="title"
+					class="mb-2"
+				></form-input>
+				<form-input
+					label="Url"
+					title="Url"
+					id="editUrl"
+					v-model="url_input"
+					name="url"
+				></form-input>
 
 				<label class="mt-2">Tags</label>
 				<div class="mt-2">
@@ -485,24 +544,39 @@ export default {
 						dropdown
 						:suggestions="filteredArray"
 						@complete="search" 
-						/>
+					/>
 				</div>				
 			</template>
 			<template #footer>
-				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
+				<button @click="editBookmark" class="btn btn-primary">
+					{{ $p.t('bookmark', 'saveLink') }}
+				</button>
 			</template>
 		</bs-modal>
 	</teleport>
 	<!--CREATE MODAL-->
 	<teleport to="body">
-		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
+		<bs-modal ref="createModal" @hide-bs-modal="clearInputs();">
 			<template #title>
-				<h2>{{$p.t('bookmark','newLink')}}</h2>
+				<h2>{{ $p.t('bookmark', 'newLink') }}</h2>
 			</template>
 			<template #default>
 
-				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
+				<form-input
+					:label="$p.t('profil', 'Titel')"
+					:title="$p.t('profil', 'Titel')"
+					id="insertTitle"
+					v-model="title_input"
+					name="title"
+					class="mb-2"
+				></form-input>
+				<form-input
+					label="Url"
+					title="Url"
+					id="insertUrl"
+					v-model="url_input"
+					name="url"
+				></form-input>
 
 				<label class="mt-2">Tags</label>
 				<div class="mt-2">
@@ -517,40 +591,42 @@ export default {
 
 			</template>
 			<template #footer>
-				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
+				<button @click="insertBookmark" class="btn btn-primary">
+					{{ $p.t('bookmark', 'saveLink') }}
+				</button>
 			</template>
 		</bs-modal>
 	</teleport>
 	<!--FILTER MODAL-->
 	<teleport to="body">
-		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="filterModal">
+		<bs-modal ref="filterModal" @hide-bs-modal="clearInputs();">
 			<template #title>
-				<h2>{{$p.t('bookmark','headerFilterBookmark')}}</h2>
+				<h2>{{ $p.t('bookmark', 'headerFilterBookmark') }}</h2>
 			</template>
 			<template #default>
 
-			<div class="mt-2 row">
-				<div class="col-10">
-					<PvMultiSelect
-						v-model="selectedFilters"
-						id="tagFilterUrl"
-						:options="tagsArrayMS"
-						optionLabel="tag"
-						display="chip"
-						:placeholder="$p.t('bookmark','noFilter')"
-						:maxSelectedLabels="3"
-						class="p-inputtext-sm w-100 me-2"
+				<div class="mt-2 row">
+					<div class="col-10">
+						<PvMultiSelect
+							v-model="selectedFilters"
+							id="tagFilterUrl"
+							:options="tagsArrayMS"
+							optionLabel="tag"
+							display="chip"
+							:placeholder="$p.t('bookmark', 'noFilter')"
+							:maxSelectedLabels="3"
+							class="p-inputtext-sm w-100 me-2"
 						/>
-				</div>
-			</div>				
+					</div>
+				</div>				
 
 			</template>
 			<template #footer>
 				<button
 					class="btn btn-secondary"
 					@click="handleAddingTagFilter(widgetId)"
-					:title="$p.t('bookmark','filterByTags')"
-					>
+					:title="$p.t('bookmark', 'filterByTags')"
+				>
 					OK
 				</button>
 			</template>
