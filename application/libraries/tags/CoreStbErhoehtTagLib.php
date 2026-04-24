@@ -4,7 +4,7 @@
  *
  * @author ma0068
  */
-class CoreStudienbeitragErhoehtTagLib
+class CoreStbErhoehtTagLib
 {
 	protected $ci;
 

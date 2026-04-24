@@ -147,9 +147,7 @@ $config['stv_prestudent_tags'] = [
 	'prewh_auto' => ['readonly' => true],
 	'out_auto' => ['readonly' => false],
 	'zgv_auto' => ['readonly' => true],
-	'wiedereinstieg_auto' => ['readonly' => true],
+	'unterbrecher_auto' => ['readonly' => true],
 	'stbtr_erh_auto' => ['readonly' => true],
-	'beitr_befr_auto' => ['readonly' => true],
 	'jgv_auto' => ['readonly' => false],
-	'nachteilausgl_auto' => ['readonly' => true],
 ];
