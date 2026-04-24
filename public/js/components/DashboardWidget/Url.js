@@ -500,13 +500,12 @@ export default {
 				<span>{{ $p.t('bookmark', 'emptyBookmarks') }}</span>
 			</div>
 
+		</template>
 
-			<template v-else>
-				<p v-for="i in 4" class="placeholder-glow">
-					<span class="placeholder col-9"></span>
-				</p>
-			</template>
-
+		<template v-else>
+			<p v-for="i in 4" class="placeholder-glow">
+				<span class="placeholder col-9"></span>
+			</p>
 		</template>
 	</div>
 	<!--EDIT MODAL-->
