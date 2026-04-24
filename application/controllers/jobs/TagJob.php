@@ -8,8 +8,6 @@ class TagJob extends JOB_Controller
 {
 
 	const BATCHUSER = 'sftest';
-	const SEMESTER = 'SS2026'; //docker
-	//TODO semester
 
 	/**
 	 * API constructor
@@ -26,11 +24,8 @@ class TagJob extends JOB_Controller
 
 		// Load Models
 		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->load->model('person/Notiz_model', 'NotizModel');
+		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
-		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 
 		$this->loadPhrases([
 			'lehre'
@@ -43,7 +38,14 @@ class TagJob extends JOB_Controller
 
 		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
-		//print_r($automatedTags);
+
+		$result = $this->StudiensemesterModel->getLastOrAktSemester();
+		if (isError($result))
+			return error ('Error occurred during retrieving studiensemester');
+		if (empty($result->retval) || !isset($result->retval[0])) {
+			return error('No studiensemester found');
+		}
+		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
 
 		foreach($automatedTags as $autoTag)
 		{
@@ -63,7 +65,7 @@ class TagJob extends JOB_Controller
 
 			$obj = new $className();
 
-			$outputArray = $obj->getZuordnungIds(['studiensemester_kurzbz' => self::SEMESTER]);
+			$outputArray = $obj->getZuordnungIds(['studiensemester_kurzbz' => $studiensemester_kurzbz]);
 			$data = $outputArray->data;
 
 			$result = $this->taglib->updateAutomatedTags($kurz_bz, $data);

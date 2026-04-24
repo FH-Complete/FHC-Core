@@ -18,7 +18,6 @@ class TagLib
 {
 	const BATCHUSER = 'sftest';
 	const TYP_ZUORDNUNG = 'prestudent_id';
-	const SEMESTER = 'SS2026';
 
 	/**
 	 * Object initialization
@@ -31,15 +30,11 @@ class TagLib
 		$this->_ci->load->config('stv');
 
 		// Models
-		$this->_ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->_ci->load->model('crm/Prestudent_model', 'PrestudentModel');
-		$this->_ci->load->model('person/Person_model', 'PersonModel');
 		$this->_ci->load->model('person/Notiz_model', 'NotizModel');
 		$this->_ci->load->model('system/Notiztyp_model', 'NotiztypModel');
 		$this->_ci->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
 		$this->_ci->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
-		// Tag-Helper
-
+		$this->_ci->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
 		// Libraries
 		$this->_ci->load->library('PermissionLib');
@@ -316,6 +311,15 @@ class TagLib
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		//echo $this->NotiztypModel->db->last_query();
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+
+		$result = $this->_ci->StudiensemesterModel->getLastOrAktSemester();
+		if (isError($result))
+			return error ('Error occurred during retrieving studiensemester');
+		if (empty($result->retval) || !isset($result->retval[0])) {
+			return error('No studiensemester found');
+		}
+		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
+
 		print_r($automatedTags);
 
 		$return = [];
@@ -338,7 +342,7 @@ class TagLib
 			$obj = new $className();
 			$criteriaIsSet = $obj->isCriteriaSetFor([
 				'prestudent_id' => $prestudent_id,
-				'studiensemester_kurzbz' => self::SEMESTER
+				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			]);
 			//$return = $this->_ci->PrestudentstatusModel->db->last_query();
 			$kurz_bz = $autoTag->typ_kurzbz;
