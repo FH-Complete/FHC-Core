@@ -235,15 +235,6 @@ export default {
 			}
 			this.changeOrder(current.bookmark_id, next.bookmark_id);
 		},
-		addNewTag(){
-			if(this.newTag != null && this.newTag.length) {
-				this.tagsArrayMS.push({tag: this.newTag, code: this.newTag});
-				this.selectedTags.push({tag: this.newTag, code: this.newTag});
-				this.newTag = null;
-			}
-			else
-				this.$fhcAlert.alertError(this.$p.t("bookmark", "errorInputNecessary"));
-		},
 		changeOrder(bookmark_id_1, bookmark_id_2){
 			this.$api
 				.call(ApiBookmark.changeOrder(bookmark_id_1, bookmark_id_2))
