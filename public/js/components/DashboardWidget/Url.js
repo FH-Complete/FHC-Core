@@ -9,10 +9,6 @@ export default {
 	name: "WidgetsUrl",
 	mixins: [AbstractWidget],
 	inject: {
-		editModeIsActive: {
-			type: Boolean,
-			default: false
-		},
 		sectionName: {
 			type: String,
 			default: false
