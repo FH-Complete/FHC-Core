@@ -8,7 +8,7 @@ export default {
 	props: {
 		semesterInfo: String,
 	},
-	data: ( ) =>{
+	data() {
 		return {
 			gradeAverage: null,
 			gradeWeightedAverage: null,
