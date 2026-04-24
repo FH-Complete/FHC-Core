@@ -14,6 +14,7 @@ export default {
 		bezeichnung: String,
 		kuerzel: String,
 		semester: [String,Number],
+		semesterInfo: [String,Number],
 		lvs: Array,
 		sg_bezeichnung_eng: String
 	},
@@ -44,7 +45,7 @@ export default {
 					<mylv-semester-studiengang-lv v-bind="lv" class="text-center h-100"></mylv-semester-studiengang-lv>
 				</div>
 			</div>
-			<mylv-semester-studiengang-average-grade :lvs="lvs" />
+			<mylv-semester-studiengang-average-grade :semesterInfo="$props.semesterInfo" />
 		</div>
 	</div>`
 };
