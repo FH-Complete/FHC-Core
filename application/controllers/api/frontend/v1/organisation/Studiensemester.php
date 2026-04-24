@@ -26,7 +26,9 @@ class Studiensemester extends FHCAPI_Controller
 				'getAll' => self::PERM_LOGGED,
 				'getAktNext' => self::PERM_LOGGED,
 				'getStudienjahrByStudiensemester' => self::PERM_LOGGED,
-				'getAllStudiensemesterAndAktOrNext' => self::PERM_LOGGED
+				'getAllStudiensemesterAndAktOrNext' => self::PERM_LOGGED,
+				'getStudySemestersByOrganizationalUnitAndDates' => self::PERM_LOGGED,
+				'getStudySemestersByStudyPlanAndDates' => self::PERM_LOGGED,
 			)
 		);
 		// Load model StudiensemesterModel
@@ -165,5 +167,52 @@ class Studiensemester extends FHCAPI_Controller
 		$studiensemester = getData($result);
 		
 		$this->terminateWithSuccess(array($studiensemester, $aktuell));
+	}
+
+	public function getStudySemestersByOrganizationalUnitAndDates($organizationalUnitShortCode)
+	{
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$startDate = date('Y-m-d', strtotime($this->input->get('filter[startDate]')));
+		$endDate = date('Y-m-d', strtotime($this->input->get('filter[endDate]')));
+		if (!$startDate || !$endDate) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Start- oder Enddatum']), self::ERROR_TYPE_GENERAL);
+		}
+		
+		$studyPlansResponse = $this->StudienplanModel->getStudyPlansForOrganizationalUnitQueryResponse($organizationalUnitShortCode);
+		if (isError($studyPlansResponse)) $this->terminateWithError(getError($studyPlansResponse), self::ERROR_TYPE_DB);
+		if (!hasData($studyPlansResponse)) return $this->terminateWithSuccess(null);
+
+		$studyPlans = $this->getDataOrTerminateWithError($studyPlansResponse);
+		$studyPlansIds = array_map(function ($studyPlan) { return $studyPlan->studienplan_id; }, $studyPlans);
+		
+		$studySemestersResponse = $this->StudiensemesterModel->getStudySemestersByStudyPlansAndDatesQueryResponse($studyPlansIds, $startDate, $endDate);
+		if (isError($studySemestersResponse)) $this->terminateWithError(getError($studySemestersResponse), self::ERROR_TYPE_DB);
+		if (!hasData($studySemestersResponse)) return $this->terminateWithSuccess([]);
+
+		$studySemesters = $this->getDataOrTerminateWithError($studySemestersResponse);
+
+		return $this->terminateWithSuccess($studySemesters);
+	}
+
+	public function getStudySemestersByStudyPlanAndDates()
+	{
+		$studyPlansId = $this->input->get('filter[studyPlanId]');
+
+		$startDate = date('Y-m-d', strtotime($this->input->get('filter[startDate]')));
+		$endDate = date('Y-m-d', strtotime($this->input->get('filter[endDate]')));
+		if (!$startDate || !$endDate) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Start- oder Enddatum']), self::ERROR_TYPE_GENERAL);
+		}
+
+		$studySemestersResponse = $this->StudiensemesterModel->getStudySemestersByStudyPlansAndDatesQueryResponse([$studyPlansId], $startDate, $endDate);
+		if (isError($studySemestersResponse)) $this->terminateWithError(getError($studySemestersResponse), self::ERROR_TYPE_DB);
+		if (!hasData($studySemestersResponse)) return $this->terminateWithSuccess([]);
+
+		$studySemesters = $this->getDataOrTerminateWithError($studySemestersResponse);
+
+		return $this->terminateWithSuccess($studySemesters);
 	}
 }

@@ -38,34 +38,48 @@ export default {
     tabulatorOptions() {
       const options = {
         ajaxURL: "dummy",
-        ajaxRequestFunc: () =>
-          this.$api.call(ApiClassSchedule.getAllClassTimeValidityPeriods()),
-        ajaxResponse: (url, params, response) => response.data,
+        ajaxRequestFunc: async () =>
+          await this.getParsedClassTimeSlotValidityPeriodData(),
+        ajaxResponse: (url, params, response) => response,
         persistenceID: "core_class_schedule_validity_periods",
         selectableRows: true,
         columns: [
           {
-            title: "gueltig von",
-            field: "gueltig_von",
+            title: this.$p.t("ui", "zeitraum"),
+            formatter: (cell, formatterParams, onRendered) => {
+              const data = cell.getData();
+              const validFrom = new Date(data.gueltig_von).toLocaleDateString(
+                "de-AT",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                },
+              );
+              data.gueltig_von;
+              const validTo = new Date(data.gueltig_bis).toLocaleDateString(
+                "de-AT",
+                {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                },
+              );
+              return `${validFrom ? validFrom : "?"} - ${validTo ? validTo : "?"}`;
+            },
+          },
+          {
+            title: this.$p.t("global", "typ"),
+            field: "unterrichtszeiten_typ_bezeichnung_mehrsprachig",
             width: 150,
           },
-          { title: "gueltig bis", field: "gueltig_bis", width: 150 },
-          { title: "orgform kurzbz", field: "orgform_kurzbz", width: 150 },
           {
-            title: "ausbildungssemester",
+            title: this.$p.t("lehre", "sem"),
             field: "ausbildungssemester",
             width: 150,
           },
           {
-            title: "typ",
-            field: "unterrichtszeitentyp_kurzbz",
-          },
-          {
-            field: "unterrichtszeitengueltigkeit_id",
-            visible: false,
-          },
-          {
-            title: "Aktionen",
+            title: this.$p.t("global", "actions"),
             field: "actions",
             minWidth: 150,
             maxWidth: 150,
@@ -135,38 +149,102 @@ export default {
             frozen: true,
           },
         ],
+        groupBy: [
+          "organisationseinheit_bezeichnung_extended",
+          "studienplan_bezeichnung",
+        ],
+        groupHeader: [
+          function (value, count, data) {
+            let container = document.createElement("span");
+
+            container.className =
+              "d-flex align-items-center justify-content-between";
+            container.style.display = "inline-block";
+            container.style.width = "100%";
+
+            let label = document.createElement("span");
+            label.textContent =
+              value + " (" + count + " item" + (count > 1 ? "s" : "") + ")";
+            container.append(label);
+
+            let button = document.createElement("button");
+            button.className =
+              "btn btn-sm btn-outline-secondary fhc-btn-for-org-unit-grouping";
+            button.style.marginLeft = "10px";
+            button.innerHTML = '<i class="fa fa-eye"></i>';
+
+            button.dataset.organizationalUnitShortCode = data[0].oe_kurzbz;
+
+            container.append(button);
+            return container;
+          },
+          function (value, count, data) {
+            let container = document.createElement("span");
+
+            container.className =
+              "d-flex align-items-center justify-content-between";
+            container.style.display = "inline-block";
+            container.style.width = "100%";
+
+            let label = document.createElement("span");
+            label.textContent =
+              value + " (" + count + " item" + (count > 1 ? "s" : "") + ")";
+            container.append(label);
+
+            let button = document.createElement("button");
+            button.className =
+              "btn btn-sm btn-outline-secondary fhc-btn-for-org-unit-and-study-plan-grouping";
+            button.style.marginLeft = "10px";
+            button.innerHTML = '<i class="fa fa-eye"></i>';
+            button.title = 22;
+
+            button.dataset.organizationalUnitShortCode = data[0].oe_kurzbz;
+            button.dataset.studyPlanId = data[0].studienplan_id;
+
+            container.append(button);
+            return container;
+          },
+        ],
       };
       return options;
     },
     tabulatorEvents() {
       const events = [
         {
-          event: "tableBuilt",
+          event: "renderComplete",
           handler: async () => {
-            const setHeader = (field, text) => {
-              const col =
-                this.$refs.classTimeSlotValidityPeriodsTable.tabulator.getColumn(
-                  field,
-                );
-              if (!col) return;
+            document
+              .querySelectorAll(".fhc-btn-for-org-unit-grouping")
+              .forEach((button) => {
+                button.addEventListener("click", (e) => {
+                  let organizationalUnitShortCode =
+                    button.dataset.organizationalUnitShortCode;
 
-              const el = col.getElement();
-              if (!el || !el.querySelector) return;
+                  this.$router.push({
+                    name: "validityPeriodsOverviewByOrganizationUnit",
+                    params: {
+                      organizationalUnitShortCode,
+                    },
+                  });
+                });
+              });
 
-              const titleEl = el.querySelector(".tabulator-col-title");
-              if (titleEl) {
-                titleEl.textContent = text;
-              }
-            };
-
-            setHeader("nummer", this.$p.t("wawi", "nummer"));
-            setHeader("anmerkung", this.$p.t("global", "anmerkung"));
-            setHeader("retouram", this.$p.t("wawi", "retourdatum"));
-            setHeader("beschreibung", this.$p.t("global", "beschreibung"));
-            setHeader("kaution", this.$p.t("infocenter", "kaution"));
-            setHeader("ausgegebenam", this.$p.t("wawi", "ausgabedatum"));
-            setHeader("person_id", this.$p.t("person", "person_id"));
-            setHeader("uid", this.$p.t("person", "uid"));
+            document
+              .querySelectorAll(".fhc-btn-for-org-unit-and-study-plan-grouping")
+              .forEach((button) => {
+                button.addEventListener("click", (e) => {
+                  let organizationalUnitShortCode =
+                    button.dataset.organizationalUnitShortCode;
+                  let studyPlanId = button.dataset.studyPlanId;
+                  this.$router.push({
+                    name: "validityPeriodsOverviewByOrganizationUnitAndStudyPlan",
+                    params: {
+                      organizationalUnitShortCode,
+                      studyPlanId,
+                    },
+                  });
+                });
+              });
           },
         },
       ];
@@ -174,6 +252,41 @@ export default {
     },
   },
   methods: {
+    test() {
+      alert("test");
+    },
+    async getParsedClassTimeSlotValidityPeriodData() {
+      let getAllClassTimeValidityPeriodsResponse = await this.$api.call(
+        ApiClassSchedule.getAllClassTimeValidityPeriods(),
+      );
+
+      if (getAllClassTimeValidityPeriodsResponse.meta.status === "success") {
+        let generalWord = this.$p.t("ui", "general");
+        return getAllClassTimeValidityPeriodsResponse.data.map(
+          function (period) {
+            period.organisationseinheit_bezeichnung_extended =
+              period.organisationseinheit_bezeichnung +
+              " - " +
+              period.organisationseinheit_organisationseinheittyp_kurzbz;
+            if (!period.studienplan_bezeichnung) {
+              period.studienplan_bezeichnung = generalWord;
+            }
+            period.unterrichtszeiten_typ_bezeichnung_mehrsprachig =
+              period.unterrichtszeiten_typ_bezeichnung_mehrsprachig[0]?.split(
+                ":",
+              )[1];
+            return {
+              ...period,
+            };
+          },
+        );
+      } else {
+        console.error(
+          "Error fetching class time slot validity periods:",
+          getAllClassTimeValidityPeriodsResponse.meta.message,
+        );
+      }
+    },
     showClassTimeSlotValidityPeriodModal() {
       this.isClassTimeSlotValidityPeriodModalVisible = true;
     },
@@ -227,12 +340,12 @@ export default {
   },
   mounted() {
     this.$p
-      .loadCategory(["global", "lehre", "ui", "gruppenmanagement"])
+      .loadCategory(["global", "lehre", "ui", "gruppenmanagement", "core"])
       .then(() => {
         this.phrasesLoaded = true;
       });
   },
-  template: /* html */`
+  template: /* html */ `
   <div class="container mt-4">
     <h1 class='mb-5'>{{ $p.t("ui", "classScheduleOverviewHeading") }}</h1>
     <div class="row mb-3">
@@ -265,7 +378,7 @@ export default {
         table-only	 
         :side-menu="false"	 
         :tabulator-options="tabulatorOptions"
-        :tabulator-events="[{ event: 'cellEdited'}]"	 
+        :tabulator-events="tabulatorEvents"	 
         :new-btn-label="$p.t('ui', 'addClassTimeSlotValidityPeriodButton')"
         new-btn-show
         reload

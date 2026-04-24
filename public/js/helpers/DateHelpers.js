@@ -37,7 +37,7 @@ export function formatDate(d) {
 	// parameter is of type Date
 	if(d instanceof Date)
 	{
-		if (isNaN(date.valueOf())) {
+		if (isNaN(d.valueOf())) {
 			return 'N/A';
 		}
 		// if the date is an invalid string then creating a date from the string will fail and N/A is returned

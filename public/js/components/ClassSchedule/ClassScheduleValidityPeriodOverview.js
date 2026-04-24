@@ -248,6 +248,7 @@ export default {
         </div>
       </div>
       <h2>{{ classScheduleValidityPeriodStartDate }} - {{ classScheduleValidityPeriodEndDate }}</h2>
+      <p>{{ $p.t("lehre", "ausbildungssemester") }}: {{ classTimeSlotValidityPeriod?.ausbildungssemester }}</p>
       <p v-html="classTimeSlotValidityPeriod?.anmerkung"></p>
     </div>
     <div>

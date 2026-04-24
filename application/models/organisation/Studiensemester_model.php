@@ -347,4 +347,24 @@ class Studiensemester_model extends DB_Model
 		$result = $this->load($studiensemester_kurzbz);
 		return hasData($result);
 	}
+
+	public function getStudySemestersByStudyPlansAndDatesQueryResponse($studyPlanIds, $fromDate, $toDate)
+	{
+		$subQuery = "(
+			SELECT ARRAY_AGG(DISTINCT sp.semester)
+			FROM lehre.tbl_studienplan_semester sp
+			WHERE sp.studienplan_id IN  ?
+			AND sp.studiensemester_kurzbz = s.studiensemester_kurzbz
+		) AS semester_numbers";
+
+		$query = "SELECT DISTINCT s.*," . $subQuery . "
+		FROM public.tbl_studiensemester s
+		JOIN lehre.tbl_studienplan_semester sp ON sp.studiensemester_kurzbz = s.studiensemester_kurzbz
+		WHERE sp.studienplan_id IN ? AND (
+			(s.start >= ? AND s.ende <= ?) OR
+			(s.start <= ? AND s.ende >= ?)
+		)";
+
+		return $this->execQuery($query, array($studyPlanIds, $studyPlanIds, $fromDate, $toDate, $fromDate, $toDate));
+	}
 }

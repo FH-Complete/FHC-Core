@@ -1,6 +1,8 @@
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 import ApiStudienPlan from "../../../js/api/factory/studienplan.js";
+import ApiStudienSemester from "../../../js/api/factory/studiensemester.js";
 import ApiOrganizationalUnit from "../../../js/api/factory/organizationalUnit.js";
+import { formatDate } from "../../helpers/DateHelpers.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 import CoreForm from "../Form/Form.js";
@@ -66,6 +68,35 @@ export default {
           this.$fhcAlert.handleSystemError(error);
         });
     },
+    async "classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"(
+      newValue,
+    ) {
+      if (!newValue) {
+        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
+        return;
+      }
+
+      this.refetchFilterableOptions();
+    },
+    async "classTimeSlotValidityPeriodFormData.validityPeriodFrom"(newValue) {
+      if (!newValue) {
+        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
+        return;
+      }
+
+      this.refetchFilterableOptions();
+    },
+    async "classTimeSlotValidityPeriodFormData.validityPeriodTo"(newValue) {
+      if (!newValue) {
+        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
+        return;
+      }
+
+      this.refetchFilterableOptions();
+    },
+    async "classTimeSlotValidityPeriodFormData.studyPlanId"(newValue) {
+      this.refetchFilterableOptions();
+    },
   },
   data: () => {
     return {
@@ -73,6 +104,8 @@ export default {
       isEditInProgress: false,
       organizationalUnits: [],
       studyPlans: [],
+      studySemesters: [],
+      studySemestersByNumber: [],
       classTimeSlotTypes: [],
       classTimeSlotValidityPeriodFormData: {
         id: null,
@@ -86,7 +119,157 @@ export default {
       },
     };
   },
+  computed: {
+    isStudyPlanSelectDisabled() {
+      return (
+        !this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode ||
+        !this.classTimeSlotValidityPeriodFormData.validityPeriodFrom ||
+        !this.classTimeSlotValidityPeriodFormData.validityPeriodTo
+      );
+    },
+    formattedValidityPeriodFrom() {
+      if (!this.classTimeSlotValidityPeriodFormData.validityPeriodFrom)
+        return null;
+
+      return formatDate(
+        this.classTimeSlotValidityPeriodFormData.validityPeriodFrom,
+      );
+    },
+    formattedValidityPeriodTo() {
+      if (!this.classTimeSlotValidityPeriodFormData.validityPeriodTo)
+        return null;
+      return formatDate(
+        this.classTimeSlotValidityPeriodFormData.validityPeriodTo,
+      );
+    },
+  },
   methods: {
+    async refetchFilterableOptions() {
+      this.studyPlans = await this.getTargetedStudyPlans(
+        this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode,
+        this.formattedValidityPeriodFrom,
+        this.formattedValidityPeriodTo,
+      );
+
+      let studySemestersByDates =
+        await this.getStudySemestersByOrganizationalUnitAndDates(
+          this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode,
+          this.formattedValidityPeriodFrom,
+          this.formattedValidityPeriodTo,
+        );
+
+        let studySemesters = new Array(
+        ...new Set(
+          studySemestersByDates
+            .map((s) => s.semester_numbers)
+            .flat()
+            .sort((a, b) => a - b),
+        ),
+      );
+
+      this.studySemestersByNumber = studySemesters;
+      if (this.classTimeSlotValidityPeriodFormData.studyPlanId) {
+        let studySemestersByStudyProgramId =
+          await this.getStudySemestersByStudyPlanAndDates(
+            this.classTimeSlotValidityPeriodFormData.studyPlanId,
+            this.formattedValidityPeriodFrom,
+            this.formattedValidityPeriodTo,
+          );
+        studySemestersByStudyProgramId = new Array(
+          ...new Set(
+            studySemestersByStudyProgramId
+              .map((s) => s.semester_numbers)
+              .flat()
+              .sort((a, b) => a - b),
+          ),
+        );
+
+        studySemesters = studySemestersByStudyProgramId;
+      }
+
+      this.studySemestersByNumber = studySemesters;
+    },
+    async getTargetedStudyPlans(
+      organizationalUnitShortCode,
+      validityPeriodFrom,
+      validityPeriodTo,
+    ) {
+      if (
+        !organizationalUnitShortCode ||
+        !validityPeriodFrom ||
+        !validityPeriodTo
+      ) {
+        return [];
+      }
+
+      let getAllStudyPlansResponse = await this.$api.call(
+        ApiStudienPlan.getStudyPlansByOrganizationalUnitAndSemesterDates(
+          organizationalUnitShortCode,
+          validityPeriodFrom,
+          validityPeriodTo,
+        ),
+      );
+      if (getAllStudyPlansResponse.meta.status !== "success") {
+        console.error(
+          "Error fetching study plans:",
+          getAllStudyPlansResponse.meta.message,
+        );
+      }
+
+      return getAllStudyPlansResponse.data?.length
+        ? getAllStudyPlansResponse.data
+        : [];
+    },
+    async getStudySemestersByOrganizationalUnitAndDates(
+      organizationalUnitShortCode,
+      validityPeriodFrom,
+      validityPeriodTo,
+    ) {
+      if (
+        !organizationalUnitShortCode ||
+        !validityPeriodFrom ||
+        !validityPeriodTo
+      ) {
+        return [];
+      }
+
+      let getStudySemestersResponse = await this.$api.call(
+        ApiStudienSemester.getStudySemestersByOrganizationalUnitAndDates(
+          organizationalUnitShortCode,
+          validityPeriodFrom,
+          validityPeriodTo,
+        ),
+      );
+      if (getStudySemestersResponse.meta.status !== "success") {
+        console.error(
+          "Error fetching study semesters by organizational unit and dates:",
+          getStudySemestersResponse.meta.message,
+        );
+      }
+
+      return getStudySemestersResponse.data?.length
+        ? getStudySemestersResponse.data
+        : [];
+    },
+    async getStudySemestersByStudyPlanAndDates(studyProgramId, validityPeriodFrom, validityPeriodTo) {
+      if (!studyProgramId || !validityPeriodFrom || !validityPeriodTo) {
+        return [];
+      }
+
+      let getStudySemestersResponse = await this.$api.call(
+        ApiStudienSemester.getStudySemestersByStudyPlanAndDates(studyProgramId, validityPeriodFrom, validityPeriodTo),
+      );
+      if (getStudySemestersResponse.meta.status !== "success") {
+        console.error(
+          "Error fetching study semesters:",
+          getStudySemestersResponse.meta.message,
+        );
+      }
+
+      return getStudySemestersResponse.data?.length
+        ? getStudySemestersResponse.data
+        : [];
+    },
     createClassTimeSlotValidityPeriod() {
       return this.$refs.classTimeSlotValidityPeriodData
         .call(
@@ -153,7 +336,9 @@ export default {
       ApiOrganizationalUnit.getAllOrganizationalUnits(),
     );
     if (getAllOrganizationalUnitsResponse.meta.status === "success") {
-      this.organizationalUnits = getAllOrganizationalUnitsResponse.data;
+      this.organizationalUnits = getAllOrganizationalUnitsResponse.data.sort(
+        (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
+      );
     } else {
       console.error(
         "Error fetching organizational units:",
@@ -197,7 +382,7 @@ export default {
       );
     }
   },
-  template: `
+  template: /*html*/ `
   <bs-modal ref="classTimeSlotValidityPeriodModal" @hideBsModal="() => { $emit('hideBsModal'); resetClassTimeSlotValidityPeriodModal(); }" size="md">
     <template #title>
       <p v-if="!classTimeSlotValidityPeriodFormData.id" class="fw-bold mt-3">{{$p.t('ui', 'addClassTimeSlotValidityPeriodModalTitle')}}</p>
@@ -207,33 +392,82 @@ export default {
       <form-validation />
       <div class="row mb-3">
         <form-input
+          v-model="classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"
+          :label="$p.t('lehre/organisationseinheit') + ' *'"
           type="select"
           name="organizationalUnitShortCode"  
-          :label="$p.t('lehre/organisationseinheit') + ' *'"
-          v-model="classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"
           >
           <option
             v-for="organizationalUnit in organizationalUnits"
             :key="organizationalUnit.oe_kurzbz"
             :value="organizationalUnit.oe_kurzbz"
             >
-            {{organizationalUnit.bezeichnung}}
+            {{organizationalUnit.bezeichnung}} - {{ organizationalUnit.organisationseinheittyp_kurzbz }}
+          </option>
+        </form-input>
+      </div>
+      <div class="row mb-3">
+        <div class="col-12 mb-3">
+          <label>{{$p.t('ui', 'validityPeriod')}}</label>
+        </div>
+        <div class="col">
+          <form-input
+            v-model="classTimeSlotValidityPeriodFormData.validityPeriodFrom"
+            :label="$p.t('ui/von') + ' *'"
+						:teleport="true"
+						:enable-time-picker="false"
+            type="datePicker"
+            name="validityPeriodFrom"  
+            format="dd.MM.yyyy"
+            auto-apply
+            />
+        </div>
+        <div class="col">
+          <form-input
+            v-model="classTimeSlotValidityPeriodFormData.validityPeriodTo"
+            :label="$p.t('global/bis') + ' *'"
+            :teleport="true"
+						:enable-time-picker="false"
+            type="datePicker"
+            name="validityPeriodTo"  
+            format="dd.MM.yyyy"
+            auto-apply
+            />
+        </div>
+      </div>
+      <div class="row mb-3">
+        <form-input
+          v-model="classTimeSlotValidityPeriodFormData.studyPlanId"
+          :label="$p.t('lehre/studienplan')"
+          :disabled="isStudyPlanSelectDisabled"
+          type="select"
+          name="studyPlan"  
+          >
+          <option :value="null"> - </option>
+          <option
+            v-for="studyPlan in studyPlans"
+            :key="studyPlan.studienplan_id"
+            :value="studyPlan.studienplan_id"
+            >
+            {{studyPlan.bezeichnung}} - {{studyPlan.studienplan_id}}
           </option>
         </form-input>
       </div>
       <div class="row mb-3">
         <form-input
           type="select"
-          name="studyPlan"  
-          :label="$p.t('lehre/studienplan')"
-          v-model="classTimeSlotValidityPeriodFormData.studyPlanId"
+          id="ausbildungssemester"
+          name="semester"
+          :disabled="isStudyPlanSelectDisabled"
+          :label="$p.t('lehre', 'ausbildungssemester')+ '*'"
+          v-model="classTimeSlotValidityPeriodFormData.semester"
           >
           <option
-            v-for="studyPlan in studyPlans"
-            :key="studyPlan.studienplan_id"
-            :value="studyPlan.studienplan_id"
+            v-for="studySemester in studySemestersByNumber"
+            :key="studySemester"
+            :value="studySemester"
             >
-            {{studyPlan.orgform_kurzbz}} - {{studyPlan.sprache}} - {{studyPlan.semesterwochen}}
+            {{studySemester}}
           </option>
         </form-input>
       </div>
@@ -249,40 +483,8 @@ export default {
             :key="classTimeSlotType.unterrichtszeitentyp_kurzbz"
             :value="classTimeSlotType.unterrichtszeitentyp_kurzbz"
             >
-            {{classTimeSlotType.unterrichtszeitentyp_kurzbz}} - {{classTimeSlotType.bezeichnung_mehrsprachig[0].value}} / ({{classTimeSlotType.bezeichnung_mehrsprachig[1].value}})
+            {{classTimeSlotType.bezeichnung_mehrsprachig[0].value}} / ({{classTimeSlotType.bezeichnung_mehrsprachig[1].value}})
           </option>
-        </form-input>
-      </div>
-      <div class="row mb-3">
-        <div class="col-12 mb-3">
-          <label>{{$p.t('ui', 'validityPeriod')}}</label>
-        </div>
-        <div class="col">
-          <form-input
-            type="date"
-            name="validityPeriodFrom"  
-            :label="$p.t('ui/von') + ' *'"
-            v-model="classTimeSlotValidityPeriodFormData.validityPeriodFrom"
-            />
-        </div>
-        <div class="col">
-          <form-input
-            type="date"
-            name="validityPeriodTo"  
-            :label="$p.t('global/bis') + ' *'"
-            v-model="classTimeSlotValidityPeriodFormData.validityPeriodTo"
-            />
-        </div>
-      </div>
-      <div class="row mb-3">
-        <form-input
-          type="select"
-          id="ausbildungssemester"
-          name="semester"
-          :label="$p.t('lehre', 'ausbildungssemester')+ '*'"
-          v-model="classTimeSlotValidityPeriodFormData.semester"
-          >
-          <option v-for="sem in Array.from({length:8}).map((u,i) => i+1)" :key="sem" :value="sem">{{sem}}. Semester</option>
         </form-input>
       </div>
       <div class="row mb-3">

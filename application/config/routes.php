@@ -120,7 +120,7 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/prestudent/(:num)'] = 'a
 $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/frontend/v1/stv/Students/getPerson/$1/$2';
 
 
-$route['lehre/ClassSchedule/(:any)/(:any)'] = 'lehre/ClassSchedule/index';
+$route['lehre/ClassSchedule/.*'] = 'lehre/ClassSchedule/index';
 
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];

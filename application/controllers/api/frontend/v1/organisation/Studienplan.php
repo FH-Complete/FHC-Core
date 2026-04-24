@@ -21,6 +21,7 @@ class Studienplan extends FHCAPI_Controller
 		// TODO(chris): access!
 		parent::__construct([
 			'getAllStudyPlans' => self::PERM_LOGGED,
+			'getStudyPlansByOrganizationalUnitAndSemesterDates' => self::PERM_LOGGED,
 			'getBySemester' => self::PERM_LOGGED
 		]);
 	}
@@ -31,6 +32,26 @@ class Studienplan extends FHCAPI_Controller
 		$result = $this->StudienplanModel->load();
 		$studien_plan_result = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($studien_plan_result);
+	}
+
+	public function getStudyPlansByOrganizationalUnitAndSemesterDates($organizationalUnitShortCode)
+	{
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$startDate = date('Y-m-d', strtotime($this->input->get('filter[startDate]')));
+		$endDate = date('Y-m-d', strtotime($this->input->get('filter[endDate]')));
+		if (!$startDate || !$endDate) {
+			return $this->terminateWithError($this->p->t('ui', 'error_missingId', ['id'=> 'Start- oder Enddatum']), self::ERROR_TYPE_GENERAL);
+		}
+
+		$studyPlansResponse = $this->StudienplanModel->getStudyPlansForOrganizationalUnitAndDatesQueryResponse($organizationalUnitShortCode, $startDate, $endDate);
+		if (isError($studyPlansResponse)) $this->terminateWithError(getError($studyPlansResponse), self::ERROR_TYPE_DB);
+		if (!hasData($studyPlansResponse)) return $this->terminateWithSuccess(null);
+
+		return $this->terminateWithSuccess($this->getDataOrTerminateWithError($studyPlansResponse));
 	}
 
 	public function getBySemester()

@@ -1,12 +1,8 @@
 import draggable from "../../directives/draggable.js";
 import drop from "../../directives/drop.js";
-import FormInput from "../Form/Input.js";
 
 export default {
   name: "ClassScheduleCalendarSelector",
-  components: {
-    FormInput,
-  },
   directives: {
     draggable,
     drop,
@@ -30,91 +26,91 @@ export default {
   emits: ["overlaysChanged"],
   watch: {
     editedOverlays: {
-      handler(newVal) {
-        setTimeout(() => {
-          this.overlays = [];
+      async handler(newVal) {
+        await this.$nextTick();
 
-          this.$refs.calendarContainer
-            .querySelectorAll("div[id^='overlay-']")
-            .forEach((element) => {
-              element.remove();
-            });
-          newVal
-            .map((slot) => {
-              return {
-                ...slot,
-                startingTimeSlot: this.timeSlotsInDay.find((timeSlot) =>
-                  timeSlot.startsWith(slot.startTime.substr(0, 5)),
-                ),
-                endingTimeSlot: this.timeSlotsInDay.find((timeSlot) =>
-                  timeSlot.endsWith(slot.endTime.substr(0, 5)),
-                ),
-              };
-            })
-            .forEach((overlay) => {
-              let firstElementDataNumber =
-                (overlay.weekday - 1) * this.timeSlotsInDay.length +
-                this.timeSlotsInDay.indexOf(overlay.startingTimeSlot);
-              let lastElementDataNumber =
-                (overlay.weekday - 1) * this.timeSlotsInDay.length +
-                this.timeSlotsInDay.indexOf(overlay.endingTimeSlot);
-
-              let firstSelectedElement =
-                this.$refs.calendarSelectorContainer.querySelector(
-                  "div[data-number='" + firstElementDataNumber + "']",
-                );
-              let lastSelectedElement =
-                this.$refs.calendarSelectorContainer.querySelector(
-                  "div[data-number='" + lastElementDataNumber + "']",
-                );
-              if (!firstSelectedElement || !lastSelectedElement) {
-                this.$fhcAlert.alertError(
-                  this.$p.t("ui", "classTimeSlotLoadingErrorMessage"),
-                );
-                return;
-              }
-
-              firstSelectedElement.style.backgroundColor =
-                this.selectedTimeSlotLabelColor;
-              lastSelectedElement.style.backgroundColor =
-                this.selectedTimeSlotLabelColor;
-
-              this.currentFirstSelectedElementNumber = firstSelectedElement
-                ? parseInt(firstSelectedElement.getAttribute("data-number"))
-                : null;
-
-              this.currentLastSelectedElementNumber = lastSelectedElement
-                ? parseInt(lastSelectedElement.getAttribute("data-number"))
-                : null;
-
-              this.createOverlay();
-
-              this.$refs.calendarSelectorContainer
-                .querySelectorAll("div[class*='part-body']")
-                .forEach((child) => {
-                  child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-                });
-
-              this.currentFirstSelectedElementNumber = null;
-              this.currentLastSelectedElementNumber = null;
-            });
-
-          this.overlays = this.overlays.map((existingOverlay, index) => {
-            let existingOverlayInNewVal = newVal[index];
-
-            existingOverlay.databaseId = existingOverlayInNewVal.databaseId;
-            existingOverlay.type = existingOverlayInNewVal.type;
-            existingOverlay.hexColor =
-              this.classTimeSlotTypes.find(
-                (type) =>
-                  type.unterrichtszeitentyp_kurzbz ===
-                  existingOverlayInNewVal.type,
-              )?.hintergrundfarbe || null;
-            return {
-              ...existingOverlay,
-            };
+        this.overlays = [];
+        await this.$nextTick();
+        this.$refs.calendarContainer
+          .querySelectorAll("div[id^='overlay-']")
+          .forEach((element) => {
+            element.remove();
           });
-        }, 500);
+        newVal
+          .map((slot) => {
+            return {
+              ...slot,
+              startingTimeSlot: this.timeSlotsInDay.find((timeSlot) =>
+                timeSlot.startsWith(slot.startTime.substr(0, 5)),
+              ),
+              endingTimeSlot: this.timeSlotsInDay.find((timeSlot) =>
+                timeSlot.endsWith(slot.endTime.substr(0, 5)),
+              ),
+            };
+          })
+          .forEach((overlay) => {
+            let firstElementDataNumber =
+              (overlay.weekday - 1) * this.timeSlotsInDay.length +
+              this.timeSlotsInDay.indexOf(overlay.startingTimeSlot);
+            let lastElementDataNumber =
+              (overlay.weekday - 1) * this.timeSlotsInDay.length +
+              this.timeSlotsInDay.indexOf(overlay.endingTimeSlot);
+
+            let firstSelectedElement =
+              this.$refs.calendarSelectorContainer.querySelector(
+                "div[data-number='" + firstElementDataNumber + "']",
+              );
+            let lastSelectedElement =
+              this.$refs.calendarSelectorContainer.querySelector(
+                "div[data-number='" + lastElementDataNumber + "']",
+              );
+            if (!firstSelectedElement || !lastSelectedElement) {
+              this.$fhcAlert.alertError(
+                this.$p.t("ui", "classTimeSlotLoadingErrorMessage"),
+              );
+              return;
+            }
+
+            firstSelectedElement.style.backgroundColor =
+              this.selectedTimeSlotLabelColor;
+            lastSelectedElement.style.backgroundColor =
+              this.selectedTimeSlotLabelColor;
+
+            this.currentFirstSelectedElementNumber = firstSelectedElement
+              ? parseInt(firstSelectedElement.getAttribute("data-number"))
+              : null;
+
+            this.currentLastSelectedElementNumber = lastSelectedElement
+              ? parseInt(lastSelectedElement.getAttribute("data-number"))
+              : null;
+
+            this.createOverlay();
+
+            this.$refs.calendarSelectorContainer
+              .querySelectorAll("div[class*='part-body']")
+              .forEach((child) => {
+                child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+              });
+
+            this.currentFirstSelectedElementNumber = null;
+            this.currentLastSelectedElementNumber = null;
+          });
+
+        this.overlays = this.overlays.map((existingOverlay, index) => {
+          let existingOverlayInNewVal = newVal[index];
+
+          existingOverlay.databaseId = existingOverlayInNewVal.databaseId;
+          existingOverlay.type = existingOverlayInNewVal.type;
+          existingOverlay.hexColor =
+            this.classTimeSlotTypes.find(
+              (type) =>
+                type.unterrichtszeitentyp_kurzbz ===
+                existingOverlayInNewVal.type,
+            )?.hintergrundfarbe || null;
+          return {
+            ...existingOverlay,
+          };
+        });
       },
       deep: true,
       immediate: true,
@@ -129,13 +125,13 @@ export default {
   data() {
     return {
       daysInWeek: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
+        this.$p.t("ui", "monday"),
+        this.$p.t("ui", "tuesday"),
+        this.$p.t("ui", "wednesday"),
+        this.$p.t("ui", "thursday"),
+        this.$p.t("ui", "friday"),
+        this.$p.t("ui", "saturday"),
+        this.$p.t("ui", "sunday"),
       ],
       timeSlotsInDay: [
         "08:00-08:45",
@@ -173,6 +169,8 @@ export default {
         x: null,
         y: null,
       },
+      currentlyEditedOverlayId: null,
+      visiblePopover: null,
     };
   },
   computed: {
@@ -209,15 +207,9 @@ export default {
     createOverlay() {
       let overlayElement;
 
-      if (!this.$props.isPreviewMode) {
-        overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-          "#overlays-container",
-        ).children[0];
-      } else {
-        overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-          "#overlays-container-preview",
-        ).children[0];
-      }
+      overlayElement = this.$refs.calendarSelectorContainer.querySelector(
+        "#overlays-container",
+      ).children[0];
 
       let firstSelectedChild =
         this.$refs.calendarSelectorContainer.querySelector(
@@ -709,11 +701,15 @@ export default {
       let dropzoneItem = event.target;
       if (!dropzoneItem) return;
 
-      
       if (!dropzoneItem.getAttribute("data-time")) {
-        let dropzoneOverlay = this.overlays.find((overlay) => overlay.id === dropzoneItem.id);
+        let dropzoneOverlay = this.overlays.find(
+          (overlay) => overlay.id === dropzoneItem.id,
+        );
         if (!dropzoneOverlay) {
-          console.error("Could not find overlay for dropzone item with id " + dropzoneItem.id);
+          console.error(
+            "Could not find overlay for dropzone item with id " +
+              dropzoneItem.id,
+          );
           return;
         }
 
@@ -726,7 +722,7 @@ export default {
 
         let startElementNumber = dropzoneOverlay.startingTimeSlotElementNumber;
         let startElement = this.$refs.calendarSelectorContainer.querySelector(
-          `[data-number='${startElementNumber}']`
+          `[data-number='${startElementNumber}']`,
         );
 
         // get mouse position
@@ -742,9 +738,10 @@ export default {
         // add delta Y to top of the start element to get new top for the dropzone item
         const newTop = startElementTop + deltaY;
         //find which item has the closest top to the new top and get its data-number attribute
-        const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-          "div[data-weekday='" + dropzoneOverlay.weekday + "']",
-        );
+        const partBodies =
+          this.$refs.calendarSelectorContainer.querySelectorAll(
+            "div[data-weekday='" + dropzoneOverlay.weekday + "']",
+          );
 
         // see which item has the new top in between its top and bottom and get its data-number attribute
         let closestPartBody = null;
@@ -756,7 +753,7 @@ export default {
         });
         if (!closestPartBody) return;
 
-        dropzoneItem  = closestPartBody;
+        dropzoneItem = closestPartBody;
       }
 
       let newStartTimeSlot =
@@ -1351,6 +1348,101 @@ export default {
         overlay.endingTimeSlotElementNumber
       );
     },
+    getOverlayClassScheduleTypeTitle(overlayId) {
+      let overlay = this.overlays.find((overlay) => overlay.id === overlayId);
+      if (!overlay) return "";
+
+      let typeDescriptions =
+        this.classTimeSlotTypes.find(
+          (type) => type.unterrichtszeitentyp_kurzbz === overlay.type,
+        )?.bezeichnung_mehrsprachig || "";
+      if (!typeDescriptions) return "";
+
+      return typeDescriptions[0].value || "";
+    },
+    handleChangeClassTimeSlotTypeForOverlay(newType) {
+      let classTimeSlotType = this.classTimeSlotTypes.find(
+        (type) => type.unterrichtszeitentyp_kurzbz === newType,
+      );
+      if (!classTimeSlotType) {
+        console.error(
+          "Could not find class time slot type for newType: " + newType,
+        );
+        return;
+      }
+
+      this.overlays = this.overlays.map((overlay) => {
+        if (overlay.id === this.currentlyEditedOverlayId) {
+          return {
+            ...overlay,
+            type: classTimeSlotType.unterrichtszeitentyp_kurzbz,
+            hexColor: classTimeSlotType.hintergrundfarbe,
+          };
+        }
+        return overlay;
+      });
+
+      this.currentlyEditedOverlayId = null;
+    },
+    showOverlayClassTimeTypePopover(overlayId) {
+      let overlayElement = this.$refs.calendarSelectorContainer.querySelector(
+        `#${overlayId}`,
+      );
+      if (!overlayElement) return;
+
+      if (this.visiblePopover) {
+        this.visiblePopover.dispose();
+        this.visiblePopover = null;
+        return;
+      }
+      this.visiblePopover = new bootstrap.Popover(overlayElement, {
+        title: this.$p.t("ui", "classTimeSlotType"),
+        html: true,
+        content: this.$refs.classScheduleTypeSelectorContainer.innerHTML,
+        placement: "left",
+      });
+      this.visiblePopover.show();
+      setTimeout(() => {
+        document
+          .querySelectorAll(".class-schedule-type-selector-option")
+          .forEach((option) => {
+            option.addEventListener("click", (event) => {
+              let selectedTypeDescription = event.currentTarget.innerText;
+
+              let selectedType = this.classTimeSlotTypes.find((type) =>
+                type.bezeichnung_mehrsprachig.some(
+                  (desc) => desc.value === selectedTypeDescription,
+                ),
+              );
+              if (!selectedType) {
+                console.error(
+                  "Could not find class time slot type for selected description: " +
+                    selectedTypeDescription,
+                );
+                return;
+              }
+
+              this.overlays = this.overlays.map((overlay) => {
+                if (overlay.id === overlayId) {
+                  return {
+                    ...overlay,
+                    type: selectedType.unterrichtszeitentyp_kurzbz,
+                    hexColor: selectedType.hintergrundfarbe,
+                  };
+                }
+                return overlay;
+              });
+
+              this.visiblePopover.dispose();
+              this.visiblePopover = null;
+            });
+          });
+      }, 10);
+    },
+  },
+  unmounted() {
+    this.visiblePopover?.dispose();
+    this.visiblePopover = null;
   },
   template: /*html*/ `
   <div ref="calendarSelectorContainer" >
@@ -1601,21 +1693,34 @@ export default {
         </div>
       </div>
     </div>
-    <div v-if="!isPreviewMode" id="overlays-container" class='d-none'>
+    <div id="overlays-container" class='d-none'>
       <div 
         v-for="(index) in 50"
         v-draggable:copyLink.noimage="selectedDragObject" 
         @mousedown='overlaySelectionChanged($event, "overlay-item-" + index)'
         @mouseover="handleMouseOverOnOverlay('overlay-item-' + index)"
         :id="'overlay-item-' + index"
+        :class="{
+          'fhc-drag-handle': !$props.isPreviewMode,
+        }"
         :style="{ backgroundColor: this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)?.hexColor || this.defaultOverlayColor }"
-        class="d-none fhc-pointer-events-all flex-column justify-content-between align-items-center shadow rounded-1 fhc-drag-handle"
-        draggable='true'
+        :title="getOverlayClassScheduleTypeTitle('overlay-item-' + index)"
+        class="d-none fhc-pointer-events-all flex-column justify-content-between align-items-center shadow rounded-1"
+        :draggable='!$props.isPreviewMode ? "true" : "false"'
       >
       <div 
         class="d-flex flex-column justify-content-center align-items-center gap-1 p-2 overflow-scroll"
         >
         <a 
+          v-if="!$props.isPreviewMode"
+          @mousedown.stop="showOverlayClassTimeTypePopover('overlay-item-' + index)"
+          :title="$p.t('ui', 'bearbeiten')"
+          class="position-absolute top-0 start-0 p-1 d-flex gap-1 fhc-cursor-pointer"
+          >
+          <i class="fa fa-edit text-primary fs-6"></i>
+        </a>
+        <a
+          v-if="!$props.isPreviewMode"
           @mousedown.stop="deleteOverlay('overlay-item-' + index)"
           :title="$p.t('global', 'loeschen')"
           class="position-absolute top-0 end-0 p-1 d-flex gap-1 fhc-cursor-pointer"
@@ -1623,43 +1728,20 @@ export default {
           <i class="fa fa-trash text-danger fs-6"></i>
         </a>
         <p 
-          v-if="!isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index))"
           :style="'color: ' + this.overlayTextColor"
           class="bg-transparent rounded-1 py-0 m-0 "
           >
           {{ getOverlayTimeSlotSpan("overlay-item-" + index) }}
         </p>
-        <div v-if="this.overlays.length">
-          <form-input
-            :modelValue="this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)?.type"
-            @mousedown.stop
-            
-            @change="(event) => {
-              let overlay = this.overlays.find(overlay => overlay.id === 'overlay-item-' + index);
-              if (!overlay) return;
-
-              overlay.type = event.target.value;
-              overlay.hexColor = this.classTimeSlotTypes.find(type => type.unterrichtszeitentyp_kurzbz === event.target.value)?.hintergrundfarbe;
-            }"
-            :class="{
-              'w-75': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
-            }"
-            type="select"
-            name="classTimeSlotType"
-            class="p-0 m-0 fs-6" 
-            >
-            <option
-               v-for="type in $props.classTimeSlotTypes"
-              :key="type.unterrichtszeitentyp_kurzbz"
-              :value="type.unterrichtszeitentyp_kurzbz"
-              selected
-              >
-            {{type.unterrichtszeitentyp_kurzbz}} 
-            </option>
-          </form-input>
-				</div>
+        <span
+          v-if="!isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index))" 
+          class="badge badge-pill bg-light text-dark"
+        >
+            {{ this.getOverlayClassScheduleTypeTitle('overlay-item-' + index) }}
+        </span>
       </div>
-      <span 
+      <span
+        v-if="!$props.isPreviewMode"
         @mousedown.stop="handleMouseDownOnResizer($event, 'overlay-item-resizer-' + index, 'overlay-item-' + index)"
         :id="'overlay-item-resizer-' + index"
         :class="{
@@ -1671,34 +1753,17 @@ export default {
       </span>
     </div>
   </div>
-  <div v-if="isPreviewMode" id="overlays-container-preview" class='d-none'>
-      <div 
-        v-for="(index) in 50"
-        :id="'overlay-item-preview-' + index"
-        :style="{ backgroundColor: this.overlays.find(overlay => overlay.id === 'overlay-item-preview-' + index)?.hexColor || this.defaultOverlayColor }"
-        :class="isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-preview-' + index)) ? 'justify-content-center' : 'justify-content-between'"
-        class="d-flex flex-column align-items-center shadow rounded-1 "
+  <div ref="classScheduleTypeSelectorContainer" class="d-none">
+    <div class='d-flex flex-column gap-2'>
+      <span v-for="(type, index) in classTimeSlotTypes"
+        :key="index"
+        :data-type="type.unterrichtszeitentyp_kurzbz"
+        class="btn btn-sm btn-outline-dark class-schedule-type-selector-option"
       >
-      <div
-        :class="{
-          'p-2': !isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-preview-' + index)),
-        }"
-        class="d-flex flex-column justify-content-center align-items-center gap-0"
-      >
-        <span
-          v-if="this.$props.isPreviewMode" 
-          class="badge badge-pill bg-light text-dark"
-        >
-            {{ this.overlays.find(overlay => overlay.id === 'overlay-item-preview-' + index)?.type }}
-        </span>
-        <p
-          v-if="!isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-preview-' + index))" 
-          :style="'color: ' + this.overlayTextColor"
-          class="bg-transparent rounded-1 py-0 m-0 "
-          >{{ getOverlayTimeSlotSpan("overlay-item-preview-" + index) }}</p>
-      </div>
+        {{ type.bezeichnung_mehrsprachig[0].value }}
+      </span>
     </div>
   </div>
-  </div>
+</div>
   `,
 };

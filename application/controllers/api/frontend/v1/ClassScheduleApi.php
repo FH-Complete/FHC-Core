@@ -27,6 +27,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getAllClassTimeValidityPeriods'=> array('lehre/unterrichtszeiten_gk:r'),
+			'getAllClassTimeValidityPeriodsPerOrganizationalUnit' => array('lehre/unterrichtszeiten_gk:r'),
 			'getClassTimeValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
 			'createClassTimeSlotValidityPeriod' => array('lehre/unterrichtszeiten_gk:rw'),
 			'updateClassTimeSlotValidityPeriod' => array('lehre/unterrichtszeiten_gk:rw'),
@@ -60,10 +61,36 @@ class ClassScheduleApi extends FHCAPI_Controller
 
 	public function getAllClassTimeValidityPeriods()
 	{
+		$this->ClassTimeSlotValidityPeriodModel->addSelect(
+			'lehre.tbl_unterrichtszeiten_gueltigkeit.*,' .
+			'public.tbl_organisationseinheit.bezeichnung as organisationseinheit_bezeichnung,' .
+			'public.tbl_organisationseinheit.organisationseinheittyp_kurzbz as  organisationseinheit_organisationseinheittyp_kurzbz,' .
+			'lehre.tbl_studienplan.bezeichnung as studienplan_bezeichnung,' . 
+			'lehre.tbl_unterrichtszeiten_typ.bezeichnung_mehrsprachig as unterrichtszeiten_typ_bezeichnung_mehrsprachig, '
+		);
 		$this->ClassTimeSlotValidityPeriodModel->addJoin('lehre.tbl_studienplan', 'lehre.tbl_studienplan.studienplan_id=lehre.tbl_unterrichtszeiten_gueltigkeit.studienplan_id', 'LEFT');
 		$this->ClassTimeSlotValidityPeriodModel->addJoin('public.tbl_organisationseinheit', 'public.tbl_organisationseinheit.oe_kurzbz=lehre.tbl_unterrichtszeiten_gueltigkeit.oe_kurzbz', 'LEFT');
+		$this->ClassTimeSlotValidityPeriodModel->addJoin('lehre.tbl_unterrichtszeiten_typ', 'lehre.tbl_unterrichtszeiten_typ.unterrichtszeitentyp_kurzbz=lehre.tbl_unterrichtszeiten_gueltigkeit.unterrichtszeitentyp_kurzbz', 'LEFT');
 		$this->ClassTimeSlotValidityPeriodModel->addOrder('gueltig_von', 'DESC');
 		$class_time_slot_validity_period_res = $this->ClassTimeSlotValidityPeriodModel->load();
+		$class_time_slot_validity_period_res = $this->getDataOrTerminateWithError($class_time_slot_validity_period_res);
+		$this->terminateWithSuccess($class_time_slot_validity_period_res);
+	}
+
+	public function getAllClassTimeValidityPeriodsPerOrganizationalUnit($organizationUnitId)
+	{
+		$this->ClassTimeSlotValidityPeriodModel->addSelect(
+			'lehre.tbl_unterrichtszeiten_gueltigkeit.*,' .
+			'public.tbl_organisationseinheit.bezeichnung as organisationseinheit_bezeichnung,' .
+			'public.tbl_organisationseinheit.organisationseinheittyp_kurzbz as  organisationseinheit_organisationseinheittyp_kurzbz,' .
+			'lehre.tbl_studienplan.bezeichnung as studienplan_bezeichnung,' . 
+			'lehre.tbl_unterrichtszeiten_typ.bezeichnung_mehrsprachig as unterrichtszeiten_typ_bezeichnung_mehrsprachig, '
+		);
+		$this->ClassTimeSlotValidityPeriodModel->addJoin('lehre.tbl_studienplan', 'lehre.tbl_studienplan.studienplan_id=lehre.tbl_unterrichtszeiten_gueltigkeit.studienplan_id', 'LEFT');
+		$this->ClassTimeSlotValidityPeriodModel->addJoin('public.tbl_organisationseinheit', 'public.tbl_organisationseinheit.oe_kurzbz=lehre.tbl_unterrichtszeiten_gueltigkeit.oe_kurzbz', 'LEFT');
+		$this->ClassTimeSlotValidityPeriodModel->addJoin('lehre.tbl_unterrichtszeiten_typ', 'lehre.tbl_unterrichtszeiten_typ.unterrichtszeitentyp_kurzbz=lehre.tbl_unterrichtszeiten_gueltigkeit.unterrichtszeitentyp_kurzbz', 'LEFT');
+		$this->ClassTimeSlotValidityPeriodModel->addOrder('gueltig_von', 'DESC');
+		$class_time_slot_validity_period_res = $this->ClassTimeSlotValidityPeriodModel->loadWhere(['lehre.tbl_unterrichtszeiten_gueltigkeit.oe_kurzbz' => $organizationUnitId]);
 		$class_time_slot_validity_period_res = $this->getDataOrTerminateWithError($class_time_slot_validity_period_res);
 		$this->terminateWithSuccess($class_time_slot_validity_period_res);
 	}

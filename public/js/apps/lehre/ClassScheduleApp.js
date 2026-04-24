@@ -17,6 +17,7 @@
 
 import ClassScheduleOverview from "../../components/ClassSchedule/ClassScheduleOverview.js";
 import ClassScheduleValidityPeriodOverview from "../../components/ClassSchedule/ClassScheduleValidityPeriodOverview.js";
+import ClassScheduleOrgUnitGroupedValidityPeriodsOverview from "../../components/ClassSchedule/ClassScheduleOrgUnitGroupedValidityPeriodsOverview.js";
 
 import FhcAlert from "../../plugins/FhcAlert.js";
 import Phrasen from "../../plugins/Phrasen.js";
@@ -35,6 +36,18 @@ const router = VueRouter.createRouter({
       component: ClassScheduleOverview,
     },
     {
+      name: "validityPeriodsOverviewByOrganizationUnit",
+      path: `/${ciPath}/lehre/ClassSchedule/validityPeriods/groupedOverviewByOrganizationUnit/:organizationalUnitShortCode`,
+      component: ClassScheduleOrgUnitGroupedValidityPeriodsOverview,
+      params: true,
+    },
+     {
+      name: "validityPeriodsOverviewByOrganizationUnitAndStudyPlan",
+      path: `/${ciPath}/lehre/ClassSchedule/validityPeriods/groupedOverviewByOrganizationUnit/:organizationalUnitShortCode/studyPlan/:studyPlanId`,
+      component: ClassScheduleOrgUnitGroupedValidityPeriodsOverview,
+      params: true,
+    },
+    {
       name: "validityPeriodOverview",
       path: `/${ciPath}/lehre/ClassSchedule/validityPeriods/:classTimeSlotValidityPeriodId`,
       component: ClassScheduleValidityPeriodOverview,
@@ -47,6 +60,7 @@ const app = Vue.createApp({
   components: {
     ClassScheduleOverview,
     ClassScheduleValidityPeriodOverview,
+    ClassScheduleOrgUnitGroupedValidityPeriodsOverview,
   },
 });
 

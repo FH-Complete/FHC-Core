@@ -11,7 +11,7 @@
 }
 
 .fhc-resize-vertical {
-  cursor: ns-resize;  
+  cursor: ns-resize;
 }
 
 .fhc-drag-handle:hover {
@@ -21,4 +21,24 @@
 
 .fhc-w-fit {
   width: fit-content;
+}
+
+.tabulator-group-level-0 {
+  background-color: #c6c6c6 !important;
+  display: flex;
+  align-items: center;
+}
+
+.tabulator-group-level-1 {
+  background-color: #f5f5f5 !important;
+  display: flex;
+  align-items: center;
+}
+
+.tabulator-cell {
+  background-color: transparent !important;
+}
+
+div[role="row"] {
+  background-color: white;
 }

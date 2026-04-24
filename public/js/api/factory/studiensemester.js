@@ -29,5 +29,17 @@ export default {
 			url: 'api/frontend/v1/organisation/studiensemester/getAll',
 			params: { order, start }
 		};
-	}
+	},
+	getStudySemestersByOrganizationalUnitAndDates(organizationalUnitShortCode, startDate, endDate) {
+		return {
+		method: "get",
+		url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByOrganizationalUnitAndDates/${organizationalUnitShortCode}?filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
+		};
+	},
+	getStudySemestersByStudyPlanAndDates(studyPlanId, startDate, endDate) {
+		return {
+		method: "get",
+		url: `api/frontend/v1/organisation/studiensemester/getStudySemestersByStudyPlanAndDates?filter[studyPlanId]=${studyPlanId}&filter[startDate]=${startDate}&filter[endDate]=${endDate}`,
+		};
+	},
 };

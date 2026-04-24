@@ -57279,7 +57279,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'montag',
+		'phrase' => 'monday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57299,7 +57299,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'dienstag',
+		'phrase' => 'tuesday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57319,7 +57319,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'mittwoch',
+		'phrase' => 'wednesday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57339,7 +57339,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'donnerstag',
+		'phrase' => 'thursday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57359,7 +57359,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'freitag',
+		'phrase' => 'friday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57379,7 +57379,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'samstag',
+		'phrase' => 'saturday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -57399,7 +57399,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
-		'phrase' => 'sonntag',
+		'phrase' => 'sunday',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -58336,7 +58336,86 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
-	// ### Phrases Dashboard Admin END
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'general',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'allgemein',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'general',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'classScheduleOrgUnitGroupedValidityPeriodsOverviewTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übersicht Unterrichtszeit Gültigkeitszeiträume nach Organisationseinheit gruppiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overview of class schedule validity periods grouped by organizational unit',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'classScheduleStudyPlanGroupedValidityPeriodsOverviewTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übersicht Unterrichtszeit Gültigkeitszeiträume nach Studienplan gruppiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Overview of class schedule validity periods grouped by study plan',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'selectClassTimeSlotTypeTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Übersicht Unterrichtszeit Gültigkeitszeiträume nach Studienplan gruppiert',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Select class time slot type',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

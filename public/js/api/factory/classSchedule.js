@@ -22,6 +22,12 @@ export default {
       url: "/api/frontend/v1/ClassScheduleApi/getAllClassTimeValidityPeriods",
     };
   },
+  getAllClassTimeValidityPeriodsPerOrganizationalUnit(organizationUnitId) {
+    return {
+      method: "get",
+      url: `/api/frontend/v1/ClassScheduleApi/getAllClassTimeValidityPeriodsPerOrganizationalUnit/${organizationUnitId}`,
+    };
+  },
   getClassTimeValidityPeriod(classTimeSlotValidityPeriodId) {
     return {
       method: "get",

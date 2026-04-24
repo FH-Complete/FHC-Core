@@ -21,6 +21,7 @@ export default {
       required: true,
     },
   },
+  emits: ["hideBsModal", "classTimeSlotTypeCreated", "classTimeSlotTypeUpdated"],
   watch: {
     isVisible(newValue) {
       if (newValue) {

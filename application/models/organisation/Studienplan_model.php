@@ -168,5 +168,30 @@ class Studienplan_model extends DB_Model
 		return $this->loadWhere([
 			'person_id' => $person_id
 		]);
+	} 
+
+	public function getStudyPlansForOrganizationalUnitQueryResponse($organizationalUnitShortCode)
+	{
+		$query = "SELECT sp.* FROM lehre.tbl_studienplan sp
+			JOIN lehre.tbl_studienordnung so ON sp.studienordnung_id = so.studienordnung_id
+			JOIN public.tbl_studiengang sg ON so.studiengang_kz = sg.studiengang_kz
+			WHERE sg.oe_kurzbz = ?";
+
+		return $this->execReadOnlyQuery($query, array($organizationalUnitShortCode));
+	}
+
+	public function getStudyPlansForOrganizationalUnitAndDatesQueryResponse($organizationalUnitShortCode, $startDate, $endDate)
+	{
+		$query = "SELECT DISTINCT sp.* FROM lehre.tbl_studienplan sp
+			JOIN lehre.tbl_studienordnung so ON sp.studienordnung_id = so.studienordnung_id
+			JOIN public.tbl_studiengang sg ON so.studiengang_kz = sg.studiengang_kz
+			AND sg.oe_kurzbz = ? AND sp.studienplan_id IN (
+				SELECT sps.studienplan_id
+				FROM lehre.tbl_studienplan_semester sps
+				JOIN public.tbl_studiensemester ss ON ss.studiensemester_kurzbz = sps.studiensemester_kurzbz
+				WHERE (ss.start >= ? AND ss.ende <= ?) OR (ss.start <= ? AND ss.ende >= ?)
+			)";
+
+		return $this->execReadOnlyQuery($query, array($organizationalUnitShortCode, $startDate, $endDate, $startDate, $endDate));
 	}
 }
