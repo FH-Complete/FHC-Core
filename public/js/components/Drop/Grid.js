@@ -258,7 +258,7 @@ export default {
 			if (this.mode != MODE_IDLE)
 				this.dragCancel();
 
-			const updated = this.createNewGrid(this.indexedItems);
+			let updated = this.createNewGrid(this.indexedItems);
 
 			this.correctedPositionUpdates = updated;
 			if (updated.length)
