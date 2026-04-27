@@ -18,6 +18,12 @@ const app = Vue.createApp({
 		};
 	}
 });
+app.use(primevue.config.default, {
+	zIndex: {
+		overlay: 9000,
+		tooltip: 8000
+	}
+})
 app.use(PluginsPhrasen);
 app.directive('tooltip', primevue.tooltip);
 app.mount('#main');
