@@ -3,6 +3,7 @@
 export function idTagFormatter (id, tagData, tagComponent, typeId)
 {
 	if (!id) return;
+	console.log(tagData);
 
 	const parsedTags = tagData.map(tag => ({
 		id: tag.notiz_id,

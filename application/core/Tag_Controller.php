@@ -43,7 +43,6 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTag($readonly_tags = null)
 	{
-		$language = $this->_getLanguageIndex();
 		$id = $this->input->get('id');
 
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
@@ -68,7 +67,7 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
@@ -97,14 +96,16 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTags($tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+
 		$this->NotiztypModel->addSelect(
-			'typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			"typ_kurzbz as tag_typ_kurzbz,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
 			style,
 			beschreibung,
 			tag,
 			automatisiert
-			'
+			"
 		);
 		$this->NotiztypModel->addOrder('prioritaet');
 
@@ -283,7 +284,6 @@ class Tag_Controller extends FHCAPI_Controller
 	}
 
 	public function getAllTags($readonly_tags = false){
-		$language = $this->_getLanguageIndex();
 		$prestudent_id = $this->input->get('prestudent_id');
 
 		//TODO check for readonly: necessary?
@@ -305,11 +305,10 @@ class Tag_Controller extends FHCAPI_Controller
 						END as readonly
 					");
 		}
-
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel,
 			tbl_notiz.text,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,

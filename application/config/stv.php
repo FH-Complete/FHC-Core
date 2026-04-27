@@ -147,7 +147,7 @@ $config['stv_prestudent_tags'] = [
 	'prewh_auto' => ['readonly' => true],
 	'out_auto' => ['readonly' => false],
 	'zgv_auto' => ['readonly' => true],
-	'unterbrecher_auto' => ['readonly' => true],
+	'unterbrecher_auto' => ['readonly' => false],
 	'stbtr_erh_auto' => ['readonly' => true],
 	'jgv_auto' => ['readonly' => false],
 ];
