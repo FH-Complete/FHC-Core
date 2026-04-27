@@ -197,12 +197,11 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError);
 		},
 		filterBookmarksByTags(bookmarks) {
-			const filter = this.filter;
-			if (!filter || filter.length === 0 || filter == "[]") return bookmarks;
-
-			return bookmarks.filter(b => {
-				const tags = JSON.parse(b.tag || "[]");
-				return tags.some(tag => filter.includes(tag));
+			if (!this.config.tags || !this.config.tags.length)
+				return bookmarks;
+			return bookmarks.filter(bookmark => {
+				const tags = JSON.parse(bookmark.tag || "[]");
+				return tags.some(tag => this.config.tags.includes(tag));
 			});
 		},
 		sortDown(bookmark_id){
@@ -281,81 +280,19 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		openFilterModal(){
+		openFilterModal() {
+			if (this.config.tags && this.config.tags.length)
+				this.selectedFilters = this.prepareTag(this.config.tags);
+			else
+				this.selectedFilters = [];
 			this.$refs.filterModal.show();
 		},
-		async handleAddingTagFilter(widgetId){
-
-			const result = await this.isInOverride(widgetId);
-
-			if (!result) {
-				return;
-			}
-			const [status, reason] = result;
-
-			if (status) {
-				this.addTagFilter(widgetId);
-			} else {
-				this.addWidgetToOverride(widgetId, reason);
-			}
-		},
-		addTagFilter(widgetId){
-			this.$api
-				.call(ApiBookmark.addTagFilter(widgetId, this.sectionName, this.filterInput))
-				.then((res) => res.data)
-				.then((result) => {
-					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
-					this.$refs.filterModal.hide();
-					this.getTagFilter(this.widgetId);
-
-					this.$nextTick(() => {
-						this.getAllBookmarkTags();
-					});
-					this.fetchBookmarks();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		async isInOverride(widgetId) {
-			try {
-				const res = await this.$api.call(ApiBookmark.isInOverride(widgetId, this.sectionName));
-				const result = res.data;
-				return result;
-			} catch (err) {
-				this.$fhcAlert.handleSystemError(err);
-				return null;
-			}
-		},
-		addWidgetToOverride(widgetId, reason){
-			this.$api
-				.call(ApiBookmark.addWidgetToOverride(
-					widgetId,
-					this.sectionName,
-					reason,
-					this.item_data.x,
-					this.item_data.y,
-					this.item_data.h,
-					this.item_data.w
-				))
-				.then((res) => res.data)
-				.then((result) => {
-					this.addTagFilter(widgetId);
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		getTagFilter(widget_id) {
-			this.$api
-				.call(ApiBookmark.getTagFilter(widget_id, this.sectionName))
-				.then((res) => res.data)
-				.then((result) => {
-					const rawTags = result.tags; // string
-					this.filter = rawTags;
-					if(rawTags != null) {
-						this.rawTagsParsed = JSON.parse(rawTags);
-						this.selectedFilters = this.prepareTag(this.rawTagsParsed);
-					}
-					this.fetchBookmarks();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+		async handleAddingTagFilter(widgetId) {
+			this.config.tags = [ ...this.filterInput ];
+			this.$emit('change');
+			this.sharedFiltered = this.filterBookmarksByTags(this.shared);
+			this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
+			this.$refs.filterModal.hide();
 		},
 		search(event) {
 			const query = event.query ?? "";
@@ -372,9 +309,6 @@ export default {
 		},
 	},
 	async mounted() {
-		if(this.widgetId) {
-			this.getTagFilter(this.widgetId);
-		}
 		await this.fetchBookmarks();
 		this.getAllBookmarkTags();
 	},
@@ -394,7 +328,7 @@ export default {
 				{{ $p.t('bookmark', 'newLink') }}
 			</button>
 			<button
-				v-if="selectedFilters.length"
+				v-if="config.tags && config.tags.length"
 				class="btn btn-secondary btn-sm"
 				:title="$p.t('bookmark/editFilter')"
 				@click="openFilterModal"

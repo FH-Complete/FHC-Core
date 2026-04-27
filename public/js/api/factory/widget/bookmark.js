@@ -54,30 +54,5 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Bookmark/getAllBookmarkTags'
 		};
-	},
-	getTagFilter(widgetId, sectionName){
-		return {
-			method: 'get',
-			url: `/api/frontend/v1/Bookmark/getTagFilter/${widgetId}/${sectionName}`
-		};
-	},
-	addTagFilter(widgetId, sectionName, tags){
-		return {
-			method: 'post',
-			url: `/api/frontend/v1/Bookmark/addAndUpdateTagFilter/${widgetId}/${sectionName}`,
-			params: { tags }
-		};
-	},
-	isInOverride(widgetId, sectionName){
-		return {
-			method: 'post',
-			url: `/api/frontend/v1/Bookmark/isInOverride/${widgetId}/${sectionName}`
-		};
-	},
-	addWidgetToOverride(widgetId, sectionName, mode, x, y, h, w){
-		return {
-			method: 'post',
-			url: `/api/frontend/v1/Bookmark/addWidgetToOverride/${widgetId}/${sectionName}/${mode}/${x}/${y}/${h}/${w}`,
-		};
 	}
 };
