@@ -626,7 +626,7 @@ class Students extends FHCAPI_Controller
 		$this->addFilter($studiensemester_kurzbz);
 
 		$result = $this->PrestudentModel->loadWhere($where);
-		
+
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($data);
@@ -851,40 +851,44 @@ class Students extends FHCAPI_Controller
 		$stdsemEsc = $studiensemester_kurzbz ? $this->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
 		$this->load->config('stv');
-		$tags = $this->config->item('stv_prestudent_tags');
 
-		$whereTags = '';
-		if (is_array($tags) && !isEmptyArray($tags)) {
-			$tags = array_keys($tags);
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$tags = $this->config->item('stv_prestudent_tags');
 
-			foreach ($tags as $key => $tag) {
-				$tags[$key] = $this->db->escape($tag);
+			$whereTags = '';
+			if (is_array($tags) && !isEmptyArray($tags)) {
+				$tags = array_keys($tags);
+
+				foreach ($tags as $key => $tag) {
+					$tags[$key] = $this->db->escape($tag);
+				}
+				$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
 			}
-			$whereTags = " AND nt.typ_kurzbz IN (" . implode(",", $tags) . ")";
+			$subQueryTag = "
+			  (
+				SELECT
+				  tag.prestudent_id,
+				  COALESCE(json_agg(tag ORDER BY tag.done), '[]'::json) AS tags
+				FROM (
+				  SELECT DISTINCT ON (n.notiz_id)
+					n.notiz_id AS id,
+					nt.typ_kurzbz,
+					array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
+					n.text AS notiz,
+					nt.style,
+					n.erledigt AS done,
+					nz.prestudent_id
+				  FROM public.tbl_notizzuordnung AS nz
+					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
+					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz "
+				. $whereTags .
+				"
+				) AS tag
+				GROUP BY tag.prestudent_id
+			  ) AS tag_data_agg
+			";
 		}
-		$subQueryTag = "
-		  (
-			SELECT
-			  tag.prestudent_id,
-			  COALESCE(json_agg(tag ORDER BY tag.done), '[]'::json) AS tags
-			FROM (
-			  SELECT DISTINCT ON (n.notiz_id)
-				n.notiz_id AS id,
-				nt.typ_kurzbz,
-				array_to_json(nt.bezeichnung_mehrsprachig)->>0 AS beschreibung,
-				n.text AS notiz,
-				nt.style,
-				n.erledigt AS done,
-				nz.prestudent_id
-			  FROM public.tbl_notizzuordnung AS nz
-				JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
-				JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz "
-			. $whereTags .
-			"
-			) AS tag
-			GROUP BY tag.prestudent_id
-		  ) AS tag_data_agg
-		";
 
 		$this->PrestudentModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->PrestudentModel->addJoin('public.tbl_person p', 'person_id');
@@ -907,11 +911,17 @@ class Students extends FHCAPI_Controller
 			AND ps.studiensemester_kurzbz=public.get_stdsem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ') 
 			AND ps.ausbildungssemester=public.get_absem_prestudent(tbl_prestudent.prestudent_id, ' . $stdsemEsc . ')', 'LEFT');
 
-		$this->PrestudentModel->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$this->PrestudentModel->addJoin($subQueryTag, 'tag_data_agg.prestudent_id = tbl_prestudent.prestudent_id', 'LEFT');
+		}
 
 
 		$this->PrestudentModel->addSelect("b.uid");
-		$this->PrestudentModel->addSelect('tag_data_agg.tags');
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED)
+		{
+			$this->PrestudentModel->addSelect('tag_data_agg.tags');
+		}
 		$this->PrestudentModel->addSelect('titelpre');
 		$this->PrestudentModel->addSelect('nachname');
 		$this->PrestudentModel->addSelect('vorname');
