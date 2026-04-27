@@ -58,6 +58,8 @@ class GridLogic {
 			item.frame.forEach(f => intermGrid.grid[f] = -1);
 
 			intermGrid.data.forEach(currItem => {
+				if (!currItem)
+					return;
 				if (currItem.pinned) {
 					if (!currItem.frame)
 						currItem.frame = intermGrid.getItemFrame(currItem);
