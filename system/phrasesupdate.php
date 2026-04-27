@@ -46911,7 +46911,7 @@ array(
 				'sprache' => 'German',
 				'text' => 'Keine Zuordnung oder Berechtigung für die Projektarbeit gefunden! 
 				
-				Der eingeloggte User konnte nicht als StudentIn identifiziert werden. 
+				Der eingeloggte User "{0}" konnte nicht als StudentIn "{1}" identifiziert werden, hat keine Betreuungszuordnung und keine Administrationsrechte. 
 				
 				Falls Sie diese Fehlermeldung als StudentIn erhalten loggen Sie sich bitte neu ein, indem Sie den Browser schließen und erneut die CIS Seite aufrufen!',
 				'description' => '',
@@ -46921,7 +46921,7 @@ array(
 				'sprache' => 'English',
 				'text' => 'No assignment or authorization found for the project!
 				
-				The logged-in user could not be identified as a student. 
+				The logged-in user "{0}" could not be identified as student "{1}", has no reviewer assignment and no administrative rights. 
 
 				If you receive this error message as a student, please log in again by closing your browser and reopening the CIS page!',
 				'description' => '',
