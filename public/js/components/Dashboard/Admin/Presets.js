@@ -23,6 +23,32 @@ export default {
 	computed: {
 		pickerWidgets() {
 			return this.widgets.filter(widget => widget.allowed);
+		},
+		sizeLimits() {
+			return Object.fromEntries(this.widgets.map(({ setup, widget_id: type }) => {
+				const result = {}; // work on a copy
+				if (setup.height === undefined)
+					result.height = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.height))
+					result.height = { min: setup.height, max: setup.height };
+				else
+					result.height = {
+						min: setup.height.min ?? 1,
+						max: setup.height.max
+					};
+
+				if (setup.width === undefined)
+					result.width = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.width))
+					result.width = { min: setup.width, max: setup.width };
+				else
+					result.width = {
+						min: setup.width.min ?? 1,
+						max: setup.width.max
+					};
+
+				return [type, result];
+			}));
 		}
 	},
 	watch: {
@@ -35,6 +61,12 @@ export default {
 		widgetAdd(widget, section_name) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				// NOTE(chris): min size
+				widget.place = Object.fromEntries(Object.entries(widget.place).map(([key, value]) => {
+					value.w = this.sizeLimits[widget_id].width.min;
+					value.h = this.sizeLimits[widget_id].height.min;
+					return [key, value];
+				}));
 				widget.id = 'loading_' + String((new Date()).valueOf());
 				delete widget.custom;
 				widget.preset = 1;
@@ -44,6 +76,8 @@ export default {
 					if (section.name == section_name)
 						section.widgets.push(loading);
 				});
+
+				delete widget.id;
 
 				const params = {
 					dashboard: this.dashboard,
