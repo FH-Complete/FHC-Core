@@ -145,4 +145,52 @@ array (
     ),
   ),
 ),
+,
+array (
+  'app' => 'core',
+  'category' => 'dashboard',
+  'phrase' => 'success_savePreset',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Voreinstellung erfolgreich aktualisiert',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Preset successfully updated',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
+,
+array (
+  'app' => 'core',
+  'category' => 'dashboard',
+  'phrase' => 'alert_deleteWidget',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Sind Sie sicher, dass Sie dieses Widget löschen möchten?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'Are you sure you want to delete this widget?',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
