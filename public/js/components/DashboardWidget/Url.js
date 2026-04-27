@@ -271,7 +271,13 @@ export default {
 			</button>
 		</div>
 
-		<template v-if="ready">
+		<div
+			v-if="adminMode"
+			class="h-100 d-flex align-items-center text-center"
+		>
+			{{ $p.t('bookmark/adminMode') }}
+		</div>
+		<template v-else-if="ready">
 			<template v-if="filteredBookmarks.length">
 				<div
 					v-for="link in filteredBookmarks"

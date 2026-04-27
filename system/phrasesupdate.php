@@ -35942,6 +35942,26 @@ array(
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'bookmark',
+		'phrase' => 'adminMode',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Inhalt kann nicht im Administrator Modus angezeigt werden.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Content can not be displayed in administrator mode.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// BOOKMARK PHRASEN END ----------------------------------------------------------------------
 	array(
 		'app' => 'core',
