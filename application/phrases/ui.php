@@ -5341,5 +5341,29 @@ array (
     ),
   ),
 )
+,
+array (
+  'app' => 'core',
+  'category' => 'ui',
+  'phrase' => 'deleteInfo',
+  'insertvon' => 'system',
+  'phrases' => 
+  array (
+    0 => 
+    array (
+      'sprache' => 'German',
+      'text' => 'Mit dieser Aktion werden auch alle Voreinstellungen der verbundenen Widgets gelöscht.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+    1 => 
+    array (
+      'sprache' => 'English',
+      'text' => 'This action will also delete all presets of the connected widgets.',
+      'description' => '',
+      'insertvon' => 'system',
+    ),
+  ),
+)
 );
 
