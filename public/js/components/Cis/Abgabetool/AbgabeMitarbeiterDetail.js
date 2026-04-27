@@ -46,12 +46,7 @@ export const AbgabeMitarbeiterDetail = {
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
-			speedDialItems: [{
-				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
-				icon: "fa fa-plus",
-				command: this.openCreateNewAbgabeModal,
-				disabled: Vue.computed(() => !this.getAllowedToCreateNewTermin)
-			},
+			speedDialItems: [
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
 				icon: "fa fa-user-check",
