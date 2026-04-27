@@ -28,4 +28,10 @@ export default {
       },
     };
   },
+  getStudyPlan(studienplan_id) {
+    return {
+      method: "get",
+      url: `api/frontend/v1/organisation/studienplan/getStudyPlan/${studienplan_id}`,
+    };
+  },
 };

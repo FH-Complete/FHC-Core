@@ -22,7 +22,8 @@ class Studienplan extends FHCAPI_Controller
 		parent::__construct([
 			'getAllStudyPlans' => self::PERM_LOGGED,
 			'getStudyPlansByOrganizationalUnitAndSemesterDates' => self::PERM_LOGGED,
-			'getBySemester' => self::PERM_LOGGED
+			'getBySemester' => self::PERM_LOGGED,
+			'getStudyPlan' => self::PERM_LOGGED,
 		]);
 	}
 
@@ -95,5 +96,16 @@ class Studienplan extends FHCAPI_Controller
 		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
 
 		$this->terminateWithSuccess(hasData($result) ? getData($result) : []);
+	}
+
+	public function getStudyPlan($id)
+	{
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
+
+		$result = $this->StudienplanModel->loadWhere(['studienplan_id' => $id]);
+		if (isError($result)) $this->terminateWithError(getError($result), self::ERROR_TYPE_DB);
+		if (!hasData($result)) return $this->terminateWithSuccess(null);
+
+		$this->terminateWithSuccess(getData($result)[0]);
 	}
 }

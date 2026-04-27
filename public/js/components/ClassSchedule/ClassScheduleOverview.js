@@ -1,9 +1,13 @@
-// Import the Core Filter- and Core RESTClient Component to build your table and handle data
 import { CoreFilterCmpt } from "../filter/Filter.js";
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
+import ApiStudienSemester from "../../../js/api/factory/studiensemester.js";
+import { formatDate } from "../../helpers/DateHelpers.js";
 
 import ClassScheduleTypeModal from "./ClassScheduleTypeModal.js";
 import ClassScheduleValidityPeriodModal from "./ClassScheduleValidityPeriodModal.js";
+import CoreForm from "../Form/Form.js";
+import FormInput from "../Form/Input.js";
+import ApiOrganizationalUnit from "../../../js/api/factory/organizationalUnit.js";
 
 export default {
   name: "ClassScheduleOverview",
@@ -11,6 +15,8 @@ export default {
     CoreFilterCmpt,
     ClassScheduleTypeModal,
     ClassScheduleValidityPeriodModal,
+    CoreForm,
+    FormInput,
   },
   props: {
     permissions: Object,
@@ -22,6 +28,29 @@ export default {
         this.permissions["lehre/unterrichtszeiten_typ_w"] || false,
     };
   },
+  watch: {
+    filterData: {
+      handler(newValue) {
+        this.$refs.classTimeSlotValidityPeriodsTable.tabulator.setData("/", {
+          organizationalUnitShortCode:
+            newValue.selectedOrganizationalUnit?.value,
+          validityPeriodFrom: newValue.validityPeriodFrom
+            ? formatDate(newValue.validityPeriodFrom, "yyyy-MM-dd")
+            : null,
+          validityPeriodTo: newValue.validityPeriodTo
+            ? formatDate(newValue.validityPeriodTo, "yyyy-MM-dd")
+            : null,
+        });
+      },
+      deep: true,
+    },
+    selectedSemester: {
+      handler(newValue) {
+        this.filterData.validityPeriodFrom = this.selectedSemester.start;
+        this.filterData.validityPeriodTo = this.selectedSemester.ende;
+      },
+    },
+  },
   data: () => {
     return {
       phrasesLoaded: false,
@@ -32,14 +61,25 @@ export default {
       mondayClassTimeSlots: [],
       isClassTimeSlotTypeModalVisible: false,
       isClassTimeSlotValidityPeriodModalVisible: false,
+      organizationalUnits: [],
+      filteredOrganizationalUnits: [],
+      allSemesters: [], 
+      filteredSemesters: [],
+      filterData: {
+        selectedOrganizationalUnit: null,
+        validityPeriodFrom: null,
+        validityPeriodTo: null,
+      },
+      selectedSemester: null,
     };
   },
   computed: {
     tabulatorOptions() {
       const options = {
         ajaxURL: "dummy",
-        ajaxRequestFunc: async () =>
-          await this.getParsedClassTimeSlotValidityPeriodData(),
+        ajaxRequestFunc: async () => {
+          return await this.getParsedClassTimeSlotValidityPeriodData();
+        },
         ajaxResponse: (url, params, response) => response,
         persistenceID: "core_class_schedule_validity_periods",
         selectableRows: true,
@@ -163,8 +203,7 @@ export default {
             container.style.width = "100%";
 
             let label = document.createElement("span");
-            label.textContent =
-              value + " (" + count + " item" + (count > 1 ? "s" : "") + ")";
+            label.textContent = value;
             container.append(label);
 
             let button = document.createElement("button");
@@ -187,8 +226,7 @@ export default {
             container.style.width = "100%";
 
             let label = document.createElement("span");
-            label.textContent =
-              value + " (" + count + " item" + (count > 1 ? "s" : "") + ")";
+            label.textContent = value;
             container.append(label);
 
             let button = document.createElement("button");
@@ -250,14 +288,38 @@ export default {
       ];
       return events;
     },
+    dropdownParsedOrganizationalUnits() {
+      return this.organizationalUnits.map((unit) => {
+        return {
+          label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
+          value: unit.oe_kurzbz,
+        };
+      });
+    },
+    dropdownParsedSemesters() {
+      return this.allSemesters.map((semester) => {
+        return {
+          label: semester.studiensemester_kurzbz,
+          value: semester.studiensemester_kurzbz,
+          start: semester.start,
+          ende: semester.ende,
+        };
+      });
+    }
   },
   methods: {
-    test() {
-      alert("test");
-    },
     async getParsedClassTimeSlotValidityPeriodData() {
       let getAllClassTimeValidityPeriodsResponse = await this.$api.call(
-        ApiClassSchedule.getAllClassTimeValidityPeriods(),
+        ApiClassSchedule.getAllClassTimeValidityPeriods({
+          organizationalUnitShortCode:
+            this.filterData.selectedOrganizationalUnit?.value,
+          validityPeriodFrom: this.filterData.validityPeriodFrom
+            ? formatDate(this.filterData.validityPeriodFrom, "yyyy-MM-dd")
+            : null,
+          validityPeriodTo: this.filterData.validityPeriodTo
+            ? formatDate(this.filterData.validityPeriodTo, "yyyy-MM-dd")
+            : null,
+        }),
       );
 
       if (getAllClassTimeValidityPeriodsResponse.meta.status === "success") {
@@ -323,6 +385,36 @@ export default {
     resetClassTimeSlotValidityPeriodModal() {
       this.isClassTimeSlotValidityPeriodModalVisible = false;
     },
+    filterOrganizationalUnits(event) {
+      let defaultItem = {
+        label: '----------',
+        value: null,
+      };
+
+      const query = event.query.toLowerCase();
+      if (!query) {
+        return this.filteredOrganizationalUnits = [defaultItem, ...this.dropdownParsedOrganizationalUnits];
+      }
+
+      return this.filteredOrganizationalUnits = [defaultItem].concat(this.dropdownParsedOrganizationalUnits.filter((unit) => {
+        return unit.label.toLowerCase().includes(query);
+      }));
+    },
+    filterSemesters(event) {
+      let defaultItem = {
+        label: '----------',
+        value: null,
+      };
+
+      const query = event.query.toLowerCase();
+      if (!query) {
+        return this.filteredSemesters = [defaultItem, ...this.dropdownParsedSemesters];
+      }
+
+      return this.filteredSemesters = [defaultItem].concat(this.dropdownParsedSemesters.filter((semester) => {
+        return semester.label.toLowerCase().includes(query);
+      }));
+    }
   },
   async created() {
     let getAllClassTimeValidityPeriodsResponse = await this.$api.call(
@@ -337,6 +429,32 @@ export default {
         getAllClassTimeValidityPeriodsResponse.meta.message,
       );
     }
+
+    let getAllOrganizationalUnitsResponse = await this.$api.call(
+      ApiOrganizationalUnit.getAllOrganizationalUnits(),
+    );
+    if (getAllOrganizationalUnitsResponse.meta.status === "success") {
+      this.organizationalUnits = getAllOrganizationalUnitsResponse.data.sort(
+        (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
+      );
+    } else {
+      console.error(
+        "Error fetching organizational units:",
+        getAllOrganizationalUnitsResponse.meta.message,
+      );
+    }
+
+    let getAllSemestersResponse = await this.$api.call(
+      ApiStudienSemester.getAll('DESC'),
+    );
+    if (getAllSemestersResponse.meta.status === "success") {
+      this.allSemesters = getAllSemestersResponse.data;
+    } else {
+      console.error(
+        "Error fetching semesters:",
+        getAllSemestersResponse.meta.message,
+      );
+    } 
   },
   mounted() {
     this.$p
@@ -349,8 +467,9 @@ export default {
   <div class="container mt-4">
     <h1 class='mb-5'>{{ $p.t("ui", "classScheduleOverviewHeading") }}</h1>
     <div class="row mb-3">
-      <div class="col d-flex justify-content-end">
-        <a class="btn btn-primary mb-3" @click="showClassTimeSlotTypeModal">{{$p.t('ui', 'addClassTimeSlotTypeButton')}}</a>
+      <div class="col d-flex justify-content-between">
+        <a class="btn btn-primary mb-3" @click="showClassTimeSlotValidityPeriodModal">{{$p.t('ui', 'addClassTimeSlotValidityPeriodButton')}}</a>
+        <a class="btn btn-secondary mb-3" @click="showClassTimeSlotTypeModal">{{$p.t('ui', 'addClassTimeSlotTypeButton')}}</a>
       </div>
     </div>
     <class-schedule-type-modal 
@@ -379,11 +498,68 @@ export default {
         :side-menu="false"	 
         :tabulator-options="tabulatorOptions"
         :tabulator-events="tabulatorEvents"	 
-        :new-btn-label="$p.t('ui', 'addClassTimeSlotValidityPeriodButton')"
-        new-btn-show
-        reload
-        @click:new="showClassTimeSlotValidityPeriodModal"
-    ></core-filter-cmpt>
+    >
+      <template #search>
+        <slot name="filterzuruecksetzen">
+          <core-form class="d-flex flex-column flex-md-row align-items-md-end gap-3">
+            <div>
+               <form-input
+                v-model="filterData.selectedOrganizationalUnit"
+                :label="$capitalize($p.t('lehre/organisationseinheit'))"
+                :suggestions="filteredOrganizationalUnits"
+                :optionValue="(option) => option.value"
+                :optionLabel="(option) => option.label" 
+                @complete="filterOrganizationalUnits($event)"
+                type="autocomplete"
+                name="organizationalUnitShortCode"
+                dropdown 
+                forceSelection
+                >
+              </form-input>
+            </div>
+            <div>
+              <form-input
+                v-model="selectedSemester"
+                :label="$capitalize($p.t('lehre/studiensemester'))"
+                :suggestions="filteredSemesters"
+                :optionValue="(option) => option.value"
+                :optionLabel="(option) => option.label"
+                @complete="filterSemesters($event)"
+                type="autocomplete"
+                name="selectedSemester"
+                dropdown 
+                forceSelection
+                >
+              </form-input>
+            </div>
+            <div>
+              <div class="d-flex align-items-center gap-2">
+                <form-input
+                  v-model="filterData.validityPeriodFrom"
+                  :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('ui', 'von')"
+                  :teleport="true"
+                  :enable-time-picker="false"
+                  type="datePicker"
+                  name="validityPeriodFrom"  
+                  format="dd.MM.yyyy"
+                  auto-apply
+                  />
+                  <form-input
+                    v-model="filterData.validityPeriodTo"
+                    :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('global', 'bis')"
+                    :teleport="true"
+                    :enable-time-picker="false"
+                    type="datePicker"
+                    name="validityPeriodTo"  
+                    format="dd.MM.yyyy"
+                    auto-apply
+                    />
+              </div>
+            </div>
+          </core-form>
+        </slot>
+      </template>
+    </core-filter-cmpt>
   </div>
   `,
 };

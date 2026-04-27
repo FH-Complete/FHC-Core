@@ -248,8 +248,14 @@ export default {
         </div>
       </div>
       <h2>{{ classScheduleValidityPeriodStartDate }} - {{ classScheduleValidityPeriodEndDate }}</h2>
-      <p>{{ $p.t("lehre", "ausbildungssemester") }}: {{ classTimeSlotValidityPeriod?.ausbildungssemester }}</p>
-      <p v-html="classTimeSlotValidityPeriod?.anmerkung"></p>
+      <h4 class="text-capitalize">{{ $p.t("lehre", "organisationseinheit") }}: {{ classTimeSlotValidityPeriod?.oe_bezeichnung }} ({{ classTimeSlotValidityPeriod?.oe_organisationseinheittyp_kurzbz }})</h4>
+      <h4 class="text-capitalize">{{ $p.t("lehre", "studienplan") }}: {{ classTimeSlotValidityPeriod?.studienplan_bezeichnung }}</h4>
+      <h5 class="text-capitalize">{{ $p.t("lehre", "ausbildungssemester") }}: 
+        <span class="fw-normal">{{ classTimeSlotValidityPeriod?.ausbildungssemester }}</span>
+      </h5>
+      <h5 class="text-capitalize">{{ $p.t("global", "anmerkung") }}:
+        <span class="fw-normal">{{ classTimeSlotValidityPeriod?.anmerkung }}</span>
+      </h5>
     </div>
     <div>
       <div v-if='!isClassTimeSlotFormVisible' class="col-12 d-flex justify-content-end">
@@ -290,7 +296,7 @@ export default {
         </div>
       </div>
       <div v-else class="d-flex align-items-center justify-content-center border rounded p-4 mt-4">
-          <p>{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>
+          <p class="m-0">{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>
       </div>
     </div>
     <class-schedule-validity-period-modal 

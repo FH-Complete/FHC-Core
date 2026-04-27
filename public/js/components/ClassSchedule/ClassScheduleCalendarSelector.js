@@ -115,6 +115,17 @@ export default {
       deep: true,
       immediate: true,
     },
+    classTimeSlotTypes() {
+      this.overlays = this.overlays.map((overlay) => {
+        let type = this.classTimeSlotTypes.find(
+          (type) => type.unterrichtszeitentyp_kurzbz === overlay.type
+        );
+        if (type) {
+          overlay.hexColor = type.hintergrundfarbe;
+        }
+        return overlay;
+      });
+    },
     overlays: {
       handler(newVal) {
         this.$emit("overlaysChanged", newVal);
@@ -202,9 +213,14 @@ export default {
 
       return firstTimeSlotFragment + "-" + lastTimeSlotFragment;
     },
+    userLanguage() {
+      return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+    }
   },
   methods: {
     createOverlay() {
+      this.hideOverlayClassTimeTypePopover();
+
       let overlayElement;
 
       overlayElement = this.$refs.calendarSelectorContainer.querySelector(
@@ -350,6 +366,8 @@ export default {
       this.$refs.calendarSelectorContainer
         .querySelector(`#${overlayId}`)
         .remove();
+
+      this.hideOverlayClassTimeTypePopover();
     },
     getLineNumberFromSelectedElementNumber(selectedElementNumber) {
       let timeSlotsCount = this.timeSlotsInDay.length;
@@ -696,6 +714,7 @@ export default {
       this.selected = [];
     },
     handleOverlayDrop(event) {
+      this.hideOverlayClassTimeTypePopover();
       if (this.$props.isPreviewMode) return;
 
       let dropzoneItem = event.target;
@@ -725,25 +744,22 @@ export default {
           `[data-number='${startElementNumber}']`,
         );
 
-        // get mouse position
         const mouseY = event.clientY;
-        // get delta Y from mouse position to top of the dropzone item
+
         const dropzoneItemRect = dropzoneItem.getBoundingClientRect();
         const deltaY = mouseY - dropzoneItemRect.top;
 
-        // get top of the start element
         const startElementRect = startElement.getBoundingClientRect();
         const startElementTop = startElementRect.top;
 
-        // add delta Y to top of the start element to get new top for the dropzone item
         const newTop = startElementTop + deltaY;
-        //find which item has the closest top to the new top and get its data-number attribute
+
         const partBodies =
           this.$refs.calendarSelectorContainer.querySelectorAll(
             "div[data-weekday='" + dropzoneOverlay.weekday + "']",
           );
 
-        // see which item has the new top in between its top and bottom and get its data-number attribute
+
         let closestPartBody = null;
         partBodies.forEach((partBody) => {
           const rect = partBody.getBoundingClientRect();
@@ -1439,10 +1455,20 @@ export default {
           });
       }, 10);
     },
+    hideOverlayClassTimeTypePopover() {
+      if (this.visiblePopover) {
+        this.visiblePopover.dispose();
+        this.visiblePopover = null;
+      }
+    },
+    getClassTimeSlotTypeLabel(classTimeSlotType) {
+      if (!classTimeSlotType) return "";
+      return this.userLanguage?.value === 'English' ? 
+        classTimeSlotType.bezeichnung_mehrsprachig[1].value : classTimeSlotType.bezeichnung_mehrsprachig[0].value;
+    }
   },
   unmounted() {
-    this.visiblePopover?.dispose();
-    this.visiblePopover = null;
+    this.hideOverlayClassTimeTypePopover();
   },
   template: /*html*/ `
   <div ref="calendarSelectorContainer" >
@@ -1760,7 +1786,7 @@ export default {
         :data-type="type.unterrichtszeitentyp_kurzbz"
         class="btn btn-sm btn-outline-dark class-schedule-type-selector-option"
       >
-        {{ type.bezeichnung_mehrsprachig[0].value }}
+        {{ getClassTimeSlotTypeLabel(type) }}
       </span>
     </div>
   </div>

@@ -16,10 +16,11 @@
  */
 
 export default {
-  getAllClassTimeValidityPeriods() {
+  getAllClassTimeValidityPeriods(params) {
     return {
       method: "get",
       url: "/api/frontend/v1/ClassScheduleApi/getAllClassTimeValidityPeriods",
+      params,
     };
   },
   getAllClassTimeValidityPeriodsPerOrganizationalUnit(organizationUnitId) {

@@ -106,7 +106,7 @@ export default {
         </div>
       </div>
       <div v-else class="d-flex align-items-center justify-content-center border rounded p-2">
-          <p>{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>
+          <p class="m-0">{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>
       </div>
     </div>
 </div>

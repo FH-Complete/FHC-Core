@@ -23,6 +23,8 @@ import FhcAlert from "../../plugins/FhcAlert.js";
 import Phrasen from "../../plugins/Phrasen.js";
 import FhcApi from "../../plugins/Api.js";
 
+import {capitalize} from "../../helpers/StringHelpers.js";
+
 const ciPath =
   FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, "") +
   FHC_JS_DATA_STORAGE_OBJECT.ci_router;
@@ -63,6 +65,8 @@ const app = Vue.createApp({
     ClassScheduleOrgUnitGroupedValidityPeriodsOverview,
   },
 });
+
+app.config.globalProperties.$capitalize = capitalize;
 
 app
   .use(router)

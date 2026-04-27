@@ -30,7 +30,7 @@ class OrganizationalUnitApi extends FHCAPI_Controller
 
 		$this->load->library('form_validation');
 
-		$this->load->model('education/ClassTimeSlotValidityPeriod_model', "ClassTimeSlotValidityPeriodModel");
+		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
 
 		// Loads phrases system
 		$this->loadPhrases([
@@ -44,8 +44,11 @@ class OrganizationalUnitApi extends FHCAPI_Controller
 
 	public function getAllOrganizationalUnits()
 	{
-		$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+		$entitledOrganizationalUnitsShortCodes = $this->permissionlib->getOE_isEntitledFor('basis/organisationseinheit');
+
+		$this->OrganisationseinheitModel->db->where_in('oe_kurzbz', $entitledOrganizationalUnitsShortCodes);
 		$result = $this->OrganisationseinheitModel->load();
+		
 		$organization_units_result = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess($organization_units_result);

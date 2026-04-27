@@ -47,9 +47,23 @@ export default {
         .call(ApiClassSchedule.getClassTimeValidityPeriod(newValue))
         .then((response) => {
           let validityPeriodData = response.data[0];
+          let organizationalUnit = this.organizationalUnits.find(
+            (unit) => unit.oe_kurzbz === validityPeriodData.oe_kurzbz,
+          );
+          if (!organizationalUnit) {
+            console.error(
+              "Organizational unit not found for validity period:",
+              validityPeriodData,
+            );
+            this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingData"));
+            return;
+          }
+
+          this.editedClassTimeSlotValidityPeriod = validityPeriodData;
+
           this.classTimeSlotValidityPeriodFormData = {
             id: validityPeriodData.unterrichtszeitengueltigkeit_id,
-            organizationalUnitShortCode: validityPeriodData.oe_kurzbz,
+            organizationalUnit,
             studyPlanId: validityPeriodData.studienplan_id,
             classTimeSlotTypeShortcode:
               validityPeriodData.unterrichtszeitentyp_kurzbz,
@@ -68,48 +82,29 @@ export default {
           this.$fhcAlert.handleSystemError(error);
         });
     },
-    async "classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"(
-      newValue,
-    ) {
-      if (!newValue) {
-        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
-        return;
-      }
-
-      this.refetchFilterableOptions();
+    "classTimeSlotValidityPeriodFormData.organizationalUnit"() {
+      this.updateClassTimeSlotValidityPeriodFormDataWatcher();
     },
-    async "classTimeSlotValidityPeriodFormData.validityPeriodFrom"(newValue) {
-      if (!newValue) {
-        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
-        return;
-      }
-
-      this.refetchFilterableOptions();
+    "classTimeSlotValidityPeriodFormData.validityPeriodFrom"() {
+      this.updateClassTimeSlotValidityPeriodFormDataWatcher();
     },
-    async "classTimeSlotValidityPeriodFormData.validityPeriodTo"(newValue) {
-      if (!newValue) {
-        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
-        return;
-      }
-
-      this.refetchFilterableOptions();
-    },
-    async "classTimeSlotValidityPeriodFormData.studyPlanId"(newValue) {
-      this.refetchFilterableOptions();
+    "classTimeSlotValidityPeriodFormData.validityPeriodTo"() {
+      this.updateClassTimeSlotValidityPeriodFormDataWatcher();
     },
   },
   data: () => {
     return {
+      editedValidityPeriod: null,
       isFormVisible: false,
-      isEditInProgress: false,
       organizationalUnits: [],
+      filteredOrganizationalUnits: [],
       studyPlans: [],
       studySemesters: [],
       studySemestersByNumber: [],
       classTimeSlotTypes: [],
       classTimeSlotValidityPeriodFormData: {
         id: null,
-        organizationalUnitShortCode: null,
+        organizationalUnit: null,
         studyPlanId: null,
         classTimeSlotTypeShortcode: null,
         validityPeriodFrom: null,
@@ -120,9 +115,13 @@ export default {
     };
   },
   computed: {
+    isEditMode() {
+      return !!this.$props.editedClassTimeSlotValidityPeriodId;
+    },
     isStudyPlanSelectDisabled() {
       return (
-        !this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode ||
+        !this.classTimeSlotValidityPeriodFormData.organizationalUnit
+          ?.oe_kurzbz ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodFrom ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodTo
       );
@@ -142,23 +141,62 @@ export default {
         this.classTimeSlotValidityPeriodFormData.validityPeriodTo,
       );
     },
+    userLanguage() {
+      return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+    },
   },
   methods: {
+    updateClassTimeSlotValidityPeriodFormDataWatcher() {
+      if (
+        !this.classTimeSlotValidityPeriodFormData.organizationalUnit
+          ?.oe_kurzbz ||
+        !this.classTimeSlotValidityPeriodFormData.validityPeriodFrom ||
+        !this.classTimeSlotValidityPeriodFormData.validityPeriodTo
+      ) {
+        this.classTimeSlotValidityPeriodFormData.studyPlanId = null;
+        return;
+      }
+
+      this.refetchFilterableOptions();
+    },
     async refetchFilterableOptions() {
       this.studyPlans = await this.getTargetedStudyPlans(
-        this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode,
+        this.classTimeSlotValidityPeriodFormData.organizationalUnit?.oe_kurzbz,
         this.formattedValidityPeriodFrom,
         this.formattedValidityPeriodTo,
       );
 
+      if (this.isEditMode) {
+        let isStudyPlanStillValid = this.studyPlans.some(
+          (plan) =>
+            plan.studienplan_id ===
+            this.editedClassTimeSlotValidityPeriod.studienplan_id,
+        );
+
+        if (!isStudyPlanStillValid) {
+          let editedStudyPlan = await this.getStudyPlan(
+            this.editedClassTimeSlotValidityPeriod.studienplan_id,
+          );
+          if (editedStudyPlan) {
+            this.studyPlans.push(editedStudyPlan);
+          } else {
+            console.error(
+              "Edited study plan not found:",
+              this.editedClassTimeSlotValidityPeriod.studienplan_id,
+            );
+          }
+        }
+      }
+
       let studySemestersByDates =
         await this.getStudySemestersByOrganizationalUnitAndDates(
-          this.classTimeSlotValidityPeriodFormData.organizationalUnitShortCode,
+          this.classTimeSlotValidityPeriodFormData.organizationalUnit
+            ?.oe_kurzbz,
           this.formattedValidityPeriodFrom,
           this.formattedValidityPeriodTo,
         );
 
-        let studySemesters = new Array(
+      let studySemesters = new Array(
         ...new Set(
           studySemestersByDates
             .map((s) => s.semester_numbers)
@@ -220,6 +258,24 @@ export default {
         ? getAllStudyPlansResponse.data
         : [];
     },
+    async getStudyPlan(studienplan_id) {
+      if (!studienplan_id) {
+        return null;
+      }
+
+      let getStudyPlanResponse = await this.$api.call(
+        ApiStudienPlan.getStudyPlan(studienplan_id),
+      );
+      if (getStudyPlanResponse.meta.status !== "success") {
+        console.error(
+          "Error fetching study plan details:",
+          getStudyPlanResponse.meta.message,
+        );
+        return null;
+      }
+
+      return getStudyPlanResponse.data ? getStudyPlanResponse.data : null;
+    },
     async getStudySemestersByOrganizationalUnitAndDates(
       organizationalUnitShortCode,
       validityPeriodFrom,
@@ -251,13 +307,21 @@ export default {
         ? getStudySemestersResponse.data
         : [];
     },
-    async getStudySemestersByStudyPlanAndDates(studyProgramId, validityPeriodFrom, validityPeriodTo) {
+    async getStudySemestersByStudyPlanAndDates(
+      studyProgramId,
+      validityPeriodFrom,
+      validityPeriodTo,
+    ) {
       if (!studyProgramId || !validityPeriodFrom || !validityPeriodTo) {
         return [];
       }
 
       let getStudySemestersResponse = await this.$api.call(
-        ApiStudienSemester.getStudySemestersByStudyPlanAndDates(studyProgramId, validityPeriodFrom, validityPeriodTo),
+        ApiStudienSemester.getStudySemestersByStudyPlanAndDates(
+          studyProgramId,
+          validityPeriodFrom,
+          validityPeriodTo,
+        ),
       );
       if (getStudySemestersResponse.meta.status !== "success") {
         console.error(
@@ -273,10 +337,12 @@ export default {
     createClassTimeSlotValidityPeriod() {
       return this.$refs.classTimeSlotValidityPeriodData
         .call(
-          ApiClassSchedule.createClassTimeSlotValidityPeriod(
-            this.id,
-            this.classTimeSlotValidityPeriodFormData,
-          ),
+          ApiClassSchedule.createClassTimeSlotValidityPeriod(this.id, {
+            ...this.classTimeSlotValidityPeriodFormData,
+            organizationalUnitShortCode:
+              this.classTimeSlotValidityPeriodFormData.organizationalUnit
+                ?.oe_kurzbz,
+          }),
         )
         .then((response) => {
           this.$fhcAlert.alertSuccess(this.$p.t("ui", "successSave"));
@@ -299,7 +365,12 @@ export default {
           ApiClassSchedule.updateClassTimeSlotValidityPeriod(
             this.id,
             this.classTimeSlotValidityPeriodFormData.id,
-            this.classTimeSlotValidityPeriodFormData,
+            {
+              ...this.classTimeSlotValidityPeriodFormData,
+              organizationalUnitShortCode:
+                this.classTimeSlotValidityPeriodFormData.organizationalUnit
+                  ?.oe_kurzbz,
+            },
           ),
         )
         .then((response) => {
@@ -307,6 +378,9 @@ export default {
           this.$refs.classTimeSlotValidityPeriodModal.hide();
           this.resetClassTimeSlotValidityPeriodModal();
           window.scrollTo(0, 0);
+
+          this.editedClassTimeSlotValidityPeriod = null;
+
           this.$emit("classTimeSlotValidityPeriodUpdated");
         })
         .catch((error) => {
@@ -321,7 +395,7 @@ export default {
       this.$refs.classTimeSlotValidityPeriodData?.clearValidation();
       this.classTimeSlotValidityPeriodFormData = {
         id: null,
-        organizationalUnitShortCode: null,
+        organizationalUnit: null,
         studyPlanId: null,
         classTimeSlotTypeShortcode: null,
         validityPeriodFrom: null,
@@ -329,6 +403,26 @@ export default {
         semester: null,
         description: null,
       };
+    },
+    filterOrganizationalUnits(event) {
+      const query = event.query.toLowerCase();
+      if (!query) {
+        return (this.filteredOrganizationalUnits = [
+          ...this.organizationalUnits,
+        ]);
+      }
+
+      return (this.filteredOrganizationalUnits =
+        this.organizationalUnits.filter((unit) => {
+          let label = `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`;
+          return label.toLowerCase().includes(query);
+        }));
+    },
+    getClassTimeSlotTypeLabel(classTimeSlotType) {
+      if (!classTimeSlotType) return "";
+      return this.userLanguage?.value === "English"
+        ? classTimeSlotType.bezeichnung_mehrsprachig[1].value
+        : classTimeSlotType.bezeichnung_mehrsprachig[0].value;
     },
   },
   async created() {
@@ -392,18 +486,17 @@ export default {
       <form-validation />
       <div class="row mb-3">
         <form-input
-          v-model="classTimeSlotValidityPeriodFormData.organizationalUnitShortCode"
-          :label="$p.t('lehre/organisationseinheit') + ' *'"
-          type="select"
+          v-model="classTimeSlotValidityPeriodFormData.organizationalUnit"
+          :label="$capitalize($p.t('lehre/organisationseinheit')) + ' *'"
+          :suggestions="filteredOrganizationalUnits"
+          :optionValue="(option) => option.kurzbz"
+          :optionLabel="(option) => option.bezeichnung + ' (' + option.organisationseinheittyp_kurzbz + ')'" 
+          @complete="filterOrganizationalUnits"
+          dropdown
+          forceSelection
+          type="autocomplete"
           name="organizationalUnitShortCode"  
           >
-          <option
-            v-for="organizationalUnit in organizationalUnits"
-            :key="organizationalUnit.oe_kurzbz"
-            :value="organizationalUnit.oe_kurzbz"
-            >
-            {{organizationalUnit.bezeichnung}} - {{ organizationalUnit.organisationseinheittyp_kurzbz }}
-          </option>
         </form-input>
       </div>
       <div class="row mb-3">
@@ -449,7 +542,7 @@ export default {
             :key="studyPlan.studienplan_id"
             :value="studyPlan.studienplan_id"
             >
-            {{studyPlan.bezeichnung}} - {{studyPlan.studienplan_id}}
+            {{studyPlan.bezeichnung}}
           </option>
         </form-input>
       </div>
@@ -478,12 +571,13 @@ export default {
           :label="$p.t('ui/classTimeSlotType')"
           v-model="classTimeSlotValidityPeriodFormData.classTimeSlotTypeShortcode"
           >
+          <option :value="null"> - </option>
           <option
             v-for="classTimeSlotType in classTimeSlotTypes"
             :key="classTimeSlotType.unterrichtszeitentyp_kurzbz"
             :value="classTimeSlotType.unterrichtszeitentyp_kurzbz"
             >
-            {{classTimeSlotType.bezeichnung_mehrsprachig[0].value}} / ({{classTimeSlotType.bezeichnung_mehrsprachig[1].value}})
+            {{ getClassTimeSlotTypeLabel(classTimeSlotType) }}
           </option>
         </form-input>
       </div>

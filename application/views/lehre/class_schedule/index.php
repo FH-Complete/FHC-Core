@@ -21,7 +21,8 @@ $includesArray = array(
 		'public/css/components/verticalsplit.css',
 		'public/extensions/FHC-Core-Developer/css/FhcMain.css',
 		'public/css/components/calendar.css',
-		'public/css/components/classSchedule.css'
+		'public/css/components/classSchedule.css',
+		'public/css/components/vue-datepicker.css',
 	)
 );
 
