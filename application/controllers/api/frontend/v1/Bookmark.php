@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 class Bookmark extends FHCAPI_Controller
 {
 
@@ -28,7 +30,7 @@ class Bookmark extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getBookmarks' => self::PERM_LOGGED,
-            'delete' => self::PERM_LOGGED,
+			'delete' => self::PERM_LOGGED,
 			'insert' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
 			'changeOrder' => self::PERM_LOGGED
@@ -38,96 +40,104 @@ class Bookmark extends FHCAPI_Controller
 
 		$this->uid = getAuthUID();
 		$this->pid = getAuthPersonID();
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
 
 	
-    /**
-	 * gets the bookmarks associated to a user 
+	/**
+	 * gets the bookmarks associated to a user
 	 * @access public
 	 * @return void
 	 */
 	public function getBookmarks()
 	{
-        $this->BookmarkModel->addOrder("sort");
+		$this->BookmarkModel->addOrder("sort");
 		$bookmarks = $this->BookmarkModel->loadWhere(["uid"=>$this->uid]);
 
-        $bookmarks = $this->getDataOrTerminateWithError($bookmarks);
+		$bookmarks = $this->getDataOrTerminateWithError($bookmarks);
 
-        $this->terminateWithSuccess($bookmarks);
-    }
+		$this->terminateWithSuccess($bookmarks);
+	}
 
-    /**
-	 * deletes bookmark from associated user 
+	/**
+	 * deletes bookmark from associated user
 	 * @access public
 	 * @return void
 	 */
-    public function delete($bookmark_id)
+	public function delete($bookmark_id)
 	{
-        $bookmark = $this->BookmarkModel->load($bookmark_id);
+		$bookmark = $this->BookmarkModel->load($bookmark_id);
 
-        $bookmark = current($this->getDataOrTerminateWithError($bookmark));
+		$bookmark = current($this->getDataOrTerminateWithError($bookmark));
 
-        // only delete bookmark if the user is the owner of the bookmark
-        if($bookmark->uid == $this->uid || $this->permissionlib->isBerechtigt('admin')){
+		// only delete bookmark if the user is the owner of the bookmark
+		if ($bookmark->uid == $this->uid || $this->permissionlib->isBerechtigt('admin')) {
+			$delete_result = $this->BookmarkModel->delete($bookmark_id);
 
-            $delete_result = $this->BookmarkModel->delete($bookmark_id);
+			$delete_result = $this->getDataOrTerminateWithError($delete_result);
 
-            $delete_result = $this->getDataOrTerminateWithError($delete_result);
+			$this->terminateWithSuccess($delete_result);
+		} else {
+			$this->_outputAuthError(['delete' => ['admin:rw']]);
+		}
+	}
 
-            $this->terminateWithSuccess($delete_result);
-        }else{
-            $this->_outputAuthError(['delete' => ['admin:rw']]);
-        }
-    }
-
-    /**
-	 * inserts new bookmark into the bookmark table 
+	/**
+	 * inserts new bookmark into the bookmark table
 	 * @access public
 	 * @return void
 	 */
-    public function insert()
+	public function insert()
 	{
-        // form validation
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
-        $this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
-        if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+		// form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
+		$this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-        $url = $this->input->post('url',true);
-        $title = $this->input->post('title',true);
-        $tag = $this->input->post('tag', true);
+		$url = $this->input->post('url', true);
+		$title = $this->input->post('title', true);
+		$tag = $this->input->post('tag', true);
 		if (is_array($tag)) {
 			$tag = json_encode($tag); // convert PHP array to JSON string
 		}
 		$sort = $this->input->post('sort', true);
 
-        $insert_into_result = $this->BookmarkModel->insert(['uid'=>$this->uid, 'url'=>$url, 'title'=>$title,'tag'=>$tag, 'insertvon'=>$this->uid, 'updateamum'=>NULL, 'updatevon'=>NULL, 'sort'=>$sort,]);
+		$insert_into_result = $this->BookmarkModel->insert([
+			'uid' => $this->uid,
+			'url' => $url,
+			'title' => $title,
+			'tag' => $tag,
+			'insertvon' => $this->uid,
+			'updateamum' => null,
+			'updatevon' => null,
+			'sort' => $sort
+		]);
 
-        $insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
+		$insert_into_result = $this->getDataOrTerminateWithError($insert_into_result);
 
-        $this->terminateWithSuccess($insert_into_result);
-
-    }
+		$this->terminateWithSuccess($insert_into_result);
+	}
 
 	/**
-	 * updates bookmark in the bookmark table 
+	 * updates bookmark in the bookmark table
 	 * @access public
 	 * @return void
 	 */
-    public function update($bookmark_id)
+	public function update($bookmark_id)
 	{
-        // form validation
-        $this->load->library('form_validation');
-        $this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
-        $this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
-        if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+		// form validation
+		$this->load->library('form_validation');
+		$this->form_validation->set_rules('url', 'URL', 'required|valid_url|max_length[511]');
+		$this->form_validation->set_rules('title', 'Title', 'required|max_length[255]');
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
 
-        $url = $this->input->post('url',true);
-        $title = $this->input->post('title',true);
+		$url = $this->input->post('url', true);
+		$title = $this->input->post('title', true);
 		$tag = $this->input->post('tag', true);
 		if (is_array($tag)) {
 			$tag = json_encode($tag);
@@ -136,21 +146,26 @@ class Bookmark extends FHCAPI_Controller
 		$now = new DateTime();
 		$now = $now->format('Y-m-d H:i:s');
 
-        $update_result = $this->BookmarkModel->update($bookmark_id,['url'=>$url, 'title'=>$title, 'tag'=>$tag, 'updateamum'=>$now]);
+		$update_result = $this->BookmarkModel->update($bookmark_id, [
+			'url' => $url,
+			'title' => $title,
+			'tag' => $tag,
+			'updateamum' => $now
+		]);
 
-        $update_result = $this->getDataOrTerminateWithError($update_result);
+		$update_result = $this->getDataOrTerminateWithError($update_result);
 
-        $this->terminateWithSuccess($update_result);
-
-    }
+		$this->terminateWithSuccess($update_result);
+	}
 
 	/**
 	 * changes sort of two bookmarks in the bookmark table
 	 * @access public
 	 * @return void
 	 */
-    public function changeOrder($bookmark_id1, $bookmark_id2)
+	public function changeOrder($bookmark_id1, $bookmark_id2)
 	{
+		$update_result = [];
 
 		$result1 = $this->BookmarkModel->load($bookmark_id1);
 		$data1 = $this->getDataOrTerminateWithError($result1);
@@ -160,13 +175,17 @@ class Bookmark extends FHCAPI_Controller
 		$data2 = $this->getDataOrTerminateWithError($result2);
 		$sort2 = current($data2)->sort;
 
-        $update_result1 = $this->BookmarkModel->update($bookmark_id1,['sort'=>$sort2,]);
-        $update_result[] = $this->getDataOrTerminateWithError($update_result1);
+		$update_result1 = $this->BookmarkModel->update($bookmark_id1, [
+			'sort' => $sort2
+		]);
+		$update_result[] = $this->getDataOrTerminateWithError($update_result1);
 
-		$update_result2 = $this->BookmarkModel->update($bookmark_id2,['sort'=>$sort1,]);
-        $update_result[] = $this->getDataOrTerminateWithError($update_result2);
+		$update_result2 = $this->BookmarkModel->update($bookmark_id2, [
+			'sort' => $sort1
+		]);
+		$update_result[] = $this->getDataOrTerminateWithError($update_result2);
 
-        $this->terminateWithSuccess($update_result);
-    }
+		$this->terminateWithSuccess($update_result);
+	}
 }
 
