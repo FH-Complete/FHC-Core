@@ -16,6 +16,9 @@ export default {
 		PvAutoComplete: primevue.autocomplete,
 	},
 	mixins: [AbstractWidget],
+	inject: [
+		"adminMode"
+	],
 	data: () => ({
 		ready: false,
 		bookmark_id: null,
@@ -235,13 +238,15 @@ export default {
 		return { bookmarks, tags, actions }
 	},
 	async mounted() {
-		await this.actions.fetch();
-		this.ready = true;
+		if (!this.adminMode) {
+			await this.actions.fetch();
+			this.ready = true;
+		}
 	},
 	template: /*html*/ `
 	<div class="widgets-url w-100 h-100 overflow-auto p-3">
 
-		<div class="d-flex mt-2">
+		<div v-if="!adminMode" class="d-flex mt-2">
 			<button
 				class="btn btn-outline-secondary btn-sm flex-grow-1 me-2"
 				@click="openCreateModal"
