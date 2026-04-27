@@ -16,9 +16,12 @@ export default {
 		PvAutoComplete: primevue.autocomplete,
 	},
 	mixins: [AbstractWidget],
-	inject: [
-		"adminMode"
-	],
+	inject: {
+		adminMode: {
+			from: 'adminMode',
+			default: false
+		}
+	},
 	data: () => ({
 		ready: false,
 		bookmark_id: null,
