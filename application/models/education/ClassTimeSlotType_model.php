@@ -9,7 +9,7 @@ class ClassTimeSlotType_model extends DB_Model
 	{
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_unterrichtszeiten_typ';
-		$this->pk = 'unterrichtszeit_id';
+		$this->pk = 'unterrichtszeitentyp_kurzbz';
 	}
 
 }
