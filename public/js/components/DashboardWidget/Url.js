@@ -31,7 +31,6 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
-		tagsArrayMS: [],
 		tagsArrayAC: [],
 		selectedTags: [],
 		newTag: null,
@@ -70,10 +69,7 @@ export default {
 				return 0;
 			else
 				return Math.min(...this.sharedFiltered.map(b => b.sort));
-		},
-		filterInput(){
-			return this.selectedFilters.map(item => item.tag);
-		},
+		}
 	},
 	methods: {
 		stopDrag(event){
@@ -272,9 +268,6 @@ export default {
 				.call(ApiBookmark.getAllBookmarkTags())
 				.then((res) => res.data)
 				.then((result) => {
-					//Version Chips
-					this.tagsArrayMS = this.prepareTag(result.data);
-
 					//Version Autocomplete
 					this.tagsArrayAC = result.data;
 				})
@@ -282,13 +275,13 @@ export default {
 		},
 		openFilterModal() {
 			if (this.config.tags && this.config.tags.length)
-				this.selectedFilters = this.prepareTag(this.config.tags);
+				this.selectedFilters = [ ...this.config.tags ];
 			else
 				this.selectedFilters = [];
 			this.$refs.filterModal.show();
 		},
 		async handleAddingTagFilter(widgetId) {
-			this.config.tags = [ ...this.filterInput ];
+			this.config.tags = this.selectedFilters;
 			this.$emit('change');
 			this.sharedFiltered = this.filterBookmarksByTags(this.shared);
 			this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
@@ -539,8 +532,7 @@ export default {
 						<PvMultiSelect
 							v-model="selectedFilters"
 							id="tagFilterUrl"
-							:options="tagsArrayMS"
-							optionLabel="tag"
+							:options="tagsArrayAC"
 							display="chip"
 							:placeholder="$p.t('bookmark', 'noFilter')"
 							:maxSelectedLabels="3"
