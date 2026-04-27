@@ -35,8 +35,7 @@ export default {
 		newTag: null,
 		selectedFilters: [],
 		filter: [],
-		filteredArray: [],
-		sharedFiltered: {},
+		filteredArray: []
 	}),
 	computed: {
 		availableTags() {
@@ -45,17 +44,17 @@ export default {
 				.flat()
 				.filter((v, i, a) => v && a.indexOf(v) === i);
 		},
-		tagName() {
-			return this.config.tag !== undefined && this.config.tag.length > 0
-				? this.config.tag
-				: this.$p.t("bookmark", "myBookmarks");
-		},
-		emptyBookmarks() {
-			if (this.shared instanceof Array && this.shared.length == 0) return true;
+		filteredBookmarks() {
+			if (!this.shared)
+				return [];
 
-			if (!this.shared) return true;
+			if (!this.config.tags || !this.config.tags.length)
+				return this.shared;
 
-			return false;
+			return this.shared.filter(bookmark => {
+				const tags = JSON.parse(bookmark.tag || "[]");
+				return tags.some(tag => this.config.tags.includes(tag));
+			});
 		},
 		newSort(){
 			if(this.shared.length == 0)
@@ -67,19 +66,16 @@ export default {
 			if(this.shared.length == 0)
 				return 0;
 			else
-				return Math.max(...this.sharedFiltered.map(b => b.sort));
+				return Math.max(...this.filteredBookmarks.map(b => b.sort));
 		},
 		minSort(){
 			if(this.shared.length == 0)
 				return 0;
 			else
-				return Math.min(...this.sharedFiltered.map(b => b.sort));
+				return Math.min(...this.filteredBookmarks.map(b => b.sort));
 		}
 	},
 	methods: {
-		stopDrag(event){
-			event.preventDefault();
-		},
 		clearInputs(){
 			this.title_input = "";
 			this.url_input = "";
@@ -171,10 +167,6 @@ export default {
 				.then((res) => res.data)
 				.then((result) => {
 					this.shared = result;
-
-					this.$nextTick(() => {
-						this.sharedFiltered = this.filterBookmarksByTags(this.shared);
-					});
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -194,18 +186,10 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		filterBookmarksByTags(bookmarks) {
-			if (!this.config.tags || !this.config.tags.length)
-				return bookmarks;
-			return bookmarks.filter(bookmark => {
-				const tags = JSON.parse(bookmark.tag || "[]");
-				return tags.some(tag => this.config.tags.includes(tag));
-			});
-		},
 		sortDown(bookmark_id){
-			const current = this.sharedFiltered.find(b => b.bookmark_id === bookmark_id);
+			const current = this.filteredBookmarks.find(b => b.bookmark_id === bookmark_id);
 
-			const next = this.sharedFiltered
+			const next = this.filteredBookmarks
 				.filter(b => b.sort > current.sort)
 				.sort((a, b) => a.sort - b.sort)[0];
 
@@ -216,9 +200,9 @@ export default {
 			this.changeOrder(current.bookmark_id, next.bookmark_id);
 		},
 		sortUp(bookmark_id){
-			const current = this.sharedFiltered.find(b => b.bookmark_id === bookmark_id);
+			const current = this.filteredBookmarks.find(b => b.bookmark_id === bookmark_id);
 
-			const next = this.sharedFiltered
+			const next = this.filteredBookmarks
 				.filter(b => b.sort < current.sort)
 				.sort((a, b) => a.sort + b.sort)[0];
 
@@ -275,7 +259,6 @@ export default {
 		async handleAddingTagFilter(widgetId) {
 			this.config.tags = this.selectedFilters;
 			this.$emit('change');
-			this.sharedFiltered = this.filterBookmarksByTags(this.shared);
 			this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
 			this.$refs.filterModal.hide();
 		},
@@ -329,92 +312,88 @@ export default {
 			</button>
 		</div>
 
-		<template v-if="sharedFiltered">
-
-			<template v-if="!emptyBookmarks">
-				<div
-					v-for="link in sharedFiltered"
-					:key="link.id"
-					class="d-flex mt-2"
+		<template v-if="filteredBookmarks.length">
+			<div
+				v-for="link in filteredBookmarks"
+				:key="link.id"
+				class="d-flex mt-2"
+			>
+				<a target="_blank" :href="link.url" class="me-1">
+					<i
+						class="fa fa-solid fa-arrow-up-right-from-square me-1"
+						aria-hidden="true"
+					></i>
+					{{ link.title }}
+				</a>
+				<span
+					v-if="hasTags(link)"
+					:title="hasTags(link)"
+					style="color: silver;"
 				>
-					<a target="_blank" :href="link.url" class="me-1">
-						<i
-							class="fa fa-solid fa-arrow-up-right-from-square me-1"
-							aria-hidden="true"
-						></i>
-						{{ link.title }}
+					<i
+						class="fa fa-solid fa-tag text-gray-500"
+						aria-hidden="true"
+					></i>
+				</span>
+
+				<div class="ms-auto">
+					<!--EDIT BOOKMARK-->
+					<a
+						type="button"
+						href="#"
+						@click.prevent="openEditModal(link)"
+						aria-label="edit bookmark"
+						:title="$p.t('bookmark/editBookmark')"
+					>
+						<i class="fa fa-edit me-1" aria-hidden="true"></i>
 					</a>
-					<span
-						v-if="hasTags(link)"
-						:title="hasTags(link)"
-						style="color: silver;"
+					<!--DELETE BOOKMARK-->
+					<a
+						type="button"
+						id="deleteBookmark"
+						href="#"
+						aria-label="delete bookmark"
+						:title="$p.t('bookmark/deleteBookmark')"
+						@click.prevent="removeLink(link.bookmark_id)"
+					>
+						<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
+					</a>
+					<!--SORT BOOKMARKS-->
+					<a
+						v-if="filteredBookmarks.length > 1"
+						type="button"
+						id="downsortBookmark"
+						href="#"
+						aria-label="sortdown bookmark"
+						:title="$p.t('bookmark/sortDownwards')"
+						@click.prevent="sortDown(link.bookmark_id)"
 					>
 						<i
-							class="fa fa-solid fa-tag text-gray-500"
-							aria-hidden="true"
+							class="fa fa-arrow-down me-1"
+							:class="{ 'text-light pointer-events-none': link.sort === maxSort }"
 						></i>
-					</span>
-
-					<div class="ms-auto">
-						<!--EDIT BOOKMARK-->
-						<a
-							type="button"
-							href="#"
-							@click.prevent="openEditModal(link)"
-							aria-label="edit bookmark"
-							:title="$p.t('bookmark/editBookmark')"
-						>
-							<i class="fa fa-edit me-1" aria-hidden="true"></i>
-						</a>
-						<!--DELETE BOOKMARK-->
-						<a
-							type="button"
-							id="deleteBookmark"
-							href="#"
-							aria-label="delete bookmark"
-							:title="$p.t('bookmark/deleteBookmark')"
-							@click.prevent="removeLink(link.bookmark_id)"
-						>
-							<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
-						</a>
-						<!--SORT BOOKMARKS-->
-						<a
-							v-if="sharedFiltered.length > 1"
-							type="button"
-							id="downsortBookmark"
-							href="#"
-							aria-label="sortdown bookmark"
-							:title="$p.t('bookmark/sortDownwards')"
-							@click.prevent="sortDown(link.bookmark_id)"
-						>
-							<i
-								class="fa fa-arrow-down me-1"
-								:class="{ 'text-light pointer-events-none': link.sort === maxSort }"
-							></i>
-						</a>
-						<a
-							v-if="sharedFiltered.length > 1"
-							type="button"
-							id="upsortBookmark"
-							href="#"
-							aria-label="sortup bookmark"
-							:title="$p.t('bookmark/sortToTop')"
-							@click.prevent="sortUp(link.bookmark_id)"
-						>
-							<i
-								class="fa fa-arrow-up me-1"
-								:class="{ 'text-light pointer-events-none': link.sort === minSort }"
-							></i>
-						</a>
-					</div>
+					</a>
+					<a
+						v-if="filteredBookmarks.length > 1"
+						type="button"
+						id="upsortBookmark"
+						href="#"
+						aria-label="sortup bookmark"
+						:title="$p.t('bookmark/sortToTop')"
+						@click.prevent="sortUp(link.bookmark_id)"
+					>
+						<i
+							class="fa fa-arrow-up me-1"
+							:class="{ 'text-light pointer-events-none': link.sort === minSort }"
+						></i>
+					</a>
 				</div>
-			</template>
-
-			<div v-else class="d-flex mt-2">
-				<span>{{ $p.t('bookmark', 'emptyBookmarks') }}</span>
 			</div>
-
 		</template>
+
+		<div v-else class="d-flex mt-2">
+			<span>{{ $p.t('bookmark', 'emptyBookmarks') }}</span>
+		</div>
 
 		<template v-else>
 			<p v-for="i in 4" class="placeholder-glow">
