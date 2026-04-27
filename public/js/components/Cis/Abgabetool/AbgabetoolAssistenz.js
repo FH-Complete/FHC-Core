@@ -278,6 +278,20 @@ export const AbgabetoolAssistenz = {
 			]};
 	},
 	methods: {
+		redrawTableScrollSave() {
+			const table = this.$refs.abgabeTable.tabulator;
+			const scrollX = table.rowManager.scrollLeft;
+			const scrollY = table.rowManager.scrollTop;
+			this.$refs.abgabeTable.tabulator.redraw(true)
+
+			Vue.nextTick(()=> {
+				const tableholder = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+				if(tableholder) {
+					tableholder.scrollLeft = scrollX;
+					tableholder.scrollTop = scrollY;
+				}
+			})
+		},
 		shortLongTitleFormatter(cell, formatterParams, onRendered) {
 			const longForm = cell.getValue()
 			const shortForm = formatterParams?.shortForm
@@ -335,7 +349,7 @@ export const AbgabetoolAssistenz = {
 		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
-			this.$refs.abgabeTable.tabulator.redraw(true)
+			this.redrawTableScrollSave()
 		},
 		getQGateStatusList() {
 			return [
@@ -860,24 +874,9 @@ export const AbgabetoolAssistenz = {
 					pa.abgabetermine.sort((a, b) => new Date(a.datum) - new Date(b.datum))
 				})
 				
-				// reset selection to empty
-				// this.$refs.abgabeTable.tabulator.deselectRow()
-				const table = this.$refs.abgabeTable.tabulator;
-				const scrollX = table.rowManager.scrollLeft;
-				const scrollY = table.rowManager.scrollTop;
-				
-				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+				this.projektarbeiten = this.mapProjekteToTableData(this.projektarbeiten)
 
-				table.setData(mappedData)
-				table.redraw(true)
-
-				Vue.nextTick(()=> {
-					const table = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
-					if(table) {
-						table.scrollLeft = scrollX;
-						table.scrollTop = scrollY;
-					}
-				})
+				this.redrawTableScrollSave()
 				
 			}).finally(()=>{
 				this.saving = false
