@@ -65,7 +65,14 @@ export default {
 		buildTreemap(messages) {
 			if (!messages || !messages.data || messages.data.length === 0)
 			{
-				return {data: [], last_page: 0};
+				if(this.tabulatorOptions.pagination)
+				{
+					return {data: [], last_page: 0};
+				}
+				else
+				{
+					return [];
+				}
 			}
 
 			const last_page = messages.meta.count;
@@ -106,7 +113,15 @@ export default {
 				// to avoid endless loop
 				if (iteration > messages.length) break;
 			}
-			return {data: messageNested, last_page: last_page};
+
+			if(this.tabulatorOptions.pagination)
+			{
+				return {data: messageNested, last_page: last_page};
+			}
+			else
+			{
+				return messageNested;
+			}
 		},
 		loadAjaxCall(url, config, params){
 			return this.$api.call(
@@ -252,7 +267,7 @@ export default {
 						frozen: true
 					}
 				],
-				pagination: true,
+				pagination: false,
 				paginationMode: "remote",
 				paginationSize: 15,
 				paginationInitialPage: 1,
