@@ -63,7 +63,10 @@ export default {
 			for (var k in payload) {
 				for (var wid in this.widgets) {
 					if (this.widgets[wid].id == k) {
-						payload[k] = ObjectUtils.mergeDeep(this.widgets[wid], payload[k]);
+						const copy = ObjectUtils.mergeDeep(this.widgets[wid], payload[k]);
+						if (payload[k].config)
+							copy.config = payload[k].config;
+						payload[k] = copy;
 						// NOTE(chris): remove internal props
 						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'preset'])
 							if (payload[k][prop])

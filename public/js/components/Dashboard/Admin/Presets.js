@@ -78,7 +78,10 @@ export default {
 				const section = this.sections.find(section => section.name == section_name);
 				for (var wid in section.widgets) {
 					if (section.widgets[wid].id == k) {
-						payload[k] = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						const copy = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						if (payload[k].config)
+							copy.config = payload[k].config;
+						payload[k] = copy;
 						// NOTE(chris): remove internal props
 						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'custom'])
 							if (payload[k][prop])
