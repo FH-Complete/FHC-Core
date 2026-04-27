@@ -31,8 +31,7 @@ class Bookmark extends FHCAPI_Controller
             'delete' => self::PERM_LOGGED,
 			'insert' => self::PERM_LOGGED,
 			'update' => self::PERM_LOGGED,
-			'changeOrder' => self::PERM_LOGGED,
-			'getAllBookmarkTags' => self::PERM_LOGGED,
+			'changeOrder' => self::PERM_LOGGED
 		]);
 
 		$this->load->model('dashboard/Bookmark_model', 'BookmarkModel');
@@ -169,20 +168,5 @@ class Bookmark extends FHCAPI_Controller
 
         $this->terminateWithSuccess($update_result);
     }
-
-	/**
-	 * get all the bookmark tags associated to a user
-	 * @access public
-	 * @return void
-	 */
-	public function getAllBookmarkTags()
-	{
-		$this->BookmarkModel->addOrder("sort");
-		$result = $this->BookmarkModel->getAllBookmarkTags($this->uid);
-
-		$bookmarks = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(current($bookmarks));
-	}
 }
 

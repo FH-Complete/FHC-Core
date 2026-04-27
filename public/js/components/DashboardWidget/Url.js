@@ -31,7 +31,6 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
-		tagsArrayAC: [],
 		selectedTags: [],
 		newTag: null,
 		selectedFilters: [],
@@ -40,6 +39,12 @@ export default {
 		sharedFiltered: {},
 	}),
 	computed: {
+		availableTags() {
+			return (this.shared || [])
+				.map(bookmark => JSON.parse(bookmark.tag))
+				.flat()
+				.filter((v, i, a) => v && a.indexOf(v) === i);
+		},
 		tagName() {
 			return this.config.tag !== undefined && this.config.tag.length > 0
 				? this.config.tag
@@ -106,7 +111,6 @@ export default {
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
 					// refetch the bookmarks to see the updates
-					this.getAllBookmarkTags();
 					this.fetchBookmarks();
 					// reset the values for the title and url inputs
 					this.clearInputs();
@@ -141,7 +145,6 @@ export default {
 				.then((result) => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
 					// refetch the bookmarks to see the updates
-					this.getAllBookmarkTags();
 					this.fetchBookmarks();
 					this.$refs.createModal.hide();
 					// reset the values for the title and url inputs
@@ -188,7 +191,6 @@ export default {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
 					// refetch the bookmarks to see the updates
 					this.fetchBookmarks();
-					this.getAllBookmarkTags();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -263,16 +265,6 @@ export default {
 
 			return result;
 		},
-		getAllBookmarkTags(){
-			this.$api
-				.call(ApiBookmark.getAllBookmarkTags())
-				.then((res) => res.data)
-				.then((result) => {
-					//Version Autocomplete
-					this.tagsArrayAC = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		openFilterModal() {
 			if (this.config.tags && this.config.tags.length)
 				this.selectedFilters = [ ...this.config.tags ];
@@ -291,7 +283,7 @@ export default {
 			const query = event.query ?? "";
 
 			// Filter for text
-			this.filteredArray = this.tagsArrayAC.filter(item =>
+			this.filteredArray = this.availableTags.filter(item =>
 				item.toLowerCase().includes(query.toLowerCase())
 			);
 
@@ -303,7 +295,6 @@ export default {
 	},
 	async mounted() {
 		await this.fetchBookmarks();
-		this.getAllBookmarkTags();
 	},
 	created() {
 		// this.$emit('setConfig', true); // -> use this to enable widget config mode if needed
@@ -532,7 +523,7 @@ export default {
 						<PvMultiSelect
 							v-model="selectedFilters"
 							id="tagFilterUrl"
-							:options="tagsArrayAC"
+							:options="availableTags"
 							display="chip"
 							:placeholder="$p.t('bookmark', 'noFilter')"
 							:maxSelectedLabels="3"

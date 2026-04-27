@@ -48,11 +48,5 @@ export default {
 			method: 'post',
 			url: `/api/frontend/v1/Bookmark/changeOrder/${bookmark_id1}/${bookmark_id2}`,
 		};
-	},
-	getAllBookmarkTags() {
-		return {
-			method: 'get',
-			url: '/api/frontend/v1/Bookmark/getAllBookmarkTags'
-		};
 	}
 };
