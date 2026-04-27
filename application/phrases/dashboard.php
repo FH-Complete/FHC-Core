@@ -145,7 +145,6 @@ array (
     ),
   ),
 ),
-,
 array (
   'app' => 'core',
   'category' => 'dashboard',
