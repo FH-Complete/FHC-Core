@@ -306,3 +306,22 @@
 #abgabetable .tabulator-row:hover .tabulator-cell.sticky-col {
 	background-color: #ccc; /* Match your existing hover color */
 }
+
+.tabulator-cell {
+	container-type: inline-size;
+}
+
+.tabulator-col-title {
+	container-type: inline-size;
+}
+
+@container (max-width: 100px) {
+	.full-text {
+		display: none !important;
+	}
+
+	.short-text {
+		display: inline-block !important;
+		width: 100%;
+	}
+}

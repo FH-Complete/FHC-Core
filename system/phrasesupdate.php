@@ -41761,7 +41761,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fehlerAktualitaetProjektarbeit ',
+		'phrase' => 'c4fehlerAktualitaetProjektarbeit',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -43767,18 +43767,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4orgform',
+		'phrase' => 'c4orgformv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Organisationseinheit",
+				'text' => "Organisationsform",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "organization unit",
+				'text' => "organization form",
 				'description' => '',
 				'insertvon' => 'system'
 			)

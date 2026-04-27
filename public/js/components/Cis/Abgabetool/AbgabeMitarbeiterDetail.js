@@ -656,6 +656,7 @@ export const AbgabeMitarbeiterDetail = {
 							:enable-time-picker="false"
 							locale="de"
 							format="dd.MM.yyyy"
+							model-type="yyyy-MM-dd"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -806,6 +807,7 @@ export const AbgabeMitarbeiterDetail = {
 								:enable-time-picker="false"
 								locale="de"
 								format="dd.MM.yyyy"
+								model-type="yyyy-MM-dd"
 								:text-input="true"
 								auto-apply>
 							</VueDatePicker>
@@ -874,6 +876,7 @@ export const AbgabeMitarbeiterDetail = {
 											:disabled="true"
 											locale="de"
 											format="dd.MM.yyyy"
+											model-type="yyyy-MM-dd"
 											>
 										</VueDatePicker>
 									</div>
