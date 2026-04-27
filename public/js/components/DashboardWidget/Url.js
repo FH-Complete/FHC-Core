@@ -3,7 +3,7 @@ import FormInput from "../Form/Input.js";
 import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
-import ApiBookmark from '../../api/factory/widget/bookmark.js';
+import { useUrlStore } from '../../composables/Pseudostore/DashboardWidget/UrlStore.js';
 
 export default {
 	name: "WidgetsUrl",
@@ -26,7 +26,6 @@ export default {
 		bookmark_id: null,
 		title_input: "",
 		url_input: "",
-		sort: null,
 		validation: {
 			invalidURL: false,
 			invalidTitel: false,
@@ -39,37 +38,37 @@ export default {
 	}),
 	computed: {
 		availableTags() {
-			return (this.shared || [])
+			return (this.bookmarks || [])
 				.map(bookmark => JSON.parse(bookmark.tag))
 				.flat()
 				.filter((v, i, a) => v && a.indexOf(v) === i);
 		},
 		filteredBookmarks() {
-			if (!this.shared)
+			if (!this.bookmarks)
 				return [];
 
 			if (!this.config.tags || !this.config.tags.length)
-				return this.shared;
+				return this.bookmarks;
 
-			return this.shared.filter(bookmark => {
+			return this.bookmarks.filter(bookmark => {
 				const tags = JSON.parse(bookmark.tag || "[]");
 				return tags.some(tag => this.config.tags.includes(tag));
 			});
 		},
 		newSort(){
-			if(this.shared.length == 0)
+			if(this.bookmarks.length == 0)
 				return 1;
 			else
-				return Math.max(...this.shared.map(b => b.sort)) + 1;
+				return Math.max(...this.bookmarks.map(b => b.sort)) + 1;
 		},
 		maxSort(){
-			if(this.shared.length == 0)
+			if(this.bookmarks.length == 0)
 				return 0;
 			else
 				return Math.max(...this.filteredBookmarks.map(b => b.sort));
 		},
 		minSort(){
-			if(this.shared.length == 0)
+			if(this.bookmarks.length == 0)
 				return 0;
 			else
 				return Math.min(...this.filteredBookmarks.map(b => b.sort));
@@ -96,18 +95,15 @@ export default {
 			event.preventDefault();
 			if(!this.bookmark_id || !this.url_input || !this.title_input) return;
 
-			this.$api
-				.call(ApiBookmark.update({
-					bookmark_id: this.bookmark_id,
-					title: this.title_input,
-					url: this.url_input,
-					tag: this.selectedTags,
-				}))
-				.then((res) => res.data)
-				.then((result) => {
+			this.actions
+				.update(
+					this.bookmark_id,
+					this.title_input,
+					this.url_input,
+					this.selectedTags
+				)
+				.then(() => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 					this.$refs.editModal.hide();
@@ -128,20 +124,17 @@ export default {
 			if (!this.isValidationSuccessfull()) return;
 
 			// get highest Sort
-			this.sort = this.newSort;
+			const sort = this.newSort;
 
-			this.$api
-				.call(ApiBookmark.insert({
-					tag: this.selectedTags,
-					title: this.title_input,
-					url: this.url_input,
-					sort: this.sort
-				}))
-				.then((res) => res.data)
-				.then((result) => {
+			this.actions
+				.insert(
+					this.title_input,
+					this.url_input,
+					this.selectedTags,
+					sort
+				)
+				.then(() => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					this.$refs.createModal.hide();
 					// reset the values for the title and url inputs
 					this.clearInputs();
@@ -161,28 +154,16 @@ export default {
 
 			return !Object.values(this.validation).some(value => value === true);
 		},
-		async fetchBookmarks() {
-			await this.$api
-				.call(ApiBookmark.getBookmarks())
-				.then((res) => res.data)
-				.then((result) => {
-					this.shared = result;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		async removeLink(bookmark_id) {
 			let isConfirmed = await this.$fhcAlert.confirmDelete();
 
 			// early return if the confirm dialog was not confirmed
 			if (!isConfirmed) return;
 
-			this.$api
-				.call(ApiBookmark.delete(bookmark_id))
-				.then((res) => res.data)
-				.then((result) => {
+			this.actions
+				.remove(bookmark_id)
+				.then(() => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -212,15 +193,8 @@ export default {
 			}
 			this.changeOrder(current.bookmark_id, next.bookmark_id);
 		},
-		changeOrder(bookmark_id_1, bookmark_id_2){
-			this.$api
-				.call(ApiBookmark.changeOrder(bookmark_id_1, bookmark_id_2))
-				.then((res) => res.data)
-				.then((result) => {
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+		changeOrder(bookmark_id_1, bookmark_id_2) {
+			this.actions.swap(bookmark_id_1, bookmark_id_2);
 		},
 		hasTags(link) {
 			if (!link || !link.tag) return false;
@@ -276,14 +250,18 @@ export default {
 			}
 		},
 	},
+	setup() {
+		const {
+			bookmarks,
+			getters: { tags },
+			actions
+		} = useUrlStore();
+
+		return { bookmarks, tags, actions }
+	},
 	async mounted() {
-		await this.fetchBookmarks();
+		this.actions.fetch();
 	},
-	created() {
-		// this.$emit('setConfig', true); // -> use this to enable widget config mode if needed
-	},
-
-
 	template: /*html*/ `
 	<div class="widgets-url w-100 h-100 overflow-auto p-3">
 
