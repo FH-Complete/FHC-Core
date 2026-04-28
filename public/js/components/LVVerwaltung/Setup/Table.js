@@ -373,7 +373,7 @@ export default {
 			{
 				this.getLVInfos(data[0]);
 			}
-			this.$emit('update:selected', [data[0]]);
+			this.$emit('update:selected', data);
 		},
 		getLVInfos(data)
 		{
