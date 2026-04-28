@@ -2,6 +2,8 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+use \stdClass as stdClass;
+
 /**
  * Library that contains all the needed functionalities to operate with the Jobs Queue System
  */
@@ -24,12 +26,12 @@ class JobsQueueLib
 	const PROPERTY_END_TIME = 'endtime';
 	const PROPERTY_ERROR = 'error';
 
-	private $_ci; // CI instance
+	protected $_ci; // CI instance
 
 	/**
 	 * Constructor
 	 */
-	public function __construct($authenticate = true)
+	public function __construct()
 	{
 		// Gets CI instance
 		$this->_ci =& get_instance();
