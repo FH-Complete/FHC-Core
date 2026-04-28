@@ -1,17 +1,22 @@
 import FhcCalendar from "../../Calendar/LvPlan.js";
 
-import ApiLvPlan from '../../../api/factory/lvPlan.js';
+import ApiLvPlan from '../.././../api/factory/lvPlan.js';
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 
-export const DEFAULT_MODE_LVPLAN = 'Week'
+export const DEFAULT_MODE_LVPLAN = 'Week';
 
 export default {
-	name: 'LvPlanPersonal',
+	name: 'LvPlanStgOrg',
+	inject: {
+		cisRoot: {
+			from: 'cisRoot'
+		},
+	},
 	components: {
-		FhcCalendar
+		FhcCalendar,
 	},
 	props: {
-		viewData: Object, // NOTE(chris): this is inherited from router-view
+		viewData: Object,
 		propsViewData: Object
 	},
 	data() {
@@ -21,7 +26,9 @@ export default {
 			studiensemester_ende: null,
 			uid: null,
 			isMitarbeiter: false,
-			isStudent: false
+			isStudent: false,
+			listStg: [],
+			currentStgBezeichnung: null
 		};
 	},
 	computed:{
@@ -77,12 +84,16 @@ export default {
 		handleChangeMode(newMode, day) {
 			const mode = newMode[0].toUpperCase() + newMode.slice(1)
 			const focus_date = day.toISODate();
-			
+
 			this.$router.push({
-				name: "MyLvPlan",
+				name: "StgOrgLvPlan",
 				params: {
 					mode,
-					focus_date
+					focus_date,
+					stgkz: this.propsViewData.stgkz,
+					sem: this.propsViewData.sem,
+					verband: this.propsViewData.verband,
+					gruppe: this.propsViewData.gruppe,
 				}
 			});
 		},
@@ -99,12 +110,18 @@ export default {
 		},
 		getPromiseFunc(start, end) {
 			return [
-				this.$api.call(ApiLvPlan.eventsPersonal(start.toISODate(), end.toISODate())),
-				this.$api.call(ApiLvPlan.getLvPlanReservierungen(start.toISODate(), end.toISODate()))
+				this.$api.call(ApiLvPlan.eventsStgOrg(start.toISODate(), end.toISODate(), this.propsViewData.stgkz, this.propsViewData.sem, this.propsViewData.verband, this.propsViewData.gruppe)),
+				//local for test
+				/*				this.$api.call(ApiLvPlan.eventsStgOrg(start.toISODate(), end.toISODate(), this.stgkz, this.sem, this.verband, this.gruppe))*/
 			];
+		},
+		backToDropdown(){
+			this.$router.push({
+				name: "OverviewLvPlan",
+			});
 		}
 	},
-	created() {
+	created(){
 		this.$api
 			.call(ApiAuthinfo.getAuthInfo())
 			.then(res => {
@@ -112,16 +129,30 @@ export default {
 				this.isMitarbeiter = res.data.isMitarbeiter;
 				this.isStudent = res.data.isStudent;
 			});
+
+		if(this.propsViewData.stgkz) {
+			this.$api
+				.call(ApiLvPlan.getStudiengaenge())
+				.then(result => {
+					const currentStg = result.data.find(
+						item => item.studiengang_kz == this.propsViewData.stgkz
+					);
+					this.currentStgBezeichnung = currentStg.kurzbzlang + " - " + currentStg.bezeichnung;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		}
 	},
-	template: /*html*/`
-	<div class="cis-lvplan-personal d-flex flex-column h-100">
-		<h2>
-			{{ $p.t('lehre/stundenplan') }}
-			<span v-if="studiensemester_kurzbz" class="ps-3">
-				{{ studiensemester_kurzbz }}
-			</span>
-		</h2>
-		<hr>
+	template: `
+	<div class="cis-lvplan-stg-org d-flex flex-column h-100">
+		<h2>{{ $p.t('LvPlan/headerLvPlanLvVerband') }}</h2>
+		<p v-if="propsViewData.stgkz"><span><strong>{{currentStgBezeichnung}}</strong></span>
+			<span v-if="propsViewData.sem" style="margin-left:10px;"> Semester: {{propsViewData.sem}} </span>
+			<span v-if="propsViewData.verband" style="margin-left:10px;"> Verband: {{propsViewData.verband}} </span>
+			<span v-if="propsViewData.gruppe" style="margin-left:10px;"> Gruppe: {{propsViewData.gruppe}} </span>
+			<button class="py-1 btn btn-outline-secondary" :title="this.$p.t('LvPlan', 'backToDropdown')" style="margin-left:10px;"> <i class="fa fa-arrow-left fa-xs" @click="backToDropdown"></i></button>
+		</p>
+		<p v-else>{{ $p.t('LvPlan/noStgProvided') }}</p>
+
 		<fhc-calendar
 			ref="calendar"
 			:timezone="viewData.timezone"
@@ -136,7 +167,7 @@ export default {
 			<div
 				v-if="downloadLinks"
 				class="d-flex gap-1 justify-items-start"
-			>
+				>
 				<div v-for="{ title, icon, link } in downloadLinks">
 					<a
 						:href="link"
@@ -151,5 +182,6 @@ export default {
 				</div>
 			</div>
 		</fhc-calendar>
-	</div>`
+	</div>
+	`,
 };

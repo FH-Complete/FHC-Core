@@ -120,10 +120,7 @@ class Preset extends FHCAPI_Controller
 			$conf = $this->dashboardlib->getPreset($db, $funktion);
 			if ($conf) {
 				$preset = json_decode($conf->preset, true);
-				if (!isset($preset[$funktion]) || !isset($preset[$funktion]['widgets']))
-					$result[$funktion] = [];
-				else
-					$result[$funktion] = $preset[$funktion]['widgets'];
+				$result[$funktion] = $preset;
 			} else {
 				$result[$funktion] = [];
 			}
@@ -154,7 +151,7 @@ class Preset extends FHCAPI_Controller
 
 		$preset_decoded = json_decode($preset->preset, true);
 		
-		$this->dashboardlib->addWidgetsToWidgets($preset_decoded, $dashboard_kurzbz, $funktion_kurzbz, [$widget]);
+		$preset_decoded[$widget['widgetid']] = $widget;
 
 		$preset->preset = json_encode($preset_decoded);
 
@@ -186,8 +183,10 @@ class Preset extends FHCAPI_Controller
 
 		$preset_decoded = json_decode($preset->preset, true);
 
-		if (!$this->dashboardlib->removeWidgetFromWidgets($preset_decoded, $funktion_kurzbz, $widgetid))
+		if (!isset($preset_decoded[$widgetid]))
 			show_404();
+		
+		unset($preset_decoded[$widgetid]);
 
 		$preset->preset = json_encode($preset_decoded);
 

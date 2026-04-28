@@ -4,25 +4,27 @@ import Theme from '../../plugins/Theme.js';
 import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
-import MyLvPlan from "../../components/Cis/LvPlan/Personal.js";
+import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
 import MylvStudent from "../../components/Cis/Mylv/Student.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
 import CmsContent from "../../components/Cis/Cms/Content.js";
 import Info from "../../components/Cis/Mylv/Semester/Studiengang/Lv/Info.js";
-import RoomInformation, {DEFAULT_MODE_RAUMINFO} from "../../components/Cis/Mylv/RoomInformation.js";
+import RoomInformation, {DEFAULT_MODE_RAUMINFO_DESKTOP, DEFAULT_MODE_RAUMINFO_MOBILE} from "../../components/Cis/Mylv/RoomInformation.js";
 import AbgabetoolStudent from "../../components/Cis/Abgabetool/AbgabetoolStudent.js";
 import AbgabetoolMitarbeiter from "../../components/Cis/Abgabetool/AbgabetoolMitarbeiter.js";
 import AbgabetoolAssistenz from "../../components/Cis/Abgabetool/AbgabetoolAssistenz.js";
 import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.js";
 import Studium from "../../components/Cis/Studium/Studium.js";
+import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
+import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 
-import ApiRenderers from '../../api/factory/renderers.js';
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
+const isMobile = window.matchMedia("(max-width: 767px)").matches;
 
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
@@ -85,7 +87,7 @@ const router = VueRouter.createRouter({
 					name: "RoomInformation",
 					params: { // in this case always populate other params since they are not optional
 						ort_kurzbz: to.params.ort_kurzbz,
-						mode: DEFAULT_MODE_RAUMINFO,
+						mode: isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP,
 						focus_date: new Date().toISOString().split("T")[0]
 					},
 				};
@@ -102,7 +104,7 @@ const router = VueRouter.createRouter({
 				const mode = route.params.mode &&
 				validModes.includes(route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase())
 					? route.params.mode.charAt(0).toUpperCase() + route.params.mode.slice(1).toLowerCase()
-					: DEFAULT_MODE_RAUMINFO;
+					: (isMobile ? DEFAULT_MODE_RAUMINFO_MOBILE : DEFAULT_MODE_RAUMINFO_DESKTOP);
 
 				// default to today date if not provided
 				const d = new Date(route.params.focus_date)
@@ -198,6 +200,26 @@ const router = VueRouter.createRouter({
 			}
 		},
 		{
+			path: `/Cis/StgOrgLvPlan/:mode?/:focus_date?/:stgkz?/:sem?/:verband?/:gruppe?`,
+			name: 'StgOrgLvPlan',
+			component: StgOrgLvPlan,
+			props(route) {
+				return {
+					propsViewData: route.params
+				};
+			}
+		},
+		{
+      		path: `/Cis/OtherLvPlan/:otherUid/:mode?/:focus_date?`,
+      		name: "OtherLvPlan",
+      		component: OtherLvPlan,
+      		props(route) {
+        		return {
+					propsViewData: route.params
+        		};
+      		}
+    	},
+		{
 			path: `/Cis4`,
 			name: 'Cis4',
 			component: FhcDashboard,
@@ -227,7 +249,7 @@ const router = VueRouter.createRouter({
 })
 
 const app = Vue.createApp({
-	name: 'FhcApp',
+	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
 		renderers: null,
@@ -238,13 +260,12 @@ const app = Vue.createApp({
 			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
 			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
 			return smallScreen;// && touchCapable;
-		}	
+		},	
 	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			renderers: Vue.computed(() => this.renderers),
-			isMobile: this.isMobile
+			isMobile: this.isMobile,
 		}	
 	},
 	methods: {
@@ -281,46 +302,6 @@ const app = Vue.createApp({
 				
 			}
 		}
-	},
-	async created(){
-		
-		await this.$api
-			.call(ApiRenderers.loadRenderers())
-			.then(res => res.data)
-			.then(data => {
-				for (let rendertype of Object.keys(data)) {
-					let modalTitle = null;
-					let modalContent = null;
-					let calendarEvent = null;
-					if (data[rendertype].modalTitle)
-						modalTitle = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalTitle)));
-					if (data[rendertype].modalContent) 	
-						modalContent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].modalContent)));
-					if (data[rendertype].calendarEvent) 	
-						calendarEvent = Vue.markRaw(Vue.defineAsyncComponent(() => import(data[rendertype].calendarEvent)));
-
-					if (data[rendertype].calendarEventStyles){
-						var head = document.head;
-						if(!head.querySelector(`link[href="${data[rendertype].calendarEventStyles}"]`)){
-							var link = document.createElement("link");
-							link.type = "text/css";
-							link.rel = "stylesheet";
-							link.href = data[rendertype].calendarEventStyles;
-							head.appendChild(link);
-						}
-					}
-
-					if(this.renderers === null) {
-						this.renderers = {};
-					}
-					if (!this.renderers[rendertype]) {
-						this.renderers[rendertype] = {}
-					}
-					this.renderers[rendertype].modalTitle = modalTitle;
-					this.renderers[rendertype].modalContent = modalContent;
-					this.renderers[rendertype].calendarEvent = calendarEvent;
-				}
-			});
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);

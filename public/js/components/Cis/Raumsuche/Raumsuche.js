@@ -3,14 +3,12 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
 export const Raumsuche =  {
 	name: "Raumsuche",
-	props: {
-		
-	},
 	components: {
 		VueDatePicker,
 		CoreFilterCmpt,
 		InputNumber: primevue.inputnumber,
 	},
+	inject: ["isMobile"],
 	data() {
 		return {
 			phrasenPromise: null,
@@ -194,8 +192,9 @@ export const Raumsuche =  {
 	<h1 class="h3">{{$p.t('rauminfo/roomSearch')}}</h1>
 	<hr>
 	<div class="row">
-		<div class="col-12 col-lg-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
 			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				:dark="isDarkMode"
 				v-model="datum"
 				:clearable="false"
@@ -207,8 +206,9 @@ export const Raumsuche =  {
 				auto-apply>
 			</VueDatePicker>
 		</div>
-		<div class="col-12 col-lg-1">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				:dark="isDarkMode"
 				v-model="von"
 				:clearable="false"
@@ -220,8 +220,9 @@ export const Raumsuche =  {
 				>
 			</VueDatePicker>
 		</div>
-		<div class="col-12 col-lg-1">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				:dark="isDarkMode"
 				v-model="bis"
 				:clearable="false"
@@ -233,7 +234,7 @@ export const Raumsuche =  {
 			</VueDatePicker>
 		</div>
 		
-		<div class="col-12 col-lg-3">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-3">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
@@ -242,7 +243,7 @@ export const Raumsuche =  {
 		</div>
 		
 
-		<div class="col-12 col-lg-3">
+		<div :class="{'pb-2': isMobile}" class="col-12 col-lg-3">
 			<InputNumber v-model="anzahl" 
 			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
 			inputId="anzahlInput" :min="1" :max="1000" 
