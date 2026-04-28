@@ -1110,7 +1110,7 @@ export const AbgabetoolMitarbeiter = {
 		<!-- low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways -->
 		<div id="abgabetable" style="max-height:40vw;">
 		
-			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+			<h2>{{$p.t('abgabetool/abgabetoolTitleBetreuer')}}</h2>
 			<hr>
 			<core-filter-cmpt
 				:title="''"  

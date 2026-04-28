@@ -76,6 +76,9 @@ export const AbgabeMitarbeiterDetail = {
 		}
 	},
 	methods: {
+		terminIsInvalid(termin) {
+			return termin.note?.positiv == false && !termin.beurteilungsnotiz	
+		},
 		getNoteBezeichnung(termin){
 			if(termin.noteBackend?.bezeichnung) {
 				return termin.noteBackend?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
@@ -556,6 +559,12 @@ export const AbgabeMitarbeiterDetail = {
 				class: "custom-tooltip"
 			}
 		},
+		getTooltipBeurteilungsnotiz() {
+			return {
+				value: this.$p.t('abgabetool/c4beurteilungsnotizBeiNegNote'),
+				class: "custom-tooltip"
+			}
+		},
 		getProjektarbeitTitel() {
 			if(this.projektarbeit?.titel) return this.$capitalize(this.$p.t('abgabetool/c4titel')) + ': ' + this.projektarbeit.titel
 			
@@ -848,8 +857,10 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
 						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
-						<div class="col-12 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
+						<div class="col-12 col-md-9" v-tooltip.right="terminIsInvalid(termin) && getTooltipBeurteilungsnotiz">
+							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" 
+							:class="{ 'p-invalid': terminIsInvalid(termin) }"
+							 rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					
@@ -905,7 +916,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-9">
 							<div class="row">
 								<div class="col-auto">
-									<button v-if="termin.allowedToSave" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
+									<button v-if="termin.allowedToSave && !terminIsInvalid(termin)" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
 										{{ $capitalize( $p.t('abgabetool/c4save') )}}
 										<i class="fa-solid fa-floppy-disk"></i>
 									</button>

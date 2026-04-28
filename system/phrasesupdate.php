@@ -43547,6 +43547,46 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'abgabetoolTitleBetreuer',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bachelor-/Masterarbeiten Betreuungen",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Supervision of Bachelor's/Master's theses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'abgabetoolTitleAdmin',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bachelor-/Masterarbeiten Administration",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Administration of Bachelor's/Master's theses",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'keinTitel',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -44924,6 +44964,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'a file has been uploaded for this deadline',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4beurteilungsnotizBeiNegNote',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Wenn Sie eine negative Note erteilen, müssen Sie eine Beurteilungsnotiz ausfüllen!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'If you give a failing grade, you must fill out an evaluation form!',
 				'description' => '',
 				'insertvon' => 'system'
 			)

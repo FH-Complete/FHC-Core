@@ -325,3 +325,8 @@
 		width: 100%;
 	}
 }
+
+/*conditional tooltips fix*/
+.p-tooltip.custom-tooltip {
+	z-index: 8001 !important;
+}
