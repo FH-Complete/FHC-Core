@@ -73,10 +73,10 @@ class CoreMissingZgvTagLib
 		));
 		if(hasData($result))
 		{
-			return true;
+			return $result;
 		}
 		else
-			return false;
+			return null;
 	}
 
 }

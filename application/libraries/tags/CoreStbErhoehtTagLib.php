@@ -57,7 +57,12 @@ class CoreStbErhoehtTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
+		$this->ci->KontoModel->addSelect('prestudent_id');
+		$this->ci->KontoModel->addSelect('start as von');
+		$this->ci->KontoModel->addSelect('ende as bis');
 		$this->ci->KontoModel->addJoin('public.tbl_prestudent', 'person_id');
+		$this->ci->KontoModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$result = $this->ci->KontoModel-> loadWhere(array(
 			'buchungstyp_kurzbz' => 'StudiengebuehrErhoeht',
 			'studiensemester_kurzbz' => $semester,
@@ -66,10 +71,10 @@ class CoreStbErhoehtTagLib
 
 		if(hasData($result))
 		{
-			return true;
+			return $result;
 		}
 		else
-			return false;
+			return null;
 	}
 
 }

@@ -100,7 +100,7 @@ class Tag_Controller extends FHCAPI_Controller
 
 		$this->NotiztypModel->addSelect(
 			"typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
 			style,
 			beschreibung,
 			tag,

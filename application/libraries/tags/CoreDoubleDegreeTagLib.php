@@ -49,6 +49,7 @@ class CoreDoubleDegreeTagLib
 
 	public function isCriteriaSetFor(array $params)
 	{
+
 		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
 		{
 			return false;
@@ -57,18 +58,26 @@ class CoreDoubleDegreeTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
+		$this->ci->MobilitaetModel->addSelect('prestudent_id');
+		$this->ci->MobilitaetModel->addSelect('start as von');
+		$this->ci->MobilitaetModel->addSelect('ende as bis');
+
 		$this->ci->MobilitaetModel->addJoin('bis.tbl_gsprogramm', 'gsprogramm_id');
+		$this->ci->MobilitaetModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$result = $this->ci->MobilitaetModel->loadWhere(array(
 			'gsprogrammtyp_kurzbz' => 'Double',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
+
 		if(hasData($result))
 		{
-			return true;
+			//array mit prestudent_id, von und bis
+			return $result;
 		}
 		else
-			return false;
+			return null;
 	}
 
 }

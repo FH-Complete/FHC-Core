@@ -39,15 +39,12 @@ class TagLib
 		// Libraries
 		$this->_ci->load->library('PermissionLib');
 		$this->_ci->load->library('PrestudentLib');
-
-
 	}
 
 	public function updateAutomatedTags($tag, $inputData)
 	{
 		/*
-		$inputData expected pattern
-
+		$params array expected pattern
 		[
 			[
 				'prestudent_id' => 123456,
@@ -64,6 +61,8 @@ class TagLib
 		$zeitraum = [];
 		$prestudentIds = [];
 
+		//TODO(Manu) check minimal input:
+
 		foreach ($inputData as $row) {
 			$pid = $row['prestudent_id'];
 
@@ -74,7 +73,6 @@ class TagLib
 				'bis' => $row['bis'] ?? null
 			];
 		}
-
 		$prestudentIds = array_unique($prestudentIds);
 
 		// ---------------------------------
@@ -239,10 +237,17 @@ class TagLib
 		]);
 	}
 
-	public function updateAutomatedTagsForPrestudent($tag, $prestudent_id)
+	public function updateAutomatedTagsForPrestudent_DEPR($tag, $prestudent_id)
 	{
+		$_ci = get_instance();
+		$_ci->addMeta(
+			'IN OLD FUNCTION updateTags', $tag
+		);
 		$return = null;
 		$notiz_id = null;
+
+		//von und bis auslesen
+
 
 		$this->_ci->NotizModel->addSelect('nz.notiz_id');
 		$this->_ci->NotizModel->addSelect('prestudent_id');
@@ -275,6 +280,7 @@ class TagLib
 			$return = ['recycled' => $notiz_id];
 		}
 		else
+
 		{
 			//TODO(Manu) refactor for recycle, add
 			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
@@ -303,28 +309,96 @@ class TagLib
 		return success($return);
 	}
 
+	public function updateAutomatedTagsForPrestudent(array $params)
+	{
+		$return = null;
+		$notiz_id = null;
+
+		$von = $params['von'];
+		$bis = $params['bis'];
+		$tag = $params['kurzbz'];
+		$prestudent_id = $params['prestudent_id'];
+
+		$this->_ci->NotizModel->addSelect('nz.notiz_id');
+		$this->_ci->NotizModel->addSelect('prestudent_id');
+		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
+		$resultAllTags = $this->_ci->NotizModel->loadWhere([
+			'typ' => $tag,
+			'prestudent_id' => $prestudent_id
+		]);
+		if(hasData($resultAllTags))
+		{
+			$notiz_id = $resultAllTags->retval[0]->notiz_id;
+		}
+
+		//RECYCLE
+		if ($notiz_id !== null)
+		{
+			//TODO(Manu) refactor for recycle, add
+			$resultUpdateNotiz = $this->_ci->NotizModel->update(
+				[
+					'notiz_id' => $notiz_id
+				],
+				array(
+					'updateamum' => date('Y-m-d H:i:s'),
+					'updatevon' => getAuthUID(),
+				));
+
+			if (isError($resultUpdateNotiz))
+				return error ('Error occurred update Result ' . $notiz_id);
+
+			$return = ['recycled' => $notiz_id];
+		}
+		else
+
+		{
+			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
+				'titel' => 'TAG',
+				'text' => 'AUTOMATED TAG',
+				'verfasser_uid' => getAuthUID(),
+				'erledigt' => false,
+				'insertamum' => date('Y-m-d H:i:s'),
+				'insertvon' => getAuthUID(),
+				'typ' => $tag,
+				'start' => $von,
+				'ende' => $bis
+			));
+
+			if (isError($resultInsertNotiz))
+				return error ('Error occurred insert Result ' . $prestudent_id);
+
+			$resultInsertZuordnung = $this->_ci->NotizzuordnungModel->insert(array(
+				'notiz_id' => $resultInsertNotiz->retval,
+				self::TYP_ZUORDNUNG => $prestudent_id
+			));
+
+			if (isError($resultInsertZuordnung))
+				return error ('Error occurred insert Zuordnung' . $prestudent_id);
+
+			$return = ['added' => $resultInsertNotiz->retval];
+		}
+		return success($return);
+	}
+
 	/*
 	 * main function for rebuild Tags for single prestudent
 	 * */
 	public function rebuildTagsForPrestudent($prestudent_id)
 	{
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
-		//echo $this->NotiztypModel->db->last_query();
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
 
 		$result = $this->_ci->StudiensemesterModel->getLastOrAktSemester();
 		if (isError($result))
-			return error ('Error occurred during retrieving studiensemester');
+			return error('Error occurred during retrieving studiensemester');
 		if (empty($result->retval) || !isset($result->retval[0])) {
 			return error('No studiensemester found');
 		}
 		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
 
-		print_r($automatedTags);
-
 		$return = [];
 
-		foreach($automatedTags as $autoTag)
+		foreach ($automatedTags as $autoTag)
 		{
 			// getPath: must not be lost
 			$filePath = APPPATH . 'libraries/' . $autoTag->taglib . '.php'; // APPPATH = application/
@@ -338,37 +412,40 @@ class TagLib
 
 			// className without PATH (basename)
 			$className = basename($autoTag->taglib);
+			$kurz_bz = $autoTag->typ_kurzbz;
 
 			$obj = new $className();
 			$criteriaIsSet = $obj->isCriteriaSetFor([
 				'prestudent_id' => $prestudent_id,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			]);
-			//$return = $this->_ci->PrestudentstatusModel->db->last_query();
-			$kurz_bz = $autoTag->typ_kurzbz;
 
-			//	$return[$kurz_bz] = $criteriaIsSet;
-
-			if($criteriaIsSet)
+			if (hasData($criteriaIsSet))
 			{
-				$result = $this->updateAutomatedTagsForPrestudent($kurz_bz, $prestudent_id);
+				$von = isset($criteriaIsSet->retval[0]->von) ? $criteriaIsSet->retval[0]->von : '';
+				$bis = isset($criteriaIsSet->retval[0]->bis) ? $criteriaIsSet->retval[0]->bis : '';
+
+				$params = [
+					'von' => $von,
+					'bis' => $bis,
+					'kurzbz' => $autoTag->typ_kurzbz,
+					'prestudent_id' => $prestudent_id
+				];
+
+				$result = $this->updateAutomatedTagsForPrestudent($params);
 				if (isError($result))
-					return error ('Error occurred during updateAutomatedTags' . $kurz_bz);
+					return error('Error occurred during updateAutomatedTags' . $kurz_bz);
 
-				else
-					$return[$kurz_bz] = $result;
+				return $result;
 			}
-			else {
+			else
+			{
 				$result = $this->checkForDelete($kurz_bz, $prestudent_id);
-				if($result != null)
+				if ($result != null)
 					$return[$kurz_bz] = $result;
 			}
-
 		}
-
-
 		return success($return);
-
 	}
 
 	public function checkForDelete($tag, $prestudent_id)

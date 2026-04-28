@@ -353,7 +353,7 @@ class Benutzerfunktion_model extends DB_Model
 	public function isJgv($semester, $prestudent_id)
 	{
 		$query = "
-			SELECT *
+			SELECT ps.prestudent_id, ss.start as von, ss.ende as bis
 			FROM public.tbl_benutzerfunktion bf
 			JOIN public.tbl_benutzer bn USING (uid)
 			JOIN public.tbl_prestudent ps USING (person_id)

@@ -47,6 +47,7 @@ class CoreWiederholerTagLib
 
 	public function isCriteriaSetFor(array $params)
 	{
+
 		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
 		{
 			return false;
@@ -55,16 +56,23 @@ class CoreWiederholerTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
+		$this->ci->PrestudentstatusModel->addSelect('prestudent_id');
+		$this->ci->PrestudentstatusModel->addSelect('start as von');
+		$this->ci->PrestudentstatusModel->addSelect('ende as bis');
+
+		$this->ci->PrestudentstatusModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
+
 		$result = $this->ci->PrestudentstatusModel->loadWhere(array(
 			'statusgrund_id' => 16,
 			'studiensemester_kurzbz' => $semester,
-			'prestudent_id' => $prestudent_id
+			'prestudent_id' => $prestudent_id,
 		));
+
 		if(hasData($result))
 		{
-			return true;
+			return $result;
 		}
 		else
-			return false;
+			return null;
 	}
 }

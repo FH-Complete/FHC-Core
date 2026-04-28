@@ -55,17 +55,23 @@ class CoreUnterbrecherTagLib
 		$semester = $params['studiensemester_kurzbz'];
 		$prestudent_id = $params['prestudent_id'];
 
+		$this->ci->PrestudentstatusModel->addSelect('prestudent_id');
+		$this->ci->PrestudentstatusModel->addSelect('start as von');
+		$this->ci->PrestudentstatusModel->addSelect('ende as bis');
+
+		$this->ci->PrestudentstatusModel->addJoin('public.tbl_studiensemester', 'studiensemester_kurzbz');
 		$result = $this->ci->PrestudentstatusModel-> loadWhere(array(
 			'status_kurzbz' => 'Unterbrecher',
 			'studiensemester_kurzbz' => $semester,
 			'prestudent_id' => $prestudent_id
 		));
+
 		if(hasData($result))
 		{
-			return true;
+			return $result;
 		}
 		else
-			return false;
+			return null;
 	}
 
 }
