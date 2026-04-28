@@ -41,4 +41,29 @@ class Lehrverband_model extends DB_Model
 
 		return $result;
 	}
+
+	public function search($query_words)
+	{
+		$this->addSelect('CONCAT(UPPER(CONCAT(typ, kurzbz)), \'\', semester, verband, COALESCE(gruppe,\'\')) as gruppe_kurzbz,
+												studiengang_kz,
+												semester,
+												tbl_lehrverband.bezeichnung,
+												gid,
+												\'true\' as lehrverband');
+		$this->addJoin('public.tbl_studiengang', 'studiengang_kz');
+		$this->addOrder('verband');
+		$this->addOrder('gruppe');
+		$this->db->where(array('tbl_lehrverband.aktiv' => true));
+
+		$this->db->group_start();
+		foreach ($query_words as $word)
+		{
+			$this->db->group_start();
+			$this->db->where('CONCAT(CONCAT(typ, kurzbz), \'\', semester, verband, COALESCE(gruppe,\'\')) ILIKE', "%" . $word . "%");
+			$this->db->or_where('tbl_lehrverband.bezeichnung ILIKE', "%" . $word . "%");
+			$this->db->group_end();
+		}
+		$this->db->group_end();
+		return $this->load();
+	}
 }

@@ -33,5 +33,17 @@ Events::on('loadRenderers', function ($renderers) {
 	);
 });
 
+//Tempus Renderers:
+Events::on('loadTempusRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["reservierung"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Reservierungen/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Reservierungen/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Reservierungen/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
+
 
 

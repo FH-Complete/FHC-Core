@@ -259,13 +259,21 @@ export default {
 				pageLeft += this.getPageLeft(el.offsetParent);
 			return pageLeft;
 		},
-		getTimestampFromMouse(evt, dayTimestamp) {
+		getTimestampFromMouse(evt, dayTimestamp)
+		{
 			let mouse, mouseFrac;
-			if (this.flipAxis) {
-				mouse = evt.pageX - this.getPageLeft(this.$refs.body) + this.$refs.main.scrollLeft;
+
+			const grabOffsetY = parseFloat(evt.dataTransfer.getData('fhc-grab-offset-y')) || 0;
+			const grabOffsetX = parseFloat(evt.dataTransfer.getData('fhc-grab-offset-x')) || 0;
+
+			if (this.flipAxis)
+			{
+				mouse = evt.pageX - this.getPageLeft(this.$refs.body) + this.$refs.scroller.scrollLeft - grabOffsetX;
 				mouseFrac = mouse / this.$refs.body.offsetWidth;
-			} else {
-				mouse = evt.pageY - this.getPageTop(this.$refs.body) + this.$refs.main.scrollTop;
+			}
+			else
+			{
+				mouse = evt.pageY - this.getPageTop(this.$refs.body) + this.$refs.scroller.scrollTop - grabOffsetY;
 				mouseFrac = mouse / this.$refs.body.offsetHeight;
 			}
 
@@ -369,7 +377,7 @@ export default {
 		},
 
 		onDropSnap(evt, items, date, part) {
-			let obj = items?.[0];
+			let obj = items;
 			if (!obj?.orig) return;
 
 			const dayStr = evt?.currentTarget?.dataset?.day;
@@ -388,40 +396,28 @@ export default {
 		},
 
 		_getNettoDurationForDrop(obj) {
-
-			if (!obj?.orig)
-				return luxon.Duration.fromObject({ minutes: 45 });
-
-			if (obj.orig.isostart && obj.orig.isoend)
+			if (obj.orig?.isostart && obj.orig?.isoend)
 			{
-				let s = luxon.DateTime.fromISO(obj.orig.isostart);
-				let e = luxon.DateTime.fromISO(obj.orig.isoend);
+				const s = luxon.DateTime.fromISO(obj.orig.isostart);
+				const e = luxon.DateTime.fromISO(obj.orig.isoend);
 				if (s.isValid && e.isValid)
 					return this.calculateNettoDuration(s, e);
 			}
 
-			if (obj.type === 'lehreinheit')
+			if (obj.stundenblockung)
 			{
-				let blockung = Number(obj.orig.blockung ?? 1);
-				if (!Number.isFinite(blockung) || blockung <= 0) blockung = 1;
-
 				let blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
 				let firstBlock = blocks[0];
-
-				let bStart = luxon.Duration.fromISO(firstBlock.start);
-				let bEnd   = luxon.Duration.fromISO(firstBlock.end);
-
-				let blockMinutes = bEnd.minus(bStart).as('minutes');
+				let blockMinutes = luxon.Duration.fromISO(firstBlock.end).minus(luxon.Duration.fromISO(firstBlock.start)).as('minutes');
 				if (!Number.isFinite(blockMinutes) || blockMinutes <= 0) blockMinutes = 45;
-
-				return luxon.Duration.fromObject({ minutes: blockung * blockMinutes });
+				return luxon.Duration.fromObject({ minutes: obj.stundenblockung * blockMinutes });
 			}
 
 			return luxon.Duration.fromObject({ minutes: 45 });
 		},
 		onDropFree(evt, items, date)
 		{
-			let obj = items?.[0];
+			let obj = items;
 			if (!obj?.orig)
 				return;
 
@@ -431,9 +427,8 @@ export default {
 			let nettoDuration = this._getNettoDurationForDrop(obj);
 			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);
 
-
 			this.onDrop?.({
-				item: items,
+				item: [obj],
 				start: dropStart.toISO(),
 				end: dropEnd.toISO()
 			});
@@ -564,7 +559,7 @@ export default {
 								style="position:absolute;inset:0"
 								:style="{ zIndex: isDragging ? 10 : 1 }"
 								:data-day="date.toFormat('yyyy-MM-dd')"
-								v-drop:move.lehreinheit-collection.kalender-collection="(evt, item) => onDropSnap(evt, item, date, part)"
+								v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropSnap(evt, item, date, part)"
 							></div>
 						</div>
 						<grid-line
@@ -585,7 +580,7 @@ export default {
 									v-if="!snapToGrid"
 									style="position:absolute;inset:0"
 									:style="{ zIndex: isDragging ? 10 : 1 }"
-									v-drop:move.lehreinheit-collection.kalender-collection="(evt, item) => onDropFree(evt, item, date)"
+									v-drop:move.lehreinheit.kalender.reservierung="(evt, item) => onDropFree(evt, item, date)"
 								></div>
 							</template>
 						</grid-line>

@@ -118,54 +118,17 @@ class Gruppe extends FHCAPI_Controller
 
 		$query_words = explode(' ', $query);
 
-		$this->_ci->GruppeModel->addSelect('gruppe_kurzbz,
-											studiengang_kz,
-											semester,
-											bezeichnung,
-											gid,
-											\'false\' as lehrverband');
-		$this->_ci->GruppeModel->db->where(array('sichtbar' => true, 'aktiv' => true, 'lehre' => true, 'direktinskription' => false, 'semester IS NOT NULL' => null));
-		$this->_ci->GruppeModel->db->group_start();
-		foreach ($query_words as $word)
-		{
-			$this->_ci->GruppeModel->db->group_start();
-			$this->_ci->GruppeModel->db->where('gruppe_kurzbz ILIKE', "%" . $word . "%");
-			$this->_ci->GruppeModel->db->or_where('bezeichnung ILIKE', "%" . $word . "%");
-			$this->_ci->GruppeModel->db->group_end();
-		}
-		$this->_ci->GruppeModel->db->group_end();
-
-		$gruppen_result = $this->_ci->GruppeModel->load();
-
-		$gruppen_array = array();
+		$gruppen_result = $this->_ci->GruppeModel->search($query_words);
 
 		if (isError($gruppen_result))
 			$this->terminateWithError(getError($gruppen_result), self::ERROR_TYPE_GENERAL);
 
+		$gruppen_array = array();
+
 		if (hasData($gruppen_result))
 			$gruppen_array = getData($gruppen_result);
 
-		$this->_ci->LehrverbandModel->addSelect('CONCAT(UPPER(CONCAT(typ, kurzbz)), \'\', semester, verband, COALESCE(gruppe,\'\')) as gruppe_kurzbz,
-												studiengang_kz,
-												semester,
-												tbl_lehrverband.bezeichnung,
-												gid,
-												\'true\' as lehrverband');
-		$this->_ci->LehrverbandModel->addJoin('public.tbl_studiengang', 'studiengang_kz');
-		$this->_ci->LehrverbandModel->addOrder('verband');
-		$this->_ci->LehrverbandModel->addOrder('gruppe');
-		$this->_ci->LehrverbandModel->db->where(array('tbl_lehrverband.aktiv' => true));
-
-		$this->_ci->LehrverbandModel->db->group_start();
-		foreach ($query_words as $word)
-		{
-			$this->_ci->LehrverbandModel->db->group_start();
-			$this->_ci->LehrverbandModel->db->where('CONCAT(CONCAT(typ, kurzbz), \'\', semester, verband, COALESCE(gruppe,\'\')) ILIKE', "%" . $word . "%");
-			$this->_ci->LehrverbandModel->db->or_where('tbl_lehrverband.bezeichnung ILIKE', "%" . $word . "%");
-			$this->_ci->LehrverbandModel->db->group_end();
-		}
-		$this->_ci->LehrverbandModel->db->group_end();
-		$lehrverband_result = $this->_ci->LehrverbandModel->load();
+		$lehrverband_result = $this->_ci->LehrverbandModel->search($query_words);
 
 		$lehrverband_array = array();
 

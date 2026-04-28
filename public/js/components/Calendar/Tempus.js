@@ -10,6 +10,7 @@ import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
 import ApiTempusConfig  from '../../api/factory/tempus/config.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
+import draggable from '../../directives/draggable.js';
 
 
 export default {
@@ -25,6 +26,9 @@ export default {
 				visible_status: 'all'
 			}
 		}
+	},
+	directives: {
+		draggable,
 	},
 	props: {
 		timezone: {
@@ -84,6 +88,7 @@ export default {
 					collapseEmptyDays: false
 				}
 			},
+			currentMode: this.mode,
 			teachingunits: null,
 			showRaster: true,
 		};
@@ -159,19 +164,11 @@ export default {
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
 
-		const { events, lv, reset  } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
 		Vue.watch(lv, newValue => {
 			context.emit('update:lv', newValue);
 		});
-
-		const bcc = new BroadcastChannel('fhc-dnd');
-		bcc.onmessage = e => {
-			if (e.data === 'dropped')
-			{
-				reset()
-			}
-		};
 
 		return {
 			rangeInterval,
@@ -208,10 +205,10 @@ export default {
 		show-btns
 		:draggable-events="true"
 		:resizable-events="true"
-		:on-drop="ondrop"
+		:on-drop="currentMode === 'week' ? ondrop : null"
 		:on-resize="onresize"
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
-		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
+		@update:mode="(newMode, newDate) => { currentMode = newMode; $emit('update:mode', newMode, newDate) }"
 		@update:range="updateRange"
 	>
 		<template v-slot="{ event, mode }">
@@ -238,13 +235,26 @@ export default {
 			</div>
 		</template>
 		<template #actions>
-			<div 
-				class="d-flex align-items-center gap-2" 
-				style="cursor:pointer"
-				@click="showRaster = !showRaster"
-			>
-				<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
-				<span class="form-check-label">Stundenraster</span>
+			<div class="d-flex align-items-center gap-2">
+				<div 
+					class="d-flex align-items-center gap-2" 
+					style="cursor:pointer"
+					@click="showRaster = !showRaster"
+				>
+					<i :class="showRaster ? 'fa-solid fa-toggle-on text-primary' : 'fa-solid fa-toggle-off text-muted'"></i>
+					<span class="form-check-label">Stundenraster</span>
+				</div>
+				<div
+					class="d-flex align-items-center gap-2 "
+					v-draggable:move.noimage="{ type: 'reservierung', id: null, orig: {} }"
+				>
+					<i 
+						class="fa-solid fa-calendar-plus text-primary" 
+						style="cursor:pointer"
+						@click.stop="$emit('open-reservierung')"
+					></i>
+					<span>Reservierung</span>
+				</div>
 			</div>
 		</template>
 	</fhc-calendar>`

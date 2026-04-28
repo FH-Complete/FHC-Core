@@ -11,12 +11,15 @@ class KalenderLib
 
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->_ci->load->model('ressource/Kalender_Lehreinheit_model', 'KalenderLehreinheitModel');
+		$this->_ci->load->model('ressource/Kalender_Event_model', 'KalenderEventModel');
+		$this->_ci->load->model('ressource/Kalender_Event_Teilnehmer_model', 'KalenderEventTeilnehmerModel');
 		$this->_ci->load->model('ressource/Kalender_Ort_model', 'KalenderOrtModel');
 		$this->_ci->load->model('education/Lehreinheit_model', 'LehreinheitModel');
 		$this->_ci->load->model('education/Lehrveranstaltung_model', 'LehrveranstaltungModel');
 		$this->_ci->load->model('education/LehreinheitMitarbeiter_model', 'LehreinheitMitarbeiterModel');
 		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
-
+		$this->_ci->load->model('organisation/gruppe_model', 'GruppeModel');
+		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
 	}
 
 	private function _getBasePlan($start_date, $end_date)
@@ -25,6 +28,7 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
 												tbl_kalender.status_kurzbz,
+												tbl_kalender.typ,
 												tbl_kalender.von,
 												tbl_kalender.bis,
 												tbl_kalender_ort.ort_kurzbz,
@@ -36,19 +40,57 @@ class KalenderLib
 												lehrfach.kurzbz AS lehrfach_kurzbz,
 												lehrfach.bezeichnung AS lehrfach_bezeichnung,
 												lehrfach.farbe,
-												tbl_lehreinheitmitarbeiter.mitarbeiter_uid,
-												tbl_person.vorname,
-												tbl_person.nachname,
-												tbl_mitarbeiter.kurzbz AS ma_kurzbz');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id');
+												COALESCE(orginasator.uid, tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as mitarbeiter_uid,
+												COALESCE(reservierung_person.vorname, tbl_person.vorname) as vorname,
+												COALESCE(reservierung_person.nachname, tbl_person.nachname) as nachname,
+												COALESCE(reservierung_ma.kurzbz, tbl_mitarbeiter.kurzbz) AS ma_kurzbz,
+												teilnehmergruppe.gruppe_kurzbz as teilnehmerg_grp,
+												COALESCE (
+													UPPER(tbl_studiengang.typ || tbl_studiengang.kurzbz) || 
+													COALESCE(verbandgruppe.semester::varchar, \'\') || 
+													COALESCE(verbandgruppe.verband::varchar, \'\') || 
+													COALESCE(verbandgruppe.gruppe, \'\'), 
+												\'\') as verband_grp,
+												tbl_kalender_event.beschreibung,
+												tbl_kalender_event.titel,
+												teilmitarbeiter.kurzbz as teilnehmer_kurzbz,
+												teilperson.vorname as teilnehmer_vorname,
+												teilperson.nachname as teilnehmer_nachname,
+												
+												teilbenutzer.uid as teilnehmer_uid');
+
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'tbl_kalender.kalender_id = tbl_kalender_event.kalender_id', 'LEFT');
+
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer orginasator', 'tbl_kalender_event.kalender_id = orginasator.kalender_id AND orginasator.rolle_kurzbz = \'organisator\'', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer teilnehmer', 'tbl_kalender_event.kalender_id = teilnehmer.kalender_id AND teilnehmer.rolle_kurzbz = \'teilnehmer\'', 'LEFT');
+
+		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer teilbenutzer', 'teilnehmer.uid = teilbenutzer.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter teilmitarbeiter', 'teilmitarbeiter.mitarbeiter_uid = teilbenutzer.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_person teilperson', 'teilperson.person_id = teilbenutzer.person_id', 'LEFT');
+
+		$this->_ci->KalenderModel->addJoin('public.tbl_gruppe teilnehmergruppe', 'teilnehmer.gruppe_kurzbz = teilnehmergruppe.gruppe_kurzbz', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_lehrverband verbandgruppe',
+			'teilnehmer.studiengang_kz = verbandgruppe.studiengang_kz 
+			AND teilnehmer.semester = verbandgruppe.semester 
+			AND TRIM(COALESCE(teilnehmer.verband::text, \'\')) = TRIM(verbandgruppe.verband::text)
+			AND TRIM(COALESCE(teilnehmer.gruppe::text, \'\')) = TRIM(verbandgruppe.gruppe::text)', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_studiengang', 'verbandgruppe.studiengang_kz = public.tbl_studiengang.studiengang_kz', 'LEFT' );
+
+
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit', 'tbl_kalender_lehreinheit.lehreinheit_id = tbl_lehreinheit.lehreinheit_id', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung', 'tbl_lehreinheit.lehrveranstaltung_id = tbl_lehrveranstaltung.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehrveranstaltung lehrfach', 'tbl_lehreinheit.lehrfach_id = lehrfach.lehrveranstaltung_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter', 'tbl_lehreinheit.lehreinheit_id = tbl_lehreinheitmitarbeiter.lehreinheit_id', 'LEFT');
+
 		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_lehreinheitmitarbeiter.mitarbeiter_uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer', 'tbl_mitarbeiter.mitarbeiter_uid = tbl_benutzer.uid', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('public.tbl_person', 'tbl_person.person_id = tbl_benutzer.person_id', 'LEFT');
+
+		$this->_ci->KalenderModel->addJoin('public.tbl_mitarbeiter reservierung_ma', 'reservierung_ma.mitarbeiter_uid = orginasator.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_benutzer resevierung_benutzer', 'reservierung_ma.mitarbeiter_uid = resevierung_benutzer.uid', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('public.tbl_person reservierung_person', 'reservierung_person.person_id = resevierung_benutzer.person_id', 'LEFT');
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
@@ -73,7 +115,7 @@ class KalenderLib
 				$bis = new DateTime($row->bis);
 
 				$events[$id] = (object) [
-					'type' => 'lehreinheit',
+					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
 					'ende' => $bis->format('H:i:s'),
 					'datum' => $von->format('Y-m-d'),
@@ -91,8 +133,11 @@ class KalenderLib
 					'kalender_id' => $id,
 					'lehreinheit_id' => [],
 					'lektor' => [],
+					'teilnehmer_gruppe' => [],
+					'teilnehmer_person' => [],
 					'gruppe' => [],
-					'titel' => '',
+					'titel' => isset($row->titel) ? $row->titel : '',
+					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => (isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '').' '.(isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : ''),
 				];
 			}
@@ -109,6 +154,39 @@ class KalenderLib
 						'vorname' => $row->vorname,
 						'nachname' => $row->nachname,
 						'kurzbz' => $row->ma_kurzbz,
+					];
+				}
+			}
+
+			if ($row->verband_grp)
+			{
+				if (!in_array($row->teilnehmerg_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
+				{
+					$events[$id]->teilnehmer_gruppe[] = [
+						'gruppe_kurzbz' => $row->verband_grp,
+					];
+				}
+			}
+
+			if ($row->teilnehmerg_grp)
+			{
+				if (!in_array($row->teilnehmerg_grp, array_column($events[$id]->teilnehmer_gruppe, 'gruppe_kurzbz')))
+				{
+					$events[$id]->teilnehmer_gruppe[] = [
+						'gruppe_kurzbz' => $row->teilnehmerg_grp,
+					];
+				}
+			}
+
+			if ($row->teilnehmer_uid)
+			{
+				if (!in_array($row->teilnehmer_uid, array_column($events[$id]->teilnehmer_person, 'uid')))
+				{
+					$events[$id]->teilnehmer_person[] = [
+						'uid' => $row->teilnehmer_uid,
+						'vorname' => $row->teilnehmer_vorname,
+						'nachname' => $row->teilnehmer_nachname,
+						'kurzbz' => $row->teilnehmer_kurzbz,
 					];
 				}
 			}
@@ -213,7 +291,7 @@ class KalenderLib
 	{
 		$this->_getBasePlan($start_date, $end_date);
 
-		$this->_ci->KalenderModel->db->where('status_kurzbz', 'visible_student');
+		$this->_ci->KalenderModel->db->where('status_kurzbz', 'live');
 
 		$data = $this->_ci->KalenderModel->load();
 
@@ -227,24 +305,14 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->addJoin(
 			'lehre.tbl_kalender neuerer',
-			"neuerer.vorgaenger_kalender_id = tbl_kalender.kalender_id AND neuerer.status_kurzbz IN ('visible_lektor', 'tosync_student')",
+			"neuerer.vorgaenger_kalender_id = tbl_kalender.kalender_id AND neuerer.status_kurzbz IN ('preview', 'sync_live')",
 			'LEFT'
 		);
 		$this->_ci->KalenderModel->db->where("(
-			tbl_kalender.status_kurzbz = 'tosync_student'
-			OR (tbl_kalender.status_kurzbz = 'visible_lektor' AND neuerer.kalender_id IS NULL)
-			OR (tbl_kalender.status_kurzbz = 'visible_student' AND neuerer.kalender_id IS NULL)
+			tbl_kalender.status_kurzbz = 'sync_live'
+			OR (tbl_kalender.status_kurzbz = 'preview' AND neuerer.kalender_id IS NULL)
+			OR (tbl_kalender.status_kurzbz = 'live' AND neuerer.kalender_id IS NULL)
 		)", NULL, FALSE);
-		$data = $this->_ci->KalenderModel->load();
-
-		return $this->_mapEvents($data);
-	}
-	public function getPlanForLecturer2($start_date, $end_date)
-	{
-		$this->_getBasePlan($start_date, $end_date);
-
-		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('visible_student', 'visible_lektor'));
-
 		$data = $this->_ci->KalenderModel->load();
 
 		return $this->_mapEvents($data);
@@ -387,6 +455,152 @@ class KalenderLib
 		}
 	}
 
+	public function addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups)
+	{
+
+		if (!is_null($ort_kurzbz))
+		{
+			$this->_ci->KalenderModel->addSelect('1');
+			$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'kalender_id');
+			$reservierung_vorhanden = $this->_ci->KalenderModel->load(array (
+				'von <=' => $end_date,
+				'bis >=' => $start_date,
+				'ort_kurzbz' => $ort_kurzbz,
+			));
+
+			if (hasData($reservierung_vorhanden) && !$this->_ci->permissionlib->isBerechtigt('lehre/reservierungAdvanced'))
+				return error ('lvplan/bereitsReserviert');
+		}
+
+
+
+		$kalenderresult = $this->_ci->KalenderModel->insert(
+			array (
+				'von' => $start_date,
+				'bis' => $end_date,
+				'typ' => 'reservierung',
+				'status_kurzbz' => 'live',
+				'insertvon' => getAuthUID(),
+				'insertamum' => date('Y-m-d H:i:s')
+			)
+		);
+
+		if(isSuccess($kalenderresult) && hasData($kalenderresult))
+		{
+			$kalender_id = getData($kalenderresult);
+
+			$kalendereventresult = $this->_ci->KalenderEventModel->insert(
+				array (
+					'kalender_id' => $kalender_id,
+					'titel' => $titel,
+					'beschreibung' => $beschreibung,
+				)
+			);
+
+			foreach ($teilnehmer as $teil)
+			{
+				$this->_addTeilnehmerToEvent($kalender_id, $teil['uid'], $teil['rolle']);
+			}
+
+			foreach($specialFinalGroups as $group)
+			{
+				$this->_addFinalGroupToEvent($kalender_id, $group['gid'], !($group['lehrverband'] === 'false'), $group['gruppe_kurzbz'], $group['studiensemester_kurzbz'], $group['rolle']);
+			}
+
+		/*	foreach ($specialGroups as $group)
+			{
+				$this->_addSpecialGroupToEvent($kalender_id, $group['gruppe_kurzbz'], $group['rolle']);
+			}
+
+			foreach ($groups as $group)
+			{
+				$this->_addGroupToEvent($kalender_id, $group['stg_kz'], $group['semester'], $group['verband'], $group['gruppe'], $group['rolle']);
+			}*/
+
+			if(isSuccess($kalendereventresult) && !is_null($ort_kurzbz))
+			{
+				return $this->_addKalenderOrt($kalender_id, $ort_kurzbz);
+			}
+
+			return $kalendereventresult;
+		}
+	}
+
+	private function _addTeilnehmerToEvent($kalender_id, $uid, $rolle)
+	{
+		return $this->_ci->KalenderEventTeilnehmerModel->insert(
+			array (
+				'kalender_id' => $kalender_id,
+				'uid' => $uid,
+				'rolle_kurzbz' => $rolle
+			)
+		);
+	}
+	private function _addFinalGroupToEvent($kalender_id, $gid, $lehrverband, $gruppe_kurzbz, $studiensemester_kurzbz, $rolle)
+	{
+
+		if ($lehrverband === false)
+		{
+			$gruppen_result = $this->_ci->GruppeModel->loadWhere(array('gid' => $gid));
+
+			if (!hasData($gruppen_result))
+				return error('No group found for gid ' . $gid);
+
+			return $this->_ci->KalenderEventTeilnehmerModel->insert(
+				array (
+					'kalender_id' => $kalender_id,
+					'gruppe_kurzbz' => $gruppe_kurzbz,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'rolle_kurzbz' => $rolle
+				)
+			);
+		}
+		else if ($lehrverband === true)
+		{
+			$gruppen_result = $this->_ci->LehrverbandModel->loadWhere(array('gid' => $gid));
+
+			if (!hasData($gruppen_result))
+				return error('No group found for gid ' . $gid);
+
+			$gruppe = getData($gruppen_result)[0];
+
+			return $this->_ci->KalenderEventTeilnehmerModel->insert(
+				array (
+					'kalender_id' => $kalender_id,
+					'studiengang_kz' => $gruppe->studiengang_kz,
+					'studiensemester_kurzbz' => $studiensemester_kurzbz,
+					'semester' => isEmptyString($gruppe->semester) ? null : $gruppe->semester,
+					'verband' => isEmptyString($gruppe->verband) ? null : $gruppe->verband,
+					'gruppe' => isEmptyString($gruppe->gruppe) ? null : $gruppe->gruppe,
+					'rolle_kurzbz' => $rolle
+				)
+			);
+		}
+	}
+
+	private function _addSpecialGroupToEvent($kalender_id, $gruppe_kurzbz, $rolle)
+	{
+		return $this->_ci->KalenderEventTeilnehmerModel->insert(
+			array (
+				'kalender_id' => $kalender_id,
+				'gruppe_kurzbz' => $gruppe_kurzbz,
+				'rolle_kurzbz' => $rolle
+			)
+		);
+	}
+	private function _addGroupToEvent($kalender_id, $stg_kz, $semester, $verband, $gruppe, $rolle)
+	{
+		return $this->_ci->KalenderEventTeilnehmerModel->insert(
+			array (
+				'kalender_id' => $kalender_id,
+				'studiengang_kz' => $stg_kz,
+				'semester' => isEmptyString($semester) ? null : $semester,
+				'verband' => isEmptyString($verband) ? null : $verband,
+				'gruppe' => isEmptyString($gruppe) ? null : $gruppe,
+				'rolle_kurzbz' => $rolle
+			)
+		);
+	}
 	private function _addKalenderOrt($kalender_id, $ort_kurzbz)
 	{
 		return $this->_ci->KalenderOrtModel->insert(
@@ -404,11 +618,14 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
-		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
-			return error('Eintrag kann nicht mehr bearbeitet werden');
+		if ($kalender_entry->typ === 'lehreinheit')
+		{
+			if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+				return error('Eintrag kann nicht mehr bearbeitet werden');
 
-		if (in_array($kalender_entry->status_kurzbz, array('visible_student', 'visible_lektor')))
-			return $this->_createHistoryEntry($kalender_entry, $start_date, $end_date);
+			if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
+				return $this->_createHistoryEntry($kalender_entry, $start_date, $end_date);
+		}
 
 		return $this->_ci->KalenderModel->update(
 			array('kalender_id' => $kalender_id),
@@ -428,11 +645,14 @@ class KalenderLib
 
 		$kalender_entry = getData($entryResult);
 
-		if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
-			return error('Eintrag kann nicht mehr bearbeitet werden');
+		if ($kalender_entry->typ === 'lehreinheit')
+		{
+			if (in_array($kalender_entry->status_kurzbz, array('todelete', 'deleted')))
+				return error('Eintrag kann nicht mehr bearbeitet werden');
 
-		if (in_array($kalender_entry->status_kurzbz, array('visible_student', 'visible_lektor')))
-			return $this->_createHistoryEntry($kalender_entry, null, null, $ort_kurzbz);
+			if (in_array($kalender_entry->status_kurzbz, array('live', 'preview')))
+				return $this->_createHistoryEntry($kalender_entry, null, null, $ort_kurzbz);
+		}
 
 		$exist = $this->_ci->KalenderOrtModel->load(array('kalender_id' => $kalender_id));
 		if (hasData($exist))
@@ -456,10 +676,10 @@ class KalenderLib
 		$kalender_entry = getData($entryResult);
 
 		$allowed = array(
-			'planning' => array('tosync_lektor', 'tosync_student'),
-			'tosync_lektor' => array('tosync_student'),
-			'tosync_student' => array('tosync_lektor'),
-			'visible_lektor' => array('tosync_student'),
+			'planning' => array('sync_preview', 'sync_live'),
+			'sync_preview' => array('sync_live'),
+			'sync_live' => array('sync_preview'),
+			'preview' => array('sync_live'),
 		);
 
 		if (!isset($allowed[$kalender_entry->status_kurzbz]) || !in_array($status_kurzbz, $allowed[$kalender_entry->status_kurzbz]))
@@ -527,7 +747,7 @@ class KalenderLib
 	private function _loadKalenderEntry($kalender_id)
 	{
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.*, tbl_kalender_lehreinheit.lehreinheit_id, tbl_kalender_ort.ort_kurzbz, tbl_kalender_ort.location');
-		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit', 'tbl_kalender.kalender_id = tbl_kalender_lehreinheit.kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id', 'LEFT');
 
 		$result = $this->_ci->KalenderModel->load(array('tbl_kalender.kalender_id' => $kalender_id));
@@ -552,6 +772,37 @@ class KalenderLib
 
 		if ($entry->typ === 'lehreinheit')
 			return $this->_deleteTypLehreinheit($entry);
+		if ($entry->typ === 'reservierung')
+			return $this->_deleteTypReservierung($entry);
+	}
+
+	private function _deleteTypReservierung($entry)
+	{
+		$result_event = $this->_ci->KalenderEventModel->loadWhere(array('kalender_id' => $entry->kalender_id));
+		if (isError($result_event)) return $result_event;
+		$has_event = hasData($result_event) ? getData($result_event)[0] : false;
+
+		$result_teilnehmer_event = $this->_ci->KalenderEventTeilnehmerModel->loadWhere(array('kalender_id' => $entry->kalender_id));
+		if (isError($result_teilnehmer_event))
+			return $result_teilnehmer_event;
+		$has_teilnehmer_event = hasData($result_teilnehmer_event) ? getData($result_teilnehmer_event)[0] : false;
+
+		$result_ort = $this->_ci->KalenderOrtModel->loadWhere(array('kalender_id' => $entry->kalender_id));
+		if (isError($result_ort)) return $result_ort;
+		$has_ort = hasData($result_ort) ? getData($result_ort)[0] : false;
+
+		if ($has_ort)
+			$this->_deleteOrtEntry($has_ort);
+
+		if ($has_teilnehmer_event)
+			$this->_deleteReservierungTeilnehmerEntry($has_teilnehmer_event);
+
+		if ($has_event)
+			$this->_deleteReservierungEntry($has_event);
+
+		$this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
+
+		return success();
 	}
 
 	private function _deleteTypLehreinheit($entry)
@@ -574,7 +825,7 @@ class KalenderLib
 
 			$this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
 		}
-		else if ($entry->status_kurzbz === 'tosync_lektor' || $entry->status_kurzbz === 'tosync_student')
+		else if ($entry->status_kurzbz === 'sync_preview' || $entry->status_kurzbz === 'sync_live')
 		{
 			$history = $this->getHistory($entry->kalender_id);
 			$history = hasData($history) ? getData($history) : false;
@@ -587,7 +838,7 @@ class KalenderLib
 
 			$this->_ci->KalenderModel->delete(array('tbl_kalender.kalender_id' => $entry->kalender_id));
 		}
-		else if ($entry->status_kurzbz === 'visible_lektor' || $entry->status_kurzbz === 'visible_student')
+		else if ($entry->status_kurzbz === 'preview' || $entry->status_kurzbz === 'live')
 		{
 			//TODO (david) überprüfen ob sinnvoll, verschwindet direkt in den ansichten (student, lecturer)
 			$result = $this->_ci->KalenderModel->update(
@@ -602,12 +853,20 @@ class KalenderLib
 	private function _deleteOrtEntry($entry)
 	{
 		return $this->_ci->KalenderOrtModel->delete(array('kalender_id' => $entry->kalender_id));
-
 	}
 
 	private function _deleteLehreinheitEntry($entry)
 	{
 		return $this->_ci->KalenderLehreinheitModel->delete(array('kalender_id' => $entry->kalender_id));
+	}
+	private function _deleteReservierungTeilnehmerEntry($entry)
+	{
+		return $this->_ci->KalenderEventTeilnehmerModel->delete(array('kalender_id' => $entry->kalender_id));
+	}
+
+	private function _deleteReservierungEntry($entry)
+	{
+		return $this->_ci->KalenderEventModel->delete(array('kalender_id' => $entry->kalender_id));
 	}
 
 	public function getHistory($kalender_id, $only_previous = false)
@@ -658,50 +917,60 @@ class KalenderLib
 	//TODO in eine eigen Lib?
 	public function sync()
 	{
-
 		$this->_ci->load->model('ressource/Kalender_model', 'KalenderModel');
 
-		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('tosync_student', 'tosync_lektor', 'todelete', 'planning', 'visible_lektor'));
-		$this->_ci->KalenderModel->addOrder('kalender_id', 'DESC');
+		$this->_ci->KalenderModel->addSelect('tbl_kalender.*, tbl_kalender_ort.ort_kurzbz, tbl_kalender_ort.location');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_ort', 'tbl_kalender.kalender_id = tbl_kalender_ort.kalender_id', 'LEFT');
+		$this->_ci->KalenderModel->db->where_in('status_kurzbz', array('sync_live', 'sync_preview', 'todelete', 'planning', 'preview'));
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.kalender_id', 'DESC');
 		$to_update = $this->_ci->KalenderModel->load();
 
 		if (!hasData($to_update))
 			return success();
+
+		$mail_infos = [];
+
 		foreach (getData($to_update) as $entry)
 		{
 			if ($entry->status_kurzbz === 'todelete')
 			{
 				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'deleted'));
+				$mail_infos[] = array('entry' => $entry, 'new_status' => 'deleted', 'notify' => array('lektor', 'student'));
 			}
-			if ($entry->status_kurzbz === 'tosync_lektor')
+
+			if ($entry->status_kurzbz === 'sync_preview')
 			{
-				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'visible_lektor'));
+				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'preview'));
 				$this->_archiveVorgaenger($entry->vorgaenger_kalender_id, true);
+				$mail_infos[] = array('entry' => $entry, 'new_status' => 'preview', 'notify' => array('lektor'));
 			}
 
-			if ($entry->status_kurzbz === 'tosync_student' || $entry->status_kurzbz === 'planning')
+			if ($entry->status_kurzbz === 'sync_live' || $entry->status_kurzbz === 'planning')
 			{
-				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'visible_student'));
+				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'live'));
 				$this->_archiveVorgaenger($entry->vorgaenger_kalender_id, false);
+				$mail_infos[] = array('entry' => $entry, 'new_status' => 'live', 'notify' => array('lektor', 'student'));
 			}
 
-			if ($entry->status_kurzbz === 'visible_lektor')
+			if ($entry->status_kurzbz === 'preview')
 			{
 				$current = getData($this->_ci->KalenderModel->load(array('kalender_id' => $entry->kalender_id)))[0];
 				if ($current->status_kurzbz === 'archived')
 					continue;
 
-				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'visible_student'));
+				$this->_ci->KalenderModel->update(array('kalender_id' => $entry->kalender_id), array('status_kurzbz' => 'live'));
 				$this->_archiveVorgaenger($entry->vorgaenger_kalender_id, false);
+				$mail_infos[] = array('entry' => $entry, 'new_status' => 'live', 'notify' => array('lektor', 'student'));
 			}
 		}
 
+		$this->_ci->load->library('KalenderNotificationLib');
+		$this->_ci->kalendernotificationlib->sendMails($mail_infos);
 		return success();
-
 
 	}
 
-	private function _archiveVorgaenger($vorgaenger_kalender_id, $stop_at_visible_student = false)
+	private function _archiveVorgaenger($vorgaenger_kalender_id, $stop_at_live = false)
 	{
 		if (!$vorgaenger_kalender_id) return;
 
@@ -714,10 +983,10 @@ class KalenderLib
 
 			$vorgaenger = getData($vorgaenger)[0];
 
-			if ($stop_at_visible_student && $vorgaenger->status_kurzbz === 'visible_student')
+			if ($stop_at_live && $vorgaenger->status_kurzbz === 'live')
 				return;
 
-			if (in_array($vorgaenger->status_kurzbz, array('visible_lektor', 'visible_student')))
+			if (in_array($vorgaenger->status_kurzbz, array('preview', 'live')))
 			{
 				$this->_ci->KalenderModel->update(
 					array('kalender_id' => $current_id),

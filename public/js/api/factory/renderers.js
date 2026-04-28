@@ -9,4 +9,12 @@ export default {
 			}
 		};
 	},
+	loadTempusRenderers() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/RendererLoader/GetTempusRenderers',
+			params: {
+			}
+		};
+	},
 }

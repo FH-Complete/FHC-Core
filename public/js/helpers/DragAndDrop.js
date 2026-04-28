@@ -12,6 +12,9 @@ const TYPE_DEFINITION = {
 	kalender: {
 		id: "kalender_id",
 	},
+	reservierung: {
+		id: "kalender_id",
+	},
 	vevent: {
 		id: "uid",
 		dragIcon: "fa-solid fa-calendar",
@@ -188,10 +191,11 @@ function convertToValidDragObject(data, strict) {
 	const found = Object.entries(TYPE_DEFINITION).find(([ , typedef ]) => {
 		if (!Object.prototype.hasOwnProperty.call(data, typedef.id))
 			return false;
-		/*if (typedef.extras) {
+		if (typedef.extras)
+		{
 			if (!typedef.extras.every(extra => Object.prototype.hasOwnProperty.call(data, extra)))
 				return false;
-		}*/
+		}
 		return true;
 	});
 
@@ -205,8 +209,8 @@ function convertToValidDragObject(data, strict) {
 	newData.type = type;
 	newData.id = data[typedef.id];
 
-	/*if (typedef.extras)
-		typedef.extras.forEach(extra => newData[extra] = data[extra]);*/
+	if (typedef.extras)
+		typedef.extras.forEach(extra => newData[extra] = data[extra]);
 
 	return newData;
 }

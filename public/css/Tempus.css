@@ -107,7 +107,7 @@ body {
 	padding: 0.5rem;
 	margin-bottom: 0.5rem;
 	border: 1px solid var(--bs-border-color);
-	background-color: var(--bs-tertiary-bg);
+	background-color: var(--event-bg);
 }
 
 .parkingevent {
@@ -126,35 +126,6 @@ body {
 .eckerltest {
 		box-shadow: 3px 3px 3px #ccc;
 }
-
-
-
-
-
-
-.fhc-resizable {
-	position: relative;
-}
-
-.fhc-resizable .fhc-resize-bar
-{
-	position:absolute; left:6px; right:6px; height:10px;
-	opacity:0; pointer-events:none; transition:opacity .12s ease;
-	cursor: ns-resize; z-index: 20;
-}
-.fhc-resizable:hover .fhc-resize-bar{ opacity:1; pointer-events:auto; }
-
-.fhc-resize-bar--top{ top:-4px; }
-.fhc-resize-bar--bottom{ bottom:-4px; }
-
-.fhc-resize-bar::after{
-	content:""; display:block; margin:3px auto 0;
-	width:44px; height:4px; border-radius:999px;
-	background: rgba(0,0,0,.35);
-}
-
-
-
 
 .verband-selection {
 	border: 1px dashed #AAAAAA;

@@ -35,6 +35,8 @@ import BsModal from "../Bootstrap/Modal.js";
 import StvVerband from "../Stv/Studentenverwaltung/Verband.js";
 import ApiStudiengangTree from "../../api/lehrveranstaltung/studiengangtree.js";
 import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
+import FormInput from "../../../js/components/Form/Input.js";
+import Reservierung from "./Reservierung.js";
 
 export default {
 	name: "Tempus",
@@ -52,6 +54,8 @@ export default {
 		StvVerband,
 		StvStudiensemester,
 		Multiselect: primevue.multiselect,
+		FormInput,
+		Reservierung
 	},
 	props: {
 		defaultSemester: String,
@@ -162,12 +166,12 @@ export default {
 						action: this.openRaumauswahl
 					},
 					{
-						label: 'Sync to Lektor',
+						label: 'Freischalten für Voransicht',
 						icon: 'fa-solid fa-chalkboard-user',
 						action: (orig) => this.$api.call(ApiKalender.syncToLecturer(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
 					},
 					{
-						label: 'Sync to Student',
+						label: 'Freischalten für Live',
 						icon: 'fa-solid fa-user-graduate',
 						action: (orig) => this.$api.call(ApiKalender.syncToStudent(orig.kalender_id)).then(() => this.$refs.calendar.resetEventLoader())
 					},
@@ -176,6 +180,13 @@ export default {
 						icon: 'fa-solid fa-clock-rotate-left',
 						action: this.openHistory
 					},
+					{
+						label: 'Delete',
+						icon: 'fa-solid fa-calendar-xmark',
+						action: this.deleteEntry
+					},
+				],
+				reservierung: [
 					{
 						label: 'Delete',
 						icon: 'fa-solid fa-calendar-xmark',
@@ -477,7 +488,13 @@ export default {
 
 			const { startDT, endDT, start_time, end_time } = dates;
 
-			if (obj.type === 'lehreinheit') {
+			if (obj.type === 'reservierung')
+			{
+				this.reservierungPending = true;
+				this.$refs.reservierung.show(start_time, end_time);
+			}
+			else if (obj.type === 'lehreinheit')
+			{
 				this.$api.call(
 					ApiKalender.addKalenderEvent(
 						obj.orig.lehreinheit_id,
@@ -634,10 +651,22 @@ export default {
 			}
 		}
 	},
+	mounted() {
+
+		this.reservierungPending = false;
+		this.bcc = new BroadcastChannel('fhc-dnd');
+		this.bcc.onmessage = e => {
+			if (e.data === 'dropped' && !this.reservierungPending)
+				this.$refs.calendar.resetEventLoader();
+		};
+	},
+	beforeUnmount() {
+		this.bcc.close();
+	},
 	async created()
 	{
 		await this.$api
-			.call(ApiRenderers.loadRenderers())
+			.call(ApiRenderers.loadTempusRenderers())
 			.then(res => res.data)
 			.then(data => {
 				for (let rendertype of Object.keys(data)) {
@@ -956,5 +985,10 @@ export default {
 				</table>
 			</template>
 		</bs-modal>
+		<reservierung
+			ref="reservierung"
+			:ort-kurzbz="ort_kurzbz"
+			@saved="reservierungPending = false; $refs.calendar.resetEventLoader()"
+		></reservierung>
 	</div>`
 };

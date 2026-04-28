@@ -31,7 +31,7 @@ class RendererLoader extends FHCAPI_Controller
 
 		parent::__construct([
 			'GetRenderers' => self::PERM_LOGGED,
-           
+			'GetTempusRenderers' => self::PERM_LOGGED,
 		]);
 
         $this->load->library('LogLib');
@@ -58,6 +58,26 @@ class RendererLoader extends FHCAPI_Controller
 		$renderer_paths = [];
 		Events::trigger(
 				'loadRenderers',
+				function & () use (&$renderer_paths)
+				{
+					return $renderer_paths;
+				}
+			);
+		$this->terminateWithSuccess($renderer_paths);
+	}
+
+	public function GetTempusRenderers(){
+		$renderer_paths = [];
+		Events::trigger(
+				'loadRenderers',
+				function & () use (&$renderer_paths)
+				{
+					return $renderer_paths;
+				}
+			);
+
+		Events::trigger(
+				'loadTempusRenderers',
 				function & () use (&$renderer_paths)
 				{
 					return $renderer_paths;

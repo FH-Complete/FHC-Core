@@ -96,7 +96,13 @@ export default {
 		},
 		closeContextMenu() {
 			this.contextMenu.show = false;
-		}
+		},
+		onDragStart(evt) {
+			console.log(evt);
+			const rect = this.$refs.eventEl.getBoundingClientRect();
+			evt.dataTransfer.setData('fhc-grab-offset-y', evt.clientY - rect.top);
+			evt.dataTransfer.setData('fhc-grab-offset-x', evt.clientX - rect.left);
+		},
 	},
 	template:`
 	<div
@@ -105,6 +111,7 @@ export default {
 		style="z-index: 2"
 		:draggable="draggable"
 		ref="eventEl"
+		@dragstart="onDragStart"
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
 		v-cal-click:event="isHeaderOrFooter ? event : event.orig"
 		@contextmenu.prevent="onRightClick"
@@ -114,7 +121,9 @@ export default {
 			class="fhc-resize-bar fhc-resize-bar--top"
 			@pointerdown.prevent.stop="onResizeStart('start', $event)"
 			@click.stop
-		/>
+		>
+			<i class="fa-solid fa-grip-lines text-muted"></i>
+		</div>
 		<slot :event="isHeaderOrFooter ? event : event.orig">
 			{{ event.orig }}
 		</slot>
@@ -123,7 +132,9 @@ export default {
 			class="fhc-resize-bar fhc-resize-bar--bottom"
 			@pointerdown.prevent.stop="onResizeStart('end', $event)"
 			@click.stop
-		/>
+		>
+			<i class="fa-solid fa-grip-lines text-muted"></i>
+		</div>
 
 	
 		<teleport to="body">

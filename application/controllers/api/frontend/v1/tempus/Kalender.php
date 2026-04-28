@@ -29,6 +29,7 @@ class Kalender extends FHCAPI_Controller
 			'getZeitsperren' => self::PERM_LOGGED,
 			'updateKalenderEvent' => 'lehre/lvplan:rw',
 			'addKalenderEvent' => 'lehre/lvplan:rw',
+			'addReservierung' => 'lehre/lvplan:rw',
 			'sync' => 'lehre/lvplan:rw',
 		]);
 
@@ -310,7 +311,7 @@ class Kalender extends FHCAPI_Controller
 
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		$result = $this->_ci->kalenderlib->updateStatus($kalender_id, 'tosync_lektor');
+		$result = $this->_ci->kalenderlib->updateStatus($kalender_id, 'sync_preview');
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));
@@ -327,7 +328,7 @@ class Kalender extends FHCAPI_Controller
 
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		$result = $this->_ci->kalenderlib->updateStatus($kalender_id, 'tosync_student');
+		$result = $this->_ci->kalenderlib->updateStatus($kalender_id, 'sync_live');
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));
@@ -351,6 +352,33 @@ class Kalender extends FHCAPI_Controller
 
 
 		$result = $this->_ci->kalenderlib->addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz);
+
+		if (isError($result))
+			$this->terminateWithError(getError($result));
+
+		$this->terminateWithSuccess('Erfolgreich');
+	}
+
+	public function addReservierung()
+	{
+		$this->_ci->form_validation->set_data($_POST);
+		$this->_ci->form_validation->set_rules('titel',"titel","required");
+		$this->_ci->form_validation->set_rules('beschreibung',"beschreibung","required");
+		$this->_ci->form_validation->set_rules('ort_kurzbz',"ort_kurzbz","required");
+		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
+		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
+
+		if($this->_ci->form_validation->run() === FALSE)
+			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
+
+		$titel = $this->_ci->input->post('titel', TRUE);
+		$beschreibung = $this->_ci->input->post('beschreibung', TRUE);
+		$ort_kurzbz = $this->_ci->input->post('ort_kurzbz', TRUE);
+		$start_date = $this->_ci->input->post('start_date', TRUE);
+		$end_date = $this->_ci->input->post('end_date', TRUE);
+
+
+		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date);
 
 		if (isError($result))
 			$this->terminateWithError(getError($result));

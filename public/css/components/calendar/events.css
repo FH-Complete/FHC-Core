@@ -75,16 +75,17 @@
 }
 
 .fhc-resize-bar {
+	display: flex;
 	align-items: center;
 	justify-content: center;
-
 	height: 15px;
 	flex: 0 0 12px;
 	cursor: ns-resize;
 	position: relative;
-
 	visibility: hidden;
 	pointer-events: none;
+	background-color: transparent !important;
+	border: none !important;
 }
 
 .fhc-resize-bar--top {
@@ -104,5 +105,4 @@
 .fhc-resize-bar {
 	z-index: 2;
 }
-
 

@@ -78,10 +78,10 @@ if(!$result = @$db->db_query("SELECT kalender_id FROM lehre.tbl_kalender LIMIT 1
 	COMMENT ON TABLE lehre.tbl_kalender_status IS 'Calender visibility Status';
 
 	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'planning', E'planning', E'{\"In Planung\", \"Planning\"}', 1);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'tosync_lektor', E'tosync_lektor', E'{\"Zu synchronisieren Lektoren\", \"To sync lecturers\"}', 2);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_lektor', E'Sichtbar für Lektoren', E'{\"Sichtbar für Lektoren\", \"Visible for lecturers\"}', 3);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'tosync_student', E'tosync_lektor', E'{\"Zu synchronisieren Studierende\", \"To sync students\"}', 4);
-	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'visible_student', E'Sichtbar für Studierende', E'{\"Sichtbar für Studierende\", \"Visible for students\"}', 5);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'sync_preview', E'sync_preview', E'{\"Synchronisierung für Voransicht\", \"Sync for Preview\"}', 2);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'preview', E'preview', E'{\"Voransicht\", \"Preview\"}', 3);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'sync_live', E'sync_live', E'{\"Synchronisierung für Live\", \"Sync for Live\"}', 4);
+	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'live', E'Sichtbar für Studierende', E'{\"Live\", \"Live\"}', 5);
 	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'todelete', E'todelete', E'{\"Zu löschen\", \"To delete\"}', 6);
 	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'deleted', E'deleted', E'{\"Gelöscht\", \"Deleted\"}', 7);
 	INSERT INTO lehre.tbl_kalender_status (status_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'archived', E'archived', E'{\"Archiviert\", \"Archived\"}', 8);
@@ -136,4 +136,102 @@ if(!$result = @$db->db_query("SELECT kalender_id FROM lehre.tbl_kalender LIMIT 1
 		echo '<strong>lehre.tbl_kalender: '.$db->db_last_error().'</strong><br>';
 	else
 		echo '<br>lehre.tbl_kalender: neue Tabellen hinzugefuegt';
+}
+
+if(!$result = @$db->db_query("SELECT kalender_id FROM lehre.tbl_kalender_event LIMIT 1"))
+{
+	$qry = "CREATE TABLE lehre.tbl_kalender_event (
+				kalender_id bigint NOT NULL,
+				titel character varying(255),
+				beschreibung text,
+				CONSTRAINT tbl_kalender_event_pk PRIMARY KEY (kalender_id)
+			);
+
+			ALTER TABLE lehre.tbl_kalender_event ADD CONSTRAINT tbl_kalender_event_fk FOREIGN KEY (kalender_id)
+			REFERENCES lehre.tbl_kalender (kalender_id)
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_kalender_event to vilesci;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_kalender_event to web;
+
+			
+
+
+			CREATE TABLE lehre.tbl_kalender_event_rolle (
+				rolle_kurzbz character varying(32) NOT NULL,
+				bezeichnung text,
+				bezeichnung_mehrsprachig character varying(255)[] NOT NULL,
+				sort smallint,
+				CONSTRAINT tbl_kalender_event_rolle_pk PRIMARY KEY (rolle_kurzbz)
+			);
+		
+			INSERT INTO lehre.tbl_kalender_event_rolle (rolle_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'organisator', E'Organisierende', E'{\"Organisierende\", \"Organizer\"}', 1);
+			INSERT INTO lehre.tbl_kalender_event_rolle (rolle_kurzbz, bezeichnung, bezeichnung_mehrsprachig, sort) VALUES (E'teilnehmer', E'Teilnehmende', E'{\"Teilnehmende\", \"Participant\"}', 2);
+			
+			GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_kalender_event_rolle to vilesci;
+			GRANT SELECT ON lehre.tbl_kalender_event_rolle to web;
+
+			CREATE TABLE lehre.tbl_kalender_event_teilnehmer (
+				kalender_event_teilnehmer_id bigserial NOT NULL,
+				kalender_id bigint NOT NULL,
+				rolle_kurzbz character varying(32), 
+				uid character varying(32),
+				studiensemester_kurzbz character varying(32),
+				gruppe_kurzbz character varying(32),
+				studiengang_kz integer,
+				semester smallint,
+				verband character(1),
+				gruppe character(1),
+				studentenlehrverband_id integer,
+				CONSTRAINT tbl_kalender_event_teilnehmer_pk PRIMARY KEY (kalender_event_teilnehmer_id)
+			);
+
+			ALTER TABLE lehre.tbl_kalender_event_teilnehmer ADD CONSTRAINT tbl_kalender_event_fk FOREIGN KEY (kalender_id)
+			REFERENCES lehre.tbl_kalender (kalender_id) 
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			ALTER TABLE lehre.tbl_kalender_event_teilnehmer ADD CONSTRAINT tbl_kalender_event_uid_fk FOREIGN KEY (uid)
+			REFERENCES public.tbl_benutzer (uid) 
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			ALTER TABLE lehre.tbl_kalender_event_teilnehmer ADD CONSTRAINT tbl_kalender_event_rolle_fk FOREIGN KEY (rolle_kurzbz)
+			REFERENCES lehre.tbl_kalender_event_rolle (rolle_kurzbz) 
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			ALTER TABLE lehre.tbl_kalender_event_teilnehmer ADD CONSTRAINT tbl_gruppe_fk FOREIGN KEY (gruppe_kurzbz)
+			REFERENCES public.tbl_gruppe (gruppe_kurzbz) 
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			ALTER TABLE lehre.tbl_kalender_event_teilnehmer ADD CONSTRAINT tbl_lehrverband_fk FOREIGN KEY (studiengang_kz, semester, verband, gruppe)
+			REFERENCES public.tbl_lehrverband(studiengang_kz, semester, verband, gruppe)
+			ON DELETE RESTRICT ON UPDATE CASCADE;
+
+			GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_kalender_event_teilnehmer to vilesci;
+			GRANT SELECT, UPDATE, INSERT, DELETE ON lehre.tbl_kalender_event_teilnehmer to web;
+
+
+			GRANT USAGE ON lehre.tbl_kalender_event_teilnehmer_kalender_event_teilnehmer_id_seq TO vilesci;
+			GRANT USAGE ON lehre.tbl_kalender_event_teilnehmer_kalender_event_teilnehmer_id_seq TO web;
+
+
+			CREATE TABLE sync.tbl_reservierung_kalender(
+				reservierung_kalender_id bigserial NOT NULL,
+				reservierung_id integer NOT NULL,
+				kalender_id bigint NOT NULL,
+				lastupdate timestamp,
+				CONSTRAINT tbl_reservierung_kalender_pk PRIMARY KEY (reservierung_kalender_id)
+			);
+		
+			GRANT SELECT, UPDATE, INSERT, DELETE ON sync.tbl_reservierung_kalender to vilesci;
+			COMMENT ON TABLE sync.tbl_reservierung_kalender IS 'Migration from old Reservierung to new Kalender Table';
+			        
+			GRANT USAGE ON sync.tbl_reservierung_kalender_reservierung_kalender_id_seq TO vilesci;
+
+";
+
+	if(!$db->db_query($qry))
+		echo '<strong>lehre.tbl_kalender_event: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>lehre.tbl_kalender_event: neue Tabellen hinzugefuegt';
+
 }
