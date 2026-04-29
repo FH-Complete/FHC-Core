@@ -396,9 +396,9 @@ export default {
         return this.filteredOrganizationalUnits = [defaultItem, ...this.dropdownParsedOrganizationalUnits];
       }
 
-      return this.filteredOrganizationalUnits = [defaultItem].concat(this.dropdownParsedOrganizationalUnits.filter((unit) => {
+      return this.filteredOrganizationalUnits = [defaultItem].concat(this.dropdownParsedOrganizationalUnits).filter((unit) => {
         return unit.label.toLowerCase().includes(query);
-      }));
+      });
     },
     filterSemesters(event) {
       let defaultItem = {
@@ -411,9 +411,9 @@ export default {
         return this.filteredSemesters = [defaultItem, ...this.dropdownParsedSemesters];
       }
 
-      return this.filteredSemesters = [defaultItem].concat(this.dropdownParsedSemesters.filter((semester) => {
+      return this.filteredSemesters = [defaultItem].concat(this.dropdownParsedSemesters).filter((semester) => {
         return semester.label.toLowerCase().includes(query);
-      }));
+      });
     }
   },
   async created() {
@@ -504,12 +504,12 @@ export default {
           <core-form class="d-flex flex-column flex-md-row align-items-md-end gap-3">
             <div>
                <form-input
-                v-model="filterData.selectedOrganizationalUnit"
                 :label="$capitalize($p.t('lehre/organisationseinheit'))"
                 :suggestions="filteredOrganizationalUnits"
                 :optionValue="(option) => option.value"
                 :optionLabel="(option) => option.label" 
                 @complete="filterOrganizationalUnits($event)"
+                @itemSelect="(option) => { filterData.selectedOrganizationalUnit = option; }"
                 type="autocomplete"
                 name="organizationalUnitShortCode"
                 dropdown 
