@@ -35,5 +35,15 @@ class Standort_model extends DB_Model
 
 		return $this->loadWhere(array("firma_id" => $firma_id));
 	}
+
+	public function getByCompanyType($companyType)
+	{
+		$query = "SELECT s.* FROM public.tbl_standort s
+				JOIN public.tbl_firma f ON s.firma_id = f.firma_id
+				JOIN public.tbl_adresse a ON s.adresse_id = a.adresse_id
+				WHERE f.firmentyp_kurzbz = ?;";
+
+		return $this->execReadOnlyQuery($query, [$companyType]);
+	}
 }
 

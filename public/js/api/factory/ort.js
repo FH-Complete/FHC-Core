@@ -16,11 +16,25 @@
  */
 
 export default {
-	getContentID(ort_kurbz) {
+	getAllRooms(params) {
+        return {
+            method: 'get',
+            url: 'api/frontend/v1/Ort/getAllRooms',
+            params: {
+                "filter[organizationalUnitShortCode]" : params.organizationalUnitShortCode,
+                "filter[locationId]" : params.locationId,
+                "filter[buildingComponent]" : params.buildingComponent,
+                "filter[isForTrainingProgram]" : params.isForTrainingProgram,
+                "filter[isReservationNeeded]" : params.isReservationNeeded,
+                "filter[isActive]" : params.isActive,
+            }
+        }
+    },
+	getContentID(ort_kurzbz) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Ort/ContentID',
-			params: { ort_kurzbz: ort_kurbz }
+			params: { ort_kurzbz: ort_kurzbz }
 		};
 	},
 	getRooms(datum, von, bis, typ, personenanzahl = 0) {
@@ -30,11 +44,37 @@ export default {
 			params: { datum, von, bis, typ, personenanzahl }
 		};
 	},
+	getRoom(ort_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Ort/getRoom/' + ort_kurzbz,
+		};
+	},
 	getRoomTypes() {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/Ort/getTypes',
 			params: { }
 		};
+	},
+	createRoom(roomData) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Ort/createRoom',
+			params: roomData
+		}
+	},
+	updateRoom(roomId, roomData) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Ort/updateRoom/' + roomId,
+			params: roomData
+		}
+	},
+	deleteRoom(ort_kurzbz) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Ort/deleteRoom/' + ort_kurzbz,
+		}
 	}
 };

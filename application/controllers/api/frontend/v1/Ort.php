@@ -33,18 +33,62 @@ class Ort extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
+			'getAllRooms' => self::PERM_LOGGED,
+			'getRooms' => self::PERM_LOGGED,
+			'getTypes' => self::PERM_LOGGED,
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
-			'getRooms' => self::PERM_LOGGED,
-			'getTypes' => self::PERM_LOGGED
+			'getRoom' => self::PERM_LOGGED,
+			'createRoom' => self::PERM_LOGGED,
+			'updateRoom' => self::PERM_LOGGED,
+			'deleteRoom' => self::PERM_LOGGED,
 		]);
+
+		$this->load->library('form_validation');
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
 		$this->config->load('raumsuche');
+
+		$this->loadPhrases([
+			'global',
+			'ui',
+		]);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
 	// Public methods
+
+	public function getAllRooms()
+	{
+		$filter = $this->input->get('filter', TRUE);
+		
+		$filterData = [];
+
+		if (isset($filter['locationId']) && $filter['locationId'] !== '') {
+			$filterData['standort_id'] = $filter['locationId'];
+		}
+		if (isset($filter['organizationalUnitShortCode']) && $filter['organizationalUnitShortCode'] !== '') {
+			$filterData['oe_kurzbz'] = $filter['organizationalUnitShortCode'];
+		}
+		if (isset($filter['buildingComponent']) && $filter['buildingComponent'] !== '') {
+			$filterData['gebteil'] = $filter['buildingComponent'];
+		}
+		if (isset($filter['isForTrainingProgram']) && $filter['isForTrainingProgram'] === 'true') {
+			$filterData['lehre'] = $filter['isForTrainingProgram'] === 'true' ? true : false;
+		}
+		if (isset($filter['isReservationNeeded']) && $filter['isReservationNeeded'] === 'true') {
+			$filterData['reservieren'] = $filter['isReservationNeeded'] === 'true' ? true : false;
+		}
+		if (isset($filter['isActive']) && $filter['isActive'] === 'true') {
+			$filterData['aktiv'] = $filter['isActive'] === 'true' ? true : false;
+		}
+
+		$this->OrtModel->addOrder("ort_kurzbz", "ASC");
+
+		$result = $this->OrtModel->loadWhere($filterData);
+		
+		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+	}
 
 	/**
 	 * Retrieves all Ort entries filtered by the provided parameters
@@ -54,7 +98,7 @@ class Ort extends FHCAPI_Controller
 		$this->load->library('form_validation');
 		$this->form_validation->set_data($_GET);
 		$this->form_validation->set_rules('datum','Datum','required');
-		$this->form_validation->set_rules('von','Uhrzeit Von','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
+		$this->form_validation->set_rules('von','Uhrzeit Von','required|regexresponse_match[/^[0-9]{2}:[0-9]{2}$/]');
 		$this->form_validation->set_rules('bis','Uhrzeit Bis','required|regex_match[/^[0-9]{2}:[0-9]{2}$/]');
 		if($this->form_validation->run() == FALSE) {
 			$this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -173,6 +217,164 @@ class Ort extends FHCAPI_Controller
 		$content = hasData($content) ? getData($content) : null;
 
 		$this->terminateWithSuccess($content);
+	}
+
+	public function getRoom($ort_kurzbz)
+	{
+		$result = $this->OrtModel->load($ort_kurzbz);
+
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+
+		$result = hasData($result) ? current(getData($result)) : null;
+
+		return $this->terminateWithSuccess($result);
+	}
+
+	public function createRoom()
+	{
+		$this->form_validation->set_rules('ort_kurzbz', 'ort_kurzbz', 'required', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'shortCode')])
+		]);
+
+		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
+		
+		$this->db->trans_start();
+
+		$result = $this->OrtModel->db->query("INSERT INTO public.tbl_ort 
+			(
+				oe_kurzbz,
+				content_id,
+				standort_id,
+				ort_kurzbz,
+				bezeichnung,
+				planbezeichnung,
+				aktiv,
+				lehre,
+				reservieren,
+				max_person,
+				stockwerk,
+				lageplan,
+				dislozierung,
+				kosten,
+				ausstattung,
+				telefonklappe,
+				m2,
+				gebteil,
+				arbeitsplaetze,
+				insertamum,
+				insertvon,
+				updateamum,
+				updatevon
+			) 
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+			$this->input->post('oe_kurzbz'),
+			$this->input->post('contentId'),
+			$this->input->post('standort_id'),
+			$this->input->post('ort_kurzbz'),
+			$this->input->post('bezeichnung'),
+			$this->input->post('planbezeichnung'),
+			$this->input->post('aktiv') ? true : false,
+			$this->input->post('lehre') ? true : false,
+			$this->input->post('reservieren') ? true : false,
+			$this->input->post('max_person'),
+			$this->input->post('stockwerk'),
+			$this->input->post('lageplan'),
+			$this->input->post('dislozierung'),
+			$this->input->post('kosten'),
+			$this->input->post('ausstattung'),
+			$this->input->post('telefonklappe'),
+			$this->input->post('m2'),
+			$this->input->post('gebteil'),
+			$this->input->post('arbeitsplatze'),
+			date('c'),
+			getAuthUid(),
+			date('c'),
+			getAuthUid()
+		]);
+
+		$this->db->trans_complete();
+
+
+		return $this->terminateWithSuccess($result);
+	}
+
+	public function updateRoom($ort_kurzbz)
+	{
+		if (!$ort_kurzbz) {
+			$this->terminateWithError("missing ort_kurzbz parameter", self::ERROR_TYPE_GENERAL);
+		}
+		
+		$this->db->trans_start();
+
+		$result = $this->OrtModel->db->query("UPDATE public.tbl_ort SET
+				oe_kurzbz = ?,
+				content_id = ?,
+				standort_id = ?,
+				bezeichnung = ?,
+				planbezeichnung = ?,
+				aktiv = ?,
+				lehre = ?,
+				reservieren = ?,
+				max_person = ?,
+				stockwerk = ?,
+				lageplan = ?,
+				dislozierung = ?,
+				kosten = ?,
+				ausstattung = ?,
+				telefonklappe = ?,
+				m2 = ?,
+				gebteil = ?,
+				arbeitsplaetze = ?,
+				updateamum = ?,
+				updatevon = ?
+			WHERE ort_kurzbz = ?", [
+			$this->input->post('oe_kurzbz'),
+			$this->input->post('contentId'),
+			$this->input->post('standort_id'),
+			$this->input->post('bezeichnung'),
+			$this->input->post('planbezeichnung'),
+			$this->input->post('aktiv') ? true : false,
+			$this->input->post('lehre') ? true : false,
+			$this->input->post('reservieren') ? true : false,
+			$this->input->post('max_person'),
+			$this->input->post('stockwerk'),
+			$this->input->post('lageplan'),
+			$this->input->post('dislozierung'),
+			$this->input->post('kosten'),
+			$this->input->post('ausstattung'),
+			$this->input->post('telefonklappe'),
+			$this->input->post('m2'),
+			$this->input->post('gebteil'),
+			$this->input->post('arbeitsplatze'),
+			date('c'),
+			getAuthUid(),
+			$ort_kurzbz
+		]);
+
+		$this->db->trans_complete();
+
+
+		return $this->terminateWithSuccess($result);
+	}
+
+	public function deleteRoom($ort_kurzbz)
+	{
+
+		$this->db->trans_start();
+
+		$result = $this->OrtModel->delete([
+			"ort_kurzbz" => $ort_kurzbz
+		]);
+
+		if (isError($result)) {
+			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
+		}
+
+		$this->db->trans_complete();
+
+		return $this->terminateWithSuccess(true);
 	}
 }
 
