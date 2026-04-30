@@ -35,7 +35,7 @@ export default {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-			preloadedPhrasen:{},
+			arePhrasesPreloaded: false,
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
@@ -44,10 +44,12 @@ export default {
 				},
 				minHeight: 200,
 				layout: "fitColumns",
-				columns: [{
-					title: Vue.computed(() => this.preloadedPhrasen.zutrittsGruppenPhrase),
+				columns: [
+					{
+					title: Vue.computed(() => this.$p.t('profil/zutrittsGruppen')),
 					field: "bezeichnung"
-				}],
+					}
+				],
 			},
 			betriebsmittel_table_options: {
 				persistenceID: "filterTableStudentProfilBetriebsmittel",
@@ -59,6 +61,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				responsiveLayoutCollapseStartOpen: false,
 				columns: [
 					{
 						title:
@@ -69,31 +72,35 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(()=>this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
+						title: Vue.computed(()=>this.$p.t('profil/entlehnteBetriebsmittel')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() =>this.preloadedPhrasen.inventarnummerPhrase) ,
+						title: Vue.computed(() => this.$p.t('profil/inventarnummer')) ,
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
-						title: Vue.computed(() =>this.preloadedPhrasen.ausgabedatum) ,
+						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')) ,
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			},
@@ -113,11 +120,9 @@ export default {
 	methods: {
 
 		betriebsmittelTableBuilt: function () {
-			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		zutrittsgruppenTableBuilt: function () {
-			this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
 			this.$refs.zutrittsgruppenTable.tabulator.setData(
 				this.data.zuttritsgruppen
 			);
@@ -252,11 +257,7 @@ export default {
 	created() {
 		// preload phrasen
 		this.$p.loadCategory('profil').then(() => {
-			this.preloadedPhrasen.zutrittsGruppenPhrase = this.$p.t('profil/zutrittsGruppen');
-			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
-			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
-			this.preloadedPhrasen.ausgabedatum = this.$p.t('profil/ausgabedatum');
-			this.preloadedPhrasen.loaded = true;
+			this.arePhrasesPreloaded = true;
 		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
@@ -379,7 +380,7 @@ export default {
 			<div class="row">
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="preloadedPhrasen.loaded"
+					v-if="arePhrasesPreloaded"
 					@tableBuilt="betriebsmittelTableBuilt"
 					:title="$p.t('profil','entlehnteBetriebsmittel')"
 					ref="betriebsmittelTable"
@@ -389,7 +390,7 @@ export default {
 				</div>
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="preloadedPhrasen.loaded"
+					v-if="arePhrasesPreloaded"
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 

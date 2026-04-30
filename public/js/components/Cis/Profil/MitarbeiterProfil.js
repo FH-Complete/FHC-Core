@@ -36,7 +36,7 @@ export default {
 		return {
 			showModal: false,
 			editDataFilter: null,
-			preloadedPhrasen:{},
+			arePhrasesPreloaded: false,
 			// tabulator options
 			funktionen_table_options: {
 				persistenceID: "filterTableMaProfilFunktionen",
@@ -48,6 +48,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				responsiveLayoutCollapseStartOpen: false,
 				columns: [
 					{
 						title:
@@ -58,24 +59,27 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.bezeichnungPhrase),
+						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.organisationseinheitPhrase),
+						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 1,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.gueltigVonPhrase),
+						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -83,10 +87,11 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 4,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.gueltigBisPhrase),
+						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -94,14 +99,16 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 3,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.wochenstundenPhrase),
+						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 				],
 			},
@@ -116,6 +123,7 @@ export default {
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
 				data: [{betriebsmittel: "", Nummer: "", Ausgegeben_am: ""}],
+				responsiveLayoutCollapseStartOpen: false,
 				columns: [
 					{
 						title:
@@ -126,32 +134,36 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
+						title: Vue.computed(() => this.$p.t('profil/entlehnteBetriebsmittel')),
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.inventarnummerPhrase),
+						title: Vue.computed(() => this.$p.t('profil/inventarnummer')),
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.ausgabedatumPhrase),
+						title: Vue.computed(() => this.$p.t('profil/ausgabedatum')),
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			}
@@ -166,11 +178,9 @@ export default {
 	
 	methods: {
 		betriebsmittelTableBuilt: function () {
-			this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
 			this.$refs.betriebsmittelTable.tabulator.setData(this.data.mittel);
 		},
 		funktionenTableBuilt: function () {
-			this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
 		hideEditProfilModal: function () {
@@ -221,8 +231,8 @@ export default {
 				});
 		},
 		setTableColumnTitles() { // reevaluates computed phrasen
-			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
-			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
+			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns);
+			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns);
 		},
 		datetimeFormatterParams: function() {
 			const params = {
@@ -308,15 +318,7 @@ export default {
 	created() {
 		// preload phrasen
 		this.$p.loadCategory(["ui","lehre","global","profil"]).then(() => {
-			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
-			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
-			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
-			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
-			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
-			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
-			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
-			this.preloadedPhrasen.ausgabedatumPhrase = this.$p.t('profil/ausgabedatum');
-			this.preloadedPhrasen.loaded=true;
+			this.arePhrasesPreloaded = true;
 		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
@@ -440,7 +442,7 @@ export default {
                 <div class="col-12 mb-4" >
                     <!-- FUNKTIONEN TABELLE -->
                     <core-filter-cmpt
-						v-if="preloadedPhrasen.loaded"
+						v-if="arePhrasesPreloaded"
                     	@tableBuilt="funktionenTableBuilt"
 						:title="$p.t('person','funktionen')"
 						ref="funktionenTable"
@@ -452,7 +454,7 @@ export default {
                 <div class="col-12 mb-4" >
                     <!-- BETRIEBSMITTEL TABELLE -->
                     <core-filter-cmpt
-						v-if="preloadedPhrasen.loaded"
+						v-if="arePhrasesPreloaded"
                     	@tableBuilt="betriebsmittelTableBuilt"
 						:title="$p.t('profil','entlehnteBetriebsmittel')"
 						ref="betriebsmittelTable"
