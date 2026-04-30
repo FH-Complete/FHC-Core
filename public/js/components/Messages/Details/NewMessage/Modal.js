@@ -63,7 +63,7 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
-				//height: 800,
+				height: 700,
 				//plugins: ['lists'],
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
 				plugins: 'link',
@@ -345,7 +345,7 @@ export default {
 									type="textarea"
 									v-model="formData.body"
 									name="body"
-									rows="35"
+									rows="75"
 									cols="75"
 									>
 								</form-input>
