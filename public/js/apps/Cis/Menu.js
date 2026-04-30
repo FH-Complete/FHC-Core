@@ -146,7 +146,7 @@ const app = Vue.createApp({
 	},
 	provide() {
 		return {
-			isMobile: this.isMobile
+			isMobile: this.isMobile,
 		}
 	},
     methods: {

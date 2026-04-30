@@ -252,7 +252,6 @@ const app = Vue.createApp({
 	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
-		renderers: null,
 	}),
 	components: {},
 	computed: {
@@ -260,7 +259,7 @@ const app = Vue.createApp({
 			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
 			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
 			return smallScreen;// && touchCapable;
-		},	
+		},
 	},
 	provide() {
 		return { // provide injectable & watchable language property

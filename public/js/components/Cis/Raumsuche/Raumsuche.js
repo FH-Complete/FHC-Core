@@ -71,6 +71,11 @@ export const Raumsuche =  {
 			}
 			]};
 	},
+	computed: {
+		isDarkMode(){
+			return this.$theme.theme_name.value == 'dark';
+		}
+	},
 	methods: {
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
@@ -176,11 +181,6 @@ export const Raumsuche =  {
 			
 		}
 	},
-	computed: {
-		isDarkMode(){
-			return this.$theme.theme_name.value == 'dark';
-		}
-	},
 	created() {
 		this.phrasenPromise = this.$p.loadCategory(['rauminfo', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
@@ -195,27 +195,14 @@ export const Raumsuche =  {
 		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
-				:dark="isDarkMode"
 				v-model="datum"
+				:dark="isDarkMode"
 				:clearable="false"
-				date-picker
 				:enable-time-picker="false"
 				:format="dateFormat"
 				:text-input="datepickerTextInputOptions"
 				:min-date="new Date()"
-				auto-apply>
-			</VueDatePicker>
-		</div>
-		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
-			<VueDatePicker
-				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
-				:dark="isDarkMode"
-				v-model="von"
-				:clearable="false"
-				time-picker
-				:format="timeFormat"
-				:text-input="timepickerTextInputOptions"
-				:is-24="true"
+				date-picker
 				auto-apply
 				>
 			</VueDatePicker>
@@ -223,13 +210,27 @@ export const Raumsuche =  {
 		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
 				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
+				v-model="von"
 				:dark="isDarkMode"
-				v-model="bis"
 				:clearable="false"
-				time-picker
 				:format="timeFormat"
 				:text-input="timepickerTextInputOptions"
 				:is-24="true"
+				time-picker
+				auto-apply
+				>
+			</VueDatePicker>
+		</div>
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
+			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
+				v-model="bis"
+				:dark="isDarkMode"
+				:clearable="false"
+				:format="timeFormat"
+				:text-input="timepickerTextInputOptions"
+				:is-24="true"
+				time-picker
 				auto-apply>
 			</VueDatePicker>
 		</div>
