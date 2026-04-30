@@ -56,7 +56,7 @@ class TagJob extends JOB_Controller
 				require_once($filePath);
 			} else {
 				echo "File not found: " . $filePath . PHP_EOL;
-				continue;
+								continue;
 			}
 
 			$kurz_bz = $autoTag->typ_kurzbz;
@@ -67,6 +67,8 @@ class TagJob extends JOB_Controller
 
 			$outputArray = $obj->getZuordnungIds(['studiensemester_kurzbz' => $studiensemester_kurzbz]);
 			$data = $outputArray->data;
+
+			print_r($kurz_bz . " " . $autoTag->taglib);
 
 			$result = $this->taglib->updateAutomatedTags($kurz_bz, $data);
 
@@ -80,7 +82,6 @@ class TagJob extends JOB_Controller
 			print_r(PHP_EOL . "Count Added: ".  $result->retval['summary']['added']);
 			print_r(PHP_EOL . "Count Deleted: ".  $result->retval['summary']['deleted']);
 			print_r(PHP_EOL);
-
 		}
 		print_r( PHP_EOL . "End Job rebuild" . PHP_EOL);
 

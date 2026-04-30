@@ -20,7 +20,7 @@ class Tag_Controller extends FHCAPI_Controller
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
 			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
-			'rebuildTagsPrestudent' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		];
 
 		$merged_permissions = array_merge($default_permissions, $permissions);
@@ -337,11 +337,12 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz) : array());
 	}
 
-	public function rebuildTagsPrestudent()
+	public function rebuildTagsForTypeId()
 	{
-		$prestudent_id = $this->input->get('prestudent_id');
+		$id = $this->input->get('id');
+		$typeId = $this->input->get('typeId');
 
-		$result = $this->taglib->rebuildTagsForPrestudent($prestudent_id);
+		$result = $this->taglib->rebuildTagsForTypeId($typeId, $id);
 		if (isError($result))
 			return error ('Error occurred during updateAutomatedTags');
 

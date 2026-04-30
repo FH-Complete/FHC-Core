@@ -19,7 +19,7 @@ class CoreStbErhoehtTagLib
 		if(!isset($params['studiensemester_kurzbz']))
 		{
 			return (object) array(
-				'prestudent_id' => []
+				'idArray' => []
 			);
 		}
 
@@ -36,7 +36,8 @@ class CoreStbErhoehtTagLib
 
 		$konto_data = array_map(function($item) {
 			return [
-				'prestudent_id' => $item->prestudent_id,
+				'typeId' => 'prestudent_id',
+				'id' => $item->prestudent_id,
 				'von' => $item->start,
 				'bis' => $item->ende
 			];
@@ -49,13 +50,11 @@ class CoreStbErhoehtTagLib
 
 	public function isCriteriaSetFor(array $params)
 	{
-		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
-		{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'prestudent_id')
 			return false;
-		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$prestudent_id = $params['prestudent_id'];
+		$prestudent_id = $params['id'];
 
 		$this->ci->KontoModel->addSelect('prestudent_id');
 		$this->ci->KontoModel->addSelect('start as von');

@@ -17,7 +17,6 @@ use \stdClass as stdClass;
 class TagLib
 {
 	const BATCHUSER = 'sftest';
-	const TYP_ZUORDNUNG = 'prestudent_id';
 
 	/**
 	 * Object initialization
@@ -47,7 +46,8 @@ class TagLib
 		$params array expected pattern
 		[
 			[
-				'prestudent_id' => 123456,
+				'id' => 123456,
+				'typeId' => 123456,
 				'von' => '2026-04-01',
 				'bis' => '2026-06-30'
 			],
@@ -64,7 +64,8 @@ class TagLib
 		//TODO(Manu) check minimal input:
 
 		foreach ($inputData as $row) {
-			$pid = $row['prestudent_id'];
+			$pid = $row['id'];
+			$typeId = $row['typeId'];
 
 			$prestudentIds[] = $pid;
 
@@ -81,7 +82,7 @@ class TagLib
 		$allTags = [];
 
 		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect('prestudent_id');
+		$this->_ci->NotizModel->addSelect($typeId);
 		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
 
 		$resultAllTags = $this->_ci->NotizModel->loadWhere([
@@ -92,7 +93,7 @@ class TagLib
 
 		if (!empty($allTagsData)) {
 			foreach ($allTagsData as $row) {
-				$allTags[$row->prestudent_id] = $row->notiz_id;
+				$allTags[$row->$typeId] = $row->notiz_id;
 			}
 		}
 
@@ -171,7 +172,7 @@ class TagLib
 
 			$resultZuordnung = $this->_ci->NotizzuordnungModel->insert([
 				'notiz_id' => $notizId,
-				self::TYP_ZUORDNUNG => $pid
+				$typeId => $pid
 			]);
 
 			if (isError($resultZuordnung)) {
@@ -237,79 +238,7 @@ class TagLib
 		]);
 	}
 
-	public function updateAutomatedTagsForPrestudent_DEPR($tag, $prestudent_id)
-	{
-		$_ci = get_instance();
-		$_ci->addMeta(
-			'IN OLD FUNCTION updateTags', $tag
-		);
-		$return = null;
-		$notiz_id = null;
-
-		//von und bis auslesen
-
-
-		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect('prestudent_id');
-		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
-		$resultAllTags = $this->_ci->NotizModel->loadWhere([
-			'typ' => $tag,
-			'prestudent_id' => $prestudent_id
-		]);
-		if(hasData($resultAllTags))
-		{
-			$notiz_id = $resultAllTags->retval[0]->notiz_id;
-		}
-
-		//RECYCLE
-		if ($notiz_id !== null)
-		{
-			//TODO(Manu) refactor for recycle, add
-			$resultUpdateNotiz = $this->_ci->NotizModel->update(
-				[
-					'notiz_id' => $notiz_id
-				],
-				array(
-					'updateamum' => date('Y-m-d H:i:s'),
-					'updatevon' => getAuthUID(),
-				));
-
-			if (isError($resultUpdateNotiz))
-				return error ('Error occurred update Result ' . $notiz_id);
-
-			$return = ['recycled' => $notiz_id];
-		}
-		else
-
-		{
-			//TODO(Manu) refactor for recycle, add
-			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
-				'titel' => 'TAG',
-				'text' => 'AUTOMATED TAG',
-				'verfasser_uid' => getAuthUID(),
-				'erledigt' => false,
-				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => getAuthUID(),
-				'typ' => $tag
-			));
-
-			if (isError($resultInsertNotiz))
-				return error ('Error occurred insert Result ' . $prestudent_id);
-
-			$resultInsertZuordnung = $this->_ci->NotizzuordnungModel->insert(array(
-				'notiz_id' => $resultInsertNotiz->retval,
-				self::TYP_ZUORDNUNG => $prestudent_id
-			));
-
-			if (isError($resultInsertZuordnung))
-				return error ('Error occurred insert Zuordnung' . $prestudent_id);
-
-			$return = ['added' => $resultInsertNotiz->retval];
-		}
-		return success($return);
-	}
-
-	public function updateAutomatedTagsForPrestudent(array $params)
+	public function updateAutomatedTagsForTypeId(array $params)
 	{
 		$return = null;
 		$notiz_id = null;
@@ -317,14 +246,15 @@ class TagLib
 		$von = $params['von'];
 		$bis = $params['bis'];
 		$tag = $params['kurzbz'];
-		$prestudent_id = $params['prestudent_id'];
+		$id = $params['id'];
+		$typeId = $params['typeId'];
 
 		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect('prestudent_id');
+		$this->_ci->NotizModel->addSelect($typeId);
 		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
 		$resultAllTags = $this->_ci->NotizModel->loadWhere([
 			'typ' => $tag,
-			'prestudent_id' => $prestudent_id
+			$typeId => $id
 		]);
 		if(hasData($resultAllTags))
 		{
@@ -334,7 +264,6 @@ class TagLib
 		//RECYCLE
 		if ($notiz_id !== null)
 		{
-			//TODO(Manu) refactor for recycle, add
 			$resultUpdateNotiz = $this->_ci->NotizModel->update(
 				[
 					'notiz_id' => $notiz_id
@@ -369,24 +298,25 @@ class TagLib
 
 			$resultInsertZuordnung = $this->_ci->NotizzuordnungModel->insert(array(
 				'notiz_id' => $resultInsertNotiz->retval,
-				self::TYP_ZUORDNUNG => $prestudent_id
+				$typeId => $id
 			));
 
 			if (isError($resultInsertZuordnung))
-				return error ('Error occurred insert Zuordnung' . $prestudent_id);
-
+				return error ('Error occurred insert Zuordnung ' . $id);
 			$return = ['added' => $resultInsertNotiz->retval];
 		}
 		return success($return);
 	}
 
 	/*
-	 * main function for rebuild Tags for single prestudent
+	 * main function for rebuild Tags for typeId
 	 * */
-	public function rebuildTagsForPrestudent($prestudent_id)
+	public function rebuildTagsForTypeId($typeId, $id)
 	{
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
+
+		$_ci = get_instance();
 
 		$result = $this->_ci->StudiensemesterModel->getLastOrAktSemester();
 		if (isError($result))
@@ -395,7 +325,6 @@ class TagLib
 			return error('No studiensemester found');
 		}
 		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
-
 		$return = [];
 
 		foreach ($automatedTags as $autoTag)
@@ -415,8 +344,10 @@ class TagLib
 			$kurz_bz = $autoTag->typ_kurzbz;
 
 			$obj = new $className();
+
 			$criteriaIsSet = $obj->isCriteriaSetFor([
-				'prestudent_id' => $prestudent_id,
+				'typeId' => $typeId,
+				'id' => $id,
 				'studiensemester_kurzbz' => $studiensemester_kurzbz
 			]);
 
@@ -429,10 +360,11 @@ class TagLib
 					'von' => $von,
 					'bis' => $bis,
 					'kurzbz' => $autoTag->typ_kurzbz,
-					'prestudent_id' => $prestudent_id
+					'typeId' => $typeId,
+					'id' => $id,
 				];
 
-				$result = $this->updateAutomatedTagsForPrestudent($params);
+				$result = $this->updateAutomatedTagsForTypeId($params);
 				if (isError($result))
 					return error('Error occurred during updateAutomatedTags' . $kurz_bz);
 
@@ -440,7 +372,8 @@ class TagLib
 			}
 			else
 			{
-				$result = $this->checkForDelete($kurz_bz, $prestudent_id);
+				$result = $this->checkForDelete($kurz_bz, $typeId, $id);
+
 				if ($result != null)
 					$return[$kurz_bz] = $result;
 			}
@@ -448,25 +381,27 @@ class TagLib
 		return success($return);
 	}
 
-	public function checkForDelete($tag, $prestudent_id)
+	public function checkForDelete($tag, $typeId, $id)
 	{
 		$return = null;
 		$notiz_id = null;
 
-		if (!is_numeric($prestudent_id))
-			return error ("prestudent_id " . $prestudent_id . "not numeric");
+		if (!is_numeric($id))
+			return error ("id " . $id . "not numeric");
 
 		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect('prestudent_id');
+		$this->_ci->NotizModel->addSelect($typeId);
 		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
 		$resultAllTags = $this->_ci->NotizModel->loadWhere([
 			'typ' => $tag,
-			'prestudent_id' => $prestudent_id
+			$typeId => $id
 		]);
 		if(hasData($resultAllTags))
 		{
 			$notiz_id = $resultAllTags->retval[0]->notiz_id;
 		}
+		else
+			return null;
 
 		if($notiz_id)
 		{

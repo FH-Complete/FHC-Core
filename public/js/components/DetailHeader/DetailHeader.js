@@ -246,9 +246,13 @@ export default {
 			this.reload();
 		},
 		rebuildPrestudentTags(){
-			const prestudent_id = this.headerData[0].prestudent_id;
+			const params = {
+				id : this.headerData[0].prestudent_id,
+				typeId: 'prestudent_id'
+			};
+
 			return this.$api
-				.call(ApiTag.rebuildTagsPrestudent({prestudent_id}))
+				.call(ApiTag.rebuildTagsforTypeId(params))
 				.then(result => {
 					this.rebuildData = result.data;
 					console.log("Rebuild manually triggered");

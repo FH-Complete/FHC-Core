@@ -61,11 +61,11 @@ export default {
 		};
 	},
 
-	rebuildTagsPrestudent(prestudent_id){
+	rebuildTagsforTypeId(data){
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/Tags/rebuildTagsPrestudent',
-			params: prestudent_id
+			url: 'api/frontend/v1/stv/Tags/rebuildTagsForTypeId/',
+			params: data
 		};
 	}
 };

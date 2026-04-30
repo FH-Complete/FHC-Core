@@ -19,7 +19,7 @@ class CoreJgvTagLib
 		if(!isset($params['studiensemester_kurzbz']))
 		{
 			return (object) array(
-				'prestudent_id' => []
+				'idArray' => []
 			);
 		}
 
@@ -31,7 +31,8 @@ class CoreJgvTagLib
 
 		$jgv_data = array_map(function($item) {
 			return [
-				'prestudent_id' => $item->prestudent_id,
+				'typeId' => 'prestudent_id',
+				'id' => $item->prestudent_id,
 				'von' => $item->datum_von,
 				'bis' => $item->datum_bis
 			];
@@ -44,13 +45,11 @@ class CoreJgvTagLib
 
 	public function isCriteriaSetFor(array $params)
 	{
-		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
-		{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'prestudent_id')
 			return false;
-		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$prestudent_id = $params['prestudent_id'];
+		$prestudent_id = $params['id'];
 
 		$result = $this->ci->BenutzerfunktionModel->isJgv($semester, $prestudent_id);
 

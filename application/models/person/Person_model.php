@@ -433,4 +433,33 @@ class Person_model extends DB_Model
 		
 		return $this->execReadOnlyQuery($qry, [$person_id]);
 	}
+
+	//just a test function for a person_id tag
+	//alle personen die innerhalb dieses Zeitraumens 55  werden
+	public function getFiftyFivers($von, $bis)
+	{
+		$qry = "
+				SELECT 
+				    p.person_id
+				FROM public.tbl_person p 
+		         WHERE p.gebdatum >= DATE ? - INTERVAL '55 years' 
+				 AND p.gebdatum <= DATE ? - INTERVAL '55 years';
+		";
+		return $this->execReadOnlyQuery($qry, [$von, $bis]);
+	}
+
+	//just a test function for a person_id tag
+	//check if Person gets 55 in this time
+	public function isFiftyFive($von, $bis, $person_id)
+	{
+		$qry = "
+				SELECT 
+				    p.person_id
+				FROM public.tbl_person p 
+		         WHERE p.gebdatum >= DATE ? - INTERVAL '55 years' 
+				 AND p.gebdatum <= DATE ? - INTERVAL '55 years'
+				 AND p.persond_id = ?;
+		";
+		return $this->execReadOnlyQuery($qry, [$von, $bis, $person_id]);
+	}
 }

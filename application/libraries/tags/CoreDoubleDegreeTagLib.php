@@ -19,7 +19,7 @@ class CoreDoubleDegreeTagLib
 		if(!isset($params['studiensemester_kurzbz']))
 		{
 			return (object) array(
-				'prestudent_id' => []
+				'idArray' => []
 			);
 		}
 
@@ -36,7 +36,8 @@ class CoreDoubleDegreeTagLib
 
 		$doubledegree_data = array_map(function($item) {
 			return [
-				'prestudent_id' => $item->prestudent_id,
+				'typeId' => 'prestudent_id',
+				'id' => $item->prestudent_id,
 				'von' => $item->start,
 				'bis' => $item->ende
 			];
