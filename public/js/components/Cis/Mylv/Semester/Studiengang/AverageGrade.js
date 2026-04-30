@@ -1,50 +1,42 @@
 import Phrasen from "../../../../../mixins/Phrasen.js";
+import ApiLehre from "../../../../../api/factory/lehre.js";
 
 export default {
 	mixins: [
 		Phrasen
 	],
 	props: {
-		lvs: Array,
+		semesterInfo: String,
 	},
-	data: ( ) =>{
+	data() {
 		return {
 			gradeAverage: null,
 			gradeWeightedAverage: null,
-			existingGrades: false
 		}
 	},
 	methods: {
-		calculateAverages(){
-			let sum = 0;
-			let count = 0;
-			let sumWeighted = 0;
-			let sumEcts = 0;
+		async fetchAverageGrade() {
+			this.gradeAverage = null;
+			this.gradeWeightedAverage = null;
+			if (!this.$props.semesterInfo) return;
 
-			this.lvs.forEach((lv) => {
-				if ((lv.znote >= 1 && lv.znote <= 5) && lv.znote!= null) {
-					this.existingGrades = true;
-					sum+= lv.znote;
-					count++;
-					sumWeighted += lv.znote * Number(lv.ects);
-					sumEcts += Number(lv.ects);
-				}
-			});
-			this.gradeAverage = (sum/count).toFixed(2);
-			this.gradeWeightedAverage = (sumWeighted/sumEcts).toFixed(2);
-		}
+			let gradeAverageResponse = await this.$api.call(
+				ApiLehre.getSemesterAverageGrade(this.$props.semesterInfo),
+			);
+			const gradeAverageResponseData = gradeAverageResponse.data;
+			this.gradeAverage =
+				gradeAverageResponseData.average_grade?.toFixed(2);
+			this.gradeWeightedAverage =
+				gradeAverageResponseData.weighted_average_grade?.toFixed(2);
+		},
 	},
 	watch: {
-		lvs: {
-			handler() {
-				this.calculateAverages();
-			},
-			deep: true,
-			immediate: true
-		}
+		semesterInfo() {
+			this.fetchAverageGrade();
+		},
 	},
-	mounted(){
-		this.calculateAverages();
+	async created() {
+		await this.fetchAverageGrade();
 	},
 	template: /*html*/`
 	<div class="card mylv-semester-studiengang-grades">
@@ -53,7 +45,7 @@ export default {
 			<h6>{{$p.t('lehre/notenstatistik')}}</h6>
 		</div>
 
-		<div v-if="existingGrades">
+		<div v-if="gradeAverage && gradeWeightedAverage">
 			<table class="card-body table w-auto mx-auto">
 			  <tbody>
 				<tr>
@@ -79,7 +71,7 @@ export default {
 			<p>{{$p.t('lehre/info_noGradesYet')}}</p>
 		</div>
 
-		<div v-if="existingGrades" class="card-footer d-flex align-items-start text-muted small">
+		<div v-if="gradeAverage && gradeWeightedAverage" class="card-footer d-flex align-items-start text-muted small">
 		  <i class="fa fa-circle-info me-2 mt-1"></i>
 		  <div>
 			<strong>{{$p.t('ui', 'hinweis')}}</strong><br>
