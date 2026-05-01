@@ -126,7 +126,7 @@ echo '<table class="tablesorter" id="myTable">
 			<th>Bezeichnung</th>
 			<th>Beschreibung</th>
 			<th>Organisationseinheit</th>
-			<th>Kategorie</th>
+			<th>Kritikalität</th>
 			<th>Content ID</th>
 			<th>Design</th>
 			<th>Betrieb</th>

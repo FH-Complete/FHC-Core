@@ -373,7 +373,8 @@ if(!$error)
 									WHERE
 										mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
 										studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
-										bismelden";
+										bismelden AND
+										lower(mitarbeiter_uid) NOT LIKE '_dummy%'";
 
 							if(count($oe_arr)>0)
 								$qry.=" AND tbl_studiengang.oe_kurzbz in(".$db->db_implode4SQL($oe_arr).")";
@@ -631,6 +632,7 @@ if(!$error)
 								JOIN public.tbl_studiengang USING(studiengang_kz)
 							WHERE
 								mitarbeiter_uid=".$db->db_add_param($lem->mitarbeiter_uid)." AND
+								lower(mitarbeiter_uid) NOT LIKE '_dummy%' AND
 								studiensemester_kurzbz=".$db->db_add_param($le->studiensemester_kurzbz)." AND
 								bismelden";
 

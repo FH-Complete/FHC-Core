@@ -6,6 +6,9 @@ import LvPopup from './Leitung/LvPopup.js';
 import BsAlert from '../Bootstrap/Alert.js';
 import FhcLoader from '../Loader.js';
 
+import ApiStudstatusLeitung from '../../api/factory/studstatus/leitung.js';
+import ApiStudstatusAbmeldung from '../../api/factory/studstatus/abmeldung.js';
+
 export default {
 	components: {
 		LeitungHeader,
@@ -39,15 +42,10 @@ export default {
 	},
 	methods: {
 		loadFilter() {
-			axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getActiveStgs'
-			).then(result => {
-				this.stgs = result.data.retval;
-			}).catch(error => {
-				console.error(error);
-			});
+			this.$api
+				.call(ApiStudstatusLeitung.getStgs())
+				.then(result => this.stgs = result.data)
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		changeFilter(filter) {
 			this.filter = filter || undefined;
@@ -103,21 +101,9 @@ export default {
 				}
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						oks.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/approve' + antrag.typ,
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+				this
+					._singleOrMultiApiCall(oks, ApiStudstatusLeitung.approve)
+					.then(this.showResults);
 			}
 		},
 		actionReject(evt, gruende) {
@@ -147,99 +133,39 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						gruende.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/reject' + antrag.typ,
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id,
-									grund: antrag.grund
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+
+				this
+					._singleOrMultiApiCall(gruende, ApiStudstatusLeitung.reject)
+					.then(this.showResults);
 			}
 		},
 		actionReopen(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/reopenAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.reopen)
+				.then(this.showResults);
 		},
 		actionPause(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/pauseAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.pause)
+				.then(this.showResults);
 		},
 		actionUnpause(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/unpauseAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.unpause)
+				.then(this.showResults);
 		},
 		actionObject(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/objectAntrag/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.object)
+				.then(this.showResults);
 		},
 		actionoObjectionDeny(evt, gruende) {
 			var antraege = evt || this.selectedData;
@@ -267,84 +193,52 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				axios
-					.all(
-						gruende.map(
-							antrag => axios.post(
-								FHC_JS_DATA_STORAGE_OBJECT.app_root +
-								FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-								'/components/Antrag/Leitung/objectionDeny/',
-								{
-									studierendenantrag_id: antrag.studierendenantrag_id,
-									grund: antrag.grund
-								}
-							)
-						)
-					)
-					.then(this.showValidation)
-					.catch(this.showError);
+				this
+					._singleOrMultiApiCall(gruende, ApiStudstatusLeitung.denyObjection)
+					.then(this.showResults);
 			}
 		},
 		actionObjectionApprove(evt, gruende) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Leitung/objectionApprove/',
-							{
-								studierendenantrag_id: antrag.studierendenantrag_id
-							}
-						)
-					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.approveObjection)
+				.then(this.showResults);
 		},
 		actionCancel(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			axios
-				.all(
-					antraege.map(
-						antrag => axios.post(
-							FHC_JS_DATA_STORAGE_OBJECT.app_root +
-							FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-							'/components/Antrag/Abmeldung/cancelAntrag/',
-							{
-								antrag_id: antrag.studierendenantrag_id
-							}
-						)
+			if (Array.isArray(antraege)) {
+				Promise
+					.allSettled(
+						antraege.map(antrag => this.$api.call(
+							ApiStudstatusAbmeldung.cancel(antrag.studierendenantrag_id),
+							{ errorHeader: '#' + antrag.studierendenantrag_id }
+						))
 					)
-				)
-				.then(this.showValidation)
-				.catch(this.showError);
-		},
-		showValidation(results) {
-			var errors = results.filter(res => res.data.error);
-			this.$refs.loader.hide();
-			if (errors.length) {
-				let errorMsg = errors.map(
-					error =>
-					'Antrag ' +
-					JSON.parse(error.config.data).studierendenantrag_id +
-					'\n' +
-					Object.values(error.data.retval).join('\n')
-				).join('\n');
-
-				BsAlert.popup(errorMsg, {dialogClass: 'alert alert-danger'});
+					.then(this.showResults);
+			} else {
+				this.$api
+					.call(ApiStudstatusAbmeldung.cancel(antraege))
+					.then(this.showResults);
 			}
-			this.reload();
 		},
-		showError(error) {
+		showResults(results) {
+			let fulfilled = results.filter(res => res.status == 'fulfilled');
 			this.$refs.loader.hide();
-			let msg = error.response.data;
-			if (msg.replace(/^\s+/, '').substr(0, 9) == '<!DOCTYPE' || msg.replace(/^\s+/, '').substr(0, 4).toLowerCase() == '<div')
-				msg = error.message;
-			BsAlert.popup(msg, {dialogClass: 'alert alert-danger'});
+			//fulfilled.forEach(a => this.$fhcAlert.alertDefault('success', '#' + a.value.data, 'Approved, ...'));
+			if (fulfilled.length)
+				this.reload();
+		},
+		_singleOrMultiApiCall(antraege, endpoint) {
+			if (Array.isArray(antraege)) {
+				return Promise
+					.allSettled(antraege.map(antrag => this.$api.call(
+						endpoint(antrag),
+						{ errorHeader: '#' + antrag.studierendenantrag_id }
+					)));
+			}
+			return this.$api.call(endpoint(antraege));
 		}
 	},
 	created() {

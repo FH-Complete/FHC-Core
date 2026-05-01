@@ -3,6 +3,8 @@ import {CoreFetchCmpt} from '../../Fetch.js';
 import LvPopup from './LvPopup.js';
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
 
+import ApiStudstatusLeitung from '../../../api/factory/studstatus/leitung.js';
+
 export default {
 	components: {
 		BsModal,
@@ -31,9 +33,6 @@ export default {
 	],
 	data() {
 		return {
-			ajaxUrl: FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getAntraege/',
 			table: null,
 			lastHistoryClickedId: null,
 			historyData: [],
@@ -42,7 +41,7 @@ export default {
 	},
 	methods: {
 		reload(stg) {
-			this.table.setData(this.ajaxUrl + (stg || ''));
+			this.table.setData('/' + (stg || ''));
 		},
 		download() {
 			this.table.download("csv", "data.csv", {
@@ -53,14 +52,12 @@ export default {
 		getHistory() {
 			if (this.lastHistoryClickedId === null)
 				return null;
-			return axios.get(
-				FHC_JS_DATA_STORAGE_OBJECT.app_root +
-				FHC_JS_DATA_STORAGE_OBJECT.ci_router +
-				'/components/Antrag/Leitung/getHistory/' +
-				this.lastHistoryClickedId
-			).then(res => {
-				this.historyData = res.data.retval.sort((a, b) => a.insertamum > b.insertamum);
-			});
+			return this.$api
+				.call(ApiStudstatusLeitung.getHistory(this.lastHistoryClickedId))
+				.then(res => {
+					this.historyData = res.data.sort((a, b) => a.insertamum > b.insertamum);
+				})
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		getHistoryStatus(data, index) {
 			if (data.insertvon == 'Studienabbruch')
@@ -116,7 +113,9 @@ export default {
 			movableColumns: true,
 			height: '65vh',
 			layout: "fitDataFill",
-			ajaxURL: this.ajaxUrl + (this.filter || ''),
+			ajaxURL: '/' + (this.filter || ''),
+			ajaxRequestFunc: url => this.$api.call(ApiStudstatusLeitung.getAntraege(url)),
+			ajaxResponse: (url, params, response) => response.data,
 			persistence: { // NOTE(chris): do not store column titles
 				sort: true, //persist column sorting
 				filter: true, //persist filters
@@ -269,7 +268,7 @@ export default {
 							allowed_status_for_download = ['Genehmigt'];
 							break;
 						case 'AbmeldungStgl':
-							allowed_status_for_download = ['Genehmigt', 'Beeinsprucht', 'EinspruchAbgelehnt', 'Abgemeldet'];
+							allowed_status_for_download = ['EinspruchAbgelehnt', 'Abgemeldet'];
 							break;
 						case 'Unterbrechung':
 							allowed_status_for_download = ['Genehmigt', 'EmailVersandt'];

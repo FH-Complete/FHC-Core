@@ -1,5 +1,14 @@
+console.warn('plugin/Phrasen.js is DEPRECATED! Use plugins/Phrasen.js instead.');
+import FhcApi from './FhcApi.js';
+import ApiPhrasen from '../api/factory/phrasen.js';
+
 const categories = Vue.reactive({});
 const loadingModules = {};
+let user_language = Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+export let user_locale = Vue.computed(()=>{
+	if(!user_language.value) return null;
+	return FHC_JS_DATA_STORAGE_OBJECT.server_languages.find(language => language.sprache == user_language.value).LC_Time;
+});
 
 function extractCategory(obj, category) {
 	return obj.filter(e => e.category == category).reduce((res, elem) => {
@@ -17,24 +26,43 @@ function getValueForLoadedPhrase(category, phrase, params) {
 	return result;
 }
 
-
 const phrasen = {
+	user_language,
+	user_locale,
+	setLanguage(language) {
+		const catArray = Object.keys(categories)
+		return this.config.globalProperties.$api
+			.call(ApiPhrasen.setLanguage(catArray, language))
+			.then(res => {
+				res.data.forEach(row => {
+					categories[row.category][row.phrase] = row.text
+				})
+
+				// update the reactive data that holds the current active user_language
+				user_language.value = language;
+
+				return res
+			})
+	},
 	loadCategory(category) {
 		if (Array.isArray(category))
-			return Promise.all(category.map(cat => this.loadCategory(cat)));
+			return Promise.all(category.map(this.config.globalProperties
+				.$p.loadCategory));
+		const $fhcApi = this.config.globalProperties.$fhcApi;
+		const $fhcApiFactory = this.config.globalProperties.$fhcApiFactory;
 		if (!loadingModules[category])
-			loadingModules[category] = axios
-				.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Phrasen/loadModule/' + category)
+			loadingModules[category] = this.config.globalProperties.$api
+				.call(
+					ApiPhrasen.loadCategory(category)
+				)
+				.then(res => res?.data ? extractCategory(res.data, category) : {})
 				.then(res => {
-					if (res.data.retval)
-						categories[category] = extractCategory(res.data.retval, category);
-					else
-						categories[category] = {};
+					categories[category] = res;
 				});
 		return loadingModules[category];
 	},
 	t_ref(category, phrase, params) {
-		console.warn('depricated');
+		console.warn('deprecated');
 		return Vue.computed(() => this.t(category, phrase, params));
 	},
 	t(category, phrase, params) {
@@ -62,6 +90,15 @@ const phrasen = {
 
 export default {
 	install(app, options) {
-		app.config.globalProperties.$p = phrasen;
+		app.use(FhcApi, options?.fhcApi || undefined);
+		app.config.globalProperties.$p = {
+			t: phrasen.t,
+			loadCategory: cat => phrasen.loadCategory.call(app, cat),
+			setLanguage: lang => phrasen.setLanguage.call(app, lang),
+			user_language: user_language,
+			user_locale,
+			t_ref: phrasen.t_ref
+		};
+		app.provide('$p', app.config.globalProperties.$p);
 	}
 }

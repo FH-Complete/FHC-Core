@@ -137,7 +137,7 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer1_nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer2_nachname" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#pruefer3_nachname" />
-									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_kurzbz" />
+									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#abschlussbeurteilung_bezeichnung" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#datum" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#uhrzeit" />
 									<treecell label="rdf:http://www.technikum-wien.at/abschlusspruefung/rdf#freigabedatum" />
@@ -365,6 +365,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 
 				<row>
+					<vbox>
+						<label id="student-abschlusspruefung-link-label" value="Zur Beurteilung"/>
+					</vbox>
+					<vbox>
+						<label id="student-abschlusspruefung-link-value" hidden="true" value=""></label>
+						<label id="student-abschlusspruefung-link" class="text-link" href="#" value="" onclick="window.open(document.getElementById('student-abschlusspruefung-link-value').value)"/>
+					</vbox>
 					<spacer />
 					<spacer />
 					<spacer />

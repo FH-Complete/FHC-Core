@@ -22,6 +22,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * This controller operates between (interface) the JS (GUI) and the NavigationLib (back-end)
  * Provides data to the ajax get calls about the filter
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
+ * TODO(chris): deprecated
  */
 class Navigation extends FHC_Controller
 {

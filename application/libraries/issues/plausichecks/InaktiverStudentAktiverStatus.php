@@ -67,6 +67,7 @@ class InaktiverStudentAktiverStatus extends PlausiChecker
 		$prestudent_id = null,
 		$exkludierte_studiengang_kz = null
 	) {
+		$this->_ci->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 		$aktStudiensemesterRes = $this->_ci->StudiensemesterModel->getAkt();
 
 		if (isError($aktStudiensemesterRes)) return $aktStudiensemesterRes;

@@ -34,6 +34,11 @@ if(defined('CIS_GESAMTNOTE_PUNKTE') && CIS_GESAMTNOTE_PUNKTE)
 else
 	$punktehidden = 'true';
 
+if(defined('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT') && FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT)
+    $show_komm_prfg_hint = true;
+else
+    $show_komm_prfg_hint = false;
+
 echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 
 ?>
@@ -203,7 +208,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 										<label value="Typ" control="student-pruefung-menulist-typ"/>
 										<menulist id="student-pruefung-menulist-typ" disabled="true"
 										          datasources="<?php echo APP_ROOT; ?>rdf/pruefungstyp.rdf.php?abschluss=false" flex="1"
-										          ref="http://www.technikum-wien.at/pruefungstyp/liste" >
+										          ref="http://www.technikum-wien.at/pruefungstyp/liste"
+										          oncommand="StudentPruefungTypChange()">
 											<template>
 												<menupopup>
 													<menuitem value="rdf:http://www.technikum-wien.at/pruefungstyp/rdf#pruefungstyp_kurzbz"
@@ -251,6 +257,12 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 					      					<spacer flex="1" />
 					      				</hbox>
 									</row>
+<?php if($show_komm_prfg_hint) { ?>
+									<row id="student-pruefung-textbox-datum-hinweis" hidden="true">
+										<label><image width="20" class="message-icon"/></label>
+										<textbox readonly="true" multiline="true" rows="3" value="Bitte bei Neuanlage einer kommissionellen Prüfung das Datum der Noteneintragung (i. d. R. heute) eintragen, um den korrekten Fristenablauf der Wiederholung zu ermöglichen. Das Datum der Prüfung bitte im Anmerkungsfeld vermerken."></textbox>
+									</row>
+<?php } ?>
 					      			<row>
 					      				<label value="Anmerkung" control="student-pruefung-textbox-anmerkung"/>
 							      		<textbox id="student-pruefung-textbox-anmerkung" disabled="true" maxlength="256"/>

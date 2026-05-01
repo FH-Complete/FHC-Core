@@ -86,71 +86,93 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 					<h3>Formel / Formula</h3>
 					<div style="font-size: large; padding-top: 15px">
 						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<mfrac>
-								<mn> 5 </mn>
-								<mn> 3 </mn>
-							</mfrac>
-
-							<mo> + </mo>
-							<mfrac>
-								<mn> 7 </mn>
-								<mn> 6 </mn>
-							</mfrac>
-							<mo> = </mo>
-
-							<mfrac>
-								<mn> 10 </mn>
-								<mn> 6 </mn>
-							</mfrac>
-							<mo> + </mo>
-							<mfrac>
-
-								<mn> 7 </mn>
-								<mn> 6 </mn>
-							</mfrac>
-							<mo> = </mo>
-							<mfrac>
-								<mn> 17 </mn>
-
-								<mn> 6 </mn>
-							</mfrac>
+						  <mrow>
+						    <mfrac>
+						      <mn>5</mn>
+						      <mn>3</mn>
+						    </mfrac>
+						    <mo>+</mo>
+						    <mfrac>
+						      <mn>7</mn>
+						      <mn>6</mn>
+						    </mfrac>
+						    <mo>=</mo>
+						    <mfrac>
+						      <mn>10</mn>
+						      <mn>6</mn>
+						    </mfrac>
+						    <mo>+</mo>
+						    <mfrac>
+						      <mn>7</mn>
+						      <mn>6</mn>
+						    </mfrac>
+						    <mo>=</mo>
+						    <mfrac>
+						      <mn>17</mn>
+						      <mn>6</mn>
+						    </mfrac>
+						  </mrow>
 						</math><br/><br/>
 						<math xmlns="http://www.w3.org/1998/Math/MathML">
-							<mrow>
-								<munderover>
-									<mo movablelimits="false">&sum;</mo>
-									<mn><mi>k</mi>=1</mn>
-									<mn>5</mn>
-								</munderover>
-								<mrow>
-									<msup>
-										<mo>(-1)</mo>
-										<mn><mi>k</mi>+1</mn>
-									</msup>
-								</mrow>
-								<mfrac>
-									<mrow>
-										<msup>
-											<mi>x</mi>
-											<mn>2<mi>k</mi> + 1</mn>
-										</msup>
-									</mrow>
-									<mrow>
-										<mo>(2<mi>k</mi>+1)!</mo>
-									</mrow>
-								</mfrac>
-							</mrow>
-
+						  <mrow>
+						    <munderover>
+						      <mo>&sum;</mo>
+						      <mrow>
+						        <mi>k</mi>
+						        <mo>=</mo>
+						        <mn>1</mn>
+						      </mrow>
+						      <mn>5</mn>
+						    </munderover>
+						    <mrow>
+						      <msup>
+						        <mrow>
+						          <mo>(</mo>
+						          <mo>-</mo>
+						          <mn>1</mn>
+						          <mo>)</mo>
+						        </mrow>
+						        <mrow>
+						          <mi>k</mi>
+						          <mo>+</mo>
+						          <mn>1</mn>
+						        </mrow>
+						      </msup>
+						      <mfrac>
+						        <mrow>
+						          <msup>
+						            <mi>x</mi>
+						            <mrow>
+						              <mn>2</mn>
+						              <mi>k</mi>
+						              <mo>+</mo>
+						              <mn>1</mn>
+						            </mrow>
+						          </msup>
+						        </mrow>
+						        <mrow>
+						          <mo>(</mo>
+						          <mn>2</mn>
+						          <mi>k</mi>
+						          <mo>+</mo>
+						          <mn>1</mn>
+						          <mo>)</mo>
+						          <mo>!</mo>
+						        </mrow>
+						      </mfrac>
+						    </mrow>
+						  </mrow>
 						</math>
 					</div>
 				</div>
 				<div class="col-sm-6">
 					<h3>Bild / Picture</h3>
-					<img alt="Beispielbild" src="MathML_Beispiel.jpg" border="1" height="154" width="233"></img>
+					<img alt="Beispielbild" src="MathML_Beispiel.png" height="140" style="border: 1px solid black">
 				</div>
 			</div>
 		</div>
 	</div>
+	<!-- Ausgeblendet, weil für FHTW derzeit nicht relevant
 	<div class="row well">
 		<div class="col-sm-12">
 			<h2>Audiofiles</h2>
@@ -162,7 +184,7 @@ echo '<?xml version="1.0" encoding="ISO-8859-1" ?>';
 				<p>Ihr Browser unterstützt dieses Audioelement leider nicht.</p>
 			</audio>
 		</div>
-	</div>
+	</div>-->
 </div>
 
 </body>

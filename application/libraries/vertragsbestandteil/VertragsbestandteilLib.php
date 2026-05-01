@@ -10,6 +10,7 @@ require_once __DIR__ . '/VertragsbestandteilKuendigungsfrist.php';
 require_once __DIR__ . '/VertragsbestandteilUrlaubsanspruch.php';
 require_once __DIR__ . '/VertragsbestandteilFreitext.php';
 require_once __DIR__ . '/VertragsbestandteilKarenz.php';
+require_once __DIR__ . '/VertragsbestandteilLohnguide.php';
 require_once __DIR__ . '/VertragsbestandteilFactory.php';
 require_once __DIR__ . '/OverlapChecker.php';
 
@@ -26,6 +27,8 @@ class VertragsbestandteilLib
 {
 	const INCLUDE_FUTURE = true;
 	const DO_NOT_INCLUDE_FUTURE = false;
+	const WITH_VALORISATION_HISTORY = true;
+	const NOT_WITH_VALORISATION_HISTORY = false;
 
 	protected $CI;
 	/** @var Dienstverhaeltnis_model */
@@ -90,10 +93,15 @@ class VertragsbestandteilLib
 		return $dv;
 	}
 
-	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	public function fetchVertragsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
+		$includefuture=false, $withvalorisationhistory=true)
 	{
-		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
-		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		$vbs = $this->VertragsbestandteilModel->getVertragsbestandteile(
+			$dienstverhaeltnis_id, $stichtag, $includefuture
+		);
+		$gbs = $this->GehaltsbestandteilLib->fetchGehaltsbestandteile(
+			$dienstverhaeltnis_id, $stichtag, $includefuture, $withvalorisationhistory
+		);
 
 		$gbsByVBid = array();
 		foreach( $gbs as $gb )
@@ -122,6 +130,11 @@ class VertragsbestandteilLib
 	public function fetchVertragsbestandteil($vertragsbestandteil_id)
 	{
 		return $this->VertragsbestandteilModel->getVertragsbestandteil($vertragsbestandteil_id);
+	}
+
+	public function fetchLastVertragsbestandteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id)
+	{
+		return $this->VertragsbestandteilModel->getLastVertragsbestanteilStundenBeforeAltersteilzeit($dienstverhaeltnis_id);
 	}
 
 	public function storeDienstverhaeltnis(Dienstverhaeltnis $dv)
@@ -435,7 +448,7 @@ class VertragsbestandteilLib
 	    return $result;
 	}
 
-	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate)
+	public function endDienstverhaeltnis(Dienstverhaeltnis $dv, $enddate, $dvendegrund_kurzbz=null, $dvendegrund_anmerkung=null)
 	{
 		if( $dv->getBis() !== null && $dv->getBis() < $enddate )
 		{
@@ -460,6 +473,14 @@ class VertragsbestandteilLib
 					$this->endVertragsbestandteil($vb, $enddate);
 				}
 
+				if( $dvendegrund_kurzbz !== null )
+				{
+				    $dv->setDvendegrund_kurzbz($dvendegrund_kurzbz);
+				}
+				if( $dvendegrund_anmerkung !== null )
+				{
+				    $dv->setDvendegrund_anmerkung($dvendegrund_anmerkung);
+				}
 				$dv->setBis($enddate);
 				$this->updateDienstverhaeltnis($dv);
 

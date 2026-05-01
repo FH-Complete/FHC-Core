@@ -5,8 +5,13 @@ if (! defined("BASEPATH")) exit("No direct script access allowed");
 class UHSTAT1 extends FHC_Controller
 {
 	const BERECHTIGUNG_UHSTAT_VERWALTEN = 'student/uhstat1daten_verwalten';
+	const LOGIN_SESSION_INDEX = 'bewerbung/user';
 	const PERSON_ID_SESSION_INDEX = 'bewerbung/personId';
 	const CODEX_OESTERREICH = 'A';
+	const CODEX_UNKNOWN_YEAR = 9999;
+	const CODEX_UNKNOWN_NATION = 'XXX';
+	const CODEX_UNKNOWN_BILDUNGMAX = 999;
+	const CODEX_EXCLUDED_NATIONS = ['ZZZ'];
 	const LOWER_BOUNDARY_YEARS = 160;
 	const UPPER_BOUNDARY_YEARS = 20;
 
@@ -28,8 +33,7 @@ class UHSTAT1 extends FHC_Controller
 		$this->load->library('PermissionLib');
 
 		// load models
-		$this->load->model('codex/Oehbeitrag_model', 'OehbeitragModel');
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('person/Benutzer_model', 'BenutzerModel');
 		$this->load->model('system/Sprache_model', 'SpracheModel');
 		$this->load->model('codex/Abschluss_model', 'AbschlussModel');
 		$this->load->model('codex/Uhstat1daten_model', 'Uhstat1datenModel');
@@ -100,7 +104,7 @@ class UHSTAT1 extends FHC_Controller
 	{
 		$saved = false;
 
-		$person_id = $this->_getValidPersonId('sui');
+		$person_id = $this->_getUHSTATPersonId('sui');
 
 		$this->form_validation->set_error_delimiters('<span class="text-danger">', '</span>');
 
@@ -210,7 +214,9 @@ class UHSTAT1 extends FHC_Controller
 		else
 			return true;
 
-		if (!isset($bildungsstaat)) return true;
+		// if no Bildungsstaat or Bildungmax unknown - valid
+		if (!isset($bildungsstaat) || $bildungmax == self::CODEX_UNKNOWN_BILDUNGMAX) return true;
+
 
 		// find out if abschluss is in Austria
 		$this->AbschlussModel->addSelect("in_oesterreich");
@@ -219,8 +225,11 @@ class UHSTAT1 extends FHC_Controller
 		if (hasData($abschlussRes))
 		{
 			$in_oesterreich = getData($abschlussRes)[0]->in_oesterreich;
-			// invalid if abschluss in Austria, but not Bildungsstaat, or abschluss not in Austria, but Bildungsstaat in Austria
-			return ($in_oesterreich && $bildungsstaat == self::CODEX_OESTERREICH) || (!$in_oesterreich && $bildungsstaat != self::CODEX_OESTERREICH);
+
+			// valid if Bildungsstaat and Abschluss in Austria, or Bildungsstaat and Abschluss not in Austria
+			// (or Abschluss not in Austria and Bildungsstaat unknown)
+			return ($in_oesterreich && $bildungsstaat == self::CODEX_OESTERREICH)
+				|| (!$in_oesterreich && ($bildungsstaat != self::CODEX_OESTERREICH || $bildungsstaat == self::CODEX_UNKNOWN_NATION));
 		}
 
 		return false;
@@ -236,7 +245,7 @@ class UHSTAT1 extends FHC_Controller
 		// uhstat data can only be deleted with permission
 		if (!$this->_checkPermission('suid')) show_error('no permission');
 
-		$person_id = $this->_getValidPersonId('suid');
+		$person_id = $this->_getUHSTATPersonId('suid');
 
 		$uhstat1datenRes = $this->Uhstat1datenModel->delete(
 			array('person_id' => $person_id)
@@ -278,13 +287,17 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	private function _getFormMetaData()
 	{
-		$person_id = $this->_getValidPersonId('s');
+		$person_id = $this->_getUHSTATPersonId('s');
 
 		// read only display param
 		$readOnly = $this->input->get('readOnly');
 
-		// depending on permissions, editing or deleting is possible
-		$editPermission = $this->_checkPermission('sui');
+		// checking permissions for form
+
+		// saving is possible if there permission or student log in (but not from application tool)
+		$savePermission = $this->_checkPermission('sui') || ($this->_getUserPersonId() && !$this->_getApplicationToolPersonId());
+
+		// deleting only possible with permission
 		$deletePermission = $this->_checkPermission('suid');
 
 		$languageIdx = $this->_getLanguageIndex();
@@ -295,7 +308,7 @@ class UHSTAT1 extends FHC_Controller
 			'abschluss_nicht_oesterreich' => array(),
 			'jahre' => array(),
 			'person_id' => $person_id,
-			'editPermission' => $editPermission,
+			'savePermission' => $savePermission,
 			'deletePermission' => $deletePermission,
 			'readOnly' => $readOnly
 		);
@@ -327,15 +340,19 @@ class UHSTAT1 extends FHC_Controller
 
 		if (hasData($nationRes))
 		{
+			$dropdownNations = [];
 			$nations = getData($nationRes);
 
-			// put austria in beginning of selection
 			foreach ($nations as $nation)
 			{
-				if ($nation->nation_code == self::CODEX_OESTERREICH) array_unshift($nations, $nation);
+				// put austria in beginning of selection
+				if ($nation->nation_code == self::CODEX_OESTERREICH)
+					array_unshift($dropdownNations, $nation);
+				elseif (!in_array($nation->nation_code, self::CODEX_EXCLUDED_NATIONS)) // add nation if not excluded
+					$dropdownNations[] = $nation;
 			}
 
-			$formMetaData['nation'] = $nations;
+			$formMetaData['nation'] = $dropdownNations;
 		}
 
 		// get abschluss list
@@ -363,7 +380,11 @@ class UHSTAT1 extends FHC_Controller
 
 		// get realistic birth years, dated back from current year
 		$currYear = date("Y");
-		$formMetaData['jahre'] = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$yearRange = range($currYear - self::UPPER_BOUNDARY_YEARS, $currYear - self::LOWER_BOUNDARY_YEARS);
+		$formMetaData['jahre'] = array_combine($yearRange, $yearRange);
+
+		// add "unknown" option
+		$formMetaData['jahre'][self::CODEX_UNKNOWN_YEAR] = 'unbekannt';
 
 		return success($formMetaData);
 	}
@@ -373,7 +394,7 @@ class UHSTAT1 extends FHC_Controller
 	 */
 	private function _getUHSTAT1Data()
 	{
-		$person_id = $this->_getValidPersonId('s');
+		$person_id = $this->_getUHSTATPersonId('s');
 
 		$this->Uhstat1datenModel->addSelect(
 			implode(', ', array_keys($this->_uhstat1Fields))
@@ -404,26 +425,70 @@ class UHSTAT1 extends FHC_Controller
 	}
 
 	/**
-	 * Gets Id of person having permissions to manage UHSTAT1 data.
-	 * Can be passed as parameter or be in session.
+	 * Gets Id of person, for which UHSTAT1 data is edited.
+	 * Can be passed as parameter, id of logged in person, or be in session.
+	 * @param berechtigungsArt type of permission (suid)
 	 * @return int person_id
 	 */
-	private function _getValidPersonId($berechtigungsArt)
+	private function _getUHSTATPersonId($berechtigungsArt)
 	{
 		// if coming from bewerbungstool - person id is in session (person must be logged in bewerbungstool)
-		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX]) && is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX]))
-			return $_SESSION[self::PERSON_ID_SESSION_INDEX];
+		$applicationToolPersonId = $this->_getApplicationToolPersonId();
+		if (isset($applicationToolPersonId) && is_numeric($applicationToolPersonId)) return $applicationToolPersonId;
 
-		// if person id passed directly...
-		$person_id = $this->input->post('person_id');
-		if (!isset($person_id)) $person_id = $this->input->get('person_id');
+		// if successfully logged in
+		$loggedInPersonId = $this->_getUserPersonId();
+		if (isset($loggedInPersonId) && is_numeric($loggedInPersonId))
+		{
+			// if person id passed directly...
+			$person_id = $this->input->post('person_id');
+			if (!isset($person_id)) $person_id = $this->input->get('person_id');
 
-		if (!isset($person_id) || !is_numeric($person_id)) show_error("invalid person id");
+			if (isset($person_id))
+			{
+				if (!is_numeric($person_id)) show_error("invalid person id");
+				// ...check if there is a permission for editing UHSTAT1 data
+				if ($this->_checkPermission($berechtigungsArt)) return $person_id;
+			}
 
-		// ...check if there is a permission for editing UHSTAT1 data
-		if ($this->_checkPermission($berechtigungsArt)) return $person_id;
+			// if no id passed, use logged in person id
+			return $loggedInPersonId;
+		}
 
 		show_error("No permission");
+	}
+
+	/**
+	 * Gets person Id if there is a application tool login.
+	 * @return person Id or null
+	 */
+	private function _getApplicationToolPersonId()
+	{
+		// if coming from aplication tool - person id is in session (person must be logged in bewerbungstool)
+		if (isset($_SESSION[self::PERSON_ID_SESSION_INDEX])
+			&& is_numeric($_SESSION[self::PERSON_ID_SESSION_INDEX])
+			&& isset($_SESSION[self::LOGIN_SESSION_INDEX])
+		)
+			return $_SESSION[self::PERSON_ID_SESSION_INDEX];
+
+		return null;
+	}
+
+	/**
+	 * Gets person Id if there is a user login.
+	 * @return person Id or null
+	 */
+	private function _getUserPersonId()
+	{
+		$loggedInPersonId = getAuthPersonId();
+		if (isset($loggedInPersonId) && is_numeric($loggedInPersonId))
+		{
+			// check if the the user is a student and if the benutzer is active
+			$this->BenutzerModel->addSelect('1');
+			$res = $this->BenutzerModel->loadWhere(["public.tbl_benutzer.person_id" => $loggedInPersonId, "public.tbl_benutzer.aktiv" => TRUE]);
+			if (hasData($res)) return $loggedInPersonId;
+		}
+		return null;
 	}
 
 	/**

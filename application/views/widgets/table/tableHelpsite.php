@@ -1,10 +1,19 @@
 <!--CollapseHTML 'Help'-->
 <div class="row">
 	<div class="col-lg-12 collapse" id="tabulatorHelp-<?php echo $tableUniqueId; ?>">
-		<div class="well">
+		<div class="mb-2 " 
+			 style="<?php 
+				if(isset($bootstrapVersion) && $bootstrapVersion==5)
+				{ 
+					echo "border: 1px solid #ccc;
+      					  border-radius: 4px;
+      					  padding: 15px;
+      					  background-color: #f5f5f5;";
+				} ?>"
+			>
    
 			<h4><?php echo ucfirst($this->p->t('ui', 'tabelleneinstellungen')); ?></h4>
-			<div class="panel panel-body">
+			<div class=" <?php echo (isset($bootstrapVersion) && $bootstrapVersion==5)?"card card-body":"panel panel-body" ?>">
 				<b><?php echo $this->p->t('table', 'spaltenEinAusblenden'); ?></b>
 				<p>
                     <ul>
@@ -25,11 +34,11 @@
 			<br> <!--end panel-body-->
 			
 			<h4><?php echo $this->p->t('table', 'zeilenAuswaehlen'); ?></h4>
-			<div class="panel panel-body">
-				<ul>
-					<li><?php echo $this->p->t('table', 'zeilenAuswaehlenEinzeln'); ?></li>
-					<li><?php echo $this->p->t('table', 'zeilenAuswaehlenBereich'); ?></li>
-					<li><?php echo $this->p->t('table', 'zeilenAuswaehlenAlle'); ?></li>
+			<div class="<?php echo (isset($bootstrapVersion) && $bootstrapVersion==5)?"card card-body":"panel panel-body" ?>">
+				<ul class="mb-0">
+					<li class="mb-1"><?php echo $this->p->t('table', 'zeilenAuswaehlenEinzeln'); ?></li>
+					<li class="mb-1"><?php echo $this->p->t('table', 'zeilenAuswaehlenBereich'); ?></li>
+					<li class="mb-1"><?php echo $this->p->t('table', 'zeilenAuswaehlenAlle'); ?></li>
 				</ul>
 			</div>
 			<br> <!--end panel-body-->

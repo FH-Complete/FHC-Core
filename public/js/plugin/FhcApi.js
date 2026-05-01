@@ -1,10 +1,20 @@
-import FhcAlert from './FhcAlert.js';
-import FhcApiFactory from '../apps/api/fhcapifactory.js';
-
-
+console.warn('plugin/FhcApi.js is DEPRECATED! Use plugins/Api.js instead.');
+import FhcAlert from '../plugins/FhcAlert.js';
+import PluginsApi from '../plugins/Api.js';
+import FhcApiFactory from '../api/fhcapifactory.js';
 export default {
 	install: (app, options) => {
+		if (app.config.globalProperties.$fhcApi) {
+			/* Deprecated Code start */
+			if (options?.factory) {
+				console.warn("$fhcApi is DEPRECATED!");
+				app.config.globalProperties.$fhcApi.factory.addEndpoints(options.factory);
+			}
+			/* Deprecated Code end */
+			return;
+		}
 		app.use(FhcAlert);
+		app.use(PluginsApi);
 
 		function _get_config(form, uri, data, config) {
 			if (typeof form == 'string' && config === undefined) {
@@ -40,15 +50,17 @@ export default {
 		function _clean_return_value(response) {
 			const result = response.data;
 			delete response.data;
+			if (!result)
+				return {meta: {response}, data: null};
 			if (!result.meta)
 				result.meta = {response};
 			else
 				result.meta.response = response;
 			return result;
 		}
-
+		const baseURL = FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/";
 		const fhcApiAxios = axios.create({
-			timeout: 5000,
+			timeout: 500000,
 			baseURL: FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/"
 		});
 
@@ -58,7 +70,7 @@ export default {
 
 			if (config.data instanceof FormData)
 				return config;
-			
+
 			if (!Object.values(config.data).every(item => {
 				if (item instanceof FileList)
 					return false;
@@ -96,18 +108,18 @@ export default {
 				|| response.config?.errorHandling === false
 				|| response.config?.errorHandling == 'fail')
 				return _clean_return_value(response);
-			
+
 			// NOTE(chris): loop through errors
 			if (response.data.errors)
 				response.data.errors = response.data.errors.filter(
-					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config.form)
+					err => (response.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, response.config)
 				);
 
 			return _clean_return_value(response);
 		}, error => {
 			if (error.code == 'ERR_CANCELED')
-				return new Promise(() => {});
-			
+				return Promise.reject({...{handled: true}, ...error});
+
 			if (error.config?.errorHandling == 'off'
 				|| error.config?.errorHandling === false
 				|| error.config?.errorHandling == 'success')
@@ -116,27 +128,30 @@ export default {
 			if (error.response) {
 				if (error.response.status == 404) {
 					app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL, true);
-					return new Promise(() => {});
+					return Promise.reject({...{handled: true}, ...error});
 				}
-				
+
 				// NOTE(chris): loop through errors
 				error.response.data.errors = error.response.data.errors.filter(
-					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config.form)
+					err => (error.config[err.type + 'ErrorHandler'] || app.config.globalProperties.$fhcApi._defaultErrorHandlers[err.type])(err, error.config)
 				);
 				if (!error.response.data.errors.length)
-					return new Promise(() => {});
+					return Promise.reject({...{handled: true}, ...error});
 			} else if (error.request) {
 				app.config.globalProperties.$fhcAlert.alertDefault('error', error.message, error.request.responseURL);
-				return new Promise(() => {});
+				return Promise.reject({...{handled: true}, ...error});
 			} else {
 				app.config.globalProperties.$fhcAlert.alertError(error.message);
-				return new Promise(() => {});
+				return Promise.reject({...{handled: true}, ...error});
 			}
-			
+
 			return Promise.reject(error);
 		});
 
 		app.config.globalProperties.$fhcApi = {
+			getUri(url) {
+				return fhcApiAxios.getUri({url});
+			},
 			get(form, uri, params, config) {
 				[uri, params, config] = _get_config(form, uri, params, config);
 				if (params) {
@@ -152,30 +167,47 @@ export default {
 				return fhcApiAxios.post(uri, data, config);
 			},
 			_defaultErrorHandlers: {
-				validation(error, form) {
+				validation(error, config) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 
-					if (form) {
-						form.clearValidation();
-						form.setFeedback(false, error.messages);
+					if (config?.form) {
+						config.form.clearValidation();
+						config.form.setFeedback(false, error.messages);
 						return false;
 					}
 					if (Array.isArray(error.messages)) {
 						error.messages.forEach($fhcAlert.alertError);
 						return false;
 					} else if (typeof error.messages == 'object') {
-						Object.entries(error.messages).forEach(
-							([key, value]) => $fhcAlert.alertDefault('error', key, value, true)
-						);
+						if (config?.errorHeader)
+							Object.values(error.messages).forEach(
+								value => $fhcAlert.alertDefault(
+									'error',
+									Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+									value,
+									true
+								)
+							);
+						else
+							Object.entries(error.messages).forEach(
+								([key, value]) => $fhcAlert.alertDefault('error', key, value, true)
+							);
 						return false;
 					}
 					return true;
 				},
-				general(error, form) {
+				general(error, config) {
 					const $fhcAlert = app.config.globalProperties.$fhcAlert;
 
-					if (form)
-						form.setFeedback(false, error.message);
+					if (config?.form)
+						config.form.setFeedback(false, error.message);
+					else if (config?.errorHeader)
+						$fhcAlert.alertDefault(
+							'error',
+							Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+							error.message,
+							true
+						);
 					else
 						$fhcAlert.alertError(error.message);
 				},
@@ -250,33 +282,86 @@ export default {
 						message += 'Line Number: ' + error.line + '\n';
 
 					$fhcAlert.alertSystemError(message);
+				},
+				auth(error, config) {
+					const $fhcAlert = app.config.globalProperties.$fhcAlert;
+
+					var message = '';
+					message += 'Controller name: ' + error.controller + '\n';
+					message += 'Method name: ' + error.method + '\n';
+					message += 'Required permissions: ' + error.required_permissions;
+					if (config?.errorHeader)
+						$fhcAlert.alertDefault(
+							'error',
+							Array.isArray(config.errorHeader) ? app.config.globalProperties.$p.t.apply(null, config.errorHeader) : config.errorHeader,
+							error.message,
+							true
+						);
+					else
+						$fhcAlert.alertDefault('error', error.message, message);
 				}
 			}
 		};
 
+		/* Deprecated Code start */
 		class FhcApiFactoryWrapper {
 			constructor(factorypart, root) {
-				if (root === undefined)
-					this.$fhcApi = app.config.globalProperties.$fhcApi;
-				else
+				if (root === undefined) {
+					this.$fhcApi = {
+						getUri(url) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.getUri(url);
+						},
+						get(form, uri, params, config) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.get(form, uri, params, config);
+						},
+						post(form, uri, data, config) {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.post(form, uri, data, config);
+						}
+					};
+					Object.defineProperty(this.$fhcApi, 'factory', {
+						get() {
+							console.warn('$fhcApi.factory is DEPRECATED!');
+							return app.config.globalProperties.$fhcApi.factory;
+						}
+					});
+					app.config.globalProperties.$fhcApi.factory = this;
+				} else {
 					Object.defineProperty(this, '$fhcApi', {
 						get() {
 							return (root || this).$fhcApi;
 						}
 					})
+				}
+
+				this.addEndpoints(factorypart)
+			}
+
+			addEndpoints(factorypart) {
 				Object.keys(factorypart).forEach(key => {
 					Object.defineProperty(this, key, {
 						get() {
 							if (typeof factorypart[key] == 'function')
 								return factorypart[key].bind(this);
-							return new FhcApiFactoryWrapper(factorypart[key], root || this);
+							return new FhcApiFactoryWrapper(factorypart[key], this.$fhcApi.factory);
 						}
 					});
 				});
+				console.warn('$fhcApi.factory.addEndpoints() is DEPRECATED!');
 			}
 		}
 
-		app.config.globalProperties.$fhcApi.factory = new FhcApiFactoryWrapper(FhcApiFactory);
+		const factory = new FhcApiFactoryWrapper(FhcApiFactory);
+		if (options?.factory) {
+			console.warn("$fhcApi is DEPRECATED!");
+			factory.addEndpoints(options.factory);
+		}
 
+		app.config.globalProperties.$fhcApi.factory = factory;
+		/* Deprecated Code end */
+		
+		app.provide('$fhcApi', app.config.globalProperties.$fhcApi);
 	}
 };

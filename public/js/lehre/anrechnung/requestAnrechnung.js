@@ -62,7 +62,7 @@ $(function(){
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $(this).closest('label').append(msgBeiEctsUeberschreitung);
+                    $(this).closest('div').append(msgBeiEctsUeberschreitung);
                 }
                  return;
             }
@@ -76,7 +76,7 @@ $(function(){
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $(this).closest('label').append(msgBeiEctsUeberschreitung);
+                    $(this).closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
 
@@ -101,8 +101,12 @@ $(function(){
                 begruendung: this.begruendung.value,
                 lv_id: this.lv_id.value,
                 studiensemester: this.studiensemester.value,
-                begruendung_ects: this.begruendung_ects.value,
-                begruendung_lvinhalt: this.begruendung_lvinhalt.value,
+                begruendung_ects: this.begruendung_ects && this.begruendung_ects.value
+                    ? this.begruendung_ects.value
+                    : null,
+                begruendung_lvinhalt: this.begruendung_lvinhalt && this.begruendung_lvinhalt.value
+                    ? this.begruendung_lvinhalt.value
+                    : null,
                 bestaetigung: this.bestaetigung.value,
                 uploadfile: this.uploadfile.files
             },
@@ -138,17 +142,17 @@ var requestAnrechnung = {
 
         switch (status_kurzbz) {
             case ANRECHNUNGSTATUS_APPROVED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-success');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-success-subtle');
                 break;
             case ANRECHNUNGSTATUS_REJECTED:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-danger');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-danger-subtle');
                 break;
             case '':
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-info');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-info-subtle');
                 $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "neu"));
                 break;
             default:
-                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+                $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
                 $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "inBearbeitung"));
         }
     },
@@ -186,7 +190,7 @@ var requestAnrechnung = {
 
             // Show sperre panel
             $('#requestAnrechnung-sperre')
-                .removeClass('hidden')
+                .removeClass('visually-hidden')
                 .html(function(){
                     let sperregrund = FHC_PhrasesLib.t('global', 'bearbeitungGesperrt') + ': ';
 
@@ -196,7 +200,7 @@ var requestAnrechnung = {
                     else if (is_blocked){
                         sperregrund += FHC_PhrasesLib.t('anrechnung', 'benotungDerLV');
                     }
-                    return "<b>"+ sperregrund + "</b>";
+                    return "<span class='fw-bold'>"+ sperregrund + "</span>";
                 })
 
             // Disable all form elements
@@ -204,7 +208,7 @@ var requestAnrechnung = {
         }
     },
     initTooltips: function (){
-        $('[data-toggle="tooltip"]').tooltip({
+        $('[data-bs-toggle="tooltip"]').tooltip({
                 delay: { "show": 200, "hide": 200 },
                 html: true
             }
@@ -216,27 +220,31 @@ var requestAnrechnung = {
             $('#requestAnrechnung-herkunftDerKenntnisse-charCounter').text(length);
         });
 
-        $('#requestAnrechnung-begruendungEcts').keyup(function() {
-            let length = CHAR_LENGTH150 - $(this).val().length;
-            $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
-        });
+        if ($('#requestAnrechnung-begruendungEcts').length) {
+            $('#requestAnrechnung-begruendungEcts').keyup(function () {
+                let length = CHAR_LENGTH150 - $(this).val().length;
+                $('#requestAnrechnung-begruendungEcts-charCounter').text(length);
+            });
+        }
 
-        $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
-            let maxlength = CHAR_LENGTH1000 - $(this).val().length;
-            $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
+        if ($('#requestAnrechnung-begruendungLvinhalt').length){
+            $('#requestAnrechnung-begruendungLvinhalt').keyup(function() {
+                let maxlength = CHAR_LENGTH1000 - $(this).val().length;
+                $('#requestAnrechnung-begruendungLvinhalt-charCounterMax').text(maxlength);
 
-            let minlength = CHAR_LENGTH500 - $(this).val().length;
-            $('#requestAnrechnung-begruendungLvinhalt-charCounterMin').text(minlength);
-        });
+                let minlength = CHAR_LENGTH500 - $(this).val().length;
+                $('#requestAnrechnung-begruendungLvinhalt-charCounterMin').text(minlength);
+            });
+        }
     },
     formatAnrechnungIsApplied: function (antragdatum, dms_id, filename){
         $('#requestAnrechnung-antragdatum').text(antragdatum);
         $('#requestAnrechnung-status_kurzbz').text(FHC_PhrasesLib.t("ui", "inBearbeitung"));
-        $('#requestAnrechnung-status_kurzbz').closest('div').addClass('alert-warning');
+        $('#requestAnrechnung-status_kurzbz').closest('div').addClass('bg-warning-subtle');
 
         // Display File-Downloadlink
         $('#requestAnrechnung-downloadDocLink')
-            .removeClass('hidden')
+            .removeClass('visually-hidden')
             .attr('href', 'RequestAnrechnung/download?dms_id=' + dms_id)
             .html(filename);
 
@@ -279,14 +287,15 @@ var requestAnrechnung = {
     alertIfMaxEctsExceeded: function(){
 
         if(
-            (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
-            (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
-            (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90
+        
+             (parseFloat($('#sumEctsSchulisch').text())) > 60 ||
+             (parseFloat($('#sumEctsBeruflich').text())) > 60 ||
+             (parseFloat($('#sumEctsSchulisch').text()) + parseFloat($('#sumEctsBeruflich').text())) > 90 
         )
         {
             $('#requestAnrechnung-maxEctsUeberschrittenMsg')
-                .html("<br><b>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </b><i class=\"fa fa-lg fa-info-circle\"></i></br>")
-                .addClass('bg-danger text-danger')
+                .html("<span class='flex-fill fw-bold'>Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz ist überschritten. </span><i class='mx-4 fa fa-lg fa-info-circle'></i>")
+                .addClass('bg-danger-subtle')
                 .tooltip({
                     title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
                     placement: 'right',
@@ -296,7 +305,8 @@ var requestAnrechnung = {
     },
     alertIfMaxEctsExceededInsideBegruendungsbox: function(){
         let status_kurzbz = $('#requestAnrechnung-status_kurzbz').data('status_kurzbz');
-
+                    
+   
         if (status_kurzbz != ' ' && status_kurzbz != ANRECHNUNGSTATUS_APPROVED)
         {
             var ectsLv = parseFloat($('#ects').text());
@@ -309,7 +319,7 @@ var requestAnrechnung = {
             {
                 return;
             }
-
+            
             // If max ECTS is ecceeded
             if (begruendung_id == 4)
             {
@@ -321,7 +331,7 @@ var requestAnrechnung = {
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
             else
@@ -334,20 +344,19 @@ var requestAnrechnung = {
                     var msgBeiEctsUeberschreitung = requestAnrechnung.getMsgBeiEctsUeberschreitung(begruendung_id, ectsLv, sumEctsSchulisch, sumEctsBeruflich);
 
                     // Add to Checkbox text
-                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('label').append(msgBeiEctsUeberschreitung);
+                    $('#requestAnrechnung-form :input[name="begruendung"]:checked').closest('div').append(msgBeiEctsUeberschreitung);
                 }
             }
         }
     },
     getMsgBeiEctsUeberschreitung: function(begruendung_id, ects, sumEctsSchulisch, sumEctsBeruflich){
 
-        return $('<span id="sumEctsMsg"></span>')
-            .html(FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTextBeiUeberschreitung",
-                begruendung_id == 4
-                    ? [(sumEctsSchulisch + sumEctsBeruflich + ects), sumEctsSchulisch, (sumEctsBeruflich  + ects)] // beruflich
-                    : [(sumEctsSchulisch + sumEctsBeruflich + ects), (sumEctsSchulisch + ects), sumEctsBeruflich])) // schulisch
+        const phraseUsed = '<span class="d-block">Die Höchstgrenze für Anrechnungen gem. § 12 Abs. 3 Fachhochschulgesetz wird überschritten.</span><span class=" fw-bold">Bisherige ECTS + ECTS dieser LV: Total: {0} [ Schulisch: {1}  | Beruflich: {2}  ]</span>&emsp;';
+
+        return $('<div class="p-1" id="sumEctsMsg"></div>')
+            .html(phraseUsed) // schulisch
             .append('<i class="fa fa-lg fa-info-circle"></i>')
-            .addClass('bg-danger text-danger')
+            .addClass('bg-danger-subtle')
             .tooltip({
                 title: FHC_PhrasesLib.t("anrechnung", "anrechnungEctsTooltipTextBeiUeberschreitung"),
                 placement: 'right',

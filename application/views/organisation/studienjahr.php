@@ -1,7 +1,7 @@
 <?php
 $this->load->view('templates/header', array('title' => 'StudienjahrList', 'tablesort' => true, 'tableid' => 't1', 'headers' => '2:{sorter:false}, 3:{sorter:false}', 'sortList' => '0,1'));
 ?>
-<body>
+
 <div class="row">
 	<div class="span4">
 		<h2>Studienjahr</h2>
@@ -40,7 +40,6 @@ $this->load->view('templates/header', array('title' => 'StudienjahrList', 'table
 		</table>
 	</div>
 </div>
-</body>
 </html>
 
 

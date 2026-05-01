@@ -55,6 +55,11 @@ if (isset($_GET['stg_kz']))
 else
 	$stg_kz=null;
 
+if (isset($_GET['aktiv']))
+	$aktiv=$_GET['aktiv'];
+else
+	$aktiv=null;
+
 if (isset($_GET['fachbereich_id']))
 	$fachbereich_id=$_GET['fachbereich_id'];
 else
@@ -126,7 +131,7 @@ function draw_row($mitarbeiter)
 
 if($lehrveranstaltung_id==null && $filter==null && $mitarbeiter_uid==null)
 {
-	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz);
+	$ma=$mitarbeiter->getMitarbeiter($lektor,$fixangestellt,$stg_kz, $aktiv);
 
 	$stg_obj = new studiengang();
 	$stg_obj->getAll('typ, kurzbz', false);

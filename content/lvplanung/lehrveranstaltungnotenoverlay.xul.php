@@ -122,7 +122,7 @@ echo "<?xml-stylesheet href=\"".APP_ROOT."content/bindings.css\" type=\"text/css
 			<splitter class="tree-splitter"/>
 			<treecol id="lehrveranstaltung-noten-tree-verband" label="Verband" flex="2" hidden="true" persist="hidden, width, ordinal"
 				class="sortDirectionIndicator"
-				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband" />						
+				sort="rdf:http://www.technikum-wien.at/zeugnisnote/rdf#verband" />
             <splitter class="tree-splitter"/>
             <treecol id="lehrveranstaltung-noten-tree-studiengang_kz_lv" label="LehrveranstaltungStudiengang_kz" flex="1" hidden="true" persist="hidden, width, ordinal"
                      class="sortDirectionIndicator"
@@ -299,7 +299,7 @@ if(defined('FAS_GESAMTNOTE_PRUEFUNGSHONORAR') && FAS_GESAMTNOTE_PRUEFUNGSHONORAR
 		<hbox>
 			<label value="MitarbeiterIn" control="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"/>
 			<menulist id="lehrveranstaltung-noten-pruefung-menulist-mitarbeiter"
-				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php" flex="1"
+				      datasources="'.APP_ROOT.'rdf/mitarbeiter.rdf.php?aktiv=true" flex="1"
 				      ref="http://www.technikum-wien.at/mitarbeiter/_alle"
 		              minwidth="250"
 				      >

@@ -46,6 +46,15 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 		}
 	}
 
+	/**
+	 * Gets all LVs for a repeating prestudent that are either not allowed or
+	 * already done.
+	 *
+	 * @param string				$prestudent_id
+	 * @param string				$studiensemester_kurzbz
+	 *
+	 * @return stdClass
+	 */
 	public function getLvsForPrestudent($prestudent_id, $studiensemester_kurzbz)
 	{
 		$this->addSelect($this->dbTable . '.*');
@@ -66,39 +75,53 @@ class Studierendenantraglehrveranstaltung_model extends DB_Model
 		);
 		$this->addJoin('public.tbl_student s', 'prestudent_id');
 
-		// NOTE(chris): last offizell note
-		$this->addJoin('(
-			SELECT z.* 
-			FROM lehre.tbl_zeugnisnote z
-			LEFT JOIN public.tbl_studiensemester zs 
-				USING(studiensemester_kurzbz)
-			JOIN (
-				SELECT zi.lehrveranstaltung_id, zi.student_uid, MAX(zis.start) AS start 
-				FROM lehre.tbl_zeugnisnote zi
-				LEFT JOIN lehre.tbl_note zin
-					USING(note)
-				LEFT JOIN public.tbl_studiensemester zis
-					USING(studiensemester_kurzbz)
-				WHERE zin.aktiv AND zin.offiziell
-				GROUP BY zi.lehrveranstaltung_id, zi.student_uid
-			) zx
-				ON (
-					z.lehrveranstaltung_id=zx.lehrveranstaltung_id
-					AND z.student_uid=zx.student_uid
-					AND zs.start = zx.start
-				)) z', 'z.lehrveranstaltung_id=lv.lehrveranstaltung_id AND z.student_uid=s.student_uid', 'LEFT');
-		$this->addJoin('lehre.tbl_note zn', 'z.note = zn.note', 'LEFT');
-
+		
 		$this->load->config('studierendenantrag');
 		$note_intern_angerechntet = $this->config->item('wiederholung_note_angerechnet');
 
-		return $this->loadWhere([
+		$where = [
 			'ps.prestudent_id' => $prestudent_id,
 			'a.typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG,
 			'stat.studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_APPROVED,
 			'n.note <> ' => 0,
-			$this->dbTable . '.studiensemester_kurzbz' => $studiensemester_kurzbz,
-			'(n.note<>' . $this->db->escape($note_intern_angerechntet) . ' OR (z.note IS NOT NULL AND zn.positiv))' => null
-		]);
+			// NOTE(chris): grade "intern angerechnet" needs an official grade beforehand (the subquery gets the last positive offical grade)
+			"(n.note<>" . $this->db->escape($note_intern_angerechntet) . " OR EXISTS (
+				SELECT
+					1
+				FROM
+					lehre.tbl_zeugnisnote z
+					LEFT JOIN public.tbl_studiensemester zs USING(studiensemester_kurzbz)
+					JOIN (
+						SELECT
+							zi.lehrveranstaltung_id,
+							zi.student_uid,
+							MAX(zis.start) AS start
+						FROM
+							lehre.tbl_zeugnisnote zi
+							LEFT JOIN lehre.tbl_note zin USING(note)
+							LEFT JOIN public.tbl_studiensemester zis USING(studiensemester_kurzbz)
+						WHERE
+							zin.aktiv
+							AND zin.offiziell
+						GROUP BY
+							zi.lehrveranstaltung_id,
+							zi.student_uid
+					) zx ON (
+						z.lehrveranstaltung_id = zx.lehrveranstaltung_id
+						AND z.student_uid = zx.student_uid
+						AND zs.start = zx.start
+					)
+					JOIN lehre.tbl_note zn USING (note)
+				WHERE
+					z.lehrveranstaltung_id = lv.lehrveranstaltung_id
+					AND z.student_uid = s.student_uid
+					AND zn.positiv
+			))" => null
+		];
+
+		if ($studiensemester_kurzbz !== false)
+			$where[$this->dbTable . '.studiensemester_kurzbz'] = $studiensemester_kurzbz;
+
+		return $this->loadWhere($where);
 	}
 }
