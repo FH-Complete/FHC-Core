@@ -24,13 +24,20 @@ class GehaltsbestandteilLib
 		$this->CI = get_instance();
 		$this->CI->load->model('vertragsbestandteil/Gehaltsbestandteil_model', 
 			'GehaltsbestandteilModel');
-		$this->CI->load->library('extensions/FHC-Core-Personalverwaltung/abrechnung/GehaltsLib');
 		$this->GehaltsbestandteilModel = $this->CI->GehaltsbestandteilModel;
 	}
 
-	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
+	public function fetchGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag=null, $includefuture=false)
 	{
-		return $this->GehaltsbestandteilModel->getGehaltsbestandteile($dienstverhaeltnis_id, $stichtag, $includefuture);
+		return $this->GehaltsbestandteilModel->getGehaltsbestandteileValorisiertForChart($dienstverhaeltnis_id, $stichtag, $includefuture);
+	}
+
+	public function fetchGehaltsbestandteile($dienstverhaeltnis_id, $stichtag=null, 
+		$includefuture=false, $withvalorisationhistory=true)
+	{
+		return $this->GehaltsbestandteilModel->getGehaltsbestandteile(
+			$dienstverhaeltnis_id, $stichtag, $includefuture, $withvalorisationhistory
+		);
 	}
 
 	public function fetchGehaltsbestandteil($gehaltsbestandteil_id)
@@ -113,10 +120,6 @@ class GehaltsbestandteilLib
 	{
 		$this->setUIDtoPGSQL();
 
-		// delete Gehaltsabrechnung
-		$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
-
-		//
 		$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
 		
 		if (isError($ret))

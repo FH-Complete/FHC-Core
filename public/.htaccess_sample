@@ -1,0 +1,9 @@
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^[0-9]{10}/(.*)$ $1 [L]
+    RewriteCond %{REQUEST_URI} ^(.*?)/public/index.ci.php/
+    RewriteRule ^index.ci.php/(.*)$ %1/index.ci.php/$1 [R=303]
+</IfModule>
+

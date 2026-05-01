@@ -73,11 +73,22 @@ class Phrasen extends FHCAPI_Controller
 	// gets all languages that are set as active in the database
 	public function getAllLanguages()
 	{
-		$langs = getDBActiveLanguages();
+		$this->load->model('system/Sprache_model', 'SprachenModel');
+
+		// Add order clause by index and select the sprache,bezeichnung and index column
+		$this->SprachenModel->addOrder('index');
+		$this->SprachenModel->addSelect('sprache, bezeichnung, index');
+
+		// Retrieves from public.tbl_sprache
+		$langs = $this->SprachenModel->loadWhere(array('content' => true));
 		$langs = $this->getDataOrTerminateWithError($langs);
 		$langs = array_map(function($lang){
-			return $lang->sprache;
+			$data = new stdClass();
+			$data->sprache = $lang->sprache;
+			$data->bezeichnung = $lang->bezeichnung[($lang->index-1)]; 
+			return $data;
 		}, $langs);
+
 		$this->terminateWithSuccess($langs);
 	}
 

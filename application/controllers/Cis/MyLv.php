@@ -26,11 +26,11 @@ class MyLv extends Auth_Controller
 	 */
 	public function index()
 	{
-		$this->load->view('Cis/MyLv');
-	}
+		
+		$viewData = array(
 
-	public function Info($studien_semester,$lvid)
-	{
-		$this->load->view('Cis/LvInfo',['lvid'=> $lvid, 'studien_semester' => $studien_semester]);
+		);
+
+		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'MyLv']);
 	}
 }

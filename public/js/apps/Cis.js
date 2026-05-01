@@ -1,9 +1,8 @@
 import FhcSearchbar from "../components/searchbar/searchbar.js";
 import CisMenu from "../components/Cis/Menu.js";
-import FhcApi from '../plugin/FhcApi.js';
-import Phrasen from '../plugin/Phrasen.js';
-import fhcapifactory from "./api/fhcapifactory.js";
-Vue.$fhcapi = fhcapifactory;
+import PluginsPhrasen from '../plugins/Phrasen.js';
+import ApiSearchbar from '../api/factory/searchbar.js';
+import Theme from "../plugins/Theme.js";
 
 const app = Vue.createApp({
     name: 'CisApp',
@@ -14,26 +13,28 @@ const app = Vue.createApp({
     data: function() {
         return {
             searchbaroptions: {
+				origin: "cis",
 				cssclass: "",
 				calcheightonly: true,
-                types: [
-                    "mitarbeiter",
-					"student",
-                    "raum",
-                    "organisationunit"
-                ],
+				types: {
+					employee: Vue.computed(() => this.$p.t("search/type_employee")),
+					student: Vue.computed(() => this.$p.t("search/type_student")),
+					room: Vue.computed(() => this.$p.t("search/type_room")),
+					organisationunit: Vue.computed(() => this.$p.t("search/type_organisationunit")),
+					cms: Vue.computed(() => this.$p.t("search/type_cms")),
+					dms: Vue.computed(() => this.$p.t("search/type_dms"))
+				},
                 actions: {
                     employee: {
                         defaultaction: {
                             type: "link",
                             action: function(data) {
-                                return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
-                                "/Cis/Profil/View/"+data.uid; 
-                                
-                            }
-                        },
+									return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router+
+										"/Cis/Profil/View/"+data.uid;
+							}
+						},
                         childactions: []
-                    },
+					},
 					student: {
 						defaultaction: {
 							type: "link",
@@ -45,11 +46,11 @@ const app = Vue.createApp({
 						},
 						childactions: []
 					},
-                    raum: {
+                    room: {
                         defaultaction: {
                             type: "link",
 							renderif: function(data) {
-								if(data.content_id === "N/A"){
+								if(data.content_id === null){
 									return false;
 								}
 								return true;
@@ -78,7 +79,7 @@ const app = Vue.createApp({
                                 icon: "fas fa-info-circle",
                                 type: "link",
                                 renderif: function(data) {
-									if(data.content_id === "N/A"){
+									if(data.content_id === null){
 										return false;
 									}
 									return true;
@@ -107,17 +108,49 @@ const app = Vue.createApp({
                             }
                         },
                         childactions: []
-                    }
+                    },
+					cms: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									FHC_JS_DATA_STORAGE_OBJECT.ci_router +
+									'/CisVue/Cms/content/' + data.content_id;
+								return link;
+							}
+						},
+						childactions: []
+					},
+					dms: {
+						defaultaction: {
+							type: "link",
+							action: function (data) {
+								const link = FHC_JS_DATA_STORAGE_OBJECT.app_root +
+									'cms/dms.php?id=' + data.dms_id;
+								return link;
+							}
+						},
+						childactions: []
+					}
                 }
             }
         };
     },
     methods: {
         searchfunction: function(searchsettings) {
-            return Vue.$fhcapi.search.search(searchsettings);
-        },
+        	return this.$api.call(ApiSearchbar.searchCis(searchsettings));
+        }
     }
 });
-app.use(FhcApi);
-app.use(Phrasen);
+
+FhcApps.makeExtendable(app);
+
+app.use(primevue.config.default, {
+	zIndex: {
+		overlay: 9000,
+		tooltip: 8000
+	}
+})
+app.use(PluginsPhrasen);
+app.use(Theme);
 app.mount('#cis-header');

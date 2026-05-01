@@ -582,7 +582,16 @@ var FHC_TableWidget = {
 
 				options.columns = arrayTabulatorColumns;
 				options.data = data.dataset;
-				options.persistence = (typeof options.persistence == 'undefined') ? true : options.persistence;			// enables persistence (default store in localStorage if available, else in cookie)
+
+				let defaultPersistence = {
+					sort: true,
+					columns: true,
+					filter: false,
+					headerFilter: false,
+					group: false,
+					page: false,
+				}
+				options.persistence = (typeof options.persistence == 'undefined') ? defaultPersistence : options.persistence;			// enables persistence (default store in localStorage if available, else in cookie)
 				options.persistenceID = (typeof options.persistenceID == 'undefined') ?  data.tableUniqueId : options.persistenceID;  // persistenceID to store persistence data seperately for multiple tables
 				options.movableColumns = (typeof options.movableColumns == 'undefined') ? true : options.movableColumns;				// allows changing column order
 				options.tooltipsHeader = (typeof options.tooltipsHeader == 'undefined') ? true : options.tooltipsHeader;					// set header tooltip with column title

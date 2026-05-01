@@ -290,7 +290,11 @@ class Prestudentstatus_model extends DB_Model
 	 */
 	public function getLastStatusPerson($person_id, $studiensemester_kurzbz = null)
 	{
-		$query = 'SELECT *
+		$query = 'SELECT p.*, ps.*, s.*,
+					stg.kurzbz AS studiengang_kurzbz, stg.kurzbzlang AS studiengang_kurzbzlang,
+					UPPER(typ::varchar(1) || kurzbz) AS studiengang_kuerzel,
+					stg.typ AS studiengang_typ, stg.bezeichnung AS studiengang_bezeichnung, stg.english AS studiengang_bezeichnung_english,
+					stg.orgform_kurzbz AS studiengang_orgform
 					FROM public.tbl_prestudent p
 					JOIN (
 							SELECT DISTINCT ON(prestudent_id) *
@@ -298,7 +302,8 @@ class Prestudentstatus_model extends DB_Model
 							 WHERE prestudent_id IN (SELECT prestudent_id FROM public.tbl_prestudent WHERE person_id = ?)
 						  ORDER BY prestudent_id, datum desc, insertamum desc
 						) ps USING(prestudent_id)
-					JOIN public.tbl_status USING(status_kurzbz)';
+					JOIN public.tbl_status s USING(status_kurzbz)
+					JOIN public.tbl_studiengang stg USING (studiengang_kz)';
 
 		$parametersArray = array($person_id);
 
@@ -501,17 +506,14 @@ class Prestudentstatus_model extends DB_Model
 		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
 		$this->addSelect('tbl_prestudentstatus.ausbildungssemester');
 		$this->addSelect('tbl_prestudentstatus.datum');
-		$this->addSelect("TO_CHAR(tbl_prestudentstatus.datum::timestamp, 'DD.MM.YYYY') AS format_datum");
 		$this->addSelect('tbl_prestudentstatus.insertamum');
 		$this->addSelect('tbl_prestudentstatus.insertvon');
 		$this->addSelect('tbl_prestudentstatus.updateamum');
 		$this->addSelect('tbl_prestudentstatus.updatevon');
 		$this->addSelect('tbl_prestudentstatus.orgform_kurzbz');
 		$this->addSelect('tbl_prestudentstatus.bestaetigtam');
-		$this->addSelect("TO_CHAR(tbl_prestudentstatus.bestaetigtam::timestamp, 'DD.MM.YYYY') AS format_bestaetigtam");
 		$this->addSelect('tbl_prestudentstatus.bestaetigtvon');
 		$this->addSelect('tbl_prestudentstatus.bewerbung_abgeschicktamum');
-		$this->addSelect("TO_CHAR(tbl_prestudentstatus.bewerbung_abgeschicktamum::timestamp, 'DD.MM.YYYY') AS format_bewerbung_abgeschicktamum");
 		$this->addSelect('tbl_prestudentstatus.anmerkung');
 		$this->addSelect('plan.studienplan_id');
 		$this->addSelect('plan.bezeichnung');

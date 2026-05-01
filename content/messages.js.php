@@ -175,7 +175,22 @@ function MessagesIFrameSetHTML(val)
 	}
 	//Value setzen
 	if(val!='')
+	{
 		editor.contentDocument.execCommand("inserthtml", false, val);
+
+		setTimeout(function()
+		{
+			  scrollToTop();
+		}, 100);
+	}
+}
+
+function scrollToTop()
+{
+	netscape.security.PrivilegeManager.enablePrivilege("UniversalXPConnect");
+	editor = document.getElementById('message-wysiwyg');
+
+	editor.contentWindow.scrollTo(0, 0);
 }
 
 function MessageIFrameInit()

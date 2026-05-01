@@ -80,9 +80,9 @@ $trenner->loadVariables($getuid);
 
 $sql_query = "SELECT *,
 			(SELECT orgform_kurzbz
-			FROM tbl_prestudentstatus
-			WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
-			ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
+				FROM tbl_prestudentstatus
+				WHERE prestudent_id=(Select prestudent_id from tbl_student where student_uid=xy.uid limit 1)
+				ORDER BY datum DESC, insertamum DESC, ext_id DESC LIMIT 1
 			) as organisationsform
 			FROM (SELECT DISTINCT ON(tbl_projektarbeit.projektarbeit_id) public.tbl_studiengang.bezeichnung as stgbez,tbl_projekttyp.bezeichnung AS prjbez,* FROM lehre.tbl_projektarbeit
 			LEFT JOIN public.tbl_benutzer on(uid=student_uid)

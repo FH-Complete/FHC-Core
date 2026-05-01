@@ -233,10 +233,10 @@ class Person extends API_Controller
 				//Quersumme bilden
 				for ($i = 0; $i < 10; $i++)
 				{
-					$erg += $gewichtung[$i] * $tmpSvnr{$i};
+					$erg += $gewichtung[$i] * $tmpSvnr[$i];
 				}
 
-				if ($tmpSvnr{3} != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
+				if ($tmpSvnr[3] != ($erg % 11)) //Vergleichen der Pruefziffer mit Quersumme Modulo 11
 				{
 					return error('SVNR ist ungueltig');
 				}
@@ -244,7 +244,7 @@ class Person extends API_Controller
 				if (mb_strlen($person['svnr']) == 12)
 				{
 					$last = substr($person['svnr'], 10, 12);
-					if ($last{0} != 'v' || !is_numeric($last{1}))
+					if ($last[0] != 'v' || !is_numeric($last[1]))
 					{
 						return error('SVNR ist ungueltig');
 					}

@@ -12,7 +12,8 @@ export default {
 		bezeichnung: String,
 		kuerzel: String,
 		semester: [String,Number],
-		lvs: Array
+		lvs: Array,
+		sg_bezeichnung_eng: String
 	},
 	computed: {
 		lehrveranstaltungen() {
@@ -32,8 +33,8 @@ export default {
 	},
 	template: `<div class="card mb-3">
 		<div class="card-body">
-			<h4 class="card-title mb-3">{{bezeichnung}} - {{kuerzel}}
-				<small>{{semester}}.{{p.t('lehre/semester')}}</small>
+			<h4 class="card-title mb-3">{{$p.user_language.value === 'English' ? sg_bezeichnung_eng : bezeichnung}} - {{kuerzel}}
+				<small>{{semester}}.{{$p.t('lehre/semester')}}</small>
 			</h4>
 			<div class="row">
 				<div v-for="lv in lehrveranstaltungen" :key="lv.lehrveranstaltung_id" class="col-12 col-md-6 col-xl-4 col-xxl-3 mb-3">

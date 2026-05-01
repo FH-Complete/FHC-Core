@@ -1113,15 +1113,15 @@ function StudentAbschlusspruefungTypChange()
 {
 	if(document.getElementById('student-abschlusspruefung-menulist-typ').value=='Bachelor')
 	{
-		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1';
-		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2';
+		document.getElementById('student-abschlusspruefung-label-pruefer1').value='PrueferIn 1';
+		document.getElementById('student-abschlusspruefung-label-pruefer2').value='PrueferIn 2';
 		document.getElementById('student-abschlusspruefung-menulist-pruefer3').hidden=false;
 		document.getElementById('student-abschlusspruefung-label-pruefer3').hidden=false;
 	}
 	else
 	{
-		document.getElementById('student-abschlusspruefung-label-pruefer1').value='Pruefer 1 (Diplomarbeit)';
-		document.getElementById('student-abschlusspruefung-label-pruefer2').value='Pruefer 2';
+		document.getElementById('student-abschlusspruefung-label-pruefer1').value='PrueferIn 1 (Diplomarbeit)';
+		document.getElementById('student-abschlusspruefung-label-pruefer2').value='PrueferIn 2';
 		document.getElementById('student-abschlusspruefung-menulist-pruefer3').hidden=true;
 		document.getElementById('student-abschlusspruefung-label-pruefer3').hidden=true;
 	}
