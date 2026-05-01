@@ -218,6 +218,24 @@ function getDataFromClipboard()
 }
 
 // ****
+// * Kopiert Inhalte in die Zwischenablage
+// ****
+function copyToClipboard(link)
+{
+	netscape.security.PrivilegeManager.enablePrivilege('UniversalXPConnect');
+	try {
+		const clipboard = Components.classes["@mozilla.org/widget/clipboardhelper;1"]
+									.getService(Components.interfaces.nsIClipboardHelper);
+		clipboard.copyString(link);
+
+		// Erfolgsmeldung anzeigen
+		alert("Link erfolgreich in die Zwischenablage kopiert.\nBitte in anderem Browser einfügen und öffnen.");
+	} catch (e) {
+		alert("Fehler beim Kopieren in die Zwischenablage: " + e);
+	}
+}
+
+// ****
 // * Oeffnet ein neues Fenster welches dann die Datei 'action' mit dem POST Parameter 'data' aufruft
 // ****
 function OpenWindowPost(action, data)

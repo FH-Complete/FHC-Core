@@ -29,30 +29,85 @@ export default {
 		uid: {
 			type: [Number, String],
 			required: true
-		}
+		},
+		/** List of types to allow for creation */
+		betriebsmittelTypes: {
+			type: Array,
+			default: null
+		},
+		/**
+		 * If true: only show the types specified in 'betriebsmittelTypes'.
+		 * If false: show all available types.
+		 */
+		filterByProvidedTypes: Boolean
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			listBetriebsmitteltyp: [],
+			formData: {
+				ausgegebenam : new Date(),
+				betriebsmitteltyp: 'Zutrittskarte'
+			},
+			statusNew: true,
+			filteredInventar: [],
+			layout: 'fitColumns',
+			layoutColumnsOnNewData: false,
+			height: '550',
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
-				ajaxRequestFunc: this.endpoint.getAllBetriebsmittel,
-				ajaxParams: () => {
-					return {
-						type: this.typeId,
-						id: this.id
-					};
-				},
+				ajaxRequestFunc: () => this.$api.call(
+					this.endpoint.getAllBetriebsmittel(this.typeId, this.id, (this.filterByProvidedTypes ? this.betriebsmittelTypes : null))
+				),
 				ajaxResponse: (url, params, response) => response.data,
+				persistenceID: 'core-betriebsmittel-20260217',
+				selectableRows: true,
 				columns: [
 					{title: "Nummer", field: "nummer", width: 150},
 					{title: "PersonId", field: "person_id", visible: false},
 					{title: "Typ", field: "betriebsmitteltyp", width: 125},
 					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "Retourdatum", field: "format_retour", width: 128},
+					{
+						title: "Retourdatum",
+						field: "retouram",
+						width: 128,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "Beschreibung", field: "beschreibung"},
 					{title: "UID", field: "uid", width: 87},
 					{title: "Kaution", field: "kaution", visible: false},
-					{title: "Ausgabedatum", field: "format_ausgabe", width: 144, visible: false},
+					{
+						title: "Ausgabedatum",
+						field: "ausgegebenam",
+						width: 144,
+						visible: false,
+						formatter: function (cell) {
+							const dateStr = cell.getValue();
+							if (!dateStr) return "";
+
+							const date = new Date(dateStr);
+							return date.toLocaleString("de-DE", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour12: false
+							});
+						}
+					},
 					{title: "Betriebsmittel ID", field: "betriebsmittel_id", visible: false},
 					{title: "Betriebsmittelperson ID", field: "betriebsmittelperson_id", visible: false},
 					{
@@ -66,7 +121,7 @@ export default {
 							let button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-print"></i>';
-							button.title = 'Übernahmebestätigung drucken';
+							button.title = this.$p.t('betriebsmittel', 'btn_printUebernahmebestaetigung');
 							let cellData = cell.getData();
 							button.addEventListener(
 								'click',
@@ -76,13 +131,13 @@ export default {
 										'/content/pdfExport.php?xml=betriebsmittelperson.rdf.php&xsl=Uebernahme&id=' + cellData.betriebsmittelperson_id + '&output=pdf';
 
 									window.open(linkToPdf, '_blank');
-							});
+								});
 							container.append(button);
 
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-edit"></i>';
-							button.title = 'Betriebsmittel bearbeiten';
+							button.title = this.$p.t('betriebsmittel', 'btn_editBetriebsmittel');
 							button.addEventListener(
 								'click',
 								(event) =>
@@ -93,7 +148,7 @@ export default {
 							button = document.createElement('button');
 							button.className = 'btn btn-outline-secondary btn-action';
 							button.innerHTML = '<i class="fa fa-xmark"></i>';
-							button.title = 'Betriebsmittel löschen';
+							button.title = this.$p.t('betriebsmittel', 'btn_deleteBetriebsmittel');
 							button.addEventListener(
 								'click',
 								() =>
@@ -104,49 +159,47 @@ export default {
 							return container;
 						},
 						frozen: true
-					}],
-				layout: 'fitColumns',
-				layoutColumnsOnNewData: false,
-				height: '550',
-				selectableRangeMode: 'click',
-				selectable: true,
-				persistenceID: 'core-betriebsmittel'
-			},
-			tabulatorEvents: [
+					}
+				],
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
 
-						await this.$p.loadCategory(['wawi', 'global', 'infocenter']);
+						await this.$p.loadCategory(['wawi', 'global', 'infocenter', 'betriebsmittel', 'person']);
 
-						let cm = this.$refs.table.tabulator.columnManager;
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						cm.getColumnByField('nummer').component.updateDefinition({
-							title: this.$p.t('wawi', 'nummer')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('format_retour').component.updateDefinition({
-							title: this.$p.t('wawi', 'retourdatum')
-						});
-						cm.getColumnByField('kaution').component.updateDefinition({
-							title: this.$p.t('infocenter', 'kaution')
-						});
-						cm.getColumnByField('format_ausgabe').component.updateDefinition({
-							title: this.$p.t('wawi', 'ausgabedatum')
-						});
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('nummer', this.$p.t('wawi', 'nummer'));
+						setHeader('betriebsmitteltyp', this.$p.t('global', 'typ'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('retouram', this.$p.t('wawi', 'retourdatum'));
+						setHeader('beschreibung', this.$p.t('global', 'beschreibung'));
+						setHeader('kaution', this.$p.t('infocenter', 'kaution'));
+						setHeader('ausgegebenam', this.$p.t('wawi', 'ausgabedatum'));
+						setHeader('betriebsmittel_id', this.$p.t('ui', 'betriebsmittel_id'));
+						setHeader('betriebsmittelperson_id', this.$p.t('ui', 'betriebsmittelperson_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
+						setHeader('uid', this.$p.t('person', 'uid'));
 					}
 				}
-			],
-			listBetriebsmitteltyp: [],
-			formData: {
-				ausgegebenam : new Date(),
-				betriebsmitteltyp: 'Zutrittskarte'
-			},
-			statusNew: true,
-			filteredInventar: []
+			];
+			return events;
 		}
 	},
 	watch: {
@@ -171,7 +224,9 @@ export default {
 				.then(result => result
 					? betriebsmittelperson_id
 					: Promise.reject({handled: true}))
-				.then(this.endpoint.deleteBetriebsmittel)
+				.then(betriebsmittelperson_id => this.$api.call(
+					this.endpoint.deleteBetriebsmittel(betriebsmittelperson_id))
+				)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
 					window.scrollTo(0, 0);
@@ -184,8 +239,8 @@ export default {
 			this.formData.uid = this.uid;
 			if (this.formData.betriebsmitteltyp == 'Inventar')
 				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
-			return this.endpoint
-				.addNewBetriebsmittel(this.$refs.betriebsmittelData, this.id, this.formData)
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.addNewBetriebsmittel(this.id, this.formData))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.betriebsmittelModal.hide();
@@ -198,8 +253,11 @@ export default {
 		updateBetriebsmittel(betriebsmittelperson_id) {
 			if (this.formData.betriebsmitteltyp == 'Inventar')
 				this.formData.betriebsmittel_id = this.formData.inventarData?.betriebsmittel_id;
-			return this.endpoint
-				.updateBetriebsmittel(this.$refs.betriebsmittelData, betriebsmittelperson_id, this.formData)
+			return this.$refs.betriebsmittelData
+				.call(this.endpoint.updateBetriebsmittel(
+					betriebsmittelperson_id,
+					this.formData
+				))
 				.then(response => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
 					this.$refs.betriebsmittelModal.hide();
@@ -212,8 +270,8 @@ export default {
 		loadBetriebsmittel(betriebsmittelperson_id) {
 			this.resetModal();
 			this.statusNew = false;
-			return this.endpoint
-				.loadBetriebsmittel(betriebsmittelperson_id)
+			return this.$api
+				.call(this.endpoint.loadBetriebsmittel(betriebsmittelperson_id))
 				.then(result => {
 					this.formData = result.data;
 				})
@@ -221,8 +279,8 @@ export default {
 		},
 		searchInventar(event) {
 			const encodedQuery = encodeURIComponent(event.query);
-			return this.endpoint
-				.loadInventarliste(encodedQuery)
+			return this.$api
+				.call(this.endpoint.loadInventarliste(encodedQuery))
 				.then(result => {
 					this.filteredInventar = result.data;
 				});
@@ -244,8 +302,8 @@ export default {
 		}
 	},
 	created() {
-		return this.endpoint
-			.getTypenBetriebsmittel()
+		return this.$api
+			.call(this.endpoint.getTypenBetriebsmittel(this.betriebsmittelTypes))
 			.then(result => {
 				this.listBetriebsmitteltyp = result.data;
 			})
@@ -260,8 +318,9 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
-			new-btn-label="Betriebsmittel"
+			:new-btn-label="this.$p.t('ui', 'betriebsmittel')"
 			@click:new="actionNewBetriebsmittel"
 			>
 		</core-filter-cmpt>		
@@ -278,7 +337,7 @@ export default {
 				<div class="row mb-3">
 					<form-input
 						type="select"
-						:label="$p.t('global/typ')"
+						:label="$p.t('global/typ') + ' *'"
 						name="betriebsmitteltyp"
 						v-model="formData.betriebsmitteltyp"
 						:disabled="!statusNew"
@@ -376,6 +435,7 @@ export default {
 						v-model="formData.ausgegebenam"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -391,6 +451,7 @@ export default {
 						v-model="formData.retouram"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						preview-format="dd.MM.yyyy"
 						:teleport="true"
@@ -405,4 +466,3 @@ export default {
 		</bs-modal>
 	</div>`
 }
-

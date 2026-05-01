@@ -2,11 +2,11 @@
 <div class="panel panel-body">
 	<table>
 		<tr class="text-center">
-			<td><img src="../../../public/images/icons/fa-user-tag.png" style="height: 60px; width: 60px;"></td>
+			<td><i class='fa fa-2x fa-user-tag'></i></td>
 			<td><i class='fa fa-2x fa-long-arrow-right'></i></td>
-			<td><img src="../../../public/images/icons/fa-user-check.png" style="height: 60px; width: 60px;"></td>
+			<td><i class='fa fa-2x fa-user-check'></i></td>
 			<td><i class='fa fa-2x fa-long-arrow-right'></i></td>
-			<td><i class='fa fa-2x fa-handshake-o'></i></td>
+			<td><i class='fa-regular fa-2x fa-handshake'></i></td>
 		</tr>
 		<tr class="text-center">
 			<td class="text-muted"><?php echo $this->p->t('lehre', 'lehrauftragStandardBestellprozessBestellen'); ?></td>
@@ -48,10 +48,10 @@
 		<tr class="text-center">
 			<td class="col-xs-1"><i class='fa fa-users'></i></td>
 			<td class="col-xs-1"><i class='fa fa-user-plus'></i></td>
-			<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-tag.png" style="height: 30px; width: 30px;"></td>
-			<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-check.png" style="height: 30px; width: 30px;"></td>
-			<td class="col-xs-1"><i class='fa fa-handshake-o'></i></td>
-			<td class="col-xs-1"><img src="../../../public/images/icons/fa-user-edit.png" style="height: 30px; width: 30px;"></td>
+			<td class="col-xs-1"><i class='fa fa-user-tag'></i></td>
+			<td class="col-xs-1"><i class='fa fa-user-check'></i></td>
+			<td class="col-xs-1"><i class='fa-regular fa-handshake'></i></td>
+			<td class="col-xs-1"><i class='fa fa-user-pen'></i></td>
 			<td class="col-xs-1"><i class='fa fa-user-secret'></i></td>
 		
 		</tr>

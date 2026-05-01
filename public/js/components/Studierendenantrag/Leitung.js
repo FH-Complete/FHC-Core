@@ -6,6 +6,9 @@ import LvPopup from './Leitung/LvPopup.js';
 import BsAlert from '../Bootstrap/Alert.js';
 import FhcLoader from '../Loader.js';
 
+import ApiStudstatusLeitung from '../../api/factory/studstatus/leitung.js';
+import ApiStudstatusAbmeldung from '../../api/factory/studstatus/abmeldung.js';
+
 export default {
 	components: {
 		LeitungHeader,
@@ -39,8 +42,8 @@ export default {
 	},
 	methods: {
 		loadFilter() {
-			this.$fhcApi.factory
-				.studstatus.leitung.getStgs()
+			this.$api
+				.call(ApiStudstatusLeitung.getStgs())
 				.then(result => this.stgs = result.data)
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -98,8 +101,8 @@ export default {
 				}
 			} else {
 				this.$refs.loader.show();
-				this.$fhcApi.factory
-					.studstatus.leitung.approve(oks)
+				this
+					._singleOrMultiApiCall(oks, ApiStudstatusLeitung.approve)
 					.then(this.showResults);
 			}
 		},
@@ -130,37 +133,38 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				this.$fhcApi.factory
-					.studstatus.leitung.reject(gruende)
+
+				this
+					._singleOrMultiApiCall(gruende, ApiStudstatusLeitung.reject)
 					.then(this.showResults);
 			}
 		},
 		actionReopen(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.leitung.reopen(gruende)
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.reopen)
 				.then(this.showResults);
 		},
 		actionPause(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.leitung.pause(antraege)
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.pause)
 				.then(this.showResults);
 		},
 		actionUnpause(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.leitung.unpause(antraege)
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.unpause)
 				.then(this.showResults);
 		},
 		actionObject(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.leitung.object(antraege)
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.object)
 				.then(this.showResults);
 		},
 		actionoObjectionDeny(evt, gruende) {
@@ -189,24 +193,35 @@ export default {
 					.catch(() => {});
 			} else {
 				this.$refs.loader.show();
-				this.$fhcApi.factory
-					.studstatus.leitung.denyObjection(gruende)
+				this
+					._singleOrMultiApiCall(gruende, ApiStudstatusLeitung.denyObjection)
 					.then(this.showResults);
 			}
 		},
 		actionObjectionApprove(evt, gruende) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.leitung.approveObjection(antraege)
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.approveObjection)
 				.then(this.showResults);
 		},
 		actionCancel(evt) {
 			var antraege = evt || this.selectedData;
 			this.$refs.loader.show();
-			this.$fhcApi.factory
-				.studstatus.abmeldung.cancel(antraege)
-				.then(this.showResults);
+			if (Array.isArray(antraege)) {
+				Promise
+					.allSettled(
+						antraege.map(antrag => this.$api.call(
+							ApiStudstatusAbmeldung.cancel(antrag.studierendenantrag_id),
+							{ errorHeader: '#' + antrag.studierendenantrag_id }
+						))
+					)
+					.then(this.showResults);
+			} else {
+				this.$api
+					.call(ApiStudstatusAbmeldung.cancel(antraege))
+					.then(this.showResults);
+			}
 		},
 		showResults(results) {
 			let fulfilled = results.filter(res => res.status == 'fulfilled');
@@ -214,6 +229,16 @@ export default {
 			//fulfilled.forEach(a => this.$fhcAlert.alertDefault('success', '#' + a.value.data, 'Approved, ...'));
 			if (fulfilled.length)
 				this.reload();
+		},
+		_singleOrMultiApiCall(antraege, endpoint) {
+			if (Array.isArray(antraege)) {
+				return Promise
+					.allSettled(antraege.map(antrag => this.$api.call(
+						endpoint(antrag),
+						{ errorHeader: '#' + antrag.studierendenantrag_id }
+					)));
+			}
+			return this.$api.call(endpoint(antraege));
 		}
 	},
 	created() {

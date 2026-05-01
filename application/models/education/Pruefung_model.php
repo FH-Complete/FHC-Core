@@ -37,6 +37,35 @@ class Pruefung_model extends DB_Model
 		return $this->execQuery($qry, array($person_id, $studiensemester_kurzbz));
 	}
 
+	/**
+	 * Gets Pruefungen of a student for a Lehrveranstaltung.
+	 * 
+	 * @param string		$uid
+	 * @param string		$lehrveranstaltung_id
+	 * @param string|null	$sprache
+	 * 
+	 * @return object
+	 */
+	public function getByStudentAndLv($uid, $lehrveranstaltung_id, $sprache = null)
+	{
+		// TODO(chris): Potentielle Anpassung "Eine UID"
+		$this->dbTable = 'lehre.tbl_pruefung';
+
+		if ($sprache) {
+			$sprache_qry = $this->db->compile_binds('SELECT index FROM public.tbl_sprache WHERE sprache = ?', [$sprache]);
+			$bezeichnung = 'bezeichnung_mehrsprachig[(' . $sprache_qry . ')]';
+		} else {
+			$bezeichnung = 'bezeichnung';
+		}
+
+		$this->addSelect($this->dbTable . '.pruefung_id, ' . $this->dbTable . '.pruefungstyp_kurzbz, ' . $this->dbTable . '.datum, COALESCE(n.' . $bezeichnung . ', n.note::text) AS note');
+
+		$this->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
+		$this->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
+		$this->addJoin('lehre.tbl_note n', 'note');
+
+		return $this->loadWhere(['lehrveranstaltung_id' => $lehrveranstaltung_id, 'student_uid' => $uid]);
+	}
 
     /**
      * NOTE(chris): not used

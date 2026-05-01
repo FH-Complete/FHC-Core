@@ -3,6 +3,7 @@ import FhcFragment from "../Fragment.js";
 let _uuid = {};
 
 export default {
+	name: "FormInput",
 	inheritAttrs: false,
 	components: {
 		FhcFragment
@@ -169,6 +170,7 @@ export default {
 				return this.$attrs.modelValue;
 			},
 			set(v) {
+				this.clearValidationForThisName()
 				if (!this.$attrs.hasOwnProperty('modelValue'))
 					this.modelValueDummy = v;
 				this.$emit('update:modelValue', v);
@@ -220,7 +222,7 @@ export default {
 			if (this.tag == 'VueDatePicker' && !this._.components.VueDatePicker) {
 				this._.components.VueDatePicker = Vue.defineAsyncComponent(() => import("../vueDatepicker.js.php"));
 			} else if (this.tag == 'PvAutocomplete' && !this._.components.PvAutocomplete) {
-				this._.components.PvAutocomplete = Vue.defineAsyncComponent(() => import(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + "/public/js/components/primevue/autocomplete/autocomplete.esm.min.js"));
+				this._.components.PvAutocomplete = primevue.autocomplete;
 			} else if (this.tag == 'UploadImage' && !this._.components.UploadImage) {
 				this._.components.UploadImage = Vue.defineAsyncComponent(() => import("./Upload/Image.js"));
 			} else if (this.tag == 'UploadDms' && !this._.components.UploadDms) {
@@ -241,9 +243,9 @@ export default {
 	template: `
 	<component :is="!hasContainer ? 'FhcFragment' : 'div'" class="position-relative" :class="autoContainerClass">
 		<label v-if="label && lcType != 'radio' && lcType != 'checkbox'" :class="!noAutoClass && 'form-label'" :for="idCmp">{{label}}</label>
-		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
-		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)"></textarea>
-		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="clearValidationForThisName(); $emit('input', $event)">
+		<input v-if="tag == 'input'" :type="lcType" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
+		<textarea v-else-if="tag == 'textarea'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)"></textarea>
+		<select v-else-if="tag == 'select'" ref="input" v-model="modelValueCmp" v-bind="$attrs" :id="idCmp" :name="name" :class="validationClass" :modelValue="undefined" @input="$emit('input', $event)">
 			<slot></slot>
 		</select>
 		<component
@@ -279,6 +281,7 @@ export default {
 			<template #chip="data"><slot name="chip" v-bind="data"></slot></template>
 			<template #header="data"><slot name="header" v-bind="data"></slot></template>
 			<template #footer="data"><slot name="footer" v-bind="data"></slot></template>
+			<template #selectedItem="data"><slot name="selectedItem" v-bind="data"></slot></template>
 			<template #option="data"><slot name="option" v-bind="data"></slot></template>
 			<template #optiongroup="data"><slot name="optiongroup" v-bind="data"></slot></template>
 			<template #content="data"><slot name="content" v-bind="data"></slot></template>
@@ -318,7 +321,7 @@ export default {
 			>
 			<slot></slot>
 		</component>
-		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'">{{label}}</label>
+		<label v-if="label && (lcType == 'radio' || lcType == 'checkbox')" :for="idCmp" :class="!noAutoClass && 'form-check-label'" v-html="label"></label>
 		<div v-if="valid !== undefined && feedback.length && !noFeedback" :class="feedbackClass">
 			<template v-for="(msg, i) in feedback" :key="i">
 				<hr v-if="i" class="m-0">

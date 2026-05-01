@@ -157,17 +157,27 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 
 		if($mitschwund)
 		{
+			if (defined('NICHT_ZUGELASSENE') && NICHT_ZUGELASSENE !== null) {
+			$noteArray = unserialize(NICHT_ZUGELASSENE);
+			$noteCondition = implode(", ", array_map('intval', $noteArray)); 
+			} else {
+					$noteCondition = "6"; // Standardwert
+			}
+		
 			// Studierende mit Anrechnungen herausnehmen
 			$qry.=" AND NOT EXISTS(
 						SELECT 1 FROM lehre.tbl_zeugnisnote
 						WHERE student_uid=tbl_studentlehrverband.student_uid
 						AND lehrveranstaltung_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit
 										WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER).")
-						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-						AND note=6)";
+						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."";
+						
+			$qry.="	AND Note IN (" . $noteCondition . "))";
+				
 			// Abbrecher und Unterbrecher herausnehmen
 			$qry.=" AND get_rolle_prestudent((SELECT prestudent_id FROM public.tbl_student
 						WHERE student_uid=tbl_studentlehrverband.student_uid),null) NOT IN('Abbrecher','Unterbrecher') ";
+								 
 		}
 	}
 	else
@@ -178,6 +188,14 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 
 		if($mitschwund)
 		{
+			if (defined('NICHT_ZUGELASSENE') && NICHT_ZUGELASSENE !== null) {
+			$noteArray = unserialize(NICHT_ZUGELASSENE);
+			$noteCondition = implode(", ", array_map('intval', $noteArray)); 
+			} else {
+					
+					$noteCondition = "6"; // Standardwert
+			}
+			
 			// Studierende mit Anrechnungen herausnehmen
 			$qry.=" AND NOT EXISTS(
 						SELECT 1 FROM lehre.tbl_zeugnisnote
@@ -185,11 +203,16 @@ function getAnzahl($studiengang_kz, $semester, $verband, $gruppe, $gruppe_kurzbz
 						AND lehrveranstaltung_id=(SELECT lehrveranstaltung_id FROM lehre.tbl_lehreinheit
 										WHERE lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER).")
 						AND studiensemester_kurzbz=".$db->db_add_param($studiensemester_kurzbz)."
-						AND note=6)";
+						";
+			
+			$qry.="	AND Note IN (" . $noteCondition . "))";
+
 			// Abbrecher und Unterbrecher herausnehmen
 			$qry.=" AND get_rolle_prestudent((SELECT prestudent_id FROM public.tbl_student
 						WHERE student_uid=tbl_benutzergruppe.uid),null) NOT IN('Abbrecher','Unterbrecher') ";
+						
 		}
+
 	}
 
 	if($res_anz = $db->db_query($qry))

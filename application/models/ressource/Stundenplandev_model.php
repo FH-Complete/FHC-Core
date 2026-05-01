@@ -10,7 +10,12 @@ class Stundenplandev_model extends DB_Model
 		parent::__construct();
 		$this->dbTable = 'lehre.tbl_stundenplandev';
 		$this->pk = 'stundenplandev_id';
+
+		$this->load->model('education/lehreinheit_model', 'LehreinheitModel');
+		$this->load->model('education/Lehreinheitgruppe_model', 'LehreinheitgruppeModel');
 	}
+
+	
 
 	public function getMissingDirectGroups($studiensemester_kurzbz = null)
 	{
@@ -155,4 +160,85 @@ class Stundenplandev_model extends DB_Model
         return $this->execQuery($qry, $params);
     }
 
+	public function deleteGroupPlanning($lehreinheit_id, $lehreinheitgruppe_id)
+	{
+		$lehreinheit = $this->LehreinheitModel->load($lehreinheit_id);
+
+		if (!hasData($lehreinheit))
+			return error ('No Lehreinheit found!');
+
+		$lehreinheitgruppe = $this->LehreinheitgruppeModel->load($lehreinheitgruppe_id);
+
+		if (!hasData($lehreinheitgruppe))
+			return error ('No Lehreinheitgruppe found!');
+
+		$this->addJoin('lehre.tbl_stundenplan_betriebsmittel', 'stundenplandev_id');
+		$this->addJoin('lehre.tbl_lehreinheitgruppe', 'lehreinheit_id');
+		$this->db->where('tbl_lehreinheitgruppe.lehreinheitgruppe_id', $lehreinheitgruppe_id);
+
+		$this->db->group_start();
+			$this->db->group_start();
+				$this->db->where('tbl_lehreinheitgruppe.gruppe_kurzbz IS NOT NULL', null, false);
+				$this->db->where('tbl_lehreinheitgruppe.gruppe_kurzbz = tbl_stundenplandev.gruppe_kurzbz', null, false);
+			$this->db->group_end();
+			$this->db->or_group_start();
+				$this->db->where('tbl_lehreinheitgruppe.gruppe_kurzbz IS NULL', null, false);
+				$this->db->where('tbl_lehreinheitgruppe.studiengang_kz = tbl_stundenplandev.studiengang_kz', null, false);
+				$this->db->where('tbl_lehreinheitgruppe.semester = tbl_stundenplandev.semester', null, false);
+				$this->db->where('tbl_lehreinheitgruppe.verband = tbl_stundenplandev.verband', null, false);
+				$this->db->where('tbl_lehreinheitgruppe.gruppe = tbl_stundenplandev.gruppe', null, false);
+			$this->db->group_end();
+		$this->db->group_end();
+
+		$betriebsmittel_result = $this->load();
+		$betriebsmittel_array = hasData($betriebsmittel_result) ? getData($betriebsmittel_result) : array();
+		if (sizeof($betriebsmittel_array) > 0)
+		{
+			return error ('Gruppe kann nicht entfernt werden da bereits Ressourcen zugeordnet wurden');
+		}
+
+		$this->addSelect('stundenplandev_id');
+		$this->addJoin('lehre.tbl_lehreinheitgruppe',
+			"tbl_stundenplandev.lehreinheit_id = tbl_lehreinheitgruppe.lehreinheit_id
+				AND tbl_stundenplandev.studiengang_kz = tbl_lehreinheitgruppe.studiengang_kz
+				AND tbl_stundenplandev.semester = tbl_lehreinheitgruppe.semester
+				AND trim(COALESCE(tbl_stundenplandev.verband, '')) = trim(COALESCE(tbl_lehreinheitgruppe.verband, ''))
+				AND trim(COALESCE(tbl_stundenplandev.gruppe, '')) = trim(COALESCE(tbl_lehreinheitgruppe.gruppe, ''))
+				AND trim(COALESCE(tbl_stundenplandev.gruppe_kurzbz, '')) = trim(COALESCE(tbl_lehreinheitgruppe.gruppe_kurzbz, ''))"
+		);
+		$stundenplan_result = $this->loadWhere(array('tbl_lehreinheitgruppe.lehreinheitgruppe_id' => $lehreinheitgruppe_id));
+
+		if (hasData($stundenplan_result))
+		{
+			$stundenplan_ids = array_column(getData($stundenplan_result), 'stundenplandev_id');
+			$this->db->where_in('stundenplandev_id', $stundenplan_ids);
+			$delete_result = $this->db->delete('lehre.tbl_stundenplandev');
+
+			if ($delete_result)
+				return success('Group deleted successfully from Stundenplandev');
+			else
+				return error('Error deleting Group from Stundenplandev');
+		}
+	}
+
+	public function deleteLektorPlanning($lehreinheit_id, $mitarbeiter_uid)
+	{
+		//TODO (david) prüfen ob der check notwendig ist
+		/*$this->addDistinct('mitarbeiter_uid');
+		$this->addSelect('mitarbeiter_uid');
+		$stundenplan_result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id));
+		$stundenplan_array = hasData($stundenplan_result) ? (getData($stundenplan_result)) : array();
+
+		if (sizeof($stundenplan_array) <= 1)
+			return error('Diese/r LektorIn kann nicht aus dem LVPlan entfernt werden da dies der/die letzte verplante LektorIn ist');*/
+
+		$this->addJoin('lehre.tbl_stundenplan_betriebsmittel', 'stundenplandev_id');
+		$betriebsmittel_result = $this->loadWhere(array('lehreinheit_id' => $lehreinheit_id, 'tbl_stundenplandev.mitarbeiter_uid' => $mitarbeiter_uid));
+		$betriebsmittel_array = hasData($betriebsmittel_result) ? getData($betriebsmittel_result) : array();
+
+		if (sizeof($betriebsmittel_array) > 0)
+			return error('Gruppe kann nicht entfernt werden da bereits Ressourcen zugeordnet wurden');
+
+		return $this->delete(array('lehreinheit_id' => $lehreinheit_id, 'mitarbeiter_uid' => $mitarbeiter_uid));
+	}
 }

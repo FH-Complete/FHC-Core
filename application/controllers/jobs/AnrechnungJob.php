@@ -195,10 +195,10 @@ class AnrechnungJob extends JOB_Controller
 			$studiengang_bezeichnung = $this->StudiengangModel->load($studiengang_kz)->retval[0]->stg_bezeichnung;
 
 			// Get STGL mail address
-			$stglMailReceiver_arr = self::_getSTGLMailAddress($studiengang_kz);
+			$stglMailReceiver_arr = $this->_getSTGLMailAddress($studiengang_kz);
 
 			// Get HTML table with new Anrechnungen of that STG plus amount of them
-			list ($anrechnungen_amount, $anrechnungen_table) = self::_getSTGLMailDataTable($studiengang_kz, $anrechnungen);
+			list ($anrechnungen_amount, $anrechnungen_table) = $this->_getSTGLMailDataTable($studiengang_kz, $anrechnungen);
 
 			// Link to Antrag genehmigen dashboard
 			$url =
@@ -514,8 +514,6 @@ html;
 					'vorname' => $stgl->vorname
 				);
 			}
-
-			return $stglMailAdress_arr;
 		}
 		// If not available, get assistance mail address
 		else
@@ -524,12 +522,13 @@ html;
 
 			if (hasData($result))
 			{
-				return array(
-					$result->retval[0]->email,
-					''
+				$stglMailAdress_arr[]= array(
+					'to' => $result->retval[0]->email,
+					'vorname' => ''
 				);
 			}
 		}
+		return $stglMailAdress_arr;
 	}
 
 	// Build HTML table with yesterdays new Anrechnungen of the given STG

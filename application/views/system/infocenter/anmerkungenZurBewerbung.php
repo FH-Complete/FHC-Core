@@ -18,6 +18,9 @@
 							<?php (!isset($notiz->kurzbzlang)) ?: print_r('(' . nl2br($notiz->kurzbzlang) . ') - ') ?>
 							<?php echo nl2br($notiz->text) ?>
 						</td>
+						<td>
+							<a href="mailto:<?php echo htmlspecialchars($notiz->email)?>?body=<?php echo rawurlencode($notiz->text);; ?>"><i class="fa fa-envelope"></i></a>
+						</td>
 					</tr>
 				<?php endforeach; ?>
 				</tbody>

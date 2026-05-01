@@ -376,7 +376,6 @@ $filterWidgetArray = array(
 		layout:"fitColumns",            // fit columns to width of table
 		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-		headerFilterPlaceholder: " ",
 		groupBy:"lehrveranstaltung_id",
 		groupToggleElement:"header",    //toggle group on click anywhere in the group header
 		groupHeader: function(value, count, data, group){
@@ -390,24 +389,15 @@ $filterWidgetArray = array(
         selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        rowUpdated:function(row){
-            func_rowUpdated(row);
-        },
         rowFormatter:function(row){
             func_rowFormatter(row);
         },
-        renderStarted:function(){
-            func_renderStarted(this);
-        },
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
-        dataLoaded: function(data){
-            func_dataLoaded(data, this);
-        },
 		tableWidgetFooter: {
 			selectButtons: true
-		}
+		},
+        columnDefaults:{
+            headerFilterPlaceholder:" ",
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt()
@@ -432,12 +422,12 @@ $filterWidgetArray = array(
         person_id: {visible: false, headerFilter:"input"},
         lv_oe_kurzbz: {headerFilter:"input"},
         lektor: {headerFilter:"input", widthGrow: 2},
-        stunden: {align:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
+        stunden: {hozAlign:"right", formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}},
-        stundensatz: {visible: true, align:"right", formatter: form_formatNulltoStringNumber,
+        stundensatz: {visible: true, hozAlign:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator},
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
+        betrag: {hozAlign:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money",
             bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
@@ -445,9 +435,9 @@ $filterWidgetArray = array(
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false, headerFilter:"input"},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
+        erteilt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
+        akzeptiert: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
         bestellt_von: {visible: false, headerFilter:"input"},
         erteilt_von: {visible: false, headerFilter:"input"},
         akzeptiert_von: {visible: false, headerFilter:"input"}

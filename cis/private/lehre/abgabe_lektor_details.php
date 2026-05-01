@@ -125,7 +125,7 @@ $projekttyp_kurzbz = $projektarbeit_obj->projekttyp_kurzbz;
 // paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
 $paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
 
-if(!is_numeric($paIsCurrent) || $paIsCurrent < 0)
+if(!is_bool($paIsCurrent))
 {
 	echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 }
@@ -166,7 +166,7 @@ if(in_array($betreuerart, array('Erstbegutachter', 'Senatsvorsitz')))
 		}
 
 		// Mail mit Token an Zweitbegutachter senden
-		if (count($zweitbetreuerArr) > 0 && $paIsCurrent >= 1 && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
+		if (count($zweitbetreuerArr) > 0 && $paIsCurrent === true && isset($_GET['zweitbegutachtertoken']) && isset($_GET['zweitbetreuer_person_id']))
 		{
 			$qry_std="SELECT * FROM campus.vw_benutzer where uid=".$db->db_add_param($uid);
 			if(!$result_std=$db->db_query($qry_std))
@@ -482,7 +482,7 @@ $htmlstr .= "<table id='beurteilungheadertable' width=100%>\n";
 $htmlstr .= "<tr><td style='font-size:16px'>".$p->t('abgabetool/student').": <b>".$db->convert_html_chars($studentenname)."</b></td>";
 $htmlstr .= "<td width=10% align=center>";
 
-$semester_benotbar = $paIsCurrent >= 1;
+$semester_benotbar = $paIsCurrent === true;
 $endupload_vorhanden = $num_rows_endupload >= 1;
 
 if ($semester_benotbar && $endupload_vorhanden)
@@ -495,7 +495,8 @@ if ($semester_benotbar && $endupload_vorhanden)
 }
 else
 {
-	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$quick_info = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenotenQuickInfo') : $p->t('abgabetool/keinEnduploadErfolgt');
+	$info_text = !$semester_benotbar ? $p->t('abgabetool/aeltereParbeitBenoten') : $p->t('abgabetool/keinEnduploadErfolgt');
 	$htmlstr .= "<form action='javascript:void(0);'>";
 	$htmlstr .= "<input type='submit' value='".$p->t('abgabetool/benoten')."' title='".$quick_info."'
 					alt='".$quick_info."' disabled>";
@@ -516,7 +517,7 @@ else
 }
 $htmlstr .= "<tr>
 					<td style='font-size:16px'>" . $p->t('abgabetool/titel') . ": <b>".$db->convert_html_chars($titel)."<b></td>
-					<td align='center' class='warningtext'>".(isset($quick_info) ? $quick_info : '')."</td>
+					<td align='center' class='warningtext'>".(isset($info_text) ? $info_text : '')."</td>
 					<td valign=\"right\"><a href='abgabe_student_frameset.php?uid=$uid' target='_blank'>".$p->t('abgabetool/studentenansicht')."</a></td>";
 $htmlstr .= "</tr>\n";
 
@@ -544,7 +545,7 @@ if (isset($zweitbetreuerArr) && is_array($zweitbetreuerArr)) // wenn es Zweitbet
 			$htmlstr .= "&nbsp;&nbsp;<img src='../../../skin/images/exclamation.png' title='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "' alt='" . $p->t('abgabetool/zweitBegutachterEmailFehlt') . "'/>";
 
 		// Token senden button wenn Zweitbegutachter extern ist und Projektarbeit nicht für altes Semester ist
-		if (isset($zweitbetreuer->email) && !isset($zweitbetreuer->uid) && $paIsCurrent >= 1)
+		if (isset($zweitbetreuer->email) && !isset($zweitbetreuer->uid) && $paIsCurrent === true)
 		{
 			$htmlstr .= "<form action='" . htmlspecialchars($_SERVER['PHP_SELF']) . "' method='GET' style='display: inline'>\n";
 			$htmlstr .= "<input type='hidden' name='uid' value='" . $student_uid . "'>";

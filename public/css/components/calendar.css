@@ -1,0 +1,41 @@
+@import './calendar/frame.css';
+@import './calendar/events.css';
+@import './calendar/backgrounds.css';
+
+/* Themable Variables */
+:root {
+	--fhc-calendar-gap: var(--bs-border-width, 1px);
+
+	--fhc-calendar-bg: var(--fhc-background, #fff);
+	--fhc-calendar-border: var(--fhc-border, #dee2e6);
+	--fhc-calendar-bg-gap: var(--fhc-border, #dee2e6);
+
+	--fhc-calendar-bg-event: var(--fhc-white-80, #ccc);
+	--fhc-calendar-border-event: var(--bs-secondary, #6c757d);
+	--fhc-calendar-radius-event: var(--bs-border-radius, .375rem);
+
+	--fhc-calendar-bg-markings-past: var(--fhc-beige-10, rgba(245, 233, 215, 0.5));
+	--fhc-calendar-border-markings-past: var(--fhc-calendar-border);
+	--fhc-calendar-bg-markings-past-label: var(--fhc-calendar-bg);
+	--fhc-calendar-border-markings-past-label: var(--fhc-calendar-border);
+
+	--fhc-calendar-bg-header: var(--fhc-calendar-bg);
+	--fhc-calendar-bg-header-gap: transparent;
+	--fhc-calendar-bg-allday: var(--fhc-calendar-bg);
+	--fhc-calendar-bg-allday-gap: transparent;
+	--fhc-calendar-bg-body: var(--fhc-calendar-bg);
+	--fhc-calendar-bg-body-gap: transparent;
+
+	--fhc-calendar-bg-month-today: var(--fhc-primary);
+	--fhc-calendar-color-month-today: var(--fhc-white-10);
+	
+	--fhc-calendar-bg-overlay1: var(--fhc-calendar-bg);
+	--fhc-calendar-bg-overlay2: var(--fhc-dark, #212529);
+	
+	--fhc-calendar-radius-day-event: var(--fhc-calendar-radius-event);
+	--fhc-calendar-radius-week-event: var(--fhc-calendar-radius-event);
+	--fhc-calendar-radius-month-event: 0;
+	--fhc-calendar-radius-list-event: var(--fhc-calendar-radius-event);
+
+	--fhc-calendar-maxheight-allday: 7.125rem;
+}

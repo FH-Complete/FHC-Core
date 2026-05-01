@@ -365,6 +365,13 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 				</row>
 
 				<row>
+					<vbox>
+						<label id="student-abschlusspruefung-link-label" value="Zur Beurteilung"/>
+					</vbox>
+					<vbox>
+						<label id="student-abschlusspruefung-link-value" hidden="true" value=""></label>
+						<label id="student-abschlusspruefung-link" class="text-link" href="#" value="" onclick="window.open(document.getElementById('student-abschlusspruefung-link-value').value)"/>
+					</vbox>
 					<spacer />
 					<spacer />
 					<spacer />

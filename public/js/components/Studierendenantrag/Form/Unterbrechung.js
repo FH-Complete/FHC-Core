@@ -3,6 +3,7 @@ import CoreForm from '../../Form/Form.js';
 import FormValidation from '../../Form/Validation.js';
 import FormInput from '../../Form/Input.js';
 
+import ApiStudstatusUnterbrechung from '../../../api/factory/studstatus/unterbrechung.js';
 
 export default {
 	components: {
@@ -72,8 +73,11 @@ export default {
 	},
 	methods: {
 		load() {
-			return this.$fhcApi.factory
-				.studstatus.unterbrechung.getDetails(this.studierendenantragId, this.prestudentId)
+			return this.$api
+				.call(ApiStudstatusUnterbrechung.getDetails(
+					this.studierendenantragId,
+					this.prestudentId
+				))
 				.then(
 					result => {
 						this.data = result.data;
@@ -99,14 +103,14 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.unterbrechung.create(
+			this.$refs.form
+				.call(ApiStudstatusUnterbrechung.create(
 					this.stsem !== null && this.data.studiensemester[this.stsem].studiensemester_kurzbz,
 					this.data.prestudent_id,
 					this.data.grund,
 					this.stsem !== null && this.currentWiedereinstieg,
 					this.attachment
-				)
+				))
 				.then(result => {
 					if (Number.isInteger(result.data))
 						document.location += "/" + result.data;
@@ -141,10 +145,10 @@ export default {
 			this.saving = true;
 
 			this.$refs.form.clearValidation();
-			this.$refs.form.factory
-				.studstatus.unterbrechung.cancel(
+			this.$refs.form
+				.call(ApiStudstatusUnterbrechung.cancel(
 					this.data.studierendenantrag_id
-				)
+				))
 				.then(result => {
 					if (Number.isInteger(result.data))
 						document.location = document.location.replace(/unterbrechung\/([0-9]*)\/[0-9]*[\/]?$/, 'unterbrechung/$1') +  "/" + result.data;

@@ -66,6 +66,15 @@ class Variable_model extends DB_Model
 					}
 				}
 			}
+
+			if (!isset($vardata['emailadressentrennzeichen']))
+			{
+				$vardata['emailadressentrennzeichen'] = 
+					(defined('DEFAULT_EMAILADRESSENTRENNZEICHEN'))
+					? DEFAULT_EMAILADRESSENTRENNZEICHEN
+					: ',';
+			}
+
 			$result = success($vardata);
 		}
 

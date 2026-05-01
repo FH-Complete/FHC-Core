@@ -18,14 +18,22 @@ $sitesettings = array(
 	)
 );
 
-$this->load->view(
-	'templates/FHC-Header',
-	$sitesettings
-);
+if(defined('CIS4')){
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$sitesettings
+	);
+}else{
+	$this->load->view(
+		'templates/FHC-Header',
+		$sitesettings
+	);
+}
+
 ?>
 
 <div id="wrapper">
-	<div class="fhc-header">
+	<div class="fhc-header hide-in-frame">
 		<h1 class="h2"><?= $this->p->t('studierendenantrag', 'antrag_header'); ?></h1>
 	</div>
 
@@ -49,7 +57,15 @@ $this->load->view(
 </div>
 
 <?php
-$this->load->view(
-	'templates/FHC-Footer',
-	$sitesettings
-);
+
+if (defined('CIS4')) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$sitesettings
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$sitesettings
+	);
+}

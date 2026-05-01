@@ -25,6 +25,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Used to create a return object, should not be used directly
+ * @return stdClass
  */
 function _createReturnObject($code, $error, $retval)
 {
@@ -39,7 +40,7 @@ function _createReturnObject($code, $error, $retval)
 /**
  * Success
  *
- * @return  array
+ * @return stdClass
  */
 function success($retval = null, $code = null)
 {
@@ -49,7 +50,7 @@ function success($retval = null, $code = null)
 /**
  * Error
  *
- * @return  array
+ * @return stdClass
  */
 function error($retval = null, $code = null)
 {

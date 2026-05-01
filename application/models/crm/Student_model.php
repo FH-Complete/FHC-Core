@@ -19,6 +19,28 @@ class Student_model extends DB_Model
 		$this->load->model('codex/Bismeldestichtag_model', 'BismeldestichtagModel');
 	}
 
+	/**
+     * Checks if the user is a Student.
+     * @param string $uid
+     * @return array
+     */
+    public function isStudent($uid)
+    {
+        $this->addSelect('1');
+
+        $result = $this->loadWhere(array('student_uid' => $uid));
+
+
+        if(hasData($result))
+        {
+            return success(true);
+        }
+        else
+        {
+            return success(false);
+        }
+    }
+
 	// ****
 	// * Generiert die Matrikelnummer
 	// * FORMAT: 0710254001
@@ -164,7 +186,7 @@ class Student_model extends DB_Model
 
 		$max = 0;
 		if ($matrikelnrres && hasData($matrikelnrres)) {
-			$max = mb_substr($matrikelnrres->retval[0]->matrikelnr, 7);
+			$max = mb_substr(trim(getData($matrikelnrres)[0]->matrikelnr), -3);
 			if (!is_numeric($max)) {
 				$max = (int)$max;
 			}
@@ -273,5 +295,13 @@ class Student_model extends DB_Model
 	public function getEmailFH($student_uid)
 	{
 		return $student_uid . '@' . DOMAIN;
+	}
+	
+	public function getEmailAnredeForStudentUID($student_uid) {
+		$qry = "SELECT anrede, titelpre, vorname, vornamen, nachname, titelpost
+				FROM campus.vw_student 
+				WHERE uid = ?";
+
+		return $this->execReadOnlyQuery($qry, array($student_uid));
 	}
 }

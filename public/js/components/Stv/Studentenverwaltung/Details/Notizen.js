@@ -1,28 +1,39 @@
 import CoreNotiz from "../../../Notiz/Notiz.js";
 
+import ApiNotizPerson from '../../../../api/factory/notiz/person.js';
+
 export default {
+	name: "TabNotes",
 	components: {
 		CoreNotiz
 	},
 	props: {
 		modelValue: Object
 	},
+	data() {
+		return {
+			endpoint: ApiNotizPerson
+		};
+	},
 	template: `
-	<div class="stv-details-notizen h-100 pb-3 overflow-hidden">
-<!--	mit factory als endpoint	-->
-		<core-notiz
-			:endpoint="$fhcApi.factory.notiz.person"
-			ref="formc"
-			notiz-layout="twoColumnsFormLeft"
-			type-id="person_id"
-			:id="modelValue.person_id"
-			show-document
-			show-tiny-mce
-			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
-			>
-		</core-notiz>
-		
-	
+	<div class="stv-details-notizen h-100 pb-3">
+
+<!--	Test Version classicFas for enter with one click vs popupModal-->
+	<core-notiz
+		class="overflow-hidden"
+		:endpoint="endpoint"
+		ref="formc"
+		notiz-layout="popupModal"
+		type-id="person_id"
+		:id="modelValue.person_id"
+		show-document
+		show-tiny-mce
+		:visibleColumns="['titel','text','verfasser','bearbeiter','dokumente']"
+		@reload="$emit('update:suffix')"
+		tabulator-persistence-id="stv-notiz-20260217"
+		>
+</core-notiz>
+
 <!--		
 ---------------------------------------------------------------------------------------------
 -------------------- DESCRIPTION FOR PARAMETER PROPS ----------------------------------------
@@ -64,7 +75,6 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 ------------------------ SOME TESTDATA	-----------------------------------------------------	
 ---------------------------------------------------------------------------------------------
 
-
 		<core-notiz
 			:endpoint="$fhcApi.factory.notiz.mitarbeiter"
 			ref="formc"
@@ -102,7 +112,8 @@ visibleColumns: list, which fields shoult be showed as default in filter compone
 			:showTinyMCE="true"
 			:visible-columns="['titel','text','verfasser','bearbeiter','dokumente']"
 			>
-		</core-notiz>-->
+		</core-notiz>
+-->
 		
 	</div>
 	`
