@@ -106,4 +106,67 @@ class Studienplan_model extends DB_Model
 			'tbl_studienplan_lehrveranstaltung.semester' => $semester
 		));
 	}
+
+	// Deprecated
+	// im Lehrveranstaltung_model vorhanden
+	public function getAllOesForLv($lehrveranstaltung_id)
+	{
+		$this->addDistinct('oe_kurzbz');
+
+		$this->addJoin('lehre.tbl_studienplan_lehrveranstaltung lv', 'studienplan_id');
+		$this->addJoin('lehre.tbl_studienordnung', 'studienordnung_id');
+		$this->addJoin('public.tbl_studiengang', 'studiengang_kz');
+
+		return $this->loadWhere([
+			'lv.lehrveranstaltung_id' => $lehrveranstaltung_id
+		]);
+	}
+
+	public function getStudienplaeneByPrestudents($prestudent_id)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('sem.start AS start_stsem');
+		$this->addJoin('lehre.tbl_studienordnung o', 'studienordnung_id');
+		$this->addJoin('public.tbl_prestudent p', 'studiengang_kz');
+		$this->addJoin('public.tbl_studiensemester sem', 'sem.studiensemester_kurzbz = o.gueltigvon', 'LEFT');
+		$this->addOrder('sem.start');
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+	}
+
+	public function loadStudienplanLehrveranstaltung($lv_id)
+	{
+		$qry = "SELECT studienplan_lehrveranstaltung_id,
+					semester,
+					pflicht,
+					studienplan_id,
+					koordinator,
+ 					studienplan_lehrveranstaltung_id_parent,
+					lehrveranstaltung_id,
+					insertamum,
+					insertvon,
+					updateamum,
+					updatevon,
+					sort,
+					curriculum,
+					export
+				FROM lehre.tbl_studienplan_lehrveranstaltung WHERE studienplan_lehrveranstaltung_id = ? ";
+		return $this->execReadOnlyQuery($qry, array($lv_id));
+	}
+
+	public function getStudienplaeneForPerson($person_id)
+	{
+		$this->addDistinct();
+		$this->addSelect($this->dbTable . '.*');
+		$this->addSelect('ps.*');
+		$this->addJoin('public.tbl_prestudentstatus pss', 'studienplan_id');
+		$this->addJoin('public.tbl_prestudent ps', 'prestudent_id');
+
+		return $this->loadWhere([
+			'person_id' => $person_id
+		]);
+	}
 }

@@ -35,11 +35,12 @@ class Searchbar extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
-			'search' => self::PERM_LOGGED
+			'search' => self::PERM_LOGGED,
+			'searchCis' => self::PERM_LOGGED,
+			'searchStv' => self::PERM_LOGGED
 		]);
 
-		// Load the library SearchBarLib
-		$this->load->library('SearchBarLib');
+		$this->load->model('system/Webservicelog_model', 'WebservicelogModel');
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -50,6 +51,7 @@ class Searchbar extends FHCAPI_Controller
 	 */
 	public function search()
 	{
+		$this->load->library('SearchBarLib');
 		$this->load->library('form_validation');
 
 		// Checks if the searchstr and the types parameters are in the POSTed JSON
@@ -63,7 +65,64 @@ class Searchbar extends FHCAPI_Controller
 		$result = $this->searchbarlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
 		if (property_exists($result, 'error'))
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
-		$this->terminateWithSuccess($result);
+		
+		$this->addMeta('mode', 'simple');
+		
+		$this->terminateWithSuccess($result->data);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	public function searchCis()
+	{
+		return $this->searchAdvanced([ 'config' => 'searchcis' ]);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	public function searchStv()
+	{
+		return $this->searchAdvanced([ 'config' => 'searchstv' ]);
+	}
+
+	/**
+	 * Gets a JSON body via HTTP POST and provides the parameters
+	 */
+	private function searchAdvanced($config)
+	{
+		$this->load->library('SearchLib', $config);
+		$this->load->library('form_validation');
+
+		// Checks if the searchstr and the types parameters are in the POSTed JSON
+		$this->form_validation->set_rules(self::SEARCHSTR_PARAM, null, 'required');
+		$this->form_validation->set_rules(self::TYPES_PARAM . '[]', null, 'required');
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		// Convert to json the result from searchlib->search
+		$result = $this->searchlib->search($this->input->post(self::SEARCHSTR_PARAM), $this->input->post(self::TYPES_PARAM));
+
+		$this->WebservicelogModel->insert(array(
+			'webservicetyp_kurzbz' => 'content',
+			'beschreibung' => $config['config'],
+			'request_data' => json_encode(array(
+				self::SEARCHSTR_PARAM => $this->input->post(self::SEARCHSTR_PARAM),
+				self::TYPES_PARAM => $this->input->post(self::TYPES_PARAM)
+			)),
+			'execute_user' => getAuthUID(),
+			'execute_time' => 'NOW()'
+		));
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->addMeta('time', $result->meta['time']);
+		$this->addMeta('searchstring', $result->meta['searchstring']);
+		$this->addMeta('mode', 'advanced');
+		
+		$this->terminateWithSuccess($data);
 	}
 }
 

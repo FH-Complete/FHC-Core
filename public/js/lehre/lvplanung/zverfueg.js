@@ -1,4 +1,19 @@
+
+// Returns relative height (depending on screen size)
+function func_height(table) {
+    return $(window).height() * 0.5;
+}
+
 $(function(){
+
+    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+    
+        $("#tableWidgetTabulator").tabulator("on","rowDeselected",(row)=>func_rowDeselected(row));
+        $("#tableWidgetTabulator").tabulator("on","rowSelected",(row)=>func_rowSelected(row));
+        
+    });
+
     var studiensemesterStart = $("#studsemStart").val();
 
     Zverfueg.initDatepicker(studiensemesterStart);
@@ -98,8 +113,8 @@ $(function(){
                     if (FHC_AjaxClient.hasData(data)) {
 
                         // Delete row
-                        let row = $('#tableWidgetTabulator').tabulator('getRow', zeitsperre_id);
-                        row.delete(zeitsperre_id);
+						$('#tableWidgetTabulator').tabulator('deleteRow', zeitsperre_id);
+						
 
                         // Reset form
                         Zverfueg.resetFormFields();

@@ -17,10 +17,17 @@ $sitesettings = array(
 	)
 );
 
-$this->load->view(
-	'templates/FHC-Header',
-	$sitesettings
-);
+if(defined('CIS4')){
+	$this->load->view(
+		'templates/CISVUE-Header',
+		$sitesettings
+	);
+}else{
+	$this->load->view(
+		'templates/FHC-Header',
+		$sitesettings
+	);
+}
 ?>
 
 <div id="wrapper">
@@ -221,7 +228,14 @@ $this->load->view(
 </div>
 
 <?php
-$this->load->view(
-	'templates/FHC-Footer',
-	$sitesettings
-);
+if (defined('CIS4')) {
+	$this->load->view(
+		'templates/CISVUE-Footer',
+		$sitesettings
+	);
+} else {
+	$this->load->view(
+		'templates/FHC-Footer',
+		$sitesettings
+	);
+}

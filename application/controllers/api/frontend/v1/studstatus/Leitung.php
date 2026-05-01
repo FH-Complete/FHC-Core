@@ -53,7 +53,8 @@ class Leitung extends FHCAPI_Controller
 
 		// Load language phrases
 		$this->loadPhrases([
-			'studierendenantrag'
+			'studierendenantrag',
+			'lehre'
 		]);
 	}
 

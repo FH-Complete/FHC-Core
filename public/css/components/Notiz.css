@@ -1,0 +1,26 @@
+.notizTitle {
+    color: darkred;
+}
+.notizText {
+    color: darkblue;
+}
+
+/* Enforce content clipping in the scrollable section */
+.tabulator .tabulator-tableHolder {
+    overflow-x: hidden;
+    position: relative;
+}
+
+.tabulator .tabulator-table {
+    overflow-x: hidden;
+    table-layout: fixed;
+    width: 100%;
+}
+
+.tabulator .tabulator-cell {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+}
+

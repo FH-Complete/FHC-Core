@@ -121,8 +121,8 @@ export const CoreRESTClient = {
 	 */
 	getError: function(response) {
 
-		if (typeof response[CORE_REST_CLIENT_RETVAL] === "object"
-			&& Object.keys(response[CORE_REST_CLIENT_RETVAL]).length > 0
+		if (typeof response === "object"
+			&& Object.keys(response).length > 0
 			&& response.hasOwnProperty(CORE_REST_CLIENT_RETVAL))
 		{
 			return response[CORE_REST_CLIENT_RETVAL];
@@ -136,7 +136,7 @@ export const CoreRESTClient = {
 	 */
 	getErrorCode: function(response) {
 
-		if (typeof response[CORE_REST_CLIENT_RETVAL] === "object" && response.hasOwnProperty(CORE_REST_CLIENT_ERROR))
+		if (typeof response === "object" && response.hasOwnProperty(CORE_REST_CLIENT_ERROR))
 		{
 			return response[CORE_REST_CLIENT_ERROR];
 		}

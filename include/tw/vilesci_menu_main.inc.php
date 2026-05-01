@@ -70,6 +70,7 @@ $menu=array
 		'link'=>'left.php?categorie=Lehre', 'target'=>'nav',
 		'Gruppenverwaltung'=>array('name'=>'Gruppen', 'permissions'=>array('admin','lv-plan','support','lehre/gruppe'), 'link'=>'stammdaten/lvbgruppenverwaltung.php', 'target'=>'main'),
 		'Lehrveranstaltung'=>array('name'=>'Lehrveranstaltung', 'link'=>'lehre/lehrveranstaltung_frameset.html', 'target'=>'main'),
+		'lvTemplateUebersicht'=>array('name'=>'LV-Template Übersicht', 'link'=>'../index.ci.php/lehre/lvplanung/LvTemplateUebersicht', 'target'=>'_blank'),
 		'Studienordnung'=>array('name'=>'Studienordnung', 'link'=>'lehre/studienordnung.php', 'target'=>'_blank','permissions'=>array('lehre/studienordnung')),
 		'StudienplanGueltigkeit'=>array('name'=>'Studienplan Gültigkeit', 'link'=>'lehre/studienplan_gueltigkeit.php', 'target'=>'main','permissions'=>array('lehre/studienordnung')),
 		'StudienplanVorruecken'=>array('name'=>'Studienplan vorrücken', 'link'=>'lehre/studienplan_vorrueckung.php', 'target'=>'main','permissions'=>array('lehre/studienplan')),

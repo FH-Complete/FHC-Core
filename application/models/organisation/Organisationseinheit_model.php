@@ -189,19 +189,74 @@ class Organisationseinheit_model extends DB_Model
         return $this->loadWhere($condition);
     }
 
-	/**
-	 * Get OEs by eventQuery string. Use with autocomplete event queries.
-	 * @param $eventQuery String
-	 * @return array
-	 */
-	public function getAutocompleteSuggestions($eventQuery)
-	{
-		$this->addSelect('oe_kurzbz');
-		$this->addSelect('organisationseinheittyp_kurzbz, oe_kurzbz, bezeichnung, aktiv, lehre');
-		$this->addOrder('organisationseinheittyp_kurzbz, bezeichnung');
+    /**
+     * @param string $oe_kurzbz
+     *
+     * @return stdClass
+     */
+    public function getWithType($oe_kurzbz)
+    {
+    	$this->addSelect($this->dbTable . '.*, t.bezeichnung AS organisationseinheittyp');
+    	$this->addJoin('public.tbl_organisationseinheittyp t', 'organisationseinheittyp_kurzbz');
 
-		return $this->loadWhere("
-			oe_kurzbz ILIKE '%". $this->escapeLike($eventQuery). "%'
-		");
+    	return $this->load($oe_kurzbz);
+    }
+
+	/**
+	 * get highest organisation units
+	 */
+	public function getHeads()
+	{
+		$this->addSelect('*');
+		$this->addSelect('oe_kurzbz as head');
+		$result = $this->loadWhere(array('oe_parent_kurzbz' => null, 'aktiv' => true));
+
+		return $result;
+	}
+
+	/**
+	 * Ermittelt die Stundenobergrenze fuer Lektoren
+	 * Dabei wird im OE Baum nach oben nach Stundengrenzen gesucht und die niedrigste Stundengrenze ermittelt
+	 * @param $oe_kurzbz Organisationseinheit
+	 * @param $fixangestellt boolean legt fest ob die Grenze
+	 *        fuer Freie oder Fixangestellte Lektoren ermittelt werden soll
+
+	 */
+	public function getStundengrenze($oe_kurzbz, $fixangestellt = true)
+	{
+		$fixfrei = $fixangestellt ? 'fix' : 'frei';
+
+		$qry = "
+			WITH RECURSIVE oes(oe_kurzbz, oe_parent_kurzbz) as
+			(
+				SELECT oe_kurzbz, oe_parent_kurzbz FROM public.tbl_organisationseinheit
+				WHERE oe_kurzbz= ?
+				UNION ALL
+				SELECT o.oe_kurzbz, o.oe_parent_kurzbz FROM public.tbl_organisationseinheit o, oes
+				WHERE o.oe_kurzbz=oes.oe_parent_kurzbz
+			)
+			SELECT oe_kurzbz, warn_semesterstunden_{$fixfrei} AS stunden
+			FROM oes
+				JOIN public.tbl_organisationseinheit USING (oe_kurzbz)
+			ORDER BY warn_semesterstunden_{$fixfrei} ASC
+			LIMIT 1";
+
+		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
+	}
+	
+	public function getAssistenzForOE($oe_kurzbz) {
+		$qry = "
+			SELECT person_id, uid, benutzerfunktion_id, funktion_kurzbz, oe_kurzbz, alias, 
+       			anrede, trim(COALESCE(titelpre,'')||' '||COALESCE(vorname,'')||' '||COALESCE(nachname,'')||' '||COALESCE(titelpost,'')) as first
+			FROM tbl_benutzerfunktion
+					 JOIN public.tbl_benutzer USING(uid)
+					 JOIN public.tbl_person USING(person_id)
+			WHERE funktion_kurzbz = 'ass'
+				AND oe_kurzbz = ?
+				AND (datum_bis IS NULL OR NOW() <= datum_bis)
+				AND public.tbl_benutzer.aktiv = true
+		";
+
+		return $this->execReadOnlyQuery($qry, array($oe_kurzbz));
 	}
 }

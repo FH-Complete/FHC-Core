@@ -123,7 +123,7 @@ class wochenplan extends basis_db
 	}
 
 	/**
-	 * initialisiert den Studenplan
+	 * initialisiert den Stundenplan
 	 *
 	 */
 	public function init_stdplan()

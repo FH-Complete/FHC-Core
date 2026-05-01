@@ -1,4 +1,7 @@
 <?php
+
+use \CI3_Events as Events;
+
 class Benutzer_model extends DB_Model
 {
 
@@ -74,22 +77,88 @@ class Benutzer_model extends DB_Model
 	 */
 	public function generateAlias($uid)
 	{
-		$aliasres = '';
 		$this->addLimit(1);
 		$this->addSelect('vorname, nachname');
 		$this->addJoin('public.tbl_person', 'person_id');
 		$nameresult = $this->loadWhere(array('uid' => $uid));
 
-		if (hasData($nameresult))
-		{
-			$aliasdata = getData($nameresult);
-			$alias = $this->_sanitizeAliasName($aliasdata[0]->vorname).'.'.$this->_sanitizeAliasName($aliasdata[0]->nachname);
-			$aliasexists = $this->aliasExists($alias);
+		if (isError($nameresult))
+			return $nameresult;
 
-			if (hasData($aliasexists) && !getData($aliasexists)[0])
-				$aliasres = $alias;
-		}
-		return success($aliasres);
+		if (!hasData($nameresult))
+			return success('');
+		
+		$aliasdata = current(getData($nameresult));
+
+		return $this->generateAliasFromName($aliasdata->vorname, $aliasdata->nachname);
+	}
+
+	/**
+	 * Generates alias for a vor- and nachname.
+	 *
+	 * @param string						$vorname
+	 * @param string						$nachname
+	 *
+	 * @return stdClass
+	 */
+	public function generateAliasFromName($vorname, $nachname)
+	{
+		$alias = $this->_sanitizeAliasName($vorname . '.' . $nachname);
+		
+		$result = $this->aliasExists($alias);
+
+		if (isError($result))
+			return $result;
+
+		if (current(getData($result)))
+			return success('');
+
+		return success($alias);
+	}
+
+	/**
+	 * Generates a matrikelnummer
+	 *
+	 * @param string						$oe_kurzbz
+	 *
+	 * @return stdClass
+	 */
+	public function generateMatrikelnummer($oe_kurzbz)
+	{
+		$matrikelnummer = false;
+
+		Events::trigger(
+			'generate_matrikelnummer',
+			function ($value) use ($matrikelnummer) {
+				$matrikelnummer = $value;
+			},
+			$oe_kurzbz
+		);
+
+		if ($matrikelnummer !== false)
+			return success($matrikelnummer);
+
+		return success(null);
+	}
+
+	/**
+	 * Generates an activation key
+	 *
+	 * @return string
+	 */
+	public function generateActivationkey()
+	{
+		$this->load->library('CryptLib');
+
+		$key = '';
+		for ($i=0; $i<32; $i++)
+			$key .= ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'][mt_rand(0, 15)];
+
+		$value = uniqid(mt_rand(), true);
+		$length = strlen($value);
+		$value = str_pad($value, $length + 32 - ($length % 32), chr(0));
+
+		return md5($this->cryptlib->RIJNDAEL_256_ECB($value, $key, true));
 	}
 
 	// --------------------------------------------------------------------------------------------
@@ -100,9 +169,10 @@ class Benutzer_model extends DB_Model
 	 * @param string $str
 	 * @return string
 	 */
+
 	private function _sanitizeAliasName($str)
 	{
 		$str = sanitizeProblemChars($str);
-		return mb_strtolower(str_replace(' ','_', $str));
+		return mb_strtolower(str_replace(' ', '_', $str));
 	}
 }

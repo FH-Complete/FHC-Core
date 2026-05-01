@@ -1,3 +1,14 @@
+
+.btn-w200
+{
+    width: 200px;
+}
+
+.btn-mr5
+{
+    margin-right: 10px;
+}
+
 .select-w500 {
     width: 500px;
 }
@@ -5,3 +16,18 @@
 .pl-15 {
     padding-left: 15px !important;
 }
+
+.bg-secondary-subtle{
+    background-color: #E9ECEF !important; 
+    border-style: solid !important;
+    border-width: 1px !important;
+    border-color: #DEE2E6 !important;
+}
+
+
+/* html attribute disabled and title don't work together, sets the pointer-event to auto in order to see the title toolip */
+.btn:disabled {
+    pointer-events: auto !important;
+    cursor: default;
+}
+

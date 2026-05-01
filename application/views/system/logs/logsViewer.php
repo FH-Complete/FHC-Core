@@ -8,11 +8,12 @@
 		'filtercomponent' => true,
 		'navigationcomponent' => true,
 		'tabulator5' => true,
+		'primevue3' => true,
 		'phrases' => array(
 			'global' => array('mailAnXversandt'),
 			'ui' => array('bitteEintragWaehlen')
 		),
-		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js')
+		'customJSModules' => array('public/js/apps/LogsViewer/LogsViewer.js'),
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);

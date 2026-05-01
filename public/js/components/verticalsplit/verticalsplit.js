@@ -1,4 +1,5 @@
 export default {
+    name: 'VerticalSplit',
     data: function() {
       return {          
           availHeight: 0,

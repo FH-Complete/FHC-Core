@@ -25,11 +25,11 @@ $this->phrasen['testtool/klickenSieAufEinTeilgebiet']='Zum Starten klicken Sie b
 $this->phrasen['testtool/gebietStarten']='Gebiet starten';
 $this->phrasen['testtool/startseite']='Startseite';
 $this->phrasen['testtool/zurueckZurStartseite']='Zurück zur Startseite';
-$this->phrasen['testtool/begruessungstext']="Willkommen zum Reihungstest der Fachhochschule Technikum Wien!";
+$this->phrasen['testtool/begruessungstext']="Willkommen zum Reihungstest der Fachhochschule Technikum Wien";
 $this->phrasen['testtool/anmeldedaten']= "Sie sind mit folgenden Daten angemeldet:";
 $this->phrasen['testtool/keineAntwort']='Keine Antwort';
 $this->phrasen['testtool/speichernUndWeiter']='Speichern und weiter';
-$this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort';
+$this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort.';
 $this->phrasen['testtool/zeitAbgelaufen']='Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet';
 $this->phrasen['testtool/spracheDerTestfragen']='Gewünschte Sprache der Testfragen';
 $this->phrasen['testtool/einleitung']='Einleitung';
@@ -53,6 +53,10 @@ $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengäng
 $this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
 $this->phrasen['testtool/confirmationText']='<b>Ich bestätige, den Online-Reihungstest persönlich, selbständig, ohne Hilfe einer zusätzlichen Person und ohne Hilfsmittel zu absolvieren.<br>
 											I confirm that I will complete the online placement test personally, independently, without the help of an additional person and without any aids.</b>';
+$this->phrasen['testtool/dsgvoConfirmText']='<b>Ich habe die <a href ="'. APP_ROOT. 'cms/dms.php?id=373121" target="_blank">Datenschutzerklärung</a> gelesen. <br />
+I have read the <a href ="'. APP_ROOT. 'cms/dms.php?id=374814" target="_blank">privacy policy</a>.</b>';
+$this->phrasen['testtool/procotoringConfirmText']='<b>Ich stimme der digitalen Beaufsichtigung beim Online-Reihungstest (Proctoring) zu. <br /> 
+I agree to the digital supervision of the online placement test (proctoring).</b>';
 $this->phrasen['testtool/loginNoetig']='Bitte beachten Sie, dass der Reihungstest erst <b>unmittelbar</b> vor Ihrem <b>Reihungstesttermin</b> von uns aktiviert wird.<br>
 										Please note that the test will be activated by us <b>immediately</b> before your <b>placement test date</b>.';
 $this->phrasen['testtool/start']='Reihungstest jetzt starten';
@@ -62,8 +66,8 @@ $this->phrasen['testtool/einfuehrungsText']='
 					<h1 style="white-space: normal">Herzlich Willkommen zum Reihungstest</h1>
 					<a href="'.APP_ROOT.'cms/dms.php?id=142964" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=142976" alt="Einfuehrungsvideo" style="border: 1px solid lightgray; border-radius: 10px; width:350px;"></a>
 					<br><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=207694" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
-					<a href="'.APP_ROOT.'cms/dms.php?id=143928" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Leitfaden zum Ablauf des Reihungstests</a>
+					<a href="'.APP_ROOT.'cms/dms.php?id=330348" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Bachelor</b>-Leitfaden zum Ablauf des Reihungstests</a><br>
+					<a href="'.APP_ROOT.'cms/dms.php?id=275533" target="_blank"><img src="'.APP_ROOT.'cms/dms.php?id=46&version=1">&nbsp;<b>Master</b>-Leitfaden zum Ablauf des Reihungstests</a>
 					<br><br>
 					Unter dem folgenden Link können Sie die korrekte Darstellung des Reihungstests testen:<br><br>
 					<a href="../public/testtool_test/testseite.php" target="_blank" class="btn btn-default">Zum Darstellungstest</a>
