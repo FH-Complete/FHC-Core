@@ -30,12 +30,15 @@ export default {
 	  // if the kontakt is already a zustellungskontakt when the user is editing the kontakt, then no warning is shown and the zustellung will be overwritten
 	  if (JSON.parse(this.originalValue).zustellung) {
 	    return false;
-	  } 
+	  }
+	  const kontakteOfSelectedType = this.zustellKontakteCount.filter((element) => {
+		  return element.kontakttyp === this.data?.kontakttyp
+	  });
       // if zustellKontakteCount is not 0 and the own kontakt has the flag zustellung set to true
-      if (!this.zustellKontakteCount.includes(this.data.kontakt_id)) {
-        return this.data.zustellung && this.zustellKontakteCount.length;
+      if (!this.zustellKontakteCount.some((element) => element.kontakt_id === this.data.kontakt_id)) {
+        return this.data.zustellung && kontakteOfSelectedType.length;
       }
-      return this.zustellKontakteCount.length >= 2 && this.data.zustellung;
+      return this.kontakteOfSelectedType.length >= 2 && this.data.zustellung;
     },
     isChanged: function () {
       //? returns true if the original passed data object was changed
@@ -56,16 +59,6 @@ export default {
     `
 
     <div class="gy-3 row align-items-center justify-content-center">
-
-    <!-- warning message for too many zustellungs Kontakte -->
-    <div v-if="showZustellKontakteWarning" class="col-12 ">
-    <div class="card bg-danger mx-2">
-    <div class="card-body text-white ">
-    <span>{{$p.t('profilUpdate','zustell_kontakte_warning')}}</span>
-    </div>
-    </div>
-    </div>
-    <!-- End of warning -->
 
     <div v-if="!data.kontakt_id" class="col-12">
 
@@ -107,6 +100,14 @@ export default {
     </div>
 
     </div>
+
+    <!-- warning message for too many zustellungs Kontakte -->
+    <div v-if="showZustellKontakteWarning" class="col-12 ">
+    <div class="alert alert-warning mx-2">
+      <span>{{$p.t('profilUpdate','zustell_kontakte_warning')}}</span>
+    </div>
+    </div>
+    <!-- End of warning -->
 
     <div  class="d-flex flex-row justify-content-start col-12  allign-middle">
         <span style="opacity: 0.65; font-size: .85rem; " class="px-2">{{$p.t('profilUpdate','zustellungsKontakt')}}</span>

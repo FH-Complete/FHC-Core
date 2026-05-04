@@ -87,6 +87,8 @@ const app = Vue.createApp({
 	}
 });
 
+FhcApps.makeExtendable(app);
+
 setScrollbarWidth();
 
 app.use(PluginsPhrasen);

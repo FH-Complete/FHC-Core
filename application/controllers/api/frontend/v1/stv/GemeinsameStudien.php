@@ -83,7 +83,7 @@ class GemeinsameStudien extends FHCAPI_Controller
 	{
 		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 
-		$this->StudiensemesterModel->addOrder('studienjahr_kurzbz', 'DESC');
+		$this->StudiensemesterModel->addOrder('start', 'DESC');
 		$result = $this->StudiensemesterModel->load();
 		$data = $this->getDataOrTerminateWithError($result);
 		$this->terminateWithSuccess($data);

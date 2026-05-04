@@ -10,21 +10,34 @@ export default {
 			type: String,
 		}
 	},
-	inject: [
-		'studiengang_kz', // inject info that should not be displayed
-	],
+	inject: {
+		// inject info that should not be displayed
+		'studiengang_kz': {
+			from: 'studiengang_kz',
+			default: false
+		},
+	},
 	computed: {
 		getLinkGruppeListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.gruppe?.value && this.data.verband?.value && this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value
 				+ '&verband=' + this.data.verband.value + '&grp=' + this.data.gruppe.value : ''
 		},
 		getLinkVerbandListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.verband?.value && this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value
 				+ '&verband=' + this.data.verband.value : ''
 		},
 		getLinkSemesterListe() {
+			if(this.studiengang_kz === false) {
+				return '';
+			}
 			return this.data.semester?.value ? FHC_JS_DATA_STORAGE_OBJECT.app_root 
 				+ 'cis/private/stud_in_grp.php?kz='+this.studiengang_kz+'&sem=' + this.data.semester.value : ''
 		}

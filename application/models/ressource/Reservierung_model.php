@@ -76,7 +76,7 @@ class Reservierung_model extends DB_Model
 	 *
 	 * @return stdClass
 	 */
-	public function getReservierungenMitarbeiter($start_date, $end_date, $ort_kurzbz = null)
+	public function getReservierungenMitarbeiter($start_date, $end_date)
 	{
 
 		$raum_reservierungen_query = "SELECT res.*, beginn, ende,
@@ -89,7 +89,6 @@ class Reservierung_model extends DB_Model
 			JOIN lehre.tbl_stunde ON lehre.tbl_stunde.stunde = res.stunde
 			WHERE res.uid = ? AND datum >= ? AND datum <= ?";
 
-//		$subquery = is_null($ort_kurzbz)? $lvplan_reservierungen_query:$raum_reservierungen_query;
 		$subquery = $raum_reservierungen_query;
 
 		
