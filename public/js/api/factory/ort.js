@@ -21,12 +21,12 @@ export default {
             method: 'get',
             url: 'api/frontend/v1/Ort/getAllRooms',
             params: {
-                "filter[organizationalUnitShortCode]" : params.organizationalUnitShortCode,
-                "filter[locationId]" : params.locationId,
-                "filter[buildingComponent]" : params.buildingComponent,
-                "filter[isForTrainingProgram]" : params.isForTrainingProgram,
-                "filter[isReservationNeeded]" : params.isReservationNeeded,
-                "filter[isActive]" : params.isActive,
+                "filter[organizationalUnitShortCode]" : params?.organizationalUnitShortCode,
+                "filter[locationId]" : params?.locationId,
+                "filter[buildingComponent]" : params?.buildingComponent,
+                "filter[isForTrainingProgram]" : params?.isForTrainingProgram,
+                "filter[isReservationNeeded]" : params?.isReservationNeeded,
+                "filter[isActive]" : params?.isActive,
             }
         }
     },

@@ -46,6 +46,8 @@ export default {
       organizationalUnits: [],
       filteredOrganizationalUnits: [],
       locations: [],
+      rooms: [],
+      filteredRooms: [],
       editedRoom: null,
       roomFormData: {
         aktiv: true,
@@ -58,6 +60,14 @@ export default {
         return {
           label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
           value: unit.oe_kurzbz,
+        };
+      });
+    },
+    dropdownParsedRooms() {
+      return this.rooms.map((room) => {
+        return {
+          label: `${room.ort_kurzbz} - ${room.bezeichnung}`,
+          value: room.ort_kurzbz,
         };
       });
     },
@@ -82,6 +92,26 @@ export default {
           return unit.label.toLowerCase().includes(query);
         }),
       ));
+    },
+    filterRooms(event) {
+      let defaultItem = {
+        label: "----------",
+        value: null,
+      };
+
+      const query = event.query.toLowerCase();
+      if (!query) {
+        return (this.filteredRooms = [
+          defaultItem,
+          ...this.dropdownParsedRooms,
+        ]);
+      }
+
+      return (this.filteredRooms = [defaultItem]
+        .concat(this.dropdownParsedRooms)
+        .filter((room) => {
+          return room.label?.toLowerCase().includes(query);
+        }));
     },
     createRoom() {
       return this.$refs.roomForm
@@ -108,19 +138,30 @@ export default {
         return;
       }
 
-
       this.isEditInProgress = true;
 
+      let orgUnitData = null;
       let orgUnit = this.organizationalUnits.find(
         (unit) => unit.oe_kurzbz === this.editedRoom.oe_kurzbz,
       );
+      if (orgUnit) {
+        orgUnitData = {
+          label: `${orgUnit.bezeichnung} (${orgUnit.organisationseinheittyp_kurzbz})`,
+          value: orgUnit.oe_kurzbz,
+        };
+      }
 
-      let orgUnitData = {
-        label: `${orgUnit.bezeichnung} (${orgUnit.organisationseinheittyp_kurzbz})`,
-        value: orgUnit.oe_kurzbz,
+
+      let parentRoom = this.rooms.find(
+        (room) => room.ort_kurzbz === this.editedRoom.parent_ort_kurzbz,
+      );
+      let parentRoomData = {
+        label: parentRoom?.bezeichnung || "",
+        value: parentRoom?.ort_kurzbz || null,
       };
 
       this.roomFormData = {
+        parentRoom: parentRoomData,
         locationId: this.editedRoom.standort_id,
         organizationalUnit: orgUnitData,
         contentId: this.editedRoom.content_id,
@@ -161,6 +202,7 @@ export default {
     },
     getApiCallParsedRoomFormData() {
       return {
+        parent_ort_kurzbz: this.roomFormData.parentRoom?.value,
         standort_id: this.roomFormData.locationId,
         oe_kurzbz: this.roomFormData.organizationalUnit?.value,
         content_id: this.roomFormData.contentId,
@@ -188,6 +230,7 @@ export default {
       this.resetRoomForm();
     },
     resetRoomForm() {
+      this.$refs.roomForm.clearValidation();
       this.isEditInProgress = false;
       this.editedRoom = null;
       this.roomFormData = {
@@ -221,6 +264,18 @@ export default {
         getAllOrganizationalUnitsResponse.meta.message,
       );
     }
+
+    let getRoomsResponse = await this.$api.call(
+      ApiRoom.getAllRooms(),
+    );
+    if (getRoomsResponse.meta.status === "success") {
+      this.rooms = getRoomsResponse.data;
+    } else {
+      console.error(
+        "Error fetching rooms:",
+        getRoomsResponse.meta.message,
+      );
+    }
   },
   template: /* html */ `
   <bs-modal ref="roomFormModal" size="sm" @hideBsModal="() => { $emit('hideBsModal'); resetRoomForm(); }" class="modal-lg">
@@ -230,6 +285,21 @@ export default {
 			</template>
       <template #default>
         <core-form ref="roomForm" class="row g-3 pb-3">
+          <div class="row mb-3">
+            <form-input
+              v-model="roomFormData.parentRoom"
+              :label="$capitalize($p.t('ui/parentRoom'))"
+              :suggestions="filteredRooms"
+              :optionValue="(option) => option.value"
+              :optionLabel="(option) => option.label" 
+              @complete="filterRooms"
+              dropdown
+              forceSelection
+              type="autocomplete"
+              name="parentRoomShortCode"  
+              >
+            </form-input>
+          </div>
           <div class="row mb-3">
             <div class="col">
               <form-input
@@ -249,7 +319,7 @@ export default {
             <div class="col">
               <form-input
                 v-model="roomFormData.locationId"
-                :label="$capitalize($p.t('global', 'raum'))"
+                :label="$capitalize($p.t('global/ortLocation'))"
                 type="select"
                 id="location"
                 name="location"
@@ -298,7 +368,7 @@ export default {
               v-model="roomFormData.kurzbezeichnung"
               :label="$capitalize($p.t('gruppenmanagement', 'kurzbezeichnung'))"
               type="text"
-              name="kurzbezeichnung"  
+              name="ort_kurzbz"  
               >
             </form-input>
           </div>

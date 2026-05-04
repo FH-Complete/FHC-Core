@@ -52,6 +52,7 @@ class Ort extends FHCAPI_Controller
 		$this->loadPhrases([
 			'global',
 			'ui',
+			'lehre'
 		]);
 	}
 
@@ -64,30 +65,49 @@ class Ort extends FHCAPI_Controller
 		
 		$filterData = [];
 
+
+		$query = "SELECT public.tbl_ort.*, pr.ort_kurzbz as pr_ort_kurzbz, org.bezeichnung as org_bezeichnung
+			FROM public.tbl_ort 
+			LEFT JOIN public.tbl_ort as pr ON pr.ort_kurzbz = public.tbl_ort.parent_ort_kurzbz
+			LEFT JOIN public.tbl_organisationseinheit as org ON org.oe_kurzbz = public.tbl_ort.oe_kurzbz";
+
+		$whereItems = [];
+
 		if (isset($filter['locationId']) && $filter['locationId'] !== '') {
-			$filterData['standort_id'] = $filter['locationId'];
+			$whereItems[] = 'public.tbl_ort.standort_id = ?';
+			$filterData[] = $filter['locationId'];
 		}
 		if (isset($filter['organizationalUnitShortCode']) && $filter['organizationalUnitShortCode'] !== '') {
-			$filterData['oe_kurzbz'] = $filter['organizationalUnitShortCode'];
+			$whereItems[] = 'public.tbl_ort.oe_kurzbz = ?';
+			$filterData[] = $filter['organizationalUnitShortCode'];
 		}
 		if (isset($filter['buildingComponent']) && $filter['buildingComponent'] !== '') {
-			$filterData['gebteil'] = $filter['buildingComponent'];
+			$whereItems[] = 'public.tbl_ort.gebteil = ?';
+			$filterData[] = $filter['buildingComponent'];
 		}
 		if (isset($filter['isForTrainingProgram']) && $filter['isForTrainingProgram'] === 'true') {
-			$filterData['lehre'] = $filter['isForTrainingProgram'] === 'true' ? true : false;
+			$whereItems[] = 'public.tbl_ort.lehre = ?';
+			$filterData[] = $filter['isForTrainingProgram'] === 'true' ? true : false;
 		}
 		if (isset($filter['isReservationNeeded']) && $filter['isReservationNeeded'] === 'true') {
-			$filterData['reservieren'] = $filter['isReservationNeeded'] === 'true' ? true : false;
+			$whereItems[] = 'public.tbl_ort.reservieren = ?';
+			$filterData[] = $filter['isReservationNeeded'] === 'true' ? true : false;
 		}
 		if (isset($filter['isActive']) && $filter['isActive'] === 'true') {
-			$filterData['aktiv'] = $filter['isActive'] === 'true' ? true : false;
+			$whereItems[] = 'public.tbl_ort.aktiv = ?';
+			$filterData[] = $filter['isActive'] === 'true' ? true : false;
+		}
+		
+		if (count($whereItems) > 0) {
+			$query .= ' WHERE ' . implode(' AND ', $whereItems);
 		}
 
-		$this->OrtModel->addOrder("ort_kurzbz", "ASC");
+		$query .= ' ORDER BY public.tbl_ort.ort_kurzbz ASC';
 
-		$result = $this->OrtModel->loadWhere($filterData);
-		
-		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
+		$result = $this->OrtModel->execReadOnlyQuery($query, $filterData);
+ 
+ 
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	/**
@@ -144,8 +164,7 @@ class Ort extends FHCAPI_Controller
 			)
 		";
 		$params = array_merge($params, [$datum, $vonStunde, $bisStunde, $datum, $vonStunde, $bisStunde]);
-//		$this->addMeta('qry', $qry);
-//		$this->addMeta('params', $params);
+
 		$result = $this->OrtModel->execReadOnlyQuery($qry, $params);
 		
 		$this->terminateWithSuccess($result);
@@ -234,65 +253,81 @@ class Ort extends FHCAPI_Controller
 
 	public function createRoom()
 	{
-		$this->form_validation->set_rules('ort_kurzbz', 'ort_kurzbz', 'required', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'shortCode')])
+		$this->form_validation->set_rules('ort_kurzbz', 'kurzbezeichnung', 'required|is_unique[tbl_ort.ort_kurzbz]', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'kurzbz')])
 		]);
-
+		$this->form_validation->set_rules('content_id', 'content_id', 'number', [
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'content_id')])
+		]);
 		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 		
+		$parent_ort_kurzbz = $this->input->post('parent_ort_kurzbz');
+		if ($parent_ort_kurzbz) {
+			$this->load->model('ressource/Ort_model', 'ParentRoomModel');
+			$parentRoom = $this->ParentRoomModel->load($parent_ort_kurzbz);
+			if (isError($parentRoom) || !hasData($parentRoom)) {
+				$this->terminateWithError("Parent room with shortcode $parent_ort_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$oe_kurzbz = $this->input->post('oe_kurzbz');
+		if ($oe_kurzbz) {
+			$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+			$orgUnit = $this->OrganisationseinheitModel->load($oe_kurzbz);
+			if (isError($orgUnit) || !hasData($orgUnit)) {
+				$this->terminateWithError("Organizational unit with shortcode $oe_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$standort_id = $this->input->post('standort_id');
+		if ($standort_id) {
+			$this->load->model('organisation/Standort_model', 'StandortModel');
+			$location = $this->StandortModel->load($standort_id);
+			if (isError($location) || !hasData($location)) {
+				$this->terminateWithError("Location with id $standort_id does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$content_id = $this->input->post('content_id');
+		if ($content_id) {
+			$this->load->model('content/Content_model', 'ContentModel');
+			$content = $this->ContentModel->load($content_id);
+			if (isError($content) || !hasData($content)) {
+				$this->terminateWithError("Content with id $content_id does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
 		$this->db->trans_start();
 
-		$result = $this->OrtModel->db->query("INSERT INTO public.tbl_ort 
-			(
-				oe_kurzbz,
-				content_id,
-				standort_id,
-				ort_kurzbz,
-				bezeichnung,
-				planbezeichnung,
-				aktiv,
-				lehre,
-				reservieren,
-				max_person,
-				stockwerk,
-				lageplan,
-				dislozierung,
-				kosten,
-				ausstattung,
-				telefonklappe,
-				m2,
-				gebteil,
-				arbeitsplaetze,
-				insertamum,
-				insertvon,
-				updateamum,
-				updatevon
-			) 
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-			$this->input->post('oe_kurzbz'),
-			$this->input->post('contentId'),
-			$this->input->post('standort_id'),
-			$this->input->post('ort_kurzbz'),
-			$this->input->post('bezeichnung'),
-			$this->input->post('planbezeichnung'),
-			$this->input->post('aktiv') ? true : false,
-			$this->input->post('lehre') ? true : false,
-			$this->input->post('reservieren') ? true : false,
-			$this->input->post('max_person'),
-			$this->input->post('stockwerk'),
-			$this->input->post('lageplan'),
-			$this->input->post('dislozierung'),
-			$this->input->post('kosten'),
-			$this->input->post('ausstattung'),
-			$this->input->post('telefonklappe'),
-			$this->input->post('m2'),
-			$this->input->post('gebteil'),
-			$this->input->post('arbeitsplatze'),
-			date('c'),
-			getAuthUid(),
-			date('c'),
-			getAuthUid()
-		]);
+		$data = [
+			"parent_ort_kurzbz" => $this->input->post('parent_ort_kurzbz'),
+			"oe_kurzbz" => $this->input->post('oe_kurzbz'),
+			"content_id" => !empty($this->input->post('content_id')) ? $this->input->post('content_id') : null,
+			"standort_id" => $this->input->post('standort_id'),
+			"ort_kurzbz" => $this->input->post('ort_kurzbz'),
+			"bezeichnung" => $this->input->post('bezeichnung'),
+			"planbezeichnung" => $this->input->post('planbezeichnung'),
+			"aktiv" => $this->input->post('aktiv') ? true : false,
+			"lehre" => $this->input->post('lehre') ? true : false,
+			"reservieren" => $this->input->post('reservieren') ? true : false,
+			"max_person" => $this->input->post('max_person'),
+			"stockwerk" => $this->input->post('stockwerk'),
+			"lageplan" => $this->input->post('lageplan'),
+			"dislozierung" => $this->input->post('dislozierung'),
+			"kosten" => $this->input->post('kosten'),
+			"ausstattung" => $this->input->post('ausstattung'),
+			"telefonklappe" => $this->input->post('telefonklappe'),
+			"m2" => $this->input->post('m2'),
+			"gebteil" => $this->input->post('gebteil'),
+			"arbeitsplaetze" => $this->input->post('arbeitsplatze'),
+			'insertamum' => date('c'),
+			'insertvon' => getAuthUid(),
+			'updateamum' => date('c'),
+			'updatevon' => getAuthUid()
+		];
+
+		$this->OrtModel->db->set($data);
+		$result = $this->OrtModel->db->insert($this->OrtModel->getDbTable());
 
 		$this->db->trans_complete();
 
@@ -306,52 +341,78 @@ class Ort extends FHCAPI_Controller
 			$this->terminateWithError("missing ort_kurzbz parameter", self::ERROR_TYPE_GENERAL);
 		}
 		
+		$parent_ort_kurzbz = $this->input->post('parent_ort_kurzbz');
+		if ($parent_ort_kurzbz) {
+			$this->load->model('ressource/Ort_model', 'ParentRoomModel');
+			$parentRoom = $this->ParentRoomModel->load($parent_ort_kurzbz);
+			if (isError($parentRoom) || !hasData($parentRoom)) {
+				$this->terminateWithError("Parent room with shortcode $parent_ort_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$oe_kurzbz = $this->input->post('oe_kurzbz');
+		if ($oe_kurzbz) {
+			$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
+			$orgUnit = $this->OrganisationseinheitModel->load($oe_kurzbz);
+			if (isError($orgUnit) || !hasData($orgUnit)) {
+				$this->terminateWithError("Organizational unit with shortcode $oe_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$standort_id = $this->input->post('standort_id');
+		if ($standort_id) {
+			$this->load->model('organisation/Standort_model', 'StandortModel');
+			$location = $this->StandortModel->load($standort_id);
+			if (isError($location) || !hasData($location)) {
+				$this->terminateWithError("Location with id $standort_id does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
+		$content_id = $this->input->post('content_id');
+		if ($content_id) {
+			$this->load->model('content/Content_model', 'ContentModel');
+			$content = $this->ContentModel->load($content_id);
+			if (isError($content) || !hasData($content)) {
+				$this->terminateWithError("Content with id $content_id does not exist", self::ERROR_TYPE_GENERAL);
+			}
+		}
+
 		$this->db->trans_start();
 
-		$result = $this->OrtModel->db->query("UPDATE public.tbl_ort SET
-				oe_kurzbz = ?,
-				content_id = ?,
-				standort_id = ?,
-				bezeichnung = ?,
-				planbezeichnung = ?,
-				aktiv = ?,
-				lehre = ?,
-				reservieren = ?,
-				max_person = ?,
-				stockwerk = ?,
-				lageplan = ?,
-				dislozierung = ?,
-				kosten = ?,
-				ausstattung = ?,
-				telefonklappe = ?,
-				m2 = ?,
-				gebteil = ?,
-				arbeitsplaetze = ?,
-				updateamum = ?,
-				updatevon = ?
-			WHERE ort_kurzbz = ?", [
-			$this->input->post('oe_kurzbz'),
-			$this->input->post('contentId'),
-			$this->input->post('standort_id'),
-			$this->input->post('bezeichnung'),
-			$this->input->post('planbezeichnung'),
-			$this->input->post('aktiv') ? true : false,
-			$this->input->post('lehre') ? true : false,
-			$this->input->post('reservieren') ? true : false,
-			$this->input->post('max_person'),
-			$this->input->post('stockwerk'),
-			$this->input->post('lageplan'),
-			$this->input->post('dislozierung'),
-			$this->input->post('kosten'),
-			$this->input->post('ausstattung'),
-			$this->input->post('telefonklappe'),
-			$this->input->post('m2'),
-			$this->input->post('gebteil'),
-			$this->input->post('arbeitsplatze'),
-			date('c'),
-			getAuthUid(),
-			$ort_kurzbz
-		]);
+		$fields = [
+			"parent_ort_kurzbz",
+			"oe_kurzbz",
+			"content_id",
+			"standort_id",
+			"bezeichnung",
+			"planbezeichnung",
+			"aktiv",
+			"lehre",
+			"reservieren",
+			"max_person",
+			"stockwerk",
+			"lageplan",
+			"dislozierung",
+			"kosten",
+			"ausstattung",
+			"telefonklappe",
+			"m2",
+			"gebteil",
+			"arbeitsplaetze"
+		];
+
+		foreach ($fields as $field) {
+			if (array_key_exists($field, $this->input->post())) {
+				$data[$field] = $this->input->post($field);
+			}
+		}
+
+		$data['updateamum'] = date('c');
+		$data['updatevon'] = getAuthUid();
+
+		$this->OrtModel->db->set($data);
+		$this->OrtModel->db->where('ort_kurzbz', $ort_kurzbz);
+		$result = $this->OrtModel->db->update($this->OrtModel->getDbTable());
 
 		$this->db->trans_complete();
 

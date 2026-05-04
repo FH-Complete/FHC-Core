@@ -6,8 +6,7 @@ import { CoreFilterCmpt } from "../filter/Filter.js";
 import CoreForm from "../Form/Form.js";
 import FormInput from "../Form/Input.js";
 import RoomFormModal from "./RoomFormModal.js";
-
-import ApiCms from "../../../js/api/factory/cms.js";
+import RoomTypeFormModal from "./RoomTypeFormModal.js";
 
 export default {
   name: "RoomManagerOverview",
@@ -16,18 +15,12 @@ export default {
     CoreForm,
     FormInput,
     RoomFormModal,
+    RoomTypeFormModal,
   },
   watch: {
     filterData: {
       handler(newValue) {
-        this.$refs.roomManagerOverviewTable.tabulator.setData("/", {
-          organizationalUnitShortCode: newValue.organizationalUnit?.value,
-          locationId: newValue.locationId,
-          buildingComponent: newValue.buildingComponent,
-          isForTrainingProgram: newValue.isForTrainingProgram,
-          isReservationNeeded: newValue.isReservationNeeded,
-          isActive: newValue.isActive,
-        });
+        this.reloadTableData();
       },
       deep: true,
     },
@@ -48,7 +41,9 @@ export default {
       filteredOrganizationalUnits: [],
       buildingComponents: ["A", "B", "C", "D", "E", "F"],
       isRoomFormModalVisible: false,
+      isRoomTypeFormModalVisible: false,
       editedRoomShortCode: null,
+      editedRoomForRoomTypeManagement: null,
     };
   },
   computed: {
@@ -70,54 +65,101 @@ export default {
         ajaxResponse: (url, params, response) => response.data,
         persistenceID: "core_class_schedule_validity_periods",
         selectableRows: true,
+        index: "ort_kurzbz",
         columns: [
           {
-            title: this.$capitalize(this.$p.t("gruppenmanagement", "kurzbezeichnung")),
+            title: this.$capitalize(
+              this.$p.t("gruppenmanagement", "kurzbezeichnung"),
+            ),
             field: "ort_kurzbz",
+            headerFilter: true,
+            width: 150,
           },
           {
-            title: this.$capitalize(this.$p.t("gruppenmanagement", "bezeichnung")),
-            field: "bezeichnun",
+            title: this.$capitalize(
+              this.$p.t("gruppenmanagement", "bezeichnung"),
+            ),
+            field: "bezeichnung",
+            headerFilter: true,
+            width: 200,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "planbezeichnung")),
             field: "planbezeichnung",
+            headerFilter: true,
+            width: 200,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "maxPersons")),
             field: "max_person",
+            headerFilter: true,
+            width: 100,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "arbeitsplaetze")),
             field: "arbeitsplaetze",
+            headerFilter: true,
+            width: 100,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "quadratmeter")),
             field: "m2",
+            headerFilter: true,
+            width: 100
           },
           {
             title: this.$capitalize(this.$p.t("lehre", "organisationseinheit")),
-            field: "oe_kurzbz",
+            field: "org_bezeichnung",
+            headerFilter: true,
+            width: 200,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "lehre")),
             field: "lehre",
+            headerFilter: true,
+            formatter: "tickCross",
+            hozAlign: "center",
+            formatterParams: {
+              tickElement: '<i class="fa fa-check text-success"></i>',
+              crossElement: '<i class="fa fa-xmark text-danger"></i>',
+            },
           },
           {
             title: this.$capitalize(this.$p.t("ui", "reservieren")),
             field: "reservieren",
+            headerFilter: true,
+            formatter: "tickCross",
+            hozAlign: "center",
+            formatterParams: {
+              tickElement: '<i class="fa fa-check text-success"></i>',
+              crossElement: '<i class="fa fa-xmark text-danger"></i>',
+            },
           },
           {
             title: this.$capitalize(this.$p.t("gruppenmanagement", "aktiv")),
             field: "aktiv",
+            headerFilter: true,
+            formatter: "tickCross",
+            hozAlign: "center",
+            formatterParams: {
+              tickElement: '<i class="fa fa-check text-success"></i>',
+              crossElement: '<i class="fa fa-xmark text-danger"></i>',
+            },
           },
           {
             title: this.$capitalize(this.$p.t("ui", "kosten")),
             field: "kosten",
+            headerFilter: true,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "stockwerk")),
             field: "stockwerk",
+            headerFilter: true,
+          },
+          {
+            title: this.$capitalize(this.$p.t("ui", "parentRoom")),
+            field: "pr_ort_kurzbz",
+            headerFilter: true,
           },
           {
             title: this.$capitalize(this.$p.t("global", "actions")),
@@ -133,14 +175,18 @@ export default {
               button = document.createElement("button");
               button.className = "btn btn-outline-secondary btn-action";
               button.innerHTML = '<i class="fa fa-edit"></i>';
-              button.title = this.$p.t(
-                "ui",
-                "btn_editRoom",
-              );
+              button.title = this.$p.t("ui", "btn_editRoom");
               button.addEventListener("click", (event) =>
-                this.editRoom(
-                  cell.getData().ort_kurzbz,
-                ),
+                this.editRoom(cell.getData().ort_kurzbz),
+              );
+              container.append(button);
+
+              button = document.createElement("button");
+              button.className = "btn btn-outline-secondary btn-action";
+              button.innerHTML = '<i class="fa fa-layer-group"></i>';
+              button.title = this.$p.t("ui", "btn_editRoomType");
+              button.addEventListener("click", (event) =>
+                this.editRoomType(cell.getData().ort_kurzbz),
               );
               container.append(button);
 
@@ -148,22 +194,14 @@ export default {
               button.className =
                 "btn btn-outline-secondary btn-action bg-danger";
               button.innerHTML = '<i class="fa fa-xmark text-white"></i>';
-              button.title = this.$p.t(
-                "ui",
-                "btn_deleteRoom",
-              );
+              button.title = this.$p.t("ui", "btn_deleteRoom");
               button.addEventListener("click", () => {
                 let isDeletionConfirmed = confirm(
-                  this.$p.t(
-                    "ui",
-                    "deleteRoomConfirmation",
-                  ),
+                  this.$p.t("ui", "deleteRoomConfirmation"),
                 );
                 if (!isDeletionConfirmed) return;
 
-                this.deleteRoom(
-                  cell.getData().ort_kurzbz
-                );
+                this.deleteRoom(cell.getData().ort_kurzbz);
               });
               container.append(button);
 
@@ -172,6 +210,7 @@ export default {
             frozen: true,
           },
         ],
+        layout: "fitColumns",
       };
       return options;
     },
@@ -180,6 +219,29 @@ export default {
         {
           event: "renderComplete",
           handler: async () => {},
+        },
+        {
+          event: "cellClick",
+          handler: async (e, cell) => {
+            let updateableFieldsByClick = ["lehre", "reservieren", "aktiv"];
+            for (let field of updateableFieldsByClick) {
+              if (cell.getField() === field) {
+                let updatedValue = !cell.getValue();
+                this.$refs.roomManagerOverviewTable.tabulator.updateData([
+                  {
+                    ort_kurzbz: cell.getData().ort_kurzbz,
+                    [field]: updatedValue,
+                  },
+                ]);
+                this.partialRoomUpdate(
+                  cell.getData().ort_kurzbz,
+                  field,
+                  updatedValue,
+                );
+                this.$refs.roomManagerOverviewTable.tabulator.replaceData("/");
+              }
+            }
+          },
         },
       ];
       return events;
@@ -208,11 +270,11 @@ export default {
         ]);
       }
 
-      return (this.filteredOrganizationalUnits = [defaultItem].concat(
-        this.dropdownParsedOrganizationalUnits.filter((unit) => {
+      return (this.filteredOrganizationalUnits = [defaultItem]
+        .concat(this.dropdownParsedOrganizationalUnits)
+        .filter((unit) => {
           return unit.label.toLowerCase().includes(query);
-        }),
-      ));
+        }));
     },
     showRoomFormModal() {
       this.isRoomFormModalVisible = true;
@@ -225,27 +287,57 @@ export default {
         .call(ApiRoom.deleteRoom(roomShortCode))
         .then((response) => {
           if (response.meta.status === "success") {
-            this.$refs.roomManagerOverviewTable.reloadTable();
-            alert(this.$p.t("ui", "roomDeletedSuccessfully"));
+            this.reloadTableData();
+            this.$fhcAlert.alertSuccess(
+              this.$p.t("ui", "roomDeletedSuccessfully"),
+            );
           } else {
             console.error("Error deleting room:", response.meta.message);
-            alert(this.$p.t("ui", "errorDeletingRoom"));
+            this.reloadTableData();
+            this.$fhcAlert.alertError(this.$p.t("ui", "errorDeletingRoom"));
           }
         })
         .catch((error) => {
           console.error("Error deleting room:", error);
-          alert(this.$p.t("ui", "errorDeletingRoom"));
+          this.$fhcAlert.alertError(this.$p.t("ui", "errorDeletingRoom"));
         });
-    }
+    },
+    showRoomTypeFormModal() {
+      this.isRoomTypeFormModalVisible = true;
+    },
+    editRoomType(roomShortCode) {
+      this.editedRoomForRoomTypeManagement = roomShortCode;
+    },
+    async reloadTableData() {
+      this.$refs.roomManagerOverviewTable.tabulator.replaceData("/", {
+        organizationalUnitShortCode: this.filterData.organizationalUnit?.value,
+        locationId: this.filterData.locationId,
+        buildingComponent: this.filterData.buildingComponent,
+        isForTrainingProgram: this.filterData.isForTrainingProgram,
+        isReservationNeeded: this.filterData.isReservationNeeded,
+        isActive: this.filterData.isActive,
+      });
+    },
+    handleRoomUpdated() {
+      this.editedRoomShortCode = null;
+      this.reloadTableData();
+    },
+    async partialRoomUpdate(roomShortCode, attribute, value) {
+      let response = await this.$api.call(
+        ApiRoom.updateRoom(roomShortCode, {
+          [attribute]: value,
+        }),
+      );
+      if (response.meta.status === "success") {
+        this.$fhcAlert.alertSuccess(this.$p.t("ui", "successUpdate"));
+        this.reloadTableData();
+      } else {
+        console.error("Error updating room:", response.meta.message);
+        this.$fhcAlert.alertError(this.$p.t("ui", "errorUpdatingRoom"));
+      }
+    },
   },
   async created() {
-    let getContent = await this.$api.call(ApiCms.content(7601));
-    if (getContent.meta.status === "success") {
-      console.log;
-    } else {
-      console.error("Error fetching locations:", getContent.meta.message);
-    }
-
     let getLocationsResponse = await this.$api.call(
       ApiLocation.getLocationsByCompanyType("Intern"),
     );
@@ -274,7 +366,14 @@ export default {
   },
   mounted() {
     this.$p
-      .loadCategory(["global", "lehre", "ui", "gruppenmanagement", "core", "person"])
+      .loadCategory([
+        "global",
+        "lehre",
+        "ui",
+        "gruppenmanagement",
+        "core",
+        "person",
+      ])
       .then(() => {
         this.phrasesLoaded = true;
       });
@@ -300,12 +399,12 @@ export default {
           <core-form class="d-flex flex-column flex-md-row align-items-md-end gap-3">
             <div>
               <form-input
-                v-model="filterData.organizationalUnit"
                 :label="$capitalize($p.t('lehre/organisationseinheit'))"
                 :suggestions="filteredOrganizationalUnits"
                 :optionValue="(option) => option.value"
                 :optionLabel="(option) => option.label" 
                 @complete="filterOrganizationalUnits"
+                @itemSelect="(option) => { filterData.organizationalUnit = option.value; }"
                 dropdown
                 forceSelection
                 type="autocomplete"
@@ -382,8 +481,13 @@ export default {
       :isVisible="isRoomFormModalVisible"
       :editedRoomShortCode="editedRoomShortCode"
       @hideBsModal="() => { isRoomFormModalVisible = false; editedRoomShortCode = null; }"
-      @roomCreated="() => { $refs.roomManagerOverviewTable.reloadTable(); editedRoomShortCode = null; }"
-      @roomUpdated="() => { $refs.roomManagerOverviewTable.reloadTable(); editedRoomShortCode = null; }"
+      @roomCreated="handleRoomUpdated"
+      @roomUpdated="handleRoomUpdated"
+    />
+    <room-type-form-modal
+      :isVisible="isRoomTypeFormModalVisible"
+      :editedRoomShortCode="editedRoomForRoomTypeManagement"
+      @hideBsModal="() => { isRoomTypeFormModalVisible = false; editedRoomForRoomTypeManagement = null; }"
     />
   </div>
   `,

@@ -1,6 +1,6 @@
 <?php
 $includesArray = array(
-	'title' => 'Raumverwaltung',
+	'title' => ucfirst($this->p->t('ui', 'roomManagerPageTitle')),
 	'vue3' => true,
 	'axios027' => true,
 	'bootstrap5' => true,

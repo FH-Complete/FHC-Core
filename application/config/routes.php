@@ -122,7 +122,7 @@ $route['api/frontend/v1/stv/[sS]tudents/([WS]S[0-9]{4})/person/(:num)'] = 'api/f
 // load routes from extensions, also look for environment-specific configs
 $subdirs = ['application/config/extensions', 'application/config/' . ENVIRONMENT . '/extensions'];
 
-$route['lehre/RoomManager/.*'] = 'lehre/RoomManager/index';
+$route['RoomManager/.*'] = 'RoomManager/index';
 
 foreach($subdirs as $subdir)
 {
