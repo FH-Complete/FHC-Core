@@ -1,7 +1,4 @@
 import LvPruefungen from "./Lv/Pruefungen.js";
-import LvInfo from "./Lv/Info.js";
-import Phrasen from "../../../../../mixins/Phrasen.js";
-import LvUebersicht from "../../LvUebersicht.js";
 
 import ApiLehre from '../../../../../api/factory/lehre.js';
 import ApiAddons from '../../../../../api/factory/addons.js';
@@ -9,15 +6,11 @@ import ApiAddons from '../../../../../api/factory/addons.js';
 // TODO(chris): L10n
 
 export default {
-	components:{
-		LvUebersicht,
-	},
-	mixins: [
-		Phrasen
-	],
-	inject: ['studien_semester'],
+	name: 'Lv',
+	inject: ['studien_semester', 'type'],
 	props: {
-		lehrveranstaltung_id: Number,
+		lehrveranstaltung_id: [Number, String],
+		semesterstunden: [Number, String],
 		bezeichnung: String,
 		bezeichnung_eng: String,
 		module: String,
@@ -35,13 +28,13 @@ export default {
 		ects: String,
 		incoming: Number,
 		positiv: Boolean,
-		note_index: String
+		note_index: String,
+		menu: [Array, String]
 	},
 	data: () => {
 		return {
 			pruefungenData: null,
 			info: null,
-			menu: null,
 			preselectedMenuItem: null,
 		}
 	},
@@ -65,12 +58,6 @@ export default {
 		emptyMenu(){
 			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
 		},
-		bodyStyle() {return {};
-			/*const bodyStyle = {};
-			if (this.farbe)
-				bodyStyle['background-color'] = '#' + this.farbe;
-			return bodyStyle;*/
-		},
 		grade() {
 			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
 			// no more showing of grade LV, if grade Zeugnis is not existing yet
@@ -84,7 +71,6 @@ export default {
 		},
 	},
 	methods: {
-		
 		fetchMenu(lehrveranstaltung_id = this.lehrveranstaltung_id, studien_semester = this.studien_semester) {
 			return this.$api
 				.call(ApiAddons.getLvMenu(lehrveranstaltung_id, studien_semester))
@@ -96,26 +82,16 @@ export default {
 					this.menu = [];
 				});
 		},
-
+		c4_target(menuItem) {
+			if (menuItem.c4_moodle_links?.length > 0) return null;
+			return menuItem.c4_target ?? null;
+		},
 		c4_link(menuItem) {
 			if (!menuItem) return null;
 			if (Array.isArray(menuItem.c4_moodle_links) && menuItem.c4_moodle_links.length) {
 				return '#';
-			}
-			else {
+			} else {
 				return menuItem.c4_link ?? null;
-			}
-		},
-		openLvOption(menuItem){
-			if (menuItem.id == "core_menu_mailanstudierende"){
-				window.location.href = menuItem.c4_link;
-			} else if (menuItem.id == "core_menu_digitale_anwesenheitslisten") {
-				window.location.href = menuItem.c4_link;
-			} else{
-				this.preselectedMenuItem = menuItem;
-				Vue.nextTick(() => {
-					this.$refs.lvUebersicht.show();
-				});
 			}
 		},
 		openPruefungen() {
@@ -126,75 +102,65 @@ export default {
 				pruefungenData: this.pruefungenData, 
 				bezeichnung: this.bezeichnung
 			});
-		},
-		openInfos() {
-			if (!this.info) {
-				this.info = true;
-				// TODO(chris): load all this params on ajax?
-				LvInfo.popup({
-					lehrveranstaltung_id: this.lehrveranstaltung_id, 
-					bezeichnung: this.bezeichnung,
-					bezeichnung_eng: this.bezeichnung_eng,
-					studiengang_kuerzel: this.studiengang_kuerzel,
-					semester: this.semester,
-					studien_semester: this.studien_semester,
-					orgform_kurzbz: this.orgform_kurzbz,
-					sprache: this.sprache,
-					ects: this.ects,
-					incoming: this.incoming
-				}).then(() => this.info = false).catch(() => this.info = false);
-			}
-		}
-	},
-	watch:{
-		studien_semester(newValue){
-			this.fetchMenu(this.lehrveranstaltung_id, newValue);
 		}
 	},
 	created() {
-		this.$api
-			.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))
-			.then(res => res.data)
-			.then(pruefungen => {
-				this.pruefungenData = pruefungen;
-			}); 
+		if(this.type == 'student') {
+			this.$api
+				.call(ApiLehre.getStudentPruefungen(this.lehrveranstaltung_id))
+				.then(res => res.data)
+				.then(pruefungen => {
+					this.pruefungenData = pruefungen;
+				});
+		}
 	},
-	mounted() {
-		this.fetchMenu(this.lehrveranstaltung_id, this.studien_semester);
-	},
-	template: /*html*/`<div class="mylv-semester-studiengang-lv card">
-		<lv-uebersicht ref="lvUebersicht" :preselectedMenu="preselectedMenuItem" :event="{
-			lehrveranstaltung_id: lehrveranstaltung_id,
-			studiensemester_kurzbz:studien_semester,
-			lehrfach_bez:studien_semester,
-			stg_kurzbzlang:studien_semester,
-		}"/>
-
+	template: /*html*/`
+	<div class="mylv-semester-studiengang-lv card">
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
 			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
 			<h6 class="mb-0">{{$p.user_language.value === 'English' ? bezeichnung_eng : bezeichnung}}</h6>
 		</div>
-		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
+		<div v-if="!emptyMenu" class="card-body ">
 			<template v-if="menu">
 				<ul class="list-group border-top-0 border-bottom-0 rounded-0">
-					<li :type="menuItem.c4_link ? 'button' : null" v-for="menuItem in menu" class="list-group-item border-0 " >
-						<div class="d-flex flex-row"  :data-bs-toggle="menuItem.c4_moodle_links?.length ? 'dropdown' : null">
+					<li :type="menuItem.c4_link ? 'button' : null" 
+						v-for="(menuItem, index) in menu" :key="index" class="list-group-item border-0 " >
+						<div class="d-flex flex-row">
 							<div class="mx-4">
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
-							<a
+							<a :id="menuItem.name"
 							class="fhc-body text-decoration-none text-truncate"
-							:id="'moodle_links_'+lehrveranstaltung_id"
-							:class="{ 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:class="{ 'unavailable':!menuItem.c4_link }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
 								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}
 							</a>
+							
+							<div v-if="(menuItem.c4_moodle_links?.length || menuItem.c4_linkList?.length) && menuItem.c4_link" class="dropdown">
+								<button 
+									class="btn btn-sm dropdown-toggle dropdown-toggle-split border-0" 
+									type="button" 
+									data-bs-toggle="dropdown" 
+									aria-expanded="false">
+									<span class="visually-hidden">Toggle Dropdown</span>
+								</button>
+					
+								<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu dropdown-menu p-0">
+									<li v-for="item in menuItem.c4_moodle_links" :key="item.url">
+									   <a class="dropdown-item border-bottom" :href="item.url" target="#">{{ item.lehrform }}</a>
+									</li>
+								</ul>
+								
+								<ul v-else class="dropdown-menu dropdown-menu p-0">
+									<li v-for="([text, link], i) in menuItem.c4_linkList" :key="i">
+									   <a class="dropdown-item border-bottom" :href="link" target="#">{{ text }}</a>
+									</li>
+								</ul>
 							</div>
-							<ul v-if="menuItem.c4_moodle_links?.length" class="dropdown-menu p-0" :aria-labelledby="'moodle_links_'+lehrveranstaltung_id">
-								<li v-for="item in menuItem.c4_moodle_links"><a class="dropdown-item border-bottom" :href="item.url">{{item.lehrform}}</a></li>
-							</ul>
+				
+					   </div>
 					</li>
 				</ul>
 			</template>
@@ -204,7 +170,7 @@ export default {
 				</div>
 			</template>
 		</div>
-		<div v-if="!emptyMenu" class="card-footer">
+		<div v-if="!emptyMenu && type == 'student'" class="card-footer">
 			<div class="row">
 				<!-- template for the LV if there are multiple pruefungen -->
 				<template v-if="LvHasPruefungenInformation">
@@ -220,6 +186,13 @@ export default {
 						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
 					</span>
 				</template>
+			</div>
+		</div>
+		<div v-else-if="!emptyMenu && type == 'employee'" class="card-footer">
+			<div class="row">
+				<div class="col-auto">
+					<span class="ps-1">{{ $p.t('lehre/semesterstunden') }}: {{ semesterstunden }}</span>
+				</div>
 			</div>
 		</div>
 	</div>`

@@ -5,7 +5,7 @@ import contrast from '../../directives/contrast.js';
 import {setScrollbarWidth} from "../../helpers/CssVarCalcHelpers.js";
 import LvPlan from "../../components/Cis/LvPlan/Lehrveranstaltung.js";
 import MyLvPlan from "../../components/Cis/LvPlan/MyLvPlan.js";
-import MylvStudent from "../../components/Cis/Mylv/Student.js";
+import Mylv from "../../components/Cis/Mylv/MyLv.js";
 import Profil from "../../components/Cis/Profil/Profil.js";
 import Raumsuche from "../../components/Cis/Raumsuche/Raumsuche.js";
 import CmsNews from "../../components/Cis/Cms/News.js";
@@ -24,6 +24,7 @@ import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
+import ApiAuthinfo from "../../api/factory/authinfo.js";
 
 const ciPath = FHC_JS_DATA_STORAGE_OBJECT.app_root.replace(/(https:|)(^|\/\/)(.*?\/)/g, '') + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
 const isMobile = window.matchMedia("(max-width: 767px)").matches;
@@ -165,8 +166,8 @@ const router = VueRouter.createRouter({
 		{
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
-			component: MylvStudent,
-			props: true
+			component: Mylv,
+			props: true,
 		},
 		{
 			path: `/Cis/MyLv/Info/:studien_semester/:lehrveranstaltung_id`,
@@ -266,6 +267,9 @@ const app = Vue.createApp({
 	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
+		uid: '',
+		isStudent: null,
+		isMitarbeiter: null
 	}),
 	components: {},
 	computed: {
@@ -279,6 +283,9 @@ const app = Vue.createApp({
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			isMobile: this.isMobile,
+			uid: Vue.computed(() => this.uid),
+			isStudent: Vue.computed(() => this.isStudent),
+			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
 		}	
 	},
 	methods: {
@@ -315,6 +322,15 @@ const app = Vue.createApp({
 
 			}
 		}
+	},
+	async created(){
+		await this.$api
+			.call(ApiAuthinfo.getAuthInfo())
+			.then(res => {
+				this.uid = res.data.uid;
+				this.isMitarbeiter = res.data.isMitarbeiter;
+				this.isStudent = res.data.isStudent;
+			});
 	},
 	mounted() {
 		document.addEventListener('click', this.handleClick);

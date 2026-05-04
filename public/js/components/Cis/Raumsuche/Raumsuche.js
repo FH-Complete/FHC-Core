@@ -68,8 +68,8 @@ export const Raumsuche =  {
 				handler: async () => {
 					this.tableBuiltResolve()
 				}
-			}
-			]};
+			}]
+		};
 	},
 	computed: {
 		isDarkMode(){

@@ -36,7 +36,8 @@ class LvMenu extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getLvMenu' => self::PERM_LOGGED
+			'getLvMenu' => self::PERM_LOGGED,
+			'getMultipleLvMenu' => self::PERM_LOGGED
 		]);
 
 		$this->load->model("ressource/Mitarbeiter_model");
@@ -61,24 +62,23 @@ class LvMenu extends FHCAPI_Controller
 
 	/**
 	 * alternative function to get multiple lvMenus with a single http request
+	 * not yet working as intended as the menu_lv.inc.php scripts called by the
+	 * lvMenuBuild event have logic coupled to require_once import which results in
+	 * a wrong logic after the first invocation -> faulty results for lvinfo, moodle
+	 * and several others
 	 */
-	public function getMultipleLvMenu($lvMenuOptionList){
+	public function getMultipleLvMenu(){
+		$lvMenuOptionList = $this->input->post('lvMenuOptionList', true);
 		$result =[];
 		foreach($lvMenuOptionList as $lvMenuOptions){
-			$lvMenu = $this->getLvMenu($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
-			if(isError($lvMenu)){
-				// TODO: some lvMenu threw an error, handle error here
-			}
+			$lvMenu = $this->getLvMenuInternal($lvMenuOptions['lvid'],$lvMenuOptions['studiensemester_kurzbz']);
+			
 			$result[$lvMenuOptions['lvid']]=$lvMenu;
 		}
 		$this->terminateWithSuccess($result);
 	}
-
-	/**
-	 * 
-	 */
-	public function getLvMenu($lvid, $studiensemester_kurzbz)
-	{
+	
+	private function getLvMenuInternal($lvid, $studiensemester_kurzbz) {
 
 		// return early if parameters are missing
 		if(!isset($lvid) || !isset($studiensemester_kurzbz))
@@ -89,14 +89,14 @@ class LvMenu extends FHCAPI_Controller
 
 		// get the user
 		if (!$user=getAuthUID())
-		    $this->terminateWithError($this->p->t('global', 'nichtAngemeldet'));
+			$this->terminateWithError($this->p->t('global', 'nichtAngemeldet'));
 
 		// check if is_lector
 		$is_lector = false;
 		$mares = $this->Mitarbeiter_model->isMitarbeiter($user);
 		if(hasData($mares))
 		{
-		    $is_lector = getData($mares);
+			$is_lector = getData($mares);
 		}
 
 		// definition of user_is_allowed_to_upload
@@ -105,7 +105,7 @@ class LvMenu extends FHCAPI_Controller
 
 		// load lehrveranstaltung
 		$lvres = $this->Lehrveranstaltung_model->load($lvid);
-		if(!hasData($lvres)) 
+		if(!hasData($lvres))
 		{
 			$this->terminateWithError('LV ' . $lvid . ' not found.');
 		}
@@ -124,7 +124,7 @@ class LvMenu extends FHCAPI_Controller
 		$stgres = $this->Studiengang_model->load(strval($studiengang_kz));
 		if(!hasData($stgres))
 		{
-		    $this->terminateWithError('Stg ' . $lv->studiengang_kz . ' not found.');
+			$this->terminateWithError('Stg ' . $lv->studiengang_kz . ' not found.');
 		}
 		$stg = (getData($stgres))[0];
 		$kurzbz = strtoupper($stg->typ . $stg->kurzbz);
@@ -139,7 +139,7 @@ class LvMenu extends FHCAPI_Controller
 			$angemeldet = false;
 
 			$lesres = $this->Lehreinheit_model->getLehreinheitenForStudentAndStudienSemester(
-			    $lvid, $user, $angezeigtes_stsem
+				$lvid, $user, $angezeigtes_stsem
 			);
 
 			if(hasData($lesres) && count(getData($lesres)) > 0)
@@ -148,7 +148,7 @@ class LvMenu extends FHCAPI_Controller
 
 		// lehrfach
 		$lehrfach_id='';
-		
+
 		if(defined('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN') && CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN)
 		{
 			// Wenn der eingeloggte User zu einer der Lehreinheiten zugeteilt ist
@@ -211,8 +211,8 @@ class LvMenu extends FHCAPI_Controller
 		foreach($fbs as $row)
 		{
 			$lehrfach_oe_kurzbz_arr[] = $row->oe_kurzbz;
-			if($this->PermissionLib->isBerechtigt('lehre', null, $row->oe_kurzbz) 
-			    || $this->PermissionLib->isBerechtigt('assistenz', null, $stg->oe_kurzbz))
+			if($this->PermissionLib->isBerechtigt('lehre', null, $row->oe_kurzbz)
+				|| $this->PermissionLib->isBerechtigt('assistenz', null, $stg->oe_kurzbz))
 			{
 				$user_is_allowed_to_upload=true;
 			}
@@ -224,21 +224,21 @@ class LvMenu extends FHCAPI_Controller
 		$menu = array();
 
 		$this->fhc_menu_lvinfo($menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr);
-		
+
 		$this->fhc_menu_feedback($menu, $angemeldet, $lvid);
-		
+
 		$this->fhc_menu_gesamtnote($menu, $angemeldet, $lvid, $lv, $is_lector, $angezeigtes_stsem);
-		
+
 		$this->fhc_menu_emailStudierende($menu, $user, $angemeldet, $lvid, $angezeigtes_stsem);
-		
+
 		$this->fhc_menu_abmeldung($menu, $user, $is_lector, $lvid, $angezeigtes_stsem);
-		
+
 		$this->fhc_menu_lehretools($menu, $lvid, $angezeigtes_stsem, $sprache);
-		
+
 		$this->fhc_menu_anrechnungStudent($menu, $lvid, $angezeigtes_stsem);
-		
+
 		$this->fhc_menu_anrechnungLector($menu, $angezeigtes_stsem);
-		
+
 
 		// Addons Menu Logic
 		// ##########################################################################################		
@@ -272,18 +272,18 @@ class LvMenu extends FHCAPI_Controller
 			'permissionLib' => &$this->PermissionLib,
 			'phrasesLib' => &$this->PhrasesLib
 		];
-		
-		Events::trigger('lvMenuBuild', 
-						// passing $menu per reference
-						function & () use (&$menu) {
-							return $menu;
-						},
-						$params
+
+		Events::trigger('lvMenuBuild',
+			// passing $menu per reference
+			function & () use (&$menu) {
+				return $menu;
+			},
+			$params
 		);
 
 		// Menu sortieren
 		// ##########################################################################################
-		
+
 		foreach ($menu as $key => $row){
 
 			// removes menu points that are not needed in the c4 lvUebersicht
@@ -291,7 +291,7 @@ class LvMenu extends FHCAPI_Controller
 				unset($menu[$key]);
 				continue;
 			}
-			
+
 			// fills pos array to sort the menu 
 			$pos[$key] = $row['position'];
 
@@ -299,11 +299,18 @@ class LvMenu extends FHCAPI_Controller
 
 		array_multisort($pos, SORT_ASC, SORT_NUMERIC, $menu);
 
-		// HTTP response
-		// ##########################################################################################
+
+		return $menu;
+	}
+	
+	/**
+	 * 
+	 */
+	public function getLvMenu($lvid, $studiensemester_kurzbz)
+	{
+		$menu = $this->getLvMenuInternal($lvid, $studiensemester_kurzbz);
 		
 		$this->terminateWithSuccess($menu);
-
 	}
 
 	private function fhc_menu_lvinfo(&$menu, $lvid, $studiengang_kz, $lektor_der_lv, $is_lector, $lehrfach_oe_kurzbz_arr){

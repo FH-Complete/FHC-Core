@@ -3,6 +3,7 @@ import LvUebersicht from "../Mylv/LvUebersicht.js";
 import ApiCisStudium from '../../../api/factory/cis/studium.js';
 
 export default {
+	name: 'Studium',
 	data(){
 		return {
 			studienSemester :[],
