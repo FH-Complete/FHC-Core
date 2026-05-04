@@ -28,7 +28,15 @@ export default {
 		getPromiseFunc: {
 			type: Function,
 			required: true
-		}
+		},
+		reservierbar: {
+			type: Boolean,
+			default: false
+		},
+		createContext: {
+			type: Object,
+			default: () => ({})
+		},
 	},
 	provide() {
 		return {
@@ -43,11 +51,26 @@ export default {
 	emits: [
 		"update:date",
 		"update:mode",
-		"update:range"
+		"update:range",
+		"create-event",
+		"delete-event",
+		'update:reservierbarMap'
 	],
 	data() {
 		return {
 			timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
+			isReservierbar: Vue.computed(() => {
+				if (!this.reservierbar)
+					return false;
+
+				if (!this.reservierbarMap)
+					return false;
+
+				if (typeof this.reservierbarMap === 'object')
+					return Object.keys(this.reservierbarMap).length > 0;
+
+				return false;
+			}),
 			modeOptions: {
 				day: {
 					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
@@ -125,11 +148,14 @@ export default {
 			);
 			this.compactibleEventTypes = compactibleEventTypesResponse.data;
 		},
+		closeModal() {
+			this.$refs.calendar.hideEventModal();
+		},
 	},
 	setup(props, context) {
 		const rangeInterval = Vue.ref(null);
 		
-		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
+		const { events, lv, reservierbarMap, reset  } = useEventLoader(rangeInterval, props.getPromiseFunc);
 
 		Vue.watch(lv, newValue => {
 			context.emit('update:lv', newValue);
@@ -137,10 +163,15 @@ export default {
 
 		const { renderers } = useRenderers();
 
+		Vue.watch(reservierbarMap, newVal => {
+			context.emit('update:reservierbarMap', newVal);
+		});
+
 		return {
 			rangeInterval,
 			events,
 			lv,
+			reservierbarMap,
 			reset,
 			renderers
 		};
@@ -162,6 +193,9 @@ export default {
 		:events="events || []"
 		:backgrounds="backgrounds"
 		:time-grid="teachingunits"
+		:reservierbar-map="reservierbarMap"
+		:isReservierbar="isReservierbar"
+		:create-context="createContext"
 		show-btns
 		@update:date="(newDate, newMode) => $emit('update:date', newDate, newMode)"
 		@update:mode="(newMode, newDate) => $emit('update:mode', newMode, newDate)"
@@ -184,6 +218,7 @@ export default {
 					v-if="mode == 'event'"
 					:is="renderers[event.type]?.modalContent"
 					:event="event"
+					@create-event="(event) => $emit('create-event', event)"
 				></component>
 				<component
 					v-else-if="mode == 'eventheader'"
@@ -194,6 +229,7 @@ export default {
 					v-else
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
+					@delete-event="(event) => $emit('delete-event', event)"
 				></component>
 			</div>
 		</template>
