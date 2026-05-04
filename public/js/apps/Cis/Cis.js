@@ -19,6 +19,7 @@ import DeadlineOverview from "../../components/Cis/Abgabetool/DeadlineOverview.j
 import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
+import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -75,6 +76,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/Raumsuche`,
 			name: 'Raumsuche',
 			component: Raumsuche,
+			props: true
+		},
+		{
+			path: `/Cis/ProjektabgabeUebersicht`,
+			name: 'PaabgabeUebersicht',
+			component: PaabgabeUebersicht,
 			props: true
 		},
 		// Redirect old links to new format
@@ -163,7 +170,7 @@ const router = VueRouter.createRouter({
 		// Redirect old links to new format
 		{
 			// only trigger on first param being numeric to avoid paths like "LvPlan/Month" entering here
-			path: "/Cis/LvPlan/:lv_id(\\d+)", 
+			path: "/Cis/LvPlan/:lv_id(\\d+)",
 			name: "LvPlanOld",
 			component: LvPlan,
 			redirect(to) {
@@ -278,7 +285,7 @@ const app = Vue.createApp({
 			if(target?.id == 'skiplink') return
 			if (target && this.isInternalRoute(target.href)) {
 				const url = new URL(target.href)
-				
+
 				const path = url.pathname
 				const base = this.$router.options.history.base
 				const route = path.replace(base, '') || '/'
@@ -286,19 +293,19 @@ const app = Vue.createApp({
 				// let click event propagate normally if we dont route internally
 				const res = this.$router.resolve(route)
 				if(!res?.matched?.length || res.name === 'Fallback') return
-				
+
 				event.preventDefault(); // Prevent browser navigation
-				
+
 				if(this.isMobile) { // toggle the menu
 					const navMain = document.getElementById('nav-main');
 					// fix unwanted toggle from off to on for some links on mobile
 					if(navMain.classList.contains('show')){
 						document.getElementById('nav-main-btn').click();
-					} 
+					}
 				}
-				
+
 				this.$router.push(route);
-				
+
 			}
 		}
 	},
