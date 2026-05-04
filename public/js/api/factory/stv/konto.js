@@ -38,6 +38,10 @@ export default {
 		};
 	},
 	insert(params) {
+		if(params.betrag)
+		{
+			params.betrag = params.betrag.replace(',', '.');
+		}
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/konto/insert',
@@ -52,6 +56,10 @@ export default {
 		};
 	},
 	edit(params) {
+		if(params.betrag)
+		{
+			params.betrag = params.betrag.replace(',', '.');
+		}
 		return {
 			method: 'post',
 			url: 'api/frontend/v1/stv/konto/update',
