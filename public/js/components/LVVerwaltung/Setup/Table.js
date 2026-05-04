@@ -69,6 +69,8 @@ export default {
 	},
 	data() {
 		return {
+			selectedRange: false,
+			lastClickedRowIndex: null,
 			expanded: [],
 			selectedColumnValues: [],
 			tagEndpoint: ApiTag,
@@ -96,8 +98,44 @@ export default {
 					handler: (data) => {
 						this.getExpandedRows()
 					}
-				}
+				},
+				{
+					event: 'rowClick',
+					handler: (e, row) => {
+						const tabulator = this.$refs.table.tabulator;
 
+						if (e.shiftKey && this.lastClickedRowIndex !== null)
+						{
+							this.selectedRange = true;
+							const allRows = tabulator.rowManager.getDisplayRows().filter(r => r.type === 'row').map(r => r.getComponent());
+							const anchorIdx = allRows.findIndex(r => r.getData().uniqueindex === this.lastClickedRowIndex);
+							const currentIdx = allRows.findIndex(r => r.getData().uniqueindex === row.getData().uniqueindex);
+
+							if (anchorIdx === -1 || currentIdx === -1)
+								return;
+
+							const from = Math.min(anchorIdx, currentIdx);
+							const to = Math.max(anchorIdx, currentIdx);
+
+							tabulator.deselectRow();
+							allRows.slice(from, to + 1).forEach(r => r.select());
+							this.$nextTick(() => {
+								this.selectedRange = false;
+							});
+
+						}
+						else if (e.ctrlKey || e.metaKey)
+						{
+							this.lastClickedRowIndex = row.getData().uniqueindex;
+						}
+						else
+						{
+							tabulator.deselectRow();
+							row.select();
+							this.lastClickedRowIndex = row.getData().uniqueindex;
+						}
+					}
+				},
 			],
 			formData: {},
 			lv_info: false,
@@ -140,8 +178,7 @@ export default {
 					headerFilterFunc: extendedHeaderFilter,
 				},
 				layout: 'fitDataStretch',
-				persistenceID: 'lehrveranstaltungen_2025_07_31_v1',
-				selectableRowsRangeMode: 'click',
+				persistenceID: 'lehrveranstaltungen_2026_05_04_v1',
 				selectableRows: true,
 				rowContextMenu: (component, e) => {
 
@@ -298,10 +335,13 @@ export default {
 				this.$refs.table.reloadTable();
 			}
 		},
-		rowSelectionChanged(data) {
+		rowSelectionChanged(data)
+		{
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().lehreinheit_id !== undefined && row.getData().lehreinheit_id).map(row => row.getData().lehreinheit_id);
 
+			if (this.selectedRange)
+				return;
 			if (data[0]?.lehreinheit_id !== undefined && this.selectedColumnValues.length === 1)
 			{
 				this.$emit('update:selected', [data[0]]);

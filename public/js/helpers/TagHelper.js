@@ -3,10 +3,12 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 	if (!addedTag || !Array.isArray(addedTag.response))
 		return;
 
+	const { response, ...baseTag } = addedTag;
 	rows.forEach(row =>
 	{
 		const rowData = row.getData();
-		let updated = false;
+		let updates = {};
+		let changed = false;
 
 		addedTag.response.forEach(tag =>
 		{
@@ -26,16 +28,17 @@ export function addTagInTable(addedTag, rows, matchKey, tagsKey = "tags")
 			if (tags.some(t => t?.id === tag.id))
 				return;
 
-			let newTag = { ...addedTag, id: tag.id };
+			tags.unshift({...baseTag, ...tag});
 
-			tags.unshift(newTag);
-
-			rowData[tagsKey] = JSON.stringify(tags);
-			updated = true;
+			updates[tagsKey] = JSON.stringify(tags);
+			changed = true;
 		});
 
-		if (updated)
-			row.update(rowData);
+		if (changed)
+		{
+			row.update(updates);
+			row.reformat();
+		}
 	});
 }
 
@@ -86,39 +89,37 @@ export function updateTagInTable(updatedTag, rows, fields = ['tags'])
 	rows.forEach(row =>
 	{
 		const rowData = row.getData();
-		let updated = false;
+		const updates = {};
+		let changed = false;
 
 		fields.forEach(field =>
 		{
-			if (!rowData[field])
-				return;
+			let tags;
 
-			let fieldData;
 			try {
-				fieldData = JSON.parse(rowData[field] || "[]");
+				tags = JSON.parse(rowData[field] || "[]");
 			} catch (e) {
 				return;
 			}
 
-			if (!Array.isArray(fieldData))
+			if (!Array.isArray(tags))
 				return;
 
-			let index = fieldData.findIndex(tag => tag?.id === updatedTag.id);
+			const index = tags.findIndex(tag => String(tag?.id) === String(updatedTag.id));
 
-			if (index !== -1)
-			{
-				fieldData[index] = { ...updatedTag };
-				let updatedFieldData = JSON.stringify(fieldData);
+			if (index === -1)
+				return;
 
-				if (updatedFieldData !== rowData[field])
-				{
-					rowData[field] = updatedFieldData;
-					updated = true;
-				}
-			}
+			tags[index] = {...tags[index], ...updatedTag};
+
+			updates[field] = JSON.stringify(tags);
+			changed = true;
 		});
 
-		if (updated)
-			row.update(rowData);
+		if (changed)
+		{
+			row.update(updates);
+			row.reformat();
+		}
 	});
 }
