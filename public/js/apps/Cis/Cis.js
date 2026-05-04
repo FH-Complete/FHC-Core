@@ -21,6 +21,7 @@ import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
 import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
+import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -259,6 +260,12 @@ const router = VueRouter.createRouter({
 					},
 				};
 			},
+		},
+		{
+			path: `/Cis/Zeitsperren`,
+			name: 'Zeitsperren',
+			component: Zeitsperren,
+			props: true
 		},
 	]
 })
