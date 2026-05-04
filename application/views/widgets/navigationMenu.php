@@ -1,4 +1,4 @@
-<div class="navbar-default sidebar" role="navigation">
+<div class="navbar-default sidebar top-0" role="navigation">
 	<div class="sidebar-nav navbar-collapse">
 		<ul class="nav" id="side-menu"></ul>
 	</div>
