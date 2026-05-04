@@ -14,7 +14,7 @@ class Lvgesamtnote_model extends DB_Model
 	}
 
 	/**
-	 * Laedt die Noten
+	 * Laedt die Noten - lvgesamtnote (Vorschlag) JOIN tbl.note (zeugnisnote)
 	 *
 	 * @param integer				$lehrveranstaltung_id
 	 * @param string				$student_uid
@@ -45,5 +45,20 @@ class Lvgesamtnote_model extends DB_Model
 			$where[$this->dbTable . ".student_uid"] = $student_uid;
 
 		return $this->loadWhere($where);
+	}
+
+	public function getLvGesamtNoteVorschlag($lehrveranstaltung_id, $student_uid, $studiensemester_kurzbz)
+	{
+		$qry = "SELECT * FROM campus.tbl_lvgesamtnote
+				WHERE campus.tbl_lvgesamtnote.student_uid = ? 
+				  AND campus.tbl_lvgesamtnote.studiensemester_kurzbz = ?";
+		$params = [$student_uid, $studiensemester_kurzbz];
+		
+		if ($lehrveranstaltung_id) {
+			$qry .= "AND campus.tbl_lvgesamtnote.lehrveranstaltung_id = ?";
+			$params[] = $lehrveranstaltung_id;
+		}
+
+		return $this->execReadOnlyQuery($qry, $params);
 	}
 }

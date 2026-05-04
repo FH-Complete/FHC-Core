@@ -41,5 +41,19 @@ export default {
 			method: 'get',
 			url: `/api/frontend/v1/Lehre/semesterAverageGrade/${semester}`
 		}
+	},
+	getZugewieseneLv(uid, sem_kurzbz){
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Lehre/getZugewieseneLv',
+			params: { uid, sem_kurzbz}
+		};
+	},
+	getLeForLv(lv_id, sem_kurzbz) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/Lehre/getLeForLv',
+			params: { lv_id, sem_kurzbz }
+		};
 	}
 };

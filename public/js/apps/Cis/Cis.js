@@ -20,6 +20,7 @@ import Studium from "../../components/Cis/Studium/Studium.js";
 import StgOrgLvPlan from "../../components/Cis/LvPlan/StgOrg.js";
 import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
+import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -82,6 +83,12 @@ const router = VueRouter.createRouter({
 			path: `/Cis/ProjektabgabeUebersicht`,
 			name: 'PaabgabeUebersicht',
 			component: PaabgabeUebersicht,
+			props: true
+		},
+		{
+			path: `/Cis/Benotungstool/:lv_id/:sem_kurzbz`,
+			name: 'Benotungstool',
+			component: Benotungstool,
 			props: true
 		},
 		// Redirect old links to new format
@@ -159,7 +166,7 @@ const router = VueRouter.createRouter({
 			path: `/Cis/MyLv/:studiensemester?`,
 			name: 'MyLv',
 			component: MylvStudent,
-			props: true,
+			props: true
 		},
 		{
 			path: `/Cis/MyLv/Info/:studien_semester/:lehrveranstaltung_id`,

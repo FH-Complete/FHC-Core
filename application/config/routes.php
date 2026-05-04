@@ -67,6 +67,7 @@ $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
 $route['Cis/OtherLvPlan/.*'] = 'Cis/OtherLvPlan/index/$1';
 //Route for LV Plan Stg/Semester/Verband/Gruppe
 $route['Cis/StgOrgLvPlan/.*'] = 'Cis/StgOrgLvPlan/index/$1';
+$route['Cis/Benotungstool/.*'] = 'Cis/Benotungstool/index/$1';
 
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';

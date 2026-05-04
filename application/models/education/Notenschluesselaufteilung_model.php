@@ -26,6 +26,9 @@ class Notenschluesselaufteilung_model extends DB_Model
 		$this->load->model('education/Notenschluesselzuordnung_model', 'NotenschluesselzuordnungModel');
 		$notenschluessel_kurzbz = $this->NotenschluesselzuordnungModel->getKurzbzForLv($lehrveranstaltung_id, $studiensemester_kurzbz);
 
+		if($notenschluessel_kurzbz == null)
+			return success(null);
+		
 		$this->addSelect("note");
 		$this->addOrder("punkte", "DESC");
 		$this->addLimit(1);

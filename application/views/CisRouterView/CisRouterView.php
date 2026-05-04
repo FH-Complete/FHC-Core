@@ -11,6 +11,7 @@ $includesArray = array(
 	'skipID' => '#fhccontent',
 	'vuedatepicker11' => true,
 	'customCSSs' => array(
+		'vendor/vuejs/vuedatepicker_css/main.css',
 		'public/css/components/verticalsplit.css',
 		'public/css/components/searchbar/searchbar.css',
 		'public/css/Fhc.css',
@@ -23,7 +24,8 @@ $includesArray = array(
 		'public/css/components/FormUnderline.css',
 		'public/css/components/abgabetool/abgabe.css',
 		'public/css/Cis4/Cms.css',
-		'public/css/Cis4/Studium.css'
+		'public/css/Cis4/Studium.css',
+		'public/css/Cis4/Benotungstool.css'
 	),
 	'customJSs' => array(
 		'vendor/npm-asset/primevue/accordion/accordion.min.js',
@@ -37,11 +39,15 @@ $includesArray = array(
 		'vendor/npm-asset/primevue/timeline/timeline.min.js',
 		'vendor/npm-asset/primevue/inplace/inplace.min.js',
 		'vendor/npm-asset/primevue/message/message.min.js',
+		'vendor/npm-asset/primevue/divider/divider.min.js',
+		'vendor/npm-asset/primevue/password/password.js',
+		'vendor/npm-asset/primevue/multiselect/multiselect.js',
 		'vendor/npm-asset/primevue/tieredmenu/tieredmenu.js',
 		'vendor/moment/luxonjs/luxon.min.js'
 	),
 	'customJSModules' => array(
 		'public/js/apps/Cis/Cis.js',
+		'vendor/olifolkerd/tabulator5/src/js/modules/ColumnCalcs/ColumnCalcs.js'
 	),
 
 );
