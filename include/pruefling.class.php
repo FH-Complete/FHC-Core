@@ -607,6 +607,7 @@ class pruefling extends basis_db
 				WHERE tbl_rt_person.person_id = " . $this->db_add_param($person_id) . "
 					AND tbl_rt_person.rt_id = " . $this->db_add_param($reihungstest_id) . "
 					AND tbl_prestudent.prestudent_id != " . $this->db_add_param($prestudent_id) . "
+					AND get_rolle_prestudent(tbl_prestudent.prestudent_id, NULL) = 'Bewerber'
 				LIMIT 1";
 
 		if($result = $this->db_query($qry))
