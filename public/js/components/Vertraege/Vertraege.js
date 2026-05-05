@@ -20,9 +20,6 @@ export default {
 		ContractStati
 	},
 	inject: {
-/*		cisRoot: {
-			from: 'cisRoot'
-		},*/
 		hasSchreibrechte: {
 			from: 'hasSchreibrechte',
 			default: false
@@ -54,9 +51,9 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Bezeichnung", field: "bezeichnung", width: 300},
+					{title: "Bezeichnung", field: "bezeichnung", width: 300, headerFilter: true},
 					{
-						title: "Betrag", field: "betrag", width: 100,
+						title: "Betrag", field: "betrag", width: 100, headerFilter: true,
 						formatter: function (cell) {
 							let value = cell.getValue();
 
@@ -66,12 +63,13 @@ export default {
 							return parseFloat(value).toFixed(2);
 						}
 					},
-					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125},
-					{title: "Status", field: "status", width: 100},
+					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title: "Status", field: "status", width: 100, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{
 						title: "Vertragsdatum",
 						field: "vertragsdatum",
 						width: 128,
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr);
@@ -82,11 +80,11 @@ export default {
 							});
 						}
 					},
-					{title: "VertragId", field: "vertrag_id", visible: false},
-					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
-					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false},
-					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "isAbgerechnet", field: "isabgerechnet", visible: false},
+					{title: "VertragId", field: "vertrag_id", visible: false, headerFilter: true},
+					{title: "Vertragsstunden", field: "vertragsstunden", visible: false, headerFilter: true},
+					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false, headerFilter: true},
+					{title: "Anmerkung", field: "anmerkung", visible: false, headerFilter: true},
+					{title: "isAbgerechnet", field: "isabgerechnet", visible: false, headerFilter: true},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150,
@@ -140,11 +138,13 @@ export default {
 					columns: true,
 					filter: false //to avoids js errors
 				},
-				persistenceID: 'core-contracts-2026021701',
+				persistenceID: 'core-contracts-2026050501',
 			};
 			return options;
 		},
 		tabulatorEvents() {
+			const vm = this;
+
 			const events = [
 				{
 					event: 'tableBuilt',
@@ -177,28 +177,11 @@ export default {
 						setHeader('actions', this.$p.t('global', 'aktionen'));
 					}
 				},
-/*				{
-					//is just enabled for ADDON Injection KU: MultiprintHonorarvertrag
-					//(maybe enable also for ADDON FH Burgenland: MultiAccept later)
-					event: 'rowClick',
-					handler: (e, row) => {
-						if (this.dataPrintHonorar != null && this.dataPrintHonorar.multiselect != null) {
-							const selectedContract = row.getData().vertrag_id;
-							const status = row.getData().status;
-							const bezeichnung =	row.getData().bezeichnung;
-
-							this.toggleRowClick(selectedContract, status, bezeichnung);
-						}
-					}
-				},*/
 				{
 					event: 'rowClick',
-					handler: (e, row) => {
-						if (!this.dataPrintHonorar?.multiselect) return;
-
+					handler: function (e, row) {
 						const { vertrag_id, status, bezeichnung, vertragstyp_bezeichnung } = row.getData();
-
-						this.toggleRowClick(e, vertrag_id, status, bezeichnung, vertragstyp_bezeichnung);
+						vm.toggleRowClick(e, vertrag_id, status, bezeichnung, vertragstyp_bezeichnung);
 					}
 				},
 				{
@@ -242,8 +225,6 @@ export default {
 		person_id() {
 			this.$refs.table.reloadTable();
 			this.arraySelectedContracts = [];
-/*			if(this.dataPrintHonorar?.multiselect)
-				this.dataPrintHonorar.multiselect = [];*/
 		},
 	},
 	methods: {
@@ -270,7 +251,6 @@ export default {
 				)
 				.then(result => {
 					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-					//window.scrollTo(0, 0);
 					this.reload();
 					this.contractSelected.vertrag_id = null;
 				})
@@ -518,19 +498,9 @@ export default {
 					'content/pdfExport.php?xml=' + this.dataPrintHonorar.xml + '&xsl=' + this.dataPrintHonorar.xsl + '&mitarbeiter_uid=' + this.mitarbeiter_uid + vertragString + '&output=pdf&uid=' + this.mitarbeiter_uid;
 			window.open(linkToPdf, '_blank');
 		},
-/*		toggleRowClick(contractId, status, bezeichnung) {
-			const index = this.arraySelectedContracts.findIndex(
-				([id]) => id === contractId
-			);
-			if (index !== -1) {
-				this.arraySelectedContracts.splice(index, 1);
-			} else {
-				this.arraySelectedContracts.push([contractId, status, bezeichnung]);
-			}
-		},*/
 		toggleRowClick(event, vertrag_id, status, bezeichnung, vertragstyp_bezeichnung) {
-			if (!this.dataPrintHonorar?.multiselect) return;
 
+			const isMulti = this.dataPrintHonorar?.multiselect === true;
 			const isCtrl = event.ctrlKey || event.metaKey;
 
 			const entry = {
@@ -540,28 +510,29 @@ export default {
 				vertragstyp_bezeichnung
 			};
 
-			// Single click
-			if (!isCtrl) {
+			// allow MultiSelect just in case event multiActionPrintHonorarvertrag
+			const allowMultiClick = isMulti && isCtrl;
+
+			if (!allowMultiClick) {
 				this.arraySelectedContracts = [entry];
+
+				//just mark last selected row as selected
+				this.$refs.table.tabulator.deselectRow();
+				this.$refs.table.tabulator.selectRow(vertrag_id);
 				return;
 			}
 
-			// CTRL / CMD → toggle
 			const index = this.arraySelectedContracts.findIndex(
 				e => e.vertrag_id === vertrag_id
 			);
 
 			if (index === -1) {
 				this.arraySelectedContracts.push(entry);
-				//this.arraySelectedContracts.push([entry.vertrag_id, entry.status, entry.bezeichnung, entry.vertragstyp_bezeichnung]);
 			} else {
 				this.arraySelectedContracts.splice(index, 1);
 			}
-		},
-/*		clearSelection(){
-			this.arraySelectedContracts = [];
-			this.$refs.table.tabulator.deselectRow();
-		}*/
+
+		}
 	},
 	created() {
 		Promise.all([
@@ -587,88 +558,6 @@ export default {
 		});
 		this.getFormattedDate();
 	},
-	/*
-	TODO(Manu) delete after check
-
-		<div class="row mb-3">
-			<form-input
-				type="DatePicker"
-				:label="$p.t('vertrag/datum_vertrag')"
-				name="vertragsdatum"
-				v-model="formData.vertragsdatum"
-				auto-apply
-				:enable-time-picker="false"
-				format="dd.MM.yyyy"
-				preview-format="dd.MM.yyyy"
-				:teleport="true"
-				>
-			</form-input>
-		</div>
-
-		<div class="row mb-3">
-			<form-input
-				type="text"
-				:label="$p.t('ui/bezeichnung')"
-				name="bezeichnung"
-				v-model="formData.bezeichnung"
-				>
-			</form-input>
-		</div>
-		<div class="row mb-3">
-			<form-input
-				type="select"
-				:label="$p.t('global/typ')"
-				v-model="formData.vertragstyp_kurzbz"
-				name="vertragstyp_kurzbz"
-				>
-				<option :value="null">-- {{$p.t('fehlermonitoring', 'keineAuswahl')}} --</option>
-				<option
-					v-for="entry in listContractTypes"
-					:key="entry.vertragstyp_kurzbz"
-					:value="entry.vertragstyp_kurzbz"
-					>
-					{{entry.bezeichnung}}
-				</option>
-			</form-input>
-		</div>
-		<div class="row mb-3">
-			<form-input
-				:label="$p.t('ui/betrag')"
-				name="betrag"
-				v-model="formData.betrag"
-				>
-			</form-input>
-		</div>
-		<div class="row mb-3" v-if="!statusNew">
-			<form-input
-				type="text"
-				:label="$p.t('ui/stunden') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-				name="vertragsstunden"
-				v-model="formData.vertragsstunden"
-				disabled
-				>
-			</form-input>
-		</div>
-		<div class="row mb-3" v-if="!statusNew">
-			<form-input
-				type="text"
-				:label="$p.t('lehre/studiensemester') + ' (' + $p.t('vertrag/vertrag_urfassung')+ ')'"
-				name="vertragsstunden_studiensemester_kurzbz"
-				v-model="formData.vertragsstunden_studiensemester_kurzbz"
-				disabled
-				>
-			</form-input>
-		</div>
-		<div class="row mb-3">
-			<form-input
-				type="textarea"
-				:label="$p.t('global/anmerkung')"
-				name="anmerkung"
-				v-model="formData.anmerkung"
-				>
-			</form-input>
-		</div>
-	 */
 	template: `
 	<div class="core-contracts h-100 d-flex flex-column">
 
