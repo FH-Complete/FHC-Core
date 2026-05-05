@@ -103,13 +103,8 @@ class ferien extends basis_db
 			FROM
 				lehre.tbl_ferien
 			WHERE
-				(CASE
-					WHEN oe_kurzbz IS NOT NULL
-					THEN oe_kurzbz IN (".$this->implode4SQL($parents).")
-					ELSE
-					studiengang_kz=0
-					OR studiengang_kz=".$this->db_add_param($stg_kz, FHC_INTEGER)."
-				END)
+				oe_kurzbz IS NULL
+				OR oe_kurzbz IN (".$this->implode4SQL($parents).")
 			ORDER BY
 				vondatum";
 		

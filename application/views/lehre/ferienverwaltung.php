@@ -17,14 +17,11 @@
 	$this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
-	<div id="main">
-
-		<div id="content">
-			<div>
-				<ferienverwaltung></ferienverwaltung>
-			</div>
-		</div>
+<div id="main">
+	<div>
+		<ferienverwaltung></ferienverwaltung>
 	</div>
+</div>
 
 <?php $this->load->view('templates/FHC-Footer', $includesArray); ?>
 

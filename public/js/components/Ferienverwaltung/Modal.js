@@ -147,6 +147,7 @@ export default {
 					:label="$p.t('ferien/organisationseinheit')"
 					@change="getStudienplaene"
 					>
+					<option :value="null">-- {{ $p.t('ui/alle') }} --</option>
 					<option v-for="oe in oeList" :key="oe.oe_kurzbz" :value="oe.oe_kurzbz">
 						{{ oe.organisationseinheittyp_kurzbz + ' ' + oe.bezeichnung }}
 					</option>

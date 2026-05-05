@@ -67,8 +67,6 @@ class Ferien extends FHCAPI_Controller
 	 */
 	public function getFerien()
 	{
-		// TODO check input
-
 		$filterVonDatum = $this->input->get('filterVonDatum');
 		$filterBisDatum = $this->input->get('filterBisDatum');
 
@@ -337,11 +335,9 @@ class Ferien extends FHCAPI_Controller
 		$this->form_validation->set_rules('vondatum', 'Von Datum', 'required|is_valid_date');
 		$this->form_validation->set_rules('bisdatum', 'Bis Datum', 'required|is_valid_date');
 		$this->form_validation->set_rules('bezeichnung', 'Bezeichnung', 'required|max_length[128]');
-		$this->form_validation->set_rules('oe_kurzbz', 'Organisationseinheit', 'required|max_length[32]');
+		$this->form_validation->set_rules('oe_kurzbz', 'Organisationseinheit', 'max_length[32]');
 		$this->form_validation->set_rules('studienplan_id', 'Studienplan', 'numeric');
 		$this->form_validation->set_rules('ferientyp_kurzbz', 'Ferientyp', 'max_length[64]');
-
-		//Events::trigger('konto_insert_validation', $this->form_validation);
 
 		if (!$this->form_validation->run())
 			$this->terminateWithValidationErrors($this->form_validation->error_array());

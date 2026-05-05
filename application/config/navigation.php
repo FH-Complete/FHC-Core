@@ -119,6 +119,15 @@ $config['navigation_header'] = array(
 					'requiredPermissions' => array(
 						'lehre/zgvpruefung:r'
 					)
+				),
+				'ferien' => array(
+					'link' => site_url('lehre/Ferienverwaltung'),
+					'description' => 'Ferienverwaltung',
+					'expand' => true,
+					'sort' => 55,
+					'requiredPermissions' => array(
+						'basis/ferien:r'
+					)
 				)
 			)
 		),

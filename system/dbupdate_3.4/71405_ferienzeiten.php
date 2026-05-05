@@ -120,6 +120,7 @@ if ($result = @$db->db_query("SELECT conname FROM pg_constraint WHERE conname = 
 	}
 }
 
+// add new fields to tbl_ferien, migrate data (add oe_kurzbz data), mark studiengang_kz as deprecated
 if(!$result = @$db->db_query("SELECT oe_kurzbz FROM lehre.tbl_ferien LIMIT 1"))
 {
 	$qry = "ALTER TABLE lehre.tbl_ferien
@@ -138,8 +139,21 @@ if(!$result = @$db->db_query("SELECT oe_kurzbz FROM lehre.tbl_ferien LIMIT 1"))
 			ADD COLUMN IF NOT EXISTS updateamum timestamp,
 			ADD COLUMN IF NOT EXISTS updatevon VARCHAR(32);
 			UPDATE lehre.tbl_ferien
-			SET oe_kurzbz = (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz = tbl_ferien.studiengang_kz)
-			WHERE oe_kurzbz IS NULL AND studiengang_kz IS NOT NULL;";
+			SET oe_kurzbz = (
+				SELECT
+					CASE
+						WHEN studiengang_kz = 0
+						THEN NULL
+						ELSE oe_kurzbz
+					END
+				FROM
+					public.tbl_studiengang
+				WHERE
+					studiengang_kz = tbl_ferien.studiengang_kz
+			)
+			WHERE oe_kurzbz IS NULL AND studiengang_kz IS NOT NULL;
+			ALTER TABLE lehre.tbl_ferien ALTER COLUMN studiengang_kz DROP NOT NULL;
+			COMMENT ON COLUMN lehre.tbl_ferien.studiengang_kz IS 'DEPRECATED';";
 
 	if(!$db->db_query($qry))
 		echo '<strong>lehre.tbl_ferien: '.$db->db_last_error().'</strong><br>';
@@ -170,7 +184,14 @@ if (!$result = @$db->db_query('SELECT 0 FROM lehre.tbl_ferientyp WHERE 0 = 1'))
 
 			ALTER TABLE lehre.tbl_ferien ADD CONSTRAINT tbl_lehre_ferien_ferientyp_kurzbz_fk FOREIGN KEY (ferientyp_kurzbz)
 			REFERENCES lehre.tbl_ferientyp (ferientyp_kurzbz) MATCH FULL
-			ON DELETE SET NULL ON UPDATE CASCADE;';
+			ON DELETE SET NULL ON UPDATE CASCADE;
+			INSERT INTO lehre.tbl_ferientyp (ferientyp_kurzbz, beschreibung, mitarbeiter, studierende, lehre)
+			VALUES(\'Feiertag\', \'Gesetzliche und andere Feiertage\', true, true, false);
+			INSERT INTO lehre.tbl_ferientyp (ferientyp_kurzbz, beschreibung, mitarbeiter, studierende, lehre)
+			VALUES(\'Ferien\', \'Ferientage\', true, true, false);
+			INSERT INTO lehre.tbl_ferientyp (ferientyp_kurzbz, beschreibung, mitarbeiter, studierende, lehre)
+			VALUES(\'Info\', \'Weitere Zeiten für Ereignisse, z.B. Sportwoche, Ausgleichswoche... \', true, true, false);
+	';
 
 	if (!$db->db_query($qry))
 		echo '<strong>lehre.tbl_ferientyp: '.$db->db_last_error().'</strong><br>';

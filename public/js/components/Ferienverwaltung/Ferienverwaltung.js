@@ -1,4 +1,5 @@
 import {CoreFilterCmpt} from "../filter/Filter.js";
+import {CoreNavigationCmpt} from "../navigation/Navigation.js";
 import FormInput from "../Form/Input.js";
 import FerienModal from "./Modal.js";
 
@@ -8,6 +9,7 @@ export default {
 	name: "Ferienverwaltung",
 	components: {
 		CoreFilterCmpt,
+		CoreNavigationCmpt,
 		FormInput,
 		FerienModal
 	},
@@ -16,6 +18,8 @@ export default {
 			filterVonDatum: null,
 			filterBisDatum: null,
 			loading: false,
+			sideMenuEntries: {},
+			headerMenuEntries: {},
 			tabulatorOptions: {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
@@ -223,6 +227,13 @@ export default {
 			});
 	},
 	template: `
+
+	<core-navigation-cmpt 
+		v-bind:add-side-menu-entries="sideMenuEntries"
+		v-bind:add-header-menu-entries="headerMenuEntries"
+		>
+	</core-navigation-cmpt>
+
 	<div class="h-100 d-flex flex-column">
 		<div class="row justify-content-center">
 			<div class="col-5">

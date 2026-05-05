@@ -43,24 +43,18 @@ class Ferien_model extends DB_Model
 
 		$parents = array_column(getData($result), 'oe_kurzbz');
 
-		// get ferien - use oe_kurzbz, if "old" ferien without oe, use studiengang
+		// get ferien - use oe_kurzbz
 		$qry = "
 			SELECT
 				*
 			FROM
 				lehre.tbl_ferien
 			WHERE
-				(bisdatum >= ? AND vondatum < ?)
-				AND (CASE
-					WHEN oe_kurzbz IS NOT NULL
-					THEN oe_kurzbz IN ?
-					ELSE
-					studiengang_kz=0
-					OR studiengang_kz=?
-				END)
+				bisdatum >= ? AND vondatum < ?
+				AND (oe_kurzbz IS NULL OR oe_kurzbz IN ?)
 			ORDER BY
 				vondatum";
 
-		return $this->execReadOnlyQuery($qry, [$vondatum, $bisdatum, $parents, $studiengang_kz]);
+		return $this->execReadOnlyQuery($qry, [$vondatum, $bisdatum, $parents]);
 	}
 }
