@@ -533,5 +533,9 @@
 		"phpmetrics/phpmetrics": "2.*",
 		"sebastian/phpcpd": "3.*",
 		"phpunit/phpunit": "^6"
+	},
+	"scripts": {
+		"post-install-cmd": "@symlink_vendor_to_public",
+		"symlink_vendor_to_public": "ln -sfn ../vendor ./public/"
 	}
 }
