@@ -39,28 +39,25 @@ class CoreFiftyFiveTagLib
 		$data = $result->retval;
 		$fiftyFiveData = array_map(function($item) {
 			return [
-				'id' => $item->person_id,
-				'typeId' => 'person_id',
+				'id' => $item->person_id
 			];
 		}, $data);
 
 		return (object) array(
-			'data' => $fiftyFiveData
+			'data' => $fiftyFiveData,
+			'typeId' => 'person_id'
 		);
 	}
 
 	public function isCriteriaSetFor(array $params)
 	{
-		if(!isset($params['person_id']) || !isset($params['studiensemester_kurzbz']))
-		{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'person_id')
 			return false;
-		}
+
 		$semester = $params['studiensemester_kurzbz'];
 		$person_id = $params['id'];
 		$typeId = $params['typeId'];
 
-		if($typeId != 'person_id')
-			return null;
 
 		$result = $this->ci->StudiensemesterModel->loadWhere(array(
 			'studiensemester_kurzbz' => $semester
@@ -71,17 +68,9 @@ class CoreFiftyFiveTagLib
 		$semBis = $data->ende;
 		$result = $this->ci->PersonModel->isFiftyFive($semVon, $semBis, $person_id);
 
-		$data = $result->retval;
-		$fiftyFiveData = array_map(function($item) {
-			return [
-				'id' => $item->person_id,
-				'typeId' => 'person_id',
-			];
-		}, $data);
 
 		if(hasData($result))
 		{
-			//array mit prestudent_id, von und bis
 			return $result;
 		}
 		else

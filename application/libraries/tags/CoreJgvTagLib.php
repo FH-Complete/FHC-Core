@@ -31,7 +31,6 @@ class CoreJgvTagLib
 
 		$jgv_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => $item->datum_von,
 				'bis' => $item->datum_bis
@@ -39,7 +38,8 @@ class CoreJgvTagLib
 		}, $data);
 
 		return (object) array(
-			'data' => $jgv_data
+			'data' => $jgv_data,
+			'typeId' => 'prestudent_id'
 		);
 	}
 

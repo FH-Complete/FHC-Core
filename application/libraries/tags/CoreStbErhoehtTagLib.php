@@ -36,7 +36,6 @@ class CoreStbErhoehtTagLib
 
 		$konto_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => $item->start,
 				'bis' => $item->ende
@@ -44,7 +43,8 @@ class CoreStbErhoehtTagLib
 		}, $data);
 
 		return (object) array(
-			'data' => $konto_data
+			'data' => $konto_data,
+			'typeId' => 'prestudent_id'
 		);
 	}
 

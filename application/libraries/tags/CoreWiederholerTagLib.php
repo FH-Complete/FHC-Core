@@ -34,7 +34,6 @@ class CoreWiederholerTagLib
 
 		$wiederholer_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => $item->start,
 				'bis' => $item->ende
@@ -42,6 +41,7 @@ class CoreWiederholerTagLib
 		}, $data);
 
 		return (object) array(
+			'typeId' => 'prestudent_id',
 			'data' => $wiederholer_data
 		);
 	}

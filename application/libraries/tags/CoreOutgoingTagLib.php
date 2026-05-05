@@ -31,7 +31,6 @@ class CoreOutgoingTagLib
 
 		$outgoing_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => $item->von,
 				'bis' => $item->bis
@@ -39,7 +38,8 @@ class CoreOutgoingTagLib
 		}, $data);
 
 		return (object) array(
-			'data' => $outgoing_data
+			'data' => $outgoing_data,
+			'typeId' => 'prestudent_id',
 		);
 	}
 

@@ -63,7 +63,7 @@ export default {
 
 	rebuildTagsforTypeId(data){
 		return {
-			method: 'get',
+			method: 'post',
 			url: 'api/frontend/v1/stv/Tags/rebuildTagsForTypeId/',
 			params: data
 		};

@@ -39,7 +39,6 @@ class CoreMissingZgvTagLib
 
 		$zgvmissing_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => null,
 				'bis' => null
@@ -47,6 +46,7 @@ class CoreMissingZgvTagLib
 		}, $data);
 
 		return (object) array(
+			'typeId' => 'prestudent_id',
 			'data' => $zgvmissing_data
 		);
 

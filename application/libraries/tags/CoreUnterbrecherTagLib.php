@@ -34,7 +34,6 @@ class CoreUnterbrecherTagLib
 
 		$unterbrecher_data = array_map(function($item) {
 			return [
-				'typeId' => 'prestudent_id',
 				'id' => $item->prestudent_id,
 				'von' => $item->start,
 				'bis' => $item->ende
@@ -42,7 +41,8 @@ class CoreUnterbrecherTagLib
 		}, $data);
 
 		return (object) array(
-			'data' => $unterbrecher_data
+			'data' => $unterbrecher_data,
+			'typeId' => 'prestudent_id'
 		);
 	}
 

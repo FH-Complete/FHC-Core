@@ -40,60 +40,63 @@ class TagLib
 		$this->_ci->load->library('PrestudentLib');
 	}
 
-	public function updateAutomatedTags($tag, $inputData)
+	public function updateAutomatedTags($paramsTag)
 	{
-		/*
-		$params array expected pattern
-		[
-			[
-				'id' => 123456,
-				'typeId' => 123456,
-				'von' => '2026-04-01',
-				'bis' => '2026-06-30'
-			],
-			...
-		]
-		*/
+		// ---------------------------------
+		// check params
+		// ---------------------------------
+		$required = ['kurzbz', 'data', 'typeId'];
+
+		foreach ($required as $key) {
+			if (!isset($paramsTag[$key])) {
+				return error('Missing Parameter: ' . $key);
+			}
+		}
+
+		$studiensemester_kurzbz = (isset ($paramsTag['studiensemester_kurzbz']) ? $paramsTag['studiensemester_kurzbz'] : null);
+		$tag = $paramsTag['kurzbz'];
+		$inputData = $paramsTag['data'];
+		$typeId = $paramsTag['typeId'];
 
 		// ---------------------------------
 		// prepare input
 		// ---------------------------------
 		$zeitraum = [];
-		$prestudentIds = [];
+		$arrayIds = [];
 
-		//TODO(Manu) check minimal input:
+		foreach ($inputData as $item) {
+			$id = $item['id'];
+			$arrayIds[] = $id;
 
-		foreach ($inputData as $row) {
-			$pid = $row['id'];
-			$typeId = $row['typeId'];
-
-			$prestudentIds[] = $pid;
-
-			$zeitraum[$pid] = [
-				'von' => $row['von'] ?? null,
-				'bis' => $row['bis'] ?? null
+			$zeitraum[$id] = [
+				'von' => $item['von'] ?? null,
+				'bis' => $item['bis'] ?? null
 			];
 		}
-		$prestudentIds = array_unique($prestudentIds);
+		$arrayIds = array_unique($arrayIds);
+
+		$result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
+		if (isError($result)) {
+			return $result;
+		}
+		$data = $result->retval[0] ?? null;
+
+		$von = $data->start ?? null;
+		$bis = $data->ende ?? null;
 
 		// ---------------------------------
 		// load existing tags
 		// ---------------------------------
 		$allTags = [];
-
-		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect($typeId);
-		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
-
-		$resultAllTags = $this->_ci->NotizModel->loadWhere([
-			'typ' => $tag
-		]);
-
+		$resultAllTags = $this->_ci->NotizModel->getAllTags($tag, $von, $bis);
+		if (isError($resultAllTags)) {
+			return $resultAllTags;
+		}
 		$allTagsData = getData($resultAllTags);
 
 		if (!empty($allTagsData)) {
-			foreach ($allTagsData as $row) {
-				$allTags[$row->$typeId] = $row->notiz_id;
+			foreach ($allTagsData as $item) {
+				$allTags[$item->$typeId] = $item->notiz_id;
 			}
 		}
 
@@ -104,17 +107,18 @@ class TagLib
 		$toAdd = [];
 		$toDelete = [];
 
-		foreach ($prestudentIds as $pid) {
-			if (isset($allTags[$pid])) {
-				$toRecycle[$pid] = $allTags[$pid];
+		foreach ($arrayIds as $id) {
+			if (isset($allTags[$id])) {
+				$toRecycle[$id] = $allTags[$id];
 			} else {
-				$toAdd[] = $pid;
+				$toAdd[] = $id;
 			}
 		}
 
-		foreach ($allTags as $pid => $notizId) {
-			if (!in_array($pid, $prestudentIds)) {
-				$toDelete[$pid] = $notizId;
+		foreach ($allTags as $id => $notizId) {
+			if (!in_array($id, $arrayIds)) {
+				$toDelete[$id] = $notizId;
+
 			}
 		}
 
@@ -124,24 +128,13 @@ class TagLib
 		$countRecycled = 0;
 		$retagged = [];
 
-		foreach ($toRecycle as $pid => $notizId) {
-
-			$result = $this->_ci->NotizModel->update(
-				['notiz_id' => $notizId],
-				[
-					'updateamum' => date('Y-m-d H:i:s'),
-					'updatevon' => 'BatchJobTagUpdate',
-					'start' => $zeitraum[$pid]['von'],
-					'ende' => $zeitraum[$pid]['bis']
-				]
-			);
-
-			if (isError($result)) {
-				return error('Error updating tag ' . $notizId);
-			}
+		foreach ($toRecycle as $id => $notizId)
+		{
+			$this->_updateTag($notizId, $zeitraum[$id]['von'], $zeitraum[$id]['bis']);
 
 			$countRecycled++;
-			$retagged[] = $notizId;
+			$retagged[] = $id;
+			//$retagged[] = $notizId; //notiz_id
 		}
 
 		// ---------------------------------
@@ -150,37 +143,15 @@ class TagLib
 		$countAdded = 0;
 		$tagged = [];
 
-		foreach ($toAdd as $pid) {
-
-			$resultInsert = $this->_ci->NotizModel->insert([
-				'titel' => 'TAG',
-				'text' => 'AUTOMATED TAG',
-				'verfasser_uid' => self::BATCHUSER,
-				'erledigt' => false,
-				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => 'BatchJobTagAdd',
-				'typ' => $tag,
-				'start' => $zeitraum[$pid]['von'],
-				'ende' => $zeitraum[$pid]['bis']
-			]);
-
-			if (isError($resultInsert)) {
-				return error('Error inserting tag for prestudent ' . $pid);
+		foreach ($toAdd as $id)
+		{
+			$result = $this->_insertTag($typeId, $id, $tag, $zeitraum[$id]['von'], $zeitraum[$id]['bis']);
+			if (isError($result)) {
+				return $result;
 			}
-
-			$notizId = $resultInsert->retval;
-
-			$resultZuordnung = $this->_ci->NotizzuordnungModel->insert([
-				'notiz_id' => $notizId,
-				$typeId => $pid
-			]);
-
-			if (isError($resultZuordnung)) {
-				return error('Error inserting relation for prestudent ' . $pid);
-			}
-
 			$countAdded++;
-			$tagged[$notizId] = $pid;
+			//$tagged[] = $result->retval[0]->notiz_id; //notiz_id
+			$tagged[] = $id;
 		}
 
 		// ---------------------------------
@@ -189,26 +160,17 @@ class TagLib
 		$countDeleted = 0;
 		$deleted = [];
 
-		foreach ($toDelete as $pid => $notizId) {
-
-			$result = $this->_ci->NotizzuordnungModel->delete([
-				'notiz_id' => $notizId
-			]);
+		foreach ($toDelete as $id => $notizId)
+		{
+			$result = $this->_deleteTag($notizId);
 
 			if (isError($result)) {
-				return error('Error deleting relation ' . $notizId);
-			}
-
-			$result = $this->_ci->NotizModel->delete([
-				'notiz_id' => $notizId
-			]);
-
-			if (isError($result)) {
-				return error('Error deleting note ' . $notizId);
+				return $result;
 			}
 
 			$countDeleted++;
-			$deleted[] = $notizId;
+			//$deleted[] = $result->retval['deleted']; //notizId
+			$deleted[] = $id;
 		}
 
 		// ---------------------------------
@@ -217,7 +179,7 @@ class TagLib
 		return success([
 			'input' => [
 				'tag' => $tag,
-				'prestudentIds' => $prestudentIds
+				'arrayIds' => $arrayIds
 			],
 			'summary' => [
 				'recycled' => $countRecycled,
@@ -231,9 +193,9 @@ class TagLib
 				'toDelete' => $toDelete
 			],
 			'results' => [
-				'retaggedNotizIds' => $retagged,
+				'retaggedIds' => $retagged,
 				'newTags' => $tagged,
-				'deletedNotizIds' => $deleted
+				'deletedTagsIds' => $deleted
 			]
 		]);
 	}
@@ -264,46 +226,14 @@ class TagLib
 		//RECYCLE
 		if ($notiz_id !== null)
 		{
-			$resultUpdateNotiz = $this->_ci->NotizModel->update(
-				[
-					'notiz_id' => $notiz_id
-				],
-				array(
-					'updateamum' => date('Y-m-d H:i:s'),
-					'updatevon' => getAuthUID(),
-				));
-
-			if (isError($resultUpdateNotiz))
-				return error ('Error occurred update Result ' . $notiz_id);
-
-			$return = ['recycled' => $notiz_id];
+			$resultUpdateNotiz = $this->_updateTag($notiz_id, $von, $bis);
+			$return = ['recycled' => $resultUpdateNotiz];
 		}
 		else
-
+		//ADD
 		{
-			$resultInsertNotiz = $this->_ci->NotizModel->insert(array(
-				'titel' => 'TAG',
-				'text' => 'AUTOMATED TAG',
-				'verfasser_uid' => getAuthUID(),
-				'erledigt' => false,
-				'insertamum' => date('Y-m-d H:i:s'),
-				'insertvon' => getAuthUID(),
-				'typ' => $tag,
-				'start' => $von,
-				'ende' => $bis
-			));
-
-			if (isError($resultInsertNotiz))
-				return error ('Error occurred insert Result ' . $prestudent_id);
-
-			$resultInsertZuordnung = $this->_ci->NotizzuordnungModel->insert(array(
-				'notiz_id' => $resultInsertNotiz->retval,
-				$typeId => $id
-			));
-
-			if (isError($resultInsertZuordnung))
-				return error ('Error occurred insert Zuordnung ' . $id);
-			$return = ['added' => $resultInsertNotiz->retval];
+			$resultInsertNotiz = $this->_insertTag($typeId, $id, $tag, $von, $bis);
+			$return = ['added' => $resultInsertNotiz];
 		}
 		return success($return);
 	}
@@ -311,20 +241,23 @@ class TagLib
 	/*
 	 * main function for rebuild Tags for typeId
 	 * */
-	public function rebuildTagsForTypeId($typeId, $id)
+	public function rebuildTagsForTypeId($typeId, $id) //TODO aktSem of frontend
 	{
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
 
-		$_ci = get_instance();
-
-		$result = $this->_ci->StudiensemesterModel->getLastOrAktSemester();
+		//TODO change to chosen Studiensemester in frontend
+		$result = $this->_ci->StudiensemesterModel->getAktOrNextSemester();
 		if (isError($result))
 			return error('Error occurred during retrieving studiensemester');
 		if (empty($result->retval) || !isset($result->retval[0])) {
 			return error('No studiensemester found');
 		}
 		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
+
+		//for checkDelete
+		$startSem = $result->retval[0]->start ?? null;
+		$endeSem = $result->retval[0]->ende ?? null;
 		$return = [];
 
 		foreach ($automatedTags as $autoTag)
@@ -339,7 +272,6 @@ class TagLib
 				continue;
 			}
 
-			// className without PATH (basename)
 			$className = basename($autoTag->taglib);
 			$kurz_bz = $autoTag->typ_kurzbz;
 
@@ -368,58 +300,141 @@ class TagLib
 				if (isError($result))
 					return error('Error occurred during updateAutomatedTags' . $kurz_bz);
 
-				return $result;
+				$return[$kurz_bz] = $result;
 			}
 			else
 			{
-				$result = $this->checkForDelete($kurz_bz, $typeId, $id);
-
-				if ($result != null)
-					$return[$kurz_bz] = $result;
+				//CHECK FOR DELETE
+				$params = [
+						'von' => $startSem,
+						'bis' => $endeSem,
+						'kurzbz' => $autoTag->typ_kurzbz,
+						'typeId' => $typeId,
+						'id' => $id,
+					];
+				$result = $this->_ci->NotizModel->checkIfExistingTag($kurz_bz, $typeId, $id, $startSem, $endeSem);
+				if (hasData($result))
+				{
+					$notizId = $result->retval[0]->notiz_id;
+					$this->_deleteTag($notizId);
+					$return[$kurz_bz] = ['deleted' => $notizId];
+				}
 			}
 		}
 		return success($return);
 	}
 
-	public function checkForDelete($tag, $typeId, $id)
+	public function checkForDeleteDEPR($tag, $typeId, $id, $start, $ende)
 	{
+		//TODO Zeitbezug
 		$return = null;
 		$notiz_id = null;
+
+		$_ci = get_instance();
+		$_ci->addMeta(
+			'in checkForDelete', $tag
+		);
 
 		if (!is_numeric($id))
 			return error ("id " . $id . "not numeric");
 
-		$this->_ci->NotizModel->addSelect('nz.notiz_id');
-		$this->_ci->NotizModel->addSelect($typeId);
-		$this->_ci->NotizModel->addJoin('public.tbl_notizzuordnung nz', 'notiz_id');
-		$resultAllTags = $this->_ci->NotizModel->loadWhere([
-			'typ' => $tag,
-			$typeId => $id
-		]);
-		if(hasData($resultAllTags))
+		$result = $this->_ci->NotizModel->checkIfValidTag($tag, $typeId, $id, $start, $ende);
+		if (isError($result)) {
+			return error('Error checking valid tag for ' .  $typeId . ': ' . $id);
+		}
+
+		if(hasData($result))
 		{
-			$notiz_id = $resultAllTags->retval[0]->notiz_id;
+			$notiz_id = $result->retval[0]->notiz_id;
+			$_ci = get_instance();
+			$_ci->addMeta(
+				'checkDeleteHas DAta', $notiz_id
+			);
 		}
 		else
 			return null;
 
 		if($notiz_id)
 		{
-			$result = $this->_ci->NotizzuordnungModel->delete([
-				'notiz_id' => $notiz_id
-			]);
-			if (isError($result))
-				return error ('Error occurred during delete Notizzuordnung' . $notiz_id);
-
-			$result = $this->_ci->NotizModel->delete([
-				'notiz_id' => $notiz_id
-			]);
-			if (isError($result))
-				return error ('Error occurred during  delete Notiz' . $notiz_id);
-
-			$return = ['deleted' => $notiz_id];
+			$_ci->addMeta(
+				'TO DELETE', $notiz_id
+			);
+			$result = $this->_deleteTag($notiz_id);
 		}
-		return $return;
+		return ['deleted' => $result];
+	}
+
+	private function _insertTag($typeId, $id, $tag, $von, $bis)
+	{
+		$resultInsert = $this->_ci->NotizModel->insert([
+			'titel' => 'TAG',
+			'text' => 'AUTOMATED TAG',
+			'verfasser_uid' => self::BATCHUSER,
+			'erledigt' => false,
+			'insertamum' => date('Y-m-d H:i:s'),
+			'insertvon' => 'BatchJobTagAdd',
+			'typ' => $tag,
+			'start' => $von,
+			'ende' => $bis
+		]);
+
+		if (isError($resultInsert)) {
+			return error('Error inserting tag for ' .  $typeId . ': ' . $id);
+		}
+
+		$notizId = $resultInsert->retval;
+
+		$resultZuordnung = $this->_ci->NotizzuordnungModel->insert([
+			'notiz_id' => $notizId,
+			$typeId => $id
+		]);
+
+		if (isError($resultZuordnung)) {
+			return error('Error inserting relation for ' .  $typeId . ': ' . $id);
+		}
+
+		return $notizId;
+	}
+
+	private function _updateTag($notiz_id, $von, $bis)
+	{
+		$resultUpdateNotiz = $this->_ci->NotizModel->update(
+			[
+				'notiz_id' => $notiz_id
+			],
+			array(
+				'updateamum' => date('Y-m-d H:i:s'),
+				'updatevon' => 'BatchJobTagUpdate',
+				'start' => $von,
+				'ende' => $bis
+			));
+
+
+		if (isError($resultUpdateNotiz))
+			return error ('Error occurred during Update ' . $notiz_id);
+
+		return $notiz_id;
+	}
+
+	private function _deleteTag($notiz_id)
+	{
+		$result = $this->_ci->NotizzuordnungModel->delete([
+			'notiz_id' => $notiz_id
+		]);
+		if (isError($result)) {
+			return error('Error occurred during delete Notizzuordnung ' . $notiz_id);
+		}
+
+		$result = $this->_ci->NotizModel->delete([
+			'notiz_id' => $notiz_id
+		]);
+		if (isError($result)) {
+			return error('Error occurred during delete Notiz ' . $notiz_id);
+		}
+
+		return success([
+			'deleted' => $notiz_id
+		]);
 	}
 
 }
