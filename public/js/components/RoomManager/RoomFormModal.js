@@ -93,7 +93,9 @@ export default {
         }),
       ));
     },
-    filterRooms(event) {
+    async filterRooms(event) {
+      this.rooms = await this.fetchRooms(event.query);
+
       let defaultItem = {
         label: "----------",
         value: null,
@@ -151,14 +153,19 @@ export default {
         };
       }
 
+      let potentialParentRooms = await this.fetchRooms(this.editedRoom.parent_ort_kurzbz);
 
-      let parentRoom = this.rooms.find(
+      let parentRoomData = null;
+      let parentRoom = potentialParentRooms.find(
         (room) => room.ort_kurzbz === this.editedRoom.parent_ort_kurzbz,
       );
-      let parentRoomData = {
-        label: parentRoom?.bezeichnung || "",
-        value: parentRoom?.ort_kurzbz || null,
-      };
+      if (parentRoom) {
+        this.rooms.push(parentRoom);
+        parentRoomData = {
+          label: `${parentRoom.ort_kurzbz} - ${parentRoom.bezeichnung}`,
+          value: parentRoom.ort_kurzbz,
+        };
+      }
 
       this.roomFormData = {
         parentRoom: parentRoomData,
@@ -237,6 +244,22 @@ export default {
         aktiv: true,
       };
     },
+    async fetchRooms(searchedRoomShortCode) {
+      let getRoomsResponse = await this.$api.call(ApiRoom.getAllRooms({
+        shortCode: searchedRoomShortCode,
+        pagination: {
+          page: 1,
+          size: 100,
+        },
+      }));
+      if (getRoomsResponse.meta.status === "success") {
+        return getRoomsResponse.data;
+      } else {
+        console.error("Error fetching rooms:", getRoomsResponse.meta.message);
+      }
+
+      return [];
+    },
   },
   async created() {
     let getLocationsResponse = await this.$api.call(
@@ -244,6 +267,10 @@ export default {
     );
     if (getLocationsResponse.meta.status === "success") {
       this.locations = getLocationsResponse.data;
+      this.locations.unshift({
+        standort_id: null,
+        kurzbz: "----------",
+      });
     } else {
       console.error(
         "Error fetching locations:",
@@ -265,17 +292,7 @@ export default {
       );
     }
 
-    let getRoomsResponse = await this.$api.call(
-      ApiRoom.getAllRooms(),
-    );
-    if (getRoomsResponse.meta.status === "success") {
-      this.rooms = getRoomsResponse.data;
-    } else {
-      console.error(
-        "Error fetching rooms:",
-        getRoomsResponse.meta.message,
-      );
-    }
+    this.rooms = await this.fetchRooms();
   },
   template: /* html */ `
   <bs-modal ref="roomFormModal" size="sm" @hideBsModal="() => { $emit('hideBsModal'); resetRoomForm(); }" class="modal-lg">
@@ -291,12 +308,13 @@ export default {
               :label="$capitalize($p.t('ui/parentRoom'))"
               :suggestions="filteredRooms"
               :optionValue="(option) => option.value"
-              :optionLabel="(option) => option.label" 
+              :optionLabel="(option) => option.label"
+              :delay="500"
               @complete="filterRooms"
               dropdown
               forceSelection
               type="autocomplete"
-              name="parentRoomShortCode"  
+              name="parentRoomShortCode"
               >
             </form-input>
           </div>

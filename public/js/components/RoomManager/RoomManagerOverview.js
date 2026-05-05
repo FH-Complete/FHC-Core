@@ -39,7 +39,36 @@ export default {
       locations: [],
       organizationalUnits: [],
       filteredOrganizationalUnits: [],
-      buildingComponents: ["A", "B", "C", "D", "E", "F"],
+      buildingComponents: [
+        {
+          label: "----------",
+          value: null,
+        }, 
+        {
+          label: "A",
+          value: "A",
+        }, 
+        {
+          label: "B",
+          value: "B",
+        },
+        {
+          label: "C",
+          value: "C",
+        },
+        {
+          label: "D", 
+          value: "D"
+        },
+        {
+          label: "E",
+          value: "E"
+        },
+        {
+          label: "F",
+          value: "F"
+        },
+      ],
       isRoomFormModalVisible: false,
       isRoomTypeFormModalVisible: false,
       editedRoomShortCode: null,
@@ -50,20 +79,53 @@ export default {
     tabulatorOptions() {
       const options = {
         ajaxURL: "dummy",
-        ajaxRequestFunc: async () =>
-          this.$api.call(
+        ajaxRequestFunc: async (url, config, params) => {
+          let shortCodeFilter = params?.filter?.find((filter) => filter.field === "ort_kurzbz");
+          let descriptionFilter = params?.filter?.find((filter) => filter.field === "bezeichnung");
+          let planDescriptionFilter = params?.filter?.find((filter) => filter.field === "planbezeichnung");
+          let maxPersonsFilter = params?.filter?.find((filter) => filter.field === "max_person");
+          let workplaceFilter = params?.filter?.find((filter) => filter.field === "arbeitsplaetze");
+          let squareMetersFilter = params?.filter?.find((filter) => filter.field === "m2");
+          let orgUnitFilter = params?.filter?.find((filter) => filter.field === "org_bezeichnung");
+          let isForTrainingProgramFilter = params?.filter?.find((filter) => filter.field === "lehre");
+          let reservationNeededFilter = params?.filter?.find((filter) => filter.field === "reservieren");
+          let isActiveFilter = params?.filter?.find((filter) => filter.field === "aktiv");
+          let costsFilter = params?.filter?.find((filter) => filter.field === "kosten");
+          let floorFilter = params?.filter?.find((filter) => filter.field === "stockwerk");
+          let parentRoomFilter = params?.filter?.find((filter) => filter.field === "pr_ort_kurzbz");
+
+          let isForTrainingProgramValue = this.filterData.isForTrainingProgram ? "true" : isForTrainingProgramFilter?.value ? "true" : "false";
+          let reservationNeededValue = this.filterData.isReservationNeeded ? "true" : reservationNeededFilter?.value ? "true" : "false";
+          let isActiveValue = this.filterData.isActive ? "true" : isActiveFilter?.value ? "true" : "false";
+
+          return this.$api.call(
             ApiRoom.getAllRooms({
               organizationalUnitShortCode:
                 this.filterData.organizationalUnit?.value,
               locationId: this.filterData.locationId,
               buildingComponent: this.filterData.buildingComponent,
-              isForTrainingProgram: this.filterData.isForTrainingProgram,
-              isReservationNeeded: this.filterData.isReservationNeeded,
-              isActive: this.filterData.isActive,
+              isForTrainingProgram: isForTrainingProgramValue,
+              isReservationNeeded: reservationNeededValue,
+              isActive: isActiveValue,
+              shortCode: shortCodeFilter?.value,
+              description: descriptionFilter?.value,
+              planDescription: planDescriptionFilter?.value,
+              maxPersons: maxPersonsFilter?.value,
+              workplace: workplaceFilter?.value,
+              squareMeters: squareMetersFilter?.value,
+              orgUnitDescription: orgUnitFilter?.value,
+              costs: costsFilter?.value,
+              floor: floorFilter?.value,
+              parentRoomShortCode: parentRoomFilter?.value,
+              pagination: {
+                page: params.page,
+                size: params.size,
+              },
             }),
-          ),
-        ajaxResponse: (url, params, response) => response.data,
-        persistenceID: "core_class_schedule_validity_periods",
+          );
+        },
+        ajaxResponse: (url, params, response) => response,
+        persistenceID: "room_manager_overview_table",
         selectableRows: true,
         index: "ort_kurzbz",
         columns: [
@@ -73,7 +135,7 @@ export default {
             ),
             field: "ort_kurzbz",
             headerFilter: true,
-            width: 150,
+            width: 100,
           },
           {
             title: this.$capitalize(
@@ -87,19 +149,19 @@ export default {
             title: this.$capitalize(this.$p.t("ui", "planbezeichnung")),
             field: "planbezeichnung",
             headerFilter: true,
-            width: 200,
+            width: 150,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "maxPersons")),
             field: "max_person",
             headerFilter: true,
-            width: 100,
+            width: 80,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "arbeitsplaetze")),
             field: "arbeitsplaetze",
             headerFilter: true,
-            width: 100,
+            width: 80,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "quadratmeter")),
@@ -111,7 +173,7 @@ export default {
             title: this.$capitalize(this.$p.t("lehre", "organisationseinheit")),
             field: "org_bezeichnung",
             headerFilter: true,
-            width: 200,
+            width: 180,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "lehre")),
@@ -164,8 +226,7 @@ export default {
           {
             title: this.$capitalize(this.$p.t("global", "actions")),
             field: "actions",
-            minWidth: 150,
-            maxWidth: 150,
+            width: 120,
             formatter: (cell, formatterParams, onRendered) => {
               let container = document.createElement("div");
               container.className = "d-flex gap-2";
@@ -211,6 +272,11 @@ export default {
           },
         ],
         layout: "fitColumns",
+        pagination:true,
+        paginationMode:"remote",
+        paginationSize: 100,
+        maxHeight:"700px",
+        filterMode:"remote", 
       };
       return options;
     },
@@ -309,14 +375,7 @@ export default {
       this.editedRoomForRoomTypeManagement = roomShortCode;
     },
     async reloadTableData() {
-      this.$refs.roomManagerOverviewTable.tabulator.replaceData("/", {
-        organizationalUnitShortCode: this.filterData.organizationalUnit?.value,
-        locationId: this.filterData.locationId,
-        buildingComponent: this.filterData.buildingComponent,
-        isForTrainingProgram: this.filterData.isForTrainingProgram,
-        isReservationNeeded: this.filterData.isReservationNeeded,
-        isActive: this.filterData.isActive,
-      });
+      this.$refs.roomManagerOverviewTable.tabulator.replaceData("/");
     },
     handleRoomUpdated() {
       this.editedRoomShortCode = null;
@@ -343,6 +402,7 @@ export default {
     );
     if (getLocationsResponse.meta.status === "success") {
       this.locations = getLocationsResponse.data;
+      this.locations.unshift({ standort_id: null, kurzbz: "----------" });
     } else {
       console.error(
         "Error fetching locations:",
@@ -440,9 +500,9 @@ export default {
                 <option
                   v-for="component in buildingComponents"
                   :key="component"
-                  :value="component"
+                  :value="component.value"
                   >
-                  {{component}}
+                  {{component.label}}
                 </option>
               </form-input>
             </div>

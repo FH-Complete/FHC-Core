@@ -1,4 +1,3 @@
-import ApiRoom from "../../../js/api/factory/ort.js";
 import ApiRoomType from "../../../js/api/factory/roomType.js";
 import ApiRoomToRoomType from "../../../js/api/factory/roomToRoomType.js";
 
@@ -74,7 +73,7 @@ export default {
             ),
           ),
         ajaxResponse: (url, params, response) => response.data,
-        persistenceID: "core_class_schedule_validity_periods",
+        persistenceID: "room_type_assignment_table",
         selectableRows: true,
         columns: [
           {

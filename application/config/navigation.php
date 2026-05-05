@@ -383,3 +383,12 @@ $config['navigation_menu']['apps'] = [
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
 	]
 ];
+
+$config['navigation_menu']['RoomManager/index'] = array(
+	'lvTemplateUebersicht' => array(
+		'link' => site_url('RoomManager'),
+		'description' => 'Raumverwaltung übersicht',
+		'icon' => '',
+		'sort' => 1
+	)
+);

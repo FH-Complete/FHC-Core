@@ -54,7 +54,7 @@ class ort extends basis_db
 	public $m2;				// numeric(8,2)
 	public $gebteil;		// varchar(32)
 	public $arbeitsplaetze;	// integer
-	
+	public $parent_ort_kurzbz; // varchar(16)
 	public $ort_kurzbz_old;	// string
 
 	/**
@@ -117,6 +117,7 @@ class ort extends basis_db
 			$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
 			$ort_obj->gebteil			= $row->gebteil;
 			$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+			$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
 			$this->result[] = $ort_obj;
 		}
 		return true;
@@ -185,6 +186,7 @@ class ort extends basis_db
 			$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
 			$ort_obj->gebteil			= $row->gebteil;
 			$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+			$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
 			$this->result[] = $ort_obj;
 		}
 		return true;
@@ -232,6 +234,7 @@ class ort extends basis_db
 			$this->oe_kurzbz		= $row->oe_kurzbz;
 			$this->m2				= $row->m2;
 			$this->arbeitsplaetze	= $row->arbeitsplaetze;
+			$this->parent_ort_kurzbz = $row->parent_ort_kurzbz;
 		}
 		else
 		{
@@ -287,7 +290,7 @@ class ort extends basis_db
 		{
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_ort (ort_kurzbz, bezeichnung, planbezeichnung, max_person, aktiv, lehre, reservieren, lageplan,
-				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon, content_id,ausstattung,m2,gebteil,oe_kurzbz,arbeitsplaetze) VALUES ('.
+				dislozierung, kosten, stockwerk, standort_id, telefonklappe, insertamum, insertvon, updateamum, updatevon, content_id,ausstattung,m2,gebteil,oe_kurzbz,arbeitsplaetze,parent_ort_kurzbz) VALUES ('.
 				$this->db_add_param($this->ort_kurzbz).', '.
 				$this->db_add_param($this->bezeichnung).', '.
 				$this->db_add_param($this->planbezeichnung).', '.
@@ -310,7 +313,8 @@ class ort extends basis_db
 				$this->db_add_param($this->m2).','.
 				$this->db_add_param($this->gebteil).','.
 				$this->db_add_param($this->oe_kurzbz).','.
-				$this->db_add_param($this->arbeitsplaetze).');';
+				$this->db_add_param($this->arbeitsplaetze).','.
+				$this->db_add_param($this->parent_ort_kurzbz).');';
 		}
 		else
 		{
@@ -337,7 +341,8 @@ class ort extends basis_db
 				'm2='.$this->db_add_param($this->m2).', '.
 				'gebteil='.$this->db_add_param($this->gebteil).', '.
 				'oe_kurzbz='.$this->db_add_param($this->oe_kurzbz).', '.
-				'arbeitsplaetze='.$this->db_add_param($this->arbeitsplaetze).' '.
+				'arbeitsplaetze='.$this->db_add_param($this->arbeitsplaetze).', '.
+				'parent_ort_kurzbz='.$this->db_add_param($this->parent_ort_kurzbz).' '.
 				'WHERE ort_kurzbz = '.$this->db_add_param(($this->ort_kurzbz_old!='')?$this->ort_kurzbz_old:$this->ort_kurzbz).';';
 		}
 
@@ -455,7 +460,8 @@ class ort extends basis_db
 				$ort_obj->gebteil 			= $row->gebteil;
 				$ort_obj->oe_kurzbz 		= $row->oe_kurzbz;
 				$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
-	
+				$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
+
 				$this->result[] = $ort_obj;
 			}
 			return true;
@@ -523,6 +529,7 @@ class ort extends basis_db
 			$ort_obj->gebteil 			= $row->gebteil;
 			$ort_obj->oe_kurzbz 		= $row->oe_kurzbz;
 			$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+			$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
 
 			$this->result[] = $ort_obj;
 		}
@@ -577,6 +584,8 @@ class ort extends basis_db
 			$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
 			$ort_obj->gebteil			= $row->gebteil;
 			$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+			$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
+
 			$this->result[] = $ort_obj;
 		}
 		return true;
@@ -634,6 +643,7 @@ class ort extends basis_db
 				$ort_obj->oe_kurzbz			= $row->oe_kurzbz;
 				$ort_obj->gebteil			= $row->gebteil;
 				$ort_obj->arbeitsplaetze	= $row->arbeitsplaetze;
+				$ort_obj->parent_ort_kurzbz = $row->parent_ort_kurzbz;
 				$this->result[] = $ort_obj;
 			}
 			return true;

@@ -17,16 +17,29 @@
 
 export default {
 	getAllRooms(params) {
+
         return {
             method: 'get',
             url: 'api/frontend/v1/Ort/getAllRooms',
             params: {
-                "filter[organizationalUnitShortCode]" : params?.organizationalUnitShortCode,
-                "filter[locationId]" : params?.locationId,
-                "filter[buildingComponent]" : params?.buildingComponent,
-                "filter[isForTrainingProgram]" : params?.isForTrainingProgram,
-                "filter[isReservationNeeded]" : params?.isReservationNeeded,
-                "filter[isActive]" : params?.isActive,
+                "filter[oe_kurzbz]" : params?.organizationalUnitShortCode,
+                "filter[standort_id]" : params?.locationId,
+                "filter[gebteil]" : params?.buildingComponent,
+                "filter[lehre]" : params?.isForTrainingProgram,
+                "filter[reservieren]" : params?.isReservationNeeded,
+                "filter[aktiv]" : params?.isActive,
+				"filter[ort_kurzbz]" : params?.shortCode,
+				"filter[bezeichnung]" : params?.description,
+				"filter[planbezeichnung]" : params?.planDescription,
+				"filter[max_person]" : params?.maxPersons,
+				"filter[arbeitsplaetze]" : params?.workplace,
+				"filter[m2]" : params?.squareMeters,
+				"filter[oe_bezeichnung]" : params?.orgUnitDescription,
+				"filter[kosten]" : params?.costs,
+				"filter[stockwerk]" : params?.floor,
+				"filter[parent_ort_kurzbz]" : params?.parentRoomShortCode,
+				"pagination[page]" : params?.pagination?.page,
+				"pagination[size]" : params?.pagination?.size,
             }
         }
     },

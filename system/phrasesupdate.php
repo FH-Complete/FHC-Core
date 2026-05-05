@@ -58857,6 +58857,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_existingReservationsForRoomsUponDeletion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt bestehende Reservierungen für diesen Raum. Bitte entfernen Sie die Reservierungen, bevor Sie den Raum löschen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There are existing reservations for this room. Please remove the reservations before deleting the room.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'error_existingSoftwareImageForRoomTypeUponDeletion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt bestehende Software-Images für diesen Raumtyp. Bitte entfernen Sie die Software-Images, bevor Sie den Raumtyp löschen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There are existing software images for this room type. Please remove the software images before deleting the room type.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

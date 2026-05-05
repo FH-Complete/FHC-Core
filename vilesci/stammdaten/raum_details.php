@@ -67,6 +67,7 @@
 	$gebteil='';
 	$m2='';
 	$arbeitsplaetze='';
+	$parent_ort_kurzbz = '';
 
 	$neu = "true";
 
@@ -93,6 +94,7 @@
 		$oe_kurzbz = $_POST["oe_kurzbz"];
 		$gebteil = $_POST["gebteil"];
 		$arbeitsplaetze = $_POST["arbeitsplaetze"];
+		$parent_ort_kurzbz = $_POST["parent_ort_kurzbz"];
 
 		$sg_update = new ort();
 		$sg_update->ort_kurzbz = $ort_kurzbz;
@@ -115,6 +117,7 @@
 		$sg_update->gebteil = $gebteil;
 		$sg_update->oe_kurzbz = $oe_kurzbz;
 		$sg_update->arbeitsplaetze = $arbeitsplaetze;
+		$sg_update->parent_ort_kurzbz = $parent_ort_kurzbz;
 		$sg_update->updateamum = date('Y-m-d H:i:s');
 		$sg_update->updatevon = $user;
 
@@ -161,6 +164,7 @@
 		$m2 = $sg->m2;
 		$oe_kurzbz = $sg->oe_kurzbz;
 		$arbeitsplaetze = $sg->arbeitsplaetze;
+		$parent_ort_kurzbz = $sg->parent_ort_kurzbz;
 		$neu = "false";
 	}
 
@@ -402,6 +406,8 @@
 						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
 						<td>Anz. Arbeitsplätze</td>
 						<td><input class="detail" type="text" name="arbeitsplaetze" size="3" maxlength="8" value="'.$arbeitsplaetze.'" onchange="submitable()"></td>
+						<td valign="top">Parent Raum</td>
+						<td valign="top"><input type="text" name="parent_ort_kurzbz" size="10" onchange="submitable()" value="'.$parent_ort_kurzbz.'" /></td>
 					</tr>
 					<tr>
 						<td valign="top">Lageplan</td>

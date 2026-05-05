@@ -31,7 +31,6 @@ class Ort extends FHCAPI_Controller
 	 */
 	public function __construct()
 	{
-		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
 			'getAllRooms' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
@@ -47,6 +46,8 @@ class Ort extends FHCAPI_Controller
 		$this->load->library('form_validation');
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
+		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
+
 		$this->config->load('raumsuche');
 
 		$this->loadPhrases([
@@ -61,53 +62,99 @@ class Ort extends FHCAPI_Controller
 
 	public function getAllRooms()
 	{
+		$paginationSize = $this->input->get('pagination[size]', TRUE);
+		$paginationPage = $this->input->get('pagination[page]', TRUE);
+
 		$filter = $this->input->get('filter', TRUE);
 		
 		$filterData = [];
 
 
-		$query = "SELECT public.tbl_ort.*, pr.ort_kurzbz as pr_ort_kurzbz, org.bezeichnung as org_bezeichnung
+		$query = "SELECT
+				COUNT(*) OVER() AS full_count,
+				public.tbl_ort.*, 
+				pr.ort_kurzbz as pr_ort_kurzbz,
+				org.bezeichnung as org_bezeichnung
 			FROM public.tbl_ort 
 			LEFT JOIN public.tbl_ort as pr ON pr.ort_kurzbz = public.tbl_ort.parent_ort_kurzbz
 			LEFT JOIN public.tbl_organisationseinheit as org ON org.oe_kurzbz = public.tbl_ort.oe_kurzbz";
 
-		$whereItems = [];
 
-		if (isset($filter['locationId']) && $filter['locationId'] !== '') {
-			$whereItems[] = 'public.tbl_ort.standort_id = ?';
-			$filterData[] = $filter['locationId'];
+		$queryWhereFragments = [];
+
+		$searchableIdAttributes = ['standort_id', 'oe_kurzbz', 'gebteil'];
+		$searchableTextAttributes = ['ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'oe_kurzbz', 'oe_bezeichnung'];
+		$searchableBooleanAttributes = ['lehre', 'reservieren', 'aktiv'];
+		$searchableNumericAttributes = ['max_person', 'arbeitsplaetze'];
+		$searchableNumericSpanAttributes = ['m2'];
+
+		foreach ($searchableIdAttributes as $attribute) {
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
+				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
+				$filterData[] = $filter[$attribute];
+			}
 		}
-		if (isset($filter['organizationalUnitShortCode']) && $filter['organizationalUnitShortCode'] !== '') {
-			$whereItems[] = 'public.tbl_ort.oe_kurzbz = ?';
-			$filterData[] = $filter['organizationalUnitShortCode'];
+
+		foreach ($searchableTextAttributes as $attribute) {
+			$tableAttribute = "public.tbl_ort.$attribute";
+			if ($attribute === 'oe_bezeichnung') {
+				$tableAttribute = "org.bezeichnung";
+			}
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
+				$queryWhereFragments[] = "$tableAttribute ILIKE ?";
+				$filterData[] = '%' . $filter[$attribute] . '%';
+			}
 		}
-		if (isset($filter['buildingComponent']) && $filter['buildingComponent'] !== '') {
-			$whereItems[] = 'public.tbl_ort.gebteil = ?';
-			$filterData[] = $filter['buildingComponent'];
+
+		foreach ($searchableBooleanAttributes as $attribute) {
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '' && $filter[$attribute] === 'true' ) {
+				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
+				$filterData[] = $filter[$attribute] === 'true' ? true : false;
+			}
 		}
-		if (isset($filter['isForTrainingProgram']) && $filter['isForTrainingProgram'] === 'true') {
-			$whereItems[] = 'public.tbl_ort.lehre = ?';
-			$filterData[] = $filter['isForTrainingProgram'] === 'true' ? true : false;
+
+		foreach ($searchableNumericAttributes as $attribute) {
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
+				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
+				$filterData[] = $filter[$attribute];
+			}
 		}
-		if (isset($filter['isReservationNeeded']) && $filter['isReservationNeeded'] === 'true') {
-			$whereItems[] = 'public.tbl_ort.reservieren = ?';
-			$filterData[] = $filter['isReservationNeeded'] === 'true' ? true : false;
+
+		foreach ($searchableNumericSpanAttributes as $attribute) {
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
+				$queryWhereFragments[] = "public.tbl_ort.$attribute >= ? AND public.tbl_ort.$attribute <= ?";
+				$filterData[] = $filter[$attribute] - 1;
+				$filterData[] = $filter[$attribute] + 1;
+			}
 		}
-		if (isset($filter['isActive']) && $filter['isActive'] === 'true') {
-			$whereItems[] = 'public.tbl_ort.aktiv = ?';
-			$filterData[] = $filter['isActive'] === 'true' ? true : false;
-		}
-		
-		if (count($whereItems) > 0) {
-			$query .= ' WHERE ' . implode(' AND ', $whereItems);
+
+		if (count($queryWhereFragments) > 0) {
+			$query .= ' WHERE ' . implode(' AND ', $queryWhereFragments);
 		}
 
 		$query .= ' ORDER BY public.tbl_ort.ort_kurzbz ASC';
 
-		$result = $this->OrtModel->execReadOnlyQuery($query, $filterData);
+		if ($paginationSize && $paginationPage) {
+			$query .= " LIMIT ? OFFSET ?";
+		}
+
+		$queryData = array_merge($filterData);
+		if ($paginationSize && $paginationPage) {
+			$queryData = array_merge($filterData, [$paginationSize, ($paginationPage - 1) * $paginationSize]);
+		}
+
+		$result = $this->OrtModel->execReadOnlyQuery($query, $queryData);
  
- 
-		$this->terminateWithSuccess(getData($result));
+		$queryData = hasData($result) ? getData($result) : [];
+		
+		if ($paginationSize && $paginationPage) {
+			$totalItems = count($queryData) > 0 ? $queryData[0]->full_count : 0;
+			$pageCount = ceil($totalItems / $paginationSize);
+			$this->addTabulatorPaginationData($pageCount); 
+		}
+		$this->terminateWithSuccess($queryData);
+
+		exit;
 	}
 
 	/**
@@ -129,7 +176,6 @@ class Ort extends FHCAPI_Controller
 		$bis = $this->input->get('bis', TRUE);
 		$typ = $this->input->get('typ', TRUE);
 		$personenanzahl = $this->input->get('personenanzahl', TRUE);
-		
 		
 		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
 		$isMitarbeiter = $this->MitarbeiterModel->isMitarbeiter(getAuthUID())->retval;
@@ -254,7 +300,8 @@ class Ort extends FHCAPI_Controller
 	public function createRoom()
 	{
 		$this->form_validation->set_rules('ort_kurzbz', 'kurzbezeichnung', 'required|is_unique[tbl_ort.ort_kurzbz]', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'kurzbz')])
+			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'kurzbz')]),
+			'is_unique' => $this->p->t('ui', 'error_fieldUnique', ['field' =>  $this->p->t('lehre', 'kurzbz')])
 		]);
 		$this->form_validation->set_rules('content_id', 'content_id', 'number', [
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'content_id')])
@@ -424,6 +471,28 @@ class Ort extends FHCAPI_Controller
 	{
 
 		$this->db->trans_start();
+
+		$reservationsQuery = "SELECT COUNT(*) FROM campus.tbl_reservierung WHERE ort_kurzbz = ?";
+		$reservationsResult = $this->OrtModel->execReadOnlyQuery($reservationsQuery, [$ort_kurzbz]);
+		if (isError($reservationsResult)) {
+			$this->terminateWithError(getError($reservationsResult), self::ERROR_TYPE_GENERAL);
+		}
+
+		$reservationsCount = hasData($reservationsResult) ? getData($reservationsResult)[0]->count : 0;
+		if ($reservationsCount > 0) {
+			$this->terminateWithError("Cannot delete room with shortcode $ort_kurzbz because there are existing reservations for this room", self::ERROR_TYPE_GENERAL);
+		}
+
+		$softwareImageOrtQuery = "SELECT COUNT(*) FROM extension.tbl_softwareimage_ort WHERE ort_kurzbz = ?";
+		$softwareImageOrtResult = $this->OrtModel->db->query($softwareImageOrtQuery, [$ort_kurzbz]);
+		if ($softwareImageOrtResult === false) {
+			$this->terminateWithError($this->p->t('ui', 'error_existingSoftwareImageForRoomTypeUponDeletion'), self::ERROR_TYPE_GENERAL);
+		}
+
+		$softwareImageOrtCount = $softwareImageOrtResult->row()->count;
+		if ($softwareImageOrtCount > 0) {
+			$this->terminateWithError($this->p->t('ui', 'error_existingReservationsForRoomsUponDeletion'), self::ERROR_TYPE_GENERAL);
+		}
 
 		$result = $this->OrtModel->delete([
 			"ort_kurzbz" => $ort_kurzbz

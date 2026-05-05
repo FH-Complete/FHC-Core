@@ -16,6 +16,7 @@
  */
 
 import RoomManagerOverview from "../components/RoomManager/RoomManagerOverview.js";
+import {CoreNavigationCmpt} from '../components/navigation/Navigation.js';
 
 import FhcAlert from "../plugins/FhcAlert.js";
 import Phrasen from "../plugins/Phrasen.js";
@@ -40,9 +41,11 @@ const router = VueRouter.createRouter({
 
 const app = Vue.createApp({
   components: {
-    RoomManagerOverview
+    RoomManagerOverview,
+    CoreNavigationCmpt
   },
 });
+
 
 app.config.globalProperties.$capitalize = capitalize;
 

@@ -154,6 +154,11 @@ class FHCAPI_Controller extends Auth_Controller
 		$this->returnObj['meta'][$key] = $value;
 	}
 
+	public function addTabulatorPaginationData($lastPage = 1)
+	{
+		$this->returnObj['last_page'] = $lastPage;
+	}
+
 	/**
 	 * @param string				$key
 	 * @return mixed
