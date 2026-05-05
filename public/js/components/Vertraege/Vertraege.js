@@ -51,9 +51,9 @@ export default {
 				),
 				ajaxResponse: (url, params, response) => response.data,
 				columns: [
-					{title: "Bezeichnung", field: "bezeichnung", width: 300},
+					{title: "Bezeichnung", field: "bezeichnung", width: 300, headerFilter: true},
 					{
-						title: "Betrag", field: "betrag", width: 100,
+						title: "Betrag", field: "betrag", width: 100, headerFilter: true,
 						formatter: function (cell) {
 							let value = cell.getValue();
 
@@ -63,12 +63,13 @@ export default {
 							return parseFloat(value).toFixed(2);
 						}
 					},
-					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125},
-					{title: "Status", field: "status", width: 100},
+					{title: "Vertragstyp", field: "vertragstyp_bezeichnung", width: 125, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title: "Status", field: "status", width: 100, headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{
 						title: "Vertragsdatum",
 						field: "vertragsdatum",
 						width: 128,
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr);
@@ -79,11 +80,11 @@ export default {
 							});
 						}
 					},
-					{title: "VertragId", field: "vertrag_id", visible: false},
-					{title: "Vertragsstunden", field: "vertragsstunden", visible: false},
-					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false},
-					{title: "Anmerkung", field: "anmerkung", visible: false},
-					{title: "isAbgerechnet", field: "isabgerechnet", visible: false},
+					{title: "VertragId", field: "vertrag_id", visible: false, headerFilter: true},
+					{title: "Vertragsstunden", field: "vertragsstunden", visible: false, headerFilter: true},
+					{title: "VertragsstundenStudiensemester", field: "vertragsstunden_studiensemester_kurzbz", visible: false, headerFilter: true},
+					{title: "Anmerkung", field: "anmerkung", visible: false, headerFilter: true},
+					{title: "isAbgerechnet", field: "isabgerechnet", visible: false, headerFilter: true},
 					{
 						title: 'Aktionen', field: 'actions',
 						minWidth: 150,
@@ -137,7 +138,7 @@ export default {
 					columns: true,
 					filter: false //to avoids js errors
 				},
-				persistenceID: 'core-contracts-2026021701',
+				persistenceID: 'core-contracts-2026050501',
 			};
 			return options;
 		},
