@@ -58456,6 +58456,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'classSchedulePageTitle',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeiten der Studiengänge',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Class schedule of study programs',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

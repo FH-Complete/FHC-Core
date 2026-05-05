@@ -383,3 +383,12 @@ $config['navigation_menu']['apps'] = [
 		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
 	]
 ];
+
+$config['navigation_menu']['lehre/ClassSchedule/index'] = array(
+	'classScheduleOverview' => array(
+		'link' => site_url('lehre/ClassSchedule'),
+		'description' => 'Unterrichtszeiten der Studiengänge',
+		'icon' => '',
+		'sort' => 1
+	)
+);

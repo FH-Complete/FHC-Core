@@ -31,16 +31,7 @@ export default {
   watch: {
     filterData: {
       handler(newValue) {
-        this.$refs.classTimeSlotValidityPeriodsTable.tabulator.setData("/", {
-          organizationalUnitShortCode:
-            newValue.selectedOrganizationalUnit?.value,
-          validityPeriodFrom: newValue.validityPeriodFrom
-            ? formatDate(newValue.validityPeriodFrom, "yyyy-MM-dd")
-            : null,
-          validityPeriodTo: newValue.validityPeriodTo
-            ? formatDate(newValue.validityPeriodTo, "yyyy-MM-dd")
-            : null,
-        });
+        this.$refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
       },
       deep: true,
     },
@@ -81,7 +72,7 @@ export default {
           return await this.getParsedClassTimeSlotValidityPeriodData();
         },
         ajaxResponse: (url, params, response) => response,
-        persistenceID: "core_class_schedule_validity_periods",
+        persistenceID: "class_schedule_validity_periods_table",
         selectableRows: true,
         columns: [
           {
@@ -366,7 +357,7 @@ export default {
         .then((response) => {
           this.$fhcAlert.alertSuccess(this.$p.t("ui", "successDelete"));
           window.scrollTo(0, 0);
-          this.$refs.classTimeSlotValidityPeriodsTable.reloadTable();
+          this.$refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
         })
         .catch((error) => {
           console.error(
@@ -481,12 +472,12 @@ export default {
       :editedClassTimeSlotValidityPeriodId="editedClassTimeSlotValidityPeriodId"
       @hideBsModal="() => { resetClassTimeSlotValidityPeriodModal(); editedClassTimeSlotValidityPeriodId = null; }"
       @classTimeSlotValidityPeriodCreated="() => { 
-        $refs.classTimeSlotValidityPeriodsTable.reloadTable();
+        $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
         resetClassTimeSlotValidityPeriodModal();
         this.editedClassTimeSlotValidityPeriodId = null;
       }"
       @classTimeSlotValidityPeriodUpdated="() => { 
-        $refs.classTimeSlotValidityPeriodsTable.reloadTable();
+        $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
         resetClassTimeSlotValidityPeriodModal();
         this.editedClassTimeSlotValidityPeriodId = null;
       }"
@@ -509,7 +500,7 @@ export default {
                 :optionValue="(option) => option.value"
                 :optionLabel="(option) => option.label" 
                 @complete="filterOrganizationalUnits($event)"
-                @itemSelect="(option) => { filterData.selectedOrganizationalUnit = option; }"
+                @itemSelect="(option) => { filterData.selectedOrganizationalUnit = option.value; }"
                 type="autocomplete"
                 name="organizationalUnitShortCode"
                 dropdown 

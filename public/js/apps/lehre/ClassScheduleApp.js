@@ -23,6 +23,7 @@ import FhcAlert from "../../plugins/FhcAlert.js";
 import Phrasen from "../../plugins/Phrasen.js";
 import FhcApi from "../../plugins/Api.js";
 
+import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
 
 const ciPath =
@@ -60,6 +61,7 @@ const router = VueRouter.createRouter({
 
 const app = Vue.createApp({
   components: {
+    CoreNavigationCmpt,
     ClassScheduleOverview,
     ClassScheduleValidityPeriodOverview,
     ClassScheduleOrgUnitGroupedValidityPeriodsOverview,

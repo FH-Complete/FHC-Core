@@ -1,6 +1,6 @@
 <?php
 $includesArray = array(
-	'title' => 'Unterrichtszeiten der Studiengänge',
+	'title' => ucfirst($this->p->t('ui', 'classSchedulePageTitle')),
 	'vue3' => true,
 	'axios027' => true,
 	'bootstrap5' => true,
@@ -23,6 +23,7 @@ $includesArray = array(
 		'public/css/components/calendar.css',
 		'public/css/components/classSchedule.css',
 		'public/css/components/vue-datepicker.css',
+		'public/css/classScheduleOverview.css',
 	)
 );
 
@@ -30,7 +31,7 @@ $this->load->view('templates/FHC-Header', $includesArray);
 ?>
 
 <div id="main">
-	
+	<core-navigation-cmpt></core-navigation-cmpt>
 	<router-view
 		cis-root="<?= CIS_ROOT; ?>"
 		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
