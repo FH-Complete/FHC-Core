@@ -223,7 +223,13 @@ export default {
 		},
 		linkRt(){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + '/vilesci/stammdaten/reihungstestverwaltung.php'
-		}
+		},
+		selected_uid(){
+			return this.selected?.[this.selected.length - 1]?.uid ?? null;
+		},
+		linkGradeList(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/' + this.selected_uid
+		},
 	},
 	watch: {
 		'url_studiensemester_kurzbz': function (newVal, oldVal) {
@@ -462,6 +468,9 @@ export default {
 		},
 		deleteCustomFilter(){
 			this.$refs.stvList.resetFilter();
+		},
+		showAlertNoSelectedStudent(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
 		}
 	},
 	created() {
@@ -686,6 +695,14 @@ export default {
 							<li>
 								<a :href="linkRt" target="_blank">
 									{{ $p.t('stv/RTVerwaltung') }}
+								</a>
+							</li>
+							<li>
+								<a v-if="selected_uid" :href="linkGradeList" target="_blank">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else href="#" @click.prevent="showAlertNoSelectedStudent">
+									{{ $p.t('stv/studienverlauf') }}
 								</a>
 							</li>
 						</app-menu>
