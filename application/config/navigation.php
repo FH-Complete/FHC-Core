@@ -52,7 +52,7 @@ $config['navigation_header'] = array(
 					'description' => 'Raumverwaltung',
 					'expand' => true,
 					'sort' => 40,
-					'requiredPermissions' => 'admin:w'
+					'requiredPermissions' => 'basis/ort:r'
 				)
 			)
 		),
