@@ -58297,6 +58297,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Phrases Dashboard Admin END
+	array(
+		'app' => 'core',
+		'category' => 'stv',
+		'phrase' => 'text_exportXLS',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '{count} Prestudent(Innen) als Excel exportieren',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Export {count} prestudent(s) to Excel',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

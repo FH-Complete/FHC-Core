@@ -195,7 +195,15 @@ export default {
 				},
 				{
 					event: 'dataLoaded',
-					handler: data => this.count = data.length
+					handler: data => {
+						if (Array.isArray(data)) {
+							this.count = data.length;
+							this.allPrestudents = data.map(item => item.prestudent_id);
+						} else {
+							this.count = 0;
+							this.allPrestudents = [];
+						}
+					}
 				},
 				{
 					event: 'dataFiltered',
@@ -237,7 +245,8 @@ export default {
 			dragSource: [],
 			oldScrollUrl: '',
 			oldScrollLeft: 0,
-			oldScrollTop: 0
+			oldScrollTop: 0,
+			allPrestudents: []
 		}
 	},
 	computed: {
@@ -274,6 +283,7 @@ export default {
 				};
 			});
 		},
+		//TODO(Manu) check: replace download or additional entry?
 		downloadConfig() {
 			return {
 				csv: {
@@ -290,6 +300,21 @@ export default {
 			let today = new Date().toLocaleDateString('en-GB')
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
+		},
+		selectedPrestudents() {
+			if (this.selected && this.selected.length > 0) {
+				return this.selected.map(item => item.prestudent_id);
+			} else {
+				// fallback whole list of prestudents
+				return this.allPrestudents || [];
+			}
+		},
+
+		linkXLS(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root
+			+ 'content/statistik/studentenexportextended.xls.php?'
+			+ '&studiensemester_kurzbz=' + this.currentSemester
+			+ '&data=' + this.selectedPrestudents.join(";");
 		},
 	},
 	created: function() {
@@ -600,7 +625,7 @@ export default {
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">
+	<div class="stv-list h-100 pt-3">	
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
@@ -626,6 +651,27 @@ export default {
 				:useSelectionSpan="false"
 				@headerFilterOn="handleHeaderFilter"
 			>
+
+		<!--
+			<template #actions>
+				<div>
+					<button
+					class="btn btn-outline-success sm mb-1"
+					  :title="'Export ' + selectedPrestudents.length + ' prestudent(s) to Excel'"
+					>
+					  <i class="fas fa-file-excel fa-xl"></i>
+					</button>
+				</div>
+			 </template>
+		 -->
+
+			 <template #additional>
+				<div>
+					<a :href="linkXLS" target="_blank">
+						 <i class="fas fa-file-excel fa-xl text-success"   :title="$p.t('stv', 'text_exportXLS', { count: selectedPrestudents.length })"></i>
+					</a>
+				</div>
+			 </template>
 
 			<template #actions>
 				<core-tag ref="tagComponent"
