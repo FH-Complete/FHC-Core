@@ -5,7 +5,7 @@ import PvAutoComplete from '../../../../../index.ci.php/public/js/components/pri
 
 import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import ApiTimelocks from "../../../api/factory/cis/zeitsperren.js";
-import ApiStvAbschlusspruefung from "../../../api/factory/stv/abschlusspruefung";
+import ApiStvAbschlusspruefung from "../../../api/factory/stv/abschlusspruefung.js";
 
 export default {
 	name: 'ZeitsperrenComponent',
