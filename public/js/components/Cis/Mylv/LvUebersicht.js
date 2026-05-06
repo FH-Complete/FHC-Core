@@ -4,7 +4,7 @@ import LvMenu from "./LvMenu.js";
 import ApiAddons from '../../../api/factory/addons.js';
 
 export default  {
-  
+	name: 'LvUebersicht',
     props:{
         event:{
             type:Object,
@@ -100,7 +100,7 @@ export default  {
 			</template>
 			<template v-else>
 				<span v-if="event?.lehrfach_bez ">{{event?.lehrfach_bez + (event?.stg_kurzbzlang?' / ' + event?.stg_kurzbzlang:'')}}</span>
-				<span v-else>Lehrveranstaltungs Übersicht</span>
+				<span v-else>{{$p.t('lehre','lvUebersicht')}}</span>
 			</template>
 
         </template>

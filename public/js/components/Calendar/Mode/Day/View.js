@@ -16,7 +16,19 @@ export default {
 	inject: {
 		timeGrid: "timeGrid",
 		originalEvents: "events",
-		timezone: "timezone"
+		timezone: "timezone",
+		reservierbar: {
+			from: "isReservierbar",
+			default: false
+		},
+		reservierbarMap: {
+			type: Object,
+			default: () => ({})
+		},
+		createContext: {
+			from: 'createContext',
+			default: () => {}
+		},
 	},
 	props: {
 		day: {
@@ -102,6 +114,27 @@ export default {
 						closeFn: () => { this.chosenEvent = null; }
 					});
 				}
+			}
+			else if (evt.detail.source == 'slot')
+			{
+				if (!this.reservierbar)
+					return;
+
+				const { date, part } = evt.detail.value || {};
+				if (!date)
+					return;
+				let reservierbar = this.reservierbarMap?.[date.toISODate()] === true;
+				if (!reservierbar)
+					return;
+
+				this.$emit('requestModalOpen', {
+					event: {
+						type: this.createContext?.scope ?? 'slot',
+						start: date.plus(part.start || part),
+						end: date.plus(part.end || part.plus({ hours: 1 })),
+						createContext: this.createContext
+					}
+				});
 			}
 		}
 	},

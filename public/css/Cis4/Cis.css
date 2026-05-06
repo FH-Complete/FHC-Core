@@ -147,6 +147,8 @@ html {
 	--fhc-cis-menu-lvl-5-color-hover: var(--fhc-text);
 	--fhc-cis-grade-positive: var(--fhc-success);
 	--fhc-cis-grade-negative: var(--fhc-danger);
+
+  --fhc-offcanvas-zindex: 1045;
 }
 
 #themeSwitch i{
@@ -375,7 +377,7 @@ html {
 /* searchbar */
 #nav-search {
   background-color: var(--fhc-primary);
-  z-index: 1;
+ 	z-index: calc(var(--fhc-offcanvas-zindex) + 1) !important;
 }
 #nav-search.me-3 {
   margin: 0 !important;
@@ -413,8 +415,16 @@ html {
 	color: var(--fhc-link) !important;
 }
 
+#nav-main {
+   	z-index: var(--fhc-offcanvas-zindex);
+}
+
 #nav-main-sticky {
 	max-height: calc(100vh - var(--fhc-cis-header-height));
+}
+
+#nav-user-menu {
+   	z-index: calc(var(--fhc-offcanvas-zindex) + 1);
 }
 
 #nav-user-menu img {

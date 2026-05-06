@@ -1,6 +1,7 @@
 import MylvSemesterStudiengang from "./Semester/Studiengang.js";
 
 export default {
+	name: 'Semester',
 	components: {
 		MylvSemesterStudiengang
 	},
@@ -36,8 +37,9 @@ export default {
 			return this.lvs.filter(lv => lv.studiengang_kz == studiengang.studiengang_kz && lv.semester == studiengang.semester);
 		}
 	},
-	template: `<div class="mylv-semester" v-if="ready">
-		<mylv-semester-studiengang v-for="studiengang in studiengaenge" :key="studiengang.studiengang_kz" v-bind="studiengang" :lvs="lvsForStudiengang(studiengang)"/>
+	template: `
+	<div class="mylv-semester" v-if="ready">
+		<mylv-semester-studiengang v-for="studiengang in studiengaenge" :key="studiengang.studiengang_kz" v-bind="studiengang" :lvs="lvsForStudiengang(studiengang)" :semesterInfo="$props.semester" />
 	</div>
 	<div class="mylv-semester text-center" v-else>
 		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>

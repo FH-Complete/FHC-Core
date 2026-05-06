@@ -3,14 +3,12 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiOrt from '../../../api/factory/ort.js'
 export const Raumsuche =  {
 	name: "Raumsuche",
-	props: {
-		
-	},
 	components: {
 		VueDatePicker,
 		CoreFilterCmpt,
 		InputNumber: primevue.inputnumber,
 	},
+	inject: ["isMobile"],
 	data() {
 		return {
 			phrasenPromise: null,
@@ -70,8 +68,13 @@ export const Raumsuche =  {
 				handler: async () => {
 					this.tableBuiltResolve()
 				}
-			}
-			]};
+			}]
+		};
+	},
+	computed: {
+		isDarkMode(){
+			return this.$theme.theme_name.value == 'dark';
+		}
 	},
 	methods: {
 		tableResolve(resolve) {
@@ -178,11 +181,6 @@ export const Raumsuche =  {
 			
 		}
 	},
-	computed: {
-		isDarkMode(){
-			return this.$theme.theme_name.value == 'dark';
-		}
-	},
 	created() {
 		this.phrasenPromise = this.$p.loadCategory(['rauminfo', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
@@ -194,46 +192,50 @@ export const Raumsuche =  {
 	<h1 class="h3">{{$p.t('rauminfo/roomSearch')}}</h1>
 	<hr>
 	<div class="row">
-		<div class="col-12 col-lg-2">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-2">
 			<VueDatePicker
-				:dark="isDarkMode"
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
 				v-model="datum"
+				:dark="isDarkMode"
 				:clearable="false"
-				date-picker
 				:enable-time-picker="false"
 				:format="dateFormat"
 				:text-input="datepickerTextInputOptions"
 				:min-date="new Date()"
-				auto-apply>
-			</VueDatePicker>
-		</div>
-		<div class="col-12 col-lg-1">
-			<VueDatePicker
-				:dark="isDarkMode"
-				v-model="von"
-				:clearable="false"
-				time-picker
-				:format="timeFormat"
-				:text-input="timepickerTextInputOptions"
-				:is-24="true"
+				date-picker
 				auto-apply
 				>
 			</VueDatePicker>
 		</div>
-		<div class="col-12 col-lg-1">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
 			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
+				v-model="von"
 				:dark="isDarkMode"
-				v-model="bis"
 				:clearable="false"
-				time-picker
 				:format="timeFormat"
 				:text-input="timepickerTextInputOptions"
 				:is-24="true"
+				time-picker
+				auto-apply
+				>
+			</VueDatePicker>
+		</div>
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-1">
+			<VueDatePicker
+				@contextmenu="(e) => {if (isMobile) {e.preventDefault();}}"
+				v-model="bis"
+				:dark="isDarkMode"
+				:clearable="false"
+				:format="timeFormat"
+				:text-input="timepickerTextInputOptions"
+				:is-24="true"
+				time-picker
 				auto-apply>
 			</VueDatePicker>
 		</div>
 		
-		<div class="col-12 col-lg-3">
+		<div :class="{'pb-1': isMobile}" class="col-12 col-lg-3">
 			<select ref="raumtyp" id="raumtypSelect" v-model="selectedType" class="form-select" 
 			:aria-label="$p.t('global/studiensemester_auswaehlen')" @change="setRoute($event.target.value)">
 				<option :key="defaultType" selected :value="defaultType">{{defaultType.beschreibung}}</option>
@@ -242,7 +244,7 @@ export const Raumsuche =  {
 		</div>
 		
 
-		<div class="col-12 col-lg-3">
+		<div :class="{'pb-2': isMobile}" class="col-12 col-lg-3">
 			<InputNumber v-model="anzahl" 
 			:prefix="$p.t('rauminfo/minCapacity') + ': '" 
 			inputId="anzahlInput" :min="1" :max="1000" 

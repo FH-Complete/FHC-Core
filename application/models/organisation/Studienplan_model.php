@@ -59,6 +59,37 @@ class Studienplan_model extends DB_Model
 			'tbl_studienplan_lehrveranstaltung.semester' => $semester
 		));
 	}
+	
+	public function getStudienplanByLvaSemKurzbz($lehrveranstaltung_id, $studiensemester_kurzbz) {
+		$qry= "
+			SELECT
+				DISTINCT tbl_studienplan.*
+			FROM
+				lehre.tbl_studienplan
+				JOIN lehre.tbl_studienplan_lehrveranstaltung 
+					USING(studienplan_id)
+			WHERE
+				tbl_studienplan_lehrveranstaltung.lehrveranstaltung_id IN (
+					SELECT 
+						lv.lehrveranstaltung_id
+					FROM
+						lehre.tbl_lehrveranstaltung AS lv
+						LEFT JOIN lehre.tbl_lehrveranstaltung AS t ON t.lehrveranstaltung_id=lv.lehrveranstaltung_template_id
+					WHERE
+						lv.lehrtyp_kurzbz<>'tpl'
+						AND (lv.lehrveranstaltung_id= ? OR (lv.lehrveranstaltung_template_id= ? AND t.lehrtyp_kurzbz='tpl'))
+					)
+				AND EXISTS (
+					SELECT 1 
+					FROM 
+						lehre.tbl_studienplan_semester
+					WHERE studienplan_id=tbl_studienplan.studienplan_id
+						AND studiensemester_kurzbz= ?
+						AND semester = tbl_studienplan_lehrveranstaltung.semester)
+			ORDER BY bezeichnung";
+		
+		return $this->execReadOnlyQuery($qry, array($lehrveranstaltung_id, $lehrveranstaltung_id, $studiensemester_kurzbz));
+	}
 
 	public function getStudienplanLehrveranstaltungForPrestudent($studienplan_id, $semester, $prestudent_id)
 	{

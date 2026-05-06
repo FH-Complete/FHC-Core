@@ -30,6 +30,7 @@ export default {
 			menuOpen:true,
         };
     },
+	inject: ["isMobile"],
 	provide(){
 		return{
 			setActiveEntry: this.setActiveEntry,
@@ -58,7 +59,7 @@ export default {
 		},
 		site_url(){
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router;
-		}
+		},
 	},
 	methods: {
 		fetchMenu() {
@@ -112,10 +113,26 @@ export default {
 		});
 	},
     template: /*html*/`
-	<button id="nav-main-btn" class="navbar-toggler rounded-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-	<fhc-searchbar ref="searchbar" id="nav-search" class="fhc-searchbar w-100 py-1 py-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
+	<div
+		id="header-options-collapsible"
+		class="collapse multi-collapse collapse-horizontal show"
+	>
+		<div class="d-flex flex-row align-items-center gap-2 h-100" style="width: 79px">
+			<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<span v-if="isMobile" class="d-flex flex-row align-items-center">
+				<theme-switch></theme-switch>
+			</span>
+		</div>
+	</div>
+	<fhc-searchbar
+		:searchoptions="searchbaroptions"
+		:searchfunction="searchfunction"
+		ref="searchbar"
+		id="nav-search"
+		class="fhc-searchbar w-100 py-1 py-lg-2"
+	></fhc-searchbar>
     <div id="nav-logo" class="d-none d-lg-block">
 		<div class="d-flex h-100 justify-content-between">
 			<a :href="rootUrl">
@@ -124,22 +141,32 @@ export default {
 			<theme-switch></theme-switch>
 		</div>
     </div>
-	<div id="nav-user">
-		<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-			<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
-		</button>
-		<ul ref="navUserDropdown"
-		@[\`shown.bs.collapse\`]="handleShowNavUser"
-		@[\`hide.bs.collapse\`]="handleHideNavUser"
-		id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
-			<li><a class="fhc-dark-bg btn rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
-			<li >
-				<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
-			</li>
-			<li><hr class="dropdown-divider m-0 "></li>
-			<li ><a class="fhc-dark-bg btn rounded-0 d-block" :href="logoutUrl">Logout</a></li>
-		</ul>
+
+	<div
+		id="header-usermenu-collapsible"
+		class="collapse multi-collapse collapse-horizontal show"
+	>
+		<div
+			:style="!isMobile ? '' : 'width: 51px'"
+			id="nav-user"
+		>
+			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
+				<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
+			</button>
+			<ul ref="navUserDropdown"
+			@[\`shown.bs.collapse\`]="handleShowNavUser"
+			@[\`hide.bs.collapse\`]="handleHideNavUser"
+			id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
+				<li><a class="fhc-dark-bg btn rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
+				<li >
+					<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
+				</li>
+				<li><hr class="dropdown-divider m-0 "></li>
+				<li ><a class="fhc-dark-bg btn rounded-0 d-block" :href="logoutUrl">Logout</a></li>
+			</ul>
+		</div>
 	</div>
+
     <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
 			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">

@@ -73,6 +73,18 @@
 		{
 			"type": "package",
 			"package": {
+				"name": "drag-drop-touch-js/dragdroptouch",
+				"version": "2.0.3",
+				"source": {
+					"url": "https://github.com/drag-drop-touch-js/dragdroptouch.git",
+					"type": "git",
+					"reference": "master"
+				}
+			}
+		},
+		{
+			"type": "package",
+			"package": {
 				"name": "fgelinas/timepicker",
 				"version": "0.3.3",
 				"source": {
@@ -452,6 +464,8 @@
 
 		"easyrdf/easyrdf": "0.9.*",
 
+		"drag-drop-touch-js/dragdroptouch": "*",
+
 		"fgelinas/timepicker": "0.3.3",
 		"fortawesome/font-awesome4": "4.7.*",
 		"fortawesome/font-awesome6": "6.1.*",
@@ -519,5 +533,9 @@
 		"phpmetrics/phpmetrics": "2.*",
 		"sebastian/phpcpd": "3.*",
 		"phpunit/phpunit": "^6"
+	},
+	"scripts": {
+		"post-install-cmd": "@symlink_vendor_to_public",
+		"symlink_vendor_to_public": "ln -sfn ../vendor ./public/"
 	}
 }

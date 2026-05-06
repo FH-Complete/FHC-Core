@@ -3,23 +3,27 @@ import FormInput from "../Form/Input.js";
 import BsModal from "../Bootstrap/Modal.js";
 import AbstractWidget from './Abstract.js';
 
-import ApiBookmark from '../../api/factory/widget/bookmark.js';
+import { useUrlStore } from '../../composables/Pseudostore/DashboardWidget/UrlStore.js';
 
 export default {
 	name: "WidgetsUrl",
-	mixins: [AbstractWidget],
-	inject: {
-		editModeIsActive: {
-			type: Boolean,
-			default: false
-		}
-	},
 	components:{
 		CoreForm,
 		FormInput,
-		BsModal
+		BsModal,
+		PvChips: primevue.chips,
+		PvMultiSelect: primevue.multiselect,
+		PvAutoComplete: primevue.autocomplete,
+	},
+	mixins: [AbstractWidget],
+	inject: {
+		adminMode: {
+			from: 'adminMode',
+			default: false
+		}
 	},
 	data: () => ({
+		ready: false,
 		bookmark_id: null,
 		title_input: "",
 		url_input: "",
@@ -27,29 +31,53 @@ export default {
 			invalidURL: false,
 			invalidTitel: false,
 		},
+		selectedTags: [],
+		selectedFilters: [],
+		filteredArray: []
 	}),
-
 	computed: {
-		tagName() {
-			return this.config.tag !== undefined && this.config.tag.length > 0
-				? this.config.tag
-				: this.$p.t("bookmark", "myBookmarks");
+		availableTags() {
+			return (this.bookmarks || [])
+				.map(bookmark => JSON.parse(bookmark.tag))
+				.flat()
+				.filter((v, i, a) => v && a.indexOf(v) === i);
 		},
-		emptyBookmarks() {
-			if (this.shared instanceof Array && this.shared.length == 0) return true;
+		filteredBookmarks() {
+			if (!this.bookmarks)
+				return [];
 
-			if (!this.shared) return true;
+			if (!this.config.tags || !this.config.tags.length)
+				return this.bookmarks;
 
-			return false;
+			return this.bookmarks.filter(bookmark => {
+				const tags = JSON.parse(bookmark.tag || "[]");
+				return tags.some(tag => this.config.tags.includes(tag));
+			});
 		},
+		newSort() {
+			if (this.bookmarks.length == 0)
+				return 1;
+			else
+				return Math.max(...this.bookmarks.map(b => b.sort)) + 1;
+		},
+		maxSort() {
+			if (this.bookmarks.length == 0)
+				return 0;
+			else
+				return Math.max(...this.filteredBookmarks.map(b => b.sort));
+		},
+		minSort() {
+			if (this.bookmarks.length == 0)
+				return 0;
+			else
+				return Math.min(...this.filteredBookmarks.map(b => b.sort));
+		}
 	},
 	methods: {
-		stopDrag(event){
-			event.preventDefault();
-		},
-		clearInputs(){
+		clearInputs() {
 			this.title_input = "";
-			this.url_input = "";	
+			this.url_input = "";
+			this.selectedTags = [];
 		},
 		openCreateModal() {
 			this.$refs.createModal.show()
@@ -58,23 +86,23 @@ export default {
 			this.title_input = bookmark.title;
 			this.url_input = bookmark.url;
 			this.bookmark_id = bookmark.bookmark_id;
-			this.$refs.editModal.show()
+			this.selectedTags = JSON.parse(bookmark.tag);
+
+			this.$refs.editModal.show();
 		},
-		editBookmark(event){
-			event.preventDefault();
-			if(!this.bookmark_id || !this.url_input || !this.title_input) return;
-			
-			this.$api
-				.call(ApiBookmark.update({
-					bookmark_id: this.bookmark_id,
-					title: this.title_input,
-					url: this.url_input,
-				}))
-				.then((res) => res.data)
-				.then((result) => {
+		editBookmark() {
+			if (!this.bookmark_id || !this.url_input || !this.title_input)
+				return;
+
+			this.actions
+				.update(
+					this.bookmark_id,
+					this.title_input,
+					this.url_input,
+					this.selectedTags
+				)
+				.then(() => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkUpdated"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 					this.$refs.editModal.hide();
@@ -82,10 +110,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-
-		insertBookmark(event) {
-			event.preventDefault();
-
+		insertBookmark() {
 			// reset is-invalid css on url input field
 			for (let key of Object.keys(this.validation)) {
 				this.validation[key] = false;
@@ -94,24 +119,24 @@ export default {
 			// early return if validation failed
 			if (!this.isValidationSuccessfull()) return;
 
-			this.$api
-				.call(ApiBookmark.insert({
-					tag: this.config.tag,
-					title: this.title_input,
-					url: this.url_input,
-				}))
-				.then((res) => res.data)
-				.then((result) => {
+			// get highest Sort
+			const sort = this.newSort;
+
+			this.actions
+				.insert(
+					this.title_input,
+					this.url_input,
+					this.selectedTags,
+					sort
+				)
+				.then(() => {
 					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkAdded"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
 					this.$refs.createModal.hide();
 					// reset the values for the title and url inputs
 					this.clearInputs();
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-
 		isValidationSuccessfull() {
 			// validate the input fields
 			if (this.title_input.length === 0) {
@@ -125,110 +150,348 @@ export default {
 
 			return !Object.values(this.validation).some(value => value === true);
 		},
-		async fetchBookmarks() {
-			await this.$api
-				.call(ApiBookmark.getBookmarks())
-				.then((res) => res.data)
-				.then((result) => {
-					this.shared = result;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		async removeLink(bookmark_id) {
 			let isConfirmed = await this.$fhcAlert.confirmDelete();
 
 			// early return if the confirm dialog was not confirmed
-			if (!isConfirmed) return;
+			if (!isConfirmed)
+				return;
 
-			this.$api
-				.call(ApiBookmark.delete(bookmark_id))
-				.then((res) => res.data)
-				.then((result) => {
-					this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
-					// refetch the bookmarks to see the updates
-					this.fetchBookmarks();
-				})
-				.catch(this.$fhcAlert.handleSystemError);
+			const errors = await this.actions.remove(bookmark_id);
+			
+			if (!errors) {
+				this.$fhcAlert.alertInfo(this.$p.t("bookmark", "bookmarkDeleted"));
+			}
 		},
+		sortDown(bookmark_id) {
+			const current = this.filteredBookmarks.find(b => b.bookmark_id === bookmark_id);
+
+			const next = this.filteredBookmarks
+				.filter(b => b.sort > current.sort)
+				.sort((a, b) => a.sort - b.sort)[0];
+
+			if (!next) {
+				console.log("lowest sort item, no change");
+				return;
+			}
+			this.actions.swap(current.bookmark_id, next.bookmark_id);
+		},
+		sortUp(bookmark_id) {
+			const current = this.filteredBookmarks.find(b => b.bookmark_id === bookmark_id);
+
+			const next = this.filteredBookmarks
+				.filter(b => b.sort < current.sort)
+				.sort((a, b) => a.sort + b.sort)[0];
+
+			if (!next) {
+				console.log("highest sort item, no change");
+				return;
+			}
+			this.actions.swap(current.bookmark_id, next.bookmark_id);
+		},
+		hasTags(link) {
+			if (!link || !link.tag) return false;
+
+			let tags = link.tag;
+			if (typeof tags === 'string') {
+				try {
+					tags = JSON.parse(tags)
+				} catch {
+					return false;
+				}
+			}
+			if (Array.isArray(tags) && tags.length > 0) {
+				return tags.join(' ');
+			}
+		},
+		openFilterModal() {
+			if (this.config.tags && this.config.tags.length)
+				this.selectedFilters = [ ...this.config.tags ];
+			else
+				this.selectedFilters = [];
+			this.$refs.filterModal.show();
+		},
+		async handleAddingTagFilter() {
+			this.config.tags = this.selectedFilters;
+			this.$emit('change');
+			this.$fhcAlert.alertInfo(this.$p.t("bookmark", "filterUpdated"));
+			this.$refs.filterModal.hide();
+		},
+		search(event) {
+			const query = event.query ?? "";
+
+			// Filter for text
+			this.filteredArray = this.availableTags.filter(item =>
+				item.toLowerCase().includes(query.toLowerCase())
+			);
+
+			// input if search not successful
+			if (this.filteredArray.length === 0 && query) {
+				this.filteredArray = [query];
+			}
+		}
+	},
+	setup() {
+		const {
+			bookmarks,
+			getters: { tags },
+			actions
+		} = useUrlStore();
+
+		return { bookmarks, tags, actions }
 	},
 	async mounted() {
-		await this.fetchBookmarks();
-	},
-	created() {
-		// 
-		// this.$emit('setConfig', true); -> use this to enable widget config mode if needed
+		if (!this.adminMode) {
+			await this.actions.fetch();
+			this.ready = true;
+		}
 	},
 	template: /*html*/ `
-    <div class="widgets-url w-100 h-100 overflow-auto" style="padding: 1rem 1rem;">
-        <div class="d-flex flex-column justify-content-between">
-        	<button class="btn btn-outline-secondary btn-sm w-100 mt-2 card" @click="openCreateModal" type="button">{{$p.t('bookmark','newLink')}}</button>
+	<div class="widgets-url w-100 h-100 overflow-auto p-3">
 
-            <template v-if="shared">
+		<div v-if="!adminMode" class="d-flex mt-2">
+			<button
+				class="btn btn-outline-secondary btn-sm flex-grow-1 me-2"
+				@click="openCreateModal"
+			>
+				{{ $p.t('bookmark', 'newLink') }}
+			</button>
+			<button
+				v-if="config.tags && config.tags.length"
+				class="btn btn-secondary btn-sm"
+				:title="$p.t('bookmark/editFilter')"
+				@click="openFilterModal"
+			>
+				<i class="fa-solid fa-filter-circle-xmark"></i>
+			</button>  
+			<button
+				v-else
+				class="btn btn-outline-secondary btn-sm"
+				:title="$p.t('bookmark/filterByTags')"
+				@click="openFilterModal"
+			>
+				<i class="fa-solid fa-filter"></i>
+			</button>
+		</div>
 
-                <template v-if="!emptyBookmarks">
-					<div v-for="link in shared" :key="link.id" class="d-flex mt-2">
-						<a target="_blank" :href="link.url">
-							<i class="fa fa-solid fa-arrow-up-right-from-square me-1"></i>{{ link.title }}
+		<div
+			v-if="adminMode"
+			class="h-100 d-flex align-items-center text-center"
+		>
+			{{ $p.t('bookmark/adminMode') }}
+		</div>
+		<template v-else-if="ready">
+			<template v-if="filteredBookmarks.length">
+				<div
+					v-for="link in filteredBookmarks"
+					:key="link.id"
+					class="d-flex mt-2"
+				>
+					<a target="_blank" :href="link.url" class="me-1">
+						<i
+							class="fa fa-solid fa-arrow-up-right-from-square me-1"
+							aria-hidden="true"
+						></i>
+						{{ link.title }}
+					</a>
+					<span
+						v-if="hasTags(link)"
+						:title="hasTags(link)"
+						style="color: silver;"
+					>
+						<i
+							class="fa fa-solid fa-tag text-gray-500"
+							aria-hidden="true"
+						></i>
+					</span>
+
+					<div class="ms-auto">
+						<!--EDIT BOOKMARK-->
+						<a
+							type="button"
+							href="#"
+							:title="$p.t('bookmark/editBookmark')"
+							aria-label="edit bookmark"
+							@click.prevent="openEditModal(link)"
+						>
+							<i class="fa fa-edit me-1" aria-hidden="true"></i>
 						</a>
-
-						<div class="ms-auto">
-							<!--EDIT BOOKMARK-->
-							<a type="button" href="#" @click.prevent="openEditModal(link)" aria-label="edit bookmark" v-tooltip="{showDelay:1000,value:'edit bookmark'}">
-								<i class="fa fa-edit me-1" aria-hidden="true"></i>
-							</a>
-							<!--DELETE BOOKMARK-->
-							<a type="button" id="deleteBookmark" href="#" aria-label="delete bookmark" v-tooltip="{showDelay:1000,value:'delete bookmark'}" @click.prevent="removeLink(link.bookmark_id)">
-								<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
-							</a>
-						</div>
+						<!--DELETE BOOKMARK-->
+						<a
+							type="button"
+							href="#"
+							:title="$p.t('bookmark/deleteBookmark')"
+							aria-label="delete bookmark"
+							@click.prevent="removeLink(link.bookmark_id)"
+						>
+							<i class="fa fa-regular fa-trash-can" aria-hidden="true"></i>
+						</a>
+						<!--SORT BOOKMARKS-->
+						<a
+							v-if="filteredBookmarks.length > 1"
+							type="button"
+							href="#"
+							:title="$p.t('bookmark/sortDownwards')"
+							aria-label="sortdown bookmark"
+							@click.prevent="sortDown(link.bookmark_id)"
+						>
+							<i
+								class="fa fa-arrow-down me-1"
+								:class="{ 'text-light pointer-events-none': link.sort === maxSort }"
+							></i>
+						</a>
+						<a
+							v-if="filteredBookmarks.length > 1"
+							type="button"
+							href="#"
+							:title="$p.t('bookmark/sortToTop')"
+							aria-label="sortup bookmark"
+							@click.prevent="sortUp(link.bookmark_id)"
+						>
+							<i
+								class="fa fa-arrow-up me-1"
+								:class="{ 'text-light pointer-events-none': link.sort === minSort }"
+							></i>
+						</a>
 					</div>
-                </template>
+				</div>
+			</template>
 
-                <div v-else class="d-flex mt-2">
-                    <span>{{$p.t('bookmark','emptyBookmarks')}}</span>
-                </div>
-
-            </template>
-
-            <template v-else>
-                <p v-for="i in 4" class="placeholder-glow">
-                    <span class="placeholder" :class="{'col-9' : true}"></span>
-                </p>
-            </template>
-        </div>
-    </div>
+			<div v-else class="d-flex mt-2">
+				<span>{{ $p.t('bookmark', 'emptyBookmarks') }}</span>
+			</div>
+		</template>
+		<template v-else>
+			<p v-for="i in 4" class="placeholder-glow">
+				<span class="placeholder col-9"></span>
+			</p>
+		</template>
+	</div>
 	<!--EDIT MODAL-->
 	<teleport to="body">
-		<bs-modal @[\`hide.bs.modal\`]="bookmark_id=null; clearInputs();" ref="editModal">
+		<bs-modal
+			ref="editModal"
+			@hide-bs-modal="bookmark_id=null; clearInputs();"
+		>
 			<template #title>
-				<h2>{{$p.t('bookmark','editLink')}}</h2>
+				<h2>{{ $p.t('bookmark', 'editLink') }}</h2>
 			</template>
 			<template #default>
-				<form-input  :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="editTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<form-input label="Url" title="Url" id="editUrl" v-model="url_input" name="url"></form-input>
+
+				<form-input
+					id="editTitle"
+					name="title"
+					v-model="title_input"
+					:label="$p.t('profil', 'Titel')"
+					:title="$p.t('profil', 'Titel')"
+					class="mb-2"
+				></form-input>
+				<form-input
+					id="editUrl"
+					name="url"
+					v-model="url_input"
+					label="Url"
+					title="Url"
+				></form-input>
+
+				<label class="mt-2">Tags</label>
+				<div class="mt-2">
+					<pv-auto-complete
+						v-model="selectedTags"
+						multiple
+						dropdown
+						:suggestions="filteredArray"
+						@complete="search" 
+					/>
+				</div>
 			</template>
 			<template #footer>
-				<button @click="editBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
+				<button class="btn btn-primary" @click.prevent="editBookmark">
+					{{ $p.t('bookmark', 'saveLink') }}
+				</button>
 			</template>
 		</bs-modal>
 	</teleport>
 	<!--CREATE MODAL-->
 	<teleport to="body">
-		<bs-modal @[\`hide.bs.modal\`]="clearInputs();" ref="createModal">
+		<bs-modal ref="createModal" @hide-bs-modal="clearInputs();">
 			<template #title>
-				<h2>{{$p.t('bookmark','newLink')}}</h2>
+				<h2>{{ $p.t('bookmark', 'newLink') }}</h2>
 			</template>
 			<template #default>
-				<form-input :label="$p.t('profil','Titel')" :title="$p.t('profil','Titel')" id="insertTitle" v-model="title_input" name="title" class="mb-2"></form-input>
-				<form-input label="Url" title="Url" id="insertUrl" v-model="url_input" name="url"></form-input>
+
+				<form-input
+					id="insertTitle"
+					name="title"
+					v-model="title_input"
+					:label="$p.t('profil', 'Titel')"
+					:title="$p.t('profil', 'Titel')"
+					class="mb-2"
+				></form-input>
+				<form-input
+					id="insertUrl"
+					name="url"
+					v-model="url_input"
+					label="Url"
+					title="Url"
+				></form-input>
+
+				<label class="mt-2">Tags</label>
+				<div class="mt-2">
+					<pv-auto-complete
+						v-model="selectedTags"
+						multiple
+						dropdown
+						:suggestions="filteredArray"
+						@complete="search" 
+					/>
+				</div>					
+
 			</template>
 			<template #footer>
-				<button @click="insertBookmark" class="btn btn-primary">{{$p.t('bookmark','saveLink')}}</button>
+				<button class="btn btn-primary" @click.prevent="insertBookmark">
+					{{ $p.t('bookmark', 'saveLink') }}
+				</button>
+			</template>
+		</bs-modal>
+	</teleport>
+	<!--FILTER MODAL-->
+	<teleport to="body">
+		<bs-modal ref="filterModal" @hide-bs-modal="clearInputs();">
+			<template #title>
+				<h2>{{ $p.t('bookmark', 'headerFilterBookmark') }}</h2>
+			</template>
+			<template #default>
+
+				<div class="mt-2 row">
+					<div class="col-10">
+						<pv-multi-select
+							id="tagFilterUrl"
+							v-model="selectedFilters"
+							:options="availableTags"
+							display="chip"
+							:placeholder="$p.t('bookmark', 'noFilter')"
+							:maxSelectedLabels="3"
+							class="p-inputtext-sm w-100 me-2"
+						/>
+					</div>
+				</div>				
+
+			</template>
+			<template #footer>
+				<button
+					class="btn btn-secondary"
+					:title="$p.t('bookmark', 'filterByTags')"
+					@click="handleAddingTagFilter()"
+				>
+					{{ $p.t('ui/ok') }}
+				</button>
 			</template>
 		</bs-modal>
 	</teleport>
 	`,
 };
+
 
 /*
 Link JSON structure:

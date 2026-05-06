@@ -12,20 +12,61 @@ export default {
 		dashboard: String,
 		widgets: Array
 	},
-	data: () => ({
-		funktionen: {},
-		sections: [],
-		tmpLoading: ''
-	}),
+	data() {
+		return {
+			funktionen: {},
+			sections: [],
+			selectedFunktionen: [],
+			abortController: null
+		};
+	},
 	computed: {
 		pickerWidgets() {
 			return this.widgets.filter(widget => widget.allowed);
+		},
+		sizeLimits() {
+			return Object.fromEntries(this.widgets.map(({ setup, widget_id: type }) => {
+				const result = {}; // work on a copy
+				if (setup.height === undefined)
+					result.height = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.height))
+					result.height = { min: setup.height, max: setup.height };
+				else
+					result.height = {
+						min: setup.height.min ?? 1,
+						max: setup.height.max
+					};
+
+				if (setup.width === undefined)
+					result.width = { min: 1, max: undefined };
+				else if (Number.isInteger(setup.width))
+					result.width = { min: setup.width, max: setup.width };
+				else
+					result.width = {
+						min: setup.width.min ?? 1,
+						max: setup.width.max
+					};
+
+				return [type, result];
+			}));
+		}
+	},
+	watch: {
+		dashboard() {
+			this.loadSections();
+			this.loadFunktionen();
 		}
 	},
 	methods: {
-		widgetAdd(section_name, widget) {
+		widgetAdd(widget, section_name) {
 			this.$refs.widgetpicker.getWidget().then(widget_id => {
 				widget.widget = widget_id;
+				// NOTE(chris): min size
+				widget.place = Object.fromEntries(Object.entries(widget.place).map(([key, value]) => {
+					value.w = this.sizeLimits[widget_id].width.min;
+					value.h = this.sizeLimits[widget_id].height.min;
+					return [key, value];
+				}));
 				widget.id = 'loading_' + String((new Date()).valueOf());
 				delete widget.custom;
 				widget.preset = 1;
@@ -35,6 +76,8 @@ export default {
 					if (section.name == section_name)
 						section.widgets.push(loading);
 				});
+
+				delete widget.id;
 
 				const params = {
 					dashboard: this.dashboard,
@@ -64,22 +107,29 @@ export default {
 			})
 			.catch(() => {});
 		},
-		widgetUpdate(section_name, payload) {
-			payload = payload[section_name];
+		widgetUpdate(payload, section_name) {
 			for (var k in payload) {
 				const section = this.sections.find(section => section.name == section_name);
 				for (var wid in section.widgets) {
 					if (section.widgets[wid].id == k) {
-						payload[k] = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						const copy = ObjectUtils.mergeDeep(section.widgets[wid], payload[k]);
+						if (payload[k].config)
+							copy.config = payload[k].config;
+						payload[k] = copy;
 						// NOTE(chris): remove internal props
-						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id'])
+						for (var prop of ['_x', '_y', '_w', '_h', 'index', 'id', 'custom'])
 							if (payload[k][prop])
 								delete payload[k][prop];
 						break;
 					}
 				}
+				if (payload[k].place) {
+					Object.values(payload[k].place).forEach(place => {
+						if (place.pinned === false)
+							delete place.pinned;
+					});
+				}
 				payload[k].widgetid = k;
-				delete payload[k].custom;
 			}
 			this.$api
 				.call(Object.entries(payload).map(([key, widget]) => [
@@ -106,7 +156,7 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		widgetRemove(section_name, id) {
+		widgetRemove(id, section_name) {
 			const params = {
 				db: this.dashboard,
 				funktion_kurzbz: section_name,
@@ -122,21 +172,22 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		loadSections(evt) {
-			let funktionen = Array.from(evt.target.querySelectorAll("option:checked"),e=>e.value);
-			this.sections = [];
-			this.tmpLoading = funktionen.join('###');
-
+		loadSections() {
 			const params = {
 				db: this.dashboard,
-				funktionen
+				funktionen: this.selectedFunktionen
 			};
 
+			if (this.abortController)
+				this.abortController.abort();
+			this.abortController = new AbortController();
+			const signal = this.abortController.signal;
+
+			this.sections = [];
+			
 			return this.$api
-				.call(ApiDashboardPreset.getBatch(params))
+				.call(ApiDashboardPreset.getBatch(params), { signal })
 				.then(result => {
-					if (this.tmpLoading !== funktionen.join('###'))
-						return; // NOTE(chris): prevent race condition
 					for (var section in result.data) {
 						let widgets = [];
 						for (var wid in result.data[section]) {
@@ -151,7 +202,6 @@ export default {
 					}
 				})
 				.catch(this.$fhcAlert.handleSystemError);
-
 		},
 		loadFunktionen() {
 			this.$api
@@ -165,17 +215,17 @@ export default {
 	created() {
 		this.loadFunktionen();
 	},
-	watch: {
-		dashboard() {
-			// TODO(chris): this should be done without a watcher
-			this.loadSections({target:this.$refs.funktionenList});
-			this.loadFunktionen();
-		}
-	},
-	template: `<div class="dashboard-admin-presets">
+	template: /* html */`
+	<div class="dashboard-admin-presets">
 		<div class="row">
 			<div class="col-3">
-				<select ref="funktionenList" style="height:30em" class="form-control" multiple @input="loadSections">
+				<select
+					v-model="selectedFunktionen"
+					class="form-control"
+					style="height:30em"
+					multiple
+					@change="loadSections"
+				>
 					<option
 						v-for="funktion in funktionen"
 						:key="funktion.funktion_kurzbz"
@@ -185,9 +235,20 @@ export default {
 				</select>
 			</div>
 			<div class="col-9">
-				<dashboard-section v-for="section in sections" :key="section.name" :name="section.name" :widgets="section.widgets" @widget-add="widgetAdd" @widget-update="widgetUpdate" @widget-remove="widgetRemove"></dashboard-section>
+				<dashboard-section
+					v-for="section in sections"
+					:key="section.name"
+					:name="section.name"
+					:widgets="section.widgets"
+					@widget-add="widgetAdd"
+					@widget-update="widgetUpdate"
+					@widget-remove="widgetRemove"
+				></dashboard-section>
 			</div>
 		</div>
-		<dashboard-widget-picker ref="widgetpicker" :widgets="pickerWidgets"></dashboard-widget-picker>
+		<dashboard-widget-picker
+			ref="widgetpicker"
+			:widgets="pickerWidgets"
+		></dashboard-widget-picker>
 	</div>`
 }

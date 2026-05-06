@@ -94,6 +94,9 @@ require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
+require_once('dbupdate_3.4/76150_perm_other_lv_plan.php');
+require_once('dbupdate_3.4/68957_dashboard_bookmark_neue_Spalte_sort.php');
+require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -467,7 +470,7 @@ $tabellen=array(
 	"wawi.tbl_rechnungsbetrag"  => array("rechnungsbetrag_id","rechnung_id","mwst","betrag","bezeichnung","ext_id"),
 	"wawi.tbl_aufteilung"  => array("aufteilung_id","bestellung_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
 	"wawi.tbl_aufteilung_default"  => array("aufteilung_id","kostenstelle_id","oe_kurzbz","anteil","insertamum","insertvon","updateamum","updatevon"),
-	"dashboard.tbl_bookmark"  => array("bookmark_id","uid","url","title","tag","insertamum","insertvon","updateamum","updatevon"),
+	"dashboard.tbl_bookmark"  => array("bookmark_id","uid","url","title","tag","insertamum","insertvon","updateamum","updatevon","sort"),
 
 );
 

@@ -1,30 +1,30 @@
-import {CoreFilterCmpt} from "../../../components/filter/Filter.js";
+import { CoreFilterCmpt } from "../../../components/filter/Filter.js";
 import Mailverteiler from "./ProfilComponents/Mailverteiler.js";
-import QuickLinks from "./ProfilComponents/QuickLinks.js";
 import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
+import QuickLinks from "./ProfilComponents/QuickLinks.js";
 
-import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { dateFilter } from "../../../tabulator/filters/Dates.js";
 
 export default {
 	components: {
 		CoreFilterCmpt,
 		Mailverteiler,
-		QuickLinks,
 		RoleInformation,
 		ProfilEmails,
 		ProfilInformation,
+		QuickLinks,
 	},
 	inject: ["collapseFunction", "language"],
 	data() {
 		return {
 			collapseIconFunktionen: true,
-			preloadedPhrasen:{},
+			arePhrasesPreloaded: false,
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
-					columns: false
+					columns: false,
 				},
 				minHeight: 300,
 				layout: "fitColumns",
@@ -35,58 +35,65 @@ export default {
 					//? option when wanting to hide the collapsed list
 
 					{
-						title:
-							"<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
+						title: "<i id='collapseIconFunktionen' role='button' class='fa-solid fa-angle-down  '></i>",
 						field: "collapse",
 						headerSort: false,
 						headerFilter: false,
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
+						title: Vue.computed(() => this.$p.t("ui/bezeichnung")),
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
+						title: Vue.computed(() =>
+							this.$p.t("lehre/organisationseinheit"),
+						),
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
+						title: Vue.computed(() =>
+							this.$p.t("global/gueltigVon"),
+						),
 						field: "Gültig_von",
-						headerFilterFunc: 'dates',
+						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
 						visible: true,
-						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatter: "datetime",
+						formatterParams: this.datetimeFormatterParams(),
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
+						title: Vue.computed(() =>
+							this.$p.t("global/gueltigBis"),
+						),
 						field: "Gültig_bis",
-						headerFilterFunc: 'dates',
+						headerFilterFunc: "dates",
 						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
 						visible: true,
-						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatter: "datetime",
+						formatterParams: this.datetimeFormatterParams(),
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
+						title: Vue.computed(() =>
+							this.$p.t("profil/wochenstunden"),
+						),
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
 					},
 				],
 			},
@@ -94,47 +101,56 @@ export default {
 	},
 
 	//? this is the prop passed to the dynamic component with the custom data of the view
-	props: ["data"],
+	props: ["data", "permissions"],
 	methods: {
 		funktionenTableBuilt: function () {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
-		datetimeFormatterParams: function() {
+		datetimeFormatterParams: function () {
 			const params = {
-				inputFormat:"yyyy-MM-dd",
-				outputFormat:"dd.MM.yyyy",
-				invalidPlaceholder:"(invalid date)",
-				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+				inputFormat: "yyyy-MM-dd",
+				outputFormat: "dd.MM.yyyy",
+				invalidPlaceholder: "(invalid date)",
+				timezone: FHC_JS_DATA_STORAGE_OBJECT.timezone,
 			};
 			return params;
-		}
+		},
 	},
 	watch: {
-		'data.funktionen'(newVal) {
-			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
+		"data.funktionen"(newVal) {
+			if (this.$refs.funktionenTable)
+				this.$refs.funktionenTable.tabulator.setData(newVal);
 		},
-		'language.value'(newVal) {  // reevaluates computed phrasen
-			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
-		}
+		"language.value"(newVal) {
+			// reevaluates computed phrasen
+			if (this.$refs.funktionenTable)
+				this.$refs.funktionenTable.tabulator.setColumns(
+					this.funktionen_table_options.columns,
+				);
+		},
 	},
 	computed: {
 		getTelefonValue() {
-			if(this.data.standort_telefon?.kontakt) {
-				return this.data.standort_telefon.kontakt + " " + this.data.telefonklappe
-			} else if(this.data.standort_telefon) {
-				return this.data.standort_telefon + " " + this.data.telefonklappe
+			if (this.data.standort_telefon?.kontakt) {
+				return (
+					this.data.standort_telefon.kontakt +
+					" " +
+					this.data.telefonklappe
+				);
+			} else if (this.data.standort_telefon) {
+				return (
+					this.data.standort_telefon + " " + this.data.telefonklappe
+				);
 			} else {
-				return this.data.telefonklappe
+				return this.data.telefonklappe;
 			}
 		},
 		fotoStatus() {
 			return this.data?.fotoStatus ?? null;
 		},
-
 		personEmails() {
 			return this.data?.emails ? this.data.emails : [];
 		},
-
 		profilInformation() {
 			if (!this.data) {
 				return {};
@@ -151,43 +167,56 @@ export default {
 				foto: this.data.foto,
 			};
 		},
-
 		roleInformation() {
 			if (!this.data) {
 				return {};
 			}
 			return {
 				geburtsdatum: {
-					label: `${this.$p.t('profil','Geburtsdatum')}`,
-					value: this.data.gebdatum
+					label: `${this.$p.t("profil", "Geburtsdatum")}`,
+					value: this.data.gebdatum,
 				},
 				geburtsort: {
-					label: `${this.$p.t('profil','Geburtsort')}`,
-					value: this.data.gebort
+					label: `${this.$p.t("profil", "Geburtsort")}`,
+					value: this.data.gebort,
 				},
 				personenkennzeichen: {
-					label: `${this.$p.t('profil','Kurzzeichen')}`,
-					value: this.data.kurzbz
+					label: `${this.$p.t("profil", "Kurzzeichen")}`,
+					value: this.data.kurzbz,
 				},
 				telefon: {
-					label: `${this.$p.t('profil','Telefon')}`,
-					value: this.getTelefonValue
+					label: `${this.$p.t("profil", "Telefon")}`,
+					value: this.getTelefonValue,
 				},
 				office: {
-					label: `${this.$p.t('profil','Büro')}`,
-					value: this.data.ort_kurzbz
-				}
+					label: `${this.$p.t("profil", "Büro")}`,
+					value: this.data.ort_kurzbz,
+				},
 			};
 		},
+		quickLinks() {
+			let quickLinks = [];
+			if (
+				this.$props.permissions &&
+				this.$props.permissions["basis/other_lv_plan"]
+			) {
+				quickLinks.push({
+					icon: "fa-calendar-days",
+					phrase: "lehre/stundenplan",
+					action: () => {
+						this.$router.push({
+							name: "OtherLvPlan",
+							params: { otherUid: this.$props.data.username },
+						});
+					},
+				});
+			}
+			return quickLinks;
+		},
 	},
-	created(){
+	created() {
 		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
-			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
-			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
-			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
-			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
-			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
-			this.preloadedPhrasen.loaded = true;
+			this.arePhrasesPreloaded = true;
 		});
 	},
 
@@ -242,12 +271,12 @@ export default {
                 </div>
                 <!-- START OF THE SECOND PROFIL INFORMATION ROW -->
                 <!-- ROW WITH PROFIL IMAGE AND INFORMATION END -->
-            </div  >
+            </div>
             <!-- SECOND ROW UNDER THE PROFIL IMAGE AND INFORMATION WITH THE TABLES -->
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt v-if="preloadedPhrasen.loaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt v-if="arePhrasesPreloaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>
@@ -256,26 +285,22 @@ export default {
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
             <!-- VISIBLE UNTIL VIEWPORT MD -->
-            <!--TODO: uncomment when implemented
-                <div  class="row d-none d-md-block mb-3">
-                  <div class="col">
-                
-                   <quick-links :title="$p.t('profil','quickLinks')" ></quick-links>
-                
-                  </div>
-                </div>
-                -->
-            <div  class="row">
-                <div class="col">
-                    <!-- MAILVERTEILER -->
-                    <mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
-                </div>
-            </div>
-            <!-- END OF SIDE PANEL -->
-        </div>
+			<div v-if="quickLinks.length" class="row mb-4">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<!-- MAILVERTEILER -->
+					<mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
+				</div>
+			</div>
+			<!-- END OF SIDE PANEL -->
+		</div>
         <!-- END OF CONTAINER ROW-->
-    </div>
-    <!-- END OF CONTAINER -->
+	</div>
+	<!-- END OF CONTAINER -->
 </div>
 `,
 };

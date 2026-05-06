@@ -42,14 +42,6 @@ export const AbgabetoolAssistenz = {
 		stg_kz_prop: {
 			default: null
 		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({name: '', uid: ''}),
-			validator(value) {
-				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
-			}
-		}
 	},
 	data() {
 		return {
@@ -530,40 +522,19 @@ export const AbgabetoolAssistenz = {
 			const table = this.$refs.abgabeTable.tabulator
 
 			this.tableBuiltResolve()
-			
-			table.on("columnMoved", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnResized", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnVisibilityChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("filterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("headerFilterChanged", () => {
-				this.saveState(table);
-			});
-
-			table.on("dataSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("columnSorted", () => {
-				this.saveState(table);
-			});
-
-			table.on("sortersChanged", () => {
-				this.saveState(table);
-			});
 
 			const saved = this.loadState();
+
+			// setup change eventlisteners
+			const events = [
+				"columnMoved", "columnResized", "columnVisibilityChanged",
+				"filterChanged", "headerFilterChanged", "dataSorted",
+				"columnSorted", "sortersChanged"
+			];
+
+			events.forEach(eventName => {
+				table.on(eventName, () => this.saveState(table));
+			});
 
 			table.on("renderComplete", () => {
 				if(!this.stateRestored) {
@@ -1007,7 +978,6 @@ export const AbgabetoolAssistenz = {
 			this.tableData = this.mapProjekteToTableData(this.projektarbeiten)
 
 			await this.tableBuiltPromise
-			
 			this.$refs.abgabeTable.tabulator.setData(this.tableData);
 		},
 		loadProjektarbeiten(all = false, callback) {

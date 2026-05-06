@@ -23,9 +23,11 @@ class Projektarbeit_model extends DB_Model
 	 */
 	public function getProjektarbeit($student_uid, $studiengang_kz = null, $studiensemester_kurzbz = null, $projekttyp = null, $final = null)
 	{
+		$sprache_index = "COALESCE((SELECT index FROM public.tbl_sprache WHERE sprache=" . $this->escape(getUserLanguage()) . " LIMIT 1), 1)";
 		$qry = "SELECT
 					pa.*, tbl_projekttyp.bezeichnung,
 					tbl_lehreinheit.studiensemester_kurzbz, tbl_lehrveranstaltung.lehrveranstaltung_id,
+					tbl_sprache.bezeichnung[".$sprache_index."] AS sprache_bezeichnung
 					tbl_firma.name AS firma_name,
 					(
 						SELECT
@@ -44,6 +46,7 @@ class Projektarbeit_model extends DB_Model
 					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					LEFT JOIN public.tbl_firma USING (firma_id)
+					LEFT JOIN public.tbl_sprache ON tbl_projektarbeit.sprache = tbl_sprache.sprache
 				WHERE
 					pa.student_uid = ?";
 

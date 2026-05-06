@@ -5,6 +5,10 @@ export default {
 			required: true
 		}
 	},
+	inject: {
+		mode: "mode",
+	},
+	emits: ['delete-event'],
 	computed: {
 		tooltipString() {
 			const tooltipArray = [];
@@ -50,12 +54,20 @@ export default {
 			return luxon.Duration
 				.fromISOTime(this.event.ende)
 				.toISOTime({ suppressSeconds: true });
+		},
+		isFutureEvent() {
+			const eventStart = luxon.DateTime.fromISO(`${this.event.datum}T${this.event.beginn}`);
+			return eventStart > luxon.DateTime.now();
+		}
+	},
+	methods: {
+		handleDelete() {
+			this.$emit('delete-event', this.event);
 		}
 	},
 	template: /* html */`
 	<div
-		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1"
-	>
+		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative">
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
 			class="event-time d-grid h-100"
@@ -64,6 +76,15 @@ export default {
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
+			<button
+				v-if="isFutureEvent && event.type === 'reservierung' && event.deletable && mode !== 'Month'"
+				class="btn btn-sm btn-outline-secondary position-absolute top-0 end-0 m-1"
+				title="Löschen"
+				@click.stop="handleDelete"
+			>
+				<i class="fa-solid fa-xmark"></i>
+			</button>
+		
 			<span class="event-topic">{{ event.topic }}</span>
 			<span
 				v-for="lektor in event.lektor.slice(0, 3)"

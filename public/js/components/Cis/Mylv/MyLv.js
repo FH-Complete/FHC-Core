@@ -1,25 +1,37 @@
-import MylvSemester from "./Semester.js";
-import Phrasen from "../../../mixins/Phrasen.js";
+import MylvSemesterCards from "./Semester.js";
+import MylvTable from "./Table.js";
+import ApiAddons from "../../../api/factory/addons.js"
 
 // TODO(chris): phrase: global/studiensemester_auswaehlen
 // TODO(chris): phrase: next & prev +aria-label
 
 export default {
+	name: 'MyLv',
 	components: {
-		MylvSemester
+		MylvSemesterCards,
+		MylvTable
 	},
-	mixins: [
-		Phrasen
-	],
 	data: () => {
 		return {
 			firstLoad: true,
 			studiensemester: null,
 			lvs: {},
-			currentSemester: null
+			currentSemester: null,
+			mode: localStorage.getItem('myLvaDefaultMode') ?? 'cards'
 		};
 	},
+	provide() {
+		return {
+			type: Vue.computed(() => this.type),
+		}
+	},
+	inject: ['isStudent', 'isMitarbeiter'],
 	computed: {
+		type() {
+			if(this.isStudent) return 'student'
+			if(this.isMitarbeiter) return 'employee'
+			return null
+		},
 		ready() {
 			return this.studiensemester !== null && (!this.firstLoad || this.current.lvs !== null);
 		},
@@ -34,7 +46,22 @@ export default {
 				axios.get(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/components/Cis/Mylv/Lvs/' + this.currentSemester).then(res => {
 					this.lvs[this.currentSemester].lvs = res.data.retval || [];
 					this.firstLoad = false;
-				});
+					
+					this.lvs[this.currentSemester].lvs.forEach(lv=>{
+
+						this.$api.call(ApiAddons.getLvMenu(lv.lehrveranstaltung_id, this.currentSemester)).then(res => {
+							if(res.data) {
+								
+								const lvProp = this.lvs[this.currentSemester].lvs.find(lv2 => lv2.lehrveranstaltung_id == lv.lehrveranstaltung_id)
+								lvProp.menu = res.data
+								
+							}
+						})
+						
+					})
+					
+
+				})
 			}
 			return this.lvs[this.currentSemester];
 		},
@@ -67,6 +94,10 @@ export default {
 		}
 	},
 	methods: {
+		clickMode(evt, mode) {
+			localStorage.setItem('myLvaDefaultMode', mode)
+			this.mode = mode
+		},
 		prevSem() {
 			this.$refs.studiensemester.selectedIndex--;
 			this.$refs.studiensemester.dispatchEvent(new Event('change', { bubbles: true }));
@@ -99,7 +130,7 @@ export default {
 
 	<h2>{{$p.t('lehre/myLV')}}</h2>
 	<hr>
-	<div class="mylv-student" v-if="ready">
+	<div class="mylv" v-if="ready">
 		<div v-if="currentSemester" class="row justify-content-center mb-3">
 			<div class="col-auto d-none">
 				<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
@@ -117,13 +148,34 @@ export default {
 					</button>
 				</div>
 			</div>
+			<div class=" col-auto my-lva-modes">
+				<div class="d-flex gap-1 justify-content-end" role="group">
+					<button
+						type="button"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'cards'}"
+						@click="clickMode($event, 'cards')"
+					>
+						<i class="fa fa-grip"></i>
+					</button>
+					<button
+						type="button"
+						class="btn btn-outline-secondary"
+						:class="{active: mode === 'table'}"
+						@click="clickMode($event, 'table')"
+					>
+						<i class="fa fa-table"></i>
+					</button>
+				</div>
+			</div>
 		</div>
 		<div class="alert alert-danger" role="alert" v-else>
 			{{$p.t('lehre/noLvFound')}}
 		</div>
-		<mylv-semester v-bind="current"/>
+		<mylv-semester-cards v-if="mode == 'cards'" v-bind="current"/>
+		<mylv-table v-else-if="mode == 'table'" v-bind="current"/>
 	</div>
-	<div class="mylv-student text-center" v-else>
+	<div class="mylv text-center" v-else>
 		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 	</div>`
 };
