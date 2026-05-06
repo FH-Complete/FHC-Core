@@ -1,0 +1,73 @@
+:root {
+	--fhc-horizontalsplit-hsplitter-bg-color: var(--fhc-background, #eee);
+	--fhc-horizontalsplit-hsplitter-border-color: var(--fhc-border, #eee);
+	--fhc-horizontalsplit-hsplitter-splitactions-color: var(--fhc-dark, #000);
+}
+
+.horizontalsplit-container {
+	display: flex;
+	flex-direction: row;
+	overflow: hidden;
+	max-height: 100%;
+	padding: 0px;
+}
+
+.horizontalsplitted {
+	overflow: auto;
+	flex-shrink: 0;
+}
+
+.horizontalsplitter {
+	flex-shrink: 0;
+	width: 8px;
+	cursor: col-resize;
+	user-select: none;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.horizontalsplitter.left {
+	border-left: solid 3px var(--fhc-horizontalsplit-hsplitter-border-color);
+}
+
+.horizontalsplitter.right {
+	border-right: solid 3px var(--fhc-horizontalsplit-hsplitter-border-color);
+}
+
+.splitactions.horizontal {
+	background-color: var(--fhc-horizontalsplit-hsplitter-bg-color);
+	color: var(--fhc-horizontalsplit-hsplitter-splitactions-color);
+	display: flex;
+	flex-direction: column;
+	padding: 5px 0 5px 0;
+}
+
+.splitactions.horizontal.left {
+	border-radius: 0 40% 40% 0;
+}
+
+.splitactions.horizontal.right {
+	border-radius: 40% 0 0 40%;
+}
+
+.splitactions.horizontal .splitaction {
+	width: auto;
+	height: 28px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.splitactions.horizontal .splitaction.resize {
+	cursor: col-resize;
+}
+
+#content {
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+}
+
+#content > div:first-child {
+	margin-top: 30px;
+}
