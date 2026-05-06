@@ -280,7 +280,7 @@ export const CoreFilterCmpt = {
 				});
 			}
 
-			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
+			if (tabulatorOptions.selectable || tabulatorOptions.selectableRows || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
 
 			if (this.idField) {
@@ -358,7 +358,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.tabulatorOptions.selectableRows || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 			this._setHeaderFilter()
@@ -723,6 +723,7 @@ export const CoreFilterCmpt = {
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
+					<slot name="additional"><slot>
 				</div>
 			</div>
 

@@ -74,6 +74,24 @@ export default {
 				],
 				'abschlussdokument_lehrgaenge.xml.php': [
 						'AbschlussdokumentLehrgaenge'
+				],
+				'microcredential.xml.php' : [
+					'microcredentialzertifikat_1',
+					'microcredentialzertifikat_2',
+					'microcredentialzertifikat_3',
+					'microcredentialzertifikat_4',
+					'microcredential_1',
+					'microcredential_2',
+					'microcredential_3',
+					'microcredential_4',
+					'microdegree_1',
+					'microdegree_2',
+					'microdegree_3',
+					'microdegree_4',
+					'microdegreeabschluss_1',
+					'microdegreeabschluss_2',
+					'microdegreeabschluss_3',
+					'microdegreeabschluss_4',
 				]
 			},
 			documentDropdownObject: {}
@@ -225,18 +243,32 @@ export default {
 			return events;
 		},
 		studentUids() {
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.uid);
+			}
+			else if (this.modelValue.uid)
 			{
 				return [this.modelValue.uid];
 			}
-			return this.modelValue.map(e => e.uid);
+			else
+			{
+				return [];
+			}
 		},
 		studentKzs(){
-			if (this.modelValue.uid)
+			if(Array.isArray(this.modelValue))
+			{
+				return this.modelValue.map(e => e.studiengang_kz);
+			}
+			else if (typeof this.modelValue.studiengang_kz !== 'undefined')
 			{
 				return [this.modelValue.studiengang_kz];
 			}
-			return this.modelValue.map(e => e.studiengang_kz);
+			else
+			{
+				return [];
+			}
 		},
 		stg_kz(){
 			return this.studentKzs[0];

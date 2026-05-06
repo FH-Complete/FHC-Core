@@ -170,6 +170,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 51,
 					'requiredPermissions' => 'vertrag/mitarbeiter:r'
+				),
+				'studierendenverwaltung' => array(
+					'link' => site_url('studentenverwaltung'),
+					'description' => 'Studierendenverwaltung',
+					'expand' => true,
+					'sort' => 52,
+					'requiredPermissions' => ['admin:r', 'assistenz:r']
 				)
 			)
 		),
@@ -208,7 +215,14 @@ $config['navigation_header'] = array(
                     'expand' => true,
                     'sort' => 30,
                     'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
-                )
+                ),
+				'dashboardadmin' => array(
+					'link' => site_url('dashboard/Admin'),
+					'description' => 'Dashboard Admin',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'dashboard/admin:r'
+				)
 			)
 		)
 	)

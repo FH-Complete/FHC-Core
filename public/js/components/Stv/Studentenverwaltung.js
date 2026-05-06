@@ -18,6 +18,7 @@
 import CoreSearchbar from "../searchbar/searchbar.js";
 import NavLanguage from "../navigation/Language.js";
 import VerticalSplit from "../verticalsplit/verticalsplit.js";
+import HorizontalSplit from "../horizontalsplit/horizontalsplit.js";
 import AppMenu from "../AppMenu.js";
 import AppConfig from "../AppConfig.js";
 import StvVerband from "./Studentenverwaltung/Verband.js";
@@ -37,6 +38,7 @@ export default {
 		CoreSearchbar,
 		NavLanguage,
 		VerticalSplit,
+		HorizontalSplit,
 		AppMenu,
 		AppConfig,
 		StvVerband,
@@ -192,7 +194,44 @@ export default {
 			}
 
 			return extraItems;
-		}
+		},
+		appMenuLvPlanungItems() {
+			const extraItems = [];
+
+			if (this.studiengangKz !== undefined && this.selected_semester !== undefined) {
+				const studiengang_kz = String(this.studiengangKz);
+				const semester = String(this.selected_semester);
+				const orgform = this.selected_orgform || '';
+
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.xls.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester
+						+ '&studiensemester_kurzbz=' + this.studiensemesterKurzbz
+						+ '&orgform_kurzbz=' + orgform,
+					description: 'stv/lvplanung_xls'
+				});
+				extraItems.push({
+					link: FHC_JS_DATA_STORAGE_OBJECT.app_root
+						+ 'content/statistik/lvplanung.php?'
+						+ '&studiengang_kz=' + studiengang_kz
+						+ '&semester=' + semester,
+					description: 'stv/lvplanung_html'
+				});
+			}
+
+			return extraItems;
+		},
+		linkRt(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + '/vilesci/stammdaten/reihungstestverwaltung.php'
+		},
+		selected_uid(){
+			return this.selected?.[this.selected.length - 1]?.uid ?? null;
+		},
+		linkGradeList(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root + 'index.ci.php/person/gradelist/index/' + this.selected_uid
+		},
 	},
 	watch: {
 		'url_studiensemester_kurzbz': function (newVal, oldVal) {
@@ -212,6 +251,7 @@ export default {
 		'url_studiengang': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.checkUrlStudiengang();
+				this.$refs.stvList.clearSelection();
 			}
 		},
 		'url_mode': function () {
@@ -235,6 +275,10 @@ export default {
 					}
 				}
 			}
+		},
+		sidebarCollapsed(newVal) {
+			if(newVal) this.$refs.hSplit.collapseLeft()
+			else this.$refs.hSplit.showBoth()
 		}
 	},
 	methods: {
@@ -431,6 +475,9 @@ export default {
 		},
 		deleteCustomFilter(){
 			this.$refs.stvList.resetFilter();
+		},
+		showAlertNoSelectedStudent(){
+			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
 		}
 	},
 	created() {
@@ -634,26 +681,69 @@ export default {
 									</li>
 								</ul>
 							</li>
+							<li class="dropend">
+								<a
+									class="dropdown-toggle"
+									href="#"
+									role="button"
+									data-bs-toggle="dropdown"
+									aria-expanded="false"
+									:class="{ disabled: !appMenuExtraItems.length }"
+									data-bs-popper-config='{"strategy":"fixed"}'
+								>
+									{{ $p.t('stv/lvplanung') }}
+								</a>
+								<ul class="dropdown-menu p-0">
+									<li
+										v-for="(item, key) in appMenuLvPlanungItems"
+										:key="key"
+									>
+										<a class="dropdown-item" :href="item.link" target="_blank">
+											{{ $p.t(item.description) }}
+										</a>
+									</li>
+								</ul>
+							</li>
+							<li>
+								<a :href="linkRt" target="_blank">
+									{{ $p.t('stv/RTVerwaltung') }}
+								</a>
+							</li>
+							<li>
+								<a v-if="selected_uid" :href="linkGradeList" target="_blank">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+								<a v-else href="#" @click.prevent="showAlertNoSelectedStudent">
+									{{ $p.t('stv/studienverlauf') }}
+								</a>
+							</li>
 						</app-menu>
 					</div>
 				</aside>
-				<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100">
-					<div class="offcanvas-header justify-content-end px-1 d-md-none">
-						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
-					</div>
-					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
-					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
-				</nav>
-				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">
-					<vertical-split>
-						<template #top>
-							<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
-						</template>
-						<template #bottom>
-							<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
-						</template>
-					</vertical-split>
-				</main>
+				<horizontal-split ref="hSplit" :defaultRatio="[15, 85]">
+					<template #left>
+						<nav id="sidebarMenu" class="bg-light offcanvas offcanvas-start col-md p-md-0 h-100  w-100">
+							<div class="offcanvas-header justify-content-end px-1 d-md-none">
+								<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
+							</div>
+							<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+							<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
+						</nav>
+					</template>
+					<template #right>
+						<main>
+							<vertical-split :defaultRatio="[50, 50]">
+								<template #top>
+									<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
+								</template>
+								<template #bottom>
+									<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
+								</template>
+							</vertical-split>
+						</main>
+					</template>
+				</horizontal-split>
+				
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>

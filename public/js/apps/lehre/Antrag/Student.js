@@ -7,6 +7,9 @@ const app = Vue.createApp({
 		LvPopup
 	}
 });
+
+FhcApps.makeExtendable(app);
+
 app
 	.use(PluginsPhrasen)
 	.mount('#wrapper');

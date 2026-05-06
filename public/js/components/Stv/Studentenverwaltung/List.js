@@ -93,7 +93,7 @@ export default {
 						}
 					},
 					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
-					{title:"Sem.", field:"semester", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
@@ -171,12 +171,20 @@ export default {
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
 				index: 'prestudent_id',
-				persistenceID: 'stv-list',
+				persistenceID: 'stv-list-20260223_01'
 			},
 			tabulatorEvents: [
 				{
 					event: 'rowSelectionChanged',
 					handler: this.rowSelectionChanged
+				},
+				{
+					event: 'dataLoading',
+					handler: this.handleDataLoading
+				},
+				{
+					event: 'renderComplete',
+					handler: this.handleRenderComplete
 				},
 				{
 					event: 'dataProcessed',
@@ -187,7 +195,15 @@ export default {
 				},
 				{
 					event: 'dataLoaded',
-					handler: data => this.count = data.length
+					handler: data => {
+						if (Array.isArray(data)) {
+							this.count = data.length;
+							this.allPrestudents = data.map(item => item.prestudent_id);
+						} else {
+							this.count = 0;
+							this.allPrestudents = [];
+						}
+					}
 				},
 				{
 					event: 'dataFiltered',
@@ -226,7 +242,11 @@ export default {
 			tagEndpoint: ApiTag,
 			currentEndpoint: null,
 			headerFilterActive: false,
-			dragSource: []
+			dragSource: [],
+			oldScrollUrl: '',
+			oldScrollLeft: 0,
+			oldScrollTop: 0,
+			allPrestudents: []
 		}
 	},
 	computed: {
@@ -263,6 +283,7 @@ export default {
 				};
 			});
 		},
+		//TODO(Manu) check: replace download or additional entry?
 		downloadConfig() {
 			return {
 				csv: {
@@ -279,6 +300,21 @@ export default {
 			let today = new Date().toLocaleDateString('en-GB')
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
+		},
+		selectedPrestudents() {
+			if (this.selected && this.selected.length > 0) {
+				return this.selected.map(item => item.prestudent_id);
+			} else {
+				// fallback whole list of prestudents
+				return this.allPrestudents || [];
+			}
+		},
+
+		linkXLS(){
+			return FHC_JS_DATA_STORAGE_OBJECT.app_root
+			+ 'content/statistik/studentenexportextended.xls.php?'
+			+ '&studiensemester_kurzbz=' + this.currentSemester
+			+ '&data=' + this.selectedPrestudents.join(";");
 		},
 	},
 	created: function() {
@@ -319,7 +355,7 @@ export default {
 						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
 						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
 						geschlecht: capitalize(this.$p.t('person/geschlecht')),
-						semester: capitalize(this.$p.t('lehre/sem')),
+						semester_berechnet: capitalize(this.$p.t('lehre/sem')),
 						verband: capitalize(this.$p.t('lehre/verb')),
 						gruppe: capitalize(this.$p.t('lehre/grp')),
 						studiengang: capitalize(this.$p.t('lehre/studiengang')),
@@ -380,15 +416,17 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data, rows) {
+		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedcount = data.length;
-			this.lastSelected = this.selected;
+
+			if(selected.length > 0 || deselected.length > 0){
+				this.lastSelected = this.selected;
+				this.$emit('update:selected', data);
+			}
 
 			//for tags
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
-
-			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
 			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
@@ -535,6 +573,10 @@ export default {
 					this.changeFocus(this.focusObj, el);
 			}
 		},
+		clearSelection(){
+			this.lastSelected = [];
+			this.$emit('update:selected',[]);
+		},
 		//methods tags
 		addedTag(addedTag)
 		{
@@ -567,11 +609,29 @@ export default {
 
 			this.dragSource = (isAlreadySelected && this.selected?.length) ? this.selected : [data];
 		},
+		handleDataLoading() {
+			this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
+			this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
+		},
+		handleRenderComplete() {
+			const table = this.$refs.table.tabulator.element.querySelector('.tabulator-tableholder');
+			if(table) {
+				const curAjaxUrl = this.$refs.table.tabulator.getAjaxUrl();
+				if(this.oldScrollUrl === curAjaxUrl) {
+					table.scrollLeft = this.oldScrollLeft;
+					table.scrollTop = this.oldScrollTop;
+				} else {
+					this.oldScrollLeft = table.scrollLeft;
+					this.oldScrollTop = table.scrollTop;
+				}
+				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
+			}
+		},
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">
+	<div class="stv-list h-100 pt-3">	
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
@@ -597,6 +657,27 @@ export default {
 				:useSelectionSpan="false"
 				@headerFilterOn="handleHeaderFilter"
 			>
+
+		<!--
+			<template #actions>
+				<div>
+					<button
+					class="btn btn-outline-success sm mb-1"
+					  :title="'Export ' + selectedPrestudents.length + ' prestudent(s) to Excel'"
+					>
+					  <i class="fas fa-file-excel fa-xl"></i>
+					</button>
+				</div>
+			 </template>
+		 -->
+
+			 <template #additional>
+				<div>
+					<a :href="linkXLS" target="_blank">
+						 <i class="fas fa-file-excel fa-xl text-success"   :title="$p.t('stv', 'text_exportXLS', { count: selectedPrestudents.length })"></i>
+					</a>
+				</div>
+			 </template>
 
 			<template #actions>
 				<core-tag ref="tagComponent"

@@ -342,6 +342,8 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		<vbox>
 			<checkbox id="mitarbeiter-entwicklungsteam-detail-checkbox-neu" checked="true" hidden="true" />
 			<textbox id="mitarbeiter-entwicklungsteam-detail-textbox-studiengang" hidden="true" />
+			<textbox id="mitarbeiter-entwicklungsteam-detail-entwicklungsteam_id" hidden="true" />
+
 			<groupbox id="mitarbeiter-entwicklungsteam-detail-groupbox" flex="1">
 				<caption label="Details" />
 				<grid id="mitarbeiter-entwicklungsteam-detail-grid" style="margin:4px;" flex="1">
