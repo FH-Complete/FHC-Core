@@ -24,6 +24,7 @@ import collapseAutoClose from '../../directives/collapseAutoClose.js';
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
 
 import ApiFilter from '../../api/factory/filter.js';
+import ApiPhrases from '../../api/factory/phrasen.js';
 
 //
 const FILTER_COMPONENT_NEW_FILTER = 'Filter Component New Filter';
@@ -84,8 +85,9 @@ export const CoreFilterCmpt = {
 		useSelectionSpan: {
 			type: Boolean,
 			default: true
-		}
+		},
 	},
+	inject: ["language"],
 	data: function() {
 		return {
 			uuid: 0,
@@ -120,7 +122,7 @@ export const CoreFilterCmpt = {
 				headerFilter: false,
 				group: false,
 				page: false,
-			}
+			},
 		};
 	},
 	computed: {
@@ -213,6 +215,19 @@ export const CoreFilterCmpt = {
 			return this.datasetMetadata.map(el => ({...el, ...{title: filterTitles[el.name]}}));
 		}
 	},
+	watch: {
+		"language.value": {
+			handler(newSelectedLanguage) {
+				if (!this.$props.tabulatorOptions.locale) return;
+
+				this.tabulator.setLocale(newSelectedLanguage);
+
+				if (this.$props.tabulatorOptions.responsiveLayoutCollapseFormatter) {
+					this.localizeCollapsedColumnHeadings(newSelectedLanguage);
+				}
+			},
+		},
+	},
 	methods: {
 		reloadTable() {
 			if (this.tableOnly)
@@ -263,6 +278,11 @@ export const CoreFilterCmpt = {
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
 
+			// set up localizations if required
+			if (tabulatorOptions.locale) {
+				tabulatorOptions = await this.configureTabulatorLocalizations(tabulatorOptions);
+			}
+
 			// set default height if no height property is set
 			if (tabulatorOptions.height === undefined &&
 				tabulatorOptions.minHeight === undefined &&
@@ -302,7 +322,13 @@ export const CoreFilterCmpt = {
 				for (let evt of this.tabulatorEvents)
 					this.tabulator.on(evt.event, evt.handler);
 			}
-			this.tabulator.on('tableBuilt', () => {this.tableBuilt = true; this.$emit('tableBuilt');});
+			this.tabulator.on('tableBuilt', () => {
+				this.tableBuilt = true;
+				this.$emit('tableBuilt');
+				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
+					this.localizeCollapsedColumnHeadings();
+				}
+			});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
 			});
@@ -340,6 +366,9 @@ export const CoreFilterCmpt = {
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
 					if (this.tabulator.options.persistence.headerFilter)
 						this._setHeaderFilter();
+					if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
+						this.localizeCollapsedColumnHeadings();
+					}	
 				});
 
 			}
@@ -348,6 +377,134 @@ export const CoreFilterCmpt = {
 				this.filterActive = filters.length > 0;
 				this.$emit("headerFilterOn", this.filterActive);
 			});
+		},
+		async configureTabulatorLocalizations(tabulatorOptions) {
+			tabulatorOptions.locale = this.$p.user_language.value;
+			tabulatorOptions.langs = {};
+
+			let phrasesGroupedByCategoryRequestParam = {
+				tabulator: [
+					"loading",
+					"error",
+					"item",
+					"items",
+					"page_size",
+					"page_title",
+					"first",
+					"first_title",
+					"last",
+					"last_title",
+					"prev",
+					"prev_title",
+					"next",
+					"next_title",
+					"all",
+					"showing",
+					"of",
+					"rows",
+					"pages",
+				],
+			};
+			tabulatorOptions.columns.forEach((column) => {
+				if (column.field === "collapse") return;
+
+				let [category, phrase] = column.title.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+
+			const phrasesResponse = await this.$api.call(
+				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
+			);
+			const phrasesData = phrasesResponse.data;
+
+			Object.keys(phrasesData).forEach((language) => {
+				let genericTabulatorPhrases = phrasesData[language].filter(
+					(phrase) => phrase.category === "tabulator",
+				);
+
+				let tabulatorPhraseToTranslationMapper = {};
+				genericTabulatorPhrases.forEach((phrase) => {
+					tabulatorPhraseToTranslationMapper[phrase.phrase] =
+						phrase.text;
+				});
+
+				tabulatorOptions.langs[language] = {
+					data: {
+						loading: tabulatorPhraseToTranslationMapper["loading"],
+						error: tabulatorPhraseToTranslationMapper["error"],
+					},
+					groups: {
+						item: tabulatorPhraseToTranslationMapper["item"],
+						items: tabulatorPhraseToTranslationMapper["items"],
+					},
+					pagination: {
+						page_size:
+							tabulatorPhraseToTranslationMapper["page_size"],
+						page_title:
+							tabulatorPhraseToTranslationMapper["page_title"],
+						first: tabulatorPhraseToTranslationMapper["first"],
+						first_title:
+							tabulatorPhraseToTranslationMapper["first_title"],
+						last: tabulatorPhraseToTranslationMapper["last"],
+						last_title:
+							tabulatorPhraseToTranslationMapper["last_title"],
+						prev: tabulatorPhraseToTranslationMapper["prev"],
+						prev_title:
+							tabulatorPhraseToTranslationMapper["prev_title"],
+						next: tabulatorPhraseToTranslationMapper["next"],
+						next_title:
+							tabulatorPhraseToTranslationMapper["next_title"],
+						all: tabulatorPhraseToTranslationMapper["all"],
+						counter: {
+							showing:
+								tabulatorPhraseToTranslationMapper["showing"],
+							of: tabulatorPhraseToTranslationMapper["of"],
+							rows: tabulatorPhraseToTranslationMapper["rows"],
+							pages: tabulatorPhraseToTranslationMapper["pages"],
+						},
+					},
+				};
+
+				let columnHeadingPhrases = phrasesData[language].filter(
+					(phrase) => phrase.category !== "tabulator",
+				);
+
+				let columnTitleToTranslationMapper = {};
+				columnHeadingPhrases.forEach((phrase) => {
+					columnTitleToTranslationMapper[
+						phrase.category + "/" + phrase.phrase
+					] = phrase.text;
+				});
+
+				let columnFieldToTranslationMapper = {};
+				tabulatorOptions.columns.forEach((column) => {
+					if (column.field === "collapse") return;
+					columnFieldToTranslationMapper[column.field] =
+						columnTitleToTranslationMapper[column.title];
+				});
+
+				tabulatorOptions.langs[language].columns =
+					columnFieldToTranslationMapper;
+			});
+
+			return tabulatorOptions;
+		},
+		async localizeCollapsedColumnHeadings() {
+			const columnHeadings = this.tabulator.getLang().columns;
+
+			this.$refs.table
+				.querySelectorAll(".collapsedColumnHeading")
+				.forEach((collapsedColumnHeadingElement) => {
+					const field = collapsedColumnHeadingElement.getAttribute("field");
+					if (!field?.length) return;
+
+					collapsedColumnHeadingElement.innerHTML =
+						columnHeadings[field];
+				});
 		},
 		updateTabulator() {
 			if (this.tabulator) {

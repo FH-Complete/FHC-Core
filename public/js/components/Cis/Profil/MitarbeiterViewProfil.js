@@ -20,7 +20,6 @@ export default {
 	data() {
 		return {
 			collapseIconFunktionen: true,
-			preloadedPhrasen:{},
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
@@ -31,6 +30,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				locale: true,
 				columns: [
 					//? option when wanting to hide the collapsed list
 
@@ -46,21 +46,21 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('ui/bezeichnung')),
+						title: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('lehre/organisationseinheit')),
+						title: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
+						title: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -71,7 +71,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
+						title: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -82,7 +82,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
+						title: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -113,9 +113,6 @@ export default {
 		'data.funktionen'(newVal) {
 			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setData(newVal);
 		},
-		'language.value'(newVal) {  // reevaluates computed phrasen
-			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
-		}
 	},
 	computed: {
 		getTelefonValue() {
@@ -180,16 +177,6 @@ export default {
 			};
 		},
 	},
-	created(){
-		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
-			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
-			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
-			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
-			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
-			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
-			this.preloadedPhrasen.loaded = true;
-		});
-	},
 
 	template: /*html*/ `
 
@@ -247,7 +234,7 @@ export default {
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt v-if="preloadedPhrasen.loaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>

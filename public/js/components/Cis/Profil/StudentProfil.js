@@ -33,7 +33,6 @@ export default {
 			showModal: false,
 			collapseIconBetriebsmittel: true,
 			editDataFilter: null,
-			preloadedPhrasen:{},
 			// tabulator options
 			zutrittsgruppen_table_options: {
 				persistenceID: "filterTableStudentProfilZutrittsgruppen",
@@ -43,7 +42,7 @@ export default {
 				minHeight: 200,
 				layout: "fitColumns",
 				columns: [{
-					title: Vue.computed(() => this.preloadedPhrasen.zutrittsGruppenPhrase),
+					title: "profil/zutrittsGruppen",
 					field: "bezeichnung"
 				}],
 			},
@@ -57,6 +56,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				locale: true,
 				columns: [
 					{
 						title:
@@ -69,14 +69,14 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title: Vue.computed(()=>this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
+						title: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() =>this.preloadedPhrasen.inventarnummerPhrase) ,
+						title: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -84,7 +84,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() =>this.preloadedPhrasen.ausgabedatum) ,
+						title: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -242,14 +242,6 @@ export default {
 		},
 	},
 	created() {
-		// preload phrasen
-		this.$p.loadCategory('profil').then(() => {
-			this.preloadedPhrasen.zutrittsGruppenPhrase = this.$p.t('profil/zutrittsGruppen');
-			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
-			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
-			this.preloadedPhrasen.ausgabedatum = this.$p.t('profil/ausgabedatum');
-			this.preloadedPhrasen.loaded = true;
-		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 	},
@@ -379,7 +371,6 @@ export default {
 			<div class="row">
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="preloadedPhrasen.loaded"
 					@tableBuilt="betriebsmittelTableBuilt"
 					:title="$p.t('profil','entlehnteBetriebsmittel')"
 					ref="betriebsmittelTable"
@@ -389,7 +380,6 @@ export default {
 				</div>
 				<div class="col-12 mb-4" >
 					<core-filter-cmpt
-					v-if="preloadedPhrasen.loaded"
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 

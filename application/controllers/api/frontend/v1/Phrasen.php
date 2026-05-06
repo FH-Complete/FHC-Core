@@ -32,6 +32,7 @@ class Phrasen extends FHCAPI_Controller
 			'setLanguage' => self::PERM_ANONYMOUS,
 			'getLanguage' => self::PERM_ANONYMOUS,
 			'getAllLanguages' => self::PERM_ANONYMOUS,
+			'getPhrases' => self::PERM_ANONYMOUS
 		]);
 
 		$this->load->helper('hlp_language');
@@ -90,6 +91,32 @@ class Phrasen extends FHCAPI_Controller
 		}, $langs);
 
 		$this->terminateWithSuccess($langs);
+	}
+
+	public function getPhrases()
+	{
+		$languages = json_decode($this->input->get('languages'));
+		if (!$languages || !count($languages)) {
+			$this->load->model('system/Sprache_model', 'sprachenModel');
+			$activeLanguages = $this->sprachenModel->loadWhere(array('content' => true));
+			$activeLanguagesData = $this->getDataOrTerminateWithError($activeLanguages);
+			$languages = array_map(
+				function ($languageData) {
+					return $languageData->sprache;
+				},
+				$activeLanguagesData
+			);
+		}
+
+		$this->load->model('system/Phrase_model', 'phraseModel');
+		$phrasesGroupedByCategory = json_decode($this->input->get('phrasesGroupedByCategory'));
+		$result = [];
+		foreach ($languages as $language) {
+			$phrases = $this->phraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($phrasesGroupedByCategory, $language);
+			$result[$language] = $this->getDataOrTerminateWithError($phrases);
+		}
+
+		$this->terminateWithSuccess($result);
 	}
 
 }

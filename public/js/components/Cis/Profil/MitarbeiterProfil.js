@@ -34,7 +34,6 @@ export default {
 		return {
 			showModal: false,
 			editDataFilter: null,
-			preloadedPhrasen:{},
 			// tabulator options
 			funktionen_table_options: {
 				persistenceID: "filterTableMaProfilFunktionen",
@@ -46,6 +45,7 @@ export default {
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
+				locale: true,
 				columns: [
 					{
 						title:
@@ -59,21 +59,21 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.bezeichnungPhrase),
+						title: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.organisationseinheitPhrase),
+						title: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.gueltigVonPhrase),
+						title: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -84,7 +84,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.gueltigBisPhrase),
+						title: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -95,7 +95,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.wochenstundenPhrase),
+						title: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -115,6 +115,7 @@ export default {
 				responsiveLayoutCollapseUseFormatters: false,
 				responsiveLayoutCollapseFormatter: Vue.$collapseFormatter,
 				data: [{betriebsmittel: "", Nummer: "", Ausgegeben_am: ""}],
+				locale: true,
 				columns: [
 					{
 						title:
@@ -128,14 +129,14 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.entlehnteBetriebsmittelPhrase),
+						title: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.inventarnummerPhrase),
+						title: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -143,7 +144,7 @@ export default {
 						visible: true
 					},
 					{
-						title: Vue.computed(() => this.preloadedPhrasen.ausgabedatumPhrase),
+						title: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -299,18 +300,6 @@ export default {
 	},
 
 	created() {
-		// preload phrasen
-		this.$p.loadCategory(["ui","lehre","global","profil"]).then(() => {
-			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
-			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
-			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
-			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
-			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
-			this.preloadedPhrasen.entlehnteBetriebsmittelPhrase = this.$p.t('profil/entlehnteBetriebsmittel');
-			this.preloadedPhrasen.inventarnummerPhrase = this.$p.t('profil/inventarnummer');
-			this.preloadedPhrasen.ausgabedatumPhrase = this.$p.t('profil/ausgabedatum');
-			this.preloadedPhrasen.loaded=true;
-		});
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
 
@@ -440,7 +429,6 @@ export default {
                 <div class="col-12 mb-4" >
                     <!-- FUNKTIONEN TABELLE -->
                     <core-filter-cmpt
-						v-if="preloadedPhrasen.loaded"
                     	@tableBuilt="funktionenTableBuilt"
 						:title="$p.t('person','funktionen')"
 						ref="funktionenTable"
@@ -452,7 +440,6 @@ export default {
                 <div class="col-12 mb-4" >
                     <!-- BETRIEBSMITTEL TABELLE -->
                     <core-filter-cmpt
-						v-if="preloadedPhrasen.loaded"
                     	@tableBuilt="betriebsmittelTableBuilt"
 						:title="$p.t('profil','entlehnteBetriebsmittel')"
 						ref="betriebsmittelTable"
