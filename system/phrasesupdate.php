@@ -53699,6 +53699,46 @@ and represent the current state of research on the topic. The prescribed citatio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'mailText_profilfoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Hallo,\n\nIhr Profilbild wurde entfernt, da es nicht den aktuellen Bildrichtlinen entspricht. Bitte laden Sie unter CIS->Profil ein neues Profilbild hoch!\n\nDanke!",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Hello,\n\nYour profile picture has been removed because it does not comply with the current image guidelines. Please upload a new profile picture under CIS->Profile!\n\nThank you!",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'person',
+		'phrase' => 'betreffProfilfoto',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Profilbild',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Profile picture',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 	// FHC-4 Finetuning END
 
 	//****************************	 CORE/search
