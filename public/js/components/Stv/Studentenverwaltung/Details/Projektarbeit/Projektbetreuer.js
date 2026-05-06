@@ -10,6 +10,7 @@ import Vertrag from "./Vertrag.js";
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
 export default {
+	name: 'Projektbetreuer',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
