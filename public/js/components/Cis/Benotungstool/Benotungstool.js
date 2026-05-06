@@ -5,7 +5,7 @@ import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
-import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule';
+import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule.js';
 import MobilityLegende from '../../Mobility/Legende.js';
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import {debounce} from "../../../helpers/debounce.js";
