@@ -308,7 +308,6 @@ export const AbgabetoolAssistenz = {
 			{
 				event: 'dataFiltered',
 				handler: (filters, rows) => {
-					console.log('dataFiltered', rows)
 					this.filteredRows = rows
 					this.filteredcount = rows.length
 				}

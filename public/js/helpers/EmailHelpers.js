@@ -1,24 +1,20 @@
 export async function splitMailsHelper(mails, event, subject, body, alertPluginRef, phrasenPluginRef) {
+	await phrasenPluginRef.loadCategory('ui')
+	
 	let splititem = ",";
 	let maillist = mails.join(splititem);
 	let mailto = "";
-	const encodedBody = body && typeof body === 'string' ? encodeURIComponent(body) : null;
+	let encodedBody = body && typeof body === 'string' ? encodeURIComponent(body) : null;
 	const subjectlength = subject && typeof subject === 'string' ? subject.length + 9 : 0;
-	const bodylength = encodedBody ? encodedBody.length + 6 : 0;
-	const overhead = subjectlength + bodylength;
+	let bodylength = encodedBody ? encodedBody.length + 6 : 0;
+	let overhead = subjectlength + bodylength;
 
-	debugger
-	
 	if (overhead > 2024)
 	{
-		await alertPluginRef.alertWarning({message: phrasenPluginRef.t('ui', 'bodyZuLang')});
-		return;
-	}
-
-	if (maillist.length > 2024)
-	{
-		if (await alertPluginRef.confirm({message: phrasenPluginRef.t('ui', 'zuvieleEMails') }) === false)
-			return;
+		await alertPluginRef.alertWarning(phrasenPluginRef.t('ui', 'bodyZuLang'));
+		encodedBody = null;
+		bodylength = 0;
+		overhead = subjectlength;
 	}
 
 	let firstrun = true;
@@ -27,7 +23,7 @@ export async function splitMailsHelper(mails, event, subject, body, alertPluginR
 	{
 		if (maillist.length + overhead > 2024)
 		{
-			let splitposition = maillist.lastIndexOf(splititem, 1900 - overhead);
+			let splitposition = maillist.lastIndexOf(splititem, 2024 - overhead);
 			mailto = maillist.substring(0, splitposition);
 			maillist = maillist.substring(splitposition + 1);
 		}
@@ -47,7 +43,7 @@ export async function splitMailsHelper(mails, event, subject, body, alertPluginR
 		}
 		else
 		{
-			if (await alertPluginRef.confirm({message: phrasenPluginRef.t('stv', 'weitereEMail')}) === true)
+			if (await alertPluginRef.confirm({message: phrasenPluginRef.t('ui', 'weitereEMail')}) === true)
 			{
 				window.location.href = mailLink;
 			}

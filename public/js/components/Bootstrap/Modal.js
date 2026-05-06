@@ -4,7 +4,9 @@ export default {
 	name: 'BootstrapModal',
 	data: () => ({
 		modal: null,
-		fullscreen: false
+		fullscreen: false,
+		expandBtnHovered: false,
+		expandBtnFocused: false,
 	}),
 	props: {
 		backdrop: {
@@ -69,6 +71,29 @@ export default {
 			this.fullscreen = !this.fullscreen
 			this.$emit('toggleFullscreen')
 		}
+	},
+	computed: {
+		getExpandButtonStyles() {
+			const hovered = this.expandBtnHovered;
+			const focused = this.expandBtnFocused;
+			return `display: flex;
+					align-items: center;
+					justify-content: center;
+					width: 1em;
+					height: 1em;
+					padding: 0;
+					border: 0;
+					background: transparent;
+					font-size: 1em;
+					opacity: 0.5;
+					color: inherit;
+					cursor: pointer;
+					line-height: 1;
+					transition: opacity 0.15s ease;
+					opacity: ${focused ? '1' : hovered ? '0.75' : '0.5'};
+					outline: ${focused ? '1px solid currentColor' : 'none'};
+					outline-offset: 2px;`
+		}	
 	},
 	mounted() {
 		if (this.$refs.modal)
@@ -140,9 +165,13 @@ export default {
 					<div class="d-flex align-items-center ms-auto gap-2">
 						<button 
 							type="button" 
-							class="btn mb-1" 
+							:style="getExpandButtonStyles"
 							v-if="allowFullscreenExpand" 
 							@click="toggleFullscreen"
+							@mouseenter="expandBtnHovered = true"
+							@mouseleave="expandBtnHovered = false"
+							@focusin="expandBtnFocused = true"
+							@focusout="expandBtnFocused = false"
 							:aria-label="fullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'"
 						>
 							<i v-if="!fullscreen" class="fa-solid fa-expand"></i>
