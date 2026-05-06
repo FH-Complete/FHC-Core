@@ -308,6 +308,7 @@ export const AbgabetoolAssistenz = {
 			{
 				event: 'dataFiltered',
 				handler: (filters, rows) => {
+					console.log('dataFiltered', rows)
 					this.filteredRows = rows
 					this.filteredcount = rows.length
 				}
@@ -1048,7 +1049,7 @@ export const AbgabetoolAssistenz = {
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
-			const selected = table.getRows().every(r => r.isSelected());
+			const selected = rows.every(r => r.isSelected());
 
 			if(selected){
 				allowed.forEach(r => r.deselect());
@@ -1066,7 +1067,7 @@ export const AbgabetoolAssistenz = {
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
-			const selected = table.getRows().every(r => r.isSelected());
+			const selected = rows.every(r => r.isSelected());
 
 			if(selected){
 				allowed.forEach(r => r.deselect());
@@ -2596,12 +2597,12 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-					<button style="max-height: 40px;" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
+					<button style="max-height: 40px;" :disabled="!selectedcountFlat" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
 						{{$capitalize( $p.t('abgabetool/c4delete') )}}
 						<i class="fa-solid fa-trash"></i>
 					</button>
 					
-					<button @click="openEditModal" class="btn btn-success ml-2" role="button">
+					<button @click="openEditModal" :disabled="!selectedcountFlat" class="btn btn-success ml-2" role="button">
 						{{$capitalize( $p.t('abgabetool/c4edit') )}}
 						<i class="fa fa-pen"></i>
 					</button>
