@@ -93,7 +93,7 @@ export default {
 						}
 					},
 					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
-					{title:"Sem.", field:"semester", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
+					{title:"Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
 					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
@@ -171,7 +171,7 @@ export default {
 				selectableRows: true,
 				selectableRowsRangeMode: 'click',
 				index: 'prestudent_id',
-				persistenceID: 'stv-list',
+				persistenceID: 'stv-list-20260223_01'
 			},
 			tabulatorEvents: [
 				{
@@ -355,7 +355,7 @@ export default {
 						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
 						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
 						geschlecht: capitalize(this.$p.t('person/geschlecht')),
-						semester: capitalize(this.$p.t('lehre/sem')),
+						semester_berechnet: capitalize(this.$p.t('lehre/sem')),
 						verband: capitalize(this.$p.t('lehre/verb')),
 						gruppe: capitalize(this.$p.t('lehre/grp')),
 						studiengang: capitalize(this.$p.t('lehre/studiengang')),
