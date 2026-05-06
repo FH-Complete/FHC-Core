@@ -109,7 +109,7 @@ export default {
   		<h2 ref="newsPageHeading" class="fhc-primary-color">News</h2>
 		<hr/>
 		<pagination
-			v-show="content?true:false"
+			v-if="content?true:false"
 			:page="page"
 			:page_size="page_size"
 			@pageUpdated="afterPageUpdated($event)"
@@ -127,7 +127,7 @@ export default {
 			</div>
 		</div>
 		<pagination
-			v-show="content?true:false"
+			v-if="content?true:false"
 			:page="page"
 			:page_size="page_size"
 			@pageUpdated="afterPageUpdated($event)"
