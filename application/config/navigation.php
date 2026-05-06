@@ -45,6 +45,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'admin:w'
+				),
+				'classScheduleOverview' => array(
+					'link' => site_url('lehre/ClassSchedule'),
+					'icon' => '',
+					'description' => 'Unterrichtszeiten der Studiengänge',
+					'expand' => true,
+					'sort' => 50,
+					'requiredPermissions' => 'lehre/unterrichtszeiten_gk:r'
 				)
 			)
 		),
