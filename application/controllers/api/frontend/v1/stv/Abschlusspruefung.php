@@ -20,7 +20,6 @@ class Abschlusspruefung extends FHCAPI_Controller
 			'getBeurteilungen' => ['admin:rw', 'assistenz:rw'],
 			'getAkadGrade' => ['admin:rw', 'assistenz:rw'],
 			'getMitarbeiter' => ['admin:rw', 'assistenz:rw'],
-			'getPruefer' => ['admin:rw', 'assistenz:rw'],
 			'getTypStudiengang' => ['admin:rw', 'assistenz:rw'],
 			'checkForExistingExams' => ['admin:rw', 'assistenz:rw'],
 		]);
@@ -239,21 +238,6 @@ class Abschlusspruefung extends FHCAPI_Controller
 		if (isError($result)) {
 			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
 		}
-		$this->terminateWithSuccess($result ?: []);
-	}
-
-	public function getPruefer()
-	{
-		$searchString = $this->input->get('searchString') ?? '';
-
-		$this->load->model('ressource/Mitarbeiter_model', 'MitarbeiterModel');
-
-		$result = $this->MitarbeiterModel->searchMitarbeiter($searchString, 'ohneMaUid');
-
-		if (isError($result)) {
-			$this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-		}
-
 		$this->terminateWithSuccess($result ?: []);
 	}
 
