@@ -33,9 +33,9 @@ class RoomToRoomTypeApi extends FHCAPI_Controller
 	{
 		// NOTE(chris): additional permission checks will be done in SearchBarLib
 		parent::__construct([
-			'getRoomToRoomTypeRelationsByRoomShortCode' => self::PERM_LOGGED,
-			'createRoomToRoomTypeRelation' => self::PERM_LOGGED,
-			'deleteRoomToRoomTypeRelation' => self::PERM_LOGGED,
+			'getRoomToRoomTypeRelationsByRoomShortCode' => array('basis/ort:r'),
+			'createRoomToRoomTypeRelation' => array('basis/ort:rw'),
+			'deleteRoomToRoomTypeRelation' => array('basis/ort:rw'),
 		]);
 
 		$this->load->library('form_validation');
@@ -101,6 +101,7 @@ class RoomToRoomTypeApi extends FHCAPI_Controller
 	public function deleteRoomToRoomTypeRelation() {
 		$this->form_validation->set_rules('roomShortCode', 'roomShortCode', 'required');
 		$this->form_validation->set_rules('roomTypeShortCode', 'roomTypeShortCode', 'required');
+		$this->form_validation->set_rules('hierarchy', 'hierarchy', 'required|integer');
 
 		if ($this->form_validation->run() === false) {
 			return $this->terminateWithError(validation_errors());
@@ -109,6 +110,7 @@ class RoomToRoomTypeApi extends FHCAPI_Controller
 		$result = $this->OrtRoomTypeModel->db->delete($this->OrtRoomTypeModel->getDbTable(), [
 			'ort_kurzbz' => $this->input->post('roomShortCode'),
 			'raumtyp_kurzbz' => $this->input->post('roomTypeShortCode'),
+			'hierarchie' => $this->input->post('hierarchy'),
 		]);
 
 		if ($result === false) {

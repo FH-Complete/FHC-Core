@@ -15,6 +15,7 @@ export default {
     FormInput,
     CoreFilterCmpt,
   },
+  inject: ["hasBasisOrtWPermission"],
   props: {
     isVisible: {
       type: Boolean,
@@ -79,10 +80,12 @@ export default {
           {
             title: this.$capitalize(this.$p.t("ui", "roomType")),
             field: "raumtyp_kurzbz",
+            width: 150,
           },
           {
             title: this.$capitalize(this.$p.t("ui", "hierarchy")),
             field: "hierarchie",
+            width: 50,
           },
           {
             title: this.$capitalize(this.$p.t("gruppenmanagement", "beschreibung")),
@@ -91,11 +94,12 @@ export default {
           {
             title: this.$capitalize(this.$p.t("global", "actions")),
             field: "actions",
-            minWidth: 150,
-            maxWidth: 150,
+            width: 50,
             formatter: (cell, formatterParams, onRendered) => {
+              if (!this.hasBasisOrtWPermission) return "";
+
               let container = document.createElement("div");
-              container.className = "d-flex gap-2";
+              container.className = "d-flex justify-content-center";
 
               let button = document.createElement("button");
 
@@ -116,6 +120,7 @@ export default {
                 this.deleteRoomToRoomTypeRelation(
                   cell.getData().ort_kurzbz,
                   cell.getData().raumtyp_kurzbz,
+                  cell.getData().hierarchie,
                 );
               });
               container.append(button);
@@ -123,8 +128,10 @@ export default {
               return container;
             },
             frozen: true,
+            visible: this.hasBasisOrtWPermission,
           },
         ],
+        layout: "fitColumns",
       };
       return options;
     },
@@ -199,12 +206,13 @@ export default {
           this.$refs.roomTypesTable.tabulator.replaceData("/");
         });
     },
-    deleteRoomToRoomTypeRelation(roomShortCode, roomTypeShortCode) {
+    deleteRoomToRoomTypeRelation(roomShortCode, roomTypeShortCode, hierarchy) {
       return this.$api
         .call(
           ApiRoomToRoomType.deleteRoomToRoomTypeRelation(
             roomShortCode,
             roomTypeShortCode,
+            hierarchy
           ),
         )
         .then((response) => {
@@ -254,14 +262,20 @@ export default {
       });
   },
   template: /* html */ `
-  <bs-modal ref="roomTypeFormModal" size="sm" @hideBsModal="() => { $emit('hideBsModal'); resetRoomTypeForm(); }" class="modal-lg">
+  <bs-modal 
+    ref="roomTypeFormModal"
+    :bodyClass="'pt-4'"
+    @hideBsModal="() => { $emit('hideBsModal'); resetRoomTypeForm(); }" 
+    size="sm" 
+    class="modal-lg"
+    >
 			<template #title>
 				<p class="fw-bold mt-3">{{$capitalize($p.t('ui', 'assignRoomTypeToRoomModalTitle'))}}</p>
 			</template>
       <template #default>
-        <div class="justify-content-end d-flex mb-1">
+        <div class="d-flex justify-content-end mb-1">
           <a 
-            v-if="!isRoomTypeFormVisible" 
+            v-if="!isRoomTypeFormVisible && hasBasisOrtWPermission" 
             :title='$p.t("ui", "createRoomType")' 
             @click.prevent="isRoomTypeFormVisible = !isRoomTypeFormVisible"
             href="#"
@@ -271,67 +285,73 @@ export default {
             ></i> 
           </a>
         </div>
-        <core-form v-if="isRoomTypeFormVisible" ref="roomTypeForm" class="row g-3 pb-3">
-          <div class="row">
-            <div class="col">
-              <p class="fw-bold">{{$capitalize($p.t('ui', 'createRoomTypeFormTitle'))}}</p>
+        <div v-if="isRoomTypeFormVisible && hasBasisOrtWPermission" class="row g-3 pb-3">
+          <core-form ref="roomTypeForm">
+            <div class="row">
+              <div class="col">
+                <p class="fw-bold">{{$capitalize($p.t('ui', 'createRoomTypeFormTitle'))}}</p>
+              </div>
             </div>
-          </div>
-          <div class="row mb-3">
-            <div class="col">
-              <form-input
-                v-model="roomTypeFormData.shortCode"
-                :label="$capitalize($p.t('gruppenmanagement', 'kurzbezeichnung'))"
-                type="text"
-                name="kurzbezeichnung"  
-                >
-              </form-input>
+            <div class="row mb-3">
+              <div class="col">
+                <form-input
+                  v-model="roomTypeFormData.shortCode"
+                  :label="$capitalize($p.t('gruppenmanagement', 'kurzbezeichnung'))"
+                  type="text"
+                  name="kurzbezeichnung"  
+                  >
+                </form-input>
+              </div>
+              <div class="col">
+                <form-input
+                  v-model="roomTypeFormData.description"
+                  :label="$capitalize($p.t('gruppenmanagement', 'beschreibung'))"
+                  type="text"
+                  name="beschreibung"  
+                  >
+                </form-input>
+              </div>
             </div>
-            <div class="col">
-              <form-input
-                v-model="roomTypeFormData.description"
-                :label="$capitalize($p.t('gruppenmanagement', 'beschreibung'))"
-                type="text"
-                name="beschreibung"  
-                >
-              </form-input>
+            <div class="col d-flex justify-content-end gap-2">
+              <button type="button" class="btn btn-secondary" @click="isRoomTypeFormVisible = false">{{$p.t('ui', 'abbrechen')}}</button>
+              <button type="button" class="btn btn-primary" @click="createRoomType()">{{$p.t('ui', 'speichern')}}</button>
             </div>
-          </div>
-          <div class="col d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-secondary" @click="isRoomTypeFormVisible = false">{{$p.t('ui', 'abbrechen')}}</button>
-            <button type="button" class="btn btn-primary" @click="createRoomType()">{{$p.t('ui', 'speichern')}}</button>
-          </div>
-        </core-form>
-        <core-form  v-if="!isRoomTypeFormVisible" ref="roomToRoomTypeForm" class="row g-3 pb-3">
-          <div class="col-8">
-            <form-input
-              v-model="roomToRoomTypeFormData.roomType"
-              :label="$capitalize($p.t('ui/parentRoom'))"
-              :suggestions="filteredRoomTypes"
-              :optionValue="(option) => option.value"
-              :optionLabel="(option) => option.label" 
-              @complete="filterRoomTypes"
-              dropdown
-              forceSelection
-              type="autocomplete"
-              name="roomTypeShortCode"  
-              >
-            </form-input>
-          </div>
-          <div class="col">
-              <form-input
-                v-model="roomToRoomTypeFormData.hierarchy"
-                :label="$capitalize($p.t('ui', 'hierarchy'))"
-                type="number"
-                name="hierarchy"  
-                >
-              </form-input>
+          </core-form>
+        </div>
+        <div v-if="!isRoomTypeFormVisible && hasBasisOrtWPermission" class="row g-3 pb-3">
+          <core-form ref="roomToRoomTypeForm">
+            <div class="row">
+              <div class="col-8">
+                <form-input
+                  v-model="roomToRoomTypeFormData.roomType"
+                  :label="$capitalize($p.t('ui/roomType'))"
+                  :suggestions="filteredRoomTypes"
+                  :optionValue="(option) => option.value"
+                  :optionLabel="(option) => option.label" 
+                  @complete="filterRoomTypes"
+                  dropdown
+                  forceSelection
+                  type="autocomplete"
+                  name="roomTypeShortCode"  
+                  >
+                </form-input>
+              </div>
+              <div class="col">
+                  <form-input
+                    v-model="roomToRoomTypeFormData.hierarchy"
+                    :label="$capitalize($p.t('ui', 'hierarchy'))"
+                    type="number"
+                    name="hierarchy"  
+                    >
+                  </form-input>
+                </div>
+              <div class="col justify-content-end align-items-end d-flex">
+                <button type="button" class="btn btn-primary" @click="createRoomToRoomTypeRelation()">{{$p.t('ui', 'speichern')}}</button>
+              </div>
             </div>
-          <div class="col justify-content-end align-items-end d-flex">
-            <button type="button" class="btn btn-primary" @click="createRoomToRoomTypeRelation()">{{$p.t('ui', 'speichern')}}</button>
-          </div>
-        </core-form>
-        <hr>
+          </core-form>
+        </div>
+        <hr v-if="hasBasisOrtWPermission" class="mb-3 mt-0" />
         <div class="row my-1">
           <div class="col">
             <p class="fw-bold">{{$capitalize($p.t('ui', 'assignedRoomTypesTitle'))}}</p>

@@ -17,6 +17,16 @@ export default {
     RoomFormModal,
     RoomTypeFormModal,
   },
+  props: {
+    permissions: Object,
+  },
+  provide() {
+    return {
+      cisRoot: this.cisRoot,
+      hasBasisOrtWPermission:
+        this.permissions["basis/ort_w"] || false,
+    };
+  },
   watch: {
     filterData: {
       handler(newValue) {
@@ -76,6 +86,9 @@ export default {
     };
   },
   computed: {
+    hasBasisOrtWPermission() {
+      return this.permissions["basis/ort_w"] || false;
+    },
     tabulatorOptions() {
       const options = {
         ajaxURL: "dummy",
@@ -125,7 +138,7 @@ export default {
           );
         },
         ajaxResponse: (url, params, response) => response,
-        persistenceID: "room_manager_overview_table",
+        persistenceID: "room_manager_overview_table1111222233333",
         selectableRows: true,
         index: "ort_kurzbz",
         columns: [
@@ -222,6 +235,7 @@ export default {
             title: this.$capitalize(this.$p.t("ui", "parentRoom")),
             field: "pr_ort_kurzbz",
             headerFilter: true,
+            width_: 120,
           },
           {
             title: this.$capitalize(this.$p.t("global", "actions")),
@@ -229,33 +243,39 @@ export default {
             width: 120,
             formatter: (cell, formatterParams, onRendered) => {
               let container = document.createElement("div");
-              container.className = "d-flex gap-2";
+              container.className = "d-flex gap-2 justify-content-center";
+
+              let roomTypeBtn = document.createElement("button");
+              roomTypeBtn.className = "btn btn-outline-secondary btn-action";
+              roomTypeBtn.innerHTML = '<i class="fa fa-layer-group"></i>';
+              roomTypeBtn.title = this.$capitalize(this.$p.t("ui", "btn_editRoomType"));
+              roomTypeBtn.addEventListener("click", (event) =>
+                this.editRoomType(cell.getData().ort_kurzbz),
+              );
+
+              if (!this.hasBasisOrtWPermission) {
+                container.append(roomTypeBtn);
+                return container;
+              }2222
 
               let button = document.createElement("button");
 
               button = document.createElement("button");
               button.className = "btn btn-outline-secondary btn-action";
               button.innerHTML = '<i class="fa fa-edit"></i>';
-              button.title = this.$p.t("ui", "btn_editRoom");
+              button.title = this.$capitalize(this.$p.t("ui", "btn_editRoom"));
               button.addEventListener("click", (event) =>
                 this.editRoom(cell.getData().ort_kurzbz),
               );
               container.append(button);
 
-              button = document.createElement("button");
-              button.className = "btn btn-outline-secondary btn-action";
-              button.innerHTML = '<i class="fa fa-layer-group"></i>';
-              button.title = this.$p.t("ui", "btn_editRoomType");
-              button.addEventListener("click", (event) =>
-                this.editRoomType(cell.getData().ort_kurzbz),
-              );
-              container.append(button);
+              container.append(roomTypeBtn);
 
               button = document.createElement("button");
               button.className =
                 "btn btn-outline-secondary btn-action bg-danger";
               button.innerHTML = '<i class="fa fa-xmark text-white"></i>';
-              button.title = this.$p.t("ui", "btn_deleteRoom");
+              button.title = this.$capitalize(this.$p.t("ui", "btn_deleteRoom"));
               button.addEventListener("click", () => {
                 let isDeletionConfirmed = confirm(
                   this.$p.t("ui", "deleteRoomConfirmation"),
@@ -441,7 +461,7 @@ export default {
   template: /* html */ `
   <div class="container mt-4">
     <h1 class='mb-5'>{{ $capitalize($p.t("ui", "roomManagerOverviewHeading")) }}</h1>
-    <div class="row mb-3">
+    <div v-if="hasBasisOrtWPermission" class="row mb-3">
       <div class="col d-flex justify-content-between">
         <a class="btn btn-primary mb-3" @click="showRoomFormModal">{{$capitalize($p.t('ui', 'addRoomButton'))}}</a>
       </div>

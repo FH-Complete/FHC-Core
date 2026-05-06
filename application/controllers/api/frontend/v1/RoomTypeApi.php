@@ -32,8 +32,8 @@ class RoomTypeApi extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAllRoomTypes' => self::PERM_LOGGED,
-			'createRoomType' => self::PERM_LOGGED,
+			'getAllRoomTypes' => array('basis/ort:r'),
+			'createRoomType' =>  array('basis/ort:rw'),
 		]);
 
 		$this->load->library('form_validation');

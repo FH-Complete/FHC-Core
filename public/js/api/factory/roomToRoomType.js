@@ -33,13 +33,14 @@ export default {
             },
         }
     },
-    deleteRoomToRoomTypeRelation(roomShortCode, roomTypeShortCode) {
+    deleteRoomToRoomTypeRelation(roomShortCode, roomTypeShortCode, hierarchy) {
         return {
             method: 'post',
             url: `api/frontend/v1/RoomToRoomTypeApi/deleteRoomToRoomTypeRelation`,
             params: {
                 roomShortCode,
-                roomTypeShortCode
+                roomTypeShortCode,
+                hierarchy
             },
         }
     }

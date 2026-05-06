@@ -32,7 +32,8 @@ $this->load->view('templates/FHC-Header', $includesArray);
 <div id="main">
 	<core-navigation-cmpt></core-navigation-cmpt>
 	<router-view
-	cis-root="<?= CIS_ROOT; ?>"
+		cis-root="<?= CIS_ROOT; ?>"
+		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 	>
 	</router-view>
 </div>

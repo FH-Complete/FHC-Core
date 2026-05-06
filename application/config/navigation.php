@@ -45,6 +45,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 30,
 					'requiredPermissions' => 'admin:w'
+				),
+				'roomManagerOverview' => array(
+					'link' => site_url('RoomManager'),
+					'icon' => '',
+					'description' => 'Raumverwaltung',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),

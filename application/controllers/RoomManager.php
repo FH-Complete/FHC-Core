@@ -15,7 +15,7 @@ class RoomManager extends Auth_Controller
 	{
 		parent::__construct(
 			array(
-				'index' => array('lehre/unterrichtszeiten_gk:r'),
+				'index' => array('basis/ort:r')
 			)
 		);
 
@@ -42,7 +42,11 @@ class RoomManager extends Auth_Controller
 	// Public methods
 	public function index()
 	{
-		return $this->load->view('room_manager/index');
+		return $this->load->view('room_manager/index', [
+			'permissions' => [
+				'basis/ort_w' => $this->permissionlib->isBerechtigt('basis/ort', 'suid'),
+			],
+		]);
 	}
 	
 	// -----------------------------------------------------------------------------------------------------------------

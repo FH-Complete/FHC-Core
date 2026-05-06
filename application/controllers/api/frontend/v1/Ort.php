@@ -32,15 +32,15 @@ class Ort extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAllRooms' => self::PERM_LOGGED,
+			'getAllRooms' => array('basis/ort:r'),
 			'getRooms' => self::PERM_LOGGED,
 			'getTypes' => self::PERM_LOGGED,
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRoom' => self::PERM_LOGGED,
-			'createRoom' => self::PERM_LOGGED,
-			'updateRoom' => self::PERM_LOGGED,
-			'deleteRoom' => self::PERM_LOGGED,
+			'createRoom' => array('basis/ort:rw'),
+			'updateRoom' => array('basis/ort:rw'),
+			'deleteRoom' => array('basis/ort:rw'),
 		]);
 
 		$this->load->library('form_validation');
@@ -82,16 +82,16 @@ class Ort extends FHCAPI_Controller
 
 		$queryWhereFragments = [];
 
-		$searchableIdAttributes = ['standort_id', 'oe_kurzbz', 'gebteil'];
-		$searchableTextAttributes = ['ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'oe_kurzbz', 'oe_bezeichnung'];
+		$searchableIdAttributes = ['standort_id', 'gebteil'];
+		$searchableTextAttributes = ['ort_kurzbz', 'parent_ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'oe_kurzbz', 'oe_bezeichnung'];
 		$searchableBooleanAttributes = ['lehre', 'reservieren', 'aktiv'];
-		$searchableNumericAttributes = ['max_person', 'arbeitsplaetze'];
+		$searchableNumericAttributes = ['max_person', 'arbeitsplaetze', 'kosten', 'stockwerk'];
 		$searchableNumericSpanAttributes = ['m2'];
 
 		foreach ($searchableIdAttributes as $attribute) {
 			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
 				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
-				$filterData[] = $filter[$attribute];
+				$filterData[] = trim($filter[$attribute]);
 			}
 		}
 
@@ -102,7 +102,7 @@ class Ort extends FHCAPI_Controller
 			}
 			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
 				$queryWhereFragments[] = "$tableAttribute ILIKE ?";
-				$filterData[] = '%' . $filter[$attribute] . '%';
+				$filterData[] = '%' . trim($filter[$attribute]) . '%';
 			}
 		}
 
@@ -116,15 +116,15 @@ class Ort extends FHCAPI_Controller
 		foreach ($searchableNumericAttributes as $attribute) {
 			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
 				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
-				$filterData[] = $filter[$attribute];
+				$filterData[] = trim($filter[$attribute]);
 			}
 		}
 
 		foreach ($searchableNumericSpanAttributes as $attribute) {
 			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
 				$queryWhereFragments[] = "public.tbl_ort.$attribute >= ? AND public.tbl_ort.$attribute <= ?";
-				$filterData[] = $filter[$attribute] - 1;
-				$filterData[] = $filter[$attribute] + 1;
+				$filterData[] = trim($filter[$attribute]) - 1;
+				$filterData[] = trim($filter[$attribute]) + 1;
 			}
 		}
 
