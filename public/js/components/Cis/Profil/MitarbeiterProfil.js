@@ -219,10 +219,6 @@ export default {
 					}
 				});
 		},
-		setTableColumnTitles() { // reevaluates computed phrasen
-			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
-			if(this.$refs.funktionenTable) this.$refs.funktionenTable.tabulator.setColumns(this.funktionen_table_options.columns)
-		},
 		datetimeFormatterParams: function() {
 			const params = {
 				inputFormat:"yyyy-MM-dd",
@@ -311,9 +307,6 @@ export default {
 		'data.mittel'(newVal) {
 			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setData(newVal);
 		},
-		'language.value'(newVal) {
-			this.setTableColumnTitles()
-		}
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form"  >

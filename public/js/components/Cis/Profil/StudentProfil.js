@@ -27,7 +27,7 @@ export default {
 		FetchProfilUpdates,
 		EditProfil,
 	},
-	inject: ["sortProfilUpdates", "collapseFunction", "language","isEditable"],
+	inject: ["sortProfilUpdates", "collapseFunction", "isEditable"],
 	data() {
 		return {
 			showModal: false,
@@ -244,12 +244,6 @@ export default {
 	created() {
 		//? sorts the profil Updates: pending -> accepted -> rejected
 		this.data.profilUpdates?.sort(this.sortProfilUpdates);
-	},
-	watch: {
-		'language.value'(newVal) {
-			if(this.$refs.betriebsmittelTable) this.$refs.betriebsmittelTable.tabulator.setColumns(this.betriebsmittel_table_options.columns)
-			if(this.$refs.zutrittsgruppenTable) this.$refs.zutrittsgruppenTable.tabulator.setColumns(this.zutrittsgruppen_table_options.columns)
-		}
 	},
 	template: /*html*/ `
 <div class="container-fluid text-break fhc-form">
