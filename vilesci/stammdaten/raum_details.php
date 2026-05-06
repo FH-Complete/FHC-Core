@@ -406,8 +406,8 @@
 						<td><input class="detail" type="text" name="telefonklappe" size="3" maxlength="8" value="'.$telefonklappe.'" onchange="submitable()"></td>
 						<td>Anz. Arbeitsplätze</td>
 						<td><input class="detail" type="text" name="arbeitsplaetze" size="3" maxlength="8" value="'.$arbeitsplaetze.'" onchange="submitable()"></td>
-						<td valign="top">Parent Raum</td>
-						<td valign="top"><input type="text" name="parent_ort_kurzbz" size="10" onchange="submitable()" value="'.$parent_ort_kurzbz.'" /></td>
+						<td>Parent Raum Kurzbz</td>
+						<td><input type="text" name="parent_ort_kurzbz" size="10" onchange="submitable()" value="'.$parent_ort_kurzbz.'" /></td>
 					</tr>
 					<tr>
 						<td valign="top">Lageplan</td>
