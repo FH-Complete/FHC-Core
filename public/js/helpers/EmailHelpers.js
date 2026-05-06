@@ -13,7 +13,6 @@ export async function splitMailsHelper(mails, event, subject, body, alertPluginR
 	{
 		await alertPluginRef.alertWarning(phrasenPluginRef.t('ui', 'bodyZuLang'));
 		encodedBody = null;
-		bodylength = 0;
 		overhead = subjectlength;
 	}
 

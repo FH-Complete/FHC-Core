@@ -64,6 +64,7 @@ export const AbgabetoolAssistenz = {
 			filteredcountFlat: 0,
 			selectedcountFlat: 0,
 			filteredRows: null,
+			filteredRowsFlat: null,
 			studiensemesterOptions: null,
 			allSem: null,
 			curSem: null,
@@ -308,8 +309,20 @@ export const AbgabetoolAssistenz = {
 			{
 				event: 'dataFiltered',
 				handler: (filters, rows) => {
-					this.filteredRows = rows
-					this.filteredcount = rows.length
+					this.filteredRows = rows;
+					this.filteredcount = rows.length;
+
+					if (!this.selectedData.length) return;
+
+					const visibleData = new Set(rows.map(r => r.getData()));
+					const filteredOut = this.selectedData.filter(sd => !visibleData.has(sd));
+
+					if (!filteredOut.length) return;
+
+					const filteredOutSet = new Set(filteredOut);
+					this.$refs.abgabeTable.tabulator.getSelectedRows()
+						.filter(r => filteredOutSet.has(r.getData()))
+						.forEach(r => r.deselect());
 				}
 			}
 			],
@@ -495,8 +508,20 @@ export const AbgabetoolAssistenz = {
 				{
 					event: 'dataFiltered',
 					handler: (filters, rows) => {
-						this.filteredRowsFlat = rows
-						this.filteredcountFlat = rows.length
+						this.filteredRowsFlat = rows;
+						this.filteredcountFlat = rows.length;
+
+						if (!this.selectedDataFlat.length) return;
+
+						const visibleData = new Set(rows.map(r => r.getData()));
+						const filteredOut = this.selectedDataFlat.filter(sd => !visibleData.has(sd));
+
+						if (!filteredOut.length) return;
+
+						const filteredOutSet = new Set(filteredOut);
+						this.$refs.abgabeTableFlat.tabulator.getSelectedRows()
+							.filter(r => filteredOutSet.has(r.getData()))
+							.forEach(r => r.deselect());
 					}
 				}
 			]
