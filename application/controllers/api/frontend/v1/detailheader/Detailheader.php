@@ -9,9 +9,10 @@ class Detailheader extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getHeader' => ['vertrag/mitarbeiter:r'],
-			'getPersonAbteilung' => ['vertrag/mitarbeiter:r'],
-			'getLeitungOrg' => ['vertrag/mitarbeiter:r'],
+			'getHeader' => self::PERM_LOGGED,
+			'getPersonAbteilung' => self::PERM_LOGGED,
+			'getLeitungOrg' => self::PERM_LOGGED,
+			'getSemesterStati' => self::PERM_LOGGED,
 		]);
 	}
 
@@ -46,6 +47,17 @@ class Detailheader extends FHCAPI_Controller
 		$data = $this->getDataOrTerminateWithError($result);
 
 		$this->terminateWithSuccess(current($data));
+	}
+
+	public function getSemesterStati($prestudent_id)
+	{
+		$this->load->model('crm/Prestudentstatus_model', 'PrestudentstatusModel');
+
+		$result = $this->PrestudentstatusModel->getAllPrestudentstatiWithStudiensemester($prestudent_id);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess($data);
 	}
 
 }

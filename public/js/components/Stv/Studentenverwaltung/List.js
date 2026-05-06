@@ -416,15 +416,17 @@ export default {
 		actionNewPrestudent() {
 			this.$refs.new.open();
 		},
-		rowSelectionChanged(data, rows) {
+		rowSelectionChanged(data, rows, selected, deselected) {
 			this.selectedcount = data.length;
-			this.lastSelected = this.selected;
+
+			if(selected.length > 0 || deselected.length > 0){
+				this.lastSelected = this.selected;
+				this.$emit('update:selected', data);
+			}
 
 			//for tags
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
-
-			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
 			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
@@ -570,6 +572,10 @@ export default {
 				if (el != this.focusObj)
 					this.changeFocus(this.focusObj, el);
 			}
+		},
+		clearSelection(){
+			this.lastSelected = [];
+			this.$emit('update:selected',[]);
 		},
 		//methods tags
 		addedTag(addedTag)

@@ -1,11 +1,13 @@
 import ApiDetailHeader from "../../api/factory/detailHeader.js";
 import ApiHandleFoto from "../../api/factory/fotoHandling.js";
 import ModalUploadFoto from "./Modal/UploadFoto.js";
+import PvSkeleton from "../../../../index.ci.php/public/js/components/primevue/skeleton/skeleton.esm.min.js";
 
 export default {
 	name: 'DetailHeader',
 	components: {
-		ModalUploadFoto
+		ModalUploadFoto,
+		PvSkeleton
 	},
 	props: {
 		headerData: {
@@ -38,6 +40,14 @@ export default {
 					'mitarbeiter',
 				].includes(value)
 			}
+		},
+		currentSemester: {
+			type: String,
+			default: ''
+		},
+		isLoading: { //if true, then parent isLoading
+			type: Boolean,
+			default: false
 		}
 	},
 	computed: {
@@ -60,8 +70,7 @@ export default {
 		},
 		hasTileUIDSlot() {
 			return !!this.$slots.uid
-		},
-
+		}
 	},
 	created(){
 		if (this.typeHeader === 'student') {
@@ -71,7 +80,7 @@ export default {
 		} else if (this.typeHeader === 'mitarbeiter') {
 			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
 				throw new Error(
-					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are requried.'
+					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are required.'
 				)
 			}
 			this.loadHeaderData(this.person_id, this.mitarbeiter_uid);
@@ -86,13 +95,26 @@ export default {
 			},
 			deep: true,
 		},
+		headerData: {
+			handler(newVal) {
+				if (this.typeHeader === 'student' && newVal?.length) {
+					this.getSemesterStati(newVal[0].prestudent_id);
+				}
+			},
+			immediate: true
+		},
 	},
 	data(){
 		return{
 			headerDataMa: {},
 			departmentData: {},
 			leitungData: {},
-			isFetchingIssues: false
+			isFetchingIssues: false,
+			noCurrentStatus: false,
+			semesterStatiLoading: false,
+			leitungOrgLoading: false,
+			departmentDataLoading: false,
+			headerDataMaLoading: false
 		};
 	},
 	methods: {
@@ -108,29 +130,40 @@ export default {
 				});
 		},
 		getHeader(person_id) {
+			this.headerDataMaLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getHeader(person_id))
 				.then(result => {
 					this.headerDataMa = result.data;
-
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.headerDataMaLoading = false;
+				});
 		},
 		loadDepartmentData(mitarbeiter_uid) {
+			this.departmentDataLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getPersonAbteilung(mitarbeiter_uid))
 				.then(result => {
 					this.departmentData = result.data;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.departmentDataLoading = false;
+				});
 		},
 		getLeitungOrg(oekurzbz){
+			this.leitungOrgLoading = true;
 			return this.$api
 				.call(ApiDetailHeader.getLeitungOrg(oekurzbz))
 				.then(result => {
 					this.leitungData = result.data;
 				})
-				.catch(this.$fhcAlert.handleSystemError);
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.leitungOrgLoading = false;
+				});
 		},
 		async goToLeitung() {
 			this.loadHeaderData(this.leitungData.person_id, this.leitungData.uid);
@@ -179,6 +212,33 @@ export default {
 			} else {
 				return 'data:image/jpeg;base64,' + foto;
 			}
+		},
+		getSemesterStati(prestudent_id){
+			this.semesterStatiLoading = true;
+			this.$api
+				.call(ApiDetailHeader.getSemesterStati(prestudent_id))
+				.then(result => {
+					this.semesterStati = result.data;
+					this.setNoCurrentStatus();
+				})
+				.catch(this.$fhcAlert.handleSystemError)
+				.finally(() => {
+					this.semesterStatiLoading = false;
+				});
+		},
+		setNoCurrentStatus() {
+			if(!Array.isArray(this.semesterStati))
+			{
+				this.noCurrentStatus = false;
+			}
+
+			if(!this.semesterStati.some(item => item.studiensemester_kurzbz === this.currentSemester)) {
+				this.noCurrentStatus = true;
+			}
+			else
+			{
+				this.noCurrentStatus = false;
+			}
 		}
 	},
 	template: `
@@ -200,7 +260,6 @@ export default {
 			</modal-upload-foto>
 
 			<template v-if="typeHeader==='student'">
-
 				<div
 					v-for="person in headerData"
 					:key="person.person_id"
@@ -236,62 +295,100 @@ export default {
 					<small class="text-muted">{{person.uid}}</small>
 				</div>
 
-					<div v-if="headerData.length == 1">
-						<div class="d-flex align-items-center gap-3">
-							<h2 class="h4">
-								{{headerData[0].titelpre}}
-								{{headerData[0].vorname}}
-								{{headerData[0].nachname}}
-								<span v-if="headerData[0].titelpost">, </span>
-								{{headerData[0].titelpost}}
-							</h2>
-							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
-						</div>
+				<div v-if="headerData.length == 1">
+					<div v-if="!isLoading" class="d-flex align-items-center gap-3">
+						<h2 class="h4">
+							{{headerData[0].titelpre}}
+							{{headerData[0].vorname}}
+							{{headerData[0].nachname}}
+							<span v-if="headerData[0].titelpost">, </span>
+							{{headerData[0].titelpost}}
+						</h2>
+						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
+					</div>
+					<div v-else class="d-flex align-items-center gap-3">
+						<pv-skeleton width="15rem" height="2rem" borderRadius="16px"></pv-skeleton>
+						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
+					</div>
 
-					<h5 class="h6">
-						<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
-						 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
-						<strong v-if="headerData[0].semester" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
-						  {{headerData[0].semester}}
-						<strong v-if="headerData[0].verband" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
-						{{headerData[0].verband}}
-						<strong v-if="headerData[0].gruppe" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
-						{{headerData[0].gruppe}}
-					</h5>
+				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
+					<strong class="text-muted">{{$p.t('lehre', 'studiengang')}} </strong>
+					<span v-if="!isLoading">
+					 {{headerData[0].stg_bezeichnung}} ({{headerData[0].studiengang}})
+					 </span>
+					 <span v-else>
+					 	<pv-skeleton width="10rem"></pv-skeleton>
+					 </span>
+					<template v-if="!semesterStatiLoading">
+						<strong v-if="headerData[0].semester != null" class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
+							{{headerData[0].semester}}
+						<strong v-if="headerData[0].gruppe !== null && headerData[0].verband != ' '" class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
+							{{headerData[0].verband}}
+						<strong v-if="headerData[0].gruppe !== null && headerData[0].gruppe != ' '" class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+							{{headerData[0].gruppe}}
+					</template>
+					<template v-else>
+					<strong class="text-muted"> | {{$p.t('lehre', 'semester')}} </strong>
+					  <pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					<strong class="text-muted"> | {{$p.t('lehre', 'verband')}}</strong>
+						<pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					<strong class="text-muted"> | {{$p.t('lehre', 'gruppe')}} </strong>
+						<pv-skeleton size="1rem" class="mr-2"></pv-skeleton>
+					</template>
+				</h5>
 
-					<h5 class="h6">
-						<strong class="text-muted">Email </strong>
-						<span>
-							<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
-						</span>
-						<strong v-if="headerData[0].statusofsemester" class="text-muted"> | Status </strong>
-						 {{headerData[0].statusofsemester}}
-					  </h5>
-
-				</div>
-				<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
-					<div class="d-flex py-1">
-						<div class="px-2" style="min-width: 100px;">
-							<slot name="issues"></slot>
-						</div>
-						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueBetaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
-						</div>
-						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
-							<h4 class="mb-1 text-center">UID</h4>
-							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
-						</div>
+				<h5 class="h6 d-flex align-items-center flex-wrap gap-1">
+					<strong class="text-muted">Email </strong>
+					<span v-if="!isLoading">
+						<a :href="'mailto:'+headerData[0]?.mail_intern">{{headerData[0].mail_intern}}</a>
+					</span>
+					<span v-else>
+						<pv-skeleton width="10rem"></pv-skeleton>
+					</span>
+					<strong class="text-muted"> | Status </strong>
+					<span v-if="noCurrentStatus">
+						<strong class="text-danger">{{$p.t('lehre', 'textNoStatusInSem', { sem: currentSemester}) }}</strong>
+					</span>
+					<span v-else>
+						{{headerData[0].statusofsemester}}
+					</span>
+				</h5>
+			</div>
+			<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
+				<div class="d-flex py-1">
+					<div class="px-2" style="min-width: 100px;">
+						<slot name="issues"></slot>
+					</div>
+					<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueGammaTile"></slot>
+						</h6>
+					</div>
+					<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueBetaTile"></slot>
+						</h6>
+					</div>
+					<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="valueAlphaTile"></slot>
+						</h6>
+					</div>
+					<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
+						<h4 class="mb-1 text-center">UID</h4>
+						<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+							<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+							<slot v-else name="uid"></slot>
+						</h6>
 					</div>
 				</div>
+			</div>
 
 		</template>
 
@@ -330,27 +427,51 @@ export default {
 
 				<!--show Ma-Details-->
 				<div class="col-md-9 text-nowrap mt-2">
-					<h4>{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}</h4>
-					<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong>
-						{{departmentData.bezeichnung}}
-					<span v-if="leitungData.uid"> | </span>
-					<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
-					<a href="#" @click.prevent="goToLeitung">
-						{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
-					</a>
-					<p>
-						<strong class="text-muted">Email </strong>
-						 <span v-if="headerDataMa && (headerDataMa.alias === undefined || headerDataMa.alias === null || headerDataMa.alias === '')">
-							<a :href="'mailto:' + mitarbeiter_uid + '@' + domain">
-							  {{ mitarbeiter_uid }}@{{ domain }}
+					<h4 v-if="!headerDataMaLoading">{{headerDataMa.titelpre}} {{headerDataMa.vorname}} {{headerDataMa.nachname}}<span v-if="headerDataMa?.titelpost">, </span> {{headerDataMa.titelpost}}</h4>
+					<h4 v-else><pv-skeleton width="15rem" height="2rem" borderRadius="16px"></pv-skeleton></h4>
+					<div class="d-flex align-items-center flex-wrap gap-1">
+						<strong class="text-muted">{{departmentData.organisationseinheittyp_kurzbz}}</strong>
+						<span v-if="!departmentDataLoading">
+							{{departmentData.bezeichnung}}
+						</span>
+						<span v-else>
+							<pv-skeleton width="12rem"></pv-skeleton>
+						</span>
+						<span v-if="leitungData.uid"> | </span>
+						<strong v-if="leitungData.uid" class="text-muted">Vorgesetzte*r </strong>
+						<span v-if="!leitungOrgLoading">
+							<a href="#" @click.prevent="goToLeitung">
+							{{leitungData.titelpre}} {{leitungData.vorname}} {{leitungData.nachname}}
 							</a>
 						</span>
 						<span v-else>
-							<a :href="'mailto:'+headerDataMa?.alias+'@'+domain">{{headerDataMa.alias}}@{{domain}}</a>
+							<pv-skeleton width="5rem"></pv-skeleton>
 						</span>
-						<span v-if="headerDataMa?.telefonklappe" class="mb-2"> | <strong class="text-muted">DW </strong>{{headerDataMa?.telefonklappe}}</span>
-					</p>
+					</div>
+
+					<div class="d-flex align-items-center gap-2 flex-nowrap">
+					  <div class="d-flex align-items-center gap-1">
+						<strong class="text-muted">Email</strong>
+						<template v-if="!headerDataMaLoading">
+						  <a :href="'mailto:' + (headerDataMa?.alias || mitarbeiter_uid) + '@' + domain">
+							{{ (headerDataMa?.alias || mitarbeiter_uid) + '@' + domain }}
+						  </a>
+						</template>
+						<pv-skeleton v-else width="10rem"></pv-skeleton>
+					  </div>
+
+					  <div v-if="headerDataMa?.telefonklappe" class="d-flex align-items-center gap-1">
+						<span>|</span>
+						<strong class="text-muted">DW</strong>
+						<template v-if="!headerDataMaLoading">
+						  {{ headerDataMa.telefonklappe }}
+						</template>
+						<pv-skeleton v-else width="4rem"></pv-skeleton>
+					  </div>
+					</div>
+
 					<slot name="tag"></slot>
+
 				</div>
 
 				<div class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
@@ -360,20 +481,33 @@ export default {
 						</div>
 						<div v-if="hasTileGammaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleGammaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueGammaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueGammaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileBetaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleBetaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueBetaTile" :valueBetaTile="valueBetaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueBetaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileAlphaSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center"><slot name="titleAlphaTile"></slot></h4>
-							<h6 class="text-muted text-center"><slot name="valueAlphaTile"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="valueAlphaTile"></slot>
+							</h6>
 						</div>
 						<div v-if="hasTileUIDSlot" class="px-2" style="border-left: 1px solid #EEE">
 							<h4 class="mb-1 text-center">UID</h4>
-							<h6 class="text-muted text-center"><slot name="uid"></slot></h6>
+							<h6 class="text-muted d-flex align-items-center justify-content-center flex-wrap gap-1">
+								<pv-skeleton v-if="isLoading" width="4rem"></pv-skeleton>
+								<slot v-else name="uid"></slot>
+							</h6>
 						</div>
+
 					</div>
 				</div>
 

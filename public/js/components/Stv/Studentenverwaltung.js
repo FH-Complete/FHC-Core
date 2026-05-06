@@ -251,6 +251,7 @@ export default {
 		'url_studiengang': function (newVal, oldVal) {
 			if (newVal !== oldVal) {
 				this.checkUrlStudiengang();
+				this.$refs.stvList.clearSelection();
 			}
 		},
 		'url_mode': function () {
