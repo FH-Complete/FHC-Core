@@ -28,10 +28,11 @@ export function getDateStyleClass(termin, notenOptions) {
 
 		// no submission yet
 		if (datum < today) return 'verpasst';
-		if (termin.diffindays <= 12) return 'abzugeben';
-		return 'standard';
+		
 	}
 
-	// GENERIC STATUS
-	return datum < today ? 'verpasst' : 'standard';
+	// GENERIC STATUS — applies to all termine
+	if (datum < today) return 'verpasst';
+	if (termin.diffindays <= 12) return 'abzugeben';
+	return 'standard';
 }

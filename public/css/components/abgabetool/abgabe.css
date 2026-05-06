@@ -330,3 +330,19 @@
 .p-tooltip.custom-tooltip {
 	z-index: 8001 !important;
 }
+
+ /* Shrinks font and table rows for desktop users who have zoomed in their browser (150%+).
+   Does not affect mobile/touchscreen devices, which use touch input instead of a mouse. */
+@media (pointer: fine) and (min-resolution: 1.5dppx) {
+
+	html {
+		font-size: 0.5rem;
+	}
+	
+	.tabulator-cell, .tabulator-row {
+		 height: 20px;
+		 max-height: 20px;
+	 }
+	
+}
+

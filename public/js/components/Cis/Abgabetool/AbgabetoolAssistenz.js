@@ -53,6 +53,7 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
+			flatDataDirty: true,
 			mode: 'perProjectView',
 			qgate1FilterSelected: [],
 			qgate2FilterSelected: [],
@@ -73,6 +74,11 @@ export const AbgabetoolAssistenz = {
 			colLayoutRestored: false,
 			sortRestored: false,
 			stateRestored: false,
+			headerFiltersRestoredFlat: false,
+			filtersRestoredFlat: false,
+			colLayoutRestoredFlat: false,
+			sortRestoredFlat: false,
+			stateRestoredFlat: false,
 			timelineProjekt: null,
 			selectedStudiengangOption: null,
 			studiengaengeOptions: null,
@@ -91,6 +97,22 @@ export const AbgabetoolAssistenz = {
 			allowedNotenFilterOptions: null,
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
+			serienEdit: Vue.reactive({
+				datum: null,
+				bezeichnung: null,
+				kurzbz: null,
+				upload_allowed: null,
+				fixtermin: null,
+				invertedFixtermin: null,
+			}),
+			// track which fields should actually be applied
+			serienEditFields: {
+				datum: false,
+				bezeichnung: false,
+				kurzbz: false,
+				upload_allowed: false,
+				fixtermin: false,
+			},
 			serienTermin: Vue.reactive({
 				datum: new Date().toISOString().split('T')[0],
 				bezeichnung: {
@@ -124,7 +146,6 @@ export const AbgabetoolAssistenz = {
 				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
-				rowHeight: 40,
 				renderVerticalBuffer: 2000,
 				columns: [
 					{
@@ -294,12 +315,12 @@ export const AbgabetoolAssistenz = {
 			],
 			abgabeTableOptionsFlat: {
 				minHeight: 250,
+				height: 700,
 				index: 'projektarbeit_id',
-				layout: 'fitData',
+				layout: 'fitColumns',
 				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
 				selectable: true,
-				rowHeight: 40,
-				renderVerticalBuffer: 2000,
+				renderVerticalBuffer: 400,
 				columns: [
 					{
 						formatter: function (cell, formatterParams, onRendered) {
@@ -347,7 +368,7 @@ export const AbgabetoolAssistenz = {
 						hozAlign: "center",
 						headerSort: false,
 						formatterParams: {
-							handleClick: this.selectHandlerFlat
+							handleClick: this.selectHandler
 						},
 						titleFormatterParams: {
 							handleClick: this.selectAllHandlerFlat
@@ -355,26 +376,25 @@ export const AbgabetoolAssistenz = {
 						width: 50,
 						cssClass: 'sticky-col'
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, minWidth: 140, tooltip: false, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1, minWidth: 100, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, minWidth: 100, visible: true},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1, minWidth: 150, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1, minWidth: 50, visible: false},
-
-					// --- termin data ---
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, tooltip: false, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabetyp'))),
 						field: 'paabgabetyp_kurzbz',
 						headerFilter: true,
-						formatter: this.centeredTextFormatter,
-						minWidth: 120, widthGrow: 1
+						formatter: this.paabgabetypFormatter,
+						
+						minWidth: 120,
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabekurzbzv2'))),
 						field: 'kurzbz',
 						headerFilter: true,
 						formatter: this.centeredTextFormatter,
-						minWidth: 120, widthGrow: 1
+						minWidth: 120
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zieldatumv2'))),
@@ -383,7 +403,7 @@ export const AbgabetoolAssistenz = {
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: (a, b) => new Date(a) - new Date(b),
 						formatter: (cell) => this.formatDate(cell.getValue()),
-						minWidth: 120, widthGrow: 1
+						minWidth: 100
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabedatum'))),
@@ -392,37 +412,47 @@ export const AbgabetoolAssistenz = {
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: (a, b) => new Date(a) - new Date(b),
 						formatter: (cell) => this.formatDate(cell.getValue()),
-						minWidth: 120, widthGrow: 1
+						minWidth: 100
 					},
-
-					// --- status ---
 					{
-						title: '',
+						title: 'Status',
 						field: 'dateStyle',
 						headerSort: false,
-						formatter: (cell) => this.abgabterminFormatter(cell, true), // icon only mode
-						width: 48,
+						headerFilter: this.statusHeaderFilterEditor,
+						headerFilterFunc: this.statusHeaderFilterFunc,
+						headerFilterParams: {},
+						formatter: this.abgabterminFormatter,
+						formatterParams: { iconOnly: true },
+						width: 70,
 						tooltip: (e, cell) => this.mapDateStyleToTabulatorTooltip(cell.getValue())
 					},
 					{
-						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))),
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4noteprojektarbeit'))),
+						field: 'pa_note',
+						formatter: (cell) => {
+							const val = cell.getValue();
+							if (!val) return '';
+							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
+						},
+						minWidth: 100
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notetermin'))),
 						field: 'note',
 						formatter: (cell) => {
 							const val = cell.getValue();
 							if (!val) return '';
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
-						minWidth: 100, widthGrow: 1
+						minWidth: 100
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notizQualGatev2'))),
 						field: 'beurteilungsnotiz',
 						headerFilter: true,
 						formatter: this.centeredTextFormatter,
-						minWidth: 150, widthGrow: 2, visible: false
+						minWidth: 150, visible: false
 					},
-
-					// --- flags ---
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4fixterminv4'))),
 						field: 'fixtermin',
@@ -443,7 +473,7 @@ export const AbgabetoolAssistenz = {
 					},
 				],
 				persistence: false,
-				persistenceID: "abgabetool_2026_03_16"
+				persistenceID: "abgabetoolflat_2026_03_16"
 			},
 			abgabeTableEventHandlersFlat: [
 				{
@@ -473,16 +503,265 @@ export const AbgabetoolAssistenz = {
 		};
 	},
 	methods: {
+		reloadData() {
+			this.loadProjektarbeiten()
+		},
+		openEditModal() {
+			// reset
+			this.serienEditFields = {
+				datum: false,
+				bezeichnung: false,
+				kurzbz: false,
+				upload_allowed: false,
+				fixtermin: false,
+			}
+			this.serienEdit.datum = new Date().toISOString().split('T')[0]
+			this.serienEdit.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
+			this.serienEdit.kurzbz = ''
+			this.serienEdit.upload_allowed = false
+			this.serienEdit.invertedFixtermin = true
+
+			this.$refs.modalContainerEditSeries.show()
+		},
+		async handleEditSelectedTermine() {
+			const activeFields = Object.keys(this.serienEditFields).filter(k => this.serienEditFields[k])
+			if (!activeFields.length) {
+				this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4noFieldsSelected'))
+				return
+			}
+
+			if (await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirm_edit_n_termine', [this.selectedDataFlat.length]),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'p-button-primary',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'p-button-secondary'
+			}) === false) return
+
+			this.$refs.modalContainerEditSeries.hide()
+			this.editSelectedTermine(this.selectedDataFlat)
+		},
+		editSelectedTermine(termine) {
+			const paabgabeIDS = termine.map(t => t.paabgabe_id)
+
+			// only send fields that were checked
+			const payload = { paabgabe_ids: paabgabeIDS }
+			if (this.serienEditFields.datum)        payload.datum = this.serienEdit.datum
+			if (this.serienEditFields.bezeichnung)  payload.paabgabetyp_kurzbz = this.serienEdit.bezeichnung.paabgabetyp_kurzbz
+			if (this.serienEditFields.kurzbz)       payload.kurzbz = this.serienEdit.kurzbz
+			if (this.serienEditFields.upload_allowed) payload.upload_allowed = this.serienEdit.upload_allowed
+			if (this.serienEditFields.fixtermin)    payload.fixtermin = !this.serienEdit.invertedFixtermin
+
+			this.saving = true
+			this.$api.call(ApiAbgabe.patchProjektarbeitAbgabeMultiple(payload)).then(res => {
+				if (res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
+
+					// patch local data structure
+					termine.forEach(t => {
+						const pa = this.projektarbeiten.find(pa => pa.projektarbeit_id == t.projektarbeit_id)
+						const termin = pa.abgabetermine.find(termin => termin.paabgabe_id === t.paabgabe_id)
+						if (!termin) return
+
+						if (this.serienEditFields.datum)         termin.datum = this.serienEdit.datum
+						if (this.serienEditFields.bezeichnung)   termin.paabgabetyp_kurzbz = this.serienEdit.bezeichnung.paabgabetyp_kurzbz
+						if (this.serienEditFields.kurzbz)        termin.kurzbz = this.serienEdit.kurzbz
+						if (this.serienEditFields.upload_allowed) termin.upload_allowed = this.serienEdit.upload_allowed
+						if (this.serienEditFields.fixtermin)     termin.fixtermin = !this.serienEdit.invertedFixtermin
+					})
+
+					const updatedProjektarbeiten = new Set(termine.map(t => t.projektarbeit_id))
+					updatedProjektarbeiten.forEach(pa_id => {
+						const projektarbeit = this.projektarbeiten.find(pa => pa.projektarbeit_id == pa_id)
+						this.checkAbgabetermineProjektarbeit(projektarbeit)
+					})
+
+					this.redrawTableScrollSave()
+					this.selectedDataFlat = []
+					this.selectedcountFlat = 0
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+
+				} else if (res?.meta?.status == 'error') {
+					this.$fhcAlert.alertError()
+				}
+			}).finally(() => {
+				this.saving = false
+			})
+		},
+		deleteSelectedTermine(termine) {
+			const paabgabeIDS = termine.map(t => t.paabgabe_id)
+			this.$api.call(ApiAbgabe.deleteProjektarbeitAbgabeMultiple(paabgabeIDS)).then( (res) => {
+				if(res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/genericDeleted', [this.$p.t('abgabetool/c4abgaben_n', [paabgabeIDS.length])]))
+					
+					termine.forEach(t => {
+						const pa = this.projektarbeiten.find(pa => pa.projektarbeit_id == t.projektarbeit_id)
+						const deletedTerminIndex = pa.abgabetermine.findIndex(termin => t.paabgabe_id === termin.paabgabe_id)
+						pa.abgabetermine.splice(deletedTerminIndex, 1)
+					})
+					
+					const updatedProjektarbeiten = new Set(termine.map(t => t.projektarbeit_id))
+
+					updatedProjektarbeiten.forEach(pa_id => {
+						const projektarbeit = this.projektarbeiten.find(pa => pa.projektarbeit_id == pa_id)
+						this.checkAbgabetermineProjektarbeit(projektarbeit)
+					})
+
+					this.redrawTableScrollSave()
+
+					// update flat table with fresh computed data and clear selection
+					this.selectedDataFlat = []
+					this.selectedcountFlat = 0
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+					
+				} else if(res?.meta?.status == 'error'){
+					this.$fhcAlert.alertError()
+				}
+			})
+		},
+		async handleDeleteSelectedTermine() {
+			// TODO: check if every selected termin is actually "allowed to delete"
+			
+			
+			if(await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirm_delete_n_termine', [this.selectedDataFlat.length]),
+				acceptLabel: 'Löschen',
+				acceptClass: 'p-button-danger',
+				rejectLabel: 'Zurück',
+				rejectClass: 'p-button-secondary'
+			}) === false) {
+				return false
+			} else {
+				this.deleteSelectedTermine(this.selectedDataFlat)
+			}
+			
+		},
 		async switchMode() {
 			if(this.mode == 'perProjectView') {
 				this.mode = 'flatView'
 
 				await this.tableBuiltPromiseFlat;
-
-				this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine);
+				
+				if(this.flatDataDirty) {
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine);
+					this.flatDataDirty = false
+				}
+				
 			} else {
 				this.mode = 'perProjectView'
 			}
+		},
+		getDateStyleHtml(dateStyle) {
+			const iconMap = {
+				'verspaetet':              '<i class="fa-solid fa-triangle-exclamation"></i>',
+				'verpasst':                '<i class="fa-solid fa-calendar-xmark"></i>',
+				'abzugeben':               '<i class="fa-solid fa-hourglass-half"></i>',
+				'standard':                '<i class="fa-solid fa-clock"></i>',
+				'abgegeben':               '<i class="fa-solid fa-paperclip"></i>',
+				'beurteilungerforderlich': '<i class="fa-solid fa-list-check"></i>',
+				'bestanden':               '<i class="fa-solid fa-check"></i>',
+				'nichtbestanden':          '<i class="fa-solid fa-circle-exclamation"></i>',
+			};
+			return iconMap[dateStyle] ?? '';
+		},
+		statusHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			const options = [
+				{ label: this.$p.t('abgabetool/c4positivBenotet'),    value: 'bestanden',              dateStyle: 'bestanden' },
+				{ label: this.$p.t('abgabetool/c4negativBenotet'),    value: 'nichtbestanden',         dateStyle: 'nichtbestanden' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerspaetet'), value: 'verspaetet',             dateStyle: 'verspaetet' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerpasst'),   value: 'verpasst',               dateStyle: 'verpasst' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbzugeben'),  value: 'abzugeben',              dateStyle: 'abzugeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbgegeben'),  value: 'abgegeben',              dateStyle: 'abgegeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich'), value: 'beurteilungerforderlich', dateStyle: 'beurteilungerforderlich' },
+				{ label: this.$p.t('abgabetool/c4tooltipStandardv2'), value: 'standard',               dateStyle: 'standard' },
+			];
+
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected'; // e.g. dateStyleFilterSelected
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+			const updateDisplay = () => {
+				display.value = options
+					.filter(o => selected.includes(o.value))
+					.map(o => o.label)
+					.join(', ');
+			};
+
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 0; cursor: pointer; white-space: nowrap; padding-right: 8px;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.value;
+				cb.checked = selected.includes(opt.value);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.value]
+						: selected.filter(v => v !== opt.value);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				// icon badge — same look as cell
+				const badge = document.createElement('div');
+				badge.className = opt.dateStyle + '-header';
+				badge.style.cssText = `min-width: 36px; height: 36px; display: flex; align-items: center; 
+				justify-content: center; flex-shrink: 0; padding: 0px 17px 0px 17px;`;
+				badge.innerHTML = this.getDateStyleHtml(opt.dateStyle);
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.label;
+				labelText.style.cssText = 'margin-left: 6px;';
+
+				row.appendChild(cb);
+				row.appendChild(badge);
+				row.appendChild(labelText);
+				dropdown.appendChild(row);
+			});
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+		statusHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+			// rowVal is the raw dateStyle string on the flat table
+			return filterVal.some(val => val === rowVal);
 		},
 		qgateHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
 
@@ -613,10 +892,12 @@ export const AbgabetoolAssistenz = {
 		},
 		toolTipFuncPrevTermin(e, cell, onRendered) {
 			const data = cell.getData();
+			if(!data.prevTermin) return ''
 			return this.mapDateStyleToTabulatorTooltip(data.prevTermin.dateStyle);
 		},
 		toolTipFuncNextTermin(e, cell, onRendered) {
 			const data = cell.getData();
+			if(!data.nextTermin) return ''
 			return this.mapDateStyleToTabulatorTooltip(data.nextTermin.dateStyle);
 		},
 		mapDateStyleToTabulatorTooltip(dateStyleString) {
@@ -722,20 +1003,31 @@ export const AbgabetoolAssistenz = {
 
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, null, this.$fhcAlert, this.$p)
 		},
 		sammelMailBetreuer(param) {
-			
 			const recipientList = [];
 			this.selectedData.forEach(row => {
 				if (row.betreuer_mail) recipientList.push(row.betreuer_mail);
 				if (row.zweitbetreuer_mail) recipientList.push(row.zweitbetreuer_mail);
 			});
 
-			// actually not necessary for email clients but looks better for assistenz if we avoid duplicates here
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailBetreuerBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+
+			// dedupe by student_uid, then build one line per student
+			const seenUids = new Set();
+			const bodyLines = [];
+			this.selectedData.forEach(row => {
+				if (seenUids.has(row.student_uid)) return;
+				seenUids.add(row.student_uid);
+				const name = `${row.student_vorname ?? ''} ${row.student_nachname ?? ''}`.trim();
+				const titel = row.titel ? ` - ${row.titel}` : '';
+				bodyLines.push(`${name}${titel}`);
+			});
+
+			const body = bodyLines.join('\n');
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, body, this.$fhcAlert, this.$p)
 		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
@@ -753,6 +1045,24 @@ export const AbgabetoolAssistenz = {
 		selectAllHandler(e, cell) {
 			const table = cell.getTable();
 			const rows = this.filteredRows ?? table.getRows();
+
+			// custom select all logic
+			const allowed = rows.filter(r => r.getData().selectable);
+			const selected = table.getRows().every(r => r.isSelected());
+
+			if(selected){
+				allowed.forEach(r => r.deselect());
+			} else {
+				allowed.forEach(r => r.select());
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		selectAllHandlerFlat(e, cell) {
+			const table = cell.getTable();
+			const rows = this.filteredRowsFlat ?? table.getRows();
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
@@ -994,7 +1304,7 @@ export const AbgabetoolAssistenz = {
 
 			table.on("renderComplete", () => {
 				if(!this.stateRestored) {
-
+					
 					if (saved?.columns && !this.colLayoutRestored) {
 						const layout = saved.columns.map(col => ({
 							field: col.field,
@@ -1051,43 +1361,43 @@ export const AbgabetoolAssistenz = {
 			this.tableBuiltResolveFlat()
 
 			table.on("columnMoved", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("columnResized", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("columnVisibilityChanged", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("filterChanged", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("headerFilterChanged", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("dataSorted", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("columnSorted", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
 			table.on("sortersChanged", () => {
-				this.saveState(table);
+				this.saveStateFlat(table);
 			});
 
-			const saved = this.loadState();
+			const saved = this.loadStateFlat();
 
 			table.on("renderComplete", () => {
-				if(!this.stateRestored) {
-
-					if (saved?.columns && !this.colLayoutRestored) {
+				if(!this.stateRestoredFlat) {
+					
+					if (saved?.columns && !this.colLayoutRestoredFlat) {
 						const layout = saved.columns.map(col => ({
 							field: col.field,
 							width: col.width,
@@ -1097,22 +1407,22 @@ export const AbgabetoolAssistenz = {
 
 						table.setColumnLayout(layout);
 
-						this.colLayoutRestored = true;
+						this.colLayoutRestoredFlat = true;
 					}
 
-					if (saved?.filters && !this.filtersRestored) {
-						this.filtersRestored = true // instantly avoid retriggers
+					if (saved?.filters && !this.filtersRestoredFlat) {
+						this.filtersRestoredFlat = true // instantly avoid retriggers
 						table.setFilter(saved.filters);
 					}
-					if (saved?.headerFilters && !this.headerFiltersRestored) {
-						this.headerFiltersRestored = true // instantly avoid retriggers
+					if (saved?.headerFilters && !this.headerFiltersRestoredFlat) {
+						this.headerFiltersRestoredFlat = true // instantly avoid retriggers
 						for (let hf of saved.headerFilters) {
 							table.setHeaderFilterValue(hf.field, hf.value);
 						}
 					}
 
-					if (saved?.sort?.length && !this.sortRestored) {
-						this.sortRestored = true;
+					if (saved?.sort?.length && !this.sortRestoredFlat) {
+						this.sortRestoredFlat = true;
 
 						setTimeout(() => {
 							const sortList = saved.sort.map(s => {
@@ -1126,7 +1436,7 @@ export const AbgabetoolAssistenz = {
 							table.setSort(sortList);
 						}, 100);
 					}
-					this.stateRestored = true
+					this.stateRestoredFlat = true
 
 					// ensure that the filterCollapseables thingy has the correct values
 					this.$refs.abgabeTableFlat.setSelectedFields();
@@ -1134,6 +1444,29 @@ export const AbgabetoolAssistenz = {
 				}
 
 			});
+		},
+		loadStateFlat() {
+			return JSON.parse(localStorage.getItem(this.abgabeTableOptionsFlat.persistenceID) || "null");
+		},
+		saveStateFlat(table) {
+			// avoid storing state after first restore part happened
+			if(!this.stateRestoredFlat) return
+			const rawLayout = table.getColumnLayout();
+			const state = {
+				columns: rawLayout.map(col => ({
+					field: col.field,
+					visible: col.visible,
+					width: col.width,
+				})),
+				sort: table.getSorters().map(s => ({
+					field: s.field,
+					dir: s.dir,
+				})),
+				filters: table.getFilters(),
+				headerFilters: table.getHeaderFilters()
+			};
+
+			localStorage.setItem(this.abgabeTableOptionsFlat.persistenceID, JSON.stringify(state));
 		},
 		handleToggleFullscreenDetail() {
 			this.detailIsFullscreen = !this.detailIsFullscreen
@@ -1273,6 +1606,12 @@ export const AbgabetoolAssistenz = {
 				this.projektarbeiten = this.mapProjekteToTableData(this.projektarbeiten)
 
 				this.redrawTableScrollSave()
+
+				// in case pesky user creates a series and instantly switches viewmode
+				this.flatDataDirty = true
+				if (this.mode === 'flatView') {
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+				}
 				
 			}).finally(()=>{
 				this.saving = false
@@ -1407,6 +1746,10 @@ export const AbgabetoolAssistenz = {
 			this.timelineProjekt = projekt
 			this.$refs.drawer.show()
 		},
+		paabgabetypFormatter(cell) {
+			const key = cell.getValue()
+			return this.$p.t('abgabetool/c4paatyp' + key)
+		},
 		centeredTextFormatter(cell) {
 			const longForm = cell.getValue()
 			if(!longForm) return
@@ -1440,12 +1783,14 @@ export const AbgabetoolAssistenz = {
 			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
 				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
 		},
-		abgabterminFormatter(cell) {
+		abgabterminFormatter(cell, formatterParams, onRendered,) {
 			const val = cell.getValue()
-
+			const dateStyle = val?.dateStyle ?? val
+			
+			
 			if(val) {
 				let icon = ''
-				switch(val.dateStyle) {
+				switch(dateStyle) {
 					case 'verspaetet':
 						icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
 						break
@@ -1474,8 +1819,16 @@ export const AbgabetoolAssistenz = {
 				
 				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
 				
+				if(formatterParams?.iconOnly) {
+					return '<div style="display: flex; height: 100%">' +
+						'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+						icon +
+						'</div>' +
+						'</div>'
+				}
+				
 				return '<div style="display: flex; height: 100%">' +
-					'<div class=' + val.dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+					'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
 						icon +
 					'</div>' + 
 					'<div style="margin-left: 4px;">' +
@@ -1519,6 +1872,21 @@ export const AbgabetoolAssistenz = {
 			await this.tableBuiltPromise
 			
 			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
+
+			// apply preselected semester filter now that table + data are ready
+			this.semesterChanged({ value: this.curSem })
+			
+			// keep flat table in sync
+			this.flatDataDirty = true
+			if (this.mode === 'flatView') {
+				await this.tableBuiltPromiseFlat
+				this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+				this.flatDataDirty = false
+			}
+
+			// reset flat selection since the underlying data changed entirely
+			this.selectedDataFlat = []
+			this.selectedcountFlat = 0
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
@@ -1533,7 +1901,7 @@ export const AbgabetoolAssistenz = {
 					callback()
 				}
 			}).finally(()=>{
-				this.loading=false
+				this.loading = false
 			})
 		},
 		loadAbgaben(details) {
@@ -1556,8 +1924,13 @@ export const AbgabetoolAssistenz = {
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.abgabeTableOptions.height = window.visualViewport.height - rect.top - 80
+
+			this.abgabeTableOptions.height = Math.round(window.visualViewport.height - rect.top)
 			this.$refs.abgabeTable.tabulator.setHeight(this.abgabeTableOptions.height)
+	
+			// same thing for 2nd tabulator which would exceed in size massively
+			this.abgabeTableOptionsFlat.height = Math.round(window.visualViewport.height - rect.top)
+	
 		},
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
@@ -1567,7 +1940,7 @@ export const AbgabetoolAssistenz = {
 			await this.allConfigPromise
 			
 			// called through notenOptionFilter/selectedStudiengangOption watcher on startup
-			// this.loadProjektarbeiten()
+			this.loadProjektarbeiten()
 
 			this.calcMaxTableHeight()
 		},
@@ -1579,15 +1952,27 @@ export const AbgabetoolAssistenz = {
 		getAllTermine() {
 			if (!this.projektarbeiten) return [];
 			return this.projektarbeiten.flatMap(pa =>
-				pa.abgabetermine.map(termin => ({
-					...termin,
-					student_uid: pa.student_uid,
-					student_vorname: pa.student_vorname,
-					student_nachname: pa.student_nachname,
-					titel: pa.titel,
-					projektarbeit_id: pa.projektarbeit_id,
-					stg: pa.stg,
-				}))
+				pa.abgabetermine.map(termin => {
+					// TODO: allowedToDelete prüfung auf terminnote? benotete qgate termine sollten "sicher" sein?
+					
+					const allowedToSave = pa.note !== null ? false : true
+					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum
+					return {
+						allowedToSave,
+						allowedToDelete,
+						selectable: allowedToSave || allowedToDelete,
+						...termin,
+						student_uid: pa.student_uid,
+						student_vorname: pa.student_vorname,
+						student_nachname: pa.student_nachname,
+						titel: pa.titel,
+						pa_note: pa.note,
+						projektarbeit_id: pa.projektarbeit_id,
+						stg: pa.stg,
+					}
+				}
+					
+				)
 			);
 		},
 		countsToHTMLFlat() {
@@ -1662,6 +2047,8 @@ export const AbgabetoolAssistenz = {
 			this.serienTermin.upload_allowed = newVal.upload_allowed_default
 		},
 		selectedStudiengangOption(newVal, oldVal) {
+			if(this.loading == true) return
+			
 			// implicitely avoids juggling around promises for created api calls,
 			// since we need note & stg flags for loadProjektarbeiten
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
@@ -1669,6 +2056,8 @@ export const AbgabetoolAssistenz = {
 			}
 		},
 		notenOptionFilter(newVal) {
+			if(this.loading == true) return
+			
 			// that single where clause is worth a decent load time so rather not filter tabulator but just 
 			// adapt the qry
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
@@ -1691,7 +2080,12 @@ export const AbgabetoolAssistenz = {
 				const cb = row.getElement().children[0]?.children[0]?.children[0]
 				if(cb) cb.checked = true
 			})
-
+		},
+		projektarbeiten: {
+			handler() {
+				this.flatDataDirty = true	
+			},
+			deep: true
 		}
 	},
 	created() {
@@ -1737,8 +2131,17 @@ export const AbgabetoolAssistenz = {
 					const res = results[2].value;
 					this.allSem = res.data[0];
 					const all = { studiensemester_kurzbz: this.$p.t('abgabetool/c4all') };
-					this.curSem = all;
+					
 					this.studiensemesterOptions = [all, ...this.allSem];
+
+					const currentSemObj = res.data[1];
+
+					// find the matching entry from studiensemesterOptions so PrimeVue
+					// can match by reference for the dropdown preselection
+					const foundRef = this.studiensemesterOptions.find(
+						s => s.studiensemester_kurzbz === currentSemObj.studiensemester_kurzbz
+					)
+					this.curSem = foundRef ?? all;
 				}
 
 				// 4. Noten
@@ -1779,6 +2182,105 @@ export const AbgabetoolAssistenz = {
 	template: `
 	<template v-if="phrasenResolved">
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
+
+	<bs-modal ref="modalContainerEditSeries" class="bootstrap-prompt" dialogClass="modal-lg">
+		<template v-slot:title>
+			<div>{{ $p.t('abgabetool/c4editTerminserie') }}</div>
+			<div class="text-muted" style="font-size: 0.9rem;">
+				{{ $p.t('abgabetool/c4nSelected', [selectedDataFlat.length]) }}
+			</div>
+		</template>
+		<template v-slot:default>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.fixtermin" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4fixterminv4'))}}</div>
+				<div class="col-8">
+					<Checkbox
+						v-model="serienEdit.invertedFixtermin"
+						:binary="true"
+						:disabled="!serienEditFields.fixtermin"
+					/>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.datum" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4zieldatumv2'))}}</div>
+				<div class="col-8">
+					<VueDatePicker
+						style="width: 95%;"
+						v-model="serienEdit.datum"
+						:clearable="false"
+						:disabled="!serienEditFields.datum"
+						locale="de"
+						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
+						:enable-time-picker="false"
+						:text-input="true"
+						auto-apply>
+					</VueDatePicker>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.bezeichnung" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4abgabetyp'))}}</div>
+				<div class="col-8">
+					<Dropdown
+						:style="{'width': '100%'}"
+						v-model="serienEdit.bezeichnung"
+						:disabled="!serienEditFields.bezeichnung"
+						:options="abgabeTypeOptions"
+						:optionLabel="getOptionLabelAbgabetyp"
+						:optionDisabled="getOptionDisabled">
+					</Dropdown>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.upload_allowed" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4upload_allowed'))}}</div>
+				<div class="col-8">
+					<Checkbox
+						v-model="serienEdit.upload_allowed"
+						:binary="true"
+						:disabled="!serienEditFields.upload_allowed"
+					/>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.kurzbz" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4abgabekurzbzv2'))}}</div>
+				<div class="col-8">
+					<Textarea
+						style="margin-bottom: 4px;"
+						v-model="serienEdit.kurzbz"
+						:disabled="!serienEditFields.kurzbz"
+						rows="1"
+						class="w-100">
+					</Textarea>
+				</div>
+			</div>
+	
+		</template>
+		<template v-slot:footer>
+			<button type="button" class="btn btn-primary" @click="handleEditSelectedTermine">
+				{{ $capitalize($p.t('abgabetool/c4save')) }}
+			</button>
+		</template>
+	</bs-modal>
 
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
 			dialogClass="modal-lg">
@@ -2069,8 +2571,12 @@ export const AbgabetoolAssistenz = {
 					</button>
 					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 					
-					<button @click="switchMode">
-						switch mode
+					<button @click="switchMode" class="btn btn-secondary">
+						{{ $p.t('abgabetool/c4terminansicht') }}
+					</button>
+					
+					<button @click="reloadData" class="btn btn-secondary">
+						<i class="fa-solid fa-arrows-rotate"></i>
 					</button>
 				</template>
 			</core-filter-cmpt>
@@ -2090,32 +2596,22 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-					<Dropdown
-						@change="semesterChanged" 
-						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 
-						:style="{'scroll-behavior': 'auto !important'}" 
-						:optionLabel="getOptionLabelStudiensemester" 
-						v-model="curSem" 
-						:options="studiensemesterOptions" 
-					>
-						<template #optionsgroup="slotProps">
-							<div>{{ option.studiensemester_kurzbz }}</div>
-						</template>
-					</Dropdown>
-					
-					<button 
-						v-if="emailItems.length"
-						role="button"
-						@click="evt => $refs.menu.toggle(evt)"
-						class="btn btn-outline-secondary dropdown-toggle"
-						aria-haspopup="true"
-					>
-						<i class="fa fa-envelope"></i>
+					<button style="max-height: 40px;" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
+						{{$capitalize( $p.t('abgabetool/c4delete') )}}
+						<i class="fa-solid fa-trash"></i>
 					</button>
-					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 					
-					<button @click="switchMode">
-						switch mode
+					<button @click="openEditModal" class="btn btn-success ml-2" role="button">
+						{{$capitalize( $p.t('abgabetool/c4edit') )}}
+						<i class="fa fa-pen"></i>
+					</button>
+										
+					<button @click="switchMode" class="btn btn-secondary">
+						{{ $p.t('abgabetool/c4projektansicht') }}
+					</button>
+					
+					<button @click="reloadData" class="btn btn-secondary">
+						<i class="fa-solid fa-arrows-rotate"></i>
 					</button>
 				</template>
 			</core-filter-cmpt>

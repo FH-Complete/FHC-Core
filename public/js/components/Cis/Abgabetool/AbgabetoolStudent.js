@@ -9,6 +9,7 @@ export const AbgabetoolStudent = {
 	components: {
 		Accordion: primevue.accordion,
 		AccordionTab: primevue.accordiontab,
+		Textarea: primevue.textarea,
 		BsModal,
 		AbgabeDetail,
 		FhcOverlay
@@ -44,14 +45,67 @@ export const AbgabetoolStudent = {
 			detail: null,
 			projektarbeiten: null,
 			selectedProjektarbeit: null,
-			moodle_link: null
+			moodle_link: null,
+			editingTitel: '',
+			editingProjektarbeit: null,
 		};
 	},
 	methods: {
+		openTitelEdit(projektarbeit, event) {
+			// stop the click from toggling the accordion tab
+			event.stopPropagation();
+			this.editingProjektarbeit = projektarbeit;
+			this.editingTitel = projektarbeit.titel ?? '';
+			this.$refs.modalTitelEdit.show();
+		},
+		async saveTitel() {
+			const trimmed = this.editingTitel.trim();
+			if (!trimmed) {
+				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningEmptyField')));
+				return;
+			}
+
+			const confirmed = await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirmTitelSpeichern'),
+				acceptLabel: this.$capitalize(this.$p.t('ui/speichern')),
+				acceptClass: 'p-button-primary',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'p-button-secondary'
+			});
+
+			if (confirmed === false) return;
+
+			this.loading = true;
+			this.$api.call(
+				ApiAbgabe.postStudentProjektarbeitTitel(
+					this.editingProjektarbeit.projektarbeit_id,
+					trimmed
+				)
+			).then(res => {
+				if (res.meta.status === 'success') {
+					// update the local list entry in-place so the accordion header reflects it immediately
+					this.editingProjektarbeit.titel = trimmed;
+					// keep the open detail modal in sync if it happens to be showing this projektarbeit
+					if (this.selectedProjektarbeit?.projektarbeit_id === this.editingProjektarbeit.projektarbeit_id) {
+						this.selectedProjektarbeit.titel = trimmed;
+					}
+					this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4titelSavedSuccess')));
+					this.$refs.modalTitelEdit.hide();
+				} else {
+					this.$fhcAlert.alertError(this.$capitalize(this.$p.t('abgabetool/c4titelSaveError')));
+				}
+			}).finally(() => {
+				this.loading = false;
+			});
+		},
+		handleTitelUpdated(projektarbeit_id, titel) {
+			const pa = this.projektarbeiten?.find(p => p.projektarbeit_id === projektarbeit_id);
+			if (pa) pa.titel = titel;
+		},
 		checkQualityGatesStrict(termine) {
 			let qgate1Passed = false
 			let qgate2Passed = false
-			
+
 			termine.forEach(t => {
 				const noteOption = this.notenOptions?.find(opt => opt.note == t.note)
 				if(noteOption && noteOption.positiv) {
@@ -68,7 +122,7 @@ export const AbgabetoolStudent = {
 		checkQualityGatesOptional(termine) {
 			const qgate1found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate1')
 			const qgate2found =  termine.find(t => t.paabgabetyp_kurzbz == 'qualgate2')
-			
+
 			let qgate1positiv = true
 			if(qgate1found) {
 				qgate1positiv = false
@@ -109,47 +163,35 @@ export const AbgabetoolStudent = {
 			this.loadAbgaben(details).then((res)=> {
 				const pa = this.projektarbeiten?.find(projekarbeit => projekarbeit.projektarbeit_id == details.projektarbeit_id)
 				pa.abgabetermine = res.data[0].retval
-				
+
 				const paIsBenotet = pa.note !== null
-				
+
 				pa.abgabetermine.forEach(termin => {
 					termin.file = []
 					termin.allowedToUpload = false
-					
+
 					if(termin.paabgabetyp_kurzbz == 'end') {
-						// old assumed production logic when qgates are required
-						// termin.allowedToUpload = !this.isPastDate(termin.datum) && this.checkQualityGatesStrict(pa.abgabetermine)
-						
 						const inTime = termin.fixtermin ? !this.isPastDate(termin.datum) : true
 						termin.allowedToUpload = inTime && this.checkQualityGatesOptional(pa.abgabetermine)
-
-
-						// development purposes
-						// termin.allowedToUpload = this.checkQualityGatesStrict(pa.abgabetermine)
-						// termin.allowedToUpload = true
-
 					} else if(termin.fixtermin) {
 						termin.allowedToUpload = !this.isPastDate(termin.datum)
 					} else {
-						// this could confuse people since we should dont show people this flag
-						termin.allowedToUpload = termin.upload_allowed 
+						termin.allowedToUpload = termin.upload_allowed
 					}
 
-					// blocks client upload button if projektarbeitet is already beurteilt und thus further abgaben on any termin should be blocked
 					if(paIsBenotet) termin.allowedToUpload = false
-					
-					
+
 					termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 					termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 				})
-				
+
 				pa.betreuer = this.buildBetreuer(pa)
 				pa.student_uid = this.student_uid
-				
+
 				this.selectedProjektarbeit = pa
 
 				this.$refs.modalContainerAbgabeDetail.show()
-				
+
 			}).finally(()=>{this.loading=false})
 		},
 		centeredTextFormatter(cell) {
@@ -171,8 +213,8 @@ export const AbgabetoolStudent = {
 		},
 		mailFormatter(cell) {
 			const val = cell.getValue()
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
-					'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
+			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%;">' +
+				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
 		},
 		beurteilungFormatter(cell) {
 			const val = cell.getValue()
@@ -182,19 +224,17 @@ export const AbgabetoolStudent = {
 			} else return '-'
 		},
 		buildMailToLink(projekt) {
-			// should always be "projekt.mitarbeiter_uid +'@'+ this.domain", built in backend
 			return 'mailto:' + projekt.email
 		},
 		buildBetreuer(abgabe) {
 			return (abgabe.btitelpre ? abgabe.btitelpre + ' ' : '') + abgabe.bvorname + ' ' + abgabe.bnachname + (abgabe.btitelpost ? ' ' + abgabe.btitelpost : '')
 		},
 		async setupData(data){
-			// this.projektarbeiten = data[0]
 			const projektarbeiten = data[0] ?? null
 			if(!projektarbeiten) return
 			this.projektarbeiten = projektarbeiten.map(projekt => {
 				let mode = 'detailTermine'
-				
+
 				return {
 					...projekt,
 					details: {
@@ -228,16 +268,14 @@ export const AbgabetoolStudent = {
 					.then(res => {
 						resolve(res)
 					})
-			})	
+			})
 		},
 		async setupMounted() {
 			this.loadProjektarbeiten()
 		},
 		getAccTabHeaderForProjektarbeit(projektarbeit) {
 			let title = ''
-			
 			title += projektarbeit.titel ?? this.$p.t('abgabetool/keinTitel')
-			
 			return title
 		},
 		getMailLink(projektarbeit) {
@@ -260,9 +298,7 @@ export const AbgabetoolStudent = {
 			window.open(projektarbeit.beurteilung2)
 		}
 	},
-	watch: {
-
-	},
+	watch: {},
 	computed: {
 		isViewMode() {
 			return this.student_uid !== this.viewData.uid
@@ -274,9 +310,8 @@ export const AbgabetoolStudent = {
 	async created() {
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
-		
+
 		this.loading = true
-		//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
 		await this.$api.call(ApiAbgabe.getNoten()).then(res => {
 			if(res.meta.status == 'success') {
 				this.notenOptions = res.data[0]
@@ -289,14 +324,12 @@ export const AbgabetoolStudent = {
 			this.loading = false
 		})
 
-		// fetch abgabetypen options
 		this.$api.call(ApiAbgabe.getPaAbgabetypen()).then(res => {
 			this.abgabeTypeOptions = res.data
 		}).catch(e => {
 			this.loading = false
 		})
 
-		// fetch config to avoid hard coded links
 		this.$api.call(ApiAbgabe.getConfigStudent()).then(res => {
 			this.moodle_link = res.data?.moodle_link
 		}).catch(e => {
@@ -318,7 +351,50 @@ export const AbgabetoolStudent = {
 			</div>
 		</template>
 		<template v-slot:default>
-			<AbgabeDetail :projektarbeit="selectedProjektarbeit"></AbgabeDetail>
+			<AbgabeDetail
+				:projektarbeit="selectedProjektarbeit"
+				@titel-updated="handleTitelUpdated"
+			></AbgabeDetail>
+		</template>
+	</bs-modal>
+	<bs-modal
+		ref="modalTitelEdit"
+		class="bootstrap-prompt"
+		dialogClass="bordered-modal"
+	>
+		<template v-slot:title>
+			{{$capitalize( $p.t('abgabetool/c4titelBearbeiten') )}}
+		</template>
+		<template v-slot:default>
+			<div class="mb-2">
+				<label class="form-label fw-bold">
+					{{$capitalize( $p.t('abgabetool/c4titel') )}}
+				</label>
+				<Textarea 
+					v-model="editingTitel" 
+					rows="10" 
+					maxlength="1024" 
+					class="form-control w-100"
+					@keyup.enter="saveTitel"
+				/>
+				<div class="form-text text-end">{{ editingTitel.length }} / 1024</div>
+			</div>
+		</template>
+		<template v-slot:footer>
+			<button
+				class="btn btn-secondary"
+				@click="$refs.modalTitelEdit.hide()"
+			>
+				{{$capitalize( $p.t('abgabetool/c4Cancel') )}}
+			</button>
+			<button
+				class="btn btn-primary"
+				:disabled="!editingTitel.trim()"
+				@click="saveTitel"
+			>
+				<i class="fa-solid fa-floppy-disk me-1"></i>
+				{{$capitalize( $p.t('ui/speichern') )}}
+			</button>
 		</template>
 	</bs-modal>
 	
@@ -335,8 +411,12 @@ export const AbgabetoolStudent = {
 				
 				<template #header>
 					<div class="d-flex row w-100">
-						<div class="text-start" :class="projektarbeit.note != null ? 'col-6' : 'col-12'">
-							<span>{{getAccTabHeaderForProjektarbeit(projektarbeit)}}</span>
+						<div class="text-start" :class="projektarbeit.note != null ? 'col-6' : 'col-12'"
+							style="min-width: 0;">
+							<span
+								:title="getAccTabHeaderForProjektarbeit(projektarbeit)"
+								style="display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 600px;"
+							>{{getAccTabHeaderForProjektarbeit(projektarbeit)}}</span>
 						</div>
 						<div class="col-6 text-end">
 							<span>{{getNoteBezeichnung(projektarbeit)}}</span>
@@ -402,10 +482,22 @@ export const AbgabetoolStudent = {
 						{{ projektarbeit.projekttypbezeichnung }}					
 					</div>
 				</div>
+
 				<div class="row mt-2">
 					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4titel') )}}</div>
-					<div class="col-8 col-md-9">
-						{{ projektarbeit.titel }}	
+					<div class="col-8 col-md-9 d-flex align-items-center gap-2" style="min-width: 0;">
+						<span
+							:title="projektarbeit.titel"
+							style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+						>{{ projektarbeit.titel }}</span>
+						<button
+							v-if="!isViewMode && projektarbeit.note == null"
+							class="btn btn-sm btn-outline-secondary border-0 p-1"
+							v-tooltip.right="{ value: $capitalize($p.t('abgabetool/c4titelBearbeiten')), class: 'custom-tooltip' }"
+							@click="openTitelEdit(projektarbeit, $event)"
+						>
+							<i class="fa-solid fa-pen"></i>
+						</button>
 					</div>
 				</div>
 			</AccordionTab>

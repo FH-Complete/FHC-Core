@@ -26,13 +26,13 @@ export default {
 		internMail(event) {
 			if (this.internMails.length)
 			{
-				splitMailsHelper(this.internMails, event, null, this.$fhcAlert, this.$p)
+				splitMailsHelper(this.internMails, event, null, null, this.$fhcAlert, this.$p)
 			}
 		},
 		privateMail(event) {
 			if (this.privateMails.length)
 			{
-				splitMailsHelper(this.privateMails, event, null, this.$fhcAlert, this.$p)
+				splitMailsHelper(this.privateMails, event, null,null, this.$fhcAlert, this.$p)
 			}
 		}
 	},
