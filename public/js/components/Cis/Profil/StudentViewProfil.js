@@ -64,6 +64,10 @@ export default {
 					label: `${this.$p.t("person", "personenkennzeichen")}`,
 					value: this.data.personenkennzeichen,
 				},
+				matrikelnummer: {
+					label: this.$p.t('person/matrikelnummer'),
+					value: this.data.matrikelnummer
+				},
 				studiengang: {
 					label: `${this.$p.t("lehre", "studiengang")}`,
 					value: this.data.studiengang,

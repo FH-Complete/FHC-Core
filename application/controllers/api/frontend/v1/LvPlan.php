@@ -99,7 +99,7 @@ class LvPlan extends FHCAPI_Controller
 		$end_date = $this->input->post('end_date', true);
 		$uid = $this->input->post('uid', true);
 
-		// disallow accessing other user's lv plan if missing permission
+		// disallow accessing other user's events if missing permission
 		if ($uid && $uid !== getAuthUID() && !$this->permissionlib->isBerechtigt('basis/other_lv_plan')) {
 			$this->terminateWithError("Missing permission to view other users' timetables!");
 		}
@@ -287,6 +287,11 @@ class LvPlan extends FHCAPI_Controller
 		$start_date = $this->input->post('start_date', true);
 		$end_date = $this->input->post('end_date', true);
 		$uid = $this->input->post('uid', true);
+
+		// disallow accessing other user's reservierungen if missing permission
+		if ($uid && $uid !== getAuthUID() && !$this->permissionlib->isBerechtigt('basis/other_lv_plan')) {
+			$this->terminateWithError("Missing permission to view other users' timetables!");
+		}
 
 		// get data
 		$this->load->library('StundenplanLib');

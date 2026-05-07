@@ -364,6 +364,9 @@ export default {
 			}
 
 			if (this.abortController) this.abortController.abort();
+
+			if (!this.searchsettings.searchstr?.length) return;
+
 			this.abortController = new AbortController();
 
 			this.searchfunction(this.searchsettings, {

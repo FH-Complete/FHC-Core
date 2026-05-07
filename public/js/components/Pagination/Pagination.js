@@ -13,7 +13,7 @@ export default {
 			required: true,
 		},
 		page: {
-			type: Number | null,
+			type: [Number, null],
 			default: null,
 		},
 	},
@@ -38,9 +38,9 @@ export default {
 	<!-- Desktop -->
 	<div class="d-none d-md-block">
         <paginator 
-			v-model:rows="page_size"
-			v-model:first="first"
 			@page="afterPageUpdated($event)"
+			v-model:first="first"
+			:rows="page_size"
 			:totalRecords="maxPageCount"
 			:rowsPerPageOptions="rowsPerPageOptions"
 		></paginator>
@@ -48,9 +48,9 @@ export default {
 	<!-- Mobile -->
 	<div class="d-block d-md-none">
 		<paginator
-			v-model:rows="page_size"
-			v-model:first="first"
 			@page="afterPageUpdated($event)"
+			v-model:first="first"
+			:rows="page_size"
 			:totalRecords="maxPageCount"
 			:rowsPerPageOptions="rowsPerPageOptions"
 			template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink RowsPerPageDropdown"
