@@ -49,6 +49,10 @@ export default {
 			from: 'configStvTagsEnabled',
 			default: false
 		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		},
 	},
 	computed: {
 		appRoot() {
@@ -85,6 +89,7 @@ export default {
 			}
 
 			if(this.tagsEnabled) {
+				this.getSemesterDates(this.currentSemester);
 				this.loadTagsAndRender(this.headerData[0].prestudent_id);
 		}
 
@@ -113,6 +118,14 @@ export default {
 				}
 			},
 			deep: true,
+		},
+		currentSemester: {
+			handler(newVal) {
+				if (newVal) {
+					this.getSemesterDates(newVal);
+				}
+			},
+			deep: true,
 		}
 	},
 	data(){
@@ -123,7 +136,8 @@ export default {
 			isFetchingIssues: false,
 			tagEndpoint: ApiTag,
 			tagData: null,
-			rebuildData: null
+			rebuildData: null,
+			semDates: {}
 		};
 	},
 	methods: {
@@ -219,7 +233,9 @@ export default {
 					prestudent_id,
 					this.tagData,
 					this.$refs.tagComponent,
-					'prestudent_id'
+					'prestudent_id',
+					this.semDates.start,
+					this.semDates.ende
 				);
 
 			this.$refs.tagWrapper.innerHTML = '';
@@ -248,7 +264,8 @@ export default {
 		rebuildPrestudentTags(){
 			const params = {
 				id : this.headerData[0].prestudent_id,
-				typeId: 'prestudent_id'
+				typeId: 'prestudent_id',
+				sem: this.currentSemester
 			};
 
 			return this.$api
@@ -257,6 +274,17 @@ export default {
 					this.rebuildData = result.data;
 					console.log("Rebuild manually triggered");
 					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		getSemesterDates(semester){
+			const params = {
+				studiensemester_kurzbz: semester
+			};
+			return this.$api
+				.call(ApiTag.getSemDates({semester}))
+				.then(result => {
+					this.semDates = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
@@ -339,8 +367,10 @@ export default {
 								v-if="tagsEnabled"
 								@click="rebuildPrestudentTags"
 								class="btn btn-outline btn-light mb-1"
-								title="Automatische Tags neu laden">
+								:title="'Automatische Tags fuer ' + currentSemester + ' neu laden'"
+								>
 								<i class="fa-solid fa-refresh"></i></button>
+								<span>{{currentSemester}}</span>
 							</div>
 							<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 						</div>

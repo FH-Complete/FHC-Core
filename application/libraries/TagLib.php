@@ -241,21 +241,18 @@ class TagLib
 	/*
 	 * main function for rebuild Tags for typeId
 	 * */
-	public function rebuildTagsForTypeId($typeId, $id) //TODO aktSem of frontend
+	public function rebuildTagsForTypeId($typeId, $id, $studiensemester_kurzbz)
 	{
 		$automatedTagsRes = $this->_ci->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
 
-		//TODO change to chosen Studiensemester in frontend
-		$result = $this->_ci->StudiensemesterModel->getAktOrNextSemester();
+		$result = $this->_ci->StudiensemesterModel->load($studiensemester_kurzbz);
 		if (isError($result))
 			return error('Error occurred during retrieving studiensemester');
 		if (empty($result->retval) || !isset($result->retval[0])) {
 			return error('No studiensemester found');
 		}
-		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
 
-		//for checkDelete
 		$startSem = $result->retval[0]->start ?? null;
 		$endeSem = $result->retval[0]->ende ?? null;
 		$return = [];

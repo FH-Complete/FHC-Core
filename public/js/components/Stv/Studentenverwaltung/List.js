@@ -237,7 +237,9 @@ export default {
 			dragSource: [],
 			oldScrollUrl: '',
 			oldScrollLeft: 0,
-			oldScrollTop: 0
+			oldScrollTop: 0,
+			semDates: {},  //TODO(Manu) check injections
+			intervalMap: {}
 		}
 	},
 	computed: {
@@ -293,7 +295,12 @@ export default {
 		},
 	},
 	created: function() {
+
 		if(this.tagsEnabled) {
+			this.getSemesterDates(this.currentSemester);
+
+			this.loadIntervals(); //preload
+
 			const coltags = {
 				title: 'Tags',
 				field: 'tags',
@@ -301,7 +308,36 @@ export default {
 				headerFilter: "input",
 				headerFilterFunc: tagHeaderFilter,
 				headerFilterFuncParams: {field: 'tags'},
-				formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
+				//formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent), //prev. Version without filter
+				formatter: (cell) => {
+					const raw = cell.getValue();
+
+					const tags =
+						Array.isArray(raw)
+							? raw
+							: (typeof raw === 'string'
+								? JSON.parse(raw)
+								: []);
+
+					const id = tags?.[0]?.id;
+
+					const interval = id
+						? this.intervalMap[id]
+						: null;
+
+					const enrichedTags = {
+						tags: tags,
+						start: interval?.start || null,
+						ende: interval?.end || null,
+					};
+
+					return tagFormatter(
+						enrichedTags,
+						this.$refs.tagComponent,
+						this.semDates.start,
+						this.semDates.ende
+					);
+				},
 				width: 150,
 			};
 			this.tabulatorOptions.columns.splice(2, 0, coltags);
@@ -312,9 +348,40 @@ export default {
 			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
 				this.translateTabulator();
 			}
+		},
+		currentSemester: {
+			handler(newVal) {
+				if (newVal) {
+					this.getSemesterDates(newVal);
+				}
+			},
+			deep: true,
 		}
 	},
 	methods: {
+		loadIntervals() {
+			return this.$api
+				.call(ApiTag.getAllStartAndEndAutomatedTags())
+				.then(result => {
+					const data = result.data || [];
+					this.intervalMap = {};
+					data.forEach(item => {
+						this.intervalMap[item.id] = item;
+					});
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		getSemesterDates(semester){ //TODO(check for injections)
+			const params = {
+				studiensemester_kurzbz: semester
+			};
+			return this.$api
+				.call(ApiTag.getSemDates({semester}))
+				.then(result => {
+					this.semDates = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 		translateTabulator() {
 			this.$p
 				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
@@ -398,7 +465,6 @@ export default {
 			//for tags
 			this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
 			this.selectedColumnValues = this.selectedRows.filter(row => row.getData().prestudent_id !== undefined && row.getData().prestudent_id).map(row => row.getData().prestudent_id);
-
 			this.$emit('update:selected', data);
 		},
 		autoSelectRows(data) {
@@ -601,6 +667,7 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
+	test manu: currentSEM: {{semDates.start}} - {{semDates.ende}}
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"

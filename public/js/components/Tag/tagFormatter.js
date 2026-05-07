@@ -1,8 +1,11 @@
-
-
-export function idTagFormatter (id, tagData, tagComponent, typeId)
+export function idTagFormatter (id, tagData, tagComponent, typeId, semesterStart=null, semesterEnd=null)
 {
 	if (!id) return;
+
+	const hasSemesterFilter = !!(semesterStart && semesterEnd);
+
+	const semStart = hasSemesterFilter ? new Date(semesterStart) : null;
+	const semEnd = hasSemesterFilter ? new Date(semesterEnd) : null;
 
 	const parsedTags = tagData.map(tag => ({
 		id: tag.notiz_id,
@@ -12,8 +15,32 @@ export function idTagFormatter (id, tagData, tagComponent, typeId)
 		style: tag.style,
 		done: tag.done,
 		automatisiert: tag.automatisiert,
-		typeId: id
+		typeId: id,
+		validFrom: tag.start ? new Date(tag.start) : null,
+		validTo: tag.ende ? new Date(tag.ende) : null
 	}));
+
+	const isInSemester = (tag) => {
+		if (!hasSemesterFilter) return true;
+
+		if (!tag.validFrom && !tag.validTo) return true;
+
+		if (!tag.validFrom && !tag.validTo) return true;
+
+		if (tag.validFrom && tag.validTo) {
+			return tag.validFrom <= semEnd && tag.validTo >= semStart;
+		}
+
+		if (tag.validFrom && !tag.validTo) {
+			return tag.validFrom <= semEnd;
+		}
+
+		if (!tag.validFrom && tag.validTo) {
+			return tag.validTo >= semStart;
+		}
+
+		return false;
+	};
 
 	let container = document.createElement('div');
 	container.className = "d-flex gap-1";
@@ -23,7 +50,9 @@ export function idTagFormatter (id, tagData, tagComponent, typeId)
 	const renderTags = () => {
 		container.innerHTML = '';
 
-		let filtered = parsedTags.filter(t => t != null);
+		let filtered = parsedTags
+			.filter(t => t != null)
+			.filter(isInSemester);
 
 		filtered.sort((a, b) => {
 			let adone = a.done ? 1 : 0;
