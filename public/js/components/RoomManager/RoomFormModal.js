@@ -132,10 +132,6 @@ export default {
       if (getLocationsResponse.meta.status === "success") {
         this.editedRoom = getLocationsResponse.data;
       } else {
-        console.error(
-          "Error fetching room data:",
-          getLocationsResponse.meta.message,
-        );
         this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingRoomData"));
         return;
       }
@@ -255,7 +251,7 @@ export default {
       if (getRoomsResponse.meta.status === "success") {
         return getRoomsResponse.data;
       } else {
-        console.error("Error fetching rooms:", getRoomsResponse.meta.message);
+        this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingRooms"));
       }
 
       return [];
@@ -272,10 +268,7 @@ export default {
         kurzbz: "----------",
       });
     } else {
-      console.error(
-        "Error fetching locations:",
-        getLocationsResponse.meta.message,
-      );
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingLocations"));
     }
 
     let getAllOrganizationalUnitsResponse = await this.$api.call(
@@ -286,9 +279,8 @@ export default {
         (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
       );
     } else {
-      console.error(
-        "Error fetching organizational units:",
-        getAllOrganizationalUnitsResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorLoadingOrganizationalUnits"),
       );
     }
 

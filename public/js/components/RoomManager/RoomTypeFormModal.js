@@ -245,10 +245,7 @@ export default {
       if (getRoomTypesResponse.meta.status === "success") {
         this.roomTypes = getRoomTypesResponse.data;
       } else {
-        console.error(
-          "Error fetching room types:",
-          getRoomTypesResponse.meta.message,
-        );
+        this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingRoomTypes"));
       }
     },
   },
@@ -276,7 +273,7 @@ export default {
         <div class="d-flex justify-content-end mb-1">
           <a 
             v-if="!isRoomTypeFormVisible && hasBasisOrtWPermission" 
-            :title='$p.t("ui", "createRoomType")' 
+            :title='$capitalize($p.t("ui", "createRoomType"))' 
             @click.prevent="isRoomTypeFormVisible = !isRoomTypeFormVisible"
             href="#"
             class="btn btn-primary rounded-circle">

@@ -42,9 +42,9 @@ export default {
         locationId: null,
         organizationalUnit: null,
         buildingComponent: null,
-        isForTrainingProgram: false,
-        isReservationNeeded: false,
-        isActive: false,
+        isForTrainingProgram: null,
+        isReservationNeeded: null,
+        isActive: null,
       },
       locations: [],
       organizationalUnits: [],
@@ -107,9 +107,38 @@ export default {
           let floorFilter = params?.filter?.find((filter) => filter.field === "stockwerk");
           let parentRoomFilter = params?.filter?.find((filter) => filter.field === "pr_ort_kurzbz");
 
-          let isForTrainingProgramValue = this.filterData.isForTrainingProgram ? "true" : isForTrainingProgramFilter?.value ? "true" : "false";
-          let reservationNeededValue = this.filterData.isReservationNeeded ? "true" : reservationNeededFilter?.value ? "true" : "false";
-          let isActiveValue = this.filterData.isActive ? "true" : isActiveFilter?.value ? "true" : "false";
+          let isForTrainingProgramValue = null;
+          if (this.filterData.isForTrainingProgram === true) {
+            isForTrainingProgramValue = true;
+          } else {
+            if (isForTrainingProgramFilter?.value === true) {
+              isForTrainingProgramValue = true;
+            } else if (isForTrainingProgramFilter?.value === false) {
+              isForTrainingProgramValue = false;
+            }
+          }
+          
+          let reservationNeededValue = null;
+          if (this.filterData.isReservationNeeded === true) {
+            reservationNeededValue = true;
+          } else {
+            if (reservationNeededFilter?.value === true) {
+              reservationNeededValue = true;
+            } else if (reservationNeededFilter?.value === false) {
+              reservationNeededValue = false;
+            }
+          }
+
+          let isActiveValue = null;
+          if (this.filterData.isActive === true) {
+            isActiveValue = true;
+          } else {
+            if (isActiveFilter?.value === true) {
+              isActiveValue = true;
+            } else if (isActiveFilter?.value === false) {
+              isActiveValue = false;
+            }
+          }
 
           return this.$api.call(
             ApiRoom.getAllRooms({
@@ -192,6 +221,9 @@ export default {
             title: this.$capitalize(this.$p.t("ui", "lehre")),
             field: "lehre",
             headerFilter: true,
+            headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -203,6 +235,9 @@ export default {
             title: this.$capitalize(this.$p.t("ui", "reservieren")),
             field: "reservieren",
             headerFilter: true,
+            headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -214,6 +249,9 @@ export default {
             title: this.$capitalize(this.$p.t("gruppenmanagement", "aktiv")),
             field: "aktiv",
             headerFilter: true,
+            headerFilterParams: {
+							"tristate":true, elementAttributes:{"value":"true"}
+						},
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -378,13 +416,11 @@ export default {
               this.$p.t("ui", "roomDeletedSuccessfully"),
             );
           } else {
-            console.error("Error deleting room:", response.meta.message);
             this.reloadTableData();
             this.$fhcAlert.alertError(this.$p.t("ui", "errorDeletingRoom"));
           }
         })
         .catch((error) => {
-          console.error("Error deleting room:", error);
           this.$fhcAlert.alertError(this.$p.t("ui", "errorDeletingRoom"));
         });
     },
@@ -411,7 +447,6 @@ export default {
         this.$fhcAlert.alertSuccess(this.$p.t("ui", "successUpdate"));
         this.reloadTableData();
       } else {
-        console.error("Error updating room:", response.meta.message);
         this.$fhcAlert.alertError(this.$p.t("ui", "errorUpdatingRoom"));
       }
     },
@@ -424,10 +459,7 @@ export default {
       this.locations = getLocationsResponse.data;
       this.locations.unshift({ standort_id: null, kurzbz: "----------" });
     } else {
-      console.error(
-        "Error fetching locations:",
-        getLocationsResponse.meta.message,
-      );
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingLocations"));
     }
 
     let getAllOrganizationalUnitsResponse = await this.$api.call(
@@ -438,10 +470,7 @@ export default {
         (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
       );
     } else {
-      console.error(
-        "Error fetching organizational units:",
-        getAllOrganizationalUnitsResponse.meta.message,
-      );
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingOrganizationalUnits"));
     }
   },
   mounted() {

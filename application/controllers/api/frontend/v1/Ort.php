@@ -107,7 +107,7 @@ class Ort extends FHCAPI_Controller
 		}
 
 		foreach ($searchableBooleanAttributes as $attribute) {
-			if (isset($filter[$attribute]) && $filter[$attribute] !== '' && $filter[$attribute] === 'true' ) {
+			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
 				$queryWhereFragments[] = "public.tbl_ort.$attribute = ?";
 				$filterData[] = $filter[$attribute] === 'true' ? true : false;
 			}
@@ -152,9 +152,8 @@ class Ort extends FHCAPI_Controller
 			$pageCount = ceil($totalItems / $paginationSize);
 			$this->addTabulatorPaginationData($pageCount); 
 		}
+		
 		$this->terminateWithSuccess($queryData);
-
-		exit;
 	}
 
 	/**

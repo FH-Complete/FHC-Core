@@ -244,6 +244,7 @@ if (isset($_GET['sendform']))
 			<th>Aktiv</th>
 			<th>Kosten</th>
 			<th>Stockwerk</th>
+			<th>Parent Ort Kurzbz</th>
 	   </tr>
 	</thead>
 	<tbody>';
@@ -287,6 +288,7 @@ if (isset($_GET['sendform']))
 		
 		$htmlstr .= "		<td>".$twraum->kosten."</td>\n";
 		$htmlstr .= "		<td>".$twraum->stockwerk."</td>\n";
+		$htmlstr .= "		<td><a href='raum_details.php?ort_kurzbz=".$twraum->parent_ort_kurzbz."' target='detail_raum'>".$twraum->parent_ort_kurzbz."</a></td>\n";
 	
 		$htmlstr .= "	</tr>\n";
 	}
