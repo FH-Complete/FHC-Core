@@ -127,55 +127,56 @@ export default {
 
 	},
 	template: `
-
-	<h2>{{$p.t('lehre/myLV')}}</h2>
-	<hr>
-	<div class="mylv" v-if="ready">
-		<div v-if="currentSemester" class="row justify-content-center mb-3">
-			<div class="col-auto d-none">
-				<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
-			</div>
-			<div class="col-auto">
-				<div class="input-group">
-					<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
-						<i class="fa fa-caret-left" aria-hidden="true"></i>
-					</button>
-					<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="updateRouter($event.target.value)">
-						<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
-					</select>
-					<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">
-						<i class="fa fa-caret-right" aria-hidden="true"></i>
-					</button>
+	<div>
+		<h2>{{$p.t('lehre/myLV')}}</h2>
+		<hr>
+		<div class="mylv" v-if="ready">
+			<div v-if="currentSemester" class="row justify-content-center mb-3">
+				<div class="col-auto d-none">
+					<label class="col-form-label">{{$p.t('lehre/studiensemester')}}</label>
+				</div>
+				<div class="col-auto">
+					<div class="input-group">
+						<button :aria-label="$p.t('lehre','previousStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','previousStudSemester')}" class="btn btn-outline-secondary" type="button" :disabled="currentIsFirst" @click="prevSem">
+							<i class="fa fa-caret-left" aria-hidden="true"></i>
+						</button>
+						<select ref="studiensemester" v-model="currentSemester" class="form-select" :aria-label="$p.t('global/studiensemester_auswaehlen')" @change="updateRouter($event.target.value)">
+							<option v-for="semester in studiensemester" :key="semester.studiensemester_kurzbz">{{semester.studiensemester_kurzbz}}</option>
+						</select>
+						<button class="btn btn-outline-secondary" :aria-label="$p.t('lehre','nextStudSemester')" v-tooltip.top="{showDelay:1000, value:$p.t('lehre','nextStudSemester')}" type="button" :disabled="currentIsLast" @click="nextSem">
+							<i class="fa fa-caret-right" aria-hidden="true"></i>
+						</button>
+					</div>
+				</div>
+				<div class=" col-auto my-lva-modes">
+					<div class="d-flex gap-1 justify-content-end" role="group">
+						<button
+							type="button"
+							class="btn btn-outline-secondary"
+							:class="{active: mode === 'cards'}"
+							@click="clickMode($event, 'cards')"
+						>
+							<i class="fa fa-grip"></i>
+						</button>
+						<button
+							type="button"
+							class="btn btn-outline-secondary"
+							:class="{active: mode === 'table'}"
+							@click="clickMode($event, 'table')"
+						>
+							<i class="fa fa-table"></i>
+						</button>
+					</div>
 				</div>
 			</div>
-			<div class=" col-auto my-lva-modes">
-				<div class="d-flex gap-1 justify-content-end" role="group">
-					<button
-						type="button"
-						class="btn btn-outline-secondary"
-						:class="{active: mode === 'cards'}"
-						@click="clickMode($event, 'cards')"
-					>
-						<i class="fa fa-grip"></i>
-					</button>
-					<button
-						type="button"
-						class="btn btn-outline-secondary"
-						:class="{active: mode === 'table'}"
-						@click="clickMode($event, 'table')"
-					>
-						<i class="fa fa-table"></i>
-					</button>
-				</div>
+			<div class="alert alert-danger" role="alert" v-else>
+				{{$p.t('lehre/noLvFound')}}
 			</div>
+			<mylv-semester-cards v-if="mode == 'cards'" v-bind="current"/>
+			<mylv-table v-else-if="mode == 'table'" v-bind="current"/>
 		</div>
-		<div class="alert alert-danger" role="alert" v-else>
-			{{$p.t('lehre/noLvFound')}}
+		<div class="mylv text-center" v-else>
+			<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 		</div>
-		<mylv-semester-cards v-if="mode == 'cards'" v-bind="current"/>
-		<mylv-table v-else-if="mode == 'table'" v-bind="current"/>
-	</div>
-	<div class="mylv text-center" v-else>
-		<i class="fa-solid fa-spinner fa-pulse fa-3x"></i>
 	</div>`
 };
