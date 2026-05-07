@@ -82,8 +82,8 @@ class Ort extends FHCAPI_Controller
 
 		$queryWhereFragments = [];
 
-		$searchableIdAttributes = ['standort_id', 'gebteil'];
-		$searchableTextAttributes = ['ort_kurzbz', 'parent_ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'oe_kurzbz', 'oe_bezeichnung'];
+		$searchableIdAttributes = ['standort_id', 'gebteil', 'oe_kurzbz'];
+		$searchableTextAttributes = ['ort_kurzbz', 'parent_ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'oe_bezeichnung'];
 		$searchableBooleanAttributes = ['lehre', 'reservieren', 'aktiv'];
 		$searchableNumericAttributes = ['max_person', 'arbeitsplaetze', 'kosten', 'stockwerk'];
 		$searchableNumericSpanAttributes = ['m2'];
