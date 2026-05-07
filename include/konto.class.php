@@ -1004,6 +1004,11 @@ class konto extends basis_db
 
 	private function _getOEHBeitrag()
 	{
+		if(!is_user_logged_in())
+		{
+			return false;
+		}
+
 		$variablen_obj = new variable();
 		$variablen_obj->loadVariables(get_uid());
 
