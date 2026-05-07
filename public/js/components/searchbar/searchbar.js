@@ -102,6 +102,7 @@ export default {
 				aria-controls="header-searchbar-collapsible header-options-collapsible header-usermenu-collapsible"
 				aria-expanded="false"
 			 	class="d-flex flex-row align-items-center ps-3 pe-1"
+				style="color: white"
 			>
 				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
 				<i v-else class="fa-solid fa-magnifying-glass"></i>
