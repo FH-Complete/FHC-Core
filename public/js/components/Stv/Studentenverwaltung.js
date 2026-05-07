@@ -571,7 +571,7 @@ export default {
 				</button>
 				<a class="navbar-brand me-0" :href="stvRoot">
 					<span style="font-size: 10px; line-height: 1; display: block; width: 100%; text-wrap: wrap; text-align: left;">
-						DEMO Datenstand 12.02.2026
+						DEMO Datenstand 06.05.2026
 					</span>
 					StudVw: {{studiensemesterKurzbz}} {{studiengangKuerzel}}
 				</a>
