@@ -700,6 +700,9 @@ export const AbgabetoolMitarbeiter = {
 					}
 					this.stateRestored = true
 
+					// ensure that the filterCollapseables thingy has the correct values
+					this.$refs.abgabeTable.setSelectedFields();
+					
 				}
 
 			});
@@ -1055,7 +1058,7 @@ export const AbgabetoolMitarbeiter = {
 				termin.allowedToSave = paIsBenotet ? false : true
 				
 				// lektoren are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
+				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum && !termin.note
 				
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 

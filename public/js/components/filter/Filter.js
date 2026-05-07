@@ -375,6 +375,7 @@ export const CoreFilterCmpt = {
 			});
 			this.tabulator.clearFilter();
 			this.filterActive = false;
+			this.$emit('headerFilterOn', this.filterActive)
 		},
 		_setHeaderFilter()
 		{

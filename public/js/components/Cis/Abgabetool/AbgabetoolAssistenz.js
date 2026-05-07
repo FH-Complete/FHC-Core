@@ -67,6 +67,7 @@ export const AbgabetoolAssistenz = {
 			filteredRowsFlat: null,
 			studiensemesterOptions: null,
 			allSem: null,
+			allSemOption: null,
 			curSem: null,
 			notenOptionFilter: null,
 			inplaceToggle: false,
@@ -312,8 +313,7 @@ export const AbgabetoolAssistenz = {
 						.filter(r => filteredOutSet.has(r.getData()))
 						.forEach(r => r.deselect());
 				}
-			}
-			],
+			}],
 			abgabeTableOptionsFlat: {
 				minHeight: 250,
 				height: 700,
@@ -401,7 +401,7 @@ export const AbgabetoolAssistenz = {
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zieldatumv2'))),
 						field: 'datum',
 						headerFilter: dateFilter,
-						headerFilterFunc: this.headerFilterTerminCol,
+						headerFilterFunc: this.headerFilterTerminColISO,
 						sorter: (a, b) => new Date(a) - new Date(b),
 						formatter: (cell) => this.formatDate(cell.getValue()),
 						minWidth: 100
@@ -410,7 +410,7 @@ export const AbgabetoolAssistenz = {
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabedatum'))),
 						field: 'abgabedatum',
 						headerFilter: dateFilter,
-						headerFilterFunc: this.headerFilterTerminCol,
+						headerFilterFunc: this.headerFilterTerminColISO,
 						sorter: (a, b) => new Date(a) - new Date(b),
 						formatter: (cell) => this.formatDate(cell.getValue()),
 						minWidth: 100
@@ -435,7 +435,9 @@ export const AbgabetoolAssistenz = {
 							if (!val) return '';
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
-						minWidth: 100
+						minWidth: 100,
+						tooltip: false,
+						headerFilter: true
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notetermin'))),
@@ -445,7 +447,8 @@ export const AbgabetoolAssistenz = {
 							if (!val) return '';
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
-						minWidth: 100
+						minWidth: 100,
+						headerFilter: true
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notizQualGatev2'))),
@@ -516,6 +519,11 @@ export const AbgabetoolAssistenz = {
 		};
 	},
 	methods: {
+		handleFilterActiveChanged(active) {
+			if(!active && this.allSemOption) {
+				this.curSem = this.allSemOption
+			}
+		},
 		reloadData() {
 			this.loadProjektarbeiten()
 		},
@@ -970,6 +978,41 @@ export const AbgabetoolAssistenz = {
 			
 			// just in case someone reuses this
 			return Math.abs(b.diffMs) - Math.abs(a.diffMs) 
+		},
+		headerFilterTerminColISO(filterVal, rowVal) {
+			if (!rowVal) {
+				return false;
+			}
+
+			const toLuxon = (val) => {
+				if (!val) return null;
+				let dt;
+				if (val instanceof Date) {
+					dt = luxon.DateTime.fromJSDate(val);
+				} else if (typeof val === "string") {
+					dt = luxon.DateTime.fromISO(val);
+				} else { // fallback
+					dt = luxon.DateTime.fromMillis(Number(val));
+				}
+
+				return dt.isValid ? dt : null;
+			};
+
+			const rowDate = toLuxon(rowVal);
+			const von = toLuxon(filterVal[0]);
+			const bis = toLuxon(filterVal[1]);
+
+			// specific day
+			if (von && !bis) {
+				return rowDate.hasSame(von, "day");
+			}
+
+			// range case
+			if (von && bis) {
+				return rowDate >= von.startOf("day") && rowDate <= bis.endOf("day");
+			}
+
+			return false
 		},
 		headerFilterTerminCol(filterVal, rowVal) {
 			if (!rowVal || !rowVal.luxonDate || !rowVal.luxonDate.isValid) {
@@ -1736,7 +1779,7 @@ export const AbgabetoolAssistenz = {
 				termin.allowedToSave = paIsBenotet ? false : true
 
 				// assistenz are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum
+				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum && !termin.note
 				
 			})
 			
@@ -1837,14 +1880,14 @@ export const AbgabetoolAssistenz = {
 				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
 				
 				if(formatterParams?.iconOnly) {
-					return '<div style="display: flex; height: 100%">' +
+					return '<div style="display: flex; height: 20px;">' +
 						'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
 						icon +
 						'</div>' +
 						'</div>'
 				}
 				
-				return '<div style="display: flex; height: 100%">' +
+				return '<div style="display: flex; height: 20px;">' +
 					'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
 						icon +
 					'</div>' + 
@@ -1966,14 +2009,18 @@ export const AbgabetoolAssistenz = {
 		},
 	},
 	computed: {
+		getDisableDeleteForSelectedFlat() {
+			return this.selectedDataFlat.some(s => s.allowedToDelete === false)
+		},
+		getDisableSaveForSelectedFlat(){
+			return this.selectedDataFlat.some(s => s.allowedToSave === false)
+		},
 		getAllTermine() {
 			if (!this.projektarbeiten) return [];
 			return this.projektarbeiten.flatMap(pa =>
 				pa.abgabetermine.map(termin => {
-					// TODO: allowedToDelete prüfung auf terminnote? benotete qgate termine sollten "sicher" sein?
-					
 					const allowedToSave = pa.note !== null ? false : true
-					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum
+					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum && !termin.note
 					return {
 						allowedToSave,
 						allowedToDelete,
@@ -1986,6 +2033,9 @@ export const AbgabetoolAssistenz = {
 						pa_note: pa.note,
 						projektarbeit_id: pa.projektarbeit_id,
 						stg: pa.stg,
+						pkz: pa.pkz,
+						studienstatus: pa.studienstatus,
+						orgform: pa.orgform
 					}
 				}
 					
@@ -2149,6 +2199,7 @@ export const AbgabetoolAssistenz = {
 					this.allSem = res.data[0];
 					const all = { studiensemester_kurzbz: this.$p.t('abgabetool/c4all') };
 					
+					this.allSemOption = all
 					this.studiensemesterOptions = [all, ...this.allSem];
 
 					const currentSemObj = res.data[1];
@@ -2559,6 +2610,7 @@ export const AbgabetoolAssistenz = {
 				:tabulator-options="abgabeTableOptions"  
 				:tabulator-events="abgabeTableEventHandlers"
 				@tableBuilt="handleTableBuilt"
+				@headerFilterOn="handleFilterActiveChanged"
 				tableOnly
 				:sideMenu="false"
 				:useSelectionSpan="false"
@@ -2613,12 +2665,12 @@ export const AbgabetoolAssistenz = {
 				:useSelectionSpan="false"
 			>
 				<template #actions>
-					<button style="max-height: 40px;" :disabled="!selectedcountFlat" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
+					<button style="max-height: 40px;" :disabled="!selectedcountFlat || getDisableDeleteForSelectedFlat" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
 						{{$capitalize( $p.t('abgabetool/c4delete') )}}
 						<i class="fa-solid fa-trash"></i>
 					</button>
 					
-					<button @click="openEditModal" :disabled="!selectedcountFlat" class="btn btn-success ml-2" role="button">
+					<button @click="openEditModal" :disabled="!selectedcountFlat || getDisableSaveForSelectedFlat" class="btn btn-success ml-2" role="button">
 						{{$capitalize( $p.t('abgabetool/c4edit') )}}
 						<i class="fa fa-pen"></i>
 					</button>

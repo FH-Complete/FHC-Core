@@ -111,6 +111,8 @@ export const AbgabeMitarbeiterDetail = {
 					if(newTerminRes.note) {
 						newTerminRes.note = noteOpt
 						newTerminRes.noteBackend = noteOpt // certain UI elements should only reflect persisted state
+						termin.allowedToDelete = false
+						newTerminRes.allowedToDelete = false
 					}
 					newTerminRes.invertedFixtermin = !newTerminRes.fixtermin
 					const existingTerminRes = res.data[1]
@@ -130,7 +132,7 @@ export const AbgabeMitarbeiterDetail = {
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
-
+						
 						termin.paabgabetyp_kurzbz = newTerminRes.paabgabetyp_kurzbz
 						termin.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
 						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
@@ -444,7 +446,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		getMessagePtStyle() {
-			// adjust outer spacing and internal padding to appear similar to doenload button in size
+			// adjust outer spacing and internal padding to appear similar to download button in size
 			return {
 				root: {
 					style: {
