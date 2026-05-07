@@ -243,6 +243,11 @@ export default {
 			}
 			this.search();
 		},
+		isMobile() {
+			if (!this.isMobile) {
+				this.isSearchShownInMobileView = false;
+			}
+		},
 	},
 	mounted() {
 		this.settingsDropdown = new bootstrap.Collapse(this.$refs.settings, {

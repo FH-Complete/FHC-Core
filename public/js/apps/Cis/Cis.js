@@ -252,19 +252,12 @@ const app = Vue.createApp({
 	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
+		windowWidth: 0,
 	}),
-	components: {},
-	computed: {
-		isMobile() {
-			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
-			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
-			return smallScreen;// && touchCapable;
-		},
-	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			isMobile: this.isMobile,
+			isMobile: Vue.computed(() => this.windowWidth < 767),
 		}	
 	},
 	methods: {
@@ -300,14 +293,21 @@ const app = Vue.createApp({
 				this.$router.push(route);
 				
 			}
-		}
+		},
+		handleWindowResize() {
+			this.windowWidth = window.innerWidth;
+		},
 	},
-	mounted() {
+	created() {
+		this.windowWidth = window.innerWidth;
+	},
+	async mounted() {
 		document.addEventListener('click', this.handleClick);
-		
+		window.addEventListener("resize", this.handleWindowResize);
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);
+		window.removeEventListener("resize", this.handleWindowResize);
 	},
 });
 

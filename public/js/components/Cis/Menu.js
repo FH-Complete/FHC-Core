@@ -114,8 +114,8 @@ export default {
 	},
     template: /*html*/`
 	<div
+		:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 		id="header-options-collapsible"
-		class="collapse multi-collapse collapse-horizontal show"
 	>
 		<div class="d-flex flex-row align-items-center gap-2 h-100" style="width: 79px">
 			<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
@@ -144,7 +144,7 @@ export default {
 
 	<div
 		id="header-usermenu-collapsible"
-		class="collapse multi-collapse collapse-horizontal show"
+		:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 	>
 		<div
 			:style="!isMobile ? '' : 'width: 51px'"
