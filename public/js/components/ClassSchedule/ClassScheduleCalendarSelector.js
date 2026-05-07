@@ -1373,16 +1373,15 @@ export default {
         )?.bezeichnung_mehrsprachig || "";
       if (!typeDescriptions) return "";
 
-      return typeDescriptions[0].value || "";
+      return this.userLanguage?.value === "English"
+        ? typeDescriptions[1].value
+        : typeDescriptions[0].value;
     },
     handleChangeClassTimeSlotTypeForOverlay(newType) {
       let classTimeSlotType = this.classTimeSlotTypes.find(
         (type) => type.unterrichtszeitentyp_kurzbz === newType,
       );
       if (!classTimeSlotType) {
-        // console.error(
-        //   "Could not find class time slot type for newType: " + newType,
-        // );
         return;
       }
 
@@ -1430,10 +1429,6 @@ export default {
                 ),
               );
               if (!selectedType) {
-                // console.error(
-                //   "Could not find class time slot type for selected description: " +
-                //     selectedTypeDescription,
-                // );
                 return;
               }
 
