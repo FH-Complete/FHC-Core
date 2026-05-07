@@ -51,10 +51,6 @@ export default {
             (unit) => unit.oe_kurzbz === validityPeriodData.oe_kurzbz,
           );
           if (!organizationalUnit) {
-            console.error(
-              "Organizational unit not found for validity period:",
-              validityPeriodData,
-            );
             this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingData"));
             return;
           }
@@ -75,10 +71,6 @@ export default {
           this.$refs.classTimeSlotValidityPeriodModal.show();
         })
         .catch((error) => {
-          console.error(
-            "Error fetching class time slot validity period details:",
-            error,
-          );
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -180,10 +172,10 @@ export default {
           if (editedStudyPlan) {
             this.studyPlans.push(editedStudyPlan);
           } else {
-            console.error(
-              "Edited study plan not found:",
-              this.editedClassTimeSlotValidityPeriod.studienplan_id,
-            );
+            // console.error(
+            //   "Edited study plan not found:",
+            //   this.editedClassTimeSlotValidityPeriod.studienplan_id,
+            // );
           }
         }
       }
@@ -248,10 +240,7 @@ export default {
         ),
       );
       if (getAllStudyPlansResponse.meta.status !== "success") {
-        console.error(
-          "Error fetching study plans:",
-          getAllStudyPlansResponse.meta.message,
-        );
+        this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingStudyPlans"));
       }
 
       return getAllStudyPlansResponse.data?.length
@@ -267,10 +256,7 @@ export default {
         ApiStudienPlan.getStudyPlan(studienplan_id),
       );
       if (getStudyPlanResponse.meta.status !== "success") {
-        console.error(
-          "Error fetching study plan details:",
-          getStudyPlanResponse.meta.message,
-        );
+        this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingStudyPlan"));
         return null;
       }
 
@@ -297,9 +283,8 @@ export default {
         ),
       );
       if (getStudySemestersResponse.meta.status !== "success") {
-        console.error(
-          "Error fetching study semesters by organizational unit and dates:",
-          getStudySemestersResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingSemesters"),
         );
       }
 
@@ -324,9 +309,8 @@ export default {
         ),
       );
       if (getStudySemestersResponse.meta.status !== "success") {
-        console.error(
-          "Error fetching study semesters:",
-          getStudySemestersResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingSemesters"),
         );
       }
 
@@ -352,10 +336,6 @@ export default {
           this.$emit("classTimeSlotValidityPeriodCreated");
         })
         .catch((error) => {
-          console.error(
-            "Error creating class time slot validity period:",
-            error,
-          );
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -384,10 +364,6 @@ export default {
           this.$emit("classTimeSlotValidityPeriodUpdated");
         })
         .catch((error) => {
-          console.error(
-            "Error updating class time slot validity period:",
-            error,
-          );
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -434,9 +410,8 @@ export default {
         (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
       );
     } else {
-      console.error(
-        "Error fetching organizational units:",
-        getAllOrganizationalUnitsResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingOrganizationalUnits"),
       );
     }
 
@@ -446,10 +421,7 @@ export default {
     if (getAllStudyPlansResponse.meta.status === "success") {
       this.studyPlans = getAllStudyPlansResponse.data;
     } else {
-      console.error(
-        "Error fetching study plans:",
-        getAllStudyPlansResponse.meta.message,
-      );
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingStudyPlans"));
     }
 
     let getAllClassTimeSlotTypesResponse = await this.$api.call(
@@ -470,9 +442,8 @@ export default {
         },
       );
     } else {
-      console.error(
-        "Error fetching class time slot types:",
-        getAllClassTimeSlotTypesResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
       );
     }
   },

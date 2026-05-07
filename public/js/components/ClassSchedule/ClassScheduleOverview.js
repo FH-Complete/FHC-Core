@@ -54,7 +54,7 @@ export default {
       isClassTimeSlotValidityPeriodModalVisible: false,
       organizationalUnits: [],
       filteredOrganizationalUnits: [],
-      allSemesters: [], 
+      allSemesters: [],
       filteredSemesters: [],
       filterData: {
         selectedOrganizationalUnit: null,
@@ -296,7 +296,7 @@ export default {
           ende: semester.ende,
         };
       });
-    }
+    },
   },
   methods: {
     async getParsedClassTimeSlotValidityPeriodData() {
@@ -334,9 +334,8 @@ export default {
           },
         );
       } else {
-        console.error(
-          "Error fetching class time slot validity periods:",
-          getAllClassTimeValidityPeriodsResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingClassScheduleValidityPeriods"),
         );
       }
     },
@@ -360,10 +359,6 @@ export default {
           this.$refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
         })
         .catch((error) => {
-          console.error(
-            "Error deleting class time slot validity period:",
-            error,
-          );
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -378,34 +373,44 @@ export default {
     },
     filterOrganizationalUnits(event) {
       let defaultItem = {
-        label: '----------',
+        label: "----------",
         value: null,
       };
 
       const query = event.query.toLowerCase();
       if (!query) {
-        return this.filteredOrganizationalUnits = [defaultItem, ...this.dropdownParsedOrganizationalUnits];
+        return (this.filteredOrganizationalUnits = [
+          defaultItem,
+          ...this.dropdownParsedOrganizationalUnits,
+        ]);
       }
 
-      return this.filteredOrganizationalUnits = [defaultItem].concat(this.dropdownParsedOrganizationalUnits).filter((unit) => {
-        return unit.label.toLowerCase().includes(query);
-      });
+      return (this.filteredOrganizationalUnits = [defaultItem]
+        .concat(this.dropdownParsedOrganizationalUnits)
+        .filter((unit) => {
+          return unit.label.toLowerCase().includes(query);
+        }));
     },
     filterSemesters(event) {
       let defaultItem = {
-        label: '----------',
+        label: "----------",
         value: null,
       };
 
       const query = event.query.toLowerCase();
       if (!query) {
-        return this.filteredSemesters = [defaultItem, ...this.dropdownParsedSemesters];
+        return (this.filteredSemesters = [
+          defaultItem,
+          ...this.dropdownParsedSemesters,
+        ]);
       }
 
-      return this.filteredSemesters = [defaultItem].concat(this.dropdownParsedSemesters).filter((semester) => {
-        return semester.label.toLowerCase().includes(query);
-      });
-    }
+      return (this.filteredSemesters = [defaultItem]
+        .concat(this.dropdownParsedSemesters)
+        .filter((semester) => {
+          return semester.label.toLowerCase().includes(query);
+        }));
+    },
   },
   async created() {
     let getAllClassTimeValidityPeriodsResponse = await this.$api.call(
@@ -415,9 +420,8 @@ export default {
       this.classTimeSlotValidityPeriods =
         getAllClassTimeValidityPeriodsResponse.data;
     } else {
-      console.error(
-        "Error fetching class time slot validity periods:",
-        getAllClassTimeValidityPeriodsResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleValidityPeriods"),
       );
     }
 
@@ -429,23 +433,19 @@ export default {
         (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
       );
     } else {
-      console.error(
-        "Error fetching organizational units:",
-        getAllOrganizationalUnitsResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingOrganizationalUnits"),
       );
     }
 
     let getAllSemestersResponse = await this.$api.call(
-      ApiStudienSemester.getAll('DESC'),
+      ApiStudienSemester.getAll("DESC"),
     );
     if (getAllSemestersResponse.meta.status === "success") {
       this.allSemesters = getAllSemestersResponse.data;
     } else {
-      console.error(
-        "Error fetching semesters:",
-        getAllSemestersResponse.meta.message,
-      );
-    } 
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingSemesters"));
+    }
   },
   mounted() {
     this.$p

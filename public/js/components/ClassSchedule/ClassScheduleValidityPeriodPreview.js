@@ -64,7 +64,6 @@ export default {
   },
   methods: {
     showClassScheduleValidityPeriod(classScheduleValidityPeriodId) {
-
       this.$router.push({
         name: "validityPeriodOverview",
         params: {

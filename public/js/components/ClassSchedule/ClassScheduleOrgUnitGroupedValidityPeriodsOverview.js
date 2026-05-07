@@ -18,7 +18,8 @@ export default {
   computed: {},
   methods: {},
   async created() {
-    this.organizationalUnitShortCode = this.$route.params.organizationalUnitShortCode;
+    this.organizationalUnitShortCode =
+      this.$route.params.organizationalUnitShortCode;
     this.studyPlanId = parseInt(this.$route.params.studyPlanId);
 
     let getAllClassTimeValidityPeriodsPerOrganizationalUnitResponse =
@@ -37,18 +38,19 @@ export default {
             if (!this.studyPlanId) return true;
 
             return period.studienplan_id === this.studyPlanId;
-          }
+          },
         );
     } else {
-      console.error(
-        "Error fetching class time slot validity periods:",
-        getAllClassTimeValidityPeriodsPerOrganizationalUnitResponse.meta
-          .message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleValidityPeriods"),
       );
     }
 
     for (let validityPeriod of this.classScheduleValidityPeriods) {
-      if (this.studyPlanId && validityPeriod.studienplan_id !== this.studyPlanId) {
+      if (
+        this.studyPlanId &&
+        validityPeriod.studienplan_id !== this.studyPlanId
+      ) {
         continue;
       }
 
@@ -65,9 +67,11 @@ export default {
           ...getClassTimeSlotsForValidityPeriodResponse.data,
         ];
       } else {
-        console.error(
-          `Error fetching class time slots for validity period ${validityPeriod.unterrichtszeitengueltigkeit_id}:`,
-          getClassTimeSlotsForValidityPeriodResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t(
+            "ui",
+            "errorFetchingClassScheduleTimeSlotForValidityPeriod",
+          ),
         );
       }
     }
@@ -90,9 +94,8 @@ export default {
         },
       );
     } else {
-      console.error(
-        "Error fetching class time slot types:",
-        getAllClassTimeSlotTypesResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
       );
     }
   },

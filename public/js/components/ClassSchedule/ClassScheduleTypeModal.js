@@ -21,7 +21,11 @@ export default {
       required: true,
     },
   },
-  emits: ["hideBsModal", "classTimeSlotTypeCreated", "classTimeSlotTypeUpdated"],
+  emits: [
+    "hideBsModal",
+    "classTimeSlotTypeCreated",
+    "classTimeSlotTypeUpdated",
+  ],
   watch: {
     isVisible(newValue) {
       if (newValue) {
@@ -68,9 +72,8 @@ export default {
           },
         );
       } else {
-        console.error(
-          "Error fetching class schedule types:",
-          getAllClassScheduleTypeResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
         );
       }
     },
@@ -147,7 +150,6 @@ export default {
           this.getAllClassScheduleTypes();
         })
         .catch((error) => {
-          console.error("Error deleting class time slot type:", error);
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -174,7 +176,7 @@ export default {
   async created() {
     await this.getAllClassScheduleTypes();
   },
-  template: /* html */`
+  template: /* html */ `
   <bs-modal ref="classScheduleTypeModal" size="md" @hideBsModal="() => { $emit('hideBsModal'); resetClassTimeSlotTypeForm(); }">
 			<template #title>
 				<p v-if="hasLehreUnterrichtszeitenTypWPermission"  class="fw-bold mt-3">{{$p.t('ui', 'editClassTimeSlotTypeModalTitle')}}</p>

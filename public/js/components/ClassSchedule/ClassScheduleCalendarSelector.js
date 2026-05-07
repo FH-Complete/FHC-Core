@@ -118,7 +118,7 @@ export default {
     classTimeSlotTypes() {
       this.overlays = this.overlays.map((overlay) => {
         let type = this.classTimeSlotTypes.find(
-          (type) => type.unterrichtszeitentyp_kurzbz === overlay.type
+          (type) => type.unterrichtszeitentyp_kurzbz === overlay.type,
         );
         if (type) {
           overlay.hexColor = type.hintergrundfarbe;
@@ -215,7 +215,7 @@ export default {
     },
     userLanguage() {
       return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
-    }
+    },
   },
   methods: {
     createOverlay() {
@@ -252,7 +252,7 @@ export default {
         firstSelectedElementNumber === null ||
         lastSelectedElementNumber === null
       ) {
-        console.error("Selected elements do not have data-number attribute");
+        //console.error("Selected elements do not have data-number attribute");
         return;
       }
 
@@ -725,10 +725,10 @@ export default {
           (overlay) => overlay.id === dropzoneItem.id,
         );
         if (!dropzoneOverlay) {
-          console.error(
-            "Could not find overlay for dropzone item with id " +
-              dropzoneItem.id,
-          );
+          // console.error(
+          //   "Could not find overlay for dropzone item with id " +
+          //     dropzoneItem.id,
+          // );
           return;
         }
 
@@ -758,7 +758,6 @@ export default {
           this.$refs.calendarSelectorContainer.querySelectorAll(
             "div[data-weekday='" + dropzoneOverlay.weekday + "']",
           );
-
 
         let closestPartBody = null;
         partBodies.forEach((partBody) => {
@@ -1381,9 +1380,9 @@ export default {
         (type) => type.unterrichtszeitentyp_kurzbz === newType,
       );
       if (!classTimeSlotType) {
-        console.error(
-          "Could not find class time slot type for newType: " + newType,
-        );
+        // console.error(
+        //   "Could not find class time slot type for newType: " + newType,
+        // );
         return;
       }
 
@@ -1431,10 +1430,10 @@ export default {
                 ),
               );
               if (!selectedType) {
-                console.error(
-                  "Could not find class time slot type for selected description: " +
-                    selectedTypeDescription,
-                );
+                // console.error(
+                //   "Could not find class time slot type for selected description: " +
+                //     selectedTypeDescription,
+                // );
                 return;
               }
 
@@ -1463,9 +1462,10 @@ export default {
     },
     getClassTimeSlotTypeLabel(classTimeSlotType) {
       if (!classTimeSlotType) return "";
-      return this.userLanguage?.value === 'English' ? 
-        classTimeSlotType.bezeichnung_mehrsprachig[1].value : classTimeSlotType.bezeichnung_mehrsprachig[0].value;
-    }
+      return this.userLanguage?.value === "English"
+        ? classTimeSlotType.bezeichnung_mehrsprachig[1].value
+        : classTimeSlotType.bezeichnung_mehrsprachig[0].value;
+    },
   },
   unmounted() {
     this.hideOverlayClassTimeTypePopover();

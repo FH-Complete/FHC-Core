@@ -60,9 +60,8 @@ export default {
           this.$router.push({ name: "overview" });
         }
       } else {
-        console.error(
-          "Error fetching class time slot validity period:",
-          getClassTimeValidityPeriodResponse.meta.message,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingClassScheduleValidityPeriod"),
         );
       }
     },
@@ -92,9 +91,8 @@ export default {
         });
         this.classTimeSlots = classTimeSlotsGroupedByWeek;
       } else {
-        console.error(
-          "Error fetching class time slots for validity period:",
-          this.classTimeSlots,
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "errorFetchingClassScheduleTimeSlotForValidityPeriod"),
         );
       }
     },
@@ -119,7 +117,7 @@ export default {
             };
           }) || [];
 
-          this.showClassTimeSlotForm();
+      this.showClassTimeSlotForm();
     },
     deleteClassTimeSlotsForValidityPeriodPerGroup(groupIdentifikator) {
       let isDeletionConfirmed = confirm(
@@ -143,7 +141,6 @@ export default {
           this.fetchClassTimeSlots();
         })
         .catch((error) => {
-          console.error("Error deleting class time slots per group:", error);
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -186,10 +183,6 @@ export default {
           this.$router.push({ name: "overview" });
         })
         .catch((error) => {
-          console.error(
-            "Error deleting class time slot validity period:",
-            error,
-          );
           this.$fhcAlert.handleSystemError(error);
         });
     },
@@ -221,15 +214,14 @@ export default {
         },
       );
     } else {
-      console.error(
-        "Error fetching class time slot types:",
-        getAllClassTimeSlotTypesResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
       );
     }
 
     this.fetchClassTimeSlots();
   },
-  template: /* html */`
+  template: /* html */ `
    <div class="container mt-4">
     <div class='mb-5'>
       <div class="d-flex align-items-center justify-content-between mb-2">

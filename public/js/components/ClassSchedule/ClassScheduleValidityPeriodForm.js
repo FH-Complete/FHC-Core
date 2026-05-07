@@ -87,7 +87,6 @@ export default {
         this.classTimeSlots = [];
         this.$emit("classTimeSlotsCreated");
       } else {
-        console.error("Error creating class time slot validity period:", error);
         this.$fhcAlert.handleSystemError(error);
       }
     },
@@ -107,10 +106,6 @@ export default {
         this.classTimeSlots = [];
         this.$emit("classTimeSlotsEdited");
       } else {
-        console.error(
-          "Error editing class time slot validity period:",
-          response.meta.message,
-        );
         this.$fhcAlert.handleSystemError(response.meta.message);
       }
     },
@@ -158,9 +153,8 @@ export default {
         },
       );
     } else {
-      console.error(
-        "Error fetching class time slot types:",
-        getAllClassTimeSlotTypesResponse.meta.message,
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
       );
     }
   },
