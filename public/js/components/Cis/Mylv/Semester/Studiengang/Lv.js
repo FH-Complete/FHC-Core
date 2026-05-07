@@ -24,9 +24,9 @@ export default {
 		farbe: String,
 		lvinfo: Boolean,
 		benotung: Boolean,
-		lvnote: String,
+		lvnote: [String, Number],
 		lvnotebez: Array,
-		znote: String,
+		znote: [String, Number],
 		znotebez: Array,
 		studiengang_kuerzel: String,
 		semester: [String, Number],
@@ -36,6 +36,11 @@ export default {
 		incoming: Number,
 		positiv: Boolean,
 		note_index: String
+	},
+	provide() {
+		return {
+			studium_studiensemester: Vue.computed(() => this.studien_semester),
+		}
 	},
 	data: () => {
 		return {
