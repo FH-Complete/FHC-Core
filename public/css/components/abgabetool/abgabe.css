@@ -335,11 +335,12 @@
    Does not affect mobile/touchscreen devices, which use touch input instead of a mouse. */
 @media (pointer: fine) and (min-resolution: 1.5dppx) {
 
-	html {
+	html.abgabetool {
 		font-size: 0.5rem;
 	}
-	
-	.tabulator-cell, .tabulator-row {
+
+	.abgabetool .tabulator-cell,
+	.abgabetool .tabulator-row {
 		 height: 20px;
 		 max-height: 20px;
 	 }

@@ -308,6 +308,9 @@ export const AbgabetoolStudent = {
 		}
 	},
 	async created() {
+		// make sure zoom media query doesnt spill ever to other CIS4 sites
+		document.documentElement.classList.add('abgabetool');
+		
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 
@@ -338,6 +341,9 @@ export const AbgabetoolStudent = {
 	},
 	mounted() {
 		this.setupMounted()
+	},
+	beforeUnmount() {
+		document.documentElement.classList.remove('abgabetool');
 	},
 	template: `
 <template v-if="phrasenResolved">

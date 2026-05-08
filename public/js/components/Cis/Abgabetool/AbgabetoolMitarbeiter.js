@@ -1237,6 +1237,8 @@ export const AbgabetoolMitarbeiter = {
 		}
 	},
 	created() {
+		document.documentElement.classList.add('abgabetool');
+		
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 		// fetch config to avoid hard coded links
@@ -1277,6 +1279,9 @@ export const AbgabetoolMitarbeiter = {
 	},
 	mounted() {
 		this.setupMounted()
+	},
+	beforeUnmount() {
+		document.documentElement.classList.remove('abgabetool');
 	},
 	template: `
 	<template v-if="phrasenResolved">

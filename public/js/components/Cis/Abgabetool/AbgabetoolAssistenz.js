@@ -57,6 +57,8 @@ export const AbgabetoolAssistenz = {
 			mode: 'perProjectView',
 			qgate1FilterSelected: [],
 			qgate2FilterSelected: [],
+			pa_noteFilterSelected: [],
+			noteFilterSelected: [],
 			count: 0,
 			filteredcount: 0,
 			selectedcount: 0,
@@ -437,7 +439,9 @@ export const AbgabetoolAssistenz = {
 						},
 						minWidth: 100,
 						tooltip: false,
-						headerFilter: true
+						headerFilter: this.notenHeaderFilterEditor,
+						headerFilterFunc: this.notenHeaderFilterFunc,
+						headerFilterParams: {},
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notetermin'))),
@@ -448,7 +452,9 @@ export const AbgabetoolAssistenz = {
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
 						minWidth: 100,
-						headerFilter: true
+						headerFilter: this.notenHeaderFilterEditor,
+						headerFilterFunc: this.notenHeaderFilterFunc,
+						headerFilterParams: {},
 					},
 					{
 						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notizQualGatev2'))),
@@ -519,6 +525,97 @@ export const AbgabetoolAssistenz = {
 		};
 	},
 	methods: {
+		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			if (!this.notenOptions) return;
+
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected';
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+
+			// mapping evaluated at render time, not at column definition time
+			const fieldOptionsMap = {
+				'pa_note': this.notenOptions,
+				'note': this.allowedNotenOptions,
+			};
+			const options = fieldOptionsMap[cell.getField()] ?? this.notenOptions;
+			if (!options) return;
+			
+			const updateDisplay = () => {
+				display.value = options
+					.filter(o => selected.includes(o.note))
+					.map(o => o.bezeichnung)
+					.join(', ');
+			};
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.note;
+				cb.checked = selected.includes(opt.note);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.note]
+						: selected.filter(v => v !== opt.note);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.bezeichnung;
+
+				row.appendChild(cb);
+				row.appendChild(labelText);
+				dropdown.appendChild(row);
+			});
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+
+		notenHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+			// rowVal is the raw integer note id or a note object
+			const noteId = typeof rowVal === 'object' ? rowVal?.note : rowVal;
+			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
+		},
 		handleFilterActiveChanged(active) {
 			if(!active && this.allSemOption) {
 				this.curSem = this.allSemOption
@@ -1253,7 +1350,6 @@ export const AbgabetoolAssistenz = {
 			if(this.$refs.abgabeTable.tabulator) {
 				const table = this.$refs.abgabeTable.tabulator
 
-				// TODO: maybe check if existing synergy really works with many filters
 				const existing = table.getFilters().filter(f => f.field != 'studiensemester_kurzbz');
 
 				const compVal = e.value.studiensemester_kurzbz == this.$p.t('abgabetool/c4all') ? '' : e.value.studiensemester_kurzbz
@@ -1475,6 +1571,8 @@ export const AbgabetoolAssistenz = {
 					if (saved?.headerFilters && !this.headerFiltersRestoredFlat) {
 						this.headerFiltersRestoredFlat = true // instantly avoid retriggers
 						for (let hf of saved.headerFilters) {
+							if (hf.field === 'note') this.noteFilterSelected = hf.value || [];
+							if (hf.field === 'pa_note') this.pa_noteFilterSelected = hf.value || [];
 							table.setHeaderFilterValue(hf.field, hf.value);
 						}
 					}
@@ -2156,6 +2254,9 @@ export const AbgabetoolAssistenz = {
 		}
 	},
 	created() {
+		// make sure zoom media query doesnt spill ever to other CIS4 sites
+		document.documentElement.classList.add('abgabetool');
+		
 		this.loading = true
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
@@ -2246,6 +2347,9 @@ export const AbgabetoolAssistenz = {
 	},
 	mounted() {
 		this.setupMounted()
+	},
+	beforeUnmount() {
+		document.documentElement.classList.remove('abgabetool');
 	},
 	template: `
 	<template v-if="phrasenResolved">
