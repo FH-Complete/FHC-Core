@@ -328,7 +328,7 @@ export default {
 					const enrichedTags = {
 						tags: tags,
 						start: interval?.start || null,
-						ende: interval?.end || null,
+						ende: interval?.ende || null,
 					};
 
 					return tagFormatter(
