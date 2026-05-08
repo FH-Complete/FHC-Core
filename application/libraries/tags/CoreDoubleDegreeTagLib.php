@@ -50,14 +50,11 @@ class CoreDoubleDegreeTagLib
 
 	public function isCriteriaSetFor(array $params)
 	{
-
-		if(!isset($params['prestudent_id']) || !isset($params['studiensemester_kurzbz']))
-		{
+		if ( !isset($params['id'], $params['studiensemester_kurzbz'], $params['typeId']) ||	$params['typeId'] !== 'prestudent_id')
 			return false;
-		}
 
 		$semester = $params['studiensemester_kurzbz'];
-		$prestudent_id = $params['prestudent_id'];
+		$prestudent_id = $params['id'];
 
 		$this->ci->MobilitaetModel->addSelect('prestudent_id');
 		$this->ci->MobilitaetModel->addSelect('start as von');
