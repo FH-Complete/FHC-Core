@@ -61,14 +61,6 @@ export default {
 		};
 	},
 
-	getSemDates(studiensemester_kurzbz){
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/stv/Tags/getSemDates',
-			params: studiensemester_kurzbz
-		};
-	},
-
 	getAllStartAndEndAutomatedTags(){
 		return {
 			method: 'get',

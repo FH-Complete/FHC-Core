@@ -53,6 +53,10 @@ export default {
 			from: 'currentSemester',
 			required: true
 		},
+		lists: {
+			from: 'lists',
+			required: true
+		},
 	},
 	computed: {
 		appRoot() {
@@ -81,6 +85,9 @@ export default {
 				return [this.headerData[0].prestudent_id];
 			}
 		},
+		semesterDates(){
+			return this.lists.studiensemester?.find(item => item.studiensemester_kurzbz === this.currentSemester) || {};
+		}
 	},
 	created(){
 		if (this.typeHeader === 'student') {
@@ -89,7 +96,6 @@ export default {
 			}
 
 			if(this.tagsEnabled) {
-				this.getSemesterDates(this.currentSemester);
 				this.loadTagsAndRender(this.headerData[0].prestudent_id);
 		}
 
@@ -119,14 +125,6 @@ export default {
 			},
 			deep: true,
 		},
-		currentSemester: {
-			handler(newVal) {
-				if (newVal) {
-					this.getSemesterDates(newVal);
-				}
-			},
-			deep: true,
-		}
 	},
 	data(){
 		return{
@@ -137,7 +135,6 @@ export default {
 			tagEndpoint: ApiTag,
 			tagData: null,
 			rebuildData: null,
-			semDates: {}
 		};
 	},
 	methods: {
@@ -234,8 +231,8 @@ export default {
 					this.tagData,
 					this.$refs.tagComponent,
 					'prestudent_id',
-					this.semDates.start,
-					this.semDates.ende
+					this.semesterDates.start,
+					this.semesterDates.ende
 				);
 
 			this.$refs.tagWrapper.innerHTML = '';
@@ -277,17 +274,6 @@ export default {
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
-		getSemesterDates(semester){
-			const params = {
-				studiensemester_kurzbz: semester
-			};
-			return this.$api
-				.call(ApiTag.getSemDates({semester}))
-				.then(result => {
-					this.semDates = result.data;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">

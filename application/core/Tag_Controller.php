@@ -19,7 +19,6 @@ class Tag_Controller extends FHCAPI_Controller
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
 			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
-			'getSemDates' => self::BERECHTIGUNG_KURZBZ,
 			'getAllStartAndEndAutomatedTags' => self::BERECHTIGUNG_KURZBZ,
 			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		];
@@ -350,18 +349,6 @@ class Tag_Controller extends FHCAPI_Controller
 			return error ('Error occurred during updateAutomatedTags');
 
 		$this->terminateWithSuccess($result);
-	}
-
-	public function getSemDates()
-	{
-		$studiensemester_kurzbz = $this->input->get('semester');
-		$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
-		$result = $this->StudiensemesterModel->loadWhere(array('studiensemester_kurzbz' => $studiensemester_kurzbz));
-		if (isError($result))
-			return error('Error occurred during retrieving studiensemester');
-		$data = getData($result);
-		$this->terminateWithSuccess(current($data));
-
 	}
 
 	public function getAllStartAndEndAutomatedTags()

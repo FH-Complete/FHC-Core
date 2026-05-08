@@ -238,7 +238,6 @@ export default {
 			oldScrollUrl: '',
 			oldScrollLeft: 0,
 			oldScrollTop: 0,
-			semDates: {},  //TODO(Manu) check injections
 			intervalMap: {}
 		}
 	},
@@ -293,12 +292,13 @@ export default {
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
 		},
+		semesterDates(){
+			return this.lists.studiensemester?.find(item => item.studiensemester_kurzbz === this.currentSemester) || {};
+		}
 	},
 	created: function() {
 
 		if(this.tagsEnabled) {
-			this.getSemesterDates(this.currentSemester);
-
 			this.loadIntervals(); //preload
 
 			const coltags = {
@@ -333,9 +333,9 @@ export default {
 
 					return tagFormatter(
 						enrichedTags,
-						this.$refs.tagComponent,
-						this.semDates.start,
-						this.semDates.ende
+						this.$refs?.tagComponent,
+						this.semesterDates?.start,
+						this.semesterDates?.ende
 					);
 				},
 				width: 150,
@@ -349,14 +349,6 @@ export default {
 				this.translateTabulator();
 			}
 		},
-		currentSemester: {
-			handler(newVal) {
-				if (newVal) {
-					this.getSemesterDates(newVal);
-				}
-			},
-			deep: true,
-		}
 	},
 	methods: {
 		loadIntervals() {
@@ -368,17 +360,6 @@ export default {
 					data.forEach(item => {
 						this.intervalMap[item.id] = item;
 					});
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		getSemesterDates(semester){ //TODO(check for injections)
-			const params = {
-				studiensemester_kurzbz: semester
-			};
-			return this.$api
-				.call(ApiTag.getSemDates({semester}))
-				.then(result => {
-					this.semDates = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		},
@@ -667,7 +648,7 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-	test manu: currentSEM: {{semDates.start}} - {{semDates.ende}}
+	test manu: currentSEM: {{semesterDates.start}} - {{semesterDates.ende}}<hr>
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
