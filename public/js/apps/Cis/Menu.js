@@ -140,7 +140,7 @@ const app = Vue.createApp({
     },
 	provide() {
 		return {
-			isMobile: Vue.computed(() => this.windowWidth < 767),
+			isNarrow: Vue.computed(() => this.windowWidth < 992),
 		}
 	},
     methods: {

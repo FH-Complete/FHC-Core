@@ -30,7 +30,7 @@ export default {
 			menuOpen:true,
         };
     },
-	inject: ["isMobile"],
+	inject: ["isNarrow"],
 	provide(){
 		return{
 			setActiveEntry: this.setActiveEntry,
@@ -113,57 +113,60 @@ export default {
 		});
 	},
     template: /*html*/`
-	<div
-		:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
-		id="header-options-collapsible"
-	>
-		<div class="d-flex flex-row align-items-center gap-2 h-100" style="width: 79px">
-			<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			</button>
-			<span v-if="isMobile" class="d-flex flex-row align-items-center">
-				<theme-switch></theme-switch>
-			</span>
+	<div id="cis-header-bar" class="d-flex flex-row flex-grow-1">
+		<div id="nav-logo" class="d-none d-lg-block">
+			<div class="d-flex h-100 justify-content-between">
+				<a :href="rootUrl">
+					<img :src="logoUrl" alt="Corporate Identity Logo">
+				</a>
+			</div>
 		</div>
-	</div>
-	<fhc-searchbar
-		:searchoptions="searchbaroptions"
-		:searchfunction="searchfunction"
-		ref="searchbar"
-		id="nav-search"
-		class="fhc-searchbar w-100 py-1 py-lg-2"
-	></fhc-searchbar>
-    <div id="nav-logo" class="d-none d-lg-block">
-		<div class="d-flex h-100 justify-content-between">
-			<a :href="rootUrl">
-				<img :src="logoUrl" alt="Corporate Identity Logo">
-			</a>
-			<theme-switch></theme-switch>
-		</div>
-    </div>
 
-	<div
-		id="header-usermenu-collapsible"
-		:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
-	>
 		<div
-			:style="!isMobile ? '' : 'width: 51px'"
-			id="nav-user"
+			v-if="isNarrow"
+			:class="{'collapse multi-collapse collapse-horizontal show': isNarrow}"
+			id="header-navbar-toggler-collapsible"
 		>
-			<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
-				<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
-			</button>
-			<ul ref="navUserDropdown"
-			@[\`shown.bs.collapse\`]="handleShowNavUser"
-			@[\`hide.bs.collapse\`]="handleHideNavUser"
-			id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
-				<li><a class="fhc-dark-bg btn rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
-				<li >
-					<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
-				</li>
-				<li><hr class="dropdown-divider m-0 "></li>
-				<li ><a class="fhc-dark-bg btn rounded-0 d-block" :href="logoutUrl">Logout</a></li>
-			</ul>
+			<div class="d-flex flex-row align-items-center h-100" style="width: 35px">
+				<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+			</div>
+		</div>
+
+		<fhc-searchbar
+			:searchoptions="searchbaroptions"
+			:searchfunction="searchfunction"
+			ref="searchbar"
+			id="nav-search"
+			class="fhc-searchbar flex-grow-1 py-1 py-lg-2"
+		></fhc-searchbar>
+		
+		<div
+			id="header-options-collapsible"
+			:class="{'collapse multi-collapse collapse-horizontal show': isNarrow}"
+		>
+			<div :style="!isNarrow ? '' : 'width: 105px'" class="d-flex flex-row ps-3 justify-content-end">
+				<span class="d-flex flex-row align-items-center">
+					<theme-switch></theme-switch>
+				</span>
+				<div id="nav-user">
+					<button id="nav-user-btn" class="btn btn-link rounded-0" type="button" data-bs-toggle="collapse" data-bs-target="#nav-user-menu" aria-expanded="false" aria-controls="nav-user-menu">
+						<img :src="avatarUrl" :alt="$p.t('profilUpdate/profilBild')" class="bg-dark avatar rounded-circle border border-dark"/>
+					</button>
+					<ul ref="navUserDropdown"
+					@[\`shown.bs.collapse\`]="handleShowNavUser"
+					@[\`hide.bs.collapse\`]="handleHideNavUser"
+					id="nav-user-menu" class="top-100 end-0 collapse list-unstyled" aria-labelledby="nav-user-btn">
+						<li><a class="fhc-dark-bg btn rounded-0 d-block" :href="site_url + '/Cis/Profil'" id="menu-profil">Profil</a></li>
+						<li >
+							<cis-sprachen @languageChanged="fetchMenu"></cis-sprachen>
+						</li>
+						<li><hr class="dropdown-divider m-0 "></li>
+						<li ><a class="fhc-dark-bg btn rounded-0 d-block" :href="logoutUrl">Logout</a></li>
+					</ul>
+				</div>
+			</div>
 		</div>
 	</div>
 

@@ -39,7 +39,7 @@ export default {
 			query: Vue.computed(() => this.lastQuery),
 		};
 	},
-	inject: ["isMobile"],
+	inject: ["isNarrow"],
 	data: function () {
 		return {
 			searchtimer: null,
@@ -56,7 +56,7 @@ export default {
 			abortController: null,
 			settingsDropdown: null,
 			lastQuery: "",
-			isSearchShownInMobileView: false,
+			isSearchShownInNarrowView: false,
 		};
 	},
 	computed: {
@@ -95,30 +95,30 @@ export default {
 			@focusout="searchfocusout"
 		>
 			<span
-				v-if="isMobile"
+				v-if="isNarrow"
 				type="button"
 				data-bs-toggle="collapse"
 				data-bs-target=".multi-collapse"
-				aria-controls="header-searchbar-collapsible header-options-collapsible header-usermenu-collapsible"
+				aria-controls="header-searchbar-collapsible header-navbar-toggler-collapsible header-options-collapsible"
 				aria-expanded="false"
-			 	class="d-flex flex-row align-items-center ps-3 pe-1"
+			 	class="d-flex flex-row align-items-center pe-1"
 				style="color: white"
 			>
-				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
-				<i v-else class="fa-solid fa-magnifying-glass"></i>
+				<i v-if="isSearchShownInNarrowView" class="fa-solid fa-chevron-left ps-3"></i>
+				<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
 			</span>
 
 			<div
-				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
+				:class="{'flex-grow-1': !isNarrow, 'collapse multi-collapse collapse-horizontal': isNarrow}"
 				id="header-searchbar-collapsible"
-				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
-				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
+				@[\`show.bs.collapse\`]="isSearchShownInNarrowView = true"
+				@[\`hidden.bs.collapse\`]="isSearchShownInNarrowView = false"
 			>
 				<div
-					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
+					:class="{open: showresult, closed: showresult, 'px-3': isNarrow}"
 					ref="searchbox"
 					class="h-100 input-group me-2 searchbar_searchbox"
-					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : ''"
+					:style="isNarrow ? 'width: ' + getMaxWidthOfSearchbarInNarrowView() : ''"
 				>
 					<span class="input-group-text">
 						<i class="fa-solid fa-magnifying-glass color-white"></i>
@@ -243,9 +243,9 @@ export default {
 			}
 			this.search();
 		},
-		isMobile() {
-			if (!this.isMobile) {
-				this.isSearchShownInMobileView = false;
+		isNarrow() {
+			if (!this.isNarrow) {
+				this.isSearchShownInNarrowView = false;
 			}
 		},
 	},
@@ -509,7 +509,7 @@ export default {
 			}
 			return this.searchoptions.actions[res.type];
 		},
-		getMaxWidthOfSearchbarInMobileView() {
+		getMaxWidthOfSearchbarInNarrowView() {
 			// body width - hardcoded chevron width; necessary for accurate collapse transition transition
 			return (
 				document.querySelector("body").getBoundingClientRect().width -
