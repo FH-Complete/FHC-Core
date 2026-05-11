@@ -102,7 +102,7 @@ export default {
 		} else if (this.typeHeader === 'mitarbeiter') {
 			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
 				throw new Error(
-					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are requried.'
+					'[DetailHeader] "person_id", "mitarbeiter_uid", and "domain" are required.'
 				)
 			}
 			this.loadHeaderData(this.person_id, this.mitarbeiter_uid);

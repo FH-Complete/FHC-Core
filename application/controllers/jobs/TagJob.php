@@ -112,34 +112,4 @@ class TagJob extends JOB_Controller
 		$this->logInfo( PHP_EOL . "End Job rebuild Automated Tags");
 
 	}
-
-	public function deleteAllAutomatedTags()
-	{
-		print_r( PHP_EOL . "Start Job delete ALL Automated Tags" . PHP_EOL);
-
-		$resultToDelete = $this->NotizModel->loadWhere(array('insertvon' => 'BatchJobTagAdd'));
-
-		$data = $resultToDelete->retval;
-		$notiz_ids = array_map(function($item) {
-			return $item->notiz_id;
-		}, $data);
-
-		print_r($notiz_ids);
-
-		foreach ($notiz_ids as $notiz_id)
-		{
-			$result = $this->NotizzuordnungModel->delete([
-				'notiz_id' => $notiz_id
-			]);
-			if (isError($result))
-				$this->logError ('Error occurred delete Notizzuordnung' . $notiz_id);
-
-			$result = $this->NotizModel->delete([
-				'notiz_id' => $notiz_id
-			]);
-			if (isError($result))
-				return error ('Error occurred delete Notiz' . $notiz_id);
-		}
-		print_r( PHP_EOL . "End Job delete Automated Tags" . PHP_EOL);
-	}
 }

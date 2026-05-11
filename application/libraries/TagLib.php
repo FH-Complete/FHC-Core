@@ -134,7 +134,6 @@ class TagLib
 
 			$countRecycled++;
 			$retagged[] = $id;
-			//$retagged[] = $notizId; //notiz_id
 		}
 
 		// ---------------------------------
@@ -145,12 +144,9 @@ class TagLib
 
 		foreach ($toAdd as $id)
 		{
-			$result = $this->_insertTag($typeId, $id, $tag, $zeitraum[$id]['von'], $zeitraum[$id]['bis']);
-			if (isError($result)) {
-				return $result;
-			}
+			$this->_insertTag($typeId, $id, $tag, $zeitraum[$id]['von'], $zeitraum[$id]['bis']);
 			$countAdded++;
-			//$tagged[] = $result->retval[0]->notiz_id; //notiz_id
+
 			$tagged[] = $id;
 		}
 
@@ -169,7 +165,6 @@ class TagLib
 			}
 
 			$countDeleted++;
-			//$deleted[] = $result->retval['deleted']; //notizId
 			$deleted[] = $id;
 		}
 
@@ -319,46 +314,6 @@ class TagLib
 			}
 		}
 		return success($return);
-	}
-
-	public function checkForDeleteDEPR($tag, $typeId, $id, $start, $ende)
-	{
-		//TODO Zeitbezug
-		$return = null;
-		$notiz_id = null;
-
-		$_ci = get_instance();
-		$_ci->addMeta(
-			'in checkForDelete', $tag
-		);
-
-		if (!is_numeric($id))
-			return error ("id " . $id . "not numeric");
-
-		$result = $this->_ci->NotizModel->checkIfValidTag($tag, $typeId, $id, $start, $ende);
-		if (isError($result)) {
-			return error('Error checking valid tag for ' .  $typeId . ': ' . $id);
-		}
-
-		if(hasData($result))
-		{
-			$notiz_id = $result->retval[0]->notiz_id;
-			$_ci = get_instance();
-			$_ci->addMeta(
-				'checkDeleteHas DAta', $notiz_id
-			);
-		}
-		else
-			return null;
-
-		if($notiz_id)
-		{
-			$_ci->addMeta(
-				'TO DELETE', $notiz_id
-			);
-			$result = $this->_deleteTag($notiz_id);
-		}
-		return ['deleted' => $result];
 	}
 
 	private function _insertTag($typeId, $id, $tag, $von, $bis)

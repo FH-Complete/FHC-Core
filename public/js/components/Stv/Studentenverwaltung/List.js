@@ -648,7 +648,6 @@ export default {
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
 	<div class="stv-list h-100 pt-3">
-	test manu: currentSEM: {{semesterDates.start}} - {{semesterDates.ende}}<hr>
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"
