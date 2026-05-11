@@ -9,6 +9,26 @@ const EFFECTS = [
 
 export default {
 	mounted(el, binding) {
+		if (!binding.arg) {
+			binding.arg = 'none';
+		} else if (typeof binding.arg === 'object' && !Array.isArray(binding.arg)) {
+			// NOTE(chris): allow object as arg and map it to arg and
+			// modifiers to allow dynamic modifiers.
+			if (binding.arg.allowed) {
+				binding.modifiers = binding.arg.allowed.reduce((a, c) => {
+					a[c] = true;
+					return a;
+				}, {});
+			}
+			if (!binding.arg.effect)
+				binding.arg.effect = 'none';
+			
+			if (binding.arg.strict)
+				binding.arg = binding.arg.effect + '-strict';
+			else 
+				binding.arg = binding.arg.effect;
+		}
+		
 		const allowedTypes = Object.keys(binding.modifiers);
 		allowedTypes.forEach(type => {
 			if (type.substr(-11) == '-collection') {
