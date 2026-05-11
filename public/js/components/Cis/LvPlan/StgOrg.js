@@ -130,6 +130,17 @@ export default {
 			];
 		},
 	},
+	watch: {
+		async isMobile() {
+			await this.$nextTick();
+			this.handleChangeMode(
+				this.currentMode,
+				luxon.DateTime.fromISO(this.currentDay, {
+					zone: this.timezone,
+				}),
+			);
+		},
+	},
 	methods: {
 		loadLvPlan() {
 			if (!this.formData.stgkz) {

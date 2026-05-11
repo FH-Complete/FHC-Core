@@ -109,7 +109,7 @@ class LvPlan extends FHCAPI_Controller
 		$lvplanEvents = $this->getDataOrTerminateWithError($result);
 
 		// fetching moodle events
-		$moodleEvents = $uid ? [] : $this->fetchMoodleEvents($start_date, $end_date);
+		$moodleEvents = $this->fetchMoodleEvents($start_date, $end_date, $uid);
 
 		// fetching ferien events
 		$ferienEvents = $this->fetchFerienEvents($start_date, $end_date, $uid);
@@ -406,7 +406,7 @@ class LvPlan extends FHCAPI_Controller
 	 */
 	public function compactibleEventTypes()
 	{
-		$this->terminateWithSuccess(["lehreinheit", "reservierung"]);
+		$this->terminateWithSuccess(["lehreinheit", "reservierung", "ferien", "moodle"]);
 	}
 
 	/**
@@ -416,7 +416,7 @@ class LvPlan extends FHCAPI_Controller
 	 * @param string		$end_date
 	 * @return array
 	 */
-	private function fetchMoodleEvents($start_date, $end_date)
+	private function fetchMoodleEvents($start_date, $end_date, $uid = null)
 	{
 		$this->load->config('calendar');
 
@@ -439,7 +439,7 @@ class LvPlan extends FHCAPI_Controller
 			[
 				'start_date' => $start->format('c'),
 				'end_date' => $end->format('c'),
-				'username' => getAuthUID()
+				'username' => $uid ?? getAuthUID()
 			]
 		);
 

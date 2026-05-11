@@ -147,12 +147,13 @@ export default {
 				:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
 				class="d-flex flex-row justify-content-center gap-1 align-items-center"
 			>
-				<i
+				<span
 					v-for="(subEvent, subEventIndex) in event.events"
 					:key="subEventIndex"
-					class="fa-solid fa-circle fa-2xs"
-					:style="subEvent.farbe ? {color: '#' + subEvent.farbe} : {}"
-				></i>
+					:style="subEvent.farbe ? {'background-color': '#' + subEvent.farbe} : {}"
+					style="height:10px; width:10px;"
+					class="border border-dark rounded-circle"
+				></span>
 			</div>
 			<div
 				v-else-if="event.display === 'compactedExtra'"

@@ -388,12 +388,6 @@ html {
 #nav-search > .input-group > * {
   border-radius: 0 !important;
 }
-#nav-search .searchbar_results {
-  top: 100% !important;
-  left: 0;
-  right: 0 !important;
-  width: 100% !important;
-}
 
 /* frame */
 .in-frame {
@@ -467,7 +461,14 @@ html {
     /* overflow: visible !important; */
   }
   #cis-header {
-    z-index: 10;
+	z-index: 10;
+  }
+  #cis-header-bar {
+	position: fixed;
+	top: 0;
+	height: var(--fhc-cis-header-height);
+	width: 100%;
+    background-color: var(--fhc-primary);
   }
   #cis-header nav {
     position: initial;
@@ -483,12 +484,7 @@ html {
     display: none;
   }
   #nav-logo {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: var(--fhc-cis-header-height);
     width: var(--fhc-cis-menu-width);
-    background-color: var(--fhc-primary);
     padding: var(--fhc-cis-header-py) var(--fhc-cis-header-px);
     z-index: 2;
   }
@@ -503,37 +499,27 @@ html {
   	top: var(--fhc-cis-header-height);
 	display: flex;
 	flex-direction: column;
-  }
-  #nav-main-sticky > :not(#nav-main-toggle) {
-	overflow: auto;
+	height: 100%;
   }
   #nav-main-toggle {
-    width: 0;
     z-index: 1;
   }
-  #nav-main-toggle .btn,
-  #nav-main-toggle .fa-arrow-circle-left {
+  #nav-main-toggle:hover {
+	background-color: var(--fhc-secondary-highlight);
+  }
+  #nav-main-toggle .div,
+  #nav-main-toggle .fa-chevron-left {
     transition: all 0.5s ease-in-out;
   }
   #nav-main-toggle .collapsed.btn {
     background-color: transparent !important;
   }
-  #nav-main-toggle .collapsed .fa-arrow-circle-left {
+  #nav-main-toggle .collapsed .fa-chevron-left {
     transform: scaleX(-1);
     color: var(--fhc-black-40);
   }
   #nav-search {
-    position: fixed;
-    top: 0;
-    left: var(--fhc-cis-menu-width);
-    height: var(--fhc-cis-header-height);
-    right: calc(var(--fhc-cis-header-height) + 2 * var(--fhc-cis-header-px) - 2 * var(--fhc-cis-header-py));
-    width: auto !important;
-  }
-  #nav-user {
-	position: fixed;
-	top: 0;
-	right: 0;
+	position: relative;
   }
   #nav-user-btn {
     border-width: 0;
@@ -568,7 +554,7 @@ html {
 
   #nav-main-menu {
     height: 100%;
-    background-color: var(--fhc-cis-menu-bg);
+    background-color: var(--fhc-primary);
   }
   #nav-main-menu > div {
     width: var(--fhc-cis-menu-width);
@@ -610,9 +596,6 @@ html {
   }
   #nav-user{
 	position: relative;
-  }
-  #nav-user-btn {
-
   }
   #nav-user-btn img {
     object-fit: cover;
