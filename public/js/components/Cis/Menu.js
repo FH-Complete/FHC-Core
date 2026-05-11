@@ -124,8 +124,8 @@ export default {
 
 		<div
 			v-if="isNarrow"
-			:class="{'collapse multi-collapse collapse-horizontal show': isNarrow}"
-			id="header-navbar-toggler-collapsible"
+			:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
+			id="navbar-toggler-collapsible"
 		>
 			<div class="d-flex flex-row align-items-center h-100" style="width: 35px">
 				<button id="nav-main-btn" class="navbar-toggler rounded-0 px-2 border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#nav-main" aria-controls="nav-main" aria-expanded="false" aria-label="Toggle navigation">
@@ -140,10 +140,26 @@ export default {
 			ref="searchbar"
 			id="nav-search"
 			class="fhc-searchbar flex-grow-1 py-1 py-lg-2"
-		></fhc-searchbar>
+		>
+			<template #collapseToggler="{ isSearchShownInMobileView }">
+				<span
+					v-if="isMobile"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target=".multi-collapse"
+					aria-controls="searchbar-collapsible navbar-toggler-collapsible options-collapsible"
+					aria-expanded="false"
+			 		class="d-flex flex-row align-items-center pe-1"
+					style="color: white"
+				>
+					<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left ps-3"></i>
+					<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
+				</span>
+			</template>
+		</fhc-searchbar>
 		
 		<div
-			id="header-options-collapsible"
+			id="options-collapsible"
 			:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 		>
 			<div :style="!isMobile ? '' : 'width: 105px'" class="d-flex flex-row ps-3 justify-content-end">

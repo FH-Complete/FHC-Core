@@ -94,23 +94,25 @@ export default {
 			@focusin="searchfocusin"
 			@focusout="searchfocusout"
 		>
-			<span
-				v-if="isMobile"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target=".multi-collapse"
-				aria-controls="header-searchbar-collapsible header-navbar-toggler-collapsible header-options-collapsible"
-				aria-expanded="false"
-			 	class="d-flex flex-row align-items-center pe-1"
-				style="color: white"
-			>
-				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left ps-3"></i>
-				<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
-			</span>
+			<slot name="collapseToggler" :isSearchShownInMobileView="isSearchShownInMobileView">
+				<span
+					v-if="isMobile"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#searchbar-collapsible"
+					aria-controls="searchbar-collapsible"
+					aria-expanded="false"
+				 	class="d-flex flex-row align-items-center pe-1"
+					style="color: white"
+				>
+					<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left ps-3"></i>
+					<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
+				</span>
+			</slot>
 
 			<div
 				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
-				id="header-searchbar-collapsible"
+				id="searchbar-collapsible"
 				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
 				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
 			>
