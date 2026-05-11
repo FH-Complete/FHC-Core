@@ -19,7 +19,6 @@ class Tag_Controller extends FHCAPI_Controller
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
 			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
-			'getAllStartAndEndAutomatedTags' => self::BERECHTIGUNG_KURZBZ,
 			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		];
 
@@ -349,24 +348,6 @@ class Tag_Controller extends FHCAPI_Controller
 			return error ('Error occurred during updateAutomatedTags');
 
 		$this->terminateWithSuccess($result);
-	}
-
-	public function getAllStartAndEndAutomatedTags()
-	{
-		$this->NotizModel->addSelect('notiz_id as id');
-		$this->NotizModel->addSelect('start');
-		$this->NotizModel->addSelect('ende');
-		$this->NotizModel->addSelect('typ');
-
-		$result = $this->NotizModel->loadWhere(array(
-			'titel' => 'TAG',
-			'verfasser_uid' => 'sftest'
-				));
-
-		if (isError($result))
-			return error('Error occurred during retrieving intervalls automated tags');
-		$data = getData($result);
-		$this->terminateWithSuccess($data);
 	}
 
 	private function _setAuthUID()

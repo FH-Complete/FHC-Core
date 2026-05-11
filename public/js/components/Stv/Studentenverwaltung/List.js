@@ -237,8 +237,7 @@ export default {
 			dragSource: [],
 			oldScrollUrl: '',
 			oldScrollLeft: 0,
-			oldScrollTop: 0,
-			intervalMap: {}
+			oldScrollTop: 0
 		}
 	},
 	computed: {
@@ -292,15 +291,10 @@ export default {
 				.replace(/\//g, '_');
 			return "StudentList_" + today + ".csv";
 		},
-		semesterDates(){
-			return this.lists.studiensemester?.find(item => item.studiensemester_kurzbz === this.currentSemester) || {};
-		}
 	},
 	created: function() {
 
 		if(this.tagsEnabled) {
-			this.loadIntervals(); //preload
-
 			const coltags = {
 				title: 'Tags',
 				field: 'tags',
@@ -308,36 +302,7 @@ export default {
 				headerFilter: "input",
 				headerFilterFunc: tagHeaderFilter,
 				headerFilterFuncParams: {field: 'tags'},
-				//formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent), //prev. Version without filter
-				formatter: (cell) => {
-					const raw = cell.getValue();
-
-					const tags =
-						Array.isArray(raw)
-							? raw
-							: (typeof raw === 'string'
-								? JSON.parse(raw)
-								: []);
-
-					const id = tags?.[0]?.id;
-
-					const interval = id
-						? this.intervalMap[id]
-						: null;
-
-					const enrichedTags = {
-						tags: tags,
-						start: interval?.start || null,
-						ende: interval?.ende || null,
-					};
-
-					return tagFormatter(
-						enrichedTags,
-						this.$refs?.tagComponent,
-						this.semesterDates?.start,
-						this.semesterDates?.ende
-					);
-				},
+				formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
 				width: 150,
 			};
 			this.tabulatorOptions.columns.splice(2, 0, coltags);
@@ -351,18 +316,6 @@ export default {
 		},
 	},
 	methods: {
-		loadIntervals() {
-			return this.$api
-				.call(ApiTag.getAllStartAndEndAutomatedTags())
-				.then(result => {
-					const data = result.data || [];
-					this.intervalMap = {};
-					data.forEach(item => {
-						this.intervalMap[item.id] = item;
-					});
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		},
 		translateTabulator() {
 			this.$p
 				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])

@@ -34,7 +34,7 @@ class TagJob extends JOB_Controller
 
 	public function rebuildAutomatedTags()
 	{
-		$this->logInfo('Start Job rebuild Automated Tags');
+
 
 		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
@@ -43,12 +43,14 @@ class TagJob extends JOB_Controller
 		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		if (isError($result))
 		{
+			$this->logInfo('Start Job rebuild Automated Tags');
 			$this->logError('Error occurred during retrieving studiensemester');
 			return $this->logInfo('End Job rebuild Automated Tags');
 		}
 
 		if (empty($result->retval) || !isset($result->retval[0])) {
-			$this->logInfo('No Studiensemester found');
+			$this->logInfo('Start Job rebuild Automated Tags');
+			$this->logError('No Studiensemester found');
 			return $this->logInfo('End Job rebuild Automated Tags');
 		}
 		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
@@ -56,6 +58,7 @@ class TagJob extends JOB_Controller
 			'studiensemester_kurzbz' => $studiensemester_kurzbz
 		);
 
+		$this->logInfo('Start Job rebuild Automated Tags ' . $studiensemester_kurzbz);
 		foreach($automatedTags as $autoTag)
 		{
 			// getPath: must not be lost
@@ -64,7 +67,7 @@ class TagJob extends JOB_Controller
 			if(file_exists($filePath)) {
 				require_once($filePath);
 			} else {
-				$this->logInfo("File not found: " . $filePath . PHP_EOL);
+				$this->logInfo("File not found: " . $filePath);
 				continue;
 			}
 
@@ -93,9 +96,8 @@ class TagJob extends JOB_Controller
 
 			$data = is_array($result) ? $result['retval'] : $result->retval;
 
-			//PRINT OUTPUT CONSOLE
 			//SUMMARY
-			$this->logInfo("Tag " . $result->retval['input']['tag'] . " | TYPE_ID " . $typeId . " --"
+			$this->logInfo("Tag " . $result->retval['input']['tag'] . " | type_id " . $typeId . " --"
 			. " Count Recycled: " . $result->retval['summary']['recycled']
 			. " Count Added: ".  $result->retval['summary']['added']
 			. " Count Deleted: ".  $result->retval['summary']['deleted']);
@@ -109,7 +111,7 @@ class TagJob extends JOB_Controller
 				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Recycled tag(s): " . implode(', ', $result->retval['results']['retaggedIds']));
 
 		}
-		$this->logInfo( PHP_EOL . "End Job rebuild Automated Tags");
+		$this->logInfo( "End Job rebuild Automated Tags");
 
 	}
 }
