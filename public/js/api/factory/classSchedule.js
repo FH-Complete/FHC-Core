@@ -65,14 +65,14 @@ export default {
       params,
     };
   },
-  editClassTimeSlotsForValidityPeriod(
+  updateClassTimeSlotsForValidityPeriod(
     userId,
     classTimeSlotValidityPeriodId,
     params,
   ) {
     return {
       method: "post",
-      url: `api/frontend/v1/ClassScheduleApi/editClassTimeSlotsForValidityPeriod/${classTimeSlotValidityPeriodId}`,
+      url: `api/frontend/v1/ClassScheduleApi/updateClassTimeSlotsForValidityPeriod/${classTimeSlotValidityPeriodId}`,
       params,
     };
   },
@@ -87,14 +87,13 @@ export default {
       params,
     };
   },
-  deleteClassTimeSlotsForValidityPeriodPerGroup(
+  deleteClassTimeSlotsForValidityPeriod(
     userId,
     classTimeSlotValidityPeriodId,
-    groupIdentifikator,
   ) {
     return {
       method: "post",
-      url: `api/frontend/v1/ClassScheduleApi/deleteClassTimeSlotsForValidityPeriodPerGroup/${classTimeSlotValidityPeriodId}/${groupIdentifikator}`,
+      url: `api/frontend/v1/ClassScheduleApi/deleteClassTimeSlotsForValidityPeriod/${classTimeSlotValidityPeriodId}`,
     };
   },
   getAllClassScheduleTypes(queryParams) {
@@ -115,14 +114,14 @@ export default {
   updateClassTimeSlotType(classTimeSlotTypeId, params) {
     return {
       method: "post",
-      url: `api/frontend/v1/ClassScheduleApi/updateClassTimeSlotType/${classTimeSlotTypeId}`,
+      url: `api/frontend/v1/ClassScheduleApi/updateClassTimeSlotType/${encodeURIComponent(classTimeSlotTypeId)}`,
       params,
     };
   },
   deleteClassTimeSlotType(userId, classTimeSlotTypeId) {
     return {
       method: "post",
-      url: `api/frontend/v1/ClassScheduleApi/deleteClassTimeSlotType/${classTimeSlotTypeId}`,
+      url: `api/frontend/v1/ClassScheduleApi/deleteClassTimeSlotType/${encodeURIComponent(classTimeSlotTypeId)}`,
     };
   },
 };

@@ -47,19 +47,21 @@ export default {
         .call(ApiClassSchedule.getClassTimeValidityPeriod(newValue))
         .then((response) => {
           let validityPeriodData = response.data[0];
-          let organizationalUnit = this.organizationalUnits.find(
-            (unit) => unit.oe_kurzbz === validityPeriodData.oe_kurzbz,
+          let parsedOrganizationalUnit = this.dropdownParsedOrganizationalUnits.find(
+            (unit) => unit.value === validityPeriodData.oe_kurzbz,
           );
-          if (!organizationalUnit) {
-            this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingData"));
-            return;
+          if (!parsedOrganizationalUnit) {
+            parsedOrganizationalUnit = {
+              value: validityPeriodData.oe_kurzbz,
+              label: validityPeriodData.oe_bezeichnung ,
+            };
           }
 
           this.editedClassTimeSlotValidityPeriod = validityPeriodData;
 
           this.classTimeSlotValidityPeriodFormData = {
             id: validityPeriodData.unterrichtszeitengueltigkeit_id,
-            organizationalUnit,
+            organizationalUnit: parsedOrganizationalUnit,
             studyPlanId: validityPeriodData.studienplan_id,
             classTimeSlotTypeShortcode:
               validityPeriodData.unterrichtszeitentyp_kurzbz,
@@ -136,12 +138,22 @@ export default {
     userLanguage() {
       return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
     },
+    dropdownParsedOrganizationalUnits() {
+      return this.organizationalUnits
+      .filter((unit) => unit.aktiv)
+      .map((unit) => {
+        return {
+          label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
+          value: unit.oe_kurzbz,
+        };
+      });
+    },
   },
   methods: {
     updateClassTimeSlotValidityPeriodFormDataWatcher() {
       if (
         !this.classTimeSlotValidityPeriodFormData.organizationalUnit
-          ?.oe_kurzbz ||
+          ?.value ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodFrom ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodTo
       ) {
@@ -153,7 +165,7 @@ export default {
     },
     async refetchFilterableOptions() {
       this.studyPlans = await this.getTargetedStudyPlans(
-        this.classTimeSlotValidityPeriodFormData.organizationalUnit?.oe_kurzbz,
+        this.classTimeSlotValidityPeriodFormData.organizationalUnit?.value,
         this.formattedValidityPeriodFrom,
         this.formattedValidityPeriodTo,
       );
@@ -171,11 +183,6 @@ export default {
           );
           if (editedStudyPlan) {
             this.studyPlans.push(editedStudyPlan);
-          } else {
-            // console.error(
-            //   "Edited study plan not found:",
-            //   this.editedClassTimeSlotValidityPeriod.studienplan_id,
-            // );
           }
         }
       }
@@ -183,7 +190,7 @@ export default {
       let studySemestersByDates =
         await this.getStudySemestersByOrganizationalUnitAndDates(
           this.classTimeSlotValidityPeriodFormData.organizationalUnit
-            ?.oe_kurzbz,
+            ?.value,
           this.formattedValidityPeriodFrom,
           this.formattedValidityPeriodTo,
         );
@@ -325,7 +332,7 @@ export default {
             ...this.classTimeSlotValidityPeriodFormData,
             organizationalUnitShortCode:
               this.classTimeSlotValidityPeriodFormData.organizationalUnit
-                ?.oe_kurzbz,
+                ?.value,
           }),
         )
         .then((response) => {
@@ -349,7 +356,7 @@ export default {
               ...this.classTimeSlotValidityPeriodFormData,
               organizationalUnitShortCode:
                 this.classTimeSlotValidityPeriodFormData.organizationalUnit
-                  ?.oe_kurzbz,
+                  ?.value,
             },
           ),
         )
@@ -384,12 +391,12 @@ export default {
       const query = event.query.toLowerCase();
       if (!query) {
         return (this.filteredOrganizationalUnits = [
-          ...this.organizationalUnits,
+          ...this.dropdownParsedOrganizationalUnits,
         ]);
       }
 
       return (this.filteredOrganizationalUnits =
-        this.organizationalUnits.filter((unit) => {
+        this.dropdownParsedOrganizationalUnits.filter((unit) => {
           let label = `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`;
           return label.toLowerCase().includes(query);
         }));
@@ -430,11 +437,14 @@ export default {
     if (getAllClassTimeSlotTypesResponse.meta.status === "success") {
       this.classTimeSlotTypes = getAllClassTimeSlotTypesResponse.data.map(
         (type) => {
-          let descriptions = [];
-          for (let item of type.bezeichnung_mehrsprachig) {
-            let [lang, value] = item.split(":");
-            descriptions.push({ lang, value });
-          }
+          let descriptions = [{
+              lang: "de",
+              value: type.bezeichnung_mehrsprachig[0] || "",
+            }, {
+              lang: "en",
+              value: type.bezeichnung_mehrsprachig[1] || "",
+            }];
+            
           return {
             ...type,
             bezeichnung_mehrsprachig: descriptions,
@@ -460,8 +470,8 @@ export default {
           v-model="classTimeSlotValidityPeriodFormData.organizationalUnit"
           :label="$capitalize($p.t('lehre/organisationseinheit')) + ' *'"
           :suggestions="filteredOrganizationalUnits"
-          :optionValue="(option) => option.kurzbz"
-          :optionLabel="(option) => option.bezeichnung + ' (' + option.organisationseinheittyp_kurzbz + ')'" 
+          :optionValue="(option) => option.value"
+          :optionLabel="(option) => option.label" 
           @complete="filterOrganizationalUnits"
           dropdown
           forceSelection
@@ -523,7 +533,7 @@ export default {
           id="ausbildungssemester"
           name="semester"
           :disabled="isStudyPlanSelectDisabled"
-          :label="$p.t('lehre', 'ausbildungssemester')+ '*'"
+          :label="$p.t('lehre', 'ausbildungssemester')"
           v-model="classTimeSlotValidityPeriodFormData.semester"
           >
           <option

@@ -60,11 +60,14 @@ export default {
       if (getAllClassScheduleTypeResponse.meta.status === "success") {
         this.classScheduleTypes = getAllClassScheduleTypeResponse.data.map(
           (type) => {
-            let descriptions = [];
-            for (let item of type.bezeichnung_mehrsprachig) {
-              let [lang, value] = item.split(":");
-              descriptions.push({ lang, value });
-            }
+            let descriptions = [{
+              lang: "de",
+              value: type.bezeichnung_mehrsprachig[0] || "",
+            }, {
+              lang: "en",
+              value: type.bezeichnung_mehrsprachig[1] || "",
+            }];
+            
             return {
               ...type,
               bezeichnung_mehrsprachig: descriptions,
@@ -190,10 +193,10 @@ export default {
 			<core-form v-else-if="isFormVisible && hasLehreUnterrichtszeitenTypWPermission" ref="classTimeSlotTypeForm" class="row g-3 pb-3">
         <div v-if="!isEditInProgress" class="row mb-3">
 					<form-input
+            v-model="classTimeSlotTypeFormData.shortCode"
+						:label="$p.t('ui/shortName')"
 						type="text"
 						name="shortCode"  
-						:label="$p.t('ui/shortName')"
-						v-model="classTimeSlotTypeFormData.shortCode"
 						>
 					</form-input>
 				</div>
@@ -214,20 +217,20 @@ export default {
 				</div>
         <div class="row mb-3">
 					<form-input
-						type="text"
-						name="backgroundColor"  
+            v-model="classTimeSlotTypeFormData.backgroundColor"
 						:label="$p.t('ui/backgroundColor')"
-						v-model="classTimeSlotTypeFormData.backgroundColor"
+            type="color"
+						name="backgroundColor"  
 						>
 					</form-input>
 				</div>
         <div class="row mb-3">
           <div class="col d-flex align-items-center justify-content-end">
             <form-input
+              v-model="classTimeSlotTypeFormData.isActive"
+              :label="$p.t('ui/isActive')"
               type="checkbox"
               name="isActive"  
-              :label="$p.t('ui/isActive')"
-              v-model="classTimeSlotTypeFormData.isActive"
               >
             </form-input>
           </div>

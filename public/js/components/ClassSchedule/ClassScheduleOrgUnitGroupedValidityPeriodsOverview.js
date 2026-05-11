@@ -82,11 +82,14 @@ export default {
     if (getAllClassTimeSlotTypesResponse.meta.status === "success") {
       this.classTimeSlotTypes = getAllClassTimeSlotTypesResponse.data.map(
         (type) => {
-          let descriptions = [];
-          for (let item of type.bezeichnung_mehrsprachig) {
-            let [lang, value] = item.split(":");
-            descriptions.push({ lang, value });
-          }
+          let descriptions = [{
+              lang: "de",
+              value: type.bezeichnung_mehrsprachig[0] || "",
+            }, {
+              lang: "en",
+              value: type.bezeichnung_mehrsprachig[1] || "",
+            }];
+            
           return {
             ...type,
             bezeichnung_mehrsprachig: descriptions,

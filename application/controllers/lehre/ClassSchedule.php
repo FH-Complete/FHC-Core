@@ -34,8 +34,6 @@ class ClassSchedule extends Auth_Controller
 		);
 
 		$this->_setAuthUID();
-
-		$this->setControllerId();
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

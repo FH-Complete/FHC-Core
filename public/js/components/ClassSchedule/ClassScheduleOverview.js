@@ -280,7 +280,9 @@ export default {
       return events;
     },
     dropdownParsedOrganizationalUnits() {
-      return this.organizationalUnits.map((unit) => {
+      return this.organizationalUnits
+      .filter((unit) => unit.aktiv)
+      .map((unit) => {
         return {
           label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
           value: unit.oe_kurzbz,

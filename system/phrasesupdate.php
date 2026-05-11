@@ -57844,13 +57844,13 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Kein Gültigkeitszeitraum für diese Unterrichtszeit gefunden',
+				'text' => 'Kein Gültigkeitszeitraum gefunden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'No validity period found for this class time slot',
+				'text' => 'No validity period found',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58631,6 +58631,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			array(
 				'sprache' => 'English',
 				'text' => 'Error fetching study plan',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'errorFetchingClassroomHours',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Fehler beim Abrufen der Unterrichtsstunden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Error fetching classroom hours',
 				'description' => '',
 				'insertvon' => 'system'
 			)

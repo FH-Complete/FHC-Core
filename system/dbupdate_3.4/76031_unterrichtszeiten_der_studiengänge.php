@@ -37,7 +37,6 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten LIMIT 1"
 	$qry = '
 		CREATE TABLE lehre.tbl_unterrichtszeiten (
 			"unterrichtszeit_id" INTEGER NOT NULL,
-			"unterrichtszeit_gruppe_identifikator" VARCHAR(32) NOT NULL,
 			"wochentag" INTEGER NOT NULL,
 			"uhrzeit_von" TIME NOT NULL,
 			"uhrzeit_bis" TIME NOT NULL,
@@ -104,6 +103,7 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_typ LIMI
 			"bezeichnung_mehrsprachig" TEXT[] NOT NULL,
 			"aktiv" BOOLEAN DEFAULT true,
 			"hintergrundfarbe" VARCHAR(7),
+			"ist_standard" BOOLEAN DEFAULT false,	
 			"insertamum" TIMESTAMP WITH TIME ZONE DEFAULT now(),
 			"insertvon" VARCHAR(32),
 			"updateamum" TIMESTAMP WITH TIME ZONE DEFAULT now(),
@@ -156,12 +156,12 @@ if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_unterrichtszeiten_typ LIMI
 
 
 	$qry = "
-	INSERT INTO lehre.tbl_unterrichtszeiten_typ (unterrichtszeitentyp_kurzbz, bezeichnung_mehrsprachig, aktiv, hintergrundfarbe) VALUES
-		('unterrichtszeiten', ARRAY['de:unterrichtszeiten', 'en:teaching times'], 't', '#FFFFFF'),
-		('vorlesungen', ARRAY['de:Vorlesung', 'en:Lecture'], 't', '#FF8A8A'),
-		('backuptage', ARRAY['de:Übung', 'en:Exercise'], 't', '#8AFF8A'),
-		('ausgleichswochen', ARRAY['de:Ausgleichswochen', 'en:Compensation Weeks'], 't', '#8A8AFF'),
-		('prüfungswochen', ARRAY['de:Prüfungswochen', 'en:Exam Weeks'], 't', '#FFFF8A');
+	INSERT INTO lehre.tbl_unterrichtszeiten_typ (unterrichtszeitentyp_kurzbz, bezeichnung_mehrsprachig, aktiv, hintergrundfarbe, ist_standard) VALUES
+		('unterrichtszeiten', ARRAY['Unterrichtszeiten', 'Teaching Times'], 't', '#FFFFFF', 'f'),
+		('vorlesungen', ARRAY['Vorlesung', 'Lecture'], 't', '#FF8A8A', 't'),
+		('backuptage', ARRAY['Übung', 'Exercise'], 't', '#8AFF8A', 'f'),
+		('ausgleichswochen', ARRAY['Ausgleichswochen', 'Compensation Weeks'], 't', '#8A8AFF', 'f'),
+		('prüfungswochen', ARRAY['Prüfungswochen', 'Exam Weeks'], 't', '#FFFF8A', 'f');
 	";	
 
 	if(!$db->db_query($qry))

@@ -34,8 +34,8 @@ class ClassScheduleApi extends FHCAPI_Controller
 			'deleteClassTimeSlotValidityPeriod' => array('lehre/unterrichtszeiten_gk:rw'),
 			'getClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
 			'createClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
-			'editClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
-			'deleteClassTimeSlotsForValidityPeriodPerGroup' => array('lehre/unterrichtszeiten_gk:r'),
+			'updateClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
+			'deleteClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
 			'getAllClassScheduleTypes' => array('lehre/unterrichtszeiten_typ:r'),
 			'createClassTimeSlotType' => array('lehre/unterrichtszeiten_typ:rw'),
 			'updateClassTimeSlotType' => array('lehre/unterrichtszeiten_typ:rw'),
@@ -135,6 +135,9 @@ class ClassScheduleApi extends FHCAPI_Controller
 		$class_time_slot_validity_period_res = $this->ClassTimeSlotValidityPeriodModel->load($classTimeSlotValidityPeriodId);
 
 		$class_time_slot_validity_period_res = $this->getDataOrTerminateWithError($class_time_slot_validity_period_res);
+		if (!$class_time_slot_validity_period_res || count($class_time_slot_validity_period_res) === 0) {
+			$this->terminateWithError($this->p->t('ui', 'classTimeSlotValidityPeriodNotFound'));
+		}
 
 		if (!$this->isUserEntitledForOrganizationalUnit($class_time_slot_validity_period_res[0]->oe_kurzbz, 'lehre/unterrichtszeiten_gk')) {
 			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
@@ -154,8 +157,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'field_organizationalUnit')]),
 			'max_length' => $this->p->t('ui', 'error_fieldMaxLength', ['field' =>  $this->p->t('ui', 'field_organizationalUnit'), 'max' => 32])
 		]);
-		$this->form_validation->set_rules('semester', 'Semester', 'required|is_natural_no_zero|less_than_equal_to[8]', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'field_semester')]),
+		$this->form_validation->set_rules('semester', 'Semester', 'is_natural_no_zero|less_than_equal_to[8]', [
 			'is_natural_no_zero' => $this->p->t('ui', 'error_fieldInvalid', ['field' =>  $this->p->t('ui', 'field_semester')]),
 			'less_than_equal_to' => $this->p->t('ui', 'error_fieldMaxValue', ['field' =>  $this->p->t('ui', 'field_semester'), 'max' => 8])
 		]);
@@ -202,8 +204,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'field_organizationalUnit')]),
 			'max_length' => $this->p->t('ui', 'error_fieldMaxLength', ['field' =>  $this->p->t('ui', 'field_organizationalUnit'), 'max' => 32])
 		]);
-		$this->form_validation->set_rules('semester', 'Semester', 'required|is_natural_no_zero|less_than_equal_to[8]', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('ui', 'field_semester')]),
+		$this->form_validation->set_rules('semester', 'Semester', 'is_natural_no_zero|less_than_equal_to[8]', [
 			'is_natural_no_zero' => $this->p->t('ui', 'error_fieldInvalid', ['field' =>  $this->p->t('ui', 'field_semester')]),
 			'less_than_equal_to' => $this->p->t('ui', 'error_fieldMaxValue', ['field' =>  $this->p->t('ui', 'field_semester'), 'max' => 8])
 		]);
@@ -265,7 +266,13 @@ class ClassScheduleApi extends FHCAPI_Controller
 	public function getClassTimeSlotsForValidityPeriod($classTimeSlotValidityPeriodId)
 	{
 		$validityPeriodResult = $this->ClassTimeSlotValidityPeriodModel->loadWhere(['unterrichtszeitengueltigkeit_id' => $classTimeSlotValidityPeriodId]);
-		$validityPeriod = $this->getDataOrTerminateWithError($validityPeriodResult)[0];
+		$validityPeriodData = $this->getDataOrTerminateWithError($validityPeriodResult);
+		if (!$validityPeriodData || count($validityPeriodData) === 0) {
+			$this->terminateWithError($this->p->t('ui', 'classTimeSlotValidityPeriodNotFound'));
+		}
+		
+		$validityPeriod = $validityPeriodData[0];
+
 		if (!$this->isUserEntitledForOrganizationalUnit($validityPeriod->oe_kurzbz, 'lehre/unterrichtszeiten_gk')) {
 			$this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
 		}
@@ -289,11 +296,8 @@ class ClassScheduleApi extends FHCAPI_Controller
 
 		$this->db->trans_start();
 
-		$timeSlotGroupIdentifier = uniqid();
-
 		foreach ($this->input->post('unterrichtszeiten') as $timeSlot) {
 			$result = $this->ClassTimeSlotModel->insert([
-				'unterrichtszeit_gruppe_identifikator' => $timeSlotGroupIdentifier,
 				'wochentag' => $timeSlot['wochentag'],
 				'uhrzeit_von' => $timeSlot['startTime'],
 				'uhrzeit_bis' => $timeSlot['endTime'],
@@ -312,7 +316,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 	}
 
-	public function editClassTimeSlotsForValidityPeriod($classTimeSlotValidityPeriodId)
+	public function updateClassTimeSlotsForValidityPeriod($classTimeSlotValidityPeriodId)
 	{
 		$this->form_validation->set_rules('unterrichtszeiten', 'Class Time Slots', 'callback_validate_items_in_class_time_slots');
 		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
@@ -325,11 +329,19 @@ class ClassScheduleApi extends FHCAPI_Controller
 
 		$this->db->trans_start();
 
-		$timeSlotGroupIdentifier = uniqid();
+		$currentTimeSlotsResult = $this->ClassTimeSlotModel->loadWhere(['unterrichtszeitengueltigkeit_id' => $classTimeSlotValidityPeriodId]);
+		$currentTimeSlots = $this->getDataOrTerminateWithError($currentTimeSlotsResult);
+		$currentTimeSlotIds = array_column($currentTimeSlots, 'unterrichtszeit_id');
+		
+		$removedTimeSlotIds = array_values(array_diff($currentTimeSlotIds, array_column($this->input->post('unterrichtszeiten'), 'id')));
+
+		if (count($removedTimeSlotIds) > 0) {
+			$query = 'DELETE FROM lehre.tbl_unterrichtszeiten WHERE unterrichtszeit_id IN ?';
+			$result = $this->db->query($query, [ $removedTimeSlotIds ]);
+		}
 
 		foreach ($this->input->post('unterrichtszeiten') as $timeSlot) {
 			$data = [
-				'unterrichtszeit_gruppe_identifikator' => $timeSlotGroupIdentifier,
 				'wochentag' => $timeSlot['wochentag'],
 				'uhrzeit_von' => $timeSlot['startTime'],
 				'uhrzeit_bis' => $timeSlot['endTime'],
@@ -354,7 +366,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 		$this->terminateWithSuccess(true);
 
 	}
-	public function deleteClassTimeSlotsForValidityPeriodPerGroup($classTimeSlotValidityPeriodId, $groupIdentifikator)
+	public function deleteClassTimeSlotsForValidityPeriod($classTimeSlotValidityPeriodId)
 	{
 		$validityPeriodResult = $this->ClassTimeSlotValidityPeriodModel->loadWhere(['unterrichtszeitengueltigkeit_id' => $classTimeSlotValidityPeriodId]);
 		$validityPeriod = $this->getDataOrTerminateWithError($validityPeriodResult)[0];
@@ -364,7 +376,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 		
 		$this->db->trans_start();
 
-		$result = $this->ClassTimeSlotModel->delete(['unterrichtszeitengueltigkeit_id'=> $classTimeSlotValidityPeriodId, 'unterrichtszeit_gruppe_identifikator' => $groupIdentifikator]);
+		$result = $this->ClassTimeSlotModel->delete(['unterrichtszeitengueltigkeit_id'=> $classTimeSlotValidityPeriodId]);
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 		}
@@ -439,7 +451,8 @@ class ClassScheduleApi extends FHCAPI_Controller
 
 		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 
-		$this->db->trans_start();
+		
+		$parsedClassTimeSlotTypeId = urldecode($classTimeSlotTypeId);
 
 	 	$descriptions = $this->input->post('descriptions');
 		$pgArray = $this->arrayToPgArray($descriptions);
@@ -451,7 +464,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 			$this->input->post('isActive'),
 			date('c'),
 			getAuthUid(),
-			$classTimeSlotTypeId,
+			$parsedClassTimeSlotTypeId,
 		]);
 		$this->db->trans_complete();
 
@@ -461,14 +474,15 @@ class ClassScheduleApi extends FHCAPI_Controller
 	public function deleteClassTimeSlotType($classTimeSlotTypeId)
 	{
 		$isClassTimeSlotDeletable = true;
-
-		$validityPeriodResult = $this->ClassTimeSlotValidityPeriodModel->loadWhere(['unterrichtszeitentyp_kurzbz' => $classTimeSlotTypeId]);
+		$parsedClassTimeSlotTypeId = urldecode($classTimeSlotTypeId);
+		
+		$validityPeriodResult = $this->ClassTimeSlotValidityPeriodModel->loadWhere(['unterrichtszeitentyp_kurzbz' => $parsedClassTimeSlotTypeId]);
 		$validityPeriod = $this->getDataOrTerminateWithError($validityPeriodResult);
 		if ($validityPeriod && count($validityPeriod) > 0) {
 			$isClassTimeSlotDeletable = false;
 		}
 
-		$classTimeSlotResult = $this->ClassTimeSlotModel->loadWhere(['unterrichtszeitentyp_kurzbz' => $classTimeSlotTypeId]);
+		$classTimeSlotResult = $this->ClassTimeSlotModel->loadWhere(['unterrichtszeitentyp_kurzbz' => $parsedClassTimeSlotTypeId]);
 		$classTimeSlot = $this->getDataOrTerminateWithError($classTimeSlotResult);
 		if ($classTimeSlot && count($classTimeSlot) > 0) {
 			$isClassTimeSlotDeletable = false;
@@ -477,9 +491,9 @@ class ClassScheduleApi extends FHCAPI_Controller
 		$this->db->trans_start();
 
 		if (!$isClassTimeSlotDeletable) {
-			$result = $this->ClassTimeSlotTypeModel->update($classTimeSlotTypeId, ['aktiv' => false, 'updateamum' => date('c'), 'updatevon' => getAuthUid()]);
+			$result = $this->ClassTimeSlotTypeModel->update($parsedClassTimeSlotTypeId, ['aktiv' => false, 'updateamum' => date('c'), 'updatevon' => getAuthUid()]);
 		} else {
-			$result = $this->ClassTimeSlotTypeModel->delete(['unterrichtszeitentyp_kurzbz' => $classTimeSlotTypeId]);
+			$result = $this->ClassTimeSlotTypeModel->delete(['unterrichtszeitentyp_kurzbz' => $parsedClassTimeSlotTypeId]);
 		}
 		if (isError($result)) {
 			$this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
@@ -492,10 +506,16 @@ class ClassScheduleApi extends FHCAPI_Controller
 	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
 	private function arrayToPgArray(array $assoc) {
-		$flat = [];
+		$flat = [null, null];
 
 		foreach ($assoc as $assocItem) {
-			$flat[] = $assocItem['lang'] . ':' . $assocItem['value'];
+			if ($assocItem['lang'] === 'de') {
+				$flat[0] = $assocItem['value'];
+			} else if ($assocItem['lang'] === 'en') {
+				$flat[1] = $assocItem['value'];
+			} else {
+				$flat[] = $assocItem['value'];
+			}
 		}
 
 		$escaped = array_map(function ($v) {
@@ -554,7 +574,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 				return false;
 			}
 
-			if (!in_array($timeSlot['wochentag'], [1, 2, 3, 4, 5, 6, 7])) {
+			if (!in_array($timeSlot['wochentag'], [1, 2, 3, 4, 5, 6, 0])) {
 				$this->form_validation->set_message(
 					'validate_items_in_class_time_slots',
 					$this->p->t('ui', 'error_fieldWeekdayInvalid', ['field' =>  $this->p->t('ui', 'field_classTimeSlot')])

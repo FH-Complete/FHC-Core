@@ -13,6 +13,10 @@ export default {
       required: false,
       default: false,
     },
+    classroomHours: {
+      type: [Array, null],
+      required: true,
+    },
     classTimeSlotTypes: {
       type: [Array, null],
       required: true,
@@ -22,21 +26,28 @@ export default {
       required: false,
       default: () => [],
     },
+    defaultClassTimeSlotType: {
+      type: String,
+      required: false,
+      default: null,
+    },
   },
   emits: ["overlaysChanged"],
   watch: {
     editedOverlays: {
       async handler(newVal) {
-        await this.$nextTick();
-
         this.overlays = [];
-        await this.$nextTick();
+
         this.$refs.calendarContainer
-          .querySelectorAll("div[id^='overlay-']")
+          ?.querySelectorAll("div[id^='overlay-']")
           .forEach((element) => {
             element.remove();
           });
-        newVal
+
+        await this.$nextTick();
+
+
+        await newVal
           .map((slot) => {
             return {
               ...slot,
@@ -48,7 +59,7 @@ export default {
               ),
             };
           })
-          .forEach((overlay) => {
+          .forEach(async (overlay) => {
             let firstElementDataNumber =
               (overlay.weekday - 1) * this.timeSlotsInDay.length +
               this.timeSlotsInDay.indexOf(overlay.startingTimeSlot);
@@ -64,6 +75,7 @@ export default {
               this.$refs.calendarSelectorContainer.querySelector(
                 "div[data-number='" + lastElementDataNumber + "']",
               );
+
             if (!firstSelectedElement || !lastSelectedElement) {
               this.$fhcAlert.alertError(
                 this.$p.t("ui", "classTimeSlotLoadingErrorMessage"),
@@ -84,7 +96,7 @@ export default {
               ? parseInt(lastSelectedElement.getAttribute("data-number"))
               : null;
 
-            this.createOverlay();
+            await this.createOverlay(1);
 
             this.$refs.calendarSelectorContainer
               .querySelectorAll("div[class*='part-body']")
@@ -98,15 +110,16 @@ export default {
 
         this.overlays = this.overlays.map((existingOverlay, index) => {
           let existingOverlayInNewVal = newVal[index];
+          let selectedClassTimeSlotType = this.$props.classTimeSlotTypes.find(
+            (type) =>
+              type.unterrichtszeitentyp_kurzbz === existingOverlayInNewVal.type,
+          );
 
           existingOverlay.databaseId = existingOverlayInNewVal.databaseId;
           existingOverlay.type = existingOverlayInNewVal.type;
-          existingOverlay.hexColor =
-            this.classTimeSlotTypes.find(
-              (type) =>
-                type.unterrichtszeitentyp_kurzbz ===
-                existingOverlayInNewVal.type,
-            )?.hintergrundfarbe || null;
+          existingOverlay.backgroundColor =
+            selectedClassTimeSlotType?.hintergrundfarbe || null;
+
           return {
             ...existingOverlay,
           };
@@ -114,17 +127,6 @@ export default {
       },
       deep: true,
       immediate: true,
-    },
-    classTimeSlotTypes() {
-      this.overlays = this.overlays.map((overlay) => {
-        let type = this.classTimeSlotTypes.find(
-          (type) => type.unterrichtszeitentyp_kurzbz === overlay.type,
-        );
-        if (type) {
-          overlay.hexColor = type.hintergrundfarbe;
-        }
-        return overlay;
-      });
     },
     overlays: {
       handler(newVal) {
@@ -143,24 +145,6 @@ export default {
         this.$p.t("ui", "friday"),
         this.$p.t("ui", "saturday"),
         this.$p.t("ui", "sunday"),
-      ],
-      timeSlotsInDay: [
-        "08:00-08:45",
-        "08:45-09:30",
-        "09:40-10:25",
-        "10:25-11:10",
-        "11:20-12:05",
-        "12:05-12:50",
-        "12:50-13:35",
-        "13:35-14:20",
-        "14:30-15:15",
-        "15:15-16:00",
-        "16:10-16:55",
-        "16:55-17:40",
-        "17:50-18:35",
-        "18:35-19:20",
-        "19:30-20:15",
-        "20:15-21:00",
       ],
       isTimeElementCreationInProgress: false,
       overlays: [],
@@ -216,16 +200,30 @@ export default {
     userLanguage() {
       return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
     },
+    timeSlotsInDay() {
+      if (!this.$props.classroomHours) return ["08:00-08:45"];
+
+      return this.$props.classroomHours;
+    },
+    trackOverlayPool() {
+      let overlaysInPool = this.$refs.overlaysContainer.children;
+      if (!overlaysInPool < 5) {
+        alert("Could not get overlays in pool");
+        return [];
+      }
+    },
   },
   methods: {
-    createOverlay() {
+    async createOverlay(test) {
       this.hideOverlayClassTimeTypePopover();
 
       let overlayElement;
 
-      overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-        "#overlays-container",
-      ).children[0];
+      overlayElement = this.$refs.overlaysContainer.children[0];
+      if (!overlayElement) {
+        console.error("Could not find overlay element");
+        return;
+      }
 
       let firstSelectedChild =
         this.$refs.calendarSelectorContainer.querySelector(
@@ -252,7 +250,6 @@ export default {
         firstSelectedElementNumber === null ||
         lastSelectedElementNumber === null
       ) {
-        //console.error("Selected elements do not have data-number attribute");
         return;
       }
 
@@ -269,7 +266,7 @@ export default {
         this.$fhcAlert.alertError(
           this.$p.t("ui", "classTimeSlotMultipleWeeksSelectedErrorMessage"),
         );
-
+        console.error(error);
         return;
       }
 
@@ -347,11 +344,19 @@ export default {
             this.timeSlotsInDay[
               this.currentLastSelectedElementNumber % this.timeSlotsInDay.length
             ],
-          type: null,
-          hexColor: null,
+          type:
+            this.$props.defaultClassTimeSlotType?.unterrichtszeitentyp_kurzbz ||
+            null,
+          backgroundColor:
+            this.$props.defaultClassTimeSlotType?.hintergrundfarbe || null,
           weekday: gridLineNumber + 1,
         });
       }
+      this.$refs.calendarSelectorContainer
+        .querySelectorAll("div[class*='part-body']")
+        .forEach((child) => {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        });
     },
     deleteOverlay(overlayId) {
       let confirm = window.confirm(
@@ -557,7 +562,7 @@ export default {
           });
       }
     },
-    handleMouseUp(event) {
+    async handleMouseUp(event) {
       if (this.$props.isPreviewMode) return;
 
       let isLeftMouseButton = event.buttons === 0;
@@ -637,7 +642,7 @@ export default {
           });
       }
 
-      this.createOverlay();
+      await this.createOverlay(2);
 
       this.$refs.calendarSelectorContainer
         .querySelectorAll("div[class*='part-body']")
@@ -725,16 +730,12 @@ export default {
           (overlay) => overlay.id === dropzoneItem.id,
         );
         if (!dropzoneOverlay) {
-          // console.error(
-          //   "Could not find overlay for dropzone item with id " +
-          //     dropzoneItem.id,
-          // );
           return;
         }
 
         if (dropzoneOverlay.id !== this.selected[0].id) {
           this.$fhcAlert.alertError(
-            this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+            this.$p.t("ui", "classTimeSlotOverlapErrorMessage2"),
           );
           return;
         }
@@ -901,7 +902,7 @@ export default {
 
       if (firstSkippedOverElement) {
         this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+          this.$p.t("ui", "classTimeSlotOverlapErrorMessage3"),
         );
         let elementBeforeFirstSkippedOverElement =
           this.$refs.calendarSelectorContainer.querySelector(
@@ -1152,7 +1153,7 @@ export default {
 
         if (firstSkippedOverElement) {
           this.$fhcAlert.alertError(
-            this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+            this.$p.t("ui", "classTimeSlotOverlapErrorMessage4"),
           );
           let elementBeforeFirstSkippedOverElement =
             this.$refs.calendarSelectorContainer.querySelector(
@@ -1224,7 +1225,7 @@ export default {
         overlayId: null,
       };
     },
-    handleMouseOverOnOverlay(overlayId) {
+    async handleMouseOverOnOverlay(overlayId) {
       if (this.$props.isPreviewMode) return;
 
       if (!this.isTimeElementCreationInProgress) return;
@@ -1247,7 +1248,9 @@ export default {
         this.currentFirstSelectedElementNumber =
           hitOverlayStartingTimeSlotElementNumber + 1;
       }
-      this.createOverlay();
+
+      await this.createOverlay(3);
+
       this.isTimeElementCreationInProgress = false;
       this.$refs.calendarSelectorContainer
         .querySelectorAll("div[class*='part-body']")
@@ -1368,7 +1371,7 @@ export default {
       if (!overlay) return "";
 
       let typeDescriptions =
-        this.classTimeSlotTypes.find(
+        this.$props.classTimeSlotTypes.find(
           (type) => type.unterrichtszeitentyp_kurzbz === overlay.type,
         )?.bezeichnung_mehrsprachig || "";
       if (!typeDescriptions) return "";
@@ -1378,7 +1381,7 @@ export default {
         : typeDescriptions[0].value;
     },
     handleChangeClassTimeSlotTypeForOverlay(newType) {
-      let classTimeSlotType = this.classTimeSlotTypes.find(
+      let classTimeSlotType = this.$props.classTimeSlotTypes.find(
         (type) => type.unterrichtszeitentyp_kurzbz === newType,
       );
       if (!classTimeSlotType) {
@@ -1390,7 +1393,7 @@ export default {
           return {
             ...overlay,
             type: classTimeSlotType.unterrichtszeitentyp_kurzbz,
-            hexColor: classTimeSlotType.hintergrundfarbe,
+            backgroundColor: classTimeSlotType.hintergrundfarbe,
           };
         }
         return overlay;
@@ -1423,7 +1426,7 @@ export default {
             option.addEventListener("click", (event) => {
               let selectedTypeDescription = event.currentTarget.innerText;
 
-              let selectedType = this.classTimeSlotTypes.find((type) =>
+              let selectedType = this.$props.classTimeSlotTypes.find((type) =>
                 type.bezeichnung_mehrsprachig.some(
                   (desc) => desc.value === selectedTypeDescription,
                 ),
@@ -1437,7 +1440,7 @@ export default {
                   return {
                     ...overlay,
                     type: selectedType.unterrichtszeitentyp_kurzbz,
-                    hexColor: selectedType.hintergrundfarbe,
+                    backgroundColor: selectedType.hintergrundfarbe,
                   };
                 }
                 return overlay;
@@ -1466,7 +1469,7 @@ export default {
     this.hideOverlayClassTimeTypePopover();
   },
   template: /*html*/ `
-  <div ref="calendarSelectorContainer" >
+  <div ref="calendarSelectorContainer">
   <div 
     ref="calendarContainer"
     @mousedown="handleMouseDown"
@@ -1714,9 +1717,9 @@ export default {
         </div>
       </div>
     </div>
-    <div id="overlays-container" class='d-none'>
+    <div ref="overlaysContainer" id="overlaysContainer" class='d-none'>
       <div 
-        v-for="(index) in 50"
+        v-for="(index) in 100"
         v-draggable:copyLink.noimage="selectedDragObject" 
         @mousedown='overlaySelectionChanged($event, "overlay-item-" + index)'
         @mouseover="handleMouseOverOnOverlay('overlay-item-' + index)"
@@ -1724,7 +1727,9 @@ export default {
         :class="{
           'fhc-drag-handle': !$props.isPreviewMode,
         }"
-        :style="{ backgroundColor: this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)?.hexColor || this.defaultOverlayColor }"
+        :style="{
+          backgroundColor: this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)?.backgroundColor || this.defaultOverlayColor,
+        }"
         :title="getOverlayClassScheduleTypeTitle('overlay-item-' + index)"
         class="d-none fhc-pointer-events-all flex-column justify-content-between align-items-center shadow rounded-1"
         :draggable='!$props.isPreviewMode ? "true" : "false"'
@@ -1776,7 +1781,7 @@ export default {
   </div>
   <div ref="classScheduleTypeSelectorContainer" class="d-none">
     <div class='d-flex flex-column gap-2'>
-      <span v-for="(type, index) in classTimeSlotTypes"
+      <span v-for="(type, index) in $props.classTimeSlotTypes"
         :key="index"
         :data-type="type.unterrichtszeitentyp_kurzbz"
         class="btn btn-sm btn-outline-dark class-schedule-type-selector-option"

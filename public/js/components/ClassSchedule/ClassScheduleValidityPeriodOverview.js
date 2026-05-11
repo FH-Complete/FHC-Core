@@ -1,4 +1,5 @@
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
+import ApiClassroomHour from "../../../js/api/factory/classroomHour.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 import ClassScheduleValidityPeriodForm from "./ClassScheduleValidityPeriodForm.js";
@@ -15,9 +16,11 @@ export default {
   },
   data: () => {
     return {
+      classroomHours: [],
       isClassTimeSlotFormVisible: false,
       classTimeSlotValidityPeriodId: null,
       classTimeSlotValidityPeriod: null,
+      areClassTimeSlotsLoaded: false,
       classTimeSlots: [],
       classTimeSlotTypes: [],
       editedClassTimeSlots: [],
@@ -32,14 +35,14 @@ export default {
       let dateParts = this.classTimeSlotValidityPeriod.gueltig_von
         .split("-")
         .reverse();
-      return dateParts.join("/");
+      return dateParts.join(".");
     },
     classScheduleValidityPeriodEndDate() {
       if (!this.classTimeSlotValidityPeriod) return null;
       let dateParts = this.classTimeSlotValidityPeriod.gueltig_bis
         .split("-")
         .reverse();
-      return dateParts.join("/");
+      return dateParts.join(".");
     },
   },
   methods: {
@@ -49,6 +52,7 @@ export default {
           this.classTimeSlotValidityPeriodId,
         ),
       );
+
       if (getClassTimeValidityPeriodResponse.meta.status === "success") {
         this.classTimeSlotValidityPeriod =
           getClassTimeValidityPeriodResponse.data[0];
@@ -74,52 +78,38 @@ export default {
       if (
         getClassTimeSlotsForValidityPeriodResponse.meta.status === "success"
       ) {
-        let classTimeSlotsGroupedByWeek = [];
-        getClassTimeSlotsForValidityPeriodResponse.data.forEach((slot) => {
-          let groupIdentifikator = slot["unterrichtszeit_gruppe_identifikator"];
-          let existingGroup = classTimeSlotsGroupedByWeek.find(
-            (group) => group.groupIdentifikator === groupIdentifikator,
-          );
-          if (existingGroup) {
-            existingGroup.slots.push(slot);
-          } else {
-            classTimeSlotsGroupedByWeek.push({
-              groupIdentifikator,
-              slots: [slot],
-            });
-          }
-        });
-        this.classTimeSlots = classTimeSlotsGroupedByWeek;
+        this.classTimeSlots = getClassTimeSlotsForValidityPeriodResponse.data;
       } else {
         this.$fhcAlert.alertError(
-          this.$p.t("ui", "errorFetchingClassScheduleTimeSlotForValidityPeriod"),
+          this.$p.t(
+            "ui",
+            "errorFetchingClassScheduleTimeSlotForValidityPeriod",
+          ),
         );
       }
+
+      this.areClassTimeSlotsLoaded = true;
     },
     showClassTimeSlotForm() {
       this.isClassTimeSlotFormVisible = true;
     },
-    async editClassTimeSlotsForValidityPeriodPerGroup(groupIdentifikator) {
+    async editClassTimeSlotsForValidityPeriod() {
       await this.fetchClassTimeSlots();
 
       this.editedClassTimeSlots =
-        this.classTimeSlots
-          .filter(
-            (group) => group.groupIdentifikator === groupIdentifikator,
-          )?.[0]
-          .slots.map((slot) => {
-            return {
-              ...slot,
-              id: slot.unterrichtszeit_id,
-              startTime: slot.uhrzeit_von,
-              endTime: slot.uhrzeit_bis,
-              classTimeSlotTypeShortcode: slot.unterrichtszeitentyp_kurzbz,
-            };
-          }) || [];
+        this.classTimeSlots.map((slot) => {
+          return {
+            ...slot,
+            id: slot.unterrichtszeit_id,
+            startTime: slot.uhrzeit_von,
+            endTime: slot.uhrzeit_bis,
+            classTimeSlotTypeShortcode: slot.unterrichtszeitentyp_kurzbz,
+          };
+        }) || [];
 
       this.showClassTimeSlotForm();
     },
-    deleteClassTimeSlotsForValidityPeriodPerGroup(groupIdentifikator) {
+    deleteClassTimeSlotsForValidityPeriod() {
       let isDeletionConfirmed = confirm(
         this.$p.t("ui", "confirmDeleteClassTimeSlotsForGroup"),
       );
@@ -129,10 +119,9 @@ export default {
 
       return this.$api
         .call(
-          ApiClassSchedule.deleteClassTimeSlotsForValidityPeriodPerGroup(
+          ApiClassSchedule.deleteClassTimeSlotsForValidityPeriod(
             this.id,
             this.classTimeSlotValidityPeriodId,
-            groupIdentifikator,
           ),
         )
         .then((response) => {
@@ -194,7 +183,7 @@ export default {
     this.classTimeSlotValidityPeriodId =
       this.$route.params.classTimeSlotValidityPeriodId;
 
-    this.fetchClassTimeValidityPeriod();
+    await this.fetchClassTimeValidityPeriod();
 
     let getAllClassTimeSlotTypesResponse = await this.$api.call(
       ApiClassSchedule.getAllClassScheduleTypes("filter[aktiv]=true"),
@@ -202,11 +191,13 @@ export default {
     if (getAllClassTimeSlotTypesResponse.meta.status === "success") {
       this.classTimeSlotTypes = getAllClassTimeSlotTypesResponse.data.map(
         (type) => {
-          let descriptions = [];
-          for (let item of type.bezeichnung_mehrsprachig) {
-            let [lang, value] = item.split(":");
-            descriptions.push({ lang, value });
-          }
+          let descriptions = [{
+              lang: "de",
+              value: type.bezeichnung_mehrsprachig[0] || "",
+            }, {
+              lang: "en",
+              value: type.bezeichnung_mehrsprachig[1] || "",
+            }];
           return {
             ...type,
             bezeichnung_mehrsprachig: descriptions,
@@ -217,6 +208,21 @@ export default {
       this.$fhcAlert.alertError(
         this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
       );
+    }
+
+    let getAllClassroomHoursResponse = await this.$api.call(
+      ApiClassroomHour.getAllClassroomHours(),
+    );
+    if (getAllClassroomHoursResponse.meta.status === "success") {
+      this.classroomHours = getAllClassroomHoursResponse.data.map((hour) => {
+        return {
+          ...hour,
+          beginn: hour.beginn.substring(0, 5),
+          ende: hour.ende.substring(0, 5),
+        };
+      });
+    } else {
+      this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingClassroomHours"));
     }
 
     this.fetchClassTimeSlots();
@@ -250,44 +256,49 @@ export default {
       </h5>
     </div>
     <div>
-      <div v-if='!isClassTimeSlotFormVisible' class="col-12 d-flex justify-content-end">
+      <div v-if='!isClassTimeSlotFormVisible && !classTimeSlots.length && areClassTimeSlotsLoaded' class="col-12 d-flex justify-content-end">
         <button type="button" class="btn btn-primary" @click="showClassTimeSlotForm">{{$p.t('ui', 'addClassTimeSlotButton')}}</button>
       </div>
       <class-schedule-validity-period-form 
-        v-else 
+        v-if="isClassTimeSlotFormVisible"
+        :class-time-slot-types="this.classTimeSlotTypes"
+        :classroom-hours="this.classroomHours.map(hour => hour.beginn + '-' + hour.ende)"
         :class-time-slot-validity-period="classTimeSlotValidityPeriod"
         :edited-class-time-slots="editedClassTimeSlots"
-        @classTimeSlotsCreated="() => { isClassTimeSlotFormVisible = false; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }" 
-        @classTimeSlotsEdited="() => { isClassTimeSlotFormVisible = false; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }"
-        @hideForm="() => { isClassTimeSlotFormVisible = false; this.editedClassTimeSlots = []; }"
+        @classTimeSlotsCreated="() => { isClassTimeSlotFormVisible = false; this.areClassTimeSlotsLoaded = false; this.classTimeSlots = []; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }" 
+        @classTimeSlotsEdited="() => { isClassTimeSlotFormVisible = false; this.areClassTimeSlotsLoaded = false; this.classTimeSlots = []; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }"
+        @hideForm="() => { isClassTimeSlotFormVisible = false; this.areClassTimeSlotsLoaded = false; this.classTimeSlots = []; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }"
         class="mb-4"
       />
       <div>
         <h4>{{ $p.t("ui", "classScheduleValidityPeriodTimeSlots") }}</h4>
       </div>
-      <div v-if="classTimeSlots && Object.keys(classTimeSlots).length > 0">
-        <div v-for="(classTimeSlotsPerWeek, index) in classTimeSlots" :key="index" class="row border-top rounded p-2 mt-4 mb-2 pt-1 pb-5">
+      <transition>
+        <div v-if="classTimeSlots && Object.keys(classTimeSlots).length > 0 && !isClassTimeSlotFormVisible">
           <div class="col-12 d-flex align-items-center justify-content-end gap-2">
-              <a class="ml-auto" @click="editClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-edit fs-5"></i></a>
-              <a class="ml-auto" @click="deleteClassTimeSlotsForValidityPeriodPerGroup(classTimeSlotsPerWeek.groupIdentifikator)"><i class="fa fa-trash text-danger fs-5"></i></a>
+              <a class="ml-auto" @click="editClassTimeSlotsForValidityPeriod"><i class="fa fa-edit fs-5"></i></a>
+              <a class="ml-auto" @click="deleteClassTimeSlotsForValidityPeriod"><i class="fa fa-trash text-danger fs-5"></i></a>
           </div>
-          <class-schedule-calendar-selector
-            :class-time-slot-types="this.classTimeSlotTypes" 
-            :edited-overlays="classTimeSlotsPerWeek.slots.map((slot) => {
-              return {
-                databaseId: slot.id,
-                id: slot.identifier,
-                weekday: slot.wochentag,
-                type: slot.unterrichtszeitentyp_kurzbz,
-                startTime: slot.uhrzeit_von,
-                endTime: slot.uhrzeit_bis,
-              };
-            })"
-            :isPreviewMode="true"
-          />
+          <div class="row border-top rounded p-2 mt-4 mb-2 pt-1 pb-5">
+            <class-schedule-calendar-selector
+              :classroom-hours="this.classroomHours.map(hour => hour.beginn + '-' + hour.ende)"
+              :class-time-slot-types="this.classTimeSlotTypes" 
+              :edited-overlays="classTimeSlots.map((slot) => {
+                return {
+                  databaseId: slot.id,
+                  id: slot.identifier,
+                  weekday: parseInt(slot.wochentag) === 0 ? 7 : slot.wochentag,
+                  type: slot.unterrichtszeitentyp_kurzbz,
+                  startTime: slot.uhrzeit_von,
+                  endTime: slot.uhrzeit_bis,
+                };
+              })"
+              :isPreviewMode="true"
+            />
+          </div>
         </div>
-      </div>
-      <div v-else class="d-flex align-items-center justify-content-center border rounded p-4 mt-4">
+      </transition>
+      <div v-if="!classTimeSlots || Object.keys(classTimeSlots).length === 0" class="d-flex align-items-center justify-content-center border rounded p-4 mt-4">
           <p class="m-0">{{ $p.t("ui", "noClassScheduleValidityPeriodTimeSlotsFound") }}</p>
       </div>
     </div>

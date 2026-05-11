@@ -1,4 +1,5 @@
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
+import ApiClassroomHour from "../../../js/api/factory/classroomHour.js";
 
 import ClassScheduleCalendarSelector from "./ClassScheduleCalendarSelector.js";
 
@@ -8,11 +9,20 @@ export default {
     ClassScheduleCalendarSelector,
   },
   props: {
+    classTimeSlotTypes: {
+      type: [Array, null],
+      required: true,
+    },
     classTimeSlotValidityPeriod: {
       type: Object,
       required: true,
     },
     editedClassTimeSlots: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    classroomHours: {
       type: Array,
       required: false,
       default: () => [],
@@ -26,7 +36,7 @@ export default {
           return {
             databaseId: slot.id,
             id: slot.identifier,
-            weekday: slot.wochentag,
+            weekday: slot.wochentag === 0 ? 7 : slot.wochentag,
             type: slot.unterrichtszeitentyp_kurzbz,
             startTime: slot.startTime,
             endTime: slot.endTime,
@@ -40,7 +50,6 @@ export default {
     return {
       editedOverlays: [],
       classTimeSlots: [],
-      classTimeSlotTypes: [],
     };
   },
   computed: {
@@ -78,7 +87,10 @@ export default {
           this.$props.classTimeSlotValidityPeriod
             .unterrichtszeitengueltigkeit_id,
           {
-            unterrichtszeiten: this.classTimeSlots,
+            unterrichtszeiten: this.classTimeSlots.map((slot) => {
+              slot.wochentag = parseInt(slot.wochentag) === 7 ? 0 : slot.wochentag;
+              return slot; 
+            }),
           },
         ),
       );
@@ -87,17 +99,20 @@ export default {
         this.classTimeSlots = [];
         this.$emit("classTimeSlotsCreated");
       } else {
-        this.$fhcAlert.handleSystemError(error);
+        this.$fhcAlert.handleSystemError(response.meta.message);
       }
     },
-    async editClassTimeSlots() {
+    async updateClassTimeSlots() {
       let response = await this.$api.call(
-        ApiClassSchedule.editClassTimeSlotsForValidityPeriod(
+        ApiClassSchedule.updateClassTimeSlotsForValidityPeriod(
           this.id,
           this.$props.classTimeSlotValidityPeriod
             .unterrichtszeitengueltigkeit_id,
           {
-            unterrichtszeiten: this.classTimeSlots,
+            unterrichtszeiten: this.classTimeSlots.map((slot) => {
+              slot.wochentag = parseInt(slot.wochentag) === 7 ? 0 : slot.wochentag;
+              return slot;
+            }),
           },
         ),
       );
@@ -134,35 +149,13 @@ export default {
       });
     },
   },
-  async created() {
-    let getAllClassTimeSlotTypesResponse = await this.$api.call(
-      ApiClassSchedule.getAllClassScheduleTypes("filter[aktiv]=true"),
-    );
-    if (getAllClassTimeSlotTypesResponse.meta.status === "success") {
-      this.classTimeSlotTypes = getAllClassTimeSlotTypesResponse.data.map(
-        (type) => {
-          let descriptions = [];
-          for (let item of type.bezeichnung_mehrsprachig) {
-            let [lang, value] = item.split(":");
-            descriptions.push({ lang, value });
-          }
-          return {
-            ...type,
-            bezeichnung_mehrsprachig: descriptions,
-          };
-        },
-      );
-    } else {
-      this.$fhcAlert.alertError(
-        this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"),
-      );
-    }
-  },
   template: `
   <div class='row'>
     <div class='col-12'>
-      <class-schedule-calendar-selector 
-        :class-time-slot-types="this.classTimeSlotTypes" 
+      <class-schedule-calendar-selector
+        :classroom-hours="this.$props.classroomHours"
+        :default-class-time-slot-type="this.$props.classTimeSlotTypes.find(type => type.ist_standard)"
+        :class-time-slot-types="this.$props.classTimeSlotTypes" 
         :edited-overlays="this.editedOverlays"
         @overlaysChanged="handleOverlaysChanged"
       />
@@ -170,7 +163,7 @@ export default {
     <div class="col-12 d-flex justify-content-end gap-2">
       <button type="button" class="btn btn-secondary" @click="hideForm">{{$p.t('ui', 'abbrechen')}}</button>
       <button v-if="!areClassTimeSlotsEdited" type="button" class="btn btn-primary" @click="createClassTimeSlots">{{$p.t('ui', 'speichern')}}</button>
-      <button v-else type="button" class="btn btn-primary" @click="editClassTimeSlots">{{$p.t('ui', 'btnAktualisieren')}}</button>
+      <button v-else type="button" class="btn btn-primary" @click="updateClassTimeSlots">{{$p.t('ui', 'btnAktualisieren')}}</button>
     </div>
   </div>
   `,

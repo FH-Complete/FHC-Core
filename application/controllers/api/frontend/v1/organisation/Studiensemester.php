@@ -31,8 +31,11 @@ class Studiensemester extends FHCAPI_Controller
 				'getStudySemestersByStudyPlanAndDates' => self::PERM_LOGGED,
 			)
 		);
-		// Load model StudiensemesterModel
+
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
+		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
+		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
 	}
 
 	/**
@@ -171,10 +174,6 @@ class Studiensemester extends FHCAPI_Controller
 
 	public function getStudySemestersByOrganizationalUnitAndDates($organizationalUnitShortCode)
 	{
-		$this->load->model('organisation/Studiengang_model', 'StudiengangModel');
-		$this->load->model('organisation/Studienordnung_model', 'StudienordnungModel');
-		$this->load->model('organisation/Studienplan_model', 'StudienplanModel');
-
 		$startDate = date('Y-m-d', strtotime($this->input->get('filter[startDate]')));
 		$endDate = date('Y-m-d', strtotime($this->input->get('filter[endDate]')));
 		if (!$startDate || !$endDate) {
