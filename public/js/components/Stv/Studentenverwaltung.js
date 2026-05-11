@@ -273,10 +273,10 @@ export default {
 		},
 		onSelectVerband({ link, studiengang_kz, semester, orgform_kurzbz }) {
 			let urlpath = String(link);
-			if (!urlpath.match(/\/prestudent/))
+			/*if (!urlpath.match(/\/prestudent/))
 			{
 				urlpath = 'CURRENT_SEMESTER' + '/' + urlpath;
-			}
+			}*/
 			this.$refs.stvList.updateUrl(ApiStv.students.verband(urlpath));
 
 			this.studiengangKz = studiengang_kz;
