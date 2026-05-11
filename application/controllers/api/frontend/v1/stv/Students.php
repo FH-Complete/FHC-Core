@@ -147,7 +147,7 @@ class Students extends FHCAPI_Controller
 		
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -214,7 +214,7 @@ class Students extends FHCAPI_Controller
 		
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -267,7 +267,7 @@ class Students extends FHCAPI_Controller
 		
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -474,7 +474,7 @@ class Students extends FHCAPI_Controller
 		$result = $this->PrestudentModel->loadWhere($where);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -628,8 +628,20 @@ class Students extends FHCAPI_Controller
 		$result = $this->PrestudentModel->loadWhere($where);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
+	}
+
+	protected function decodeTagsJsonInResult(&$data)
+	{
+		if(defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
+			array_walk($data, function($item, $key) {
+				if(isset($item->tags))
+				{
+					$item->tags = json_decode($item->tags);
+				}
+			});
+		}
 	}
 
 	/**
@@ -676,7 +688,7 @@ class Students extends FHCAPI_Controller
 		]);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -719,7 +731,7 @@ class Students extends FHCAPI_Controller
 		]);
 		
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -761,7 +773,7 @@ class Students extends FHCAPI_Controller
 		]);
 		
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -836,7 +848,7 @@ class Students extends FHCAPI_Controller
 		$result = $this->PrestudentModel->load();
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$this->decodeTagsJsonInResult($data);
 		$this->terminateWithSuccess($data);
 	}
 
@@ -878,12 +890,31 @@ class Students extends FHCAPI_Controller
 					n.text AS notiz,
 					nt.style,
 					n.erledigt AS done,
-					nz.prestudent_id
+					nz.prestudent_id,
+					n.start,
+					n.ende
 				  FROM public.tbl_notizzuordnung AS nz
 					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
 					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz "
 				. $whereTags .
 				"
+				WHERE
+				  COALESCE(n.start, '1970-01-01') <= (
+					SELECT
+					  ende
+					FROM
+					  public.tbl_studiensemester
+					WHERE
+					  studiensemester_kurzbz = '{$studiensemester_kurzbz}'
+				  )
+				  AND COALESCE(n.ende, '2170-12-31') >= (
+					SELECT
+					  start
+					FROM
+					  public.tbl_studiensemester
+					WHERE
+					  studiensemester_kurzbz = '{$studiensemester_kurzbz}'
+				  )
 				) AS tag
 				GROUP BY tag.prestudent_id
 			  ) AS tag_data_agg
