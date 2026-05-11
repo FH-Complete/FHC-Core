@@ -176,6 +176,7 @@ export const Profil = {
 			this.data = data.profil_data.data;
 			this.calendarSyncUrls = data.calendar_sync_urls ?? [];
 			this.authPermissions = data.permissions;
+			console.log(data.profil_data);
 		},
 		zustellAdressenCount() {
 			if (!this.data || !this.data.adressen) {
