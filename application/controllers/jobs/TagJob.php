@@ -34,16 +34,22 @@ class TagJob extends JOB_Controller
 
 	public function rebuildAutomatedTags()
 	{
-		print_r( PHP_EOL . "Start Job rebuild" . PHP_EOL);
+		$this->logInfo('Start Job rebuild Automated Tags');
 
 		$automatedTagsRes = $this->NotiztypModel->loadWhere(array('automatisiert' => true, 'taglib IS NOT NULL' => null));
 		$automatedTags = hasData($automatedTagsRes) ? getData($automatedTagsRes) : [];
 
+
 		$result = $this->StudiensemesterModel->getAktOrNextSemester();
 		if (isError($result))
-			return error ('Error occurred during retrieving studiensemester');
+		{
+			$this->logError('Error occurred during retrieving studiensemester');
+			return $this->logInfo('End Job rebuild Automated Tags');
+		}
+
 		if (empty($result->retval) || !isset($result->retval[0])) {
-			return error('No studiensemester found');
+			$this->logInfo('No Studiensemester found');
+			return $this->logInfo('End Job rebuild Automated Tags');
 		}
 		$studiensemester_kurzbz = $result->retval[0]->studiensemester_kurzbz ?? null;
 		$params = array(
@@ -58,7 +64,7 @@ class TagJob extends JOB_Controller
 			if(file_exists($filePath)) {
 				require_once($filePath);
 			} else {
-				echo "File not found: " . $filePath . PHP_EOL;
+				$this->logInfo("File not found: " . $filePath . PHP_EOL);
 				continue;
 			}
 
@@ -81,26 +87,29 @@ class TagJob extends JOB_Controller
 			$result = $this->taglib->updateAutomatedTags($paramsTag);
 
 			if (isError($result)) {
-				return error('Error occurred during updateAutomatedTags');
+				$this->logError('Error occurred during updateAutomatedTags ' . $kurz_bz);
+				continue;
 			}
 
 			$data = is_array($result) ? $result['retval'] : $result->retval;
 
 			//PRINT OUTPUT CONSOLE
 			//SUMMARY
-			print_r(PHP_EOL . "-- TAG " . $result->retval['input']['tag'] . " | TYPE_ID " . $typeId . " --");
-
-			print_r( PHP_EOL . "Count Recycled: " . $result->retval['summary']['recycled']);
-			print_r(PHP_EOL . "Count Added: ".  $result->retval['summary']['added']);
-			print_r(PHP_EOL . "Count Deleted: ".  $result->retval['summary']['deleted']);
+			$this->logInfo("Tag " . $result->retval['input']['tag'] . " | TYPE_ID " . $typeId . " --"
+			. " Count Recycled: " . $result->retval['summary']['recycled']
+			. " Count Added: ".  $result->retval['summary']['added']
+			. " Count Deleted: ".  $result->retval['summary']['deleted']);
 
 			//DETAILS
-			//print_r(PHP_EOL . "New tag(s) [". $typeId . "]: " .  implode(', ', $result->retval['results']['newTags']));
-			//print_r(PHP_EOL . "Deleted tags(s) [". $typeId . "]: " . implode(', ', $result->retval['results']['deletedTagsIds']));
-			//print_r(PHP_EOL . "Recycled tag(s) [". $typeId . "]: " . implode(', ', $result->retval['results']['retaggedIds']));
-			print_r(PHP_EOL);
+			if($result->retval['results']['newTags'])
+				$this->logInfo("Tag " . $result->retval['input']['tag'] . "New tag(s): " .  implode(', ', $result->retval['results']['newTags']));
+			if($result->retval['results']['deletedTagsIds'])
+				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Deleted tags(s: " . implode(', ', $result->retval['results']['deletedTagsIds']));
+			if ($result->retval['results']['retaggedIds'])
+				$this->logInfo("Tag " . $result->retval['input']['tag'] . "Recycled tag(s): " . implode(', ', $result->retval['results']['retaggedIds']));
+
 		}
-		print_r( PHP_EOL . "End Job rebuild" . PHP_EOL);
+		$this->logInfo( PHP_EOL . "End Job rebuild Automated Tags");
 
 	}
 
@@ -123,7 +132,7 @@ class TagJob extends JOB_Controller
 				'notiz_id' => $notiz_id
 			]);
 			if (isError($result))
-				return error ('Error occurred delete Notizzuordnung' . $notiz_id);
+				$this->logError ('Error occurred delete Notizzuordnung' . $notiz_id);
 
 			$result = $this->NotizModel->delete([
 				'notiz_id' => $notiz_id
