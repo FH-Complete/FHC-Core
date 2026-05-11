@@ -30,7 +30,7 @@ export default {
 			menuOpen:true,
         };
     },
-	inject: ["isNarrow"],
+	inject: ["isNarrow", "isMobile"],
 	provide(){
 		return{
 			setActiveEntry: this.setActiveEntry,
@@ -144,9 +144,9 @@ export default {
 		
 		<div
 			id="header-options-collapsible"
-			:class="{'collapse multi-collapse collapse-horizontal show': isNarrow}"
+			:class="{'collapse multi-collapse collapse-horizontal show': isMobile}"
 		>
-			<div :style="!isNarrow ? '' : 'width: 105px'" class="d-flex flex-row ps-3 justify-content-end">
+			<div :style="!isMobile ? '' : 'width: 105px'" class="d-flex flex-row ps-3 justify-content-end">
 				<span class="d-flex flex-row align-items-center">
 					<theme-switch></theme-switch>
 				</span>

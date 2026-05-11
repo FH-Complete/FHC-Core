@@ -39,7 +39,7 @@ export default {
 			query: Vue.computed(() => this.lastQuery),
 		};
 	},
-	inject: ["isNarrow"],
+	inject: ["isMobile"],
 	data: function () {
 		return {
 			searchtimer: null,
@@ -56,7 +56,7 @@ export default {
 			abortController: null,
 			settingsDropdown: null,
 			lastQuery: "",
-			isSearchShownInNarrowView: false,
+			isSearchShownInMobileView: false,
 		};
 	},
 	computed: {
@@ -95,7 +95,7 @@ export default {
 			@focusout="searchfocusout"
 		>
 			<span
-				v-if="isNarrow"
+				v-if="isMobile"
 				type="button"
 				data-bs-toggle="collapse"
 				data-bs-target=".multi-collapse"
@@ -104,21 +104,21 @@ export default {
 			 	class="d-flex flex-row align-items-center pe-1"
 				style="color: white"
 			>
-				<i v-if="isSearchShownInNarrowView" class="fa-solid fa-chevron-left ps-3"></i>
+				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left ps-3"></i>
 				<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
 			</span>
 
 			<div
-				:class="{'flex-grow-1': !isNarrow, 'collapse multi-collapse collapse-horizontal': isNarrow}"
+				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
 				id="header-searchbar-collapsible"
-				@[\`show.bs.collapse\`]="isSearchShownInNarrowView = true"
-				@[\`hidden.bs.collapse\`]="isSearchShownInNarrowView = false"
+				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
+				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
 			>
 				<div
-					:class="{open: showresult, closed: showresult, 'px-3': isNarrow}"
+					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
 					ref="searchbox"
 					class="h-100 input-group me-2 searchbar_searchbox"
-					:style="isNarrow ? 'width: ' + getMaxWidthOfSearchbarInNarrowView() : ''"
+					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInNarrowView() : ''"
 				>
 					<span class="input-group-text">
 						<i class="fa-solid fa-magnifying-glass color-white"></i>
@@ -243,9 +243,9 @@ export default {
 			}
 			this.search();
 		},
-		isNarrow() {
-			if (!this.isNarrow) {
-				this.isSearchShownInNarrowView = false;
+		isMobile() {
+			if (!this.isMobile) {
+				this.isSearchShownInMobileView = false;
 			}
 		},
 	},
