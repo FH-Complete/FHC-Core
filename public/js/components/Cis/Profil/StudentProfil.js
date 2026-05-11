@@ -292,14 +292,13 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- MOBILE PROFIL UPDATES -->
 				<div v-if="data.profilUpdates" class="row mb-3">
 					<div class="col">
-						<!-- MOBILE PROFIL UPDATES -->
 						<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 					</div>
 				</div>
 			</div>
-			<!-- END OF HIDDEN QUCK LINKS -->
 
 			<!-- MAIN PANNEL -->
 			<div class="col-sm-12 col-md-8 col-xxl-9 ">
@@ -308,30 +307,42 @@ export default {
 				<!-- ROW WITH THE PROFIL INFORMATION -->
 				<div class="row mb-4 ">
 					<div  class="col-lg-12 col-xl-6 ">
+						<!-- PROFIL INFORMATION -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- PROFIL INFORMATION -->
 								<profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','studentIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
 							</div>
 						</div>
+						<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+							<div class="col">
+								<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+							</div>
+						</div>
+						<!-- CALENDAR SYNC OPTIONS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+						<div class="row mb-4 d-md-none">
+            			    <div class="col">
+								<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+            			    </div>
+						</div>
+						<!-- STUDENT INFO -->
 						<div class="row mb-4">
 							<div  class=" col-lg-12">
-								<!-- STUDENT INFO -->
 								<role-information :title="$p.t('profil','studentInformation')" :data="roleInformation"></role-information>
 							</div>
 						</div>
 					<!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
 					</div>
 					<div  class="col-xl-6 col-lg-12 ">
+						<!-- EMAILS -->
 						<div class="row mb-4">
 							<div class="col">
-								<!-- EMAILS -->
 								<profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
 							</div>
 						</div>
+						<!-- PRIVATE KONTAKTE-->
 						<div class="row mb-4 ">
 							<div class="col">
-								<!-- PRIVATE KONTAKTE-->
 								<div class="card">
 									<div class="card-header">
 										<div class="row">
@@ -354,9 +365,9 @@ export default {
 						</div>
 					</div>
 
+					<!-- PRIVATE ADRESSEN-->
 					<div class="row mb-4">
 						<div class="col">
-							<!-- PRIVATE ADRESSEN-->
 							<div class="card">
 								<div class="card-header">
 									<div class="row">
@@ -408,11 +419,6 @@ export default {
 		</div>
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-			<div v-if="quickLinks.length" class="row mb-4">
-				<div class="col">
-					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
-				</div>
-			</div>
 			<!-- Bearbeiten Button -->
 			<div class="row d-none d-md-block">
 				<div class="col mb-3">
@@ -426,9 +432,21 @@ export default {
 					</button>
 				</div>
 			</div>
+			<!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- CALENDAR SYNC OPTIONS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div class="row mb-3 d-none d-md-block">
+                <div class="col">
+					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+                </div>
+			</div>
+			<!-- PROFIL UPDATES -->
 			<div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
 				<div class="col mb-3">
-					<!-- PROFIL UPDATES -->
 					<fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates"></fetch-profil-updates>
 				</div>
 			</div>
@@ -438,18 +456,13 @@ export default {
 				</div>
 			</div>
 			<!-- START OF THE SECOND ROW IN THE SIDE PANEL -->
+			<!-- MAILVERTEILER -->
             <div class="row mb-3">
 				<div class="col">
-					<!-- HIER SIND DIE MAILVERTEILER -->
 					<mailverteiler :title="$p.t('profil','mailverteiler')" :data="data?.mailverteiler"></mailverteiler>
 				</div>
-            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
             </div>
-			<div class="row">
-                <div class="col">
-					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
-                </div>
-			</div>
+            <!-- END OF THE SECOND ROW IN THE SIDE PANEL -->
         <!-- END OF SIDE PANEL -->
         </div>
     <!-- END OF CONTAINER ROW-->
