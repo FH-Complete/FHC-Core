@@ -468,7 +468,6 @@ html {
 	top: 0;
 	height: var(--fhc-cis-header-height);
 	width: 100%;
-	/* padding: var(--fhc-cis-header-py) var(--fhc-cis-header-px); */
     background-color: var(--fhc-primary);
   }
   #cis-header nav {
@@ -500,22 +499,22 @@ html {
   	top: var(--fhc-cis-header-height);
 	display: flex;
 	flex-direction: column;
-  }
-  #nav-main-sticky > :not(#nav-main-toggle) {
-	overflow: auto;
+	height: 100%;
   }
   #nav-main-toggle {
-    width: 0;
     z-index: 1;
   }
-  #nav-main-toggle .btn,
-  #nav-main-toggle .fa-arrow-circle-left {
+  #nav-main-toggle:hover {
+	background-color: var(--fhc-secondary-highlight);
+  }
+  #nav-main-toggle .div,
+  #nav-main-toggle .fa-chevron-left {
     transition: all 0.5s ease-in-out;
   }
   #nav-main-toggle .collapsed.btn {
     background-color: transparent !important;
   }
-  #nav-main-toggle .collapsed .fa-arrow-circle-left {
+  #nav-main-toggle .collapsed .fa-chevron-left {
     transform: scaleX(-1);
     color: var(--fhc-black-40);
   }
@@ -555,7 +554,7 @@ html {
 
   #nav-main-menu {
     height: 100%;
-    background-color: var(--fhc-cis-menu-bg);
+    background-color: var(--fhc-primary);
   }
   #nav-main-menu > div {
     width: var(--fhc-cis-menu-width);
@@ -597,9 +596,6 @@ html {
   }
   #nav-user{
 	position: relative;
-  }
-  #nav-user-btn {
-
   }
   #nav-user-btn img {
     object-fit: cover;

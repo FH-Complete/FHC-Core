@@ -188,15 +188,26 @@ export default {
 
     <nav id="nav-main" class="offcanvas offcanvas-start" tabindex="-1" aria-labelledby="nav-main-btn" data-bs-backdrop="false">
 		<div id="nav-main-sticky">
-			<div id="nav-main-toggle" class="position-static d-none d-lg-block ">
-				<button :aria-label="menuCollapseAriaLabel"  type="button" @click="menuOpen = !menuOpen"  class="btn text-light rounded-0 p-1 d-flex align-items-center" data-bs-toggle="collapse" data-bs-target=".nav-menu-collapse" aria-expanded="true" aria-controls="nav-sprachen nav-main-menu">
-					<i aria-hidden="true" class="fa fa-arrow-circle-left fhc-text"></i>
-				</button>
-			</div>
-			<div class="offcanvas-body p-0">
-				<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
-					<div>
-						<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+			<div class="d-flex flex-row h-100">
+				<div class="offcanvas-body p-0">
+					<div id="nav-main-menu" class="nav-menu-collapse collapse collapse-horizontal show">
+						<div class="flex-grow-1">
+							<cis-menu-entry :highestMatchingUrlCount="highestMatchingUrlCount" :activeContent="activeEntry" v-for="entry in entries" :key="entry.content_id" :entry="entry" />
+						</div>
+					</div>
+				</div>
+				<div id="nav-main-toggle" class="d-none d-lg-block">
+					<div
+						@click="menuOpen = !menuOpen"
+						:aria-label="menuCollapseAriaLabel"
+						type="button"
+						class="h-100 d-flex align-items-center px-2"
+						data-bs-toggle="collapse"
+						data-bs-target=".nav-menu-collapse"
+						aria-expanded="true"
+						aria-controls="nav-sprachen nav-main-menu"
+					>
+						<i aria-hidden="true" class="fa-solid fa-chevron-left fhc-text"></i>
 					</div>
 				</div>
 			</div>
