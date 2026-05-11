@@ -134,26 +134,27 @@ const app = Vue.createApp({
 						childactions: []
 					}
                 }
-            }
+            },
+			windowWidth: 0,
         };
     },
-	computed: {
-		isMobile() {
-			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
-			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
-			return smallScreen;// && touchCapable;
-		},
-	},
 	provide() {
 		return {
-			isMobile: this.isMobile,
+			isNarrow: Vue.computed(() => this.windowWidth < 992),
+			isMobile: Vue.computed(() => this.windowWidth < 767),
 		}
 	},
     methods: {
         searchfunction: function(searchsettings) {
         	return this.$api.call(ApiSearchbar.searchCis(searchsettings));
-        }
+        },
+		handleWindowResize() {
+			this.windowWidth = window.innerWidth;
+		},
     },
+	created() {
+		this.windowWidth = window.innerWidth;
+	},
 	async mounted() {
 		const openOtherLvPlanAction = {
 			label: Vue.computed(() => this.$p.t("lehre/stundenplan")),
@@ -183,6 +184,10 @@ const app = Vue.createApp({
 				openOtherLvPlanAction,
 			);
 		}
+		window.addEventListener("resize", this.handleWindowResize);
+	},
+	beforeUnmount() {
+		window.removeEventListener("resize", this.handleWindowResize);
 	},
 });
 

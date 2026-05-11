@@ -94,22 +94,25 @@ export default {
 			@focusin="searchfocusin"
 			@focusout="searchfocusout"
 		>
-			<span
-				v-if="isMobile"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target=".multi-collapse"
-				aria-controls="header-searchbar-collapsible header-options-collapsible header-usermenu-collapsible"
-				aria-expanded="false"
-			 	class="d-flex flex-row align-items-center ps-3 pe-1"
-			>
-				<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left"></i>
-				<i v-else class="fa-solid fa-magnifying-glass"></i>
-			</span>
+			<slot name="collapseToggler" :isSearchShownInMobileView="isSearchShownInMobileView">
+				<span
+					v-if="isMobile"
+					type="button"
+					data-bs-toggle="collapse"
+					data-bs-target="#searchbar-collapsible"
+					aria-controls="searchbar-collapsible"
+					aria-expanded="false"
+				 	class="d-flex flex-row align-items-center pe-1"
+					style="color: white"
+				>
+					<i v-if="isSearchShownInMobileView" class="fa-solid fa-chevron-left ps-3"></i>
+					<i v-else class="fa-solid fa-magnifying-glass ps-2"></i>
+				</span>
+			</slot>
 
 			<div
 				:class="{'flex-grow-1': !isMobile, 'collapse multi-collapse collapse-horizontal': isMobile}"
-				id="header-searchbar-collapsible"
+				id="searchbar-collapsible"
 				@[\`show.bs.collapse\`]="isSearchShownInMobileView = true"
 				@[\`hidden.bs.collapse\`]="isSearchShownInMobileView = false"
 			>
@@ -117,7 +120,7 @@ export default {
 					:class="{open: showresult, closed: showresult, 'px-3': isMobile}"
 					ref="searchbox"
 					class="h-100 input-group me-2 searchbar_searchbox"
-					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInMobileView() : ''"
+					:style="isMobile ? 'width: ' + getMaxWidthOfSearchbarInNarrowView() : ''"
 				>
 					<span class="input-group-text">
 						<i class="fa-solid fa-magnifying-glass color-white"></i>
@@ -241,6 +244,11 @@ export default {
 				);
 			}
 			this.search();
+		},
+		isMobile() {
+			if (!this.isMobile) {
+				this.isSearchShownInMobileView = false;
+			}
 		},
 	},
 	mounted() {
@@ -503,7 +511,7 @@ export default {
 			}
 			return this.searchoptions.actions[res.type];
 		},
-		getMaxWidthOfSearchbarInMobileView() {
+		getMaxWidthOfSearchbarInNarrowView() {
 			// body width - hardcoded chevron width; necessary for accurate collapse transition transition
 			return (
 				document.querySelector("body").getBoundingClientRect().width -

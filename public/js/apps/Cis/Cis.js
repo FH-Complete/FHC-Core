@@ -274,25 +274,12 @@ const app = Vue.createApp({
 	name: 'CisApp',
 	data: () => ({
 		appSideMenuEntries: {},
-		uid: '',
-		isStudent: null,
-		isMitarbeiter: null
+		windowWidth: 0,
 	}),
-	components: {},
-	computed: {
-		isMobile() {
-			const smallScreen = window.matchMedia("(max-width: 767px)").matches;
-			const touchCapable = ("ontouchstart" in window) || navigator.maxTouchPoints > 0;
-			return smallScreen;// && touchCapable;
-		},
-	},
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
-			isMobile: this.isMobile,
-			uid: Vue.computed(() => this.uid),
-			isStudent: Vue.computed(() => this.isStudent),
-			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
+			isMobile: Vue.computed(() => this.windowWidth < 767),
 		}	
 	},
 	methods: {
@@ -328,23 +315,21 @@ const app = Vue.createApp({
 				this.$router.push(route);
 
 			}
-		}
+		},
+		handleWindowResize() {
+			this.windowWidth = window.innerWidth;
+		},
 	},
-	async created(){
-		await this.$api
-			.call(ApiAuthinfo.getAuthInfo())
-			.then(res => {
-				this.uid = res.data.uid;
-				this.isMitarbeiter = res.data.isMitarbeiter;
-				this.isStudent = res.data.isStudent;
-			});
+	created() {
+		this.windowWidth = window.innerWidth;
 	},
-	mounted() {
+	async mounted() {
 		document.addEventListener('click', this.handleClick);
-		
+		window.addEventListener("resize", this.handleWindowResize);
 	},
 	beforeUnmount() {
 		document.removeEventListener('click', this.handleClick);
+		window.removeEventListener("resize", this.handleWindowResize);
 	},
 });
 
