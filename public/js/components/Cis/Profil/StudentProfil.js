@@ -280,14 +280,14 @@ export default {
     <div class="row">
         <div  class="d-md-none col-12 ">
 			<!-- Bearbeiten Button -->
-			<div v-if="isEditable" class="row ">
-				<div class="col mb-3">
+			<div v-if="isEditable" class="row">
+				<div class="col mb-4">
 					<button @click="showEditProfilModal" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
-							<div class="col-2">
+							<div class="col-auto">
 								<i class="fa fa-edit"></i>
 							</div>
-							<div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
+							<div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
 						</div>
 					</button>
 				</div>
@@ -409,7 +409,7 @@ export default {
 					@tableBuilt="zutrittsgruppenTableBuilt" 
 					:title="$p.t('profil','zutrittsGruppen')" 
 					ref="zutrittsgruppenTable" 
-					:tabulator-options="zutrittsgruppen_table_options"  
+					:tabulator-options="zutrittsgruppen_table_options"
 					tableOnly 
 					:sideMenu="false" 
 					noColumnFilter />
@@ -420,14 +420,14 @@ export default {
 		<!-- START OF SIDE PANEL -->
 		<div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
 			<!-- Bearbeiten Button -->
-			<div class="row d-none d-md-block">
+			<div v-if="isEditable" class="row d-none d-md-block">
 				<div class="col mb-3">
 					<button @click="()=>showEditProfilModal()" type="button" class="card text-start  w-100 btn btn-outline-secondary" >
 						<div class="row">
-							<div class="col-2">
+							<div class="col-auto">
 								<i class="fa fa-edit"></i>
 							</div>
-							<div class="col-10">{{$p.t('ui','bearbeiten')}}</div>
+							<div class="col-auto">{{$p.t('ui','bearbeiten')}}</div>
 						</div>
 					</button>
 				</div>
