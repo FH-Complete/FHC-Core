@@ -270,7 +270,7 @@ export default {
         @hideForm="() => { isClassTimeSlotFormVisible = false; this.areClassTimeSlotsLoaded = false; this.classTimeSlots = []; fetchClassTimeSlots(); this.editedClassTimeSlots = []; }"
         class="mb-4"
       />
-      <div>
+      <div v-if="!isClassTimeSlotFormVisible">
         <h4>{{ $p.t("ui", "classScheduleValidityPeriodTimeSlots") }}</h4>
       </div>
       <transition>

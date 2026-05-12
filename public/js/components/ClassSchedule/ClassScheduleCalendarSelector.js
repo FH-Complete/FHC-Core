@@ -140,7 +140,11 @@ export default {
       currentLastSelectedElementNumber: null,
       selected: [],
       isTimeElementResizingInProgress: false,
-      currentResize: {
+      currentUpperResize: {
+        id: null,
+        overlayId: null,
+      },
+      currentLowerResize: {
         id: null,
         overlayId: null,
       },
@@ -186,13 +190,6 @@ export default {
       if (!this.$props.classroomHours) return ["08:00-08:45"];
 
       return this.$props.classroomHours;
-    },
-    trackOverlayPool() {
-      let overlaysInPool = this.$refs.overlaysContainer.children;
-      if (!overlaysInPool < 5) {
-        alert("Could not get overlays in pool");
-        return [];
-      }
     },
   },
   methods: {
@@ -584,7 +581,7 @@ export default {
       draggedItem.classList.remove("fhc-pointer-events-none");
       draggedItem.classList.add("fhc-pointer-events-all");
     },
-    handleMouseDownOnResize(event, resizeId, overlayId) {
+    handleMouseDownOnUpperResize(event, resizeId, overlayId) {
       if (this.$props.isPreviewMode) return;
 
       let isLeftMouseButton = event.buttons === 1;
@@ -592,10 +589,32 @@ export default {
 
       this.isTimeElementResizingInProgress = true;
 
-      this.currentResize = {
+      this.currentUpperResize = {
         id: resizeId,
         overlayId: overlayId,
       };
+
+      this.resetCurrentLowerResize();
+
+      this.getOverlayElementByOverlayId(overlayId).setAttribute(
+        "draggable",
+        "false",
+      );
+    },
+    handleMouseDownOnLowerResize(event, resizeId, overlayId) {
+      if (this.$props.isPreviewMode) return;
+
+      let isLeftMouseButton = event.buttons === 1;
+      if (!isLeftMouseButton) return;
+
+      this.isTimeElementResizingInProgress = true;
+
+      this.currentLowerResize = {
+        id: resizeId,
+        overlayId: overlayId,
+      };
+
+      this.resetCurrentUpperResize();
 
       this.getOverlayElementByOverlayId(overlayId).setAttribute(
         "draggable",
@@ -610,13 +629,40 @@ export default {
         return;
       }
 
-      let overlayElement1 = this.getOverlayElementByOverlayId(
-        this.currentResize.overlayId,
+      if (
+        this.currentUpperResize.id === null &&
+        this.currentLowerResize.id === null
+      ) {
+        return;
+      }
+
+      let isUpperResizeMoving = this.currentUpperResize.id !== null;
+
+      let overlayId = isUpperResizeMoving
+        ? this.currentUpperResize.overlayId
+        : this.currentLowerResize.overlayId;
+      let overlay = this.overlays.find((overlay) => overlay.id === overlayId);
+      if (!overlay) return;
+
+      let overlayElement = this.getOverlayElementByOverlayId(overlayId);
+      if (!overlayElement) return;
+
+      let overlayTop = parseInt(overlayElement.getBoundingClientRect().top);
+      let overlayBottom = parseInt(
+        overlayElement.getBoundingClientRect().bottom,
       );
-      let overlayTop = parseInt(overlayElement1.getBoundingClientRect().top);
+
       let mouseY = event.clientY;
 
-      if (mouseY < overlayTop + 5) {
+      let randomTimeSlotElement = this.getElementByDataNumber(
+        overlay.startingTimeSlotElementNumber,
+      );
+      let randomTimeSlotElementHeight =
+        randomTimeSlotElement.getBoundingClientRect().height;
+
+      let overlayHeight = overlayBottom - overlayTop;
+
+      if (overlayHeight < randomTimeSlotElementHeight) {
         this.isTimeElementResizingInProgress = false;
 
         this.oldMousePosition.x = null;
@@ -626,37 +672,55 @@ export default {
         );
         this.handleMouseUpOnResizeColumn(event);
 
-        let currentStartingTimeSlotElement = this.getElementByDataNumber(
-          this.overlays.find(
-            (overlay) => overlay.id === this.currentResize.overlayId,
-          ).startingTimeSlotElementNumber,
-        );
-        if (!currentStartingTimeSlotElement) return;
+        let currentAnchorTimeSlotElement = isUpperResizeMoving
+          ? this.getElementByDataNumber(overlay.endingTimeSlotElementNumber)
+          : this.getElementByDataNumber(overlay.startingTimeSlotElementNumber);
+        if (!currentAnchorTimeSlotElement) return;
 
-        const rect = currentStartingTimeSlotElement.getBoundingClientRect();
-        const resizeRect = overlayElement1.getBoundingClientRect();
-        const deltaY = rect.bottom - resizeRect.bottom;
+        const rect = currentAnchorTimeSlotElement.getBoundingClientRect();
+        const resizeRect = overlayElement.getBoundingClientRect();
 
-        overlayElement1.style.height =
-          parseInt(overlayElement1.style.height) + deltaY + "px";
+        let deltaY = null;
+        if (isUpperResizeMoving) {
+          deltaY = rect.top - resizeRect.top;
+          overlayElement.style.top =
+            parseInt(overlayElement.style.top) + deltaY + "px";
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) - deltaY + "px";
+        } else {
+          deltaY = rect.bottom - resizeRect.bottom;
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) + deltaY + "px";
+        }
 
         this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResize.overlayId) {
+          if (overlay.id !== overlayId) return overlay;
+
+          if (isUpperResizeMoving) {
+            overlay.startingTimeSlotElementNumber = this.getElementDataNumber(
+              currentAnchorTimeSlotElement,
+            );
+            overlay.startingTimeSlot = this.getTimeSlotItemByDataNumber(
+              this.getElementDataNumber(currentAnchorTimeSlotElement),
+            );
+          } else {
             overlay.endingTimeSlotElementNumber = this.getElementDataNumber(
-              currentStartingTimeSlotElement,
+              currentAnchorTimeSlotElement,
             );
             overlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
-              this.getElementDataNumber(currentStartingTimeSlotElement),
+              this.getElementDataNumber(currentAnchorTimeSlotElement),
             );
-            return overlay;
           }
+
           return overlay;
         });
 
-        this.currentResize = {
-          id: null,
-          overlayId: null,
-        };
+        if (isUpperResizeMoving) {
+          this.resetCurrentUpperResize();
+        } else {
+          this.resetCurrentLowerResize();
+        }
+
         return;
       }
 
@@ -668,12 +732,11 @@ export default {
         return;
       }
 
-      const resizeElement = this.getResizeElementById(this.currentResize.id);
-      const overlayElement = this.getOverlayElementByOverlayId(
-        this.currentResize.overlayId,
-      );
-
-      if (!resizeElement || !overlayElement) return;
+      let resizeElementId = isUpperResizeMoving
+        ? this.currentUpperResize.id
+        : this.currentLowerResize.id;
+      const resizeElement = this.getResizeElementById(resizeElementId);
+      if (!resizeElement) return;
 
       const newMousePosition = {
         x: event.clientX,
@@ -684,13 +747,27 @@ export default {
       if (deltaY > 0) {
         resizeElement.style.bottom =
           parseInt(resizeElement.style.bottom || 0) - deltaY + "px";
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
+        if (!isUpperResizeMoving) {
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) + deltaY + "px";
+        } else {
+          overlayElement.style.top =
+            parseInt(overlayElement.style.top) + deltaY + "px";
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) - deltaY + "px";
+        }
       } else {
         resizeElement.style.bottom =
           parseInt(resizeElement.style.bottom || 0) - deltaY + "px";
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
+        if (!isUpperResizeMoving) {
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) + deltaY + "px";
+        } else {
+          overlayElement.style.top =
+            parseInt(overlayElement.style.top) + deltaY + "px";
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) - deltaY + "px";
+        }
       }
 
       this.oldMousePosition.x = newMousePosition.x;
@@ -710,20 +787,36 @@ export default {
       this.isTimeElementResizingInProgress = false;
       this.removeGridLinePointerEvents();
 
-      const resizeElement = this.getResizeElementById(this.currentResize.id);
-      const overlayElement = this.getOverlayElementByOverlayId(
-        this.currentResize.overlayId,
-      );
+      let isUpperResizeMoving = this.currentUpperResize.id !== null;
 
-      if (!resizeElement || !overlayElement) {
+      let resizeElementId = isUpperResizeMoving
+        ? this.currentUpperResize.id
+        : this.currentLowerResize.id;
+      const resizeElement = this.getResizeElementById(resizeElementId);
+      if (!resizeElement) {
         this.oldMousePosition.x = null;
         this.oldMousePosition.y = null;
         return;
       }
 
-      let editedOverlay = this.overlays.find(
-        (overlay) => overlay.id === this.currentResize.overlayId,
+      const editedOverlayId = isUpperResizeMoving
+        ? this.currentUpperResize.overlayId
+        : this.currentLowerResize.overlayId;
+      const overlayElement = this.getOverlayElementByOverlayId(editedOverlayId);
+      if (!overlayElement) {
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+        return;
+      }
+
+      const editedOverlay = this.overlays.find(
+        (overlay) => overlay.id === editedOverlayId,
       );
+      if (!editedOverlay) {
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+        return;
+      }
 
       let closestPartBody =
         this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
@@ -734,27 +827,41 @@ export default {
         const closestPartBodyNumber =
           this.getElementDataNumber(closestPartBody);
 
-        let firstSkippedOverElement = this.overlays.find((overlay) => {
-          if (overlay.id === this.currentResize.overlayId) return false;
+        let firstSkippedOverOverlay = this.overlays.find((overlay) => {
+          if (overlay.id === editedOverlayId) return false;
 
           if (
             editedOverlay.startingTimeSlotElementNumber <=
               overlay.startingTimeSlotElementNumber &&
-            closestPartBodyNumber >= overlay.startingTimeSlotElementNumber
+            closestPartBodyNumber >= overlay.startingTimeSlotElementNumber &&
+            !isUpperResizeMoving
           ) {
             return true;
           }
+
+          if (
+            editedOverlay.startingTimeSlotElementNumber >=
+              overlay.startingTimeSlotElementNumber &&
+            closestPartBodyNumber <= overlay.endingTimeSlotElementNumber &&
+            isUpperResizeMoving
+          ) {
+            return true;
+          }
+
           return false;
         });
 
-        if (firstSkippedOverElement) {
+        if (firstSkippedOverOverlay) {
           this.$fhcAlert.alertError(
             this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
           );
-          let elementBeforeFirstSkippedOverElement =
-            this.getElementByDataNumber(
-              firstSkippedOverElement.startingTimeSlotElementNumber - 1,
-            );
+          let elementBeforeFirstSkippedOverElement = isUpperResizeMoving
+            ? this.getElementByDataNumber(
+                firstSkippedOverOverlay.endingTimeSlotElementNumber + 1,
+              )
+            : this.getElementByDataNumber(
+                firstSkippedOverOverlay.startingTimeSlotElementNumber - 1,
+              );
           if (!elementBeforeFirstSkippedOverElement) return;
 
           let elementBeforeFirstSkippedOverElementNumber =
@@ -763,19 +870,37 @@ export default {
           const rect =
             elementBeforeFirstSkippedOverElement.getBoundingClientRect();
           const resizeRect = resizeElement.getBoundingClientRect();
-          const deltaY = rect.bottom - resizeRect.bottom;
 
-          overlayElement.style.height =
-            parseInt(overlayElement.style.height) + deltaY + "px";
+          let deltaY = null;
+          if (isUpperResizeMoving) {
+            deltaY = rect.top - resizeRect.top;
+            overlayElement.style.top =
+              parseInt(overlayElement.style.top) + deltaY + "px";
+            overlayElement.style.height =
+              parseInt(overlayElement.style.height) - deltaY + "px";
+          } else {
+            deltaY = rect.bottom - resizeRect.bottom;
+            overlayElement.style.height =
+              parseInt(overlayElement.style.height) + deltaY + "px";
+          }
 
           this.overlays = this.overlays.map((overlay) => {
-            if (overlay.id === this.currentResize.overlayId) {
+            if (overlay.id !== editedOverlayId) return overlay;
+
+            if (isUpperResizeMoving) {
+              overlay.startingTimeSlotElementNumber =
+                elementBeforeFirstSkippedOverElementNumber;
+              overlay.startingTimeSlot = this.getTimeSlotItemByDataNumber(
+                elementBeforeFirstSkippedOverElementNumber,
+              );
+            } else {
               overlay.endingTimeSlotElementNumber =
                 elementBeforeFirstSkippedOverElementNumber;
               overlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
                 elementBeforeFirstSkippedOverElementNumber,
               );
             }
+
             return overlay;
           });
 
@@ -786,20 +911,37 @@ export default {
         }
         const rect = closestPartBody.getBoundingClientRect();
         const resizeRect = resizeElement.getBoundingClientRect();
-        const deltaY = rect.bottom - resizeRect.bottom;
 
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
+        let deltaY = null;
+        if (isUpperResizeMoving) {
+          deltaY = rect.top - resizeRect.top;
+        } else {
+          deltaY = rect.bottom - resizeRect.bottom;
+        }
+
+        if (!isUpperResizeMoving) {
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) + deltaY + "px";
+        } else {
+          overlayElement.style.top =
+            parseInt(overlayElement.style.top) + deltaY + "px";
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) - deltaY + "px";
+        }
+
+        const closestPartBodyTimeSlot = this.getTimeSlotItemByDataNumber(
+          closestPartBodyNumber,
+        );
 
         this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResize.overlayId) {
-            const closestPartBodyTimeSlot = this.getTimeSlotItemByDataNumber(
-              closestPartBodyNumber,
-            );
+          if (overlay.id !== editedOverlayId) return overlay;
 
+          if (isUpperResizeMoving) {
+            overlay.startingTimeSlotElementNumber = closestPartBodyNumber;
+            overlay.startingTimeSlot = closestPartBodyTimeSlot;
+          } else {
             overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
             overlay.endingTimeSlot = closestPartBodyTimeSlot;
-            return overlay;
           }
           return overlay;
         });
@@ -808,14 +950,10 @@ export default {
       this.oldMousePosition.x = null;
       this.oldMousePosition.y = null;
 
-      this.getOverlayElementByOverlayId(
-        this.currentResize.overlayId,
-      ).setAttribute("draggable", "true");
+      overlayElement.setAttribute("draggable", "true");
 
-      this.currentResize = {
-        id: null,
-        overlayId: null,
-      };
+      this.resetCurrentUpperResize();
+      this.resetCurrentLowerResize();
     },
     async handleMouseOverOnOverlay(overlayId) {
       if (this.$props.isPreviewMode) return;
@@ -861,8 +999,8 @@ export default {
       }
 
       if (this.isTimeElementResizingInProgress) {
-        let overlayElement1 = this.getOverlayElementByOverlayId(
-          this.currentResize.overlayId,
+        let overlayElement = this.getOverlayElementByOverlayId(
+          this.currentLowerResize.overlayId,
         );
 
         this.isTimeElementResizingInProgress = false;
@@ -880,20 +1018,20 @@ export default {
 
         let previousEndingTimeSlotElement = this.getElementByDataNumber(
           this.overlays.find(
-            (overlay) => overlay.id === this.currentResize.overlayId,
+            (overlay) => overlay.id === this.currentLowerResize.overlayId,
           ).endingTimeSlotElementNumber,
         );
         if (!previousEndingTimeSlotElement) return;
 
         const rect = previousEndingTimeSlotElement.getBoundingClientRect();
-        const resizeRect = overlayElement1.getBoundingClientRect();
+        const resizeRect = overlayElement.getBoundingClientRect();
         const deltaY = rect.bottom - resizeRect.bottom;
 
-        overlayElement1.style.height =
-          parseInt(overlayElement1.style.height) + deltaY + "px";
+        overlayElement.style.height =
+          parseInt(overlayElement.style.height) + deltaY + "px";
 
         this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResize.overlayId) {
+          if (overlay.id === this.currentLowerResize.overlayId) {
             overlay.endingTimeSlotElementNumber = this.getElementDataNumber(
               previousEndingTimeSlotElement,
             );
@@ -908,10 +1046,10 @@ export default {
         this.addGridLinePointerEvents();
 
         this.getOverlayElementByOverlayId(
-          this.currentResize.overlayId,
+          this.currentLowerResize.overlayId,
         ).setAttribute("draggable", "true");
 
-        this.currentResize = {
+        this.currentLowerResize = {
           id: null,
           overlayId: null,
         };
@@ -928,7 +1066,6 @@ export default {
 
       overlayElement = this.$refs.overlaysContainer.children[0];
       if (!overlayElement) {
-        console.error("Could not find overlay element");
         return;
       }
 
@@ -971,7 +1108,6 @@ export default {
         this.$fhcAlert.alertError(
           this.$p.t("ui", "classTimeSlotMultipleWeeksSelectedErrorMessage"),
         );
-        console.error(error);
         return;
       }
 
@@ -1072,6 +1208,7 @@ export default {
     },
     isOverlayMinimallySized(overlay) {
       if (!overlay) return false;
+
       if (
         !overlay.startingTimeSlotElementNumber ||
         !overlay.endingTimeSlotElementNumber
@@ -1079,10 +1216,11 @@ export default {
         return false;
       }
 
-      return (
-        overlay.startingTimeSlotElementNumber ===
-        overlay.endingTimeSlotElementNumber
-      );
+      let difference =
+        overlay.endingTimeSlotElementNumber -
+        overlay.startingTimeSlotElementNumber;
+
+      return difference < 1;
     },
     getLineNumberFromSelectedElementNumber(selectedElementNumber) {
       let timeSlotsCount = this.timeSlotsInDay.length;
@@ -1357,6 +1495,18 @@ export default {
           element.remove();
         });
     },
+    resetCurrentUpperResize() {
+      this.currentUpperResize = {
+        id: null,
+        overlayId: null,
+      };
+    },
+    resetCurrentLowerResize() {
+      this.currentLowerResize = {
+        id: null,
+        overlayId: null,
+      };
+    },
   },
   unmounted() {
     this.hideOverlayClassTimeTypePopover();
@@ -1428,7 +1578,7 @@ export default {
             >
               <div v-for="(timeSlot, index) in timeSlotsInDay" :key="index" class="part-header" :style="'grid-area: ps_' + index + ' / 1 / pe_' + index">
                 <div
-                  :class="$props.isPreviewMode ? 'py-0' : 'py-2'"
+                  :class="$props.isPreviewMode ? 'py-2' : 'py-2'"
                   class="d-flex gap-1"
                 >
                   <span>{{ timeSlot.split('-')[0] }}</span><span>-</span><span>{{ timeSlot.split('-')[1] }}</span>
@@ -1627,14 +1777,29 @@ export default {
         class="d-none fhc-pointer-events-all flex-column justify-content-between align-items-center shadow rounded-1"
         :draggable='!$props.isPreviewMode ? "true" : "false"'
       >
+      <span
+        v-if="!$props.isPreviewMode"
+        @mousedown.stop="handleMouseDownOnUpperResize($event, 'overlay-item-resize-upper-' + index, 'overlay-item-' + index)"
+        :id="'overlay-item-resize-upper-' + index"
+        :class="{
+              'position-absolute top-0 start-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
+            }"
+        class="d-flex justify-content-center p-1 fhc-resize-vertical fhc-w-fit"
+      >
+        <i class="fa-solid fa-grip-lines"></i>
+      </span>
       <div 
-        class="d-flex flex-column justify-content-center align-items-center gap-1 p-2 overflow-scroll"
+        class="d-flex flex-column justify-content-center align-items-center gap-1 p-0 overflow-scroll h-100"
         >
         <a 
           v-if="!$props.isPreviewMode"
           @mousedown.stop="showOverlayClassTimeTypePopover('overlay-item-' + index)"
           :title="$p.t('ui', 'bearbeiten')"
-          class="position-absolute top-0 start-0 p-1 d-flex gap-1 fhc-cursor-pointer"
+          :class="{
+            'bottom-0 end-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
+            'top-0 start-0': !isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
+          }"
+          class="position-absolute  p-1 d-flex gap-1 fhc-cursor-pointer"
           >
           <i class="fa fa-edit text-primary fs-6"></i>
         </a>
@@ -1661,10 +1826,10 @@ export default {
       </div>
       <span
         v-if="!$props.isPreviewMode"
-        @mousedown.stop="handleMouseDownOnResize($event, 'overlay-item-resize-' + index, 'overlay-item-' + index)"
-        :id="'overlay-item-resize-' + index"
+        @mousedown.stop="handleMouseDownOnLowerResize($event, 'overlay-item-resize-lower-' + index, 'overlay-item-' + index)"
+        :id="'overlay-item-resize-lower-' + index"
         :class="{
-              'position-absolute bottom-0 end-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
+              'position-absolute bottom-0 start-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
             }"
         class="d-flex justify-content-center p-1 fhc-resize-vertical fhc-w-fit"
       >
