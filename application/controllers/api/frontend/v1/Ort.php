@@ -36,7 +36,9 @@ class Ort extends FHCAPI_Controller
 			'ContentID' => self::PERM_LOGGED,
 			'getOrtKurzbzContent' => self::PERM_LOGGED,
 			'getRooms' => self::PERM_LOGGED,
-			'getTypes' => self::PERM_LOGGED
+			'getTypes' => self::PERM_LOGGED,
+			'getRoomsWithEmployeesAssigned' => 'basis/ort:r',
+			'getEmployeesWithRoomAssigned' => 'basis/ort:r'
 		]);
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
@@ -173,6 +175,43 @@ class Ort extends FHCAPI_Controller
 		$content = hasData($content) ? getData($content) : null;
 
 		$this->terminateWithSuccess($content);
+	}
+
+	public function getRoomsWithEmployeesAssigned($ort_kurzbz=null)
+	{
+		$res = $this->OrtModel->getRoomsWithEmployeesAssigned($ort_kurzbz);
+
+		if (isError($res))
+		{
+			$this->terminateWithError(getError($res));
+		}
+
+		$data = hasData($res) ? getData($res) : [];
+		$this->json_decode_db_res($data);
+		$this->terminateWithSuccess($data);
+	}
+
+	public function getEmployeesWithRoomAssigned($mitarbeiter_uid=null)
+	{
+		$res = $this->OrtModel->getEmployeesWithRoomAssigned($mitarbeiter_uid);
+
+		if (isError($res))
+		{
+			$this->terminateWithError(getError($res));
+		}
+
+		$data = hasData($res) ? getData($res) : [];
+		$this->json_decode_db_res($data);
+		$this->terminateWithSuccess($data);
+	}
+
+	protected function json_decode_db_res(&$data)
+	{
+		array_walk($data, function($item, $key) {
+			isset($item->employees) && $item->employees = json_decode($item->employees);
+			isset($item->employee) && $item->employee = json_decode($item->employee);
+			isset($item->room) && $item->room = json_decode($item->room);
+		});
 	}
 }
 
