@@ -78,52 +78,32 @@ class Dokumente extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('ui', 'errorMissingValue', ['value' => 'Studiengang_kz']), self::ERROR_TYPE_GENERAL);
 
 		$resultPreDoc = $this->_getPrestudentDokumente($prestudent_id);
-
-		$arrayAccepted = [];
 		$person_id = $this->_getPersonId($prestudent_id);
 
-		$docNames = array_map(function ($item) {
-			return $item->dokument_kurzbz;
-		}, $resultPreDoc);
+		$mergedArray = [];
 
-		foreach($docNames as $doc)
+		foreach ($resultPreDoc as $pre)
 		{
-			$result = $this->AkteModel->getAktenFAS($person_id, $doc, $studiengang_kz, $prestudent_id, true);
+			$result = $this->AkteModel->getAktenFAS($person_id, $pre->dokument_kurzbz, $studiengang_kz, $prestudent_id, true);
 
 			if (isError($result))
-			{
 				return $this->terminateWithError($result, self::ERROR_TYPE_GENERAL);
-			}
+
 			if (hasData($result))
 			{
-				$data = getData($result);
-				foreach ($data as $value)
+				foreach (getData($result) as $doc)
 				{
-					array_push($arrayAccepted, $value);
+					$merged = clone $doc;
+					$merged->docdatum = $pre->docdatum;
+					$merged->insertvonma = $pre->insertvonma;
+					$merged->bezeichnung = $pre->bezeichnung;
+					$mergedArray[] = $merged;
 				}
 			}
-		}
-
-		//Mapping with document_kurzbz
-		$preDocMap = [];
-		foreach ($resultPreDoc as $pre) {
-			$preDocMap[$pre->dokument_kurzbz] = $pre;
-		}
-
-		$mergedArray = [];
-		foreach ($arrayAccepted as $doc) {
-			$merged = clone $doc;
-
-			if (isset($preDocMap[$doc->dokument_kurzbz])) {
-				$merged->docdatum = $preDocMap[$doc->dokument_kurzbz]->docdatum;
-				$merged->insertvonma = $preDocMap[$doc->dokument_kurzbz]->insertvonma;
-				$merged->bezeichnung = $preDocMap[$doc->dokument_kurzbz]->bezeichnung;
-			} else {
-				$merged->akzeptiertdatum = null;
-				$merged->akzeptiertvon = null;
+			else
+			{
+				$mergedArray[] = $pre;
 			}
-
-			$mergedArray[] = $merged;
 		}
 
 		$this->terminateWithSuccess($mergedArray);
