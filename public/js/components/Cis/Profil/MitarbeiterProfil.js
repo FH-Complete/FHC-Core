@@ -338,9 +338,9 @@ export default {
 <div class="container-fluid text-break fhc-form"  >
     <edit-profil v-if="showModal" ref="editModal" :isMitarbeiter="true" @hideBsModal="hideEditProfilModal" :value="JSON.parse(JSON.stringify(filteredEditData))" :titel="$p.t('profil','profilBearbeiten')"></edit-profil>
     <div class="row">
-        <div  class="d-md-none col-12 ">
-            <!-- Bearbeiten Button -->
-            <div v-if="isEditable" class="row mb-3 ">
+		<div class="d-md-none col-12">
+			<!-- Bearbeiten Button -->
+            <div v-if="isEditable" class="row mb-4">
                 <div class="col">
                     <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">
@@ -352,9 +352,9 @@ export default {
                     </button>
                 </div>
             </div>
+			<!-- MOBILE PROFIL UPDATES -->
             <div v-if="data.profilUpdates" class="row mb-3">
                 <div class="col">
-                    <!-- MOBILE PROFIL UPDATES -->
                     <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates"  :data="data.profilUpdates" ></fetch-profil-updates>
                 </div>
             </div>
@@ -367,30 +367,42 @@ export default {
             <!-- ROW WITH THE PROFIL INFORMATION -->
             <div class="row mb-4">
                 <div  class="col-lg-12 col-xl-6 ">
+					<!-- PROFIL INFORMATION -->
                     <div class="row mb-4">
                         <div class="col">
-                            <!-- PROFIL INFORMATION -->
                             <profil-information @showEditProfilModal="showEditProfilModal" :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
+					<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+					<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+						<div class="col">
+							<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+						</div>
+					</div>
+					<!-- CALENDAR SYNC OPTIONS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+					<div class="row mb-4 d-md-none">
+            		    <div class="col">
+							<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
+            		    </div>
+					</div>
+					<!-- MITARBEITER INFO -->
                     <div class="row mb-4">
                         <div  class=" col-lg-12">
-                            <!-- MITARBEITER INFO -->
                             <role-information :title="$p.t('profil','mitarbeiterInformation')" :data="roleInformation"></role-information>
                         </div>
                     </div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                 </div>
                 <div  class="col-xl-6 col-lg-12 ">
+					<!-- EMAILS -->
                     <div class="row mb-4">
                         <div class="col">
-                            <!-- EMAILS -->
                             <profil-emails :title="this.$p.t('person','email')" :data="data.emails" ></profil-emails>
                         </div>
                     </div>
+					<!-- PRIVATE KONTAKTE-->
                     <div class="row mb-4 ">
                         <div class="col">
-                            <!-- PRIVATE KONTAKTE-->
                             <div class="card">
                                 <div class="card-header">
                                     <div class="row">
@@ -412,9 +424,9 @@ export default {
                             </div>
                         </div>
                     </div>
+					<!-- PRIVATE ADRESSEN-->
                     <div class="row mb-4">
                         <div class="col">
-                            <!-- PRIVATE ADRESSEN-->
                             <div class="card">
                                 <div class="card-header">
                                     <div class="row">
@@ -439,8 +451,8 @@ export default {
                 </div>
             </div  >
             <div class="row">
+				<!-- FUNKTIONEN TABELLE -->
                 <div class="col-12 mb-4" >
-                    <!-- FUNKTIONEN TABELLE -->
                     <core-filter-cmpt
 						v-if="arePhrasesPreloaded"
                     	@tableBuilt="funktionenTableBuilt"
@@ -451,8 +463,8 @@ export default {
 						:sideMenu="false"
                      />
                 </div>
+				<!-- BETRIEBSMITTEL TABELLE -->
                 <div class="col-12 mb-4" >
-                    <!-- BETRIEBSMITTEL TABELLE -->
                     <core-filter-cmpt
 						v-if="arePhrasesPreloaded"
                     	@tableBuilt="betriebsmittelTableBuilt"
@@ -467,13 +479,8 @@ export default {
         </div>
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-			<div v-if="quickLinks.length" class="row mb-4">
-				<div class="col">
-					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
-				</div>
-			</div>
             <!-- Bearbeiten Button -->
-            <div class="row d-none d-md-block ">
+            <div v-if="isEditable" class="row d-none d-md-block ">
                 <div class="col mb-3">
                     <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">
@@ -485,29 +492,36 @@ export default {
                     </button>
                 </div>
             </div>
-            <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
-                <div class="col mb-3">
-                    <!-- PROFIL UPDATES -->
-                    <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
-                </div>
-            </div>
-            <div class="row mb-3" >
-                <div class="col-12">
-                    <!-- AUSWEIS STATUS -->
-                    <ausweis-status :data="data.zutrittsdatum"></ausweis-status>
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col">
-                    <!-- MAILVERTEILER -->
-                    <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
-                </div>
-            </div>
-			<div class="row">
+			<!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
+				<div class="col">
+					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+				</div>
+			</div>
+			<!-- CALENDAR SYNC OPTIONS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div class="row mb-3 d-none d-md-block">
                 <div class="col">
 					<calendar-sync :uid="$props.data.username" :calendarSyncUrls="$props.calendarSyncUrls"></calendar-sync>
                 </div>
 			</div>
+			<!-- PROFIL UPDATES -->
+            <div v-if="data.profilUpdates" class="row d-none d-md-block mb-3">
+                <div class="col mb-3">
+                    <fetch-profil-updates v-if="data.profilUpdates && data.profilUpdates.length" @fetchUpdates="fetchProfilUpdates" :data="data.profilUpdates"></fetch-profil-updates>
+                </div>
+            </div>
+			<!-- AUSWEIS STATUS -->
+            <div class="row mb-3" >
+                <div class="col-12">
+                    <ausweis-status :data="data.zutrittsdatum"></ausweis-status>
+                </div>
+            </div>
+			<!-- MAILVERTEILER -->
+            <div class="row mb-3">
+                <div class="col">
+                    <mailverteiler  :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
+                </div>
+            </div>
         </div>
     </div>
 </div>

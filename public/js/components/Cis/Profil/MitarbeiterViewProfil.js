@@ -225,15 +225,6 @@ export default {
 <div class="container-fluid text-break fhc-form"  >
     <!-- ROW -->
     <div class="row">
-        <!-- HIDDEN QUICK LINKS -->
-        <!-- TODO: uncomment when implemented
-            <div  class="d-md-none col-12 ">
-
-            <quick-links :title="$p.t('profil','quickLinks')" :mobile="true" ></quick-links>
-
-            </div>
-            -->
-        <!-- END OF HIDDEN QUCK LINKS -->
         <!-- MAIN PANNEL -->
         <div class="col-sm-12 col-md-8 col-xxl-9 ">
             <!-- ROW WITH PROFIL IMAGE AND INFORMATION -->
@@ -242,27 +233,33 @@ export default {
             <div class="row mb-4">
                 <!-- FIRST KAESTCHEN -->
                 <div  class="col-lg-12 col-xl-6 ">
+					<!-- Profil Informationen -->
                     <div class="row mb-4">
                         <div class="col">
-                            <!-- Profil Informationen -->
                             <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
+					<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+					<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+						<div class="col">
+							<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+						</div>
+					</div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                     <!-- END OF PROFIL INFORMATION ROW -->
                     <!-- INFORMATION CONTENT END -->
                 </div>
                 <div  class="col-xl-6 col-lg-12 ">
+					<!-- EMAILS -->
                     <div class="row mb-4">
                         <div class="col">
-                            <!-- EMAILS -->
                             <profil-emails :title="this.$p.t('person','email')" :data="personEmails"></profil-emails>
                         </div>
                     </div>
                     <!-- SECOND ROW OF SECOND COLUMN IN MAIN CONTENT -->
+					<!-- roleInformation -->
                     <div class="row mb-4">
                         <div  class=" col-lg-12">
-                            <!-- roleInformation -->
                             <role-information :data="roleInformation" :title="$p.t('profil','mitarbeiterInformation')"></role-information>
                         </div>
                     </div>
@@ -284,15 +281,15 @@ export default {
         </div>
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
-            <!-- VISIBLE UNTIL VIEWPORT MD -->
-			<div v-if="quickLinks.length" class="row mb-4">
+			<!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
 				<div class="col">
 					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
 				</div>
 			</div>
+			<!-- MAILVERTEILER -->
 			<div class="row">
 				<div class="col">
-					<!-- MAILVERTEILER -->
 					<mailverteiler :data="data?.mailverteiler" :title="$p.t('profil','mailverteiler')"></mailverteiler>
 				</div>
 			</div>

@@ -2,6 +2,8 @@ import MylvSemesterStudiengangLv from "./Studiengang/Lv.js";
 import MylvSemesterStudiengangAverageGrade from "./Studiengang/AverageGrade.js";
 import Phrasen from "../../../../mixins/Phrasen.js";
 
+import ApiAuthinfo from '../../../../api/factory/authinfo.js';
+
 export default {
 	name: 'Studiengang',
 	components: {
@@ -19,6 +21,11 @@ export default {
 		lvs: Array,
 		sg_bezeichnung_eng: String
 	},
+	data() {
+		return {
+			isAverageGradeDisplayed: false,
+		}
+	},
 	computed: {
 		lehrveranstaltungen() {
 			return [... new Map(
@@ -34,6 +41,14 @@ export default {
 		note(lv) {
 			return lv.benotung ? lv.znote || lv.lvnote || null : null;
 		},
+		async checkIfAverageGradeIsDisplayed() {
+			const authInfoResponse = await this.$api.call(ApiAuthinfo.getAuthInfo());
+			const authInfo = authInfoResponse.data;
+			this.isAverageGradeDisplayed = !!authInfo.isStudent;
+		},
+	},
+	created() {
+		this.checkIfAverageGradeIsDisplayed();
 	},
 	template: `
 	<div class="card mb-3">
@@ -46,7 +61,7 @@ export default {
 					<mylv-semester-studiengang-lv v-bind="lv" class="text-center h-100"></mylv-semester-studiengang-lv>
 				</div>
 			</div>
-			<mylv-semester-studiengang-average-grade :semesterInfo="$props.semesterInfo" />
+			<mylv-semester-studiengang-average-grade v-if="isAverageGradeDisplayed" :semesterInfo="$props.semesterInfo" />
 		</div>
 	</div>`
 };
