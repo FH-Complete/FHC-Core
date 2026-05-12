@@ -36,16 +36,9 @@ export default {
   watch: {
     editedOverlays: {
       async handler(newVal) {
-        this.overlays = [];
-
-        this.$refs.calendarContainer
-          ?.querySelectorAll("div[id^='overlay-']")
-          .forEach((element) => {
-            element.remove();
-          });
+        this.removeAllDisplayedOverlayElements();
 
         await this.$nextTick();
-
 
         await newVal
           .map((slot) => {
@@ -67,14 +60,12 @@ export default {
               (overlay.weekday - 1) * this.timeSlotsInDay.length +
               this.timeSlotsInDay.indexOf(overlay.endingTimeSlot);
 
-            let firstSelectedElement =
-              this.$refs.calendarSelectorContainer.querySelector(
-                "div[data-number='" + firstElementDataNumber + "']",
-              );
-            let lastSelectedElement =
-              this.$refs.calendarSelectorContainer.querySelector(
-                "div[data-number='" + lastElementDataNumber + "']",
-              );
+            let firstSelectedElement = this.getElementByDataNumber(
+              firstElementDataNumber,
+            );
+            let lastSelectedElement = this.getElementByDataNumber(
+              lastElementDataNumber,
+            );
 
             if (!firstSelectedElement || !lastSelectedElement) {
               this.$fhcAlert.alertError(
@@ -88,21 +79,14 @@ export default {
             lastSelectedElement.style.backgroundColor =
               this.selectedTimeSlotLabelColor;
 
-            this.currentFirstSelectedElementNumber = firstSelectedElement
-              ? parseInt(firstSelectedElement.getAttribute("data-number"))
-              : null;
+            this.currentFirstSelectedElementNumber =
+              this.getElementDataNumber(firstSelectedElement);
+            this.currentLastSelectedElementNumber =
+              this.getElementDataNumber(lastSelectedElement);
 
-            this.currentLastSelectedElementNumber = lastSelectedElement
-              ? parseInt(lastSelectedElement.getAttribute("data-number"))
-              : null;
+            await this.createOverlay();
 
-            await this.createOverlay(1);
-
-            this.$refs.calendarSelectorContainer
-              .querySelectorAll("div[class*='part-body']")
-              .forEach((child) => {
-                child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-              });
+            this.resetPartBodiesBackgroundColor();
 
             this.currentFirstSelectedElementNumber = null;
             this.currentLastSelectedElementNumber = null;
@@ -156,7 +140,7 @@ export default {
       currentLastSelectedElementNumber: null,
       selected: [],
       isTimeElementResizingInProgress: false,
-      currentResizer: {
+      currentResize: {
         id: null,
         overlayId: null,
       },
@@ -183,14 +167,12 @@ export default {
       )
         return null;
 
-      const firstTimeSlot =
-        this.timeSlotsInDay[
-          this.currentFirstSelectedElementNumber % this.timeSlotsInDay.length
-        ];
-      const lastTimeSlot =
-        this.timeSlotsInDay[
-          this.currentLastSelectedElementNumber % this.timeSlotsInDay.length
-        ];
+      const firstTimeSlot = this.getTimeSlotItemByDataNumber(
+        this.currentFirstSelectedElementNumber,
+      );
+      const lastTimeSlot = this.getTimeSlotItemByDataNumber(
+        this.currentLastSelectedElementNumber,
+      );
 
       let firstTimeSlotFragment = firstTimeSlot.split("-")[0];
       let lastTimeSlotFragment = lastTimeSlot.split("-")[1];
@@ -214,7 +196,732 @@ export default {
     },
   },
   methods: {
-    async createOverlay(test) {
+    handleMouseDown(event) {
+      if (this.$props.isPreviewMode) return;
+
+      let isLeftMouseButton = event.buttons === 1;
+      if (!isLeftMouseButton) return;
+
+      this.isTimeElementCreationInProgress = true;
+
+      let parent =
+        this.$refs.calendarSelectorContainer.querySelector(".grid-body");
+      if (!parent.contains(event.target)) {
+        this.isTimeElementCreationInProgress = false;
+        return;
+      }
+
+      let closestXPartBody =
+        this.getXClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          event.clientX,
+        );
+      if (!closestXPartBody) return;
+
+      let closestXPartBodyNumber = this.getElementDataNumber(closestXPartBody);
+
+      let weekday = this.getWeekdayByElementDataNumber(closestXPartBodyNumber);
+      if (!weekday) {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotSelectionErrorMessage"),
+        );
+        this.isTimeElementCreationInProgress = false;
+        return;
+      }
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          event.clientY,
+          weekday,
+        );
+      if (!closestPartBody) return;
+
+      this.currentFirstSelectedElementNumber =
+        this.getElementDataNumber(closestPartBody);
+      closestPartBody.style.backgroundColor = this.selectedTimeSlotLabelColor;
+    },
+    handleMouseMove(event) {
+      if (this.$props.isPreviewMode) return;
+      if (!this.isTimeElementCreationInProgress) return;
+
+      let weekday = this.getWeekdayByElementDataNumber(
+        this.currentFirstSelectedElementNumber,
+      );
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          event.clientY,
+          weekday,
+        );
+      if (!closestPartBody) return;
+
+      this.getPartBodiesElementByWeekday(weekday).forEach((child) => {
+        let itemNumber = this.getElementDataNumber(child);
+
+        if (
+          itemNumber >= this.currentFirstSelectedElementNumber &&
+          itemNumber <= this.getElementDataNumber(closestPartBody)
+        ) {
+          child.style.backgroundColor = this.selectedTimeSlotLabelColor;
+        } else if (
+          itemNumber <= this.currentFirstSelectedElementNumber &&
+          itemNumber >= this.getElementDataNumber(closestPartBody)
+        ) {
+          child.style.backgroundColor = this.selectedTimeSlotLabelColor;
+        } else {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        }
+      });
+    },
+    async handleMouseUp(event) {
+      if (this.$props.isPreviewMode) return;
+
+      let isLeftMouseButton = event.buttons === 0;
+      if (!isLeftMouseButton) return;
+
+      if (!this.isTimeElementCreationInProgress) {
+        this.resetPointerEventsForDisplayedOverlays();
+        this.isTimeElementCreationInProgress = false;
+        return;
+      }
+
+      if (this.isTimeElementResizingInProgress) {
+        return;
+      }
+
+      this.isTimeElementCreationInProgress = false;
+
+      let weekday = this.getWeekdayByElementDataNumber(
+        this.currentFirstSelectedElementNumber,
+      );
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          event.clientY,
+          weekday,
+        );
+      if (!closestPartBody) return;
+
+      this.getPartBodiesElementByWeekday(weekday).forEach((child) => {
+        let itemNumber = this.getElementDataNumber(child);
+
+        if (
+          itemNumber >= this.currentFirstSelectedElementNumber &&
+          itemNumber <= this.getElementDataNumber(closestPartBody)
+        ) {
+          child.style.backgroundColor = this.selectedTimeSlotLabelColor;
+        } else if (
+          itemNumber <= this.currentFirstSelectedElementNumber &&
+          itemNumber >= this.getElementDataNumber(closestPartBody)
+        ) {
+          child.style.backgroundColor = this.selectedTimeSlotLabelColor;
+        } else {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        }
+      });
+
+      await this.createOverlay();
+
+      this.resetPartBodiesBackgroundColor();
+      this.resetPointerEventsForDisplayedOverlays();
+
+      this.currentFirstSelectedElementNumber = null;
+      this.currentLastSelectedElementNumber = null;
+    },
+    handleLeave(event) {
+      if (this.$props.isPreviewMode) return;
+
+      if (!this.isTimeElementCreationInProgress) return;
+      const rect = event.target.getBoundingClientRect();
+
+      let hasLeftFromTop = undefined;
+      const fromTop = event.clientY <= rect.top + 15;
+
+      if (fromTop) {
+        hasLeftFromTop = true;
+      } else {
+        hasLeftFromTop = false;
+      }
+
+      const child = event.target;
+      let number = this.getElementDataNumber(child);
+
+      if (number > this.currentFirstSelectedElementNumber) {
+        if (hasLeftFromTop) {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        }
+      } else if (number < this.currentFirstSelectedElementNumber) {
+        if (!hasLeftFromTop) {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        }
+      }
+    },
+    overlaySelectionChanged(event, overlayId) {
+      if (this.$props.isPreviewMode) return;
+
+      let isLeftMouseButton = event.buttons === 1;
+      if (!isLeftMouseButton) return;
+
+      this.getOverlayElementByOverlayId(overlayId).classList.remove(
+        "fhc-pointer-events-all",
+      );
+      this.getOverlayElementByOverlayId(overlayId).classList.add(
+        "fhc-pointer-events-none",
+      );
+      this.selected = [
+        {
+          type: "calendar_selector_overlay",
+          id: overlayId,
+        },
+      ];
+    },
+    handleMouseUpOnOverlay(overlayId) {
+      if (this.$props.isPreviewMode) return;
+
+      this.getOverlayElementByOverlayId(overlayId).classList.remove(
+        "fhc-pointer-events-none",
+      );
+      this.getOverlayElementByOverlayId(overlayId).classList.add(
+        "fhc-pointer-events-all",
+      );
+      this.selected = [];
+    },
+    handleOverlayDrop(event) {
+      this.hideOverlayClassTimeTypePopover();
+      if (this.$props.isPreviewMode) return;
+
+      let dropzoneItem = event.target;
+      if (!dropzoneItem) return;
+
+      if (!dropzoneItem.getAttribute("data-time")) {
+        let dropzoneOverlay = this.overlays.find(
+          (overlay) => overlay.id === dropzoneItem.id,
+        );
+        if (!dropzoneOverlay) {
+          return;
+        }
+
+        if (dropzoneOverlay.id !== this.selected[0].id) {
+          this.$fhcAlert.alertError(
+            this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+          );
+          return;
+        }
+
+        let startElementNumber = dropzoneOverlay.startingTimeSlotElementNumber;
+        let startElement = this.getElementByDataNumber(startElementNumber);
+
+        const mouseY = event.clientY;
+
+        const dropzoneItemRect = dropzoneItem.getBoundingClientRect();
+        const deltaY = mouseY - dropzoneItemRect.top;
+
+        const startElementRect = startElement.getBoundingClientRect();
+        const startElementTop = startElementRect.top;
+
+        const newTop = startElementTop + deltaY;
+
+        const partBodies = this.getPartBodiesElementByWeekday(
+          dropzoneOverlay.weekday,
+        );
+
+        let closestPartBody = null;
+        partBodies.forEach((partBody) => {
+          const rect = partBody.getBoundingClientRect();
+          if (newTop >= rect.top && newTop <= rect.bottom) {
+            closestPartBody = partBody;
+          }
+        });
+        if (!closestPartBody) return;
+
+        dropzoneItem = closestPartBody;
+      }
+
+      let newStartTimeSlot = this.getTimeSlotItemByDataNumber(
+        this.getElementDataNumber(dropzoneItem),
+      );
+
+      const draggedItemId =
+        this.selected.length > 0 ? this.selected[0].id : null;
+      if (!draggedItemId) return;
+
+      const draggedItem = this.getOverlayElementByOverlayId(draggedItemId);
+      if (!draggedItem) return;
+
+      let overlay = this.overlays.find(
+        (overlay) => overlay.id === draggedItemId,
+      );
+      if (!overlay) return;
+
+      let gridLineNumber;
+      try {
+        gridLineNumber = this.getLineNumberFromSelectedElementNumber(
+          this.getElementDataNumber(dropzoneItem),
+        );
+      } catch (error) {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotMultipleWeeksSelectedErrorMessage"),
+        );
+
+        return;
+      }
+
+      let gridLine = this.$refs.calendarSelectorContainer.querySelectorAll(
+        ".fhc-calendar-base-grid-line",
+      )[gridLineNumber];
+      if (!gridLine) return;
+
+      let overlayElement = this.getOverlayElementByOverlayId(draggedItemId);
+      gridLine.appendChild(overlayElement);
+
+      draggedItem.style.top = dropzoneItem.offsetTop + "px";
+      let draggedItemRectBottom = draggedItem.getBoundingClientRect().bottom;
+
+      let weekday = gridLineNumber + 1;
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          draggedItemRectBottom,
+          weekday,
+        );
+      if (!closestPartBody) return;
+
+      const closestPartBodyNumber = this.getElementDataNumber(closestPartBody);
+
+      const rect = closestPartBody.getBoundingClientRect();
+      const deltaY = rect.bottom - draggedItemRectBottom;
+
+      draggedItem.style.height =
+        parseInt(draggedItem.style.height) + deltaY + "px";
+
+      this.overlays = this.overlays.map((overlay) => {
+        if (overlay.id === draggedItemId) {
+          const timeSlot = this.getTimeSlotItemByDataNumber(
+            closestPartBodyNumber,
+          );
+          overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
+          overlay.endingTimeSlot = timeSlot;
+
+          overlay.weekday = gridLineNumber + 1;
+          return overlay;
+        }
+        return overlay;
+      });
+
+      this.overlays = this.overlays.map((overlay) => {
+        if (overlay.id === draggedItemId) {
+          overlay.startingTimeSlotElementNumber =
+            this.getElementDataNumber(dropzoneItem);
+          overlay.startingTimeSlot = newStartTimeSlot;
+          return overlay;
+        }
+        return overlay;
+      });
+
+      let firstSkippedOverElement = this.overlays.find((innerOverlay) => {
+        if (innerOverlay.id === overlay.id) return false;
+
+        if (
+          overlay.startingTimeSlotElementNumber <=
+            innerOverlay.startingTimeSlotElementNumber &&
+          overlay.endingTimeSlotElementNumber >=
+            innerOverlay.startingTimeSlotElementNumber
+        ) {
+          return true;
+        }
+        return false;
+      });
+
+      if (firstSkippedOverElement) {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+        );
+        let elementBeforeFirstSkippedOverElement = this.getElementByDataNumber(
+          firstSkippedOverElement.startingTimeSlotElementNumber - 1,
+        );
+        if (!elementBeforeFirstSkippedOverElement) return;
+
+        let elementBeforeFirstSkippedOverElementNumber =
+          this.getElementDataNumber(elementBeforeFirstSkippedOverElement);
+
+        const rect =
+          elementBeforeFirstSkippedOverElement.getBoundingClientRect();
+        const overlayElementRect = overlayElement.getBoundingClientRect();
+        const deltaY = rect.bottom - overlayElementRect.bottom;
+
+        overlayElement.style.height =
+          parseInt(overlayElement.style.height) + deltaY + "px";
+
+        this.overlays = this.overlays.map((innerOverlay) => {
+          if (innerOverlay.id === overlay.id) {
+            innerOverlay.endingTimeSlotElementNumber =
+              elementBeforeFirstSkippedOverElementNumber;
+            innerOverlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
+              elementBeforeFirstSkippedOverElementNumber,
+            );
+          }
+          return innerOverlay;
+        });
+
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+
+        this.overlays = this.overlays.map((overlay) => {
+          if (overlay.id === draggedItemId) {
+            const timeSlot = this.getTimeSlotItemByDataNumber(
+              elementBeforeFirstSkippedOverElementNumber,
+            );
+            overlay.endingTimeSlotElementNumber =
+              elementBeforeFirstSkippedOverElementNumber;
+            overlay.endingTimeSlot = timeSlot;
+
+            overlay.weekday = gridLineNumber + 1;
+            return overlay;
+          }
+          return overlay;
+        });
+      }
+
+      draggedItem.classList.remove("fhc-pointer-events-none");
+      draggedItem.classList.add("fhc-pointer-events-all");
+    },
+    handleMouseDownOnResize(event, resizeId, overlayId) {
+      if (this.$props.isPreviewMode) return;
+
+      let isLeftMouseButton = event.buttons === 1;
+      if (!isLeftMouseButton) return;
+
+      this.isTimeElementResizingInProgress = true;
+
+      this.currentResize = {
+        id: resizeId,
+        overlayId: overlayId,
+      };
+
+      this.getOverlayElementByOverlayId(overlayId).setAttribute(
+        "draggable",
+        "false",
+      );
+    },
+    handleMouseMoveOnResizeColumn(event) {
+      if (this.$props.isPreviewMode) return;
+
+      if (!this.isTimeElementResizingInProgress) {
+        this.removeGridLinePointerEvents();
+        return;
+      }
+
+      let overlayElement1 = this.getOverlayElementByOverlayId(
+        this.currentResize.overlayId,
+      );
+      let overlayTop = parseInt(overlayElement1.getBoundingClientRect().top);
+      let mouseY = event.clientY;
+
+      if (mouseY < overlayTop + 5) {
+        this.isTimeElementResizingInProgress = false;
+
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotMinimumSizeErrorMessage"),
+        );
+        this.handleMouseUpOnResizeColumn(event);
+
+        let currentStartingTimeSlotElement = this.getElementByDataNumber(
+          this.overlays.find(
+            (overlay) => overlay.id === this.currentResize.overlayId,
+          ).startingTimeSlotElementNumber,
+        );
+        if (!currentStartingTimeSlotElement) return;
+
+        const rect = currentStartingTimeSlotElement.getBoundingClientRect();
+        const resizeRect = overlayElement1.getBoundingClientRect();
+        const deltaY = rect.bottom - resizeRect.bottom;
+
+        overlayElement1.style.height =
+          parseInt(overlayElement1.style.height) + deltaY + "px";
+
+        this.overlays = this.overlays.map((overlay) => {
+          if (overlay.id === this.currentResize.overlayId) {
+            overlay.endingTimeSlotElementNumber = this.getElementDataNumber(
+              currentStartingTimeSlotElement,
+            );
+            overlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
+              this.getElementDataNumber(currentStartingTimeSlotElement),
+            );
+            return overlay;
+          }
+          return overlay;
+        });
+
+        this.currentResize = {
+          id: null,
+          overlayId: null,
+        };
+        return;
+      }
+
+      this.addGridLinePointerEvents();
+
+      if (!this.oldMousePosition.x || !this.oldMousePosition.y) {
+        this.oldMousePosition.x = event.clientX;
+        this.oldMousePosition.y = event.clientY;
+        return;
+      }
+
+      const resizeElement = this.getResizeElementById(this.currentResize.id);
+      const overlayElement = this.getOverlayElementByOverlayId(
+        this.currentResize.overlayId,
+      );
+
+      if (!resizeElement || !overlayElement) return;
+
+      const newMousePosition = {
+        x: event.clientX,
+        y: event.clientY,
+      };
+
+      const deltaY = newMousePosition.y - this.oldMousePosition.y;
+      if (deltaY > 0) {
+        resizeElement.style.bottom =
+          parseInt(resizeElement.style.bottom || 0) - deltaY + "px";
+        overlayElement.style.height =
+          parseInt(overlayElement.style.height) + deltaY + "px";
+      } else {
+        resizeElement.style.bottom =
+          parseInt(resizeElement.style.bottom || 0) - deltaY + "px";
+        overlayElement.style.height =
+          parseInt(overlayElement.style.height) + deltaY + "px";
+      }
+
+      this.oldMousePosition.x = newMousePosition.x;
+      this.oldMousePosition.y = newMousePosition.y;
+    },
+    handleMouseUpOnResizeColumn(event) {
+      if (this.$props.isPreviewMode) return;
+
+      if (!this.isTimeElementResizingInProgress) {
+        this.removeGridLinePointerEvents();
+        return;
+      }
+
+      let isLeftMouseButton = event.buttons === 0;
+      if (!isLeftMouseButton) return;
+
+      this.isTimeElementResizingInProgress = false;
+      this.removeGridLinePointerEvents();
+
+      const resizeElement = this.getResizeElementById(this.currentResize.id);
+      const overlayElement = this.getOverlayElementByOverlayId(
+        this.currentResize.overlayId,
+      );
+
+      if (!resizeElement || !overlayElement) {
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+        return;
+      }
+
+      let editedOverlay = this.overlays.find(
+        (overlay) => overlay.id === this.currentResize.overlayId,
+      );
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+          event.clientY,
+          editedOverlay.weekday,
+        );
+      if (closestPartBody) {
+        const closestPartBodyNumber =
+          this.getElementDataNumber(closestPartBody);
+
+        let firstSkippedOverElement = this.overlays.find((overlay) => {
+          if (overlay.id === this.currentResize.overlayId) return false;
+
+          if (
+            editedOverlay.startingTimeSlotElementNumber <=
+              overlay.startingTimeSlotElementNumber &&
+            closestPartBodyNumber >= overlay.startingTimeSlotElementNumber
+          ) {
+            return true;
+          }
+          return false;
+        });
+
+        if (firstSkippedOverElement) {
+          this.$fhcAlert.alertError(
+            this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+          );
+          let elementBeforeFirstSkippedOverElement =
+            this.getElementByDataNumber(
+              firstSkippedOverElement.startingTimeSlotElementNumber - 1,
+            );
+          if (!elementBeforeFirstSkippedOverElement) return;
+
+          let elementBeforeFirstSkippedOverElementNumber =
+            this.getElementDataNumber(elementBeforeFirstSkippedOverElement);
+
+          const rect =
+            elementBeforeFirstSkippedOverElement.getBoundingClientRect();
+          const resizeRect = resizeElement.getBoundingClientRect();
+          const deltaY = rect.bottom - resizeRect.bottom;
+
+          overlayElement.style.height =
+            parseInt(overlayElement.style.height) + deltaY + "px";
+
+          this.overlays = this.overlays.map((overlay) => {
+            if (overlay.id === this.currentResize.overlayId) {
+              overlay.endingTimeSlotElementNumber =
+                elementBeforeFirstSkippedOverElementNumber;
+              overlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
+                elementBeforeFirstSkippedOverElementNumber,
+              );
+            }
+            return overlay;
+          });
+
+          this.oldMousePosition.x = null;
+          this.oldMousePosition.y = null;
+
+          return;
+        }
+        const rect = closestPartBody.getBoundingClientRect();
+        const resizeRect = resizeElement.getBoundingClientRect();
+        const deltaY = rect.bottom - resizeRect.bottom;
+
+        overlayElement.style.height =
+          parseInt(overlayElement.style.height) + deltaY + "px";
+
+        this.overlays = this.overlays.map((overlay) => {
+          if (overlay.id === this.currentResize.overlayId) {
+            const closestPartBodyTimeSlot = this.getTimeSlotItemByDataNumber(
+              closestPartBodyNumber,
+            );
+
+            overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
+            overlay.endingTimeSlot = closestPartBodyTimeSlot;
+            return overlay;
+          }
+          return overlay;
+        });
+      }
+
+      this.oldMousePosition.x = null;
+      this.oldMousePosition.y = null;
+
+      this.getOverlayElementByOverlayId(
+        this.currentResize.overlayId,
+      ).setAttribute("draggable", "true");
+
+      this.currentResize = {
+        id: null,
+        overlayId: null,
+      };
+    },
+    async handleMouseOverOnOverlay(overlayId) {
+      if (this.$props.isPreviewMode) return;
+
+      if (!this.isTimeElementCreationInProgress) return;
+
+      let hitOverlay = this.overlays.find(
+        (overlay) => overlay.id === overlayId,
+      );
+
+      let startingTimeSlotElementNumber =
+        this.currentFirstSelectedElementNumber;
+      let hitOverlayStartingTimeSlotElementNumber =
+        hitOverlay.startingTimeSlotElementNumber;
+
+      if (
+        startingTimeSlotElementNumber < hitOverlayStartingTimeSlotElementNumber
+      ) {
+        this.currentLastSelectedElementNumber =
+          hitOverlayStartingTimeSlotElementNumber - 1;
+      } else {
+        this.currentFirstSelectedElementNumber =
+          hitOverlayStartingTimeSlotElementNumber + 1;
+      }
+
+      await this.createOverlay();
+
+      this.isTimeElementCreationInProgress = false;
+      this.resetPartBodiesBackgroundColor();
+
+      this.currentFirstSelectedElementNumber = null;
+      this.currentLastSelectedElementNumber = null;
+    },
+    handleMouseLeaveOnCalendar(event) {
+      if (this.$props.isPreviewMode) return;
+
+      if (this.isTimeElementCreationInProgress) {
+        this.isTimeElementCreationInProgress = false;
+        this.currentFirstSelectedElementNumber = null;
+        this.currentLastSelectedElementNumber = null;
+
+        this.resetPartBodiesBackgroundColor();
+      }
+
+      if (this.isTimeElementResizingInProgress) {
+        let overlayElement1 = this.getOverlayElementByOverlayId(
+          this.currentResize.overlayId,
+        );
+
+        this.isTimeElementResizingInProgress = false;
+        this.removeGridLinePointerEvents();
+
+        this.isTimeElementResizingInProgress = false;
+
+        this.oldMousePosition.x = null;
+        this.oldMousePosition.y = null;
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotResizeOutOfScopeErrorMessage"),
+          1000,
+        );
+        this.handleMouseUpOnResizeColumn(event);
+
+        let previousEndingTimeSlotElement = this.getElementByDataNumber(
+          this.overlays.find(
+            (overlay) => overlay.id === this.currentResize.overlayId,
+          ).endingTimeSlotElementNumber,
+        );
+        if (!previousEndingTimeSlotElement) return;
+
+        const rect = previousEndingTimeSlotElement.getBoundingClientRect();
+        const resizeRect = overlayElement1.getBoundingClientRect();
+        const deltaY = rect.bottom - resizeRect.bottom;
+
+        overlayElement1.style.height =
+          parseInt(overlayElement1.style.height) + deltaY + "px";
+
+        this.overlays = this.overlays.map((overlay) => {
+          if (overlay.id === this.currentResize.overlayId) {
+            overlay.endingTimeSlotElementNumber = this.getElementDataNumber(
+              previousEndingTimeSlotElement,
+            );
+            overlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
+              this.getElementDataNumber(previousEndingTimeSlotElement),
+            );
+            return overlay;
+          }
+          return overlay;
+        });
+
+        this.addGridLinePointerEvents();
+
+        this.getOverlayElementByOverlayId(
+          this.currentResize.overlayId,
+        ).setAttribute("draggable", "true");
+
+        this.currentResize = {
+          id: null,
+          overlayId: null,
+        };
+
+        return;
+      }
+
+      this.resetPointerEventsForDisplayedOverlays();
+    },
+    async createOverlay() {
       this.hideOverlayClassTimeTypePopover();
 
       let overlayElement;
@@ -240,12 +947,10 @@ export default {
         return;
       }
 
-      let firstSelectedElementNumber = parseInt(
-        firstSelectedChild.getAttribute("data-number"),
-      );
-      let lastSelectedElementNumber = parseInt(
-        lastSelectedChild.getAttribute("data-number"),
-      );
+      let firstSelectedElementNumber =
+        this.getElementDataNumber(firstSelectedChild);
+      let lastSelectedElementNumber =
+        this.getElementDataNumber(lastSelectedChild);
       if (
         firstSelectedElementNumber === null ||
         lastSelectedElementNumber === null
@@ -335,15 +1040,12 @@ export default {
           id: overlayId,
           startingTimeSlotElementNumber: this.currentFirstSelectedElementNumber,
           endingTimeSlotElementNumber: this.currentLastSelectedElementNumber,
-          startingTimeSlot:
-            this.timeSlotsInDay[
-              this.currentFirstSelectedElementNumber %
-                this.timeSlotsInDay.length
-            ],
-          endingTimeSlot:
-            this.timeSlotsInDay[
-              this.currentLastSelectedElementNumber % this.timeSlotsInDay.length
-            ],
+          startingTimeSlot: this.getTimeSlotItemByDataNumber(
+            this.currentFirstSelectedElementNumber,
+          ),
+          endingTimeSlot: this.getTimeSlotItemByDataNumber(
+            this.currentLastSelectedElementNumber,
+          ),
           type:
             this.$props.defaultClassTimeSlotType?.unterrichtszeitentyp_kurzbz ||
             null,
@@ -352,11 +1054,8 @@ export default {
           weekday: gridLineNumber + 1,
         });
       }
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[class*='part-body']")
-        .forEach((child) => {
-          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        });
+
+      this.resetPartBodiesBackgroundColor();
     },
     deleteOverlay(overlayId) {
       let confirm = window.confirm(
@@ -368,11 +1067,22 @@ export default {
         (overlay) => overlay.id !== overlayId,
       );
 
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .remove();
-
+      this.getOverlayElementByOverlayId(overlayId).remove();
       this.hideOverlayClassTimeTypePopover();
+    },
+    isOverlayMinimallySized(overlay) {
+      if (!overlay) return false;
+      if (
+        !overlay.startingTimeSlotElementNumber ||
+        !overlay.endingTimeSlotElementNumber
+      ) {
+        return false;
+      }
+
+      return (
+        overlay.startingTimeSlotElementNumber ===
+        overlay.endingTimeSlotElementNumber
+      );
     },
     getLineNumberFromSelectedElementNumber(selectedElementNumber) {
       let timeSlotsCount = this.timeSlotsInDay.length;
@@ -408,963 +1118,6 @@ export default {
       let endingTimeSlotFragment = overlay.endingTimeSlot.split("-")[1];
 
       return startingTimeSlotFragment + " - " + endingTimeSlotFragment;
-    },
-    handleMouseDown(event) {
-      if (this.$props.isPreviewMode) return;
-
-      let isLeftMouseButton = event.buttons === 1;
-      if (!isLeftMouseButton) return;
-
-      this.isTimeElementCreationInProgress = true;
-
-      let parent =
-        this.$refs.calendarSelectorContainer.querySelector(".grid-body");
-      if (!parent.contains(event.target)) {
-        this.isTimeElementCreationInProgress = false;
-        return;
-      }
-
-      let mouseY = event.clientY;
-      let mouseX = event.clientX;
-
-      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-        `div[class*='part-body']`,
-      );
-
-      let closestXPartBody = null;
-      let closestXDistance = Infinity;
-      let weekday = null;
-      partBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distanceX = Math.abs(mouseX - rect.left - rect.width / 2);
-
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distanceX < closestXDistance ||
-          (distanceX + gridLineHeight === closestXDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
-          closestXDistance = distanceX;
-          closestXPartBody = partBody;
-        }
-      });
-
-      if (closestXPartBody) {
-        let number = parseInt(closestXPartBody.getAttribute("data-number"));
-        weekday = parseInt(number / this.timeSlotsInDay.length) + 1;
-      }
-
-      if (!weekday) {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotSelectionErrorMessage"),
-        );
-        this.isTimeElementCreationInProgress = false;
-        return;
-      }
-
-      let closestPartBody = null;
-      let closestYDistance = Infinity;
-      const newPartBodies =
-        this.$refs.calendarSelectorContainer.querySelectorAll(
-          `div[data-weekday='${weekday}']`,
-        );
-      newPartBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distanceY = Math.abs(mouseY - rect.top - rect.height / 2);
-
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distanceY < closestYDistance ||
-          (distanceY + gridLineHeight === closestYDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
-          closestYDistance = distanceY;
-          closestPartBody = partBody;
-        }
-      });
-
-      if (closestPartBody) {
-        let number = parseInt(closestPartBody.getAttribute("data-number"));
-        this.currentFirstSelectedElementNumber = number;
-        closestPartBody.style.backgroundColor = this.selectedTimeSlotLabelColor;
-      }
-    },
-    handleMouseMove(event) {
-      if (this.$props.isPreviewMode) return;
-      if (!this.isTimeElementCreationInProgress) return;
-
-      let weekday =
-        parseInt(
-          this.currentFirstSelectedElementNumber / this.timeSlotsInDay.length,
-        ) + 1;
-      let mouseY = event.clientY;
-
-      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-        `div[data-weekday='${weekday}']`,
-      );
-      let closestPartBody = null;
-      let closestDistance = Infinity;
-
-      partBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distance = Math.abs(mouseY - rect.top - rect.height / 2);
-
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distance < closestDistance ||
-          (distance + gridLineHeight === closestDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
-          closestDistance = distance;
-          closestPartBody = partBody;
-        }
-      });
-
-      if (closestPartBody) {
-        this.$refs.calendarSelectorContainer
-          .querySelectorAll(`div[data-weekday='${weekday}']`)
-          .forEach((child) => {
-            let itemNumber = parseInt(child.getAttribute("data-number"));
-
-            if (
-              itemNumber >= this.currentFirstSelectedElementNumber &&
-              itemNumber <=
-                parseInt(closestPartBody.getAttribute("data-number"))
-            ) {
-              child.style.backgroundColor = this.selectedTimeSlotLabelColor;
-            } else if (
-              itemNumber <= this.currentFirstSelectedElementNumber &&
-              itemNumber >=
-                parseInt(closestPartBody.getAttribute("data-number"))
-            ) {
-              child.style.backgroundColor = this.selectedTimeSlotLabelColor;
-            } else {
-              child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-            }
-          });
-      }
-    },
-    async handleMouseUp(event) {
-      if (this.$props.isPreviewMode) return;
-
-      let isLeftMouseButton = event.buttons === 0;
-      if (!isLeftMouseButton) return;
-
-      if (!this.isTimeElementCreationInProgress) {
-        this.$refs.calendarSelectorContainer
-          .querySelectorAll("div[id^='overlay-']")
-          .forEach((element) => {
-            element.classList.remove("fhc-pointer-events-none");
-            element.classList.add("fhc-pointer-events-all");
-          });
-        this.isTimeElementCreationInProgress = false;
-        return;
-      }
-
-      if (this.isTimeElementResizingInProgress) {
-        return;
-      }
-
-      this.isTimeElementCreationInProgress = false;
-
-      let weekday =
-        parseInt(
-          this.currentFirstSelectedElementNumber / this.timeSlotsInDay.length,
-        ) + 1;
-      let mouseY = event.clientY;
-
-      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-        `div[data-weekday='${weekday}']`,
-      );
-      let closestPartBody = null;
-      let closestDistance = Infinity;
-
-      partBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distance = Math.abs(mouseY - rect.top - rect.height / 2);
-
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distance < closestDistance ||
-          (distance + gridLineHeight === closestDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
-          closestDistance = distance;
-          closestPartBody = partBody;
-        }
-      });
-
-      if (closestPartBody) {
-        this.$refs.calendarSelectorContainer
-          .querySelectorAll(`div[data-weekday='${weekday}']`)
-          .forEach((child) => {
-            let itemNumber = parseInt(child.getAttribute("data-number"));
-
-            if (
-              itemNumber >= this.currentFirstSelectedElementNumber &&
-              itemNumber <=
-                parseInt(closestPartBody.getAttribute("data-number"))
-            ) {
-              child.style.backgroundColor = this.selectedTimeSlotLabelColor;
-            } else if (
-              itemNumber <= this.currentFirstSelectedElementNumber &&
-              itemNumber >=
-                parseInt(closestPartBody.getAttribute("data-number"))
-            ) {
-              child.style.backgroundColor = this.selectedTimeSlotLabelColor;
-            } else {
-              child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-            }
-          });
-      }
-
-      await this.createOverlay(2);
-
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[class*='part-body']")
-        .forEach((child) => {
-          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        });
-
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[id^='overlay-']")
-        .forEach((element) => {
-          element.classList.remove("fhc-pointer-events-none");
-          element.classList.add("fhc-pointer-events-all");
-        });
-
-      this.currentFirstSelectedElementNumber = null;
-      this.currentLastSelectedElementNumber = null;
-    },
-    handleLeave(event) {
-      if (this.$props.isPreviewMode) return;
-
-      if (!this.isTimeElementCreationInProgress) return;
-      const rect = event.target.getBoundingClientRect();
-
-      let hasLeftFromTop = undefined;
-      const fromTop = event.clientY <= rect.top + 15;
-
-      if (fromTop) {
-        hasLeftFromTop = true;
-      } else {
-        hasLeftFromTop = false;
-      }
-
-      const child = event.target;
-      let number = parseInt(child.getAttribute("data-number"));
-
-      if (number > this.currentFirstSelectedElementNumber) {
-        if (hasLeftFromTop) {
-          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        }
-      } else if (number < this.currentFirstSelectedElementNumber) {
-        if (!hasLeftFromTop) {
-          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        }
-      }
-    },
-    overlaySelectionChanged(event, overlayId) {
-      if (this.$props.isPreviewMode) return;
-
-      let isLeftMouseButton = event.buttons === 1;
-      if (!isLeftMouseButton) return;
-
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .classList.remove("fhc-pointer-events-all");
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .classList.add("fhc-pointer-events-none");
-      this.selected = [
-        {
-          type: "calendar_selector_overlay",
-          id: overlayId,
-        },
-      ];
-    },
-    handleMouseUpOnOverlay(overlayId) {
-      if (this.$props.isPreviewMode) return;
-
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .classList.remove("fhc-pointer-events-none");
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .classList.add("fhc-pointer-events-all");
-      this.selected = [];
-    },
-    handleOverlayDrop(event) {
-      this.hideOverlayClassTimeTypePopover();
-      if (this.$props.isPreviewMode) return;
-
-      let dropzoneItem = event.target;
-      if (!dropzoneItem) return;
-
-      if (!dropzoneItem.getAttribute("data-time")) {
-        let dropzoneOverlay = this.overlays.find(
-          (overlay) => overlay.id === dropzoneItem.id,
-        );
-        if (!dropzoneOverlay) {
-          return;
-        }
-
-        if (dropzoneOverlay.id !== this.selected[0].id) {
-          this.$fhcAlert.alertError(
-            this.$p.t("ui", "classTimeSlotOverlapErrorMessage2"),
-          );
-          return;
-        }
-
-        let startElementNumber = dropzoneOverlay.startingTimeSlotElementNumber;
-        let startElement = this.$refs.calendarSelectorContainer.querySelector(
-          `[data-number='${startElementNumber}']`,
-        );
-
-        const mouseY = event.clientY;
-
-        const dropzoneItemRect = dropzoneItem.getBoundingClientRect();
-        const deltaY = mouseY - dropzoneItemRect.top;
-
-        const startElementRect = startElement.getBoundingClientRect();
-        const startElementTop = startElementRect.top;
-
-        const newTop = startElementTop + deltaY;
-
-        const partBodies =
-          this.$refs.calendarSelectorContainer.querySelectorAll(
-            "div[data-weekday='" + dropzoneOverlay.weekday + "']",
-          );
-
-        let closestPartBody = null;
-        partBodies.forEach((partBody) => {
-          const rect = partBody.getBoundingClientRect();
-          if (newTop >= rect.top && newTop <= rect.bottom) {
-            closestPartBody = partBody;
-          }
-        });
-        if (!closestPartBody) return;
-
-        dropzoneItem = closestPartBody;
-      }
-
-      let newStartTimeSlot =
-        this.timeSlotsInDay[
-          dropzoneItem.getAttribute("data-number") % this.timeSlotsInDay.length
-        ];
-
-      const draggedItemId =
-        this.selected.length > 0 ? this.selected[0].id : null;
-      if (!draggedItemId) return;
-
-      const draggedItem = this.$refs.calendarSelectorContainer.querySelector(
-        `#${draggedItemId}`,
-      );
-      if (!draggedItem) return;
-
-      let overlay = this.overlays.find(
-        (overlay) => overlay.id === draggedItemId,
-      );
-      if (!overlay) return;
-
-      let gridLineNumber;
-      try {
-        gridLineNumber = this.getLineNumberFromSelectedElementNumber(
-          dropzoneItem.getAttribute("data-number"),
-        );
-      } catch (error) {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotMultipleWeeksSelectedErrorMessage"),
-        );
-
-        return;
-      }
-
-      let gridLine = this.$refs.calendarSelectorContainer.querySelectorAll(
-        ".fhc-calendar-base-grid-line",
-      )[gridLineNumber];
-      if (!gridLine) return;
-
-      let overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${draggedItemId}`,
-      );
-      gridLine.appendChild(overlayElement);
-
-      draggedItem.style.top = dropzoneItem.offsetTop + "px";
-      let draggedItemRectBottom = draggedItem.getBoundingClientRect().bottom;
-
-      let weekday = gridLineNumber + 1;
-
-      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-        "div[data-weekday='" + weekday + "']",
-      );
-      let closestPartBody = null;
-      let closestDistance = Infinity;
-
-      partBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distance = Math.abs(
-          draggedItemRectBottom - rect.top - rect.height / 2,
-        );
-
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distance < closestDistance ||
-          (distance + gridLineHeight === closestDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
-          closestDistance = distance;
-          closestPartBody = partBody;
-        }
-      });
-
-      if (closestPartBody) {
-        const closestPartBodyNumber = parseInt(
-          closestPartBody.getAttribute("data-number"),
-        );
-
-        const rect = closestPartBody.getBoundingClientRect();
-        const deltaY = rect.bottom - draggedItemRectBottom;
-
-        draggedItem.style.height =
-          parseInt(draggedItem.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === draggedItemId) {
-            const timeSlot =
-              this.timeSlotsInDay[
-                closestPartBodyNumber % this.timeSlotsInDay.length
-              ];
-            overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
-            overlay.endingTimeSlot = timeSlot;
-
-            overlay.weekday = gridLineNumber + 1;
-            return overlay;
-          }
-          return overlay;
-        });
-      }
-
-      this.overlays = this.overlays.map((overlay) => {
-        if (overlay.id === draggedItemId) {
-          overlay.startingTimeSlotElementNumber = parseInt(
-            dropzoneItem.getAttribute("data-number"),
-          );
-          overlay.startingTimeSlot = newStartTimeSlot;
-          return overlay;
-        }
-        return overlay;
-      });
-
-      let firstSkippedOverElement = this.overlays.find((innerOverlay) => {
-        if (innerOverlay.id === overlay.id) return false;
-
-        if (
-          overlay.startingTimeSlotElementNumber <=
-            innerOverlay.startingTimeSlotElementNumber &&
-          overlay.endingTimeSlotElementNumber >=
-            innerOverlay.startingTimeSlotElementNumber
-        ) {
-          return true;
-        }
-        return false;
-      });
-
-      if (firstSkippedOverElement) {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotOverlapErrorMessage3"),
-        );
-        let elementBeforeFirstSkippedOverElement =
-          this.$refs.calendarSelectorContainer.querySelector(
-            `div[data-number='${firstSkippedOverElement.startingTimeSlotElementNumber - 1}']`,
-          );
-        if (!elementBeforeFirstSkippedOverElement) return;
-
-        let elementBeforeFirstSkippedOverElementNumber = parseInt(
-          elementBeforeFirstSkippedOverElement.getAttribute("data-number"),
-        );
-
-        const rect =
-          elementBeforeFirstSkippedOverElement.getBoundingClientRect();
-        const overlayElementRect = overlayElement.getBoundingClientRect();
-        const deltaY = rect.bottom - overlayElementRect.bottom;
-
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((innerOverlay) => {
-          if (innerOverlay.id === overlay.id) {
-            innerOverlay.endingTimeSlotElementNumber =
-              elementBeforeFirstSkippedOverElementNumber;
-            innerOverlay.endingTimeSlot =
-              this.timeSlotsInDay[
-                elementBeforeFirstSkippedOverElementNumber %
-                  this.timeSlotsInDay.length
-              ];
-          }
-          return innerOverlay;
-        });
-
-        this.oldMousePosition.x = null;
-        this.oldMousePosition.y = null;
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === draggedItemId) {
-            const timeSlot =
-              this.timeSlotsInDay[
-                elementBeforeFirstSkippedOverElementNumber %
-                  this.timeSlotsInDay.length
-              ];
-            overlay.endingTimeSlotElementNumber =
-              elementBeforeFirstSkippedOverElementNumber;
-            overlay.endingTimeSlot = timeSlot;
-
-            overlay.weekday = gridLineNumber + 1;
-            return overlay;
-          }
-          return overlay;
-        });
-      }
-
-      draggedItem.classList.remove("fhc-pointer-events-none");
-      draggedItem.classList.add("fhc-pointer-events-all");
-    },
-    handleMouseDownOnResizer(event, resizerId, overlayId) {
-      if (this.$props.isPreviewMode) return;
-
-      let isLeftMouseButton = event.buttons === 1;
-      if (!isLeftMouseButton) return;
-
-      this.isTimeElementResizingInProgress = true;
-
-      this.currentResizer = {
-        id: resizerId,
-        overlayId: overlayId,
-      };
-
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${overlayId}`)
-        .setAttribute("draggable", "false");
-    },
-    handleMouseMoveOnResizerColumn(event) {
-      if (this.$props.isPreviewMode) return;
-
-      if (!this.isTimeElementResizingInProgress) {
-        this.$refs.calendarSelectorContainer
-          .querySelector(".fhc-calendar-base-grid-line")
-          .classList.add("fhc-pointer-events-none");
-        return;
-      }
-
-      let overlayElement1 = this.$refs.calendarSelectorContainer.querySelector(
-        `#${this.currentResizer.overlayId}`,
-      );
-      let overlayTop = parseInt(overlayElement1.getBoundingClientRect().top);
-      let mouseY = event.clientY;
-
-      if (mouseY < overlayTop + 5) {
-        this.isTimeElementResizingInProgress = false;
-
-        this.oldMousePosition.x = null;
-        this.oldMousePosition.y = null;
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotMinimumSizeErrorMessage"),
-        );
-        this.handleMouseUpOnResizerColumn(event);
-
-        let currentStartingTimeSlotElement =
-          this.$refs.calendarSelectorContainer.querySelector(
-            `div[data-number='${
-              this.overlays.find(
-                (overlay) => overlay.id === this.currentResizer.overlayId,
-              ).startingTimeSlotElementNumber
-            }']`,
-          );
-        if (!currentStartingTimeSlotElement) return;
-
-        const rect = currentStartingTimeSlotElement.getBoundingClientRect();
-        const resizerRect = overlayElement1.getBoundingClientRect();
-        const deltaY = rect.bottom - resizerRect.bottom;
-
-        overlayElement1.style.height =
-          parseInt(overlayElement1.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResizer.overlayId) {
-            overlay.endingTimeSlotElementNumber = parseInt(
-              currentStartingTimeSlotElement.getAttribute("data-number"),
-            );
-            overlay.endingTimeSlot =
-              this.timeSlotsInDay[
-                parseInt(
-                  currentStartingTimeSlotElement.getAttribute("data-number"),
-                ) % this.timeSlotsInDay.length
-              ];
-            return overlay;
-          }
-          return overlay;
-        });
-
-        this.currentResizer = {
-          id: null,
-          overlayId: null,
-        };
-        return;
-      }
-
-      this.$refs.calendarSelectorContainer
-        .querySelector(".fhc-calendar-base-grid-line")
-        .classList.remove("fhc-pointer-events-none");
-
-      if (!this.oldMousePosition.x || !this.oldMousePosition.y) {
-        this.oldMousePosition.x = event.clientX;
-        this.oldMousePosition.y = event.clientY;
-        return;
-      }
-
-      const resizerElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${this.currentResizer.id}`,
-      );
-      const overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${this.currentResizer.overlayId}`,
-      );
-
-      if (!resizerElement || !overlayElement) return;
-
-      const newMousePosition = {
-        x: event.clientX,
-        y: event.clientY,
-      };
-
-      const deltaY = newMousePosition.y - this.oldMousePosition.y;
-      if (deltaY > 0) {
-        resizerElement.style.bottom =
-          parseInt(resizerElement.style.bottom || 0) - deltaY + "px";
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
-      } else {
-        resizerElement.style.bottom =
-          parseInt(resizerElement.style.bottom || 0) - deltaY + "px";
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
-      }
-
-      this.oldMousePosition.x = newMousePosition.x;
-      this.oldMousePosition.y = newMousePosition.y;
-    },
-    handleMouseUpOnResizerColumn(event) {
-      if (this.$props.isPreviewMode) return;
-
-      if (!this.isTimeElementResizingInProgress) {
-        this.$refs.calendarSelectorContainer
-          .querySelector(".fhc-calendar-base-grid-line")
-          .classList.add("fhc-pointer-events-none");
-        return;
-      }
-
-      let isLeftMouseButton = event.buttons === 0;
-      if (!isLeftMouseButton) return;
-
-      this.isTimeElementResizingInProgress = false;
-      this.$refs.calendarSelectorContainer
-        .querySelector(".fhc-calendar-base-grid-line")
-        .classList.add("fhc-pointer-events-none");
-
-      const resizerElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${this.currentResizer.id}`,
-      );
-      const overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${this.currentResizer.overlayId}`,
-      );
-
-      if (!resizerElement || !overlayElement) {
-        this.oldMousePosition.x = null;
-        this.oldMousePosition.y = null;
-        return;
-      }
-
-      let editedOverlay = this.overlays.find(
-        (overlay) => overlay.id === this.currentResizer.overlayId,
-      );
-
-      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
-        "div[data-weekday='" + editedOverlay.weekday + "']",
-      );
-      let closestPartBody = null;
-      let closestDistance = Infinity;
-
-      partBodies.forEach((partBody) => {
-        const rect = partBody.getBoundingClientRect();
-        const distance = Math.abs(event.clientY - rect.top - rect.height / 2);
-
-        if (distance < closestDistance) {
-          closestDistance = distance;
-          closestPartBody = partBody;
-        }
-      });
-
-      if (closestPartBody) {
-        const closestPartBodyNumber = parseInt(
-          closestPartBody.getAttribute("data-number"),
-        );
-
-        let firstSkippedOverElement = this.overlays.find((overlay) => {
-          if (overlay.id === this.currentResizer.overlayId) return false;
-
-          if (
-            editedOverlay.startingTimeSlotElementNumber <=
-              overlay.startingTimeSlotElementNumber &&
-            closestPartBodyNumber >= overlay.startingTimeSlotElementNumber
-          ) {
-            return true;
-          }
-          return false;
-        });
-
-        if (firstSkippedOverElement) {
-          this.$fhcAlert.alertError(
-            this.$p.t("ui", "classTimeSlotOverlapErrorMessage4"),
-          );
-          let elementBeforeFirstSkippedOverElement =
-            this.$refs.calendarSelectorContainer.querySelector(
-              `div[data-number='${firstSkippedOverElement.startingTimeSlotElementNumber - 1}']`,
-            );
-          if (!elementBeforeFirstSkippedOverElement) return;
-
-          let elementBeforeFirstSkippedOverElementNumber = parseInt(
-            elementBeforeFirstSkippedOverElement.getAttribute("data-number"),
-          );
-
-          const rect =
-            elementBeforeFirstSkippedOverElement.getBoundingClientRect();
-          const resizerRect = resizerElement.getBoundingClientRect();
-          const deltaY = rect.bottom - resizerRect.bottom;
-
-          overlayElement.style.height =
-            parseInt(overlayElement.style.height) + deltaY + "px";
-
-          this.overlays = this.overlays.map((overlay) => {
-            if (overlay.id === this.currentResizer.overlayId) {
-              overlay.endingTimeSlotElementNumber =
-                elementBeforeFirstSkippedOverElementNumber;
-              overlay.endingTimeSlot =
-                this.timeSlotsInDay[
-                  elementBeforeFirstSkippedOverElementNumber %
-                    this.timeSlotsInDay.length
-                ];
-            }
-            return overlay;
-          });
-
-          this.oldMousePosition.x = null;
-          this.oldMousePosition.y = null;
-
-          return;
-        }
-        const rect = closestPartBody.getBoundingClientRect();
-        const resizerRect = resizerElement.getBoundingClientRect();
-        const deltaY = rect.bottom - resizerRect.bottom;
-
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResizer.overlayId) {
-            const closestPartBodyTimeSlot =
-              this.timeSlotsInDay[
-                closestPartBodyNumber % this.timeSlotsInDay.length
-              ];
-
-            overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
-            overlay.endingTimeSlot = closestPartBodyTimeSlot;
-            return overlay;
-          }
-          return overlay;
-        });
-      }
-
-      this.oldMousePosition.x = null;
-      this.oldMousePosition.y = null;
-
-      this.$refs.calendarSelectorContainer
-        .querySelector(`#${this.currentResizer.overlayId}`)
-        .setAttribute("draggable", "true");
-
-      this.currentResizer = {
-        id: null,
-        overlayId: null,
-      };
-    },
-    async handleMouseOverOnOverlay(overlayId) {
-      if (this.$props.isPreviewMode) return;
-
-      if (!this.isTimeElementCreationInProgress) return;
-
-      let hitOverlay = this.overlays.find(
-        (overlay) => overlay.id === overlayId,
-      );
-
-      let startingTimeSlotElementNumber =
-        this.currentFirstSelectedElementNumber;
-      let hitOverlayStartingTimeSlotElementNumber =
-        hitOverlay.startingTimeSlotElementNumber;
-
-      if (
-        startingTimeSlotElementNumber < hitOverlayStartingTimeSlotElementNumber
-      ) {
-        this.currentLastSelectedElementNumber =
-          hitOverlayStartingTimeSlotElementNumber - 1;
-      } else {
-        this.currentFirstSelectedElementNumber =
-          hitOverlayStartingTimeSlotElementNumber + 1;
-      }
-
-      await this.createOverlay(3);
-
-      this.isTimeElementCreationInProgress = false;
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[class*='part-body']")
-        .forEach((child) => {
-          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        });
-
-      this.currentFirstSelectedElementNumber = null;
-      this.currentLastSelectedElementNumber = null;
-    },
-    handleMouseLeaveOnCalendar(event) {
-      if (this.$props.isPreviewMode) return;
-
-      if (this.isTimeElementCreationInProgress) {
-        this.isTimeElementCreationInProgress = false;
-        this.$refs.calendarSelectorContainer
-          .querySelectorAll("div[class*='part-body']")
-          .forEach((child) => {
-            child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-          });
-        this.currentFirstSelectedElementNumber = null;
-        this.currentLastSelectedElementNumber = null;
-      }
-
-      if (this.isTimeElementResizingInProgress) {
-        let overlayElement1 =
-          this.$refs.calendarSelectorContainer.querySelector(
-            `#${this.currentResizer.overlayId}`,
-          );
-
-        this.isTimeElementResizingInProgress = false;
-        this.$refs.calendarSelectorContainer
-          .querySelector(".fhc-calendar-base-grid-line")
-          .classList.add("fhc-pointer-events-none");
-
-        this.isTimeElementResizingInProgress = false;
-
-        this.oldMousePosition.x = null;
-        this.oldMousePosition.y = null;
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotResizeOutOfScopeErrorMessage"),
-          1000,
-        );
-        this.handleMouseUpOnResizerColumn(event);
-
-        let previousEndingTimeSlotElement =
-          this.$refs.calendarSelectorContainer.querySelector(
-            `div[data-number='${
-              this.overlays.find(
-                (overlay) => overlay.id === this.currentResizer.overlayId,
-              ).endingTimeSlotElementNumber
-            }']`,
-          );
-        if (!previousEndingTimeSlotElement) return;
-
-        const rect = previousEndingTimeSlotElement.getBoundingClientRect();
-        const resizerRect = overlayElement1.getBoundingClientRect();
-        const deltaY = rect.bottom - resizerRect.bottom;
-
-        overlayElement1.style.height =
-          parseInt(overlayElement1.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === this.currentResizer.overlayId) {
-            overlay.endingTimeSlotElementNumber = parseInt(
-              previousEndingTimeSlotElement.getAttribute("data-number"),
-            );
-            overlay.endingTimeSlot =
-              this.timeSlotsInDay[
-                parseInt(
-                  previousEndingTimeSlotElement.getAttribute("data-number"),
-                ) % this.timeSlotsInDay.length
-              ];
-            return overlay;
-          }
-          return overlay;
-        });
-
-        this.$refs.calendarSelectorContainer
-          .querySelector(".fhc-calendar-base-grid-line")
-          .classList.remove("fhc-pointer-events-none");
-
-        this.$refs.calendarSelectorContainer
-          .querySelector(`#${this.currentResizer.overlayId}`)
-          .setAttribute("draggable", "true");
-
-        this.currentResizer = {
-          id: null,
-          overlayId: null,
-        };
-
-        return;
-      }
-
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[id^='overlay-']")
-        .forEach((element) => {
-          element.classList.remove("fhc-pointer-events-none");
-          element.classList.add("fhc-pointer-events-all");
-        });
-    },
-    isOverlayMinimallySized(overlay) {
-      if (!overlay) return false;
-      if (
-        !overlay.startingTimeSlotElementNumber ||
-        !overlay.endingTimeSlotElementNumber
-      ) {
-        return false;
-      }
-
-      return (
-        overlay.startingTimeSlotElementNumber ===
-        overlay.endingTimeSlotElementNumber
-      );
     },
     getOverlayClassScheduleTypeTitle(overlayId) {
       let overlay = this.overlays.find((overlay) => overlay.id === overlayId);
@@ -1402,9 +1155,7 @@ export default {
       this.currentlyEditedOverlayId = null;
     },
     showOverlayClassTimeTypePopover(overlayId) {
-      let overlayElement = this.$refs.calendarSelectorContainer.querySelector(
-        `#${overlayId}`,
-      );
+      let overlayElement = this.getOverlayElementByOverlayId(overlayId);
       if (!overlayElement) return;
 
       if (this.visiblePopover) {
@@ -1458,11 +1209,153 @@ export default {
         this.visiblePopover = null;
       }
     },
+    getTimeSlotItemByDataNumber(number) {
+      let timeSlotIndex = number % this.timeSlotsInDay.length;
+
+      if (timeSlotIndex < 0 || timeSlotIndex >= this.timeSlotsInDay.length) {
+        return null;
+      }
+
+      return this.timeSlotsInDay[timeSlotIndex];
+    },
+    getElementDataNumber(element) {
+      if (!element) return null;
+      if (!element.hasAttribute("data-number")) return null;
+
+      return parseInt(element.getAttribute("data-number"));
+    },
+    getElementByDataNumber(number) {
+      return this.$refs.calendarSelectorContainer.querySelector(
+        `div[data-number='${number}']`,
+      );
+    },
+    getWeekdayByElementDataNumber(dataNumber) {
+      let weekday = parseInt(dataNumber / this.timeSlotsInDay.length) + 1;
+
+      return weekday;
+    },
     getClassTimeSlotTypeLabel(classTimeSlotType) {
       if (!classTimeSlotType) return "";
       return this.userLanguage?.value === "English"
         ? classTimeSlotType.bezeichnung_mehrsprachig[1].value
         : classTimeSlotType.bezeichnung_mehrsprachig[0].value;
+    },
+    getOverlayElementByOverlayId(overlayId) {
+      return this.$refs.calendarSelectorContainer.querySelector(
+        `#${overlayId}`,
+      );
+    },
+    getResizeElementById(resizeId) {
+      return this.$refs.calendarSelectorContainer.querySelector(`#${resizeId}`);
+    },
+    removeGridLinePointerEvents() {
+      this.$refs.calendarSelectorContainer
+        .querySelector(".fhc-calendar-base-grid-line")
+        .classList.add("fhc-pointer-events-none");
+    },
+    addGridLinePointerEvents() {
+      this.$refs.calendarSelectorContainer
+        .querySelector(".fhc-calendar-base-grid-line")
+        .classList.remove("fhc-pointer-events-none");
+    },
+    resetPartBodiesBackgroundColor() {
+      this.$refs.calendarSelectorContainer
+        ?.querySelectorAll("div[class*='part-body']")
+        .forEach((child) => {
+          child.style.backgroundColor = this.defaultTimeSlotLabelColor;
+        });
+    },
+    resetPointerEventsForDisplayedOverlays() {
+      this.$refs.calendarSelectorContainer
+        .querySelectorAll("div[id^='overlay-']")
+        .forEach((element) => {
+          element.classList.remove("fhc-pointer-events-none");
+          element.classList.add("fhc-pointer-events-all");
+        });
+    },
+    getPartBodiesElement() {
+      return this.$refs.calendarSelectorContainer.querySelectorAll(
+        `div[class*='part-body']`,
+      );
+    },
+    getPartBodiesElementByWeekday(weekday) {
+      return this.$refs.calendarSelectorContainer.querySelectorAll(
+        `div[data-weekday='${weekday}']`,
+      );
+    },
+    getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+      targetYLocation,
+      weekday,
+    ) {
+      let closestPartBody = null;
+      let closestDistance = Infinity;
+
+      const partBodies = this.getPartBodiesElementByWeekday(weekday);
+      partBodies.forEach((partBody) => {
+        const rect = partBody.getBoundingClientRect();
+        const distance = Math.abs(targetYLocation - rect.top - rect.height / 2);
+
+        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
+          ".fhc-calendar-base-grid-line",
+        ).style.height;
+        let seeIfAdjacentElementIsGridLine =
+          partBody.nextElementSibling.classList.contains(
+            "fhc-calendar-base-grid-line",
+          );
+        if (
+          distance < closestDistance ||
+          (distance + gridLineHeight === closestDistance &&
+            seeIfAdjacentElementIsGridLine)
+        ) {
+          closestDistance = distance;
+          closestPartBody = partBody;
+        }
+      });
+
+      return closestPartBody;
+    },
+    getXClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+      targetXLocation,
+    ) {
+      let closestXPartBody = null;
+      let closestXDistance = Infinity;
+
+      const partBodies = this.$refs.calendarSelectorContainer.querySelectorAll(
+        `div[class*='part-body']`,
+      );
+      partBodies.forEach((partBody) => {
+        const rect = partBody.getBoundingClientRect();
+        const distanceX = Math.abs(
+          targetXLocation - rect.left - rect.width / 2,
+        );
+
+        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
+          ".fhc-calendar-base-grid-line",
+        ).style.height;
+        let seeIfAdjacentElementIsGridLine =
+          partBody.nextElementSibling.classList.contains(
+            "fhc-calendar-base-grid-line",
+          );
+        if (
+          distanceX < closestXDistance ||
+          (distanceX + gridLineHeight === closestXDistance &&
+            seeIfAdjacentElementIsGridLine)
+        ) {
+          closestXDistance = distanceX;
+          closestXPartBody = partBody;
+        }
+      });
+
+      return closestXPartBody;
+    },
+    removeAllDisplayedOverlayElements() {
+      this.overlays = [];
+
+      this.$refs.calendarContainer
+        ?.querySelectorAll("div[id^='overlay-']")
+        .forEach((element) => {
+          element.remove();
+        });
     },
   },
   unmounted() {
@@ -1473,8 +1366,8 @@ export default {
   <div 
     ref="calendarContainer"
     @mousedown="handleMouseDown"
-    @mousemove="(event) => { handleMouseMove(event); handleMouseMoveOnResizerColumn(event); }"
-    @mouseup="(event) => { handleMouseUp(event); handleMouseUpOnResizerColumn(event); }"
+    @mousemove="(event) => { handleMouseMove(event); handleMouseMoveOnResizeColumn(event); }"
+    @mouseup="(event) => { handleMouseUp(event); handleMouseUpOnResizeColumn(event); }"
     @mouseleave="handleMouseLeaveOnCalendar"
     class="h-100 w-100"
     style="height: 100%; width: 100%"
@@ -1768,8 +1661,8 @@ export default {
       </div>
       <span
         v-if="!$props.isPreviewMode"
-        @mousedown.stop="handleMouseDownOnResizer($event, 'overlay-item-resizer-' + index, 'overlay-item-' + index)"
-        :id="'overlay-item-resizer-' + index"
+        @mousedown.stop="handleMouseDownOnResize($event, 'overlay-item-resize-' + index, 'overlay-item-' + index)"
+        :id="'overlay-item-resize-' + index"
         :class="{
               'position-absolute bottom-0 end-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
             }"

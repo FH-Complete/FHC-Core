@@ -43,9 +43,12 @@ div[role="row"] {
   background-color: white;
 }
 
-.v-enter-active,
-.v-leave-active {
+.v-enter-active {
   transition: opacity 0.5s ease;
+}
+ 
+.v-leave-active {
+  transition: none;
 }
 
 .v-enter-from,
