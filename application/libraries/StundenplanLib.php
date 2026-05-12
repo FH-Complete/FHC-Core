@@ -114,6 +114,7 @@ class StundenplanLib
 			return $stundenplan_data;
 		$stundenplan_data = getData($stundenplan_data) ?? [];
 
+		$this->_ci->addMeta("stundenplanData", $stundenplan_data);
 		$function_error = $this->expandObjectInformation($stundenplan_data);
 		if ($function_error)
 			return $function_error;
@@ -387,7 +388,14 @@ class StundenplanLib
 			$res_lektor_start_str = date('Y-m-d', $res_lektor_start);
 			$res_lektor_ende_str = date('Y-m-d', $res_lektor_ende);
 
-			$show_delete = (($berechtigt_begrenzt && ($item->insertvon == getAuthUID() || in_array(getAuthUID(), $item->uids))) &&
+			$show_delete = (
+				(
+					$berechtigt_begrenzt &&
+					(
+						(isset($item->insertvon) && $item->insertvon == getAuthUID()) ||
+						(isset($item->uids) && in_array(getAuthUID(), $item->uids))
+					)
+				) &&
 				$start_date_str >= $res_lektor_start_str &&
 				$start_date_str <= $res_lektor_ende_str
 			);
