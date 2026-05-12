@@ -192,14 +192,6 @@ export const CoreFilterCmpt = {
 				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
 			}).map(col => col.getField());
 		},
-		fieldNames() {
-			if (!this.tableBuilt)
-				return {};
-			return this.tabulator.getColumns().reduce((res, col) => {
-				res[col.getField()] = col.getDefinition().title;
-				return res;
-			}, {});
-		},
 		idExtra() {
 			if (!this.uuid)
 				return '';
@@ -811,7 +803,18 @@ export const CoreFilterCmpt = {
 
 			// parent not found
 			return false;
-		}
+		},
+		getColumnNames() {
+			if (!this.tableBuilt) {
+				return {};
+			} else if (this.tabulator.getLocale()); {
+				return this.tabulator.getLang().columns;
+			}
+			return this.tabulator.getColumns().reduce((res, col) => {
+				res[col.getField()] = col.getDefinition().title;
+				return res;
+			}, {});
+		},
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
@@ -889,7 +892,7 @@ export const CoreFilterCmpt = {
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:fields="fieldIdsForVisibilty"
 				:selected="selectedFields"
-				:names="fieldNames"
+				:names="getColumnNames()"
 				@hide="tabulator.hideColumn($event)"
 				@show="tabulator.showColumn($event)"
 				v-collapse-auto-close
