@@ -29562,7 +29562,8 @@ array(
 				'insertvon' => 'system'
 			)
 		)
-	),	array(
+	),
+	array(
 		'app' => 'core',
 		'category' => 'profil',
 		'phrase' => 'sem_short',
@@ -29577,6 +29578,26 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'sem',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'profil',
+		'phrase' => 'alleStudentenVon',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Alle StudentInnen aus',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'All students from',
 				'description' => '',
 				'insertvon' => 'system'
 			)
