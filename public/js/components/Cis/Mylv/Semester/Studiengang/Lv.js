@@ -124,7 +124,6 @@ export default {
 			}
 		},
 		openPruefungen() {
-			// early return if the pruefungenData is empty or not set
 			if (!this.LvHasPruefungenInformation) return;
 
 			LvPruefungen.popup({
@@ -210,21 +209,14 @@ export default {
 			</template>
 		</div>
 		<div v-if="!emptyMenu" class="card-footer">
-			<div class="row">
-				<!-- template for the LV if there are multiple pruefungen -->
-				<template v-if="LvHasPruefungenInformation">
-					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
-						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
-					</a>
-				</template>
-				<!-- template for the LV with no pruefungen -->
-				<template v-else>
-					<span  class="col-auto text-start text-decoration-none" >
-						<i class="fa fa-check text-success" v-if="positiv"></i>
-						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
-					</span>
-				</template>
+			<div
+				@click.prevent="openPruefungen()"
+				:type="LvHasPruefungenInformation ? 'button' : ''"
+				class="d-flex flex-row align-items-center gap-1"
+			>
+				<i class="fa fa-check text-success" v-if="positiv"></i>
+				<span :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
+				<i v-if="LvHasPruefungenInformation" class="fa fa-circle-info ms-1"></i>
 			</div>
 		</div>
 	</div>`
