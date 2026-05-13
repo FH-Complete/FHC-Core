@@ -27,7 +27,6 @@ import StvStudiensemester from "./Studentenverwaltung/Studiensemester.js";
 
 import ApiSearchbar from "../../api/factory/searchbar.js";
 import ApiStv from "../../api/factory/stv.js";
-import ApiStvVerband from '../../api/factory/stv/verband.js';
 import ApiStvConfig from '../../api/factory/stv/config.js';
 
 
@@ -149,7 +148,6 @@ export default {
 				sprachen: [],
 				geschlechter: []
 			},
-			verbandEndpoint: ApiStvVerband,
 			filter: []
 		}
 	},
@@ -636,7 +634,7 @@ export default {
 					<div class="offcanvas-header justify-content-end px-1 d-md-none">
 						<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" :aria-label="$p.t('ui/schliessen')"></button>
 					</div>
-					<stv-verband :preselectedKey="studiengangKz ? '' + studiengangKz : null" :endpoint="verbandEndpoint" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
+					<stv-verband menu="stv" :preselectedKey="studiengangKz ? '' + studiengangKz : null" @select-verband="onSelectVerband" class="col" style="height:0%"></stv-verband>
 					<stv-studiensemester v-model:studiensemester-kurzbz="studiensemesterKurzbz" @update:studiensemester-kurzbz="studiensemesterChanged"></stv-studiensemester>
 				</nav>
 				<main class="col-md-8 ms-sm-auto col-lg-9 col-xl-10">

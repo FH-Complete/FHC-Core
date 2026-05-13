@@ -19,4 +19,5 @@
 
 if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-$config['stv'] = "menu/StvMenuLib";
+$config['stv'] = "menu/StvMenuLib"; // TODO(chris): rename to StudVw
+$config['lvvw'] = "menu/LvVwMenuLib";

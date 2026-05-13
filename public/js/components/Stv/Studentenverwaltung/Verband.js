@@ -27,6 +27,10 @@ export default {
 		'selectVerband'
 	],
 	props: {
+		menu: {
+			type: String,
+			required: true
+		},
 		preselectedKey: {
 			type: String,
 			default: null
@@ -85,7 +89,7 @@ export default {
 	<div class="overflow-auto" tabindex="-1">
 		<base-menu
 			ref="menu"
-			config="stv"
+			:config="menu"
 			:preselected-key="preselectedKey"
 			@select-entry="onSelectTreeNode"
 			@drop="onDrop"
