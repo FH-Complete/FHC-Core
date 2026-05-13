@@ -43,15 +43,17 @@ if($result = @$db->db_query("SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABL
 								AND TABLE_NAME='tbl_bookmark' AND COLUMN_NAME = 'tag'
 								AND DATA_TYPE='character varying' AND character_maximum_length='255';"))
 {
-	$qry = "
-		ALTER TABLE dashboard.tbl_bookmark
-		ALTER COLUMN tag TYPE jsonb
-		USING tag::jsonb;
-			  ";
+	if($db->db_num_rows($result) > 0)
+	{
+		$qry = "
+			ALTER TABLE dashboard.tbl_bookmark
+			ALTER COLUMN tag TYPE jsonb
+			USING tag::jsonb;
+		";
 
-	if (!$db->db_query($qry))
-		echo '<strong>dashboard.tbl_bookmark ' . $db->db_last_error() . '</strong><br>';
-	else
-		echo '<br>Tabelle dashboard.tbl_bookmark: Spalte tag auf Typ JSONB geändert';
-
+		if (!$db->db_query($qry))
+			echo '<strong>dashboard.tbl_bookmark ' . $db->db_last_error() . '</strong><br>';
+		else
+			echo '<br>Tabelle dashboard.tbl_bookmark: Spalte tag auf Typ JSONB geändert';
+	}
 }
