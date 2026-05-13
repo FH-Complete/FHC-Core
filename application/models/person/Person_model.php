@@ -149,7 +149,7 @@ class Person_model extends DB_Model
 	 * @param $filter Term to search for.
 	 * @return DB-result
 	 */
-	public function searchPerson($filter)
+	public function searchPerson($filter, $mode=null)
 	{
 		$this->addSelect('vorname, nachname, gebdatum, person_id, titelpre, titelpost');
 		$this->addSelect("CASE
@@ -161,6 +161,20 @@ class Person_model extends DB_Model
 				THEN 'Student'
 				ELSE 'Person'
 			END AS status");
+
+		if($mode == 'mitMaUid')
+		{
+			$this->addSelect("(
+				SELECT m.mitarbeiter_uid
+				FROM public.tbl_benutzer b
+				JOIN public.tbl_mitarbeiter m
+					 ON b.uid = m.mitarbeiter_uid
+				WHERE b.person_id = tbl_person.person_id
+				LIMIT 1
+				)
+				AS uid");
+		};
+
 		$result = $this->loadWhere(
 			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
