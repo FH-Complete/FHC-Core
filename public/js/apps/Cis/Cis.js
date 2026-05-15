@@ -275,11 +275,15 @@ const app = Vue.createApp({
 	data: () => ({
 		appSideMenuEntries: {},
 		windowWidth: 0,
+		isStudent: null,
+		isMitarbeiter: null,
 	}),
 	provide() {
 		return { // provide injectable & watchable language property
 			language: Vue.computed(() => this.$p.user_language),
 			isMobile: Vue.computed(() => this.windowWidth < 767),
+			isStudent: Vue.computed(() => this.isStudent),
+			isMitarbeiter: Vue.computed(() => this.isMitarbeiter)
 		}	
 	},
 	methods: {
@@ -320,8 +324,12 @@ const app = Vue.createApp({
 			this.windowWidth = window.innerWidth;
 		},
 	},
-	created() {
+	async created() {
 		this.windowWidth = window.innerWidth;
+		await this.$api.call(ApiAuthinfo.getAuthInfo()).then((res) => {
+			this.isMitarbeiter = res.data.isMitarbeiter;
+			this.isStudent = res.data.isStudent;
+		});
 	},
 	async mounted() {
 		document.addEventListener('click', this.handleClick);
