@@ -173,6 +173,7 @@ class Person_model extends DB_Model
 				LIMIT 1
 				)
 				AS uid");
+			$this->addOrder('uid');
 		};
 
 		$result = $this->loadWhere(
