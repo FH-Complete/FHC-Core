@@ -115,7 +115,7 @@ export default {
     isStudyPlanSelectDisabled() {
       return (
         !this.classTimeSlotValidityPeriodFormData.organizationalUnit
-          ?.oe_kurzbz ||
+          ?.value ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodFrom ||
         !this.classTimeSlotValidityPeriodFormData.validityPeriodTo
       );
@@ -398,8 +398,7 @@ export default {
 
       return (this.filteredOrganizationalUnits =
         this.dropdownParsedOrganizationalUnits.filter((unit) => {
-          let label = `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`;
-          return label.toLowerCase().includes(query);
+          return unit.label.toLowerCase().includes(query);
         }));
     },
     getClassTimeSlotTypeLabel(classTimeSlotType) {
