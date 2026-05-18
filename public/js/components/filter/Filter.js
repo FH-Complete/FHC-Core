@@ -215,7 +215,7 @@ export const CoreFilterCmpt = {
 				this.tabulator.setLocale(newSelectedLanguage);
 
 				if (this.$props.tabulatorOptions.responsiveLayoutCollapseFormatter) {
-					this.localizeCollapsedColumnHeadings(newSelectedLanguage);
+					this.localizeCollapsedColumnHeadings();
 				}
 			},
 		},
@@ -316,9 +316,6 @@ export const CoreFilterCmpt = {
 			this.tabulator.on('tableBuilt', () => {
 				this.tableBuilt = true;
 				this.$emit('tableBuilt');
-				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
-					this.localizeCollapsedColumnHeadings();
-				}
 			});
 			this.tabulator.on("rowSelectionChanged", data => {
 				this.selectedData = data;
@@ -357,9 +354,6 @@ export const CoreFilterCmpt = {
 					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
 					if (this.tabulator.options.persistence.headerFilter)
 						this._setHeaderFilter();
-					if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
-						this.localizeCollapsedColumnHeadings();
-					}	
 				});
 
 			}
@@ -367,6 +361,12 @@ export const CoreFilterCmpt = {
 			this.tabulator.on("dataFiltered", filters => {
 				this.filterActive = filters.length > 0;
 				this.$emit("headerFilterOn", this.filterActive);
+			});
+
+			this.tabulator.on('renderComplete', () => {
+				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter && this.tableBuilt) {
+					this.localizeCollapsedColumnHeadings();
+				}	
 			});
 		},
 		async configureTabulatorLocalizations(tabulatorOptions) {
@@ -485,12 +485,14 @@ export const CoreFilterCmpt = {
 			return tabulatorOptions;
 		},
 		async localizeCollapsedColumnHeadings() {
-			const columnHeadings = this.tabulator.getLang().columns;
+			const columnHeadings = this.tabulator?.getLang()?.columns;
+			if (!columnHeadings) return;
 
 			this.$refs.table
 				.querySelectorAll(".collapsedColumnHeading")
 				.forEach((collapsedColumnHeadingElement) => {
-					const field = collapsedColumnHeadingElement.getAttribute("field");
+					const field =
+						collapsedColumnHeadingElement.getAttribute("tabulator-column-field");
 					if (!field?.length) return;
 
 					collapsedColumnHeadingElement.innerHTML =
