@@ -173,8 +173,13 @@ class Person_model extends DB_Model
 				LIMIT 1
 				)
 				AS uid");
-			$this->addOrder('uid');
-		};
+			$this->addOrder('uid, lower(nachname), lower(vorname)');
+		}
+		else
+		{
+			$this->addOrder('lower(nachname), lower(vorname)');
+		}
+
 
 		$result = $this->loadWhere(
 			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
