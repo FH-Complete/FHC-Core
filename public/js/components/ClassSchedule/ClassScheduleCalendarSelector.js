@@ -1079,7 +1079,7 @@ export default {
 
       let dropzoneElementDataNumber =
         this.getElementDataNumber(closestPartBody);
-      if (!dropzoneElementDataNumber) {
+      if (dropzoneElementDataNumber === null || dropzoneElementDataNumber === undefined) {
         return;
       }
 
