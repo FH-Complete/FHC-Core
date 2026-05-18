@@ -319,7 +319,7 @@ export const AbgabetoolAssistenz = {
 			abgabeTableOptionsFlat: {
 				minHeight: 250,
 				height: 700,
-				index: 'projektarbeit_id',
+				index: 'paabgabe_id',
 				layout: 'fitColumns',
 				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
 				selectable: true,

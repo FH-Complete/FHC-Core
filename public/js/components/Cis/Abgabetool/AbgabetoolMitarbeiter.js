@@ -531,7 +531,7 @@ export const AbgabetoolMitarbeiter = {
 			})
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = ""; // empty subject line 
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, null, this.$fhcAlert, this.$p)
 		},
 		getQGateStatusList() {
 			return [
