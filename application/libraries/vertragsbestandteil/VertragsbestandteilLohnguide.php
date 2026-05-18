@@ -137,19 +137,25 @@ EOTXT;
 		return parent::__toString() . $txt;
 	}
 
-	/* public function validate()
+	public function validate()
 	{
-		if( !(filter_var($this->tage, FILTER_VALIDATE_INT, 
-				array(
-					'options' => array(
-						'min_range' => 1,
-						'max_range' => 50
-					)
-				)
-			)) ) {
-			$this->validationerrors[] = 'Urlaubsanspruch muss eine Tagesanzahl im Bereich 1 bis 50 sein.';
+		$value = $this->vordienstzeit;
+
+		if ($value === null || $value === '') {
+			$result = null;   // allow null value 
+		} else {
+			$result = filter_var($value, FILTER_VALIDATE_INT, [
+				'options' => [
+					'min_range' => 0,
+					'max_range' => 100
+				]
+			]);
+
+			if ($result === false) {				
+				$this->validationerrors[] = 'Vordienstjahre muss eine ganze Zahl (0 bis 100) enthalten oder leer sein.';
+			}
 		}
 		
 		return parent::validate();
-	} */
+	} 
 }
