@@ -189,9 +189,14 @@ class Studienplan_model extends DB_Model
 				SELECT sps.studienplan_id
 				FROM lehre.tbl_studienplan_semester sps
 				JOIN public.tbl_studiensemester ss ON ss.studiensemester_kurzbz = sps.studiensemester_kurzbz
-				WHERE (ss.start >= ? AND ss.ende <= ?) OR (ss.start <= ? AND ss.ende >= ?)
+				WHERE (
+					(ss.start >= ? AND ss.ende <= ?) OR
+					(ss.start <= ? AND ss.ende >= ?) OR
+					(ss.start <= ? AND ss.ende >= ? AND ss.ende <= ?) OR
+					(ss.start >= ? AND ss.start <= ? AND ss.ende >= ?)
+				)
 			)";
 
-		return $this->execReadOnlyQuery($query, array($organizationalUnitShortCode, $startDate, $endDate, $startDate, $endDate));
+		return $this->execReadOnlyQuery($query, array($organizationalUnitShortCode, $startDate, $endDate, $startDate, $endDate, $startDate, $startDate, $endDate, $startDate, $endDate, $endDate));	
 	}
 }

@@ -33,7 +33,6 @@ const TYPE_DEFINITION = {
 	},
 	calendar_selector_overlay: {
 		id: "calendar_selector_overlay_id",
-		dragIcon: "fa-solid fa-calendar-plus"
 	}
 	// TODO: IMPLEMENT OTHER TYPES
 };

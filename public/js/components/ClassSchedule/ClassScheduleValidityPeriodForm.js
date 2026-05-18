@@ -154,7 +154,7 @@ export default {
     <div class='col-12'>
       <class-schedule-calendar-selector
         :classroom-hours="this.$props.classroomHours"
-        :default-class-time-slot-type="this.$props.classTimeSlotTypes.find(type => type.ist_standard)"
+        :default-class-time-slot-type="this.$props.classTimeSlotTypes.find(type => type.is_default)"
         :class-time-slot-types="this.$props.classTimeSlotTypes" 
         :edited-overlays="this.editedOverlays"
         @overlaysChanged="handleOverlaysChanged"

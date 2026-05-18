@@ -87,9 +87,7 @@ export default {
             await this.createOverlay();
 
             this.resetPartBodiesBackgroundColor();
-
-            this.currentFirstSelectedElementNumber = null;
-            this.currentLastSelectedElementNumber = null;
+            this.resetCurrentSelectedElementsNumbers();
           });
 
         this.overlays = this.overlays.map((existingOverlay, index) => {
@@ -121,6 +119,7 @@ export default {
   },
   data() {
     return {
+      componentID: Math.random().toString(36).substring(2, 15),
       daysInWeek: [
         this.$p.t("ui", "monday"),
         this.$p.t("ui", "tuesday"),
@@ -139,6 +138,11 @@ export default {
       currentFirstSelectedElementNumber: null,
       currentLastSelectedElementNumber: null,
       selected: [],
+      currentlyActiveOverlayDropzoneItemDataNumber: null,
+      onOverlaySelectionPositionOffset: {
+        x: null,
+        y: null,
+      },
       isTimeElementResizingInProgress: false,
       currentUpperResize: {
         id: null,
@@ -159,9 +163,8 @@ export default {
   computed: {
     selectedDragObject() {
       return this.selected.map((item) => ({
-        name: "test",
         type: "calendar_selector_overlay",
-        id: 2,
+        id: item.id,
       }));
     },
     currentlySelectedTimeSlotSpan() {
@@ -209,9 +212,7 @@ export default {
       }
 
       let closestXPartBody =
-        this.getXClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
-          event.clientX,
-        );
+        this.getXClosestPartBodyWithGridLineAdditionToMouseEvent(event.clientX);
       if (!closestXPartBody) return;
 
       let closestXPartBodyNumber = this.getElementDataNumber(closestXPartBody);
@@ -226,7 +227,7 @@ export default {
       }
 
       let closestPartBody =
-        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
           event.clientY,
           weekday,
         );
@@ -239,13 +240,12 @@ export default {
     handleMouseMove(event) {
       if (this.$props.isPreviewMode) return;
       if (!this.isTimeElementCreationInProgress) return;
-
       let weekday = this.getWeekdayByElementDataNumber(
         this.currentFirstSelectedElementNumber,
       );
 
       let closestPartBody =
-        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
           event.clientY,
           weekday,
         );
@@ -276,7 +276,6 @@ export default {
       if (!isLeftMouseButton) return;
 
       if (!this.isTimeElementCreationInProgress) {
-        this.resetPointerEventsForDisplayedOverlays();
         this.isTimeElementCreationInProgress = false;
         return;
       }
@@ -292,7 +291,7 @@ export default {
       );
 
       let closestPartBody =
-        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
           event.clientY,
           weekday,
         );
@@ -319,10 +318,7 @@ export default {
       await this.createOverlay();
 
       this.resetPartBodiesBackgroundColor();
-      this.resetPointerEventsForDisplayedOverlays();
-
-      this.currentFirstSelectedElementNumber = null;
-      this.currentLastSelectedElementNumber = null;
+      this.resetCurrentSelectedElementsNumbers();
     },
     handleLeave(event) {
       if (this.$props.isPreviewMode) return;
@@ -358,84 +354,45 @@ export default {
       let isLeftMouseButton = event.buttons === 1;
       if (!isLeftMouseButton) return;
 
-      this.getOverlayElementByOverlayId(overlayId).classList.remove(
-        "fhc-pointer-events-all",
-      );
-      this.getOverlayElementByOverlayId(overlayId).classList.add(
-        "fhc-pointer-events-none",
-      );
+      let overlay = this.overlays.find((overlay) => overlay.id === overlayId);
+      if (!overlay) return;
+
+      let overlayElement = this.getOverlayElementByOverlayId(overlayId);
+      if (!overlayElement) return;
+
       this.selected = [
         {
           type: "calendar_selector_overlay",
           id: overlayId,
         },
       ];
+
+      let startingElement = this.getElementByDataNumber(
+        overlay.startingTimeSlotElementNumber,
+      );
+      if (!startingElement) return;
+
+      let overlayElementRect = overlayElement.getBoundingClientRect();
+      const calibrationOffset = 20;
+      this.onOverlaySelectionPositionOffset.x =
+        event.clientX - overlayElementRect.left - calibrationOffset;
+      this.onOverlaySelectionPositionOffset.y =
+        event.clientY - overlayElementRect.top - calibrationOffset;
     },
     handleMouseUpOnOverlay(overlayId) {
       if (this.$props.isPreviewMode) return;
 
-      this.getOverlayElementByOverlayId(overlayId).classList.remove(
-        "fhc-pointer-events-none",
-      );
-      this.getOverlayElementByOverlayId(overlayId).classList.add(
-        "fhc-pointer-events-all",
-      );
+      let overlayElement = this.getOverlayElementByOverlayId(overlayId);
+      if (!overlayElement) return;
+
       this.selected = [];
     },
     handleOverlayDrop(event) {
       this.hideOverlayClassTimeTypePopover();
+      this.resetCurrentSelectedElementsNumbers();
+      this.currentlyActiveOverlayDropzoneItemDataNumber = null;
+
       if (this.$props.isPreviewMode) return;
-
-      let dropzoneItem = event.target;
-      if (!dropzoneItem) return;
-
-      if (!dropzoneItem.getAttribute("data-time")) {
-        let dropzoneOverlay = this.overlays.find(
-          (overlay) => overlay.id === dropzoneItem.id,
-        );
-        if (!dropzoneOverlay) {
-          return;
-        }
-
-        if (dropzoneOverlay.id !== this.selected[0].id) {
-          this.$fhcAlert.alertError(
-            this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
-          );
-          return;
-        }
-
-        let startElementNumber = dropzoneOverlay.startingTimeSlotElementNumber;
-        let startElement = this.getElementByDataNumber(startElementNumber);
-
-        const mouseY = event.clientY;
-
-        const dropzoneItemRect = dropzoneItem.getBoundingClientRect();
-        const deltaY = mouseY - dropzoneItemRect.top;
-
-        const startElementRect = startElement.getBoundingClientRect();
-        const startElementTop = startElementRect.top;
-
-        const newTop = startElementTop + deltaY;
-
-        const partBodies = this.getPartBodiesElementByWeekday(
-          dropzoneOverlay.weekday,
-        );
-
-        let closestPartBody = null;
-        partBodies.forEach((partBody) => {
-          const rect = partBody.getBoundingClientRect();
-          if (newTop >= rect.top && newTop <= rect.bottom) {
-            closestPartBody = partBody;
-          }
-        });
-        if (!closestPartBody) return;
-
-        dropzoneItem = closestPartBody;
-      }
-
-      let newStartTimeSlot = this.getTimeSlotItemByDataNumber(
-        this.getElementDataNumber(dropzoneItem),
-      );
 
       const draggedItemId =
         this.selected.length > 0 ? this.selected[0].id : null;
@@ -448,6 +405,116 @@ export default {
         (overlay) => overlay.id === draggedItemId,
       );
       if (!overlay) return;
+
+      let mouseX = event.clientX;
+      let mouseY = event.clientY;
+
+      this.resetPartBodiesBackgroundColor();
+      this.isTimeElementCreationInProgress = false;
+
+      mouseX = mouseX - this.onOverlaySelectionPositionOffset.x;
+      mouseY = mouseY - this.onOverlaySelectionPositionOffset.y;
+
+      let closestXPartBody =
+        this.getXClosestPartBodyWithGridLineAdditionToMouseEvent(mouseX);
+      if (!closestXPartBody) {
+        console.error("No closest X part body found");
+        return;
+      }
+      let closestXPartBodyNumber = this.getElementDataNumber(closestXPartBody);
+
+      let firstWeekday = this.getWeekdayByElementDataNumber(
+        closestXPartBodyNumber,
+      );
+      if (!firstWeekday) {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotSelectionErrorMessage"),
+        );
+        this.isTimeElementCreationInProgress = false;
+        return;
+      }
+
+      let dropzoneItem =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
+          mouseY,
+          firstWeekday,
+        );
+      if (!dropzoneItem) return;
+
+      let weekday = this.getWeekdayByElementDataNumber(
+        this.getElementDataNumber(dropzoneItem),
+      );
+      if (!weekday) {
+        return;
+      }
+
+      let newStartTimeSlotItemNumber = this.getElementDataNumber(dropzoneItem);
+      let newStartTimeSlot = this.getTimeSlotItemByDataNumber(
+        newStartTimeSlotItemNumber,
+      );
+
+      let newEndingTimeSlotItemNumber =
+        newStartTimeSlotItemNumber +
+        overlay.endingTimeSlotElementNumber -
+        overlay.startingTimeSlotElementNumber;
+
+      let maxTimeSlotItemNumber = weekday * this.timeSlotsInDay.length - 1;
+      if (newEndingTimeSlotItemNumber > maxTimeSlotItemNumber) {
+        newEndingTimeSlotItemNumber = maxTimeSlotItemNumber;
+      }
+
+      let overlappedOverlay = this.overlays.find((overlay) => {
+        if (overlay.id === this.selected[0].id) return false;
+        if (overlay.weekday !== firstWeekday) return false;
+
+        let isEnvelopingOtherOverlay =
+          newStartTimeSlotItemNumber <= overlay.startingTimeSlotElementNumber &&
+          overlay.endingTimeSlotElementNumber <= newEndingTimeSlotItemNumber;
+        let isInsideOtherOverlay =
+          overlay.startingTimeSlotElementNumber <= newStartTimeSlotItemNumber &&
+          newEndingTimeSlotItemNumber <= overlay.endingTimeSlotElementNumber;
+        let isIntersectingWithOtherOverlayFromTop =
+          newStartTimeSlotItemNumber <= overlay.startingTimeSlotElementNumber &&
+          overlay.startingTimeSlotElementNumber <=
+            newEndingTimeSlotItemNumber &&
+          newEndingTimeSlotItemNumber <= overlay.endingTimeSlotElementNumber;
+        let isIntersectingWithOtherOverlayFromBottom =
+          overlay.startingTimeSlotElementNumber <= newStartTimeSlotItemNumber &&
+          newStartTimeSlotItemNumber <= overlay.endingTimeSlotElementNumber &&
+          overlay.endingTimeSlotElementNumber <= newEndingTimeSlotItemNumber;
+
+        return (
+          isEnvelopingOtherOverlay ||
+          isInsideOtherOverlay ||
+          isIntersectingWithOtherOverlayFromTop ||
+          isIntersectingWithOtherOverlayFromBottom
+        );
+      });
+      if (overlappedOverlay) {
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
+        );
+
+        let overlayElement = this.getOverlayElementByOverlayId(overlay.id);
+        if (!overlayElement) return;
+
+        let originalStartingElement = this.getElementByDataNumber(
+          overlay.startingTimeSlotElementNumber,
+        );
+        if (!originalStartingElement) return;
+
+        let originalEndingElement = this.getElementByDataNumber(
+          overlay.endingTimeSlotElementNumber,
+        );
+        if (!originalEndingElement) return;
+
+        const startingRect = originalStartingElement.getBoundingClientRect();
+        const endingRect = originalEndingElement.getBoundingClientRect();
+
+        overlayElement.style.top = startingRect.offsetTop + "px";
+
+        return;
+      }
 
       let gridLineNumber;
       try {
@@ -471,31 +538,24 @@ export default {
       gridLine.appendChild(overlayElement);
 
       draggedItem.style.top = dropzoneItem.offsetTop + "px";
-      let draggedItemRectBottom = draggedItem.getBoundingClientRect().bottom;
 
-      let weekday = gridLineNumber + 1;
-
-      let closestPartBody =
-        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
-          draggedItemRectBottom,
-          weekday,
-        );
-      if (!closestPartBody) return;
-
-      const closestPartBodyNumber = this.getElementDataNumber(closestPartBody);
-
-      const rect = closestPartBody.getBoundingClientRect();
-      const deltaY = rect.bottom - draggedItemRectBottom;
+      let newEndingTimeSlotElement = this.getElementByDataNumber(
+        newEndingTimeSlotItemNumber,
+      );
+      if (!newEndingTimeSlotElement) return;
 
       draggedItem.style.height =
-        parseInt(draggedItem.style.height) + deltaY + "px";
+        newEndingTimeSlotElement.offsetTop +
+        newEndingTimeSlotElement.getBoundingClientRect().height -
+        dropzoneItem.offsetTop +
+        "px";
 
       this.overlays = this.overlays.map((overlay) => {
         if (overlay.id === draggedItemId) {
           const timeSlot = this.getTimeSlotItemByDataNumber(
-            closestPartBodyNumber,
+            newEndingTimeSlotItemNumber,
           );
-          overlay.endingTimeSlotElementNumber = closestPartBodyNumber;
+          overlay.endingTimeSlotElementNumber = newEndingTimeSlotItemNumber;
           overlay.endingTimeSlot = timeSlot;
 
           overlay.weekday = gridLineNumber + 1;
@@ -513,73 +573,6 @@ export default {
         }
         return overlay;
       });
-
-      let firstSkippedOverElement = this.overlays.find((innerOverlay) => {
-        if (innerOverlay.id === overlay.id) return false;
-
-        if (
-          overlay.startingTimeSlotElementNumber <=
-            innerOverlay.startingTimeSlotElementNumber &&
-          overlay.endingTimeSlotElementNumber >=
-            innerOverlay.startingTimeSlotElementNumber
-        ) {
-          return true;
-        }
-        return false;
-      });
-
-      if (firstSkippedOverElement) {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
-        );
-        let elementBeforeFirstSkippedOverElement = this.getElementByDataNumber(
-          firstSkippedOverElement.startingTimeSlotElementNumber - 1,
-        );
-        if (!elementBeforeFirstSkippedOverElement) return;
-
-        let elementBeforeFirstSkippedOverElementNumber =
-          this.getElementDataNumber(elementBeforeFirstSkippedOverElement);
-
-        const rect =
-          elementBeforeFirstSkippedOverElement.getBoundingClientRect();
-        const overlayElementRect = overlayElement.getBoundingClientRect();
-        const deltaY = rect.bottom - overlayElementRect.bottom;
-
-        overlayElement.style.height =
-          parseInt(overlayElement.style.height) + deltaY + "px";
-
-        this.overlays = this.overlays.map((innerOverlay) => {
-          if (innerOverlay.id === overlay.id) {
-            innerOverlay.endingTimeSlotElementNumber =
-              elementBeforeFirstSkippedOverElementNumber;
-            innerOverlay.endingTimeSlot = this.getTimeSlotItemByDataNumber(
-              elementBeforeFirstSkippedOverElementNumber,
-            );
-          }
-          return innerOverlay;
-        });
-
-        this.oldMousePosition.x = null;
-        this.oldMousePosition.y = null;
-
-        this.overlays = this.overlays.map((overlay) => {
-          if (overlay.id === draggedItemId) {
-            const timeSlot = this.getTimeSlotItemByDataNumber(
-              elementBeforeFirstSkippedOverElementNumber,
-            );
-            overlay.endingTimeSlotElementNumber =
-              elementBeforeFirstSkippedOverElementNumber;
-            overlay.endingTimeSlot = timeSlot;
-
-            overlay.weekday = gridLineNumber + 1;
-            return overlay;
-          }
-          return overlay;
-        });
-      }
-
-      draggedItem.classList.remove("fhc-pointer-events-none");
-      draggedItem.classList.add("fhc-pointer-events-all");
     },
     handleMouseDownOnUpperResize(event, resizeId, overlayId) {
       if (this.$props.isPreviewMode) return;
@@ -625,7 +618,6 @@ export default {
       if (this.$props.isPreviewMode) return;
 
       if (!this.isTimeElementResizingInProgress) {
-        this.removeGridLinePointerEvents();
         return;
       }
 
@@ -724,8 +716,6 @@ export default {
         return;
       }
 
-      this.addGridLinePointerEvents();
-
       if (!this.oldMousePosition.x || !this.oldMousePosition.y) {
         this.oldMousePosition.x = event.clientX;
         this.oldMousePosition.y = event.clientY;
@@ -777,7 +767,6 @@ export default {
       if (this.$props.isPreviewMode) return;
 
       if (!this.isTimeElementResizingInProgress) {
-        this.removeGridLinePointerEvents();
         return;
       }
 
@@ -785,7 +774,6 @@ export default {
       if (!isLeftMouseButton) return;
 
       this.isTimeElementResizingInProgress = false;
-      this.removeGridLinePointerEvents();
 
       let isUpperResizeMoving = this.currentUpperResize.id !== null;
 
@@ -819,7 +807,7 @@ export default {
       }
 
       let closestPartBody =
-        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
           event.clientY,
           editedOverlay.weekday,
         );
@@ -982,19 +970,17 @@ export default {
       await this.createOverlay();
 
       this.isTimeElementCreationInProgress = false;
-      this.resetPartBodiesBackgroundColor();
 
-      this.currentFirstSelectedElementNumber = null;
-      this.currentLastSelectedElementNumber = null;
+      this.resetPartBodiesBackgroundColor();
+      this.resetCurrentSelectedElementsNumbers();
     },
     handleMouseLeaveOnCalendar(event) {
       if (this.$props.isPreviewMode) return;
 
       if (this.isTimeElementCreationInProgress) {
         this.isTimeElementCreationInProgress = false;
-        this.currentFirstSelectedElementNumber = null;
-        this.currentLastSelectedElementNumber = null;
 
+        this.resetCurrentSelectedElementsNumbers();
         this.resetPartBodiesBackgroundColor();
       }
 
@@ -1002,9 +988,6 @@ export default {
         let overlayElement = this.getOverlayElementByOverlayId(
           this.currentLowerResize.overlayId,
         );
-
-        this.isTimeElementResizingInProgress = false;
-        this.removeGridLinePointerEvents();
 
         this.isTimeElementResizingInProgress = false;
 
@@ -1043,8 +1026,6 @@ export default {
           return overlay;
         });
 
-        this.addGridLinePointerEvents();
-
         this.getOverlayElementByOverlayId(
           this.currentLowerResize.overlayId,
         ).setAttribute("draggable", "true");
@@ -1056,8 +1037,89 @@ export default {
 
         return;
       }
+    },
+    onDragOver(event) {
+      const calendarContainerZone = document.getElementById(
+        "calendarContainer" + this.componentID,
+      );
+      const rect = calendarContainerZone.getBoundingClientRect();
 
-      this.resetPointerEventsForDisplayedOverlays();
+      const inside =
+        event.clientX >= rect.left &&
+        event.clientX <= rect.right &&
+        event.clientY >= rect.top &&
+        event.clientY <= rect.bottom;
+
+      if (!inside) {
+        this.resetPartBodiesBackgroundColor();
+        this.currentlyActiveOverlayDropzoneItemDataNumber = null;
+
+        return;
+      }
+
+      let mouseX = event.clientX - this.onOverlaySelectionPositionOffset.x;
+      let mouseY = event.clientY - this.onOverlaySelectionPositionOffset.y;
+
+      let closestXPartBody =
+        this.getXClosestPartBodyWithGridLineAdditionToMouseEvent(mouseX);
+      if (!closestXPartBody) {
+        return;
+      }
+
+      let closestPartBody =
+        this.getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
+          mouseY,
+          this.getWeekdayByElementDataNumber(
+            this.getElementDataNumber(closestXPartBody),
+          ),
+        );
+      if (!closestPartBody) {
+        return;
+      }
+
+      let dropzoneElementDataNumber =
+        this.getElementDataNumber(closestPartBody);
+      if (!dropzoneElementDataNumber) {
+        return;
+      }
+
+      let weekday = this.getWeekdayByElementDataNumber(
+        dropzoneElementDataNumber,
+      );
+      if (!weekday) {
+        return;
+      }
+
+      let overlayItem = this.overlays.find(
+        (overlay) => overlay.id === this.selected[0].id,
+      );
+      if (!overlayItem) {
+        return;
+      }
+
+      if (
+        this.currentlyActiveOverlayDropzoneItemDataNumber !==
+        dropzoneElementDataNumber
+      ) {
+        this.resetPartBodiesBackgroundColor();
+      }
+
+      let overlayItemSlotSpan =
+        overlayItem.endingTimeSlotElementNumber -
+        overlayItem.startingTimeSlotElementNumber;
+      this.currentlyActiveOverlayDropzoneItemDataNumber =
+        dropzoneElementDataNumber;
+
+      this.getPartBodiesElementByWeekday(weekday).forEach((child) => {
+        let currentItemDataNumber = this.getElementDataNumber(child);
+        if (
+          currentItemDataNumber >= dropzoneElementDataNumber &&
+          currentItemDataNumber <=
+            dropzoneElementDataNumber + overlayItemSlotSpan
+        ) {
+          child.style.backgroundColor = this.selectedTimeSlotLabelColor;
+        }
+      });
     },
     async createOverlay() {
       this.hideOverlayClassTimeTypePopover();
@@ -1160,12 +1222,7 @@ export default {
       });
 
       if (hasCollidingOverlays) {
-        this.$fhcAlert.alertError(
-          this.$p.t("ui", "classTimeSlotOverlapErrorMessage"),
-        );
-
-        this.currentFirstSelectedElementNumber = null;
-        this.currentLastSelectedElementNumber = null;
+        this.resetCurrentSelectedElementsNumbers();
         return;
       }
 
@@ -1386,29 +1443,11 @@ export default {
     getResizeElementById(resizeId) {
       return this.$refs.calendarSelectorContainer.querySelector(`#${resizeId}`);
     },
-    removeGridLinePointerEvents() {
-      this.$refs.calendarSelectorContainer
-        .querySelector(".fhc-calendar-base-grid-line")
-        .classList.add("fhc-pointer-events-none");
-    },
-    addGridLinePointerEvents() {
-      this.$refs.calendarSelectorContainer
-        .querySelector(".fhc-calendar-base-grid-line")
-        .classList.remove("fhc-pointer-events-none");
-    },
     resetPartBodiesBackgroundColor() {
       this.$refs.calendarSelectorContainer
         ?.querySelectorAll("div[class*='part-body']")
         .forEach((child) => {
           child.style.backgroundColor = this.defaultTimeSlotLabelColor;
-        });
-    },
-    resetPointerEventsForDisplayedOverlays() {
-      this.$refs.calendarSelectorContainer
-        .querySelectorAll("div[id^='overlay-']")
-        .forEach((element) => {
-          element.classList.remove("fhc-pointer-events-none");
-          element.classList.add("fhc-pointer-events-all");
         });
     },
     getPartBodiesElement() {
@@ -1421,7 +1460,7 @@ export default {
         `div[data-weekday='${weekday}']`,
       );
     },
-    getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
+    getYClosestPartBodyWithGridLineAdditionToMouseEventPerWeekday(
       targetYLocation,
       weekday,
     ) {
@@ -1452,9 +1491,7 @@ export default {
 
       return closestPartBody;
     },
-    getXClosestPartBodyWithGridLineAdditionToMouseEventPerWeek(
-      targetXLocation,
-    ) {
+    getXClosestPartBodyWithGridLineAdditionToMouseEvent(targetXLocation) {
       let closestXPartBody = null;
       let closestXDistance = Infinity;
 
@@ -1463,24 +1500,14 @@ export default {
       );
       partBodies.forEach((partBody) => {
         const rect = partBody.getBoundingClientRect();
-        const distanceX = Math.abs(
-          targetXLocation - rect.left - rect.width / 2,
-        );
+        const distanceX = Math.abs(targetXLocation - rect.left);
+        const isLocationInPartBody =
+          targetXLocation >= rect.left - 5 && targetXLocation <= rect.right + 5;
 
-        let gridLineHeight = this.$refs.calendarSelectorContainer.querySelector(
-          ".fhc-calendar-base-grid-line",
-        ).style.height;
-        let seeIfAdjacentElementIsGridLine =
-          partBody.nextElementSibling.classList.contains(
-            "fhc-calendar-base-grid-line",
-          );
-        if (
-          distanceX < closestXDistance ||
-          (distanceX + gridLineHeight === closestXDistance &&
-            seeIfAdjacentElementIsGridLine)
-        ) {
+        if (isLocationInPartBody) {
           closestXDistance = distanceX;
           closestXPartBody = partBody;
+          return;
         }
       });
 
@@ -1495,6 +1522,10 @@ export default {
           element.remove();
         });
     },
+    resetCurrentSelectedElementsNumbers() {
+      this.currentFirstSelectedElementNumber = null;
+      this.currentLastSelectedElementNumber = null;
+    },
     resetCurrentUpperResize() {
       this.currentUpperResize = {
         id: null,
@@ -1507,6 +1538,9 @@ export default {
         overlayId: null,
       };
     },
+    logError(error) {
+      console.error(error);
+    },
   },
   unmounted() {
     this.hideOverlayClassTimeTypePopover();
@@ -1515,10 +1549,12 @@ export default {
   <div ref="calendarSelectorContainer">
   <div 
     ref="calendarContainer"
+    :id="'calendarContainer' + componentID"
     @mousedown="handleMouseDown"
     @mousemove="(event) => { handleMouseMove(event); handleMouseMoveOnResizeColumn(event); }"
     @mouseup="(event) => { handleMouseUp(event); handleMouseUpOnResizeColumn(event); }"
     @mouseleave="handleMouseLeaveOnCalendar"
+    @dragover.prevent="onDragOver"
     class="h-100 w-100"
     style="height: 100%; width: 100%"
   >
@@ -1529,7 +1565,7 @@ export default {
             display: grid;
             width: 100%;
             height: 100%;
-            overflow: auto;
+            overflow: visible;
             grid-template-rows: auto auto 1fr;
             grid-template-columns: auto repeat(7, 1fr);
           "
@@ -1561,7 +1597,7 @@ export default {
           <div
             style="
               display: grid;
-              overflow: auto;
+              overflow: visible;
               grid-column: 1 / -1;
               grid-template-columns: subgrid;
             "
@@ -1594,7 +1630,7 @@ export default {
                 "
               >
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 1 / pe_' + index"
@@ -1606,8 +1642,8 @@ export default {
                   >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1617,7 +1653,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 2 / pe_' + index"
@@ -1629,8 +1665,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1640,7 +1676,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 3 / pe_' + index"
@@ -1652,8 +1688,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1663,7 +1699,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 4 / pe_' + index"
@@ -1675,8 +1711,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1686,7 +1722,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 5 / pe_' + index"
@@ -1698,8 +1734,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1709,7 +1745,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 6 / pe_' + index"
@@ -1721,8 +1757,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1732,7 +1768,7 @@ export default {
                   "
                 ></div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
                   v-for="(timeSlot, index) in timeSlotsInDay"
                   :key="index"
                   :style="'position: relative; grid-area: ps_' + index + ' / 7 / pe_' + index"
@@ -1744,8 +1780,8 @@ export default {
                 >
                 </div>
                 <div
-                  v-drop:link-strict.calendar_selector_overlay-collection="handleOverlayDrop"
-                  class="fhc-calendar-base-grid-line fhc-pointer-events-none"
+                  v-drop:move.calendar_selector_overlay-collection="handleOverlayDrop"
+                  class="fhc-calendar-base-grid-line"
                   style="
                     position: relative;
                     display: grid;
@@ -1763,7 +1799,7 @@ export default {
     <div ref="overlaysContainer" id="overlaysContainer" class='d-none'>
       <div 
         v-for="(index) in 100"
-        v-draggable:copyLink.noimage="selectedDragObject" 
+        v-draggable:move.noImage="selectedDragObject" 
         @mousedown='overlaySelectionChanged($event, "overlay-item-" + index)'
         @mouseover="handleMouseOverOnOverlay('overlay-item-' + index)"
         :id="'overlay-item-' + index"
@@ -1789,7 +1825,7 @@ export default {
         <i class="fa-solid fa-grip-lines"></i>
       </span>
       <div 
-        class="d-flex flex-column justify-content-center align-items-center gap-1 p-0 overflow-scroll h-100"
+        class="d-flex flex-column justify-content-center align-items-center gap-1 p-0 overflow-auto scrollable h-100"
         >
         <a 
           v-if="!$props.isPreviewMode"

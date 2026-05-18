@@ -143,10 +143,11 @@ export default {
       .filter((unit) => unit.aktiv)
       .map((unit) => {
         return {
-          label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
+          label: `[${unit.organisationseinheittyp_kurzbz}] ${unit.bezeichnung}`,
           value: unit.oe_kurzbz,
         };
-      });
+      })
+      .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
   methods: {

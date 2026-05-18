@@ -55,3 +55,26 @@ div[role="row"] {
 .v-leave-to {
   opacity: 0;
 }
+
+.scrollable {
+  overflow: auto;
+
+  /* Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: #888 transparent;
+}
+
+/* Chrome / Edge / Safari */
+.scrollable::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollable::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 999px;
+}
+
+.scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}

@@ -362,9 +362,11 @@ class Studiensemester_model extends DB_Model
 		JOIN lehre.tbl_studienplan_semester sp ON sp.studiensemester_kurzbz = s.studiensemester_kurzbz
 		WHERE sp.studienplan_id IN ? AND (
 			(s.start >= ? AND s.ende <= ?) OR
-			(s.start <= ? AND s.ende >= ?)
+			(s.start <= ? AND s.ende >= ?) OR
+			(s.start <= ? AND s.ende >= ? AND s.ende <= ?) OR
+			(s.start >= ? AND s.start <= ? AND s.ende >= ?)
 		)";
 
-		return $this->execQuery($query, array($studyPlanIds, $studyPlanIds, $fromDate, $toDate, $fromDate, $toDate));
+		return $this->execQuery($query, array($studyPlanIds, $studyPlanIds, $fromDate, $toDate, $fromDate, $toDate, $fromDate, $fromDate, $toDate, $fromDate, $toDate, $toDate));
 	}
 }
