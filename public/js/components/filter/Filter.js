@@ -270,7 +270,6 @@ export const CoreFilterCmpt = {
 					persistence: this.persistence,
 				}, ...(this.tabulatorOptions || {})};
 
-			// set up localizations if required
 			if (tabulatorOptions.locale) {
 				tabulatorOptions = await this.configureTabulatorLocalizations(tabulatorOptions);
 			}
