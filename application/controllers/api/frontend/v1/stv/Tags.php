@@ -45,4 +45,5 @@ class Tags extends Tag_Controller
 	{
 		parent::doneTag($this->config->item('stv_prestudent_tags'));
 	}
+
 }

@@ -94,6 +94,7 @@ require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
+require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
