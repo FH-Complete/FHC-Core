@@ -100,7 +100,6 @@ export default {
 			}
 		},
 		openPruefungen() {
-			// early return if the pruefungenData is empty or not set
 			if (!this.LvHasPruefungenInformation) return;
 
 			LvPruefungen.popup({
@@ -182,6 +181,7 @@ export default {
 					<a href="#" class="col-auto text-start text-decoration-none" @click.prevent="openPruefungen">
 						<i class="fa fa-check text-success" v-if="positiv"></i>
 						<span class="ps-1" :style="'color:'+gradeColor">{{ grade || $p.t('lehre/noGrades') }}</span>
+						<i class="fa fa-circle-info ms-1"></i>
 					</a>
 				</template>
 				<!-- template for the LV with no pruefungen -->
