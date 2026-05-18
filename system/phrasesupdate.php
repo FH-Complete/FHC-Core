@@ -58177,6 +58177,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Phrases Dashboard Admin END
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'link_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Weiter zur Abmeldung',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Continue to De-registration',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

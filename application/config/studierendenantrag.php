@@ -168,3 +168,13 @@ $config['stgkz_blacklist_wiederholung'] = [];
  * @var array           An array of noten ids
  */
 $config['note_blacklist_wiederholung'] = [];
+
+
+/**
+ * Modal with Infotext of TLC
+ * if true, there will be shown an info modal in the studentsView after the first button ABMELDUNG
+ *
+ * @var boolean
+ */
+$config['showInfoModalAbmeldung'] = true;
+
