@@ -132,7 +132,11 @@
 			if ($cis === true) generateCSSsInclude(defined('CIS4') ? 'public/css/cis4.css' : 'public/css/cis_bs5.css');
 
 			//Tags
-			if ($tags === true) generateCSSsInclude('public/css/tags.css');
+			if ($tags === true) 
+			{
+				generateCSSsInclude('public/css/tags.css');
+				generateCSSsIncludeIfExtensionCssExists('tags.css');
+			}
 
 			$extapphelper = ExtendableAppsHelper::getInstance();
 			$extapphelper->init($customCSSs, $customJSs, $customJSModules);

@@ -66,6 +66,7 @@ export default {
 			arrNoten: [],
 			selectedVorsitz: null,
 			filteredMitarbeiter: [],
+			filteredPersons: [],
 			selectedPruefer1: null,
 			selectedPruefer2: null,
 			selectedPruefer3: null,
@@ -301,7 +302,7 @@ export default {
 
 			//prepare local Storage
 			let STORAGE_KEY = 'finalExamDefaultData';
-			const id = '20260224_01';
+			const id = '20260224_02';
 			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
 			if (stored[id]) {
@@ -354,20 +355,23 @@ export default {
 				};
 				if (data.p1_person_id) {
 					this.selectedPruefer1 = {
-						label: this.getPersonLabel(data.p1_titelpre, data.p1_nachname, data.p1_vorname, data.p1_titelpost),
-						person_id: data.p1_person_id
+						label: this.getPersonLabel(data.p1_titelpre, data.p1_nachname, data.p1_vorname, data.p1_titelpost, data.p1_uid),
+						person_id: data.p1_person_id,
+						mitarbeiter_uid: data.p1_uid
 					};
 				}
 				if (data.p2_person_id) {
 					this.selectedPruefer2 = {
-						label: this.getPersonLabel(data.p2_titelpre, data.p2_nachname, data.p2_vorname, data.p2_titelpost),
-						person_id: data.p2_person_id
+						label: this.getPersonLabel(data.p2_titelpre, data.p2_nachname, data.p2_vorname, data.p2_titelpost, data.p2_uid),
+						person_id: data.p2_person_id,
+						mitarbeiter_uid: data.p2_uid
 					}
 				};
 				if (data.p3_person_id) {
 					this.selectedPruefer3= {
-						label: this.getPersonLabel(data.p3_titelpre, data.p3_nachname, data.p3_vorname, data.p3_titelpost),
-						person_id: data.p3_person_id
+						label: this.getPersonLabel(data.p3_titelpre, data.p3_nachname, data.p3_vorname, data.p3_titelpost, data.p3_uid),
+						person_id: data.p3_person_id,
+						mitarbeiter_uid: data.p3_uid
 					};
 				}
 			});
@@ -564,6 +568,33 @@ export default {
 					}
 				});
 		},
+		searchPerson(event) {
+			if (this.abortController.persons) {
+				this.abortController.persons.abort();
+			  }
+			this.abortController.persons = new AbortController();
+
+			return this.$api
+				.call(ApiStvAbschlusspruefung.getPruefer(event.query))
+				.then(result => {
+				  this.filteredPersons = [];
+				  for (let person of result.data.retval) {
+					  this.filteredPersons.push(
+					  {
+						  label: this.getPersonLabel(
+								  person.titelpre,
+								  person.nachname,
+								  person.vorname,
+								  person.titelpost,
+								  person.uid
+						  ),
+						  person_id: person.person_id,
+						  mitarbeiter_uid: person.uid
+					  }
+				  );
+			  }
+			});
+		},
 	},
 	created() {
 		this.$api
@@ -737,8 +768,8 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredMitarbeiter"
-						@complete="searchMitarbeiter"
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
@@ -772,8 +803,8 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredMitarbeiter"
-						@complete="searchMitarbeiter"
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
@@ -788,8 +819,8 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredMitarbeiter"
-						@complete="searchMitarbeiter"
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>
@@ -822,8 +853,8 @@ export default {
 						optionValue="person_id"
 						dropdown
 						forceSelection
-						:suggestions="filteredMitarbeiter"
-						@complete="searchMitarbeiter"
+						:suggestions="filteredPersons"
+						@complete="searchPerson"
 						:min-length="3"
 					>
 					</form-input>

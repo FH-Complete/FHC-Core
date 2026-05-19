@@ -15,10 +15,11 @@ class Tag_Controller extends FHCAPI_Controller
 			'getTag' => self::BERECHTIGUNG_KURZBZ,
 			'getTags' => self::BERECHTIGUNG_KURZBZ,
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
-
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
 			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
+			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		];
 
 		$merged_permissions = array_merge($default_permissions, $permissions);
@@ -26,6 +27,10 @@ class Tag_Controller extends FHCAPI_Controller
 		parent::__construct($merged_permissions);
 
 		$this->_setAuthUID();
+
+		// Library
+		$this->load->library('TagLib');
+
 		$this->load->model('person/Notiz_model', 'NotizModel');
 		$this->load->model('system/Notiztyp_model', 'NotiztypModel');
 		$this->load->model('person/Notizzuordnung_model', 'NotizzuordnungModel');
@@ -37,7 +42,6 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTag($readonly_tags = null)
 	{
-		$language = $this->_getLanguageIndex();
 		$id = $this->input->get('id');
 
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
@@ -62,14 +66,17 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $language. " as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
+			tbl_notiz_typ.automatisiert,
 			tbl_notiz.erledigt as done,
 			tbl_notiz.insertamum,
 			tbl_notiz.updateamum,
 			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
-			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
 			"
 		);
 		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
@@ -82,18 +89,22 @@ class Tag_Controller extends FHCAPI_Controller
 
 		$notiz = $this->NotizModel->loadWhere(array('notiz_id' => $id));
 
+
 		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz)[0] : array());
 	}
 
 	public function getTags($tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+
 		$this->NotiztypModel->addSelect(
-			'typ_kurzbz as tag_typ_kurzbz,
+			"typ_kurzbz as tag_typ_kurzbz,
 			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
 			style,
 			beschreibung,
-			tag
-			'
+			tag,
+			automatisiert
+			"
 		);
 		$this->NotiztypModel->addOrder('prioritaet');
 
@@ -269,6 +280,74 @@ class Tag_Controller extends FHCAPI_Controller
 			));
 		}
 		$this->terminateWithSuccess($deleteNotiz);
+	}
+
+	public function getAllTags($readonly_tags = false){
+		$prestudent_id = $this->input->get('prestudent_id');
+
+		//TODO check for readonly: necessary?
+		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
+		{
+			$readonly_tags = $this->_filterTag($readonly_tags, true);
+
+			foreach ($readonly_tags as $key => $tag)
+			{
+				$readonly_tags[$key] = $this->NotizModel->db->escape($tag);
+			}
+			$tags = '(' . implode(',', $readonly_tags) . ')';
+
+			$this->NotizModel->addSelect("
+						CASE
+							WHEN tbl_notiz_typ.typ_kurzbz IN $tags
+							THEN TRUE
+							ELSE FALSE
+						END as readonly
+					");
+		}
+		$this->NotizModel->addSelect(
+			"tbl_notiz.titel,
+			tbl_notiz.text,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			tbl_notiz.notiz_id,
+			tbl_notiz_typ.style,
+			tbl_notiz_typ.automatisiert,
+			tbl_notiz.erledigt as done,
+			tbl_notiz.insertamum,
+			tbl_notiz.updateamum,
+			(verfasserperson.vorname || ' ' || verfasserperson.nachname || ' ' || '(' || verfasserbenutzer.uid || ')') as verfasser,
+			(bearbeiterperson.vorname || ' ' || bearbeiterperson.nachname || ' ' || '(' || bearbeiterbenutzer.uid || ')') as bearbeiter,
+			tbl_notiz.start,
+			tbl_notiz.ende
+			"
+		);
+		$this->NotizModel->addJoin('public.tbl_notiz_typ', 'public.tbl_notiz.typ = public.tbl_notiz_typ.typ_kurzbz');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer verfasserbenutzer', 'tbl_notiz.verfasser_uid = verfasserbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person verfasserperson', 'verfasserbenutzer.person_id = verfasserperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_benutzer bearbeiterbenutzer', 'tbl_notiz.bearbeiter_uid = bearbeiterbenutzer.uid', 'LEFT');
+		$this->NotizModel->addJoin('public.tbl_person bearbeiterperson', 'bearbeiterbenutzer.person_id = bearbeiterperson.person_id', 'LEFT');
+
+		$this->NotizModel->addJoin('public.tbl_notizzuordnung notizzuordnung', 'tbl_notiz.notiz_id = notizzuordnung.notiz_id');
+
+		$notiz = $this->NotizModel->loadWhere(array('prestudent_id' => $prestudent_id));
+
+
+		$this->terminateWithSuccess(hasData($notiz) ? getData($notiz) : array());
+	}
+
+	public function rebuildTagsForTypeId()
+	{
+		$id = $this->input->post('id');
+		$typeId = $this->input->post('typeId');
+		$semester = $this->input->post('sem');
+
+		$result = $this->taglib->rebuildTagsForTypeId($typeId, $id, $semester);
+
+		if (isError($result))
+			return error ('Error occurred during updateAutomatedTags');
+
+		$this->terminateWithSuccess($result);
 	}
 
 	private function _setAuthUID()

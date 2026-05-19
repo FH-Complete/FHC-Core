@@ -271,6 +271,28 @@ function absoluteJsImportUrl($relurl)
 }
 
 /*
+ * Generate Css File Include if Extension contains file
+ *
+ * @param $relativeFilePath path relative to Extension public/css dir
+ */
+function generateCSSsIncludeIfExtensionCssExists($relativeFilePath)
+{
+	$fsiterator = new FilesystemIterator(FHCPATH . 'application/extensions');
+	foreach ($fsiterator as $fsitem)
+	{
+		if(preg_match('/^FHC-Core-/', $fsitem->getBasename()))
+		{
+			$extensionfile = 'public/extensions/' . $fsitem->getBasename() 
+				. '/css/' . $relativeFilePath;
+			if(is_readable(FHCPATH . $extensionfile))
+			{
+				generateCSSsInclude($extensionfile);
+			}
+		}
+	}
+}
+
+/*
  * Manipulate CI views includes Array to load
  *   - public/js/FhcApps.js via customJSs and
  *   - app customisation js and/or css from extensions via customJSModules

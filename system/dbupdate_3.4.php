@@ -97,6 +97,7 @@ require_once('dbupdate_3.4/70376_lohnguide.php');
 require_once('dbupdate_3.4/76150_perm_other_lv_plan.php');
 require_once('dbupdate_3.4/68957_dashboard_bookmark_neue_Spalte_sort.php');
 require_once('dbupdate_3.4/68530_Dashboard_Cleanup.php');
+require_once('dbupdate_3.4/75959_StudVw_Automatische_Tags.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

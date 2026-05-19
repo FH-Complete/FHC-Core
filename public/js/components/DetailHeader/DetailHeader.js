@@ -2,12 +2,16 @@ import ApiDetailHeader from "../../api/factory/detailHeader.js";
 import ApiHandleFoto from "../../api/factory/fotoHandling.js";
 import ModalUploadFoto from "./Modal/UploadFoto.js";
 import PvSkeleton from "../../../../index.ci.php/public/js/components/primevue/skeleton/skeleton.esm.min.js";
+import CoreTag from "../Tag/Tag.js";
+import ApiTag from "../../api/factory/stv/tag.js";
+import { idTagFormatter } from "../Tag/tagFormatter.js";
 
 export default {
 	name: 'DetailHeader',
 	components: {
 		ModalUploadFoto,
-		PvSkeleton
+		PvSkeleton,
+		CoreTag
 	},
 	props: {
 		headerData: {
@@ -50,6 +54,20 @@ export default {
 			default: false
 		}
 	},
+	inject: {
+		tagsEnabled: {
+			from: 'configStvTagsEnabled',
+			default: false
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		},
+		lists: {
+			from: 'lists',
+			required: true
+		},
+	},
 	computed: {
 		appRoot() {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root;
@@ -70,6 +88,15 @@ export default {
 		},
 		hasTileUIDSlot() {
 			return !!this.$slots.uid
+		},
+		prestudentIds() {
+			if (this.headerData[0].prestudent_id)
+			{
+				return [this.headerData[0].prestudent_id];
+			}
+		},
+		semesterDates(){
+			return this.lists.studiensemester?.find(item => item.studiensemester_kurzbz === this.currentSemester) || {};
 		}
 	},
 	created(){
@@ -77,6 +104,11 @@ export default {
 			if (!this.headerData) {
 				throw new Error('[DetailHeader] "headerData" is required.')
 			}
+
+			if(this.tagsEnabled) {
+				this.loadTagsAndRender(this.headerData[0].prestudent_id);
+			}
+
 		} else if (this.typeHeader === 'mitarbeiter') {
 			if (!this.person_id || !this.mitarbeiter_uid || !this.domain) {
 				throw new Error(
@@ -100,7 +132,12 @@ export default {
 				if (this.typeHeader === 'student' && newVal?.length) {
 					this.getSemesterStati(newVal[0].prestudent_id);
 				}
+
+				if(this.tagsEnabled) {
+					this.loadTagsAndRender(this.headerData[0].prestudent_id);
+				}
 			},
+			deep: true,
 			immediate: true
 		},
 	},
@@ -114,7 +151,10 @@ export default {
 			semesterStatiLoading: false,
 			leitungOrgLoading: false,
 			departmentDataLoading: false,
-			headerDataMaLoading: false
+			headerDataMaLoading: false,
+			tagEndpoint: ApiTag,
+			tagData: null,
+			rebuildData: null,
 		};
 	},
 	methods: {
@@ -239,7 +279,59 @@ export default {
 			{
 				this.noCurrentStatus = false;
 			}
-		}
+		},
+		//methods tags
+		async loadTagsAndRender(prestudent_id) {
+				await this.getAllTags(prestudent_id);
+
+				const container = idTagFormatter(
+					prestudent_id,
+					this.tagData,
+					this.$refs.tagComponent,
+					'prestudent_id',
+					this.semesterDates.start,
+					this.semesterDates.ende
+				);
+
+			this.$refs.tagWrapper.innerHTML = '';
+			this.$refs.tagWrapper.appendChild(container);
+		},
+		getAllTags(prestudent_id){
+			return this.$api
+				.call(ApiTag.getAllTagsPrestudent({prestudent_id}))
+				.then(result => {
+					this.tagData = result.data;
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		addedTag(addedTag)
+		{
+			this.reload();
+		},
+		deletedTag(id)
+		{
+			this.reload();
+		},
+		updatedTag(updatedTag)
+		{
+			this.reload();
+		},
+		rebuildPrestudentTags(){
+			const params = {
+				id : this.headerData[0].prestudent_id,
+				typeId: 'prestudent_id',
+				sem: this.currentSemester
+			};
+
+			return this.$api
+				.call(ApiTag.rebuildTagsforTypeId(params))
+				.then(result => {
+					this.rebuildData = result.data;
+					console.log("Rebuild manually triggered");
+					this.reload();
+				})
+				.catch(this.$fhcAlert.handleSystemError);
+		},
 	},
 	template: `
 		<div class="core-header d-flex justify-content-start align-items-center w-100 overflow-auto pb-2 gap-3" style="max-height:9rem; min-width: 37.5rem;">
@@ -304,6 +396,25 @@ export default {
 							<span v-if="headerData[0].titelpost">, </span>
 							{{headerData[0].titelpost}}
 						</h2>
+						<core-tag ref="tagComponent"
+							v-if="tagsEnabled"
+							:endpoint="tagEndpoint"
+							:values="prestudentIds"
+							@added="addedTag"
+							@deleted="deletedTag"
+							@updated="updatedTag"
+							zuordnung_typ="prestudent_id"
+						></core-tag>
+						<div
+							role="button"
+							v-if="tagsEnabled"
+							@click="rebuildPrestudentTags"
+							class="btn btn-outline btn-light mb-1"
+							:title="'Automatische Tags fuer ' + currentSemester + ' neu laden'"
+							>
+							<i class="fa-solid fa-refresh"></i></button>
+							<span>{{currentSemester}}</span>
+						</div>
 						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
 					</div>
 					<div v-else class="d-flex align-items-center gap-3">
@@ -353,6 +464,7 @@ export default {
 						{{headerData[0].statusofsemester}}
 					</span>
 				</h5>
+				<div ref="tagWrapper"></div>
 			</div>
 			<div v-if="headerData.length == 1" class="col-md-1 d-flex flex-column align-items-end justify-content-start ms-auto">
 				<div class="d-flex py-1">

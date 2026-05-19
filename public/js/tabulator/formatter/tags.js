@@ -1,12 +1,24 @@
 export function tagFormatter(cell, tagComponent)
 {
+	const mappedData = tagComponent.tags.map(tag => ({
+		typ_kurzbz: tag.tag_typ_kurzbz,
+		automatisiert: tag.automatisiert
+	}));
+
+
 	let tags = cell.getValue();
 	if (!tags) return;
 
 	let container = document.createElement('div');
 	container.className = "d-flex gap-1";
 
-	let parsedTags = JSON.parse(tags);
+	let parsedTags = [];
+	if (typeof tags === 'string') {
+	        parsedTags = JSON.parse(tags);
+	} else if (Array.isArray(tags)) {
+	        parsedTags = tags;
+	}
+
 	let maxVisibleTags = 2;
 
 	const rowData = cell.getRow().getData();
@@ -38,10 +50,17 @@ export function tagFormatter(cell, tagComponent)
 			tagElement.className = "tag " + tag.style;
 			if (tag.done) tagElement.className += " tag_done";
 
+			const tagDef = mappedData.find(t => t.typ_kurzbz === tag.typ_kurzbz);
+
+			if (!tagDef && tag.typ_kurzbz?.includes("_auto") || tagDef?.automatisiert) {
+				tagElement.className += " tag_auto";
+				tagElement.innerHTML = "<i class='fa-solid fa-lock'></i> " + tag.beschreibung;
+			}
+
 			tagElement.addEventListener('click', (event) => {
 				event.stopPropagation();
 				event.preventDefault();
-				tagComponent.editTag(tag.id);
+				tagComponent.editTag(tag.id)
 			});
 
 			container.appendChild(tagElement);
