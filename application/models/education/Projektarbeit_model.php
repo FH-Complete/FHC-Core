@@ -27,7 +27,7 @@ class Projektarbeit_model extends DB_Model
 		$qry = "SELECT
 					pa.*, tbl_projekttyp.bezeichnung,
 					tbl_lehreinheit.studiensemester_kurzbz, tbl_lehrveranstaltung.lehrveranstaltung_id,
-					tbl_sprache.bezeichnung[".$sprache_index."] AS sprache_bezeichnung
+					tbl_sprache.bezeichnung[".$sprache_index."] AS sprache_bezeichnung,
 					tbl_firma.name AS firma_name,
 					(
 						SELECT
