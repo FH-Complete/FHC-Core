@@ -422,6 +422,16 @@ export default {
 
 			if(selected.length > 0 || deselected.length > 0){
 				this.lastSelected = this.selected;
+
+				//for tags
+				this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+				this.selectedColumnValues = this.selectedRows.filter(
+					row => row.getData().prestudent_id !== undefined
+						&& row.getData().prestudent_id
+				).map(
+					row => row.getData().prestudent_id
+				);
+
 				this.$emit('update:selected', data);
 			}
 		},
