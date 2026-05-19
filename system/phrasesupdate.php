@@ -58186,7 +58186,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Lädt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58206,7 +58206,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Fehler',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58226,7 +58226,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Element',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58246,7 +58246,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Elemente',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58266,7 +58266,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Seitengröße',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58286,7 +58286,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Seite anzeigen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58306,7 +58306,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Erste',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58326,7 +58326,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Erste Seite',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58346,7 +58346,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Letzte',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58366,7 +58366,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Letzte Seite',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58386,13 +58386,13 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'zurück',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Prev',
+				'text' => 'Previous',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -58406,13 +58406,13 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'vorherige Seite',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Prev Page',
+				'text' => 'Previous Page',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -58426,7 +58426,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Nächste',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58446,7 +58446,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Nächste Seite',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58466,7 +58466,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Alle',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58486,7 +58486,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Angezeigt',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58506,7 +58506,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'von',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58526,7 +58526,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Zeilen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58546,7 +58546,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => '???',
+				'text' => 'Seiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
