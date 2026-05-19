@@ -679,7 +679,7 @@ export default {
 		 -->
 
 			 <template #additional>
-				<div>
+				<div class="pe-2">
 					<a :href="linkXLS" target="_blank">
 						 <i class="fas fa-file-excel fa-xl text-success"   :title="$p.t('stv', 'text_exportXLS', { count: selectedPrestudents.length })"></i>
 					</a>
