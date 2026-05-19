@@ -10,6 +10,7 @@ $includesArray = array(
 	'navigationcomponent' => true,
 	'filtercomponent' => true,
 	'vuedatepicker11' => true,
+	'momentjs2' => true,
     'customJSs' => array(
 		'vendor/moment/luxonjs/luxon.min.js'
 	),

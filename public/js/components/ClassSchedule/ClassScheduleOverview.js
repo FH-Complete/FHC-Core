@@ -1,7 +1,6 @@
 import { CoreFilterCmpt } from "../filter/Filter.js";
 import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 import ApiStudienSemester from "../../../js/api/factory/studiensemester.js";
-import { formatDate } from "../../helpers/DateHelpers.js";
 
 import ClassScheduleTypeModal from "./ClassScheduleTypeModal.js";
 import ClassScheduleValidityPeriodModal from "./ClassScheduleValidityPeriodModal.js";
@@ -308,10 +307,10 @@ export default {
           organizationalUnitShortCode:
             this.filterData.selectedOrganizationalUnit?.value,
           validityPeriodFrom: this.filterData.validityPeriodFrom
-            ? formatDate(this.filterData.validityPeriodFrom, "yyyy-MM-dd")
+            ? moment(this.filterData.validityPeriodFrom).format("YYYY-MM-DD")
             : null,
           validityPeriodTo: this.filterData.validityPeriodTo
-            ? formatDate(this.filterData.validityPeriodTo, "yyyy-MM-dd")
+            ? moment(this.filterData.validityPeriodTo).format("YYYY-MM-DD")
             : null,
         }),
       );

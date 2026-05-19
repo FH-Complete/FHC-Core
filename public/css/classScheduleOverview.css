@@ -1,3 +1,41 @@
 html {
     font-size: .75em;
 }
+
+nav.navbar.navbar-header,
+nav.navbar.navbar-left-side {
+    font-size: 18px
+}
+
+nav.navbar.navbar-left-side {
+        padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+/* Relative sizing inside navbar */
+nav.navbar .nav-item {
+    font-size: 18px
+}
+
+nav.navbar .navbar-brand-icon {
+    font-size: 16px
+}
+
+nav.navbar .left-side-menu-link-entry {
+    font-size: 14px !important;
+}
+
+nav.navbar .nav-link {
+    font-size: 18px;
+    padding-top: 15px;
+    padding-bottom: 8px;
+}
+
+nav.navbar .dropdown-menu {
+    padding: 8px 0px;
+}
+
+nav.navbar .dropdown-item {
+    font-size: 16px;
+    padding: 4px 16px;
+}

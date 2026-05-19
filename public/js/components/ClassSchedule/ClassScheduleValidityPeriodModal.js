@@ -2,7 +2,6 @@ import ApiClassSchedule from "../../../js/api/factory/classSchedule.js";
 import ApiStudienPlan from "../../../js/api/factory/studienplan.js";
 import ApiStudienSemester from "../../../js/api/factory/studiensemester.js";
 import ApiOrganizationalUnit from "../../../js/api/factory/organizationalUnit.js";
-import { formatDate } from "../../helpers/DateHelpers.js";
 
 import BsModal from "../Bootstrap/Modal.js";
 import CoreForm from "../Form/Form.js";
@@ -124,16 +123,12 @@ export default {
       if (!this.classTimeSlotValidityPeriodFormData.validityPeriodFrom)
         return null;
 
-      return formatDate(
-        this.classTimeSlotValidityPeriodFormData.validityPeriodFrom,
-      );
+      return moment(this.classTimeSlotValidityPeriodFormData.validityPeriodFrom).format("YYYY-MM-DD");
     },
     formattedValidityPeriodTo() {
       if (!this.classTimeSlotValidityPeriodFormData.validityPeriodTo)
         return null;
-      return formatDate(
-        this.classTimeSlotValidityPeriodFormData.validityPeriodTo,
-      );
+      return moment(this.classTimeSlotValidityPeriodFormData.validityPeriodTo).format("YYYY-MM-DD");
     },
     userLanguage() {
       return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
