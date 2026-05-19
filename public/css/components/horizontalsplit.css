@@ -19,7 +19,7 @@
 
 .horizontalsplitter {
 	flex-shrink: 0;
-	width: 8px;
+	width: 16px;
 	cursor: col-resize;
 	user-select: none;
 	display: flex;
@@ -29,10 +29,12 @@
 
 .horizontalsplitter.left {
 	border-left: solid 3px var(--fhc-horizontalsplit-hsplitter-border-color);
+	margin-right: 3px;
 }
 
 .horizontalsplitter.right {
 	border-right: solid 3px var(--fhc-horizontalsplit-hsplitter-border-color);
+	margin-left: 3px;
 }
 
 .splitactions.horizontal {
@@ -52,7 +54,7 @@
 }
 
 .splitactions.horizontal .splitaction {
-	width: auto;
+	width: 14px;
 	height: 28px;
 	display: flex;
 	align-items: center;
