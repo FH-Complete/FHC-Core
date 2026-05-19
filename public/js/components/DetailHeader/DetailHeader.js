@@ -412,7 +412,7 @@ export default {
 							class="btn btn-outline btn-light mb-1"
 							:title="'Automatische Tags fuer ' + currentSemester + ' neu laden'"
 							>
-							<i class="fa-solid fa-refresh"></i></button>
+							<i class="fa-solid fa-refresh pe-1"></i>
 							<span>{{currentSemester}}</span>
 						</div>
 						<h6  v-if="headerData[0].unruly" class="badge" :class="'bg-unruly rounded-0'"><strong>unruly</strong></h6>
