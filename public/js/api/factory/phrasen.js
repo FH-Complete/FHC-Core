@@ -52,4 +52,13 @@ export default {
 			},
 		};
 	},
+	getTabulatorPhrases(languages = []) {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/phrasen/getTabulatorPhrases',
+			params: {
+				languages: JSON.stringify(languages),
+			},
+		};
+	},
 };

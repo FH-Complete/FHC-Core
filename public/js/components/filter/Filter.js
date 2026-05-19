@@ -373,54 +373,14 @@ export const CoreFilterCmpt = {
 			tabulatorOptions.locale = this.$p.user_language.value;
 			tabulatorOptions.langs = {};
 
-			let phrasesGroupedByCategoryRequestParam = {
-				tabulator: [
-					"loading",
-					"error",
-					"item",
-					"items",
-					"page_size",
-					"page_title",
-					"first",
-					"first_title",
-					"last",
-					"last_title",
-					"prev",
-					"prev_title",
-					"next",
-					"next_title",
-					"all",
-					"showing",
-					"of",
-					"rows",
-					"pages",
-				],
-			};
-			tabulatorOptions.columns.forEach((column) => {
-				if (column.field === "collapse") return;
-
-				let [category, phrase] = column.title.split("/");
-				if (phrasesGroupedByCategoryRequestParam[category]) {
-					phrasesGroupedByCategoryRequestParam[category].push(phrase);
-				} else {
-					phrasesGroupedByCategoryRequestParam[category] = [phrase];
-				}
-			});
-
-			const phrasesResponse = await this.$api.call(
-				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
+			const tabulatorPhrasesResponse = await this.$api.call(
+				ApiPhrases.getTabulatorPhrases(),
 			);
-			const phrasesData = phrasesResponse.data;
-
-			Object.keys(phrasesData).forEach((language) => {
-				let genericTabulatorPhrases = phrasesData[language].filter(
-					(phrase) => phrase.category === "tabulator",
-				);
-
+			const tabulatorPhrasesData = tabulatorPhrasesResponse.data;
+			Object.keys(tabulatorPhrasesData).forEach((language) => {
 				let tabulatorPhraseToTranslationMapper = {};
-				genericTabulatorPhrases.forEach((phrase) => {
-					tabulatorPhraseToTranslationMapper[phrase.phrase] =
-						phrase.text;
+				tabulatorPhrasesData[language].forEach((phrase) => {
+					tabulatorPhraseToTranslationMapper[phrase.phrase] = phrase.text;
 				});
 
 				tabulatorOptions.langs[language] = {
@@ -459,6 +419,35 @@ export const CoreFilterCmpt = {
 						},
 					},
 				};
+			});
+
+			let phrasesGroupedByCategoryRequestParam = {};
+			tabulatorOptions.columns.forEach((column) => {
+				if (column.field === "collapse") return;
+
+				let [category, phrase] = column.title.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+
+			const phrasesResponse = await this.$api.call(
+				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
+			);
+			const phrasesData = phrasesResponse.data;
+
+			Object.keys(phrasesData).forEach((language) => {
+				let genericTabulatorPhrases = phrasesData[language].filter(
+					(phrase) => phrase.category === "tabulator",
+				);
+
+				let tabulatorPhraseToTranslationMapper = {};
+				genericTabulatorPhrases.forEach((phrase) => {
+					tabulatorPhraseToTranslationMapper[phrase.phrase] =
+						phrase.text;
+				});
 
 				let columnHeadingPhrases = phrasesData[language].filter(
 					(phrase) => phrase.category !== "tabulator",
