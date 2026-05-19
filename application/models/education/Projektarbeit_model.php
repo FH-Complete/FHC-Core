@@ -46,7 +46,7 @@ class Projektarbeit_model extends DB_Model
 					JOIN lehre.tbl_lehreinheit USING (lehreinheit_id)
 					JOIN lehre.tbl_lehrveranstaltung USING (lehrveranstaltung_id)
 					LEFT JOIN public.tbl_firma USING (firma_id)
-					LEFT JOIN public.tbl_sprache ON tbl_projektarbeit.sprache = tbl_sprache.sprache
+					LEFT JOIN public.tbl_sprache ON pa.sprache = tbl_sprache.sprache
 				WHERE
 					pa.student_uid = ?";
 
