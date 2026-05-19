@@ -475,9 +475,8 @@ export const CoreFilterCmpt = {
 				tabulatorOptions.columns.forEach((column) => {
 					if (column.field === "collapse") return;
 					columnFieldToTranslationMapper[column.field] =
-						columnTitleToTranslationMapper[column.title];
+						columnTitleToTranslationMapper[column.title] ?? "<< PHRASE " + column.title + " >>";
 				});
-
 				tabulatorOptions.langs[language].columns =
 					columnFieldToTranslationMapper;
 			});
