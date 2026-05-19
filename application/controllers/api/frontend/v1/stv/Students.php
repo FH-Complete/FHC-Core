@@ -894,7 +894,7 @@ class Students extends FHCAPI_Controller
 					n.start,
 					n.ende
 				  FROM public.tbl_notizzuordnung AS nz
-					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id
+					JOIN public.tbl_notiz AS n ON nz.notiz_id = n.notiz_id AND nz.prestudent_id IS NOT NULL
 					JOIN public.tbl_notiz_typ AS nt ON n.typ = nt.typ_kurzbz "
 				. $whereTags .
 				"
