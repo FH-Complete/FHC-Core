@@ -96,7 +96,9 @@ class Phrasen extends FHCAPI_Controller
 
 	public function getPhrases()
 	{
-		$languages = json_decode($this->input->get('languages'));
+		$postParams = $this->getPostJSON();
+
+		$languages = $postParams->languages;
 		if (!$languages || !count($languages)) {
 			$this->load->model('system/Sprache_model', 'sprachenModel');
 			$activeLanguages = $this->sprachenModel->loadWhere(array('content' => true));
@@ -110,7 +112,7 @@ class Phrasen extends FHCAPI_Controller
 		}
 
 		$this->load->model('system/Phrase_model', 'phraseModel');
-		$phrasesGroupedByCategory = json_decode($this->input->get('phrasesGroupedByCategory'));
+		$phrasesGroupedByCategory = $postParams->phrasesGroupedByCategory;
 		$result = [];
 		foreach ($languages as $language) {
 			$phrases = $this->phraseModel->getPhrasesByCategoryAndPhrasesAndLanguage($phrasesGroupedByCategory, $language);

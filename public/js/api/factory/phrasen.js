@@ -44,11 +44,11 @@ export default {
 	},
 	getPhrases(phrasesGroupedByCategory, languages = []) {
 		return {
-			method: 'get',
+			method: 'post',
 			url: '/api/frontend/v1/phrasen/getPhrases',
 			params: {
-				phrasesGroupedByCategory: JSON.stringify(phrasesGroupedByCategory),
-				languages: JSON.stringify(languages),
+				phrasesGroupedByCategory,
+				languages,
 			},
 		};
 	},
