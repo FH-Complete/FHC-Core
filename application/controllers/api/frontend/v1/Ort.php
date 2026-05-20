@@ -454,7 +454,7 @@ class Ort extends FHCAPI_Controller
 
 		$reservationsCount = hasData($reservationsResult) ? getData($reservationsResult)[0]->count : 0;
 		if ($reservationsCount > 0) {
-			$this->terminateWithError("Cannot delete room with shortcode $ort_kurzbz because there are existing reservations for this room", self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui', 'error_existingReservationsForRoomsUponDeletion'), self::ERROR_TYPE_GENERAL);
 		}
 
 		$softwareImageOrtQuery = "SELECT COUNT(*) FROM extension.tbl_softwareimage_ort WHERE ort_kurzbz = ?";
@@ -465,7 +465,14 @@ class Ort extends FHCAPI_Controller
 
 		$softwareImageOrtCount = $softwareImageOrtResult->row()->count;
 		if ($softwareImageOrtCount > 0) {
-			$this->terminateWithError($this->p->t('ui', 'error_existingReservationsForRoomsUponDeletion'), self::ERROR_TYPE_GENERAL);
+			$this->terminateWithError($this->p->t('ui', 'error_existingSoftwareImageForRoomTypeUponDeletion'), self::ERROR_TYPE_GENERAL);
+		}
+
+		$subRoomsCountQuery = "SELECT COUNT(*) FROM public.tbl_ort WHERE parent_ort_kurzbz = ?";
+		$subRoomsCountQuery = $this->OrtModel->execReadOnlyQuery($subRoomsCountQuery, [$ort_kurzbz]);
+		$subRoomsCount = hasData($subRoomsCountQuery) ? getData($subRoomsCountQuery)[0]->count : 0;
+		if ($subRoomsCount > 0) {
+			$this->terminateWithError($this->p->t('ui', 'error_existingSubRoomsForRoomUponDeletion'), self::ERROR_TYPE_GENERAL);
 		}
 
 		$result = $this->OrtModel->delete([

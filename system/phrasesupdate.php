@@ -58880,6 +58880,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'ui',
+		'phrase' => 'error_existingSubRoomsForRoomUponDeletion',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Es gibt bestehende Unterräume für diesen Raum. Bitte entfernen Sie die Unterräume, bevor Sie den Raum löschen.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'There are existing sub-rooms for this room. Please remove the sub-rooms before deleting the room.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
 		'phrase' => 'error_existingReservationsForRoomsUponDeletion',
 		'insertvon' => 'system',
 		'phrases' => array(
