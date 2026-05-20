@@ -70,6 +70,8 @@ export default {
 				if (this.abortController) this.abortController.abort();
 				this.abortController = new AbortController();
 
+				if (!this.getSearchStr()?.length) return;
+
 				this.searchfunction(this.searchsettings, {
 					timeout: 50000,
 					signal: this.abortController.signal,
