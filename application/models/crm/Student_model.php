@@ -75,6 +75,7 @@ class Student_model extends DB_Model
 		return $matrikelnummer.sprintf("%03d", $max);
 	}
 
+
 	/**
 	 * Generiert die Matrikelnummer
 	 * FORMAT: 0710254001
@@ -88,15 +89,35 @@ class Student_model extends DB_Model
 	 * TODO(chris): replace function above with this?
 	 *
 	 * @param integer					$studiengang_kz
-	 * @param string					$studiensemester_kurzbz
 	 * @param string					$beginndatum
 	 * @param string					$typ
 	 *
 	 * @return stdClass
 	 */
-	public function generatePersonenkennzeichen($studiengang_kz, $studiensemester_kurzbz, $beginndatum, $typ = null)
+	public function generatePersonenkennzeichen($studiengang_kz, $beginndatum, $typ = null)
 	{
 		$personenkennzeichen = false;
+		$studiensemester_kurzbz = null;
+
+		// Validierung der Eingabewerte
+		if (!is_valid_date($beginndatum)) return error("Ungültiges Beginndatum.");
+
+		// get studiensemester from datum
+		$meldestichtagRes = $this->BismeldestichtagModel->getByDate($beginndatum);
+
+		if (isError($meldestichtagRes)) return $meldestichtagRes;
+
+		if (hasData($meldestichtagRes))
+			$studiensemester_kurzbz = getData($meldestichtagRes)[0]->studiensemester_kurzbz;
+		else
+		{
+			$studiensemesterRes = $this->StudiensemesterModel->getByDate($beginndatum);
+			if (isError($studiensemesterRes)) return $studiensemesterRes;
+
+			if (!hasData($studiensemesterRes)) return error("Kein Studiensemester gefunden.");
+
+			$studiensemester_kurzbz = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
+		}
 
 		Events::trigger(
 			'generate_personenkennzeichen',
@@ -110,11 +131,6 @@ class Student_model extends DB_Model
 
 		if ($personenkennzeichen !== false)
 			return success($personenkennzeichen);
-
-		// Validierung der Eingabewerte
-		if (strlen($studiensemester_kurzbz) < 6) {
-			throw new InvalidArgumentException("Ungültiges studiensemester_kurzbz Format.");
-		}
 
 		$jahr = mb_substr($studiensemester_kurzbz, 4);
 		$art = substr($studiensemester_kurzbz, 0, 2);
@@ -153,21 +169,7 @@ class Student_model extends DB_Model
 			}
 		}
 
-		// get Bismeldestichtag for the semester
-		$meldestichtagRes = $this->BismeldestichtagModel->getByStudiensemester($studiensemester_kurzbz);
-
-		if (isError($meldestichtagRes))
-			return $meldestichtagRes;
-
-		// if start of study is after Bismeldestichtag, Studienjahr of next semester is used, so 1 doesn't need to be subtracted for SS
-		$afterMeldeStichtag = false;
-		if (hasData($meldestichtagRes))
-		{
-			$meldestichtag = getData($meldestichtagRes)[0]->meldestichtag;
-			$afterMeldeStichtag = isset($beginndatum) && new DateTime($beginndatum) > new DateTime($meldestichtag);
-		}
-
-		if (($art=='2' || $art=='4') && !$afterMeldeStichtag)
+		if ($art=='2' || $art=='4')
 			$jahr = $jahr-1;
 
 		//FH-Burgenland - weil leider die AO Studiengänge aufgeteilt sind

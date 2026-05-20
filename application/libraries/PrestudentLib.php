@@ -687,10 +687,9 @@ class PrestudentLib
 		$now = date('c');
 		$today = date('Y-m-d');
 
-		// Genererate Personenkennzeichen
+		// Generate Personenkennzeichen
 		$personenkennzeichen = $this->_ci->StudentModel->generatePersonenkennzeichen(
 			$student_data->studiengang_kz,
-			$studiensemester_kurzbz,
 			$today,
 			$student_data->typ
 		);

@@ -130,4 +130,27 @@ class Bismeldestichtag_model extends DB_Model
 
 		return $this->execQuery($query, array($studiensemester_kurzbz));
 	}
+
+	/**
+	 * Gets first Bismeldestichtag after a certain date.
+	 * @param $beginndatum
+	 * @return object success or error
+	 */
+	public function getByDate($beginndatum)
+	{
+		$query = '
+				SELECT
+					meldestichtag, studiensemester_kurzbz, studienjahr_kurzbz
+				FROM
+					bis.tbl_bismeldestichtag
+					JOIN public.tbl_studiensemester USING (studiensemester_kurzbz)
+					LEFT JOIN public.tbl_studienjahr USING (studienjahr_kurzbz)
+				WHERE
+					?::date <= meldestichtag
+				ORDER BY
+					meldestichtag
+				LIMIT 1';
+
+		return $this->execQuery($query, array($beginndatum));
+	}
 }
