@@ -36,7 +36,7 @@ export default {
           return {
             databaseId: slot.id,
             id: slot.identifier,
-            weekday: slot.wochentag === 0 ? 7 : slot.wochentag,
+            weekday: slot.wochentag + 1,
             type: slot.unterrichtszeitentyp_kurzbz,
             startTime: slot.startTime,
             endTime: slot.endTime,
@@ -88,7 +88,7 @@ export default {
             .unterrichtszeitengueltigkeit_id,
           {
             unterrichtszeiten: this.classTimeSlots.map((slot) => {
-              slot.wochentag = parseInt(slot.wochentag) === 7 ? 0 : slot.wochentag;
+              slot.wochentag = parseInt(slot.wochentag)- 1;
               return slot; 
             }),
           },
@@ -110,7 +110,7 @@ export default {
             .unterrichtszeitengueltigkeit_id,
           {
             unterrichtszeiten: this.classTimeSlots.map((slot) => {
-              slot.wochentag = parseInt(slot.wochentag) === 7 ? 0 : slot.wochentag;
+              slot.wochentag = parseInt(slot.wochentag)- 1;
               return slot;
             }),
           },

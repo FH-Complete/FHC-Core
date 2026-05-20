@@ -58656,6 +58656,27 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'dropdownEmptyOption',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => '--keine Auswahl--',
+
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => '--no selection--',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 

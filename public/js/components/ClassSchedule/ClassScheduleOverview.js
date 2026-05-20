@@ -320,9 +320,7 @@ export default {
         return getAllClassTimeValidityPeriodsResponse.data.map(
           function (period) {
             period.organisationseinheit_bezeichnung_extended =
-              period.organisationseinheit_bezeichnung +
-              " - " +
-              period.organisationseinheit_organisationseinheittyp_kurzbz;
+              "[" + period.organisationseinheit_organisationseinheittyp_kurzbz + "] " + period.organisationseinheit_bezeichnung;
             if (!period.studienplan_bezeichnung) {
               period.studienplan_bezeichnung = generalWord;
             }
@@ -375,7 +373,7 @@ export default {
     },
     filterOrganizationalUnits(event) {
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 
@@ -395,7 +393,7 @@ export default {
     },
     filterSemesters(event) {
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 

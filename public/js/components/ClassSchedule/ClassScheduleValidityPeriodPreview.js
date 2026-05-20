@@ -93,7 +93,7 @@ export default {
               return {
                 databaseId: slot.id,
                 id: slot.identifier,
-                weekday: parseInt(slot.wochentag) === 0 ? 7 : slot.wochentag,
+                weekday: parseInt(slot.wochentag) + 1,
                 type: slot.unterrichtszeitentyp_kurzbz,
                 startTime: slot.uhrzeit_von,
                 endTime: slot.uhrzeit_bis,
