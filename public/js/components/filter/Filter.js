@@ -22,6 +22,9 @@ import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
+import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js"
+
+import { debounce } from "../../helpers/DebounceHelper.js";
 
 import ApiFilter from '../../api/factory/filter.js';
 import ApiPhrases from '../../api/factory/phrasen.js';
@@ -123,6 +126,27 @@ export const CoreFilterCmpt = {
 				group: false,
 				page: false,
 			},
+			collapsedHeadingLocalizationTimer: null,
+			localizeCollapsedColumnHeadings:
+				debounce(
+					() => {
+						const columnHeadings = this.tabulator?.getLang()?.columns;
+						if (!columnHeadings) return;
+
+						this.$refs.table
+							.querySelectorAll(".collapsedColumnHeading")
+							.forEach((collapsedColumnHeadingElement) => {
+								const field =
+									collapsedColumnHeadingElement.getAttribute(
+										"tabulator-column-field",
+									);
+								if (!field?.length) return;
+
+								collapsedColumnHeadingElement.innerHTML =
+									columnHeadings[field];
+							});
+					}, 200)
+		,
 		};
 	},
 	computed: {
@@ -368,6 +392,11 @@ export const CoreFilterCmpt = {
 					this.localizeCollapsedColumnHeadings();
 				}	
 			});
+			this.tabulator.on('layoutRefreshed', () => {
+				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
+					this.localizeCollapsedColumnHeadings();
+				}	
+			});
 		},
 		async configureTabulatorLocalizations(tabulatorOptions) {
 			tabulatorOptions.locale = this.$p.user_language.value;
@@ -471,21 +500,6 @@ export const CoreFilterCmpt = {
 			});
 
 			return tabulatorOptions;
-		},
-		async localizeCollapsedColumnHeadings() {
-			const columnHeadings = this.tabulator?.getLang()?.columns;
-			if (!columnHeadings) return;
-
-			this.$refs.table
-				.querySelectorAll(".collapsedColumnHeading")
-				.forEach((collapsedColumnHeadingElement) => {
-					const field =
-						collapsedColumnHeadingElement.getAttribute("tabulator-column-field");
-					if (!field?.length) return;
-
-					collapsedColumnHeadingElement.innerHTML =
-						columnHeadings[field];
-				});
 		},
 		updateTabulator() {
 			if (this.tabulator) {
@@ -814,6 +828,8 @@ export const CoreFilterCmpt = {
 			alert('"nwNewEntry" listener is mandatory when sideMenu is true');
 		this.uuid = _uuid++;
 		this.$emit('uuidDefined', this.uuid)
+
+		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
 	},
 	mounted() {
 		this.initTabulator().then(() => {
