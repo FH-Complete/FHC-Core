@@ -50,18 +50,6 @@ if(defined('CIS4')){
 
 					<?php foreach ($array['allowedNewTypes'] as $type) { ?>
 
-<!--	TODO (REMOVE Not needed code) -->
-	<!--					<div class="alert alert-secondary">
-								<p><?php /*= $this->p->t('studierendenantrag', 'calltoaction_' . $type); */?></p>
-								<hr>
-								<a
-									href="<?php /*= site_url('lehre/Studierendenantrag/' . strtolower($type) . '/' . $prestudent_id); */?>"
-									class="btn btn-outline-secondary"
-									>
-									<i class="fa fa-plus"></i> <?php /*= $this->p->t('studierendenantrag', 'antrag_typ_' . $type); */?>
-								</a>
-							</div>-->
-
 						<div class="alert alert-secondary">
 								<p><?= $this->p->t('studierendenantrag', 'calltoaction_' . $type); ?></p>
 								<hr>
@@ -97,18 +85,19 @@ if(defined('CIS4')){
 											<h5
 													class="modal-title"
 													id="modalinfoLabel<?= $prestudent_id; ?>"
-											> Hinweis Beratungsgespräch <?= $this->p->t('studierendenantrag', 'title_Abmeldung'); ?>
+											> <?= $this->p->t('studierendenantrag', 'info_consultation'); ?>
 											</h5>
 											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 										</div>
+										<?php
+										$hrefUnterbrechung = site_url('lehre/Studierendenantrag/unterbrechung/' . $prestudent_id);
+										?>
 										<div class="modal-body">
-											<!--	TODO (ADD TEXT) -->
-													<textarea
+													<div
 															class="form-control"
-															style="width: 100%; height: 250px;"
-															readonly
-													>Ich nehme zur Kenntnis, dass es die Möglichkeit für ein Beratungsgespräch gibt. (.... Text folgt noch ....)
-													</textarea>
+															style="width: 100%; height: 250px;overflow:auto; white-space: normal;"
+													><?= $this->p->t('studierendenantrag', 'modalHinweistext_Abmeldung', ['linkUnterbrechung' => $hrefUnterbrechung] ); ?>
+													</div>
 										</div>
 
 										<div class="modal-footer">

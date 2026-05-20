@@ -58197,6 +58197,52 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'modalHinweistext_Abmeldung',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => "Bevor du deine Abmeldung abschließt, möchten wir dir gerne ein Gespräch anbieten. Vielleicht gibt es Fragen, Unsicherheiten oder Herausforderungen, bei denen wir dich unterstützen können.<br>
+<br>Du kannst dich jederzeit unverbindlich an deine Studiengangsassistenz, Studiengangsleitung oder das <a href='https://cis.technikum-wien.at/cis.php/CisVue/Cms/content/9248' target='_blank'>Student Support Team</a> wenden. Ein Gespräch ist natürlich freiwillig – manchmal hilft es aber, gemeinsam Optionen zu besprechen, zum Beispiel auch eine vorübergehende
+<a href={linkUnterbrechung} target='_blank'>Studienunterbrechung</a>.
+<br><br>Wenn du deine Abmeldung fortsetzen möchtest, kannst du das selbstverständlich tun.",
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => "Before you finalize your deregistration, we would like to offer you a consultation. Perhaps you have questions, uncertainties, or challenges that we can help you with. <br>
+<br>You can contact your program assistant, program director, or the <a href='https://cis.technikum-wien.at/cis.php/CisVue/Cms/content/9248' target='_blank'>Student Support Team</a> at any time without obligation. A consultation is, of course, voluntary; however, sometimes it helps to discuss options together, such as a
+<a href={linkUnterbrechung} target='_blank'>temporary break</a> from your studies.
+<br><br>If you wish to proceed with your deregistration, you can, of course, do so.",
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'studierendenantrag',
+		'phrase' => 'info_consultation',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Hinweis Beratungsgespräch',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Note Consultation',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
