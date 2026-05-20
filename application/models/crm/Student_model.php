@@ -111,6 +111,7 @@ class Student_model extends DB_Model
 			$studiensemester_kurzbz = getData($meldestichtagRes)[0]->studiensemester_kurzbz;
 		else
 		{
+			$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 			$studiensemesterRes = $this->StudiensemesterModel->getByDate($beginndatum);
 			if (isError($studiensemesterRes)) return $studiensemesterRes;
 
