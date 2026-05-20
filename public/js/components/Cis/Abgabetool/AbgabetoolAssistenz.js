@@ -1798,7 +1798,7 @@ export const AbgabetoolAssistenz = {
 				}
 
 				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
-				
+
 				return {
 					...projekt,
 					abgabetermine: projekt.abgabetermine,
@@ -1820,8 +1820,10 @@ export const AbgabetoolAssistenz = {
 			})
 		},
 		findLatestTerminWithUpload(projekt) {
-			const withAbgabedatumSorted = projekt?.abgabetermine?.filter(t => t.abgabedatum != null)?.sort((a,b) => a < b)
-
+			const withAbgabedatumSorted = projekt?.abgabetermine
+				?.filter(t => t.abgabedatum != null)
+				?.sort((a, b) => new Date(b.abgabedatum) - new Date(a.abgabedatum));
+			
 			if(withAbgabedatumSorted.length) {
 				return withAbgabedatumSorted[0]
 			}
