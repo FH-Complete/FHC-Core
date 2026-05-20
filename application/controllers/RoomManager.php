@@ -34,8 +34,6 @@ class RoomManager extends Auth_Controller
 		);
 
 		$this->_setAuthUID();
-
-		$this->setControllerId();
 	}
 
 	// -----------------------------------------------------------------------------------------------------------------

@@ -156,7 +156,7 @@ export default {
   methods: {
     filterRoomTypes(event) {
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 

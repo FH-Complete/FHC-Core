@@ -44,6 +44,7 @@ class Ort extends FHCAPI_Controller
 		]);
 
 		$this->load->library('form_validation');
+		$this->load->library('requests/RoomRequest');
 
 		$this->load->model('ressource/Ort_model', 'OrtModel');
 		$this->load->model('ressource/Reservierung_model', 'ReservierungModel');
@@ -53,8 +54,12 @@ class Ort extends FHCAPI_Controller
 		$this->loadPhrases([
 			'global',
 			'ui',
-			'lehre'
+			'lehre',
+			'gruppenmanagement',
+			'person',
 		]);
+
+		
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -73,8 +78,8 @@ class Ort extends FHCAPI_Controller
 		$query = "SELECT
 				COUNT(*) OVER() AS full_count,
 				public.tbl_ort.*, 
-				pr.ort_kurzbz as pr_ort_kurzbz,
-				org.bezeichnung as org_bezeichnung
+				org.bezeichnung as org_bezeichnung,
+				org.organisationseinheittyp_kurzbz as org_organisationseinheittyp_kurzbz
 			FROM public.tbl_ort 
 			LEFT JOIN public.tbl_ort as pr ON pr.ort_kurzbz = public.tbl_ort.parent_ort_kurzbz
 			LEFT JOIN public.tbl_organisationseinheit as org ON org.oe_kurzbz = public.tbl_ort.oe_kurzbz";
@@ -87,6 +92,16 @@ class Ort extends FHCAPI_Controller
 		$searchableBooleanAttributes = ['lehre', 'reservieren', 'aktiv'];
 		$searchableNumericAttributes = ['max_person', 'arbeitsplaetze', 'kosten', 'stockwerk'];
 		$searchableNumericSpanAttributes = ['m2'];
+		$searchableCustomAttributes = [
+			[
+				'raw_sql_fragment' => "CONCAT(public.tbl_ort.ort_kurzbz, ' - ', public.tbl_ort.bezeichnung)",
+				'filter_parameter' => 'ort_kurzbz_bezeichnung_concat',
+			], 
+			[
+				'raw_sql_fragment' => "CONCAT('[', org.organisationseinheittyp_kurzbz, '] ', org.bezeichnung)",
+				'filter_parameter' => 'org_organisationseinheittyp_kurzbz_org_bezeichnung_concat',
+			]
+		];
 
 		foreach ($searchableIdAttributes as $attribute) {
 			if (isset($filter[$attribute]) && $filter[$attribute] !== '') {
@@ -128,11 +143,45 @@ class Ort extends FHCAPI_Controller
 			}
 		}
 
+		foreach ($searchableCustomAttributes as $customAttribute) {
+			if (isset($filter[$customAttribute['filter_parameter']]) && $filter[$customAttribute['filter_parameter']] !== '') {
+				$queryWhereFragments[] = $customAttribute['raw_sql_fragment'] . " ILIKE ?";
+				$filterData[] = '%' . trim($filter[$customAttribute['filter_parameter']]) . '%';
+			}
+		}
+
 		if (count($queryWhereFragments) > 0) {
 			$query .= ' WHERE ' . implode(' AND ', $queryWhereFragments);
 		}
 
-		$query .= ' ORDER BY public.tbl_ort.ort_kurzbz ASC';
+		$sortableAttributes = ['ort_kurzbz', 'bezeichnung', 'planbezeichnung', 'max_person', 'arbeitsplaetze', 'm2', 'lehre', 'reservieren', 'aktiv', 'stockwerk', 'kosten', 'parent_ort_kurzbz', 'org_bezeichnung'];
+		$sortableConcatAttributes = [
+			[
+				'raw_sql_fragment' => "CONCAT('[', org.organisationseinheittyp_kurzbz, '] ', org.bezeichnung)",
+				'sort_parameter' => 'org_organisationseinheittyp_kurzbz_org_bezeichnung_concat',
+			]
+		];
+		$sorter = $this->input->get('sort', TRUE);
+
+		foreach ($sortableAttributes as $attribute) {
+			if (isset($sorter[$attribute]) && in_array(strtolower($sorter[$attribute]), ['asc', 'desc'])) {
+				if ($attribute === 'org_bezeichnung') {
+					$query .= " ORDER BY org.bezeichnung " . strtoupper($sorter[$attribute]);
+				} else {
+					$query .= " ORDER BY public.tbl_ort.$attribute " . strtoupper($sorter[$attribute]);
+				}
+			}
+		}
+
+		foreach ($sortableConcatAttributes as $customAttribute) {
+			if (isset($sorter[$customAttribute['sort_parameter']]) && in_array(strtolower($sorter[$customAttribute['sort_parameter']]), ['asc', 'desc'])) {
+				$query .= " ORDER BY " . $customAttribute['raw_sql_fragment'] . " " . strtoupper($sorter[$customAttribute['sort_parameter']]);
+			}
+		}
+
+		if (!isset($sorter)) {
+			$query .= ' ORDER BY public.tbl_ort.ort_kurzbz ASC';
+		}
 
 		if ($paginationSize && $paginationPage) {
 			$query .= " LIMIT ? OFFSET ?";
@@ -298,49 +347,10 @@ class Ort extends FHCAPI_Controller
 
 	public function createRoom()
 	{
-		$this->form_validation->set_rules('ort_kurzbz', 'kurzbezeichnung', 'required|is_unique[tbl_ort.ort_kurzbz]', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'kurzbz')]),
-			'is_unique' => $this->p->t('ui', 'error_fieldUnique', ['field' =>  $this->p->t('lehre', 'kurzbz')])
-		]);
-		$this->form_validation->set_rules('content_id', 'content_id', 'number', [
-			'required' => $this->p->t('ui', 'error_fieldRequired', ['field' =>  $this->p->t('lehre', 'content_id')])
-		]);
-		if($this->form_validation->run() == FALSE) $this->terminateWithValidationErrors($this->form_validation->error_array());
 		
-		$parent_ort_kurzbz = $this->input->post('parent_ort_kurzbz');
-		if ($parent_ort_kurzbz) {
-			$this->load->model('ressource/Ort_model', 'ParentRoomModel');
-			$parentRoom = $this->ParentRoomModel->load($parent_ort_kurzbz);
-			if (isError($parentRoom) || !hasData($parentRoom)) {
-				$this->terminateWithError("Parent room with shortcode $parent_ort_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$oe_kurzbz = $this->input->post('oe_kurzbz');
-		if ($oe_kurzbz) {
-			$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
-			$orgUnit = $this->OrganisationseinheitModel->load($oe_kurzbz);
-			if (isError($orgUnit) || !hasData($orgUnit)) {
-				$this->terminateWithError("Organizational unit with shortcode $oe_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$standort_id = $this->input->post('standort_id');
-		if ($standort_id) {
-			$this->load->model('organisation/Standort_model', 'StandortModel');
-			$location = $this->StandortModel->load($standort_id);
-			if (isError($location) || !hasData($location)) {
-				$this->terminateWithError("Location with id $standort_id does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$content_id = $this->input->post('content_id');
-		if ($content_id) {
-			$this->load->model('content/Content_model', 'ContentModel');
-			$content = $this->ContentModel->load($content_id);
-			if (isError($content) || !hasData($content)) {
-				$this->terminateWithError("Content with id $content_id does not exist", self::ERROR_TYPE_GENERAL);
-			}
+		if (!$this->roomrequest->validate()) {
+			$this->terminateWithValidationErrors($this->roomrequest->errors());
+			return;
 		}
 
 		$this->db->trans_start();
@@ -365,7 +375,7 @@ class Ort extends FHCAPI_Controller
 			"telefonklappe" => $this->input->post('telefonklappe'),
 			"m2" => $this->input->post('m2'),
 			"gebteil" => $this->input->post('gebteil'),
-			"arbeitsplaetze" => $this->input->post('arbeitsplatze'),
+			"arbeitsplaetze" => $this->input->post('arbeitsplaetze'),
 			'insertamum' => date('c'),
 			'insertvon' => getAuthUid(),
 			'updateamum' => date('c'),
@@ -383,44 +393,9 @@ class Ort extends FHCAPI_Controller
 
 	public function updateRoom($ort_kurzbz)
 	{
-		if (!$ort_kurzbz) {
-			$this->terminateWithError("missing ort_kurzbz parameter", self::ERROR_TYPE_GENERAL);
-		}
-		
-		$parent_ort_kurzbz = $this->input->post('parent_ort_kurzbz');
-		if ($parent_ort_kurzbz) {
-			$this->load->model('ressource/Ort_model', 'ParentRoomModel');
-			$parentRoom = $this->ParentRoomModel->load($parent_ort_kurzbz);
-			if (isError($parentRoom) || !hasData($parentRoom)) {
-				$this->terminateWithError("Parent room with shortcode $parent_ort_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$oe_kurzbz = $this->input->post('oe_kurzbz');
-		if ($oe_kurzbz) {
-			$this->load->model('organisation/Organisationseinheit_model', 'OrganisationseinheitModel');
-			$orgUnit = $this->OrganisationseinheitModel->load($oe_kurzbz);
-			if (isError($orgUnit) || !hasData($orgUnit)) {
-				$this->terminateWithError("Organizational unit with shortcode $oe_kurzbz does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$standort_id = $this->input->post('standort_id');
-		if ($standort_id) {
-			$this->load->model('organisation/Standort_model', 'StandortModel');
-			$location = $this->StandortModel->load($standort_id);
-			if (isError($location) || !hasData($location)) {
-				$this->terminateWithError("Location with id $standort_id does not exist", self::ERROR_TYPE_GENERAL);
-			}
-		}
-
-		$content_id = $this->input->post('content_id');
-		if ($content_id) {
-			$this->load->model('content/Content_model', 'ContentModel');
-			$content = $this->ContentModel->load($content_id);
-			if (isError($content) || !hasData($content)) {
-				$this->terminateWithError("Content with id $content_id does not exist", self::ERROR_TYPE_GENERAL);
-			}
+		if (!$this->roomrequest->validate("update")) {
+			$this->terminateWithValidationErrors($this->roomrequest->errors());
+			return;
 		}
 
 		$this->db->trans_start();

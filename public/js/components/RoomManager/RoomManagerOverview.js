@@ -23,8 +23,7 @@ export default {
   provide() {
     return {
       cisRoot: this.cisRoot,
-      hasBasisOrtWPermission:
-        this.permissions["basis/ort_w"] || false,
+      hasBasisOrtWPermission: this.permissions["basis/ort_w"] || false,
     };
   },
   watch: {
@@ -51,13 +50,9 @@ export default {
       filteredOrganizationalUnits: [],
       buildingComponents: [
         {
-          label: "----------",
-          value: null,
-        }, 
-        {
           label: "A",
           value: "A",
-        }, 
+        },
         {
           label: "B",
           value: "B",
@@ -67,16 +62,16 @@ export default {
           value: "C",
         },
         {
-          label: "D", 
-          value: "D"
+          label: "D",
+          value: "D",
         },
         {
           label: "E",
-          value: "E"
+          value: "E",
         },
         {
           label: "F",
-          value: "F"
+          value: "F",
         },
       ],
       isRoomFormModalVisible: false,
@@ -93,19 +88,45 @@ export default {
       const options = {
         ajaxURL: "dummy",
         ajaxRequestFunc: async (url, config, params) => {
-          let shortCodeFilter = params?.filter?.find((filter) => filter.field === "ort_kurzbz");
-          let descriptionFilter = params?.filter?.find((filter) => filter.field === "bezeichnung");
-          let planDescriptionFilter = params?.filter?.find((filter) => filter.field === "planbezeichnung");
-          let maxPersonsFilter = params?.filter?.find((filter) => filter.field === "max_person");
-          let workplaceFilter = params?.filter?.find((filter) => filter.field === "arbeitsplaetze");
-          let squareMetersFilter = params?.filter?.find((filter) => filter.field === "m2");
-          let orgUnitFilter = params?.filter?.find((filter) => filter.field === "org_bezeichnung");
-          let isForTrainingProgramFilter = params?.filter?.find((filter) => filter.field === "lehre");
-          let reservationNeededFilter = params?.filter?.find((filter) => filter.field === "reservieren");
-          let isActiveFilter = params?.filter?.find((filter) => filter.field === "aktiv");
-          let costsFilter = params?.filter?.find((filter) => filter.field === "kosten");
-          let floorFilter = params?.filter?.find((filter) => filter.field === "stockwerk");
-          let parentRoomFilter = params?.filter?.find((filter) => filter.field === "pr_ort_kurzbz");
+          let shortCodeFilter = params?.filter?.find(
+            (filter) => filter.field === "ort_kurzbz",
+          );
+          let descriptionFilter = params?.filter?.find(
+            (filter) => filter.field === "bezeichnung",
+          );
+          let planDescriptionFilter = params?.filter?.find(
+            (filter) => filter.field === "planbezeichnung",
+          );
+          let maxPersonsFilter = params?.filter?.find(
+            (filter) => filter.field === "max_person",
+          );
+          let workplaceFilter = params?.filter?.find(
+            (filter) => filter.field === "arbeitsplaetze",
+          );
+          let squareMetersFilter = params?.filter?.find(
+            (filter) => filter.field === "m2",
+          );
+          let orgUnitConcatFilter = params?.filter?.find(
+            (filter) => filter.field === "org_organisationseinheittyp_kurzbz_org_bezeichnung_concat",
+          );
+          let isForTrainingProgramFilter = params?.filter?.find(
+            (filter) => filter.field === "lehre",
+          );
+          let reservationNeededFilter = params?.filter?.find(
+            (filter) => filter.field === "reservieren",
+          );
+          let isActiveFilter = params?.filter?.find(
+            (filter) => filter.field === "aktiv",
+          );
+          let costsFilter = params?.filter?.find(
+            (filter) => filter.field === "kosten",
+          );
+          let floorFilter = params?.filter?.find(
+            (filter) => filter.field === "stockwerk",
+          );
+          let parentRoomFilter = params?.filter?.find(
+            (filter) => filter.field === "parent_ort_kurzbz",
+          );
 
           let isForTrainingProgramValue = null;
           if (this.filterData.isForTrainingProgram === true) {
@@ -117,7 +138,7 @@ export default {
               isForTrainingProgramValue = false;
             }
           }
-          
+
           let reservationNeededValue = null;
           if (this.filterData.isReservationNeeded === true) {
             reservationNeededValue = true;
@@ -140,6 +161,20 @@ export default {
             }
           }
 
+          let shortCodeSorter = params?.sort?.find((sort) => sort.field === "ort_kurzbz");
+          let descriptionSorter = params?.sort?.find((sort) => sort.field === "bezeichnung");
+          let planDescriptionSorter = params?.sort?.find((sort) => sort.field === "planbezeichnung");
+          let maxPersonsSorter = params?.sort?.find((sort) => sort.field === "max_person");
+          let workplaceSorter = params?.sort?.find((sort) => sort.field === "arbeitsplaetze");
+          let squareMetersSorter = params?.sort?.find((sort) => sort.field === "m2");
+          let orgUnitConcatSorter = params?.sort?.find((sort) => sort.field === "org_organisationseinheittyp_kurzbz_org_bezeichnung_concat");
+          let lehreSorter = params?.sort?.find((sort) => sort.field === "lehre");
+          let reservierenSorter = params?.sort?.find((sort) => sort.field === "reservieren");
+          let aktivSorter = params?.sort?.find((sort) => sort.field === "aktiv");
+          let costsSorter = params?.sort?.find((sort) => sort.field === "kosten");
+          let floorSorter = params?.sort?.find((sort) => sort.field === "stockwerk");
+          let parentRoomSorter = params?.sort?.find((sort) => sort.field === "parent_ort_kurzbz");
+
           return this.$api.call(
             ApiRoom.getAllRooms({
               organizationalUnitShortCode:
@@ -155,10 +190,25 @@ export default {
               maxPersons: maxPersonsFilter?.value,
               workplace: workplaceFilter?.value,
               squareMeters: squareMetersFilter?.value,
-              orgUnitDescription: orgUnitFilter?.value,
+              orgUnitConcatDescription: orgUnitConcatFilter?.value,
               costs: costsFilter?.value,
               floor: floorFilter?.value,
               parentRoomShortCode: parentRoomFilter?.value,
+              sort: {
+                ort_kurzbz: shortCodeSorter?.dir,
+                bezeichnung: descriptionSorter?.dir,
+                planbezeichnung: planDescriptionSorter?.dir,
+                max_person: maxPersonsSorter?.dir,
+                arbeitsplaetze: workplaceSorter?.dir,
+                m2: squareMetersSorter?.dir,
+                org_organisationseinheittyp_kurzbz_org_bezeichnung_concat: orgUnitConcatSorter?.dir,
+                lehre: lehreSorter?.dir,
+                reservieren: reservierenSorter?.dir,
+                aktiv: aktivSorter?.dir,
+                kosten: costsSorter?.dir,
+                stockwerk: floorSorter?.dir,
+                parent_ort_kurzbz: parentRoomSorter?.dir,
+              },
               pagination: {
                 page: params.page,
                 size: params.size,
@@ -167,7 +217,7 @@ export default {
           );
         },
         ajaxResponse: (url, params, response) => response,
-        persistenceID: "room_manager_overview_table1111222233333",
+        persistenceID: "room_manager_overview_table",
         selectableRows: true,
         index: "ort_kurzbz",
         columns: [
@@ -209,11 +259,40 @@ export default {
             title: this.$capitalize(this.$p.t("ui", "quadratmeter")),
             field: "m2",
             headerFilter: true,
-            width: 100
+            width: 100,
           },
           {
             title: this.$capitalize(this.$p.t("lehre", "organisationseinheit")),
-            field: "org_bezeichnung",
+            field: "org_organisationseinheittyp_kurzbz_org_bezeichnung_concat",
+            formatter: function (cell) {
+              let data = cell.getRow().getData();
+              let value = null;
+              if (data.org_organisationseinheittyp_kurzbz) {
+                value = `[${data.org_organisationseinheittyp_kurzbz}]`;
+              }
+              if (data.org_bezeichnung) {
+                value += ` ${data.org_bezeichnung}`;
+              }
+
+              return value;
+            },
+            sorter: function (a, b, aRow, bRow, column, dir, sorterParams) {
+              let aData = aRow.getData();
+              let bData = bRow.getData();
+
+              let aFull = (
+                aData.org_organisationseinheittyp_kurzbz +
+                " " +
+                aData.org_bezeichnung
+              ).toLowerCase().trim();
+              let bFull = (
+                bData.org_organisationseinheittyp_kurzbz +
+                " " +
+                bData.org_bezeichnung
+              ).toLowerCase().trim();
+
+              return aFull.localeCompare(bFull);
+            },
             headerFilter: true,
             width: 180,
           },
@@ -222,8 +301,9 @@ export default {
             field: "lehre",
             headerFilter: true,
             headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						},
+              tristate: true,
+              elementAttributes: { value: "true" },
+            },
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -236,8 +316,9 @@ export default {
             field: "reservieren",
             headerFilter: true,
             headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						},
+              tristate: true,
+              elementAttributes: { value: "true" },
+            },
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -250,8 +331,9 @@ export default {
             field: "aktiv",
             headerFilter: true,
             headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						},
+              tristate: true,
+              elementAttributes: { value: "true" },
+            },
             formatter: "tickCross",
             hozAlign: "center",
             formatterParams: {
@@ -271,7 +353,7 @@ export default {
           },
           {
             title: this.$capitalize(this.$p.t("ui", "parentRoom")),
-            field: "pr_ort_kurzbz",
+            field: "parent_ort_kurzbz",
             headerFilter: true,
             width_: 120,
           },
@@ -286,7 +368,9 @@ export default {
               let roomTypeBtn = document.createElement("button");
               roomTypeBtn.className = "btn btn-outline-secondary btn-action";
               roomTypeBtn.innerHTML = '<i class="fa fa-layer-group"></i>';
-              roomTypeBtn.title = this.$capitalize(this.$p.t("ui", "btn_editRoomType"));
+              roomTypeBtn.title = this.$capitalize(
+                this.$p.t("ui", "btn_editRoomType"),
+              );
               roomTypeBtn.addEventListener("click", (event) =>
                 this.editRoomType(cell.getData().ort_kurzbz),
               );
@@ -294,7 +378,7 @@ export default {
               if (!this.hasBasisOrtWPermission) {
                 container.append(roomTypeBtn);
                 return container;
-              }2222
+              }
 
               let button = document.createElement("button");
 
@@ -313,7 +397,9 @@ export default {
               button.className =
                 "btn btn-outline-secondary btn-action bg-danger";
               button.innerHTML = '<i class="fa fa-xmark text-white"></i>';
-              button.title = this.$capitalize(this.$p.t("ui", "btn_deleteRoom"));
+              button.title = this.$capitalize(
+                this.$p.t("ui", "btn_deleteRoom"),
+              );
               button.addEventListener("click", () => {
                 let isDeletionConfirmed = confirm(
                   this.$p.t("ui", "deleteRoomConfirmation"),
@@ -330,11 +416,12 @@ export default {
           },
         ],
         layout: "fitColumns",
-        pagination:true,
-        paginationMode:"remote",
+        pagination: true,
+        paginationMode: "remote",
         paginationSize: 100,
-        maxHeight:"700px",
-        filterMode:"remote", 
+        maxHeight: "700px",
+        filterMode: "remote",
+        sortMode: "remote",
       };
       return options;
     },
@@ -371,18 +458,20 @@ export default {
       return events;
     },
     dropdownParsedOrganizationalUnits() {
-      return this.organizationalUnits.map((unit) => {
-        return {
-          label: `${unit.bezeichnung} (${unit.organisationseinheittyp_kurzbz})`,
-          value: unit.oe_kurzbz,
-        };
-      });
+      return this.organizationalUnits
+        .map((unit) => {
+          return {
+            label: `[${unit.organisationseinheittyp_kurzbz}] ${unit.bezeichnung}`,
+            value: unit.oe_kurzbz,
+          };
+        })
+        .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
   methods: {
     filterOrganizationalUnits(event) {
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 
@@ -450,6 +539,18 @@ export default {
         this.$fhcAlert.alertError(this.$p.t("ui", "errorUpdatingRoom"));
       }
     },
+    setDefaultBuildingComponentOption() {
+      this.buildingComponents.unshift({
+        label: this.$p.t("ui", "dropdownEmptyOption"),
+        value: null,
+      });
+    },
+    setDefaultLocationOption() {
+      this.locations.unshift({
+        standort_id: null,
+        bezeichnung: this.$p.t("ui", "dropdownEmptyOption"),
+      });
+    },
   },
   async created() {
     let getLocationsResponse = await this.$api.call(
@@ -457,7 +558,6 @@ export default {
     );
     if (getLocationsResponse.meta.status === "success") {
       this.locations = getLocationsResponse.data;
-      this.locations.unshift({ standort_id: null, kurzbz: "----------" });
     } else {
       this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingLocations"));
     }
@@ -470,7 +570,9 @@ export default {
         (a, b) => a.bezeichnung.localeCompare(b.bezeichnung),
       );
     } else {
-      this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingOrganizationalUnits"));
+      this.$fhcAlert.alertError(
+        this.$p.t("ui", "errorLoadingOrganizationalUnits"),
+      );
     }
   },
   mounted() {
@@ -485,6 +587,8 @@ export default {
       ])
       .then(() => {
         this.phrasesLoaded = true;
+        this.setDefaultBuildingComponentOption();
+        this.setDefaultLocationOption();
       });
   },
   template: /* html */ `
@@ -524,7 +628,7 @@ export default {
             <div>
               <form-input
                 v-model="filterData.locationId"
-                :label="$capitalize($p.t('global', 'raum'))"
+                :label="$capitalize($p.t('person', 'standort'))"
                 type="select"
                 id="location"
                 name="location"
@@ -534,7 +638,7 @@ export default {
                   :key="location.standort_id"
                   :value="location.standort_id"
                   >
-                  {{location.kurzbz}}
+                  {{location.bezeichnung}}
                 </option>
               </form-input>
             </div>

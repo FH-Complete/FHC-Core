@@ -38,7 +38,7 @@ export default {
       } else {
         this.resetRoomForm();
       }
-    },
+    }, 
   },
   data: () => {
     return {
@@ -65,8 +65,13 @@ export default {
     },
     dropdownParsedRooms() {
       return this.rooms.map((room) => {
+        let label = room.ort_kurzbz;
+        if (room.bezeichnung && room.bezeichnung !== '') {
+          label += ` - ${room.bezeichnung}`;
+        }
+
         return {
-          label: `${room.ort_kurzbz} - ${room.bezeichnung}`,
+          label,
           value: room.ort_kurzbz,
         };
       });
@@ -75,7 +80,7 @@ export default {
   methods: {
     filterOrganizationalUnits(event) {
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 
@@ -97,7 +102,7 @@ export default {
       this.rooms = await this.fetchRooms(event.query);
 
       let defaultItem = {
-        label: "----------",
+        label: this.$p.t("ui", "dropdownEmptyOption"),
         value: null,
       };
 
@@ -149,7 +154,9 @@ export default {
         };
       }
 
-      let potentialParentRooms = await this.fetchRooms(this.editedRoom.parent_ort_kurzbz);
+      let potentialParentRooms = await this.fetchRooms(
+        this.editedRoom.parent_ort_kurzbz,
+      );
 
       let parentRoomData = null;
       let parentRoom = potentialParentRooms.find(
@@ -157,8 +164,13 @@ export default {
       );
       if (parentRoom) {
         this.rooms.push(parentRoom);
+        let label = parentRoom.ort_kurzbz;
+        if (parentRoom.bezeichnung && parentRoom.bezeichnung !== '') {
+          label += ` - ${parentRoom.bezeichnung}`;
+        }
+
         parentRoomData = {
-          label: `${parentRoom.ort_kurzbz} - ${parentRoom.bezeichnung}`,
+          label,
           value: parentRoom.ort_kurzbz,
         };
       }
@@ -183,7 +195,7 @@ export default {
         telefonklappe: this.editedRoom.telefonklappe,
         quadratmeter: this.editedRoom.m2,
         gebaudeteil: this.editedRoom.gebteil,
-        arbeitsplatze: this.editedRoom.arbeitsplaetze,
+        arbeitsplaetze: this.editedRoom.arbeitsplaetze,
       };
 
       this.$refs.roomFormModal.show();
@@ -207,24 +219,46 @@ export default {
       return {
         parent_ort_kurzbz: this.roomFormData.parentRoom?.value,
         standort_id: this.roomFormData.locationId,
-        oe_kurzbz: this.roomFormData.organizationalUnit?.value,
-        content_id: this.roomFormData.contentId,
+        oe_kurzbz:
+          this.roomFormData.organizationalUnit?.value !== ""
+            ? this.roomFormData.organizationalUnit?.value
+            : null,
+        content_id:
+          this.roomFormData.contentId !== ""
+            ? this.roomFormData.contentId
+            : null,
         ort_kurzbz: this.roomFormData.kurzbezeichnung,
         bezeichnung: this.roomFormData.bezeichnung,
         planbezeichnung: this.roomFormData.planbezeichnung,
         aktiv: this.roomFormData.aktiv,
         lehre: this.roomFormData.lehre,
         reservieren: this.roomFormData.reservieren,
-        max_person: this.roomFormData.maxPerson,
-        stockwerk: this.roomFormData.stockwerk,
+        max_person:
+          this.roomFormData.maxPerson !== ""
+            ? this.roomFormData.maxPerson
+            : null,
+        stockwerk:
+          this.roomFormData.stockwerk !== ""
+            ? this.roomFormData.stockwerk
+            : null,
         lageplan: this.roomFormData.lageplan,
-        dislozierung: this.roomFormData.dislozierung,
-        kosten: this.roomFormData.kosten,
+        dislozierung:
+          this.roomFormData.dislozierung === ""
+            ? null
+            : this.roomFormData.dislozierung,
+        kosten:
+          this.roomFormData.kosten !== "" ? this.roomFormData.kosten : null,
         ausstattung: this.roomFormData.ausstattung,
         telefonklappe: this.roomFormData.telefonklappe,
-        m2: this.roomFormData.quadratmeter,
+        m2:
+          this.roomFormData.quadratmeter !== ""
+            ? this.roomFormData.quadratmeter
+            : null,
         gebteil: this.roomFormData.gebaudeteil,
-        arbeitsplatze: this.roomFormData.arbeitsplatze,
+        arbeitsplaetze:
+          this.roomFormData.arbeitsplaetze !== ""
+            ? this.roomFormData.arbeitsplaetze
+            : null,
       };
     },
     hideRoomFormModal() {
@@ -240,14 +274,16 @@ export default {
         aktiv: true,
       };
     },
-    async fetchRooms(searchedRoomShortCode) {
-      let getRoomsResponse = await this.$api.call(ApiRoom.getAllRooms({
-        shortCode: searchedRoomShortCode,
-        pagination: {
-          page: 1,
-          size: 100,
-        },
-      }));
+    async fetchRooms(roomSearchTerm = "") {
+      let getRoomsResponse = await this.$api.call(
+        ApiRoom.getAllRooms({
+          ort_kurzbz_bezeichnung_concat: roomSearchTerm,
+          pagination: {
+            page: 1,
+            size: 100,
+          },
+        }),
+      );
       if (getRoomsResponse.meta.status === "success") {
         return getRoomsResponse.data;
       } else {
@@ -256,6 +292,12 @@ export default {
 
       return [];
     },
+    setDefaultLocationOption() {
+      this.locations.unshift({
+        standort_id: null,
+        bezeichnung: this.$p.t("ui", "dropdownEmptyOption"),
+      });
+    },
   },
   async created() {
     let getLocationsResponse = await this.$api.call(
@@ -263,10 +305,6 @@ export default {
     );
     if (getLocationsResponse.meta.status === "success") {
       this.locations = getLocationsResponse.data;
-      this.locations.unshift({
-        standort_id: null,
-        kurzbz: "----------",
-      });
     } else {
       this.$fhcAlert.alertError(this.$p.t("ui", "errorLoadingLocations"));
     }
@@ -285,6 +323,21 @@ export default {
     }
 
     this.rooms = await this.fetchRooms();
+  },
+   mounted() {
+    this.$p
+      .loadCategory([
+        "global",
+        "lehre",
+        "ui",
+        "gruppenmanagement",
+        "core",
+        "person",
+      ])
+      .then(() => {
+        this.phrasesLoaded = true;
+        this.setDefaultLocationOption();
+      });
   },
   template: /* html */ `
   <bs-modal ref="roomFormModal" size="sm" @hideBsModal="() => { $emit('hideBsModal'); resetRoomForm(); }" class="modal-lg">
@@ -306,7 +359,7 @@ export default {
               dropdown
               forceSelection
               type="autocomplete"
-              name="parentRoomShortCode"
+              name="parent_ort_kurzbz"
               >
             </form-input>
           </div>
@@ -322,38 +375,29 @@ export default {
                 dropdown
                 forceSelection
                 type="autocomplete"
-                name="organizationalUnitShortCode"  
+                name="oe_kurzbz"  
                 >
               </form-input>
             </div>
             <div class="col">
               <form-input
                 v-model="roomFormData.locationId"
-                :label="$capitalize($p.t('global/ortLocation'))"
+                :label="$capitalize($p.t('person/standort'))"
                 type="select"
                 id="location"
-                name="location"
+                name="standort_id"
                 >
                 <option
                   v-for="location in locations"
                   :key="location.standort_id"
                   :value="location.standort_id"
                   >
-                  {{location.kurzbz}}
+                  {{location.bezeichnung}}
                 </option>
               </form-input>
             </div>
           </div>
           <div class="row mb-3">
-            <div class="col">
-              <form-input
-                v-model="roomFormData.aktiv"
-                :label="$capitalize($p.t('person', 'aktiv'))"
-                type="checkbox"
-                name="aktiv"  
-                >
-              </form-input>
-            </div>
             <div class="col">
               <form-input
                   v-model="roomFormData.lehre"
@@ -369,6 +413,15 @@ export default {
                 :label="$capitalize($p.t('ui', 'reservieren'))"
                 type="checkbox"
                 name="reservieren"  
+                >
+              </form-input>
+            </div>
+            <div class="col">
+              <form-input
+                v-model="roomFormData.aktiv"
+                :label="$capitalize($p.t('person', 'aktiv'))"
+                type="checkbox"
+                name="aktiv"  
                 >
               </form-input>
             </div>
@@ -403,28 +456,25 @@ export default {
           <div class="row mb-3">
             <div class="col">
               <form-input
-                v-model="roomFormData.maxPerson"
+                v-model.number="roomFormData.maxPerson"
                 :label="$capitalize($p.t('ui', 'maxPersons'))"
-                type="number"
-                name="maxPerson"  
+                name="max_person"  
                 >
               </form-input>
             </div>
             <div class="col">
               <form-input
-                  v-model="roomFormData.stockwerk"
+                  v-model.number="roomFormData.stockwerk"
                   :label="$capitalize($p.t('ui', 'stockwerk'))"
-                  type="number"
                   name="stockwerk"  
                   >
               </form-input>
             </div>
             <div class="col">
               <form-input
-                v-model="roomFormData.quadratmeter"
+                v-model.number="roomFormData.quadratmeter"
                 :label="$capitalize($p.t('ui', 'quadratmeter'))"
-                type="number"
-                name="quadratmeter"  
+                name="m2"  
                 >
               </form-input>
             </div>
@@ -434,17 +484,15 @@ export default {
               <form-input
                 v-model="roomFormData.telefonklappe"
                 :label="$capitalize($p.t('person', 'telefonklappe'))"
-                type="number"
                 name="telefonklappe"  
                 >
               </form-input>
             </div>
             <div class='col'>
               <form-input
-                v-model="roomFormData.arbeitsplatze"
+                v-model.number="roomFormData.arbeitsplaetze"
                 :label="$capitalize($p.t('ui', 'arbeitsplaetze'))"
-                type="number"
-                name="arbeitsplatze"  
+                name="arbeitsplaetze"  
                 >
               </form-input>
             </div>
@@ -464,24 +512,22 @@ export default {
                 v-model="roomFormData.gebaudeteil"
                 :label="$capitalize($p.t('ui', 'gebaudeteil'))"
                 type="text"
-                name="gebaudeteil"  
+                name="gebteil"  
                 >
               </form-input>
             </div>
             <div class='col'>
               <form-input
-                v-model="roomFormData.contentId"
+                v-model.number="roomFormData.contentId"
                 :label="$capitalize($p.t('ui', 'contentId'))"
-                type="number"
-                name="contentId"  
+                name="content_id"  
                 >
               </form-input>
             </div>
             <div class='col'>
               <form-input
-                v-model="roomFormData.dislozierung"
+                v-model.number="roomFormData.dislozierung"
                 :label="$capitalize($p.t('ui', 'dislozierung'))"
-                type="text"
                 name="dislozierung"  
                 >
               </form-input>
