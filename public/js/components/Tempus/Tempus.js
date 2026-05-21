@@ -710,7 +710,7 @@ export default {
 			});
 	},
 	template: `
-	<div class="tempus">
+	<div data-cy="tempus" class="tempus">
 		<header class="navbar navbar-expand-lg navbar-dark bg-dark flex-md-nowrap p-0 shadow">
 			<div class="col-md-4 col-lg-3 col-xl-2 d-flex align-items-center">
 				<button
@@ -838,7 +838,7 @@ export default {
 							class="w-100"
 						/>
 						
-						<div class="d-flex gap-1 py-1">
+						<div class="d-flex gap-1 py-1" data-cy="previewRoleOptionsHolder">
 							<button
 								class="btn btn-sm"
 								:class="previewRole === 'planer' ? 'btn-dark' : 'btn-outline-dark'"
@@ -934,7 +934,7 @@ export default {
 			</div>
 		</div>
 		<app-config ref="config" v-model="appconfig" :endpoints="configEndpoints"></app-config>
-		<div id="verbandMenu" ref="verbandMenu" class="offcanvas offcanvas-start col-md p-md-0 h-100" tabindex="-1">
+		<div id="verbandMenu" ref="verbandMenu" class="offcanvas offcanvas-start col-md p-md-0 h-100" tabindex="-1" data-cy="verbandMenu">
 			<div class="offcanvas-header justify-content-end px-1 d-md-none">
 				<h5 class="offcanvas-title" id="verbandMenuLabel">
 					<i class="fa-solid fa-university me-2"></i>Verband
@@ -962,7 +962,7 @@ export default {
 			</template>
 		</bs-modal>
 		
-		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="historyModel" class="bootstrap-prompt" dialogClass="modal-lg" data-cy="historyModal">
 			<template #title>History</template>
 			<template #default>
 				<table v-if="historyEntries.length" class="table table-bordered table-hover">

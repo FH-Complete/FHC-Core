@@ -146,6 +146,7 @@ export default {
 			/>
 			<ul
 				v-if="contextMenu.show"
+				data-cy="eventContextMenu"
 				class="dropdown-menu show"
 				:style="{ position: 'fixed', top: contextMenu.y + 'px', left: contextMenu.x + 'px', zIndex: 9999 }"
 			>

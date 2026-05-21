@@ -247,6 +247,7 @@ export default {
 				<div
 					class="d-flex align-items-center gap-2 "
 					v-draggable:move.noimage="{ type: 'reservierung', id: null, orig: {} }"
+					data-cy="reservationDragHandle"
 				>
 					<i 
 						class="fa-solid fa-calendar-plus text-primary" 
