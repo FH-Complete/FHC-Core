@@ -203,21 +203,10 @@ class Kalender extends FHCAPI_Controller
 		$updateFields = $this->_checkUpdate($this->_ci->input->post('updatedInfos', TRUE));
 		$kalender_id = $this->_ci->input->post('kalender_id', TRUE);
 
-		if (isset($updateFields->ort_kurzbz) && !isEmptyString($updateFields->ort_kurzbz))
-		{
-			$result = $this->_ci->kalenderlib->updateOrt($kalender_id, $updateFields->ort_kurzbz);
+		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->ort_kurzbz ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null);
 
-			if (isError($result))
-				$this->terminateWithError(getError($result));
-		}
-
-		if (isset($updateFields->start_time) || isset($updateFields->end_time))
-		{
-			$result = $this->_ci->kalenderlib->updateZeit($kalender_id, $updateFields->start_time, $updateFields->end_time);
-
-			if (isError($result))
-				$this->terminateWithError(getError($result));
-		}
+		if (isError($result))
+			$this->terminateWithError(getError($result));
 
 		$this->terminateWithSuccess('Erfolgreich');
 	}
