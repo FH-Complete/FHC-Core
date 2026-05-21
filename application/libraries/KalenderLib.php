@@ -611,6 +611,28 @@ class KalenderLib
 		);
 	}
 
+	public function updateKalenderEvent($kalender_id, $ort_kurzbz = null, $start_time = null, $end_time = null)
+	{
+		if (!is_null($ort_kurzbz) && !isEmptyString($ort_kurzbz))
+		{
+			$result = $this->updateOrt($kalender_id, $ort_kurzbz);
+			if (isError($result)) return $result;
+
+			if (hasData($result))
+			{
+				$kalender_id = (getData($result)['kalender_id']) ?? getData($result);
+			}
+		}
+
+		if (!is_null($start_time) || !is_null($end_time))
+		{
+			$result = $this->updateZeit($kalender_id, $start_time, $end_time);
+			if (isError($result)) return $result;
+		}
+
+		return success('Erfolgreich');
+	}
+
 	public function updateZeit($kalender_id, $start_date, $end_date)
 	{
 		$entryResult = $this->_loadKalenderEntry($kalender_id);
