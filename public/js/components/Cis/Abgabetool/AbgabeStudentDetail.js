@@ -169,9 +169,9 @@ export const AbgabeStudentDetail = {
 			const date = new Date(dateParam)
 			const padZero = (num) => String(num).padStart(2, '0');
 
-			const month = padZero(date.getMonth() + 1);
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
+			const month = padZero(date.getUTCMonth() + 1);
+			const day = padZero(date.getUTCDate());
+			const year = date.getUTCFullYear();
 
 			return `${day}.${month}.${year}`
 		},
