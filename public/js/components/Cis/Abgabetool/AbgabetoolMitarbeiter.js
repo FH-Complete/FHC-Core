@@ -7,6 +7,7 @@ import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass } from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
 import {splitMailsHelper} from "../../../helpers/EmailHelpers.js";
+import { formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -63,7 +64,7 @@ export const AbgabetoolMitarbeiter = {
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
-				datum: new Date().toISOString().split('T')[0],
+				datum: getViennaTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -571,7 +572,7 @@ export const AbgabetoolMitarbeiter = {
 				if (val instanceof Date) {
 					dt = luxon.DateTime.fromJSDate(val);
 				} else if (typeof val === "string") {
-					dt = luxon.DateTime.fromISO(val);
+					dt = toViennaDate(val);
 				} else { // fallback
 					dt = luxon.DateTime.fromMillis(Number(val));
 				}
@@ -803,7 +804,7 @@ export const AbgabetoolMitarbeiter = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				const date = toViennaDate(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -914,15 +915,7 @@ export const AbgabetoolMitarbeiter = {
 			return option.bezeichnung
 		},
 		formatDate(dateParam) {
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-
-			return `${day}.${month}.${year}`;
+			return formatISODate(dateParam);
 		},
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection

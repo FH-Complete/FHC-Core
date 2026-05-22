@@ -2,6 +2,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import { getDateStyleClass } from "./getDateStyleClass.js";
+import { compareISODateValues, formatISODate, getViennaTodayISO } from "./dateUtils.js";
 
 export const AbgabeMitarbeiterDetail = {
 	name: "AbgabeMitarbeiterDetail",
@@ -138,7 +139,7 @@ export const AbgabeMitarbeiterDetail = {
 						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
-					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
+					this.projektarbeit.abgabetermine.sort((a, b) => compareISODateValues(a.datum, b.datum))
 					
 					const index = this.projektarbeit.abgabetermine.findIndex(t => termin.paabgabe_id == t.paabgabe_id)
 					
@@ -159,7 +160,7 @@ export const AbgabeMitarbeiterDetail = {
 							'fixtermin': false,
 							'invertedFixtermin': true,
 							'kurzbz': '', // todo kurzbz textfield value vorschlag für qualgates
-							'datum': new Date().toISOString().split('T')[0],
+							'datum': getViennaTodayISO(),
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 							'beurteilungsnotiz': '',
 							'upload_allowed': false,
@@ -337,16 +338,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		formatDate(dateParam) {
-			// unsafe for datepickers, dont use there
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-			
-			return `${day}.${month}.${year}`
+			return formatISODate(dateParam)
 		},
 		openCreateNewAbgabeModal() {
 			if(this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter') {
@@ -364,7 +356,7 @@ export const AbgabeMitarbeiterDetail = {
 					'fixtermin': false,
 					'invertedFixtermin': true,
 					'kurzbz': '',
-					'datum': new Date().toISOString().split('T')[0],
+					'datum': getViennaTodayISO(),
 					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 					'beurteilungsnotiz': '',
 					'upload_allowed': typ.upload_allowed_default,
@@ -398,7 +390,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': new Date().toISOString().split('T')[0],
+				'datum': getViennaTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': false,
@@ -597,7 +589,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': new Date().toISOString().split('T')[0],
+				'datum': getViennaTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': typ.upload_allowed_default,

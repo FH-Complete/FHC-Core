@@ -3,6 +3,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import { formatISODate, getViennaTodayISO } from "./dateUtils.js";
 
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
@@ -166,14 +167,7 @@ export const AbgabeStudentDetail = {
 			window.open(FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + url)
 		},
 		formatDate(dateParam) {
-			const date = new Date(dateParam)
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getUTCMonth() + 1);
-			const day = padZero(date.getUTCDate());
-			const year = date.getUTCFullYear();
-
-			return `${day}.${month}.${year}`
+			return formatISODate(dateParam)
 		},
 		async upload(termin) {
 
@@ -210,7 +204,7 @@ export const AbgabeStudentDetail = {
 			if(res.meta.status == "success") {
 				this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4fileUploadSuccessv3')))
 
-				termin.abgabedatum = new Date().toISOString().split('T')[0];
+				termin.abgabedatum = getViennaTodayISO();
 				if(res?.data?.signatur !== undefined) {
 					termin.signatur = res.data.signatur
 				}

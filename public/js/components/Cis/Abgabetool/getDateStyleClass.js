@@ -1,8 +1,8 @@
 
 const zone = 'Europe/Vienna';
-const today = luxon.DateTime.now().setZone(zone);
 
 export function getDateStyleClass(termin, notenOptions) {
+	const today = luxon.DateTime.now().setZone(zone);
 	const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
 	const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
 	termin.diffindays = datum.diff(today, 'days').days;

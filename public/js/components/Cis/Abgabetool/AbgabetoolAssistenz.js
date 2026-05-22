@@ -10,6 +10,7 @@ import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -118,7 +119,7 @@ export const AbgabetoolAssistenz = {
 				fixtermin: false,
 			},
 			serienTermin: Vue.reactive({
-				datum: new Date().toISOString().split('T')[0],
+				datum: getViennaTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -404,7 +405,7 @@ export const AbgabetoolAssistenz = {
 						field: 'datum',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminColISO,
-						sorter: (a, b) => new Date(a) - new Date(b),
+						sorter: compareISODateValues,
 						formatter: (cell) => this.formatDate(cell.getValue()),
 						minWidth: 100
 					},
@@ -413,7 +414,7 @@ export const AbgabetoolAssistenz = {
 						field: 'abgabedatum',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminColISO,
-						sorter: (a, b) => new Date(a) - new Date(b),
+						sorter: compareISODateValues,
 						formatter: (cell) => this.formatDate(cell.getValue()),
 						minWidth: 100
 					},
@@ -633,7 +634,7 @@ export const AbgabetoolAssistenz = {
 				upload_allowed: false,
 				fixtermin: false,
 			}
-			this.serienEdit.datum = new Date().toISOString().split('T')[0]
+			this.serienEdit.datum = getViennaTodayISO()
 			this.serienEdit.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
 			this.serienEdit.kurzbz = ''
 			this.serienEdit.upload_allowed = false
@@ -1087,7 +1088,7 @@ export const AbgabetoolAssistenz = {
 				if (val instanceof Date) {
 					dt = luxon.DateTime.fromJSDate(val);
 				} else if (typeof val === "string") {
-					dt = luxon.DateTime.fromISO(val);
+					dt = toViennaDate(val);
 				} else { // fallback
 					dt = luxon.DateTime.fromMillis(Number(val));
 				}
@@ -1124,7 +1125,7 @@ export const AbgabetoolAssistenz = {
 				if (val instanceof Date) {
 					dt = luxon.DateTime.fromJSDate(val);
 				} else if (typeof val === "string") {
-					dt = luxon.DateTime.fromISO(val);
+					dt = toViennaDate(val);
 				} else { // fallback
 					dt = luxon.DateTime.fromMillis(Number(val));
 				}
@@ -1372,7 +1373,7 @@ export const AbgabetoolAssistenz = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				const date = toViennaDate(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -1640,16 +1641,7 @@ export const AbgabetoolAssistenz = {
 			return option.bezeichnung	
 		},
 		formatDate(dateParam) {
-			if(dateParam === null) return ''
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-
-			return `${day}.${month}.${year}`;
+			return formatISODate(dateParam);
 		},
 		formAction(cell) {
 			const actionButtons = document.createElement('div');
@@ -1758,7 +1750,7 @@ export const AbgabetoolAssistenz = {
 					abgabe.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == abgabe.paabgabetyp_kurzbz)
 					
 					pa.abgabetermine.push(abgabe)
-					pa.abgabetermine.sort((a, b) => new Date(a.datum) - new Date(b.datum))
+					pa.abgabetermine.sort((a, b) => compareISODateValues(a.datum, b.datum))
 				})
 				
 				this.projektarbeiten = this.mapProjekteToTableData(this.projektarbeiten)
@@ -1822,7 +1814,7 @@ export const AbgabetoolAssistenz = {
 		findLatestTerminWithUpload(projekt) {
 			const withAbgabedatumSorted = projekt?.abgabetermine
 				?.filter(t => t.abgabedatum != null)
-				?.sort((a, b) => new Date(b.abgabedatum) - new Date(a.abgabedatum));
+				?.sort((a, b) => compareISODateValues(b.abgabedatum, a.abgabedatum));
 			
 			if(withAbgabedatumSorted.length) {
 				return withAbgabedatumSorted[0]
