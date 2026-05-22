@@ -151,3 +151,5 @@ $config['stv_prestudent_tags'] = [
 	'stbtr_erh_auto' => ['readonly' => true],
 	'jgv_auto' => ['readonly' => true],
 ];
+
+$config['userAutomatedTags'] = 'sftest';

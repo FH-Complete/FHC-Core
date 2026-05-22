@@ -16,8 +16,6 @@ use \stdClass as stdClass;
 
 class TagLib
 {
-	const BATCHUSER = 'sftest';
-
 	/**
 	 * Object initialization
 	 */
@@ -38,6 +36,8 @@ class TagLib
 		// Libraries
 		$this->_ci->load->library('PermissionLib');
 		$this->_ci->load->library('PrestudentLib');
+
+		$batchUser = $this->_ci->config->item('userAutomatedTags');
 	}
 
 	public function updateAutomatedTags($paramsTag)
@@ -321,7 +321,7 @@ class TagLib
 		$resultInsert = $this->_ci->NotizModel->insert([
 			'titel' => 'TAG',
 			'text' => 'AUTOMATED TAG',
-			'verfasser_uid' => self::BATCHUSER,
+			'verfasser_uid' => $this->batchUser,
 			'erledigt' => false,
 			'insertamum' => date('Y-m-d H:i:s'),
 			'insertvon' => 'BatchJobTagAdd',
