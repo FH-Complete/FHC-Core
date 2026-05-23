@@ -347,10 +347,10 @@ export const CoreFilterCmpt = {
 			}
 
 			// Start the tabulator with the build options
-			this.tabulator = new Tabulator(
-				this.$refs.table,
-				tabulatorOptions
-			);
+			this.tabulator = new Tabulator(this.$refs.table, {
+				...tabulatorOptions,
+				debugInvalidOptions: false,
+			});
 			// If event handlers have been provided
 			if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
 			{
