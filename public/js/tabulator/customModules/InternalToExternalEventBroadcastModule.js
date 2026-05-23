@@ -6,7 +6,7 @@ import Module from "../../../../vendor/olifolkerd/tabulator5/src/js/core/Module.
 import { convertCase } from "../../helpers/StringHelpers.js";
 
 export default class InternalToExternalEventBroadcastModule extends Module {
-	static moduleName = "internalToExternalEventBroadcastModule";
+	static moduleName = "internalToExternalEventBroadcast";
 	static moduleInitNumber = 1;
 
 	constructor(table) {
@@ -27,6 +27,4 @@ export default class InternalToExternalEventBroadcastModule extends Module {
 			});
 		});
 	}
-
-	
 }

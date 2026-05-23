@@ -59,21 +59,21 @@ export default {
 						visible: true
 					},
 					{
-						title: "ui/bezeichnung",
+						titlePhrase: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "lehre/organisationseinheit",
+						titlePhrase: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "global/gueltigVon",
+						titlePhrase: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -84,7 +84,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: "global/gueltigBis",
+						titlePhrase: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -95,7 +95,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: "profil/wochenstunden",
+						titlePhrase: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
@@ -129,14 +129,14 @@ export default {
 						visible: true
 					},
 					{
-						title: "profil/entlehnteBetriebsmittel",
+						titlePhrase: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "profil/inventarnummer",
+						titlePhrase: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -144,7 +144,7 @@ export default {
 						visible: true
 					},
 					{
-						title: "profil/ausgabedatum",
+						titlePhrase: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,

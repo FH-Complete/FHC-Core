@@ -23,6 +23,7 @@ import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
 import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js"
+import MenuExtensionModule from "../../tabulator/customModules/MenuExtensionModule.js"
 
 import { debounce } from "../../helpers/DebounceHelper.js";
 
@@ -131,7 +132,7 @@ export const CoreFilterCmpt = {
 				debounce(
 					() => {
 						const columnHeadings = this.tabulator?.getLang()?.columns;
-						if (!columnHeadings) return;
+						if (!columnHeadings?.length) return;
 
 						this.$refs.table
 							.querySelectorAll(".collapsedColumnHeading")
@@ -209,12 +210,25 @@ export const CoreFilterCmpt = {
 			return columns;
 		},
 		fieldIdsForVisibilty() {
-			if (!this.tableBuilt)
-				return [];
-			return this.tabulator.getColumns().filter(col => {
-				let def = col.getDefinition();
-				return !def.frozen && def.title && def.formatter != "responsiveCollapse";
-			}).map(col => col.getField());
+			if (!this.tableBuilt) return [];
+
+			const localizedColumnTitles = this.tabulator.getLang().columns;
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+			return this.tabulator
+				.getColumns()
+				.filter((col) => {
+					let def = col.getDefinition();
+					let title =
+						isTabulatorLocalized && localizedColumnTitles[def.field]
+							? localizedColumnTitles[def.field]
+							: def.title;
+					return (
+						!def.frozen &&
+						title &&
+						def.formatter != "responsiveCollapse"
+					);
+				})
+				.map((col) => col.getField());
 		},
 		idExtra() {
 			if (!this.uuid)
@@ -222,14 +236,21 @@ export const CoreFilterCmpt = {
 			return '-' + this.uuid;
 		},
 		columnsForFilter() {
-			if (!this.filteredColumns || !this.datasetMetadata)
-				return [];
-			const filterTitles = this.filteredColumns.reduce((a,c) => {
-				a[c.field] = c.title;
+			if (!this.filteredColumns || !this.datasetMetadata) return [];
+			const localizedColumnTitles = this.tabulator.getLang().columns;
+			const isTabulatorLocalized = !!this.$props.tabulatorOptions.locale;
+			const filterTitles = this.filteredColumns.reduce((a, c) => {
+				a[c.field] =
+					isTabulatorLocalized && localizedColumnTitles[c.field]
+						? localizedColumnTitles[c.field]
+						: c.title;
 				return a;
 			}, {});
-			return this.datasetMetadata.map(el => ({...el, ...{title: filterTitles[el.name]}}));
-		}
+			return this.datasetMetadata.map((el) => ({
+				...el,
+				...{ title: filterTitles[el.name] },
+			}));
+		},
 	},
 	watch: {
 		"language.value": {
@@ -387,12 +408,12 @@ export const CoreFilterCmpt = {
 				this.$emit("headerFilterOn", this.filterActive);
 			});
 
-			this.tabulator.on('renderComplete', () => {
+			this.tabulator.on("renderComplete", () => {
 				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter && this.tableBuilt) {
 					this.localizeCollapsedColumnHeadings();
 				}	
 			});
-			this.tabulator.on('layoutRefreshed', () => {
+			this.tabulator.on("layoutRefreshed", () => {
 				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
 					this.localizeCollapsedColumnHeadings();
 				}	
@@ -402,49 +423,49 @@ export const CoreFilterCmpt = {
 			tabulatorOptions.locale = this.$p.user_language.value;
 			tabulatorOptions.langs = {};
 
-			const tabulatorPhrasesResponse = await this.$api.call(
+			const genericTabulatorPhrasesResponse = await this.$api.call(
 				ApiPhrases.getTabulatorPhrases(),
 			);
-			const tabulatorPhrasesData = tabulatorPhrasesResponse.data;
-			Object.keys(tabulatorPhrasesData).forEach((language) => {
-				let tabulatorPhraseToTranslationMapper = {};
-				tabulatorPhrasesData[language].forEach((phrase) => {
-					tabulatorPhraseToTranslationMapper[phrase.phrase] = phrase.text;
+			const genericTabulatorPhrasesData = genericTabulatorPhrasesResponse.data;
+			Object.keys(genericTabulatorPhrasesData).forEach((language) => {
+				let genericTabulatorPhraseToTranslationMapper = {};
+				genericTabulatorPhrasesData[language].forEach((phrase) => {
+					genericTabulatorPhraseToTranslationMapper[phrase.phrase] = phrase.text;
 				});
 
 				tabulatorOptions.langs[language] = {
 					data: {
-						loading: tabulatorPhraseToTranslationMapper["loading"],
-						error: tabulatorPhraseToTranslationMapper["error"],
+						loading: genericTabulatorPhraseToTranslationMapper["loading"],
+						error: genericTabulatorPhraseToTranslationMapper["error"],
 					},
 					groups: {
-						item: tabulatorPhraseToTranslationMapper["item"],
-						items: tabulatorPhraseToTranslationMapper["items"],
+						item: genericTabulatorPhraseToTranslationMapper["item"],
+						items: genericTabulatorPhraseToTranslationMapper["items"],
 					},
 					pagination: {
 						page_size:
-							tabulatorPhraseToTranslationMapper["page_size"],
+							genericTabulatorPhraseToTranslationMapper["page_size"],
 						page_title:
-							tabulatorPhraseToTranslationMapper["page_title"],
-						first: tabulatorPhraseToTranslationMapper["first"],
+							genericTabulatorPhraseToTranslationMapper["page_title"],
+						first: genericTabulatorPhraseToTranslationMapper["first"],
 						first_title:
-							tabulatorPhraseToTranslationMapper["first_title"],
-						last: tabulatorPhraseToTranslationMapper["last"],
+							genericTabulatorPhraseToTranslationMapper["first_title"],
+						last: genericTabulatorPhraseToTranslationMapper["last"],
 						last_title:
-							tabulatorPhraseToTranslationMapper["last_title"],
-						prev: tabulatorPhraseToTranslationMapper["prev"],
+							genericTabulatorPhraseToTranslationMapper["last_title"],
+						prev: genericTabulatorPhraseToTranslationMapper["prev"],
 						prev_title:
-							tabulatorPhraseToTranslationMapper["prev_title"],
-						next: tabulatorPhraseToTranslationMapper["next"],
+							genericTabulatorPhraseToTranslationMapper["prev_title"],
+						next: genericTabulatorPhraseToTranslationMapper["next"],
 						next_title:
-							tabulatorPhraseToTranslationMapper["next_title"],
-						all: tabulatorPhraseToTranslationMapper["all"],
+							genericTabulatorPhraseToTranslationMapper["next_title"],
+						all: genericTabulatorPhraseToTranslationMapper["all"],
 						counter: {
 							showing:
-								tabulatorPhraseToTranslationMapper["showing"],
-							of: tabulatorPhraseToTranslationMapper["of"],
-							rows: tabulatorPhraseToTranslationMapper["rows"],
-							pages: tabulatorPhraseToTranslationMapper["pages"],
+								genericTabulatorPhraseToTranslationMapper["showing"],
+							of: genericTabulatorPhraseToTranslationMapper["of"],
+							rows: genericTabulatorPhraseToTranslationMapper["rows"],
+							pages: genericTabulatorPhraseToTranslationMapper["pages"],
 						},
 					},
 				};
@@ -452,9 +473,17 @@ export const CoreFilterCmpt = {
 
 			let phrasesGroupedByCategoryRequestParam = {};
 			tabulatorOptions.columns.forEach((column) => {
-				if (column.field === "collapse") return;
+				if (!column.titlePhrase?.length) return;
 
-				let [category, phrase] = column.title.split("/");
+				let [category, phrase] = column.titlePhrase.split("/");
+				if (phrasesGroupedByCategoryRequestParam[category]) {
+					phrasesGroupedByCategoryRequestParam[category].push(phrase);
+				} else {
+					phrasesGroupedByCategoryRequestParam[category] = [phrase];
+				}
+			});
+			tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+				let [category, phrase] = menuItemPhrase.split("/");
 				if (phrasesGroupedByCategoryRequestParam[category]) {
 					phrasesGroupedByCategoryRequestParam[category].push(phrase);
 				} else {
@@ -468,35 +497,32 @@ export const CoreFilterCmpt = {
 			const phrasesData = phrasesResponse.data;
 
 			Object.keys(phrasesData).forEach((language) => {
-				let genericTabulatorPhrases = phrasesData[language].filter(
-					(phrase) => phrase.category === "tabulator",
-				);
-
-				let tabulatorPhraseToTranslationMapper = {};
-				genericTabulatorPhrases.forEach((phrase) => {
-					tabulatorPhraseToTranslationMapper[phrase.phrase] =
-						phrase.text;
-				});
-
-				let columnHeadingPhrases = phrasesData[language].filter(
-					(phrase) => phrase.category !== "tabulator",
-				);
-
-				let columnTitleToTranslationMapper = {};
-				columnHeadingPhrases.forEach((phrase) => {
-					columnTitleToTranslationMapper[
+				let phraseToTranslationMapper = {};
+				phrasesData[language].forEach((phrase) => {
+					phraseToTranslationMapper[
 						phrase.category + "/" + phrase.phrase
 					] = phrase.text;
 				});
 
 				let columnFieldToTranslationMapper = {};
 				tabulatorOptions.columns.forEach((column) => {
-					if (column.field === "collapse") return;
+					if (!column.titlePhrase?.length) return;
+
 					columnFieldToTranslationMapper[column.field] =
-						columnTitleToTranslationMapper[column.title] ?? "<< PHRASE " + column.title + " >>";
+						phraseToTranslationMapper[column.titlePhrase] ??
+						"<< PHRASE " + column.titlePhrase + " >>";
 				});
 				tabulatorOptions.langs[language].columns =
 					columnFieldToTranslationMapper;
+
+				let menuItemPhraseToTranslationMapper = {};
+				tabulatorOptions.menuItemPhrases?.forEach((menuItemPhrase) => {
+					menuItemPhraseToTranslationMapper[menuItemPhrase] =
+						phraseToTranslationMapper[menuItemPhrase] ??
+						"<< PHRASE " + menuItemPhrase + " >>";
+				});
+				tabulatorOptions.langs[language].menuItems =
+					menuItemPhraseToTranslationMapper;
 			});
 
 			return tabulatorOptions;
@@ -810,7 +836,7 @@ export const CoreFilterCmpt = {
 		getColumnNames() {
 			if (!this.tableBuilt) {
 				return {};
-			} else if (this.tabulator.getLocale()); {
+			} else if (this.tabulator.options.locale); {
 				return this.tabulator.getLang().columns;
 			}
 			return this.tabulator.getColumns().reduce((res, col) => {
@@ -830,6 +856,7 @@ export const CoreFilterCmpt = {
 		this.$emit('uuidDefined', this.uuid)
 
 		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
+		Tabulator.registerModule(MenuExtensionModule);
 	},
 	mounted() {
 		this.initTabulator().then(() => {
