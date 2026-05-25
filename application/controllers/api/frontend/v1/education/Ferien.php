@@ -27,7 +27,6 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 class Ferien extends FHCAPI_Controller
 {
 	const DEFAULT_BERECHTIGUNG = 'basis/ferien';
-	const DEFAULT_STUDIENGANG_KZ = 0;
 
 	/**
 	 * Calls the parent's constructor and prepares libraries and phrases
@@ -40,7 +39,6 @@ class Ferien extends FHCAPI_Controller
 			'getOe' => self::DEFAULT_BERECHTIGUNG.':r',
 			'getStudienplaene' => self::DEFAULT_BERECHTIGUNG.':r',
 			'getFerientypen' => self::DEFAULT_BERECHTIGUNG.':r',
-			'getStg' => self::DEFAULT_BERECHTIGUNG.':r',
 			'insert' => self::DEFAULT_BERECHTIGUNG.':w',
 			'update' => self::DEFAULT_BERECHTIGUNG.':w',
 			'delete' => self::DEFAULT_BERECHTIGUNG.':w'
@@ -78,10 +76,9 @@ class Ferien extends FHCAPI_Controller
 
 		$this->FerienModel->addSelect(
 			'tbl_ferien.ferien_id, tbl_ferien.bezeichnung, tbl_ferien.vondatum, tbl_ferien.bisdatum,
-			plan.studienplan_id, stg.studiengang_kz, oe.oe_kurzbz, fetyp.ferientyp_kurzbz,
-			oe.bezeichnung AS oe_bezeichnung, UPPER(stg.typ::varchar(1) || stg.kurzbz) AS studiengang_kuerzel,
-			plan.studienplan_id, plan.bezeichnung AS studienplan_bezeichnung, fetyp.mitarbeiter AS mitarbeiterrelevant, fetyp.studierende AS studierendenrelevant,
-			fetyp.lehre'
+			plan.studienplan_id, oe.oe_kurzbz, fetyp.ferientyp_kurzbz, oe.bezeichnung AS oe_bezeichnung,
+			plan.studienplan_id, plan.bezeichnung AS studienplan_bezeichnung, fetyp.mitarbeiter AS mitarbeiterrelevant,
+			fetyp.studierende AS studierendenrelevant, fetyp.lehre'
 		);
 		$this->FerienModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
 		$this->FerienModel->addJoin('lehre.tbl_studienplan plan', 'studienplan_id', 'LEFT');
@@ -227,20 +224,6 @@ class Ferien extends FHCAPI_Controller
 	}
 
 	/**
-	 * Get list of Studiengaenge
-	 */
-	public function getStg()
-	{
-		$this->StudiengangModel->addSelect(' tbl_studiengang.*, UPPER(typ::varchar(1) || kurzbz) AS kuerzel');
-		$this->StudiengangModel->addOrder('typ, kurzbz');
-		$result = $this->StudiengangModel->loadWhere(['aktiv' => true]);
-
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess($data);
-	}
-
-	/**
 	 * Add Ferien
 	 */
 	public function insert()
@@ -252,13 +235,6 @@ class Ferien extends FHCAPI_Controller
 		// check permissions for new Ferien
 		if (!$this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, 'suid', $data['oe_kurzbz']))
 			return $this->terminateWithError($this->p->t('ui', 'keineBerechtigung'));
-
-		// get studiengang_kz from oe, otherwise default kz
-		$this->StudiengangModel->addSelect('studiengang_kz');
-		$this->StudiengangModel->addLimit(1);
-		$result = $this->StudiengangModel->loadWhere(['oe_kurzbz' => $data['oe_kurzbz']]);
-
-		$data['studiengang_kz'] = hasData($result) ? getData($result)[0]->studiengang_kz : self::DEFAULT_STUDIENGANG_KZ;
 
 		$data = array_merge($data, ['insertamum' => date('c'), 'insertvon' => getAuthUID()]);
 
@@ -353,8 +329,7 @@ class Ferien extends FHCAPI_Controller
 	{
 		if (isset($ferien_id))
 		{
-			$this->FerienModel->addSelect('tbl_ferien.oe_kurzbz, stg.oe_kurzbz AS studiengang_oe_kurzbz, studiengang_kz');
-			$this->FerienModel->addJoin('public.tbl_studiengang stg', 'studiengang_kz', 'LEFT');
+			$this->FerienModel->addSelect('oe_kurzbz');
 			$result = $this->FerienModel->load($ferien_id);
 
 			if (isError($result)) return $this->terminateWithError(getError($result));
@@ -363,12 +338,7 @@ class Ferien extends FHCAPI_Controller
 			{
 				$ferien = getData($result)[0];
 
-				if (isset($ferien->oe_kurzbz))
-					$berechtigung_oe_kurzbz = $ferien->oe_kurzbz;
-				elseif (isset($ferien->studiengang_oe_kurzbz))
-					$berechtigung_oe_kurzbz = $ferien->studiengang_oe_kurzbz;
-
-				if ($this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, $typ, $berechtigung_oe_kurzbz)) return;
+				if ($this->permissionlib->isBerechtigt(self::DEFAULT_BERECHTIGUNG, $typ, $ferien->oe_kurzbz)) return;
 			}
 		}
 

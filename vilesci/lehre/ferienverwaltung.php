@@ -125,11 +125,13 @@
 		}
 		else
 		{
-			$sql_query="INSERT INTO lehre.tbl_ferien (studiengang_kz, bezeichnung, vondatum, bisdatum) VALUES(
+			$sql_query="INSERT INTO lehre.tbl_ferien (studiengang_kz, bezeichnung, vondatum, bisdatum, oe_kurzbz) VALUES(
 			".$db->db_add_param($_POST['studiengang_kz'], FHC_INTEGER).",
 			".$db->db_add_param($_POST['bezeichnung']).",
 			".$db->db_add_param($datum_obj->formatDatum($_POST['vondatum'],'Y-m-d')).",
-			".$db->db_add_param($datum_obj->formatDatum($_POST['bisdatum'],'Y-m-d')).");";
+			".$db->db_add_param($datum_obj->formatDatum($_POST['bisdatum'],'Y-m-d')).",
+			CASE WHEN ".$db->db_add_param($_POST['studiengang_kz'], FHC_INTEGER)." = 0 THEN NULL
+			ELSE (SELECT oe_kurzbz FROM public.tbl_studiengang WHERE studiengang_kz = ".$db->db_add_param($_POST['studiengang_kz'], FHC_INTEGER).") END);";
 			//echo $sql_query;
 			$db->db_query($sql_query);
 			$stg_kz = $_POST['studiengang_kz'];
@@ -251,7 +253,7 @@
 			{
 				echo '
 					<tr>
-						<td>'.$db->convert_html_chars($stg_arr[$row->studiengang_kz]).'</td>
+						<td>'.$db->convert_html_chars($stg_arr[$row->studiengang_kz] ?? '').'</td>
 						<td>'.$db->convert_html_chars($row->vondatum).'</td>
 						<td>'.$db->convert_html_chars($row->bisdatum).'</td>
 						<td>'.$db->convert_html_chars($row->bezeichnung).'</td>';

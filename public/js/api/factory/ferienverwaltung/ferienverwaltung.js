@@ -49,12 +49,6 @@ export default {
 			url: 'api/frontend/v1/education/ferien/getFerientypen'
 		};
 	},
-	getStg() {
-		return {
-			method: 'get',
-			url: 'api/frontend/v1/education/ferien/getStg'
-		};
-	},
 	getDefaultVonBis() {
 		return {
 			method: 'get',
