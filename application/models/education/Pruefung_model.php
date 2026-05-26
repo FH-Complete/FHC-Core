@@ -306,4 +306,35 @@ class Pruefung_model extends DB_Model
 
 		return $this->loadWhereCommitteeExamsFailed();
 	}
+
+	/**
+	 *
+	 * @return stdClass
+	 */
+	public function getAllExRepeaterWithNewNegativeCommissionalExams()
+	{
+		$query = "
+		SELECT DISTINCT antrag.prestudent_id
+			FROM lehre.tbl_pruefung p
+			JOIN lehre.tbl_note n USING (note)
+			JOIN (
+				SELECT
+					stud.student_uid,
+					antr.datum,
+					antr.prestudent_id
+				FROM campus.tbl_studierendenantrag antr
+				JOIN public.tbl_prestudent ps USING (prestudent_id)
+				JOIN public.tbl_student stud USING (prestudent_id)
+					JOIN public.tbl_benutzer ben ON (ben.uid = stud.student_uid)
+				WHERE antr.typ = 'Wiederholung'
+				AND ben.aktiv = true
+			) antrag ON antrag.student_uid = p.student_uid
+			WHERE n.note IN (20, 13, 5, 15, 14)  -- 9 (noch nicht eingetragen ist negativ)
+			AND p.pruefungstyp_kurzbz IN ('kommPruef', 'zusKommPruef')
+			AND p.datum > antrag.datum
+					";
+
+		return $this->execQuery($query);
+	}
+
 }

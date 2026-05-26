@@ -673,6 +673,58 @@ class AntragJob extends JOB_Controller
 		$this->logInfo('Ende Job sendAufforderungWiederholer');
 	}
 
+	/**
+	 * Send Reminder to Assistance of Wiederholer with a Second Negative Commissional Exam
+	 *
+	 */
+	public function sendReminderWiederholerWithNegativeCommissionalExam()
+	{
+		$this->logInfo('Start Job sendReminderWiederholerWithNegativeCommissionalExam');
+
+		$this->load->library('PrestudentLib');
+		$result = $this->PruefungModel->getAllExRepeaterWithNewNegativeCommissionalExams();
+		if (isError($result)) {
+			print_r(getError($result));
+		}
+		$dataExrepeater = getData($result) ?: [];
+		$count = 0;
+
+		foreach ($dataExrepeater as $exrepeater) {
+
+			$result = $this->PrestudentModel->load($exrepeater->prestudent_id);
+			if (!hasData($result)) {
+				$this->logWarning('No Prestudent found');
+				continue;
+			}
+			$prestudent = current(getData($result));
+			$result = $this->StudiengangModel->load($prestudent->studiengang_kz);
+			if (!hasData($result)) {
+				$this->logWarning('No Studiengang found');
+				continue;
+			}
+			$studiengang = current(getData($result));
+			$result = $this->PersonModel->loadPrestudent($exrepeater->prestudent_id);
+			if (!hasData($result)) {
+				$this->logWarning('No Person found');
+				continue;
+			}
+			$person = current(getData($result));
+			$count++;
+			$email = $studiengang->email;
+			$dataMail = array(
+				'prestudent' => 'PreStudentId: ' . $exrepeater->prestudent_id,
+				'name' => trim($person->vorname . ' ' . $person->nachname),
+				//'emailAn' => $email
+			);
+
+			if (!sendSanchoMail('Sancho_Mail_Antrag_W_EX_W', $dataMail, $email, 'Kommissionelle Prüfung ehemalige*r Wiederholer*in')) {
+				$this->logWarning("Failed to send Notification to " . $email);
+			}
+		}
+		$this->logInfo($count . " Mails sent");
+		$this->logInfo('End Job sendReminderWiederholerWithNegativeCommissionalExam');
+	}
+
 	protected function prestudentsGetUnique($prestudents)
     {
 		$result = [];
