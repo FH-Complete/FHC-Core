@@ -360,7 +360,10 @@ class StundenplanLib
 				if (isError($ort_content_object)) {
 					return error(getData($ort_content_object));
 				}
-				$ort_content_object = getData($ort_content_object)[0];
+				$ort_content_object_data = getData($ort_content_object);
+				$ort_content_object = (is_array($ort_content_object_data) && count($ort_content_object_data) > 0)
+					? $ort_content_object_data[0]
+					: null;
 				if($ort_content_object) {
 					$item->ort_content_id = $ort_content_object->content_id;
 				}
