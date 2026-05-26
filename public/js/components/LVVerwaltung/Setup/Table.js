@@ -192,7 +192,7 @@ export default {
 
 				columns: [
 					{
-						title: "adis",
+						title: this.$p.t('lehre', 'kurzbz'),
 						field: "lv_kurzbz",
 						headerFilterFuncParams: {field: 'lv_kurzbz'},
 						headerFilter: true,
