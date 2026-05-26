@@ -24,6 +24,7 @@ class VertragsbestandteilFactory
 	const VERTRAGSBESTANDTEIL_ZEITAUFZEICHNUNG = 'zeitaufzeichnung';
 	const VERTRAGSBESTANDTEIL_LEHRE = 'lehre';
 	const VERTRAGSBESTANDTEIL_LOHNGUIDE = 'lohnguide';
+	const VERTRAGSBESTANDTEIL_KOLLEKTIVVERTRAG = 'kollektivvertrag';
 	
 	public static function getVertragsbestandteil($data, $fromdb=false)
 	{
@@ -76,6 +77,11 @@ class VertragsbestandteilFactory
 				$vertragsbestandteil = new VertragsbestandteilLohnguide();
 				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
 				break;
+
+			case self::VERTRAGSBESTANDTEIL_KOLLEKTIVVERTRAG:
+				$vertragsbestandteil = new VertragsbestandteilKollektivvertrag();
+				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
+				break;				
 			
 			default:
 				throw new Exception('Unknown vertragsbestandteiltyp_kurzbz ' 
