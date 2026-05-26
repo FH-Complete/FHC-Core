@@ -194,6 +194,9 @@ export default {
 					v-else
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
+					:timeSlotDisplayBehavior="
+						$props.mode.toLowerCase() === 'list' ? 'always' : 'default'
+					"
 				></component>
 			</div>
 		</template>

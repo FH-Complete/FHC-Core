@@ -97,6 +97,7 @@ export default {
 				<component
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
+					:timeSlotDisplayBehavior="'always'"
 				></component>
 			</div>
 		</template>
