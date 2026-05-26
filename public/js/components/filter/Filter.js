@@ -809,7 +809,7 @@ export const CoreFilterCmpt = {
 		getColumnNames() {
 			if (!this.tableBuilt) {
 				return {};
-			} else if (this.tabulator.options.locale); {
+			} else if (this.tabulator.options.locale) {
 				return this.tabulator.getLang().columns;
 			}
 			return this.tabulator.getColumns().reduce((res, col) => {
