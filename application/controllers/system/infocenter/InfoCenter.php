@@ -2420,11 +2420,11 @@ class InfoCenter extends Auth_Controller
 		if ($statusgrund === 'null' || $studiengang === 'null' || $abgeschickt === 'null' || empty($personen))
 			$this->terminateWithJsonError("Bitte füllen Sie alle Felder aus");
 
-		if ($studiengang === 'all' && $abgeschickt === 'all')
+		if ($studiengang === 'all')
 		{
 			foreach($personen as $person)
 			{
-				$prestudenten = $this->PrestudentModel->getByPersonWithoutLehrgang($person, $studienSemester);
+				$prestudenten = $this->PrestudentModel->getByPersonWithoutLehrgang($person, $studienSemester, $abgeschickt, $abgeschickt === 'all');
 
 				if (!hasData($prestudenten))
 					continue;

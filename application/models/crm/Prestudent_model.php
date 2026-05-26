@@ -693,7 +693,7 @@ class Prestudent_model extends DB_Model
 
 		if (!$ignoreAbgeschickt)
 		{
-			$query .= "AND";
+			$query .= " AND";
 
 			if ($abgeschickt === 'true')
 				$query .= " EXISTS";
@@ -709,7 +709,7 @@ class Prestudent_model extends DB_Model
 		return $this->execQuery($query, array($person, $studiengang, $studienSemester));
 	}
 
-	public function getByPersonWithoutLehrgang($person, $studienSemester)
+	public function getByPersonWithoutLehrgang($person, $studienSemester, $abgeschickt, $ignoreAbgeschickt = false)
 	{
 		$query = "SELECT DISTINCT(ps.prestudent_id)
 					FROM public.tbl_prestudentstatus pss
@@ -720,6 +720,21 @@ class Prestudent_model extends DB_Model
 					WHERE ps.person_id = ?
 							AND (sg.typ = 'b' OR sg.typ = 'm')
 						AND pss.studiensemester_kurzbz = ?";
+
+		if (!$ignoreAbgeschickt)
+		{
+			$query .= " AND";
+
+			if ($abgeschickt === 'true')
+				$query .= " EXISTS";
+			else
+				$query .= " NOT EXISTS";
+
+			$query .= " (SELECT 1 FROM public.tbl_prestudentstatus spss
+					JOIN public.tbl_prestudent sps USING(prestudent_id)
+					WHERE sps.prestudent_id = ps.prestudent_id
+					AND spss.bewerbung_abgeschicktamum IS NOT NULL)";
+		}
 
 		return $this->execQuery($query, array($person, $studienSemester));
 	}
