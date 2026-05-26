@@ -19,9 +19,10 @@ class GbDatumWeitZurueck extends PlausiChecker
 		// pass parameters needed for plausicheck
 		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
-		$personRes = $this->getGbDatumWeitZurueck($studiensemester_kurzbz, $studiengang_kz, null, $exkludierte_studiengang_kz);
+		$personRes = $this->getGbDatumWeitZurueck($studiensemester_kurzbz, $studiengang_kz, $person_id, $exkludierte_studiengang_kz);
 
 		if (isError($personRes)) return $personRes;
 

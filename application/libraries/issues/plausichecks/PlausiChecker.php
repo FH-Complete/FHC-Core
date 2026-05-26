@@ -5,11 +5,11 @@
  */
 abstract class PlausiChecker
 {
+	const ISSUE_ID_NAME = 'issue_id';
+
 	protected $_ci; // code igniter instance
 	protected $_config; // all applicable configuration parameters for this plausicheck
 	protected $_db; // database for queries
-
-	protected $_isForResolutionCheck; // if true, additional parameters only needed for resolution are checked
 
 	protected $_base_sql = ''; // base sql string
 
@@ -26,8 +26,6 @@ abstract class PlausiChecker
 		// set configuration
 		$this->_config = $params['configurationParams'] ?? [];
 
-		$this->_isForResolutionCheck = $params['isForResolutionCheck'] ?? false;
-
 		// get database for queries
 		$this->_db = new DB_Model();
 	}
@@ -43,14 +41,19 @@ abstract class PlausiChecker
 		$params = [];
 		$qry = $this->_base_sql;
 
-		if ($this->_isForResolutionCheck == true)
+		// if issue id is set, issue is resolving - check if behebung parameter are present
+		if (isset($paramsForChecking[self::ISSUE_ID_NAME]))
 		{
 			foreach ($this->_resolution_params as $resParam)
 			{
 				if (!isset($paramsForChecking[$resParam]))
-					return error("$resParam missing".(isset($paramsForChecking['issue_id']) ? ", issue ID: ".$paramsForChecking['issue_id'] : ""));
+					return error("$resParam missing"
+						.(isset($paramsForChecking[self::ISSUE_ID_NAME]) ? ", issue ID: ".$paramsForChecking[self::ISSUE_ID_NAME] : ""));
 			}
 		}
+
+		// get fehlertext and resolution params
+
 
 		// add config params to query
 		if (isset($this->_config_params) && !isEmptyArray($this->_config_params))

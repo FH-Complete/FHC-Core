@@ -16,7 +16,7 @@ class CORE_INOUT_0005 implements IIssueResolvedChecker
 
 		$this->_ci->load->model('codex/Bisio_model', 'BisioModel');
 
-		// get all Zwecke
+		// get bisio
 		$this->_ci->BisioModel->addSelect('ects_angerechnet');
 		$bisioRes = $this->_ci->BisioModel->loadWhere(array('bisio_id' => $params['bisio_id']));
 

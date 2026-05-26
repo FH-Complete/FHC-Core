@@ -23,7 +23,11 @@ class AbbrecherAktiv extends PlausiChecker
 			AND benutzer.aktiv=true";
 
 	protected $_config_params = ['exkludierteStudiengaenge' => " AND stg.studiengang_kz NOT IN ?"];
-	protected $_params_for_checking = ['studiengang_kz' => " AND stg.studiengang_kz = ?", 'prestudent_id' => " AND pre.prestudent_id = ?"];
+	protected $_params_for_checking = [
+		'studiengang_kz' => " AND stg.studiengang_kz = ?",
+		'prestudent_id' => " AND pre.prestudent_id = ?",
+		'person_id' => " AND pre.person_id = ?"
+	];
 	protected $_fehlertext_params = ['prestudent_id'];
 	protected $_resolution_params = ['prestudent_id'];
 }

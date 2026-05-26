@@ -12,16 +12,13 @@ class CORE_STUDENTSTATUS_0004 implements IIssueResolvedChecker
 		if (!isset($params['prestudent_id']) || !is_numeric($params['prestudent_id']))
 			return error('Prestudent Id missing, issue_id: '.$params['issue_id']);
 
-		if (!isset($params['studiensemester_kurzbz']) || isEmptyString($params['studiensemester_kurzbz']))
-			return error('Studiensemester missing, issue_id: '.$params['issue_id']);
-
 		$this->_ci =& get_instance(); // get code igniter instance
 
 		$this->_ci->load->library('issues/plausichecks/InaktiverStudentAktiverStatus');
 
 		// check if issue persists
 		$checkRes = $this->_ci->inaktiverstudentaktiverstatus->getInaktiverStudentAktiverStatus(
-			$params['studiensemester_kurzbz'],
+			null,
 			null,
 			$params['prestudent_id']
 		);

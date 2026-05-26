@@ -6,7 +6,7 @@
 class PlausiIssueProducer extends PlausiIssueProducer_Controller
 {
 	private $_currentStudiensemester;
-	protected $_app = 'core';
+	protected $_apps = 'core';
 
 	public function __construct()
 	{
@@ -18,12 +18,12 @@ class PlausiIssueProducer extends PlausiIssueProducer_Controller
 		$this->load->model('organisation/studiensemester_model', 'StudiensemesterModel');
 
 		// get current Studiensemester
-		$studiensemesterRes = $this->StudiensemesterModel->getAkt();
+		$studiensemesterRes = $this->StudiensemesterModel->getAktOrNextSemester(62);
 		if (hasData($studiensemesterRes)) $this->_currentStudiensemester = getData($studiensemesterRes)[0]->studiensemester_kurzbz;
 
 		// set fehler which can be produced by the job
 		// structure: fehler_kurzbz => class (library) name for resolving
-		$this->_fehlerLibMappings = $this->plausicheckdefinitionlib->getFehlerLibMappings();
+		$this->_fehlerKurzbz = $this->plausicheckdefinitionlib->getFehlerKurzbz();
 	}
 
 	/**

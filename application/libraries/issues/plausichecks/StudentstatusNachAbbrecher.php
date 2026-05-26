@@ -18,9 +18,10 @@ class StudentstatusNachAbbrecher extends PlausiChecker
 
 		// pass parameters needed for plausicheck
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->getStudentstatusNachAbbrecher($studiengang_kz, null, $exkludierte_studiengang_kz);
+		$prestudentRes = $this->getStudentstatusNachAbbrecher($studiengang_kz, null, $person_id, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
@@ -51,7 +52,7 @@ class StudentstatusNachAbbrecher extends PlausiChecker
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
+	public function getStudentstatusNachAbbrecher($studiengang_kz = null, $prestudent_id = null, $person_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -77,6 +78,12 @@ class StudentstatusNachAbbrecher extends PlausiChecker
 		{
 			$qry .= " AND prestudent.prestudent_id = ?";
 			$params[] = $prestudent_id;
+		}
+
+		if (isset($person_id))
+		{
+			$qry .= " AND prestudent.person_id = ?";
+			$params[] = $person_id;
 		}
 
 		if (isset($exkludierte_studiengang_kz) && !isEmptyArray($exkludierte_studiengang_kz))

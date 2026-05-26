@@ -18,11 +18,12 @@ class NationNichtOesterreichAberGemeinde extends PlausiChecker
 
 		// pass parameters needed for plausicheck
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
+		$person_id = isset($params['person_id']) ? $params['person_id'] : null;
 
 		// get all students failing the plausicheck
 		$personRes = $this->getNationNichtOesterreichAberGemeinde(
 			$studiengang_kz,
-			null,
+			$person_id,
 			$exkludierte_studiengang_kz
 		);
 

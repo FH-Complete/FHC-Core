@@ -88,9 +88,11 @@ class IssuesKonfiguration extends Auth_Controller
 
 		// get all Fehler, optionally filtered by app
 		$params = array('fehlercode_extern' => null);
+		$this->FehlerModel->addDistinct();
 		$this->FehlerModel->addSelect('fehlercode, fehler_kurzbz, fehlertyp_kurzbz, fehlertext');
+		$this->FehlerModel->addJoin('system.tbl_fehler_app', 'fehlercode');
 		$this->FehlerModel->addOrder('fehlercode');
-		if (!isEmptyString($app)) $params['app'] = $app;
+		if (!isEmptyString($app)) $params['tbl_fehler_app.app'] = $app;
 		$fehlerRes = $this->FehlerModel->loadWhere($params);
 
 		if (isError($fehlerRes)) $this->terminateWithJsonError($this->p->t('fehlermonitoring', 'fehlerFehlerLaden'));
