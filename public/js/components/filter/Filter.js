@@ -24,6 +24,7 @@ import collapseAutoClose from '../../directives/collapseAutoClose.js';
 import moduleLayoutFitDataStretchFrozen from '../../tabulator/layouts/fitDataStretchFrozen.js';
 import InternalToExternalEventBroadcastModule from "../../tabulator/customModules/InternalToExternalEventBroadcastModule.js"
 import MenuExtensionModule from "../../tabulator/customModules/MenuExtensionModule.js"
+import ResponsiveLayoutExtensionModule from "../../tabulator/customModules/ResponsiveLayoutExtensionModule.js"
 
 import { debounce } from "../../helpers/DebounceHelper.js";
 
@@ -128,26 +129,6 @@ export const CoreFilterCmpt = {
 				page: false,
 			},
 			collapsedHeadingLocalizationTimer: null,
-			localizeCollapsedColumnHeadings:
-				debounce(
-					() => {
-						const columnHeadings = this.tabulator?.getLang()?.columns;
-						if (!columnHeadings?.length) return;
-
-						this.$refs.table
-							.querySelectorAll(".collapsedColumnHeading")
-							.forEach((collapsedColumnHeadingElement) => {
-								const field =
-									collapsedColumnHeadingElement.getAttribute(
-										"tabulator-column-field",
-									);
-								if (!field?.length) return;
-
-								collapsedColumnHeadingElement.innerHTML =
-									columnHeadings[field];
-							});
-					}, 200)
-		,
 		};
 	},
 	computed: {
@@ -258,10 +239,6 @@ export const CoreFilterCmpt = {
 				if (!this.$props.tabulatorOptions.locale) return;
 
 				this.tabulator.setLocale(newSelectedLanguage);
-
-				if (this.$props.tabulatorOptions.responsiveLayoutCollapseFormatter) {
-					this.localizeCollapsedColumnHeadings();
-				}
 			},
 		},
 	},
@@ -349,7 +326,8 @@ export const CoreFilterCmpt = {
 			// Start the tabulator with the build options
 			this.tabulator = new Tabulator(this.$refs.table, {
 				...tabulatorOptions,
-				debugInvalidOptions: false,
+				// todo: remove comment
+				// debugInvalidOptions: false,
 			});
 			// If event handlers have been provided
 			if (Array.isArray(this.tabulatorEvents) && this.tabulatorEvents.length > 0)
@@ -407,16 +385,8 @@ export const CoreFilterCmpt = {
 				this.filterActive = filters.length > 0;
 				this.$emit("headerFilterOn", this.filterActive);
 			});
-
-			this.tabulator.on("renderComplete", () => {
-				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter && this.tableBuilt) {
-					this.localizeCollapsedColumnHeadings();
-				}	
-			});
-			this.tabulator.on("layoutRefreshed", () => {
-				if (tabulatorOptions.locale && tabulatorOptions.responsiveLayoutCollapseFormatter) {
-					this.localizeCollapsedColumnHeadings();
-				}	
+			this.tabulator.on("localized", () => {
+				this.tabulator.modules.responsiveLayout.generateCollapsedContent();
 			});
 		},
 		async configureTabulatorLocalizations(tabulatorOptions) {
@@ -490,6 +460,10 @@ export const CoreFilterCmpt = {
 					phrasesGroupedByCategoryRequestParam[category] = [phrase];
 				}
 			});
+
+			if (!Object.keys(phrasesGroupedByCategoryRequestParam).length) {
+				return tabulatorOptions;
+			}
 
 			const phrasesResponse = await this.$api.call(
 				ApiPhrases.getPhrases(phrasesGroupedByCategoryRequestParam),
@@ -857,6 +831,7 @@ export const CoreFilterCmpt = {
 
 		Tabulator.registerModule(InternalToExternalEventBroadcastModule);
 		Tabulator.registerModule(MenuExtensionModule);
+		Tabulator.registerModule(ResponsiveLayoutExtensionModule);
 	},
 	mounted() {
 		this.initTabulator().then(() => {

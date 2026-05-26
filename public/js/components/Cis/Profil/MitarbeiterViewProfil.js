@@ -46,21 +46,24 @@ export default {
 						visible: true
 					},
 					{
-						title: "ui/bezeichnung",
+						title: "placeholder",
+						titlePhrase: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "lehre/organisationseinheit",
+						title: "placeholder",
+						titlePhrase: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "global/gueltigVon",
+						title: "placeholder",
+						titlePhrase: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -71,7 +74,8 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: "global/gueltigBis",
+						title: "placeholder",
+						titlePhrase: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,
@@ -82,7 +86,8 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
-						title: "profil/wochenstunden",
+						title: "placeholder",
+						titlePhrase: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,

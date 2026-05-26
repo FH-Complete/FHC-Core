@@ -42,7 +42,8 @@ export default {
 				minHeight: 200,
 				layout: "fitColumns",
 				columns: [{
-					title: "profil/zutrittsGruppen",
+					title: "placeholder",
+					titlePhrase: "profil/zutrittsGruppen",
 					field: "bezeichnung"
 				}],
 			},
@@ -69,14 +70,16 @@ export default {
 						headerClick: this.collapseFunction,
 					},
 					{
-						title: "profil/entlehnteBetriebsmittel",
+						title: "placeholder",
+						titlePhrase: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
 						visible: true
 					},
 					{
-						title: "profil/inventarnummer",
+						title: "placeholder",
+						titlePhrase: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
 						resizable: true,
@@ -84,7 +87,8 @@ export default {
 						visible: true
 					},
 					{
-						title: "profil/ausgabedatum",
+						title: "placeholder",
+						titlePhrase: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
 						headerFilter: dateFilter,

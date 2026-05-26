@@ -9,7 +9,7 @@ export default class MenuExtensionModule extends Menu {
 	}
 
 	loadMenu(e, component, menu, parentEl, parentPopup){
-		const isLocalizationEnabled = !!component.table.options.locale;
+		const isLocalizationEnabled = component.table.options.locale && component.table.options.locale !== "default";
 		const menuItemTranslations = component.table.getLang().menuItems;
 		if (isLocalizationEnabled && menuItemTranslations) {
 			menu = menu.map((menuItem) => {

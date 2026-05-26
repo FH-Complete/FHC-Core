@@ -24,7 +24,7 @@ Vue.$collapseFormatter = function (data) {
 		let item2 = document.createElement("div");
 		item2.classList.add("col-6");
 
-		item.innerHTML = "<strong class=\"collapsedColumnHeading\" tabulator-column-field=\"" + col.field + "\">...</strong>";
+		item.innerHTML = "<strong>" + col.title + "</strong>";
 		item2.innerHTML = col.value ? col.value : "-";
 
 		list.appendChild(item);

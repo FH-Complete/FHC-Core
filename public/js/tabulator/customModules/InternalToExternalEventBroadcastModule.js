@@ -13,10 +13,11 @@ export default class InternalToExternalEventBroadcastModule extends Module {
 		super(table);
 
 		this.eventsToBroadcast = [
-			{
-				internal: "layout-refreshed",
-				external: null,
-			},
+			// example event
+			// {
+			// 	internal: "layout-refreshed",
+			// 	external: null,
+			// },
 		];
 	}
 

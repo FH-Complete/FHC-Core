@@ -59,6 +59,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "ui/bezeichnung",
 						field: "Bezeichnung",
 						headerFilter: true,
@@ -66,6 +67,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "lehre/organisationseinheit",
 						field: "Organisationseinheit",
 						headerFilter: true,
@@ -73,6 +75,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "global/gueltigVon",
 						field: "Gültig_von",
 						headerFilterFunc: 'dates',
@@ -84,6 +87,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "global/gueltigBis",
 						field: "Gültig_bis",
 						headerFilterFunc: 'dates',
@@ -95,6 +99,7 @@ export default {
 						formatterParams: this.datetimeFormatterParams()
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "profil/wochenstunden",
 						field: "Wochenstunden",
 						headerFilter: true,
@@ -129,6 +134,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "profil/entlehnteBetriebsmittel",
 						field: "betriebsmittel",
 						headerFilter: true,
@@ -136,6 +142,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "profil/inventarnummer",
 						field: "Nummer",
 						headerFilter: true,
@@ -144,6 +151,7 @@ export default {
 						visible: true
 					},
 					{
+						title: "placeholder",
 						titlePhrase: "profil/ausgabedatum",
 						field: "Ausgegeben_am",
 						headerFilterFunc: 'dates',
