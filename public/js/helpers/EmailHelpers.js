@@ -1,6 +1,6 @@
 export async function splitMailsHelper(mails, event, subject, body, alertPluginRef, phrasenPluginRef) {
 	await phrasenPluginRef.loadCategory('ui');
-
+	debugger
 	let splititem = ",";
 	let maillist = mails.join(splititem);
 	let useBcc = event?.ctrlKey || event?.metaKey;
@@ -16,13 +16,13 @@ export async function splitMailsHelper(mails, event, subject, body, alertPluginR
 
 	// initial overhead: "mailto:?bcc=" -> 12 chars, "mailto:" -> 7 chars
 	const baseOverhead = useBcc ? 12 : 7;
-	let queryString = urlParams.toString();
+	let queryString = urlParams.toString().replace(/\+/g, '%20');;
 	let overhead = baseOverhead + (queryString ? 1 + queryString.length : 0); // +1 accounts for '?' or '&'
 
 	// calculate overhead with body to exceed the limit
 	if (overhead > 2024) {
 		await alertPluginRef.alertWarning(phrasenPluginRef.t('ui', 'bodyZuLang'));
-		urlParams.delete('body');
+		urlParams.delete('body').replace(/\+/g, '%20');;
 		queryString = urlParams.toString();
 		overhead = baseOverhead + (queryString ? 1 + queryString.length : 0);
 	}

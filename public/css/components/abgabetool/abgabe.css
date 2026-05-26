@@ -347,3 +347,52 @@
 	
 }
 
+/*confetti celebration on endupload - impossible to miss*/
+#confetti-container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	pointer-events: none;
+	z-index: 9999;
+	overflow: hidden;
+}
+
+.confetti-piece {
+	position: absolute;
+	opacity: 0;
+	will-change: top, transform, opacity;
+}
+
+/* Background Rain */
+@keyframes fallAndSpin {
+	0% {
+		top: var(--start-y);
+		transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
+		opacity: 1;
+	}
+	100% {
+		top: 105vh;
+		transform: translate3d(var(--drift), 0, 0) rotateX(720deg) rotateY(360deg);
+		opacity: 0.3;
+	}
+}
+
+/* Corner Cannons*/
+@keyframes cannonBlast {
+	0% {
+		transform: translate3d(0, 0, 0) scale(0.3) rotate(0deg);
+		opacity: 1;
+		animation-timing-function: cubic-bezier(0.1, 0.8, 0.2, 1);
+	}
+	30% {
+		transform: translate3d(var(--blast-x), var(--blast-y), 0) scale(1.2) rotate(270deg);
+		opacity: 1;
+		animation-timing-function: linear;
+	}
+	100% {
+		transform: translate3d(calc(var(--blast-x) * 1.4), 15vh, 0) scale(0.4) rotate(630deg);
+		opacity: 0;
+	}
+}

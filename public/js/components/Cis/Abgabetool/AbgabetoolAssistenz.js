@@ -95,6 +95,7 @@ export const AbgabetoolAssistenz = {
 			old_abgabe_beurteilung_link: null,
 			ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT: null,
 			ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER: null,
+			MULTIEDIT_TABLE: false,
 			saving: false,
 			loading: false,
 			abgabeTypeOptions: null,
@@ -2275,6 +2276,7 @@ export const AbgabetoolAssistenz = {
 					this.old_abgabe_beurteilung_link = res.data?.old_abgabe_beurteilung_link;
 					this.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT;
 					this.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = res.data?.ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER;
+					this.MULTIEDIT_TABLE = res.data?.MULTIEDIT_TABLE;
 				}
 
 				// 2. Studiengänge
@@ -2659,7 +2661,7 @@ export const AbgabetoolAssistenz = {
 				<div class="col-auto me-auto">
 					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitleAdmin')}}</h2>
 				</div>
-				<div class="col-auto">
+				<div class="col-auto d-none d-xxl-flex">
 					<label class="col-form-label">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
 				</div>
 				<div class="col-3">
@@ -2676,10 +2678,10 @@ export const AbgabetoolAssistenz = {
 						</template>
 					</Dropdown>
 				</div>
-				<div class="col-auto">
+				<div class="col-auto d-none d-xxl-flex">
 					<label class="col-form-label">{{$capitalize($p.t('lehre/note'))}}:</label>
 				</div>
-				<div class="col-3">
+				<div class="col-2">
 					<Dropdown
 						:placeholder="$p.t('lehre/note')" 
 						:style="{'width': '100%', 'scroll-behavior': 'auto !important'}" 
@@ -2738,7 +2740,7 @@ export const AbgabetoolAssistenz = {
 					</button>
 					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
 					
-					<button @click="switchMode" class="btn btn-secondary">
+					<button v-if="MULTIEDIT_TABLE" @click="switchMode" class="btn btn-secondary">
 						{{ $p.t('abgabetool/c4terminansicht') }}
 					</button>
 					

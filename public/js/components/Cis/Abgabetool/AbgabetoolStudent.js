@@ -18,7 +18,9 @@ export const AbgabetoolStudent = {
 		return {
 			notenOptions: Vue.computed(() => this.notenOptions),
 			isViewMode: Vue.computed(() => this.isViewMode),
-			moodle_link: Vue.computed(() => this.moodle_link)
+			moodle_link: Vue.computed(() => this.moodle_link),
+			title_edit_allowed: Vue.computed(() => this.title_edit_allowed),
+			confetti_on_endupload: Vue.computed(() => this.confetti_on_endupload)
 		}
 	},
 	props: {
@@ -46,6 +48,8 @@ export const AbgabetoolStudent = {
 			projektarbeiten: null,
 			selectedProjektarbeit: null,
 			moodle_link: null,
+			title_edit_allowed: null,
+			confetti_on_endupload: null,
 			editingTitel: '',
 			editingProjektarbeit: null,
 		};
@@ -335,6 +339,8 @@ export const AbgabetoolStudent = {
 
 		this.$api.call(ApiAbgabe.getConfigStudent()).then(res => {
 			this.moodle_link = res.data?.moodle_link
+			this.title_edit_allowed = res.data?.title_edit_allowed
+			this.confetti_on_endupload = res.data?.confetti_on_endupload
 		}).catch(e => {
 			this.loading = false
 		})
@@ -381,7 +387,7 @@ export const AbgabetoolStudent = {
 					rows="10" 
 					maxlength="1024" 
 					class="form-control w-100"
-					@keyup.enter="saveTitel"
+					@keydown.enter.prevent="saveTitel"
 				/>
 				<div class="form-text text-end">{{ editingTitel.length }} / 1024</div>
 			</div>
@@ -407,7 +413,7 @@ export const AbgabetoolStudent = {
 	<h2>{{$capitalize( $p.t('abgabetool/abgabetoolTitle') )}}</h2>
 	<hr>
 	
-	<div v-if="projektarbeiten === null">
+	<div v-if="projektarbeiten === null || projektarbeiten?.length == 0">
 		{{$capitalize( $p.t('abgabetool/c4abgabeStudentNoProjectsFound') )}}
 	</div>
 	
@@ -497,7 +503,7 @@ export const AbgabetoolStudent = {
 							style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
 						>{{ projektarbeit.titel }}</span>
 						<button
-							v-if="!isViewMode && projektarbeit.note == null"
+							v-if="title_edit_allowed && !isViewMode && projektarbeit.note == null"
 							class="btn btn-sm btn-outline-secondary border-0 p-1"
 							v-tooltip.right="{ value: $capitalize($p.t('abgabetool/c4titelBearbeiten')), class: 'custom-tooltip' }"
 							@click="openTitelEdit(projektarbeit, $event)"
