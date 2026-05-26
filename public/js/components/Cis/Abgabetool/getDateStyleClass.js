@@ -1,8 +1,8 @@
 
 const zone = 'Europe/Vienna';
-const today = luxon.DateTime.now().setZone(zone);
 
 export function getDateStyleClass(termin, notenOptions) {
+	const today = luxon.DateTime.now().setZone(zone);
 	const datum = luxon.DateTime.fromISO(termin.datum, { zone }).endOf('day');
 	const abgabedatum = termin.abgabedatum ? luxon.DateTime.fromISO(termin.abgabedatum, { zone }) : null;
 	termin.diffindays = datum.diff(today, 'days').days;
@@ -28,10 +28,11 @@ export function getDateStyleClass(termin, notenOptions) {
 
 		// no submission yet
 		if (datum < today) return 'verpasst';
-		if (termin.diffindays <= 12) return 'abzugeben';
-		return 'standard';
+		
 	}
 
-	// GENERIC STATUS
-	return datum < today ? 'verpasst' : 'standard';
+	// GENERIC STATUS — applies to all termine
+	if (datum < today) return 'verpasst';
+	if (termin.diffindays <= 12) return 'abzugeben';
+	return 'standard';
 }

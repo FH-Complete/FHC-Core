@@ -7,6 +7,7 @@ import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass } from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
 import {splitMailsHelper} from "../../../helpers/EmailHelpers.js";
+import { formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolMitarbeiter = {
 	name: "AbgabetoolMitarbeiter",
@@ -33,7 +34,12 @@ export const AbgabetoolMitarbeiter = {
 	},
 	data() {
 		return {
-			tableData: null,
+			filteredRows: null,
+			count: 0,
+			filteredcount: 0,
+			selectedcount: 0,
+			qgate1FilterSelected: [],
+			qgate2FilterSelected: [],
 			abgabetypenBetreuer: null,
 			detailIsFullscreen: false,
 			phrasenPromise: null,
@@ -48,7 +54,7 @@ export const AbgabetoolMitarbeiter = {
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
 			serienTermin: Vue.reactive({
-				datum: new Date(),
+				datum: getViennaTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -70,7 +76,7 @@ export const AbgabetoolMitarbeiter = {
 			abgabeTableOptions: {
 				minHeight: 250,
 				index: 'projektarbeit_id',
-				layout: 'fitDataStretch',
+				layout: 'fitData',
 				placeholder: Vue.computed(() => this.$p.t('global/noDataAvailable')),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
@@ -128,38 +134,65 @@ export const AbgabetoolMitarbeiter = {
 							handleClick: this.selectAllHandler
 						},
 						width: 50,
-						cssClass: 'sticky-col'
+						cssClass: 'sticky-col',
+						visible: true
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, headerFilter: false, headerSort: false, widthGrow: 1, tooltip: false, cssClass: 'sticky-col'},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, maxWidth: 500, widthGrow: 8},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerartv2'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))), field: 'prevTermin',
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, headerFilter: false, headerSort: false, minWidth: 50, visible: true, tooltip: false, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, visible: false,tooltip: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, visible: true, minWidth: 100},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, width: 500, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerartv2'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, visible: true, minWidth: 100, width: 200},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncPrevTermin,
+						field: 'prevTermin', formatter: this.abgabterminFormatter, width: 250, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncNextTermin,
+						formatter: this.abgabterminFormatter, width: 250, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
-						headerFilter: 'list',
-						headerFilterParams: { valuesLookup: this.getQGateStatusList }, 
-						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						headerFilter: this.qgateHeaderFilterEditor,
+						headerFilterFunc: this.qgateHeaderFilterFunc,
+						headerFilterParams: {},
+						field: 'qgate1Status',
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG1'
+						},
+						width: 50,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate1Status
+						}
+					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
-						headerFilter: 'list',
-						headerFilterParams: { valuesLookup: this.getQGateStatusList }, 
-						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false}
+						headerFilter: this.qgateHeaderFilterEditor,
+						headerFilterFunc: this.qgateHeaderFilterFunc,
+						headerFilterParams: {},
+						field: 'qgate2Status',
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG2'
+						},
+						width: 50,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate2Status
+						}
+					}
 				],
 				persistence: false,
-				persistenceID: 'abgabeTableBetreuer2026-02-26'
+				persistenceID: 'abgabeTableBetreuer2026-05-26'
 			},
 			abgabeTableEventHandlers: [{
 				event: "tableBuilt",
@@ -190,11 +223,293 @@ export const AbgabetoolMitarbeiter = {
 					})
 					
 					this.selectedData = data
+					this.selectedcount = data.length;
+				}
+			},
+			{
+				event: 'dataFiltered',
+				handler: (filters, rows) => {
+					this.filteredRows = rows;
+					this.filteredcount = rows.length;
+
+					if (!this.selectedData.length) return;
+
+					const visibleData = new Set(rows.map(r => r.getData()));
+					const filteredOut = this.selectedData.filter(sd => !visibleData.has(sd));
+
+					if (!filteredOut.length) return;
+
+					const filteredOutSet = new Set(filteredOut);
+					this.$refs.abgabeTable.tabulator.getSelectedRows()
+						.filter(r => filteredOutSet.has(r.getData()))
+						.forEach(r => r.deselect());
 				}
 			}
 			]};
 	},
 	methods: {
+		getDateStyleHtml(dateStyle) {
+			const iconMap = {
+				'verspaetet':              '<i class="fa-solid fa-triangle-exclamation"></i>',
+				'verpasst':                '<i class="fa-solid fa-calendar-xmark"></i>',
+				'abzugeben':               '<i class="fa-solid fa-hourglass-half"></i>',
+				'standard':                '<i class="fa-solid fa-clock"></i>',
+				'abgegeben':               '<i class="fa-solid fa-paperclip"></i>',
+				'beurteilungerforderlich': '<i class="fa-solid fa-list-check"></i>',
+				'bestanden':               '<i class="fa-solid fa-check"></i>',
+				'nichtbestanden':          '<i class="fa-solid fa-circle-exclamation"></i>',
+			};
+			return iconMap[dateStyle] ?? '';
+		},
+		statusHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			const options = [
+				{ label: this.$p.t('abgabetool/c4positivBenotet'),    value: 'bestanden',              dateStyle: 'bestanden' },
+				{ label: this.$p.t('abgabetool/c4negativBenotet'),    value: 'nichtbestanden',         dateStyle: 'nichtbestanden' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerspaetet'), value: 'verspaetet',             dateStyle: 'verspaetet' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerpasst'),   value: 'verpasst',               dateStyle: 'verpasst' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbzugeben'),  value: 'abzugeben',              dateStyle: 'abzugeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbgegeben'),  value: 'abgegeben',              dateStyle: 'abgegeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich'), value: 'beurteilungerforderlich', dateStyle: 'beurteilungerforderlich' },
+				{ label: this.$p.t('abgabetool/c4tooltipStandardv2'), value: 'standard',               dateStyle: 'standard' },
+			];
+
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected'; // e.g. dateStyleFilterSelected
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+			const updateDisplay = () => {
+				display.value = options
+					.filter(o => selected.includes(o.value))
+					.map(o => o.label)
+					.join(', ');
+			};
+
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 0; cursor: pointer; white-space: nowrap; padding-right: 8px;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.value;
+				cb.checked = selected.includes(opt.value);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.value]
+						: selected.filter(v => v !== opt.value);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				// icon badge — same look as cell
+				const badge = document.createElement('div');
+				badge.className = opt.dateStyle + '-header';
+				badge.style.cssText = `min-width: 36px; height: 36px; display: flex; align-items: center; 
+				justify-content: center; flex-shrink: 0; padding: 0px 17px 0px 17px;`;
+				badge.innerHTML = this.getDateStyleHtml(opt.dateStyle);
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.label;
+				labelText.style.cssText = 'margin-left: 6px;';
+
+				row.appendChild(cb);
+				row.appendChild(badge);
+				row.appendChild(labelText);
+				dropdown.appendChild(row);
+			});
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+		statusHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+			// rowVal is the raw dateStyle string on the flat table
+			return filterVal.some(val => val === rowVal);
+		},
+		qgateHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+
+			const options = [
+				{ label: '[+] ' + this.$p.t('abgabetool/c4positivBenotet'), value: 'positive' },
+				{ label: '[-] ' + this.$p.t('abgabetool/c4negativBenotet'), value: 'negative' },
+				{ label: '[~] ' + this.$p.t('abgabetool/c4notYetGraded'), value: 'not_graded' },
+				{ label: '[?] ' + this.$p.t('abgabetool/c4notSubmitted'), value: 'not_submitted' },
+				{ label: '[o] ' + this.$p.t('abgabetool/c4notHappenedYet'), value: 'not_happened' },
+				{ label: '[--] ' + this.$p.t('abgabetool/c4keinTerminVorhanden'), value: 'no_termin' },
+			];
+
+			const field = cell.getField();
+			const stateKey = field === 'qgate1Status' ? 'qgate1FilterSelected' : 'qgate2FilterSelected';
+			let selected = [...(this[stateKey] || [])]; // restore persistence state
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.value;
+				cb.checked = selected.includes(opt.value); // sync with persistence
+				cb.addEventListener('change', () => {
+					if (cb.checked) {
+						selected.push(opt.value);
+					} else {
+						selected = selected.filter(v => v !== opt.value);
+					}
+					this[stateKey] = [...selected]; // sync with persistence
+					display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
+					success([...selected]);
+				});
+
+				row.appendChild(cb);
+				row.appendChild(document.createTextNode(opt.label));
+				dropdown.appendChild(row);
+			});
+
+			display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+		qgateHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+
+			const matches = (val) => {
+				switch (val) {
+					case 'positive':     return rowVal === this.$p.t('abgabetool/c4positivBenotet');
+					case 'negative':     return rowVal === this.$p.t('abgabetool/c4negativBenotet');
+					case 'not_graded':   return rowVal === this.$p.t('abgabetool/c4notYetGraded');
+					case 'not_submitted':return rowVal === this.$p.t('abgabetool/c4notSubmitted');
+					case 'not_happened': return rowVal === this.$p.t('abgabetool/c4notHappenedYet');
+					case 'no_termin':    return rowVal === this.$p.t('abgabetool/c4keinTerminVorhanden');
+					default:             return true;
+				}
+			};
+
+			// OR logic — row passes if it matches any selected filter
+			return filterVal.some(val => matches(val));
+		},
+		shortLongTitleFormatter(cell, formatterParams, onRendered) {
+			const longForm = cell.getValue()
+			const shortForm = formatterParams?.shortForm
+
+			if(longForm && shortForm) {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>`
+			} else {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>`
+			}
+
+		},
+		toolTipFuncPrevTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			return this.mapDateStyleToTabulatorTooltip(data.prevTermin.dateStyle);
+		},
+		toolTipFuncNextTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			return this.mapDateStyleToTabulatorTooltip(data.nextTermin.dateStyle);
+		},
+		mapDateStyleToTabulatorTooltip(dateStyleString) {
+			switch(dateStyleString) {
+				case 'bestanden':
+					return this.$p.t('abgabetool/c4tooltipBestanden')
+					break;
+				case 'nichtbestanden':
+					return this.$p.t('abgabetool/c4tooltipNichtBestanden')
+					break;
+				case 'beurteilungerforderlich':
+					return this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')
+					break;
+				case 'verspaetet':
+					return this.$p.t('abgabetool/c4tooltipVerspaetet')
+					break;
+				case 'abgegeben':
+					return this.$p.t('abgabetool/c4tooltipAbgegeben')
+					break;
+				case 'verpasst':
+					return this.$p.t('abgabetool/c4tooltipVerpasst')
+					break;
+				case 'abzugeben':
+					return this.$p.t('abgabetool/c4tooltipAbzugeben')
+					break;
+				case 'standard':
+					return this.$p.t('abgabetool/c4tooltipStandardv2')
+					break;
+				default: return ''
+			}
+		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
 			this.$refs.abgabeTable.tabulator.redraw(true)
@@ -207,7 +522,7 @@ export const AbgabetoolMitarbeiter = {
 			})
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = ""; // empty subject line 
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, null, this.$fhcAlert, this.$p)
 		},
 		getQGateStatusList() {
 			return [
@@ -247,7 +562,7 @@ export const AbgabetoolMitarbeiter = {
 				if (val instanceof Date) {
 					dt = luxon.DateTime.fromJSDate(val);
 				} else if (typeof val === "string") {
-					dt = luxon.DateTime.fromISO(val);
+					dt = toViennaDate(val);
 				} else { // fallback
 					dt = luxon.DateTime.fromMillis(Number(val));
 				}
@@ -376,6 +691,9 @@ export const AbgabetoolMitarbeiter = {
 					}
 					this.stateRestored = true
 
+					// ensure that the filterCollapseables thingy has the correct values
+					this.$refs.abgabeTable.setSelectedFields();
+					
 				}
 
 			});
@@ -441,6 +759,32 @@ export const AbgabetoolMitarbeiter = {
 					projekt.qgate2StatusRank = 1
 				}
 			})
+			
+			// set shorthand statuscode once real status has been determined
+			projekt.qgate1StatusShort = this.mapRankToShortStatus(projekt.qgate1StatusRank)
+			projekt.qgate2StatusShort = this.mapRankToShortStatus(projekt.qgate2StatusRank)
+		},
+		mapRankToShortStatus(rank) {
+			switch(rank){
+				case 0: // kein termin vorhanden
+					return '--'
+					break;
+				case 1: // noch nicht stattgefunden
+					return 'o'
+					break;
+				case 2: // noch nicht abgegeben
+					return '?'
+					break;
+				case 3: // noch nicht benotet
+					return '~'
+					break;
+				case 4: // negativ benotet
+					return '-'
+					break;
+				case 5: // positiv benotet
+					return '+'
+					break;
+			}
 		},
 		checkAbgabetermineProjektarbeit(projekt) {
 			const now = luxon.DateTime.now()
@@ -450,7 +794,7 @@ export const AbgabetoolMitarbeiter = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				const date = toViennaDate(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -507,11 +851,11 @@ export const AbgabetoolMitarbeiter = {
 				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
 
 				return '<div style="display: flex; height: 100%">' +
-					'<div class=' + val.dateStyle + "-header" + ' style="width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
-					icon +
+					'<div class=' + val.dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+						icon +
 					'</div>' +
 					'<div style="margin-left: 4px;">' +
-					'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
+						'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
 					'</div>'+
 					'</div>'
 
@@ -535,16 +879,19 @@ export const AbgabetoolMitarbeiter = {
 		},
 		selectAllHandler(e, cell) {
 			const table = cell.getTable();
-			const rows = table.getRows();
+			const rows = this.filteredRows ?? table.getRows();
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
+			// since betreuerpage acctually has logic behind selectable flag, it is important to go over allowed only here
 			const selected = allowed.every(r => r.isSelected());
 
-			if(selected) {
+			if(selected){
 				allowed.forEach(r => r.deselect());
+				e.target.checked = false;
 			} else {
 				allowed.forEach(r => r.select());
+				e.target.checked = true;
 			}
 
 			// stop built-in handler
@@ -558,15 +905,7 @@ export const AbgabetoolMitarbeiter = {
 			return option.bezeichnung
 		},
 		formatDate(dateParam) {
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-
-			return `${day}.${month}.${year}`;
+			return formatISODate(dateParam);
 		},
 		undoSelection(cell) {
 			// checks if cells row is selected and unselects -> imitates columns which dont trigger row selection
@@ -579,6 +918,8 @@ export const AbgabetoolMitarbeiter = {
 		},
 		selectionCheck(row) {
 			const data = row.getData()
+			
+			// zweitbetreuer cant select projektarbeiten for serientermine
 			if(data?.betreuerart_kurzbz == 'Zweitbegutachter') return false
 			return true
 		},
@@ -602,7 +943,7 @@ export const AbgabetoolMitarbeiter = {
 		addSeries() {
 			this.saving = true
 			this.$api.call(ApiAbgabe.postSerientermin(
-				this.serienTermin.datum.toISOString(),
+				this.serienTermin.datum,
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
@@ -700,7 +1041,7 @@ export const AbgabetoolMitarbeiter = {
 				termin.allowedToSave = paIsBenotet ? false : true
 				
 				// lektoren are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum
+				termin.allowedToDelete = termin.allowedToSave && !termin.abgabedatum && !termin.note
 				
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 
@@ -717,28 +1058,37 @@ export const AbgabetoolMitarbeiter = {
 			
 		},
 		centeredTextFormatter(cell) {
-			const val = cell.getValue()
-			if(!val) return
-			
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<p style="max-width: 100%; width: 100%; overflow-wrap: break-word; word-break: break-word; white-space: normal; margin: 0px; text-align: center">'+val+'</p></div>'
+			const longForm = cell.getValue()
+			if(!longForm) return
+			const data = cell.getData()
+			const entry = Object.entries(data).find(entry => entry[1] == longForm)
+
+			// shortFormKey must have same keyname as longForm but with 'Short' appended 
+			const shortForm = data[entry[0]+'Short']
+
+			if(shortForm && longForm) {
+				return `<div style="display: flex; justify-content: start; align-items: center; height: 100%; width: 100%;">
+				<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>
+				</div>`;
+			} else {
+				return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+					'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">'+longForm+'</p></div>'
+			}
 		},
 		detailFormatter(cell) {
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
 				'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
-		},
-		beurteilungFormatter(cell) {
-			const val = cell.getValue()
-			if(val) {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
-			} else return '-'
 		},
 		pkzTextFormatter(cell) {
 			const val = cell.getValue()
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</a></div>'
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
 		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
@@ -755,10 +1105,9 @@ export const AbgabetoolMitarbeiter = {
 		setupData(data){
 			
 			
-			this.projektarbeiten = data[0]
 			this.domain = data[1]
 			
-			this.tableData = data[0]?.retval?.map(projekt => {
+			this.projektarbeiten = data[0]?.retval?.map(projekt => {
 				this.checkAbgabetermineProjektarbeit(projekt)
 				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
@@ -777,9 +1126,10 @@ export const AbgabetoolMitarbeiter = {
 					titel: projekt.titel
 				}
 			})
+			this.count = this.projektarbeiten.length
 			
 			this.$refs.abgabeTable.tabulator.setColumns(this.abgabeTableOptions.columns)
-			this.$refs.abgabeTable.tabulator.setData(this.tableData);
+			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.$api.call(ApiAbgabe.getMitarbeiterProjektarbeiten(all))
@@ -831,6 +1181,17 @@ export const AbgabetoolMitarbeiter = {
 		},
 	},
 	computed: {
+		countsToHTML() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
 		emailItems() {
 			const menu = []
 
@@ -859,6 +1220,8 @@ export const AbgabetoolMitarbeiter = {
 		}
 	},
 	created() {
+		document.documentElement.classList.add('abgabetool');
+		
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
 		// fetch config to avoid hard coded links
@@ -900,6 +1263,9 @@ export const AbgabetoolMitarbeiter = {
 	mounted() {
 		this.setupMounted()
 	},
+	beforeUnmount() {
+		document.documentElement.classList.remove('abgabetool');
+	},
 	template: `
 	<template v-if="phrasenResolved">
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
@@ -925,6 +1291,7 @@ export const AbgabetoolMitarbeiter = {
 							:enable-time-picker="false"
 							locale="de"
 							format="dd.MM.yyyy"
+							model-type="yyyy-MM-dd"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -991,12 +1358,13 @@ export const AbgabetoolMitarbeiter = {
 		<!-- low max height on this vsplit wrapper to avoid padding scrolls, elements have their inherent height anyways -->
 		<div id="abgabetable" style="max-height:40vw;">
 		
-			<h2>{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+			<h2>{{$p.t('abgabetool/abgabetoolTitleBetreuer')}}</h2>
 			<hr>
 			<core-filter-cmpt
 				:title="''"  
 				@uuidDefined="handleUuidDefined"
 				ref="abgabeTable"
+				:description="countsToHTML"
 				:newBtnShow="true"
 				:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
 				:newBtnDisabled="!selectedData.length"

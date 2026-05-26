@@ -306,3 +306,44 @@
 #abgabetable .tabulator-row:hover .tabulator-cell.sticky-col {
 	background-color: #ccc; /* Match your existing hover color */
 }
+
+.tabulator-cell {
+	container-type: inline-size;
+}
+
+.tabulator-col-title {
+	container-type: inline-size;
+}
+
+@container (max-width: 100px) {
+	.full-text {
+		display: none !important;
+	}
+
+	.short-text {
+		display: inline-block !important;
+		width: 100%;
+	}
+}
+
+/*conditional tooltips fix*/
+.p-tooltip.custom-tooltip {
+	z-index: 8001 !important;
+}
+
+ /* Shrinks font and table rows for desktop users who have zoomed in their browser (150%+).
+   Does not affect mobile/touchscreen devices, which use touch input instead of a mouse. */
+@media (pointer: fine) and (min-resolution: 1.5dppx) {
+
+	html.abgabetool {
+		font-size: 0.5rem;
+	}
+
+	.abgabetool .tabulator-cell,
+	.abgabetool .tabulator-row {
+		 height: 20px;
+		 max-height: 20px;
+	 }
+	
+}
+

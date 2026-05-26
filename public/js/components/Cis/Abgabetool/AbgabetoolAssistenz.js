@@ -10,6 +10,7 @@ import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
 import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
@@ -45,9 +46,23 @@ export const AbgabetoolAssistenz = {
 	},
 	data() {
 		return {
-			tableData: null,
+			flatDataDirty: true,
+			mode: 'perProjectView',
+			qgate1FilterSelected: [],
+			qgate2FilterSelected: [],
+			pa_noteFilterSelected: [],
+			noteFilterSelected: [],
+			count: 0,
+			filteredcount: 0,
+			selectedcount: 0,
+			countFlat: 0,
+			filteredcountFlat: 0,
+			selectedcountFlat: 0,
+			filteredRows: null,
+			filteredRowsFlat: null,
 			studiensemesterOptions: null,
 			allSem: null,
+			allSemOption: null,
 			curSem: null,
 			notenOptionFilter: null,
 			inplaceToggle: false,
@@ -56,6 +71,11 @@ export const AbgabetoolAssistenz = {
 			colLayoutRestored: false,
 			sortRestored: false,
 			stateRestored: false,
+			headerFiltersRestoredFlat: false,
+			filtersRestoredFlat: false,
+			colLayoutRestoredFlat: false,
+			sortRestoredFlat: false,
+			stateRestoredFlat: false,
 			timelineProjekt: null,
 			selectedStudiengangOption: null,
 			studiengaengeOptions: null,
@@ -74,8 +94,24 @@ export const AbgabetoolAssistenz = {
 			allowedNotenFilterOptions: null,
 			allowedNotenOptions: null,
 			notenOptionsNonFinal: null,
+			serienEdit: Vue.reactive({
+				datum: null,
+				bezeichnung: null,
+				kurzbz: null,
+				upload_allowed: null,
+				fixtermin: null,
+				invertedFixtermin: null,
+			}),
+			// track which fields should actually be applied
+			serienEditFields: {
+				datum: false,
+				bezeichnung: false,
+				kurzbz: false,
+				upload_allowed: false,
+				fixtermin: false,
+			},
 			serienTermin: Vue.reactive({
-				datum: new Date(),
+				datum: getViennaTodayISO(),
 				bezeichnung: {
 					paabgabetyp_kurzbz: 'zwischen',
 					bezeichnung: 'Zwischenabgabe'
@@ -87,7 +123,9 @@ export const AbgabetoolAssistenz = {
 			}),
 			showAll: false,
 			tabulatorUuid: Vue.ref(0),
+			tabulatorUuidFlat: Vue.ref(0),
 			selectedData: [],
+			selectedDataFlat: [],
 			domain: '',
 			student_uid: null,
 			detail: null,
@@ -96,6 +134,8 @@ export const AbgabetoolAssistenz = {
 			selectedProjektarbeit: null,
 			tableBuiltResolve: null,
 			tableBuiltPromise: null,
+			tableBuiltResolveFlat: null,
+			tableBuiltPromiseFlat: null,
 			abgabeTableOptions: {
 				minHeight: 250,
 				index: 'projektarbeit_id',
@@ -103,7 +143,6 @@ export const AbgabetoolAssistenz = {
 				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
 				selectable: true,
 				selectableCheck: this.selectionCheck,
-				rowHeight: 40,
 				renderVerticalBuffer: 2000,
 				columns: [
 					{
@@ -158,64 +197,78 @@ export const AbgabetoolAssistenz = {
 							handleClick: this.selectAllHandler
 						},
 						width: 50,
-						cssClass: 'sticky-col'
+						cssClass: 'sticky-col',
+						visible: true
 					},
-				// {
-					// 	field: 'rowSelection',
-					// 	formatter: 'rowSelection',
-					// 	titleFormatter: 'rowSelection',
-					// 	titleFormatterParams: {
-					// 		rowRange: "active" // Only toggle the values of the active filtered rows
-					// 	},
-					// 	hozAlign:"center",
-					// 	headerSort: false,
-					// 	frozen: true,
-					// 	width: 40
-					// },
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 100, cssClass: 'sticky-col'},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, widthGrow: 1, tooltip: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgform'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter,widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true,
-						 formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, widthGrow: 1},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', headerFilter: false, headerSort: false, formatter: this.formAction, tooltip:false, minWidth: 130, visible: true, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, tooltip: false, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, formatter: this.centeredTextFormatter, minWidth: 100},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPre'))), field: 'betreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerVorname'))), field: 'betreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerNachname'))), field: 'betreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPost'))), field: 'betreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPre'))), field: 'betreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerVorname'))), field: 'betreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerNachname'))), field: 'betreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPost'))), field: 'betreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))), field: 'zweitbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPre'))), field: 'zweitbetreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, widthGrow: 1, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPre'))), field: 'zweitbetreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						field: 'prevTermin', formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncPrevTermin,
+						field: 'prevTermin', formatter: this.abgabterminFormatter, width: 250, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nextAbgabetermin'))), field: 'nextTermin',
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
 						sorter: this.sortFuncTerminCol,
-						formatter: this.abgabterminFormatter, widthGrow: 1, width: 250, tooltip: false},
+						tooltip: this.toolTipFuncNextTermin,
+						formatter: this.abgabterminFormatter, width: 250, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate1Status'))),
-						headerFilter: 'list',
-						headerFilterParams: { valuesLookup: this.getQGateStatusList },
-						field: 'qgate1Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						headerFilter: this.qgateHeaderFilterEditor,
+						headerFilterFunc: this.qgateHeaderFilterFunc,
+						headerFilterParams: {},
+						field: 'qgate1Status',
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG1'
+						},
+						width: 50,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate1Status
+						}
+					},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4qgate2Status'))),
-						headerFilter: 'list',
-						headerFilterParams: { valuesLookup: this.getQGateStatusList },
-						field: 'qgate2Status', formatter: this.centeredTextFormatter, widthGrow: 1, width: 220, tooltip: false},
+						headerFilter: this.qgateHeaderFilterEditor,
+						headerFilterFunc: this.qgateHeaderFilterFunc,
+						headerFilterParams: {},
+						field: 'qgate2Status', 
+						formatter: this.centeredTextFormatter,
+						titleFormatter: this.shortLongTitleFormatter,
+						titleFormatterParams: {
+							shortForm: 'QG2'
+						},
+						width: 50,
+						tooltip: (e, cell) => {
+							const data = cell.getData();
+							return data.qgate2Status
+						}
+					},
 				],
 				persistence: false,
 				persistenceID: "abgabetool_2026_03_16"
@@ -234,14 +287,762 @@ export const AbgabetoolAssistenz = {
 					})
 					
 					this.selectedData = data
+					this.selectedcount = data.length;
 				}
-			}
-			]};
+			},
+			{
+				event: 'dataFiltered',
+				handler: (filters, rows) => {
+					this.filteredRows = rows;
+					this.filteredcount = rows.length;
+
+					if (!this.selectedData.length) return;
+
+					const visibleData = new Set(rows.map(r => r.getData()));
+					const filteredOut = this.selectedData.filter(sd => !visibleData.has(sd));
+
+					if (!filteredOut.length) return;
+
+					const filteredOutSet = new Set(filteredOut);
+					this.$refs.abgabeTable.tabulator.getSelectedRows()
+						.filter(r => filteredOutSet.has(r.getData()))
+						.forEach(r => r.deselect());
+				}
+			}],
+			abgabeTableOptionsFlat: {
+				minHeight: 250,
+				height: 700,
+				index: 'paabgabe_id',
+				layout: 'fitColumns',
+				placeholder: Vue.computed(() => this.$capitalize(this.$p.t('global/noDataAvailable'))),
+				selectable: true,
+				renderVerticalBuffer: 400,
+				columns: [
+					{
+						formatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							if(!cell.getRow().getData().selectable) return
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+
+							// Handle select manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							cell.getRow().getData().checkbox = checkbox
+
+							let wrapper = document.createElement("div");
+							wrapper.style.cssText = "display: flex; justify-content: center; align-items: center; height: 100%; width: 100%;";
+
+							wrapper.appendChild(checkbox);
+
+							return wrapper;
+						},
+						titleFormatter: function (cell, formatterParams, onRendered) {
+							// create the built-in checkbox
+							let checkbox = document.createElement("input");
+							checkbox.type = "checkbox";
+
+							// Handle "select all" manually
+							checkbox.addEventListener("click", (e) => {
+								e.stopPropagation();
+
+								// call our function
+								if (formatterParams && formatterParams.handleClick) {
+									formatterParams.handleClick(e, cell);
+								}
+							});
+
+							return checkbox;
+						},
+						hozAlign: "center",
+						headerSort: false,
+						formatterParams: {
+							handleClick: this.selectHandler
+						},
+						titleFormatterParams: {
+							handleClick: this.selectAllHandlerFlat
+						},
+						width: 50,
+						cssClass: 'sticky-col'
+					},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, tooltip: false, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'student_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'student_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabetyp'))),
+						field: 'paabgabetyp_kurzbz',
+						headerFilter: true,
+						formatter: this.paabgabetypFormatter,
+						
+						minWidth: 120,
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabekurzbzv2'))),
+						field: 'kurzbz',
+						headerFilter: true,
+						formatter: this.centeredTextFormatter,
+						minWidth: 120
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zieldatumv2'))),
+						field: 'datum',
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminColISO,
+						sorter: compareISODateValues,
+						formatter: (cell) => this.formatDate(cell.getValue()),
+						minWidth: 100
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4abgabedatum'))),
+						field: 'abgabedatum',
+						headerFilter: dateFilter,
+						headerFilterFunc: this.headerFilterTerminColISO,
+						sorter: compareISODateValues,
+						formatter: (cell) => this.formatDate(cell.getValue()),
+						minWidth: 100
+					},
+					{
+						title: 'Status',
+						field: 'dateStyle',
+						headerSort: false,
+						headerFilter: this.statusHeaderFilterEditor,
+						headerFilterFunc: this.statusHeaderFilterFunc,
+						headerFilterParams: {},
+						formatter: this.abgabterminFormatter,
+						formatterParams: { iconOnly: true },
+						width: 70,
+						tooltip: (e, cell) => this.mapDateStyleToTabulatorTooltip(cell.getValue())
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4noteprojektarbeit'))),
+						field: 'pa_note',
+						formatter: (cell) => {
+							const val = cell.getValue();
+							if (!val) return '';
+							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
+						},
+						minWidth: 100,
+						tooltip: false,
+						headerFilter: this.notenHeaderFilterEditor,
+						headerFilterFunc: this.notenHeaderFilterFunc,
+						headerFilterParams: {},
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notetermin'))),
+						field: 'note',
+						formatter: (cell) => {
+							const val = cell.getValue();
+							if (!val) return '';
+							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
+						},
+						minWidth: 100,
+						headerFilter: this.notenHeaderFilterEditor,
+						headerFilterFunc: this.notenHeaderFilterFunc,
+						headerFilterParams: {},
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4notizQualGatev2'))),
+						field: 'beurteilungsnotiz',
+						headerFilter: true,
+						formatter: this.centeredTextFormatter,
+						minWidth: 150, visible: false
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4fixterminv4'))),
+						field: 'fixtermin',
+						hozAlign: 'center',
+						formatter: 'tickCross',
+						width: 80,
+						headerFilter: 'tickCross',
+						headerFilterParams: { tristate: true },
+					},
+					{
+						title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4upload_allowed'))),
+						field: 'upload_allowed',
+						hozAlign: 'center',
+						formatter: 'tickCross',
+						width: 80,
+						headerFilter: 'tickCross',
+						headerFilterParams: { tristate: true },
+					},
+				],
+				persistence: false,
+				persistenceID: "abgabetoolflat_2026_05_05"
+			},
+			abgabeTableEventHandlersFlat: [
+				{
+					event: "rowSelectionChanged",
+					handler: async(data) =>
+					{
+						this.selectedDataFlat.filter(sd => !data.includes(sd)).forEach(fsd => {
+							if(fsd.checkbox) fsd.checkbox.checked = false
+						})
+
+						data.forEach(d => {
+							if(d.checkbox) d.checkbox.checked = true
+						})
+
+						this.selectedDataFlat = data
+						this.selectedcountFlat = data.length;
+					}
+				},
+				{
+					event: 'dataFiltered',
+					handler: (filters, rows) => {
+						this.filteredRowsFlat = rows;
+						this.filteredcountFlat = rows.length;
+
+						if (!this.selectedDataFlat.length) return;
+
+						const visibleData = new Set(rows.map(r => r.getData()));
+						const filteredOut = this.selectedDataFlat.filter(sd => !visibleData.has(sd));
+
+						if (!filteredOut.length) return;
+
+						const filteredOutSet = new Set(filteredOut);
+						this.$refs.abgabeTableFlat.tabulator.getSelectedRows()
+							.filter(r => filteredOutSet.has(r.getData()))
+							.forEach(r => r.deselect());
+					}
+				}
+			]
+		};
 	},
 	methods: {
+		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			if (!this.notenOptions) return;
+
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected';
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+
+			// mapping evaluated at render time, not at column definition time
+			const fieldOptionsMap = {
+				'pa_note': this.notenOptions,
+				'note': this.allowedNotenOptions,
+			};
+			const options = fieldOptionsMap[cell.getField()] ?? this.notenOptions;
+			if (!options) return;
+			
+			const updateDisplay = () => {
+				display.value = options
+					.filter(o => selected.includes(o.note))
+					.map(o => o.bezeichnung)
+					.join(', ');
+			};
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.note;
+				cb.checked = selected.includes(opt.note);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.note]
+						: selected.filter(v => v !== opt.note);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.bezeichnung;
+
+				row.appendChild(cb);
+				row.appendChild(labelText);
+				dropdown.appendChild(row);
+			});
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+
+		notenHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+			// rowVal is the raw integer note id or a note object
+			const noteId = typeof rowVal === 'object' ? rowVal?.note : rowVal;
+			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
+		},
+		handleFilterActiveChanged(active) {
+			if(!active && this.allSemOption) {
+				this.curSem = this.allSemOption
+			}
+		},
+		reloadData() {
+			this.loadProjektarbeiten()
+		},
+		openEditModal() {
+			// reset
+			this.serienEditFields = {
+				datum: false,
+				bezeichnung: false,
+				kurzbz: false,
+				upload_allowed: false,
+				fixtermin: false,
+			}
+			this.serienEdit.datum = getViennaTodayISO()
+			this.serienEdit.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === 'zwischen')
+			this.serienEdit.kurzbz = ''
+			this.serienEdit.upload_allowed = false
+			this.serienEdit.invertedFixtermin = true
+
+			this.$refs.modalContainerEditSeries.show()
+		},
+		async handleEditSelectedTermine() {
+			const activeFields = Object.keys(this.serienEditFields).filter(k => this.serienEditFields[k])
+			if (!activeFields.length) {
+				this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4noFieldsSelected'))
+				return
+			}
+
+			if (await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirm_edit_n_termine', [this.selectedDataFlat.length]),
+				acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+				acceptClass: 'p-button-primary',
+				rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+				rejectClass: 'p-button-secondary'
+			}) === false) return
+
+			this.$refs.modalContainerEditSeries.hide()
+			this.editSelectedTermine(this.selectedDataFlat)
+		},
+		editSelectedTermine(termine) {
+			const paabgabeIDS = termine.map(t => t.paabgabe_id)
+
+			// only send fields that were checked
+			const payload = { paabgabe_ids: paabgabeIDS }
+			if (this.serienEditFields.datum)        payload.datum = this.serienEdit.datum
+			if (this.serienEditFields.bezeichnung)  payload.paabgabetyp_kurzbz = this.serienEdit.bezeichnung.paabgabetyp_kurzbz
+			if (this.serienEditFields.kurzbz)       payload.kurzbz = this.serienEdit.kurzbz
+			if (this.serienEditFields.upload_allowed) payload.upload_allowed = this.serienEdit.upload_allowed
+			if (this.serienEditFields.fixtermin)    payload.fixtermin = !this.serienEdit.invertedFixtermin
+
+			this.saving = true
+			this.$api.call(ApiAbgabe.patchProjektarbeitAbgabeMultiple(payload)).then(res => {
+				if (res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/gespeichert'))
+
+					// patch local data structure
+					termine.forEach(t => {
+						const pa = this.projektarbeiten.find(pa => pa.projektarbeit_id == t.projektarbeit_id)
+						const termin = pa.abgabetermine.find(termin => termin.paabgabe_id === t.paabgabe_id)
+						if (!termin) return
+
+						if (this.serienEditFields.datum)         termin.datum = this.serienEdit.datum
+						if (this.serienEditFields.bezeichnung)   termin.paabgabetyp_kurzbz = this.serienEdit.bezeichnung.paabgabetyp_kurzbz
+						if (this.serienEditFields.kurzbz)        termin.kurzbz = this.serienEdit.kurzbz
+						if (this.serienEditFields.upload_allowed) termin.upload_allowed = this.serienEdit.upload_allowed
+						if (this.serienEditFields.fixtermin)     termin.fixtermin = !this.serienEdit.invertedFixtermin
+					})
+
+					const updatedProjektarbeiten = new Set(termine.map(t => t.projektarbeit_id))
+					updatedProjektarbeiten.forEach(pa_id => {
+						const projektarbeit = this.projektarbeiten.find(pa => pa.projektarbeit_id == pa_id)
+						this.checkAbgabetermineProjektarbeit(projektarbeit)
+					})
+
+					this.redrawTableScrollSave()
+					this.selectedDataFlat = []
+					this.selectedcountFlat = 0
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+
+				} else if (res?.meta?.status == 'error') {
+					this.$fhcAlert.alertError()
+				}
+			}).finally(() => {
+				this.saving = false
+			})
+		},
+		deleteSelectedTermine(termine) {
+			const paabgabeIDS = termine.map(t => t.paabgabe_id)
+			this.$api.call(ApiAbgabe.deleteProjektarbeitAbgabeMultiple(paabgabeIDS)).then( (res) => {
+				if(res?.meta?.status == 'success') {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/genericDeleted', [this.$p.t('abgabetool/c4abgaben_n', [paabgabeIDS.length])]))
+					
+					termine.forEach(t => {
+						const pa = this.projektarbeiten.find(pa => pa.projektarbeit_id == t.projektarbeit_id)
+						const deletedTerminIndex = pa.abgabetermine.findIndex(termin => t.paabgabe_id === termin.paabgabe_id)
+						pa.abgabetermine.splice(deletedTerminIndex, 1)
+					})
+					
+					const updatedProjektarbeiten = new Set(termine.map(t => t.projektarbeit_id))
+
+					updatedProjektarbeiten.forEach(pa_id => {
+						const projektarbeit = this.projektarbeiten.find(pa => pa.projektarbeit_id == pa_id)
+						this.checkAbgabetermineProjektarbeit(projektarbeit)
+					})
+
+					this.redrawTableScrollSave()
+
+					// update flat table with fresh computed data and clear selection
+					this.selectedDataFlat = []
+					this.selectedcountFlat = 0
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+					
+				} else if(res?.meta?.status == 'error'){
+					this.$fhcAlert.alertError()
+				}
+			})
+		},
+		async handleDeleteSelectedTermine() {
+			// TODO: check if every selected termin is actually "allowed to delete"
+			
+			
+			if(await this.$fhcAlert.confirm({
+				message: this.$p.t('abgabetool/c4confirm_delete_n_termine', [this.selectedDataFlat.length]),
+				acceptLabel: 'Löschen',
+				acceptClass: 'p-button-danger',
+				rejectLabel: 'Zurück',
+				rejectClass: 'p-button-secondary'
+			}) === false) {
+				return false
+			} else {
+				this.deleteSelectedTermine(this.selectedDataFlat)
+			}
+			
+		},
+		async switchMode() {
+			if(this.mode == 'perProjectView') {
+				this.mode = 'flatView'
+
+				await this.tableBuiltPromiseFlat;
+				
+				if(this.flatDataDirty) {
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine);
+					this.flatDataDirty = false
+				}
+				
+			} else {
+				this.mode = 'perProjectView'
+			}
+		},
+		getDateStyleHtml(dateStyle) {
+			const iconMap = {
+				'verspaetet':              '<i class="fa-solid fa-triangle-exclamation"></i>',
+				'verpasst':                '<i class="fa-solid fa-calendar-xmark"></i>',
+				'abzugeben':               '<i class="fa-solid fa-hourglass-half"></i>',
+				'standard':                '<i class="fa-solid fa-clock"></i>',
+				'abgegeben':               '<i class="fa-solid fa-paperclip"></i>',
+				'beurteilungerforderlich': '<i class="fa-solid fa-list-check"></i>',
+				'bestanden':               '<i class="fa-solid fa-check"></i>',
+				'nichtbestanden':          '<i class="fa-solid fa-circle-exclamation"></i>',
+			};
+			return iconMap[dateStyle] ?? '';
+		},
+		statusHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+			const options = [
+				{ label: this.$p.t('abgabetool/c4positivBenotet'),    value: 'bestanden',              dateStyle: 'bestanden' },
+				{ label: this.$p.t('abgabetool/c4negativBenotet'),    value: 'nichtbestanden',         dateStyle: 'nichtbestanden' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerspaetet'), value: 'verspaetet',             dateStyle: 'verspaetet' },
+				{ label: this.$p.t('abgabetool/c4tooltipVerpasst'),   value: 'verpasst',               dateStyle: 'verpasst' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbzugeben'),  value: 'abzugeben',              dateStyle: 'abzugeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipAbgegeben'),  value: 'abgegeben',              dateStyle: 'abgegeben' },
+				{ label: this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich'), value: 'beurteilungerforderlich', dateStyle: 'beurteilungerforderlich' },
+				{ label: this.$p.t('abgabetool/c4tooltipStandardv2'), value: 'standard',               dateStyle: 'standard' },
+			];
+
+			const field = cell.getField();
+			const stateKey = field + 'FilterSelected'; // e.g. dateStyleFilterSelected
+			let selected = [...(this[stateKey] || [])];
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 220px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+			const updateDisplay = () => {
+				display.value = options
+					.filter(o => selected.includes(o.value))
+					.map(o => o.label)
+					.join(', ');
+			};
+
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 0; cursor: pointer; white-space: nowrap; padding-right: 8px;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.value;
+				cb.checked = selected.includes(opt.value);
+				cb.style.cssText = 'margin: 0 6px;';
+				cb.addEventListener('change', () => {
+					selected = cb.checked
+						? [...selected, opt.value]
+						: selected.filter(v => v !== opt.value);
+					this[stateKey] = [...selected];
+					updateDisplay();
+					success([...selected]);
+				});
+
+				// icon badge — same look as cell
+				const badge = document.createElement('div');
+				badge.className = opt.dateStyle + '-header';
+				badge.style.cssText = `min-width: 36px; height: 36px; display: flex; align-items: center; 
+				justify-content: center; flex-shrink: 0; padding: 0px 17px 0px 17px;`;
+				badge.innerHTML = this.getDateStyleHtml(opt.dateStyle);
+
+				const labelText = document.createElement('span');
+				labelText.textContent = opt.label;
+				labelText.style.cssText = 'margin-left: 6px;';
+
+				row.appendChild(cb);
+				row.appendChild(badge);
+				row.appendChild(labelText);
+				dropdown.appendChild(row);
+			});
+
+			updateDisplay();
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+		statusHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+			// rowVal is the raw dateStyle string on the flat table
+			return filterVal.some(val => val === rowVal);
+		},
+		qgateHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
+
+			const options = [
+				{ label: '[+] ' + this.$p.t('abgabetool/c4positivBenotet'), value: 'positive' },
+				{ label: '[-] ' + this.$p.t('abgabetool/c4negativBenotet'), value: 'negative' },
+				{ label: '[~] ' + this.$p.t('abgabetool/c4notYetGraded'), value: 'not_graded' },
+				{ label: '[?] ' + this.$p.t('abgabetool/c4notSubmitted'), value: 'not_submitted' },
+				{ label: '[o] ' + this.$p.t('abgabetool/c4notHappenedYet'), value: 'not_happened' },
+				{ label: '[--] ' + this.$p.t('abgabetool/c4keinTerminVorhanden'), value: 'no_termin' },
+			];
+
+			const field = cell.getField();
+			const stateKey = field === 'qgate1Status' ? 'qgate1FilterSelected' : 'qgate2FilterSelected';
+			let selected = [...(this[stateKey] || [])]; // restore persistence state
+
+			const wrapper = document.createElement('div');
+			wrapper.style.cssText = 'position: relative; width: 100%;';
+
+			const display = document.createElement('input');
+			display.readOnly = true;
+			display.placeholder = '';
+			display.style.cssText = 'padding: 4px; width: 100%; box-sizing: border-box; cursor: default; border: 1px solid; outline: none; background: #fff; appearance: none; caret-color: transparent;';
+
+			const dropdown = document.createElement('div');
+			dropdown.style.cssText = 'display: none; position: fixed; background: #fff; border: 1px solid; z-index: 9999; min-width: 180px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);';
+
+			options.forEach(opt => {
+				const row = document.createElement('label');
+				row.style.cssText = 'display: flex; align-items: center; gap: 6px; padding: 4px 8px; cursor: pointer; white-space: nowrap;';
+				row.addEventListener('mousedown', e => e.preventDefault());
+
+				const cb = document.createElement('input');
+				cb.type = 'checkbox';
+				cb.value = opt.value;
+				cb.checked = selected.includes(opt.value); // sync with persistence
+				cb.addEventListener('change', () => {
+					if (cb.checked) {
+						selected.push(opt.value);
+					} else {
+						selected = selected.filter(v => v !== opt.value);
+					}
+					this[stateKey] = [...selected]; // sync with persistence
+					display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
+					success([...selected]);
+				});
+
+				row.appendChild(cb);
+				row.appendChild(document.createTextNode(opt.label));
+				dropdown.appendChild(row);
+			});
+
+			display.value = options.filter(o => selected.includes(o.value)).map(o => o.label).join(', ');
+
+			display.addEventListener('click', () => {
+				if (dropdown.style.display === 'none') {
+					const rect = display.getBoundingClientRect();
+					dropdown.style.top = rect.bottom + 'px';
+					dropdown.style.left = rect.left + 'px';
+					dropdown.style.display = 'block';
+				} else {
+					dropdown.style.display = 'none';
+				}
+			});
+
+			display.addEventListener('blur', () => {
+				setTimeout(() => { dropdown.style.display = 'none'; }, 150);
+			});
+
+			document.body.appendChild(dropdown);
+			wrapper.appendChild(display);
+
+			cell.getElement().addEventListener('remove', () => dropdown.remove());
+
+			onRendered(() => display.focus());
+
+			return wrapper;
+		},
+		qgateHeaderFilterFunc(filterVal, rowVal, rowData, filterParams) {
+			if (!filterVal || !filterVal.length) return true;
+
+			const matches = (val) => {
+				switch (val) {
+					case 'positive':     return rowVal === this.$p.t('abgabetool/c4positivBenotet');
+					case 'negative':     return rowVal === this.$p.t('abgabetool/c4negativBenotet');
+					case 'not_graded':   return rowVal === this.$p.t('abgabetool/c4notYetGraded');
+					case 'not_submitted':return rowVal === this.$p.t('abgabetool/c4notSubmitted');
+					case 'not_happened': return rowVal === this.$p.t('abgabetool/c4notHappenedYet');
+					case 'no_termin':    return rowVal === this.$p.t('abgabetool/c4keinTerminVorhanden');
+					default:             return true;
+				}
+			};
+
+			// OR logic — row passes if it matches any selected filter
+			return filterVal.some(val => matches(val));
+		},
+		redrawTableScrollSave() {
+			const table = this.$refs.abgabeTable.tabulator;
+			const scrollX = table.rowManager.scrollLeft;
+			const scrollY = table.rowManager.scrollTop;
+			this.$refs.abgabeTable.tabulator.redraw(true)
+
+			Vue.nextTick(()=> {
+				const tableholder = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
+				if(tableholder) {
+					tableholder.scrollLeft = scrollX;
+					tableholder.scrollTop = scrollY;
+				}
+			})
+		},
+		shortLongTitleFormatter(cell, formatterParams, onRendered) {
+			const longForm = cell.getValue()
+			const shortForm = formatterParams?.shortForm
+			
+			if(longForm && shortForm) {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>`
+			} else {
+				return `<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>`
+			}
+		
+		},
+		toolTipFuncPrevTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			if(!data.prevTermin) return ''
+			return this.mapDateStyleToTabulatorTooltip(data.prevTermin.dateStyle);
+		},
+		toolTipFuncNextTermin(e, cell, onRendered) {
+			const data = cell.getData();
+			if(!data.nextTermin) return ''
+			return this.mapDateStyleToTabulatorTooltip(data.nextTermin.dateStyle);
+		},
+		mapDateStyleToTabulatorTooltip(dateStyleString) {
+			switch(dateStyleString) {
+				case 'bestanden':
+					return this.$p.t('abgabetool/c4tooltipBestanden')
+				break;
+				case 'nichtbestanden':
+					return this.$p.t('abgabetool/c4tooltipNichtBestanden')
+				break;
+				case 'beurteilungerforderlich':
+					return this.$p.t('abgabetool/c4tooltipBeurteilungerforderlich')
+				break;
+				case 'verspaetet':
+					return this.$p.t('abgabetool/c4tooltipVerspaetet')
+				break;
+				case 'abgegeben':
+					return this.$p.t('abgabetool/c4tooltipAbgegeben')
+				break;
+				case 'verpasst':
+					return this.$p.t('abgabetool/c4tooltipVerpasst')
+				break;
+				case 'abzugeben':
+					return this.$p.t('abgabetool/c4tooltipAbzugeben')
+				break;
+				case 'standard':
+					return this.$p.t('abgabetool/c4tooltipStandardv2')
+				break;
+				default: return ''
+			}
+		},
 		handlePaUpdated(projektarbeit) {
 			this.checkAbgabetermineProjektarbeit(projektarbeit)
-			this.$refs.abgabeTable.tabulator.redraw(true)
+			this.redrawTableScrollSave()
 		},
 		getQGateStatusList() {
 			return [
@@ -268,6 +1069,41 @@ export const AbgabetoolAssistenz = {
 			// just in case someone reuses this
 			return Math.abs(b.diffMs) - Math.abs(a.diffMs) 
 		},
+		headerFilterTerminColISO(filterVal, rowVal) {
+			if (!rowVal) {
+				return false;
+			}
+
+			const toLuxon = (val) => {
+				if (!val) return null;
+				let dt;
+				if (val instanceof Date) {
+					dt = luxon.DateTime.fromJSDate(val);
+				} else if (typeof val === "string") {
+					dt = toViennaDate(val);
+				} else { // fallback
+					dt = luxon.DateTime.fromMillis(Number(val));
+				}
+
+				return dt.isValid ? dt : null;
+			};
+
+			const rowDate = toLuxon(rowVal);
+			const von = toLuxon(filterVal[0]);
+			const bis = toLuxon(filterVal[1]);
+
+			// specific day
+			if (von && !bis) {
+				return rowDate.hasSame(von, "day");
+			}
+
+			// range case
+			if (von && bis) {
+				return rowDate >= von.startOf("day") && rowDate <= bis.endOf("day");
+			}
+
+			return false
+		},
 		headerFilterTerminCol(filterVal, rowVal) {
 			if (!rowVal || !rowVal.luxonDate || !rowVal.luxonDate.isValid) {
 				return false;
@@ -281,7 +1117,7 @@ export const AbgabetoolAssistenz = {
 				if (val instanceof Date) {
 					dt = luxon.DateTime.fromJSDate(val);
 				} else if (typeof val === "string") {
-					dt = luxon.DateTime.fromISO(val);
+					dt = toViennaDate(val);
 				} else { // fallback
 					dt = luxon.DateTime.fromMillis(Number(val));
 				}
@@ -313,20 +1149,31 @@ export const AbgabetoolAssistenz = {
 
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailStudentBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, null, this.$fhcAlert, this.$p)
 		},
 		sammelMailBetreuer(param) {
-			
 			const recipientList = [];
 			this.selectedData.forEach(row => {
 				if (row.betreuer_mail) recipientList.push(row.betreuer_mail);
 				if (row.zweitbetreuer_mail) recipientList.push(row.zweitbetreuer_mail);
 			});
 
-			// actually not necessary for email clients but looks better for assistenz if we avoid duplicates here
 			const uniqueRecipients = [...new Set(recipientList)];
 			const subject = this.$p.t('abgabetool/c4sammelmailBetreuerBetreff', [this.selectedStudiengangOption?.bezeichnung]);
-			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, this.$fhcAlert, this.$p)
+
+			// dedupe by student_uid, then build one line per student
+			const seenUids = new Set();
+			const bodyLines = [];
+			this.selectedData.forEach(row => {
+				if (seenUids.has(row.student_uid)) return;
+				seenUids.add(row.student_uid);
+				const name = `${row.student_vorname ?? ''} ${row.student_nachname ?? ''}`.trim();
+				const titel = row.titel ? ` - ${row.titel}` : '';
+				bodyLines.push(`${name}${titel}`);
+			});
+
+			const body = bodyLines.join('\n');
+			splitMailsHelper(uniqueRecipients, param.originalEvent, subject, body, this.$fhcAlert, this.$p)
 		},
 		selectHandler(e, cell) {
 			const row = cell.getRow();
@@ -343,11 +1190,31 @@ export const AbgabetoolAssistenz = {
 		},
 		selectAllHandler(e, cell) {
 			const table = cell.getTable();
-			const rows = table.getRows();
+			const rows = this.filteredRows ?? table.getRows();
 
 			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
-			const selected = allowed.every(r => r.isSelected());
+			const selected = rows.every(r => r.isSelected());
+
+			if(selected){
+				allowed.forEach(r => r.deselect());
+				e.target.checked = false;
+			} else {
+				allowed.forEach(r => r.select());
+				e.target.checked = true;
+			}
+
+			// stop built-in handler
+			e.stopPropagation();
+			return false;
+		},
+		selectAllHandlerFlat(e, cell) {
+			const table = cell.getTable();
+			const rows = this.filteredRowsFlat ?? table.getRows();
+
+			// custom select all logic
+			const allowed = rows.filter(r => r.getData().selectable);
+			const selected = rows.every(r => r.isSelected());
 
 			if(selected){
 				allowed.forEach(r => r.deselect());
@@ -420,6 +1287,32 @@ export const AbgabetoolAssistenz = {
 					projekt.qgate2StatusRank = 1
 				}
 			})
+			
+			// set shorthand statuscode once real status has been determined
+			projekt.qgate1StatusShort = this.mapRankToShortStatus(projekt.qgate1StatusRank)
+			projekt.qgate2StatusShort = this.mapRankToShortStatus(projekt.qgate2StatusRank)
+		},
+		mapRankToShortStatus(rank) {
+				switch(rank){
+					case 0: // kein termin vorhanden
+						return '--'
+						break;
+					case 1: // noch nicht stattgefunden
+						return 'o'
+						break;
+					case 2: // noch nicht abgegeben
+						return '?'
+						break;
+					case 3: // noch nicht benotet
+						return '~'
+						break;
+					case 4: // negativ benotet
+						return '-'
+						break;
+					case 5: // positiv benotet
+						return '+'
+						break;
+				}
 		},
 		getItemBezeichnung(item){
 			if(!item.bezeichnung) return ''
@@ -450,7 +1343,6 @@ export const AbgabetoolAssistenz = {
 			if(this.$refs.abgabeTable.tabulator) {
 				const table = this.$refs.abgabeTable.tabulator
 
-				// TODO: maybe check if existing synergy really works with many filters
 				const existing = table.getFilters().filter(f => f.field != 'studiensemester_kurzbz');
 
 				const compVal = e.value.studiensemester_kurzbz == this.$p.t('abgabetool/c4all') ? '' : e.value.studiensemester_kurzbz
@@ -473,7 +1365,7 @@ export const AbgabetoolAssistenz = {
 				// while already looping through each termin, calculate datestyle beforehand
 				termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 
-				const date = luxon.DateTime.fromISO(termin.datum).endOf('day')
+				const date = toViennaDate(termin.datum).endOf('day')
 				termin.luxonDate = date
 				termin.diffMs = date.toMillis() - now.toMillis(); // positive = future, negative = past
 
@@ -559,7 +1451,7 @@ export const AbgabetoolAssistenz = {
 
 			table.on("renderComplete", () => {
 				if(!this.stateRestored) {
-
+					
 					if (saved?.columns && !this.colLayoutRestored) {
 						const layout = saved.columns.map(col => ({
 							field: col.field,
@@ -580,6 +1472,8 @@ export const AbgabetoolAssistenz = {
 					if (saved?.headerFilters && !this.headerFiltersRestored) {
 						this.headerFiltersRestored = true // instantly avoid retriggers
 						for (let hf of saved.headerFilters) {
+							if (hf.field === 'qgate1Status') this.qgate1FilterSelected = hf.value || [];
+							if (hf.field === 'qgate2Status') this.qgate2FilterSelected = hf.value || [];
 							table.setHeaderFilterValue(hf.field, hf.value);
 						}
 					}
@@ -600,10 +1494,128 @@ export const AbgabetoolAssistenz = {
 						}, 100);
 					}
 					this.stateRestored = true
+					
+					// ensure that the filterCollapseables thingy has the correct values
+					this.$refs.abgabeTable.setSelectedFields();
 
 				}
 
 			});
+		},
+		handleTableBuiltFlat() {
+			const table = this.$refs.abgabeTableFlat.tabulator
+
+			this.tableBuiltResolveFlat()
+
+			table.on("columnMoved", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("columnResized", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("columnVisibilityChanged", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("filterChanged", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("headerFilterChanged", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("dataSorted", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("columnSorted", () => {
+				this.saveStateFlat(table);
+			});
+
+			table.on("sortersChanged", () => {
+				this.saveStateFlat(table);
+			});
+
+			const saved = this.loadStateFlat();
+
+			table.on("renderComplete", () => {
+				if(!this.stateRestoredFlat) {
+					
+					if (saved?.columns && !this.colLayoutRestoredFlat) {
+						const layout = saved.columns.map(col => ({
+							field: col.field,
+							width: col.width,
+							visible: col.visible,
+							// add more if needed, but keep it simple
+						}));
+
+						table.setColumnLayout(layout);
+
+						this.colLayoutRestoredFlat = true;
+					}
+
+					if (saved?.filters && !this.filtersRestoredFlat) {
+						this.filtersRestoredFlat = true // instantly avoid retriggers
+						table.setFilter(saved.filters);
+					}
+					if (saved?.headerFilters && !this.headerFiltersRestoredFlat) {
+						this.headerFiltersRestoredFlat = true // instantly avoid retriggers
+						for (let hf of saved.headerFilters) {
+							if (hf.field === 'note') this.noteFilterSelected = hf.value || [];
+							if (hf.field === 'pa_note') this.pa_noteFilterSelected = hf.value || [];
+							table.setHeaderFilterValue(hf.field, hf.value);
+						}
+					}
+
+					if (saved?.sort?.length && !this.sortRestoredFlat) {
+						this.sortRestoredFlat = true;
+
+						setTimeout(() => {
+							const sortList = saved.sort.map(s => {
+								const col = table.columnManager.findColumn(s.field);
+								if (!col) {
+									return null;
+								}
+								return { column: col, dir: s.dir };
+							}).filter(Boolean);
+
+							table.setSort(sortList);
+						}, 100);
+					}
+					this.stateRestoredFlat = true
+
+					// ensure that the filterCollapseables thingy has the correct values
+					this.$refs.abgabeTableFlat.setSelectedFields();
+
+				}
+
+			});
+		},
+		loadStateFlat() {
+			return JSON.parse(localStorage.getItem(this.abgabeTableOptionsFlat.persistenceID) || "null");
+		},
+		saveStateFlat(table) {
+			// avoid storing state after first restore part happened
+			if(!this.stateRestoredFlat) return
+			const rawLayout = table.getColumnLayout();
+			const state = {
+				columns: rawLayout.map(col => ({
+					field: col.field,
+					visible: col.visible,
+					width: col.width,
+				})),
+				sort: table.getSorters().map(s => ({
+					field: s.field,
+					dir: s.dir,
+				})),
+				filters: table.getFilters(),
+				headerFilters: table.getHeaderFilters()
+			};
+
+			localStorage.setItem(this.abgabeTableOptionsFlat.persistenceID, JSON.stringify(state));
 		},
 		handleToggleFullscreenDetail() {
 			this.detailIsFullscreen = !this.detailIsFullscreen
@@ -621,24 +1633,15 @@ export const AbgabetoolAssistenz = {
 			return option.bezeichnung	
 		},
 		formatDate(dateParam) {
-			if(dateParam === null) return ''
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-
-			return `${day}.${month}.${year}`;
+			return formatISODate(dateParam);
 		},
 		formAction(cell) {
 			const actionButtons = document.createElement('div');
-			actionButtons.className = "d-flex gap-3"; // you can keep Bootstrap gap if loaded
+			actionButtons.className = "d-flex gap-3";
 			actionButtons.style.display = "flex";
-			actionButtons.style.alignItems = "stretch"; // buttons stretch to full height
+			actionButtons.style.alignItems = "stretch";
 			actionButtons.style.justifyContent = "start";
-			actionButtons.style.height = "100%"; // full grid cell height
+			actionButtons.style.height = "100%";
 
 			const val = cell.getValue();
 
@@ -693,7 +1696,9 @@ export const AbgabetoolAssistenz = {
 		},
 		selectionCheck(row) {
 			const data = row.getData()
-			if(data?.betreuerart_kurzbz == 'Zweitbegutachter') return false
+			
+			// currently assistenz is allowed to select everything in projektarbeit table
+			
 			return true
 		},
 		showDeadlines(){
@@ -712,7 +1717,7 @@ export const AbgabetoolAssistenz = {
 			this.saving = true
 			this.serienTermin.fixtermin = !this.serienTermin.invertedFixtermin
 			this.$api.call(ApiAbgabe.postSerientermin(
-				this.serienTermin.datum.toISOString(),
+				this.serienTermin.datum,
 				this.serienTermin.bezeichnung.paabgabetyp_kurzbz,
 				this.serienTermin.bezeichnung.bezeichnung,
 				this.serienTermin.kurzbz,
@@ -737,27 +1742,18 @@ export const AbgabetoolAssistenz = {
 					abgabe.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == abgabe.paabgabetyp_kurzbz)
 					
 					pa.abgabetermine.push(abgabe)
-					pa.abgabetermine.sort((a, b) => new Date(a.datum) - new Date(b.datum))
+					pa.abgabetermine.sort((a, b) => compareISODateValues(a.datum, b.datum))
 				})
 				
-				// reset selection to empty
-				// this.$refs.abgabeTable.tabulator.deselectRow()
-				const table = this.$refs.abgabeTable.tabulator;
-				const scrollX = table.rowManager.scrollLeft;
-				const scrollY = table.rowManager.scrollTop;
-				
-				const mappedData = this.mapProjekteToTableData(this.projektarbeiten)
+				this.projektarbeiten = this.mapProjekteToTableData(this.projektarbeiten)
 
-				table.setData(mappedData)
-				table.redraw(true)
+				this.redrawTableScrollSave()
 
-				Vue.nextTick(()=> {
-					const table = this.$refs.abgabeTable?.tabulator.element.querySelector('.tabulator-tableholder')
-					if(table) {
-						table.scrollLeft = scrollX;
-						table.scrollTop = scrollY;
-					}
-				})
+				// in case pesky user creates a series and instantly switches viewmode
+				this.flatDataDirty = true
+				if (this.mode === 'flatView') {
+					this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+				}
 				
 			}).finally(()=>{
 				this.saving = false
@@ -786,7 +1782,7 @@ export const AbgabetoolAssistenz = {
 				}
 
 				const latestTerminWithUpload = this.findLatestTerminWithUpload(projekt)
-				
+
 				return {
 					...projekt,
 					abgabetermine: projekt.abgabetermine,
@@ -808,8 +1804,10 @@ export const AbgabetoolAssistenz = {
 			})
 		},
 		findLatestTerminWithUpload(projekt) {
-			const withAbgabedatumSorted = projekt?.abgabetermine?.filter(t => t.abgabedatum != null)?.sort((a,b) => a < b)
-
+			const withAbgabedatumSorted = projekt?.abgabetermine
+				?.filter(t => t.abgabedatum != null)
+				?.sort((a, b) => compareISODateValues(b.abgabedatum, a.abgabedatum));
+			
 			if(withAbgabedatumSorted.length) {
 				return withAbgabedatumSorted[0]
 			}
@@ -865,7 +1863,7 @@ export const AbgabetoolAssistenz = {
 				termin.allowedToSave = paIsBenotet ? false : true
 
 				// assistenz are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum
+				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum && !termin.note
 				
 			})
 			
@@ -892,45 +1890,51 @@ export const AbgabetoolAssistenz = {
 			this.timelineProjekt = projekt
 			this.$refs.drawer.show()
 		},
+		paabgabetypFormatter(cell) {
+			const key = cell.getValue()
+			return this.$p.t('abgabetool/c4paatyp' + key)
+		},
 		centeredTextFormatter(cell) {
-			const val = cell.getValue()
-			if(!val) return
+			const longForm = cell.getValue()
+			if(!longForm) return
+			const data = cell.getData()
+			const entry = Object.entries(data).find(entry => entry[1] == longForm)
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<p style="max-width: 100%; overflow-wrap: break-word; word-break: break-word; white-space: normal; margin: 0px; text-align: center">'+val+'</p></div>'
+			// shortFormKey must have same keyname as longForm but with 'Short' appended 
+			const shortForm = data[entry[0]+'Short']
+
+			if(shortForm && longForm) {
+				return `<div style="display: flex; justify-content: start; align-items: center; height: 100%; width: 100%;">
+				<span class="full-text" style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">
+					${longForm}
+				</span>
+				<span class="short-text" style="font-weight: bold; display: none;">
+					${shortForm}
+				</span>
+				</div>`;
+			} else {
+				return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+					'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">'+longForm+'</p></div>'
+			}
 		},
 		detailFormatter(cell) {
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
 				'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
-		},
-		mailFormatter(cell) {
-			const val = cell.getValue()
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a href='+val+'><i class="fa fa-envelope" style="color:#00649C"></i></a></div>'
-		},
-		timelineFormatter() {
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a><i class="fa fa-timeline" style="color:#00649C"></i></a></div>'
-		},
-		beurteilungFormatter(cell) {
-			const val = cell.getValue()
-			if(val) {
-				return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-					'<a><i class="fa fa-file-pdf" style="color:#00649C"></i></a></div>'
-			} else return '-'
 		},
 		pkzTextFormatter(cell) {
 			const val = cell.getValue()
 
-			return '<div style="display: flex; justify-content: center; align-items: center; height: 100%">' +
-				'<a style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+val+'</a></div>'
+			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
+				'<a style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+val+'</a></div>'
 		},
-		abgabterminFormatter(cell) {
+		abgabterminFormatter(cell, formatterParams, onRendered,) {
 			const val = cell.getValue()
-
+			const dateStyle = val?.dateStyle ?? val
+			
+			
 			if(val) {
 				let icon = ''
-				switch(val.dateStyle) {
+				switch(dateStyle) {
 					case 'verspaetet':
 						icon = '<i class="fa-solid fa-triangle-exclamation"></i>'
 						break
@@ -959,15 +1963,23 @@ export const AbgabetoolAssistenz = {
 				
 				const bezeichnung = val.bezeichnung?.bezeichnung ?? val.bezeichnung
 				
-				return '<div style="display: flex; height: 100%">' +
-					'<div class=' + val.dateStyle + "-header" + ' style="width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+				if(formatterParams?.iconOnly) {
+					return '<div style="display: flex; height: 20px;">' +
+						'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
+						icon +
+						'</div>' +
+						'</div>'
+				}
+				
+				return '<div style="display: flex; height: 20px;">' +
+					'<div class=' + dateStyle + "-header" + ' style="min-width:48px; height: 100%; padding: 0px; display: flex; align-items: center; justify-content: center;">' +
 						icon +
 					'</div>' + 
 					'<div style="margin-left: 4px;">' +
-						'<p style="max-width: 100%; word-wrap: break-word; white-space: normal;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
+						'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">'+bezeichnung+' - '+ this.formatDate(val.datum)+'</p>' +
 					'</div>'+
 					'</div>'
-
+				
 			} else {
 				return ''
 			}
@@ -975,6 +1987,9 @@ export const AbgabetoolAssistenz = {
 		},
 		tableResolve(resolve) {
 			this.tableBuiltResolve = resolve
+		},
+		tableResolveFlat(resolve) {
+			this.tableBuiltResolveFlat = resolve
 		},
 		buildMailToLink(projekt) {
 			return 'mailto:' + projekt.student_uid +'@'+ this.domain
@@ -993,14 +2008,29 @@ export const AbgabetoolAssistenz = {
 			return projekt.zweitbetreuer_full_name ?? ''
 		},
 		async setupData(data){
-			this.projektarbeiten = data[0]
 			this.domain = data[1]
-			
-			this.tableData = this.mapProjekteToTableData(this.projektarbeiten)
 
+			this.projektarbeiten = this.mapProjekteToTableData(data[0])
+			this.count = this.projektarbeiten.length
+			
 			await this.tableBuiltPromise
 			
-			this.$refs.abgabeTable.tabulator.setData(this.tableData);
+			this.$refs.abgabeTable.tabulator.setData(this.projektarbeiten);
+
+			// apply preselected semester filter now that table + data are ready
+			this.semesterChanged({ value: this.curSem })
+			
+			// keep flat table in sync
+			this.flatDataDirty = true
+			if (this.mode === 'flatView') {
+				await this.tableBuiltPromiseFlat
+				this.$refs.abgabeTableFlat.tabulator.setData(this.getAllTermine)
+				this.flatDataDirty = false
+			}
+
+			// reset flat selection since the underlying data changed entirely
+			this.selectedDataFlat = []
+			this.selectedcountFlat = 0
 		},
 		loadProjektarbeiten(all = false, callback) {
 			this.loading = true
@@ -1015,7 +2045,7 @@ export const AbgabetoolAssistenz = {
 					callback()
 				}
 			}).finally(()=>{
-				this.loading=false
+				this.loading = false
 			})
 		},
 		loadAbgaben(details) {
@@ -1029,23 +2059,32 @@ export const AbgabetoolAssistenz = {
 		handleUuidDefined(uuid) {
 			this.tabulatorUuid = uuid
 		},
+		handleUuidDefinedFlat(uuid) {
+			this.tabulatorUuidFlat = uuid
+		},
 		calcMaxTableHeight() {
 			const tableID = this.tabulatorUuid ? ('-' + this.tabulatorUuid) : ''
 			const tableDataSet = document.getElementById('filterTableDataset' + tableID);
 			if(!tableDataSet) return
 			const rect = tableDataSet.getBoundingClientRect();
 
-			this.abgabeTableOptions.height = window.visualViewport.height - rect.top - 80
+
+			this.abgabeTableOptions.height = Math.round(window.visualViewport.height - rect.top)
 			this.$refs.abgabeTable.tabulator.setHeight(this.abgabeTableOptions.height)
+	
+			// same thing for 2nd tabulator which would exceed in size massively
+			this.abgabeTableOptionsFlat.height = Math.round(window.visualViewport.height - rect.top)
+	
 		},
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
+			this.tableBuiltPromiseFlat = new Promise(this.tableResolveFlat);
 			await this.tableBuiltPromise
 			
 			await this.allConfigPromise
 			
 			// called through notenOptionFilter/selectedStudiengangOption watcher on startup
-			// this.loadProjektarbeiten()
+			this.loadProjektarbeiten()
 
 			this.calcMaxTableHeight()
 		},
@@ -1054,6 +2093,61 @@ export const AbgabetoolAssistenz = {
 		},
 	},
 	computed: {
+		getDisableDeleteForSelectedFlat() {
+			return this.selectedDataFlat.some(s => s.allowedToDelete === false)
+		},
+		getDisableSaveForSelectedFlat(){
+			return this.selectedDataFlat.some(s => s.allowedToSave === false)
+		},
+		getAllTermine() {
+			if (!this.projektarbeiten) return [];
+			return this.projektarbeiten.flatMap(pa =>
+				pa.abgabetermine.map(termin => {
+					const allowedToSave = pa.note !== null ? false : true
+					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum && !termin.note
+					return {
+						allowedToSave,
+						allowedToDelete,
+						selectable: allowedToSave || allowedToDelete,
+						...termin,
+						student_uid: pa.student_uid,
+						student_vorname: pa.student_vorname,
+						student_nachname: pa.student_nachname,
+						titel: pa.titel,
+						pa_note: pa.note,
+						projektarbeit_id: pa.projektarbeit_id,
+						stg: pa.stg,
+						pkz: pa.pkz,
+						studienstatus: pa.studienstatus,
+						orgform: pa.orgform
+					}
+				}
+					
+				)
+			);
+		},
+		countsToHTMLFlat() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcountFlat || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcountFlat || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.countFlat || 0) + '</strong>';
+		},
+		countsToHTML() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': '
+				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.count || 0) + '</strong>';
+		},
 		emailItems() {
 			const menu = []
 			
@@ -1104,6 +2198,8 @@ export const AbgabetoolAssistenz = {
 			this.serienTermin.upload_allowed = newVal.upload_allowed_default
 		},
 		selectedStudiengangOption(newVal, oldVal) {
+			if(this.loading == true) return
+			
 			// implicitely avoids juggling around promises for created api calls,
 			// since we need note & stg flags for loadProjektarbeiten
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
@@ -1111,6 +2207,8 @@ export const AbgabetoolAssistenz = {
 			}
 		},
 		notenOptionFilter(newVal) {
+			if(this.loading == true) return
+			
 			// that single where clause is worth a decent load time so rather not filter tabulator but just 
 			// adapt the qry
 			if(this.notenOptionFilter !== null && this.selectedStudiengangOption !== null) {
@@ -1133,10 +2231,18 @@ export const AbgabetoolAssistenz = {
 				const cb = row.getElement().children[0]?.children[0]?.children[0]
 				if(cb) cb.checked = true
 			})
-
+		},
+		projektarbeiten: {
+			handler() {
+				this.flatDataDirty = true	
+			},
+			deep: true
 		}
 	},
 	created() {
+		// make sure zoom media query doesnt spill ever to other CIS4 sites
+		document.documentElement.classList.add('abgabetool');
+		
 		this.loading = true
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
@@ -1179,8 +2285,18 @@ export const AbgabetoolAssistenz = {
 					const res = results[2].value;
 					this.allSem = res.data[0];
 					const all = { studiensemester_kurzbz: this.$p.t('abgabetool/c4all') };
-					this.curSem = all;
+					
+					this.allSemOption = all
 					this.studiensemesterOptions = [all, ...this.allSem];
+
+					const currentSemObj = res.data[1];
+
+					// find the matching entry from studiensemesterOptions so PrimeVue
+					// can match by reference for the dropdown preselection
+					const foundRef = this.studiensemesterOptions.find(
+						s => s.studiensemester_kurzbz === currentSemObj.studiensemester_kurzbz
+					)
+					this.curSem = foundRef ?? all;
 				}
 
 				// 4. Noten
@@ -1218,9 +2334,111 @@ export const AbgabetoolAssistenz = {
 	mounted() {
 		this.setupMounted()
 	},
+	beforeUnmount() {
+		document.documentElement.classList.remove('abgabetool');
+	},
 	template: `
 	<template v-if="phrasenResolved">
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
+
+	<bs-modal ref="modalContainerEditSeries" class="bootstrap-prompt" dialogClass="modal-lg">
+		<template v-slot:title>
+			<div>{{ $p.t('abgabetool/c4editTerminserie') }}</div>
+			<div class="text-muted" style="font-size: 0.9rem;">
+				{{ $p.t('abgabetool/c4nSelected', [selectedDataFlat.length]) }}
+			</div>
+		</template>
+		<template v-slot:default>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.fixtermin" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4fixterminv4'))}}</div>
+				<div class="col-8">
+					<Checkbox
+						v-model="serienEdit.invertedFixtermin"
+						:binary="true"
+						:disabled="!serienEditFields.fixtermin"
+					/>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.datum" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4zieldatumv2'))}}</div>
+				<div class="col-8">
+					<VueDatePicker
+						style="width: 95%;"
+						v-model="serienEdit.datum"
+						:clearable="false"
+						:disabled="!serienEditFields.datum"
+						locale="de"
+						format="dd.MM.yyyy"
+						model-type="yyyy-MM-dd"
+						:enable-time-picker="false"
+						:text-input="true"
+						auto-apply>
+					</VueDatePicker>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.bezeichnung" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4abgabetyp'))}}</div>
+				<div class="col-8">
+					<Dropdown
+						:style="{'width': '100%'}"
+						v-model="serienEdit.bezeichnung"
+						:disabled="!serienEditFields.bezeichnung"
+						:options="abgabeTypeOptions"
+						:optionLabel="getOptionLabelAbgabetyp"
+						:optionDisabled="getOptionDisabled">
+					</Dropdown>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.upload_allowed" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4upload_allowed'))}}</div>
+				<div class="col-8">
+					<Checkbox
+						v-model="serienEdit.upload_allowed"
+						:binary="true"
+						:disabled="!serienEditFields.upload_allowed"
+					/>
+				</div>
+			</div>
+	
+			<div class="row mt-2 align-items-center">
+				<div class="col-1">
+					<Checkbox v-model="serienEditFields.kurzbz" :binary="true"/>
+				</div>
+				<div class="col-3 fw-bold">{{$capitalize($p.t('abgabetool/c4abgabekurzbzv2'))}}</div>
+				<div class="col-8">
+					<Textarea
+						style="margin-bottom: 4px;"
+						v-model="serienEdit.kurzbz"
+						:disabled="!serienEditFields.kurzbz"
+						rows="1"
+						class="w-100">
+					</Textarea>
+				</div>
+			</div>
+	
+		</template>
+		<template v-slot:footer>
+			<button type="button" class="btn btn-primary" @click="handleEditSelectedTermine">
+				{{ $capitalize($p.t('abgabetool/c4save')) }}
+			</button>
+		</template>
+	</bs-modal>
 
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
 			dialogClass="modal-lg">
@@ -1254,6 +2472,7 @@ export const AbgabetoolAssistenz = {
 							:clearable="false"
 							locale="de"
 							format="dd.MM.yyyy"
+							model-type="yyyy-MM-dd"
 							:enable-time-picker="false"
 							:text-input="true"
 							auto-apply>
@@ -1430,7 +2649,7 @@ export const AbgabetoolAssistenz = {
 		<div id="abgabetable" style="max-height:40vw;">
 			<div class="row">
 				<div class="col-auto me-auto">
-					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitle')}}</h2>
+					<h2 tabindex="1">{{$p.t('abgabetool/abgabetoolTitleAdmin')}}</h2>
 				</div>
 				<div class="col-auto">
 					<label class="col-form-label">{{$capitalize($p.t('lehre/studiengang'))}}:</label>
@@ -1468,10 +2687,12 @@ export const AbgabetoolAssistenz = {
 				</div>
 			</div>
 			<hr>
+			<div :style="mode === 'perProjectView' ? '' : 'visibility: hidden; height: 0; overflow: hidden;'">
 			<core-filter-cmpt
-				:title="''"  
+				:title="''"
 				@uuidDefined="handleUuidDefined"
 				ref="abgabeTable"
+				:description="countsToHTML"
 				:newBtnShow="true"
 				:newBtnLabel="$p.t('abgabetool/neueTerminserie')"
 				:newBtnDisabled="!selectedData.length"
@@ -1479,6 +2700,7 @@ export const AbgabetoolAssistenz = {
 				:tabulator-options="abgabeTableOptions"  
 				:tabulator-events="abgabeTableEventHandlers"
 				@tableBuilt="handleTableBuilt"
+				@headerFilterOn="handleFilterActiveChanged"
 				tableOnly
 				:sideMenu="false"
 				:useSelectionSpan="false"
@@ -1507,8 +2729,52 @@ export const AbgabetoolAssistenz = {
 						<i class="fa fa-envelope"></i>
 					</button>
 					<tiered-menu ref="menu" :model="emailItems" popup :autoZIndex="false" />
+					
+					<button @click="switchMode" class="btn btn-secondary">
+						{{ $p.t('abgabetool/c4terminansicht') }}
+					</button>
+					
+					<button @click="reloadData" class="btn btn-secondary">
+						<i class="fa-solid fa-arrows-rotate"></i>
+					</button>
 				</template>
 			</core-filter-cmpt>
+			</div>
+			
+			<div :style="mode === 'flatView' ? '' : 'visibility: hidden; height: 0; overflow: hidden;'">
+			<core-filter-cmpt
+				:title="''"
+				@uuidDefined="handleUuidDefinedFlat"
+				ref="abgabeTableFlat"
+				:description="countsToHTMLFlat"
+				:tabulator-options="abgabeTableOptionsFlat"  
+				:tabulator-events="abgabeTableEventHandlersFlat"
+				@tableBuilt="handleTableBuiltFlat"
+				tableOnly
+				:sideMenu="false"
+				:useSelectionSpan="false"
+			>
+				<template #actions>
+					<button style="max-height: 40px;" :disabled="!selectedcountFlat || getDisableDeleteForSelectedFlat" class="btn btn-danger border-0" @click="handleDeleteSelectedTermine">
+						{{$capitalize( $p.t('abgabetool/c4delete') )}}
+						<i class="fa-solid fa-trash"></i>
+					</button>
+					
+					<button @click="openEditModal" :disabled="!selectedcountFlat || getDisableSaveForSelectedFlat" class="btn btn-success ml-2" role="button">
+						{{$capitalize( $p.t('abgabetool/c4edit') )}}
+						<i class="fa fa-pen"></i>
+					</button>
+										
+					<button @click="switchMode" class="btn btn-secondary">
+						{{ $p.t('abgabetool/c4projektansicht') }}
+					</button>
+					
+					<button @click="reloadData" class="btn btn-secondary">
+						<i class="fa-solid fa-arrows-rotate"></i>
+					</button>
+				</template>
+			</core-filter-cmpt>
+			</div>
 		</div>
 	</template>
     `,

@@ -220,6 +220,10 @@ export const CoreFilterCmpt = {
 			else
 				this.getFilter();
 		},
+		setSelectedFields() {
+			const cols = this.tabulator.getColumns();
+			this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+		},
 		async initTabulator() {
 			let placeholder = '< Phrasen Plugin not loaded! >';
 			if (this.$p) {
@@ -337,7 +341,7 @@ export const CoreFilterCmpt = {
 				this.tabulator.on('tableBuilt', () => {
 					const cols = this.tabulator.getColumns();
 					this.fields = cols.map(col => col.getField());
-					this.selectedFields = cols.filter(col => col.isVisible()).map(col => col.getField());
+					this.setSelectedFields();
 					if (this.tabulator.options.persistence.headerFilter)
 						this._setHeaderFilter();
 				});
@@ -371,6 +375,7 @@ export const CoreFilterCmpt = {
 			});
 			this.tabulator.clearFilter();
 			this.filterActive = false;
+			this.$emit('headerFilterOn', this.filterActive)
 		},
 		_setHeaderFilter()
 		{

@@ -2,6 +2,7 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import { getDateStyleClass } from "./getDateStyleClass.js";
+import { compareISODateValues, formatISODate, getViennaTodayISO } from "./dateUtils.js";
 
 export const AbgabeMitarbeiterDetail = {
 	name: "AbgabeMitarbeiterDetail",
@@ -46,12 +47,7 @@ export const AbgabeMitarbeiterDetail = {
 			eidAkzeptiert: false,
 			enduploadTermin: null,
 			allActiveLanguages: FHC_JS_DATA_STORAGE_OBJECT.server_languages,
-			speedDialItems: [{
-				label: Vue.computed(() => this.$p.t('abgabetool/c4newAbgabetermin')),
-				icon: "fa fa-plus",
-				command: this.openCreateNewAbgabeModal,
-				disabled: Vue.computed(() => !this.getAllowedToCreateNewTermin)
-			},
+			speedDialItems: [
 			{
 				label: Vue.computed(() => this.$p.t('abgabetool/c4benoten')),
 				icon: "fa fa-user-check",
@@ -81,6 +77,9 @@ export const AbgabeMitarbeiterDetail = {
 		}
 	},
 	methods: {
+		terminIsInvalid(termin) {
+			return termin.note?.positiv == false && !termin.beurteilungsnotiz	
+		},
 		getNoteBezeichnung(termin){
 			if(termin.noteBackend?.bezeichnung) {
 				return termin.noteBackend?.positiv ? this.$capitalize(this.$p.t('abgabetool/c4positivBenotet')) + ' ✅' : this.$capitalize(this.$p.t('abgabetool/c4negativBenotet')) + ' ❌'
@@ -113,6 +112,8 @@ export const AbgabeMitarbeiterDetail = {
 					if(newTerminRes.note) {
 						newTerminRes.note = noteOpt
 						newTerminRes.noteBackend = noteOpt // certain UI elements should only reflect persisted state
+						termin.allowedToDelete = false
+						newTerminRes.allowedToDelete = false
 					}
 					newTerminRes.invertedFixtermin = !newTerminRes.fixtermin
 					const existingTerminRes = res.data[1]
@@ -132,13 +133,13 @@ export const AbgabeMitarbeiterDetail = {
 					} else {
 						const noteOptExisting = this.allowedNotenOptions.find(opt => opt.note == existingTerminRes.note)
 						existingTerminRes.note = noteOptExisting
-
+						
 						termin.paabgabetyp_kurzbz = newTerminRes.paabgabetyp_kurzbz
 						termin.noteBackend = noteOpt // do NOT take noteOptExisting -> should reflect the "yes the qgate grade is confirmed in backend ux behaviour"
 						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
 					}
 					
-					this.projektarbeit.abgabetermine.sort((a, b) =>new Date(a.datum) - new Date(b.datum))
+					this.projektarbeit.abgabetermine.sort((a, b) => compareISODateValues(a.datum, b.datum))
 					
 					const index = this.projektarbeit.abgabetermine.findIndex(t => termin.paabgabe_id == t.paabgabe_id)
 					
@@ -159,7 +160,7 @@ export const AbgabeMitarbeiterDetail = {
 							'fixtermin': false,
 							'invertedFixtermin': true,
 							'kurzbz': '', // todo kurzbz textfield value vorschlag für qualgates
-							'datum': new Date().toISOString().split('T')[0],
+							'datum': getViennaTodayISO(),
 							'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 							'beurteilungsnotiz': '',
 							'upload_allowed': false,
@@ -337,16 +338,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		formatDate(dateParam) {
-			// unsafe for datepickers, dont use there
-			const date = new Date(dateParam)
-			// handle missing leading 0
-			const padZero = (num) => String(num).padStart(2, '0');
-
-			const month = padZero(date.getMonth() + 1); // Months are zero-based
-			const day = padZero(date.getDate());
-			const year = date.getFullYear();
-			
-			return `${day}.${month}.${year}`
+			return formatISODate(dateParam)
 		},
 		openCreateNewAbgabeModal() {
 			if(this.projektarbeit?.betreuerart_kurzbz == 'Zweitbegutachter') {
@@ -364,7 +356,7 @@ export const AbgabeMitarbeiterDetail = {
 					'fixtermin': false,
 					'invertedFixtermin': true,
 					'kurzbz': '',
-					'datum': new Date().toISOString().split('T')[0],
+					'datum': getViennaTodayISO(),
 					'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 					'beurteilungsnotiz': '',
 					'upload_allowed': typ.upload_allowed_default,
@@ -398,7 +390,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': new Date().toISOString().split('T')[0],
+				'datum': getViennaTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': false,
@@ -446,7 +438,7 @@ export const AbgabeMitarbeiterDetail = {
 			}
 		},
 		getMessagePtStyle() {
-			// adjust outer spacing and internal padding to appear similar to doenload button in size
+			// adjust outer spacing and internal padding to appear similar to download button in size
 			return {
 				root: {
 					style: {
@@ -561,6 +553,12 @@ export const AbgabeMitarbeiterDetail = {
 				class: "custom-tooltip"
 			}
 		},
+		getTooltipBeurteilungsnotiz() {
+			return {
+				value: this.$p.t('abgabetool/c4beurteilungsnotizBeiNegNote'),
+				class: "custom-tooltip"
+			}
+		},
 		getProjektarbeitTitel() {
 			if(this.projektarbeit?.titel) return this.$capitalize(this.$p.t('abgabetool/c4titel')) + ': ' + this.projektarbeit.titel
 			
@@ -591,7 +589,7 @@ export const AbgabeMitarbeiterDetail = {
 				'fixtermin': false,
 				'invertedFixtermin': true,
 				'kurzbz': '',
-				'datum': new Date().toISOString().split('T')[0],
+				'datum': getViennaTodayISO(),
 				'note': this.allowedNotenOptions.find(opt => opt.note == 9),
 				'beurteilungsnotiz': '',
 				'upload_allowed': typ.upload_allowed_default,
@@ -656,6 +654,7 @@ export const AbgabeMitarbeiterDetail = {
 							:enable-time-picker="false"
 							locale="de"
 							format="dd.MM.yyyy"
+							model-type="yyyy-MM-dd"
 							:text-input="true"
 							auto-apply>
 						</VueDatePicker>
@@ -806,6 +805,7 @@ export const AbgabeMitarbeiterDetail = {
 								:enable-time-picker="false"
 								locale="de"
 								format="dd.MM.yyyy"
+								model-type="yyyy-MM-dd"
 								:text-input="true"
 								auto-apply>
 							</VueDatePicker>
@@ -851,8 +851,10 @@ export const AbgabeMitarbeiterDetail = {
 					</div>
 					<div class="row mt-2" v-if="termin.bezeichnung?.benotbar">
 						<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4notizQualGatev2') )}}</div>
-						<div class="col-12 col-md-9">
-							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
+						<div class="col-12 col-md-9" v-tooltip.right="terminIsInvalid(termin) && getTooltipBeurteilungsnotiz">
+							<Textarea style="margin-bottom: 4px;" v-model="termin.beurteilungsnotiz" 
+							:class="{ 'p-invalid': terminIsInvalid(termin) }"
+							 rows="1" class="w-100" :disabled="!termin.allowedToSave"></Textarea>
 						</div>
 					</div>
 					
@@ -874,6 +876,7 @@ export const AbgabeMitarbeiterDetail = {
 											:disabled="true"
 											locale="de"
 											format="dd.MM.yyyy"
+											model-type="yyyy-MM-dd"
 											>
 										</VueDatePicker>
 									</div>
@@ -907,7 +910,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-9">
 							<div class="row">
 								<div class="col-auto">
-									<button v-if="termin.allowedToSave" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
+									<button v-if="termin.allowedToSave && !terminIsInvalid(termin)" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
 										{{ $capitalize( $p.t('abgabetool/c4save') )}}
 										<i class="fa-solid fa-floppy-disk"></i>
 									</button>
