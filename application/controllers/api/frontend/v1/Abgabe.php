@@ -191,7 +191,7 @@ class Abgabe extends FHCAPI_Controller
 			$result = $this->ProjektarbeitModel->getStudentProjektarbeitenWithBetreuer(getAuthUID());
 		}
 
-		$projektarbeiten = getData($result);
+		$projektarbeiten = hasData($result) ? getData($result) : array();
 		
 		if(count($projektarbeiten)) {
 			foreach($projektarbeiten as $pa) {
