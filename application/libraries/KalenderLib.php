@@ -20,6 +20,9 @@ class KalenderLib
 		$this->_ci->load->model('ressource/Ort_model', 'OrtModel');
 		$this->_ci->load->model('organisation/gruppe_model', 'GruppeModel');
 		$this->_ci->load->model('organisation/Lehrverband_model', 'LehrverbandModel');
+
+		$this->_ci->load->library('CollisionChecker');
+
 	}
 
 	private function _getBasePlan($start_date, $end_date)
@@ -139,6 +142,7 @@ class KalenderLib
 					'titel' => isset($row->titel) ? $row->titel : '',
 					'beschreibung' => isset($row->beschreibung) ? $row->beschreibung : '',
 					'topic' => (isset($row->lehrfach_kurzbz) ? $row->lehrfach_kurzbz : '').' '.(isset($row->lehrform_kurzbz) ? $row->lehrform_kurzbz : ''),
+					'collisions' => false
 				];
 			}
 
@@ -190,6 +194,15 @@ class KalenderLib
 					];
 				}
 			}
+		}
+
+		$kalender_ids = array_keys($events);
+		$collisions = $this->_ci->collisionchecker->runAll($kalender_ids);
+
+		foreach ($collisions as $kalender_id => $errors)
+		{
+			if (isset($events[$kalender_id]))
+				$events[$kalender_id]->collisions = !empty($errors);
 		}
 
 		return array_values($events);
@@ -613,6 +626,19 @@ class KalenderLib
 
 	public function updateKalenderEvent($kalender_id, $ort_kurzbz = null, $start_time = null, $end_time = null)
 	{
+		$entryResult = $this->_loadKalenderEntry($kalender_id);
+		if (isError($entryResult)) return $entryResult;
+
+		$kalender_entry = getData($entryResult);
+
+		$kalender_entry->ort_kurzbz = $ort_kurzbz  ?? $kalender_entry->ort_kurzbz;
+		$kalender_entry->von = $start_time ?? $kalender_entry->von;
+		$kalender_entry->bis = $end_time ?? $kalender_entry->bis;
+
+		$errors = $this->_ci->collisionchecker->run($kalender_entry);
+
+		if (!empty($errors)) return error($errors);
+
 		if (!is_null($ort_kurzbz) && !isEmptyString($ort_kurzbz))
 		{
 			$result = $this->updateOrt($kalender_id, $ort_kurzbz);

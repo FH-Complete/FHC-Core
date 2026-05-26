@@ -44,6 +44,16 @@ Events::on('loadTempusRenderers', function ($renderers) {
 	);
 });
 
+Events::on('loadTempusRenderers', function ($renderers) {
+	$fhc_core_renderers =& $renderers();
+	$fhc_core_renderers["lehreinheit"] = array(
+		'calendarEvent' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Lehreinheit/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Lehreinheit/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Tempus/Renderer/Lehreinheit/modalContent.js'),
+		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
+	);
+});
+
 
 
 

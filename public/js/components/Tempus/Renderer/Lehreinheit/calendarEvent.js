@@ -1,13 +1,13 @@
 export default {
-	props: {
+	props:{
 		event: {
 			type: Object,
 			required: true
 		}
 	},
-	computed: {
+	computed:{
 		classes() {
-			const classes = ['cis-renderer-reservierungen-calendar-event', 'calendar-event-default', 'h-100', 'w-100', 'p-1'];
+			const classes = ['cis-renderer-lehreinheit-calendar-event', 'calendar-event-default', 'h-100', 'w-100', 'p-1'];
 
 			if (this.event.collisions) {
 				classes.push('calendar-event-collisions');
@@ -22,17 +22,17 @@ export default {
 				this.$p.t('global/uhrzeit'),
 				[this.start, this.end].join(' - ')
 			].join(": "));
-			
+
 			tooltipArray.push([
 				this.$p.t('profilUpdate/topic'),
 				this.event.topic
 			].join(": "));
-			
+
 			tooltipArray.push([
 				this.$p.t('person/ort'),
 				this.event.ort_kurzbz
 			].join(": "));
-			
+
 			if (Array.isArray(this.event.lektor) && this.event.lektor.length > 0) {
 				if (this.event.lektor.length > 3) {
 					tooltipArray.push([
@@ -47,7 +47,7 @@ export default {
 					].join(": "));
 				}
 			}
-			
+
 			return tooltipArray.join("\n");
 		},
 		start() {
@@ -61,21 +61,23 @@ export default {
 				.toISOTime({ suppressSeconds: true });
 		}
 	},
-	template: /* html */`
+	template: /*html*/`
 	<div
 		:class="classes"
+		@wheel.stop
 	>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-grid h-100"
+			class="event-time d-none d-xl-grid h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
 		</div>
 		<div class="event-text" v-tooltip="tooltipString">
 			<span class="event-topic">{{ event.topic }}</span>
+			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span
-				v-for="lektor in event.lektor.slice(0, 3)"
+				v-for="(lektor,index) in event.lektor.slice(0, 3)"
 				class="event-lectors"
 			>
 				{{ lektor.kurzbz }}
@@ -86,7 +88,6 @@ export default {
 			>
 				... +{{ event.lektor.length - 3 }}
 			</span>
-			<span class="event-place">{{ event.ort_kurzbz }}</span>
 		</div>
 	</div>
 	`,
