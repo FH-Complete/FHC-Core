@@ -246,7 +246,7 @@ class Abschlusspruefung extends FHCAPI_Controller
 	{
 		$searchString = $this->input->get('searchString') ?? '';
 
-		$this->load->model('ressource/Person_model', 'PersonModel');
+		$this->load->model('person/Person_model', 'PersonModel');
 
 		$result = $this->PersonModel->searchPerson($searchString, 'mitMaUid');
 
