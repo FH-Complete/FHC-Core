@@ -27,11 +27,12 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
+			'viewData' => self::PERM_LOGGED,
 			'getPaAbgaben' => array('lehre/abgabetool:r'),
 			'getStudiengaenge' => array('lehre/abgabetool:r'),
 			'getTermine' => array('lehre/abgabetool:r'),
 			'getPaAbgabetypen' => array('lehre/abgabetool:r'),
-			'downloadZip' => array('lehre/abgabetool:r')
+			'downloadZip' => array('lehre/abgabetool:r'),
 			//'downloadProjektarbeit' => array('lehre/abgabetool:r')
 		]);
 
@@ -43,6 +44,17 @@ class PaabgabeUebersicht extends FHCAPI_Controller
 		$this->loadPhrases([
 			'abgabetool'
 		]);
+	}
+
+	public function viewData()
+	{
+		$viewData = [
+			"uid" => getAuthUID(),
+			// TODO create permission
+			"showEdit" => true,
+		];
+
+        $this->terminateWithSuccess($viewData);
 	}
 
 	/**

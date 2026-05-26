@@ -26,5 +26,11 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/education/PaabgabeUebersicht/getPaAbgabetypen'
 		};
+	},
+	getViewData() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/education/PaabgabeUebersicht/viewData'
+		};
 	}
 };

@@ -25,12 +25,6 @@ class ProjektabgabeUebersicht extends Auth_Controller
 	 */
 	public function index()
 	{
-		// TODO create permission
-		$viewData = array(
-			'uid' => getAuthUID(),
-			'showEdit' => true
-		);
-
-		$this->load->view('CisRouterView/CisRouterView.php', ['viewData' => $viewData, 'route' => 'ProjektabgabeUebersicht']);
+		$this->load->view('CisRouterView/CisRouterView.php', ['route' => 'ProjektabgabeUebersicht']);
 	}
 }
