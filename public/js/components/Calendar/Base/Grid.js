@@ -329,6 +329,9 @@ export default {
 			return !dayEvents.some(ev => ev.start < end && ev.end > start);
 		}
 	},
+	created() {
+		this.$p.loadCategory(["LvPlan"]);
+	},
 	beforeUnmount() {
 		this.disableAutoScroll();
 	},
@@ -425,6 +428,7 @@ export default {
 								class="fhc-calendar-empty-slot"
 								style="position:absolute; inset:0; z-index:1"
 								v-cal-click:slot="{ date, part }"
+								:title="this.reservierbarMap?.[date.toISODate()] ? $p.t('LvPlan/add_reservation') : $p.t('LvPlan/reservation_not_allowed')"
 							>
 								<div class="fhc-calendar-empty-slot-plus">
 									<i v-if="this.reservierbarMap?.[date.toISODate()]" class="fa-solid fa-plus"></i>
