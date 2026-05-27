@@ -1079,7 +1079,10 @@ export default {
 
       let dropzoneElementDataNumber =
         this.getElementDataNumber(closestPartBody);
-      if (dropzoneElementDataNumber === null || dropzoneElementDataNumber === undefined) {
+      if (
+        dropzoneElementDataNumber === null ||
+        dropzoneElementDataNumber === undefined
+      ) {
         return;
       }
 
@@ -1350,6 +1353,8 @@ export default {
       this.currentlyEditedOverlayId = null;
     },
     showOverlayClassTimeTypePopover(overlayId) {
+      if (this.$props.isPreviewMode) return;
+
       let overlayElement = this.getOverlayElementByOverlayId(overlayId);
       if (!overlayElement) return;
 
@@ -1827,18 +1832,6 @@ export default {
       <div 
         class="d-flex flex-column justify-content-center align-items-center gap-1 p-0 overflow-auto scrollable h-100"
         >
-        <a 
-          v-if="!$props.isPreviewMode"
-          @mousedown.stop="showOverlayClassTimeTypePopover('overlay-item-' + index)"
-          :title="$p.t('ui', 'bearbeiten')"
-          :class="{
-            'bottom-0 end-0': isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
-            'top-0 start-0': !isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index)),
-          }"
-          class="position-absolute  p-1 d-flex gap-1 fhc-cursor-pointer"
-          >
-          <i class="fa fa-edit text-primary fs-6"></i>
-        </a>
         <a
           v-if="!$props.isPreviewMode"
           @mousedown.stop="deleteOverlay('overlay-item-' + index)"
@@ -1854,7 +1847,10 @@ export default {
           {{ getOverlayTimeSlotSpan("overlay-item-" + index) }}
         </p>
         <span
-          v-if="!isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index))" 
+          v-if="!isOverlayMinimallySized(this.overlays.find(overlay => overlay.id === 'overlay-item-' + index))"
+          @mousedown.stop="showOverlayClassTimeTypePopover('overlay-item-' + index)"
+          :title="$props.isPreviewMode ? '' : $p.t('ui', 'bearbeiten')"
+          :class="$props.isPreviewMode ? '' : 'fhc-cursor-pointer'"
           class="badge badge-pill bg-light text-dark"
         >
             {{ this.getOverlayClassScheduleTypeTitle('overlay-item-' + index) }}

@@ -482,7 +482,7 @@ export default {
         <div class="col">
           <form-input
             v-model="classTimeSlotValidityPeriodFormData.validityPeriodFrom"
-            :label="$p.t('ui/von') + ' *'"
+            :label="$capitalize($p.t('ui/von') + ' *')"
 						:teleport="true"
 						:enable-time-picker="false"
             type="datePicker"
@@ -494,7 +494,7 @@ export default {
         <div class="col">
           <form-input
             v-model="classTimeSlotValidityPeriodFormData.validityPeriodTo"
-            :label="$p.t('global/bis') + ' *'"
+            :label="$capitalize($p.t('global/bis') + ' *')"
             :teleport="true"
 						:enable-time-picker="false"
             type="datePicker"
@@ -507,7 +507,7 @@ export default {
       <div class="row mb-3">
         <form-input
           v-model="classTimeSlotValidityPeriodFormData.studyPlanId"
-          :label="$p.t('lehre/studienplan')"
+          :label="$capitalize($p.t('lehre/studienplan'))"
           :disabled="isStudyPlanSelectDisabled"
           type="select"
           name="studyPlan"  
@@ -528,7 +528,7 @@ export default {
           id="ausbildungssemester"
           name="semester"
           :disabled="isStudyPlanSelectDisabled"
-          :label="$p.t('lehre', 'ausbildungssemester')"
+          :label="$capitalize($p.t('lehre', 'ausbildungssemester'))"
           v-model="classTimeSlotValidityPeriodFormData.semester"
           >
           <option
@@ -544,7 +544,7 @@ export default {
         <form-input
           type="select"
           name="classTimeSlotType"  
-          :label="$p.t('ui/classTimeSlotType')"
+          :label="$capitalize($p.t('ui/classTimeSlotType'))"
           v-model="classTimeSlotValidityPeriodFormData.classTimeSlotTypeShortcode"
           >
           <option :value="null"> - </option>
@@ -561,7 +561,7 @@ export default {
         <form-input
           type="textarea"
           name="beschreibung"  
-          :label="$p.t('global/beschreibung')"
+          :label="$capitalize($p.t('global/beschreibung'))"
           v-model="classTimeSlotValidityPeriodFormData.description"
           >
         </form-input>

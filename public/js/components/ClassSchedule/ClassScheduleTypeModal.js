@@ -153,7 +153,7 @@ export default {
           this.getAllClassScheduleTypes();
         })
         .catch((error) => {
-          this.$fhcAlert.handleSystemError(error);
+          this.$fhcAlert.alertError(this.$p.t("ui", "errorFetchingClassScheduleTimeSlotTypes"));
         });
     },
     showClassTimeSlotTypeForm() {

@@ -64,6 +64,9 @@ export default {
     };
   },
   computed: {
+    userLanguage() {
+      return Vue.ref(FHC_JS_DATA_STORAGE_OBJECT.user_language);
+    },
     tabulatorOptions() {
       const options = {
         ajaxURL: "dummy",
@@ -71,11 +74,17 @@ export default {
           return await this.getParsedClassTimeSlotValidityPeriodData();
         },
         ajaxResponse: (url, params, response) => response,
-        persistenceID: "class_schedule_validity_periods_table",
+        persistenceID: "class_schedule_validity_periods_table12333451",
         selectableRows: true,
+        maxHeight:"100%",
         columns: [
           {
-            title: this.$p.t("ui", "zeitraum"),
+            title: this.$capitalize(this.$p.t("ui", "unterrichtszeitenGueltigkeitId")),
+            field: "unterrichtszeitengueltigkeit_id",
+            visible: false,
+          },
+          {
+            title: this.$capitalize(this.$p.t("ui", "zeitraum")),
             formatter: (cell, formatterParams, onRendered) => {
               const data = cell.getData();
               const validFrom = new Date(data.gueltig_von).toLocaleDateString(
@@ -99,17 +108,32 @@ export default {
             },
           },
           {
-            title: this.$p.t("global", "typ"),
+            title: this.$capitalize(this.$p.t("global", "typ")),
             field: "unterrichtszeiten_typ_bezeichnung_mehrsprachig",
             width: 150,
+            formatter: (cell, formatterParams, onRendered) => {
+              console.log(cell.getData())
+              if (!cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig) {
+                return "sdsd";
+              }
+               return this.userLanguage?.value === "English"
+                ? cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig[1]
+                : cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig[0];
+            },
+          
           },
           {
-            title: this.$p.t("lehre", "sem"),
+            title: this.$capitalize(this.$p.t("lehre", "sem")),
             field: "ausbildungssemester",
             width: 150,
           },
           {
-            title: this.$p.t("global", "actions"),
+            title: this.$capitalize(this.$p.t("global", "beschreibung")),
+            field: "anmerkung",
+            width: 150,
+          },
+          {
+            title: this.$capitalize(this.$p.t("global", "actions")),
             field: "actions",
             minWidth: 150,
             maxWidth: 150,
@@ -299,6 +323,9 @@ export default {
         };
       });
     },
+    hasLehreUnterrichtszeitenTypRPermission() {
+      return this.permissions["lehre/unterrichtszeiten_typ_r"] || false;
+    }
   },
   methods: {
     async getParsedClassTimeSlotValidityPeriodData() {
@@ -324,10 +351,6 @@ export default {
             if (!period.studienplan_bezeichnung) {
               period.studienplan_bezeichnung = generalWord;
             }
-            period.unterrichtszeiten_typ_bezeichnung_mehrsprachig =
-              period.unterrichtszeiten_typ_bezeichnung_mehrsprachig[0]?.split(
-                ":",
-              )[1];
             return {
               ...period,
             };
@@ -460,97 +483,100 @@ export default {
     <div class="row mb-3">
       <div class="col d-flex justify-content-between">
         <a class="btn btn-primary mb-3" @click="showClassTimeSlotValidityPeriodModal">{{$p.t('ui', 'addClassTimeSlotValidityPeriodButton')}}</a>
-        <a class="btn btn-secondary mb-3" @click="showClassTimeSlotTypeModal">{{$p.t('ui', 'addClassTimeSlotTypeButton')}}</a>
+        <a v-if="hasLehreUnterrichtszeitenTypRPermission" class="btn btn-secondary mb-3" @click="showClassTimeSlotTypeModal">{{$p.t('ui', 'addClassTimeSlotTypeButton')}}</a>
       </div>
     </div>
-    <class-schedule-type-modal 
-      :isVisible="isClassTimeSlotTypeModalVisible" 
-      @hideBsModal="resetClassTimeSlotTypeModal"
-    />
-    <class-schedule-validity-period-modal 
-      :isVisible="isClassTimeSlotValidityPeriodModalVisible" 
-      :editedClassTimeSlotValidityPeriodId="editedClassTimeSlotValidityPeriodId"
-      @hideBsModal="() => { resetClassTimeSlotValidityPeriodModal(); editedClassTimeSlotValidityPeriodId = null; }"
-      @classTimeSlotValidityPeriodCreated="() => { 
-        $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
-        resetClassTimeSlotValidityPeriodModal();
-        this.editedClassTimeSlotValidityPeriodId = null;
-      }"
-      @classTimeSlotValidityPeriodUpdated="() => { 
-        $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
-        resetClassTimeSlotValidityPeriodModal();
-        this.editedClassTimeSlotValidityPeriodId = null;
-      }"
-    />
-    <core-filter-cmpt  
-        v-if="phrasesLoaded"
-        ref="classTimeSlotValidityPeriodsTable"
-        table-only	 
-        :side-menu="false"	 
-        :tabulator-options="tabulatorOptions"
-        :tabulator-events="tabulatorEvents"	 
-    >
-      <template #search>
-        <slot name="filterzuruecksetzen">
-          <core-form class="d-flex flex-column flex-md-row align-items-md-end gap-3">
-            <div>
-               <form-input
-                :label="$capitalize($p.t('lehre/organisationseinheit'))"
-                :suggestions="filteredOrganizationalUnits"
-                :optionValue="(option) => option.value"
-                :optionLabel="(option) => option.label" 
-                @complete="filterOrganizationalUnits($event)"
-                @itemSelect="(option) => { filterData.selectedOrganizationalUnit = option.value; }"
-                type="autocomplete"
-                name="organizationalUnitShortCode"
-                dropdown 
-                forceSelection
-                >
-              </form-input>
-            </div>
-            <div>
-              <form-input
-                v-model="selectedSemester"
-                :label="$capitalize($p.t('lehre/studiensemester'))"
-                :suggestions="filteredSemesters"
-                :optionValue="(option) => option.value"
-                :optionLabel="(option) => option.label"
-                @complete="filterSemesters($event)"
-                type="autocomplete"
-                name="selectedSemester"
-                dropdown 
-                forceSelection
-                >
-              </form-input>
-            </div>
-            <div>
-              <div class="d-flex align-items-center gap-2">
+    <div class="row mb-3" style="height: 65vh;">
+      <class-schedule-type-modal
+        v-if="hasLehreUnterrichtszeitenTypRPermission"
+        :isVisible="isClassTimeSlotTypeModalVisible" 
+        @hideBsModal="resetClassTimeSlotTypeModal"
+      />
+      <class-schedule-validity-period-modal 
+        :isVisible="isClassTimeSlotValidityPeriodModalVisible" 
+        :editedClassTimeSlotValidityPeriodId="editedClassTimeSlotValidityPeriodId"
+        @hideBsModal="() => { resetClassTimeSlotValidityPeriodModal(); editedClassTimeSlotValidityPeriodId = null; }"
+        @classTimeSlotValidityPeriodCreated="() => { 
+          $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
+          resetClassTimeSlotValidityPeriodModal();
+          this.editedClassTimeSlotValidityPeriodId = null;
+        }"
+        @classTimeSlotValidityPeriodUpdated="() => { 
+          $refs.classTimeSlotValidityPeriodsTable.tabulator.replaceData();
+          resetClassTimeSlotValidityPeriodModal();
+          this.editedClassTimeSlotValidityPeriodId = null;
+        }"
+      />
+      <core-filter-cmpt  
+          v-if="phrasesLoaded"
+          ref="classTimeSlotValidityPeriodsTable"
+          table-only	 
+          :side-menu="false"	 
+          :tabulator-options="tabulatorOptions"
+          :tabulator-events="tabulatorEvents"	 
+      >
+        <template #search>
+          <slot name="filterzuruecksetzen">
+            <core-form class="d-flex flex-column flex-md-row align-items-md-end gap-3">
+              <div>
                 <form-input
-                  v-model="filterData.validityPeriodFrom"
-                  :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('ui', 'von')"
-                  :teleport="true"
-                  :enable-time-picker="false"
-                  type="datePicker"
-                  name="validityPeriodFrom"  
-                  format="dd.MM.yyyy"
-                  auto-apply
-                  />
+                  :label="$capitalize($p.t('lehre/organisationseinheit'))"
+                  :suggestions="filteredOrganizationalUnits"
+                  :optionValue="(option) => option.value"
+                  :optionLabel="(option) => option.label" 
+                  @complete="filterOrganizationalUnits($event)"
+                  @itemSelect="(option) => { filterData.selectedOrganizationalUnit = option.value; }"
+                  type="autocomplete"
+                  name="organizationalUnitShortCode"
+                  dropdown 
+                  forceSelection
+                  >
+                </form-input>
+              </div>
+              <div>
+                <form-input
+                  v-model="selectedSemester"
+                  :label="$capitalize($p.t('lehre/studiensemester'))"
+                  :suggestions="filteredSemesters"
+                  :optionValue="(option) => option.value"
+                  :optionLabel="(option) => option.label"
+                  @complete="filterSemesters($event)"
+                  type="autocomplete"
+                  name="selectedSemester"
+                  dropdown 
+                  forceSelection
+                  >
+                </form-input>
+              </div>
+              <div>
+                <div class="d-flex align-items-center gap-2">
                   <form-input
-                    v-model="filterData.validityPeriodTo"
-                    :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('global', 'bis')"
+                    v-model="filterData.validityPeriodFrom"
+                    :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('ui', 'von')"
                     :teleport="true"
                     :enable-time-picker="false"
                     type="datePicker"
-                    name="validityPeriodTo"  
+                    name="validityPeriodFrom"  
                     format="dd.MM.yyyy"
                     auto-apply
                     />
+                    <form-input
+                      v-model="filterData.validityPeriodTo"
+                      :label="$p.t('ui', 'validityPeriod') + ' ' + $p.t('global', 'bis')"
+                      :teleport="true"
+                      :enable-time-picker="false"
+                      type="datePicker"
+                      name="validityPeriodTo"  
+                      format="dd.MM.yyyy"
+                      auto-apply
+                      />
+                </div>
               </div>
-            </div>
-          </core-form>
-        </slot>
-      </template>
-    </core-filter-cmpt>
+            </core-form>
+          </slot>
+        </template>
+      </core-filter-cmpt>
+    </div>
   </div>
   `,
 };

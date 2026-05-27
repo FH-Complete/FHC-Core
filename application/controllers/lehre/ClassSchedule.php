@@ -42,6 +42,7 @@ class ClassSchedule extends Auth_Controller
 	{
 		return $this->load->view('lehre/class_schedule/index.php', [
 			'permissions' => [
+				'lehre/unterrichtszeiten_typ_r' => $this->permissionlib->isBerechtigt('lehre/unterrichtszeiten_typ', 's'),
 				'lehre/unterrichtszeiten_typ_w' => $this->permissionlib->isBerechtigt('lehre/unterrichtszeiten_typ', 'suid'),
 			],
 		]);

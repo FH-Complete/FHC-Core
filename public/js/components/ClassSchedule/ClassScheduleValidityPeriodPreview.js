@@ -84,7 +84,7 @@ export default {
       ><i class="fa fa-eye fs-5"></i></a>
     </div>
     <div class='py-3 mb-4'>
-      <div v-if="$props.classTimeSlots && $props.classTimeSlots.length > 0">
+      <div v-if="$props.classTimeSlots.length > 0 && this.classroomHours?.length > 0">
         <div class="row border-top rounded pt-1 pb-5">
           <class-schedule-calendar-selector
             :classroom-hours="this.classroomHours.map(hour => hour.beginn + '-' + hour.ende)"

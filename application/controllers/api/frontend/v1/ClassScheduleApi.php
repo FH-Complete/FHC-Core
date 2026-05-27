@@ -36,7 +36,7 @@ class ClassScheduleApi extends FHCAPI_Controller
 			'createClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
 			'updateClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
 			'deleteClassTimeSlotsForValidityPeriod' => array('lehre/unterrichtszeiten_gk:r'),
-			'getAllClassScheduleTypes' => array('lehre/unterrichtszeiten_typ:r'),
+			'getAllClassScheduleTypes' => array('lehre/unterrichtszeiten_typ:r', 'lehre/unterrichtszeiten_gk:r'),
 			'createClassTimeSlotType' => array('lehre/unterrichtszeiten_typ:rw'),
 			'updateClassTimeSlotType' => array('lehre/unterrichtszeiten_typ:rw'),
 			'deleteClassTimeSlotType' => array('lehre/unterrichtszeiten_typ:rw'),

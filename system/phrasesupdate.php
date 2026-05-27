@@ -58677,6 +58677,26 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'unterrichtszeitenGueltigkeitId',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Unterrichtszeit Gültigkeitszeitraum Id',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'validity period id',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
