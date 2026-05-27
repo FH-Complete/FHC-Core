@@ -19,7 +19,8 @@ export default {
 		originalBackgrounds: "backgrounds",
 		dropAllowed: "dropAllowed",
 		timezone: "timezone",
-		reservierbar: "isReservierbar"
+		reservierbar: "isReservierbar",
+		reservierbarMap: "reservierbarMap",
 	},
 	provide() {
 		return {
@@ -426,7 +427,8 @@ export default {
 								v-cal-click:slot="{ date, part }"
 							>
 								<div class="fhc-calendar-empty-slot-plus">
-									<i class="fa-solid fa-plus"></i>
+									<i v-if="this.reservierbarMap?.[date.toISODate()]" class="fa-solid fa-plus"></i>
+									<i v-else class="fa-solid fa-ban" style="color: red;"></i>
 								</div>
 							</div>
 
