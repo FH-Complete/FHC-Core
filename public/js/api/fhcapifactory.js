@@ -67,13 +67,9 @@ export default {
     studiengang,
     menu,
     authinfo,
-    permission
     messages,
     vorlagen,
-    addons,
-	studiengang,
-	menu,
-	authinfo,
+    permission,
 	vertraege,
 	studium,
 	language
