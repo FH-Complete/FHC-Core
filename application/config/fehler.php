@@ -380,6 +380,72 @@ $config['fehler'] = array(
 		'producerIsResolver' => false
 	),
 	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0017',
+		'fehler_kurzbz' => 'BeginndatumVorBismeldung',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Statusdatum vor Bismeldedatum eingetragen, nachdem das Bismeldedatum erreicht wurde  (prestudent_id %s, Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'BeginndatumVorBismeldung',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0018',
+		'fehler_kurzbz' => 'StudentstatusNachDiplomand',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Studentstatus nach Diplomandenstatus (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'StudentstatusNachDiplomand',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0019',
+		'fehler_kurzbz' => 'OrgformBewerberUngleichOrgformStudent',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Orgform des Bewerbers (Studienplan) stimmt nicht mit Orgform des ersten Studenten überein (prestudent_id %s, Student Studiensemester %s, Bewerber Studiensemester %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'OrgformBewerberUngleichOrgformStudent',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0020',
+		'fehler_kurzbz' => 'StartsemesterUngleichPersonenkennzeichen',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Semester des ersten Studentstatus stimmt nicht mit Personenkennzeichen überein (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'StartsemesterUngleichPersonenkennzeichen',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0021',
+		'fehler_kurzbz' => 'AbschlusspruefungOderAbsolventFehlt',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Keine Abschlussprüfung vor der Bismeldung oder kein Absolventenstatus vor der Bismeldung (prestudent_id %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'AbschlusspruefungOderAbsolventFehlt',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
+		'fehlercode' => 'CORE_STUDENTSTATUS_0022',
+		'fehler_kurzbz' => 'FalscheStatusabfolgeVorStudentstatus',
+		'fehlercode_extern' => null,
+		'fehlertext' => 'Falsche Statusabfolge vor Studentstatus (prestudent_id %s, Studiensemester%s, richtige Abfolge: %s)',
+		'fehlertyp_kurzbz' => 'error',
+		'app' => 'core',
+		'producerLibName' => 'FalscheStatusabfolgeVorStudentstatus',
+		'resolverLibName' => null,
+		'producerIsResolver' => true
+	),
+	array(
 		'fehlercode' => 'CORE_PERSON_0001',
 		'fehler_kurzbz' => 'GbDatumWeitZurueck',
 		'fehlercode_extern' => null,

@@ -42,7 +42,7 @@ class AbschlusspruefungOderAbsolventFehlt extends PlausiChecker
 					'person_id' => $prestudent->person_id,
 					'oe_kurzbz' => $prestudent->prestudent_stg_oe_kurzbz,
 					'fehlertext_params' => array('prestudent_id' => $prestudent->prestudent_id),
-					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id)
+					'resolution_params' => array('prestudent_id' => $prestudent->prestudent_id, 'studiensemester_kurzbz' => $studiensemester_kurzbz)
 				);
 			}
 		}
@@ -65,7 +65,7 @@ class AbschlusspruefungOderAbsolventFehlt extends PlausiChecker
 
 
 		$qry = "
-				SELECT  person_id, prestudent_id, studiengang_kz, prestudent_stg_oe_kurzbz FROM (
+				SELECT DISTINCT ON (prestudent_id) person_id, prestudent_id, studiengang_kz, prestudent_stg_oe_kurzbz FROM (
 					WITH meldestichtag AS (
 						SELECT
 							meldestichtag, studiensemester_kurzbz
@@ -95,7 +95,7 @@ class AbschlusspruefungOderAbsolventFehlt extends PlausiChecker
 			$qry .= "
 					)
 					SELECT
-						DISTINCT ON (prestudent_id) prestudent.person_id, prestudent.prestudent_id,
+						prestudent.person_id, prestudent.prestudent_id,
 						stg.studiengang_kz, stg.oe_kurzbz AS prestudent_stg_oe_kurzbz,
 						EXISTS (
 							SELECT 1

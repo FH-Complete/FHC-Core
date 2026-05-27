@@ -397,7 +397,7 @@ function checkStatusaenderung(
 {
 	global $db;
 
-	// load stuidenplan orgform
+	// load studienplan orgform
 	$new_studienplan_orgform_kurzbz = '';
 	$studienplan = new studienplan();
 	if ($studienplan->loadStudienplan($new_studienplan_id))
