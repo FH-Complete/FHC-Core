@@ -5,6 +5,7 @@ import ZeugnisDocuments from './Documents.js';
 import ApiStvGrades from '../../../../../../api/factory/stv/grades.js';
 
 export default {
+	name: 'ZeugnisActions',
 	components: {
 		CoreForm,
 		FormInput,
@@ -14,9 +15,16 @@ export default {
 		'setGrade',
 		'deleteGrade'
 	],
-	inject: [
-		'config'
-	],
+	inject: {
+		config: {
+			from: 'config',
+			required: true
+		},
+		currentSemester: {
+			from: 'currentSemester',
+			required: true
+		}
+	},
 	props: {
 		selected: Array
 	},
@@ -66,7 +74,8 @@ export default {
 			this.$refs.points
 				.call(ApiStvGrades.getGradeFromPoints(
 					query,
-					this.selected.find(Boolean)?.lehrveranstaltung_id
+					this.selected.find(Boolean)?.lehrveranstaltung_id,
+					this.currentSemester
 				))
 				.then(result => {
 					if (result.data === null) {

@@ -27,18 +27,59 @@ export default {
 		currentSemester: {
 			from: 'currentSemester',
 		},
+		hasAssistenzPermissionForStgs: {
+			from: 'hasAssistenzPermissionForStgs',
+			default: false
+		},
 	},
 	props: {
 		student: Object
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			formData: {
+				von: new Date(),
+				bis: new Date(),
+				mobilitaetsprogramm_code: 7,
+				nation_code: 'A',
+				herkunftsland_code: 'A',
+				bisio_id: null,
+				localPurposes: [],
+				localSupports: [],
+				lehrveranstaltung_id: null,
+				lehreinheit_id: null
+			},
+			statusNew: true,
+			programsMobility: [],
+			listLvs: [],
+			listLes: [],
+			listLvsAndLes: [],
+			listPurposes: [],
+			listSupports: [],
+			tabulatorData: [],
+			layout: 'fitDataStretchFrozen',
+			layoutColumnsOnNewData: false,
+			height: 'auto',
+			minHeight: 200,
+		}
+	},
+	watch: {
+		student(){
+			if (this.$refs.table) {
+				this.$refs.table.reloadTable();
+			}
+		},
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(
 					ApiStvMobility.getMobilitaeten(this.student.uid)
 				),
 				ajaxResponse: (url, params, response) => response.data,
+				index: 'bisio_id',
+				persistenceID: 'stv-details-table_mobility-20260217',
 				columns: [
 					{title: "Kurzbz", field: "kurzbz"},
 					{title: "Nation", field: "nation_code"},
@@ -59,8 +100,8 @@ export default {
 					},
 					{
 						title: "Bis",
-						 field: "bis",
-						 formatter: function (cell) {
+						field: "bis",
+						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							if (!dateStr) return "";
 
@@ -105,85 +146,56 @@ export default {
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData: false,
-				height: 'auto',
-				minHeight: 200,
-				selectable: true,
-				index: 'bisio_id',
-				persistenceID: 'stv-details-table_mobiliy'
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'dataLoaded',
 					handler: data => this.tabulatorData = data.map(item => {
-					//	item.actionDiv = document.createElement('div');
+						//	item.actionDiv = document.createElement('div');
 						return item;
 					}),
 				},
 				{
 					event: 'tableBuilt',
 					handler: async() => {
+
+						if (!this.$refs.table) return;
+
 						await this.$p.loadCategory(['global', 'person', 'stv', 'mobility', 'ui']);
 
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						cm.getColumnByField('kurzbz').component.updateDefinition({
-							title: this.$p.t('mobility', 'kurzbz_program')
-						});
-						cm.getColumnByField('nation_code').component.updateDefinition({
-							title: this.$p.t('mobility', 'gastnation')
-						});
-						cm.getColumnByField('von').component.updateDefinition({
-							title: this.$p.t('ui', 'von')
-						});
-						cm.getColumnByField('bis').component.updateDefinition({
-							title: this.$p.t('global', 'bis')
-						});
-						cm.getColumnByField('bisio_id').component.updateDefinition({
-							title: this.$p.t('mobility', 'bisio_id')
-						});
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-/*						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-						});*/
+						setHeader('kurzbz', this.$p.t('mobility', 'kurzbz_program'));
+						setHeader('nation_code', this.$p.t('mobility', 'gastnation'));
+						setHeader('von', this.$p.t('ui', 'von'));
+						setHeader('bis', this.$p.t('global', 'bis'));
+						setHeader('bisio_id', this.$p.t('mobility', 'bisio_id'));
 					}
 				}
-			],
-			formData: {
-				von: new Date(),
-				bis: new Date(),
-				mobilitaetsprogramm_code: 7,
-				nation_code: 'A',
-				herkunftsland_code: 'A',
-				bisio_id: null,
-				localPurposes: [],
-				localSupports: [],
-				lehrveranstaltung_id: '',
-				lehreinheit_id: ''
-			},
-			statusNew: true,
-			programsMobility: [],
-			listLvs: [],
-			listLes: [],
-			listLvsAndLes: [],
-			listPurposes: [],
-			listSupports: [],
-			tabulatorData: []
-		}
-	},
-	watch: {
-		student(){
-			if (this.$refs.table) {
-				this.$refs.table.reloadTable();
-			}
+			];
+			return events;
 		},
-	},
-	computed:{
 		lv_teile(){
 			return this.listLvsAndLes.filter(lv => lv.lehreinheit_id == this.formData.lehreinheit_id);
 		},
+		isBerechtigtForStudiengang(){
+			const currentKz = this.student.studiengang_kz.toString();
+			return this.hasAssistenzPermissionForStgs.includes(currentKz);
+		}
 	},
 	methods: {
 		actionNewMobility() {
@@ -239,7 +251,7 @@ export default {
 			this.loadItems();
 		},
 		resetLehreinheit(){
-			this.formData.lehreinheit_id = '';
+			this.formData.lehreinheit_id = null;
 		},
 		getLehreinheiten(lv_id, studiensemester_kurzbz) {
 			const data = {
@@ -264,12 +276,7 @@ export default {
 				.call(ApiStvMobility.loadMobility(bisio_id))
 				.then(result => {
 					this.formData = result.data;
-					if(this.formData.lehrveranstaltung_id === null) {
-						this.formData.lehrveranstaltung_id = '';
-					}
-					if(this.formData.lehreinheit_id === null) {
-						this.formData.lehreinheit_id = '';
-					}
+
 					if(this.formData.lehrveranstaltung_id > 0 ) {
 						this.loadItems();
 					}
@@ -291,6 +298,8 @@ export default {
 				.catch(this.$fhcAlert.handleSystemError)
 				.finally(() => {
 					this.reload();
+					this.$refs.purposes.resetLocalData();
+					this.$refs.supports.resetLocalData();
 				});
 		},
 		deleteMobility(bisio_id) {
@@ -314,8 +323,8 @@ export default {
 			this.formData.bisio_id = null;
 			this.formData.localPurposes = [];
 			this.formData.localSupports = [];
-			this.formData.lehrveranstaltung_id = '',
-			this.formData.lehreinheit_id = '',
+			this.formData.lehrveranstaltung_id = null,
+			this.formData.lehreinheit_id = null,
 			this.statusNew = true;
 			this.listLes = [];
 		},
@@ -431,6 +440,7 @@ export default {
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('stv', 'tab_mobility')"
 			@click:new="actionNewMobility"
@@ -444,14 +454,13 @@ export default {
 				<p v-else class="fw-bold mt-3">{{$p.t('mobility', 'mobility_bearbeiten')}}</p>
 			</template>
 
-
 			<form-form v-if="!this.student.length" ref="formMobility" @submit.prevent>
 
 				<div class="row my-3">
 					<legend class="col-6">BIS</legend>
 					<legend class="col-6">Outgoing</legend>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						container-class="col-6 stv-details-mobility-von"
@@ -460,6 +469,7 @@ export default {
 						v-model="formData.von"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="von"
 						:teleport="true"
@@ -474,7 +484,7 @@ export default {
 						name="lehrveranstaltung_id"
 						@change="handleLVchanged"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="lv in listLvs"
 							:key="lv.lehrveranstaltung_id"
@@ -493,6 +503,7 @@ export default {
 						v-model="formData.bis"
 						auto-apply
 						:enable-time-picker="false"
+						text-input
 						format="dd.MM.yyyy"
 						name="bis"
 						:teleport="true"
@@ -507,7 +518,7 @@ export default {
 						name="lehreinheit_id"
 						:disabled="listLes.length > 0 ? false : true"
 						>
-						<option value=""> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
+						<option value=null> -- {{ $p.t('fehlermonitoring', 'keineAuswahl') }} --</option>
 						<option
 							v-for="le in listLes"
 							:key="le.lehreinheit_id"

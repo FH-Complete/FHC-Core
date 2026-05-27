@@ -2,7 +2,8 @@
 	$includesArray = array(
 		'title' => 'FH-Complete',
 		'bootstrap5' => true,
-		'fontawesome6' => true
+		'fontawesome6' => true,
+		'customJSs' => 'public/js/helpers/ColorThemeSetting.js'
 	);
 
 	$this->load->view('templates/FHC-Header', $includesArray);

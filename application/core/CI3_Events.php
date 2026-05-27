@@ -35,7 +35,7 @@ class CI3_Events
 			});
 			self::$eventsSorted[$event] = true;
 		}
-		
+
 		foreach (self::$events[$event] as $conf) {
 			$conf[1](...$args);
 		}

@@ -16,10 +16,15 @@
  */
 
 export default {
-	getView(uid) {
+	
+	profilViewData(uid) {
+		let url = "/api/frontend/v1/Profil/profilViewData";
+		if(uid){
+			url += `/${uid}`;
+		}
 		return {
 			method: 'get',
-			url: `/api/frontend/v1/Profil/getView/${uid}`
+			url: url
 		};
 	},
 	fotoSperre(value) {
@@ -69,5 +74,5 @@ export default {
 			method: 'get',
 			url: '/api/frontend/v1/Profil/getAllNationen'
 		};
-	}
+	},
 };

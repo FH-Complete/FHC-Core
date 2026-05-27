@@ -5,6 +5,8 @@ import RoleInformation from "./ProfilComponents/RoleInformation.js";
 import ProfilEmails from "./ProfilComponents/ProfilEmails.js";
 import ProfilInformation from "./ProfilComponents/ProfilInformation.js";
 
+import { dateFilter } from '../../../tabulator/filters/Dates.js';
+
 export default {
 	components: {
 		CoreFilterCmpt,
@@ -18,13 +20,13 @@ export default {
 	data() {
 		return {
 			collapseIconFunktionen: true,
-
+			preloadedPhrasen:{},
 			funktionen_table_options: {
 				persistenceID: "filterTableMaViewProfilFunktionen",
 				persistence: {
 					columns: false
 				},
-				height: 300,
+				minHeight: 300,
 				layout: "fitColumns",
 				responsiveLayout: "collapse",
 				responsiveLayoutCollapseUseFormatters: false,
@@ -60,18 +62,24 @@ export default {
 					{
 						title: Vue.computed(() => this.$p.t('global/gueltigVon')),
 						field: "Gültig_von",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.$p.t('global/gueltigBis')),
 						field: "Gültig_bis",
-						headerFilter: true,
+						headerFilterFunc: 'dates',
+						headerFilter: dateFilter,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						formatter:"datetime",
+						formatterParams: this.datetimeFormatterParams()
 					},
 					{
 						title: Vue.computed(() => this.$p.t('profil/wochenstunden')),
@@ -91,6 +99,15 @@ export default {
 		funktionenTableBuilt: function () {
 			this.$refs.funktionenTable.tabulator.setData(this.data.funktionen);
 		},
+		datetimeFormatterParams: function() {
+			const params = {
+				inputFormat:"yyyy-MM-dd",
+				outputFormat:"dd.MM.yyyy",
+				invalidPlaceholder:"(invalid date)",
+				timezone:FHC_JS_DATA_STORAGE_OBJECT.timezone
+			};
+			return params;
+		}
 	},
 	watch: {
 		'data.funktionen'(newVal) {
@@ -110,8 +127,8 @@ export default {
 				return this.data.telefonklappe
 			}
 		},
-		editable() {
-			return this.data?.editAllowed ?? false;
+		fotoStatus() {
+			return this.data?.fotoStatus ?? null;
 		},
 
 		personEmails() {
@@ -163,6 +180,16 @@ export default {
 			};
 		},
 	},
+	created(){
+		this.$p.loadCategory(["ui", "lehre", "global", "profil"]).then(() => {
+			this.preloadedPhrasen.bezeichnungPhrase = this.$p.t('ui/bezeichnung');
+			this.preloadedPhrasen.organisationseinheitPhrase = this.$p.t('lehre/organisationseinheit');
+			this.preloadedPhrasen.gueltigVonPhrase = this.$p.t('global/gueltigVon');
+			this.preloadedPhrasen.gueltigBisPhrase = this.$p.t('global/gueltigBis');
+			this.preloadedPhrasen.wochenstundenPhrase = this.$p.t('profil/wochenstunden');
+			this.preloadedPhrasen.loaded = true;
+		});
+	},
 
 	template: /*html*/ `
 
@@ -172,9 +199,9 @@ export default {
         <!-- HIDDEN QUICK LINKS -->
         <!-- TODO: uncomment when implemented
             <div  class="d-md-none col-12 ">
-            
+
             <quick-links :title="$p.t('profil','quickLinks')" :mobile="true" ></quick-links>
-            
+
             </div>
             -->
         <!-- END OF HIDDEN QUCK LINKS -->
@@ -189,7 +216,7 @@ export default {
                     <div class="row mb-4">
                         <div class="col">
                             <!-- Profil Informationen -->
-                            <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :editable="editable"></profil-information>
+                            <profil-information :title="$p.t('profil','mitarbeiterIn')" :data="profilInformation" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
@@ -220,7 +247,7 @@ export default {
             <div class="row">
                 <!-- FIRST TABLE -->
                 <div class="col-12 mb-4" >
-                    <core-filter-cmpt @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
+                    <core-filter-cmpt v-if="preloadedPhrasen.loaded" @tableBuilt="funktionenTableBuilt" :title="$p.t('person','funktionen')"  ref="funktionenTable" :tabulator-options="funktionen_table_options"  tableOnly :sideMenu="false" />
                 </div>
                 <!-- END OF THE ROW WITH THE TABLES UNDER THE PROFIL INFORMATION -->
             </div>

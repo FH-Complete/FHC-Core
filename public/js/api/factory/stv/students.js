@@ -16,22 +16,42 @@
  */
 
 export default {
-	uid(uid) {
+	uid(uid, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/uid/'
+			+ encodeURIComponent(uid);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/uid/' + uid
+			url: url
 		};
 	},
-	prestudent(prestudent_id) {
+	prestudent(prestudent_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/prestudent/'
+			+ encodeURIComponent(prestudent_id);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/prestudent/' + prestudent_id
+			url: url
 		};
 	},
-	person(person_id) {
+	person(person_id, studiensemester_kurzbz) {
+		let url = 'api/frontend/v1/stv/students/'
+			+ encodeURIComponent(studiensemester_kurzbz)
+			+ '/person/'
+			+ encodeURIComponent(person_id);
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/stv/students/person/' + person_id
+			url: url
+		};
+	},
+	search(params, studiensemester_kurzbz) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/students/search/'
+				+ encodeURIComponent(studiensemester_kurzbz),
+			params
 		};
 	},
 	verband(relative_path) {
@@ -40,10 +60,17 @@ export default {
 			url: 'api/frontend/v1/stv/students/' + relative_path
 		};
 	},
-	check(params) {
+	getPerson(params) {
 		return {
 			method: 'post',
-			url: 'api/frontend/v1/stv/student/check',
+			url: 'api/frontend/v1/stv/student/getPerson',
+			params
+		};
+	},
+	add(params) {
+		return {
+			method: 'post',
+			url: 'api/frontend/v1/stv/student/add',
 			params
 		};
 	}

@@ -48,7 +48,8 @@ export const CoreFilterCmpt = {
 		'nwNewEntry',
 		'click:new',
 		'tableBuilt',
-		'uuidDefined'
+		'uuidDefined',
+		'headerFilterOn'
 	],
 	props: {
 		onNwNewEntry: Function, // NOTE(chris): Hack to get the nwNewEntry listener into $props
@@ -66,6 +67,7 @@ export const CoreFilterCmpt = {
 		tableOnly: Boolean,
 		noColumnFilter:Boolean,
 		reload: Boolean,
+		reloadBtnInfotext: String,
 		download: {
 			type: [Boolean, String, Function, Array, Object],
 			default: false
@@ -78,7 +80,11 @@ export const CoreFilterCmpt = {
 
 		idField: String,
 		parentIdField: String,
-		countOnly: Boolean
+		countOnly: Boolean,
+		useSelectionSpan: {
+			type: Boolean,
+			default: true
+		}
 	},
 	data: function() {
 		return {
@@ -90,7 +96,6 @@ export const CoreFilterCmpt = {
 			dataset: null,
 			datasetMetadata: null,
 			selectedFields: null,
-			notSelectedFields: null,
 			filterFields: null,
 
 			availableFilters: null,
@@ -101,6 +106,8 @@ export const CoreFilterCmpt = {
 			fetchCmptApiFunction: null,
 			fetchCmptApiFunctionParams: null,
 			fetchCmptDataFetched: null,
+
+			fetchResult: null,
 
 			tabulator: null,
 			tableBuilt: false,
@@ -117,6 +124,11 @@ export const CoreFilterCmpt = {
 		};
 	},
 	computed: {
+		notSelectedFields() {
+			if (!this.fields || !this.selectedFields)
+				return null;
+			return this.fields.filter(x => this.selectedFields.indexOf(x) === -1)
+		},
 		filteredData() {
 			if (!this.dataset)
 				return [];
@@ -214,6 +226,32 @@ export const CoreFilterCmpt = {
 				await this.$p.loadCategory('ui');
 				placeholder = this.$p.t('ui/keineDatenVorhanden');
 			}
+
+			if (!this.tableOnly) {
+				// prefetch data to get fields & selectedFields for filteredColumns & filteredData
+				await new Promise(resolve => {
+					const filterId = window.location.hash ? window.location.hash.slice(1) : null;
+
+					const resolvePromiseFunc = data => {
+						this.setRenderData(data);
+						resolve();
+					};
+					// get the filter data
+					if (filterId === null)
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilter(wsParams)),
+							null,
+							resolvePromiseFunc
+						);
+					else
+						this.startFetchCmpt(
+							wsParams => this.$api.call(ApiFilter.getFilterById(wsParams)),
+							{ filterId },
+							resolvePromiseFunc
+						);
+				});
+			}
+
 			// Define a default tabulator options in case it was not provided
 			let tabulatorOptions = {...{
 					layout: "fitDataStretchFrozen",
@@ -235,9 +273,14 @@ export const CoreFilterCmpt = {
 			if (!this.tableOnly) {
 				tabulatorOptions.data = this.filteredData;
 				tabulatorOptions.columns = this.filteredColumns;
+			} else {
+				tabulatorOptions.columns.forEach(col => {
+					if (col.visible === undefined)
+						col.visible = true;
+				});
 			}
 
-			if (tabulatorOptions.selectable || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
+			if (tabulatorOptions.selectable || tabulatorOptions.selectableRows || (tabulatorOptions.columns && tabulatorOptions.columns.filter(el => el.formatter == 'rowSelection').length))
 				this.tabulatorHasSelector = true;
 
 			if (this.idField) {
@@ -303,6 +346,7 @@ export const CoreFilterCmpt = {
 
 			this.tabulator.on("dataFiltered", filters => {
 				this.filterActive = filters.length > 0;
+				this.$emit("headerFilterOn", this.filterActive);
 			});
 		},
 		updateTabulator() {
@@ -314,7 +358,7 @@ export const CoreFilterCmpt = {
 			}
 		},
 		_updateTabulator() {
-			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
+			this.tabulatorHasSelector = this.tabulatorOptions.selectable || this.tabulatorOptions.selectableRows || this.filteredColumns.filter(el => el.formatter == 'rowSelection').length;
 			this.tabulator.setColumns(this.filteredColumns);
 			this.tabulator.setData(this.filteredData);
 			this._setHeaderFilter()
@@ -335,9 +379,6 @@ export const CoreFilterCmpt = {
 				this.tabulator.setHeaderFilterValue(filter.field, filter.value);
 			});
 		},
-		/**
-		 *
-		 */
 		getFilter() {
 			if (this.selectedFilter === null)
 				this.startFetchCmpt(
@@ -354,18 +395,14 @@ export const CoreFilterCmpt = {
 					this.render
 				);
 		},
-		/**
-		 *
-		 */
-		render(response) {
-			let data = response;
+		setRenderData(data) {
+			this.fetchResult = data;
 			this.filterName = data.filterName;
 			this.dataset = data.dataset;
 			this.datasetMetadata = data.datasetMetadata;
 
 			this.fields = data.fields;
 			this.selectedFields = data.selectedFields;
-			this.notSelectedFields = this.fields.filter(x => this.selectedFields.indexOf(x) === -1);
 			this.filterFields = [];
 
 			for (let i = 0; i < data.datasetMetadata.length; i++)
@@ -382,6 +419,14 @@ export const CoreFilterCmpt = {
 					}
 				}
 			}
+		},
+		/**
+		 *
+		 */
+		render(response) {
+			let data = response;
+
+			this.setRenderData(data);
 
 			// If the side menu is active
 			if (this.sideMenu === true)
@@ -622,11 +667,10 @@ export const CoreFilterCmpt = {
 		this.$emit('uuidDefined', this.uuid)
 	},
 	mounted() {
-
 		this.initTabulator().then(() => {
 			if (!this.tableOnly) {
 				this.selectedFilter = window.location.hash ? window.location.hash.slice(1) : null;
-				this.getFilter(); // get the filter data
+				this.render(this.fetchResult);
 			}
 		});
 
@@ -648,7 +692,6 @@ export const CoreFilterCmpt = {
 				</h3>
 			</div>
 		</div>
-
 		<div :id="'filterCollapsables' + idExtra">
 
 			<div class="d-flex flex-row justify-content-between flex-wrap">
@@ -658,28 +701,28 @@ export const CoreFilterCmpt = {
 						{{ newBtnLabel }}
 					</button>
 					<button v-if="reload" class="btn btn-outline-secondary" aria-label="Reload" @click="reloadTable">
-						<span class="fa-solid fa-rotate-right" aria-hidden="true"></span>
+						<span class="fa-solid fa-rotate-right" aria-hidden="true"  :title="reloadBtnInfotext ? reloadBtnInfotext : 'Reload'" ></span>
 					</button>
-					<span v-if="$slots.actions && tabulatorHasSelector">
+					<span v-if="$slots.actions && tabulatorHasSelector && useSelectionSpan">
 						<span v-if="countOnly">{{ selectedData.length }} ausgewählt</span>
-						<span v-else> Mit {{ selectedData.length }} ausgewählten:</span>
+						<span v-else id="selected-info-text"> Mit {{ selectedData.length }} ausgewählten:</span>
 					</span>
 					<slot name="actions" v-bind="{selected: tabulatorHasSelector ? selectedData : []}"></slot>
 					<slot name="search"></slot>
 				</div>
 				<div class="d-flex gap-1 align-items-baseline flex-grow-1 justify-content-end">
 					<span v-if="!tableOnly">[ {{ filterName }} ]</span>
-					<span v-else-if="description">{{ description }}</span>
-					<a v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
+					<span v-else-if="description" v-html="description"></span>
+					<a aria-label="filter" v-if="!tableOnly || $slots.filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseFilters' + idExtra">
 						<span class="fa-solid fa-xl fa-filter"></span>
 					</a>
-					<a v-if="filterActive"  class="btn btn-link px-0 text-dark" :title="$p.t('ui','filterdelete')" @click="clearFilters">
+					<a aria-label="filter" v-if="filterActive"  class="btn btn-link px-0 fhc-text" :title="$p.t('ui','filterdelete')" @click="clearFilters">
 						<span class="fa-solid fa-xl fa-filter-circle-xmark"></span>
 					</a>
-					<a href="#" class="btn btn-link px-0 text-dark" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
+					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
-					<table-download class="btn btn-link px-0 text-dark" :tabulator="tabulator" :config="download"></table-download>
+					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
 				</div>
 			</div>
 

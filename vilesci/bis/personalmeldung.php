@@ -742,7 +742,7 @@ function _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 			$has_oe_lehrgang = !($studiengang->studiengang_kz > 0 && $studiengang->studiengang_kz < 10000);
 
 			// STG, die nicht BIS-bemeldet werden, ueberspringen
-			if (in_array($studiengang->studiengang_kz, BIS_EXCLUDE_STG))
+			if (in_array($studiengang->studiengang_kz, BIS_EXCLUDE_STG) || !$studiengang->melderelevant)
 			{
 				continue;
 			}
@@ -825,6 +825,7 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag)
 		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj) {
 			return
 				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+				$obj->melderelevant &&
 				$obj->studiengang_kz > 0 &&
 				$obj->studiengang_kz < 10000;
 		});
@@ -875,7 +876,6 @@ function _getLehrecontainer($sws_proStg_arr)
 		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj) {
 			return
 				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
-				$obj->studiengang_kz > 0 &&
 				$obj->studiengang_kz < 10000;
 		});
 	}
@@ -886,13 +886,17 @@ function _getLehrecontainer($sws_proStg_arr)
 		{
 			$is_sommersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'SS';
 			$is_wintersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'WS';
+			$is_lehrgang = isset($sws_proStg->lgartcode);
+			$kennzeichen_name = $is_lehrgang ? 'LehrgangNr' : 'StgKz';
 
 			// Lehreobjekt generieren
-			if (empty($lehre_arr) || !lehre_stg_exists($sws_proStg->studiengang_kz, $lehre_arr))
+			if (empty($lehre_arr) || !lehre_stg_exists($sws_proStg->melde_studiengang_kz, $lehre_arr))
 			{
 				$lehre_obj = new StdClass();
 
-				$lehre_obj->StgKz = setLeadingZero(intval($sws_proStg->studiengang_kz), 4);
+				$lehre_obj->{$kennzeichen_name} = $sws_proStg->melde_studiengang_kz;
+				//~ $lehre_obj->StgKz = setLeadingZero(intval($sws_proStg->studiengang_kz), 4);
+
 				$lehre_obj->SommersemesterSWS = $is_sommersemester ? $sws_proStg->sws : 0.00;
 				$lehre_obj->WintersemesterSWS = $is_wintersemester ? $sws_proStg->sws : 0.00;
 
@@ -901,8 +905,8 @@ function _getLehrecontainer($sws_proStg_arr)
 			}
 			else	// Lehrecontainer mit STG schon vorhanden
 			{
-				$lehre_obj_arr = array_filter($lehre_arr, function (&$obj) use ($sws_proStg) {
-					return $obj->StgKz == $sws_proStg->studiengang_kz;
+				$lehre_obj_arr = array_filter($lehre_arr, function (&$obj) use ($sws_proStg, $kennzeichen_name) {
+					return isset($obj->{$kennzeichen_name}) && $obj->{$kennzeichen_name} == $sws_proStg->melde_studiengang_kz;
 				});
 
 				// SWS ergaenzen
@@ -1020,9 +1024,14 @@ function _generateXML($person_arr)
 		foreach ($person->lehre_arr as $lehre)
 		{
 			$xml .= '<Lehre>';
-			$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
-			$xml .= '<SommersemesterSWS><![CDATA['. $lehre->SommersemesterSWS. ']]></SommersemesterSWS>';
-			$xml .= '<WintersemesterSWS><![CDATA['. $lehre->WintersemesterSWS. ']]></WintersemesterSWS>';
+
+			if (isset($lehre->LehrgangNr))
+				$xml .= '<LehrgangNr><![CDATA['. $lehre->LehrgangNr. ']]></LehrgangNr>';
+			else
+				$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
+
+			$xml .= '<SommersemesterSWS><![CDATA['. number_format($lehre->SommersemesterSWS, 2, '.', ''). ']]></SommersemesterSWS>';
+			$xml .= '<WintersemesterSWS><![CDATA['. number_format($lehre->WintersemesterSWS, 2, '.', ''). ']]></WintersemesterSWS>';
 			$xml .= '</Lehre>';
 		}
 
@@ -1211,7 +1220,7 @@ function _outputHTML($person_arr)
 			{
 				echo '
 				<tr>
-					<td>'. $lehre->StgKz. '</td>
+					<td>'. (isset($lehre->LehrgangNr) ? $lehre->LehrgangNr : $lehre->StgKz). '</td>
 					<td>'. $lehre->SommersemesterSWS. '</td>
 					<td>'. $lehre->WintersemesterSWS. '</td>
 				</tr>';
@@ -1351,15 +1360,16 @@ function verwendung_exists($bisverwendung, $verwendung_arr)
 
 /**
  * Prueft ob ein Studiengang bereits im Lehre Container vorhanden ist
- * @param $studiengang_kz Studiengangskennzahl
+ * @param $melde_studiengang_kz Studiengangskennzahl
  * @param $lehre_arr Array mit Lehre Objekten
  * @return true wenn der Studiengang bereits existiert
  */
-function lehre_stg_exists($studiengang_kz, $lehre_arr)
+function lehre_stg_exists($melde_studiengang_kz, $lehre_arr)
 {
 	foreach($lehre_arr as $row)
 	{
-		if($row->StgKz == $studiengang_kz)
+		$kennzeichenName = isset($row->LehrgangNr) ? 'LehrgangNr' : 'StgKz';
+		if(isset($row->{$kennzeichenName}) && $row->{$kennzeichenName} == $melde_studiengang_kz)
 			return true;
 	}
 	return false;

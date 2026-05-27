@@ -6,7 +6,6 @@ import FormForm from '../../../../Form/Form.js';
 import FormInput from '../../../../Form/Input.js';
 
 import ApiStvAddress from '../../../../../api/factory/stv/kontakt/address.js';
-import ApiStvCompany from '../../../../../api/factory/stv/kontakt/company.js';
 
 export default{
 	name: 'AddressComponent',
@@ -23,11 +22,39 @@ export default{
 	},
 	data() {
 		return {
-			tabulatorOptions: {
+			addressData: {
+				zustelladresse: true,
+				heimatadresse: true,
+				rechnungsadresse: false,
+				typ: 'h',
+				nation: 'A',
+				address: {plz: null},
+				plz: null,
+			},
+			statusNew: true,
+			places: [],
+			suggestions: {},
+			nations: [],
+			adressentypen: [],
+			firmen: [],
+			listFirmen: [],
+			filteredFirmen: [],
+			selectedFirma: null,
+			abortController: {
+				suggestions: null,
+				places: null
+			},
+		}
+	},
+	computed:{
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: () => this.$api.call(ApiStvAddress.get(this.uid)),
 				ajaxResponse: (url, params, response) => response.data,
 				//autoColumns: true,
+				index: 'adresse_id',
+				persistenceID: 'stv-details-kontakt-address-20260217',
 				columns:[
 					{title:"Typ", field:"bezeichnung"},
 					{title:"Strasse", field:"strasse"},
@@ -122,101 +149,52 @@ export default{
 						frozen: true
 					},
 				],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
-				height:	'auto',
-				selectable:	true,
-				index: 'adresse_id',
-				persistenceID: 'stv-details-kontakt-address'
-			},
-			tabulatorEvents: [
+				height:	'auto'
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
-					handler: async () => {
+					handler: async() => {
 						await this.$p.loadCategory(['notiz', 'global', 'person', 'ui']);
-						let cm = this.$refs.table.tabulator.columnManager;
 
-						cm.getColumnByField('bezeichnung').component.updateDefinition({
-							title: this.$p.t('global', 'typ')
-						});
-						cm.getColumnByField('strasse').component.updateDefinition({
-							title: this.$p.t('person', 'strasse')
-						});
-						cm.getColumnByField('plz').component.updateDefinition({
-							title: this.$p.t('person', 'plz')
-						});
-						cm.getColumnByField('ort').component.updateDefinition({
-							title: this.$p.t('person', 'ort')
-						});
-						cm.getColumnByField('gemeinde').component.updateDefinition({
-							title: this.$p.t('person', 'gemeinde')
-						});
-						cm.getColumnByField('nation').component.updateDefinition({
-							title: this.$p.t('person', 'nation')
-						});
-						cm.getColumnByField('heimatadresse').component.updateDefinition({
-							title: this.$p.t('person', 'heimatadresse')
-						});
-						cm.getColumnByField('zustelladresse').component.updateDefinition({
-							title: this.$p.t('person', 'zustelladresse')
-						});
-						cm.getColumnByField('co_name').component.updateDefinition({
-							title: this.$p.t('person', 'co_name')
-						});
-						cm.getColumnByField('name').component.updateDefinition({
-							title: this.$p.t('person', 'firma_zusatz')
-						});
-						cm.getColumnByField('firmenname').component.updateDefinition({
-							title: this.$p.t('person', 'firma')
-						});
-						cm.getColumnByField('lastupdate').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('rechnungsadresse').component.updateDefinition({
-							title: this.$p.t('person', 'rechnungsadresse')
-						});
-						cm.getColumnByField('anmerkung').component.updateDefinition({
-							title: this.$p.t('global', 'anmerkung')
-						});
-						cm.getColumnByField('firma_id').component.updateDefinition({
-							title: this.$p.t('ui', 'firma_id')
-						});
-						cm.getColumnByField('adresse_id').component.updateDefinition({
-							title: this.$p.t('ui', 'adresse_id')
-						});
-						cm.getColumnByField('person_id').component.updateDefinition({
-							title: this.$p.t('person', 'person_id')
-						});
-/*						cm.getColumnByField('actions').component.updateDefinition({
-							title: this.$p.t('global', 'aktionen')
-						});*/
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
+
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
+
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
+
+						setHeader('bezeichnung', this.$p.t('global', 'typ'));
+						setHeader('strasse', this.$p.t('person', 'strasse'));
+						setHeader('plz', this.$p.t('person', 'plz'));
+						setHeader('ort', this.$p.t('person', 'ort'));
+						setHeader('gemeinde', this.$p.t('person', 'gemeinde'));
+						setHeader('nation', this.$p.t('person', 'nation'));
+						setHeader('heimatadresse', this.$p.t('person', 'heimatadresse'));
+						setHeader('zustelladresse', this.$p.t('person', 'zustelladresse'));
+						setHeader('co_name', this.$p.t('person', 'co_name'));
+						setHeader('name', this.$p.t('person', 'firma_zusatz'));
+						setHeader('firmenname', this.$p.t('person', 'firma'));
+						setHeader('lastupdate', this.$p.t('notiz', 'letzte_aenderung'));
+						setHeader('rechnungsadresse', this.$p.t('person', 'rechnungsadresse'));
+						setHeader('anmerkung', this.$p.t('global', 'anmerkung'));
+						setHeader('firma_id', this.$p.t('ui', 'firma_id'));
+						setHeader('adresse_id', this.$p.t('ui', 'adresse_id'));
+						setHeader('person_id', this.$p.t('person', 'person_id'));
 					}
 				}
-			],
-			addressData: {
-				zustelladresse: true,
-				heimatadresse: true,
-				rechnungsadresse: false,
-				typ: 'h',
-				nation: 'A',
-				address: {plz: null},
-				plz: null
-			},
-			statusNew: true,
-			places: [],
-			suggestions: {},
-			nations: [],
-			adressentypen: [],
-			firmen: [],
-			filteredFirmen: [],
-			abortController: {
-				suggestions: null,
-				places: null,
-				firmen: null
-			},
-		}
-	},
-	computed:{
+			];
+			return events;
+		},
 		orte() {
 			return this.places.filter(ort => ort.name == this.addressData.gemeinde);
 		},
@@ -231,6 +209,9 @@ export default{
 		uid() {
 			this.reload();
 		},
+		selectedFirma(newVal) {
+			this.addressData.firma_id = newVal?.firma_id || null;
+		}
 	},
 	methods:{
 		actionNewAdress() {
@@ -242,8 +223,12 @@ export default{
 			this.loadAdress(adresse_id).then(() => {
 				if(this.addressData.adresse_id)
 				{
+					this.selectedFirma = this.listFirmen.find(
+						item => item.firma_id === this.addressData.firma_id
+					);
+
 					this.addressData.address.plz = this.addressData.plz;
-				//	delete this.addressData.plz;
+					//	delete this.addressData.plz;
 					this.loadPlaces(this.addressData.address.plz);
 					this.$refs.adressModal.show();
 
@@ -324,18 +309,13 @@ export default{
 					this.places = result.data;
 				});
 		},
-		search(event) {
-			if (this.abortController.firmen) {
-				this.abortController.firmen.abort();
-			}
+		filterFirmen(event) {
+			const query = event?.query?.toLowerCase()?.trim() || "";
 
-			this.abortController.firmen = new AbortController();
-
-			return this.$api
-				.call(ApiStvCompany.get(event.query))
-				.then(result => {
-					this.filteredFirmen = result.data.retval;
-				});
+			this.filteredFirmen = this.listFirmen.filter(item => {
+				const label = (item.label || "").toLowerCase();
+				return label.includes(query);
+			});
 		},
 		hideModal(modalRef) {
 			this.$refs[modalRef].hide();
@@ -354,6 +334,7 @@ export default{
 			this.addressData.typ = 'h';
 			this.addressData.nation = 'A';
 			this.addressData.address = {plz: null};
+			this.selectedFirma = null;
 
 			this.statusNew = true;
 		},
@@ -372,10 +353,17 @@ export default{
 				this.adressentypen = result.data;
 			})
 			.catch(this.$fhcAlert.handleSystemError);
+
+		this.$api
+			.call(ApiStvAddress.getAllFirmen())
+			.then(result => {
+				this.listFirmen = result.data;
+			})
+			.catch(this.$fhcAlert.handleSystemError);
 	},
 	template: `
 	<div class="stv-details-kontakt-address h-100 pt-3">
-		
+
 		<!--Modal: AddressModal-->
 		<bs-modal ref="adressModal" dialog-class="modal-dialog-scrollable">
 			<template #title>
@@ -400,7 +388,7 @@ export default{
 						</option>
 						</form-input>
 					</div>
-					
+
 					<div class="row mb-3">
 						<form-input
 							type="text"
@@ -410,7 +398,7 @@ export default{
 						>
 						</form-input>					
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="select"
@@ -428,7 +416,7 @@ export default{
 						</option>
 						</form-input>
 				</div>
-													
+							
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -440,7 +428,7 @@ export default{
 					>
 					</form-input>					
 				</div>
-											
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'"
@@ -457,17 +445,17 @@ export default{
 							>
 							{{gemeinde.name}}
 						</option>
-						</form-input>
-						<form-input
+					</form-input>
+					<form-input
 							v-else
 							type="text"
 							:label="$p.t('person/gemeinde')"
 							name="addressData.gemeinde"
 							v-model="addressData.gemeinde"
 						>	
-						</form-input>
-					</div>
-				
+					</form-input>
+				</div>
+
 				<div class="row mb-3">
 					<form-input
 						v-if="addressData.nation == 'A'" 
@@ -494,7 +482,7 @@ export default{
 						>	
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -507,7 +495,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -520,7 +508,7 @@ export default{
 						</form-input>
 					</div>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
@@ -530,7 +518,7 @@ export default{
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<div class="col-sm-4">
 						<form-input
@@ -543,58 +531,38 @@ export default{
 						</form-input>
 					</div>
 				</div>
-					
-				<div v-if="statusNew" class="row mb-3">
+
+				<div class="row mb-3">
 					<form-input
 						type="autocomplete"
 						:label="$p.t('person/firma')"
 						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
+						v-model="selectedFirma"
+						optionLabel="label"
+						optionValue="firma_id"
+						dropdown
+						forceSelection
 						:suggestions="filteredFirmen" 
-						@complete="search" 
-						:min-length="3"
-					>
-					</form-input>
-				</div>				
-					
-				<div v-else class="row mb-3">
-					<form-input
-						v-if="addressData.firmenname" 
-						type="text"
-						name="name"
-						:label="$p.t('person/firma')"
-						v-model="addressData.firmenname"
-					>
-					</form-input>
-					<form-input
-						v-else 
-						type="autocomplete"
-						:label="$p.t('person/firma')"
-						name="firma_name"
-						v-model="addressData.firma"  
-						optionLabel="name" 
-						:suggestions="filteredFirmen" 
-						@complete="search" 
+						@complete="filterFirmen"
 						:min-length="3"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<input type="hidden" class="form-control" id="firma_id" v-model="addressData.firma_id">
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 						type="text"
 						name="firma_zusatz"
-						:label="$p.t('person/firma_zusatz')"
+						:label="$p.t('global/name')"
 						v-model="addressData.name"
 					>
 					</form-input>
 				</div>
-				
+
 				<div class="row mb-3">
 					<form-input
 							type="text"
@@ -604,16 +572,16 @@ export default{
 						>
 					</form-input>
 				</div>
-			
+
 			</form-form>
-			
+
 			<template #footer>
 				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="reload()">{{$p.t('ui', 'abbrechen')}}</button>
 				<button v-if="statusNew" type="button" class="btn btn-primary" @click="addNewAddress()">OK</button>
 				<button v-else type="button" class="btn btn-primary" @click="updateAddress(addressData.adresse_id)">OK</button>
             </template>
 		</bs-modal>
-			
+
 		<core-filter-cmpt
 			ref="table"
 			:tabulator-options="tabulatorOptions"
@@ -621,6 +589,7 @@ export default{
 			table-only
 			:side-menu="false"
 			reload
+			:reload-btn-infotext="this.$p.t('table', 'reload')"
 			new-btn-show
 			:new-btn-label="this.$p.t('person', 'adresse')"
 			@click:new="actionNewAdress"
@@ -628,4 +597,6 @@ export default{
 		</core-filter-cmpt>
 	</div>`
 };
+
+
 

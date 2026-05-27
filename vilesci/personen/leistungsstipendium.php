@@ -71,7 +71,7 @@ $fileTmpName = null;
 $fileMimeType = null;
 
 // Constants
-$L_CSV_N_COLS = 10; // Number of columns of the CSV file
+$L_CSV_N_COLS = 9; // Number of columns of the CSV file
 $L_ERROR = "Error";
 $L_WARNING = "Warning";
 $L_INFO = "Info";
@@ -477,8 +477,8 @@ if (!$errorOccurred && $dataPosted)
 						Feldtrenner: ;<br>
 						Texttrenner: "<br>
 						Felder:<br>
-						<pre>Nachname;Vorname;UID/PersKZ;Studiengang;Betrag;Überweisungsdatum
-Dylan;Bob;1234567;MEE;750;03.10.2016</pre>
+						<pre>Nachname;Vorname;Gebdatum;UID/PersKZ;Studiengang;Betrag;IBAN;BIC;Bankname
+Dylan;Bob;12.12.2000;1234567;MEE;750;ATXXXX;BBAWAATWW;BAWAG PSK</pre>
 					</td>
 				</tr>
 				<tr>

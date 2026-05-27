@@ -19,12 +19,15 @@ export default {
 	props: {
 		lehrveranstaltung_id: Number,
 		bezeichnung: String,
+		bezeichnung_eng: String,
 		module: String,
 		farbe: String,
 		lvinfo: Boolean,
 		benotung: Boolean,
 		lvnote: String,
+		lvnotebez: Array,
 		znote: String,
+		znotebez: Array,
 		studiengang_kuerzel: String,
 		semester: [String, Number],
 		orgform_kurzbz: String,
@@ -32,7 +35,7 @@ export default {
 		ects: String,
 		incoming: Number,
 		positiv: Boolean,
-		note_index: String,
+		note_index: String
 	},
 	data: () => {
 		return {
@@ -49,11 +52,11 @@ export default {
 			// returns a suitable color for the given grade
 			if (this.positiv)
 			{
-				return 'var(--fhc-cis-grade-positive)';
+				return 'var(--fhc-success)';
 			}
 			else
 			{
-				return 'var(--fhc-cis-grade-negative)';
+				return 'var(--fhc-danger)';
 			}
 		},
 		is_organisatorische_einheit(){
@@ -63,14 +66,18 @@ export default {
 			return !this.menu || !Array.isArray(this.menu) || Array.isArray(this.menu) && this.menu.length == 0;
 		},
 		bodyStyle() {return {};
-			const bodyStyle = {};
+			/*const bodyStyle = {};
 			if (this.farbe)
 				bodyStyle['background-color'] = '#' + this.farbe;
-			return bodyStyle;
+			return bodyStyle;*/
 		},
 		grade() {
-			// TODO: noten phrasen
-			return this.benotung ? this.znote || this.lvnote || null : null;
+			const languageIndex = this.$p.user_language.value === 'English' ? 1 : 0
+			if(this.benotung && this.znotebez?.length) {
+				return this.znotebez[languageIndex]
+			} else if(this.benotung && this.lvnotebez?.length) {
+				return this.lvnotebez[languageIndex]
+			} else return null
 		},
 		LvHasPruefungenInformation(){
 			return this.pruefungenData && this.pruefungenData.length > 0;
@@ -127,6 +134,7 @@ export default {
 				LvInfo.popup({
 					lehrveranstaltung_id: this.lehrveranstaltung_id, 
 					bezeichnung: this.bezeichnung,
+					bezeichnung_eng: this.bezeichnung_eng,
 					studiengang_kuerzel: this.studiengang_kuerzel,
 					semester: this.semester,
 					studien_semester: this.studien_semester,
@@ -165,7 +173,7 @@ export default {
 		<div class="p-2" :class="is_organisatorische_einheit?'':'card-header'">
 			<!-- {{module}} if the module of the lv is important then query the module from the api endpoint for LV-->
 			<h6 class="fw-bold" v-if="is_organisatorische_einheit" >{{ $p.t('lehre/organisationseinheit') }}:</h6>
-			<h6 class="mb-0">{{bezeichnung}}</h6>
+			<h6 class="mb-0">{{$p.user_language.value === 'English' ? bezeichnung_eng : bezeichnung}}</h6>
 		</div>
 		<div v-if="!emptyMenu" class="card-body " :style="bodyStyle">
 			<template v-if="menu">
@@ -176,9 +184,9 @@ export default {
 								<i :class="[menuItem.c4_icon2 ? menuItem.c4_icon2 : 'fa-solid fa-pen-to-square', !menuItem.c4_link ? 'unavailable' : null ]"></i>
 							</div>
 							<a
-							class="text-decoration-none text-truncate"
+							class="fhc-body text-decoration-none text-truncate"
 							:id="'moodle_links_'+lehrveranstaltung_id"
-							:class="{'link-dark':menuItem.c4_link, 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
+							:class="{ 'unavailable':!menuItem.c4_link, 'dropdown-toggle':menuItem.c4_moodle_links?.length }"
 							:target="menuItem.c4_target"
 							:href="c4_link(menuItem) ? c4_link(menuItem) : null">
 								{{ menuItem.phrase ? $p.t(menuItem.phrase) : menuItem.name}}

@@ -1,4 +1,5 @@
 import ApiProfil from '../../../../api/factory/profil.js';
+import ImageUpload from '../../Profil/ProfilModal/EditProfilComponents/ImageUpload.js';
 
 export default {
 	props: {
@@ -8,10 +9,13 @@ export default {
 		data: {
 			type: Object,
 		},
-		editable: {
+		fotoStatus:{
 			type: Boolean,
-			default: false
+			default: true
 		}
+	},
+	components:{
+		ImageUpload,
 	},
 	data() {
 		return {
@@ -19,8 +23,12 @@ export default {
 		};
 	},
 	emits: ["showEditProfilModal"],
+	inject:["isEditable"],
 
 	methods: {
+		showModal(){
+			this.$refs.imageUpload.show();
+		},
 		sperre_foto_function() {
 			//TODO: refactor
 			if (!this.data) {
@@ -62,9 +70,10 @@ export default {
 	template: /*html*/ `
 
 <div class="card h-100">
+	<image-upload ref="imageUpload" :titel="$p.t('profilUpdate','profilBild')"></image-upload>
     <div class="card-header">
         <div class="row">
-            <div v-if="editable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button">
+            <div v-if="isEditable" @click="$emit('showEditProfilModal','Personen_Informationen')" class="col-auto" type="button" :title="$p.t('profilUpdate','profilBearbeiten')">
                 <i class="fa fa-edit"></i>
             </div>
             <div class="col">
@@ -78,11 +87,14 @@ export default {
             <!-- START OF THE FIRST ROW WITH THE PROFIL IMAGE -->
             <div class="col-12 col-sm-6 mb-2">
                 <div class="row justify-content-center">
-                    <div class="col-auto " style="position:relative">
-                        <img class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"/>
+                    <div class="col-auto profil-image" style="position:relative">
+                        <img alt="profile picture" class=" img-thumbnail " style=" max-height:150px; "  :src="get_image_base64_src"/>
                         <!-- LOCKING IMAGE FUNCTIONALITY -->
-                        <div v-if="editable" role="button" @click.prevent="sperre_foto_function" class="image-lock">
+                        <div v-if="isEditable" role="button" type="button"  :title="FotoSperre?$p.t('profil','fotoSperren'):$p.t('profil','fotoEntsperren')" @click.prevent="sperre_foto_function" class="image-lock">
                             <i :class="{'fa':true, ...(FotoSperre?{'fa-lock':true}:{'fa-lock-open':true})} "></i>
+                        </div>
+						<div v-if="fotoStatus != null && !fotoStatus" role="button" type="button" :title="$p.t('profil','fotoHochladen')" @click.prevent="showModal" class="image-upload">
+                            <i class="fa fa-upload"></i>
                         </div>
                     </div>
                 </div>
