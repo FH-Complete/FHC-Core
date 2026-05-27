@@ -140,7 +140,16 @@ const helperApp = Vue.createApp({
 		}
 	},
 	template: /* html */`
-	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999"></pv-toast>
+	<pv-toast ref="toast" class="fhc-alert" :base-z-index="99999">
+		<template #message="{ message }">
+			<!--span :class="slotProps.iconClass"></span-->
+			<div class="p-toast-message-text">
+				<span class="p-toast-summary">{{ message.summary }}</span>
+				<div v-if="message.detail && message.html" class="p-toast-detail" v-html="message.detail"></div>
+				<div v-else-if="message.detail" class="p-toast-detail">{{ message.detail }}</div>
+			</div>
+		</template>
+	</pv-toast>
 	<pv-toast ref="alert" class="fhc-alert" :base-z-index="99999" position="center">
 		<template #message="slotProps">
 			<i class="fa fa-circle-exclamation fa-2xl mt-3"></i>
@@ -263,18 +272,18 @@ export default {
 					});
 				});
 			},
-			alertDefault(severity, title, message, sticky = false) {
-				let options = { severity: severity, summary: title, detail: message};
+			alertDefault(severity, title, message, sticky = false, html = false) {
+				let options = { severity: severity, summary: title, detail: message, html };
 				
 				if (!sticky)
 					options.life = 3000;
 
 				helperAppInstance.$refs.toast.add(options);
 			},
-			alertMultiple(messageArray, severity = 'info', title = 'Info', sticky = false){
+			alertMultiple(messageArray, severity = 'info', title = 'Info', sticky = false, html = false){
 				// Check, if array has only string values
 				if (messageArray.every(message => typeof message === 'string')) {
-					messageArray.forEach(message => this.alertDefault(severity, title, message, sticky));
+					messageArray.forEach(message => this.alertDefault(severity, title, message, sticky, html));
 					return true;
 				}
 				return false;

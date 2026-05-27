@@ -1,6 +1,8 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import FormForm from '../../Form/Form.js';
 
+import ApiMessages from "../../../api/factory/messages/messages.js"
+
 export default {
 	name: "TableMessages",
 	components: {
@@ -13,13 +15,9 @@ export default {
 		},
 	},
 	props: {
-		endpoint: {
-			type: Object,
-			required: true
-		},
 		typeId: String,
 		id: {
-			type: [Number, String],
+			type: Array,
 			required: true
 		},
 		messageLayout: String,
@@ -27,7 +25,114 @@ export default {
 	},
 	data(){
 		return {
-			tabulatorOptions: {
+			previewBody: "",
+			open: false,
+			personId: null,
+			layoutColumnsOnNewData:	false,
+			height: '400',
+			arePhrasesLoaded: false
+		}
+	},
+	methods: {
+		actionDeleteMessage(message_id){
+			this.$fhcAlert
+				.confirmDelete()
+				.then(result => result
+					? message_id
+					: Promise.reject({handled: true}))
+				.then(this.deleteMessage)
+				.catch(this.$fhcAlert.handleSystemError);
+		},
+		deleteMessage(message_id){
+			return this.$api
+				.call(ApiMessages.deleteMessage(message_id))
+				.then(response => {
+					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
+				}).catch(this.$fhcAlert.handleSystemError)
+				.finally(()=> {
+					window.scrollTo(0, 0);
+					this.reload();
+				});
+		},
+		actionNewMessage(){
+			this.$emit('newMessage', this.id, this.typeId);
+		},
+		actionReplyToMessage(message_id){
+			this.$emit('replyToMessage', this.id, this.typeId, message_id);
+		},
+		reload() {
+			this.$refs.table.reloadTable();
+		},
+		buildTreemap(messages) {
+			if (!messages || !messages.data || messages.data.length === 0)
+			{
+				if(this.tabulatorOptions.pagination)
+				{
+					return {data: [], last_page: 0};
+				}
+				else
+				{
+					return [];
+				}
+			}
+
+			const last_page = messages.meta.count;
+			messages = messages.data;
+			const messageMap = new Map();
+			const messageNested = [];
+			const remainingMessages = new Set(messages);
+
+			//save all Data in Map
+			messages.forEach(msg => messageMap.set(msg.message_id, msg));
+
+			let iteration = 0;
+			let changes = true;
+
+			// do until each relationmessage_id finds message_id (not sensitive to order)
+			while (changes) {
+				changes = false;
+				iteration++;
+
+				remainingMessages.forEach(msg => {
+					if (msg.relationmessage_id === null) {
+						messageNested.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					} else if (messageMap.has(msg.relationmessage_id)) {
+
+						const parent = messageMap.get(msg.relationmessage_id);
+
+						if (!parent.children) {
+							parent.children = [];
+						}
+						parent.children.push(messageMap.get(msg.message_id));
+						remainingMessages.delete(msg);
+						changes = true;
+					}
+				});
+
+				// to avoid endless loop
+				if (iteration > messages.length) break;
+			}
+
+			if(this.tabulatorOptions.pagination)
+			{
+				return {data: messageNested, last_page: last_page};
+			}
+			else
+			{
+				return messageNested;
+			}
+		},
+		loadAjaxCall(url, config, params){
+			return this.$api.call(
+				ApiMessages.getMessages(params)
+			);
+		}
+	},
+	computed: {
+		tabulatorOptions() {
+			const options = {
 				ajaxURL: 'dummy',
 				ajaxRequestFunc: this.loadAjaxCall,
 				ajaxParams: () => {
@@ -37,13 +142,19 @@ export default {
 					};
 				},
 				ajaxResponse: (url, params, response) => this.buildTreemap(response),
+				layout: 'fitDataStretchFrozen',
+				index: 'message_id',
+				persistenceID: 'core-message-20260217',
+				selectableRows: 1,
+				selectableRowsRangeMode: 'click',
 				columns: [
-					{title: "subject", field: "subject"},
-					{title: "body", field: "body", formatter: "html", visible: false},
-					{title: "message_id", field: "message_id", visible: false},
+					{title: "subject", field: "subject", headerFilter: true},
+					{title: "body", field: "body", formatter: "html", visible: false, headerFilter: true},
+					{title: "message_id", field: "message_id", visible: false, headerFilter: true},
 					{
 						title: "Datum",
 						field: "insertamum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr); // Convert to Date object
@@ -55,16 +166,28 @@ export default {
 								minute: "2-digit",
 								hour12: false
 							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
 						}
 					},
-					{title: "sender", field: "sender"},
-					{title: "recipient", field: "recipient"},
-					{title: "senderId", field: "sender_id"},
-					{title: "recipientId", field: "recipient_id"},
-					{title: "Relationmessage ID", field: "relationmessage_id"},
+					{title: "sender", field: "sender", headerFilter: true},
+					{title: "recipient", field: "recipient", headerFilter: true},
+					{title: "senderId", field: "sender_id", headerFilter: true},
+					{title: "recipientId", field: "recipient_id", headerFilter: true},
+					{title: "Relationmessage ID", field: "relationmessage_id", headerFilter: true},
 					{
 						title: "Status",
 						field: "status",
+						headerFilter: true,
 						formatterParams: [
 							"unread",
 							"read",
@@ -72,12 +195,14 @@ export default {
 							"deleted"
 						],
 						formatter: (cell, formatterParams) => {
-							return formatterParams[cell.getValue()];
-						}
+							const key = formatterParams[cell.getValue()];
+							return this.$p?.t?.('messages', key) || key;
+						},
 					},
 					{
 						title: "letzte Änderung",
 						field: "statusdatum",
+						headerFilter: true,
 						formatter: function (cell) {
 							const dateStr = cell.getValue();
 							const date = new Date(dateStr); // Convert to Date object
@@ -89,6 +214,17 @@ export default {
 								minute: "2-digit",
 								hour12: false
 							});
+						},
+						headerFilterFunc(headerValue, rowValue) {
+							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
+							let comparestr = headerValue;
+							if(matches !== null) {
+								const year = (matches[4] !== undefined) ? matches[4] : '';
+								const month = matches[3];
+								const day = (matches[2] !== undefined) ? matches[2] : '';
+								comparestr = year + '-' + month + '-' + day;
+							}
+							return rowValue.match(comparestr);
 						}
 					},
 					{
@@ -131,13 +267,8 @@ export default {
 						},
 						frozen: true
 					}
-					],
-				layout: 'fitDataFill',
-				layoutColumnsOnNewData:	false,
-				height: '400',
-				selectableRangeMode: 'click',
-				index: 'message_id',
-				pagination: true,
+				],
+				pagination: false,
 				paginationMode: "remote",
 				paginationSize: 15,
 				paginationInitialPage: 1,
@@ -147,7 +278,6 @@ export default {
 				dataTreeCollapseElement:"<i class='fas fa-minus-square'></i>",
 				dataTreeChildIndent: 15,
 				dataTreeStartExpanded: false,
-				persistenceID: 'core-message',
 				locale: 'de',
 				"langs": {
 					"de":{ //German language definition
@@ -168,191 +298,83 @@ export default {
 						},
 					},
 				}
-			},
-			tabulatorEvents: [
+			};
+			return options;
+		},
+		tabulatorEvents() {
+			const events = [
 				{
 					event: 'tableBuilt',
 					handler: async() => {
-						await this.$p.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz']);
+						const setHeader = (field, text) => {
+							const col = this.$refs.table.tabulator.getColumn(field);
+							if (!col) return;
 
+							const el = col.getElement();
+							if (!el || !el.querySelector) return;
 
-						let cm = this.$refs.table.tabulator.columnManager;
+							const titleEl = el.querySelector('.tabulator-col-title');
+							if (titleEl) {
+								titleEl.textContent = text;
+							}
+						};
 
-						cm.getColumnByField('subject').component.updateDefinition({
-							title: this.$p.t('global', 'betreff')
-						});
-						cm.getColumnByField('body').component.updateDefinition({
-							title: this.$p.t('messages', 'body')
-						});
-						cm.getColumnByField('message_id').component.updateDefinition({
-							title: this.$p.t('messages', 'message_id')
-						});
-						cm.getColumnByField('insertamum').component.updateDefinition({
-							title: this.$p.t('global', 'datum')
-						});
-						cm.getColumnByField('sender').component.updateDefinition({
-							title: this.$p.t('messages', 'sender')
-						});
-						cm.getColumnByField('recipient').component.updateDefinition({
-							title: this.$p.t('messages', 'recipient')
-						});
-						cm.getColumnByField('sender_id').component.updateDefinition({
-							title: this.$p.t('messages', 'senderId')
-						});
-						cm.getColumnByField('recipient_id').component.updateDefinition({
-							title: this.$p.t('messages', 'recipientId')
-						});
-						cm.getColumnByField('statusdatum').component.updateDefinition({
-							title: this.$p.t('notiz', 'letzte_aenderung')
-						});
-						cm.getColumnByField('status').component.updateDefinition({
-							formatterParams: [
-								this.$p.t('messages/unread'),
-								this.$p.t('messages/read'),
-								this.$p.t('messages/archived'),
-								this.$p.t('messages/deleted')
-							]
-						});
+						setHeader('subject', this.$p.t('global', 'betreff'));
+						setHeader('body', this.$p.t('messages', 'body'));
+						setHeader('message_id', this.$p.t('messages', 'message_id'));
+						setHeader('insertamum', this.$p.t('global', 'datum'));
+						setHeader('sender', this.$p.t('messages', 'sender'));
+						setHeader('recipient', this.$p.t('messages', 'recipient'));
+						setHeader('sender_id', this.$p.t('messages', 'senderId'));
+						setHeader('recipient_id', this.$p.t('messages', 'recipientId'));
+						setHeader('statusdatum', this.$p.t('notiz', 'letzte_aenderung'));
+
 						this.$refs.table.tabulator.rowManager.getDisplayRows();
-						/*
-						cm.getColumnByField('actions').component.updateDefinition({
-						title: this.$p.t('global', 'aktionen')
-												});
-						*/
+						this.$emit('tabulator_tablebuilt');
 					}
 				},
 				{
 					event: 'rowClick',
 					handler: (e, row) => {
-							const selectedMessage = row.getData().message_id;
-							const body = row.getData().body;
-							this.previewBody = body;
+						const selectedMessage = row.getData().message_id;
+						const body = row.getData().body;
+						this.previewBody = body;
 					}
 				},
-/*
-				{
-					event: 'pageLoaded',
-					handler: (pageno) => {
-						this.pageNo = pageno+1;
-					}
-				}
-*/
-			],
-			previewBody: "",
-			open: false,
-			personId: null,
-		}
-	},
-	methods: {
-		actionDeleteMessage(message_id){
-			this.$fhcAlert
-				.confirmDelete()
-				.then(result => result
-					? message_id
-					: Promise.reject({handled: true}))
-				.then(this.deleteMessage)
-				.catch(this.$fhcAlert.handleSystemError);
-		},
-		deleteMessage(message_id){
-			return this.$api
-				.call(this.endpoint.deleteMessage(message_id))
-				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successDelete'));
-				}).catch(this.$fhcAlert.handleSystemError)
-				.finally(()=> {
-					window.scrollTo(0, 0);
-					this.reload();
-				});
-		},
-		actionNewMessage(){
-			this.$emit('newMessage', this.id, this.typeId);
-		},
-		actionReplyToMessage(message_id){
-			this.$emit('replyToMessage', this.id, this.typeId, message_id);
-		},
-		reload() {
-			this.$refs.table.reloadTable();
-		},
-		buildTreemap(messages) {
-			const last_page = messages.meta.count;
-			messages = messages.data;
-			const messageMap = new Map();
-			const messageNested = [];
-			const remainingMessages = new Set(messages);
-
-			//save all Data in Map
-			messages.forEach(msg => messageMap.set(msg.message_id, msg));
-
-			let iteration = 0;
-			let changes = true;
-
-			// do until each relationmessage_id finds message_id (not sensitive to order)
-			while (changes) {
-				changes = false;
-				iteration++;
-
-				remainingMessages.forEach(msg => {
-					if (msg.relationmessage_id === null) {
-						messageNested.push(messageMap.get(msg.message_id));
-						remainingMessages.delete(msg);
-						changes = true;
-					} else if (messageMap.has(msg.relationmessage_id)) {
-
-						const parent = messageMap.get(msg.relationmessage_id);
-
-						if (!parent.children) {
-							parent.children = [];
-						}
-						parent.children.push(messageMap.get(msg.message_id));
-						remainingMessages.delete(msg);
-						changes = true;
-					}
-				});
-
-			// to avoid endless loop
-			if (iteration > messages.length) break;
-			}
-		return {data: messageNested, last_page: last_page};
-		},
-		loadAjaxCall(url, config, params){
-			return this.$api.call(
-				this.endpoint.getMessages(params)
-			);
-		}
-	},
-	computed: {
-		statusText(){
-			return {
-				0: this.$p.t('messsages', 'unread'),
-				1: this.$p.t('messsages', 'read'),
-				2: this.$p.t('messsages', 'archived'),
-				3: this.$p.t('messsages', 'deleted')
-			}
+			];
+			return events;
 		},
 	},
 	mounted() {
 		// change to target="_blank"
-/*		this.$nextTick(() => {
-			const links = document.querySelectorAll('.preview a');
-			links.forEach(link => {
-				link.setAttribute('target', '_blank');
-				link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
-			});
-		});*/
+		/*		this.$nextTick(() => {
+					const links = document.querySelectorAll('.preview a');
+					links.forEach(link => {
+						link.setAttribute('target', '_blank');
+						link.setAttribute('rel', 'noopener noreferrer'); // Sicherheitsmaßnahme
+					});
+				});*/
 	},
 	created(){
-		if(this.typeId != 'person_id') {
+		this.$p
+			.loadCategory(['global', 'person', 'stv', 'messages', 'ui', 'notiz'])
+			.then(() => {
+				this.arePhrasesLoaded = true;
+			});
+
+		if(this.typeId != 'person_id' && Array.isArray(this.id) && this.id.length === 1) {
 			const params = {
 				id: this.id,
 				type_id: this.typeId
 			};
 			this.$api
-				.call(this.endpoint.getPersonId(params))
+				.call(ApiMessages.getPersonId(params))
 				.then(result => {
 					this.personId = result.data;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
+
 	},
 	template: `
 	<div class="messages-detail-table">
@@ -362,8 +384,9 @@ export default {
 
 			<div class="row">
 				<!--table-->
-				<div class="col-sm-6 pt-6">
+				<div class="col-sm-6 pt-1">
 					<core-filter-cmpt
+						v-if="arePhrasesLoaded"
 						ref="table"
 						:tabulator-options="tabulatorOptions"
 						:tabulator-events="tabulatorEvents"
@@ -378,9 +401,9 @@ export default {
 				</div>
 
 				<!--preview wysiwyg-window-->
-				<div class="col-sm-6 pt-6">
-				<br><br><br><br>
-					<div ref="preview">
+				<div class="col-sm-6 pt-5">
+					<div class="msg-preview-spacer pt-2" aria-hidden="true"></div>
+					<div ref="preview" class="bg-white">
 						<div v-html="previewBody" class="p-3 border rounded overflow-scroll twoColumns"></div>
 					</div>
 
@@ -396,6 +419,7 @@ export default {
 				<div class="col-sm-12 pt-6">
 					<core-filter-cmpt
 						ref="table"
+						v-if="arePhrasesLoaded"
 						:tabulator-options="tabulatorOptions"
 						:tabulator-events="tabulatorEvents"
 						table-only

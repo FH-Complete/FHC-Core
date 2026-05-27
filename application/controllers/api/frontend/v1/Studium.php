@@ -58,8 +58,8 @@ class Studium extends FHCAPI_Controller
 		$parameter_semester = $this->input->get('semester',true);
 		$parameter_studienplan = $this->input->get('studienplan',true);
 
-		$aktuelles_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->getAkt()));
-		
+		$aktuelles_studiensemester = current($this->getDataOrTerminateWithError($this->StudiensemesterModel->getAktOrNextSemester()));
+
 		if($this->getDataOrTerminateWithError($this->StudentModel->isStudent(getAuthUID()))){
 			$studentLehrverband =$this->StudentlehrverbandModel->loadWhere(["student_uid" => getAuthUID(), "studiensemester_kurzbz" => $aktuelles_studiensemester->studiensemester_kurzbz]);
 			$studentLehrverband = current($this->getDataOrTerminateWithError($studentLehrverband));

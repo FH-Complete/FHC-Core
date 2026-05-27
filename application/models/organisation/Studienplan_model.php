@@ -107,6 +107,8 @@ class Studienplan_model extends DB_Model
 		));
 	}
 
+	// Deprecated
+	// im Lehrveranstaltung_model vorhanden
 	public function getAllOesForLv($lehrveranstaltung_id)
 	{
 		$this->addDistinct('oe_kurzbz');
@@ -133,6 +135,26 @@ class Studienplan_model extends DB_Model
 		return $this->loadWhere([
 			'prestudent_id' => $prestudent_id
 		]);
+	}
+
+	public function loadStudienplanLehrveranstaltung($lv_id)
+	{
+		$qry = "SELECT studienplan_lehrveranstaltung_id,
+					semester,
+					pflicht,
+					studienplan_id,
+					koordinator,
+ 					studienplan_lehrveranstaltung_id_parent,
+					lehrveranstaltung_id,
+					insertamum,
+					insertvon,
+					updateamum,
+					updatevon,
+					sort,
+					curriculum,
+					export
+				FROM lehre.tbl_studienplan_lehrveranstaltung WHERE studienplan_lehrveranstaltung_id = ? ";
+		return $this->execReadOnlyQuery($qry, array($lv_id));
 	}
 
 	public function getStudienplaeneForPerson($person_id)

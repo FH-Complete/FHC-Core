@@ -146,17 +146,22 @@ class GehaltsbestandteilLib
 		$this->setUIDtoPGSQL();
 
 		$dv = $this->fetchDienstverhaeltnis($gehaltsbestandteil->getDienstverhaeltnis_id());
-		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 'd', $dv->getOe_kurzbz())) 
+		if($dv && $this->PermissionLib->isberechtigt('basis/gehaelter', 'd', $dv->getOe_kurzbz()))
 		{
-			// delete Gehaltsabrechnung
-			$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
-
-			//
 			$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
-			
+		
 			if (isError($ret))
 			{
-				throw new Exception('error deleting gehaltsbestandteil');
+				// delete Gehaltsabrechnung
+				$ret = $this->CI->gehaltslib->deleteAbrechnung($gehaltsbestandteil);
+
+				//
+				$ret = $this->GehaltsbestandteilModel->delete($gehaltsbestandteil->getGehaltsbestandteil_id());
+			
+				if (isError($ret))
+				{
+					throw new Exception('error deleting gehaltsbestandteil');
+				}
 			}
 
 		} else {

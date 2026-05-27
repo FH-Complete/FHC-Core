@@ -33,14 +33,15 @@ export default {
 	data() {
 		return {
 			current: null,
-			tabs: {}
+			tabs: {},
+			count: null
 		}
 	},
 	computed: {
 		currentTab() {
 			if (this.tabs[this.current])
 				return this.tabs[this.current];
-			
+
 			return { component: 'div' };
 		},
 		value: {
@@ -67,9 +68,9 @@ export default {
 		}
 	},
 	methods: {
-		handleTabClick: function(index) {
+		handleTabClick: function (e) {
 			let keys = Object.keys(this.tabs);
-			this.change(keys[index]);
+			this.change(keys[e.index]);
 		},
 		change(key) {
 			this.$emit("change", key)
@@ -97,19 +98,28 @@ export default {
 				if (!item.component)
 					return console.error('Component missing for ' + key);
 
+				//making it reactive for showing headerSuffix
+				const value = Vue.reactive({
+					suffix: '',
+					showSuffix: item.showSuffix || false
+				});
+
 				tabs[key] = {
 					component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
 					title: Vue.computed(() => item.title || key),
 					config: item.config,
 					key,
-					value: {}
-				}
+					value,
+					suffixhelper: item.suffixhelper ?? null
+				};
 			}
 
-			if (Array.isArray(config))
+			if (Array.isArray(config)) {
 				config.forEach((item, key) => _addToTabs(key, item));
-			else
+			}
+			else {
 				Object.entries(config).forEach(([key, item]) => _addToTabs(key, item));
+			}
 
 			if (this.current === null || !tabs[this.current]) {
 				if (tabs[this.default])
@@ -118,36 +128,123 @@ export default {
 					this.current = Object.keys(tabs)[0];
 			}
 			this.tabs = tabs;
+		},
+		updateSuffix() {
+			this.getTabSuffix(this.currentTab);
+		},
+		removeInvalidCountTabs(){
+			if(this.modelValue.length)
+			{
+				let countIst = this.modelValue.length;
+				const tabsToDelete = [];
+
+				Object.entries(this.config).forEach(([key, item]) => {
+
+					const target = item?.config ? item : item?.value || item;
+
+					// check config for validCountMulti
+					if (target.config?.validCountMulti !== undefined) {
+						let tab;
+						let countSoll;
+						tab = key;
+						countSoll = target.config.validCountMulti;
+
+						//check if tab is existing
+						if (countSoll !== undefined && countSoll == countIst) {
+							//add tab if it was removed before
+							if (tab in this.tabs == false) {
+								const value = Vue.reactive({
+									suffix: '',
+									showSuffix: item.showSuffix || false
+								});
+
+								this.tabs[tab] = {
+									component: Vue.markRaw(Vue.defineAsyncComponent(() => import(item.component))),
+									title: Vue.computed(() => item.title || tab),
+									config: item.config,
+									tab,
+									value,
+									suffixhelper: item.suffixhelper ?? null
+								};
+							}
+						}
+
+						//add to toDeleteArray if count is not allowed
+						if (countSoll !== undefined && countSoll !== countIst) {
+							tabsToDelete.push(tab);
+						}
+					}
+				});
+
+				// Delete all tabs with count not allowed
+				tabsToDelete.forEach(k => {
+					delete this.tabs[k];
+				});
+
+			}
+		},
+		async getTabSuffix(tab) {
+			if (!tab.value.showSuffix) {
+				return;
+			}
+
+			if (tab.suffixhelper !== null) {
+				const suffixhelper = await import(tab.suffixhelper);
+				const suffix = await suffixhelper.getSuffix(this.$api, this.modelValue);
+				tab.value.suffix = suffix;
+			} else {
+				tab.value.suffix = '';
+			}
+		},
+		getTabSuffixes() {
+			Object.entries(this.tabs).forEach(([key, item]) => this.getTabSuffix(item));
 		}
 	},
 	created() {
 		this.initConfig(this.config);
 	},
+	mounted() {
+		this.getTabSuffixes();
+		this.removeInvalidCountTabs();
+	},
+	updated() {
+		this.getTabSuffixes();
+		this.removeInvalidCountTabs();
+	},
 	template: `
 	<template v-if="useprimevue">
 
-	<tabview 
-		:scrollable="true" 
-		:lazy="true"
-		:activeIndex="calcActiveIndex"
-		@tab-click="handleTabClick"
-	>
-		<tabpanel 
-			v-for="tab in tabs" 
-			:key="tab.key" 
-			:header="tab.title"
+		<tabview
+			class="d-flex flex-column"
+			:scrollable="true"
+			:lazy="true"
+			:activeIndex="calcActiveIndex"
+			:pt="{navContainer:{style: 'flex: 0 0 auto;'}, panelContainer:{class: 'overflow-y-scroll p-2', style: 'flex: 1 1 auto;'}}"
+			@tab-click="handleTabClick"
 		>
-			<keep-alive>
-				<component :is="tab.component" v-model="value" :config="tab.config"></component>
-			</keep-alive>
-		</tabpanel>
-	</tabview>
+			<tabpanel
+				v-for="tab in tabs"
+				:key="tab.key"
+				:header="tab.title + ((tab.value.showSuffix && tab.value.suffix !== '') ? ' ' + tab.value.suffix : '')"
+				:pt="{headerAction:{class: 'px-2 py-1'}}"
+			>
+				<keep-alive>
+					<component
+						:is="tab.component"
+						v-model="value"
+						:config="tab.config"
+						@update:suffix="updateSuffix($event)"
+						></component>
+				</keep-alive>
+			</tabpanel>
+		</tabview>
 
 	</template>
 	<template v-else="">
 
 	<div class="fhc-tabs d-flex" :class="vertical ? 'align-items-stretch gap-3' : (border ? 'flex-column' : 'flex-column gap-3')" v-if="Object.keys(tabs).length">
 		<div class="nav" :class="vertical ? 'nav-pills flex-column' : 'nav-tabs'">
+
 			<div
 				v-for="tab in tabs"
 				:key="tab.key"
@@ -157,15 +254,22 @@ export default {
 				:aria-current="tab.key == current ? 'page' : ''"
 				v-accessibility:tab.[vertical]
 				>
-				{{tab.title}}
+				{{tab.title}} <span v-if="tab.value.showSuffix && tab.value.suffix"> {{ tab.value.suffix }}</span>
 			</div>
 		</div>
 		<div :style="vertical ? '' : 'flex: 1 1 0%; height: 0%'" class="overflow-auto flex-grow-1" :class="vertical || !border ? '' : 'p-3 border-bottom border-start border-end'">
 			<keep-alive>
-				<component ref="current" :is="currentTab.component" v-model="value" :config="currentTab.config"></component>
+				<component
+					ref="current"
+					:is="currentTab.component"
+					v-model="value"
+					:config="currentTab.config"
+					@update:suffix="updateSuffix($event)"
+					></component>
 			</keep-alive>
 		</div>
 	</div>
 
 	</template>`
 };
+

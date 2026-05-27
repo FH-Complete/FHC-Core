@@ -3,13 +3,13 @@
 	gap: 1rem;
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1440px) {
 	.lvUebersicht {
 		grid-template-columns: 1fr 1fr 1fr;
 	}
 }
 
-@media (max-width: 992px){
+@media (max-width: 1439px){
 	.lvUebersicht{
 		grid-template-columns: 1fr 1fr;
 	}
@@ -38,13 +38,13 @@
 
 }
 
-@media (min-width: 1200px) {
+@media (min-width: 1440px) {
 	.lvOptions {
 		grid-template-columns: 1fr 1fr 1fr 1fr;
 	}
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1439px) {
 	.lvOptions {
 		grid-template-columns: 1fr 1fr;
 	}

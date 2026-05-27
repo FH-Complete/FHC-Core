@@ -40,6 +40,10 @@ $configArray = [
 		cis-root="<?= CIS_ROOT; ?>"
 		:permissions="<?= htmlspecialchars(json_encode($permissions)); ?>"
 		:config="<?=  htmlspecialchars(json_encode($configArray)); ?>"
+<?php if($ids !== null && $typeid !== null) { ?>
+		:id ="<?= htmlspecialchars(json_encode($ids)); ?>"
+		type-id ="<?= htmlspecialchars($typeid); ?>"
+<?php } ?>
 	>
 	</router-view>
 </div>

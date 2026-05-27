@@ -176,6 +176,7 @@ class LvPlan extends FHCAPI_Controller
 	{
 		$this->load->model('ressource/Stunde_model', 'StundeModel');
 
+		$this->StundeModel->addOrder('stunde', 'ASC');
 		$stunden = $this->StundeModel->load();
 
         $stunden = $this->getDataOrTerminateWithError($stunden);

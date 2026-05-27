@@ -843,7 +843,6 @@ function meine_uid_informationen_detail($db,$uid,$count=0)
 
 		$aktiv=$db->db_result($erg,0,"aktiv");
 
-		$svnr=$db->db_result($erg,0,"svnr");
 
 		$titelpre=$db->db_result($erg,0,"titelpre");
 		$titelpost=$db->db_result($erg,0,"titelpost");

@@ -103,7 +103,8 @@
 
 .widgets-news img
 {
-    max-width: 100%;
+	max-width: 100%;
+	height: auto;
 }
 
 .fhc-news-menu-item {
@@ -192,3 +193,6 @@
 	word-break: break-word;
 }
 
+.news-list-item p {
+	word-break: break-word;
+}

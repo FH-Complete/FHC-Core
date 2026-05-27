@@ -117,7 +117,7 @@ export default {
     </button>
 	<fhc-searchbar ref="searchbar" id="nav-search" class="fhc-searchbar w-100 py-1 py-lg-2" :searchoptions="searchbaroptions" :searchfunction="searchfunction"></fhc-searchbar>
     <div id="nav-logo" class="d-none d-lg-block">
-		<div class="d-flex h-100">
+		<div class="d-flex h-100 justify-content-between">
 			<a :href="rootUrl">
 				<img :src="logoUrl" alt="Corporate Identity Logo">
 			</a>

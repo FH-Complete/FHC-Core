@@ -456,6 +456,7 @@
 		"fortawesome/font-awesome4": "4.7.*",
 		"fortawesome/font-awesome6": "6.1.*",
 		"fzaninotto/faker": "1.*",
+		"firebase/php-jwt": "^6.0",
 
 		"highcharts/highcharts-dist": "^7.1.2",
 

@@ -57,7 +57,7 @@
 				<div class="row<?php if ($lockedbyother) echo ' alert-danger' ?>">
 					<div class="col-lg-8">
 						<h3 class="page-header">
-							Infocenter Details: <?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?>
+							Infocenter Details: <a target="_blank" title="Studentenverwaltung" href="<?php echo site_url('/Studentenverwaltung/' . $studiensemester . '/person/' . $stammdaten->person_id) ?>"><?php echo $stammdaten->vorname.' '.$stammdaten->nachname ?> <i class="fa fa-external-link" style="font-size:small"></i></a>
 						</h3>
 					</div>
 					<div class="col-lg-4">
