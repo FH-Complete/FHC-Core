@@ -4,6 +4,7 @@
     "cypress": "^15.11.0"
   },
   "dependencies": {
+    "cypress-real-events": "^1.15.0",
     "dotenv": "^17.4.2"
   }
 }

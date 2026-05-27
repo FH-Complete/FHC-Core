@@ -630,7 +630,7 @@ class KalenderLib
 			if (isError($result)) return $result;
 		}
 
-		return success('Erfolgreich');
+		return success($result);
 	}
 
 	public function updateZeit($kalender_id, $start_date, $end_date)

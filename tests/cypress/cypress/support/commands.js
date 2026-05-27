@@ -25,6 +25,7 @@
 // Cypress.Commands.overwrite('visit', (originalFn, url, options) => { ... })
 
 require("@4tw/cypress-drag-drop");
+require("cypress-real-events")
 
 Cypress.Commands.add("login", () => {
   const { adminusername, adminpassword, loginAsUser } = Cypress.env();

@@ -6,8 +6,12 @@ module.exports = defineConfig({
    
   e2e: {
     baseUrl: process.env.BASE_URL || "http://localhost:8080",
-    defaultCommandTimeout: 40000,
-    pageLoadTimeout: 20000,
+    defaultCommandTimeout: 20000,
+    pageLoadTimeout: 10000,
+    retries: {
+      runMode: 2,   // when running via CLI / CI
+      openMode: 2   // when running in interactive mode
+    }
   },
   env: {
     adminusername: process.env.USER_NAME || "2",

@@ -208,7 +208,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess('Erfolgreich');
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	public function getRaumvorschlag()
