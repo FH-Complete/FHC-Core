@@ -407,7 +407,6 @@ html {
   background-color: var(--fhc-background);
   border-color: var(--fhc-border);
   padding: var(--fhc-cis-main-py) var(--fhc-cis-main-px);
-  min-width: 0; /* fix flex-grow with tabulator exceeding width */
 }
 
 #cis-main .fa-arrow-up-right-from-square {
@@ -855,4 +854,10 @@ html {
 #cis-main .modal-footer {
 	background-color: var(--fhc-secondary);
 	
+}
+
+.bordered-modal {
+	border: 1px solid rgba(0, 0, 0, 0.15);
+	border-radius: 0.5rem;
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
 }

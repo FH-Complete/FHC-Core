@@ -62,9 +62,18 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
-				//height: 800,
+				min_height: 300,
 				//plugins: ['lists'],
-				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify',
+				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
+				plugins: 'link',
+				link_context_toolbar: true,
+				automatic_uploads: true,
+				default_link_target: "_blank",
+				link_title: true,
+				target_list: [
+					{ title: 'New tab', value: '_blank' },
+					{ title: 'Same tab', value: '_self' }
+				],
 				style_formats: [
 					{title: 'Blocks', block: 'div'},
 					{title: 'Paragraph', block: 'p'},
@@ -98,7 +107,8 @@ export default {
 			return this.$api
 				.call(ApiMessages.sendMessage(this.typeId, data))
 				.then(response => {
-					this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
+					if(this.openMode == "inSamePage")
+						this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSent'));
 					this.hideTemplate();
 					this.resetForm();
 					this.messageSent = true;
@@ -114,18 +124,16 @@ export default {
 			return this.$api
 				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
+					this.editor.setContent(response.data.text);
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
 				}).catch(this.$fhcAlert.handleSystemError);
 		},
 		getPreviewText(){
-			console.log("subj" + this.formData.subject);
 			const data = new FormData();
 
 			data.append('data', JSON.stringify(this.formData.body));
 			data.append('ids', JSON.stringify(this.id));
-
-			console.log("subj" + this.formData.subject);
 
 			return this.$api
 				.call(ApiMessages.getPreviewText(
@@ -195,33 +203,13 @@ export default {
 				.call(ApiMessages.getReplyData(messageId))
 				.then(result => {
 					this.replyData = result.data;
+					this.editor.setContent(this.replyData[0].replyBody);
 					this.formData.subject = this.replyData[0].replySubject;
 					this.formData.body = this.replyData[0].replyBody;
 					this.formData.relationmessage_id = messageId;
 				})
 				.catch(this.$fhcAlert.handleSystemError);
 		}
-	},
-	watch: {
-		'formData.body': {
-			handler(newVal) {
-				const tinymcsVal = this.editor.getContent();
-
-				if (newVal && tinymcsVal != newVal) {
-					//Inhalt des Editors aktualisieren
-					this.editor.setContent(newVal);
-				}
-			}
-		},
-		'formData.vorlage_kurzbz': {
-			handler(newVal){
-
-				if (newVal && newVal != null) {
-					this.formData.subject = newVal;
-					return this.getDataVorlage(newVal);
-				}
-			}
-		},
 	},
 	created(){
 		const missingparamsmsgs = [];
@@ -291,17 +279,8 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		//case of reply
-		if(this.messageId != null) {
+		if(this.messageId) {
 			this.loadReplyData(this.messageId);
-/*			this.$api
-				.call(ApiMessages.getReplyData(this.messageId))
-				.then(result => {
-					this.replyData = result.data;
-					this.formData.subject = this.replyData[0].replySubject;
-					this.formData.body = this.replyData[0].replyBody;
-					this.formData.relationmessage_id = this.messageId;
-				})
-				.catch(this.$fhcAlert.handleSystemError);*/
 		}
 
 	},
@@ -499,10 +478,10 @@ export default {
 						
 						<div class="row">
 							<div class="col-6" style="border-right: 1px">
-								You can safely close this window.
+								You can safely close this window/tab.
 							</div>
 							<div class="col-6">
-								Sie können dieses Fenster schließen.
+								Fenster/Reiter kann geschlossen werden!
 							</div>
 						</div>
 				</div>
