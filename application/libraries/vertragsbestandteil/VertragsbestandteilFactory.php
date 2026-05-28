@@ -4,6 +4,7 @@ namespace vertragsbestandteil;
 use Exception;
 use vertragsbestandteil\VertragsbestandteilStunden;
 use vertragsbestandteil\VertragsbestandteilLohnguide;
+use vertragsbestandteil\VertragsbestandteilKollektivvertrag;
 
 /**
  * Description of VertragsbestandteilFactory
@@ -144,6 +145,14 @@ class VertragsbestandteilFactory
 				$CI->load->model('vertragsbestandteil/VertragsbestandteilLohnguide_model',
 					'VertragsbestandteilLohnguide_model');
 				$vertragsbestandteildbmodel = $CI->VertragsbestandteilLohnguide_model;
+				break;
+			case self::VERTRAGSBESTANDTEIL_KOLLEKTIVVERTRAG:
+				$CI->load->model(
+					'vertragsbestandteil/VertragsbestandteilKollektivvertrag_model',
+					'VertragsbestandteilKollektivvertrag_model'
+				);
+
+				$vertragsbestandteildbmodel = $CI->VertragsbestandteilKollektivvertrag_model;
 				break;
 
 			default:

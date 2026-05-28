@@ -38,7 +38,8 @@ class Vertragsbestandteil_model extends DB_Model
 				s.wochenstunden, s.teilzeittyp_kurzbz,
 				u.tage,
 				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice,
-				lg.stellenbezeichnung, lg.vordienstzeit, lg.fachrichtung_kurzbz, lg.modellstelle_kurzbz, lg.kommentar_person, lg.kommentar_modellstelle
+				lg.stellenbezeichnung, lg.vordienstzeit, lg.fachrichtung_kurzbz, lg.modellstelle_kurzbz, lg.kommentar_person, lg.kommentar_modellstelle,
+				kv.verwendungsgruppe_kurzbz, kv.kv_jahre, kv.kommentar
 			FROM
 				hr.tbl_vertragsbestandteil v
 			LEFT JOIN
@@ -66,6 +67,8 @@ class Vertragsbestandteil_model extends DB_Model
 				hr.tbl_vertragsbestandteil_zeitaufzeichnung z USING(vertragsbestandteil_id)
 			LEFT JOIN
 				hr.tbl_vertragsbestandteil_lohnguide lg USING(vertragsbestandteil_id)
+			LEFT JOIN
+				hr.tbl_vertragsbestandteil_kollektivvertrag kv USING(vertragsbestandteil_id)
 EOSQL;
 		return $sql;
 	}

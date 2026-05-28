@@ -158,6 +158,9 @@ COMMENT ON TABLE hr.tbl_vertragsbestandteil_kollektivvertrag IS E'Zuordnung zur 
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_vertragsbestandteil_kollektivvertrag TO vilesci;
 
+INSERT INTO hr.tbl_vertragsbestandteiltyp(vertragsbestandteiltyp_kurzbz, bezeichnung, ueberlappend) VALUES('kollektivvertrag', 'Kollektivvertrag', false);
+
+
 
 		";
 
