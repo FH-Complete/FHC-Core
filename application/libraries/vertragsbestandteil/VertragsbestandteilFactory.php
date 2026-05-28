@@ -81,11 +81,11 @@ class VertragsbestandteilFactory
 			case self::VERTRAGSBESTANDTEIL_KOLLEKTIVVERTRAG:
 				$vertragsbestandteil = new VertragsbestandteilKollektivvertrag();
 				$vertragsbestandteil->hydrateByStdClass($data, $fromdb);
-				break;				
+				break;
 			
 			default:
 				throw new Exception('Unknown vertragsbestandteiltyp_kurzbz ' 
-					. $vertragsbestandteiltyp_kurzbz);			
+					. $vertragsbestandteiltyp_kurzbz);
 		}
 		
 		return $vertragsbestandteil;

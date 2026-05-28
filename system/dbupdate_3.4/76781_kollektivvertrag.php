@@ -145,13 +145,11 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		$qry = "
 CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_kollektivvertrag (
     vertragsbestandteil_id integer NOT NULL,
-    kollektivvertrag_kurzbz  character varying(32) NOT NULL,
     verwendungsgruppe_kurzbz character varying(32) NOT NULL,
 	kv_jahre integer NOT NULL,
     kommentar varchar(255),
     CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_pk PRIMARY KEY (vertragsbestandteil_id),
 	CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id) REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
-    CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kurzbz_fk FOREIGN KEY (kollektivvertrag_kurzbz) REFERENCES hr.tbl_kollektivvertrag (kollektivvertrag_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kv_jahre_fk FOREIGN KEY (kv_jahre) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppenjahre (kv_jahre) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
 );
