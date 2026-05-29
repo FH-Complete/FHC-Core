@@ -34544,7 +34544,7 @@ array(
 				'sprache' => 'German',
 				'text' => 'Sie können eine Entschuldigung für einen Zeitraum von bis zu {0} Tagen in die Vergangenheit und bis zum Ende des aktuellen Semesters hochladen. Die erlaubten Dateitypen für das Dokument sind .pdf, .png und .jpg.
 
-				Sobald Sie eine Entschuldigung hochladen wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde können Sie den Eintrag nichtmehr löschen.
+				Sobald Sie eine Entschuldigung hochladen wird die zugehörige Studiengangsassistenz informiert und Ihr Anliegen überprüft. Solange Ihre Entschuldigung noch keinen akzeptierten oder abgelehnten Status erhalten hat, steht es Ihnen frei diese inklusive Datei zu löschen. Sobald sie entweder akzeptiert oder abgelehnt wurde können Sie den Eintrag nicht mehr löschen.
 
 				Bei einer akzeptierten Entschuldigung werden sämtliche digitalen Anwesenheiten in diesem Zeitraum als positiv gewertet. Eine abgelehnte Entschuldigung hat keine Auswirkungen auf ihre Anwesenheitsquote.',
 				'description' => '',
@@ -42204,12 +42204,12 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4fehlerAktualitaetProjektarbeit',
+		'phrase' => 'c4fehlerAktualitaetProjektarbeitv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Projektarbeit ist nichtmehr aktuell",
+				'text' => "Projektarbeit ist nicht mehr aktuell",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -43990,46 +43990,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'abgabetoolTitleBetreuer',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Bachelor-/Masterarbeiten Betreuungen",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Supervision of Bachelor's/Master's theses",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'abgabetoolTitleAdmin',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Bachelor-/Masterarbeiten Administration",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Administration of Bachelor's/Master's theses",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
 		'phrase' => 'keinTitel',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -44210,26 +44170,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgaben_n',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "{0} Abgaben",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "{0} Dates",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
 		'phrase' => 'c4abgabeStudentenbereich',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -44270,18 +44210,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4orgformv2',
+		'phrase' => 'c4orgform',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Organisationsform",
+				'text' => "Organisationseinheit",
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => "organization form",
+				'text' => "organization unit",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -44642,26 +44582,6 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => "Delete",
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4edit',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Bearbeiten",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => "Edit",
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -45090,46 +45010,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4notetermin',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Terminnote",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Date grade',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4noteprojektarbeit',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Projektarbeitnote",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Project work grade',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
 		'phrase' => 'c4upload_allowed',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -45495,26 +45375,6 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4beurteilungsnotizBeiNegNote',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Wenn Sie eine negative Note erteilen, müssen Sie eine Beurteilungsnotiz ausfüllen!",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'If you give a failing grade, you must fill out an evaluation form!',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
 		'phrase' => 'c4tapForTooltipInfo',
 		'insertvon' => 'system',
 		'phrases' => array(
@@ -45718,26 +45578,6 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Do you really want to delete?',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4confirm_delete_n_termine',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => "Möchten Sie wirklich {0} Termine Löschen?",
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Do you really want to delete {0} dates?',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -47527,18 +47367,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4projektansicht',
+		'phrase' => 'c4signaturinfo',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Projektarbeitansicht',
+				'text' => 'Digitale Signatur Leitfaden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Projectwork mode',
+				'text' => 'Guidelines for digital signatures',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -47547,18 +47387,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4terminansicht',
+		'phrase' => 'c4emptyThesisTitle',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Terminansicht',
+				'text' => 'Projektarbeit Titel darf nicht leer sein.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Deadline mode',
+				'text' => 'Projekt work title is not allowed to be empty.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -47567,118 +47407,18 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4editTerminserie',
+		'phrase' => 'c4invalidCharactersThesisTitle',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Mehrfachbearbeitung Termine',
+				'text' => 'Ungültige Zeichen im Titel der Projektarbeit gefunden.',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Multiedit Deadlines',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4nSelected',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => '{0} Termine zur Bearbeitung ausgewählt.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => '{0} Deadlines selected for editing.',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4confirm_edit_n_termine',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Möchten sie wirklich {0} Termine bearbeiten?',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Do you really want to edit {0} Deadlines?',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4titelBearbeiten',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Titel bearbeiten',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Edit title',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'abgabetool',
-		'phrase' => 'c4confirmTitelSpeichern',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Möchten Sie den Titel wirklich bearbeiten?',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'Do you really want to edit the title?',
-				'description' => '',
-				'insertvon' => 'system'
-			)
-		)
-	),
-	array(
-		'app' => 'core',
-		'category' => 'ui',
-		'phrase' => 'bodyZuLang',
-		'insertvon' => 'system',
-		'phrases' => array(
-			array(
-				'sprache' => 'German',
-				'text' => 'Der Emailtext ist zu lange um kopiert zu werden.',
-				'description' => '',
-				'insertvon' => 'system'
-			),
-			array(
-				'sprache' => 'English',
-				'text' => 'The Emailbody is too long to be copied',
+				'text' => 'Invalid characters detected in thesis title.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -48673,7 +48413,7 @@ array(
 	),
 	array(
 		'app' => 'core',
-		'category' => 'ui',
+		'category' => 'stv',
 		'phrase' => 'weitereEMail',
 		'insertvon' => 'system',
 		'phrases' => array(

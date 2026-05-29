@@ -4,6 +4,8 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { formatISODate, getViennaTodayISO } from "./dateUtils.js";
+import { validateThesisTitle } from './titleValidation.js'
+
 
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
@@ -21,7 +23,16 @@ export const AbgabeStudentDetail = {
 		VueDatePicker,
 		FhcOverlay
 	},
-	inject: ['notenOptions', 'isMobile', 'isViewMode', 'moodle_link'],
+	inject: [
+		'notenOptions',
+		'isMobile', 
+		'isViewMode', 
+		'moodle_link', 
+		'confetti_on_endupload',
+		'title_edit_allowed',
+		'siginfolink_german',
+		'siginfolink_english'
+	],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -52,15 +63,83 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	methods: {
+		confettiCannons() {
+			const container = document.getElementById('confetti-container');
+			if (!container) return;
+
+			const colors = ['#FFC107', '#FF5722', '#E91E63', '#00BCD4', '#4CAF50', '#9C27B0'];
+			const shapes = ['50%', '0%'];
+			const fragment = document.createDocumentFragment();
+
+			// Corner Cannons - Slowed Down)
+			const cannonCount = 150;
+
+			for (let i = 0; i < cannonCount; i++) {
+				const leftConfetti = document.createElement('div');
+				leftConfetti.classList.add('confetti-piece');
+				leftConfetti.style.left = '0px';
+				leftConfetti.style.top = '100%';
+
+				const rightConfetti = document.createElement('div');
+				rightConfetti.classList.add('confetti-piece');
+				rightConfetti.style.left = '100vw';
+				rightConfetti.style.top = '100%';
+
+				const colorL = colors[Math.floor(Math.random() * colors.length)];
+				const colorR = colors[Math.floor(Math.random() * colors.length)];
+				const shapeL = shapes[Math.floor(Math.random() * shapes.length)];
+				const shapeR = shapes[Math.floor(Math.random() * shapes.length)];
+
+				// Left Styles
+				leftConfetti.style.background = colorL;
+				leftConfetti.style.borderRadius = shapeL;
+				leftConfetti.style.width = `${Math.random() * 10 + 6}px`;
+				leftConfetti.style.height = `${Math.random() * 14 + 6}px`;
+				leftConfetti.style.setProperty('--blast-x', `${Math.random() * 50 + 10}vw`);
+				leftConfetti.style.setProperty('--blast-y', `-${Math.random() * 65 + 30}vh`);
+
+				// Right Styles
+				rightConfetti.style.background = colorR;
+				rightConfetti.style.borderRadius = shapeR;
+				rightConfetti.style.width = `${Math.random() * 10 + 6}px`;
+				rightConfetti.style.height = `${Math.random() * 14 + 6}px`;
+				rightConfetti.style.setProperty('--blast-x', `-${Math.random() * 50 + 10}vw`);
+				rightConfetti.style.setProperty('--blast-y', `-${Math.random() * 65 + 30}vh`);
+
+				// Increased durations to 3s - 5s for a floating gravity effect
+				const durationL = Math.random() * 2 + 3;
+				const durationR = Math.random() * 2 + 3;
+				const delayL = Math.random() * 0.2;
+				const delayR = Math.random() * 0.2;
+
+				leftConfetti.style.animation = `cannonBlast ${durationL}s linear ${delayL}s both`;
+				rightConfetti.style.animation = `cannonBlast ${durationR}s linear ${delayR}s both`;
+
+				fragment.appendChild(leftConfetti);
+				fragment.appendChild(rightConfetti);
+
+				setTimeout(() => leftConfetti.remove(), (delayL + durationL) * 1000);
+				setTimeout(() => rightConfetti.remove(), (delayR + durationR) * 1000);
+			}
+
+			container.appendChild(fragment);
+		},
 		openTitelEdit() {
 			this.editingTitel = this.projektarbeit.titel ?? '';
 			this.$refs.modalTitelEdit.show();
 		},
 		async saveTitel() {
-			const trimmed = this.editingTitel.trim();
-			if (!trimmed) {
-				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningEmptyField')));
-				return;
+			
+			const validation = validateThesisTitle(this.editingTitel);
+
+			if (!validation.isValid) {
+				if (validation.error === 'empty') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4emptyThesisTitle'))
+				} else if (validation.error === 'invalid_characters') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4invalidCharactersThesisTitle'))
+
+				}
+				return false;
 			}
 
 			const confirmed = await this.$fhcAlert.confirm({
@@ -77,14 +156,14 @@ export const AbgabeStudentDetail = {
 			this.$api.call(
 				ApiAbgabe.postStudentProjektarbeitTitel(
 					this.projektarbeit.projektarbeit_id,
-					trimmed
+					validation.cleanedTitle
 				)
 			).then(res => {
 				if (res.meta.status === 'success') {
-					this.projektarbeit.titel = trimmed;
+					this.projektarbeit.titel = res.data;
 					this.$emit('titel-updated', {
 						projektarbeit_id: this.projektarbeit.projektarbeit_id,
-						titel: trimmed
+						titel: res.data
 					});
 					this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4titelSavedSuccess')));
 					this.$refs.modalTitelEdit.hide();
@@ -155,6 +234,9 @@ export const AbgabeStudentDetail = {
 			this.$api.call(ApiAbgabe.postStudentProjektarbeitEndupload(formData))
 				.then(res => {
 					this.handleUploadRes(res, this.enduploadTermin)
+						if(this.confetti_on_endupload && res.meta.status == "success") {
+							this.confettiCannons()
+						}
 				}).finally(()=> {
 				this.loading = false
 			})
@@ -237,6 +319,15 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	computed: {
+		getSignaturInfoLink() {
+			if(this.$p.user_language.value == 'German' && this.siginfolink_german) return this.siginfolink_german
+			else if (this.$p.user_language.value == 'English' && this.siginfolink_english) return this.siginfolink_english
+		},
+		getSignaturInfoAvailable() {
+			if(this.$p.user_language.value == 'German' && this.siginfolink_german) return true
+			else if (this.$p.user_language.value == 'English' && this.siginfolink_english) return true
+			else return false
+		},
 		getMoodleLink() {
 			return this.moodle_link + this.projektarbeit.studiengang_kz
 		},
@@ -274,8 +365,7 @@ export const AbgabeStudentDetail = {
 			return qgatefound
 		},
 		isTitelEditAllowed() {
-			// blocked once the projektarbeit has a note (finished) - mirrors backend guard
-			return !this.isViewMode && !this.projektarbeit?.note;
+			return this.title_edit_allowed && !this.isViewMode && !this.projektarbeit?.note;
 		},
 		getTooltipVerspaetet() {
 			return { value: this.$capitalize(this.$p.t('abgabetool/c4tooltipVerspaetet')), class: "custom-tooltip" }
@@ -343,9 +433,15 @@ export const AbgabeStudentDetail = {
 					<p>{{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				</div>
 				<div class="col-4">
-					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
-						<a :href="getMoodleLink" target="_blank">Moodle</a>
-					</p>
+					<div class="row">
+						<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
+							<a :href="getMoodleLink" target="_blank">Moodle</a>
+						</p>
+					</div>
+					
+					<div class="row" v-if="getSignaturInfoAvailable">
+						<a :href="getSignaturInfoLink" target="_blank">{{$p.t('abgabetool/c4signaturinfo')}} <i class="fa-solid fa-circle-info"></i></a>
+					</div>
 				</div>
 			</div>
 			
@@ -433,7 +529,7 @@ export const AbgabeStudentDetail = {
 								</VueDatePicker>
 							</div>
 						</div>
-						
+												
 						<div class="row mt-2">
 							<div class="col-12 col-md-3 fw-bold align-content-center">{{$capitalize( $p.t('abgabetool/c4abgabetyp') )}}</div>
 							<div class="col-12 col-md-9">
@@ -469,7 +565,7 @@ export const AbgabeStudentDetail = {
 							<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">
 								<div class="row">
-									<div style="width:100px; align-content: center;">
+									<div style="width:100px; align-content: end;">
 										<h6>{{ termin.abgabedatum?.split("-").reverse().join(".") }}</h6>
 									</div>
 									
@@ -544,10 +640,13 @@ export const AbgabeStudentDetail = {
 			
 		</div>
 
+		<div v-if="confetti_on_endupload" id="confetti-container"></div>
+
 		<bs-modal
 			ref="modalTitelEdit"
 			class="bootstrap-prompt"
 			dialogClass="bordered-modal"
+			bodyClass="px-4 py-4"
 		>
 			<template v-slot:title>
 				{{$capitalize( $p.t('abgabetool/c4titelBearbeiten') )}}
@@ -562,7 +661,7 @@ export const AbgabeStudentDetail = {
 						rows="10" 
 						maxlength="1024" 
 						class="form-control w-100"
-						@keyup.enter="saveTitel"
+						@keydown.enter.prevent="saveTitel"
 					/>
 					<div class="form-text text-end">{{ editingTitel.length }} / 1024</div>
 				</div>
@@ -588,7 +687,8 @@ export const AbgabeStudentDetail = {
 	 	<bs-modal 
 	 		ref="modalContainerEnduploadZusatzdaten"
 	 		class="bootstrap-prompt"
-	 		dialogClass="bordered-modal modal-lg">
+	 		dialogClass="bordered-modal modal-lg"
+	 		bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{$capitalize( $p.t('abgabetool/c4enduploadZusatzdaten') )}}
@@ -674,6 +774,7 @@ export const AbgabeStudentDetail = {
 				<div v-show="!allowedToSaveZusatzdaten">{{ $p.t('abgabetool/c4zusatzdatenausfuellen') }}</div>
 				<button class="btn btn-primary" :disabled="!getAllowedToSendEndupload" @click="triggerEndupload">{{$capitalize( $p.t('ui/hochladen') )}}</button>
 			</template>
+			
 		</bs-modal>
     `,
 };

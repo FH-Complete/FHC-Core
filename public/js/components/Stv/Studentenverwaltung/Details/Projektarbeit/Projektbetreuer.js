@@ -10,6 +10,7 @@ import Vertrag from "./Vertrag.js";
 import ApiStvProjektbetreuer from '../../../../../api/factory/stv/projektbetreuer.js';
 
 export default {
+	name: 'Projektbetreuer',
 	components: {
 		CoreFilterCmpt,
 		BsModal,
@@ -296,17 +297,25 @@ export default {
 				this.emptyBetreuerList();
 			}
 		},
-		saveProjektbetreuer() {
-			this.$refs.formProjektbetreuer.call(
+		_doSaveBetreuer() {
+			return this.$refs.formProjektbetreuer.call(
 				ApiStvProjektbetreuer.saveProjektbetreuer(this.projektarbeit_id, this.getFormDataWithBetreuer())
-			)
-			.then(result => {
-				this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave'));
+			).then(result => {
 				this.getProjektbetreuer(this.projektarbeit_id, this.studiensemester_kurzbz);
 				this.resetModes();
 				this.$emit('betreuerSaved');
-			})
-			.catch(this.$fhcAlert.handleSystemError);
+				return result;
+			});
+		},
+		// called by combined save button
+		saveIfOpen() {
+			if (!this.betreuerFormOpened) return Promise.resolve(null);
+			return this._doSaveBetreuer();
+		},
+		saveProjektbetreuer() {
+			this._doSaveBetreuer()
+				.then(() => this.$fhcAlert.alertSuccess(this.$p.t('ui', 'successSave')))
+				.catch(this.$fhcAlert.handleSystemError);
 		},
 		searchBetreuer(event) {
 			if (this.abortController.betreuer) {
@@ -538,9 +547,6 @@ export default {
 
 			</form-form>
 
-			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="saveProjektbetreuer">
-				{{ $p.t('projektarbeit', 'betreuerSpeichern') }}
-			</button>
 			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
 					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : beurteilungDownloadLink === ''}">

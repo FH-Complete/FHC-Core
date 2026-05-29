@@ -137,7 +137,7 @@ export const AbgabetoolMitarbeiter = {
 						cssClass: 'sticky-col',
 						visible: true
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.detailFormatter, headerFilter: false, headerSort: false, minWidth: 50, visible: true, tooltip: false, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 85, visible: true, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, visible: false,tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
@@ -248,6 +248,77 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		async openBenotung(type, link) {
+			if(type === 'new') {
+				window.open(link, '_blank')
+			} else if(type === 'old') {
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/c4aeltereParbeitBenotenv2'),
+					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+
+				window.open(link, '_blank')
+			} else {
+				// show info text that no endupload with abgabe has been found
+				if(await this.$fhcAlert.confirm({
+					message: this.$p.t('abgabetool/c4keinEnduploadErfolgt'),
+					acceptLabel: this.$capitalize(this.$p.t('abgabetool/c4AcceptAndProceed')),
+					acceptClass: 'btn btn-danger',
+					rejectLabel: this.$capitalize(this.$p.t('abgabetool/c4Cancel')),
+					rejectClass: 'btn btn-outline-secondary'
+				}) === false) {
+					return false
+				}
+			}
+		},
+		formAction(cell) {
+			const actionButtons = document.createElement('div');
+			actionButtons.className = "d-flex gap-3";
+			actionButtons.style.display = "flex";
+			actionButtons.style.alignItems = "stretch";
+			actionButtons.style.justifyContent = "start";
+			actionButtons.style.height = "100%";
+
+			const val = cell.getValue();
+			const data = cell.getRow().getData()
+			
+			const createButton = (iconClass, titleKey, clickHandler) => {
+				const btn = document.createElement('button');
+				btn.className = 'btn btn-outline-secondary';
+				btn.style.display = "flex";
+				btn.style.alignItems = "center"; // center icon vertically
+				btn.style.justifyContent = "center"; // center icon horizontally
+				btn.style.height = "100%"; // fill parent container height
+				btn.style.aspectRatio = "1 / 1"; // keep square shape (optional)
+				btn.style.padding = "0"; // remove extra padding for compactness
+				if(iconClass == 'fa fa-timeline') btn.style.transform = "rotate(90deg)";
+				btn.innerHTML = `<i class="${iconClass}" style="color:#00649C; font-size:1.1rem;"></i>`;
+				btn.title = this.$capitalize(this.$p.t(titleKey));
+				btn.addEventListener('click', (e) => {
+					e.stopPropagation();
+					e.stopImmediatePropagation();
+					clickHandler();
+				});
+				return btn;
+			};
+
+			actionButtons.append(
+				createButton('fa fa-folder-open', 'abgabetool/c4details', () => this.setDetailComponent(val)),
+			);
+			
+			if(data.isCurrent && data.abgabetermine?.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && data.beurteilungLinkNew) {
+				actionButtons.append(createButton('fa fa-user-check', 'abgabetool/c4benoten', () => this.openBenotung('new', data.beurteilungLinkNew)))
+			} else if(data.abgabetermine?.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && data.beurteilungLinkOld) {
+				actionButtons.append(createButton('fa fa-user-check', 'abgabetool/c4benoten', () => this.openBenotung('old', data.beurteilungLinkOld)))
+			}
+
+			return actionButtons;
+		},
 		getDateStyleHtml(dateStyle) {
 			const iconMap = {
 				'verspaetet':              '<i class="fa-solid fa-triangle-exclamation"></i>',
@@ -1271,7 +1342,8 @@ export const AbgabetoolMitarbeiter = {
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
 		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
-			dialogClass="modal-lg">
+			dialogClass="modal-lg"
+			bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{ $p.t('abgabetool/neueTerminserie') }}
@@ -1339,7 +1411,8 @@ export const AbgabetoolMitarbeiter = {
 		
 		<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 			dialogClass="modal-xl" :allowFullscreenExpand="true"
-			@toggle-fullscreen="handleToggleFullscreenDetail">
+			@toggle-fullscreen="handleToggleFullscreenDetail"
+			bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{$p.t('abgabetool/c4abgabeMitarbeiterDetailTitle')}}

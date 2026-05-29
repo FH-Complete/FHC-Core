@@ -25,9 +25,6 @@ const app = Vue.createApp({
 		
 	},
 	computed: {
-		viewData() {
-			return { uid: this.uid}
-		},
 		student_uid_computed() {
 			return this.student_uid ?? this.uid
 		},
@@ -55,10 +52,10 @@ const app = Vue.createApp({
 	},
 	template: `
 		<template v-if="comp && uid">
-			<AbgabetoolStudent v-if="comp == 'AbgabetoolStudent'" :viewData="viewData" :student_uid_prop="student_uid_computed"></AbgabetoolStudent>
-			<AbgabetoolMitarbeiter v-if="comp == 'AbgabetoolMitarbeiter'" :viewData="viewData"></AbgabetoolMitarbeiter>
-			<AbgabetoolAssistenz v-if="comp == 'AbgabetoolAssistenz'" :viewData="viewData" :stg_kz_prop="stg_kz_computed"></AbgabetoolAssistenz>
-			<DeadlineOverview v-if="comp == 'DeadlinesOverview'" :viewData="viewData"></DeadlineOverview>
+			<AbgabetoolStudent v-if="comp == 'AbgabetoolStudent'" :student_uid_prop="student_uid_computed"></AbgabetoolStudent>
+			<AbgabetoolMitarbeiter v-if="comp == 'AbgabetoolMitarbeiter'"></AbgabetoolMitarbeiter>
+			<AbgabetoolAssistenz v-if="comp == 'AbgabetoolAssistenz'" :stg_kz_prop="stg_kz_computed"></AbgabetoolAssistenz>
+			<DeadlineOverview v-if="comp == 'DeadlinesOverview'"></DeadlineOverview>
 		</template>
 	`
 });

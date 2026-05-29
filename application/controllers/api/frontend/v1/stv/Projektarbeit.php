@@ -90,6 +90,15 @@ class Projektarbeit extends FHCAPI_Controller
 
 		if (!isset($projektarbeit_id) || !is_numeric($projektarbeit_id)) return $this->terminateWithError('Projektarbeit Id missing', self::ERROR_TYPE_GENERAL);
 
+		$result = $this->fetchProjektarbeitByID($projektarbeit_id);
+
+		$data = $this->getDataOrTerminateWithError($result);
+
+		$this->terminateWithSuccess(current($data));
+	}
+	
+	private function fetchProjektarbeitById($projektarbeit_id) {
+		$this->ProjektarbeitModel->resetQuery();
 		$this->ProjektarbeitModel->addSelect(
 			'lehre.tbl_projektarbeit.projektarbeit_id, titel, titel_english, themenbereich, projekttyp_kurzbz, lehrveranstaltung_id, lehreinheit_id, 
 			firma_id, beginn, ende, gesperrtbis, note, final, freigegeben, tbl_projektarbeit.anmerkung, fa.name AS firma_name'
@@ -97,13 +106,10 @@ class Projektarbeit extends FHCAPI_Controller
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehreinheit le', 'lehreinheit_id');
 		$this->ProjektarbeitModel->addJoin('lehre.tbl_lehrveranstaltung lv', 'lehrveranstaltung_id');
 		$this->ProjektarbeitModel->addJoin('public.tbl_firma fa', 'firma_id', 'LEFT');
-		$result = $this->ProjektarbeitModel->loadWhere(
+		return $this->ProjektarbeitModel->loadWhere(
 			array('projektarbeit_id' => $projektarbeit_id)
 		);
 
-		$data = $this->getDataOrTerminateWithError($result);
-
-		$this->terminateWithSuccess(current($data));
 	}
 
 	/**
@@ -132,7 +138,8 @@ class Projektarbeit extends FHCAPI_Controller
 		);
 
 		$data = $this->getDataOrTerminateWithError($result);
-
+		$data = $this->getDataOrTerminateWithError($this->fetchProjektarbeitById($data));
+		
 		$this->terminateWithSuccess($data);
 	}
 

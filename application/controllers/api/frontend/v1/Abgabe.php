@@ -93,6 +93,7 @@ class Abgabe extends FHCAPI_Controller
 		$ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT');
 		$ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER = $this->config->item('ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER');
 		$BETREUER_SAMMELMAIL_BUTTON_STUDENT = $this->config->item('BETREUER_SAMMELMAIL_BUTTON_STUDENT');
+		$MULTIEDIT_TABLE = $this->config->item('MULTIEDIT_TABLE');
 		
 		$ret = array(
 			'old_abgabe_beurteilung_link' => $old_abgabe_beurteilung_link,
@@ -100,7 +101,7 @@ class Abgabe extends FHCAPI_Controller
 			'abgabetypenBetreuer' => $abgabetypenBetreuer,
 			'ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT' => $ASSISTENZ_SAMMELMAIL_BUTTON_STUDENT,
 			'ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER' => $ASSISTENZ_SAMMELMAIL_BUTTON_BETREUER,
-			'BETREUER_SAMMELMAIL_BUTTON_STUDENT' => $BETREUER_SAMMELMAIL_BUTTON_STUDENT,
+			'MULTIEDIT_TABLE' => $MULTIEDIT_TABLE,
 		);
 		
 		$this->terminateWithSuccess($ret);
@@ -110,10 +111,18 @@ class Abgabe extends FHCAPI_Controller
 	 * loads config related to abgabetool for students to avoid handing out links reserved for employees
 	 */
 	public function getConfigStudent() {
-		$moodle_link =$this->config->item('STG_MOODLE_LINK');
-
+		$moodle_link = $this->config->item('STG_MOODLE_LINK');
+		$title_edit_allowed = $this->config->item('STUDENT_EDIT_PROJEKTARBEIT_TITLE');
+		$confetti_on_endupload = $this->config->item('CONFETTI_ON_ENDUPLOAD');
+		$siginfolink_german = $this->config->item('SIGNATUR_INFO_LINK_GERMAN');
+		$siginfolink_english = $this->config->item('SIGNATUR_INFO_LINK_ENGLISH');
+		
 		$ret = array(
 			'moodle_link' => $moodle_link,
+			'title_edit_allowed' => $title_edit_allowed,
+			'confetti_on_endupload' => $confetti_on_endupload,
+			'siginfolink_german' => $siginfolink_german,
+			'siginfolink_english' => $siginfolink_english
 		);
 
 		$this->terminateWithSuccess($ret);
@@ -459,6 +468,10 @@ class Abgabe extends FHCAPI_Controller
 	 */
 	public function postStudentProjektarbeitTitel()
 	{
+		if(!$this->config->item('STUDENT_EDIT_PROJEKTARBEIT_TITLE')) {
+			$this->terminateWithError($this->p->t('global', 'c4studentEditNotAllowed'), 'general');
+		};
+		
 		$projektarbeit_id = $this->input->post('projektarbeit_id');
 		$titel            = $this->input->post('titel');
 
@@ -467,6 +480,23 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		// strip all HTML tags to prevent XSS in mail bodies, table views and Projektarbeitsbenotung
+		$titel = trim(strip_tags($titel));
+		if ($titel === '') {
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+
+		// Reject emojis and pictographs
+		// allows foreign letters, math symbols, accents, and standard punctuation.
+		$emojiPattern = '/[\x{1F300}-\x{1F5FF}\x{1F600}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1FAFF}\x{23E9}-\x{23EF}\x{2b50}\x{2700}-\x{27BF}]/u';
+		
+		// i would like this much more but our server does not recognize this utf-8 character range this way, so hexcodes it is 
+//		if (preg_match('/\p{Extended_Pictographic}/u', $titel)) {
+		if (preg_match($emojiPattern, $titel)) {
+
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
@@ -484,6 +514,8 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
 
+		
+		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
 		$data = getData($result);
 		
@@ -492,7 +524,7 @@ class Abgabe extends FHCAPI_Controller
 		$result = $this->ProjektarbeitModel->update(
 			$projektarbeit_id,
 			array(
-				'titel'      => trim($titel),
+				'titel'      => $titel,
 				'updatevon'  => getAuthUID(),
 				'updateamum' => date('Y-m-d H:i:s')
 			)
@@ -504,7 +536,7 @@ class Abgabe extends FHCAPI_Controller
 			'titelUpdate',
 			array(
 				'projektarbeit_id' => $projektarbeit_id,
-				'titel'            => trim($titel),
+				'titel'            => $titel,
 				'updatevon'        => getAuthUID(),
 				'updateamum'       => date('Y-m-d H:i:s')
 			),
@@ -514,13 +546,14 @@ class Abgabe extends FHCAPI_Controller
 
 		$this->sendTitelChangedEmail(
 			$projektarbeit_id,
-			trim($titel),
+			$titel,
 			$oldTitle,
 			$assignedStudentUid
 		);
 		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$this->terminateWithSuccess($result);
+		$titel = hasData($result) ? getData($result)[0]->titel : $titel;
+		$this->terminateWithSuccess($titel);
 	}
 
 	/**
@@ -1533,7 +1566,7 @@ class Abgabe extends FHCAPI_Controller
 		};
 		Events::trigger('projektarbeit_is_current', $projektarbeit_id, $returnFunc);
 		if(!$projektarbeitIsCurrent) {
-			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit'), 'general');
+			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2'), 'general');
 		}
 
 		// Link to Abgabetool
@@ -1739,7 +1772,7 @@ class Abgabe extends FHCAPI_Controller
 		$data = getData($res)[0];
 		if($data->note !== NULL) {
 			// hardcode this error msg cause phrasen arent reliable and people keep bugging why the cant edit old entries they definitely shouldnt update
-			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeit');
+			$message = $this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2');
 			if(strpos($message, "<<") === 0) { // phrase could not be loaded
 				$this->terminateWithError('Die Projektarbeit wurde bereits benotet, Sie dürfen deshalb keine weiteren Termine anlegen oder bearbeiten.', 'general');
 			} else {
