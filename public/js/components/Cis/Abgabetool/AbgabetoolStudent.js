@@ -1,5 +1,6 @@
 import AbgabeDetail from "./AbgabeStudentDetail.js";
 import ApiAbgabe from '../../../api/factory/abgabe.js'
+import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass} from "./getDateStyleClass.js";
@@ -20,20 +21,14 @@ export const AbgabetoolStudent = {
 			isViewMode: Vue.computed(() => this.isViewMode),
 			moodle_link: Vue.computed(() => this.moodle_link),
 			title_edit_allowed: Vue.computed(() => this.title_edit_allowed),
-			confetti_on_endupload: Vue.computed(() => this.confetti_on_endupload)
+			confetti_on_endupload: Vue.computed(() => this.confetti_on_endupload),
+			siginfolink_german: Vue.computed(() => this.siginfolink_german),
+			siginfolink_english: Vue.computed(() => this.siginfolink_english)
 		}
 	},
 	props: {
 		student_uid_prop: {
 			default: null
-		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({uid: ''}),
-			validator(value) {
-				return value && value.uid
-			}
 		}
 	},
 	data() {
@@ -50,8 +45,11 @@ export const AbgabetoolStudent = {
 			moodle_link: null,
 			title_edit_allowed: null,
 			confetti_on_endupload: null,
+			siginfolink_german: null,
+			siginfolink_english: null,
 			editingTitel: '',
 			editingProjektarbeit: null,
+			uid: null
 		};
 	},
 	methods: {
@@ -305,15 +303,17 @@ export const AbgabetoolStudent = {
 	watch: {},
 	computed: {
 		isViewMode() {
-			return this.student_uid !== this.viewData.uid
+			return this.student_uid !== this.uid
 		},
 		student_uid() {
-			return this.student_uid_prop || this.viewData?.uid || null
+			return this.student_uid_prop || this.uid || null
 		}
 	},
 	async created() {
 		// make sure zoom media query doesnt spill ever to other CIS4 sites
 		document.documentElement.classList.add('abgabetool');
+		
+		this.$api.call(ApiAuthinfo.getAuthUID()).then(res => this.uid = res.data.uid)
 		
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
@@ -341,6 +341,8 @@ export const AbgabetoolStudent = {
 			this.moodle_link = res.data?.moodle_link
 			this.title_edit_allowed = res.data?.title_edit_allowed
 			this.confetti_on_endupload = res.data?.confetti_on_endupload
+			this.siginfolink_german = res.data?.siginfolink_german
+			this.siginfolink_english = res.data?.siginfolink_english
 		}).catch(e => {
 			this.loading = false
 		})
@@ -356,7 +358,7 @@ export const AbgabetoolStudent = {
 	<FhcOverlay :active="loading"></FhcOverlay>
 	
 	<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
-		dialogClass="modal-xl" :allowFullscreenExpand="true">
+		dialogClass="modal-xl" :allowFullscreenExpand="true" bodyClass="px-4 py-4">
 		<template v-slot:title>
 			<div>
 				{{$capitalize( $p.t('abgabetool/c4abgabeStudentDetailTitle') )}}
@@ -373,6 +375,7 @@ export const AbgabetoolStudent = {
 		ref="modalTitelEdit"
 		class="bootstrap-prompt"
 		dialogClass="bordered-modal"
+		 bodyClass="px-4 py-4"
 	>
 		<template v-slot:title>
 			{{$capitalize( $p.t('abgabetool/c4titelBearbeiten') )}}
@@ -511,6 +514,15 @@ export const AbgabetoolStudent = {
 							<i class="fa-solid fa-pen"></i>
 						</button>
 					</div>
+				</div>
+				
+				<div class="row mt-2">
+					<div class="col-4 col-md-3 fw-bold">{{$capitalize( $p.t('abgabetool/c4note') )}}</div>
+
+					<div class="col-8 col-md-9">
+						<span>{{getNoteBezeichnung(projektarbeit)}}</span>					
+					</div>
+					
 				</div>
 			</AccordionTab>
 		</template>

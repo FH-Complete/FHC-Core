@@ -625,6 +625,7 @@ export const AbgabeMitarbeiterDetail = {
 		dialogClass="bordered-modal modal-lg" 
 		:backdrop="true"
 		@hideBsModal="showAutomagicModalPhrase=false;"
+		bodyClass="px-4 py-4"
 	>
 		<template v-slot:title>
 			<div>
@@ -892,9 +893,6 @@ export const AbgabeMitarbeiterDetail = {
 										<Message v-else-if="termin?.signatur == false" severity="error" :closable="false" :pt="getMessagePtStyle"> {{ $capitalize($p.t('abgabetool/c4keineSignatur')) }} </Message>
 										<Message v-else-if="termin?.signatur == 'error'" severity="warn" :closable="false" :pt="getMessagePtStyle"> {{ $capitalize($p.t('abgabetool/c4signaturServerError')) }} </Message>
 									</div>
-<!--									<div v-else class="col-auto">-->
-<!--										<Message severity="info" :closable="false" :pt="getMessagePtStyle"> {{ $p.t('abgabetool/c4noFileFound') }} </Message>-->
-<!--									</div>-->
 									
 								</div>						
 							</template>
@@ -947,7 +945,8 @@ export const AbgabeMitarbeiterDetail = {
 		<bs-modal 
 	 		ref="modalContainerZusatzdaten"
 	 		class="bootstrap-prompt"
-	 		dialogClass="bordered-modal modal-lg">
+	 		dialogClass="bordered-modal modal-lg"
+	 		bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{$capitalize( $p.t('abgabetool/c4enduploadZusatzdaten') )}}

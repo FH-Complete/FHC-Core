@@ -114,11 +114,15 @@ class Abgabe extends FHCAPI_Controller
 		$moodle_link = $this->config->item('STG_MOODLE_LINK');
 		$title_edit_allowed = $this->config->item('STUDENT_EDIT_PROJEKTARBEIT_TITLE');
 		$confetti_on_endupload = $this->config->item('CONFETTI_ON_ENDUPLOAD');
-
+		$siginfolink_german = $this->config->item('SIGNATUR_INFO_LINK_GERMAN');
+		$siginfolink_english = $this->config->item('SIGNATUR_INFO_LINK_ENGLISH');
+		
 		$ret = array(
 			'moodle_link' => $moodle_link,
 			'title_edit_allowed' => $title_edit_allowed,
-			'confetti_on_endupload' => $confetti_on_endupload
+			'confetti_on_endupload' => $confetti_on_endupload,
+			'siginfolink_german' => $siginfolink_german,
+			'siginfolink_english' => $siginfolink_english
 		);
 
 		$this->terminateWithSuccess($ret);

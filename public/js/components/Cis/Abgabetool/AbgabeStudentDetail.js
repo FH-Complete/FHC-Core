@@ -21,7 +21,16 @@ export const AbgabeStudentDetail = {
 		VueDatePicker,
 		FhcOverlay
 	},
-	inject: ['notenOptions', 'isMobile', 'isViewMode', 'moodle_link', 'confetti_on_endupload', 'title_edit_allowed'],
+	inject: [
+		'notenOptions',
+		'isMobile', 
+		'isViewMode', 
+		'moodle_link', 
+		'confetti_on_endupload',
+		'title_edit_allowed',
+		'siginfolink_german',
+		'siginfolink_english'
+	],
 	props: {
 		projektarbeit: {
 			type: Object,
@@ -301,6 +310,15 @@ export const AbgabeStudentDetail = {
 		}
 	},
 	computed: {
+		getSignaturInfoLink() {
+			if(this.$p.user_language.value == 'German' && this.siginfolink_german) return this.siginfolink_german
+			else if (this.$p.user_language.value == 'English' && this.siginfolink_english) return this.siginfolink_english
+		},
+		getSignaturInfoAvailable() {
+			if(this.$p.user_language.value == 'German' && this.siginfolink_german) return true
+			else if (this.$p.user_language.value == 'English' && this.siginfolink_english) return true
+			else return false
+		},
 		getMoodleLink() {
 			return this.moodle_link + this.projektarbeit.studiengang_kz
 		},
@@ -406,9 +424,15 @@ export const AbgabeStudentDetail = {
 					<p>{{$capitalize( $p.t('abgabetool/c4betreuerv2') ) }}: {{projektarbeit ? $p.t('abgabetool/c4betrart' + projektarbeit.betreuerart_kurzbz) + ' ' + projektarbeit.betreuer : ''}}</p>
 				</div>
 				<div class="col-4">
-					<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
-						<a :href="getMoodleLink" target="_blank">Moodle</a>
-					</p>
+					<div class="row">
+						<p>{{ $p.t('abgabetool/c4checkoutStgMoodleInfos') }} 
+							<a :href="getMoodleLink" target="_blank">Moodle</a>
+						</p>
+					</div>
+					
+					<div class="row" v-if="getSignaturInfoAvailable">
+						<a :href="getSignaturInfoLink" target="_blank">{{$p.t('abgabetool/c4signaturinfo')}} <i class="fa-solid fa-circle-info"></i></a>
+					</div>
 				</div>
 			</div>
 			
@@ -532,7 +556,7 @@ export const AbgabeStudentDetail = {
 							<div class="col-12 col-md-9">
 							<template v-if="termin?.abgabedatum">
 								<div class="row">
-									<div style="width:100px; align-content: center;">
+									<div style="width:100px; align-content: end;">
 										<h6>{{ termin.abgabedatum?.split("-").reverse().join(".") }}</h6>
 									</div>
 									
@@ -613,6 +637,7 @@ export const AbgabeStudentDetail = {
 			ref="modalTitelEdit"
 			class="bootstrap-prompt"
 			dialogClass="bordered-modal"
+			bodyClass="px-4 py-4"
 		>
 			<template v-slot:title>
 				{{$capitalize( $p.t('abgabetool/c4titelBearbeiten') )}}
@@ -653,7 +678,8 @@ export const AbgabeStudentDetail = {
 	 	<bs-modal 
 	 		ref="modalContainerEnduploadZusatzdaten"
 	 		class="bootstrap-prompt"
-	 		dialogClass="bordered-modal modal-lg">
+	 		dialogClass="bordered-modal modal-lg"
+	 		bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{$capitalize( $p.t('abgabetool/c4enduploadZusatzdaten') )}}

@@ -42,14 +42,6 @@ export const AbgabetoolAssistenz = {
 	props: {
 		stg_kz_prop: {
 			default: null
-		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({name: '', uid: ''}),
-			validator(value) {
-				return value && value.uid // && value.name -> extensive viewData use only for cis4 onwards
-			}
 		}
 	},
 	data() {
@@ -1926,10 +1918,6 @@ export const AbgabetoolAssistenz = {
 					'<p style="max-width: 100%; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; margin: 0px;">'+longForm+'</p></div>'
 			}
 		},
-		detailFormatter(cell) {
-			return '<div style="display: flex; justify-content: start; align-items: center; height: 100%">' +
-				'<a><i class="fa fa-folder-open" style="color:#00649C"></i></a></div>'
-		},
 		pkzTextFormatter(cell) {
 			const val = cell.getValue()
 
@@ -2351,7 +2339,11 @@ export const AbgabetoolAssistenz = {
 	<template v-if="phrasenResolved">
 		<FhcOverlay :active="loading || saving"></FhcOverlay>
 
-	<bs-modal ref="modalContainerEditSeries" class="bootstrap-prompt" dialogClass="modal-lg">
+	<bs-modal 
+		ref="modalContainerEditSeries" 
+		class="bootstrap-prompt" 
+		dialogClass="modal-lg"
+		bodyClass="px-4 py-4">
 		<template v-slot:title>
 			<div>{{ $p.t('abgabetool/c4editTerminserie') }}</div>
 			<div class="text-muted" style="font-size: 0.9rem;">
@@ -2450,8 +2442,11 @@ export const AbgabetoolAssistenz = {
 		</template>
 	</bs-modal>
 
-		<bs-modal ref="modalContainerAddSeries" class="bootstrap-prompt"
-			dialogClass="modal-lg">
+		<bs-modal 
+			ref="modalContainerAddSeries" 
+			class="bootstrap-prompt"
+			dialogClass="modal-lg"
+			bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{ $p.t('abgabetool/neueTerminserie') }}
@@ -2530,7 +2525,8 @@ export const AbgabetoolAssistenz = {
 		
 		<bs-modal ref="modalContainerAbgabeDetail" class="bootstrap-prompt"
 			dialogClass="modal-xl" :allowFullscreenExpand="true"
-			@toggle-fullscreen="handleToggleFullscreenDetail">
+			@toggle-fullscreen="handleToggleFullscreenDetail"
+			bodyClass="px-4 py-4">
 			<template v-slot:title>
 				<div>
 					{{$p.t('abgabetool/c4abgabeMitarbeiterDetailTitle')}}
