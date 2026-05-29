@@ -17,11 +17,12 @@ class StudentstatusNachDiplomand extends PlausiChecker
 		$exkludierte_studiengang_kz = isset($this->_config['exkludierteStudiengaenge']) ? $this->_config['exkludierteStudiengaenge'] : null;
 
 		// pass parameters needed for plausicheck
+		$studiensemester_kurzbz = isset($params['studiensemester_kurzbz']) ? $params['studiensemester_kurzbz'] : null;
 		$studiengang_kz = isset($params['studiengang_kz']) ? $params['studiengang_kz'] : null;
 		$prestudent_id = isset($params['prestudent_id']) ? $params['prestudent_id'] : null;
 
 		// get all students failing the plausicheck
-		$prestudentRes = $this->getStudentstatusNachDiplomand($studiengang_kz, $prestudent_id, $exkludierte_studiengang_kz);
+		$prestudentRes = $this->getStudentstatusNachDiplomand($studiensemester_kurzbz, $studiengang_kz, $prestudent_id, $exkludierte_studiengang_kz);
 
 		if (isError($prestudentRes)) return $prestudentRes;
 
@@ -47,12 +48,13 @@ class StudentstatusNachDiplomand extends PlausiChecker
 
 	/**
 	 * There shouldn't be any student status after Diplomand status.
+	 * @param studiensemester_kurzbz int if check is to be executed for certain Studiensemester
 	 * @param studiengang_kz int if check is to be executed for certain Studiengang
 	 * @param prestudent_id int if check is to be executed only for one prestudent
 	 * @param exkludierte_studiengang_kz array if certain Studiengänge have to be excluded from check
 	 * @return success with prestudents or error
 	 */
-	public function getStudentstatusNachDiplomand($studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
+	public function getStudentstatusNachDiplomand($studiensemester_kurzbz = null, $studiengang_kz = null, $prestudent_id = null, $exkludierte_studiengang_kz = null)
 	{
 		$params = array();
 
@@ -75,6 +77,18 @@ class StudentstatusNachDiplomand extends PlausiChecker
 						AND status_kurzbz = 'Student'
 						AND datum::date > status.datum::date
 				)";
+
+		if (isset($studiensemester_kurzbz))
+		{
+			$qry .= " AND EXISTS (
+						SELECT 1
+						FROM public.tbl_prestudentstatus ps
+						WHERE studiensemester_kurzbz IN ?
+						AND ps.prestudent_id = prestudent.prestudent_id
+					)";
+
+			$params[] = [$studiensemester_kurzbz];
+		}
 
 		if (isset($studiengang_kz))
 		{
