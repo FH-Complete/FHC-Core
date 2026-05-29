@@ -86,9 +86,7 @@ if($prestudent_id!='')
 	$disabled = $bismeldestichtag->checkMeldestichtagErreicht($datum) && !$rechte->isBerechtigt('student/keine_studstatuspruefung', null, 'suid')
 		? ' disabled="true"'
 		: '';
-	$isStatusBeforeStudent = in_array($status_kurzbz, array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher'))
-		? false
-		: true;
+	$isStatusBeforeStudent = !in_array($status_kurzbz, array('Student','Diplomand','Absovlent','Incoming','Abbrecher','Unterbrecher'));
 	$disabledStudent = $isStatusBeforeStudent
 		? ' '
 		: ' disabled="true"';
