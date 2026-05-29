@@ -4,9 +4,6 @@ import Loader from "../../Loader.js";
 
 export const ProjektabgabeUebersicht =  {
 	name: "ProjektabgabeUebersicht",
-	props: {
-		viewData: Object // NOTE: this is inherited from router-view
-	},
 	components: {
 		CoreFilterCmpt,
 		Loader
@@ -60,7 +57,7 @@ export const ProjektabgabeUebersicht =  {
 							});
 							container.append(downloadButton);
 
-							if (this.viewData.showEdit)
+							if (this.showEdit)
 							{
 								let editButton = document.createElement('button');
 								editButton.className = 'btn btn-outline-secondary';
@@ -116,7 +113,9 @@ export const ProjektabgabeUebersicht =  {
 						this.tableBuiltResolve()
 					}
 				}
-			]};
+			],
+			showEdit: null,
+		};
 	},
 	methods: {
 		tableResolve(resolve) {
@@ -220,7 +219,12 @@ export const ProjektabgabeUebersicht =  {
 			if (this.selectedTermin) url.searchParams.append('abgabedatum', this.selectedTermin);
 			if (this.personSearchString) url.searchParams.append('personSearchString', this.personSearchString);
 			window.open(url.toString(), '_blank');
-		}
+		},
+		async getViewData() {
+			const viewDataResponse = await this.$api.call(ApiPaabgabe.getViewData());
+			const viewData = viewDataResponse.data;
+			this.showEdit = viewData.showEdit;
+		},
 	},
 	computed: {
 		isDarkMode() {
@@ -236,7 +240,8 @@ export const ProjektabgabeUebersicht =  {
 			return FHC_JS_DATA_STORAGE_OBJECT.app_root + FHC_JS_DATA_STORAGE_OBJECT.ci_router + '/api/frontend/v1/education/PaabgabeUebersicht/downloadZip';
 		}
 	},
-	created() {
+	async created() {
+		await this.getViewData();
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global', 'person', 'ui']);
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true});
 	},

@@ -29924,6 +29924,46 @@ array(
 				)
 			)
 		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'add_reservation',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Reservierung hinzufügen',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Add reservation',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
+		array(
+			'app' => 'core',
+			'category' => 'LvPlan',
+			'phrase' => 'reservation_not_allowed',
+			'insertvon' => 'system',
+			'phrases' => array(
+				array(
+					'sprache' => 'German',
+					'text' => 'Reservierung nicht erlaubt',
+					'description' => '',
+					'insertvon' => 'system'
+				),
+				array(
+					'sprache' => 'English',
+					'text' => 'Reservation not allowed',
+					'description' => '',
+					'insertvon' => 'system'
+				)
+			)
+		),
 		// LvPlan Phrasen ende
 		//ProfilUpdate Phrasen start
 		array(
