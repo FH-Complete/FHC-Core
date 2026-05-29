@@ -3,6 +3,11 @@ export default {
 		event: {
 			type: Object,
 			required: true
+		},
+		timeSlotDisplayBehavior: {
+			type: String,
+			default: "default",
+			// options: default, always, never 
 		}
 	},
 	inject: {
@@ -63,14 +68,25 @@ export default {
 	methods: {
 		handleDelete() {
 			this.$emit('delete-event', this.event);
-		}
+		},
+		timeSlotDisplayClasses() {
+			switch (this.$props.timeSlotDisplayBehavior) {
+				case "always":
+					return "d-grid";
+				case "never":
+					return "d-none";
+				default:
+					return "d-none d-xl-grid";
+			}
+		},
 	},
 	template: /* html */`
 	<div
 		class="cis-renderer-reservierungen-calendar-event calendar-event-default h-100 w-100 p-1 position-relative">
 		<div
-			v-if="!event.allDayEvent && event?.beginn && event?.ende"
-			class="event-time d-grid h-100"
+			v-if="!event?.allDayEvent && event?.beginn && event?.ende"
+			:class="timeSlotDisplayClasses"
+			class="event-time h-100"
 		>
 			<span>{{ start }}</span>
 			<span>{{ end }}</span>
@@ -86,6 +102,7 @@ export default {
 			</button>
 		
 			<span class="event-topic">{{ event.topic }}</span>
+			<span class="event-place">{{ event.ort_kurzbz }}</span>
 			<span
 				v-for="lektor in event.lektor.slice(0, 3)"
 				class="event-lectors"
@@ -98,7 +115,6 @@ export default {
 			>
 				... +{{ event.lektor.length - 3 }}
 			</span>
-			<span class="event-place">{{ event.ort_kurzbz }}</span>
 		</div>
 	</div>
 	`,

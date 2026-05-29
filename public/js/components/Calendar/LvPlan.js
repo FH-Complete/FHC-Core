@@ -230,6 +230,9 @@ export default {
 					:is="renderers[event.type]?.calendarEvent"
 					:event="event"
 					@delete-event="(event) => $emit('delete-event', event)"
+					:timeSlotDisplayBehavior="
+						$props.mode.toLowerCase() === 'list' ? 'always' : 'default'
+					"
 				></component>
 			</div>
 		</template>

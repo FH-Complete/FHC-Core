@@ -340,7 +340,7 @@ export default {
     <div class="row">
 		<div class="d-md-none col-12">
 			<!-- Bearbeiten Button -->
-            <div v-if="isEditable" class="row mb-4">
+            <div v-if="isEditable" class="row mb-3 ">
                 <div class="col">
                     <button @click="()=>showEditProfilModal()" type="button" class="text-start card w-100 btn btn-outline-secondary" >
                         <div class="row">
