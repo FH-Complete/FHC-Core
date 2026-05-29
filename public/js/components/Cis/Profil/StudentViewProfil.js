@@ -121,12 +121,12 @@ export default {
                             <profil-information :data="profilInformation" :title="$p.t('profil','studentIn')" :fotoStatus="fotoStatus"></profil-information>
                         </div>
                     </div>
-                    <!-- SECOND ROW OF FIRST COLUMN -->
-					<div class="row mb-4">
-                        <div class="col">
-                            
-                        </div>
-                    </div>
+					<!-- QUICK LINKS, MOBILE VIEW (HIDDEN IF VIEWPORT >= MD BREAKPOINT) -->
+					<div v-if="quickLinks.length" class="row mb-4 d-md-none">
+						<div class="col">
+							<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
+						</div>
+					</div>
                     <!-- START OF SECOND PROFIL  INFORMATION COLUMN -->
                     <!-- END OF PROFIL INFORMATION ROW -->
                     <!-- INFORMATION CONTENT END -->
@@ -155,7 +155,8 @@ export default {
         <!-- START OF SIDE PANEL -->
         <div  class="col-md-4 col-xxl-3 col-sm-12 text-break" >
             <!-- START OF THE FIRST ROW IN THE SIDE PANEL -->
-            <div v-if="quickLinks.length" class="row mb-4">
+            <!-- QUICK LINKS, HIDDEN IF VIEWPORT < MD BREAKPOINT -->
+			<div v-if="quickLinks.length" class="row mb-3 d-none d-md-block">
 				<div class="col">
 					<quick-links :title="$p.t('profil/quickLinks')" :links="quickLinks" />
 				</div>

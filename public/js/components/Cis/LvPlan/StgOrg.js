@@ -319,6 +319,10 @@ export default {
 				this.loadListGroup();
 			}
 		}
+
+		if (this.formData.stgkz) {
+			this.loadLvPlan();
+		}
 	},
 	template: `
 	<div class="cis-lvplan-stg-org d-flex flex-column h-100">
