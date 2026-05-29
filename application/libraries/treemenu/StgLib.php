@@ -1,39 +1,38 @@
 <?php
-
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/PHPClass.php to edit this template
- */
+require_once APPPATH . 'libraries/treemenu/TreeMenuLib.php';
 
 /**
  * Description of InOutLib
  *
  * @author bambi
  */
-class StgLib
+class StgLib extends TreeMenuLib
 {
+	public function getNodes()
+	{
+		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$res = $this->ci->StudiengangModel->loadWhere(array('aktiv' => true));
+		$stgs = hasData($res) ? getData($res) : array();
+
+		$this->ci->addMeta('bhstg', $stgs);
+		$nodes = array_map(
+			function($stg) {
+				return array(
+					'name' => strtoupper($stg->typ . $stg->kurzbz) . ' ' . $stg->bezeichnung,
+					'link' => 'stg/' . $stg->studiengang_kz,
+					'leaf' => false
+				);
+			},
+			$stgs
+		);
+
+		return $nodes;
+	}
+
 	public function getSubMenu()
 	{
 		return [
-			'name' => 'International',
-			'link' => 'inout',
-			'children' => [
-				[
-					'name' => 'Incoming',
-					'link' => 'inout/incoming',
-					'leaf' => true
-				],
-				[
-					'name' => 'Outgoing',
-					'link' => 'inout/outgoing',
-					'leaf' => true
-				],
-				[
-					'name' => 'Gemeinsame Studien',
-					'link' => 'inout/gemeinsamestudien',
-					'leaf' => true
-				]
-			]
+			'StgLib' => 'test123'
 		];
 	}
 }

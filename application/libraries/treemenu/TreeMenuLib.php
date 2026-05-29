@@ -17,12 +17,12 @@ abstract class TreeMenuLib
 
 	public function __construct($children_config)
 	{
-		$this->ci = get_instance();
+		$this->ci =& get_instance();
 		$this->children_config = $children_config;
 		foreach($this->children_config as $child_config)
 		{
 			$grandchildren_config = isset($child_config['children']) ? $child_config['children'] : [];
-			$this->ci->load->library($child_config->library, $grandchildren_config);
+			$this->ci->load->library($child_config['library'], $grandchildren_config, basename($child_config['library']));
 		}
 	}
 

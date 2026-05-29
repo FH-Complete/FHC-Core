@@ -64,17 +64,41 @@ class TreeMenu extends FHCAPI_Controller
 
 		$this->loadMenuConfig($treemenu);
 
+		$startconfig = $this->findStartLib($this->treemenuconfig, array_keys($this->uri->uri_to_assoc(7)));
+
+		$libpath = $startconfig['library'];
+		$children = isset($startconfig['children']) ? $startconfig['children'] : array();
+		$libname = basename($startconfig['library']);
+
+		$this->load->library(
+			$libpath,
+			$children,
+			$libname
+		);
+
 		$bhdebug = (object) array(
 			'treemenu' => $treemenu,
 			'treemenuconfig' => $this->treemenuconfig,
-			'uri' => $this->uri->uri_to_assoc(7)
+			'uri' => $this->uri->uri_to_assoc(7),
+			'libpath' => $libpath,
+			'libname' => $libname,
+			'children' => $children,
+			'startconfig' => $startconfig
 		);
 		$this->addMeta('bhdebug', $bhdebug);
+		//$this->addMeta('bhci', $this);
 
-		$this->load->library($this->treemenuconfig->library, $this->treemenuconfig->children);
-
-		$data = $this->StvMenuLib->getSubMenu();
+		$data = $this->$libname->getSubMenu();
 		$this->terminateWithSuccess($data);
+	}
+
+	protected function findStartLib($config, $uri)
+	{
+		$level = array_shift($uri);
+		if(is_null($level)) {
+			return $config;
+		}
+		return $this->findStartLib($config['children'][$level], $uri);
 	}
 
 	protected function loadMenuConfig($treemenu)

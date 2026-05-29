@@ -6,35 +6,37 @@ $config['stv_menu'] = array(
 	'children' => array(
 		'stg' => array(
 			'library' => 'treemenu/StgLib',
+/*
 			'children' => array(
 				'pre' => array(
-					'library' => 'treemenu/Prestudent'
+					'library' => 'treemenu/PrestudentLib'
 				),
 				'sem' => array(
-					'library' => 'treemenu/AusbSemester',
+					'library' => 'treemenu/AusbSemesterLib',
 					'children' => array(
 						'vbd' => array(
-							'library' => 'treemenu/Verband'
+							'library' => 'treemenu/VerbandLib'
 						)
 					)
 				),
 				'orgform' => array(
-					'library' => 'treemenu/OrgForm',
+					'library' => 'treemenu/OrgFormLib',
 					'children' => array(
 						'pre' => array(
-							'library' => 'treemenu/Prestudent'
+							'library' => 'treemenu/PrestudentLib'
 						),
 						'sem' => array(
-							'library' => 'treemenu/AusbSemester',
+							'library' => 'treemenu/AusbSemesterLib',
 							'children' => array(
 								'vbd' => array(
-									'library' => 'treemenu/Verband'
+									'library' => 'treemenu/VerbandLib'
 								)
 							)
 						)
 					)
 				)
 			)
+*/
 		),
 		'inout' => array(
 			'library' => 'treemenu/InOutLib'

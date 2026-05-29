@@ -1,5 +1,5 @@
 <?php
-require_once APPPATH . 'library/treemenu/TreeMenuLib.php';
+require_once APPPATH . 'libraries/treemenu/TreeMenuLib.php';
 /**
  * Description of StvMenuLib
  *
@@ -9,8 +9,15 @@ class StvMenuLib extends TreeMenuLib
 {
 	public function getSubMenu()
 	{
-		return [
-			'StvMenuLib' => null
-		];
+		$nodes = array();
+
+		foreach($this->children_config as $childconfig)
+		{
+			$childlib = basename($childconfig['library']);
+			$childnodes = $this->ci->$childlib->getNodes();
+			$nodes = array_merge($nodes, $childnodes);
+		}
+
+		return $nodes;
 	}
 }
