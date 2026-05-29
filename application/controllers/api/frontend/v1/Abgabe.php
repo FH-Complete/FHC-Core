@@ -486,7 +486,17 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
 		}
 
+		// Reject emojis and pictographs
+		// allows foreign letters, math symbols, accents, and standard punctuation.
+		$emojiPattern = '/[\x{1F300}-\x{1F5FF}\x{1F600}-\x{1F64F}\x{1F680}-\x{1F6FF}\x{1F900}-\x{1FAFF}\x{23E9}-\x{23EF}\x{2b50}\x{2700}-\x{27BF}]/u';
+		
+		// i would like this much more but our server does not recognize this utf-8 character range this way, so hexcodes it is 
+//		if (preg_match('/\p{Extended_Pictographic}/u', $titel)) {
+		if (preg_match($emojiPattern, $titel)) {
 
+			$this->terminateWithError($this->p->t('global', 'wrongParameters'), 'general');
+		}
+		
 		$this->checkProjektarbeitForFinishedStatus($projektarbeit_id);
 
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
@@ -542,7 +552,8 @@ class Abgabe extends FHCAPI_Controller
 		);
 		
 		$result = $this->ProjektarbeitModel->load($projektarbeit_id);
-		$this->terminateWithSuccess($result);
+		$titel = hasData($result) ? getData($result)[0]->titel : $titel;
+		$this->terminateWithSuccess($titel);
 	}
 
 	/**

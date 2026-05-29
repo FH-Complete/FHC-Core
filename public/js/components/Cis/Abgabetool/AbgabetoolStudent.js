@@ -4,6 +4,7 @@ import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass} from "./getDateStyleClass.js";
+import { validateThesisTitle } from './titleValidation.js'
 
 export const AbgabetoolStudent = {
 	name: "AbgabetoolStudent",
@@ -61,10 +62,16 @@ export const AbgabetoolStudent = {
 			this.$refs.modalTitelEdit.show();
 		},
 		async saveTitel() {
-			const trimmed = this.editingTitel.trim();
-			if (!trimmed) {
-				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningEmptyField')));
-				return;
+			const validation = validateThesisTitle(this.editingTitel);
+
+			if (!validation.isValid) {
+				if (validation.error === 'empty') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4emptyThesisTitle'))
+				} else if (validation.error === 'invalid_characters') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4invalidCharactersThesisTitle'))
+
+				}
+				return false;
 			}
 
 			const confirmed = await this.$fhcAlert.confirm({
@@ -81,15 +88,15 @@ export const AbgabetoolStudent = {
 			this.$api.call(
 				ApiAbgabe.postStudentProjektarbeitTitel(
 					this.editingProjektarbeit.projektarbeit_id,
-					trimmed
+					validation.cleanedTitle
 				)
 			).then(res => {
 				if (res.meta.status === 'success') {
 					// update the local list entry in-place so the accordion header reflects it immediately
-					this.editingProjektarbeit.titel = trimmed;
+					this.editingProjektarbeit.titel = res.data;
 					// keep the open detail modal in sync if it happens to be showing this projektarbeit
 					if (this.selectedProjektarbeit?.projektarbeit_id === this.editingProjektarbeit.projektarbeit_id) {
-						this.selectedProjektarbeit.titel = trimmed;
+						this.selectedProjektarbeit.titel = res.data;
 					}
 					this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4titelSavedSuccess')));
 					this.$refs.modalTitelEdit.hide();

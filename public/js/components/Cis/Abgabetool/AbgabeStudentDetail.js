@@ -4,6 +4,8 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { formatISODate, getViennaTodayISO } from "./dateUtils.js";
+import { validateThesisTitle } from './titleValidation.js'
+
 
 export const AbgabeStudentDetail = {
 	name: "AbgabeStudentDetail",
@@ -127,10 +129,17 @@ export const AbgabeStudentDetail = {
 			this.$refs.modalTitelEdit.show();
 		},
 		async saveTitel() {
-			const trimmed = this.editingTitel.trim();
-			if (!trimmed) {
-				this.$fhcAlert.alertWarning(this.$capitalize(this.$p.t('global/warningEmptyField')));
-				return;
+			
+			const validation = validateThesisTitle(this.editingTitel);
+
+			if (!validation.isValid) {
+				if (validation.error === 'empty') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4emptyThesisTitle'))
+				} else if (validation.error === 'invalid_characters') {
+					this.$fhcAlert.alertWarning(this.$p.t('abgabetool/c4invalidCharactersThesisTitle'))
+
+				}
+				return false;
 			}
 
 			const confirmed = await this.$fhcAlert.confirm({
@@ -147,14 +156,14 @@ export const AbgabeStudentDetail = {
 			this.$api.call(
 				ApiAbgabe.postStudentProjektarbeitTitel(
 					this.projektarbeit.projektarbeit_id,
-					trimmed
+					validation.cleanedTitle
 				)
 			).then(res => {
 				if (res.meta.status === 'success') {
-					this.projektarbeit.titel = trimmed;
+					this.projektarbeit.titel = res.data;
 					this.$emit('titel-updated', {
 						projektarbeit_id: this.projektarbeit.projektarbeit_id,
-						titel: trimmed
+						titel: res.data
 					});
 					this.$fhcAlert.alertSuccess(this.$capitalize(this.$p.t('abgabetool/c4titelSavedSuccess')));
 					this.$refs.modalTitelEdit.hide();
