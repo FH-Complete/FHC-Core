@@ -94,6 +94,7 @@ require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
+require_once('dbupdate_3.4/76677_zeitaufzeichnung_zeitmodell.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -246,6 +247,7 @@ $tabellen=array(
 	"hr.tbl_lohnguide_modellstelle" => array("modellstelle_kurzbz", "bezeichnung", "grade", "modellfunktion_kurzbz", "aktiv", "sort", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_lohnguide_fachrichtung" => array("fachrichtung_kurzbz", "bezeichnung", "aktiv", "insertvon", "insertamum", "updatevon", "updateamum"),
 	"hr.tbl_vertragsbestandteil_lohnguide" => array("vertragsbestandteil_id", "stellenbezeichnung", "vordienstzeit", "fachrichtung_kurzbz", "modellstelle_kurzbz", "kommentar_person", "kommentar_modellstelle"),	
+	"hr.tbl_zeitmodell" => array('zeitmodell_id','bezeichnung','aktiv', 'stundenanzahl','ext_id','sort'),
 	"lehre.tbl_abschlussbeurteilung"  => array("abschlussbeurteilung_kurzbz","bezeichnung","bezeichnung_english","sort"),
 	"lehre.tbl_abschlusspruefung"  => array("abschlusspruefung_id","student_uid","vorsitz","pruefer1","pruefer2","pruefer3","abschlussbeurteilung_kurzbz","akadgrad_id","pruefungstyp_kurzbz","datum","uhrzeit","sponsion","anmerkung","updateamum","updatevon","insertamum","insertvon","ext_id","note","protokoll","endezeit","pruefungsantritt_kurzbz","freigabedatum"),
 	"lehre.tbl_abschlusspruefung_antritt"  => array("pruefungsantritt_kurzbz","bezeichnung","bezeichnung_english","sort"),
