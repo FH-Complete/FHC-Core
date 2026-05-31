@@ -1,8 +1,23 @@
+import { waitForOk } from "../helpers/network";
+
+export const PLANER = "Planer";
+export const LEKTOR = "Lektor";
+export const STUDENT = "Student";
+export const SYNC = "Sync";
+
+const roleFetchAliases = {
+  [PLANER]: "@fetchPlanData",
+  [LEKTOR]: "@fetchLecturerPlanData",
+  [STUDENT]: "@fetchStudentPlanData",
+};
+
 class TempusPage {
   selectors = {
     calendarBaseGrid: "div[data-cy='tempus'] .fhc-calendar-base-grid",
     parkingSlot: "div[data-cy='tempus'] #parkingslot",
   };
+
+  cleanupMondayFirstColumnAfterTest = false;
 
   visit = () => cy.visit("/index.ci.php/tempus", {
     onBeforeLoad(win) {
@@ -118,6 +133,34 @@ class TempusPage {
     const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
     return eventData?.orig?.beginn === startTime && eventData?.orig?.ende === endTime;
   });
+  getKalenderId = (eventData) =>
+    eventData?.orig?.kalender_id ?? eventData?.id;
+  getCalendarEventData = ($event) =>
+    JSON.parse($event.attr("data-fhc-draggable-value"));
+  getFirstLecturer = (eventData) =>
+    eventData?.orig?.lektor?.find((lecturer) => lecturer?.kurzbz);
+  getUpdatedKalenderId = (interception) => {
+    const retval = interception.response.body?.data?.retval;
+
+    return retval?.kalender_id ?? retval;
+  };
+  getMondayFirstColumnEventData = ($body) =>
+    [
+      ...$body
+        .find(`${this.selectors.calendarBaseGrid} .fhc-calendar-base-grid-line`)
+        .first()
+        .find(".fhc-calendar-base-grid-line-event"),
+    ]
+      .map((event) => {
+        const eventJSON = event.getAttribute("data-fhc-draggable-value");
+
+        try {
+          return eventJSON ? JSON.parse(eventJSON) : null;
+        } catch {
+          return null;
+        }
+      })
+      .filter(Boolean);
   getCalendarLoadingEvents = () => this.getCalendarSection().find(".placeholder-glow");
   getCalendarEventModal = () => this.getCalendarSection().find(".bootstrap-modal.show");
   getEventContextMenu = () => cy.get("[data-cy='eventContextMenu']");
@@ -150,6 +193,158 @@ class TempusPage {
 
   selectPreviewRole = (role) => {
     this.getPreviewRoleButton(role).click();
+  };
+
+  syncAndReloadPlanner = () => {
+    this.selectPreviewRole(SYNC);
+    waitForOk("@syncCalendar");
+    waitForOk("@fetchPlanData");
+    this.waitForCalendarToFinishLoading();
+  };
+
+  selectRoleAndWait = (role) => {
+    this.selectPreviewRole(role);
+    waitForOk(roleFetchAliases[role]);
+    this.waitForCalendarToFinishLoading();
+  };
+
+  expectCalendarEventRoom = (eventId, expectedRoom) => {
+    this.getCalendarEventRoom(eventId)
+      .scrollIntoView()
+      .should("be.visible")
+      .invoke("text")
+      .then((roomText) => {
+        expect(roomText.trim(), "event room").to.eq(expectedRoom);
+      });
+  };
+
+  setupIntercepts = () => {
+    cy.intercept({ method: "GET", url: "**/StgTree" }).as("fetchCourseTree");
+    cy.intercept({
+      method: "GET",
+      url: /\/tempus\/Kalender\/getPlan(?:\?|$)/,
+    }).as("fetchPlanData");
+    cy.intercept({
+      method: "GET",
+      url: /\/tempus\/Kalender\/getPlanLecturer(?:\?|$)/,
+    }).as("fetchLecturerPlanData");
+    cy.intercept({
+      method: "GET",
+      url: /\/tempus\/Kalender\/getPlanStudent(?:\?|$)/,
+    }).as("fetchStudentPlanData");
+    cy.intercept({ method: "GET", url: "**/tempus/Kalender/getHistory**" }).as(
+      "fetchEventHistory",
+    );
+    cy.intercept({
+      method: "GET",
+      url: "**/tempus/Kalender/getRaumvorschlag**",
+    }).as("fetchRoomSuggestions");
+    cy.intercept({
+      method: "GET",
+      url: "**/tempus/coursepicker/getByStg**",
+    }).as("fetchCoursePickerCourses");
+    cy.intercept({
+      method: "POST",
+      url: "**/searchbar/search**",
+    }).as("searchbarSearch");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/addKalenderEvent**",
+    }).as("addCalendarEvent");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/updateKalenderEvent**",
+    }).as("updateCalendarEvent");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/sync**",
+    }).as("syncCalendar");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/syncToStudent**",
+    }).as("syncCalendarToStudent");
+    cy.intercept({
+      method: "POST",
+      url: "**/tempus/Kalender/deleteEntry**",
+    }).as("deleteCalendarEvent");
+  };
+
+  visitAndWaitForPlanner = () => {
+    cy.login();
+    this.setupIntercepts();
+    this.visit();
+
+    waitForOk("@fetchCourseTree");
+    waitForOk("@fetchPlanData");
+    this.waitForCalendarToFinishLoading();
+  };
+
+  reloadPlannerForCleanup = () => {
+    this.visit();
+    waitForOk("@fetchCourseTree");
+    waitForOk("@fetchPlanData");
+
+    return this.waitForCalendarToFinishLoading();
+  };
+
+  deleteKalenderEvent = (kalenderId) =>
+    cy.request({
+      method: "POST",
+      url: "/index.ci.php/api/frontend/v1/tempus/Kalender/deleteEntry",
+      form: true,
+      body: {
+        kalender_id: kalenderId,
+      },
+      failOnStatusCode: false,
+    });
+
+  clearMondayFirstColumn = () => {
+    this.reloadPlannerForCleanup();
+
+    return cy.get("body").then(($body) => {
+      const calendarIds = [
+        ...new Set(
+          this.getMondayFirstColumnEventData($body)
+            .map(this.getKalenderId)
+            .filter(Boolean),
+        ),
+      ];
+
+      if (!calendarIds.length) {
+        return;
+      }
+
+      return cy
+        .wrap(calendarIds, { log: false })
+        .each((kalenderId) => {
+          return this.deleteKalenderEvent(kalenderId).then((response) => {
+            if (response.status !== 200) {
+              Cypress.log({
+                name: "tempus cleanup",
+                message: `Could not delete calendar event ${kalenderId}: ${response.status}`,
+              });
+            }
+          });
+        })
+        .then(() => {
+          return this.reloadPlannerForCleanup();
+        });
+    });
+  };
+
+  clearMondayFirstColumnBeforeAndAfter = () => {
+    this.cleanupMondayFirstColumnAfterTest = true;
+
+    return this.clearMondayFirstColumn();
+  };
+
+  clearMondayFirstColumnAfterTest = () => {
+    const shouldClearMondayFirstColumn = this.cleanupMondayFirstColumnAfterTest;
+    this.cleanupMondayFirstColumnAfterTest = false;
+
+    if (shouldClearMondayFirstColumn) {
+      return this.clearMondayFirstColumn();
+    }
   };
 
   disableStundenraster = () => {
