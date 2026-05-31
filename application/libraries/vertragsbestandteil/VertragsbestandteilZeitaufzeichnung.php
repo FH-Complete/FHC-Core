@@ -9,6 +9,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 	protected $zeitaufzeichnung;
 	protected $azgrelevant;
 	protected $homeoffice;
+	protected $zeitmodell_id;
 	
 	public function __construct()
 	{
@@ -24,6 +25,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 		isset($data->zeitaufzeichnung) && $this->setZeitaufzeichnung($data->zeitaufzeichnung);
 		isset($data->azgrelevant) && $this->setAzgrelevant($data->azgrelevant);
 		isset($data->homeoffice) && $this->setHomeoffice($data->homeoffice);
+		isset($data->zeitmodell_id) && $this->setHomeoffice($data->zeitmodell_id);
 		$this->fromdb = false;
 	}
 	
@@ -83,6 +85,25 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 
 		return $this;
 	}
+
+	/**
+	 * Get the value of zeitmodell_id
+	 */
+	public function getZeitmodell_id()
+	{
+		return $this->zeitmodell_id;
+	}
+
+	/**
+	 * Set the value of zeitmodell_id
+	 */
+	public function setZeitmodell_id($zeitmodell_id): self
+	{
+		$this->markDirty('zeitmodell_id', $this->zeitmodell_id, $zeitmodell_id);
+		$this->zeitmodell_id = $zeitmodell_id;
+
+		return $this;
+	}
 	
 	public function toStdClass(): \stdClass
 	{
@@ -90,7 +111,8 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 			'vertragsbestandteil_id' => $this->getVertragsbestandteil_id(),
 			'zeitaufzeichnung' => $this->getZeitaufzeichnung(),
 			'azgrelevant' => $this->getAzgrelevant(),
-			'homeoffice' => $this->getHomeoffice()
+			'homeoffice' => $this->getHomeoffice(),
+			'zeitmodell_id' => $this->getZeitmodell_id()
 		);
 		
 		$tmp = array_filter($tmp, function($k) {
@@ -106,6 +128,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 		zeitaufzeichnung: {$this->getZeitaufzeichnung()}
 		azgrelevant: {$this->getAzgrelevant()}
 		homeoffice: {$this->getHomeoffice()}
+		zeitmodell_id: {$this->getZeitmodell_id()}
 
 EOTXT;
 		return parent::__toString() . $txt;

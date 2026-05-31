@@ -37,7 +37,7 @@ class Vertragsbestandteil_model extends DB_Model
 				kf.arbeitgeber_frist, kf.arbeitnehmer_frist,
 				s.wochenstunden, s.teilzeittyp_kurzbz,
 				u.tage,
-				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice,
+				z.zeitaufzeichnung, z.azgrelevant, z.homeoffice, z.zeitmodell_id,
 				lg.stellenbezeichnung, lg.vordienstzeit, lg.fachrichtung_kurzbz, lg.modellstelle_kurzbz, lg.kommentar_person, lg.kommentar_modellstelle
 			FROM
 				hr.tbl_vertragsbestandteil v
