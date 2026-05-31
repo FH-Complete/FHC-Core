@@ -9,8 +9,8 @@ module.exports = defineConfig({
     defaultCommandTimeout: 20000,
     pageLoadTimeout: 10000,
     retries: {
-      runMode: 2,   // when running via CLI / CI
-      openMode: 2   // when running in interactive mode
+      runMode: 1,
+      openMode: 1
     }
   },
   env: {

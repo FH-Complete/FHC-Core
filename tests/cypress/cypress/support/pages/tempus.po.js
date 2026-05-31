@@ -1,6 +1,5 @@
 class TempusPage {
   selectors = {
-    calendarSection: "div[data-cy='tempus'] .fhc-calendar-base",
     calendarBaseGrid: "div[data-cy='tempus'] .fhc-calendar-base-grid",
     parkingSlot: "div[data-cy='tempus'] #parkingslot",
   };
@@ -8,6 +7,8 @@ class TempusPage {
   visit = () => cy.visit("/index.ci.php/tempus", {
     onBeforeLoad(win) {
       win.localStorage.removeItem("tempus_parking");
+      win.localStorage.removeItem("tempus_searchtypes");
+      win.sessionStorage.removeItem("tempus_searchstr");
     },
   });
 
@@ -22,59 +23,87 @@ class TempusPage {
   getCourseTreeRows = () => this.getSlideInCoursesMenu().find(".p-treetable-tbody tr");
   getCoursePickerRows = () => this.getCoursePicker().find(".course-picker-row");
   getCoursePickerSearchInput = () => this.getCoursePicker().find("input");
-  getCalendarEvents = () => this.getCalendarSection().find(".fhc-calendar-base-grid-line-event");
+  getCalendarEvents = () =>  this.getCalendarSection().then(($calendar) => {
+    return $calendar.find(".fhc-calendar-base-grid-line-event");
+  });
+  getLecturerWishOverlays = () => this.getCalendarSection().find(".bg-lecturer-wish");
+  getCalendarEventsWithRoom = () => this.getCalendarEvents().filter((index, event) => {
+    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+    return !!eventData?.orig?.ort_kurzbz;
+  });
+  getCalendarEventsWithLecturer = () => this.getCalendarEvents().filter((index, event) => {
+    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+    return eventData?.orig?.lektor?.some((lecturer) => lecturer?.kurzbz);
+  });
+  getCalendarEventsWithLehreinheit = () => this.getCalendarEvents().filter((index, event) => {
+    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+    const lehreinheitIds = eventData?.orig?.lehreinheit_id;
+
+    return Array.isArray(lehreinheitIds)
+      ? lehreinheitIds.length > 0
+      : !!lehreinheitIds;
+  });
+  getCalendarEventsWithLehreinheitAndRoom = () =>
+    this.getCalendarEventsWithLehreinheit().filter((index, event) => {
+      const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+
+      return !!eventData?.orig?.ort_kurzbz;
+    });
+  getNavbarSearchInput = () => this.getTempusOverview().find("header .searchbar_input");
+  getNavbarRoomSearchResult = (room) => {
+    const escapedRoom = room.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+    return cy.contains(
+      ".searchbar-result-room .searchbar-result-template-action",
+      new RegExp(`^\\s*${escapedRoom}\\s*$`),
+    );
+  };
+  getFirstNavbarEmployeeSearchResult = () =>
+    cy.get(".searchbar-result-student .searchbar_data .searchbar-result-template-action").first();
+  getSelectedRoomIndicator = (room) =>
+    this.getSidebarMenu().contains(".room-selection", room);
+  getSelectedRoomRemoveButton = (room) =>
+    this.getSelectedRoomIndicator(room).find("i.fa-xmark");
+  getSelectedLecturerIndicator = (lecturer) =>
+    this.getSidebarMenu().contains(".lecture-selection .fw-semibold", lecturer);
+  getSelectedLecturerRemoveButton = (lecturer) =>
+    this.getSelectedLecturerIndicator(lecturer).find("i.fa-xmark");
+  getSelectedLecturerPlanToggle = (lecturer) =>
+    this.getSelectedLecturerIndicator(lecturer)
+      .parent()
+      .contains(".d-flex.align-items-center", "Plan");
+  getSelectedLecturerWishToggle = (lecturer) =>
+    this.getSelectedLecturerIndicator(lecturer)
+      .parent()
+      .contains(".d-flex.align-items-center", "Zeitwünsche");
 
   getCalendarEventById = (id) => this.getCalendarEvents().filter(`div[data-id="event-${id}"]`);
   getCalendarPartDropTarget = (partIndex) =>
     `${this.selectors.calendarBaseGrid} .part-body:nth-of-type(${partIndex})`;
   dropEventOnCalendarPart = (eventId, partIndex, options = {}) => {
-    const { scrollIntoView = false, ...dragOptions } = options;
     const event = this.getCalendarEventById(eventId);
-    const eventToDrag = scrollIntoView ? event.scrollIntoView() : event;
 
-    return eventToDrag.should("be.visible").focus().drag(
+    return event.should("be.visible").drag(
       this.getCalendarPartDropTarget(partIndex),
       {
         waitForAnimations: false,
         animationDistanceThreshold: 0,
-        scrollBehavior: false,
-        ...dragOptions,
+        ...options,
       },
     );
   };
   dropCourseOnCalendarPart = (courseIndex, partIndex, options = {}) => {
-    const { scrollIntoView = false, ...dragOptions } = options;
     const course = this.getCoursePickerRows().eq(courseIndex);
-    const courseToDrag = scrollIntoView ? course.scrollIntoView() : course;
 
-    return courseToDrag.should("be.visible").drag(
+    return course.should("be.visible").drag(
       this.getCalendarPartDropTarget(partIndex),
       {
         waitForAnimations: false,
         animationDistanceThreshold: 0,
-        ...dragOptions,
+        ...options,
       },
     );
   };
-  updateKalenderEvent = (kalenderId, updatedInfos, options = {}) =>
-    cy.request({
-      method: "POST",
-      url: "/index.ci.php/api/frontend/v1/tempus/Kalender/updateKalenderEvent",
-      body: {
-        kalender_id: kalenderId,
-        updatedInfos,
-      },
-      ...options,
-    });
-  restoreKalenderEventTime = (kalenderId, startTime, endTime, options = {}) =>
-    this.updateKalenderEvent(
-      kalenderId,
-      {
-        start_time: startTime,
-        end_time: endTime,
-      },
-      options,
-    );
   getEventGridRowFromStyle = (style) =>
     /grid-row:\s*([^;]+)/.exec(style)?.[1]?.trim();
   getEventGridRow = (id) =>
@@ -85,10 +114,6 @@ class TempusPage {
     const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
     return eventData?.orig?.beginn === startTime;
   });
-  getCalendarEventsByEndTime = (endTime) => this.getCalendarEvents().filter((index, event) => {
-    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
-    return eventData?.orig?.ende === endTime;
-  });
   getCalendarEventsByTimeRange = (startTime, endTime) => this.getCalendarEvents().filter((index, event) => {
     const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
     return eventData?.orig?.beginn === startTime && eventData?.orig?.ende === endTime;
@@ -97,6 +122,15 @@ class TempusPage {
   getCalendarEventModal = () => this.getCalendarSection().find(".bootstrap-modal.show");
   getEventContextMenu = () => cy.get("[data-cy='eventContextMenu']");
   getEventContextMenuOption = (option) => this.getEventContextMenu().contains("button", option);
+  getRaumauswahlModal = () =>
+    cy.contains(".bootstrap-modal.show .modal-title", "Raumauswahl")
+      .closest(".bootstrap-modal.show");
+  getRaumauswahlRoomOptions = () =>
+    this.getRaumauswahlModal().find(".list-group-item");
+  getCalendarEventRoom = (id) =>
+    this.getCalendarEventById(id).find(".event-place");
+  getStundenrasterToggle = () =>
+    cy.contains(".form-check-label", "Stundenraster").parent();
   getHistoryModal = () => cy.get("[data-cy='historyModal']");
   getReservationDragHandle = () => cy.get("[data-cy='reservationDragHandle']");
   getReservationModal = () => cy.get("[data-cy='reservationModal']");
@@ -116,6 +150,16 @@ class TempusPage {
 
   selectPreviewRole = (role) => {
     this.getPreviewRoleButton(role).click();
+  };
+
+  disableStundenraster = () => {
+    this.getStundenrasterToggle().then(($toggle) => {
+      if ($toggle.find(".fa-toggle-on").length) {
+        cy.wrap($toggle).click();
+      }
+    });
+
+    this.getStundenrasterToggle().find("i").should("have.class", "fa-toggle-off");
   };
 
   waitForCalendarToFinishLoading = () => {
