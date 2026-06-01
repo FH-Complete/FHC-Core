@@ -25,12 +25,12 @@ class VerbandCollisionCheck implements ICollisionCheck
 
 		if ($this->_ci->variablelib->getVar('ignore_kollision') === 'true') return [];
 
-		$kollision_student      = $this->_ci->variablelib->getVar('kollision_student') === 'false';
+		$kollision_student = $this->_ci->variablelib->getVar('kollision_student') === 'false';
 		$kollision_reservierung = $this->_ci->variablelib->getVar('ignore_reservierung') === 'false';
 
 		if (!$kollision_student && !$kollision_reservierung) return [];
 
-		$dbModel    = new DB_Model();
+		$dbModel = new DB_Model();
 		$collisions = [];
 
 		if ($kollision_student)
@@ -61,7 +61,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 
 				JOIN (
 					SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
-						   tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+						tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
 					FROM lehre.tbl_kalender_lehreinheit
 					JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 					JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
@@ -78,7 +78,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 
 				JOIN (
 					SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
-						   tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+						tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
 					FROM lehre.tbl_kalender_lehreinheit
 					JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 					JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
@@ -257,7 +257,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 	
 			JOIN (
 				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
-					   tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
 				FROM lehre.tbl_kalender_lehreinheit
 				JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
@@ -277,7 +277,7 @@ class VerbandCollisionCheck implements ICollisionCheck
 	
 			JOIN (
 				SELECT tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester, tbl_lehreinheitgruppe.verband, tbl_lehreinheitgruppe.gruppe,
-					   tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
+					tbl_lehreinheitgruppe.gruppe_kurzbz, tbl_kalender_lehreinheit.kalender_id
 				FROM lehre.tbl_kalender_lehreinheit
 				JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 				JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id

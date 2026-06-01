@@ -32,7 +32,7 @@ class StudentCollisionCheck implements ICollisionCheck
 
 		$qry1 = "
 			SELECT DISTINCT tbl_benutzergruppe.uid
-			FROM lehre.tbl_kalender  
+			FROM lehre.tbl_kalender
 			JOIN lehre.tbl_kalender_lehreinheit USING(kalender_id)
 			JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 			JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
@@ -48,7 +48,7 @@ class StudentCollisionCheck implements ICollisionCheck
 			UNION ALL
 
 			SELECT DISTINCT tbl_studentlehrverband.student_uid AS uid
-			FROM lehre.tbl_kalender  
+			FROM lehre.tbl_kalender
 			JOIN lehre.tbl_kalender_lehreinheit USING(kalender_id)
 			JOIN lehre.tbl_lehreinheit ON tbl_lehreinheit.lehreinheit_id = tbl_kalender_lehreinheit.lehreinheit_id
 			JOIN lehre.tbl_lehreinheitgruppe ON tbl_lehreinheitgruppe.lehreinheit_id = tbl_lehreinheit.lehreinheit_id
@@ -57,7 +57,7 @@ class StudentCollisionCheck implements ICollisionCheck
 				AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester
 				AND tbl_studentlehrverband.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz
 				AND (tbl_lehreinheitgruppe.verband = tbl_studentlehrverband.verband OR tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = '' OR tbl_studentlehrverband.verband IS NULL)
-				AND (tbl_lehreinheitgruppe.gruppe  = tbl_studentlehrverband.gruppe  OR tbl_lehreinheitgruppe.gruppe  IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text)  = '' OR tbl_studentlehrverband.gruppe  IS NULL)
+				AND (tbl_lehreinheitgruppe.gruppe = tbl_studentlehrverband.gruppe OR tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = '' OR tbl_studentlehrverband.gruppe IS NULL)
 			WHERE tbl_kalender.kalender_id = ?
 				AND tbl_studentlehrverband.student_uid NOT IN ($placeholders)
 
@@ -87,14 +87,14 @@ class StudentCollisionCheck implements ICollisionCheck
 			JOIN public.tbl_benutzergruppe ON tbl_benutzergruppe.gruppe_kurzbz = tbl_gruppe.gruppe_kurzbz
 				AND tbl_benutzergruppe.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz
 			WHERE tbl_kalender.von < ?
-			  AND tbl_kalender.bis > ?
-			  AND tbl_kalender.kalender_id != ?
-			  AND tbl_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete')
-			  AND tbl_benutzergruppe.uid NOT IN ($placeholders)
-			  AND NOT EXISTS (
-				SELECT 1 FROM lehre.tbl_kalender vorgaenger
-				WHERE vorgaenger.vorgaenger_kalender_id = tbl_kalender.kalender_id
-			  )
+				AND tbl_kalender.bis > ?
+				AND tbl_kalender.kalender_id != ?
+				AND tbl_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete')
+				AND tbl_benutzergruppe.uid NOT IN ($placeholders)
+				AND NOT EXISTS (
+					SELECT 1 FROM lehre.tbl_kalender vorgaenger
+					WHERE vorgaenger.vorgaenger_kalender_id = tbl_kalender.kalender_id
+				)
 
 			UNION ALL
 			
@@ -108,16 +108,16 @@ class StudentCollisionCheck implements ICollisionCheck
 				AND tbl_studentlehrverband.semester = tbl_lehreinheitgruppe.semester
 				AND tbl_studentlehrverband.studiensemester_kurzbz = tbl_lehreinheit.studiensemester_kurzbz
 				AND (tbl_lehreinheitgruppe.verband = tbl_studentlehrverband.verband OR tbl_lehreinheitgruppe.verband IS NULL OR btrim(tbl_lehreinheitgruppe.verband::text) = '' OR tbl_studentlehrverband.verband IS NULL)
-				AND (tbl_lehreinheitgruppe.gruppe  = tbl_studentlehrverband.gruppe  OR tbl_lehreinheitgruppe.gruppe  IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text)  = '' OR tbl_studentlehrverband.gruppe  IS NULL)
+				AND (tbl_lehreinheitgruppe.gruppe = tbl_studentlehrverband.gruppe OR tbl_lehreinheitgruppe.gruppe IS NULL OR btrim(tbl_lehreinheitgruppe.gruppe::text) = '' OR tbl_studentlehrverband.gruppe IS NULL)
 			WHERE tbl_kalender.von < ?
-			  AND tbl_kalender.bis > ?
-			  AND tbl_kalender.kalender_id != ?
-			  AND tbl_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete')
-			  AND tbl_studentlehrverband.student_uid NOT IN ($placeholders)
-			  AND NOT EXISTS (
-				  SELECT 1 FROM lehre.tbl_kalender vorgaenger
-				  WHERE vorgaenger.vorgaenger_kalender_id = tbl_kalender.kalender_id
-			  )
+				AND tbl_kalender.bis > ?
+				AND tbl_kalender.kalender_id != ?
+				AND tbl_kalender.status_kurzbz NOT IN ('archived', 'deleted', 'to_delete')
+				AND tbl_studentlehrverband.student_uid NOT IN ($placeholders)
+				AND NOT EXISTS (
+					SELECT 1 FROM lehre.tbl_kalender vorgaenger
+					WHERE vorgaenger.vorgaenger_kalender_id = tbl_kalender.kalender_id
+				)
 		";
 
 		$result2 = $dbModel->execReadOnlyQuery($qry2, array_merge(
@@ -200,7 +200,7 @@ class StudentCollisionCheck implements ICollisionCheck
 				AND current_studentlehrverband.semester = current_lehreinheitgruppe.semester
 				AND current_studentlehrverband.studiensemester_kurzbz = current_lehreinheit.studiensemester_kurzbz
 				AND (current_lehreinheitgruppe.verband = current_studentlehrverband.verband OR current_lehreinheitgruppe.verband IS NULL OR btrim(current_lehreinheitgruppe.verband::text) = '' OR current_studentlehrverband.verband IS NULL)
-				AND (current_lehreinheitgruppe.gruppe  = current_studentlehrverband.gruppe  OR current_lehreinheitgruppe.gruppe  IS NULL OR btrim(current_lehreinheitgruppe.gruppe::text)  = '' OR current_studentlehrverband.gruppe  IS NULL)
+				AND (current_lehreinheitgruppe.gruppe = current_studentlehrverband.gruppe OR current_lehreinheitgruppe.gruppe IS NULL OR btrim(current_lehreinheitgruppe.gruppe::text) = '' OR current_studentlehrverband.gruppe IS NULL)
 
 			JOIN lehre.tbl_kalender other_kalender
 				ON other_kalender.kalender_id != current_kalender.kalender_id
@@ -220,7 +220,7 @@ class StudentCollisionCheck implements ICollisionCheck
 				AND other_slv.studiensemester_kurzbz = other_lehreinheit.studiensemester_kurzbz
 				AND other_slv.student_uid = current_studentlehrverband.student_uid
 				AND (other_lehreinheitgruppe.verband = other_slv.verband OR other_lehreinheitgruppe.verband IS NULL OR btrim(other_lehreinheitgruppe.verband::text) = '' OR other_slv.verband IS NULL)
-				AND (other_lehreinheitgruppe.gruppe  = other_slv.gruppe  OR other_lehreinheitgruppe.gruppe  IS NULL OR btrim(other_lehreinheitgruppe.gruppe::text)  = '' OR other_slv.gruppe  IS NULL)
+				AND (other_lehreinheitgruppe.gruppe = other_slv.gruppe OR other_lehreinheitgruppe.gruppe IS NULL OR btrim(other_lehreinheitgruppe.gruppe::text) = '' OR other_slv.gruppe IS NULL)
 
 			WHERE current_kalender.kalender_id IN ($placeholders)
 		";
