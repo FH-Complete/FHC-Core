@@ -437,6 +437,8 @@ class KalenderLib
 	}
 	public function addKalenderEvent($start_date, $end_date, $lehreinheit_id, $ort_kurzbz)
 	{
+		$this->_ci->KalenderModel->db->trans_start();
+
 		$kalenderresult = $this->_ci->KalenderModel->insert(
 			array (
 				'von' => $start_date,
@@ -448,7 +450,7 @@ class KalenderLib
 			)
 		);
 
-		if(isSuccess($kalenderresult) && hasData($kalenderresult))
+		if (isSuccess($kalenderresult) && hasData($kalenderresult))
 		{
 			$kalender_id = getData($kalenderresult);
 
@@ -459,13 +461,39 @@ class KalenderLib
 				)
 			);
 
-			if(isSuccess($kalenderlehreinheitresult) && !is_null($ort_kurzbz))
+			if (isSuccess($kalenderlehreinheitresult) && !is_null($ort_kurzbz))
 			{
-				return $this->_addKalenderOrt($kalender_id, $ort_kurzbz);
+				$ortresult = $this->_addKalenderOrt($kalender_id, $ort_kurzbz);
+				if (isError($ortresult))
+				{
+					$this->_ci->KalenderModel->db->trans_rollback();
+					return $ortresult;
+				}
 			}
 
+			$entryResult = $this->_loadKalenderEntry($kalender_id);
+
+			if (isError($entryResult))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return $entryResult;
+			}
+
+			$kalender_entry = getData($entryResult);
+
+			$errors = $this->_ci->collisionchecker->run($kalender_entry);
+
+			if (!empty($errors))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return error($errors);
+			}
+
+			$this->_ci->KalenderModel->db->trans_complete();
 			return $kalenderlehreinheitresult;
 		}
+		$this->_ci->KalenderModel->db->trans_rollback();
+		return $kalenderresult;
 	}
 
 	public function addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups)
@@ -485,7 +513,7 @@ class KalenderLib
 				return error ('lvplan/bereitsReserviert');
 		}
 
-
+		$this->_ci->KalenderModel->db->trans_start();
 
 		$kalenderresult = $this->_ci->KalenderModel->insert(
 			array (
@@ -498,7 +526,7 @@ class KalenderLib
 			)
 		);
 
-		if(isSuccess($kalenderresult) && hasData($kalenderresult))
+		if (isSuccess($kalenderresult) && hasData($kalenderresult))
 		{
 			$kalender_id = getData($kalenderresult);
 
@@ -512,12 +540,22 @@ class KalenderLib
 
 			foreach ($teilnehmer as $teil)
 			{
-				$this->_addTeilnehmerToEvent($kalender_id, $teil['uid'], $teil['rolle']);
+				$teilnehmerresult = $this->_addTeilnehmerToEvent($kalender_id, $teil['uid'], $teil['rolle']);
+				if (isError($teilnehmerresult))
+				{
+					$this->_ci->KalenderModel->db->trans_rollback();
+					return $teilnehmerresult;
+				}
 			}
 
-			foreach($specialFinalGroups as $group)
+			foreach ($specialFinalGroups as $group)
 			{
-				$this->_addFinalGroupToEvent($kalender_id, $group['gid'], !($group['lehrverband'] === 'false'), $group['gruppe_kurzbz'], $group['studiensemester_kurzbz'], $group['rolle']);
+				$specialgroupresult = $this->_addFinalGroupToEvent($kalender_id, $group['gid'], !($group['lehrverband'] === 'false'), $group['gruppe_kurzbz'], $group['studiensemester_kurzbz'], $group['rolle']);
+				if (isError($specialgroupresult))
+				{
+					$this->_ci->KalenderModel->db->trans_rollback();
+					return $specialgroupresult;
+				}
 			}
 
 		/*	foreach ($specialGroups as $group)
@@ -530,13 +568,38 @@ class KalenderLib
 				$this->_addGroupToEvent($kalender_id, $group['stg_kz'], $group['semester'], $group['verband'], $group['gruppe'], $group['rolle']);
 			}*/
 
-			if(isSuccess($kalendereventresult) && !is_null($ort_kurzbz))
+			if (isSuccess($kalendereventresult) && !is_null($ort_kurzbz))
 			{
-				return $this->_addKalenderOrt($kalender_id, $ort_kurzbz);
+				$ortresult = $this->_addKalenderOrt($kalender_id, $ort_kurzbz);
+				if (isError($ortresult))
+				{
+					$this->_ci->KalenderModel->db->trans_rollback();
+					return $ortresult;
+				}
 			}
 
+			$entryResult = $this->_loadKalenderEntry($kalender_id);
+			if (isError($entryResult))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return $entryResult;
+			}
+
+			$kalender_entry = getData($entryResult);
+			$errors = $this->_ci->collisionchecker->run($kalender_entry);
+
+			if (!empty($errors))
+			{
+				$this->_ci->KalenderModel->db->trans_rollback();
+				return error($errors);
+			}
+
+			$this->_ci->KalenderModel->db->trans_complete();
 			return $kalendereventresult;
 		}
+
+		$this->_ci->KalenderModel->db->trans_rollback();
+		return $kalenderresult;
 	}
 
 	private function _addTeilnehmerToEvent($kalender_id, $uid, $rolle)
