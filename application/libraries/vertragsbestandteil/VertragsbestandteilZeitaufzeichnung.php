@@ -25,7 +25,7 @@ class VertragsbestandteilZeitaufzeichnung extends Vertragsbestandteil
 		isset($data->zeitaufzeichnung) && $this->setZeitaufzeichnung($data->zeitaufzeichnung);
 		isset($data->azgrelevant) && $this->setAzgrelevant($data->azgrelevant);
 		isset($data->homeoffice) && $this->setHomeoffice($data->homeoffice);
-		isset($data->zeitmodell_id) && $this->setHomeoffice($data->zeitmodell_id);
+		isset($data->zeitmodell_id) && $this->setZeitmodell_id($data->zeitmodell_id);
 		$this->fromdb = false;
 	}
 	
