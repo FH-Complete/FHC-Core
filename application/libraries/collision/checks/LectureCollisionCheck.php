@@ -212,8 +212,8 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->ZeitsperreModel->db->where_in('mitarbeiter_uid', $uids);
 
 		$result = $this->_ci->ZeitsperreModel->loadWhere(array(
-			'vondatum <' => date('Y-m-d', strtotime($data->von)),
-			'bisdatum >' => date('Y-m-d', strtotime($data->bis)),
+			'vondatum <=' => date('Y-m-d', strtotime($data->bis)),
+			'bisdatum >=' => date('Y-m-d', strtotime($data->von)),
 		));
 
 		if (isError($result) || !hasData($result)) return [];
