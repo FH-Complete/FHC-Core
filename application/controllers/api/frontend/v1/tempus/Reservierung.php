@@ -176,8 +176,15 @@ class Reservierung extends FHCAPI_Controller
 		$specialFinalGroups = $this->_ci->input->post('specialFinalGroups', TRUE);
 		$groups = $this->_ci->input->post('groups', TRUE);
 
-		if (empty($teilnehmer) || !is_array($teilnehmer))
-			$this->terminateWithValidationErrors(['teilnehmer' => 'Teilnehmer ist erforderlich']);
+		if ($this->_ci->permissionlib->isBerechtigt('lehre/reservierung'))
+		{
+			if (empty($teilnehmer) || !is_array($teilnehmer))
+			{
+				$teilnehmer[] = array('uid' => getAuthUID(), 'rolle' => 'organisator');
+			}
+		}
+		else
+			$teilnehmer[] = array('uid' => getAuthUID(), 'rolle' => 'organisator');
 
 
 		$result = $this->_ci->kalenderlib->addReservierung($titel, $beschreibung, $ort_kurzbz, $start_date, $end_date, $teilnehmer, $specialFinalGroups, $specialGroups, $groups);

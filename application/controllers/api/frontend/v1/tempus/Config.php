@@ -18,7 +18,7 @@ class Config extends FHCAPI_Controller
 
 		// Load Phrases
 		$this->loadPhrases([
-			'global',
+			'ui',
 		]);
 
 		$this->_ci = &get_instance();
@@ -27,26 +27,40 @@ class Config extends FHCAPI_Controller
 
 	public function get()
 	{
+		$this->_ci->load->model('system/Variable_model', 'VariableModel');
 
-		$language = getUserLanguage() == 'German' ? 0 : 1;
+		$config = [];
 
-		$this->_ci->KalenderStatusModel->addSelect('*, array_to_json(bezeichnung_mehrsprachig::varchar[])->>' . $language .' AS status');
-		$this->_ci->KalenderStatusModel->addOrder('sort');
-		$visible_status = $this->_ci->KalenderStatusModel->load();
+		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), ['ignore_kollision', 'kollision_student', 'ignore_reservierung', 'ignore_zeitsperre']);
 
-		$visible_status = getData($visible_status);
+		$data = $this->getDataOrTerminateWithError($result);
+		$config['ignore_kollision'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'ignore_kollision'),
+			"value" => ($data['ignore_kollision'] ?? 'false') === 'true'
 
-		$config['visible_status'] = [
-			"type" => "select",
-			"label" => $this->p->t('ui', 'status'),
-			"value" => 'all'
+		];
+
+		$config['kollision_student'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'kollision_student'),
+			"value" => ($data['kollision_student'] ?? 'false') === 'true'
+		];
+
+		$config['ignore_reservierung'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'ignore_reservierung'),
+			"value" => ($data['ignore_reservierung'] ?? 'false') === 'true'
+
+		];
+
+		$config['ignore_zeitsperre'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'ignore_zeitsperre'),
+			"value" => ($data['ignore_zeitsperre'] ?? 'false') === 'true'
 		];
 
 
-		foreach ($visible_status as $status)
-		{
-			$config['visible_status']['options'][$status->status_kurzbz] = $status->status;
-		}
 
 		$this->terminateWithSuccess($config);
 	}
@@ -73,8 +87,30 @@ class Config extends FHCAPI_Controller
 
 	public function set()
 	{
+		$this->_ci->load->model('system/Variable_model', 'VariableModel');
 
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'ignore_kollision',
+			$this->input->post('ignore_kollision') === true ? 'true' : 'false'
+		);
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'kollision_student',
+			$this->input->post('kollision_student') === true ? 'true' : 'false'
+		);
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'ignore_reservierung',
+			$this->input->post('ignore_reservierung') === true ? 'true' : 'false'
+		);
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'ignore_zeitsperre',
+			$this->input->post('ignore_zeitsperre') === true ? 'true' : 'false'
+		);
 		$this->terminateWithSuccess();
 	}
+
 
 }

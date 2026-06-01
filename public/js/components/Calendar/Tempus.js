@@ -1,14 +1,10 @@
 import FhcCalendar from "./Base.js";
 
-import ApiLvPlan from '../../api/factory/lvPlan.js';
-
 import { useEventLoader } from '../../composables/EventLoader.js';
 
-import ModeDay from './Mode/Day.js';
 import ModeWeek from './Mode/Week.js';
 import ModeMonth from './Mode/Month.js';
 import ModeTable from './Mode/Table.js';
-import ApiTempusConfig  from '../../api/factory/tempus/config.js';
 import ApiKalender from '../../api/factory/tempus/kalender.js';
 import draggable from '../../directives/draggable.js';
 

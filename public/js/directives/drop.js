@@ -50,16 +50,14 @@ export default {
 				result = [result];
 
 			const res = binding.value(evt, result);
-			
+
 			if (res instanceof Promise) {
 				res.then(r => {
 					bcc.postMessage('release');
-					bcc.postMessage('dropped');
 					return r;
 				});
 			} else {
 				bcc.postMessage('release');
-				bcc.postMessage('dropped');
 			}
 		}
 

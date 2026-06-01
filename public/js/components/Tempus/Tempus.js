@@ -447,7 +447,7 @@ export default {
 				end_time,
 			};
 
-			this.$api.call(ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos))
+			return this.$api.call(ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos))
 				.then(() => {
 					if (onSuccess)
 						onSuccess();
@@ -467,7 +467,7 @@ export default {
 			if (!dates)
 				return;
 
-			this._updateKalenderEvent(obj, dates.startDT, dates.endDT, dates.start_time, dates.end_time, () => {
+			return this._updateKalenderEvent(obj, dates.startDT, dates.endDT, dates.start_time, dates.end_time, () => {
 				this.$refs.calendar.resetEventLoader();
 			});
 		},
@@ -495,20 +495,26 @@ export default {
 			}
 			else if (obj.type === 'lehreinheit')
 			{
-				this.$api.call(
+				return this.$api.call(
 					ApiKalender.addKalenderEvent(
 						obj.orig.lehreinheit_id,
 						this.ort_kurzbz ? this.ort_kurzbz : obj.orig.ort_kurzbz,
 						start_time,
 						end_time
 					)
-				);
+				).then(() => {
+					this.$refs.calendar.resetEventLoader();
+					this.bcc.postMessage('dropped');
+				});
 			}
 			else if (obj.type === 'kalender')
 			{
-				this._updateKalenderEvent(obj, startDT, endDT, start_time, end_time, () =>
+				return this._updateKalenderEvent(obj, startDT, endDT, start_time, end_time, () =>
 				{
 					this.$refs.parking.unpark({ type: obj.type, id: obj.orig.kalender_id });
+					this.$refs.calendar.resetEventLoader();
+					this.bcc.postMessage('dropped');
+
 				});
 			}
 			else
@@ -652,13 +658,12 @@ export default {
 		}
 	},
 	mounted() {
-
 		this.reservierungPending = false;
 		this.bcc = new BroadcastChannel('fhc-dnd');
-		this.bcc.onmessage = e => {
+		this.bcc.addEventListener('message', e => {
 			if (e.data === 'dropped' && !this.reservierungPending)
 				this.$refs.calendar.resetEventLoader();
-		};
+		});
 	},
 	beforeUnmount() {
 		this.bcc.close();
@@ -827,7 +832,7 @@ export default {
 						</button>
 					</div>
 					<div class="px-2 py-1 w-100">
-						<Multiselect
+						<!--<Multiselect
 							:model-value="visibleStatusValue"
 							@update:model-value="val => toggleStatus(val.map(o => o.key))"
 							option-label="label"
@@ -836,7 +841,7 @@ export default {
 							:hide-selected="false"
 							:show-toggle-all="false"
 							class="w-100"
-						/>
+						/>-->
 						
 						<div class="d-flex gap-1 py-1" data-cy="previewRoleOptionsHolder">
 							<button

@@ -383,7 +383,14 @@ export default {
 			const dayStr = evt?.currentTarget?.dataset?.day;
 			const dropDay = dayStr ? luxon.DateTime.fromISO(dayStr) : date;
 
-			const dropStart = dropDay.plus(part.start || part);
+			const rawTimestamp = this.getTimestampFromMouse(evt, dropDay.toMillis());
+			const grabTime = luxon.DateTime.fromMillis(rawTimestamp);
+
+			const blocks = this.axisPartsWithBreaks.filter(p => p.index !== undefined);
+			const grabOffset = grabTime.diff(dropDay);
+
+			const snappedPart = blocks.find(b => grabOffset >= b.start && grabOffset < b.end) || part;
+			const dropStart = dropDay.plus(snappedPart.start);
 
 			let nettoDuration = this._getNettoDurationForDrop(obj);
 			let dropEnd = this.calculateDropEnd(dropStart, nettoDuration);

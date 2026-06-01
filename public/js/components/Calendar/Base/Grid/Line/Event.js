@@ -98,7 +98,6 @@ export default {
 			this.contextMenu.show = false;
 		},
 		onDragStart(evt) {
-			console.log(evt);
 			const rect = this.$refs.eventEl.getBoundingClientRect();
 			evt.dataTransfer.setData('fhc-grab-offset-y', evt.clientY - rect.top);
 			evt.dataTransfer.setData('fhc-grab-offset-x', evt.clientX - rect.left);
