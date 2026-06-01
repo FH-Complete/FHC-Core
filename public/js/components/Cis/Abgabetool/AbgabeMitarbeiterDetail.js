@@ -817,7 +817,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-9">
 							<Dropdown
 								:style="{'width': '100%'}"
-								:disabled="!termin.allowedToSave"
+								:disabled="!termin.allowedToSave || termin.abgabedatum !== null || termin.noteBackend"
 								:placeholder="getPlaceholderTermin(termin)"
 								v-model="termin.bezeichnung"
 								@change="handleChangeAbgabetyp(termin)"

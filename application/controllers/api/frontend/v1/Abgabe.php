@@ -854,6 +854,16 @@ class Abgabe extends FHCAPI_Controller
 			$existingPaabgabeArr = getData($existingResult);
 			if(count($existingPaabgabeArr) > 0) $existingPaabgabe = $existingPaabgabeArr[0];
 			
+			if($existingPaabgabe->note !== null || $existingPaabgabe->abgabedatum !== null) {
+				// check if a change of paabgabetyp is being attempted -> not allowed at this point
+				if($paabgabetyp_kurzbz !== $existingPaabgabe->paabgabetyp_kurzbz) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypAendernNichtErlaubt'));
+				}
+				
+				
+				// check if a change of deadline aka datum is being attempted -> should not be allowed at this point?
+			}
+			
 			$result = $this->PaabgabeModel->update(
 				$paabgabe_id,
 				array(
