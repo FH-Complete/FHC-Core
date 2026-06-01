@@ -71,147 +71,157 @@ if(defined('CIS4')){
 						</thead>
 						<tbody>
 							<?php foreach($array['antraege'] as $antrag){ ?>
-							<tr>
-								<td><?= $antrag->studierendenantrag_id; ?></td>
-								<td><?= $this->p->t('studierendenantrag', 'antrag_typ_' . $antrag->typ); ?></td>
-								<td>
-									<?=
-										(
-											$antrag->status == Studierendenantragstatus_model::STATUS_PAUSE
-											&& $antrag->status_insertvon == Studierendenantragstatus_model::INSERTVON_DEREGISTERED
-										)
-										? $this->p->t('studierendenantrag', 'status_stop')
-										: $antrag->status_bezeichnung;
-									?>
-								</td>
-								<td><?= $antrag->studiensemester_kurzbz; ?></td>
-								<td><?= (new DateTime($antrag->datum))->format('d.m.Y'); ?></td>
-								<td><?= $antrag->datum_wiedereinstieg ? (new DateTime($antrag->datum_wiedereinstieg))->format('d.m.Y') : ''; ?></td>
-								<td><!-- Button trigger modal -->
-									<?php if($antrag->grund){ ?>
-									<a href="#modalgrund<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal">
-										<?= $this->p->t('studierendenantrag', 'antrag_grund'); ?>
-									</a>
 
-									<!-- Modal -->
-									<div
-										class="modal fade"
-										id="modalgrund<?= $antrag->studierendenantrag_id; ?>"
-										tabindex="-1"
-										aria-labelledby="modalgrundLabel<?= $antrag->studierendenantrag_id; ?>"
-										aria-hidden="true"
-										>
-										<div class="modal-dialog modal-dialog modal-lg">
-											<div class="modal-content">
-												<div class="modal-header">
-													<h5
-														class="modal-title"
-														id="modalgrundLabel<?= $antrag->studierendenantrag_id; ?>"
-														>
-														<?= $this->p->t('studierendenantrag', 'antrag_grund'); ?>
-													</h5>
-													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-												</div>
-												<div class="modal-body">
-													<textarea
-														class="form-control"
-														style="width: 100%; height: 250px;"
-														readonly
-														>
-														<?= $antrag->grund; ?>
-													</textarea>
+								<?php if (
+										!(
+												$antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG
+												&& $antrag->status == Studierendenantragstatus_model::STATUS_TERMINATED
+										)
+								) { ?>
+
+									<tr>
+										<td><?= $antrag->studierendenantrag_id; ?></td>
+										<td><?= $this->p->t('studierendenantrag', 'antrag_typ_' . $antrag->typ); ?></td>
+										<td>
+											<?=
+												(
+													$antrag->status == Studierendenantragstatus_model::STATUS_PAUSE
+													&& $antrag->status_insertvon == Studierendenantragstatus_model::INSERTVON_DEREGISTERED
+												)
+												? $this->p->t('studierendenantrag', 'status_stop')
+												: $antrag->status_bezeichnung;
+											?>
+										</td>
+										<td><?= $antrag->studiensemester_kurzbz; ?></td>
+										<td><?= (new DateTime($antrag->datum))->format('d.m.Y'); ?></td>
+										<td><?= $antrag->datum_wiedereinstieg ? (new DateTime($antrag->datum_wiedereinstieg))->format('d.m.Y') : ''; ?></td>
+										<td><!-- Button trigger modal -->
+											<?php if($antrag->grund){ ?>
+											<a href="#modalgrund<?= $antrag->studierendenantrag_id; ?>" data-bs-toggle="modal">
+												<?= $this->p->t('studierendenantrag', 'antrag_grund'); ?>
+											</a>
+
+											<!-- Modal -->
+											<div
+												class="modal fade"
+												id="modalgrund<?= $antrag->studierendenantrag_id; ?>"
+												tabindex="-1"
+												aria-labelledby="modalgrundLabel<?= $antrag->studierendenantrag_id; ?>"
+												aria-hidden="true"
+												>
+												<div class="modal-dialog modal-dialog modal-lg">
+													<div class="modal-content">
+														<div class="modal-header">
+															<h5
+																class="modal-title"
+																id="modalgrundLabel<?= $antrag->studierendenantrag_id; ?>"
+																>
+																<?= $this->p->t('studierendenantrag', 'antrag_grund'); ?>
+															</h5>
+															<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+														</div>
+														<div class="modal-body">
+															<textarea
+																class="form-control"
+																style="width: 100%; height: 250px;"
+																readonly
+																>
+																<?= $antrag->grund; ?>
+															</textarea>
+														</div>
+													</div>
 												</div>
 											</div>
-										</div>
-									</div>
-									<?php } ?>
-								</td>
-								<td>
-									<?php if($antrag->dms_id) {?>
-									<a
-										class="text-decoration-none"
-										href="<?= site_url('lehre/Antrag/Attachment/show/' . $antrag->dms_id) ?>"
-										target="_blank">
-										<i class="fa fa-paperclip" aria-hidden="true"></i> <?= $this->p->t('studierendenantrag', 'antrag_anhang'); ?>
-									</a>
-									<?php } ?>
-								</td>
-								<td>
-									<a
-										href="<?= site_url('lehre/Studierendenantrag/' .
-											strtolower($antrag->typ) .
-											'/' .
-											$antrag->prestudent_id .
-											'/' .
-											$antrag->studierendenantrag_id); ?>"
-										>
-										<i class="fa-solid fa-pen" title="<?= $this->p->t('studierendenantrag', 'btn_edit'); ?>"></i>
-									</a>
-									<?php
-									$allowed = [];
-									switch ($antrag->typ) {
-										case Studierendenantrag_model::TYP_ABMELDUNG:
-											$allowed = [
-												Studierendenantragstatus_model::STATUS_APPROVED
-											];
-											break;
-										case Studierendenantrag_model::TYP_ABMELDUNG_STGL:
-											$allowed = [
-												Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
-												Studierendenantragstatus_model::STATUS_DEREGISTERED
-											];
-											break;
-										case Studierendenantrag_model::TYP_UNTERBRECHUNG:
-											$allowed = [
-												Studierendenantragstatus_model::STATUS_APPROVED,
-												Studierendenantragstatus_model::STATUS_REMINDERSENT
-											];
-											break;
-										case Studierendenantrag_model::TYP_WIEDERHOLUNG:
-											$allowed = [
-												Studierendenantragstatus_model::STATUS_DEREGISTERED
-											];
-											break;
-									}
-									if (in_array($antrag->status, $allowed)) { ?>
-										<a
-											class="ms-2"
-											target="_blank"
-											href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' .
-											$antrag->typ .
-											'.xml.php&xsl=Antrag' .
-											$antrag->typ .
-											'&id=' .
-											$antrag->studierendenantrag_id .
-											'&uid=' .
-											getAuthUID()); ?>"
-											>
-											<i
-												class="fa-solid fa-download"
-												title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"
+											<?php } ?>
+										</td>
+										<td>
+											<?php if($antrag->dms_id) {?>
+											<a
+												class="text-decoration-none"
+												href="<?= site_url('lehre/Antrag/Attachment/show/' . $antrag->dms_id) ?>"
+												target="_blank">
+												<i class="fa fa-paperclip" aria-hidden="true"></i> <?= $this->p->t('studierendenantrag', 'antrag_anhang'); ?>
+											</a>
+											<?php } ?>
+										</td>
+										<td>
+											<a
+												href="<?= site_url('lehre/Studierendenantrag/' .
+													strtolower($antrag->typ) .
+													'/' .
+													$antrag->prestudent_id .
+													'/' .
+													$antrag->studierendenantrag_id); ?>"
 												>
-											</i>
-										</a>
-									<?php } ?>
-									<?php if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG
-										&& $antrag->status == Studierendenantragstatus_model::STATUS_APPROVED
-									) { ?>
-										<a
-											class="ms-2"
-											href="#modallv<?= $antrag->studierendenantrag_id; ?>"
-											data-bs-toggle="modal"
-											>
-											<?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?>
-										</a>
-										<lv-popup
-											id="modallv<?= $antrag->studierendenantrag_id; ?>"
-											antrag-id = "<?= $antrag->studierendenantrag_id; ?>"
-											>
-											<?= $this->p->t('studierendenantrag', 'my_lvs'); ?>
-										</lv-popup>
-									<?php } ?>
-								</td>
-							</tr>
+												<i class="fa-solid fa-pen" title="<?= $this->p->t('studierendenantrag', 'btn_edit'); ?>"></i>
+											</a>
+											<?php
+											$allowed = [];
+											switch ($antrag->typ) {
+												case Studierendenantrag_model::TYP_ABMELDUNG:
+													$allowed = [
+														Studierendenantragstatus_model::STATUS_APPROVED
+													];
+													break;
+												case Studierendenantrag_model::TYP_ABMELDUNG_STGL:
+													$allowed = [
+														Studierendenantragstatus_model::STATUS_OBJECTION_DENIED,
+														Studierendenantragstatus_model::STATUS_DEREGISTERED
+													];
+													break;
+												case Studierendenantrag_model::TYP_UNTERBRECHUNG:
+													$allowed = [
+														Studierendenantragstatus_model::STATUS_APPROVED,
+														Studierendenantragstatus_model::STATUS_REMINDERSENT
+													];
+													break;
+												case Studierendenantrag_model::TYP_WIEDERHOLUNG:
+													$allowed = [
+														Studierendenantragstatus_model::STATUS_DEREGISTERED
+													];
+													break;
+											}
+											if (in_array($antrag->status, $allowed)) { ?>
+												<a
+													class="ms-2"
+													target="_blank"
+													href="<?= base_url('cis/private/pdfExport.php?xml=Antrag' .
+													$antrag->typ .
+													'.xml.php&xsl=Antrag' .
+													$antrag->typ .
+													'&id=' .
+													$antrag->studierendenantrag_id .
+													'&uid=' .
+													getAuthUID()); ?>"
+													>
+													<i
+														class="fa-solid fa-download"
+														title="<?= $this->p->t('studierendenantrag', 'btn_download_antrag'); ?>"
+														>
+													</i>
+												</a>
+											<?php } ?>
+											<?php if ($antrag->typ == Studierendenantrag_model::TYP_WIEDERHOLUNG
+												&& $antrag->status == Studierendenantragstatus_model::STATUS_APPROVED
+											) { ?>
+												<a
+													class="ms-2"
+													href="#modallv<?= $antrag->studierendenantrag_id; ?>"
+													data-bs-toggle="modal"
+													>
+													<?= $this->p->t('studierendenantrag', 'btn_show_lvs'); ?>
+												</a>
+												<lv-popup
+													id="modallv<?= $antrag->studierendenantrag_id; ?>"
+													antrag-id = "<?= $antrag->studierendenantrag_id; ?>"
+													>
+													<?= $this->p->t('studierendenantrag', 'my_lvs'); ?>
+												</lv-popup>
+											<?php } ?>
+										</td>
+									</tr>
+								<?php } ?>
+
 							<?php } ?>
 						</tbody>
 					</table>
