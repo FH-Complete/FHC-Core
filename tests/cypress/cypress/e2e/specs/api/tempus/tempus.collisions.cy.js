@@ -18,31 +18,6 @@ const getPlannerEvents = (startDate, endDate) =>
       return response.body.data;
     });
 
-const findEditableLessonEvent = (events) =>
-  events.find(
-    (event) =>
-      event.type === "lehreinheit" &&
-      ["live", "preview"].includes(event.status_kurzbz) &&
-      Number(event.kalender_id) > 0 &&
-      event.datum &&
-      Array.isArray(event.lehreinheit_id) &&
-      event.lehreinheit_id.length > 0,
-  );
-
-const getReturnedKalenderId = (body) => {
-  const payload = body?.data;
-  const rawKalenderId =
-    payload?.retval?.kalender_id ??
-    payload?.retval ??
-    payload?.kalender_id ??
-    payload;
-  const kalenderId = Number(rawKalenderId);
-
-  expect(kalenderId, "returned kalender_id").to.be.greaterThan(0);
-
-  return kalenderId;
-};
-
 const updateKalenderEvent = (kalenderId, startDateTime, endDateTime) =>
   cy.request({
     method: "POST",
@@ -55,20 +30,6 @@ const updateKalenderEvent = (kalenderId, startDateTime, endDateTime) =>
     },
     failOnStatusCode: false,
   });
-
-const deleteKalenderEvent = (kalenderId) =>
-  cy.request({
-    method: "POST",
-    url: `${KALENDER_API}/Kalender/deleteEntry`,
-    form: true,
-    body: {
-      kalender_id: kalenderId,
-    },
-    failOnStatusCode: false,
-  });
-
-const findEventByKalenderId = (events, kalenderId) =>
-  events.find((event) => Number(event.kalender_id) === Number(kalenderId));
 
 const getSettingsData = () => ({
   ignore_kollision: false,
@@ -101,10 +62,8 @@ describe("Tempus Kalender API", () => {
             event.ende === "20:15:00" &&
             event.organisationseinheit === "kfSprachen",
         );
-        expect(
-          sourceEvent,
-          "source event without collision for update test",
-        ).to.exist;
+        expect(sourceEvent, "source event without collision for update test").to
+          .exist;
 
         const startDateTime = `${sourceEvent.datum} 20:15`;
         const endDateTime = `${sourceEvent.datum} 21:00`;
@@ -115,7 +74,10 @@ describe("Tempus Kalender API", () => {
           endDateTime,
         ).then((response) => {
           expect(response.status).to.eq(200);
-          expect(response.body).to.have.nested.property("meta.status", "success");
+          expect(response.body).to.have.nested.property(
+            "meta.status",
+            "success",
+          );
         });
       });
     });
@@ -165,7 +127,7 @@ describe("Tempus Kalender API", () => {
   it("prohibited event update due to student collision", () => {
     let settingsData = getSettingsData();
     settingsData.kollision_student = true;
-    
+
     updateSettingsData(settingsData).then((response) => {
       getPlannerEvents("2026-06-01", "2026-06-01").then((events) => {
         const sourceEvent = events.find(
@@ -191,7 +153,7 @@ describe("Tempus Kalender API", () => {
           expect(response.status).to.eq(500);
           expect(response.body).to.have.nested.property("meta.status", "error");
           expect(response.body.errors).to.be.an("array");
-          console.log(response.body.errors)
+          console.log(response.body.errors);
           let hasStudentCollisionError = response.body.errors.some(
             (error) =>
               error.message.toLowerCase().includes("studierende kollision") ||
@@ -209,10 +171,10 @@ describe("Tempus Kalender API", () => {
   it("prohibited event update due to lector collision", () => {
     let settingsData = getSettingsData();
     settingsData.kollision_student = false;
-    
+
     updateSettingsData(settingsData).then((response) => {
       getPlannerEvents("2026-06-02", "2026-06-02").then((events) => {
-        console.log(events)
+        console.log(events);
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
@@ -236,7 +198,7 @@ describe("Tempus Kalender API", () => {
           expect(response.status).to.eq(500);
           expect(response.body).to.have.nested.property("meta.status", "error");
           expect(response.body.errors).to.be.an("array");
-          console.log(response.body.errors)
+          console.log(response.body.errors);
           let hasLectorCollisionError = response.body.errors.some(
             (error) =>
               error.message.toLowerCase().includes("lektorin kollision") ||
@@ -251,13 +213,12 @@ describe("Tempus Kalender API", () => {
     });
   });
 
-   it("prohibited event update due to lector - zeitsperre collision", () => {
+  it("prohibited event update due to lector - zeitsperre collision", () => {
     let settingsData = getSettingsData();
     settingsData.kollision_student = false;
-    
+
     updateSettingsData(settingsData).then((response) => {
       getPlannerEvents("2026-06-01", "2026-06-01").then((events) => {
-        console.log(events)
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
@@ -281,7 +242,7 @@ describe("Tempus Kalender API", () => {
           expect(response.status).to.eq(500);
           expect(response.body).to.have.nested.property("meta.status", "error");
           expect(response.body.errors).to.be.an("array");
-          console.log(response.body.errors)
+
           let hasTimeLockCollisionError = response.body.errors.some(
             (error) =>
               error.message.toLowerCase().includes("zeitsperre kollision") ||
@@ -290,6 +251,93 @@ describe("Tempus Kalender API", () => {
           expect(
             hasTimeLockCollisionError,
             "response contains time lock collision error",
+          ).to.be.true;
+        });
+      });
+    });
+  });
+
+  it("prohibited event update due to lector - reservation collision", () => {
+    let settingsData = getSettingsData();
+    settingsData.kollision_student = false;
+
+    updateSettingsData(settingsData).then((response) => {
+      getPlannerEvents("2026-06-01", "2026-06-01").then((events) => {
+        const sourceEvent = events.find(
+          (event) =>
+            event.type === "lehreinheit" &&
+            event.beginn === "19:30:00" &&
+            event.ende === "20:15:00" &&
+            event.organisationseinheit === "bic",
+        );
+        expect(
+          sourceEvent,
+          "source event with fixed time and room for collision test",
+        ).to.exist;
+
+        const startDateTime = `${sourceEvent.datum} 20:15`;
+        const endDateTime = `${sourceEvent.datum} 21:00`;
+
+        updateKalenderEvent(
+          sourceEvent.kalender_id,
+          startDateTime,
+          endDateTime,
+        ).then((response) => {
+          expect(response.status).to.eq(500);
+          expect(response.body).to.have.nested.property("meta.status", "error");
+          expect(response.body.errors).to.be.an("array");
+          console.log(response.body.errors);
+          let hasReservationCollisionError = response.body.errors.some(
+            (error) =>
+              error.message.toLowerCase().includes("reservierung kollision") ||
+              error.message.toLowerCase().includes("reservation collision"),
+          );
+          expect(
+            hasReservationCollisionError,
+            "response contains reservation collision error",
+          ).to.be.true;
+        });
+      });
+    });
+  });
+
+  it("prohibited reservation update due to lector - reservation collision", () => {
+    let settingsData = getSettingsData();
+    settingsData.kollision_student = false;
+
+    updateSettingsData(settingsData).then((response) => {
+      getPlannerEvents("2026-06-01", "2026-06-01").then((events) => {
+        const sourceEvent = events.find(
+          (event) =>
+            event.type === "reservierung" &&
+            event.beginn === "20:15:00" &&
+            event.ende === "21:00:00",
+        );
+        expect(
+          sourceEvent,
+          "source event with fixed time and room for collision test",
+        ).to.exist;
+
+        const startDateTime = `${sourceEvent.datum} 19:30`;
+        const endDateTime = `${sourceEvent.datum} 20:15`;
+
+        updateKalenderEvent(
+          sourceEvent.kalender_id,
+          startDateTime,
+          endDateTime,
+        ).then((response) => {
+          expect(response.status).to.eq(500);
+          expect(response.body).to.have.nested.property("meta.status", "error");
+          expect(response.body.errors).to.be.an("array");
+          console.log(response.body.errors);
+          let hasReservationCollisionError = response.body.errors.some(
+            (error) =>
+              error.message.toLowerCase().includes("lektorin kollision") ||
+              error.message.toLowerCase().includes("reservation collision"),
+          );
+          expect(
+            hasReservationCollisionError,
+            "response contains reservation collision error",
           ).to.be.true;
         });
       });
