@@ -98,8 +98,13 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheit current_lehreinheit', 'current_lehreinheit.lehreinheit_id = current_kalender_le.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_lehreinheitmitarbeiter current_lehreinheit_ma', 'current_lehreinheit_ma.lehreinheit_id = current_lehreinheit.lehreinheit_id');
 		$this->_ci->KalenderModel->addJoin('campus.tbl_zeitsperre z',
-			"z.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid AND z.zeitsperretyp_kurzbz != 'ZVerfueg' AND z.vondatum < tbl_kalender.bis AND z.bisdatum > tbl_kalender.von");
+			"z.mitarbeiter_uid = current_lehreinheit_ma.mitarbeiter_uid 
+			AND z.zeitsperretyp_kurzbz != 'ZVerfueg'");
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_stunde vonstunde_z', 'vonstunde_z.stunde = z.vonstunde', 'LEFT');
+		$this->_ci->KalenderModel->addJoin('lehre.tbl_stunde bisstunde_z', 'bisstunde_z.stunde = z.bisstunde', 'LEFT');
 
+		$this->_ci->KalenderModel->db->where('(z.vondatum + COALESCE(vonstunde_z.beginn, \'00:00\'))::timestamp < tbl_kalender.bis', null, false);
+		$this->_ci->KalenderModel->db->where('(z.bisdatum + COALESCE(bisstunde_z.ende, \'23:59\'))::timestamp > tbl_kalender.von', null, false);
 		$this->_ci->KalenderModel->db->where_not_in('current_lehreinheit_ma.mitarbeiter_uid', $kollisionsfreie_user);
 		$this->_ci->KalenderModel->db->where_in('tbl_kalender.kalender_id', $kalender_ids);
 		$result = $this->_ci->KalenderModel->load();
@@ -207,20 +212,20 @@ class LectureCollisionCheck implements ICollisionCheck
 	{
 		if ($this->_ci->variablelib->getVar('ignore_zeitsperre') === 'true') return [];
 
-		$this->_ci->ZeitsperreModel->addSelect('mitarbeiter_uid, vondatum as von, bisdatum as bis');
+		$this->_ci->ZeitsperreModel->addSelect('mitarbeiter_uid, vondatum, vonstunde_z.beginn as von_beginn, bisdatum, bisstunde_z.ende as bis_ende');
+		$this->_ci->ZeitsperreModel->addJoin('lehre.tbl_stunde vonstunde_z', 'vonstunde_z.stunde = tbl_zeitsperre.vonstunde', 'LEFT');
+		$this->_ci->ZeitsperreModel->addJoin('lehre.tbl_stunde bisstunde_z', 'bisstunde_z.stunde = tbl_zeitsperre.bisstunde', 'LEFT');
 		$this->_ci->ZeitsperreModel->db->where('zeitsperretyp_kurzbz !=', 'ZVerfueg');
-		$this->_ci->ZeitsperreModel->db->where_in('mitarbeiter_uid', $uids);
+		$this->_ci->ZeitsperreModel->db->where('(tbl_zeitsperre.vondatum + COALESCE(vonstunde_z.beginn, \'00:00\'))::timestamp <', $data->bis);
+		$this->_ci->ZeitsperreModel->db->where('(tbl_zeitsperre.bisdatum + COALESCE(bisstunde_z.ende, \'23:59\'))::timestamp >', $data->von);
 
-		$result = $this->_ci->ZeitsperreModel->loadWhere(array(
-			'vondatum <=' => date('Y-m-d', strtotime($data->bis)),
-			'bisdatum >=' => date('Y-m-d', strtotime($data->von)),
-		));
+		$this->_ci->ZeitsperreModel->db->where_in('mitarbeiter_uid', $uids);
+		$result = $this->_ci->ZeitsperreModel->load();
 
 		if (isError($result) || !hasData($result)) return [];
 
 		return array_map(function($row) {
-			return $this->_ci->phraseslib->t('ui', 'ma_zeitsperre_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
-		}, getData($result));
+			return $this->_ci->phraseslib->t('ui', 'ma_zeitsperre_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->vondatum . ' ' . $row->von_beginn)) . ' - ' . date('d.m.Y H:i', strtotime($row->bisdatum . ' ' . $row->bis_ende)) . ')';		}, getData($result));
 	}
 
 }
