@@ -44,7 +44,7 @@ $uid = get_uid();
 $sprache = getSprache();
 $p = new phrasen($sprache);
 
-if(!check_lektor($uid))
+if (!check_lektor($uid))
 	die('Sie haben keine Berechtigung fuer diese Seite');
 
 if (!$db = new basis_db())
@@ -89,6 +89,20 @@ if(isset($_GET['lehreinheit_id']))
 	$lehreinheit_id = $_GET['lehreinheit_id'];
 else
 	$lehreinheit_id = '';
+
+// Checks if the logged lector belongs to this teaching unit
+$qry = "SELECT DISTINCT 1
+	FROM campus.vw_lehreinheit vwl
+	WHERE lehrveranstaltung_id = ".$db->db_add_param($lvid, FHC_INTEGER)."
+	AND studiensemester_kurzbz = ".$db->db_add_param($stsem)."
+	AND vwl.mitarbeiter_uid = ".$db->db_add_param($uid);
+if ($lehreinheit_id != '')
+	$qry .= " AND lehreinheit_id=".$db->db_add_param($lehreinheit_id, FHC_INTEGER);
+
+if (!$result = $db->db_query($qry))
+	die($p->t('tools/fehlerBeimAuslesenDerNoten'));
+if (!$db->db_fetch_object($result))
+	die('Sie haben keine Berechtigung fuer diese Seite');
 
 /*
  * Create Excel File
