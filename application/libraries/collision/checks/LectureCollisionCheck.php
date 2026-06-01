@@ -130,7 +130,10 @@ class LectureCollisionCheck implements ICollisionCheck
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event', 'kalender_id', 'LEFT');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_event_teilnehmer', 'tbl_kalender_event.kalender_id = tbl_kalender_event_teilnehmer.kalender_id', 'LEFT');
 
-		$this->_ci->KalenderModel->db->where_not_in('mitarbeiter_uid', $kollisionsfreie_user);
+		$this->_ci->KalenderModel->db->group_start();
+			$this->_ci->KalenderModel->db->where_not_in('mitarbeiter_uid', $kollisionsfreie_user);
+			$this->_ci->KalenderModel->db->or_where('mitarbeiter_uid IS NULL', null, false);
+		$this->_ci->KalenderModel->db->group_end();
 
 		$result = $this->_ci->KalenderModel->loadWhere(array(
 			'tbl_kalender.kalender_id' => $kalender_id
