@@ -422,9 +422,16 @@ class Abgabe extends FHCAPI_Controller
 					$this->checkAbgabeSignatur($paabgabe, $projektarbeit->student_uid);
 					$signaturstatus = $paabgabe->signatur;
 
-					// update projektarbeit cols
-					$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id, $sprache, $abstract, $abstract_en
-						, $schlagwoerter, $schlagwoerter_en, $seitenanzahl);
+					// update projektarbeit cols with zusatzdaten AND abgabedatum!
+					$this->ProjektarbeitModel->update($projektarbeit->projektarbeit_id, array(
+						'sprache' => $sprache,
+						'seitenanzahl' => $seitenanzahl,
+						'abgabedatum' => date('Y-m-d'),
+						'schlagwoerter_en' => $schlagwoerter_en,
+						'schlagwoerter' => $schlagwoerter,
+						'abstract' => $abstract,
+						'abstract_en' => $abstract_en
+					));
 
 
 					// update paabgabe datum
@@ -1466,9 +1473,15 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool', 'c4noZuordnungBetreuerStudent'), 'general');
 		}
 		
-		// update projektarbeit cols
-		$this->ProjektarbeitModel->updateProjektarbeit($projektarbeit_id,$sprache,$abstract,$abstract_en
-			,$schlagwoerter, $schlagwoerter_en, $seitenanzahl);
+		// update projektarbeit cols with zusatzdaten only
+		$this->ProjektarbeitModel->update($projektarbeit_id, array(
+			'sprache' => $sprache,
+			'seitenanzahl' => $seitenanzahl,
+			'schlagwoerter_en' => $schlagwoerter_en,
+			'schlagwoerter' => $schlagwoerter,
+			'abstract' => $abstract,
+			'abstract_en' => $abstract_en
+		));
 
 		$this->logLib->logInfoDB(array('zusatzdatenEditMitarbeiter', array(
 			'updatevon' => getAuthUID(),
