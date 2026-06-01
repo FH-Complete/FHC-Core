@@ -16,7 +16,11 @@ export default {
 		columnData: Array,
 		stgL: Array,
 		stgA: Array,
-		filter: String
+		filter: String,
+		permissionTerminateAntrag: {
+			type: Boolean,
+			default: false
+		},
 	},
 	emits: [
 		'update:columnData',
@@ -29,7 +33,8 @@ export default {
 		'action:objectionApprove',
 		'action:cancel',
 		'action:pause',
-		'action:unpause'
+		'action:unpause',
+		'action:terminate'
 	],
 	data() {
 		return {
@@ -308,6 +313,26 @@ export default {
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.$emit('action:pause', [cell.getData()]));
 						container.append(button);
+
+						// Terminate
+						if(this.permissionTerminateAntrag){
+							button = document.createElement('button');
+							icon = document.createElement('i');
+							span = document.createElement('span');
+
+							icon.className = "fa-solid fa-xmark";
+							icon.setAttribute('aria-hidden', true);
+							icon.setAttribute('title', this.$p.t('studierendenantrag', 'btn_terminate'));
+
+							span.className = "fa-sr-only";
+							span.append(this.$p.t('studierendenantrag', 'btn_terminate'));
+
+							button.append(icon);
+							button.append(span);
+							button.className = "btn btn-outline-danger";
+							button.addEventListener('click', () => this.$emit('action:terminate', [cell.getData()]));
+							container.append(button);
+						}
 					}
 
 					let canUnpause = data.status == 'Pause' && !['AbmeldungStgl', 'Studienabbruch'].includes(data.status_insertvon);
@@ -337,6 +362,26 @@ export default {
 						button.className = "btn btn-outline-secondary";
 						button.addEventListener('click', () => this.$emit('action:unpause', [cell.getData()]));
 						container.append(button);
+
+						// Terminate: show buttion
+						if(this.permissionTerminateAntrag){
+							button = document.createElement('button');
+							icon = document.createElement('i');
+							span = document.createElement('span');
+
+							icon.className = "fa-solid fa-xmark";
+							icon.setAttribute('aria-hidden', true);
+							icon.setAttribute('title', this.$p.t('studierendenantrag', 'btn_terminate'));
+
+							span.className = "fa-sr-only";
+							span.append(this.$p.t('studierendenantrag', 'btn_terminate'));
+
+							button.append(icon);
+							button.append(span);
+							button.className = "btn btn-outline-danger";
+							button.addEventListener('click', () => this.$emit('action:terminate', [cell.getData()]));
+							container.append(button);
+						}
 					}
 
 					if (data.typ == 'AbmeldungStgl' && data.status == 'Genehmigt') {

@@ -86,9 +86,12 @@ class Studierendenantrag extends FHC_Controller
 
 		$stgA = $this->permissionlib->getSTG_isEntitledFor('student/studierendenantrag') ?: [];
 
+		$permissionTerminateAntrag = $this->permissionlib->isBerechtigt('student/antragstornieren');
+
 		$this->load->view('lehre/Antrag/Leitung/List', [
 			'stgA' => $stgA,
-			'stgL' => $stgL
+			'stgL' => $stgL,
+			'permissionTerminateAntrag' => $permissionTerminateAntrag
 		]);
 	}
 

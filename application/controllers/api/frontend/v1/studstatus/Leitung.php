@@ -45,7 +45,8 @@ class Leitung extends FHCAPI_Controller
 			'unpauseAntrag' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
 			'objectAntrag' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
 			'approveObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
-			'denyObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w']
+			'denyObjection' => ['student/antragfreigabe:w', 'student/studierendenantrag:w'],
+			'terminateAntrag' => ['student/antragstornieren:w']
 		]);
 
 		// Libraries
@@ -422,6 +423,39 @@ class Leitung extends FHCAPI_Controller
 		$grund = $this->input->post('grund');
 
 		$result = $this->antraglib->denyObjectionAbmeldung($studierendenantrag_id, getAuthUID(), $grund);
+		$this->getDataOrTerminateWithError($result);
+
+		return $this->terminateWithSuccess($studierendenantrag_id);
+	}
+
+	public function terminateAntrag()
+	{
+		$this->load->library('form_validation');
+
+		$this->form_validation->set_rules(
+			'studierendenantrag_id',
+			'Studierenden Antrag',
+			[
+				'required',
+				['isEntitledToTerminateAntrag', [$this->antraglib, 'isEntitledToTerminateAntrag']],
+				['antragCanBeTerminated', [$this->antraglib, 'antragCanBeTerminated']]
+			],
+			[
+				'isEntitledToUnpauseAntrag' => $this->p->t('studierendenantrag', 'error_no_right'),
+				'antragCanBeTerminated' => $this->p->t(
+					'studierendenantrag',
+					'error_not_terminated',
+					['id' => $this->input->post('studierendenantrag_id')]
+				)
+			]
+		);
+
+		if (!$this->form_validation->run())
+			$this->terminateWithValidationErrors($this->form_validation->error_array());
+
+		$studierendenantrag_id = $this->input->post('studierendenantrag_id');
+
+		$result = $this->antraglib->terminateAntrag($studierendenantrag_id, getAuthUID());
 		$this->getDataOrTerminateWithError($result);
 
 		return $this->terminateWithSuccess($studierendenantrag_id);

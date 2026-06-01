@@ -1948,6 +1948,22 @@ class AntragLib
 		return $result;
 	}
 
+	/**
+	 * @param integer		$antrag_id
+	 * @param string		$insertvon
+	 *
+	 * @return stdClass
+	 */
+	public function terminateAntrag($antrag_id, $insertvon)
+	{
+		$result = $this->_ci->StudierendenantragstatusModel->insert([
+			'studierendenantrag_id' => $antrag_id,
+			'studierendenantrag_statustyp_kurzbz' => Studierendenantragstatus_model::STATUS_TERMINATED,
+			'insertvon' => $insertvon
+		]);
+		return $result;
+	}
+
 
 	/**
 	 * @param integer		$studierendenantrag_id
@@ -2124,6 +2140,16 @@ class AntragLib
 	 *
 	 * @return boolean
 	 */
+	public function isEntitledToTerminateAntrag($antrag_id)
+	{
+		return ($this->hasAccessToAntrag($antrag_id, 'student/antragstornieren'));
+	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
 	public function antragCanBeManualPaused($antrag_id)
 	{
 		$this->_ci->StudierendenantragModel->db->where_not_in('campus.get_status_studierendenantrag(studierendenantrag_id)', [
@@ -2148,6 +2174,27 @@ class AntragLib
 	{
 		return $this->_ci->StudierendenantragModel->isManuallyPaused($antrag_id);
 	}
+
+	/**
+	 * @param integer		$antrag_id
+	 *
+	 * @return boolean
+	 */
+	public function antragCanBeTerminated($antrag_id)
+	{
+		$this->_ci->StudierendenantragModel->db->where_not_in('campus.get_status_studierendenantrag(studierendenantrag_id)', [
+			Studierendenantragstatus_model::STATUS_DEREGISTERED,
+			Studierendenantragstatus_model::STATUS_APPROVED,
+			Studierendenantragstatus_model::STATUS_TERMINATED
+		]);
+		$result = $this->_ci->StudierendenantragModel->loadWhere([
+			'studierendenantrag_id' => $antrag_id,
+			'typ' => Studierendenantrag_model::TYP_WIEDERHOLUNG
+		]);
+
+		return hasData($result);
+	}
+
 
 	/**
 	 * @param integer		$antrag_id

@@ -16,6 +16,7 @@ class Studierendenantragstatus_model extends DB_Model
 	const STATUS_OBJECTION_DENIED = 'EinspruchAbgelehnt';
 	const STATUS_DEREGISTERED = 'Abgemeldet';
 	const STATUS_PAUSE = 'Pause';
+	const STATUS_TERMINATED = 'Storniert';
 
 	const INSERTVON_ABMELDUNGSTGL = "AbmeldungStgl";
 	const INSERTVON_DEREGISTERED = "Studienabbruch";

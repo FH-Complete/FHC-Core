@@ -44,6 +44,7 @@ $this->load->view(
 			<studierendenantrag-leitung
 				:stg-a="<?= htmlspecialchars(json_encode(array_values($stgA))); ?>"
 				:stg-l="<?= htmlspecialchars(json_encode(array_values($stgL))); ?>"
+				:permission-terminate-antrag="<?= json_encode($permissionTerminateAntrag); ?>"
 				>
 			</studierendenantrag-leitung>
 

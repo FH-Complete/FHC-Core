@@ -96,5 +96,12 @@ export default {
 			url: '/api/frontend/v1/studstatus/leitung/denyObjection',
 			params: antrag
 		};
-	}
+	},
+	terminate(antrag) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/studstatus/leitung/terminateAntrag',
+			params: antrag
+		};
+	},
 };

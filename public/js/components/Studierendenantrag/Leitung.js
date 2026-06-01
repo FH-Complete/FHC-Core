@@ -18,7 +18,11 @@ export default {
 	},
 	props: {
 		stgL: Array,
-		stgA: Array
+		stgA: Array,
+		permissionTerminateAntrag: {
+			type: Boolean,
+			default: false
+		},
 	},
 	data() {
 		return {
@@ -223,6 +227,13 @@ export default {
 					.then(this.showResults);
 			}
 		},
+		actionTerminate(evt){
+			var antraege = evt || this.selectedData;
+			this.$refs.loader.show();
+			this
+				._singleOrMultiApiCall(antraege, ApiStudstatusLeitung.terminate)
+				.then(this.showResults);
+		},
 		showResults(results) {
 			let fulfilled = results.filter(res => res.status == 'fulfilled');
 			this.$refs.loader.hide();
@@ -270,6 +281,7 @@ export default {
 			:stg-a="stgkzA"
 			:stg-l="stgkzL"
 			:filter="filter"
+			:permission-terminate-antrag="permissionTerminateAntrag"
 			v-model:columnData="columns"
 			v-model:selectedData="selectedData"
 			@action:approve="actionApprove"
@@ -280,7 +292,8 @@ export default {
 			@action:objectionApprove="actionObjectionApprove"
 			@action:cancel="actionCancel"
 			@action:pause="actionPause"
-			@action:unpause="actionUnpause"
+			@action:unpause="actionUnpause"	
+			@action:terminate="actionTerminate"
 			@reload="reload"
 			>
 		</leitung-table>
