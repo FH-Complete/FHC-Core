@@ -132,7 +132,12 @@ export default {
 					<span class="fw-semibold small w-50" v-tooltip="course.lehrfach_bez">{{ course.lehrfach }} {{ course.lehrform }}</span>
 					<span class="fw-semibold small w-50" v-tooltip="course.raumtypalternativ">{{ course.raumtyp }}</span>
 				</div>
-
+				
+				<!--TODO(david) entfernen, dient nur für das mappen mit der lvverwaltung-->
+				<div class="d-flex gap-1">
+					<span class="small w-50" v-tooltip="course.lehreinheit_id">{{ course.lehreinheit_id[0] }} </span>
+				</div>
+				
 				<div class="d-flex gap-1 text-muted">
 					<div class="w-50 d-flex flex-column" v-tooltip="course.anmerkung">
 						<span
