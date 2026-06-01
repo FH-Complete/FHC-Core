@@ -410,7 +410,7 @@ export const AbgabeStudentDetail = {
 
 		<div v-if="projektarbeit">
 		
-			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
+			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereichv2') )}}</h5>
 			<div class="row">
 				<div class="col-8">
 					<p>{{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>

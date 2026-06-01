@@ -43727,7 +43727,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgabeStudentenbereich',
+		'phrase' => 'c4abgabeStudentenbereichv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
