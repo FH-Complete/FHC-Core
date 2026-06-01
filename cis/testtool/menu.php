@@ -187,6 +187,7 @@ else if (isset($_SESSION['pruefling_id']))
 			}
 
 			$qry .= "
+				AND ps_status.bewerbung_abgeschicktamum IS NOT NULL
 
 		/* Order to get last semester when using distinct on */
 		ORDER BY
