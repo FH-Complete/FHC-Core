@@ -694,13 +694,6 @@ class StundenplanLib
 		{
 			$ymd = date('Y-m-d', $current);
 
-			if ((int)date('w', $current) === 0)
-			{
-				$result[$ymd] = false;
-				$current = $this->jump_day($current, 1);
-				continue;
-			}
-
 			$result[$ymd] = ($ymd >= $start_ymd_allowed && $ymd <= $end_ymd_allowed) ? true : false;
 
 			$current = $this->jump_day($current, 1);
