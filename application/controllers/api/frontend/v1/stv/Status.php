@@ -1081,6 +1081,9 @@ class Status extends FHCAPI_Controller
 	{
 		$changedFields = array();
 		$allowedFields = array('anmerkung', 'statusgrund_id');
+		// wenn vor Studentstatus, darf man Ausbildungssemester bearbeiten
+		if (in_array($oldstatus->status_kurzbz, ['Interessent', 'Bewerber', 'Aufgenommener', 'Wartender', 'Abgewiesener']))
+			$allowedFields[] = 'ausbildungssemester';
 		$oldstatus_array = get_object_vars($oldstatus);
 		foreach($oldstatus_array as $key => $oldValue)
 		{
