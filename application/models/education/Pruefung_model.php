@@ -288,20 +288,152 @@ class Pruefung_model extends DB_Model
 
 		if (is_array($status)) {
 			if (in_array(null, $status)) {
-				$status = array_filter($status);
-				if (count($status)) {
+				//$status = array_filter($status);
+				//just filter out null
+				$status = array_filter($status, static function ($value) {
+					return $value !== null;
+				});
+
+				$this->db->group_start();
+				// kein Antrag vorhanden ODER nur stornierte Anträge vorhanden
+				$this->db->or_where("
+                NOT EXISTS (
+                    SELECT 1
+                    FROM campus.tbl_studierendenantrag a2
+                    WHERE a2.prestudent_id = ps.prestudent_id
+                      AND a2.typ = " . $this->db->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG) . "
+                      AND COALESCE(
+                            campus.get_status_studierendenantrag(a2.studierendenantrag_id),
+                            ''
+                          ) <> 'Storniert')", null, false);
+
+				if (!empty($status))
+				{
+					$this->db->or_where_in('campus.get_status_studierendenantrag(a.studierendenantrag_id)',	$status);
+				}
+				$this->db->group_end();
+
+/*				if (count($status)) {
 					$this->db->group_start();
 					$this->db->where_in('campus.get_status_studierendenantrag(a.studierendenantrag_id)', $status);
 					$this->db->or_where('campus.get_status_studierendenantrag(a.studierendenantrag_id)', null);
 					$this->db->group_end();
-				} else {
+				} */
+/*				else {
 					$this->db->where('campus.get_status_studierendenantrag(a.studierendenantrag_id)', null);
-				}
+				}*/
 			} else {
 				$this->db->where_in('campus.get_status_studierendenantrag(a.studierendenantrag_id)', $status);
 			}
-		} else {
+		}
+		// kein Antrag vorhanden ODER nur stornierte Anträge vorhanden
+		elseif ($status === null)
+		{
+			$this->db->where("
+            NOT EXISTS (
+                SELECT 1
+                FROM campus.tbl_studierendenantrag a2
+                WHERE a2.prestudent_id = ps.prestudent_id
+                  AND a2.typ = " . $this->db->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG) . "
+                  AND COALESCE(
+                        campus.get_status_studierendenantrag(a2.studierendenantrag_id),
+                        ''
+                      ) <> 'Storniert'
+            )", null, false);
+		}
+		else {
 			$this->db->where('campus.get_status_studierendenantrag(a.studierendenantrag_id)', $status);
+		}
+
+		return $this->loadWhereCommitteeExamsFailed();
+	}
+
+
+	public function getAllPrestudentsWhereCommitteeExamFailed2($status, $maxDate, $minDate)
+	{
+		$this->withDetailsForStudierendenAntrag();
+
+		if ($maxDate)
+		{
+			$this->db->where("p.datum <=", $maxDate->format('Y-m-d'));
+		}
+
+		if ($minDate)
+		{
+			$this->db->where("p.datum >", $minDate->format('Y-m-d'));
+		}
+
+		$this->db->where("b.aktiv", true);
+
+		$this->db->where_in(
+			"get_rolle_prestudent(ps.prestudent_id, null)",
+			$this->config->item('antrag_prestudentstatus_whitelist')
+		);
+
+		if (is_array($status))
+		{
+			if (in_array(null, $status, true))
+			{
+				$status = array_filter($status, static function ($value) {
+					return $value !== null;
+				});
+
+				$this->db->group_start();
+
+				// Neuer "kein offener Antrag"-Fall:
+				// kein Antrag vorhanden ODER nur stornierte Anträge vorhanden
+				$this->db->or_where("
+                NOT EXISTS (
+                    SELECT 1
+                    FROM campus.tbl_studierendenantrag a2
+                    WHERE a2.prestudent_id = ps.prestudent_id
+                      AND a2.typ = " . $this->db->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG) . "
+                      AND COALESCE(
+                            campus.get_status_studierendenantrag(a2.studierendenantrag_id),
+                            ''
+                          ) <> 'Storniert'
+                )
+            ", null, false);
+
+				if (!empty($status))
+				{
+					$this->db->or_where_in(
+						'campus.get_status_studierendenantrag(a.studierendenantrag_id)',
+						$status
+					);
+				}
+
+				$this->db->group_end();
+			}
+			else
+			{
+				$this->db->where_in(
+					'campus.get_status_studierendenantrag(a.studierendenantrag_id)',
+					$status
+				);
+			}
+		}
+		elseif ($status === null)
+		{
+			$this->db->where("
+            NOT EXISTS (
+                SELECT 1
+                FROM campus.tbl_studierendenantrag a2
+                WHERE a2.prestudent_id = ps.prestudent_id
+                  AND a2.typ = " . $this->db->escape(Studierendenantrag_model::TYP_WIEDERHOLUNG) . "
+                  AND COALESCE(
+                        campus.get_status_studierendenantrag(a2.studierendenantrag_id),
+                        ''
+                      ) <> 'Storniert'
+            )
+        ", null, false);
+		}
+		else
+		{
+			$this->db->where(
+				'campus.get_status_studierendenantrag(a.studierendenantrag_id)',
+				$status
+			);
 		}
 
 		return $this->loadWhereCommitteeExamsFailed();
