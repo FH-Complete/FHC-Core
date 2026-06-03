@@ -18,6 +18,7 @@
 import {CoreFetchCmpt} from '../../components/Fetch.js';
 import FilterConfig from './Filter/Config.js';
 import FilterColumns from './Filter/Columns.js';
+import TablePresets from './Filter/TablePresets.js';
 import TableDownload from './Table/Download.js';
 import collapseAutoClose from '../../directives/collapseAutoClose.js';
 
@@ -45,7 +46,8 @@ export const CoreFilterCmpt = {
 		CoreFetchCmpt,
 		FilterConfig,
 		FilterColumns,
-		TableDownload
+		TablePresets,
+		TableDownload,
 	},
 	directives: {
 		collapseAutoClose
@@ -90,6 +92,10 @@ export const CoreFilterCmpt = {
 		useSelectionSpan: {
 			type: Boolean,
 			default: true
+		},
+		isUsingPresets: {
+			Boolean,
+			default: false,
 		},
 	},
 	inject: ["language"],
@@ -841,7 +847,7 @@ export const CoreFilterCmpt = {
 		});
 
 	},
-	template: `
+	template: /*html*/ `
 		<!-- Load filter data -->
 		<core-fetch-cmpt
 			v-if="!tableOnly && fetchCmptApiFunction"
@@ -888,9 +894,21 @@ export const CoreFilterCmpt = {
 					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
+					<a v-if="$props.isUsingPresets" aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#tablePresets' + idExtra">
+						<span class="fa-solid fa-xl fa-sliders"></span>
+					</a>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
 				</div>
 			</div>
+
+			<table-presets
+				v-collapse-auto-close
+				:id="'tablePresets' + idExtra"
+				:data-bs-parent="'#filterCollapsables' + idExtra"
+				:identifier="idExtra"
+				:tabulator="tabulator"
+				class="card-body collapse"
+			></table-presets>
 
 			<filter-columns
 				:id="'collapseColumns' + idExtra"
