@@ -5,7 +5,7 @@ if($result = @$db->db_query("SELECT 1 FROM campus.tbl_studierendenantrag_statust
 {
 	if($db->db_num_rows($result) == 0)
 	{
-		$qry = "INSERT INTO campus.tbl_studierendenantrag_statustyp(studierendenantrag_statustyp_kurzbz, bezeichnung) VALUES ('Storniert', '{\"Storniert\", \"Terminated\"}');";
+		$qry = "INSERT INTO campus.tbl_studierendenantrag_statustyp(studierendenantrag_statustyp_kurzbz, bezeichnung) VALUES ('Storniert', '{Storniert, Terminated}');";
 
 		if(!$db->db_query($qry))
 			echo '<strong>campus.tbl_studierendenantrag_statustyp: '.$db->db_last_error().'</strong><br>';
