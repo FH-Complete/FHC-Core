@@ -68,6 +68,7 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -75,7 +76,8 @@ export default {
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -84,7 +86,8 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
 						title: "placeholder",
@@ -95,7 +98,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			},

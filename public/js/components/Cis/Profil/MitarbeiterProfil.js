@@ -56,7 +56,8 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -64,7 +65,8 @@ export default {
 						field: "Bezeichnung",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -72,7 +74,8 @@ export default {
 						field: "Organisationseinheit",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 1,
 					},
 					{
 						title: "placeholder",
@@ -84,7 +87,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 4,
 					},
 					{
 						title: "placeholder",
@@ -96,7 +100,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 3,
 					},
 					{
 						title: "placeholder",
@@ -104,7 +109,8 @@ export default {
 						field: "Wochenstunden",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 				],
 			},
@@ -131,7 +137,8 @@ export default {
 						formatter: "responsiveCollapse",
 						maxWidth: 40,
 						headerClick: this.collapseFunction,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -139,7 +146,8 @@ export default {
 						field: "betriebsmittel",
 						headerFilter: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 0,
 					},
 					{
 						title: "placeholder",
@@ -148,7 +156,8 @@ export default {
 						headerFilter: true,
 						resizable: true,
 						minWidth: 200,
-						visible: true
+						visible: true,
+						responsive: 2,
 					},
 					{
 						title: "placeholder",
@@ -159,7 +168,8 @@ export default {
 						minWidth: 200,
 						visible: true,
 						formatter:"datetime",
-						formatterParams: this.datetimeFormatterParams()
+						formatterParams: this.datetimeFormatterParams(),
+						responsive: 1,
 					},
 				],
 			}
