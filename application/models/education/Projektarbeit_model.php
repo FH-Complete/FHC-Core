@@ -210,7 +210,15 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabe.insertvon,
 					campus.tbl_paabgabe.updatevon,
 					campus.tbl_paabgabe.insertamum,
-					campus.tbl_paabgabe.updateamum
+					campus.tbl_paabgabe.updateamum,
+					(SELECT p.vorname || ' ' || p.nachname
+						FROM public.tbl_benutzer b
+						JOIN public.tbl_person p USING(person_id)
+						WHERE b.uid = campus.tbl_paabgabe.insertvon) AS insertvon_fullname,
+					(SELECT p.vorname || ' ' || p.nachname
+					FROM public.tbl_benutzer b
+						JOIN public.tbl_person p USING(person_id)
+						WHERE b.uid = campus.tbl_paabgabe.updatevon) AS updatevon_fullname
 				FROM campus.tbl_paabgabe JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 				WHERE campus.tbl_paabgabe.projektarbeit_id IN ?
 				ORDER BY campus.tbl_paabgabe.datum";
