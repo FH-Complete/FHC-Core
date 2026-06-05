@@ -9,7 +9,7 @@ import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
-import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
 import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolAssistenz = {
