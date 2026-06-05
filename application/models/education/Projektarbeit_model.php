@@ -207,7 +207,10 @@ class Projektarbeit_model extends DB_Model
 					campus.tbl_paabgabetyp.paabgabetyp_kurzbz, 
 					campus.tbl_paabgabetyp.bezeichnung, 
 					campus.tbl_paabgabe.abgabedatum,
-					campus.tbl_paabgabe.insertvon
+					campus.tbl_paabgabe.insertvon,
+					campus.tbl_paabgabe.updatevon,
+					campus.tbl_paabgabe.insertamum,
+					campus.tbl_paabgabe.updateamum
 				FROM campus.tbl_paabgabe JOIN campus.tbl_paabgabetyp USING(paabgabetyp_kurzbz)
 				WHERE campus.tbl_paabgabe.projektarbeit_id IN ?
 				ORDER BY campus.tbl_paabgabe.datum";

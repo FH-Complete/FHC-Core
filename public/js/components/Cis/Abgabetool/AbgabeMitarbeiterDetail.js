@@ -905,7 +905,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-3 fw-bold align-content-center">
 								 {{ $capitalize( $p.t('abgabetool/c4actions') )}}
 						</div>
-						<div class="col-12 col-md-9">
+						<div class="col-12 col-md-6">
 							<div class="row">
 								<div class="col-auto">
 									<button v-if="termin.allowedToSave && !terminIsInvalid(termin)" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
@@ -932,6 +932,9 @@ export const AbgabeMitarbeiterDetail = {
 									</div>
 								</div>
 							</div>
+						</div>
+						<div class="col-12 col-md-3 align-content-center text-end text-muted small">
+							Your grey text here
 						</div>
 					</div>
 				</AccordionTab>

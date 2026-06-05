@@ -848,8 +848,6 @@ class Abgabe extends FHCAPI_Controller
 			// load existing entry of paabgabe and check if note has changed to negativ, to avoid sending when
 			// only notiz has changed.
 			
-			// TODO: what if paabgabe is a qualgate1, is benotet negativ and then its type is changed to gate2?
-			
 			$existingResult = $this->PaabgabeModel->load($paabgabe_id);
 			$existingPaabgabeArr = getData($existingResult);
 			if(count($existingPaabgabeArr) > 0) $existingPaabgabe = $existingPaabgabeArr[0];
@@ -860,8 +858,10 @@ class Abgabe extends FHCAPI_Controller
 					$this->terminateWithError($this->p->t('abgabetool', 'c4abgabetypAendernNichtErlaubt'));
 				}
 				
-				
-				// check if a change of deadline aka datum is being attempted -> should not be allowed at this point?
+				// check if a change of deadline aka datum is being attempted -> notallowed at this point
+				if($datum !== $existingPaabgabe->datum) {
+					$this->terminateWithError($this->p->t('abgabetool', 'c4datumAendernNichtErlaubt'));
+				}
 			}
 			
 			$result = $this->PaabgabeModel->update(
@@ -1238,9 +1238,12 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmailByPersonID($person_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmailByPersonID($person_id);
-		$email = $this->getDataOrTerminateWithError($result, 'general');
-
-		return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		if(hasData($result)) {
+			$email = getData($result);
+			return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
+		} else {
+			return null;
+		}
 	}
  
 	//TODO: SWITCH TO NOTEN API ONCE NOTENTOOL IS IN MASTER TO AVOID DUPLICATE API
@@ -1629,7 +1632,7 @@ class Abgabe extends FHCAPI_Controller
 
 			$email = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id);
 
-			if(!$email) $this->terminateWithError($this->p->t('abgabetool', 'c4fehlerMailBegutachterv2'), 'general');
+			if(!$email) $this->terminateWithError('early fail', 'general');
 			
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',

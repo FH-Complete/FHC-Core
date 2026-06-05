@@ -658,7 +658,7 @@ export const AbgabeStudentDetail = {
 					</label>
 					<Textarea 
 						v-model="editingTitel" 
-						rows="10" 
+						rows="2" 
 						maxlength="1024" 
 						class="form-control w-100"
 						@keydown.enter.prevent="saveTitel"
