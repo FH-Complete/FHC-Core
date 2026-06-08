@@ -17,13 +17,16 @@
 
 export default {
 	getMessages(params) {
+		let url = 'api/frontend/v1/messages/messages/getMessages'
+				+ '/' + params.id
+				+ '/' + params.type;
+			if(params.size && params.page) {
+				url += '/' + params.size
+				+ '/' + params.page;
+			}
 		return {
 			method: 'get',
-			url: 'api/frontend/v1/messages/messages/getMessages/'
-				+ params.id + '/'
-				+ params.type + '/'
-				+ params.size + '/'
-				+ params.page
+			url: url
 		};
 	},
 	getVorlagen(){
