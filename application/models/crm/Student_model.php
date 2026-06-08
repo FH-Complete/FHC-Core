@@ -102,7 +102,7 @@ class Student_model extends DB_Model
 		// Validierung der Eingabewerte
 		if (!is_valid_date($beginndatum)) return error("Ungültiges Beginndatum.");
 
-		// get studiensemester from datum
+		// Studiensemester der Meldung nach Datum holen
 		$meldestichtagRes = $this->BismeldestichtagModel->getByDate($beginndatum);
 
 		if (isError($meldestichtagRes)) return $meldestichtagRes;
@@ -111,6 +111,7 @@ class Student_model extends DB_Model
 			$studiensemester_kurzbz = getData($meldestichtagRes)[0]->studiensemester_kurzbz;
 		else
 		{
+			// aktuelles Studiensemester wenn kein Meldestichtag gefunden
 			$this->load->model('organisation/Studiensemester_model', 'StudiensemesterModel');
 			$studiensemesterRes = $this->StudiensemesterModel->getByDate($beginndatum);
 			if (isError($studiensemesterRes)) return $studiensemesterRes;
@@ -170,6 +171,7 @@ class Student_model extends DB_Model
 			}
 		}
 
+		// Sommersemester: 1 von Jahreszahl abziehen, um korrektes Meldejahr zu erhalten
 		if ($art=='2' || $art=='4')
 			$jahr = $jahr-1;
 
