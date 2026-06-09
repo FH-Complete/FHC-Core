@@ -920,6 +920,7 @@ export const CoreFilterCmpt = {
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:presetsId="$props.presetsId"
 				:tabulator="tabulator"
+				:generalPresets="$props.generalPresets"
 				class="card-body collapse"
 			></table-presets>
 
