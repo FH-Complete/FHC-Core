@@ -15,111 +15,332 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import ApiTabulatorPresets from "../../../api/factory/tabulatorPresets.js";
+
 /**
  *
  */
 export default {
 	name: "TablePresets",
-	props: ["identifier", "tabulator"],
-	emits: {},
+	props: {
+		presetsId: { type: String },
+		tabulator: { type: Object },
+		generalPresets: { type: Array, default: [] },
+	},
+	emits: ["applyTablePreset"],
 	data: function () {
 		return {
-			// todo: remove once actual data is fetched
-			testDataForUIDev: [
-				{
-					id: null,
-					name: "Test Preset 1",
-					displayedColumns: {
-						testCol1: true,
-						testCol2: false,
-						testCol3: true,
-						testCol4: false,
-						testCol5: true,
-					},
-					filters: {
-						testCol3: "adis",
-						testCol5: "01.06.2026.-31.12.2026.",
-					},
-					columnsOrder: ["testCol3", "testCol5", "testCol1"],
-					sort: {
-						column: "testCol1",
-						direction: "asc",
-					},
-					isUserCustom: false,
-				},
-				{
-					id: 1,
-					name: "Test Preset 2",
-					displayedColumns: {
-						testCol1: true,
-						testCol2: true,
-						testCol3: true,
-						testCol4: false,
-						testCol5: false,
-					},
-					filters: {
-						testCol1: "posko",
-					},
-					columnsOrder: ["testCol1", "testCol3", "testCol2"],
-					sort: {
-						column: "testCol3",
-						direction: "desc",
-					},
-				},
-			],
+			customUserPresets: [],
 			presetInfo: null,
+			newPreset: null,
+			newPresetName: "",
 		};
 	},
 	computed: {
+		allPresets() {
+			return this.$props.generalPresets.concat(this.customUserPresets);
+		},
 		presetInfoFormattedStrings() {
 			if (!this.presetInfo) return null;
 
-			const displayedColumns = Object.keys(this.presetInfo.displayedColumns).filter((column) => this.presetInfo.displayedColumns[column]);
-			const filters = Object.keys(this.presetInfo.filters).map((column) => column + ": \"" + this.presetInfo.filters[column] + "\"");
+			const columnTitles = this.getColumnTitles();
+
+			const displayedColumns = this.presetInfo.displayedColumns.map(
+				(columnField) => columnTitles[columnField],
+			);
+
+			const headerFilters = Object.keys(
+				this.presetInfo.headerFilters,
+			).map(
+				(column) =>
+					columnTitles[column] +
+					'["' +
+					this.presetInfo.headerFilters[column] +
+					'"]',
+			);
 			return {
-				displayedColumns: "Displayed columns: " + displayedColumns.join(", "),
-				columnsOrder: "Columns ordering: " + this.presetInfo.columnsOrder.join(", "),
-				filters: "Column filters: " + filters.join(", "),
-				sort: "Sort: " + this.presetInfo.sort.column + " (" + (this.presetInfo.sort.direction === "asc" ? "ascending" : "descending") + ")",
+				displayedColumns:
+					"Displayed columns (in order): " +
+					displayedColumns.join(", "),
+				headerFilters:
+					"Column header filters: " + headerFilters.join(", "),
+				sort:
+					"Sort: " +
+					columnTitles[this.presetInfo.sort.column] +
+					" (" +
+					(this.presetInfo.sort.direction === "asc"
+						? "ascending"
+						: "descending") +
+					")",
+			};
+		},
+		newPresetFormattedStrings() {
+			if (!this.newPreset) return null;
+
+			const columnTitles = this.getColumnTitles();
+
+			const displayedColumns = this.newPreset.displayedColumns.map(
+				(columnField) => columnTitles[columnField],
+			);
+
+			const headerFilters = Object.keys(this.newPreset.headerFilters).map(
+				(column) =>
+					columnTitles[column] +
+					'["' +
+					this.newPreset.headerFilters[column] +
+					'"]',
+			);
+			return {
+				displayedColumns:
+					"Displayed columns (in order): " +
+					displayedColumns.join(", "),
+				headerFilters:
+					"Column header filters: " + headerFilters.join(", "),
+				sort:
+					"Sort: " +
+					(this.newPreset.sort
+						? columnTitles[this.newPreset.sort.column] +
+							" (" +
+							(this.newPreset.sort.direction === "asc"
+								? "ascending"
+								: "descending") +
+							")"
+						: ""),
 			};
 		},
 	},
 	watch: {
-		// todo: watch presets, once they change nullify presetInfo and collapse preset info section
+		allPresets: {
+			handler() {
+				this.hidePresetInfo();
+				this.hideNewPresetForm();
+			},
+			deep: true,
+		},
 	},
 	methods: {
 		async showPresetInfo(preset) {
 			if (preset !== this.presetInfo) {
 				this.presetInfo = preset;
 			}
+
+			this.hideNewPresetForm();
+
 			await this.$nextTick();
-			if (!this.$refs.presetInfoCollapsible.getAttribute("class").split(" ").includes("show")) {
+
+			if (
+				!this.$refs.presetInfoCollapsible
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
 				this.togglePresetInfoCollapsible();
 			}
 		},
-		hidePresetInfo() {
+		async hidePresetInfo() {
+			if (
+				this.$refs.presetInfoCollapsible
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
+				this.togglePresetInfoCollapsible();
+			}
+			await this.$nextTick();
 			this.presetInfo = null;
-			this.togglePresetInfoCollapsible();
 		},
 		togglePresetInfoCollapsible() {
-			new bootstrap.Collapse("#presetInfoCollapsible" + this.$props.identifier, {toggle: true});
+			new bootstrap.Collapse(
+				"#presetInfoCollapsible_" + this.$props.presetsId,
+				{ toggle: true },
+			);
 		},
-		deletePreset(preset) {
-			// todo
-		},
-		showNewPresetForm() {
-			// todo
-			if (!this.$refs.newPresetFormCollapsible.getAttribute("class").split(" ").includes("show")) {
+		async showNewPresetForm() {
+			this.generateNewPreset();
+
+			this.hidePresetInfo();
+
+			await this.$nextTick();
+
+			if (
+				!this.$refs.newPresetFormCollapsible
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
 				this.toggleNewPresetFormCollapsible();
 			}
+		},
+		generateNewPreset() {
+			const columns = this.tabulator
+				.getColumnDefinitions()
+				.filter((column) => column.field !== "collapse");
 
+			const displayedColumns = columns
+				.filter((column) => column.visible)
+				.map((column) => column.field);
+
+			const unparsedHeaderFilters =
+				this.tabulator.modules.filter.headerFilters;
+			const headerFilterFieldValuePairs = Object.entries(
+				unparsedHeaderFilters,
+			).map(([columnField, filter]) => [columnField, filter.value]);
+			const headerFiltersFieldValuePairsExcludingHiddenColumns =
+				headerFilterFieldValuePairs.filter(
+					([columnField, filterValue]) => {
+						return displayedColumns.includes(columnField);
+					},
+				);
+			const headerFilters = Object.fromEntries(
+				headerFiltersFieldValuePairsExcludingHiddenColumns,
+			);
+
+			const activeSort = this.tabulator.getSorters()[0];
+			const sort = activeSort
+				? {
+						column: activeSort.field,
+						direction: activeSort.dir,
+					}
+				: null;
+
+			this.newPreset = {
+				displayedColumns,
+				headerFilters,
+				sort,
+			};
+		},
+		async hideNewPresetForm() {
+			if (
+				this.$refs.newPresetFormCollapsible
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
+				this.toggleNewPresetFormCollapsible();
+			}
 		},
 		toggleNewPresetFormCollapsible() {
-			new bootstrap.Collapse("#newPresetFormCollapsible" + this.$props.identifier, {toggle: true});
+			this.newPresetName = "";
+			new bootstrap.Collapse(
+				"#newPresetFormCollapsible_" + this.$props.presetsId,
+				{ toggle: true },
+			);
 		},
-		applyPreset() {
+		async createPreset() {
+			if (!this.newPresetName?.length) return;
+
+			const presetCreationResponse = await this.$api.call(
+				ApiTabulatorPresets.createTabulatorPreset(
+					this.$props.presetsId,
+					this.newPresetName,
+					this.newPreset,
+				),
+			);
+
+			if (presetCreationResponse.meta.status === "success") {
+				this.fetchCustomUserTabulatorPresets();
+				this.hideNewPresetForm();
+			}
+		},
+		async deletePreset(preset) {
+			if (!preset.id) return;
+
+			if (
+				window.confirm(
+					"Are you sure you want to delete preset (((presetName)))?".replace(
+						"(((presetName)))",
+						preset.name,
+					),
+				)
+			) {
+				const presetDeletionResponse = await this.$api.call(
+					ApiTabulatorPresets.deleteTabulatorPreset(preset.id),
+				);
+
+				if (presetDeletionResponse.meta.status === "success") {
+					this.fetchCustomUserTabulatorPresets();
+				}
+			}
+		},
+		async syncPresetWithConfig(preset) {
 			// todo
+			return preset;
 		},
+		async applyPreset(preset) {
+			preset = await this.syncPresetWithConfig(preset);
+
+			console.log(this.$props.tabulator);
+			let columns = this.$props.tabulator
+				.getColumnDefinitions()
+				.filter((column) => column.field !== "collapse");
+			columns.forEach((column) =>
+				this.$props.tabulator.hideColumn(column.field),
+			);
+			preset.displayedColumns.forEach(
+				(columnField, index, displayedColumns) => {
+					this.$props.tabulator.showColumn(columnField);
+					if (index === 0) return;
+					this.$props.tabulator.moveColumn(
+						columnField,
+						displayedColumns[index - 1],
+						true,
+					);
+				},
+			);
+
+			this.$props.tabulator.clearHeaderFilter();
+			Object.entries(preset.headerFilters).forEach(
+				([columnField, filterValue]) => {
+					this.$props.tabulator.setHeaderFilterValue(
+						columnField,
+						filterValue,
+					);
+				},
+			);
+
+			this.$props.tabulator.clearSort();
+			if (preset.sort?.column) {
+				this.$props.tabulator.setSort(
+					preset.sort.column,
+					preset.sort.direction ?? "asc",
+				);
+			}
+
+			this.$emit("tablePresetApplied", { preset });
+		},
+		async fetchCustomUserTabulatorPresets() {
+			let tabulatorPresetsResponse = await this.$api.call(
+				ApiTabulatorPresets.getTabulatorPresets(this.$props.presetsId),
+			);
+
+			if (tabulatorPresetsResponse.meta.status === "success") {
+				this.customUserPresets = tabulatorPresetsResponse.data.map(
+					(presetInfo) => {
+						return {
+							id: presetInfo.preset_id,
+							name: presetInfo.preset_name,
+							...JSON.parse(presetInfo.preset_json),
+						};
+					},
+				);
+			}
+		},
+		getColumnTitles() {
+			const columnLocalizations =
+				this.$props.tabulator.getLocale() !== "default"
+					? this.$props.tabulator.getLang().columns
+					: {};
+			const columnFieldTitlePairs = this.$props.tabulator
+				.getColumnDefinitions()
+				.map((column) => [
+					column.field,
+					columnLocalizations[column.field] ?? column.title,
+				]);
+			return Object.fromEntries(columnFieldTitlePairs);
+		},
+	},
+	async created() {
+		await this.fetchCustomUserTabulatorPresets();
 	},
 	template: /*html*/ `
 	<div>
@@ -127,10 +348,10 @@ export default {
 			<div class="card-header">Table Presets</div>
 			<div class="card-body d-flex flex-column">
 				<div class="d-flex flex-row gap-1 justify-content-start flex-wrap">
-					<div v-for="preset in testDataForUIDev" class="d-flex flex-column gap-1">
-						<div @click="applyPreset()" class="btn btn-dark py-1 px-2">{{ preset.name }}</div>
+					<div v-for="preset in allPresets" class="d-flex flex-column gap-1 mb-2">
+						<div @click="applyPreset(preset)" class="btn btn-dark py-1 px-2">{{ preset.name }}</div>
 						<div class="d-flex flex-row justify-content-center">
-							<div class="d-flex flex-row gap-2">
+							<div class="d-flex flex-row gap-2 px-3">
 								<span @click="showPresetInfo(preset)" type="button" class="fa-solid fa-circle-info"></span>
 								<span v-if="preset.id" @click="deletePreset(preset)" type="button" class="fa-solid fa-trash-can"></span>
 							</div>
@@ -143,7 +364,7 @@ export default {
 						</div>
 					</div>
 				</div>
-				<div :id="'presetInfoCollapsible' + $props.identifier" ref="presetInfoCollapsible" class="collapse">
+				<div :id="'presetInfoCollapsible_' + $props.presetsId" ref="presetInfoCollapsible" class="collapse">
 					<div class="d-flex flex-column">
 						<hr />
 						<div class="d-flex flex-column gap-2">
@@ -152,22 +373,26 @@ export default {
 								<span @click="hidePresetInfo()" type="button" class="fa-solid fa-xmark"></span>
 							</div>
 							<span>{{ presetInfoFormattedStrings?.displayedColumns }}</span>
-							<span>{{ presetInfoFormattedStrings?.columnsOrder }}</span>
-							<span>{{ presetInfoFormattedStrings?.filters }}</span>
+							<span>{{ presetInfoFormattedStrings?.headerFilters }}</span>
 							<span>{{ presetInfoFormattedStrings?.sort }}</span>
 						</div>
 					</div>
 				</div>
-				<div :id="'newPresetFormCollapsible' + $props.identifier" ref="newPresetFormCollapsible" class="collapse">
-					<!-- todo -->
+				<div :id="'newPresetFormCollapsible_' + $props.presetsId" ref="newPresetFormCollapsible" class="collapse">
 					<div class="d-flex flex-column">
 						<hr />
 						<div class="d-flex flex-column gap-2">
 							<div class="w-100 d-flex flex-row justify-content-between">
 								<span class="fw-bold">{{ "Save current configuration" }}</span>
-								<span @click="toggleNewPresetFormCollapsible()" type="button" class="fa-solid fa-xmark"></span>
+								<span @click="hideNewPresetForm()" type="button" class="fa-solid fa-xmark"></span>
 							</div>
-							adis
+							<span>{{ newPresetFormattedStrings?.displayedColumns }}</span>
+							<span>{{ newPresetFormattedStrings?.headerFilters }}</span>
+							<span>{{ newPresetFormattedStrings?.sort }}</span>
+							<div class="d-flex flex-row justify-content-center align-items-center gap-2">
+								<input v-model="newPresetName" :placeholder="'Preset name'" />
+								<div @click="createPreset()" :class="{'opacity-50 pe-none': !newPresetName?.length}" class="btn btn-dark py-1 px-2">{{ "Save" }}</div>
+							</div>
 						</div>
 					</div>
 				</div>

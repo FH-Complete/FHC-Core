@@ -94,6 +94,7 @@ require_once('dbupdate_3.4/71399_dashboard_update_widget_paths.php');
 require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
+require_once('dbupdate_3.4/77080_tabulator_presets_table.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';
@@ -391,6 +392,7 @@ $tabellen=array(
 	"public.tbl_studiengangstyp" => array("typ","bezeichnung","beschreibung","bezeichnung_mehrsprachig"),
 	"public.tbl_studienjahr"  => array("studienjahr_kurzbz","bezeichnung"),
 	"public.tbl_studiensemester"  => array("studiensemester_kurzbz","bezeichnung","start","ende","studienjahr_kurzbz","ext_id","beschreibung","onlinebewerbung"),
+	"public.tbl_tabulator_presets" => array("preset_id", "benutzer_uid", "table_name", "preset_json"),
 	"public.tbl_tag"  => array("tag"),
 	"public.tbl_variable"  => array("name","uid","wert"),
 	"public.tbl_variablenname"  => array("name","defaultwert"),

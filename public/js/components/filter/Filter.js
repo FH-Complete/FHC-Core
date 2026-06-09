@@ -97,6 +97,14 @@ export const CoreFilterCmpt = {
 			Boolean,
 			default: false,
 		},
+		presetsId: {
+			String,
+			default: "",
+		},
+		generalPresets: {
+			type: Array,
+			default: []
+		},
 	},
 	inject: ["language"],
 	data: function() {
@@ -823,6 +831,9 @@ export const CoreFilterCmpt = {
 				return res;
 			}, {});
 		},
+		afterTablePresetApplied(preset) {
+			this.selectedFields = preset.displayedColumns;
+		},
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
@@ -894,7 +905,7 @@ export const CoreFilterCmpt = {
 					<a aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#collapseColumns' + idExtra">
 						<span class="fa-solid fa-xl fa-table-columns"></span>
 					</a>
-					<a v-if="$props.isUsingPresets" aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#tablePresets' + idExtra">
+					<a v-if="$props.isUsingPresets && $props.presetsId?.length" aria-label="filter" href="#" class="btn btn-link px-0 fhc-text" data-bs-toggle="collapse" :data-bs-target="'#tablePresets' + idExtra">
 						<span class="fa-solid fa-xl fa-sliders"></span>
 					</a>
 					<table-download class="btn btn-link px-0 fhc-text" :tabulator="tabulator" :config="download"></table-download>
@@ -902,10 +913,12 @@ export const CoreFilterCmpt = {
 			</div>
 
 			<table-presets
+				v-if="$props.isUsingPresets && $props.presetsId?.length"
 				v-collapse-auto-close
+				@tablePresetApplied="afterTablePresetApplied($event.preset)"
 				:id="'tablePresets' + idExtra"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
-				:identifier="idExtra"
+				:presetsId="$props.presetsId"
 				:tabulator="tabulator"
 				class="card-body collapse"
 			></table-presets>

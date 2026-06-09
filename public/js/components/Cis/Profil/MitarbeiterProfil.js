@@ -446,7 +446,6 @@ export default {
 						:tabulator-options="funktionen_table_options"
 						tableOnly
 						:sideMenu="false"
-						:isUsingPresets="true"
                      />
                 </div>
                 <div class="col-12 mb-4" >
