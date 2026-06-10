@@ -64,7 +64,6 @@ if(!isset($_POST['uid']))
 	$fixtermin = false;
 	$datum = '01.01.1980';
 	$kurzbz = '';
-	$kontrollschlagwoerter = '';
 	$schlagwoerter = '';
 	$schlagwoerter_en = '';
 	$abstract = '';
@@ -88,7 +87,6 @@ else
 	$kurzbz = (isset($_POST['kurzbz'])?$_POST['kurzbz']:'');
 	$betreuer = (isset($_POST['betreuer'])?$_POST['betreuer']:'-1');
 	$sprache = (isset($_POST['sprache'])?$_POST['sprache']:'German');
-	$kontrollschlagwoerter = (isset($_POST['kontrollschlagwoerter'])?$_POST['kontrollschlagwoerter']:'-1');
 	$schlagwoerter = (isset($_POST['schlagwoerter'])?$_POST['schlagwoerter']:'-1');
 	$schlagwoerter_en = (isset($_POST['schlagwoerter_en'])?$_POST['schlagwoerter_en']:'-1');
 	$abstract = (isset($_POST['abstract'])?$_POST['abstract']:'-1');
@@ -211,23 +209,7 @@ if($command=='add')
 	{
 		//zusätzliche Daten bearbeiten
 		//Check der Eingabedaten
-		if(strlen($kontrollschlagwoerter)<1)
-		{
-			$error=true;
-		}
-		if(mb_strlen($kontrollschlagwoerter)>=150)
-		{
-			$kontrollschlagwoerter = mb_substr($kontrollschlagwoerter, 0, 146).'...';
-		}
-		if(strlen($abstract)<1)
-		{
-			$error=true;
-		}
-		if(strlen($abstract_en)<1)
-		{
-			$error=true;
-		}
-		if($seitenanzahl<1)
+		if((strlen($schlagwoerter) < 1) || (strlen($schlagwoerter_en) < 1) || (strlen($abstract) < 1) || (strlen($abstract_en) < 1) || ($seitenanzahl < 1))
 		{
 			$error=true;
 		}
@@ -237,7 +219,6 @@ if($command=='add')
 					seitenanzahl = ".$db->db_add_param($seitenanzahl).",
 					abgabedatum = now(),
 					sprache = ".$db->db_add_param($sprache).",
-					kontrollschlagwoerter = ".$db->db_add_param($kontrollschlagwoerter).",
 					schlagwoerter_en = ".$db->db_add_param($schlagwoerter_en).",
 					schlagwoerter = ".$db->db_add_param($schlagwoerter).",
 					abstract = ".$db->db_add_param($abstract).",
@@ -413,19 +394,16 @@ if($command=="update" && $error!=true)
 							        $htmlstr .= "</SELECT> \n";
 							    }
 							    $htmlstr .= "</td></tr>\n";
-								$htmlstr .= '<tr><td width="30%"><b>'.$p->t('abgabetool/kontrollierteSchlagwoerter').':*</b></td>
-											<td width="40%"><input type="text" name="kontrollschlagwoerter" id="kontrollschlagwoerter" value="'.$db->convert_html_chars($kontrollschlagwoerter).'" size="60" maxlength="150"></td>
-											<td  width="30%" align="left"><input type="button" name="SWD" value="    SWD    " onclick="window.open(\'swd.php\')"></td></tr>'."\n";
-								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').':</b></td>
-											<td><input  type="text" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'" size="60" maxlength="150"></td></tr>'."\n";
-								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/englischeSchlagwoerter').':</b></td>
-											<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'" size="60" maxlength="150"></td></tr>'."\n";
+								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/deutscheSchlagwoerter').':*</b></td>
+											<td><input  type="text" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'" size="60" maxlength="150" required></td></tr>'."\n";
+								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/englischeSchlagwoerter').':*</b></td>
+											<td><input type="text" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'" size="60" maxlength="150" required></td></tr>'."\n";
 								$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstract').' </b>'.$p->t('abgabetool/maxZeichen').':*</td>
-											<td><textarea name="abstract" cols="46"  rows="7">'.$db->convert_html_chars($abstract).'</textarea></td></tr>'."\n";
+											<td><textarea name="abstract" cols="46"  rows="7" required>'.$db->convert_html_chars($abstract).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td valign="top"><b>'.$p->t('abgabetool/abstractEng').'</b>'.$p->t('abgabetool/maxZeichen').':*</td>
-											<td><textarea name="abstract_en" cols="46"  rows="7">'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
+											<td><textarea name="abstract_en" cols="46"  rows="7" required>'.$db->convert_html_chars($abstract_en).'</textarea></td></tr>'."\n";
 								$htmlstr .= '<tr><td><b>'.$p->t('abgabetool/seitenanzahl').':*</b></td>
-											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4"></td></tr>'."\n";
+											<td><input  type="text" name="seitenanzahl" value="'.$db->convert_html_chars($seitenanzahl).'" size="5" maxlength="4" required></td></tr>'."\n";
 								$htmlstr .="<tr><td>&nbsp;</td></tr>\n";
 
 								// If there are info about the signed document
@@ -494,8 +472,8 @@ if($command=="update" && $error!=true)
 							else
 							{
 								// paarbeit sollte nur ab bestimmten Zeitpunkt online bewertet werden
-								$num_rows_sem = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
-								if(!is_numeric($num_rows_sem) || $num_rows_sem < 0)
+								$paIsCurrent = $projektarbeit_obj->projektarbeitIsCurrent($projektarbeit_id);
+								if(!is_bool($paIsCurrent))
 								{
 									echo "<font color=\"#FF0000\">".$p->t('abgabetool/fehlerAktualitaetProjektarbeit')."</font><br>&nbsp;";
 								}
@@ -517,7 +495,7 @@ if($command=="update" && $error!=true)
 								$maildata['student_voller_name'] = trim($row_std->titelpre." ".$row_std->vorname." ".$row_std->nachname." ".$row_std->titelpost);
 								$maildata['abgabetyp'] = $abgabetyp;
 								$maildata['parbeituebersichtlink'] = "<p><a href='".APP_ROOT."cis/private/lehre/abgabe_lektor_frameset.html'>Zur Projektarbeitsübersicht</a></p>";
-								$maildata['bewertunglink'] = $num_rows_sem >= 1 && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
+								$maildata['bewertunglink'] = $paIsCurrent && $paabgabetyp_kurzbz == 'end' ? "<p><a href='$mail_fulllink'>Zur Beurteilung der Arbeit</a></p>" : "";
 								$maildata['token'] = "";
 
 								$mailres = sendSanchoMail(
@@ -579,8 +557,8 @@ if($command=="update" && $error!=true)
 												$zweitbetmaildata['student_voller_name'] = $maildata['student_voller_name'];
 												$zweitbetmaildata['abgabetyp'] = $abgabetyp;
 												$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
-												$zweitbetmaildata['bewertunglink'] = $num_rows_sem >= 1 ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
-												$zweitbetmaildata['token'] = $num_rows_sem >= 1 && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+												$zweitbetmaildata['bewertunglink'] = $paIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
+												$zweitbetmaildata['token'] = $paIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
 
 												$mailres = sendSanchoMail(
 													'ParbeitsbeurteilungEndupload',
@@ -657,7 +635,6 @@ if($command!="add")
 			$htmlstr .= '<input type="hidden" name="uid" value="'.$db->convert_html_chars($uid).'">'."\n";
 			$htmlstr .= '<input type="hidden" name="betreuer" value="'.$db->convert_html_chars($betreuer).'">'."\n";
 			$htmlstr .= '<input type="hidden" name="command" value="update">'."\n";
-			$htmlstr .= '<input type="hidden" name="kontrollschlagwoerter" value="'.$db->convert_html_chars($kontrollschlagwoerter).'">'."\n";
 			$htmlstr .= '<input type="hidden" name="schlagwoerter" value="'.$db->convert_html_chars($schlagwoerter).'">'."\n";
 			$htmlstr .= '<input type="hidden" name="schlagwoerter_en" value="'.$db->convert_html_chars($schlagwoerter_en).'">'."\n";
 			$htmlstr .= '<input type="hidden" name="abstract" value="'.$db->convert_html_chars($abstract).'">'."\n";

@@ -71,9 +71,9 @@ $this->load->view(
 					<label>Fehler</label>
 					<select class="form-control" name="fehler_kurzbz" id="fehler_kurzbz">
 						<option value="" selected="selected">Alle</option>';
-						<?php foreach ($fehler as $fehler_kurzbz):?>
+						<?php foreach ($fehlerKurzbzCodeMappings as $fehler_kurzbz => $fehlercode):?>
 							<option value="<?php echo $fehler_kurzbz ?>">
-								<?php echo $fehler_kurzbz ?>
+								<?php echo $fehler_kurzbz.' ('.$fehlercode.')' ?>
 							</option>
 						<?php endforeach; ?>
 					</select>

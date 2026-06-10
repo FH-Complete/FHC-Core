@@ -25,6 +25,7 @@ SELECT
     lv_oe_kurzbz,
     lektor,
     stunden,
+    stundensatz,
     betrag,
     vertrag_id,
     vertrag_stunden,
@@ -148,7 +149,8 @@ FROM
                     ELSE (oe.organisationseinheittyp_kurzbz || \' \' || oe.bezeichnung)
                     END                                             AS "lv_oe_kurzbz",
                 (person.nachname || \' \' || person.vorname)        AS "lektor",
-                TRUNC(lema.semesterstunden, 1)                      AS "stunden",
+                TRUNC(lema.semesterstunden, 2)                      AS "stunden",
+                lema.stundensatz,
                 TRUNC((lema.semesterstunden * lema.stundensatz), 2) AS "betrag",
                 vertrag_id,
                 vertragsstunden                                                                     AS "vertrag_stunden",
@@ -270,6 +272,7 @@ FROM
                         END                                                                             AS "lv_oe_kurzbz",
                     (nachname || \' \' || vorname)                                                        AS "lektor",
                     TRUNC(pb.stunden, 1)                                                                AS "stunden",
+                    pb.stundensatz,
                     TRUNC((pb.stunden * pb.stundensatz), 2)                                             AS "betrag",
                     vertrag_id,
                     vertragsstunden                                                                     AS "vertrag_stunden",
@@ -325,6 +328,7 @@ $filterWidgetArray = array(
 	    ucfirst($this->p->t('lehre', 'organisationseinheit')),
 	    ucfirst($this->p->t('lehre', 'lektor')),
 	    ucfirst($this->p->t('ui', 'stunden')),
+		ucfirst($this->p->t('ui', 'stundensatz')),
 	    ucfirst($this->p->t('ui', 'betrag')),
 	    ucfirst($this->p->t('ui', 'vertrag')). '-ID',
 	    ucfirst($this->p->t('ui', 'vertrag')). '-'. ucfirst($this->p->t('ui', 'stunden')),
@@ -342,7 +346,6 @@ $filterWidgetArray = array(
 		layout: "fitColumns",			// fit columns to width of table
 		layoutColumnsOnNewData: true,	// ajust column widths to the data each time TableWidget is loaded
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
 	    groupBy:"lehrveranstaltung_id",
 	    groupToggleElement:"header",	//toggle group on click anywhere in the group header
 	    groupHeader: function(value, count, data, group){
@@ -357,22 +360,16 @@ $filterWidgetArray = array(
             return func_selectableCheck(row);
         },
         initialFilter: func_initialFilter(),
-        rowUpdated:function(row){
-             func_rowUpdated(row);
-        },
         rowFormatter:function(row)
         {
             func_rowFormatter(row);
         },
-        renderStarted:function(){
-            func_renderStarted(this);
-        },
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
 		tableWidgetFooter: {
 			selectButtons: true
-		}
+		},
+        columnDefaults:{
+            headerFilterPlaceholder: " ",
+        }
     }', // tabulator properties
     'datasetRepFieldsDefs' => '{
         // column status is built dynamically in funcTableBuilt(),
@@ -396,19 +393,21 @@ $filterWidgetArray = array(
         person_id: {visible: false, headerFilter:"input"},
         lv_oe_kurzbz: {visible: false, headerFilter:"input"},
         lektor: {headerFilter:"input", widthGrow: 2},
-        stunden: {align:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:1},
+        stunden: {hozAlign:"right",  formatter: form_formatNulltoStringNumber, formatterParams:{precision:2},
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
-            bottomCalc:"sum", bottomCalcParams:{precision:1}},
-        betrag: {align:"right", formatter: form_formatNulltoStringNumber,
+            bottomCalc:"sum", bottomCalcParams:{precision:2}},
+		stundensatz: {visible: true, hozAlign:"right", formatter: form_formatNulltoStringNumber,
+			headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator},
+        betrag: {hozAlign:"right", formatter: form_formatNulltoStringNumber,
             headerFilter:"input", headerFilterFunc: hf_filterStringnumberWithOperator,
             bottomCalc:"sum", bottomCalcParams:{precision:2}, bottomCalcFormatter:"money", bottomCalcFormatterParams:{decimal: ",", thousand: ".", symbol:"€"}},
         vertrag_id: {visible: false},
         vertrag_stunden: {visible: false},
         vertrag_betrag: {visible: false},
         mitarbeiter_uid: {visible: false, headerFilter:"input"},
-        bestellt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
-        erteilt: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
-        akzeptiert: {align:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
+        bestellt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: bestellt_tooltip},
+        erteilt: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: erteilt_tooltip},
+        akzeptiert: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate, tooltip: akzeptiert_tooltip},
         bestellt_von: {visible: false, headerFilter:"input"},
         erteilt_von: {visible: false, headerFilter:"input"},
         akzeptiert_von: {visible: false, headerFilter:"input"},

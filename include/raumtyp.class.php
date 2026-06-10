@@ -33,6 +33,7 @@ class raumtyp extends basis_db
 	//Tabellenspalten
 	public $beschreibung;		//  string
 	public $raumtyp_kurzbz;		//  string
+	public $aktiv;	//boolean
 
 
 	/**
@@ -42,7 +43,7 @@ class raumtyp extends basis_db
 	public function __construct($raumtyp_kurzbz=null)
 	{
 		parent::__construct();
-		
+
 		if($raumtyp_kurzbz != null)
 			$this->load($raumtyp_kurzbz);
 	}
@@ -51,10 +52,14 @@ class raumtyp extends basis_db
 	 * Laedt alle verfuegbaren Raumtypen
 	 * @return true wenn ok, false im Fehlerfall
 	 */
-	public function getAll()
+	public function getAll($aktiv = null)
 	{
-		$qry = 'SELECT * FROM public.tbl_raumtyp ORDER BY raumtyp_kurzbz;';
+		$qry = 'SELECT * FROM public.tbl_raumtyp';
 
+		if (!is_null($aktiv))
+			$qry .= ' WHERE aktiv = '.$this->db_add_param($aktiv, FHC_BOOLEAN);
+
+		$qry .= ' ORDER BY raumtyp_kurzbz';
 		if(!$this->db_query($qry))
 		{
 			$this->errormsg = 'Fehler beim Laden der Datensaetze';
@@ -67,7 +72,7 @@ class raumtyp extends basis_db
 
 			$raumtyp_obj->beschreibung = $row->beschreibung;
 			$raumtyp_obj->raumtyp_kurzbz = $row->raumtyp_kurzbz;
-
+			$raumtyp_obj->aktiv = $this->db_parse_bool($row->aktiv);
 
 			$this->result[] = $raumtyp_obj;
 		}
@@ -99,7 +104,7 @@ class raumtyp extends basis_db
 		{
 			$this->beschreibung 	= $row->beschreibung;
 			$this->raumtyp_kurzbz 	= $row->kurzbz;
-
+			$this->aktiv 	= $this->db_parse_bool($row->aktiv);
 		}
 		else
 		{
@@ -135,7 +140,7 @@ class raumtyp extends basis_db
 		$this->errormsg = '';
 		return true;
 	}
-	
+
 	/**
 	 * Speichert den aktuellen Datensatz
 	 * @return true wenn ok, false im Fehlerfall
@@ -154,6 +159,7 @@ class raumtyp extends basis_db
 				$this->errormsg = 'Keine gültige ID';
 				return false;
 			}
+
 			//Neuen Datensatz anlegen
 			$qry = 'INSERT INTO public.tbl_raumtyp (beschreibung, raumtyp_kurzbz) VALUES ('.
 				$this->db_add_param($this->beschreibung).', '.

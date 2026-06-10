@@ -147,7 +147,7 @@ if(isset($_GET['show']))
 							<th>Level</th>
 							<th>Frage</th>
 							<th colspan="3" title="Anzahl der Personen die diese Frage gestellt bekommen haben">Gesamt (m/w)</th>
-							<th colspan="30">Nummer | Punkte | Gesamt | Männlich | Weiblich</th>
+							<th colspan="30">Nummer | Punkte | Gesamt | % | Männlich | Weiblich</th>
 						</tr>';
 			}
 		}		
@@ -244,12 +244,20 @@ if(isset($_GET['show']))
 					
 					$anz_m = $row_geschlecht->anz_m;
 					$anz_w = $row_vorschlag->anzahl_vorschlag-$row_geschlecht->anz_m;
+					if ($row_vorschlag->anzahl_gesamt == 0)
+						$anzahl_gesamt = 1;
+					else
+						$anzahl_gesamt = $row_vorschlag->anzahl_gesamt;
+
+					$vorschlag_prozent = round(100 * $row_vorschlag->anzahl_vorschlag / $anzahl_gesamt, 1);
+					$vorschlag_prozent = number_format($vorschlag_prozent,1,',','');
 					
 					$hlp2.= '
 						<td style="border-left: 1px solid black; padding-left:2px;"><b>'.$row_vorschlag->nummer.'</b></td>
 						<!--<td style="padding-left:2px;">'.$row_vorschlag->text.'</td>-->
 						<td>'.number_format($row_vorschlag->punkte,2).'</td>
 						<td><b>'.$row_vorschlag->anzahl_vorschlag.'</b></td>
+						<td><b>'.$vorschlag_prozent.'%</b></td>
 						<td style="color:blue;"><b>'.$anz_m.'</b></td>
 						<td style="color:magenta;"><b>'.$anz_w.'</b></td>';
 					

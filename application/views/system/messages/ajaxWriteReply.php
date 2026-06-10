@@ -10,14 +10,13 @@
 			'sbadmintemplate3' => true,
 			'ajaxlib' => true,
 			'dialoglib' => true,
-			'tinymce4' => true,
+			'tinymce5' => true,
 			'phrases' => array('global', 'ui'),
 			'customCSSs' => array('public/css/sbadmin2/admintemplate_contentonly.css', 'public/css/messaging/message.css'),
 			'customJSs' => array('public/js/bootstrapper.js', 'public/js/messaging/writeReply.js')
 		)
 	);
 ?>
-	<body>
 		<div id="wrapper">
 			<div id="page-wrapper">
 				<div class="container-fluid">
@@ -96,6 +95,5 @@
 				</div>
 			</div>
 		</div>
-	</body>
 
 <?php $this->load->view("templates/FHC-Footer"); ?>

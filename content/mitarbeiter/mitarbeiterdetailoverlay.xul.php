@@ -227,8 +227,6 @@ echo '<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>';
 		    		<checkbox label="Kleriker" id="mitarbeiter-detail-checkbox-kleriker" checked="false" disabled="true" hidden="true" onchange="MitarbeiterDetailValueChange()"/>
 		    	</row>
 		    	<row>
-		    	    <label align="end" control="mitarbeiter-detail-textbox-stundensatz" value="Stundensatz"/>
-		    		<textbox id="mitarbeiter-detail-textbox-stundensatz" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>
 		    		<label align="end" control="mitarbeiter-detail-textbox-telefonklappe" value="Telefonklappe"/>
 		    		<hbox>
 	    				<textbox id="mitarbeiter-detail-textbox-telefonklappe" size="10" maxlength="10" disabled="true" oninput="MitarbeiterDetailValueChange()"/>

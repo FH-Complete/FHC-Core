@@ -234,3 +234,19 @@ treechildren::-moz-tree-row(makeItMarked)
    width: 25px;
    height:25px;
 }
+
+treechildren::-moz-tree-cell(stichtagsinaktiv)
+{
+	background-color: #e6e6e6;
+}
+
+treechildren::-moz-tree-cell(erstes_stichtagsinaktiv)
+{
+	background-color: #e6e6e6;
+	border-top: 1px solid grey;
+}
+
+label.warning
+{
+	font-weight: bold;
+}

@@ -64,7 +64,7 @@ $format_title->setAlign('merge');
 
 //Zeilenueberschriften ausgeben
 $headline = array('Typ der Projektarbeit','Titel der Projektarbeit','Student',
-                'Note','Punkte','Beginn','Ende','Freigegeben','Gesperrt bis','Gesamtstunden','Themenbereich',
+                'Note','Punkte','Beginn','Ende','Freigegeben','Gesperrt bis','Themenbereich',
                 'Anmerkung','Projektarbeit ID');
 
 $i = 0;
@@ -81,7 +81,7 @@ $qry = "SELECT
 			trim(COALESCE(titelpre,'') || ' ' || COALESCE(vorname,'')
 			|| ' ' || COALESCE(nachname,'') || ' ' || COALESCE(titelpost,'')),
 			(SELECT anmerkung FROM lehre.tbl_note WHERE note=tbl_projektarbeit.note) as anmerkung, punkte, beginn,
-			ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, gesamtstunden, themenbereich,
+			ende, CASE WHEN freigegeben THEN 'Ja' ELSE 'Nein' END, gesperrtbis, themenbereich,
 			tbl_projektarbeit.anmerkung, projektarbeit_id
 		FROM
 			lehre.tbl_projektarbeit, lehre.tbl_lehreinheit, lehre.tbl_lehrveranstaltung,

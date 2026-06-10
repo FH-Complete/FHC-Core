@@ -1,6 +1,7 @@
 <?php
 $this->phrasen['abgabetool/abgabetool']='Abgabetool';
 $this->phrasen['abgabetool/aeltereParbeitBenoten']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
+$this->phrasen['abgabetool/aeltereParbeitBenotenQuickInfo']='Projektarbeit für älteres Semester, bitte Word-Formular zur Benotung verwenden!';
 $this->phrasen['abgabetool/keinEnduploadErfolgt']='Endupload ist noch nicht erfolgt';
 $this->phrasen['abgabetool/typ']='Typ';
 $this->phrasen['abgabetool/titel']='Titel';
@@ -94,6 +95,7 @@ $this->phrasen['abgabetool/fehlerErmittelnEndabgabeProjektarbeit']='Fehler beim 
 $this->phrasen['abgabetool/uploadedDocumentNotSignedStudent']='Es konnte keine gültige digitale Signatur erkannt werden. Bitte wenden Sie sich an Ihren Studiengang ob Ihre Endabgabe erfolgreich war und die Arbeit zur Benotung vorgelegt werden kann.';
 $this->phrasen['abgabetool/uploadedDocumentNotSigned']='Signatur fehlt';
 $this->phrasen['abgabetool/uploadedDocumentSigned']='Signatur vorhanden';
+$this->phrasen['abgabetool/uploaddDocumentToBigForSignature']='Datei zu groß für Signaturprüfung';
 $this->phrasen['abgabetool/senatsMitglied']='Mitglied Prüfungssenat';
 $this->phrasen['abgabetool/abgegeben']='Abgegeben, in Beurteilung';
 ?>

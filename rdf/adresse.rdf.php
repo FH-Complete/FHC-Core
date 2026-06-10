@@ -100,7 +100,7 @@ function draw_rdf($row)
             <ADRESSE:gemeinde><![CDATA['.$row->gemeinde.']]></ADRESSE:gemeinde>
             <ADRESSE:nation><![CDATA['.$row->nation.']]></ADRESSE:nation>
             <ADRESSE:typ><![CDATA['.$row->typ.']]></ADRESSE:typ>
-            <ADRESSE:typ_name><![CDATA['.$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE].']]></ADRESSE:typ_name>
+            <ADRESSE:typ_name><![CDATA['.(isset($row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE])?$row->bezeichnung_mehrsprachig[DEFAULT_LANGUAGE]:'').']]></ADRESSE:typ_name>
             <ADRESSE:heimatadresse><![CDATA['.($row->heimatadresse?'Ja':'Nein').']]></ADRESSE:heimatadresse>
             <ADRESSE:zustelladresse><![CDATA['.($row->zustelladresse?'Ja':'Nein').']]></ADRESSE:zustelladresse>
             <ADRESSE:co_name><![CDATA['. $row->co_name.']]></ADRESSE:co_name>

@@ -122,6 +122,7 @@
 		$lv->benotung = isset($_POST['benotung']);
 		$lv->lvinfo = isset($_POST['lvinfo']);
 		$lv->lehrauftrag = isset($_POST['lehrauftrag']);
+		$lv->evaluierung = isset($_POST['evaluierung']);
 		$lv->lehrveranstaltung_template_id = $lv->lehrtyp_kurzbz == 'tpl' ? '' : $_POST['lehrveranstaltung_template_id'];
 
 		if(!$lv->save())
@@ -402,7 +403,12 @@
 					$selected='selected';
 				else
 					$selected='';
-				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.'>'.$row->raumtyp_kurzbz.'</option>';
+				
+				$inaktiv = '';
+				if (!$db->db_parse_bool($row->aktiv))
+					$inaktiv = 'disabled';
+
+				$htmlstr .= '<option value="'.$row->raumtyp_kurzbz.'" '.$selected.' '. $inaktiv . '>'.$row->raumtyp_kurzbz.'</option>';
 			}
 		}//#'.$lv->farbe.'
 		$htmlstr .= '</select></td>
@@ -440,6 +446,10 @@
 			<td><input type="checkbox" name="lvinfo" '.($lv->lvinfo?'checked':'').'></td>
 			<td>Lehrauftrag</td>
 			<td><input type="checkbox" name="lehrauftrag" '.($lv->lehrauftrag?'checked':'').'></td>
+		</tr>
+		<tr>
+			<td>Evaulierung</td>
+			<td><input type="checkbox" name="evaluierung" '.($lv->evaluierung?'checked':'').'></td>
 		</tr>
 		<tr id="lehrveranstaltung_template_id">
 			<td>Template</td>

@@ -17,10 +17,10 @@ class CORE_STUDENTSTATUS_0015 implements IIssueResolvedChecker
 
 		$this->_ci =& get_instance(); // get code igniter instance
 
-		$this->_ci->load->library('issues/PlausicheckLib');
+		$this->_ci->load->library('issues/plausichecks/AktiverStudentstatusOhneKontobuchung');
 
 		// check if issue persists
-		$checkRes = $this->_ci->plausichecklib->getAktiverStudentstatusOhneKontobuchung(
+		$checkRes = $this->_ci->aktiverstudentstatusohnekontobuchung->getAktiverStudentstatusOhneKontobuchung(
 			$params['studiensemester_kurzbz'],
 			null,
 			$params['prestudent_id']

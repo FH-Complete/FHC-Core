@@ -29,6 +29,7 @@ require_once('../../include/prestudent.class.php');
 require_once('../../include/pruefling.class.php');
 require_once('../../include/studiengang.class.php');
 require_once('../../include/studienplan.class.php');
+require_once('../../include/studienordnung.class.php');
 require_once('../../include/ablauf.class.php');
 require_once('../../include/reihungstest.class.php');
 require_once('../../include/sprache.class.php');
@@ -39,8 +40,7 @@ if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 // Start session
-session_start();
-
+require_once './session_init.php';
 // Logout (triggered by logout button in menu.php)
 if (isset($_GET['logout']) && $_GET['logout'] == true)
 {
@@ -126,10 +126,6 @@ if (isset($_REQUEST['prestudent']))
 			$rt->getReihungstestPerson($ps->person_id);
 			if (isset($rt->result[0]))
 				$reihungstest_id = $rt->result[0]->reihungstest_id;
-			else
-			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-			}
 		}
 		else
 		{
@@ -138,10 +134,6 @@ if (isset($_REQUEST['prestudent']))
 				// TODO Was ist wenn da mehrere Zurueckkommen?!
 				if (isset($rt->result[0]))
 					$reihungstest_id = $rt->result[0]->reihungstest_id;
-				else
-				{
-					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestKannNichtGeladenWerden').'</div>';
-				}
 			}
 			else
 			{
@@ -150,7 +142,9 @@ if (isset($_REQUEST['prestudent']))
 		}
 		if ($reihungstest_id != '' && $rt->load($reihungstest_id))
 		{
-			if ($rt->freigeschaltet)
+			$pruefling_exist = new Pruefling();
+			$alreadyInRT = $pruefling_exist->personAlreadyInRT($ps->person_id, $rt->reihungstest_id, $ps->prestudent_id);
+			if ($rt->freigeschaltet && !$alreadyInRT)
 			{
 				// regenerate Session ID after Login
 				session_regenerate_id();
@@ -179,6 +173,12 @@ if (isset($_REQUEST['prestudent']))
 						}
 						else
 							$reload_menu = true;
+					}
+
+					if ($rt->externe_ueberwachung && defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED)
+					{
+						$_SESSION['externe_ueberwachung'] = true;
+						$_SESSION['externe_ueberwachung_verified'] = false;
 					}
 				}
 
@@ -284,7 +284,14 @@ if (isset($_REQUEST['prestudent']))
 			}
 			else
 			{
-				$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				if ($alreadyInRT)
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtRegistriert').'</div>';
+				}
+				else
+				{
+					$alertmsg .= '<div class="alert alert-danger">'.$p->t('testtool/reihungstestNichtFreigeschalten').'</div>';
+				}
 			}
 		}
 		else
@@ -342,11 +349,26 @@ else
 	}
 }
 
-if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
-	!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code'])) ||
-	(isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
-	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
-	isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])))
+if (
+	(
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
+		!isset($_SESSION['confirmation_needed']) && !isset($_SESSION['confirmed_code']) &&
+		!isset($_SESSION['externe_ueberwachung']) && !isset($_SESSION['externe_ueberwachung_verified'])
+	)
+	||
+	(
+		isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+		isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+	||
+	(
+		isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true &&
+		isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === true &&
+		isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id'])
+	)
+
+)
 {
 	$pruefling = new pruefling();
 
@@ -362,6 +384,8 @@ if ((isset($_SESSION['prestudent_id']) && !isset($_SESSION['pruefling_id']) &&
 		$pruefling->idnachweis = '';
 		$pruefling->registriert = date('Y-m-d H:i:s');
 		$pruefling->prestudent_id = $_SESSION['prestudent_id'];
+		$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
+
 		if ($pruefling->save())
 		{
 			$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -385,6 +409,7 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 	$pruefling->registriert = date('Y-m-d H:i:s');
 	$pruefling->prestudent_id = $_SESSION['prestudent_id'];
 	$pruefling->semester = $_POST['semester'];
+	$pruefling->gesperrt = $pruefling->isGesperrt(null, $_SESSION['prestudent_id']);
 	if ($pruefling->save())
 	{
 		$_SESSION['pruefling_id']=$pruefling->pruefling_id;
@@ -431,14 +456,26 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 				});';
 		?>
 
-		// If Browser is any other than Mozilla Firefox and the test includes any MathML,
-		// show message to use Mozilla Firefox
-		var ua = navigator.userAgent;
-		if ((ua.indexOf("Firefox") > -1) == false)
+		$(document).bind('cut copy paste', function(e)
 		{
-			$("#alertmsgdiv").html("<div class='alert alert-danger'>BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!<br>(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.<br><br>PLEASE USE MOZILLA FIREFOX BROWSER!<br>(Otherwise some exam items will not be displayed correctly</div>");
-			//alert('BITTE VERWENDEN SIE DEN MOZILLA FIREFOX BROWSER!\n(Manche Prüfungsfragen werden sonst nicht korrekt dargestellt.\n\nPLEASE USE MOZILLA FIREFOX BROWSER!\n(Ohterwise some exam items will not be displayed correctly.)');
-		}
+			if (document.querySelector('.frage'))
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("keydown", function (e)
+		{
+			if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+			{
+				e.preventDefault();
+			}
+		});
+
+		$(document).on("contextmenu", function (e)
+		{
+			e.preventDefault();
+		});
 	});
 	</script>
 <?php
@@ -452,7 +489,13 @@ if (isset($_POST['save']) && isset($_SESSION['prestudent_id']))
 
 <?php
 
-if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
+if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true) &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === false)
+{
+	echo "<script> top.location.href = 'resetconnection.php';</script>";
+	exit;
+}
+else if (isset($_SESSION['confirmation_needed']) && $_SESSION['confirmation_needed'] === true &&
 	isset($_SESSION['confirmed_code']) && $_SESSION['confirmed_code'] === false)
 {
 	echo '
@@ -599,13 +642,26 @@ elseif (isset($prestudent_id))
 			{
 				echo '<tr>';
 				$stg = new Studiengang($ps_obj->studiengang_kz);
+				$sto = new Studienordnung();
+				$sto->getStudienordnungFromStudienplan($ps_obj->studienplan_id);
+				// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
+				$stg_name = $sto->studiengangbezeichnung;
+				$stg_name_eng = $sto->studiengangbezeichnung_englisch;
+				if ($stg_name == '')
+				{
+					$stg_name = $stg->bezeichnung;
+				}
+				if ($stg_name_eng == '')
+				{
+					$stg_name_eng = $stg->english;
+				}
 
 				if ($ps_obj->lastStatus == "Interessent"
 					|| $ps_obj->lastStatus == "Bewerber"
 					|| $ps_obj->lastStatus == "Wartender"
 					|| $ps_obj->lastStatus == "Aufgenommener")
 				{
-					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
+					echo '<td style="width: 50%;">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). ' ('.$ps_obj->orgform_bezeichnung[$sprache_user].')</td>';
 					if ($ps_obj->ausbildungssemester == '1')
 					{
 						echo '<td>'. $p->t('testtool/regulaererEinstieg'). ' (1. Semester)</td>';
@@ -619,7 +675,7 @@ elseif (isset($prestudent_id))
 				elseif ($ps_obj->lastStatus == "Abgewiesener")
 				{
 					echo '
-						<td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg->english : $stg->bezeichnung). '</td>
+						<td class="text-muted">'. $ps_obj->typ_bz .' '. ($sprache_user == 'English' ? $stg_name_eng : $stg_name). '</td>
 						<td class="text-muted">'. $ps_obj->status_mehrsprachig[$sprache_user]. '</td>
 					';
 				}
@@ -631,9 +687,23 @@ elseif (isset($prestudent_id))
 	else
 	{
 		// Letzten Status für des Prestudenten einholen
-		$ps_master = new Prestudent();
+		$ps_master = new Prestudent($prestudent_id);
 		$ps_master->getLastStatus($prestudent_id);
-		echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_obj->english:$stg_obj->bezeichnung).'</td>';
+		$sto = new Studienordnung();
+		$sto->getStudienordnungFromStudienplan($ps_master->studienplan_id);
+		$stg = new Studiengang($ps_master->studiengang_kz);
+		// Name des Studiengangs aus Studienordnung laden, ansonsten Fallback auf Studiengang
+		$stg_name = $sto->studiengangbezeichnung;
+		$stg_name_eng = $sto->studiengangbezeichnung_englisch;
+		if ($stg_name == '')
+		{
+			$stg_name = $stg->bezeichnung;
+		}
+		if ($stg_name_eng == '')
+		{
+			$stg_name_eng = $stg->english;
+		}
+		echo '<td>'. $typ->bezeichnung.' '.($sprache_user=='English'?$stg_name_eng : $stg_name).'</td>';
 		echo '<td>'. $ps_master->status_mehrsprachig[$sprache_user]. '</td>';
 	}
 
@@ -684,7 +754,7 @@ else // LOGIN Site (vor Login)
 			echo '<script>
 				function changeconfirmation()
 				{
-					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked;
+					document.getElementById("confirmationSubmit").disabled = !document.getElementById("confirmationCheckbox").checked || !document.getElementById("dsgvoconfirm").checked || !document.getElementById("procotoringconfirm").checked;
 				}
 				</script>';
 			echo '<div class="row text-center">
@@ -693,6 +763,12 @@ else // LOGIN Site (vor Login)
 			<input type="hidden" name="prestudent" value="'.$_REQUEST['prestudent'].'" />
 			<input id="confirmationCheckbox" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
 			'.$p->t('testtool/confirmationText').'
+			<br><br>
+			<input id="dsgvoconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/dsgvoConfirmText').'
+			<br><br>
+			<input id="procotoringconfirm" type="checkbox" name="confirmation" onclick="changeconfirmation()" />
+			'.$p->t('testtool/procotoringConfirmText').'
 			<br><br>
 			<button id="confirmationSubmit" type="submit" class="btn btn-primary" disabled/>
 				'.$p->t('testtool/start').'

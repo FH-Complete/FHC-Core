@@ -390,30 +390,34 @@ if($result = $db->db_query($qry))
 			$error_log.=(!empty($error_log)?', ':'')."Matrikelnummer ('".trim($row->matr_nr)."') ist nicht 8 Zeichen lang";
 		}
 		//SVNR muß¸ 10-stellig sein
+		/* Alle SVNR Checks entfernt
 		if($row->svnr!='' && $row->svnr!=null && mb_strlen(trim($row->svnr))!=10)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".trim($row->svnr)."') ist nicht 10 Zeichen lang";
-		}
+		}*/
 		//Ersatzkennzeichen muß 10-stellig sein
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && mb_strlen(trim($row->ersatzkennzeichen))!=10)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".trim($row->ersatzkennzeichen)."') ist nicht 10 Zeichen lang";
 		}
+
 		//Vergleich der letzten 6 Stellen der SVNR mit Geburtsdatum - ausser bei 01.01. und 01.07.
+		/* Alle SVNR Checks entfernt
 		if($row->svnr!='' && $row->svnr!=null && substr($row->svnr,4,6)!=$row->vdat && substr($row->vdat,0,4)!='0101' && substr($row->vdat,0,4)!='0107')
 		{
 			$error_log_hinweis.=(!empty($error_log_hinweis)?', ':'')."SVNR ('".$row->svnr."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
-		}
+		}*/
 		//Vergleich der letzten 6 Stellen des Ersatzkennzeichen mit Geburtsdatum
 		if($row->ersatzkennzeichen!='' && $row->ersatzkennzeichen!=null && substr($row->ersatzkennzeichen,4,6)!=$row->vdat)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Ersatzkennzeichen ('".$row->ersatzkennzeichen."') enth&auml;lt Geburtsdatum (".$row->gebdatum.") nicht";
 		}
 		// Wenn SVNR fehlt, darf Ersatzkennzeichen nicht fehlen (und umgekehrt)
+		/* Alle SVNR Checks entfernt
 		if(($row->svnr=='' || $row->svnr==null)&&($row->ersatzkennzeichen=='' || $row->ersatzkennzeichen==null))
 		{
 			$error_log.=(!empty($error_log)?', ':'')."SVNR ('".$row->svnr."') bzw. ErsKz ('".$row->ersatzkennzeichen."') fehlt";
-		}
+		}*/
 		if($row->staatsbuergerschaft=='' || $row->staatsbuergerschaft==null)
 		{
 			$error_log.=(!empty($error_log)?', ':'')."Staatsb&uuml;rgerschaft ('".$row->staatsbuergerschaft."')";
@@ -714,7 +718,7 @@ if($result = $db->db_query($qry))
 			$qry_ap="SELECT * FROM lehre.tbl_abschlusspruefung WHERE student_uid=".$db->db_add_param($row->student_uid)." AND abschlussbeurteilung_kurzbz!='nicht' AND abschlussbeurteilung_kurzbz IS NOT NULL";
 			if($result_ap = $db->db_query($qry_ap))
 			{
-				$ap=0;
+				$ap = array();
 				while($row_ap = $db->db_fetch_object($result_ap))
 				{
 					if($row_ap->datum=='' || $row_ap->datum==null)
@@ -725,12 +729,19 @@ if($result = $db->db_query($qry))
 					{
 						$error_log.=(!empty($error_log)?', ':'')."Datum der Sponsion ('".$row_ap->sponsion."')";
 					}
-					$ap++;
+					if (!isset($ap[$row_ap->pruefungstyp_kurzbz]))
+					{
+						$ap[$row_ap->pruefungstyp_kurzbz] = 0;
+					}
+					$ap[$row_ap->pruefungstyp_kurzbz]++;
 					$sponsion=$row_ap->sponsion;
 				}
-				if($ap!=1)
+				foreach ($ap as $typ => $count)
 				{
-					$error_log.=(!empty($error_log)?', ':'').$ap." bestandene Abschlusspr&uuml;fungen";
+				    if ($count > 1)
+				    {
+					    $error_log.=(!empty($error_log)?', ':'').$count." bestandene Abschlusspr&uuml;fungen desselben Typs";
+				    }
 				}
 			}
 		}
@@ -815,13 +826,16 @@ if($result = $db->db_query($qry))
 				<Vorname>".$row->vorname."</Vorname>
 				<Familienname>".$row->nachname."</Familienname>";
 
+				/* Alle SVNR Checks entfernt
 				if($row->svnr!='')
 				{
 					$datei.="
 				<SVNR>".$row->svnr."</SVNR>";
-				}
+				}*/
 				// Ersatzkennzeichen nur inkludieren wenn svnr nicht gesetzt
-				if($row->ersatzkennzeichen!='' && $row->svnr == null)
+				// Alle SVNR Checks entfernt
+				// if($row->ersatzkennzeichen!='' && $row->svnr == null)
+				if($row->ersatzkennzeichen!='')
 				{
 					$datei.="
 				<ErsKz>".$row->ersatzkennzeichen."</ErsKz>";

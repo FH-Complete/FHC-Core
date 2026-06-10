@@ -1,6 +1,25 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 if (! defined('BASEPATH')) exit('No direct script access allowed');
+
+use \stdClass as stdClass;
 
 /**
  * FilterWidget logic
@@ -16,6 +35,7 @@ class FilterWidgetLib
 	const SESSION_SELECTED_FIELDS = 'selectedFields';
 	const SESSION_COLUMNS_ALIASES = 'columnsAliases';
 	const SESSION_ADDITIONAL_COLUMNS = 'additionalColumns';
+	const SESSION_ENCRYPTED_COLUMNS = 'encryptedColumns';
 	const SESSION_CHECKBOXES = 'checkboxes';
 	const SESSION_FILTERS = 'filters';
 	const SESSION_METADATA = 'datasetMetadata';
@@ -56,6 +76,7 @@ class FilterWidgetLib
 	const ADDITIONAL_COLUMNS = 'additionalColumns';
 	const CHECKBOXES = 'checkboxes';
 	const COLUMNS_ALIASES = 'columnsAliases';
+	const ENCRYPTED_COLUMNS = 'encryptedColumns';
 
 	// ...to format/mark records of a dataset
 	const FORMAT_ROW = 'formatRow';
@@ -120,7 +141,7 @@ class FilterWidgetLib
 	/**
 	 * Gets the CI instance and loads message helper
 	 */
-	public function __construct($params = null)
+	public function __construct()
 	{
 		$this->_ci =& get_instance(); // get code igniter instance
 	}
@@ -367,7 +388,7 @@ class FilterWidgetLib
 	/**
 	 * Retrieves the dataset from the DB
 	 */
-	public function getDataset($datasetQuery)
+	public function getDataset($datasetQuery, $encryptedColumns)
 	{
 		$dataset = null;
 
@@ -376,7 +397,7 @@ class FilterWidgetLib
 			$this->_ci->load->model('system/Filters_model', 'FiltersModel');
 
 			// Execute the given SQL statement suppressing error messages
-			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery);
+			$dataset = @$this->_ci->FiltersModel->execReadOnlyQuery($datasetQuery, null, $encryptedColumns);
 		}
 
 		return $dataset;
@@ -390,7 +411,7 @@ class FilterWidgetLib
 	public function getFilterName($filterJson)
 	{
 		$filterName = $filterJson->name; // always present, used as default
-		$trimedname = (isset($filterJson->namePhrase)?trim($filterJson->namePhrase):'');
+
 		// Filter name from phrases system
 		if (isset($filterJson->namePhrase) && !isEmptyString($filterJson->namePhrase))
 		{
@@ -451,7 +472,8 @@ class FilterWidgetLib
 			if (in_array($selectedField, $fields))
 			{
 				// If the selected field is present in the list of the selected fields by the current filter
-				if (($pos = array_search($selectedField, $selectedFields)) !== false)
+				$pos = array_search($selectedField, $selectedFields);
+				if ($pos !== false)
 				{
 					// Then remove it and shift the rest of elements by one if needed
 					array_splice($selectedFields, $pos, 1);
@@ -750,7 +772,6 @@ class FilterWidgetLib
 		$this->_ci->load->library('NavigationLib', array(self::NAVIGATION_PAGE => $navigationPage));
 
 		$filterMenu = null;
-		$currentMenu = $this->_ci->navigationlib->getSessionMenu(); // The navigation menu currently stored in session
 
 		$session = $this->getSession(); // The filter currently stored in session (the one that is currently used)
 		if ($session != null)

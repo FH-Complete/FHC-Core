@@ -806,7 +806,12 @@ if (isset($_POST['save']))
 		$stg_obj = new studiengang();
 		$stg_obj->load(ltrim($stg,'0'));
 
-		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr);
+		$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
+		$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
+		$nachname_clean = str_replace(' ','_', $nachname_clean);
+		$vorname_clean = str_replace(' ','_', $vorname_clean);
+
+		$uid = generateUID($stg_obj->kurzbz,$jahr, $stg_obj->typ, $matrikelnr, $vorname_clean, $nachname_clean);
 
 		//Benutzerdatensatz anlegen
 		$benutzer = new benutzer();
@@ -815,10 +820,6 @@ if (isset($_POST['save']))
 		$benutzer->aktiv = true;
 		$benutzer->aktivierungscode = generateActivationKey();
 
-		$nachname_clean = mb_strtolower(convertProblemChars($person->nachname));
-		$vorname_clean = mb_strtolower(convertProblemChars($person->vorname));
-		$nachname_clean = str_replace(' ','_', $nachname_clean);
-		$vorname_clean = str_replace(' ','_', $vorname_clean);
 
 		if (!defined('GENERATE_ALIAS_STUDENT') || GENERATE_ALIAS_STUDENT === true)
 		{
@@ -1166,8 +1167,7 @@ if ($where != '')
 				}
 			}
 			$status = mb_substr($status, 0, mb_strlen($status)-2);
-
-			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->wahlname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>$row->svnr</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
+			echo '<tr valign="top"><td><input type="radio" name="person_id" value="'.$row->person_id.'" onclick="disablefields(this)"></td><td>'."$row->nachname</td><td>$row->vorname</td><td>$row->wahlname</td><td>$row->vornamen</td><td>$row->gebdatum</td><td>".((strpos($status, 'Mitarbeiter') !== false) ? $row->svnr : '')."</td><td>".($row->geschlecht=='m'?'männlich':'weiblich')."</td><td>";
 			$qry_adr = "SELECT * FROM public.tbl_adresse WHERE person_id=".$db->db_add_param($row->person_id, FHC_INTEGER);
 			if ($result_adr = $db->db_query($qry_adr))
 				while ($row_adr = $db->db_fetch_object($result_adr))

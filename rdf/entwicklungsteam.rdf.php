@@ -34,6 +34,11 @@ require_once('../include/entwicklungsteam.class.php');
 require_once('../include/datum.class.php');
 require_once('../include/studiengang.class.php');
 
+if(isset($_GET['entwicklungsteam_id']))
+	$entwicklungsteam_id = $_GET['entwicklungsteam_id'];
+else
+	$entwicklungsteam_id = '';
+
 if(isset($_GET['mitarbeiter_uid']))
 	$mitarbeiter_uid = $_GET['mitarbeiter_uid'];
 else
@@ -43,6 +48,7 @@ if(isset($_GET['studiengang_kz']))
 	$studiengang_kz = $_GET['studiengang_kz'];
 else
 	$studiengang_kz = '';
+
 
 $datum = new datum();
 $stg = new studiengang();
@@ -70,8 +76,10 @@ foreach ($entwicklungsteam->result as $row)
 {
 	echo '
       <RDF:li>
-         <RDF:Description  id="'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'"  about="'.$rdf_url.'/'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'" >
-            <ENTWICKLUNGSTEAM:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></ENTWICKLUNGSTEAM:mitarbeiter_uid>
+				 <RDF:Description  id="'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'/'.$row->entwicklungsteam_id.'"
+				 about="'.$rdf_url.'/'.$row->mitarbeiter_uid.'/'.$row->studiengang_kz.'/'.$row->entwicklungsteam_id.'" >
+				 	  <ENTWICKLUNGSTEAM:entwicklungsteam_id><![CDATA['.$row->entwicklungsteam_id.']]></ENTWICKLUNGSTEAM:entwicklungsteam_id>
+						<ENTWICKLUNGSTEAM:mitarbeiter_uid><![CDATA['.$row->mitarbeiter_uid.']]></ENTWICKLUNGSTEAM:mitarbeiter_uid>
             <ENTWICKLUNGSTEAM:studiengang_kz><![CDATA['.$row->studiengang_kz.']]></ENTWICKLUNGSTEAM:studiengang_kz>
             <ENTWICKLUNGSTEAM:besqualcode><![CDATA['.$row->besqualcode.']]></ENTWICKLUNGSTEAM:besqualcode>
             <ENTWICKLUNGSTEAM:besqual><![CDATA['.$row->besqual.']]></ENTWICKLUNGSTEAM:besqual>

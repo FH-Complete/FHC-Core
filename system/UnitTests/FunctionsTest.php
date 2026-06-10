@@ -18,10 +18,14 @@
  * Authors: Werner Masik <werner@gefi.at>,
  */
 
-require_once('../../config/vilesci.config.inc.php');
-require_once('../../include/functions.inc.php');
 
-class FunctionsTest extends PHPUnit_Framework_TestCase
+
+require_once(__DIR__.'/../../config/vilesci.config.inc.php');
+require_once(__DIR__.'/../../include/functions.inc.php');
+
+use PHPUnit\Framework\TestCase;
+
+class FunctionsTest extends TestCase
 {
 	
     public function setUp()

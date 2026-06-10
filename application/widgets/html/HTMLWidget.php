@@ -27,6 +27,7 @@ class HTMLWidget extends Widget
 	const MIN_LENGTH = 'min-length';
 	const PLACEHOLDER = 'placeholder';
 	const DISABLED = 'disabled';
+	const STYLE = 'class';
 
 	/**
 	 * It gets also the htmlArgs array as parameter, it will be used to set the HTML properties

@@ -36,7 +36,7 @@ $uid = get_uid();
 $rechte = new benutzerberechtigung();
 $rechte->getBerechtigungen($uid);
 
-if(!$rechte->isBerechtigt('mitarbeiter/stammdaten',null,'suid'))
+if(!$rechte->isBerechtigt('mitarbeiter/stammdaten', null, 'suid'))
 	die('Sie haben keine Berechtigung für diese Seite');
 
 if (!$db = new basis_db())
@@ -141,11 +141,11 @@ $studiensemester = new studiensemester();
 $stsem = (isset($_GET['stsem'])) ? $_GET['stsem'] : $studiensemester->getaktorNext();	// aktuelles Studiensemester
 
 $datum_obj = new datum();
-if(mb_strstr($stsem,'SS'))
+if(mb_strstr($stsem, 'SS'))
 {
 	$studiensemester->load($stsem);
 	$jahr = $datum_obj->formatDatum($studiensemester->start, 'Y');
-	$stichtag = date("Y-m-d",  mktime(0, 0, 0, 12, 31, $jahr - 1)); // 31.12. des vorangehenden Kalenderjahres zur BIS Meldung TODO: oder Abfragetag mitgeben?
+	$stichtag = date("Y-m-d", mktime(0, 0, 0, 12, 31, $jahr - 1)); // 31.12. des vorangehenden Kalenderjahres zur BIS Meldung TODO: oder Abfragetag mitgeben?
 }
 else
 {
@@ -219,7 +219,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	 * - nebenberuflich Lehrender: Hauptberufscode der letzten BIS-Verwendung
 	 */
 	$person_obj->hauptberufcode = ($is_hauptberuflich == true)
-		? NULL
+		? null
 		: $bisverwendung_arr[count($bisverwendung_arr) - 1]->hauptberufcode;
 
 
@@ -258,7 +258,6 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 			// Loop innerhalb Verwendungen mit selben Beschaeftigungsverhaeltnissen und Verwendung_codes
 			foreach ($verwendung_tmp_arr as $verwendung_tmp)
 			{
-
 				//	Jahresvollzeitaequivalenz JVZAE ermitteln
 				// -----------------------------------------------------------------------------------------------------
 				/**
@@ -299,7 +298,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 			}
 
 			// Neue Verwendung im finalen Verwendungcontainer speichern
-			$verwendung_arr [] = $verwendung_obj;
+			$verwendung_arr[] = $verwendung_obj;
 		}
 	}
 
@@ -316,7 +315,8 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	// Alle Benutzerfunktionen im BIS Meldungsjahr holen
 	$benutzerfunktion = new Benutzerfunktion();
 	$benutzerfunktion->getBenutzerFunktionByUid(
-		$person_obj->uid, null,
+		$person_obj->uid,
+		null,
 		$beginn_imJahr->format('Y-m-d'),
 		$ende_imJahr->format('Y-m-d')
 	);
@@ -334,7 +334,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 	 * Exkludiert Funktionen, die einem Lehrgang bzw. STG, die nicht BIS-gemeldet werden, zugeordnet sind.
 	 */
 	// -------------------------------------------------------------------------------------------------------------
-	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr);
+	$funktion_arr = _addFunktionscontainer_Funktionscode7($person_obj->uid, $funktion_arr, $stichtag);
 
 	// Container Funktion dem Container Person anhaengen
 	// -----------------------------------------------------------------------------------------------------------------
@@ -368,7 +368,7 @@ foreach ($mitarbeiter_arr as $mitarbeiter)
 
 	// Container Person dem Gesamt-Container anhaengen
 	// -----------------------------------------------------------------------------------------------------------------
-	$person_arr []= $person_obj;
+	$person_arr[]= $person_obj;
 }
 
 // *********************************************************************************************************************
@@ -380,7 +380,7 @@ _outputHTML($person_arr);
 $xml = _generateXML($person_arr);
 
 $xml_datei = 'bisdaten/bismeldung_mitarbeiter.xml';
-$dateiausgabe = fopen($xml_datei,'w');
+$dateiausgabe = fopen($xml_datei, 'w');
 fwrite($dateiausgabe, $xml);
 fclose($dateiausgabe);
 
@@ -449,7 +449,7 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 		// Echter Dienstvertrag - d.h. Vertragsstunden sind vorhanden
 		// Bsp. angestellte Lektoren, angestellte MA in Verwaltung/Management/Wartung
 		// -------------------------------------------------------------------------------------------------------------
-		else if ($has_vertragsstunden)
+		elseif ($has_vertragsstunden)
 		{
 			// Vertragsstunden koennen max. VZ Aequivalenz-Basiswert haben
 			if ($bisverwendung->vertragsstunden > BIS_VOLLZEIT_ARBEITSSTUNDEN)
@@ -523,7 +523,7 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 						 * (durch Abzug der eben erstellten anteiligen JVZAE fuer Lehrtaetigkeiten)
 						 */
 						$bisverwendung->jvzae_anteilig -= $verwendung_lehre_obj->jvzae_anteilig;
-						$bisverwendung_arr [] = $verwendung_lehre_obj;
+						$bisverwendung_arr[] = $verwendung_lehre_obj;
 					}
 				}
 			}
@@ -532,7 +532,7 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 		// Sonstige Beschaeftigungsverhaeltnisse ohne Vertragsstunden
 		// Freie Dienstvertraege auf Stundenbasis
 		// -------------------------------------------------------------------------------------------------------------
-		else if (!$has_vertragsstunden &&  $has_lehrtaetigkeit)
+		elseif (!$has_vertragsstunden && $has_lehrtaetigkeit)
 		{
 			/**
 			 * Verwendungen ergänzen, wenn die BIS-Verwendung als externer Mitarbeiter in Sommer- / Wintersemester
@@ -565,7 +565,7 @@ function _add_relativesBA_und_anteiligeJVZAE($uid, $bisverwendung_arr)
 					$verwendung_lehre_obj->beschaeftigungsausmass_relativ = round($lehre_sws / BIS_VOLLZEIT_SWS_EINZELSTUNDENBASIS, 2);	// VZ-Basis nach BIS-Vorgabe fuer Stundenbasis
 					$verwendung_lehre_obj->gewichtung = BIS_HALBJAHRES_GEWICHTUNG_SWS;
 					$verwendung_lehre_obj->jvzae_anteilig = round($verwendung_lehre_obj->beschaeftigungsausmass_relativ * $verwendung_lehre_obj->gewichtung, 2);
-					$bisverwendung_arr []= $verwendung_lehre_obj;
+					$bisverwendung_arr[]= $verwendung_lehre_obj;
 				}
 			}
 		}
@@ -723,13 +723,13 @@ function _addVerwendung_fuerLehre_Stundenbasis($bisverwendung)
  * @param array $bisfunktion_arr
  * @return array
  */
-function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
+function _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 {
 	$funktion_arr = array();
 
 	foreach ($bisfunktion_arr as $bisfunktion)
 	{
-		$funktion_code = NULL;
+		$funktion_code = null;
 		$has_oe_lehrgang = false;	// default
 
 		$studiengang = new Studiengang();
@@ -742,7 +742,7 @@ function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 			$has_oe_lehrgang = !($studiengang->studiengang_kz > 0 && $studiengang->studiengang_kz < 10000);
 
 			// STG, die nicht BIS-bemeldet werden, ueberspringen
-			if (in_array($studiengang->studiengang_kz, BIS_EXCLUDE_STG))
+			if (in_array($studiengang->studiengang_kz, BIS_EXCLUDE_STG) || !$studiengang->melderelevant)
 			{
 				continue;
 			}
@@ -784,15 +784,15 @@ function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
 		{
 			$funktion_obj = new StdClass();
 			$funktion_obj->funktionscode = $funktion_code;
-			$funktion_obj->besondereQualifikationCode = NULL;
+			$funktion_obj->besondereQualifikationCode = null;
 			$funktion_obj->studiengang = ($funktion_code == 5)
 				? array(setLeadingZero(intval($studiengang->studiengang_kz), 4))		// STG bei Funktionscode 5 melden
-				: NULL;
+				: null;
 
 			// Funktionsobjekt dem Funktionscontainer anhaengen
-			$funktion_arr []= $funktion_obj;
+			$funktion_arr[]= $funktion_obj;
 		}
-		else if ($funktion_code == 5)		// Funktionscontainer vorhanden und Funktionscode 5
+		elseif ($funktion_code == 5)// Funktionscontainer vorhanden und Funktionscode 5
 		{
 			$funktion_obj_arr = array_filter($funktion_arr, function (&$obj) {
 				return $obj->funktionscode == 5;
@@ -812,19 +812,20 @@ function  _getFunktionscontainer_Funktionscode123456($bisfunktion_arr)
  * @return array
  *
  */
-function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
+function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr, $stichtag)
 {
 	$entwicklungsteam = new Entwicklungsteam();
-	$entwicklungsteam->getEntwicklungsteam($uid);
+	//nur aktuelle bzw EW-Teameinträge ohne Datumseinträgen werden berücksichtigt
+	$entwicklungsteam->getEntwicklungsteamBis($uid, $stichtag);
 	$entwicklungsteam_arr = $entwicklungsteam->result;
 
 	if (!empty($entwicklungsteam_arr))
 	{
 		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
-		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj)
-		{
+		$entwicklungsteam_arr = array_filter($entwicklungsteam_arr, function ($obj) {
 			return
 				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+				$obj->melderelevant &&
 				$obj->studiengang_kz > 0 &&
 				$obj->studiengang_kz < 10000;
 		});
@@ -834,15 +835,14 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
 	{
 		// Hoechste besondere Qualifikation
 		$besondere_qualifikation_code_arr = array();
-		foreach($entwicklungsteam_arr as $row_entw)
-			$besondere_qualifikation_code_arr[] = $row_entw->besqualcode;
-
-		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
-
 		// Studiengaenge, wo Person Teil des Entwicklungsteams gewesen ist
 		$studiengang_kz_arr = array();
 		foreach($entwicklungsteam_arr as $row_entw)
+		{
+			$besondere_qualifikation_code_arr[] = $row_entw->besqualcode;
 			$studiengang_kz_arr[] = $row_entw->studiengang_kz;
+		}
+		$besondere_qualifikation_code = max($besondere_qualifikation_code_arr);
 
 		sort($studiengang_kz_arr);							// sortieren
 		foreach($studiengang_kz_arr as &$studiengang_kz)	// fuehrende Nullen fuer STG
@@ -855,7 +855,7 @@ function _addFunktionscontainer_Funktionscode7($uid, $funktion_arr)
 		$funktion_obj->funktionscode = 7;
 		$funktion_obj->besondereQualifikationCode = $besondere_qualifikation_code;
 		$funktion_obj->studiengang = $studiengang_kz_arr;
-		$funktion_arr []= $funktion_obj;
+		$funktion_arr[] = $funktion_obj;
 	}
 
 	return $funktion_arr;
@@ -873,13 +873,11 @@ function _getLehrecontainer($sws_proStg_arr)
 	if (!empty($sws_proStg_arr))
 	{
 		// Lehrgaenge und STG, die nicht BIS gemeldet werden, extrahieren
-		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj)
-	{
-		return
-			!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
-			$obj->studiengang_kz > 0 &&
-			$obj->studiengang_kz < 10000;
-	});
+		$sws_proStg_arr = array_filter($sws_proStg_arr, function ($obj) {
+			return
+				!in_array($obj->studiengang_kz, BIS_EXCLUDE_STG) &&
+				$obj->studiengang_kz < 10000;
+		});
 	}
 
 	if (!empty($sws_proStg_arr))
@@ -888,23 +886,27 @@ function _getLehrecontainer($sws_proStg_arr)
 		{
 			$is_sommersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'SS';
 			$is_wintersemester = substr($sws_proStg->studiensemester_kurzbz, 0, 2) == 'WS';
+			$is_lehrgang = isset($sws_proStg->lgartcode);
+			$kennzeichen_name = $is_lehrgang ? 'LehrgangNr' : 'StgKz';
 
 			// Lehreobjekt generieren
-			if (empty($lehre_arr) || !lehre_stg_exists($sws_proStg->studiengang_kz, $lehre_arr))
+			if (empty($lehre_arr) || !lehre_stg_exists($sws_proStg->melde_studiengang_kz, $lehre_arr))
 			{
 				$lehre_obj = new StdClass();
 
-				$lehre_obj->StgKz = setLeadingZero(intval($sws_proStg->studiengang_kz), 4);
+				$lehre_obj->{$kennzeichen_name} = $sws_proStg->melde_studiengang_kz;
+				//~ $lehre_obj->StgKz = setLeadingZero(intval($sws_proStg->studiengang_kz), 4);
+
 				$lehre_obj->SommersemesterSWS = $is_sommersemester ? $sws_proStg->sws : 0.00;
 				$lehre_obj->WintersemesterSWS = $is_wintersemester ? $sws_proStg->sws : 0.00;
 
 				// Lehreobjekt dem Lehrecontainer anhaengen
-				$lehre_arr []= $lehre_obj;
+				$lehre_arr[]= $lehre_obj;
 			}
 			else	// Lehrecontainer mit STG schon vorhanden
 			{
-				$lehre_obj_arr = array_filter($lehre_arr, function (&$obj) use ($sws_proStg) {
-					return $obj->StgKz == $sws_proStg->studiengang_kz;
+				$lehre_obj_arr = array_filter($lehre_arr, function (&$obj) use ($sws_proStg, $kennzeichen_name) {
+					return isset($obj->{$kennzeichen_name}) && $obj->{$kennzeichen_name} == $sws_proStg->melde_studiengang_kz;
 				});
 
 				// SWS ergaenzen
@@ -912,7 +914,7 @@ function _getLehrecontainer($sws_proStg_arr)
 				{
 					current($lehre_obj_arr)->SommersemesterSWS = $sws_proStg->sws;
 				}
-				else if ($is_wintersemester)
+				elseif ($is_wintersemester)
 				{
 					current($lehre_obj_arr)->WintersemesterSWS = $sws_proStg->sws;
 				}
@@ -934,7 +936,7 @@ function _generateXML($person_arr)
 
 	if(isset($erhalter->result[0]))
 	{
-		$erhalter = sprintf("%03s",trim($erhalter->result[0]->erhalter_kz));
+		$erhalter = sprintf("%03s", trim($erhalter->result[0]->erhalter_kz));
 	}
 	else
 		$erhalter = '';
@@ -966,8 +968,8 @@ function _generateXML($person_arr)
 			$xml .= '<VerwendungsCode><![CDATA['. $verwendung->verwendung_code. ']]></VerwendungsCode>';
 			$xml .= '<BeschaeftigungsArt1><![CDATA['. $verwendung->ba1code. ']]></BeschaeftigungsArt1>';
 			$xml .= '<BeschaeftigungsArt2><![CDATA['. $verwendung->ba2code. ']]></BeschaeftigungsArt2>';
-			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. number_format($verwendung->vzae,2,'.',''). ']]></BeschaeftigungsAusmassVZAE>';
-			$xml .= '<BeschaeftigungsAusmassJVZAE><![CDATA['. number_format($verwendung->jvzae,2,'.',''). ']]></BeschaeftigungsAusmassJVZAE>';
+			$xml .= '<BeschaeftigungsAusmassVZAE><![CDATA['. number_format($verwendung->vzae, 2, '.', ''). ']]></BeschaeftigungsAusmassVZAE>';
+			$xml .= '<BeschaeftigungsAusmassJVZAE><![CDATA['. number_format($verwendung->jvzae, 2, '.', ''). ']]></BeschaeftigungsAusmassJVZAE>';
 			$xml .= '</Verwendung>';
 		}
 
@@ -979,7 +981,7 @@ function _generateXML($person_arr)
 				? '<BesondereQualifikationCode><![CDATA['. $funktion->besondereQualifikationCode. ']]></BesondereQualifikationCode>'
 				: '';
 
-			if ($funktion->funktionscode == 5 || $funktion->funktionscode == 7)
+			if (($funktion->funktionscode == 5) || ($funktion->funktionscode == 7))
 			{
 				if (is_array($funktion->studiengang))
 				{
@@ -990,7 +992,7 @@ function _generateXML($person_arr)
 						$xml .= '</Studiengang>';
 					}
 				}
-				else if (!is_null($funktion->studiengang))
+				elseif (!is_null($funktion->studiengang))
 				{
 					$xml .= '<Studiengang>';
 					$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
@@ -998,15 +1000,38 @@ function _generateXML($person_arr)
 				}
 			}
 
+			// if ($funktion->funktionscode == 7)
+			// {
+			// 	if (is_array($funktion->studiengang))
+			// 	{
+			// 		foreach ($funktion->studiengang as $studiengang)
+			// 		{
+			// 			$xml .= '<Studiengang>';
+			// 			$xml .= '<StgKz><![CDATA['. $studiengang["studieng_kz"]. ']]></StgKz>';
+			// 			$xml .= '</Studiengang>';
+			// 		}
+			// 	}
+			// 	elseif (!is_null($funktion->studiengang))
+			// 	{
+			// 		$xml .= '<Studiengang>';
+			// 		$xml .= '<StgKz><![CDATA['. $funktion->studiengang. ']]></StgKz>';
+			// 		$xml .= '</Studiengang>';
+			// 	}
+			// }
 			$xml .= '</Funktion>';
 		}
 
 		foreach ($person->lehre_arr as $lehre)
 		{
 			$xml .= '<Lehre>';
-			$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
-			$xml .= '<SommersemesterSWS><![CDATA['. $lehre->SommersemesterSWS. ']]></SommersemesterSWS>';
-			$xml .= '<WintersemesterSWS><![CDATA['. $lehre->WintersemesterSWS. ']]></WintersemesterSWS>';
+
+			if (isset($lehre->LehrgangNr))
+				$xml .= '<LehrgangNr><![CDATA['. $lehre->LehrgangNr. ']]></LehrgangNr>';
+			else
+				$xml .= '<StgKz><![CDATA['. $lehre->StgKz. ']]></StgKz>';
+
+			$xml .= '<SommersemesterSWS><![CDATA['. number_format($lehre->SommersemesterSWS, 2, '.', ''). ']]></SommersemesterSWS>';
+			$xml .= '<WintersemesterSWS><![CDATA['. number_format($lehre->WintersemesterSWS, 2, '.', ''). ']]></WintersemesterSWS>';
 			$xml .= '</Lehre>';
 		}
 
@@ -1154,7 +1179,7 @@ function _outputHTML($person_arr)
 					<td>'. $funktion->besondereQualifikationCode. '</td>
 					<td>';
 
-				if ($funktion->funktionscode == 5 || $funktion->funktionscode == 7)
+				if (($funktion->funktionscode == 5) || ($funktion->funktionscode == 7))
 				{
 					if (is_array($funktion->studiengang))
 					{
@@ -1163,11 +1188,12 @@ function _outputHTML($person_arr)
 							echo $studiengang.' ';
 						}
 					}
-					else if (!is_null($funktion->studiengang))
+					elseif (!is_null($funktion->studiengang))
 					{
 						echo $funktion->studiengang.' ';
 					}
 				}
+
 				echo '</td>
 				</tr>';
 			}
@@ -1194,7 +1220,7 @@ function _outputHTML($person_arr)
 			{
 				echo '
 				<tr>
-					<td>'. $lehre->StgKz. '</td>
+					<td>'. (isset($lehre->LehrgangNr) ? $lehre->LehrgangNr : $lehre->StgKz). '</td>
 					<td>'. $lehre->SommersemesterSWS. '</td>
 					<td>'. $lehre->WintersemesterSWS. '</td>
 				</tr>';
@@ -1306,7 +1332,7 @@ function outputPlausibilitaetschecks($person_arr)
 
 		if (count($msg) > 0)
 		{
-			echo "Fehler bei ".$row->vorname.' '.$row->nachname.' : '.implode($msg,', ');
+			echo "Fehler bei ".$row->vorname.' '.$row->nachname.' : '.implode($msg, ', ');
 			echo "\n<br/>";
 		}
 	}
@@ -1334,15 +1360,16 @@ function verwendung_exists($bisverwendung, $verwendung_arr)
 
 /**
  * Prueft ob ein Studiengang bereits im Lehre Container vorhanden ist
- * @param $studiengang_kz Studiengangskennzahl
+ * @param $melde_studiengang_kz Studiengangskennzahl
  * @param $lehre_arr Array mit Lehre Objekten
  * @return true wenn der Studiengang bereits existiert
  */
-function lehre_stg_exists($studiengang_kz, $lehre_arr)
+function lehre_stg_exists($melde_studiengang_kz, $lehre_arr)
 {
 	foreach($lehre_arr as $row)
 	{
-		if($row->StgKz == $studiengang_kz)
+		$kennzeichenName = isset($row->LehrgangNr) ? 'LehrgangNr' : 'StgKz';
+		if(isset($row->{$kennzeichenName}) && $row->{$kennzeichenName} == $melde_studiengang_kz)
 			return true;
 	}
 	return false;

@@ -378,7 +378,8 @@ $filters = array(
 					{"name" : "FoerderfallId"},
 					{"name" : "LeistungsdatenId"},
 					{"name" : "startjahr"},
-					{"name" : "endjahr"}
+					{"name" : "endjahr"},
+					{"name" : "Uebermittelt"}
 				],
 				"filters": []
 			}
@@ -520,7 +521,52 @@ $filters = array(
 					{"name": "Studiengang"},
 					{"name": "AbgewiesenAm"},
 					{"name": "Nachricht"},
-					{"name": "Kaution"}
+					{"name": "Kaution"},
+					{"name": "LockUser"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'onboarding',
+		'filter_kurzbz' => 'InfoCenterOnboarding',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Electronic Onboarding - Alle",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "LockUser"},
+					{"name": "HoldDate"},
+					{"name": "Rueckstellgrund"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'infocenter',
+		'dataset_name' => 'aufgenommen',
+		'filter_kurzbz' => 'InfoCenterAufgenommenAlle',
+		'description' => '{Alle}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Aufgenommen - Lehrgänge",
+				"columns": [
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Studiengang"}
 				],
 				"filters": []
 			}
@@ -1038,6 +1084,7 @@ $filters = array(
 					{"name": "Note"},
 					{"name": "ErstNachname"},
 					{"name": "ErstAbgeschickt"},
+					{"name": "ZweitNachname"},
 					{"name": "ZweitAbgeschickt"}
 				],
 				"filters": []
@@ -1125,6 +1172,72 @@ $filters = array(
 		'oe_kurzbz' => null,
 	),
 	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'offeneFehlerPersonal',
+		'description' => '{Alle offenen Fehler}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle offenen Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"}
+				],
+				"filters": [
+					{
+						"name": "Statuscode",
+						"operation": "ncontains",
+						"condition": "resolved"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'personalIssueViewer',
+		'filter_kurzbz' => 'FehlerLetzte7TageBearbeitetPersonal',
+		'description' => '{Letzten 7 Tage bearbeitet}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle in den letzten 7 Tagen bearbeiteten Fehler",
+				"columns": [
+					{"name": "Datum"},
+					{"name": "Inhalt"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "PersonId"},
+					{"name": "Statuscode"},
+					{"name": "Verarbeitet von"},
+					{"name": "Verarbeitet am"}
+				],
+				"filters": [
+					{
+						"name": "Verarbeitet am",
+						"operation": "lt",
+						"condition": "7",
+						"option": "days"
+					},
+					{
+						"name": "Statuscode",
+						"operation": "contains",
+						"condition": "resolved"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
 		'app' => 'core',
 		'dataset_name' => 'fehlerZustaendigkeiten',
 		'filter_kurzbz' => 'fehlerZustaendigkeiten',
@@ -1141,6 +1254,28 @@ $filters = array(
 					{"name": "nachname"},
 					{"name": "oe_bezeichnung"},
 					{"name": "funktion_beschreibung"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'fehlerKonfiguration',
+		'filter_kurzbz' => 'fehlerKonfiguration',
+		'description' => '{Fehler Konfiguration}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Fehler Konfiguration",
+				"columns": [
+					{"name": "konfigurationstyp_kurzbz"},
+					{"name": "fehlercode"},
+					{"name": "fehler_kurzbz"},
+					{"name": "konfiguration"},
+					{"name": "app"}
 				],
 				"filters": []
 			}
@@ -1167,7 +1302,342 @@ $filters = array(
 			}
 		',
 		'oe_kurzbz' => null,
-	)
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'softwareManagement',
+		'filter_kurzbz' => 'SoftwareManagement',
+		'description' => '{Software Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "SoftwareManagement",
+				"columns": [
+					{"name": "software_kurzbz"},
+					{"name": "version"},
+					{"name": "beschreibung"},
+					{"name": "hersteller"},
+					{"name": "os"},
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "lizenzserver_port"},
+					{"name": "anzahl_lizenzen"},
+					{"name": "softwarestatus_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'imageVerwaltung',
+		'filter_kurzbz' => 'ImageVerwaltung',
+		'description' => '{Image Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "ImageVerwaltung",
+				"columns": [
+					{"name": "bezeichnung"},
+					{"name": "betriebssystem"},
+					{"name": "verfuegbarkeit_start"},
+					{"name": "verfuegbarkeit_ende"},
+					{"name": "anmerkung"},
+					{"name": "ort_count"},
+					{"name": "software_count"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'lizenzserverVerwaltung',
+		'filter_kurzbz' => 'LizenzserverVerwaltung',
+		'description' => '{Lizenzserver Verwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "LizenzserverVerwaltung",
+				"columns": [
+					{"name": "lizenzserver_kurzbz"},
+					{"name": "bezeichnung"},
+					{"name": "macadresse"},
+					{"name": "ipadresse"},
+					{"name": "ansprechpartner"},
+					{"name": "anmerkung"},
+					{"name": "location"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'fhctemplate',
+		'dataset_name' => 'exampledata',
+		'filter_kurzbz' => 'exampledata',
+		'description' => '{Beispieldaten Filter}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Alle Beispieldaten",
+				"columns": [
+					{"name": "uid"},
+					{"name": "stringval"},
+					{"name": "integerval"},
+					{"name": "dateval"},
+					{"name": "booleanval"},
+					{"name": "moneyval"},
+					{"name": "dokument_bezeichnung"},
+					{"name": "textval"},
+					{"name": "examplestatus_kurzbz"}
+				],
+				"filters": []
+			}
+		',
+		'oe_kurzbz' => null
+		),
+		array(
+			'app' => 'personalverwaltung',
+			'dataset_name' => 'handyverwaltung',
+			'filter_kurzbz' => 'ma4handyverwaltung',
+			'description' => '{MA Handyverwaltung}',
+			'sort' => 1,
+			'default_filter' => true,
+			'filter' => '
+				{
+					"name": "MA Handyverwaltung",
+					"columns": [
+						{"name": "UID"},
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "EMail"},
+						{"name": "Unternehmen"},
+						{"name": "Vertragsart"},
+						{"name": "DV_von"},
+						{"name": "DV_bis"},
+						{"name": "Wochenstunden"},
+						{"name": "WS_von"},
+						{"name": "WS_bis"},
+						{"name": "Standardkostenstelle"},
+						{"name": "DV_status"}
+					],
+					"filters": [
+						{
+							"name": "DV_status",
+							"option": "",
+							"operation": "nequal",
+							"condition": "beendet"
+						}
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		),
+		array(
+			'app' => 'personalverwaltung',
+			'dataset_name' => 'handyverwaltung',
+			'filter_kurzbz' => 'ma4handyverwaltung_beendet',
+			'description' => '{MA Handyverwaltung (DV beendet)}',
+			'sort' => 2,
+			'default_filter' => false,
+			'filter' => '
+				{
+					"name": "MA Handyverwaltung (DV beendet)",
+					"columns": [
+						{"name": "UID"},
+						{"name": "PersonId"},
+						{"name": "Vorname"},
+						{"name": "Nachname"},
+						{"name": "EMail"},
+						{"name": "Unternehmen"},
+						{"name": "Vertragsart"},
+						{"name": "DV_von"},
+						{"name": "DV_bis"},
+						{"name": "Wochenstunden"},
+						{"name": "WS_von"},
+						{"name": "WS_bis"},
+						{"name": "Standardkostenstelle"},
+						{"name": "DV_status"}
+					],
+					"filters": [
+						{
+							"name": "DV_status",
+							"option": "",
+							"operation": "equal",
+							"condition": "beendet"
+						}
+					]
+				}
+			',
+			'oe_kurzbz' => null,
+		),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'schluesselverwaltung',
+		'filter_kurzbz' => 'ma4schluesselverwaltung',
+		'description' => '{MA Schluesselverwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "MA Schlüsselverwaltung",
+				"columns": [
+					{"name": "UID"},
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "EMail"},
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
+					{"name": "Wochenstunden"},
+					{"name": "WS_von"},
+					{"name": "WS_bis"},
+					{"name": "Standardkostenstelle"},
+					{"name": "DV_status"}
+				],
+				"filters": [
+					{
+						"name": "DV_status",
+						"option": "",
+						"operation": "nequal",
+						"condition": "beendet"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'schluesselverwaltung',
+		'filter_kurzbz' => 'ma4schluesselverwaltung_beendet',
+		'description' => '{MA Schluesselverwaltung (DV beendet)}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "MA Schlüsselverwaltung (DV beendet)",
+				"columns": [
+					{"name": "UID"},
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "EMail"},
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
+					{"name": "Wochenstunden"},
+					{"name": "WS_von"},
+					{"name": "WS_bis"},
+					{"name": "Standardkostenstelle"},
+					{"name": "DV_status"}
+				],
+				"filters": [
+					{
+						"name": "DV_status",
+						"option": "",
+						"operation": "equal",
+						"condition": "beendet"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'personalverwaltung',
+		'dataset_name' => 'kontaktdatenverwaltung',
+		'filter_kurzbz' => 'ma4kontaktdaten',
+		'description' => '{MA Kontaktdatenverwaltung}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "MA Kontaktdatenverwaltung",
+				"columns": [
+					{"name": "UID"},
+					{"name": "PersonId"},
+					{"name": "Vorname"},
+					{"name": "Nachname"},
+					{"name": "Unternehmen"},
+					{"name": "Vertragsart"},
+					{"name": "DV_von"},
+					{"name": "DV_bis"},
+					{"name": "Disziplinaere_Zuordnung"},
+					{"name": "DV_status"}
+				],
+				"filters": []
+			}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'vertragsverwaltung',
+		'filter_kurzbz' => 'VertragsverwaltungAktiv',
+		'description' => '{Aktive Mitarbeiter}',
+		'sort' => 1,
+		'default_filter' => true,
+		'filter' => '
+			{
+				"name": "Aktive Mitarbeiter",
+				"columns": [
+					{"name": "uid"},
+					{"name": "person_id"},
+					{"name": "nachname"},
+					{"name": "vorname"},
+					{"name": "aktiv"},
+					{"name": "gebdatum"},
+					{"name": "unternehmen"},
+					{"name": "vertragsarten"},
+					{"name": "ids"}
+				],
+				"filters": [
+					{
+						"name": "aktiv",
+						"option": "",
+						"operation": "equal",
+						"condition": "true"
+					}
+					]
+			}',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'vertragsverwaltung',
+		'filter_kurzbz' => 'VertragsverwaltungAlle',
+		'description' => '{Alle Mitarbeiter}',
+		'sort' => 1,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "Alle Mitarbeiter",
+				"columns": [
+					{"name": "uid"},
+					{"name": "person_id"},
+					{"name": "nachname"},
+					{"name": "vorname"},
+					{"name": "aktiv"},
+					{"name": "gebdatum"},
+					{"name": "unternehmen"},
+					{"name": "vertragsarten"},
+					{"name": "ids"}
+				],
+				"filters": []
+			}',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array

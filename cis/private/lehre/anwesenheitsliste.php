@@ -62,7 +62,7 @@
     	$stsem = $_GET['stsem'];
     else
     	die($p->t('anwesenheitsliste/studiensemesterIstUngueltig'));
-	
+
 $covidhelper = new CovidHelper();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
@@ -113,9 +113,6 @@ $covidhelper = new CovidHelper();
 
 
 	  	echo "</table>";
-
-	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester FROM lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitgruppe USING(lehreinheit_id) JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
-	  			WHERE lehrveranstaltung_id='$lvid' AND studiensemester_kurzbz=".$db->db_add_param($stsem);
 
 	  	$qry = "SELECT *, tbl_lehreinheitgruppe.studiengang_kz, tbl_lehreinheitgruppe.semester ,tbl_lehreinheit.lehrform_kurzbz
 				 FROM lehre.tbl_lehreinheit
@@ -213,7 +210,7 @@ $covidhelper = new CovidHelper();
 				$covid_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/covidstatuslisten')."</h3></td></tr>".$covid_content."</table>";
 		  	else
 		  		$covid_content = ($covidhelper->isUdfDefined()) ? $p->t('anwesenheitsliste/keineStudentenVorhanden') : '';
-			
+
 		  	if($aw_content!='')
 				$aw_content = "<table border='0' cellspacing='0'><tr><td><h3>".$p->t('anwesenheitsliste/anwesenheitslisten')."</h3></td></tr>".$aw_content."</table>";
 		  	else
@@ -241,9 +238,9 @@ $covidhelper = new CovidHelper();
 			{
 				$covid_content = '';
 			}
-			
+
 		  	echo "<table cellpadding='0' cellspacing='0'>
-				
+
 		  		<tr>
 		  		   <td>$aw_content</td>
 				   <td class=\"covidstatus\">$covid_content</td>

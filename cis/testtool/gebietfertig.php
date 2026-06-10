@@ -44,18 +44,53 @@ if (isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
 $sprache_user = (isset($_SESSION['sprache_user']) && !empty($_SESSION['sprache_user'])) ? $_SESSION['sprache_user'] : DEFAULT_LANGUAGE;
 $p = new phrasen($sprache_user);
 
+$showInfo = false;
+if (isset($_SESSION['alleGebiete']))
+{
+	$alleGebiete = array_map('intval', $_SESSION['alleGebiete']);
+	$pruefling_id = $_SESSION['pruefling_id'];
+
+	$qry = "SELECT COUNT(DISTINCT gebiet_id)  as anzahl
+			FROM testtool.tbl_pruefling_frage
+			JOIN testtool.tbl_frage USING(frage_id)
+			WHERE gebiet_id IN (". implode(',', $alleGebiete) .")
+			AND pruefling_id = ". $pruefling_id ."
+	";
+
+	$result = $db->db_query($qry);
+	$anzahlGebiete = $db->db_fetch_object($result);
+
+
+	if ((int)$anzahlGebiete->anzahl === count($alleGebiete))
+		$showInfo = true;
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <link href="../../skin/style.css.php" rel="stylesheet" type="text/css">
-
+<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
 </head>
 
+<script type="text/javascript">
+
+	$(document).on("keydown", function (e) {
+		if (((e.ctrlKey || e.metaKey) && e.keyCode === 85) || e.keyCode === 123)
+		{
+			e.preventDefault();
+		}
+	});
+
+	$(document).on("contextmenu", function (e) {
+		e.preventDefault();
+	});
+</script>
 <body>
 <br><br><br><br><br>
 <center><h2><?php echo $p->t('testtool/zeitAbgelaufen');?></h2>
+	<h3><?php echo ($showInfo ? ($p->t('testtool/alleGebietGestartet') . "<br />" . $p->t('testtool/alleGebieteGestartetInfo')) : ''); ?></h3>
 </center>
 </body>
 </html>

@@ -1,6 +1,12 @@
 <?php
 // Header menu
 
+if(defined('CIS4') && CIS4) {
+	$root = APP_ROOT;
+} else {
+	$root = CIS_ROOT;
+}
+
 $config['navigation_header'] = array(
 	'*' => array(
 		'fhcomplete' => array(
@@ -31,6 +37,14 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 20,
 					'requiredPermissions' => 'admin:w'
+				),
+				'bismeldestichtagsverwaltung' => array(
+					'link' => site_url('codex/Bismeldestichtag'),
+					'icon' => '',
+					'description' => 'BIS-Meldestichtagsverwaltung',
+					'expand' => true,
+					'sort' => 30,
+					'requiredPermissions' => 'admin:w'
 				)
 			)
 		),
@@ -42,10 +56,16 @@ $config['navigation_header'] = array(
 			'requiredPermissions' => 'basis/vilesci:r',
 			'children' => array(
 				'cis' => array(
-					'link' => CIS_ROOT,
+					'link' => $root,
 					'icon' => '',
 					'description' => 'CIS',
 					'sort' => 10
+				),
+				'lehrveranstaltungen' => array(
+					'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+					'icon' => '',
+					'description' => 'Lehrveranstaltungen Templates',
+					'sort' => 15
 				),
 				'reihungstest' => array(
 					'link' => site_url('organisation/Reihungstest'),
@@ -61,6 +81,16 @@ $config['navigation_header'] = array(
 					'sort' => 30,
 					'requiredPermissions' => 'infocenter:r'
 				),
+				'lvverwaltung' => array(
+					'link' => site_url('LVVerwaltung'),
+					'icon' => '',
+					'description' => 'LV Verwaltung',
+					'requiredPermissions' => array(
+						'admin:r',
+						'assistenz:r'
+					),
+					'sort' => 35
+				),
 				'lehrauftrag' => array(
 					'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
 					'description' => 'Lehrauftrag',
@@ -73,7 +103,7 @@ $config['navigation_header'] = array(
 				),
 				'zverfueg' => array(
 					'link' => site_url('lehre/lvplanung/AdminZeitverfuegbarkeit'),
-					'description' => 'Zeitverf&uuml;gbarkeit',
+					'description' => 'Zeitverfügbarkeit',
 					'expand' => true,
 					'sort' => 45,
 					'requiredPermissions' => array(
@@ -133,6 +163,13 @@ $config['navigation_header'] = array(
 					'expand' => true,
 					'sort' => 50,
 					'requiredPermissions' => 'lehre/gruppenmanager:r'
+				),
+				'vertragsverwaltung' => array(
+					'link' => site_url('vertragsverwaltung'),
+					'description' => 'Vertragsverwaltung',
+					'expand' => true,
+					'sort' => 51,
+					'requiredPermissions' => 'vertrag/mitarbeiter:r'
 				)
 			)
 		),
@@ -171,7 +208,14 @@ $config['navigation_header'] = array(
                     'expand' => true,
                     'sort' => 30,
                     'requiredPermissions' => 'lehre/anrechnungszeitfenster:rw'
-                )
+                ),
+				'dashboardadmin' => array(
+					'link' => site_url('dashboard/Admin'),
+					'description' => 'Dashboard Admin',
+					'expand' => true,
+					'sort' => 40,
+					'requiredPermissions' => 'dashboard/admin:r'
+				)
 			)
 		)
 	)
@@ -209,7 +253,7 @@ $config['navigation_menu']['organisation/Reihungstest/index'] = array(
 		'target' => '_blank'
 	),
 	'auswertung' => array(
-		'link' => CIS_ROOT.'/cis/testtool/admin/auswertung.php',
+		'link' => $root.'/cis/testtool/admin/auswertung.php',
 		'description' => 'Auswertung',
 		'icon' => 'list-alt',
 		'sort' => 1,
@@ -279,14 +323,63 @@ $config['navigation_menu']['lehre/lehrauftrag/LehrauftragErteilen/*'] = array(
 	)
 );
 
+$config['navigation_menu']['lehre/lvplanung/LvTemplateUebersicht/index'] = array(
+	'lvTemplateUebersicht' => array(
+		'link' => site_url('lehre/lvplanung/LvTemplateUebersicht'),
+		'description' => 'LV Template Übersicht',
+		'icon' => '',
+		'sort' => 1
+	)
+);
+
 $config['navigation_menu']['system/issues/Issues/*'] = array(
 	'fehlerzustaendigkeiten' => array(
 		'link' => site_url('system/issues/IssuesZustaendigkeiten'),
 		'description' => 'Fehler Zuständigkeiten',
-		'icon' => 'cogs',
+		'icon' => 'users',
 		'sort' => 100,
 		'target' => '_blank',
 		'requiredPermissions' => array('admin:rw')
+	),
+	'fehlerkonfiguration' => array(
+		'link' => site_url('system/issues/IssuesKonfiguration'),
+		'description' => 'Fehler Konfiguration',
+		'icon' => 'cogs',
+		'sort' => 200,
+		'target' => '_blank',
+		'requiredPermissions' => array('admin:rw')
+	),
+
+);
+
+$config['navigation_menu']['vertragsverwaltung/*'] = array(
+	'vertragsverwaltung' => array(
+		'link' => site_url('vertragsverwaltung'),
+		'description' => 'Vertragsverwaltung',
+		'icon' => 'home',
+		'sort' => 100,
+		'target' => '_blank',
+		'requiredPermissions' => array('vertrag/mitarbeiter:r')
 	)
 );
 
+$config['navigation_menu']['apps'] = [
+	'stv' => [
+		'link' => site_url('studentenverwaltung'),
+		'description' => 'Studierendenverwaltung',
+		#'icon' => 'users',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lvv' => [
+		'link' => site_url('lVVerwaltung'),
+		'description' => 'LV Verwaltung',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('admin:r', 'assistenz:r')
+	],
+	'lav' => [
+		'link' => site_url('lehre/lehrauftrag/Lehrauftrag/Dashboard'),
+		'description' => 'Lehraufträge',
+		#'icon' => 'person-chalkboard',
+		'requiredPermissions' => array('lehre/lehrauftrag_bestellen:r', 'lehre/lehrauftrag_erteilen:r')
+	]
+];

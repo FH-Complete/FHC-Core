@@ -69,6 +69,8 @@ if(isset($_GET['getAnmeldung']))
 
 	$lehrveranstaltung_id=$_GET['lehrveranstaltung_id'];
 	$stsem = $_GET['stsem'];
+	$semester = $_GET['semester'];
+	$studienplan_id = $_GET['studienplan_id'];
 
 	echo $p->t('studienplan/LehrveranstalungWaehlen').'
 		<form action="'.$_SERVER['PHP_SELF'].'?uid='.$db->convert_html_chars($uid).'" method="POST">
@@ -83,6 +85,10 @@ if(isset($_GET['getAnmeldung']))
 	$datum = new datum();
 	$kompatibel[]=$lehrveranstaltung_id;
 	$kompatibel = array_unique($kompatibel);
+	$stsem_obj = new studiensemester();
+	$aktornext = $stsem_obj->getaktorNext();
+
+	$lvregel = new lvregel();
 	foreach($kompatibel as $lvid)
 	{
 		$lvangebot = new  lvangebot();
@@ -95,19 +101,50 @@ if(isset($_GET['getAnmeldung']))
 			$angebot = $lvangebot->result[0];
 			if($angebot->AnmeldungMoeglich())
 			{
-				$anzahl++;
-				// LV wird angeboten und Anmeldefenster ist offen
+				$kompatible_lv = $lehrveranstaltung->getStudienplanLehrveranstaltung($lvid, $studienplan_id);
 
-				$bngruppe = new benutzergruppe();
-				if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
+				$lvregelExists = false;
+				$abgeschlossen = false;
+				$semesterlock = false;
+				$regelerfuellt = true;
+
+				if ($kompatible_lv)
 				{
-					// User ist noch nicht angemeldet
-					echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
+					$lvregelExists = $lvregel->exists($kompatible_lv);
+
+					if(!$lvregel->checkSemester($kompatible_lv, $semester))
+					{
+						$semesterlock=true;
+					}
+					else
+					{
+						if($stsem === $aktornext)
+						{
+							$result = $lvregel->isZugangsberechtigt($uid, $kompatible_lv, $stsem);
+							if((is_array($result)) && ($result[0] !== true))
+							{
+								$regelerfuellt=false;
+							}
+						}
+					}
 				}
-				else
+
+				if (!$semesterlock && $regelerfuellt)
 				{
-					// Bereits angemeldet
-					echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
+					$anzahl++;
+					// LV wird angeboten und Anmeldefenster ist offen
+
+					$bngruppe = new benutzergruppe();
+					if(!$bngruppe->load($uid, $lvangebot->result[0]->gruppe_kurzbz, $stsem))
+					{
+						// User ist noch nicht angemeldet
+						echo '<br><input type="radio" value="'.$lvid.'" name="lv"/>'.$lv->bezeichnung.' (Anmeldung bis '.$datum->formatDatum($angebot->anmeldefenster_ende,"d.m.Y").')';
+					}
+					else
+					{
+						// Bereits angemeldet
+						echo '<br><input type="radio" disabled="true" value="'.$lvid.'" name="lv" /><span class="ok">'.$lv->bezeichnung.'</span><img src="../../../skin/images/information.png" title="'.$p->t('studienplan/bereitsAngemeldet').'"/>';
+					}
 				}
 			}
 /*			else
@@ -170,9 +207,9 @@ echo '
 		$("#dialog").dialog({ autoOpen: false, width: "auto" });
 	});
 
-	function OpenAnmeldung(lehrveranstaltung_id, stsem)
+	function OpenAnmeldung(lehrveranstaltung_id, stsem, semester, studienplan_id)
 	{
-		$("#dialog").load("studienplan.php?getAnmeldung=true&lehrveranstaltung_id="+lehrveranstaltung_id+"&stsem="+stsem+"&uid='.$db->convert_html_chars($uid).'");
+		$("#dialog").load("studienplan.php?getAnmeldung=true&lehrveranstaltung_id="+lehrveranstaltung_id+"&stsem="+stsem+"&semester="+semester+"&studienplan_id="+studienplan_id+"&uid='.$db->convert_html_chars($uid).'");
 		$("#dialog").dialog("open");
 	}
 	</script>
@@ -321,6 +358,10 @@ $lv->loadLehrveranstaltungStudienplan($studienplan_id);
 foreach($lv->lehrveranstaltungen as $row_lva)
 	$lv_arr[$row_lva->lehrveranstaltung_id]=$row_lva;
 
+// Anrechnungen laden
+$anrechnung = new anrechnung();
+$anrechnung->getAnrechnungPrestudent($student->prestudent_id);
+
 echo '<h1>'.$p->t('studienplan/studienplan').": $studienplan->bezeichnung ($studienplan_id) - $student->vorname $student->nachname ( $student->uid )</h1>";
 
 echo '<table style="border: 1px solid black">
@@ -355,8 +396,9 @@ drawTree($tree,0);
 
 function drawTree($tree, $depth)
 {
-	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext;
+	global $uid, $stsem_arr, $noten_arr, $lvangebot_arr, $aktornext, $studienplan_id;
 	global $datum_obj, $db, $lv_arr, $p, $note_pruef_arr, $student;
+	global $anrechnung;
 
 	foreach($tree as $row_tree)
 	{
@@ -425,7 +467,7 @@ function drawTree($tree, $depth)
 		    echo $icon." ".$termine." <a href=\"#\" class='Item' onClick=\"javascript:window.open('../lehre/ects/preview.php?lv=$row_tree->lehrveranstaltung_id&language=$sprache','Lehrveranstaltungsinformation','width=700,height=750,resizable=yes,menuebar=no,toolbar=no,status=yes,scrollbars=yes');\">".$row_tree->kurzbz.' - '.$row_tree->bezeichnung."</a>";
 		else
 		// Bezeichnung der Lehrveranstaltung
-		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung.'('.$row_tree->lehrveranstaltung_id.')';
+		    echo $icon." ".$termine." ".$row_tree->kurzbz.' - '.$row_tree->bezeichnung.' ('.$row_tree->lehrveranstaltung_id.')';
 		echo $bende.'</td>';
 
 		// Semester
@@ -534,26 +576,26 @@ function drawTree($tree, $depth)
 			}
 			elseif(count($kompatibleLVs) > 0)
 			{
-
                 $i = 0;
-                while(!$found && $i < count($kompatibleLVs))
+				while(!$found && $i < count($kompatibleLVs))
                 {
                     foreach($kompatibleLVs as $komp)
                     {
-                        $anrechnung = new anrechnung();
-                        $anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-
-                        if(count($anrechnung->result) == 1)
+                        if(count($anrechnung->result))
                         {
-                            $lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-                            if(isset($noten_arr[$lv][$stsem]))
-                            {
-                                $found = true;
-                                if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
-                                        $tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                                else
-                                        $tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
-                            }
+							foreach($anrechnung->result as $row)
+							{
+								$lv = $row->lehrveranstaltung_id_kompatibel;
+								if(isset($noten_arr[$lv][$stsem]) && $lv == $komp && $row_tree->lehrveranstaltung_id == $row->lehrveranstaltung_id)
+								{
+									$found = true;
+									if($note_pruef_arr[$noten_arr[$lv][$stsem]]->positiv)
+										$tdinhalt .= '<span class="ok">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+									else
+										$tdinhalt .= '<span class="error">'.$note_pruef_arr[$noten_arr[$lv][$stsem]]->anmerkung.'</span>';
+								}
+							}
+
                         }
                         $i++;
                     }
@@ -634,12 +676,12 @@ function drawTree($tree, $depth)
 						$tdclass[]='angebot';
 						if($angemeldet)
 						{
-							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/ja.png" title="'.$p->t('studienplan/legendeAngemeldet').'" /></a>';
+							$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\',\''.$semester.'\',\''.$studienplan_id.'\'); return false;"><img src="../../../skin/images/ja.png" title="'.$p->t('studienplan/legendeAngemeldet').'" /></a>';
 						}
 						else
 						{
 							if($anmeldungmoeglich)
-								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
+								$tdinhalt.= '<a href="#" onclick="OpenAnmeldung(\''.$row_tree->lehrveranstaltung_id.'\',\''.$stsem.'\', \''.$semester.'\', \''.$studienplan_id.'\'); return false;"><img src="../../../skin/images/anmelden.png" title="'.$p->t('studienplan/anmelden').'" height="15px" /></a>';
 							else
 								$tdinhalt.= '<span title="'.$anmeldeinformation.'">-</a>';
 
@@ -669,38 +711,39 @@ function drawTree($tree, $depth)
 
 function checkKompatibleLvs($kompatibleLVs, $student, $row_tree, $noten_arr, $note_pruef_arr, $p, $uid, $negativeNote= null)
 {
+	global $anrechnung;
 	$positiv = false;
 	$found = false;
 	$i = 0;
+
 	while(!$found && $i < count($kompatibleLVs))
 	{
 		foreach($kompatibleLVs as $komp)
 		{
-
-			$anrechnung = new anrechnung();
-			$anrechnung->getAnrechnungPrestudent($student->prestudent_id, $row_tree->lehrveranstaltung_id, $komp);
-
-			if(count($anrechnung->result) == 1)
+			if(count($anrechnung->result))
 			{
-				$lv = $anrechnung->result[0]->lehrveranstaltung_id_kompatibel;
-				if(isset($noten_arr[$lv]))
+				foreach($anrechnung->result as $row)
 				{
-					$positiv=false;
-					foreach($noten_arr[$lv] as $note)
+					$lv = $row->lehrveranstaltung_id_kompatibel;
+					if(isset($noten_arr[$lv]) && $lv == $komp && $row_tree->lehrveranstaltung_id == $row->lehrveranstaltung_id)
 					{
-						if($note_pruef_arr[$note]->positiv)
-							$positiv=true;
-					}
+						$positiv=false;
+						foreach($noten_arr[$lv] as $note)
+						{
+							if($note_pruef_arr[$note]->positiv)
+								$positiv=true;
+						}
 
-					$found = true;
-				}
-				else
-				{
-					/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
-					 * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
-					 */
-					if(!$found)
-						$found = false;
+						$found = true;
+					}
+					else
+					{
+						/* wenn zu mehreren kompatiblen lvs eine Anrechnung existiert
+                         * darf found nicht auf false gesetzt werden wenn es zuvor bereits auf true gesetzt wurde
+                         */
+						if(!$found)
+							$found = false;
+					}
 				}
 			}
 			$i++;

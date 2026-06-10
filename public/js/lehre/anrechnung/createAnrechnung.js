@@ -1,5 +1,16 @@
 $(function () {
 
+    // tableInit is called in the jquery_wrapper when the tableBuilt event was finished
+    $(document).on("tableInit", function(event,tabulatorInstance) {
+        
+           // event rowSelected needs to be attached as a callback to the tableBuilt event in tabulator5
+           $("#tableWidgetTabulator").tabulator("on","rowSelected",(row)=>{func_rowSelected(row)});
+           // event rowSelectionChanged needs to be attached as a callback to the tableBuilt event in tabulator5
+           $("#tableWidgetTabulator").tabulator("on","rowSelectionChanged",(data,rows)=>{func_rowSelectionChanged(data,rows)});
+          
+    });
+
+
     // Disable all form fields by default
     createAnrechnung.disableFormFields();
 
@@ -7,6 +18,13 @@ $(function () {
     $('#createAnrechnung-form').submit(function(e){
 
         e.preventDefault();
+
+        var fileInput = $('#requestAnrechnung-uploadfile');
+        const uploadMaxFilesize = $('#requestAnrechnung-uploadfile').data('maxsize')  ; // in byte
+        if (!createAnrechnung.fileSizeOk(fileInput, uploadMaxFilesize)) // in byte
+        {
+            return FHC_DialogLib.alertWarning(FHC_PhrasesLib.t("ui", "errorDokumentZuGross"));
+        }
 
         FHC_AjaxClient.ajaxCallPost(
             FHC_JS_DATA_STORAGE_OBJECT.called_path + "/create",
@@ -93,6 +111,20 @@ function func_rowSelectionChanged(data, rows){
 // ---------------------------------------------------------------------------------------------------------------------
 
 var createAnrechnung = {
+    fileSizeOk: function(fileInput, maxSize){
+
+        if (fileInput.get(0).files.length){
+
+            var fileSize = fileInput.get(0).files[0].size; // in bytes
+
+            if (fileSize > maxSize)
+            {
+                return false;
+            }
+
+            return true;
+        }
+    },
     emptyFormFields: function(){
 
         // Empty field StudentIn
@@ -102,7 +134,7 @@ var createAnrechnung = {
         $('#createAnrechnung-form :input:not([type=hidden])').val('');
 
         // Hide eventually displayed button to open Anrechnung
-        $('#createAnrechnung-openAnrechnung').addClass('hidden');
+        $('#createAnrechnung-openAnrechnung').addClass('visually-hidden');
     },
     disableFormFields: function(){
         let prestudent_id = $('#prestudent_id').data('prestudent_id');
@@ -152,7 +184,7 @@ var createAnrechnung = {
     displayButtonToOpenAnrechnung: function(anrechnung_id){
         // Display button to open Anrechnung in new tab
         $('#createAnrechnung-openAnrechnung')
-            .removeClass('hidden')
+            .removeClass('visually-hidden')
             .attr('href', 'ApproveAnrechnungDetail/?anrechnung_id=' + anrechnung_id)
             .html('<i class="fa fa-external-link" aria-hidden="true"></i> ' + FHC_PhrasesLib.t("global", "antragBearbeiten"));
     }

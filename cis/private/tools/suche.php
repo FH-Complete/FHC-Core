@@ -126,6 +126,9 @@ if (!$searchPerson && !$searchOrt && !$searchDms && !$searchContent && !$searchO
 
 function searchPerson($searchItems)
 {
+	if (defined('CIS_ALLOW_PERSON_SEARCH') && !CIS_ALLOW_PERSON_SEARCH)
+		return false;
+
 	global $db, $p, $noalias, $uid;
 	$bn = new benutzer();
 	//search only active and Mitarbeiter with positive Personalnr
@@ -172,9 +175,6 @@ function searchPerson($searchItems)
 			';
 		foreach($bn->result as $row)
 		{
-			$bisverwendung = new bisverwendung();
-			$bisverwendung->getLastAktVerwendung($row->uid);
-
 			echo '<tr>';
 			//echo '<td>',$row->titelpre,'</td>';
 			echo '<td>',$row->anrede,'</td>';
@@ -185,21 +185,16 @@ function searchPerson($searchItems)
 					echo '<td>',$row->vorname, '</td>';
 
 			echo '<td>';
-			if(!defined('CIS_SUCHE_PROFIL_ANZEIGEN'))
-				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
-			else if(!CIS_SUCHE_PROFIL_ANZEIGEN)
-			{
-				$mitarbeiter = new Mitarbeiter($uid);
-				if($mitarbeiter->errormsg === NULL)
-					echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname, ' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
-				else
+
+			$mitarbeiter = new Mitarbeiter();
+			if (defined('CIS_SUCHE_PROFIL_ANZEIGEN') && CIS_SUCHE_PROFIL_ANZEIGEN === false && !$mitarbeiter->load($uid))
 					echo $row->nachname;
-			}
 			else
 				echo '<a href="../profile/index.php?uid=',$row->uid,'" title="',$row->titelpre,' ',$row->vorname,' ',$row->wahlname,' ',$row->nachname,' ',$row->titelpost,'">',$row->nachname,'</a>';
+
 			if($row->aktiv==false)
 				echo '<span style="color: red"> (ausgeschieden)</span>';
-			elseif($bisverwendung->beschausmasscode=='5')
+			elseif(isKarenziert($row->uid))
 				echo '<span style="color: orange"> (karenziert)</span>';
 			echo '</td>';
 			//echo '<td>',$row->titelpost,'</td>';
@@ -262,6 +257,47 @@ function searchPerson($searchItems)
 	else
 		return false;
 }
+
+function isKarenziert($uid)
+{
+	global $db;
+
+	if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
+	{
+		$qry ="
+		SELECT
+			1
+		FROM
+			hr.tbl_dienstverhaeltnis
+			JOIN hr.tbl_vertragsbestandteil USING(dienstverhaeltnis_id)
+			JOIN hr.tbl_vertragsbestandteil_karenz USING(vertragsbestandteil_id)
+		WHERE
+			tbl_dienstverhaeltnis.mitarbeiter_uid=".$db->db_add_param($uid)."
+			AND tbl_vertragsbestandteil.von<=now() AND tbl_vertragsbestandteil.bis>=now()
+		";
+
+		if($result = $db->db_query($qry))
+		{
+			if($db->db_num_rows($result)>0)
+				return true;
+			else
+				return false;
+		}
+		else
+			return false;
+	}
+	else
+	{
+		$bisverwendung = new bisverwendung();
+		$bisverwendung->getLastAktVerwendung($uid);
+
+		if($bisverwendung->beschausmasscode=='5')
+			return true;
+		else
+			return false;
+	}
+}
+
 function searchOE($searchItems)
 {
 	global $db, $p, $noalias;
@@ -332,8 +368,6 @@ function searchOE($searchItems)
 						$mitarbeiter->load($bf->uid);
 						$kontakt = new kontakt();
 						$kontakt->loadFirmaKontakttyp($mitarbeiter->standort_id,'telefon');
-						$bisverwendung = new bisverwendung();
-						$bisverwendung->getLastAktVerwendung($bf->uid);
 						$benutzer = new benutzer($bf->uid);
 						if ($benutzer->bnaktiv)
 						{
@@ -341,8 +375,8 @@ function searchOE($searchItems)
 							echo '<td>'.$person->vorname.'</td>';
 							echo '<td><a href="../profile/index.php?uid=',$person->uid,'" title="',$person->titelpre,' ',$person->vorname,' ',$person->nachname,' ',$person->titelpost,'">',$person->nachname,'</a></td>';
 							echo '<td>'.$bf->bezeichnung;
-								if($bisverwendung->beschausmasscode=='5')
-									echo '<span style="color: orange"> (karenziert)</span>';
+							if( isKarenziert($bf->uid))
+								echo '<span style="color: orange"> (karenziert)</span>';
 							echo '</td>';
 
 							// Display phone number

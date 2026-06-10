@@ -276,15 +276,22 @@ if (!$ansicht)
 {
 	if ($type === 'mitarbeiter')
 	{
-		$verwendung = new bisverwendung();
-		if($verwendung->getLastVerwendung($uid))
+		if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
 		{
-			if (!$verwendung->hauptberuflich)
-			{
-				echo 'Hauptberuf: '. $verwendung->hauptberuf;
-			}
+			// TODO Hauptberuf wieder anzeigen sobald verfuegbar
 		}
-		echo "<br><br>";
+		else
+		{
+			$verwendung = new bisverwendung();
+			if($verwendung->getLastVerwendung($uid))
+			{
+				if (!$verwendung->hauptberuflich)
+				{
+					echo 'Hauptberuf: '. $verwendung->hauptberuf;
+				}
+			}
+			echo "<br><br>";
+		}		
 	}
 }
 
@@ -606,9 +613,36 @@ function printFunctionsTable($query, $headingphrase, $tableid, $showVertragsstun
 			if ($showVertragsstunden === true && $adminOrOwnUser)
 			{
 				$vertragsstunden = 0.00;
-				$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
-						WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
-						AND (ende > now() OR ende IS NULL)";
+				if(defined('DIENSTVERHAELTNIS_SUPPORT') && DIENSTVERHAELTNIS_SUPPORT)
+				{
+					$qry = "SELECT 
+								sum(wochenstunden) AS vertragsstdsumme 
+							FROM 
+								hr.tbl_vertragsbestandteil_stunden vbs
+							JOIN 
+								hr.tbl_vertragsbestandteil vb USING(vertragsbestandteil_id) 
+							JOIN 
+								hr.tbl_dienstverhaeltnis dv USING(dienstverhaeltnis_id)
+							WHERE 
+								dv.mitarbeiter_uid = ".$db->db_add_param($uid)."
+								AND NOW() BETWEEN COALESCE(vb.von, '1970-01-01'::date) AND COALESCE(vb.bis, '2170-12-31'::date)
+								AND NOT EXISTS (
+									SELECT 
+										1 
+									FROM 
+										hr.tbl_vertragsbestandteil 
+									WHERE 
+										dienstverhaeltnis_id = dv.dienstverhaeltnis_id 
+										AND vertragsbestandteiltyp_kurzbz = 'karenz' 
+										AND NOW() BETWEEN COALESCE(von, '1970-01-01'::date) AND COALESCE(bis, '2170-12-31'::date)
+								)";
+				}
+				else 
+				{
+					$qry = "SELECT sum(vertragsstunden) AS vertragsstdsumme from bis.tbl_bisverwendung
+							WHERE mitarbeiter_uid = ".$db->db_add_param($uid)."
+							AND (ende > now() OR ende IS NULL)";
+				}
 
 				if ($result_vertragsstd = $db->db_query($qry))
 				{

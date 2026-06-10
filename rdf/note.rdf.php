@@ -40,7 +40,7 @@ echo '
 	xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
 	xmlns:NOTE="'.$rdf_url.'/rdf#"
 >
-   <RDF:Seq about="'.$rdf_url.'/liste">
+	<RDF:Seq about="'.$rdf_url.'/liste">
 ';
 
 //Daten holen
@@ -48,13 +48,14 @@ $qry = 'SELECT * FROM lehre.tbl_note ORDER BY note';
 if(isset($_GET['optional']))
 {
 	echo '
-	  <RDF:li>
-	     <RDF:Description  id=""  about="'.$rdf_url.'/" >
-			<NOTE:note><![CDATA[]]></NOTE:note>
-			<NOTE:bezeichnung><![CDATA[-- keine Auswahl --]]></NOTE:bezeichnung>
-			<NOTE:anmerkung><![CDATA[]]></NOTE:anmerkung>
-	     </RDF:Description>
-	  </RDF:li>';
+		<RDF:li>
+			<RDF:Description  id=""  about="'.$rdf_url.'/" >
+				<NOTE:note><![CDATA[]]></NOTE:note>
+				<NOTE:bezeichnung><![CDATA[-- keine Auswahl --]]></NOTE:bezeichnung>
+				<NOTE:anmerkung><![CDATA[]]></NOTE:anmerkung>
+				<NOTE:aktiv><![CDATA[]]></NOTE:aktiv>
+			</RDF:Description>
+		</RDF:li>';
 }
 $db = new basis_db();
 
@@ -63,13 +64,14 @@ if($db->db_query($qry))
 	while($row = $db->db_fetch_object())
 	{
 		echo '
-			  <RDF:li>
-		         <RDF:Description  id="'.$row->note.'"  about="'.$rdf_url.'/'.$row->note.'" >
+			<RDF:li>
+				<RDF:Description  id="'.$row->note.'"  about="'.$rdf_url.'/'.$row->note.'" >
 					<NOTE:note><![CDATA['.$row->note.']]></NOTE:note>
 					<NOTE:bezeichnung><![CDATA['.$row->bezeichnung.']]></NOTE:bezeichnung>
 					<NOTE:anmerkung><![CDATA['.$row->anmerkung.']]></NOTE:anmerkung>
-		         </RDF:Description>
-		      </RDF:li>';
+					<NOTE:aktiv><![CDATA['.($db->db_parse_bool($row->aktiv)?'true':'false') .']]></NOTE:aktiv>
+				</RDF:Description>
+			</RDF:li>';
 	}
 }
 ?>

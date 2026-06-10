@@ -14,7 +14,8 @@ class Rueckstellung extends Auth_Controller
 				'get' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'set' => array('infocenter:r', 'lehre/zgvpruefung:r'),
 				'delete' => array('infocenter:r', 'lehre/zgvpruefung:r'),
-				'getStatus' => array('infocenter:rw', 'lehre/zgvpruefung:rw')
+				'getStatus' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
+				'setForPersonen' => array('infocenter:rw', 'lehre/zgvpruefung:rw'),
 			)
 		);
 		
@@ -79,7 +80,34 @@ class Rueckstellung extends Auth_Controller
 
 		$this->outputJson($result);
 	}
-	
+
+	public function setForPersonen()
+	{
+		$personen = $this->input->post('personen');
+		$datum_bis = $this->input->post('datum_bis');
+		$status_kurzbz = $this->input->post('status_kurzbz');
+
+		foreach ($personen as $person)
+		{
+			$rueckstellung = $this->_ci->RueckstellungModel->loadWhere(array('person_id' => $person));
+			if (hasData($rueckstellung))
+				continue;
+
+			$result = $this->_ci->RueckstellungModel->insert(
+				array('person_id' => $person,
+					'status_kurzbz' => $status_kurzbz,
+					'datum_bis' => date_format(date_create($datum_bis), 'Y-m-d'),
+					'insertvon' => $this->_uid
+				)
+			);
+
+			if (isError($result))
+				$this->terminateWithJsonError(getError($result));
+			$this->_log($person, $status_kurzbz);
+		}
+		$this->outputJsonSuccess("Erfolgreich gespeichert!");
+	}
+
 	public function delete()
 	{
 		$person_id = $this->input->post('person_id');

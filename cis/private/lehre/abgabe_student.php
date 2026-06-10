@@ -124,7 +124,6 @@ $sql_query = "SELECT (SELECT nachname FROM public.tbl_person  WHERE person_id=tb
 		AND tbl_projektarbeit.student_uid=".$db->db_add_param($uid)."
 		ORDER BY studiensemester_kurzbz desc, tbl_lehrveranstaltung.kurzbz";
 
-//AND tbl_projektarbeit.student_uid='$getuid' 'ie07m102';
 if(!$erg=$db->db_query($sql_query))
 {
 	$errormsg=$p->t('global/fehlerBeimLesenAusDatenbank');
@@ -196,13 +195,13 @@ else
 			$htmlstr .= "<td>";
 
 			if (!is_null($row->babgeschickt))
-				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->betreuer_person_id ."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungErstDownload')."</a>";
+				$htmlstr .= "<a href='./projektbeurteilungDocumentExport.php?betreuerart_kurzbz=" . $row->betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->betreuer_person_id ."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungErstDownload')."</a>";
 
 			if (!is_null($row->babgeschickt) && !is_null($row->zweitbetreuer_abgeschickt))
 				$htmlstr .= "/";
 
 			if (!is_null($row->zweitbetreuer_abgeschickt))
-				$htmlstr .= "<a href='../pdfExport.php?xml=projektarbeitsbeurteilung.xml.php&xsl=Projektbeurteilung&betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungZweitDownload')."</a>";
+				$htmlstr .= "<a href='./projektbeurteilungDocumentExport.php?betreuerart_kurzbz=" . $row->zweitbetreuer_betreuerart_kurzbz . "&projektarbeit_id=" . $row->projektarbeit_id . "&person_id=" . $row->zweitbetreuer_person_id."' title='".$p->t('abgabetool/projektbeurteilungDownload')."'>".$p->t('abgabetool/projektbeurteilungZweitDownload')."</a>";
 
 			$htmlstr .= "</td>";
 		}

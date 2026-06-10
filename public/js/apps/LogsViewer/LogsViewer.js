@@ -21,6 +21,8 @@ import {LogsViewerTabulatorEventHandlers} from './TabulatorSetup.js';
 import {CoreFilterCmpt} from '../../components/filter/Filter.js';
 import {CoreNavigationCmpt} from '../../components/navigation/Navigation.js';
 
+import PluginsPhrasen from '../../plugins/Phrasen.js';
+
 const logsViewerApp = Vue.createApp({
 	data: function() {
 		return {
@@ -40,5 +42,7 @@ const logsViewerApp = Vue.createApp({
 	}
 });
 
-logsViewerApp.mount('#main');
+FhcApps.makeExtendable(logsViewerApp);
+
+logsViewerApp.use(PluginsPhrasen).mount('#main');
 

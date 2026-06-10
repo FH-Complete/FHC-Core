@@ -18,6 +18,8 @@
 
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
+use \DateTime as DateTime;
+
 // ------------------------------------------------------------------------
 // Collection of utility functions for general purpose
 // ------------------------------------------------------------------------
@@ -89,7 +91,7 @@ function var_dump_to_error_log($parameter)
 	var_dump($parameter); // KEEP IT!!!
 	$ob_get_contents = ob_get_contents();
 	ob_end_clean();
-	error_log(str_replace("\n", '', $ob_get_contents)); // KEEP IT!!!
+	error_log(str_replace("\n", '', $ob_get_contents) . ', referer: ' . "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']); // KEEP IT!!!
 }
 
 /**
@@ -354,7 +356,8 @@ function sanitizeProblemChars($str)
 		'ss' => '/&szlig;/'
 	);
 
-	return preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
+	$tmp = preg_replace($acentos, array_keys($acentos), htmlentities($str, ENT_NOQUOTES | ENT_HTML5, $enc));
+	return html_entity_decode($tmp, ENT_NOQUOTES | ENT_HTML5, $enc);
 }
 
 /**
@@ -405,3 +408,165 @@ function findResource($path, $resource, $subdir = false, $extraDir = null)
 	return null;
 }
 
+// ------------------------------------------------------------------------
+// PHP functions that don't exist in older versions
+// ------------------------------------------------------------------------
+
+/**
+ * Returns true if the given array is sequential
+ */
+if (!function_exists('array_is_list')) {
+    function array_is_list(array $arr)
+    {
+        if ($arr === []) {
+            return true;
+        }
+        return array_keys($arr) === range(0, count($arr) - 1);
+    }
+}
+
+// ------------------------------------------------------------------------
+// Collection of utility functions for form validation purposes
+// ------------------------------------------------------------------------
+
+/**
+ * Check if the provided parameter is a string containing a valid date
+ * NOTE: the name is in the "snake case" format because othewise the CI form validation _cannot_ use it
+ */
+function is_valid_date($dateString)
+{
+	try
+	{
+		return (new DateTime($dateString)) !== false;
+	}
+	catch(Exception $e)
+	{
+		return false;
+	}
+}
+
+/**
+ * check if given permissions are met
+ */
+function has_write_permissions($value, $permissions = '')
+{
+	if (!$permissions)
+		$permissions = $value;
+	$permissions = explode(',', $permissions);
+
+	$CI =& get_instance();
+	$CI->load->library('AuthLib');
+	$CI->load->library('PermissionLib');
+
+	return $CI->permissionlib->hasAtLeastOne(
+		$permissions,
+		'sometable',
+		PermissionLib::WRITE_RIGHT
+	);
+}
+
+/**
+ * check if has permissions for a studiengang_kz
+ */
+function has_permissions_for_stg($studiengang_kz, $permissions = '')
+{
+	if (!$permissions)
+		return false;
+	$permissions = explode(',', $permissions);
+
+	$CI =& get_instance();
+	$CI->load->library('AuthLib');
+	$CI->load->library('PermissionLib');
+
+	foreach ($permissions as $perm) {
+		if (strpos($perm, PermissionLib::PERMISSION_SEPARATOR) === false) {
+			$CI->addError(
+				'The given permission does not use the correct format',
+				FHCAPI_Controller::ERROR_TYPE_GENERAL
+			);
+			return false;
+		}
+
+		list($perm, $accesstype) = explode(PermissionLib::PERMISSION_SEPARATOR, $perm);
+		$at = '';
+		if (strpos($accesstype, PermissionLib::READ_RIGHT) !== false)
+			$at = PermissionLib::SELECT_RIGHT; // S
+		if (strpos($accesstype, PermissionLib::WRITE_RIGHT) !== false)
+			$at .= PermissionLib::REPLACE_RIGHT.PermissionLib::DELETE_RIGHT; // UID
+
+		if ($CI->permissionlib->isBerechtigt($perm, $at, $studiengang_kz))
+			return true;
+	}
+
+	return false;
+}
+
+/**
+ * check if an entry exists in the database
+ */
+function is_in_db($key, $model = '')
+{
+	if (!$model)
+		return false;
+
+	$field = strstr($model, ":");
+	if ($field) {
+		$model = strstr($model, ":", true);
+		$field = substr($field, 1);
+	}
+
+	$CI =& get_instance();
+	$CI->load->model($model, $model);
+
+	if ($field) {
+		$result = $CI->$model->loadWhere([
+			$field => $key
+		]);
+	} else {
+		$result = $CI->$model->load($key);
+	}
+
+	return (isSuccess($result) && hasData($result));
+}
+
+/**
+ * is building an array for Dropdown Entry in Print Dropdown
+ * @param $id id for the Document to add to the Document Array
+ * @param $name title of the dropdownEntry
+ * @param $parameterUrl url of parameters xml, xsl, format etc as needed
+ * 	WITHOUT BASEURL eg. "xml=abschlusspruefung.rdf.php&xsl_stg_kz=$studiengang_kz&xsl=Bescheid&output=pdf"
+ * @param $uid default parameter, if null only parameterurl will be added
+ * 	additional needed parameter: put in the parameterUrl
+ * @param $alternativeBaseUrl: if baseUrl not pdfExport.php, put here alternative without ? char, eg. "zutrittskarte.php"
+ *
+ * @return Array
+ */
+function buildDropdownEntryPrintArray($id, $name, $parameterurl, $uid=null, $order=null, $alternativeBaseUrl=null)
+{
+	//DEFAULT BASEURL
+	$baseurl = "pdfExport.php?";
+
+	$uidString = $uid ? "&uid=" . $uid : "";
+
+
+
+	if($alternativeBaseUrl)
+	{
+		return [
+			"id"    => $id,
+			"type"  => "documenturl",
+			"name"  => $name,
+			"url"   => $alternativeBaseUrl . "?" . $parameterurl . $uidString,
+			"order" => $order
+		];
+	}
+	else
+		return [
+			"id"    => $id,
+			"type"  => "documenturl",
+			"name"  => $name,
+			"url"   => $baseurl . $parameterurl . "&uid=" . $uid,
+			"order" => $order
+		];
+
+}

@@ -27,6 +27,15 @@ define('CIS_LEHRVERANSTALTUNG_SEMESTERINFO_ANZEIGEN',true);
 define('CIS_LEHRVERANSTALTUNG_LEHRFACH_ANZEIGEN',false);
 define('CIS_LEHRVERANSTALTUNG_GESAMTNOTE_ANZEIGEN', true);
 define('CIS_LEHRVERANSTALTUNG_ANRECHNUNG_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN', true);
+define('CIS_LEHRVERANSTALTUNG_EVALUIERUNG_ANZEIGEN', true);
+
+// Wenn gesetzt, werden die Digitale Anwesenheit-Icons nur fuer diese Studiengaenge angezeigt, sonst für alle
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_STG', serialize(array('257')));
+// define('CIS_LEHRVERANSTALTUNG_ANWESENHEIT_ANZEIGEN_LVA', serialize(array('39455','39481','39480','41906','41905','41904','39459','39512','39454','39482','42230','42231','39458','41921','41922','39457','42896')));
+
+// Wenn gesetzt, werden die LV-Evaluierung-Icons nur für diese Studiengaenge angezeigt, sonst alle
+define('CIS_EVALUIERUNG_ANZEIGEN_STG', serialize((array('335', '585', '914', '298'))));	// BIW, MAI, BUB, MIO
 
 // Im CIS Menue Links bei Modulen anzeigen wenn Lehrauftrag
 define('CIS_LEHRVERANSTALTUNG_MODULE_LINK',true);
@@ -47,6 +56,9 @@ define('CIS_PROFIL_STUDIENINFORMATION_ANZEIGEN',true);
 // Zeitaufzeichnung gesperrt_bis Datum YYYY-MM-DD
 define('CIS_ZEITAUFZEICHNUNG_GESPERRT_BIS','');
 
+// maximale Dauer einer Zeitsperre in Tagen
+define('CIS_ZEITSPERREN_MAX_DAUER', 730);
+
 // Anzeige des Links zur Noteneingabe in der LVA Uebersicht
 define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 
@@ -54,7 +66,12 @@ define('CIS_LVALISTE_NOTENEINGABE_ANZEIGEN',true);
 define('CIS_SUCHE_LVPLAN_ANZEIGEN',true);
 
 // Anzeige des Links zum Profil von Personen bei globaler Suche
+// Wenn ein Mitarbeiter sucht, wird der Link IMMER angezeigt, unabhängig von der Config
+// Wenn ein Studierender sucht und die Config auf false ist, wird der Link nicht angezeigt - ansonsten schon
 define('CIS_SUCHE_PROFIL_ANZEIGEN',true);
+
+// Anzeige von Personen bei globaler Suche
+define('CIS_ALLOW_PERSON_SEARCH', true);
 
 // Soll geprueft werden ob das Passwort innerhalb des letzten Jahres geaendert wurde true|false
 // Wenn dies nicht geaendert wurde wird nach dem Login auf die Passwort aendern Seite umgeleitet
@@ -148,6 +165,12 @@ define('CIS_LV_LEKTORINNENZUTEILUNG_VERTRAGSPRUEFUNG_VON', '');
 
 // Legt fest, ob Vertragsdetails zum Projektauftrag im Reiter Projektarbeit angezeigt werden
 define('FAS_STUDIERENDE_PROJEKTARBEIT_VERTRAGSDETAILS_ANZEIGEN', false);
+
+// Legt default Stunden pro Projektarbeitsbetreuung für Bachelorarbeiten fest
+define('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_BACHELOR', '5.0');
+
+// Legt default Stunden pro Projektarbeitsbetreuung für Masterarbeiten fest
+define('FAS_STUDIERENDE_PROJEKTARBEIT_DEFAULT_BETREUER_STUNDEN_MASTER', '5.0');
 
 // Anzeigeoptionen für LV-Plan Menü
 define('CIS_LVPLAN_EXPORT_ANZEIGEN',true);
@@ -319,4 +342,35 @@ define ('ZAHLUNGSBESTAETIGUNG_ZAHLUNGSREFERENZ_ANZEIGEN', false);
 
 define('DOCSBOX_ENABLED', false);
 
+// Aktiviert Abfragen auf die Dienstverhaeltnisse im HR Schema anstatt auf die BIS-Verwendung
+// Uebergangsphase bis zur entfernung der BIS-Verwendungen
+// (true | false)
+define('DIENSTVERHAELTNIS_SUPPORT', false);
+
+// Falls Studstatus (Abmeldung, AbmeldungStg, Unterbrechung, Wiederholung) verwendet wird zeige Hinweistext bei Eingabe einer kommissionellen oder zusaetzlichen kommissionellen Pruefung
+define('FAS_STUDSTATUS_SHOW_KOMM_PRFG_HINT', false);
+
+// default absender (@DOMAIN wird hinzugefuegt daher ohne angeben)
+define('SANCHO_MAIL_DEFAULT_SENDER', 'noreply');
+
+// header und footer Bilder für eigene Mails verwenden
+define('SANCHO_MAIL_USE_IMAGES', true);
+
+// Pfad für Bilder für eigene Mails, relativ zu document root
+define('SANCHO_MAIL_IMG_PATH', 'skin/images/sancho/');
+
+// header Bild für eigene Mails
+define('SANCHO_MAIL_HEADER_IMG', 'sancho_header_DEFAULT.jpg');
+
+// footer image for eigene Mails
+define('SANCHO_MAIL_FOOTER_IMG', 'sancho_footer_DEFAULT.jpg');
+
+// Gibt an, ob in der StudVW der Status vorgerueckt werden kann
+define('STATUS_VORRUECKEN_ANZEIGEN', true);
+
+//externe Ueberwachung im Testtool erlauben
+define('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED', false);
+
+//enable tags in StudVW
+define('STV_TAGS_ENABLED', false);
 ?>

@@ -490,22 +490,67 @@ if ($rtprueflingEntSperren)
 		exit();
 	}
 
-	if (isset($_POST['prestudent_id']) && is_numeric($_POST['prestudent_id'])
+	if (isset($_POST['person_id']) && is_numeric($_POST['person_id'])
 		&& isset($_POST['art']))
 	{
-		$qry = "UPDATE testtool.tbl_pruefling SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
-				WHERE prestudent_id IN 
-						(SELECT prestudent_id FROM public.tbl_prestudent ps
-							JOIN public.tbl_person tp ON tp.person_id = ps.person_id 
-							WHERE tp.person_id = (SELECT person_id FROM public.tbl_prestudent sps WHERE sps.prestudent_id = " . $db->db_add_param($_POST['prestudent_id']) . "));";
+		$qry = "SELECT pruefling_id
+				FROM testtool.tbl_pruefling
+				WHERE prestudent_id IN (
+					SELECT prestudent_id
+					FROM public.tbl_prestudent
+						WHERE person_id = ". $db->db_add_param($_POST['person_id']) . "
+				)";
 
 		if ($result = $db->db_query($qry))
 		{
-			$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
-			echo json_encode(array(
-				'status' => 'ok',
-				'msg' => $msg));
-			exit();
+			if ($db->db_num_rows($result) === 0)
+			{
+				$ps = new prestudent();
+				$ps->getPrestudenten($_POST['person_id']);
+
+				$prestudent = new prestudent($ps->result[0]->prestudent_id);
+				$prestudent->getLastStatus($prestudent->prestudent_id);
+
+				$pruefling = new pruefling();
+				$pruefling->new = true;
+				$pruefling->studiengang_kz = $prestudent->studiengang_kz;
+				$pruefling->registriert = date('Y-m-d H:i:s');
+				$pruefling->semester = $prestudent->ausbildungssemester;
+				$pruefling->prestudent_id = $prestudent->prestudent_id;
+				$pruefling->gesperrt = true;
+
+				$resultSperre = $pruefling->save();
+			}
+			else
+			{
+				$pruefling_ids = array();
+
+				while ($row = $db->db_fetch_object($result))
+					$pruefling_ids[] = $row->pruefling_id;
+
+				$qry = "UPDATE testtool.tbl_pruefling
+						SET gesperrt =" . $db->db_add_param($_POST['art'], 'BOOLEAN') . "
+						WHERE pruefling_id IN (" . $db->db_implode4SQL($pruefling_ids) . ")";
+
+				$resultSperre = $db->db_query($qry);
+			}
+
+			if ($resultSperre)
+			{
+				$msg = $_POST['art'] === 'false' ? 'Pruefling wurde gesperrt' : 'Pruefling wurde freigeschaltet';
+				echo json_encode(array(
+					'status' => 'ok',
+					'msg' => $msg));
+				exit();
+			}
+			else
+			{
+				echo json_encode(array(
+					'status' => 'fehler',
+					'msg' => 'Fehler beim speichern der Daten'
+				));
+				exit();
+			}
 		}
 		else
 		{
@@ -1036,77 +1081,6 @@ if ($punkteUebertragen)
 						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits Gesamtpunkte eingetragen.';
 					}
 				}
-
-				$zuBewerberMachen = filter_input(INPUT_POST, 'zuBewerberMachen', FILTER_VALIDATE_BOOLEAN);
-				// Wenn zuBewerberMachen true ist, wird der Prestudent auch zum Bewerber gemacht
-				if ($zuBewerberMachen)
-				{
-					$prestudent = new prestudent($array['prestudent_id']);
-
-					// Checken, ob schon Bewerberstatus vorhanden ist
-					if (!$prestudent->load_rolle($array['prestudent_id'], 'Bewerber', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
-					{
-						// Checken, ob Abgewiesener-Status vorhanden ist
-						if (!$prestudent->load_rolle($array['prestudent_id'], 'Abgewiesener', $prestudentrolle->studiensemester_kurzbz, $prestudentrolle->ausbildungssemester))
-						{
-							// Um einen Bewerberstatus zu setzen, muss "reihungstestangetreten" true sein
-							if ($prestudent->reihungstestangetreten == true)
-							{
-								// Um einen Bewerberstatus zu setzen, muss die ZGV ausgefüllt sein
-								if ($prestudent->zgv_code != '')
-								{
-									$studiengang = new studiengang($prestudent->studiengang_kz);
-									// Bei Mastern muss auch die ZGV-Master ausgefüllt sein
-									if ($studiengang->typ == 'm' && $prestudent->zgvmas_code == '')
-									{
-										$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine Master-ZGV eingetragen sein.';
-									}
-									else
-									{
-										$prestudent->new = true;
-										$prestudent->prestudent_id = $array['prestudent_id'];
-										$prestudent->status_kurzbz = 'Bewerber';
-										$prestudent->studiensemester_kurzbz = $prestudentrolle->studiensemester_kurzbz;
-										$prestudent->ausbildungssemester = $prestudentrolle->ausbildungssemester;
-										$prestudent->datum = date('Y-m-d');
-										$prestudent->insertamum = date('Y-m-d H:i:s');
-										$prestudent->insertvon = $user;
-										$prestudent->orgform_kurzbz = $prestudentrolle->orgform_kurzbz;
-										$prestudent->bestaetigtam = '';
-										$prestudent->bestaetigtvon = '';
-										$prestudent->bewerbung_abgeschicktamum = '';
-										$prestudent->studienplan_id = $prestudentrolle->studienplan_id;
-
-										if (!$prestudent->save_rolle())
-										{
-											$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].': '.$prestudent->errormsg;
-										}
-										else
-										{
-											$count_success_bewerber++;
-										}
-									}
-								}
-								else
-								{
-									$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es muss zuerst eine ZGV eingetragen sein.';
-								}
-							}
-							else
-							{
-								$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Zuerst muss "Reihungstestverfahren absolviert" gesetzt sein.';
-							}
-						}
-						else
-						{
-							$msg_error .= '<br>Fehler beim speichern des Bewerberstatus für Prestudent '.$array['prestudent_id'].'. Es ist bereits ein Abgewiesener-Status vorhanden';
-						}
-					}
-					else
-					{
-						$msg_warning .= '<br>Der Prestudent '.$array['prestudent_id'].' hat bereits einen Bewerberstatus';
-					}
-				}
 			}
 		}
 
@@ -1246,8 +1220,10 @@ $reihungstest = isset($_REQUEST['reihungstest']) ? $_REQUEST['reihungstest'] : '
 $studiengang = isset($_REQUEST['studiengang']) ? $_REQUEST['studiengang'] : '';
 $semester = isset($_REQUEST['semester']) ? $_REQUEST['semester'] : '';
 $prestudent_id = isset($_REQUEST['prestudent_id']) ? $_REQUEST['prestudent_id'] : '';
+$prestudent_ids = isset($_REQUEST['prestudent_ids']) ? $_REQUEST['prestudent_ids'] : '';
 $orgform_kurzbz = isset($_REQUEST['orgform_kurzbz']) ? $_REQUEST['orgform_kurzbz'] : '';
 $format = (isset($_REQUEST['format']) ? $_REQUEST['format'] : '');
+$stgtyp = (isset($_REQUEST['stgtyp']) ? $_REQUEST['stgtyp'] : '');
 $rtStudiensemester = '';
 
 if ($reihungstest != '' && (is_array($reihungstest) || is_numeric($reihungstest)))
@@ -1284,7 +1260,7 @@ if ($prestudent_id != '' && !is_numeric($prestudent_id))
 {
 	die('PrestudentID ist ungueltig');
 }
-if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '')
+if (isset($_POST['rtauswsubmit']) && $reihungstest == '' && $studiengang == '' && $semester == '' && $prestudent_id == '' && $datum_von == '' && $datum_bis == '' && $prestudent_ids == '')
 {
 	die('Waehlen Sie bitte mindestens eine der Optionen aus');
 }
@@ -1403,6 +1379,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
 	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',', $prestudent_ids)) . ")";
+	}
 	if ($orgform_kurzbz != '' && $studiengang != '')
 	{
 		$query .= " AND (tbl_ablauf.studienplan_id=(
@@ -1418,7 +1398,12 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 							ORDER BY studienplan_id DESC LIMIT 1)
 							OR tbl_ablauf.studienplan_id IS NULL)";
 	}
-	//$query .= " AND nachname='Al-Mafrachi'";
+
+	if ($stgtyp !== '')
+	{
+		$query .= " AND tbl_studiengang.typ = " .$db->db_add_param($stgtyp);
+	}
+
 	$query .= " ORDER BY tbl_ablauf.studiengang_kz, tbl_ablauf.semester, reihung";
 
 	if (!($result = $db->db_query($query)))
@@ -1631,6 +1616,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 	{
 		$query .= " AND ps.prestudent_id=" . $db->db_add_param($prestudent_id, FHC_INTEGER);
 	}
+	if ($prestudent_ids != '')
+	{
+		$query .= " AND ps.prestudent_id IN (" .$db->db_implode4SQL(explode(',',$prestudent_ids)) . ")";
+	}
 	if ($orgform_kurzbz != '')
 	{
 		//$query .= " AND tbl_prestudentstatus.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
@@ -1638,18 +1627,23 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		//$query .= " AND tbl_ablauf.studienplan_id = 5";
 		$query .= " AND tbl_studienplan.orgform_kurzbz=" . $db->db_add_param($orgform_kurzbz);
 	}
+	
+	if ($stgtyp !== '')
+	{
+		$query .= " AND tbl_studiengang.typ = " . $db->db_add_param($stgtyp);
+	}
+	
 	//$query .= " AND nachname='Al-Mafrachi'";
 	$query .= " ORDER BY nachname,
 				vorname,
-				person_id	
-	";/*print_r($query);*/
-	//echo '<pre>', var_dump($query), '</pre>';
+				person_id";
 	if (!($result = $db->db_query($query)))
 	{
 		die($db->db_last_error());
 	}
 
 	$gebiete_arr = array();
+	$gesperrt_arr = array();
 	while ($row = $db->db_fetch_object($result))
 	{
 		// Hack für BEW-BB, wenn auch BEW-DL-Ergebnisse vorliegen
@@ -1666,7 +1660,10 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 			$ergebnis[$row->prestudent_id] = new stdClass();
 			$gebiete_arr[$row->prestudent_id] = array();
 		}
-
+		
+		if (!isset($gesperrt_arr[$row->person_id]))
+			$gesperrt_arr[$row->person_id] = new stdClass();
+		
 		$ergebnis[$row->prestudent_id]->prestudent_id = $row->prestudent_id;
 		$ergebnis[$row->prestudent_id]->person_id = $row->person_id;
 		$ergebnis[$row->prestudent_id]->reihungstest_id = $row->reihungstest_id;
@@ -1678,7 +1675,6 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->geschlecht = $row->geschlecht;
 		$ergebnis[$row->prestudent_id]->idnachweis = $row->idnachweis;
 		$ergebnis[$row->prestudent_id]->registriert = $row->registriert;
-		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
 		$ergebnis[$row->prestudent_id]->stg_kurzbz = $row->stg_kurzbz;
 		$ergebnis[$row->prestudent_id]->stg_bez = $row->stg_bez;
 		$ergebnis[$row->prestudent_id]->ausbildungssemester = $row->ausbildungssemester;
@@ -1690,6 +1686,13 @@ if (isset($_REQUEST['reihungstest']) || isset($_POST['rtauswsubmit']))
 		$ergebnis[$row->prestudent_id]->teilgenommen = $db->db_parse_bool($row->teilgenommen);
 		$ergebnis[$row->prestudent_id]->qualifikationskurs = $db->db_parse_bool($row->qualifikationskurs);
 		$ergebnis[$row->prestudent_id]->letzter_status = $row->letzter_status;
+		$ergebnis[$row->prestudent_id]->gesperrt = $row->gesperrt;
+
+		$gesperrt = $db->db_parse_bool($row->gesperrt);
+		if (!isset($gesperrt_arr[$row->person_id]->gesperrt) || ($gesperrt_arr[$row->person_id]->gesperrt !== true && $gesperrt === true))
+		{
+			$gesperrt_arr[$row->person_id]->gesperrt = $gesperrt;
+		}
 
 		if (!isset($ergebnis[$row->prestudent_id]->gebiet[$row->gebiet_id]))
 		{
@@ -2375,30 +2378,7 @@ else
 		{
 			$("#uebertragenOptions").toggle(300);
 		});
-		
-		if($("#uebertragenOptionGesamtpunkte").not(":checked"))
-		{
-			$("#div_checkbox_bewerber").addClass("disabled");
-			$("#div_checkbox_bewerber").find("label").addClass("text-muted");
-			$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
-			$("#uebertragenOptionBewerber").prop("disabled", true);
-		}
-		$("#uebertragenOptionGesamtpunkte").on("click", function(e) 
-		{
-			if($(this).is(":checked"))
-			{
-				$("#div_checkbox_bewerber").removeClass("disabled");
-				$("#div_checkbox_bewerber").find("label").removeClass("text-muted");
-				$("#uebertragenOptionBewerber").prop("disabled", false);
-			}
-			else
-			{
-				$("#div_checkbox_bewerber").addClass("disabled");
-				$("#div_checkbox_bewerber").find("label").addClass("text-muted");
-				$("#div_checkbox_bewerber").find("label").prop("title", "Erst \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" setzen");
-				$("#uebertragenOptionBewerber").prop("disabled", true);
-			}
-		});
+	
 	});
 	
 	function deleteResult(prestudent_id, gebiet_id, name, gebiet_bezeichnung)
@@ -2440,17 +2420,18 @@ else
 			});
 		}
 	}
-	function prueflingEntSperren(prestudent_id, name, art)
+	function prueflingEntSperren(element)
 	{
-		if (art === true)
-			var text = "sperren";
-		else if (art === false)
-			var text = "entsperren";
+	 	var person_id = element.getAttribute("data-person-id");
+		var name = element.getAttribute("data-person-name");
+		var art = element.getAttribute("data-art") === "true";
+
+		let text = art ? "sperren" : "entsperren";
 
 		if (confirm("Wollen Sie den Studenten "+ name + " wirklich " + text + "?"))
 		{
 			data = {
-				prestudent_id: prestudent_id,
+				person_id: person_id,
 				art: art,
 				rtprueflingEntSperren: true
 			};
@@ -2464,21 +2445,31 @@ else
 				{
 					if(data.status !== "ok")
 					{
-						$("#msgbox").attr("class","alert alert-danger");
-						$("#msgbox").show();
-						$("#msgbox").html(data["msg"]);
+						if (data.status === "warning")
+						{
+							$("#msgbox").attr("class","alert alert-warning");
+							$("#msgbox").show();
+							$("#msgbox").html(data["msg"]);
+							$("#msgbox").html(data["msg"]).delay(2000).fadeOut();
+						}
+						else
+						{
+							$("#msgbox").attr("class","alert alert-danger");
+							$("#msgbox").show();
+							$("#msgbox").html(data["msg"]);
+						}
 					}
 					else
 					{
 						if (art === true)
 						{
-							$("#prueflingentsperren_" + prestudent_id).removeClass("hidden");
-							$("#prueflingsperren_" + prestudent_id).addClass("hidden");
+							$(".prueflingentsperren_" + person_id).removeClass("hidden");
+							$(".prueflingsperren_" + person_id).addClass("hidden");
 						}
 						else if (art === false)
 						{
-							$("#prueflingsperren_" + prestudent_id).removeClass("hidden");
-							$("#prueflingentsperren_" + prestudent_id).addClass("hidden");
+							$(".prueflingsperren_" + person_id).removeClass("hidden");
+							$(".prueflingentsperren_" + person_id).addClass("hidden");
 						}
 					}
 				},
@@ -2784,15 +2775,9 @@ else
 	{
 		var prestudentPunkteArr = [];
 		var gesamtpunkteSetzen = false;
-		var zuBewerberMachen = false;
 		if ($("input.prestudentCheckbox:checked").length === 0)
 		{
 			alert("Bitte wählen Sie mindestens einen Eintrag aus der Liste");
-			return false;
-		}
-		else if ($("#uebertragenOptionBewerber:checked").length === 1 && $("#uebertragenOptionGesamtpunkte:checked").length !== 1)
-		{
-			alert("Um den Bewerberstatus setzen zu können, muss \"Gesamtpunkte\" und \"Reihungsverfahren absolviert\" gesetzt sein");
 			return false;
 		}
 		else
@@ -2811,15 +2796,10 @@ else
 			{
 				gesamtpunkteSetzen = true;
 			}
-			if ($("#uebertragenOptionBewerber:checked").length === 1)
-			{
-				zuBewerberMachen = true;
-			}
 			
 			data = {
 				prestudentPunkteArr: prestudentPunkteArr,
 				gesamtpunkteSetzen: gesamtpunkteSetzen,
-				zuBewerberMachen: zuBewerberMachen,
 				punkteUebertragen: true
 			};
 	
@@ -2920,7 +2900,7 @@ else
 	$selectedrtstr = '';
 	$checkbxstr = '';
 	$first = true;
-	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '';
+	$noparamsselected = $prestudent_id == '' && $reihungstest == '' && $datum_von == '' && $datum_bis == '' && $studiengang == '' && $semester == '' && $prestudent_ids == '';
 	//$maxeachline = 1;
 	foreach ($rtest as $rt)
 	{
@@ -3019,9 +2999,26 @@ else
 
 	echo '&nbsp;<label>von Datum: <INPUT class="datepicker_datum" type="text" name="datum_von" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_von, 'd.m.Y') . '" /></label>&nbsp;';
 	echo '<label>bis Datum: <INPUT class="datepicker_datum" type="text" name="datum_bis" maxlength="10" size="10" value="' . $datum_obj->formatDatum($datum_bis, 'd.m.Y') . '" /></label>';
+	
+	$studiengangtyp = ['b' => 'Bachelor', 'm' => 'Master'];
+	echo '&nbsp;<label>Studiengang Typ:
+				<SELECT name="stgtyp">
+					<OPTION value="">Alle</OPTION>';
+		foreach ($studiengangtyp as $key => $typ)
+		{
+			$selected = "";
+			if (isset($_REQUEST['stgtyp']) && $_REQUEST['stgtyp'] !== '' && $_REQUEST['stgtyp'] === $key)
+				$selected = 'selected';
+			
+			echo '<option value='. $key .' '. $selected .'>'. $typ . '</option>';
+		}
+	echo '</SELECT></label>';
 	echo '</td></tr>';
 	echo '<tr><td>';
 	echo 'PrestudentIn: <INPUT id="prestudent" type="text" name="prestudent_id" size="50" value="' . $prestudent_id . '" placeholder="Name, UID oder Prestudent_id eingeben"/><input type="hidden" id="prestudent_id" name="prestudent_id" value="' . $prestudent_id . '" />';
+	echo '</td></tr>';
+	echo '<tr><td>';
+	echo 'PrestudentIn (Mehrfachauswahl): <input name="prestudent_ids" disabled type="text" size="50" value="' . $prestudent_ids . '"/><input type="hidden" id="prestudent_ids" name="prestudent_ids" value="' . $prestudent_ids . '" />';
 	echo '</td></tr>
 			</table></td><td id="auswertencell">';
 	echo '<INPUT type="submit" class="btn btn-primary" value="Anzeigen" name="rtauswsubmit" id="auswertenButton"/><br><br>';
@@ -3030,8 +3027,10 @@ else
 										&datum_von=' . $datum_von . '
 										&datum_bis=' . $datum_bis . '
 										&prestudent_id=' . $prestudent_id . '
+										&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 										&' . http_build_query(array('reihungstest' => $reihungstest)) . '
 										&orgform_kurzbz=' . $orgform_kurzbz . '
+										&stgtyp=' . $stgtyp . '
 										&format=xls"
 									class="btn btn-primary"
 									role="button">
@@ -3082,6 +3081,7 @@ else
 				datum_von=' . $datum_von . '&
 				datum_bis=' . $datum_bis . '&
 				prestudent_id=' . $prestudent_id . '&
+				&' . http_build_query(array('prestudent_ids' => $prestudent_ids)) . '
 				&' . http_build_query(array('reihungstest' => $reihungstest)) . '">
 		<div class="row">';
 	echo '<div class="col-xs-12" id="miscfunctionscol">';
@@ -3156,8 +3156,9 @@ else
 				<div class="checkbox">
 				  <label><input type="checkbox" id="uebertragenOptionGesamtpunkte" value="">"Gesamtpunkte" und "Reihungsverfahren absolviert" setzen</label>
 				</div>
+				<!---Deprecated: Bewerberstatus wird über einen Cronjob gesetzt-->
 				<div id="div_checkbox_bewerber" class="checkbox">
-				  <label class="checkbox_bewerber"><input type="checkbox" id="uebertragenOptionBewerber" value="">Zu Bewerber machen</label>
+				  <label class="checkbox_bewerber text-muted"><input type="checkbox" id="uebertragenOptionBewerber" disabled value="">Zu Bewerber machen</label>
 				</div>
 				<button type="button" class="btn btn-success" onclick="punkteUebertragen()" id="punkteUebertragenButton">Jetzt übertragen</button>
 			</div>
@@ -3293,10 +3294,18 @@ else
 
 
 				echo "<td class='textcentered ".$inaktiv ."'>
-						<a href='#' id='prueflingsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt === 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", true)'>
+						<a href='#' class='prueflingsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt === true) ? " hidden" : "") ."' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='true' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-remove'></span>
 						</a>
-						<a href='#' id='prueflingentsperren_".$erg->prestudent_id ."' class='" . ($erg->gesperrt !== 't' ? "hidden" : "") ."' onclick='prueflingEntSperren(" . $erg->prestudent_id . ", \"" . $erg->vorname . " " . $erg->nachname ."\"" .", false);'>
+						<a href='#' class='prueflingentsperren_".$erg->person_id . ((isset($gesperrt_arr[$erg->person_id]) && $gesperrt_arr[$erg->person_id]->gesperrt !== true ? " hidden" : "")) . "' 
+							data-person-id='".$erg->person_id."' 
+							data-person-name='".htmlspecialchars($erg->vorname . " " . $erg->nachname, ENT_QUOTES, 'UTF-8')."' 
+							data-art='false' 
+							onclick='prueflingEntSperren(this)'>
 							<span class='glyphicon glyphicon-ok'></span>
 						</a>
 					</td>";

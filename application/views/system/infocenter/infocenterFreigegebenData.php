@@ -13,7 +13,8 @@
 	$ORG_NAME = '\'InfoCenter\'';
 	$IDENTITY = '\'identity\'';
 	$ONLINE = '\'online\'';
-	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
+	$KAUTION_DRITT_STAAT = '\'KautionDrittStaat\'';
+
 
 $query = '
 		SELECT
@@ -111,7 +112,7 @@ $query = '
 				 LIMIT 1
 			) AS "AnzahlAbgeschickt",
 			(
-				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz), \', \')
+				SELECT ARRAY_TO_STRING(ARRAY_AGG(DISTINCT UPPER(so.studiengangkurzbzlang) || \':\' || sp.orgform_kurzbz || \' [\' || pss.ausbildungssemester || \']\'), \', \')
 				  FROM public.tbl_prestudentstatus pss
 				  JOIN public.tbl_prestudent ps USING(prestudent_id)
 				  JOIN public.tbl_studiengang sg USING(studiengang_kz)
@@ -267,12 +268,15 @@ $query = '
 				LIMIT 1
 			) AS "AktenId",
 			(
-				SELECT SUM(konto.betrag)
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
 				FROM public.tbl_konto konto
-				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
-					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
 			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (

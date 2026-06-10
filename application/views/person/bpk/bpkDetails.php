@@ -9,7 +9,6 @@
 			'jqueryui1' => true,
 			'ajaxlib' => true,
 			'tablesorter2' => true,
-			'tinymce4' => true,
 			'sbadmintemplate3' => true,
 			'addons' => true,
 			'navigationwidget' => true,
@@ -35,7 +34,6 @@
 		)
 	);
 ?>
-<body>
 <div id="wrapper">
 
 	<?php echo $this->widgetlib->widget('NavigationWidget'); ?>
@@ -126,10 +124,18 @@
 										</table>
 									</div>
 									<div class="col-lg-4 table-responsive">
-										<form action="<?php echo base_url('soap/datenverbund_client.php?action=pruefeBPK');?>" method="POST" target="_blank">
+										<form
+											action="<?php echo base_url('soap/datenverbund_client.php?action=pruefeBPK');?>"
+											method="POST"
+											target="_blank"
+										>
 											<input type="hidden" name="vorname" value="<?php echo $stammdaten->vorname; ?>"/>
 											<input type="hidden" name="nachname" value="<?php echo $stammdaten->nachname; ?>"/>
-											<input type="hidden" name="geburtsdatum" value="<?php echo mb_str_replace('-', '',$stammdaten->gebdatum); ?>"/>
+											<input
+												type="hidden"
+												name="geburtsdatum"
+												value="<?php echo mb_str_replace('-', '', $stammdaten->gebdatum); ?>"
+											/>
 											<input type="hidden" name="geschlecht" value="<?php echo mb_strtoupper($stammdaten->geschlecht); ?>"/>
 											<input type="submit" value="Namenssuche starten" class="btn btn-default"/>
 										</form>
@@ -148,6 +154,5 @@
 		</div> <!-- ./container-fluid-->
 	</div> <!-- ./page-wrapper-->
 </div> <!-- ./wrapper -->
-</body>
 
 <?php $this->load->view('templates/FHC-Footer'); ?>

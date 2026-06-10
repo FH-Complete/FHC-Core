@@ -7,12 +7,13 @@
 	$STUDIENGANG_TYP = '\''.$this->variablelib->getVar('infocenter_studiensgangtyp').'\'';
 	$TAETIGKEIT_KURZBZ = '\'bewerbung\', \'kommunikation\'';
 	$LOGDATA_NAME = '\'Login with code\', \'Login with user\', \'Interessent rejected\', \'Attempt to register with existing mailadress\', \'Access code sent\', \'Personal data saved\'';
+	$LOGDATA_DELETED_BY_USER = '\'% deleted by user\'';
 	$POSTPONE_STATUS_PARKED = '\'parked\'';
 	$STATUS_KURZBZ = '\'Wartender\', \'Bewerber\', \'Aufgenommener\', \'Student\'';
 	$ADDITIONAL_STG = $this->config->item('infocenter_studiengang_kz');
 	$AKTE_TYP = '\'identity\', \'zgv_bakk\'';
 	$STUDIENSEMESTER = '\''.$this->variablelib->getVar('infocenter_studiensemester').'\'';
-	$STUDIENGEBUEHR_ANZAHLUNG = '\'StudiengebuehrAnzahlung\'';
+	$KAUTION_DRITT_STAAT = '\'KautionDrittStaat\'';
 	$ORG_NAME = '\'InfoCenter\'';
 	$ONLINE = '\'online\'';
 
@@ -283,6 +284,7 @@
 					FROM system.tbl_log l
 					WHERE l.taetigkeit_kurzbz IN ('.$TAETIGKEIT_KURZBZ.')
 					AND l.logdata->>\'name\' NOT IN ('.$LOGDATA_NAME.')
+					AND l.logdata->>\'message\' NOT LIKE ('.$LOGDATA_DELETED_BY_USER.')
 					AND l.person_id = p.person_id
 					ORDER BY l.log_id DESC
 					LIMIT 1
@@ -292,12 +294,15 @@
 			rueck.datum_bis AS "HoldDate",
 			rueck.bezeichnung AS "Rueckstellgrund",
 			(
-				SELECT SUM(konto.betrag)
+				SELECT
+					CASE
+						WHEN COUNT(CASE WHEN konto.betrag != 0 THEN 1 END) = 0 THEN null
+						ELSE SUM(konto.betrag)
+					END AS "Kaution"
 				FROM public.tbl_konto konto
-				LEFT JOIN tbl_konto skonto ON (skonto.buchungsnr_verweis = konto.buchungsnr)
 				WHERE konto.person_id = p.person_id
 					AND konto.studiensemester_kurzbz = '. $STUDIENSEMESTER .'
-					AND konto.buchungstyp_kurzbz = '. $STUDIENGEBUEHR_ANZAHLUNG .'
+					AND konto.buchungstyp_kurzbz = '. $KAUTION_DRITT_STAAT .'
 			) AS "Kaution"
 		  FROM public.tbl_person p
 	 LEFT JOIN (
@@ -310,22 +315,15 @@
 				 WHERE tpl.app = '.$APP.'
 			) pl USING(person_id)
 	LEFT JOIN (
-				SELECT
+				SELECT DISTINCT ON (tbl_rueckstellung.person_id)
 					tbl_rueckstellung.person_id,
 					tbl_rueckstellung.datum_bis,
 					tbl_rueckstellung.status_kurzbz,
 					array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung
 				FROM public.tbl_rueckstellung
 				JOIN public.tbl_rueckstellung_status USING(status_kurzbz)
-				JOIN public.tbl_person sp ON tbl_rueckstellung.person_id = sp.person_id
-				WHERE tbl_rueckstellung.rueckstellung_id =
-				(
-					SELECT srueck.rueckstellung_id
-					FROM public.tbl_rueckstellung srueck
-					WHERE srueck.person_id = tbl_rueckstellung.person_id
-						AND datum_bis >= NOW()
-					ORDER BY srueck.datum_bis DESC LIMIT 1
-				)
+				WHERE tbl_rueckstellung.datum_bis >= NOW()
+				ORDER BY tbl_rueckstellung.person_id, tbl_rueckstellung.datum_bis DESC
 			) rueck ON rueck.person_id = p.person_id
 		 WHERE
 			EXISTS (

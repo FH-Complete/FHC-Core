@@ -38,7 +38,7 @@ require_once('../include/basis_db.class.php');
 
 // Orte holen
 $sql_query="SELECT * FROM (public.tbl_ort JOIN public.tbl_ortraumtyp USING (ort_kurzbz)) JOIN public.tbl_raumtyp USING (raumtyp_kurzbz)
-				WHERE aktiv	AND raumtyp_kurzbz!='LM' ORDER BY raumtyp_kurzbz, hierarchie,ort_kurzbz";
+				WHERE tbl_ort.aktiv AND tbl_raumtyp.aktiv AND raumtyp_kurzbz!='LM' ORDER BY raumtyp_kurzbz, hierarchie,ort_kurzbz";
 $db = new basis_db();
 if(!$result = $db->db_query($sql_query))
 	$error_msg.=$db->db_last_error();
@@ -67,7 +67,9 @@ for ($i=0;$i<$num_rows;$i++)
 	$nextTYP=(($i<$num_rows-1)?$ortNEXT->raumtyp_kurzbz:null);
 	//echo "current:$currentTYP last:$lastTYP next:$nextTYP";
 	$raumtypen='';
-	$qry = "SELECT raumtyp_kurzbz FROM public.tbl_ortraumtyp WHERE ort_kurzbz='$ort->ort_kurzbz'";
+	$qry = "SELECT tbl_ortraumtyp.raumtyp_kurzbz FROM public.tbl_ortraumtyp
+			JOIN tbl_raumtyp USING(raumtyp_kurzbz)
+			WHERE tbl_raumtyp.aktiv AND ort_kurzbz='$ort->ort_kurzbz'";
 	if($result_rt = $db->db_query($qry))
 	{
 		while($row_rt = $db->db_fetch_object($result_rt))

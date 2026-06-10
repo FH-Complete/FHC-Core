@@ -86,6 +86,7 @@ define("AUTH_NAME","FH-Complete");
  * LDAP_BIND_USER: DN des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_BIND_PASSWORD: Passwort des Users falls eine Authentifizierung am LDAP noetig ist oder null
  * LDAP_USER_SEARCH_FILTER: LDAP Attribut in dem der Username steht nach dem gesucht wird (uid | sAMAccountName)
+ * LDAP_SERVICEPING: LDAP Service Ping verwenden (true | false) - wirksam für alle LDAP Server
  */
 define('LDAP_SERVER','ldap://ldap.example.com');
 define('LDAP_PORT',389);
@@ -94,6 +95,7 @@ define('LDAP_BASE_DN','ou=People,dc=example,dc=com');
 define('LDAP_BIND_USER',null);
 define('LDAP_BIND_PASSWORD',null);
 define('LDAP_USER_SEARCH_FILTER','uid');
+define('LDAP_SERVICEPING',true);
 
 // 2. LDAP Server (zB wenn Mitarbeiter und Studierende auf 2 getrennten Servern liegen)
 /*
@@ -126,6 +128,8 @@ define('MAILVERTEILER_SPERRE', true);
 
 // Bezeichnung des Campus
 define('CAMPUS_NAME','FH Technikum Wien');
+
+define('CI_ENVIRONMENT', 'development'); // Code igniter environment variable
 
 // Anzahl der Tag die eine Nachricht am Pinboard angezeigt wird.
 define("MAXNEWSALTER",60);
@@ -245,6 +249,9 @@ define('CIS_INFOSCREEN_NEWS_ANZEIGEN',false);
 //User, welcher für das Anlegen von Anrechnungen bei der Prüfungsanmeldung verwendet wird
 define('CIS_PRUEFUNGSANMELDUNG_USER','p.pruefungsanmeldung');
 
+//Gibt an, ob die Studierenden bei der Anmeldung zu einer Prüfung den Ausmas an ECTS angeben können
+define('CIS_PRUEFUNGSANMELDUNG_ECTS_ANGABE', false);
+
 // Anmeldefristen für Prüfungen in Tagen;
 // Wenn nicht definiert: 3
 //define('CIS_PRUEFUNGSANMELDUNG_FRIST',3);
@@ -291,6 +298,20 @@ define ('DEFAULT_ALLIN_DIENSTVERTRAG',[111]);
 
 //Echter Dienstvertrag
 define ('DEFAULT_ECHTER_DIENSTVERTRAG',[103,111]);
+
+// Weiterleiten zu CIS neu (wenn Rechte vorhanden)
+define('CIS_REDIRECT_TO_CIS4', false);
+
+//Externe Ueberwachung
+define('EXTERNE_UEBERWACHUNG_PROTOCOL_URL', 'https://example.com');
+define('EXTERNE_UEBERWACHUNG_SECRET_KEY', null);
+define('EXTERNE_UEBERWACHUNG_INTEGRATION_NAME', 'example');
+define('EXTERNE_UEBERWACHUNG_SESSION_URL', 'https://example.com');
+define('EXTERNE_UEBERWACHUNG_TRIAL_TEST', false);
+define('EXTERNE_UEBERWACHUNG_EXAM_PARAMS', []);
+define('EXTERNE_UEBERWACHUNG_EXAM_RULES', []);
+define('EXTERNE_UEBERWACHUNG_EXAM_SCORE', []);
+define('EXTERNE_UEBERWACHUNG_EXAM_WARNINGS', []);
 
 
 ?>

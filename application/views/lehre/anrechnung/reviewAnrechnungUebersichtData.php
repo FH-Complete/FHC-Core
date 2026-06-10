@@ -70,9 +70,8 @@ $query = '
         ORDER BY lehrveranstaltung_id, benutzer.uid, lehrfunktion_kurzbz DESC
     )';
 
-if ($configFachbereichsleitung === TRUE)
-{
-    $query.= '
+if ($configFachbereichsleitung === TRUE) {
+	$query .= '
         SELECT 
         -- immer empfehlungsberechtigt, da hier nur Leitungen der LV-OE eine Empfehlungsanfrage erhalten
         TRUE AS empfehlungsberechtigt, 
@@ -95,10 +94,8 @@ if ($configFachbereichsleitung === TRUE)
         ) 
         order by empfehlung_anrechnung NULLS FIRST, antragsdatum
     ';
-}
-else
-{
-    $query.= '
+} else {
+	$query .= '
         SELECT DISTINCT ON (anrechnungen.*, lema.mitarbeiter_uid) 
         CASE 
             -- erst prüfen, ob es überhaupt eine LV Leitung gibt (wenn nicht, dann immer empfehlungsberechtigt)
@@ -127,11 +124,12 @@ else
 
 $filterWidgetArray = array(
 	'query' => $query,
+	'bootstrapVersion' => 5,
 	'tableUniqueId' => 'approveAnrechnungUebersicht',
 	'requiredPermissions' => 'lehre/anrechnung_empfehlen',
 	'datasetRepresentation' => 'tabulator',
 	'columnsAliases' => array(
-        'Empfehlungsberechtigt',
+		'Empfehlungsberechtigt',
 		'anrechnung_id',
 		'lehrveranstaltung_id',
 		'begruendung_id',
@@ -157,33 +155,29 @@ $filterWidgetArray = array(
 		persistentLayout:true,
 		persistentSort:true,
 		autoResize: false, 				// prevent auto resizing of table (false to allow adapting table size when cols are (de-)activated
-	    headerFilterPlaceholder: " ",
 	    initialHeaderFilter: [{field:"empfehlungsberechtigt", value: true}], 
         index: "anrechnung_id",             // assign specific column as unique id (important for row indexing)
         selectable: true,               // allow row selection
         selectableRangeMode: "click",   // allow range selection using shift end click on end of range
         selectablePersistence:false,    // deselect previously selected rows when table is filtered, sorted or paginated
-        tableBuilt: function(){
-            func_tableBuilt(this);
-        },
         tableWidgetFooter: {
 			selectButtons: true
 		},
+		
 		selectableCheck: function(row){
             return func_selectableCheck(row);
         },
-        rowFormatter:function(row){
-            func_rowFormatter(row);
-        },
-         rowUpdated:function(row){
-            func_rowUpdated(row);
-        },
-        tooltips: function(cell){
-            return func_tooltips(cell);
-        }
+		rowFormatter:function(row){
+			return func_rowFormatter(row);
+		},
+        columnDefaults:{
+			tooltip:func_tooltips,
+			headerFilterPlaceholder: " ",
+		}
+        
 	 }', // tabulator properties
 	'datasetRepFieldsDefs' => '{
-		empfehlungsberechtigt: {formatter:"tickCross", align:"center", headerTooltip:"Berechtigt wenn man die LV leitet oder wenn der LV keine LV-Leitung zugeordnet ist.",
+		empfehlungsberechtigt: {formatter:"tickCross", hozAlign:"center", headerTooltip:"Berechtigt wenn man die LV leitet oder wenn der LV keine LV-Leitung zugeordnet ist.",
 		    headerFilter:"tickCross", headerFilterParams:{"tristate": true}, headerFilterFunc: hf_empfehlungsberechtigt
         },
 		anrechnung_id: {visible: false, headerFilter:"input"},
@@ -194,14 +188,14 @@ $filterWidgetArray = array(
 		studiengang_kz: {visible: false, headerFilter:"input"},
 		stg_bezeichnung: {headerFilter:"input"},
 		lv_bezeichnung: {headerFilter:"input"},
-		ects: {headerFilter:"input", align:"center"},
+		ects: {headerFilter:"input", hozAlign:"center"},
 		student: {headerFilter:"input"},
 		begruendung: {headerFilter:"input"},
 		zgv: {headerFilter:"input"},
 		dokument_bezeichnung: {headerFilter:"input", formatter:"link", formatterParams: paramLookup_dokBez},
 		anmerkung_student: {headerFilter:"input"},
-		antragsdatum: {align:"center", headerFilter:"input", mutator: mut_formatStringDate},
-		empfehlung_anrechnung: {headerFilter:"input", align:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
+		antragsdatum: {hozAlign:"center", headerFilter:"input", mutator: mut_formatStringDate},
+		empfehlung_anrechnung: {headerFilter:"input", hozAlign:"center", formatter: format_empfehlung_anrechnung, headerFilterFunc: hf_filterTrueFalse},
 		status_kurzbz: {visible: false, headerFilter:"input"},
 		status_bezeichnung: {headerFilter:"input"}
 	 }', // col properties

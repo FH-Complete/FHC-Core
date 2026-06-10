@@ -256,9 +256,9 @@ if(isset($_GET['excel']))
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
 				WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -269,9 +269,9 @@ if(isset($_GET['excel']))
 							)
 					ORDER BY ende DESC LIMIT 1
 					)
-				
+
 				UNION
-				
+
 				(
 					SELECT studiensemester_kurzbz
 					FROM PUBLIC.tbl_studiensemester
@@ -820,8 +820,8 @@ if(isset($_GET['excel']))
 		<title>Reihungstest</title>
 		<link rel="stylesheet" href="../../skin/vilesci.css" type="text/css">
 		<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
-		
-		<?php 
+
+		<?php
 			include('../../include/meta/jquery.php');
 			include('../../include/meta/jquery-tablesorter.php');
 		?>
@@ -837,6 +837,25 @@ if(isset($_GET['excel']))
 		<script src="../../vendor/fgelinas/timepicker/jquery.ui.timepicker.js" type="text/javascript" ></script>
 
 		<script type="text/javascript">
+			$.tablesorter.addParser({
+				id: "customDate",
+				is: function(s) {
+					//return false;
+					//use the above line if you don\'t want table sorter to auto detected this parser
+					// match dd.mm.yyyy e.g. 01.01.2001 as regex
+					//return /\d{1,4}-\d{1,2}-\d{1,2} \d{1,2}:\d{1,2} .*/.test(s);
+					return /\d{1,2}.\d{1,2}.\d{1,4}.*/.test(s);
+				},
+				// replace regex-wildcards and return new date
+				format: function(s) {
+					s = s.replace(/\-/g," ");
+					s = s.replace(/:/g," ");
+					s = s.replace(/\./g," ");
+					s = s.split(" ");
+					return $.tablesorter.formatFloat(new Date(s[2], s[1]-1, s[0]).getTime());
+				},
+				type: "numeric"
+			});
 			$(document).ready(function()
 			{
 				// Check, ob Räume zugeteilt sind oder max_teilnehmer gesetzt ist, wenn "öffentlich" gesetzt wird
@@ -951,15 +970,15 @@ if(isset($_GET['excel']))
 				});
 
 				$("#studienplan_autocomplete").autocomplete({
-					source: function(request, response) 
+					source: function(request, response)
 					{
-						$.getJSON("reihungstestverwaltung_autocomplete.php", 
-						{ 
+						$.getJSON("reihungstestverwaltung_autocomplete.php",
+						{
 							autocomplete: 'studienplan',
 							aktiv: 'true',
 							studiensemester_kurzbz: $('#studiensemester_dropdown').val(),
 							term: request.term
-						}, 
+						},
 						response);
 					},
 					minLength:2,
@@ -1007,9 +1026,10 @@ if(isset($_GET['excel']))
 						{
 							widgets: ["zebra", "filter", "stickyHeaders"],
 							sortList: [[2,0],[3,0]],
-							headers: {0: { sorter: false}},
+							headers: {0: { sorter: false},10: { sorter: "customDate"},11: { sorter: "customDate"}},
 							widgetOptions: {filter_cssFilter: [
 									"filter_clm_null",
+									"filter_clm_prestudent_id",
 									"filter_clm_person_id",
 									"filter_clm_null",
 									"filter_clm_vorname",
@@ -1019,6 +1039,7 @@ if(isset($_GET['excel']))
 									"filter_clm_studienplan",
 									"filter_clm_einstiegssemester",
 									"filter_clm_geburtsdatum",
+									"filter_clm_anmeldedatum",
 									"filter_clm_email",
 									"filter_clm_absolviert"]}
 						});
@@ -1027,18 +1048,30 @@ if(isset($_GET['excel']))
 						$("#"+v.id).checkboxes('toggle');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
+						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
+							$("#msgSendButton").html('Message an markierte Personen senden');
+						}
 						else
+						{
 							$("#mailSendButton").html('Mail an alle senden');
+							$("#msgSendButton").html('Message an alle senden');
+						}
 					});
 
 					$("#uncheck_"+v.id).on('click', function(e) {
 						$("#"+v.id).checkboxes('uncheck');
 						e.preventDefault();
 						if ($("input.chkbox:checked").size() > 0)
+						{
 							$("#mailSendButton").html('Mail an markierte Personen senden');
+							$("#msgSendButton").html('Message an markierte Personen senden');
+						}
 						else
+						{
 							$("#mailSendButton").html('Mail an alle senden');
+							$("#msgSendButton").html('Message an alle senden');
+						}
 					});
 
 					$("#"+v.id).checkboxes('range', true);
@@ -1049,6 +1082,7 @@ if(isset($_GET['excel']))
 					if (typeof(Storage) !== 'undefined')
 					{
 						var arr = ['clm_null',
+							'clm_prestudent_id',
 							'clm_person_id',
 							'clm_null',
 							'clm_vorname',
@@ -1058,6 +1092,7 @@ if(isset($_GET['excel']))
 							'clm_studienplan',
 							'clm_einstiegssemester',
 							'clm_geburtsdatum',
+							"filter_clm_anmeldedatum",
 							'clm_email',
 							'clm_absolviert'];
 						for (var i in arr)
@@ -1114,9 +1149,15 @@ if(isset($_GET['excel']))
 				$('.chkbox').change(function()
 				{
 					if ($("input.chkbox:checked").size() > 0)
+					{
 						$("#mailSendButton").html('Mail an markierte Personen senden');
+						$("#msgSendButton").html('Message an markierte Personen senden');
+					}
 					else
+					{
 						$("#mailSendButton").html('Mail an alle senden');
+						$("#msgSendButton").html('Message an alle senden');
+					}
 				});
 
 				$('#toggle_bearbeitenForm').click(function()
@@ -1226,6 +1267,23 @@ if(isset($_GET['excel']))
 					mailadressen += adresse;
 				});
 				window.location.href = "mailto:?bcc="+mailadressen;
+			}
+
+			function SendMessage()
+			{
+				// Wenn Checkboxen markiert sind, an diese senden, sonst an alle
+				if ($("input.chkbox:checked").size() > 0)
+					var elements = $("input.chkbox:checked");
+				else
+					var elements = $("input.chkbox");
+				var form = $("#sendMsgForm");
+				form.find("input[type=hidden]").remove();
+				$.each(elements, function(index, item)
+				{
+					var prestudent_id = $(this).closest('tr').find('td.clm_prestudent_id').text();
+					form.append("<input type='hidden' name='prestudent_id[]' value='" + prestudent_id + "'>");
+				});
+				form.submit();
 			}
 		</script>
 		<style type="text/css">
@@ -1374,7 +1432,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 		$reihungstest->insertvon = $user;
 		$reihungstest->insertamum = date('Y-m-d H:i:s');
 	}
-	
+
 	// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
 	$stg_rechtecheck = new studiengang($reihungstest->studiengang_kz);
 	if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'sui'))
@@ -1402,7 +1460,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$error = true;
 		}
 	}
-	
+
 	if (isset($_POST['zugangs_ueberpruefung']) && $_POST['zugangcode'] === '')
 	{
 		$messageError .= '<p>Der Zugangscode muss ausgefüllt sein, wenn die Zugangsüberprüfung aktiviert ist. </p>';
@@ -1421,6 +1479,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->anmeldefrist = $datum_obj->formatDatum($_POST['anmeldefrist']);
 			$reihungstest->zugangs_ueberpruefung = false;
 			$reihungstest->zugangscode = null;
+			$reihungstest->externe_ueberwachung = false;
 		}
 		else
 		{
@@ -1437,6 +1496,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 			$reihungstest->updatevon = $user;
 			$reihungstest->zugangs_ueberpruefung = isset($_POST['zugangs_ueberpruefung']);
 			$reihungstest->zugangscode = ($_POST['zugangcode'] === '' ? null : $_POST['zugangcode']);
+			$reihungstest->externe_ueberwachung = isset($_POST['externe_ueberwachung']);
 		}
 		$reihungstest->studiengang_kz = $_POST['studiengang_kz'];
 		//$reihungstest->ort_kurzbz = $_POST['ort_kurzbz'];
@@ -1511,7 +1571,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 					$rt_stpl->new = true;
 					$rt_stpl->reihungstest_id = $reihungstest->reihungstest_id;
 					$rt_stpl->studienplan_id = $studienplan;
-					
+
 					if (!in_array($studienplan, $rt_stplaeneArray))
 					{
 						if (!$rt_stpl->saveStudienplanReihungstest())
@@ -1535,7 +1595,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 				$rt_studienplan = new reihungstest();
 				$rt_studienplan->getStudienplaeneReihungstest($_POST['reihungstest_id']);
 				$error = false;
-				foreach ($rt_studienplan->result as $row) 
+				foreach ($rt_studienplan->result as $row)
 				{
 					$rtKopieStudienplan = new reihungstest();
 					$rtKopieStudienplan->new = true;
@@ -1572,7 +1632,7 @@ if(isset($_POST['speichern']) || isset($_POST['kopieren']))
 				{
 					$messageSuccess .= '<p>Der Termin wurde erfolgreich kopiert</p>';
 				}
-				else 
+				else
 				{
 					$messageSuccess .= '<p>Neuer Reihungstesttermin erfolgreich angelegt</p>';
 				}
@@ -1629,14 +1689,14 @@ if(isset($_POST['raumzuteilung_speichern']))
 		{
 			die($raumzuteilung->errormsg);
 		}
-		
+
 		// OE über Studiengang des Reihungstests laden und Berechtigung prüfen
 		$stg_rechtecheck = new studiengang($raumzuteilung->studiengang_kz);
 		if(!$rechte->isBerechtigt('lehre/reihungstest', $stg_rechtecheck->oe_kurzbz, 'su'))
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		if (isset($_POST['checkbox']))
 		{
 			$person_ids = $_POST['checkbox'];
@@ -1877,7 +1937,7 @@ if(isset($_GET['type']) && $_GET['type']=='auffuellen')
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		$orte = new Reihungstest();
 		$orte->getOrteReihungstest($reihungstest_id);
 
@@ -1964,7 +2024,7 @@ if(isset($_POST['aufsicht']) && $_POST['aufsicht']!='' && !isset($_POST['kopiere
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		//Reihungstest laden
 		if(!$save_aufsicht->load($_POST['reihungstest_id']))
 		{
@@ -2010,7 +2070,7 @@ if(isset($_POST['delete_ort']))
 		{
 			die($rechte->errormsg);
 		}
-		
+
 		$delete_ort = new reihungstest();
 		$delete_ort->getPersonReihungstestOrt($_POST['reihungstest_id'], $_POST['delete_ort']);
 
@@ -2082,7 +2142,7 @@ echo "<OPTION value='".$_SERVER['PHP_SELF']."?stg_kz=-1&studiensemester_kurzbz="
 foreach ($studiengang->result as $row)
 {
 	$stg_arr[$row->studiengang_kz] = $row->kuerzel;
-	
+
 	if ($typ != $row->typ || $typ == '')
 	{
 		if ($typ != '')
@@ -2091,14 +2151,14 @@ foreach ($studiengang->result as $row)
 		}
 		echo '<optgroup label="'.($types->studiengang_typ_arr[$row->typ] != ''?$types->studiengang_typ_arr[$row->typ]:$row->typ).'">';
 	}
-	
+
 	if ($stg_kz == '')
 		$stg_kz = $row->studiengang_kz;
 	if ($row->studiengang_kz == $stg_kz)
 		$selected = 'selected';
 	else
 		$selected = '';
-	
+
 	echo "<OPTION value='" . $_SERVER['PHP_SELF'] . "?stg_kz=$row->studiengang_kz&studiensemester_kurzbz=$studiensemester_kurzbz' $selected>" . $db->convert_html_chars($row->kuerzel) . " (" . $db->convert_html_chars($row->bezeichnung) . ")</OPTION>" . "\n";
 	$typ = $row->typ;
 }
@@ -2256,7 +2316,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 			<td>
 				<select name='stufe'>
 				<option value=''>-- keine Auswahl --</option>
-					<?php 
+					<?php
 							// An der FHTW wird eine Beschreibung neben der Stufe angezeigt
 							if (defined('DOMAIN') && DOMAIN == 'technikum-wien.at')
 							{
@@ -2264,11 +2324,13 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2 (Interview)</option>';
 								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
 							}
-							else 
+							else
 							{
 								echo '<option value="1" '.($reihungstest->stufe == 1 ? 'selected' : '').'>1</option>';
 								echo '<option value="2" '.($reihungstest->stufe == 2 ? 'selected' : '').'>2</option>';
 								echo '<option value="3" '.($reihungstest->stufe == 3 ? 'selected' : '').'>3</option>';
+								echo '<option value="4" '.($reihungstest->stufe == 4 ? 'selected' : '').'>4</option>';
+								echo '<option value="5" '.($reihungstest->stufe == 5 ? 'selected' : '').'>5</option>';
 							}
 					?>
 				</select>
@@ -2532,13 +2594,21 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 				<input type="number" class="input" id="zugangcode" name="zugangcode" value="<?php echo $db->convert_html_chars($reihungstest->zugangscode) ?>"> (Verpflichtend, wenn die Zugangsüberprüfung aktiviert ist)
 			</td>
 		</tr>
+		<?php if(defined('TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED') && TESTTOOL_EXTERNE_UEBERWACHUNG_ALLOWED) : ?>
+			<tr>
+				<td class="feldtitel">Externe Überwachnung</td>
+				<td>
+					<input type="checkbox" id="externe_ueberwachung" name="externe_ueberwachung"<?php echo $reihungstest->externe_ueberwachung ? 'checked="checked"' : '' ?>>
+				</td>
+			</tr>
+		<?php endif; ?>
 		<tr>
 			<td>&nbsp;</td>
 		</tr>
 		<tr>
 			<td></td>
 			<td>
-				<?php 	
+				<?php
 					if(!$neu)
 					{
 						if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'sui'))
@@ -2551,7 +2621,7 @@ $studienplaene_list = implode(',', array_keys($studienplaene_arr));
 					{
 						echo '<button type="submit" name="speichern">Neu anlegen</button>';
 					}
-					
+
 					if($rechte->isBerechtigt('lehre/reihungstest',  $stg_rechtecheck->oe_kurzbz, 'suid'))
 					{
 						$anzahl_teilnehmer = new reihungstest();
@@ -2583,6 +2653,9 @@ if($reihungstest_id!='')
 	echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&excel=true">Excel Export</a>';
 	//echo '<a class="buttongreen" href="'.$_SERVER['PHP_SELF'].'?reihungstest_id='.$reihungstest_id.'&type=saveallrtpunkte">Punkte ins FAS &uuml;bertragen</a>';
 	echo '<a class="buttongreen" href="#" onclick="SendMail()" id="mailSendButton">Mail an alle BewerberInnen senden</a>';
+	echo '<form id="sendMsgForm" method="post" action="'. APP_ROOT .'index.ci.php/system/messages/FASMessages/writeTemplate" target="_blank" style="display:inline-block">
+			<a class="buttongreen" href="javascript:void(0)" onclick="SendMessage()" id="msgSendButton">Message an alle BewerberInnen senden</a>
+			</form>';
 }
 if (defined('CAMPUS_NAME') && CAMPUS_NAME == 'FH Technikum Wien')
 {
@@ -2607,7 +2680,7 @@ if($reihungstest_id!='')
 	$qry = "
 	SELECT DISTINCT rt_person_id,
 		rt_id,
-		'0' AS prestudent_id,
+		prestudent_id,
 		tbl_rt_person.person_id,
 		vorname,
 		nachname,
@@ -2645,7 +2718,8 @@ if($reihungstest_id!='')
 					WHERE prestudent_id = tbl_prestudent.prestudent_id
 						AND status_kurzbz = 'Interessent'
 					) LIMIT 1
-			) AS orgform_kurzbz
+			) AS orgform_kurzbz,
+       tbl_rt_person.anmeldedatum
 	FROM PUBLIC.tbl_rt_person
 	JOIN PUBLIC.tbl_person USING (person_id)
 	JOIN PUBLIC.tbl_reihungstest rt ON (rt_id = rt.reihungstest_id)
@@ -2661,9 +2735,9 @@ if($reihungstest_id!='')
 			SELECT studiensemester_kurzbz
 			FROM PUBLIC.tbl_studiensemester
 			WHERE studiensemester_kurzbz = rt.studiensemester_kurzbz
-			
+
 			UNION
-			
+
 			(
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
@@ -2674,9 +2748,9 @@ if($reihungstest_id!='')
 						)
 				ORDER BY ende DESC LIMIT 1
 				)
-			
+
 			UNION
-			
+
 			(
 				SELECT studiensemester_kurzbz
 				FROM PUBLIC.tbl_studiensemester
@@ -2725,7 +2799,7 @@ if($reihungstest_id!='')
 		echo '<br><span style="color: red"><b>Achtung!</b> Anzahl Arbeitsplätze überschritten</span>';
 	echo '</td></tr>';
 	echo '<tr><td>';
-	//echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
+	echo '<div id="clm_prestudent_id" class="active" onclick="hideColumn(\'clm_prestudent_id\')">Prestudent ID</div>';
 	echo '<div id="clm_person_id" class="active" onclick="hideColumn(\'clm_person_id\')">Person ID</div>';
 	echo '<div id="clm_vorname" class="active" onclick="hideColumn(\'clm_vorname\')">Vorname</div>';
 	echo '<div id="clm_geschlecht" class="active" onclick="hideColumn(\'clm_geschlecht\')">Geschlecht</div>';
@@ -2734,6 +2808,7 @@ if($reihungstest_id!='')
 	echo '<div id="clm_studienplan" class="active" onclick="hideColumn(\'clm_studienplan\')">Studienplan</div>';
 	echo '<div id="clm_einstiegssemester" class="active" onclick="hideColumn(\'clm_einstiegssemester\')">Einstiegssemester</div>';
 	echo '<div id="clm_geburtsdatum" class="active" onclick="hideColumn(\'clm_geburtsdatum\')">Geburtsdatum</div>';
+	echo '<div id="clm_anmeldedatum" class="active" onclick="hideColumn(\'clm_anmeldedatum\')">Geburtsdatum</div>';
 	echo '<div id="clm_email" class="active" onclick="hideColumn(\'clm_email\')">EMail</div>';
 	echo '<div id="clm_absolviert" class="active" onclick="hideColumn(\'clm_absolviert\')">Absolvierte Tests <span class="wait"></span></div>';
 	//echo '<div id="clm_ergebnis" class="active" onclick="hideColumn(\'clm_ergebnis\')">Ergebnis <span class="wait"></span></div>';
@@ -2765,7 +2840,7 @@ if($reihungstest_id!='')
 						<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 					</nobr>
 					</th>
-					<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+					<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 					<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 					<th>Nachname</th>
 					<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -2775,6 +2850,7 @@ if($reihungstest_id!='')
 					<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 					<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 					<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
+					<th style="display: table-cell" class="clm_anmeldedatum">Anmeldedatum</th>
 					<th style="display: table-cell" class="clm_email">EMail</th>
 					<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
 					<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
@@ -2884,7 +2960,7 @@ if($reihungstest_id!='')
 							echo '
 									<tr>
 										<td style="text-align: center"><input type="checkbox" class="chkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-										<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+										<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 										<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 										<td>'.$db->convert_html_chars($row->nachname).'</td>
 										<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
@@ -2894,6 +2970,7 @@ if($reihungstest_id!='')
 										<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 										<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 										<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+										<td style="display: table-cell" class="clm_anmeldedatum">'.$db->convert_html_chars($row->anmeldedatum!=''?$datum_obj->convertISODate($row->anmeldedatum):' ').'</td>
 										<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 										<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>
 									</tr>';
@@ -2947,7 +3024,7 @@ if($reihungstest_id!='')
 									<a href="#" data-toggle="checkboxes" data-action="uncheck" id="uncheck_t'.$cnt.'"><img src="../../skin/images/checkbox_uncheck.png" name="toggle"></a>
 							</nobr>
 							</th>
-							<!--<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>-->
+							<th style="display: table-cell" class="clm_prestudent_id" title="PrestudentID">Prestudent ID</th>
 							<th style="display: table-cell" class="clm_person_id" title="PersonID">Person ID</th>
 							<th>Nachname</th>
 							<th style="display: table-cell" class="clm_vorname">Vorname</th>
@@ -2957,6 +3034,7 @@ if($reihungstest_id!='')
 							<th style="display: table-cell" class="clm_studienplan">Studienplan</th>
 							<th style="display: table-cell" class="clm_einstiegssemester">Einstiegssemester</th>
 							<th style="display: table-cell" class="clm_geburtsdatum">Geburtsdatum</th>
+							<th style="display: table-cell" class="clm_anmeldedatum">Anmeldedatum</th>
 							<th style="display: table-cell" class="clm_email">EMail</th>
 							<th style="display: table-cell" class="clm_absolviert">bereits absolvierte Verfahren</th>
 							<!--<th style="display: table-cell" class="clm_ergebnis">Ergebnis</th>
@@ -3066,7 +3144,7 @@ if($reihungstest_id!='')
 							echo '
 								<tr>
 									<td style="text-align: center"><input class="chkbox" type="checkbox" id="checkbox_'.$row->person_id.'" name="checkbox['.$row->person_id.']"></td>
-									<!--<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>-->
+									<td style="display: table-cell" class="clm_prestudent_id">'.$db->convert_html_chars($row->prestudent_id).'</td>
 									<td style="display: table-cell" class="clm_person_id">'.$db->convert_html_chars($row->person_id).'</td>
 									<td>'.$db->convert_html_chars($row->nachname).'</td>
 									<td style="display: table-cell" class="clm_vorname">'.$db->convert_html_chars($row->vorname).'</td>
@@ -3076,6 +3154,7 @@ if($reihungstest_id!='')
 									<td style="display: table-cell" class="clm_studienplan">'.$db->convert_html_chars($studienplan_bezeichnung).' ('.$row->studienplan_id.')</td>
 									<td style="display: table-cell" class="clm_einstiegssemester">'.$db->convert_html_chars($row->ausbildungssemester).'</td>
 									<td style="display: table-cell" class="clm_geburtsdatum">'.$db->convert_html_chars($row->gebdatum!=''?$datum_obj->convertISODate($row->gebdatum):' ').'</td>
+									<td style="display: table-cell" class="clm_anmeldedatum">'.$db->convert_html_chars($row->anmeldedatum!=''?$datum_obj->convertISODate($row->anmeldedatum):' ').'</td>
 									<td style="display: table-cell; text-align: center" class="clm_email"><a href="mailto:'.$db->convert_html_chars($row->email).'"><img src="../../skin/images/button_mail.gif" name="mail"></a></td>
 									<td style="display: table-cell;" class="clm_absolviert">'.$rt_in_anderen_stg.'</td>';
 							/*echo	'<td style="display: table-cell; align: right" class="clm_ergebnis">'.($rtergebnis==0?'-':number_format($rtergebnis,2,'.','')).' %</td>
@@ -3112,7 +3191,7 @@ if($reihungstest_id!='')
 					echo '</div>';
 			}
 		}
-} 
+}
 
 /**
  * Liefert die interne Empfangsadresse des Studiengangs fuer den Mailversand.
@@ -3128,18 +3207,18 @@ if($reihungstest_id!='')
 function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kurzbz = null)
 {
 	$studiengang = new studiengang($studiengang_kz);
-	
+
 	if ($studienplan_id != '')
 	{
 		$studienplan = new studienplan();
 		$studienplan->loadStudienplan($studienplan_id);
 	}
-	
+
 	$empf_array = array();
 	$empfaenger = '';
 	if(defined('BEWERBERTOOL_BEWERBUNG_EMPFAENGER'))
 		$empf_array = unserialize(BEWERBERTOOL_BEWERBUNG_EMPFAENGER);
-		
+
 	// Umgehung für FHTW. Ausprogrammiert im Code
 	if(defined('BEWERBERTOOL_MAILEMPFANG') && BEWERBERTOOL_MAILEMPFANG != '')
 	{
@@ -3159,7 +3238,7 @@ function getMailEmpfaenger($studiengang_kz, $studienplan_id = null, $orgform_kur
 	}
 	else
 		$empfaenger = $studiengang->email;
-		
+
 	if ($empfaenger != '')
 		return $empfaenger;
 	else

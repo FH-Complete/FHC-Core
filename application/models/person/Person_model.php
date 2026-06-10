@@ -1,5 +1,22 @@
 <?php
 
+/**
+ * Copyright (C) 2023 fhcomplete.org
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 class Person_model extends DB_Model
 {
 	/**
@@ -8,6 +25,7 @@ class Person_model extends DB_Model
 	public function __construct()
 	{
 		parent::__construct();
+
 		$this->dbTable = 'public.tbl_person';
 		$this->pk = 'person_id';
 
@@ -70,7 +88,7 @@ class Person_model extends DB_Model
 		if (isset($person['svnr']) && $person['svnr'] != '')
 		{
 			$this->PersonModel->addOrder('svnr', 'DESC');
-			$result =  $this->PersonModel->loadWhere(array(
+			$result = $this->PersonModel->loadWhere(array(
 				'person_id != ' => $person['person_id'],
 				'SUBSTRING(svnr FROM 1 FOR 10) = ' => $person['svnr'])
 			);
@@ -133,12 +151,22 @@ class Person_model extends DB_Model
 	 */
 	public function searchPerson($filter)
 	{
-		$this->addSelect('vorname, nachname, gebdatum, person_id');
+		$this->addSelect('vorname, nachname, gebdatum, person_id, titelpre, titelpost');
+		$this->addSelect("CASE
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_mitarbeiter ON(uid=mitarbeiter_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Mitarbeiter'
+				WHEN EXISTS
+					(SELECT 1 FROM public.tbl_benutzer JOIN public.tbl_student ON(uid=student_uid) WHERE person_id=tbl_person.person_id)
+				THEN 'Student'
+				ELSE 'Person'
+			END AS status");
 		$result = $this->loadWhere(
-			'lower(nachname) like '.$this->db->escape('%'.$filter.'%')."
+			'lower(nachname) like '.$this->db->escape('%'.mb_strtolower($filter).'%')."
 			OR lower(vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.$filter.'%')."
-			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.$filter.'%'));
+			OR lower(nachname || ' ' || vorname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')."
+			OR lower(vorname || ' ' || nachname) like ".$this->db->escape('%'.mb_strtolower($filter).'%')
+		);
 
 		return $result;
 	}
@@ -152,8 +180,12 @@ class Person_model extends DB_Model
 	 */
 	public function getPersonStammdaten($person_id, $zustellung_only = false)
 	{
-		$this->addSelect('public.tbl_person.*, tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code, tbl_person.geburtsnation AS geburtsnation_code, 
-		s.kurztext as staatsbuergerschaft, g.kurztext as geburtsnation');
+		$this->addSelect('public.tbl_person.*,
+			tbl_person.staatsbuergerschaft AS staatsbuergerschaft_code,
+			tbl_person.geburtsnation AS geburtsnation_code, 
+			s.kurztext as staatsbuergerschaft,
+			g.kurztext as geburtsnation'
+		);
 		$this->addJoin('bis.tbl_nation s', 'public.tbl_person.staatsbuergerschaft = s.nation_code', 'LEFT');
 		$this->addJoin('bis.tbl_nation g', 'public.tbl_person.geburtsnation = g.nation_code', 'LEFT');
 
@@ -258,7 +290,8 @@ class Person_model extends DB_Model
 	 */
 	public function getFullName($uid)
 	{
-		if (!$result = getData($this->getByUid($uid))[0])
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result)
 		{
 			show_error('Failed loading person');
 		}
@@ -266,73 +299,138 @@ class Person_model extends DB_Model
 		return success($result->vorname. ' '. $result->nachname);
 	}
 
+	/**
+	 * Get first name of given uid. (Vorname Nachname)
+	 * @param $uid
+	 * @return array
+	 */
+	public function getFirstName($uid)
+	{
+		$result = getData($this->getByUid($uid))[0];
+		if (!$result) {
+			show_error('Failed loading person');
+		}
+
+		return success($result->vorname);
+	}
+
 	public function checkDuplicate($person_id)
 	{
-		$qry = "SELECT person_id
-				FROM public.tbl_prestudent p
-				JOIN 
-				(
-					SELECT DISTINCT ON(prestudent_id) *
-					FROM public.tbl_prestudentstatus
-					WHERE prestudent_id IN 
-						(
-							SELECT prestudent_id 
-							FROM public.tbl_prestudent 
-							WHERE person_id IN 
-							(
-								SELECT p2.person_id
-								FROM public.tbl_person p
-								JOIN public.tbl_person p2
-								ON lower(p.vorname) = lower(p2.vorname)
-								AND lower(p.nachname) = lower(p2.nachname)
-								AND p.gebdatum = p2.gebdatum
-								AND p.person_id = ?
-							)
-						)
-					ORDER BY prestudent_id, datum DESC, insertamum DESC
-				) ps USING(prestudent_id)
-				JOIN public.tbl_status USING(status_kurzbz)
-				WHERE status_kurzbz = 'Interessent' 
-				AND studiengang_kz IN 
-				(
-					SELECT studiengang_kz
-					FROM public.tbl_prestudent p
-					JOIN
-					(
-						SELECT DISTINCT ON(prestudent_id) *
-						FROM public.tbl_prestudentstatus
-						WHERE prestudent_id IN
-						(
-							SELECT prestudent_id
-							FROM public.tbl_prestudent
-							WHERE person_id IN
-							(
-								SELECT p2.person_id
-								FROM public.tbl_person p
-								JOIN public.tbl_person p2
-								ON lower(p.vorname) = lower(p2.vorname)
-								AND lower(p.nachname) = lower(p2.nachname)
-								AND p.gebdatum = p2.gebdatum
-								AND p.person_id = ?
-							)
-						)
-						ORDER BY prestudent_id, datum DESC, insertamum DESC
-					) ps USING(prestudent_id)
-					JOIN public.tbl_status USING(status_kurzbz)
-					WHERE status_kurzbz = 'Abbrecher'
-				)
-
-				UNION
-
+		$qry = "
+			WITH person AS (
+				SELECT *
+				FROM public.tbl_person
+				WHERE person_id = ?
+			),
+			allePersonen AS (
+				SELECT p.person_id
+				FROM public.tbl_person p
+					JOIN person
+						ON lower(p.vorname) = lower(person.vorname)
+						AND lower(p.nachname) = lower(person.nachname)
+						AND p.gebdatum = person.gebdatum
+			),
+			lastStatus AS (
+				SELECT DISTINCT ON (tbl_prestudentstatus.prestudent_id)
+					tbl_prestudentstatus.prestudent_id,
+					tbl_prestudentstatus.status_kurzbz,
+					tbl_prestudent.studiengang_kz,
+					tbl_prestudent.person_id
+				FROM public.tbl_prestudentstatus
+				JOIN public.tbl_prestudent USING (prestudent_id)
+				WHERE tbl_prestudent.person_id IN (SELECT person_id FROM allePersonen)
+				ORDER BY tbl_prestudentstatus.prestudent_id, tbl_prestudentstatus.datum DESC, tbl_prestudentstatus.insertamum DESC
+			),
+			interessenten AS (
+				SELECT *
+				FROM lastStatus
+				WHERE status_kurzbz = 'Interessent'
+			),
+			keineInteressenten AS (
+				SELECT *
+				FROM lastStatus
+				WHERE status_kurzbz != 'Interessent'
+			),
+			doppeltePerson AS (
 				SELECT p2.person_id
-				FROM tbl_person p1
-				INNER JOIN (
-					SELECT vorname, nachname, gebdatum, person_id
-					FROM tbl_person
-					) p2
-					ON (lower(p1.vorname) = lower(p2.vorname) AND lower(p1.nachname) = lower(p2.nachname) AND p1.gebdatum = p2.gebdatum)
-				WHERE p1.person_id != p2.person_id AND (p1.person_id = ?)";
+				FROM public.tbl_person p1
+				JOIN public.tbl_prestudent ps1 ON ps1.person_id = p1.person_id
+				JOIN public.tbl_person p2
+						ON  lower(p1.vorname) = lower(p2.vorname)
+						AND lower(p1.nachname) = lower(p2.nachname)
+						AND p1.gebdatum = p2.gebdatum
+				WHERE p1.person_id = ?
+				  AND p1.person_id <> p2.person_id
+			)
+			SELECT DISTINCT(interessenten.person_id)
+			FROM interessenten
+				JOIN keineInteressenten
+					ON interessenten.studiengang_kz = keineInteressenten.studiengang_kz
+			WHERE interessenten.person_id = ?
+			UNION
+			SELECT DISTINCT person_id
+			FROM doppeltePerson";
 
 		return $this->execQuery($qry, array($person_id, $person_id, $person_id));
+	}
+
+	public function loadPrestudent($prestudent_id)
+	{
+		$this->addSelect($this->dbTable . '.*');
+		
+		$this->addJoin('public.tbl_prestudent p', 'person_id');
+
+		$this->addLimit(1);
+
+		return $this->loadWhere([
+			'prestudent_id' => $prestudent_id
+		]);
+	}
+
+	public function checkUnruly($vorname, $nachname, $gebdatum)
+	{
+		$qry = "SELECT person_id, vorname, nachname, gebdatum, unruly
+				FROM tbl_person
+				WHERE tbl_person.vorname = ? 
+					AND tbl_person.nachname = ? 
+					AND tbl_person.gebdatum = ? 
+					AND tbl_person.unruly = TRUE;";
+
+		return $this->execQuery($qry, [$vorname, $nachname, $gebdatum]);
+	}
+
+	public function checkUnrulyWhere($where, $paramsArray)
+	{
+		$qry =  'SELECT *
+				FROM tbl_person p
+				WHERE '.$where.';';
+
+		return $this->execQuery($qry, $paramsArray);
+	}
+
+	public function updateUnruly($person_id, $unruly)
+	{
+		$result = $this->update($person_id, array(
+			'unruly' => $unruly
+		));
+
+		if (isError($result)) {
+			return error($result->msg, EXIT_ERROR);
+		} else if (isSuccess($result) && hasData($result)) {
+			return success($result);
+		}
+	}
+
+	public function loadAllStudentUIDSForPersonID($person_id) {
+		$qry = "SELECT
+			CONCAT(tp.vorname, ' ', tp.nachname) AS name,
+			ARRAY_AGG(DISTINCT b.uid ORDER BY b.uid) AS uids
+		FROM public.tbl_student s
+				 JOIN public.tbl_benutzer b ON s.student_uid = b.uid
+				 JOIN public.tbl_person tp ON b.person_id = tp.person_id
+		GROUP BY tp.vorname, tp.nachname, b.aktiv, b.person_id
+		HAVING b.person_id = ? AND b.aktiv IS TRUE;";
+		
+		return $this->execReadOnlyQuery($qry, [$person_id]);
 	}
 }
