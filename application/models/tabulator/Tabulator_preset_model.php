@@ -41,24 +41,31 @@ class Tabulator_preset_model extends DB_Model
 
 	public function createTabulatorPreset($uid, $tableName, $presetName, $preset)
 	{
-		$this->db->trans_start(false);
-
-		$result = $this->insert([
+		$presetCreationResult = $this->insert([
 			"benutzer_uid" => $uid,
 			"table_name" => $tableName,
 			"preset_name" => $presetName,
 			"preset_json" => json_encode($preset),
 		]);
-
-		$this->db->trans_complete();
 		
-		if ($this->db->trans_status() === false)
+		if (isError($presetCreationResult))
 		{
-			$this->db->trans_rollback();
 			return error('Something went wrong with tabulator preset creation.');
 		}
 		
-		return success($result->retval);
+		return success($presetCreationResult->retval);
+	}
+
+	public function updateTabulatorPreset($presetId, $preset)
+	{
+		$presetUpdateResult = $this->update(["preset_id" => $presetId], ["preset_json" => json_encode($preset)]);
+
+		if (isError($presetUpdateResult))
+        {
+            return error('Something went wrong during tabulator preset update.');
+        }
+
+        return success($presetUpdateResult->retval);
 	}
 
 	public function deleteTabulatorPreset($presetId)

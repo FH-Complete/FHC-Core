@@ -35,6 +35,16 @@ export default {
 			},
 		};
 	},
+	updateTabulatorPreset(presetId, preset) {
+		return {
+			method: "post",
+			url: "/api/frontend/v1/TabulatorPresets/updateTabulatorPreset",
+			params: {
+				presetId,
+				preset,
+			},
+		};
+	},
 	deleteTabulatorPreset(tabulatorPresetId) {
 		return {
 			method: "post",

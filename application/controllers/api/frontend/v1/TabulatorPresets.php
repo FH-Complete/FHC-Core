@@ -30,6 +30,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		parent::__construct([
 			'getTabulatorPresets' => self::PERM_LOGGED,
 			'createTabulatorPreset' => self::PERM_LOGGED,
+			'updateTabulatorPreset' => self::PERM_LOGGED,
 			'deleteTabulatorPreset' => self::PERM_LOGGED,
 		]);
 
@@ -93,6 +94,39 @@ class TabulatorPresets extends FHCAPI_Controller
 		$this->terminateWithSuccess($newPreset);
 	}
 
+	public function updateTabulatorPreset()
+	{
+		$presetId = $this->input->post("presetId");
+		$preset = $this->input->post("preset");
+
+		if (!$presetId || !$preset) {
+			$this->terminateWithError("Invalid parameters!", "general", 400);
+		} 
+
+		$existingPresetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
+		$existingPresetArray = $this->getDataOrTerminateWithError($existingPresetData) ?? [null];
+		$existingPreset = $existingPresetArray[0];
+		if (!$existingPreset) {
+			$this->terminateWithError("Preset not found!", "general", 404);
+		}
+
+		$uid = getAuthUID();
+		if ($existingPreset->benutzer_uid !== $uid) {
+			$this->terminateWithError("You are not allowed to delete this preset!", "general", 403);
+		}
+
+		$presetUpdateResult = $this->TabulatorPresetModel->updateTabulatorPreset($presetId, $preset);
+		if (isError($presetUpdateResult)) {
+			$this->terminateWithError($presetUpdateResult->retval);
+		}
+
+		$updatedPresetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
+		$updatedPresetArray = $this->getDataOrTerminateWithError($updatedPresetData) ?? [null];
+		$updatedPreset = $updatedPresetArray[0];
+
+		$this->terminateWithSuccess($updatedPreset);
+	}
+
 	public function deleteTabulatorPreset()
 	{
 		$presetId = $this->input->post("presetId");
@@ -108,7 +142,6 @@ class TabulatorPresets extends FHCAPI_Controller
 		}
 
 		$uid = getAuthUID();
-		$this->addMeta("preset", $preset);
 		if ($preset->benutzer_uid !== $uid) {
 			$this->terminateWithError("You are not allowed to delete this preset!", "general", 403);
 		}

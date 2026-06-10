@@ -45,19 +45,26 @@ export default {
 
 			const columnTitles = this.getColumnTitles();
 
-			const displayedColumns = this.presetInfo.displayedColumns.map(
-				(columnField) => columnTitles[columnField],
+			let displayedColumns =
+				this.presetInfo.displayedColumns?.map(
+					(columnField) => columnTitles[columnField] ?? "",
+				) ?? [];
+			displayedColumns = displayedColumns.filter(
+				(string) => string.length,
 			);
 
-			const headerFilters = Object.keys(
-				this.presetInfo.headerFilters,
-			).map(
-				(column) =>
-					columnTitles[column] +
-					'["' +
-					this.presetInfo.headerFilters[column] +
-					'"]',
-			);
+			let headerFilters = this.presetInfo.headerFilters
+				? Object.keys(this.presetInfo.headerFilters).map((column) =>
+						columnTitles[column]
+							? columnTitles[column] +
+								'["' +
+								this.presetInfo.headerFilters[column] +
+								'"]'
+							: "",
+					)
+				: [];
+			headerFilters = headerFilters.filter((string) => string.length);
+
 			return {
 				displayedColumns:
 					"Displayed columns (in order): " +
@@ -65,13 +72,14 @@ export default {
 				headerFilters:
 					"Column header filters: " + headerFilters.join(", "),
 				sort:
-					"Sort: " +
-					columnTitles[this.presetInfo.sort.column] +
-					" (" +
-					(this.presetInfo.sort.direction === "asc"
-						? "ascending"
-						: "descending") +
-					")",
+					"Sort: " + this.presetInfo.sort
+						? columnTitles[this.presetInfo.sort.column] +
+							" (" +
+							(this.presetInfo.sort.direction === "asc"
+								? "ascending"
+								: "descending") +
+							")"
+						: "",
 			};
 		},
 		newPresetFormattedStrings() {
@@ -172,9 +180,9 @@ export default {
 			}
 		},
 		generateNewPreset() {
-			const columns = this.tabulator
-				.getColumnDefinitions()
-				.filter((column) => column.field !== "collapse");
+			const columns = this.tabulator.columnManager.columns.filter(
+				(column) => column.field !== "collapse",
+			);
 
 			const displayedColumns = columns
 				.filter((column) => column.visible)
@@ -262,21 +270,98 @@ export default {
 				}
 			}
 		},
-		async syncPresetWithConfig(preset) {
-			// todo
+		syncPresetWithConfig(preset) {
+			const validColumns = this.$props.tabulator.getColumnDefinitions();
+			let isUpdateNecessary = false;
+
+			if (preset.displayedColumns) {
+				const initialNumberOfDisplayedColumns =
+					preset.displayedColumns.length;
+				preset.displayedColumns = preset.displayedColumns.filter(
+					(columnField) => {
+						return validColumns.some(
+							(column) => column.field === columnField,
+						);
+					},
+				);
+				const updatedNumberOfDisplayedColumns =
+					preset.displayedColumns.length;
+
+				isUpdateNecessary =
+					updatedNumberOfDisplayedColumns <
+					initialNumberOfDisplayedColumns;
+			}
+
+			if (preset.headerFilters) {
+				const initialNumberOfHeaderFilters = Object.keys(
+					preset.headerFilters,
+				).length;
+				Object.keys(preset.headerFilters).forEach((columnField) => {
+					if (
+						!validColumns.some(
+							(column) =>
+								column.field === columnField &&
+								column.headerFilter,
+						) ||
+						!preset.displayedColumns.includes(columnField)
+					) {
+						delete preset.headerFilters[columnField];
+					}
+				});
+				const updatedNumberOfHeaderFilters = Object.keys(
+					preset.headerFilters,
+				).length;
+
+				isUpdateNecessary =
+					isUpdateNecessary ||
+					updatedNumberOfHeaderFilters < initialNumberOfHeaderFilters;
+			}
+
+			if (preset.sort) {
+				if (
+					!validColumns.some(
+						(column) =>
+							column.field === preset.sort.column &&
+							column.headerSort,
+					)
+				) {
+					preset.sort = null;
+					isUpdateNecessary = true;
+				}
+			}
+
+			if (isUpdateNecessary) {
+				this.updateTabulatorPreset(preset);
+			}
+
 			return preset;
 		},
-		async applyPreset(preset) {
-			preset = await this.syncPresetWithConfig(preset);
+		async updateTabulatorPreset(preset) {
+			if (!preset.id) return;
 
-			console.log(this.$props.tabulator);
+			const tabulatorPresetUpdateResponse = await this.$api.call(
+				ApiTabulatorPresets.updateTabulatorPreset(preset.id, {
+					displayedColumns: preset.displayedColumns,
+					headerFilters: preset.headerFilters,
+					sort: preset.sort,
+				}),
+			);
+
+			if (tabulatorPresetUpdateResponse.meta.status === "success") {
+				this.fetchCustomUserTabulatorPresets();
+			}
+		},
+		async applyPreset(preset) {
+			preset = this.syncPresetWithConfig(preset);
+
 			let columns = this.$props.tabulator
 				.getColumnDefinitions()
 				.filter((column) => column.field !== "collapse");
 			columns.forEach((column) =>
 				this.$props.tabulator.hideColumn(column.field),
 			);
-			preset.displayedColumns.forEach(
+
+			preset.displayedColumns?.forEach(
 				(columnField, index, displayedColumns) => {
 					this.$props.tabulator.showColumn(columnField);
 					if (index === 0) return;
@@ -289,14 +374,16 @@ export default {
 			);
 
 			this.$props.tabulator.clearHeaderFilter();
-			Object.entries(preset.headerFilters).forEach(
-				([columnField, filterValue]) => {
-					this.$props.tabulator.setHeaderFilterValue(
-						columnField,
-						filterValue,
-					);
-				},
-			);
+			if (preset.headerFilters) {
+				Object.entries(preset.headerFilters).forEach(
+					([columnField, filterValue]) => {
+						this.$props.tabulator.setHeaderFilterValue(
+							columnField,
+							filterValue,
+						);
+					},
+				);
+			}
 
 			this.$props.tabulator.clearSort();
 			if (preset.sort?.column) {
