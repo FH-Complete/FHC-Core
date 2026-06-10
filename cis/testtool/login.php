@@ -640,6 +640,8 @@ elseif (isset($prestudent_id))
 			});
 			foreach ($ps_arr->result as $ps_obj)
 			{
+				if ($ps_obj->bewerbung_abgeschicktamum === null)
+					continue;
 				echo '<tr>';
 				$stg = new Studiengang($ps_obj->studiengang_kz);
 				$sto = new Studienordnung();
