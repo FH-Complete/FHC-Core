@@ -426,6 +426,29 @@ class Status extends FHCAPI_Controller
 				);
 
 				return $this->getDataOrTerminateWithError($result);
+			}],
+			['wrong_personenkennzeichen', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkPersonenkennzeichen(
+					$prestudent_id,
+					$status_kurzbz,
+					$datum,
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
 			}]
 		], [
 			'meldestichtag_not_exceeded' => $this->p->t('lehre', 'error_dataVorMeldestichtag'),
@@ -434,7 +457,8 @@ class Status extends FHCAPI_Controller
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
-			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent')
+			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
+			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
 		]);
 
 		if (!$this->form_validation->run())
@@ -1032,14 +1056,39 @@ class Status extends FHCAPI_Controller
 				);
 
 				return $this->getDataOrTerminateWithError($result);
+			}],
+			['wrong_personenkennzeichen', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkPersonenkennzeichen(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
 			}]
+
 		], [
 			'rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
-			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent')
+			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
+			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
 		]);
 
 		if (!$this->form_validation->run())
@@ -1340,6 +1389,31 @@ class Status extends FHCAPI_Controller
 				);
 
 				return $this->getDataOrTerminateWithError($result);
+			}],
+			['wrong_personenkennzeichen', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkPersonenkennzeichen(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
+				return $this->getDataOrTerminateWithError($result);
 			}]
 		], [
 			'new_rolle_doesnt_exist' => $this->p->t('lehre', 'error_rolleBereitsVorhanden'),
@@ -1347,7 +1421,8 @@ class Status extends FHCAPI_Controller
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
-			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent')
+			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
+			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
 		]);
 
 		if (!$this->form_validation->run())

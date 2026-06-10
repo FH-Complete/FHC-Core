@@ -334,7 +334,8 @@ class PrestudentstatusCheckLib
 			'unterbrechersemester' => true,
 			'abbrechersemester' => true,
 			'diplomant' => true,
-			'student' => true
+			'student' => true,
+			'studentPerskz' => true
 		];
 
 		for ($n = 0, $c = 1; $c < $historyCount; $n++, $c++) {
@@ -344,6 +345,7 @@ class PrestudentstatusCheckLib
 				&& !$checks['abbrechersemester']
 				&& !$checks['diplomant']
 				&& !$checks['student']
+				&& !$checks['studentPerskz']
 			)
 				break; // early out
 
@@ -379,7 +381,8 @@ class PrestudentstatusCheckLib
 				$checks['abbrechersemester'] = false;
 
 			if (($checks['diplomant']
-				|| $checks['student'])
+				|| $checks['student']
+				|| $checks['studentPerskz'])
 				&& $next->status_kurzbz == self::STUDENT_STATUS
 			) {
 				$restl_stati = array_unique(array_column(array_slice($history, $c), 'status_kurzbz'));
@@ -395,6 +398,24 @@ class PrestudentstatusCheckLib
 					&& array_values(array_intersect($restl_stati, $this->_statusAbfolgeVorStudent)) != array_values($this->_statusAbfolgeVorStudent)
 				)
 					$checks['student'] = false;
+
+				// korrektes Personenkennzeichen zu erstem Student status
+				if ($checks['studentPerskz'] && !in_array(self::STUDENT_STATUS, $restl_stati))
+				{
+					$this->_ci->StudentModel->addLimit('1');
+					$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+
+					if (isError($result))
+						return $result;
+
+					if (!hasData($result))
+						return error('Prestudent without student entry');
+
+					$personenkennzeichen = getData($result)[0]->matrikelnr;
+
+					$jahr = $this->_ci->StudiensemesterModel->getStudienjahrNumberFromStudiensemester($next->studiensemester_kurzbz);
+					$checks['studentPerskz'] = $jahr == mb_substr($personenkennzeichen, 0, 2);
+				}
 			}
 		}
 
@@ -642,37 +663,29 @@ class PrestudentstatusCheckLib
 	 *
 	 * @return stdClass
 	 */
-	public function checkPersonenkennzeichen($prestudent_id)
-	{
-		// TODO(chris): TEST
-		$this->_ci->PrestudentstatusModel->addSelect('tbl_prestudentstatus.prestudent_id');
-		$this->_ci->PrestudentstatusModel->addSelect('tbl_student.matrikelnr');
-
-		$this->_ci->PrestudentstatusModel->addJoin('public.tbl_student', 'prestudent_id');
-
-		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.datum', 'DESC');
-		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.insertamum', 'DESC');
-		$this->_ci->PrestudentstatusModel->addOrder('tbl_prestudentstatus.ext_id', 'DESC');
-		
-		$this->_ci->PrestudentstatusModel->addLimit(1);
-		
-		$result = $this->_ci->PrestudentstatusModel->loadWhere([
-			'tbl_prestudentstatus.prestudent_id' => $prestudent_id,
-			'tbl_prestudentstatus.status_kurzbz' => self::STATUS_STUDENT
-		]);
+	public function checkPersonenkennzeichen(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester
+		);
 
 		if (isError($result))
 			return $result;
 
-		if (!hasData($result))
-			return success(true); // Not a student yet so no wrong personenkennzeichen
-
-		$data = current(getData($result));
-
-		$jahr = $this->_ci->StudiensemesterModel->getStudienjahrNumberFromStudiensemester($data->studiensemester_kurzbz);
-
-
-		return success($jahr == mb_substr($data->matrikelnr, 0, 2));
+		return success(getData($result)['studentPerskz']);
 	}
 
 	/**
