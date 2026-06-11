@@ -106,6 +106,15 @@ export default {
 					this.newPreset.headerFilters[column] +
 					'"]',
 			);
+
+			const sortColumn = this.newPreset.sort?.column
+				? columnTitles[this.newPreset.sort.column]
+				: null;
+			const sortDirection =
+				this.newPreset.sort?.direction === "desc"
+					? this.$p.t("tabulator_presets/desc")
+					: this.$p.t("tabulator_presets/asc");
+
 			return {
 				displayedColumns:
 					this.$p.t("tabulator_presets/displayed_columns") +
@@ -120,14 +129,7 @@ export default {
 				sort:
 					this.$p.t("tabulator_presets/sort") +
 					": " +
-					(this.newPreset.sort
-						? columnTitles[this.newPreset.sort.column] +
-							" (" +
-							(this.newPreset.sort.direction === "asc"
-								? this.$p.t("tabulator_presets/asc")
-								: this.$p.t("tabulator_presets/desc")) +
-							")"
-						: ""),
+					(sortColumn ? sortColumn + " (" + sortDirection + ")" : ""),
 			};
 		},
 	},
