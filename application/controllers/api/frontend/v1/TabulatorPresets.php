@@ -112,7 +112,7 @@ class TabulatorPresets extends FHCAPI_Controller
 
 		$uid = getAuthUID();
 		if ($existingPreset->benutzer_uid !== $uid) {
-			$this->terminateWithError("You are not allowed to delete this preset!", "general", 403);
+			$this->terminateWithError("You are not allowed to update this preset!", "general", 403);
 		}
 
 		$presetUpdateResult = $this->TabulatorPresetModel->updateTabulatorPreset($presetId, $preset);
