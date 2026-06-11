@@ -26,7 +26,6 @@ export default {
 		presetsId: { type: String },
 		tabulator: { type: Object },
 		generalPresets: { type: Array, default: [] },
-		isShown: { type: Boolean, default: true },
 	},
 	emits: ["applyTablePreset"],
 	data: function () {
@@ -160,12 +159,6 @@ export default {
 			},
 			deep: true,
 		},
-		isShown() {
-			if (!this.$props.isShown) {
-				this.hidePresetInfo();
-				this.hideNewPresetForm();
-			}
-		},
 	},
 	methods: {
 		async showPresetInfo(preset) {
@@ -258,7 +251,7 @@ export default {
 				sort,
 			};
 		},
-		async hideNewPresetForm() {
+		hideNewPresetForm() {
 			if (
 				this.$refs.newPresetFormCollapsible
 					.getAttribute("class")
@@ -500,9 +493,9 @@ export default {
 								<span class="fw-bold">{{ presetInfo?.name }}</span>
 								<span @click="hidePresetInfo()" type="button" class="fa-solid fa-xmark"></span>
 							</div>
-							<span>{{ presetInfoFormattedStrings?.displayedColumns }}</span>
-							<span>{{ presetInfoFormattedStrings?.headerFilters }}</span>
-							<span>{{ presetInfoFormattedStrings?.sort }}</span>
+							<span v-if="presetInfoFormattedStrings?.displayedColumns.length">{{ presetInfoFormattedStrings.displayedColumns }}</span>
+							<span v-if="presetInfoFormattedStrings?.headerFilters.length">{{ presetInfoFormattedStrings.headerFilters }}</span>
+							<span v-if="presetInfoFormattedStrings?.sort.length">{{ presetInfoFormattedStrings.sort }}</span>
 						</div>
 					</div>
 				</div>
@@ -514,9 +507,9 @@ export default {
 								<span class="fw-bold">{{ $p.t("tabulator_presets/save_current_config") }}</span>
 								<span @click="hideNewPresetForm()" type="button" class="fa-solid fa-xmark"></span>
 							</div>
-							<span>{{ newPresetFormattedStrings?.displayedColumns }}</span>
-							<span>{{ newPresetFormattedStrings?.headerFilters }}</span>
-							<span>{{ newPresetFormattedStrings?.sort }}</span>
+							<span v-if="newPresetFormattedStrings?.displayedColumns.length">{{ newPresetFormattedStrings.displayedColumns }}</span>
+							<span v-if="newPresetFormattedStrings?.headerFilters.length">{{ newPresetFormattedStrings.headerFilters }}</span>
+							<span v-if="newPresetFormattedStrings?.sort.length">{{ newPresetFormattedStrings.sort }}</span>
 							<div class="d-flex flex-row justify-content-center align-items-center gap-2">
 								<input v-model="newPresetName" :placeholder="$p.t('tabulator_presets/preset_name')" />
 								<div

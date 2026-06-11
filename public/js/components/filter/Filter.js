@@ -143,7 +143,6 @@ export const CoreFilterCmpt = {
 				page: false,
 			},
 			collapsedHeadingLocalizationTimer: null,
-			areTablePresetsShown: false,
 		};
 	},
 	computed: {
@@ -835,6 +834,17 @@ export const CoreFilterCmpt = {
 		afterTablePresetApplied(preset) {
 			this.selectedFields = preset.displayedColumns;
 		},
+		updateTablePresetsSubCollapsibles() {
+			if (
+				!this.$refs.tablePresets.$el
+					.getAttribute("class")
+					.split(" ")
+					.includes("show")
+			) {
+				this.$refs.tablePresets?.hidePresetInfo();
+				this.$refs.tablePresets?.hideNewPresetForm();
+			}
+		},
 	},
 	beforeCreate() {
 		if (!this.tableOnly == !this.filterType)
@@ -917,14 +927,14 @@ export const CoreFilterCmpt = {
 				v-if="$props.isUsingPresets && $props.presetsId?.length"
 				v-collapse-auto-close
 				@tablePresetApplied="afterTablePresetApplied($event.preset)"
-				@[\`shown.bs.collapse\`]="areTablePresetsShown = true"
-				@[\`hide.bs.collapse\`]="areTablePresetsShown = false"
+				@[\`shown.bs.collapse\`]="updateTablePresetsSubCollapsibles()"
+				@[\`hidden.bs.collapse\`]="updateTablePresetsSubCollapsibles()"
 				:id="'tablePresets' + idExtra"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:presetsId="$props.presetsId"
 				:tabulator="tabulator"
 				:generalPresets="$props.generalPresets"
-				:isShown="areTablePresetsShown"
+				ref="tablePresets"
 				class="card-body collapse"
 			></table-presets>
 
