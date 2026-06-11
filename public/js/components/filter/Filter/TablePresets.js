@@ -346,12 +346,12 @@ export default {
 			}
 
 			if (isUpdateNecessary) {
-				this.updateTabulatorPreset(preset);
+				this.updatePreset(preset);
 			}
 
 			return preset;
 		},
-		async updateTabulatorPreset(preset) {
+		async updatePreset(preset) {
 			if (!preset.id) return;
 
 			const tabulatorPresetUpdateResponse = await this.$api.call(
