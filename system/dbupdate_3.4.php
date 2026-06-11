@@ -95,6 +95,7 @@ require_once('dbupdate_3.4/71645_studvw_messagetab_ladezeit.php');
 require_once('dbupdate_3.4/71566_studienordnungsdokument_neuer_organisationseinheitstyp_programm.php');
 require_once('dbupdate_3.4/70376_lohnguide.php');
 require_once('dbupdate_3.4/75888_reihungstest_mehrfachdurchfuehrung.php');
+require_once('dbupdate_3.4/77048_cis4_mitarbeiter_studstatus_widget.php');
 
 // *** Pruefung und hinzufuegen der neuen Attribute und Tabellen
 echo '<H2>Pruefe Tabellen und Attribute!</H2>';

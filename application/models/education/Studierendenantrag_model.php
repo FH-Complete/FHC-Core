@@ -490,4 +490,75 @@ class Studierendenantrag_model extends DB_Model
 		
 		return hasData($this->load());
 	}
+
+	/**
+	 * Loads all todos for a certain studiengangsleiter
+	 *
+	 * @param integer		$stg_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getOpenAntraegeForStgl($stg_kz)
+	{
+		$qry = "
+			 SELECT
+				studierendenantrag_id,
+				prestudent_id,
+				typ,
+				person.nachname,
+				person.vorname,
+				ps.studiengang_kz
+			FROM campus.tbl_studierendenantrag a
+			JOIN public.tbl_prestudent ps USING (prestudent_id)
+			JOIN public.tbl_person person USING (person_id)
+			WHERE studiengang_kz in ?
+			  AND (
+					(typ IN ('Abmeldung', 'AbmeldungStgl', 'Unterbrechung')
+					 AND campus.get_status_studierendenantrag(a.studierendenantrag_id) = 'Erstellt')
+				  OR
+					(typ = 'Wiederholung'
+					 AND campus.get_status_studierendenantrag(a.studierendenantrag_id) = 'Lvszugewiesen')
+				  )
+			ORDER BY typ;
+			";
+
+		$params = array($stg_kz);
+		return $this->execQuery($qry, $params);
+	}
+
+	/**
+	 * Lists all open antraege for a certain stg
+	 *
+	 * @param Array	$stg_kz
+	 *
+	 * @return stdClass
+	 */
+	public function getOpenAntraegeForAss($stg_kz)
+	{
+		$qry = "
+		 SELECT
+			 UPPER(stg.typ) || UPPER(stg.kurzbz) || ' ' || stg.bezeichnung AS studiengang,
+			 COUNT(*) AS anzahl
+		FROM campus.tbl_studierendenantrag
+		JOIN public.tbl_prestudent p USING (prestudent_id)
+		JOIN public.tbl_studiengang stg ON p.studiengang_kz=stg.studiengang_kz
+		JOIN campus.tbl_studierendenantrag_status as s ON campus.get_status_id_studierendenantrag(campus.tbl_studierendenantrag.studierendenantrag_id) = studierendenantrag_status_id
+		JOIN campus.tbl_studierendenantrag_statustyp as st USING (studierendenantrag_statustyp_kurzbz)
+		WHERE   (
+		s.studierendenantrag_statustyp_kurzbz NOT IN('Zurueckgezogen', 'Genehmigt', 'Abgelehnt', 'EinspruchAbgelehnt', 'Abgemeldet', 'Pause', 'EmailVersandt')
+		OR    (
+		s.studierendenantrag_statustyp_kurzbz = 'Genehmigt'
+		AND tbl_studierendenantrag.typ = 'AbmeldungStgl'
+		  )
+		 )
+		AND p.studiengang_kz IN ?
+		GROUP BY studiengang
+		ORDER BY studiengang
+			"
+		;
+
+		$params = array($stg_kz);
+		return $this->execQuery($qry, $params);
+	}
+
 }
