@@ -67,17 +67,24 @@ export default {
 
 			return {
 				displayedColumns:
-					"Displayed columns (in order): " +
+					this.$p.t("tabulator_presets/displayed_columns") +
+					" (" +
+					this.$p.t("tabulator_presets/in_order") +
+					"): " +
 					displayedColumns.join(", "),
 				headerFilters:
-					"Column header filters: " + headerFilters.join(", "),
+					this.$p.t("tabulator_presets/column_header_filters") +
+					": " +
+					headerFilters.join(", "),
 				sort:
-					"Sort: " + this.presetInfo.sort
+					this.$p.t("tabulator_presets/sort") +
+					": " +
+					this.presetInfo.sort
 						? columnTitles[this.presetInfo.sort.column] +
 							" (" +
 							(this.presetInfo.sort.direction === "asc"
-								? "ascending"
-								: "descending") +
+								? this.$p.t("tabulator_presets/asc")
+								: this.$p.t("tabulator_presets/desc")) +
 							")"
 						: "",
 			};
@@ -100,18 +107,24 @@ export default {
 			);
 			return {
 				displayedColumns:
-					"Displayed columns (in order): " +
+					this.$p.t("tabulator_presets/displayed_columns") +
+					" (" +
+					this.$p.t("tabulator_presets/in_order") +
+					"): " +
 					displayedColumns.join(", "),
 				headerFilters:
-					"Column header filters: " + headerFilters.join(", "),
+					this.$p.t("tabulator_presets/column_header_filters") +
+					": " +
+					headerFilters.join(", "),
 				sort:
-					"Sort: " +
+					this.$p.t("tabulator_presets/sort") +
+					": " +
 					(this.newPreset.sort
 						? columnTitles[this.newPreset.sort.column] +
 							" (" +
 							(this.newPreset.sort.direction === "asc"
-								? "ascending"
-								: "descending") +
+								? this.$p.t("tabulator_presets/asc")
+								: this.$p.t("tabulator_presets/desc")) +
 							")"
 						: ""),
 			};
@@ -255,10 +268,9 @@ export default {
 
 			if (
 				window.confirm(
-					"Are you sure you want to delete preset (((presetName)))?".replace(
-						"(((presetName)))",
-						preset.name,
-					),
+					this.$p
+						.t("tabulator_presets/preset_deletion_confirmation")
+						.replace("(((presetName)))", preset.name),
 				)
 			) {
 				const presetDeletionResponse = await this.$api.call(
@@ -427,12 +439,13 @@ export default {
 		},
 	},
 	async created() {
+		await this.$p.loadCategory(["tabulator_presets", "global"]);
 		await this.fetchCustomUserTabulatorPresets();
 	},
 	template: /*html*/ `
 	<div>
 		<div class="card">
-			<div class="card-header">Table Presets</div>
+			<div class="card-header">{{ $p.t("tabulator_presets/table_presets") }}</div>
 			<div class="card-body d-flex flex-column">
 				<div class="d-flex flex-row gap-1 justify-content-start flex-wrap">
 					<div v-for="preset in allPresets" class="d-flex flex-column gap-1 mb-2">
@@ -447,7 +460,7 @@ export default {
 					<div>
 						<div @click="showNewPresetForm()" class="btn btn-dark py-1 px-2 d-flex flex-row align-items-center gap-1">
 							<span class="fa-solid fa-plus"></span>
-							<span class="flex-nowrap">{{ "Save current configuration" }}</span>
+							<span class="flex-nowrap">{{ $p.t("tabulator_presets/save_current_config") }}</span>
 						</div>
 					</div>
 				</div>
@@ -470,15 +483,21 @@ export default {
 						<hr />
 						<div class="d-flex flex-column gap-2">
 							<div class="w-100 d-flex flex-row justify-content-between">
-								<span class="fw-bold">{{ "Save current configuration" }}</span>
+								<span class="fw-bold">{{ $p.t("tabulator_presets/save_current_config") }}</span>
 								<span @click="hideNewPresetForm()" type="button" class="fa-solid fa-xmark"></span>
 							</div>
 							<span>{{ newPresetFormattedStrings?.displayedColumns }}</span>
 							<span>{{ newPresetFormattedStrings?.headerFilters }}</span>
 							<span>{{ newPresetFormattedStrings?.sort }}</span>
 							<div class="d-flex flex-row justify-content-center align-items-center gap-2">
-								<input v-model="newPresetName" :placeholder="'Preset name'" />
-								<div @click="createPreset()" :class="{'opacity-50 pe-none': !newPresetName?.length}" class="btn btn-dark py-1 px-2">{{ "Save" }}</div>
+								<input v-model="newPresetName" :placeholder="$p.t('tabulator_presets/preset_name')" />
+								<div
+									@click="createPreset()"
+									:class="{'opacity-50 pe-none': !newPresetName?.length}"
+									class="btn btn-dark py-1 px-2"
+								>
+									{{ $p.t('global/speichern') }}
+								</div>
 							</div>
 						</div>
 					</div>
