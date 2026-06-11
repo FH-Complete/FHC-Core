@@ -42,3 +42,22 @@ if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_widget WHERE widget_kur
 			echo '<br>dashboard.tbl_widget: Widget studstatus hinzugefuegt!<br>';
 	}
 }
+
+// neuer eintrag in dashboard.tbl_dashboard_widget
+if($result = @$db->db_query("SELECT 1 FROM dashboard.tbl_dashboard_widget WHERE dashboard_id= 1 AND widget_id = 9;"))
+{
+	if($db->db_num_rows($result) == 0)
+	{
+		$qry = "
+			INSERT INTO
+			  dashboard.tbl_dashboard_widget (dashboard_id, widget_id)
+			VALUES
+			  (1, 9);
+			";
+	}
+
+	if(!$db->db_query($qry))
+		echo '<strong>dashboard.tbl_dashboard_widget: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>dashboard.tbl_dashboard_widget: Widget studstatus hinzugefuegt!<br>';
+}
