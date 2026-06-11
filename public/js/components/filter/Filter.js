@@ -143,6 +143,7 @@ export const CoreFilterCmpt = {
 				page: false,
 			},
 			collapsedHeadingLocalizationTimer: null,
+			areTablePresetsShown: false,
 		};
 	},
 	computed: {
@@ -916,11 +917,14 @@ export const CoreFilterCmpt = {
 				v-if="$props.isUsingPresets && $props.presetsId?.length"
 				v-collapse-auto-close
 				@tablePresetApplied="afterTablePresetApplied($event.preset)"
+				@[\`shown.bs.collapse\`]="areTablePresetsShown = true"
+				@[\`hide.bs.collapse\`]="areTablePresetsShown = false"
 				:id="'tablePresets' + idExtra"
 				:data-bs-parent="'#filterCollapsables' + idExtra"
 				:presetsId="$props.presetsId"
 				:tabulator="tabulator"
 				:generalPresets="$props.generalPresets"
+				:isShown="areTablePresetsShown"
 				class="card-body collapse"
 			></table-presets>
 
