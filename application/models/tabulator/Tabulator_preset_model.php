@@ -50,7 +50,7 @@ class Tabulator_preset_model extends DB_Model
 		
 		if (isError($presetCreationResult))
 		{
-			return error('Something went wrong with tabulator preset creation.');
+			return error('Something went wrong during preset creation!');
 		}
 		
 		return success($presetCreationResult->retval);
@@ -62,7 +62,7 @@ class Tabulator_preset_model extends DB_Model
 
 		if (isError($presetUpdateResult))
         {
-            return error('Something went wrong during tabulator preset update.');
+            return error('Something went wrong during preset update!');
         }
 
         return success($presetUpdateResult->retval);
@@ -74,7 +74,7 @@ class Tabulator_preset_model extends DB_Model
 		
 		if (isError($presetDeletionReseult))
         {
-            return error('Something went wrong during tabulator preset deletion.');
+            return error('Something went wrong during preset deletion!');
         }
 
         return success($presetDeletionReseult->retval);

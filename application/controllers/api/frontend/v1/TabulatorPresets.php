@@ -35,6 +35,11 @@ class TabulatorPresets extends FHCAPI_Controller
 		]);
 
 		$this->load->model('tabulator/Tabulator_preset_model', 'TabulatorPresetModel');
+
+		$this->loadPhrases([
+			'global',
+			'tabulator_presets'
+		]);
 	}
 	
 	//------------------------------------------------------------------------------------------------------------------
@@ -44,7 +49,7 @@ class TabulatorPresets extends FHCAPI_Controller
 	{
 		$tableName = $this->input->get("tableName");
 		if (!$tableName) {
-			$this->terminateWithError(error("Invalid parameters!"));
+			$this->terminateWithError(error($this->p->t("global", "invalid_params_err_msg")));
 		}
 
 		$uid = getAuthUID();
@@ -61,7 +66,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		$preset = $this->input->post("preset");
 
 		if (!$tableName || !$presetName || !$preset) {
-			$this->terminateWithError("Invalid parameters!", "general", 400);
+			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
 		}
 
 		$uid = getAuthUID();
@@ -70,7 +75,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		$existingPresets = $this->getDataOrTerminateWithError($existingPresetsResult) ?? [];
 
 		if (count($existingPresets) > 19) {
-			$this->terminateWithError("Maximum number of presets reached!", "general", 409);
+			$this->terminateWithError($this->p->t("tabulator_presets", "max_presets_count_err_msg"), "general", 409);
 		}
 
 		$existingPresetNames = array_map(function($presetInfo) {
@@ -78,7 +83,7 @@ class TabulatorPresets extends FHCAPI_Controller
 		}, $existingPresets);
 
 		if (in_array($presetName, $existingPresetNames)) {
-			$this->terminateWithError("Preset name duplicate not allowed!", "general", 409);
+			$this->terminateWithError($this->p->t("tabulator_presets", "preset_name_duplicate_err_msg"), "general", 409);
 		}
 
 		$presetCreationResult = $this->TabulatorPresetModel->createTabulatorPreset($uid, $tableName, $presetName, $preset);
@@ -100,19 +105,19 @@ class TabulatorPresets extends FHCAPI_Controller
 		$preset = $this->input->post("preset");
 
 		if (!$presetId || !$preset) {
-			$this->terminateWithError("Invalid parameters!", "general", 400);
+			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
 		} 
 
 		$existingPresetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
 		$existingPresetArray = $this->getDataOrTerminateWithError($existingPresetData) ?? [null];
 		$existingPreset = $existingPresetArray[0];
 		if (!$existingPreset) {
-			$this->terminateWithError("Preset not found!", "general", 404);
+			$this->terminateWithError($this->p->t("tabulator_presets", "preset_not_found_err_msg"), "general", 404);
 		}
 
 		$uid = getAuthUID();
 		if ($existingPreset->benutzer_uid !== $uid) {
-			$this->terminateWithError("You are not allowed to update this preset!", "general", 403);
+			$this->terminateWithError($this->p->t("tabulator_presets", "preset_not_own_update_err_msg"), "general", 403);
 		}
 
 		$presetUpdateResult = $this->TabulatorPresetModel->updateTabulatorPreset($presetId, $preset);
@@ -131,19 +136,19 @@ class TabulatorPresets extends FHCAPI_Controller
 	{
 		$presetId = $this->input->post("presetId");
 		if (!$presetId) {
-			$this->terminateWithError("Invalid parameters!", "general", 400);
+			$this->terminateWithError($this->p->t("global", "invalid_params_err_msg"), "general", 400);
 		}
 
 		$presetData = $this->TabulatorPresetModel->getTabulatorPreset($presetId);
 		$presetArray = $this->getDataOrTerminateWithError($presetData) ?? [null];
 		$preset = $presetArray[0];
 		if (!$preset) {
-			$this->terminateWithError("Preset not found!", "general", 404);
+			$this->terminateWithError($this->p->t("tabulator_presets", "preset_not_found_err_msg"), "general", 404);
 		}
 
 		$uid = getAuthUID();
 		if ($preset->benutzer_uid !== $uid) {
-			$this->terminateWithError("You are not allowed to delete this preset!", "general", 403);
+			$this->terminateWithError($this->p->t("tabulator_presets", "preset_not_own_delete_err_msg"), "general", 403);
 		}
 
 		$presetDeletionResult = $this->TabulatorPresetModel->deleteTabulatorPreset($presetId);
