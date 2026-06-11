@@ -26,7 +26,7 @@ export default {
 		presetsId: { type: String },
 		tabulator: { type: Object },
 		generalPresets: { type: Array, default: [] },
-		isShown: { type: Boolean, default: true }
+		isShown: { type: Boolean, default: true },
 	},
 	emits: ["applyTablePreset"],
 	data: function () {
@@ -53,6 +53,13 @@ export default {
 			displayedColumns = displayedColumns.filter(
 				(string) => string.length,
 			);
+			const displayedColumnsString = displayedColumns.length
+				? this.$p.t("tabulator_presets/displayed_columns") +
+					" (" +
+					this.$p.t("tabulator_presets/in_order") +
+					"): " +
+					displayedColumns.join(", ")
+				: "";
 
 			let headerFilters = this.presetInfo.headerFilters
 				? Object.keys(this.presetInfo.headerFilters).map((column) =>
@@ -65,6 +72,11 @@ export default {
 					)
 				: [];
 			headerFilters = headerFilters.filter((string) => string.length);
+			const headerFiltersString = headerFilters.length
+				? this.$p.t("tabulator_presets/column_header_filters") +
+					": " +
+					headerFilters.join(", ")
+				: "";
 
 			const sortColumn = this.presetInfo.sort?.column
 				? columnTitles[this.presetInfo.sort.column]
@@ -73,22 +85,19 @@ export default {
 				this.presetInfo.sort?.direction === "desc"
 					? this.$p.t("tabulator_presets/desc")
 					: this.$p.t("tabulator_presets/asc");
+			const sortString = sortColumn
+				? this.$p.t("tabulator_presets/sort") +
+					": " +
+					sortColumn +
+					" (" +
+					sortDirection +
+					")"
+				: "";
 
 			return {
-				displayedColumns:
-					this.$p.t("tabulator_presets/displayed_columns") +
-					" (" +
-					this.$p.t("tabulator_presets/in_order") +
-					"): " +
-					displayedColumns.join(", "),
-				headerFilters:
-					this.$p.t("tabulator_presets/column_header_filters") +
-					": " +
-					headerFilters.join(", "),
-				sort:
-					this.$p.t("tabulator_presets/sort") +
-					": " +
-					(sortColumn ? sortColumn + " (" + sortDirection + ")" : ""),
+				displayedColumns: displayedColumnsString,
+				headerFilters: headerFiltersString,
+				sort: sortString,
 			};
 		},
 		newPresetFormattedStrings() {
@@ -99,6 +108,13 @@ export default {
 			const displayedColumns = this.newPreset.displayedColumns.map(
 				(columnField) => columnTitles[columnField],
 			);
+			const displayedColumnsString = displayedColumns.length
+				? this.$p.t("tabulator_presets/displayed_columns") +
+					" (" +
+					this.$p.t("tabulator_presets/in_order") +
+					"): " +
+					displayedColumns.join(", ")
+				: "";
 
 			const headerFilters = Object.keys(this.newPreset.headerFilters).map(
 				(column) =>
@@ -107,6 +123,11 @@ export default {
 					this.newPreset.headerFilters[column] +
 					'"]',
 			);
+			const headerFiltersString = headerFilters.length
+				? this.$p.t("tabulator_presets/column_header_filters") +
+					": " +
+					headerFilters.join(", ")
+				: "";
 
 			const sortColumn = this.newPreset.sort?.column
 				? columnTitles[this.newPreset.sort.column]
@@ -115,22 +136,19 @@ export default {
 				this.newPreset.sort?.direction === "desc"
 					? this.$p.t("tabulator_presets/desc")
 					: this.$p.t("tabulator_presets/asc");
+			const sortString = sortColumn
+				? this.$p.t("tabulator_presets/sort") +
+					": " +
+					sortColumn +
+					" (" +
+					sortDirection +
+					")"
+				: "";
 
 			return {
-				displayedColumns:
-					this.$p.t("tabulator_presets/displayed_columns") +
-					" (" +
-					this.$p.t("tabulator_presets/in_order") +
-					"): " +
-					displayedColumns.join(", "),
-				headerFilters:
-					this.$p.t("tabulator_presets/column_header_filters") +
-					": " +
-					headerFilters.join(", "),
-				sort:
-					this.$p.t("tabulator_presets/sort") +
-					": " +
-					(sortColumn ? sortColumn + " (" + sortDirection + ")" : ""),
+				displayedColumns: displayedColumnsString,
+				headerFilters: headerFiltersString,
+				sort: sortString,
 			};
 		},
 	},
