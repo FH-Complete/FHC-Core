@@ -734,7 +734,7 @@ class Abgabe extends FHCAPI_Controller
 			$showAllBool = false;
 		}
 
-		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthUID(), $showAllBool);
+		$projektarbeiten = $this->ProjektarbeitModel->getMitarbeiterProjektarbeiten(getAuthPersonId(), $showAllBool);
 
 
 		$mapFunc = function($projektarbeit) {
@@ -749,18 +749,15 @@ class Abgabe extends FHCAPI_Controller
 		
 		forEach($projektarbeiten->retval as $pa) {
 			
-			$result = $this->ProjektarbeitModel->getProjektbetreuerAnrede($pa->betreuer_person_id);
-			$anredeArr = $this->getDataOrTerminateWithError($result, 'general');
-			$pa->betreuer = $anredeArr[0];
-			
 			$oldLink = ''; // show this when paIsCurrent == false -> moodle course template
 			$newLink = ''; // get curated path for betreuer type
-			$returnFunc = function ( $resultOld, $resultNew) use (&$oldLink, &$newLink) {
+			$returnFunc = function ($resultOld, $resultNew) use (&$oldLink, &$newLink) {
 				$newLink = $resultNew;
 				$oldLink = $resultOld;
 			};
 			
-			Events::trigger('projektbeurteilung_formular_link', $pa->betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
+			$own_betreuerart_kurzbz = $pa->betreuer_person_id == getAuthPersonId() ? $pa->betreuer_betreuerart_kurzbz : $pa->zweitbetreuer_betreuerart_kurzbz;
+			Events::trigger('projektbeurteilung_formular_link', $own_betreuerart_kurzbz, APP_ROOT, $pa->projektarbeit_id, $pa->student_uid, $returnFunc);
 			$pa->beurteilungLinkNew = $newLink;
 			$pa->beurteilungLinkOld = $oldLink;
 
@@ -1224,10 +1221,10 @@ class Abgabe extends FHCAPI_Controller
 	private function getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id) {
 		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
 		$result = $this->ProjektarbeitModel->getProjektbetreuerEmail($projektarbeit_id);
-		if(count($result->retval) > 0) {
+		if(hasData($result)) {
 			$email = getData($result);
 			return $email[0]->uid ? $email[0]->uid.'@'.DOMAIN : $email[0]->private_email;
-		} else return '';
+		} else return null;
 
 	}
 
@@ -1595,13 +1592,6 @@ class Abgabe extends FHCAPI_Controller
 			$this->terminateWithError($this->p->t('abgabetool','c4fehlerAktualitaetProjektarbeitv2'), 'general');
 		}
 
-		// Link to Abgabetool
-		if (defined('CIS4') && CIS4) {
-			$ci3BootstrapFilePath = "cis.php";
-		} else {
-			$ci3BootstrapFilePath = "index.ci.php";
-		}
-
 		$path = $this->config->item('URL_MITARBEITER');
 		$url = APP_ROOT.$path;
 		
@@ -1631,8 +1621,6 @@ class Abgabe extends FHCAPI_Controller
 			$maildata['token'] = "";
 
 			$email = $this->getProjektbetreuerEmailByProjektarbeitID($projektarbeit_id);
-
-			if(!$email) $this->terminateWithError('early fail', 'general');
 			
 			$mailres = sendSanchoMail(
 				'ParbeitsbeurteilungEndupload',
@@ -1654,6 +1642,7 @@ class Abgabe extends FHCAPI_Controller
 				// Zweitbegutachter holen
 				$this->load->model('education/Projektbetreuer_model', 'ProjektbetreuerModel');
 				$zweitbegutachterRetval = getData($this->ProjektbetreuerModel->getZweitbegutachterWithToken($bperson_id, $projektarbeit_id, $studentUser->uid));
+				$this->addMeta('$zweitbegutachterRetval', $zweitbegutachterRetval);
 				
 				if ($zweitbegutachterRetval && count($zweitbegutachterRetval) > 0)
 				{
@@ -1693,6 +1682,8 @@ class Abgabe extends FHCAPI_Controller
 						$zweitbetmaildata['parbeituebersichtlink'] = $intern ? $maildata['parbeituebersichtlink'] : "";
 						$zweitbetmaildata['bewertunglink'] = $projektarbeitIsCurrent ? "<p><a href='$mail_link'>Zur Beurteilung der Arbeit</a></p>" : "";
 						$zweitbetmaildata['token'] = $projektarbeitIsCurrent && isset($begutachterMitToken->zugangstoken) && !$intern ? "<p>Zugangstoken: " . $begutachterMitToken->zugangstoken . "</p>" : "";
+						
+						$this->addMeta('$zweitbetmaildata', $zweitbetmaildata);
 						
 						$mailres = sendSanchoMail(
 							'ParbeitsbeurteilungEndupload',

@@ -611,7 +611,7 @@ export const AbgabetoolAssistenz = {
 			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
 		},
 		handleFilterActiveChanged(active) {
-			if(!active && this.allSemOption) {
+			if(!active && this.allSemOption && this.stateRestored) {
 				this.curSem = this.allSemOption
 			}
 		},
@@ -1361,6 +1361,11 @@ export const AbgabetoolAssistenz = {
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
 
+				// only set this if it has not been set yet and abgabetermin has a note (qgate)
+				if(!termin.noteBackend && termin.note) {
+					termin.noteBackend = termin.note
+				}
+				
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 				
 				// while already looping through each termin, calculate datestyle beforehand
@@ -1851,20 +1856,17 @@ export const AbgabetoolAssistenz = {
 				if(typeof termin.note !== 'object') {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 				}
-
-				// only set this if it has not been set yet and abgabetermin has a note (qgate)
-				if(!termin.noteBackend && termin.note) {
-					termin.noteBackend = termin.note
-				}
 				
 				termin.file = []
 
 				// assistenz should be able to edit every abgabe
 				// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
+				const terminHasAbgabe = termin.abgabedatum != null
+				const terminHasNote = termin.noteBackend
 				termin.allowedToSave = paIsBenotet ? false : true
 
 				// assistenz are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum && !termin.note
+				termin.allowedToDelete = paIsBenotet || terminHasNote || terminHasAbgabe ? false : true
 				
 			})
 			
@@ -2100,8 +2102,14 @@ export const AbgabetoolAssistenz = {
 			if (!this.projektarbeiten) return [];
 			return this.projektarbeiten.flatMap(pa =>
 				pa.abgabetermine.map(termin => {
-					const allowedToSave = pa.note !== null ? false : true
-					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum && !termin.note
+					const terminHasAbgabe = termin.abgabedatum != null
+					const terminHasNote = termin.noteBackend
+					
+					// IN multiedit changing anything for a termin with an existing note is not allowed anymore, to avoid
+					// confusing UX behaviour why some fields could be edited and others not -> just edit in detail view
+					const allowedToSave = pa.note !== null || terminHasNote || terminHasAbgabe ? false : true
+					const allowedToDelete = pa.note !== null || terminHasNote || terminHasAbgabe ? false : true
+					
 					return {
 						allowedToSave,
 						allowedToDelete,
@@ -2713,6 +2721,7 @@ export const AbgabetoolAssistenz = {
 			>
 				<template #actions>
 					<Dropdown
+						v-if="curSem"
 						@change="semesterChanged" 
 						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 
 						:style="{'scroll-behavior': 'auto !important'}" 

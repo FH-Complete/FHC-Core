@@ -293,6 +293,21 @@ export default {
 						this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
 					})
 					.catch(this.$fhcAlert.handleSystemError);
+
+				// get other initial data
+				this.$api
+					.call(ApiStvProjektbetreuer.getBetreuerarten())
+					.then(result => {
+						this.arrBetreuerart = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+
+				this.$api
+					.call(ApiStvProjektbetreuer.getNoten())
+					.then(result => {
+						this.arrNoten = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
 			} else {
 				this.emptyBetreuerList();
 			}
