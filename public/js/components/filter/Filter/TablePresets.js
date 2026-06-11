@@ -65,6 +65,14 @@ export default {
 				: [];
 			headerFilters = headerFilters.filter((string) => string.length);
 
+			const sortColumn = this.presetInfo.sort?.column
+				? columnTitles[this.presetInfo.sort.column]
+				: null;
+			const sortDirection =
+				this.presetInfo.sort?.direction === "desc"
+					? this.$p.t("tabulator_presets/desc")
+					: this.$p.t("tabulator_presets/asc");
+
 			return {
 				displayedColumns:
 					this.$p.t("tabulator_presets/displayed_columns") +
@@ -79,14 +87,7 @@ export default {
 				sort:
 					this.$p.t("tabulator_presets/sort") +
 					": " +
-					this.presetInfo.sort
-						? columnTitles[this.presetInfo.sort.column] +
-							" (" +
-							(this.presetInfo.sort.direction === "asc"
-								? this.$p.t("tabulator_presets/asc")
-								: this.$p.t("tabulator_presets/desc")) +
-							")"
-						: "",
+					(sortColumn ? sortColumn + " (" + sortDirection + ")" : ""),
 			};
 		},
 		newPresetFormattedStrings() {
