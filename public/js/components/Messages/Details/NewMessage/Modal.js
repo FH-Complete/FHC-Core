@@ -63,7 +63,7 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
-				//height: 800,
+				min_height: 300,
 				//plugins: ['lists'],
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
 				plugins: 'link',
@@ -313,7 +313,7 @@ export default {
 
 				<div class="row">
 					<div class="col-sm-8">
-						<form-form class="row g-3 mt-2 h-100" ref="formMessage">
+						<form-form class="row g-3 mt-2 align-content-start" ref="formMessage">
 
 							<div class="row mb-3">
 
@@ -338,7 +338,7 @@ export default {
 							</div>
 
 							<!--Tiny MCE-->
-							<div class="row mb-3 h-100 tiny-90">
+							<div class="row mb-3 tiny-90">
 								<form-input
 									ref="editor"
 									:label="$p.t('global','nachricht')  + ' *'"
