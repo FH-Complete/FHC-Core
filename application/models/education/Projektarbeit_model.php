@@ -311,6 +311,7 @@ class Projektarbeit_model extends DB_Model
 				SELECT DISTINCT ON (pb.projektarbeit_id)
 					pb.projektarbeit_id,
 					pb.person_id                  AS zweitbetreuer_person_id,
+					b.uid						  AS zweitbetreuer_benutzer_uid,
 					pb.betreuerart_kurzbz         AS zweitbetreuer_betreuerart_kurzbz,
 					ba.beschreibung               AS zweitbetreuer_betreuerart_beschreibung,
 					p.titelpre                    AS zweitbetreuer_titelpre,
@@ -406,6 +407,7 @@ class Projektarbeit_model extends DB_Model
 					pb.betreuer_full_name,
 					
 					sb.zweitbetreuer_person_id,
+					sb.zweitbetreuer_benutzer_uid,
 					sb.zweitbetreuer_betreuerart_kurzbz,
 					sb.zweitbetreuer_betreuerart_beschreibung,
 					sb.zweitbetreuer_titelpre,

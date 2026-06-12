@@ -46058,6 +46058,26 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
+		'phrase' => 'c4zweitBegutachterTokenMailSuccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Access Token E-Mail an Zweitbegutachter*In wurde erfolgreich versandt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access token email has been successfully sent to second reviewer.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
 		'phrase' => 'c4projektarbeitNichtGefunden',
 		'insertvon' => 'system',
 		'phrases' => array(

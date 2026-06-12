@@ -137,7 +137,7 @@ export const AbgabetoolMitarbeiter = {
 						cssClass: 'sticky-col',
 						visible: true
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 85, visible: true, tooltip: false, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 140, visible: true, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, visible: false,tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
@@ -293,6 +293,7 @@ export const AbgabetoolMitarbeiter = {
 			}
 		},
 		formAction(cell) {
+			
 			const actionButtons = document.createElement('div');
 			actionButtons.className = "d-flex gap-3";
 			actionButtons.style.display = "flex";
@@ -333,12 +334,25 @@ export const AbgabetoolMitarbeiter = {
 				actionButtons.append(createButton('fa fa-user-check', 'abgabetool/c4benoten', () => this.openBenotung('old', data.beurteilungLinkOld)))
 			}
 			
-			// if() {
-			// 	actionButtons.append(createButton('fa fa-envelope-open-text', 'abgabetool/c4benoten', () => this.sendZweitbetreuerToken()))
-			//
-			// }
+			if(this.checkForZweitbetreuerTokenMailAvailability(data)) {
+				actionButtons.append(createButton('fa fa-envelope-open-text', 'abgabetool/c4zweitBegutachterTokenMailSenden', () => this.sendZweitbetreuerToken(data)))
 
+			}
+			
 			return actionButtons;
+		},
+		checkForZweitbetreuerTokenMailAvailability(data) {
+			const hasEndabgabeWithUpload = !!data.abgabetermine.find(termin => termin.abgabedatum !== null && termin.paabgabetyp_kurzbz == 'end')
+			const hasZweitbetreuerWithoutBenutzerUid = data.zweitbetreuer_person_id !== null && data.zweitbetreuer_benutzer_uid === null
+			
+			return hasEndabgabeWithUpload && hasZweitbetreuerWithoutBenutzerUid
+		},
+		sendZweitbetreuerToken(data) {
+
+			this.$api.call(ApiAbgabe.sendZweitbetreuerTokenMail(data.projektarbeit_id, data.betreuer_person_id, data.student_uid))
+				.then(res => {
+					if(res.meta.status == 'success') this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4zweitBegutachterTokenMailSuccess'))
+				})
 		},
 		getDateStyleHtml(dateStyle) {
 			const iconMap = {
@@ -1270,7 +1284,7 @@ export const AbgabetoolMitarbeiter = {
 			}
 
 			this.serienTermin.upload_allowed = newVal.upload_allowed_default
-		},
+		}
 	},
 	computed: {
 		countsToHTML() {

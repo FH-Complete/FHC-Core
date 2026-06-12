@@ -162,5 +162,13 @@ export default {
 			params: {projektarbeit_id, titel},
 
 		};
+	},
+	sendZweitbetreuerTokenMail(projektarbeit_id, betreuer_person_id, student_uid) {
+		return {
+			method: 'post',
+			url: '/api/frontend/v1/Abgabe/sendZweitbetreuerTokenMail',
+			params: {projektarbeit_id, bperson_id: betreuer_person_id, student_uid},
+
+		};
 	}
 };
