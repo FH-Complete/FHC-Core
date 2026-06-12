@@ -1,3 +1,4 @@
+-- Rooms setup for calendar tests 
 INSERT INTO public.tbl_adresse
 (adresse_id, person_id, "name", strasse, plz, ort, gemeinde, nation, typ, heimatadresse, zustelladresse, firma_id, updateamum, updatevon, insertamum, insertvon, ext_id, rechnungsadresse, anmerkung, co_name)
 VALUES(1, NULL, 'Hauptwohnsitz', 'Stromstraße 18-20/1/10', '1200', 'Wien', 'Wien', 'A', 'h', true, true, NULL, '2007-08-13 10:53:40.298', 'demoadmin', '2007-08-10 10:42:02.579', 'demoadmin', 14470, false, NULL, NULL);
@@ -8,255 +9,124 @@ VALUES('Vienna Universit', 1, 1, 'Vienna University of Technology, Institute of 
 
 INSERT INTO public.tbl_ort
 (ort_kurzbz, bezeichnung, planbezeichnung, max_person, lehre, reservieren, aktiv, lageplan, dislozierung, kosten, ausstattung, updateamum, updatevon, insertamum, insertvon, ext_id, stockwerk, telefonklappe, standort_id, content_id, m2, gebteil, oe_kurzbz, arbeitsplaetze)
-VALUES('Bro_F7.37', 'Büro', 'F7.37', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
+VALUES
+('Bro_F7.37', 'Büro', 'F7.37', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL),
+('Bro_F7.38', 'Büro', 'F7.38', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL),
+('Bro_F7.39', 'Büro', 'F7.39', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL),
+('Bro_F7.40', 'Büro', 'F7.40', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL),
+('Bro_F7.41', 'Büro', 'F7.41', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
 
 INSERT INTO public.tbl_ortraumtyp
 (ort_kurzbz, hierarchie, raumtyp_kurzbz)
-VALUES('Bro_F7.37', 1, 'Dummy');
-
-INSERT INTO public.tbl_ort
-(ort_kurzbz, bezeichnung, planbezeichnung, max_person, lehre, reservieren, aktiv, lageplan, dislozierung, kosten, ausstattung, updateamum, updatevon, insertamum, insertvon, ext_id, stockwerk, telefonklappe, standort_id, content_id, m2, gebteil, oe_kurzbz, arbeitsplaetze)
-VALUES('Bro_F7.38', 'Büro', 'F7.38', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
-
-INSERT INTO public.tbl_ortraumtyp
-(ort_kurzbz, hierarchie, raumtyp_kurzbz)
-VALUES('Bro_F7.38', 1, 'Dummy');
-
-INSERT INTO public.tbl_ort
-(ort_kurzbz, bezeichnung, planbezeichnung, max_person, lehre, reservieren, aktiv, lageplan, dislozierung, kosten, ausstattung, updateamum, updatevon, insertamum, insertvon, ext_id, stockwerk, telefonklappe, standort_id, content_id, m2, gebteil, oe_kurzbz, arbeitsplaetze)
-VALUES('Bro_F7.39', 'Büro', 'F7.39', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
-
-INSERT INTO public.tbl_ortraumtyp
-(ort_kurzbz, hierarchie, raumtyp_kurzbz)
-VALUES('Bro_F7.39', 1, 'Dummy');
-
-INSERT INTO public.tbl_ort
-(ort_kurzbz, bezeichnung, planbezeichnung, max_person, lehre, reservieren, aktiv, lageplan, dislozierung, kosten, ausstattung, updateamum, updatevon, insertamum, insertvon, ext_id, stockwerk, telefonklappe, standort_id, content_id, m2, gebteil, oe_kurzbz, arbeitsplaetze)
-VALUES('Bro_F7.40', 'Büro', 'F7.40', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
-
-INSERT INTO public.tbl_ortraumtyp
-(ort_kurzbz, hierarchie, raumtyp_kurzbz)
-VALUES('Bro_F7.40', 1, 'Dummy');
-
-INSERT INTO public.tbl_ort
-(ort_kurzbz, bezeichnung, planbezeichnung, max_person, lehre, reservieren, aktiv, lageplan, dislozierung, kosten, ausstattung, updateamum, updatevon, insertamum, insertvon, ext_id, stockwerk, telefonklappe, standort_id, content_id, m2, gebteil, oe_kurzbz, arbeitsplaetze)
-VALUES('Bro_F7.41', 'Büro', 'F7.41', NULL, true, true, true, NULL, NULL, NULL, NULL, '2023-09-19 10:35:20.000', 'demoadmin', '2012-09-05 15:20:25.979', 'demoadmin', NULL, 7, NULL, 1, NULL, 21.58, 'F', 'etw', NULL);
-
-INSERT INTO public.tbl_ortraumtyp
-(ort_kurzbz, hierarchie, raumtyp_kurzbz)
-VALUES('Bro_F7.41', 1, 'Dummy');
+VALUES
+('Bro_F7.37', 1, 'Dummy'),
+('Bro_F7.38', 1, 'Dummy'),
+('Bro_F7.39', 1, 'Dummy'),
+('Bro_F7.40', 1, 'Dummy'),
+('Bro_F7.41', 1, 'Dummy');
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+-- Calendar setup for event drag and drop tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:30:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '08:45:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:30:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '09:40:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
 (date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
- 
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'reservierung', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
-;
-
-INSERT INTO lehre.tbl_kalender
-(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
-(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
 ;
 
 INSERT INTO lehre.tbl_kalender_ort
 (location, ort_kurzbz, kalender_id)
 VALUES(NULL, 'Bro_F7.37', 1);
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+-- Calendar setup for resize tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:00:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '08:45:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '10:25:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '11:10:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+;
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+-- Calendar setup for role preview tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '13:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '14:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+;
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+-- Calendar setup for API event creation tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+;
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+-- Calendar setup for API event update tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon)
+VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '1 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '2 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '3 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '4 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day' + TIME '21:00:00', 'reservierung', 'live', NULL, now(), 'demoadmin', NULL, 'demoadmin')
+;
 
 INSERT INTO lehre.tbl_kalender_ort
 (location, ort_kurzbz, kalender_id)
-VALUES(NULL, 'Bro_F7.37', 13);
+VALUES
+(NULL, 'Bro_F7.37', 13),
+(NULL, 'Bro_F7.37', 14);
 
-INSERT INTO lehre.tbl_kalender_ort
-(location, ort_kurzbz, kalender_id)
-VALUES(NULL, 'Bro_F7.37', 14);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 1);
+-- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 INSERT INTO lehre.tbl_kalender_lehreinheit
 (lehreinheit_id, kalender_id)
-VALUES(51002, 2);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 3);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 4);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 5);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 6);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51002, 7);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 8);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51002, 9);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 10);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51005, 11);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 12);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 13);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 14);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51001, 15);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 16);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 17);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51004, 18);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51004, 19);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51005, 20);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51003, 21);
-
-INSERT INTO lehre.tbl_kalender_lehreinheit
-(lehreinheit_id, kalender_id)
-VALUES(51006, 22);
+VALUES
+(51001, 1),
+(51002, 2),
+(51003, 3),
+(51003, 4),
+(51002, 5),
+(51006, 6),
+(51002, 7),
+(51006, 8),
+(51001, 9),
+(51003, 10),
+(51002, 11),
+(51001, 12),
+(51002, 13),
+(51003, 14),
+(51005, 15),
+(51001, 16),
+(51001, 17),
+(51003, 18),
+(51001, 19),
+(51003, 20),
+(51003, 21),
+(51004, 22),
+(51004, 23),
+(51005, 24),
+(51003, 25),
+(51006, 26);
 
 INSERT INTO lehre.tbl_kalender_event
 (kalender_id, titel, beschreibung)
