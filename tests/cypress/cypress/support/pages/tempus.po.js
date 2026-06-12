@@ -5,6 +5,15 @@ export const LEKTOR = "Lektor";
 export const STUDENT = "Student";
 export const SYNC = "Sync";
 
+const weekdayToGridRowMap = {
+  "Monday": "1",
+  "Tuesday": "2",
+  "Wednesday": "3",
+  "Thursday": "4",
+  "Friday": "5",
+  "Saturday": "6",
+  "Sunday": "7",
+};
 const roleFetchAliases = {
   [PLANER]: "@fetchPlanData",
   [LEKTOR]: "@fetchLecturerPlanData",
@@ -38,6 +47,7 @@ class TempusPage {
   getCourseTreeRows = () => this.getSlideInCoursesMenu().find(".p-treetable-tbody tr");
   getCoursePickerRows = () => this.getCoursePicker().find(".course-picker-row");
   getCoursePickerSearchInput = () => this.getCoursePicker().find("input");
+  getCalendarEventsPerWeekHolders = () => this.getCalendarBaseGrid().find(".fhc-calendar-base-grid-line");
   getCalendarEvents = () =>  this.getCalendarSection().then(($calendar) => {
     return $calendar.find(".fhc-calendar-base-grid-line-event");
   });
@@ -108,13 +118,14 @@ class TempusPage {
     );
   };
   dropCourseOnCalendarPart = (courseIndex, partIndex, options = {}) => {
-    const course = this.getCoursePickerRows().eq(courseIndex);
+    const course = this.getCoursePickerRows().eq(courseIndex).find("span").first();
 
     return course.should("be.visible").drag(
       this.getCalendarPartDropTarget(partIndex),
       {
         waitForAnimations: false,
-        animationDistanceThreshold: 0,
+        animationDistanceThreshold: 0, 
+        scrollBehavior: "top",
         ...options,
       },
     );
@@ -125,6 +136,7 @@ class TempusPage {
     this.getCalendarEventById(id)
       .invoke("attr", "style")
       .then((style) => this.getEventGridRowFromStyle(style));
+  getCalendarEventsByWeekday = (weekday) => this.getCalendarEventsPerWeekHolders().eq(weekdayToGridRowMap[weekday] - 1).find(".fhc-calendar-base-grid-line-event");
   getCalendarEventsByStartTime = (startTime) => this.getCalendarEvents().filter((index, event) => {
     const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
     return eventData?.orig?.beginn === startTime;
@@ -133,6 +145,20 @@ class TempusPage {
     const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
     return eventData?.orig?.beginn === startTime && eventData?.orig?.ende === endTime;
   });
+  getCalendarEventsBySoftTimeRange = (startTime, endTime) => this.getCalendarEvents().filter((index, event) => {
+    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+    return eventData?.orig?.beginn >= startTime && eventData?.orig?.ende <= endTime;
+  });
+  getCalendarEventsByWeekdayAndStartTime = (weekday, startTime) => this.getCalendarEventsByWeekday(weekday).filter((index, event) => {
+    const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+    return eventData?.orig?.beginn === startTime;
+  });
+  getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime = (weekday, startTime) =>
+    this.getCalendarEventsByWeekdayAndStartTime(weekday, startTime).filter((index, event) => {
+      const eventData = JSON.parse(event.getAttribute("data-fhc-draggable-value"));
+
+      return !!eventData?.orig?.ort_kurzbz && eventData?.orig?.lehreinheit_id;
+    });
   getKalenderId = (eventData) =>
     eventData?.orig?.kalender_id ?? eventData?.id;
   getCalendarEventData = ($event) =>
@@ -181,6 +207,8 @@ class TempusPage {
   getParkedEvents = () => this.getEventParkingSlot().find(".fhc-calendar-base-grid-line-event");
   getPreviewRoleButton = (role) => this.getPreviewRoleOptionsHolder().contains("button", role);
 
+  getSemesterSetterButton = () => this.getSidebarMenu().find(".stv-studiensemester button").last();
+
   openCoursesMenu = () => {
     this.getAllCoursesSliderBtn().click();
     this.getSlideInCoursesMenu().should("be.visible");
@@ -190,6 +218,11 @@ class TempusPage {
     this.openCoursesMenu();
     this.getCourseTreeRows().first().click();
   };
+
+  selectCourseByName = (courseShortName) => {
+    this.openCoursesMenu();
+    this.getCourseTreeRows().contains(courseShortName).click();
+  }
 
   selectPreviewRole = (role) => {
     this.getPreviewRoleButton(role).click();
@@ -235,6 +268,14 @@ class TempusPage {
     cy.intercept({ method: "GET", url: "**/tempus/Kalender/getHistory**" }).as(
       "fetchEventHistory",
     );
+    cy.intercept({
+      method: "GET",
+      url: "**/components/stv/studiensemester/now**",
+    }).as("getCurrentSemester");
+    cy.intercept({
+      method: "POST",
+      url: "**/components/stv/studiensemester/set**",
+    }).as("setSemester");
     cy.intercept({
       method: "GET",
       url: "**/tempus/Kalender/getRaumvorschlag**",
@@ -360,6 +401,13 @@ class TempusPage {
   waitForCalendarToFinishLoading = () => {
     this.getCalendarLoadingEvents().should("not.exist");
   };
+
+  setCurrentSemester = () => {
+    this.getSemesterSetterButton().click();
+    //waitForOk("@getCurrentSemester");
+    //waitForOk("@setSemester");
+  }
+
 }
 
 export const tempusPage = new TempusPage();

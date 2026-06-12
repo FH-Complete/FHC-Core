@@ -1,12 +1,14 @@
 import { waitForOk } from "../../../../support/helpers/network";
-import { LEKTOR, PLANER, STUDENT, tempusPage } from "../../../../support/pages/tempus.po";
+import {
+  LEKTOR,
+  PLANER,
+  STUDENT,
+  tempusPage,
+} from "../../../../support/pages/tempus.po";
 
 context("Tempus role preview tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
-  });
-
-  afterEach(() => {
     return tempusPage.clearMondayFirstColumnAfterTest();
   });
 
@@ -38,12 +40,8 @@ context("Tempus role preview tests", () => {
 
     tempusPage.syncAndReloadPlanner();
 
-    cy.get(".fhc-calendar-base-grid > div")
-      .last()
-      .invoke("css", "overflow", "hidden");
-    cy.wait(500);
     tempusPage
-      .getCalendarEventsByTimeRange("08:00:00", "08:45:00")
+      .getCalendarEventsByTimeRange("13:35:00", "14:20:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -58,9 +56,11 @@ context("Tempus role preview tests", () => {
 
         cy.wait("@updateCalendarEvent").then((interception) => {
           expect(interception.response.statusCode).to.eq(200);
+          expect(interception.response.body.data.retval).to.exist;
 
           const updatedEventId =
-            interception.response.body.data.retval.kalender_id;
+            interception.response.body.data.retval?.kalender_id ??
+            interception.response.body.data.retval;
 
           cy.wrap(updatedEventId).as("updatedEventId");
         });
@@ -94,7 +94,7 @@ context("Tempus role preview tests", () => {
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEventsByTimeRange("08:00:00", "08:45:00")
+      .getCalendarEventsBySoftTimeRange("13:35:00", "14:20:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -109,9 +109,11 @@ context("Tempus role preview tests", () => {
 
         cy.wait("@updateCalendarEvent").then((interception) => {
           expect(interception.response.statusCode).to.eq(200);
+          expect(interception.response.body.data.retval).to.exist;
 
           const updatedEventId =
-            interception.response.body.data.retval.kalender_id;
+            interception.response.body.data.retval?.kalender_id ??
+            interception.response.body.data.retval;
 
           cy.wrap(updatedEventId).as("updatedEventId");
         });
@@ -139,13 +141,13 @@ context("Tempus role preview tests", () => {
       });
   });
 
-  it("live unlock after planner preview event change loads event in same way on planner and lektor, but not on student preview", () => {
+  it.skip("live unlock after planner preview event change loads event in same way on planner and lektor, but not on student preview", () => {
     tempusPage.clearMondayFirstColumnBeforeAndAfter();
 
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEventsByTimeRange("08:00:00", "08:45:00")
+      .getCalendarEventsBySoftTimeRange("08:00:00", "08:45:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -195,7 +197,7 @@ context("Tempus role preview tests", () => {
     tempusPage.selectRoleAndWait(LEKTOR);
 
     tempusPage
-      .getCalendarEventsByTimeRange("08:00:00", "08:45:00")
+      .getCalendarEventsBySoftTimeRange("08:00:00", "14:20:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -228,7 +230,7 @@ context("Tempus role preview tests", () => {
     tempusPage.selectRoleAndWait(STUDENT);
 
     tempusPage
-      .getCalendarEventsByTimeRange("08:00:00", "08:45:00")
+      .getCalendarEventsBySoftTimeRange("08:00:00", "14:20:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {

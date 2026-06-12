@@ -1,4 +1,8 @@
+import { tempusPage } from "../../../../support/pages/tempus.po";
+import moment from "moment";
+
 const KALENDER_API = "/index.ci.php/api/frontend/v1/tempus";
+const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
 
 const getStudyPlansTree = () =>
   cy
@@ -75,6 +79,17 @@ const updateKalenderEvent = (kalenderId, startDateTime, endDateTime) =>
     failOnStatusCode: false,
   });
 
+  const deleteKalenderEvent = (kalenderId) =>
+  cy.request({
+    method: "POST",
+    url: `${KALENDER_API}/Kalender/deleteEntry`,
+    form: true,
+    body: {
+      kalender_id: kalenderId,
+    },
+    failOnStatusCode: false,
+  });
+
 const getSettingsData = () => ({
   ignore_kollision: false,
   kollision_student: false,
@@ -91,49 +106,77 @@ const updateSettingsData = (options) =>
     body: { ...options },
   });
 
+  function getDateForDay(dayName) {
+  const days = {
+    monday: 0,
+    tuesday: 1,
+    wednesday: 2,
+    thursday: 3,
+    friday: 4,
+    saturday: 5,
+    sunday: 6,
+  };
+
+  const dayIndex = days[dayName.toLowerCase()];
+
+  if (dayIndex === undefined) {
+    throw new Error(`Invalid day name: ${dayName}`);
+  }
+
+  return moment()
+    .startOf('isoWeek')
+    .add(dayIndex, 'days')
+    .format('YYYY-MM-DD');
+}
+
 describe("Tempus Kalender API", () => {
   beforeEach(() => {
     cy.login();
+    getPlannerEvents(getDateForDay("monday"), getDateForDay("monday")).then((events) => {
+      events.forEach((event) => {
+        deleteKalenderEvent(event.kalender_id);
+      });
+    });
+    getPlannerEvents(getDateForDay("tuesday"), getDateForDay("tuesday")).then((events) => {
+      events.forEach((event) => {
+        if (event.type === "lehreinheit" && event.beginn === "20:15:00" && event.ende === "21:00:00") {
+          updateKalenderEvent(event.kalender_id, `${event.datum} 19:30`, `${event.datum} 20:15`);
+        }
+      });
+    });
   });
 
   it("event creation works for non collision case", () => {
     getStudyPlansTree().then((stgTree) => {
-      let studyPlan = stgTree.find(
-        (plan) => plan.name === "BIF (BIF) - Informatik/Computer Science",
-      );
+      let studyPlan = stgTree.find((plan) => plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE));
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026").then(
         (courses) => {
           let course = courses.find(
             (course) =>
-              course.lehrfach === "KREKO" &&
-              course.lektoren.some((lector) => lector.kurzbz === "BoehmTh"),
+              course.lehrfach === "MAT",
           );
           expect(course, "course for test event creation").to.exist;
 
           updateSettingsData(getSettingsData()).then((response) => {
-            getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
-              const lehreinheitId = course.unr;
-              expect(lehreinheitId, "lehreinheit id for test event creation").to
-                .exist;
+            const lehreinheitId = course.lehreinheit_id[0];
+            expect(lehreinheitId, "lehreinheit id for test event creation").to
+              .exist;
 
-              const startDateTime = `2026-06-08 18:35`;
-              const endDateTime = `2026-06-08 19:20`;
+            const startDateTime = `${getDateForDay("monday")} 17:50`;
+            const endDateTime = `${getDateForDay("monday")} 18:35`;
 
-              createKalenderEvent(
-                lehreinheitId,
-                startDateTime,
-                endDateTime,
-              ).then((response) => {
+            createKalenderEvent(lehreinheitId, startDateTime, endDateTime).then(
+              (response) => {
                 console.log(response);
                 expect(response.status).to.eq(200);
                 expect(response.body).to.have.nested.property(
                   "meta.status",
                   "success",
                 );
-              });
-            });
+              },
+            );
           });
         },
       );
@@ -142,34 +185,27 @@ describe("Tempus Kalender API", () => {
 
   it("prohibited event creation due to zeitsperre collision", () => {
     getStudyPlansTree().then((stgTree) => {
-      let studyPlan = stgTree.find(
-        (plan) => plan.name === "BMB (BMB) - Maschinenbau",
-      );
+      let studyPlan = stgTree.find((plan) => plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE));
       expect(studyPlan, "study plan for test event creation").to.exist;
 
       getCoursesByStudyPlan(studyPlan.studiengang_kz, "SS2026").then(
         (courses) => {
           let course = courses.find(
             (course) =>
-              course.lehrfach === "ETMB" &&
-              course.lektoren.some((lector) => lector.kurzbz === "CarralSa"),
+              course.lektoren.some((lector) => lector.kurzbz === "DemoLKT1"),
           );
           expect(course, "course for test event creation").to.exist;
 
           updateSettingsData(getSettingsData()).then((response) => {
-            getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
-              const lehreinheitId = course.unr;
-              expect(lehreinheitId, "lehreinheit id for test event creation").to
-                .exist;
+            const lehreinheitId = course.lehreinheit_id[0];
+            expect(lehreinheitId, "lehreinheit id for test event creation").to
+              .exist;
 
-              const startDateTime = `2026-06-08 18:35`;
-              const endDateTime = `2026-06-08 19:20`;
+            const startDateTime = `${getDateForDay("saturday")} 18:35`;
+            const endDateTime = `${getDateForDay("saturday")} 19:20`;
 
-              createKalenderEvent(
-                lehreinheitId,
-                startDateTime,
-                endDateTime,
-              ).then((response) => {
+            createKalenderEvent(lehreinheitId, startDateTime, endDateTime).then(
+              (response) => {
                 console.log(response.body.errors);
                 expect(response.status).to.eq(500);
                 expect(response.body).to.have.nested.property(
@@ -189,18 +225,18 @@ describe("Tempus Kalender API", () => {
                   hasTimeLockCollisionError,
                   "response contains time lock collision error",
                 ).to.be.true;
-              });
-            });
+              },
+            );
           });
         },
       );
     });
   });
 
-  it("prohibited event creation due to student collision", () => {
+  it("prohibited event creation due to student group collision", () => {
     getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find(
-        (plan) => plan.name === "BMB (BMB) - Maschinenbau",
+        (plan) => plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE)
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
@@ -208,25 +244,21 @@ describe("Tempus Kalender API", () => {
         (courses) => {
           let course = courses.find(
             (course) =>
-              course.lehrfach === "DYN2" &&
-              course.lektoren.some((lector) => lector.kurzbz === "Froeh N"),
+              course.lehrfach === "ENG" &&
+              course.lektoren.some((lector) => lector.kurzbz === "DemoLKT3"),
           );
           expect(course, "course for test event creation").to.exist;
 
           updateSettingsData(getSettingsData()).then((response) => {
-            getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
-              const lehreinheitId = course.unr;
-              expect(lehreinheitId, "lehreinheit id for test event creation").to
-                .exist;
+            const lehreinheitId = course.lehreinheit_id[0];
+            expect(lehreinheitId, "lehreinheit id for test event creation").to
+              .exist;
 
-              const startDateTime = `2026-06-08 18:35`;
-              const endDateTime = `2026-06-08 19:20`;
+            const startDateTime = `${getDateForDay("wednesday")} 18:35`;
+            const endDateTime = `${getDateForDay("wednesday")} 19:20`;
 
-              createKalenderEvent(
-                lehreinheitId,
-                startDateTime,
-                endDateTime,
-              ).then((response) => {
+            createKalenderEvent(lehreinheitId, startDateTime, endDateTime).then(
+              (response) => {
                 console.log(response.body.errors);
                 expect(response.status).to.eq(500);
                 expect(response.body).to.have.nested.property(
@@ -234,17 +266,17 @@ describe("Tempus Kalender API", () => {
                   "error",
                 );
                 expect(response.body.errors).to.be.an("array");
-                let hasStudentCollisionError = response.body.errors.some(
+                let hasStudentGroupCollisionError = response.body.errors.some(
                   (error) =>
                     error.message.toLowerCase().includes("verband kollision") ||
                     error.message.toLowerCase().includes("student collision"),
                 );
                 expect(
-                  hasStudentCollisionError,
+                  hasStudentGroupCollisionError,
                   "response contains student collision error",
                 ).to.be.true;
-              });
-            });
+              },
+            );
           });
         },
       );
@@ -257,7 +289,7 @@ describe("Tempus Kalender API", () => {
 
     getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find(
-        (plan) => plan.name === "BMB (BMB) - Maschinenbau",
+        (plan) => plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE)
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
@@ -265,19 +297,19 @@ describe("Tempus Kalender API", () => {
         (courses) => {
           let course = courses.find(
             (course) =>
-              course.lehrfach === "DYN2" &&
-              course.lektoren.some((lector) => lector.kurzbz === "Froeh N"),
+              course.lehrfach === "ENG" &&
+              course.lektoren.some((lector) => lector.kurzbz === "DemoLKT3"),
           );
           expect(course, "course for test event creation").to.exist;
 
           updateSettingsData(settingsData).then((response) => {
-            getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
-              const lehreinheitId = course.unr;
+            getPlannerEvents(getDateForDay("monday"), getDateForDay("monday")).then((events) => {
+              const lehreinheitId = course.lehreinheit_id[0];
               expect(lehreinheitId, "lehreinheit id for test event creation").to
                 .exist;
 
-              const startDateTime = `2026-06-08 18:35`;
-              const endDateTime = `2026-06-08 19:20`;
+              const startDateTime = `${getDateForDay("wednesday")} 18:35`;
+              const endDateTime = `${getDateForDay("wednesday")} 19:20`;
 
               createKalenderEvent(
                 lehreinheitId,
@@ -313,7 +345,7 @@ describe("Tempus Kalender API", () => {
   it("prohibited event creation due to lector collision", () => {
     getStudyPlansTree().then((stgTree) => {
       let studyPlan = stgTree.find(
-        (plan) => plan.name === "BMR (BMR) - Mechatronik/Robotik",
+        (plan) => plan.name.includes(TARGETED_STUDY_PLAN_SHORT_CODE)
       );
       expect(studyPlan, "study plan for test event creation").to.exist;
 
@@ -321,19 +353,18 @@ describe("Tempus Kalender API", () => {
         (courses) => {
           let course = courses.find(
             (course) =>
-              course.lehrfach === "IROBO" &&
-              course.lektoren.some((lector) => lector.kurzbz === "StujaKe"),
+              course.lektoren.some((lector) => lector.kurzbz === "DemoLKT4"),
           );
           expect(course, "course for test event creation").to.exist;
 
           updateSettingsData(getSettingsData()).then((response) => {
-            getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
-              const lehreinheitId = course.unr;
+            getPlannerEvents(getDateForDay("monday"), getDateForDay("monday")).then((events) => {
+              const lehreinheitId = course.lehreinheit_id[0];
               expect(lehreinheitId, "lehreinheit id for test event creation").to
                 .exist;
 
-              const startDateTime = `2026-06-08 18:35`;
-              const endDateTime = `2026-06-08 19:20`;
+              const startDateTime = `${getDateForDay("thursday")} 18:35`;
+              const endDateTime = `${getDateForDay("thursday")} 19:20`;
 
               createKalenderEvent(
                 lehreinheitId,
@@ -347,14 +378,14 @@ describe("Tempus Kalender API", () => {
                   "error",
                 );
                 expect(response.body.errors).to.be.an("array");
-                let hasStudentCollisionError = response.body.errors.some(
+                let hasLectorCollisionError = response.body.errors.some(
                   (error) =>
-                    error.message.toLowerCase().includes("verband kollision") ||
-                    error.message.toLowerCase().includes("student collision"),
+                    error.message.toLowerCase().includes("lektorin kollision") ||
+              error.message.toLowerCase().includes("lector collision"),
                 );
                 expect(
-                  hasStudentCollisionError,
-                  "response contains student collision error",
+                  hasLectorCollisionError,
+                  "response contains lector collision error",
                 ).to.be.true;
               });
             });
@@ -366,13 +397,12 @@ describe("Tempus Kalender API", () => {
 
   it("event update works for non collision case", () => {
     updateSettingsData(getSettingsData()).then((response) => {
-      getPlannerEvents("2026-06-09", "2026-06-09").then((events) => {
+      getPlannerEvents(getDateForDay("tuesday"), getDateForDay("tuesday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
-            event.ende === "20:15:00" &&
-            event.organisationseinheit === "kfSprachen",
+            event.ende === "20:15:00"
         );
         expect(sourceEvent, "source event without collision for update test").to
           .exist;
@@ -385,7 +415,7 @@ describe("Tempus Kalender API", () => {
           startDateTime,
           endDateTime,
         ).then((response) => {
-          expect(response.status).to.eq(200);
+          expect(response.status).to.eq(200); 
           expect(response.body).to.have.nested.property(
             "meta.status",
             "success",
@@ -397,13 +427,12 @@ describe("Tempus Kalender API", () => {
 
   it("prohibited event update due to room collision", () => {
     updateSettingsData(getSettingsData()).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("wednesday"), getDateForDay("wednesday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
-            event.ende === "20:15:00" &&
-            event.organisationseinheit === "kfSocialSkills",
+            event.ende === "20:15:00"
         );
         expect(
           sourceEvent,
@@ -436,15 +465,14 @@ describe("Tempus Kalender API", () => {
     });
   });
 
-  it("prohibited event update due to student collision", () => {
+  it("prohibited event update due to student group collision", () => {
     updateSettingsData(getSettingsData()).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("thursday"), getDateForDay("thursday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
-            event.ende === "20:15:00" &&
-            event.organisationseinheit === "kfMathematik",
+            event.ende === "20:15:00"
         );
         expect(
           sourceEvent,
@@ -463,13 +491,13 @@ describe("Tempus Kalender API", () => {
           expect(response.body).to.have.nested.property("meta.status", "error");
           expect(response.body.errors).to.be.an("array");
           console.log(response.body.errors);
-          let hasStudentCollisionError = response.body.errors.some(
+          let hasStudentGroupCollisionError = response.body.errors.some(
             (error) =>
               error.message.toLowerCase().includes("verband kollision") ||
               error.message.toLowerCase().includes("student collision"),
           );
           expect(
-            hasStudentCollisionError,
+            hasStudentGroupCollisionError,
             "response contains student collision error",
           ).to.be.true;
         });
@@ -477,18 +505,17 @@ describe("Tempus Kalender API", () => {
     });
   });
 
-  it("prohibited event update due to student collision", () => {
+  it("prohibited event update due to direct student collision", () => {
     let settingsData = getSettingsData();
     settingsData.kollision_student = true;
 
     updateSettingsData(settingsData).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("friday"), getDateForDay("friday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
-            event.ende === "20:15:00" &&
-            event.organisationseinheit === "kfMathematik",
+            event.ende === "20:15:00"
         );
         expect(
           sourceEvent,
@@ -507,13 +534,13 @@ describe("Tempus Kalender API", () => {
           expect(response.body).to.have.nested.property("meta.status", "error");
           expect(response.body.errors).to.be.an("array");
           console.log(response.body.errors);
-          let hasStudentCollisionError = response.body.errors.some(
+          let hasDirectStudentCollisionError = response.body.errors.some(
             (error) =>
               error.message.toLowerCase().includes("studierende kollision") ||
               error.message.toLowerCase().includes("student collision"),
           );
           expect(
-            hasStudentCollisionError,
+            hasDirectStudentCollisionError,
             "response contains student collision error",
           ).to.be.true;
         });
@@ -526,14 +553,13 @@ describe("Tempus Kalender API", () => {
     settingsData.kollision_student = false;
 
     updateSettingsData(settingsData).then((response) => {
-      getPlannerEvents("2026-06-09", "2026-06-09").then((events) => {
+      getPlannerEvents(getDateForDay("saturday"), getDateForDay("saturday")).then((events) => {
         console.log(events);
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
-            event.ende === "20:15:00" &&
-            event.organisationseinheit === "kfWirtschaftRecht",
+            event.ende === "20:15:00"
         );
         expect(
           sourceEvent,
@@ -571,21 +597,21 @@ describe("Tempus Kalender API", () => {
     settingsData.kollision_student = false;
 
     updateSettingsData(settingsData).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("friday"), getDateForDay("friday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
             event.ende === "20:15:00" &&
-            event.organisationseinheit === "bic",
+            event.lektor.some((lector) => lector.kurzbz === "DemoLKT1"),
         );
         expect(
           sourceEvent,
           "source event with fixed time and room for collision test",
         ).to.exist;
 
-        const startDateTime = `2026-06-02 20:15`;
-        const endDateTime = `2026-06-02 21:00`;
+        const startDateTime = `${getDateForDay("saturday")} 20:15`;
+        const endDateTime = `${getDateForDay("saturday")} 21:00`;
 
         updateKalenderEvent(
           sourceEvent.kalender_id,
@@ -615,13 +641,13 @@ describe("Tempus Kalender API", () => {
     settingsData.kollision_student = false;
 
     updateSettingsData(settingsData).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("saturday"), getDateForDay("saturday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "lehreinheit" &&
             event.beginn === "19:30:00" &&
             event.ende === "20:15:00" &&
-            event.organisationseinheit === "bic",
+            event.lektor.some((lector) => lector.kurzbz === "DemoLKT4"),
         );
         expect(
           sourceEvent,
@@ -654,17 +680,18 @@ describe("Tempus Kalender API", () => {
     });
   });
 
-  it("prohibited reservation update due to lector - reservation collision", () => {
+  it("prohibited reservation update due to reservation - lector collision", () => {
     let settingsData = getSettingsData();
     settingsData.kollision_student = false;
 
     updateSettingsData(settingsData).then((response) => {
-      getPlannerEvents("2026-06-08", "2026-06-08").then((events) => {
+      getPlannerEvents(getDateForDay("saturday"), getDateForDay("saturday")).then((events) => {
         const sourceEvent = events.find(
           (event) =>
             event.type === "reservierung" &&
             event.beginn === "20:15:00" &&
-            event.ende === "21:00:00",
+            event.ende === "21:00:00" &&
+            event.lektor.some((lector) => lector.kurzbz === "DemoLKT3"),
         );
         expect(
           sourceEvent,

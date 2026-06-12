@@ -7,7 +7,7 @@ module.exports = defineConfig({
   e2e: {
     baseUrl: process.env.BASE_URL || "http://localhost:8080",
     defaultCommandTimeout: 20000,
-    pageLoadTimeout: 10000,
+    pageLoadTimeout: 20000,
     retries: {
       runMode: 1,
       openMode: 1

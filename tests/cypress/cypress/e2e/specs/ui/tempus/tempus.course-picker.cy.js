@@ -1,12 +1,16 @@
 import { waitForOk } from "../../../../support/helpers/network";
 import { tempusPage } from "../../../../support/pages/tempus.po";
 
+const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
+
 context("Tempus course picker tests", () => {
-  beforeEach(() => {
+  before(() => {
     tempusPage.visitAndWaitForPlanner();
+    tempusPage.setCurrentSemester();
   });
 
-  afterEach(() => {
+  beforeEach(() => {
+    tempusPage.visitAndWaitForPlanner();
     return tempusPage.clearMondayFirstColumnAfterTest();
   });
 
@@ -16,14 +20,14 @@ context("Tempus course picker tests", () => {
     tempusPage.getCoursePicker().should("exist");
     tempusPage.getCoursePickerRows().should("have.length", 0);
 
-    tempusPage.selectFirstCourse();
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
     tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
   });
 
   it("can search for a course event in the course picker", () => {
-    tempusPage.selectFirstCourse();
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
     tempusPage.getCoursePickerRows().should("have.length.greaterThan", 0);
@@ -52,7 +56,7 @@ context("Tempus course picker tests", () => {
     tempusPage.getCalendarSection().should("exist");
     tempusPage.waitForCalendarToFinishLoading();
 
-    tempusPage.selectFirstCourse();
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
     tempusPage.getCalendarEvents().then(($events) => {
@@ -68,6 +72,7 @@ context("Tempus course picker tests", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     cy.get("@initialEventCount").then((initialEventCount) => {
+      console.log("Initial event count:", initialEventCount);
       tempusPage
         .getCalendarEvents()
         .should("have.length", initialEventCount + 1);

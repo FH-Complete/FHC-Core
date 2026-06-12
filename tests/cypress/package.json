@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "cypress-real-events": "^1.15.0",
-    "dotenv": "^17.4.2"
+    "dotenv": "^17.4.2",
+    "moment": "^2.30.1"
   }
 }

@@ -6,10 +6,6 @@ context("Tempus filter tests", () => {
     tempusPage.visitAndWaitForPlanner();
   });
 
-  afterEach(() => {
-    return tempusPage.clearMondayFirstColumnAfterTest();
-  });
-
   it("filters calendar events by selecting the first event room in the navbar", () => {
     tempusPage.waitForCalendarToFinishLoading();
 

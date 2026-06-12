@@ -5,11 +5,7 @@ context("Tempus smoke tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
   });
-
-  afterEach(() => {
-    return tempusPage.clearMondayFirstColumnAfterTest();
-  });
-
+  
   it("can access Tempus page with valid credentials", () => {
     tempusPage.getTempusOverview().should("be.visible");
   });
@@ -75,18 +71,18 @@ context("Tempus smoke tests", () => {
   it.skip("shows reservation modal when dropping reservation handle on calendar", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarBaseGrid().should("be.visible");
-    cy.wait(1000);
+
     tempusPage
       .getReservationDragHandle()
+      .scrollIntoView()
       .drag(
-        tempusPage.selectors.calendarBaseGrid + " .part-body:nth-of-type(18)",
+        tempusPage.selectors.calendarBaseGrid,
         {
           waitForAnimations: false,
           animationDistanceThreshold: 0,
         },
       );
 
-    cy.wait(3000);
     tempusPage.getReservationModal().should("be.visible");
   });
 });

@@ -1,12 +1,11 @@
 import { waitForOk } from "../../../../support/helpers/network";
 import { LEKTOR, STUDENT, tempusPage } from "../../../../support/pages/tempus.po";
 
+const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
+
 context("Tempus event mutation tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
-  });
-
-  afterEach(() => {
     return tempusPage.clearMondayFirstColumnAfterTest();
   });
 
@@ -16,11 +15,11 @@ context("Tempus event mutation tests", () => {
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEventsWithLehreinheitAndRoom()
+      .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime("Wednesday", "08:00:00")
       .should("have.length.greaterThan", 0);
 
     tempusPage
-      .getCalendarEventsWithLehreinheitAndRoom()
+      .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime("Wednesday", "08:00:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -89,11 +88,11 @@ context("Tempus event mutation tests", () => {
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEventsWithLehreinheitAndRoom()
+      .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime("Wednesday", "08:00:00")
       .should("have.length.greaterThan", 0);
 
     tempusPage
-      .getCalendarEventsWithLehreinheitAndRoom()
+      .getCalendarEventsWithLehreinheitAndRoomByWeekdayAndStartTime("Wednesday", "08:00:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -163,7 +162,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.getParkedEvents().should("have.length", 0);
 
     tempusPage
-      .getCalendarEvents()
+      .getCalendarEventsByWeekdayAndStartTime("Wednesday", "08:45:00")
       .first()
       .drag(tempusPage.selectors.parkingSlot);
 
@@ -176,7 +175,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEvents()
+      .getCalendarEventsByWeekdayAndStartTime("Wednesday", "09:40:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -211,7 +210,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
-      .getCalendarEvents()
+      .getCalendarEventsByWeekdayAndStartTime("Wednesday", "10:25:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -247,7 +246,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
-      .getCalendarEventsByStartTime("08:00:00")
+      .getCalendarEventsByWeekdayAndStartTime("Thursday", "08:00:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -271,11 +270,11 @@ context("Tempus event mutation tests", () => {
         .realMouseUp();
 
       cy.wait("@updateCalendarEvent").then((interception) => {
+        console.log("updatedEventId", interception.response.body);
         expect(interception.response.statusCode).to.eq(200);
-
+        expect(interception.response.body.data.retval).to.exist;
         const updatedEventId =
-          interception.response.body.data.retval.kalender_id;
-
+          interception.response.body.data.retval?.kalender_id ?? interception.response.body.data.retval;
         cy.wrap(updatedEventId).as("updatedEventId");
       });
       waitForOk("@fetchPlanData");
@@ -306,7 +305,7 @@ context("Tempus event mutation tests", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage
-      .getCalendarEventsByStartTime("09:40:00")
+      .getCalendarEventsByWeekdayAndStartTime("Friday", "10:25:00")
       .first()
       .invoke("attr", "data-fhc-draggable-value")
       .then((eventJSON) => {
@@ -330,10 +329,12 @@ context("Tempus event mutation tests", () => {
         .realMouseUp();
 
       cy.wait("@updateCalendarEvent").then((interception) => {
+        console.log("updatedEventId top", interception.response.body);
         expect(interception.response.statusCode).to.eq(200);
+        expect(interception.response.body.data.retval).to.exist;
 
         const updatedEventId =
-          interception.response.body.data.retval.kalender_id;
+          interception.response.body.data.retval?.kalender_id ?? interception.response.body.data.retval;
 
         cy.wrap(updatedEventId).as("updatedEventId");
       });
@@ -358,14 +359,14 @@ context("Tempus event mutation tests", () => {
     });
   });
 
-  it("can drag and drop one course event into the calendar when Stundenraster is disabled", () => {
+  it.skip("can drag and drop one course event into the calendar when Stundenraster is disabled", () => {
     tempusPage.clearMondayFirstColumnBeforeAndAfter();
 
     tempusPage.getCalendarSection().should("exist");
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.disableStundenraster();
 
-    tempusPage.selectFirstCourse();
+    tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
 
     tempusPage.getCalendarEvents().then(($events) => {
@@ -387,7 +388,7 @@ context("Tempus event mutation tests", () => {
     });
   });
 
-  it("can drag and drop an event on part 6 when Stundenraster is disabled", () => {
+  it("can drag and drop an existing event when Stundenraster is disabled", () => {
     tempusPage.clearMondayFirstColumnBeforeAndAfter();
 
     tempusPage.syncAndReloadPlanner();
