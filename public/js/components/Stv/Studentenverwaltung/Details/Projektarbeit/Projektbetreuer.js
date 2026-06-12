@@ -562,6 +562,9 @@ export default {
 
 			</form-form>
 
+			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="saveProjektbetreuer">
+				{{ $p.t('projektarbeit', 'betreuerSpeichernv2') }}
+			</button>
 			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
 					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : beurteilungDownloadLink === ''}">
