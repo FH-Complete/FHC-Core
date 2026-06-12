@@ -718,7 +718,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 		{
 			$ects_berufliche_kompetenzen = 0;
 			echo '<berufliche_kompetenzen>';
-			echo '<header_berufliche_kompetenz>Validierung beruflicher Kompetenzen</header_berufliche_kompetenz>';
+			echo '<header_berufliche_kompetenz>Validierung von beruflich erworbenen Kompetenzen</header_berufliche_kompetenz>';
 
 			$qry_sem_0="
 				SELECT
