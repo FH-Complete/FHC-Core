@@ -723,7 +723,7 @@ class PrestudentLib
 
 
 		// Generate Alias
-		$alias = '';
+		$alias = null;
 		if (!defined('GENERATE_ALIAS_STUDENT')
 			|| GENERATE_ALIAS_STUDENT === true
 		) {

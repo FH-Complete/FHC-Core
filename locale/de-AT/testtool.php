@@ -17,6 +17,7 @@ $this->phrasen['testtool/basic']='Basic';
 $this->phrasen['testtool/basisgebiete']='Basisgebiete';
 $this->phrasen['testtool/semester']='Semester';
 $this->phrasen['testtool/reihungstestNichtFreigeschalten']='Der zuteilte Reihungstest ist noch nicht freigeschaltet';
+$this->phrasen['testtool/reihungstestNichtRegistriert']='Sie sind für den Reihungstest nicht registriert';
 $this->phrasen['testtool/reihungstestKannNichtGeladenWerden']='Der Reihungstest dem Sie zugeteilt sind, kann nicht geladen werden. Melden Sie sich bitte bei der Reihungstestaufsicht.';
 $this->phrasen['testtool/geburtsdatumStimmtNichtUeberein']='Ihr Geburtsdatum stimmt nicht mit unseren Daten überein. Bitte wenden Sie sich an die Aufsichtsperson';
 $this->phrasen['testtool/home']='Home';
@@ -31,10 +32,14 @@ $this->phrasen['testtool/keineAntwort']='Keine Antwort';
 $this->phrasen['testtool/speichernUndWeiter']='Speichern und weiter';
 $this->phrasen['testtool/alleFragenBeantwortet']='GLÜCKWUNSCH! \n\nSie haben alle Fragen in der zur Verfügung stehenden Zeit beantwortet. \nNutzen Sie die verbleibende Zeit, um Ihre Antworten zu kontrollieren oder fahren Sie mit dem nächsten Teilgebiet fort.';
 $this->phrasen['testtool/zeitAbgelaufen']='Die Maximalzeit für dieses Gebiet ist abgelaufen, oder alle Fragen wurden beantwortet';
+$this->phrasen['testtool/alleGebietGestartet']='Sie haben alle Gebiete bearbeitet.';
+$this->phrasen['testtool/alleGebieteGestartetInfo']='Sie können sich nun ausloggen und den Browser schließen.';
 $this->phrasen['testtool/spracheDerTestfragen']='Gewünschte Sprache der Testfragen';
 $this->phrasen['testtool/einleitung']='Einleitung';
 $this->phrasen['testtool/blaettern']='Blättern';
 $this->phrasen['testtool/demo']='Demobeispiel ansehen';
+$this->phrasen['testtool/abbrechen']='Abbrechen';
+$this->phrasen['testtool/startGebiet']='Gebiet starten';
 $this->phrasen['testtool/okKlickenUmZuStarten']='Klicken Sie OK um dieses Gebiet zu starten. \nSie haben für die Bearbeitung ein Zeitlimit von';
 $this->phrasen['testtool/bitteZuerstAnmelden']='Bitte zuerst anmelden!';
 $this->phrasen['testtool/fehlerBeimGenerierenDesFragenpools']='Fehler beim generieren des Fragenpools';
@@ -53,6 +58,10 @@ $this->phrasen['testtool/fuerFolgendeStgAngemeldet']='Für folgende Studiengäng
 $this->phrasen['testtool/invalideGebiete']='Ein oder mehrere Fragengebiet/e inkorrekt!<br>Bitte melden Sie dies der Betreuungsperson.';
 $this->phrasen['testtool/confirmationText']='<b>Ich bestätige, den Online-Reihungstest persönlich, selbständig, ohne Hilfe einer zusätzlichen Person und ohne Hilfsmittel zu absolvieren.<br>
 											I confirm that I will complete the online placement test personally, independently, without the help of an additional person and without any aids.</b>';
+$this->phrasen['testtool/dsgvoConfirmText']='<b>Ich habe die <a href ="'. APP_ROOT. 'cms/dms.php?id=373121" target="_blank">Datenschutzerklärung</a> gelesen. <br />
+I have read the <a href ="'. APP_ROOT. 'cms/dms.php?id=374814" target="_blank">privacy policy</a>.</b>';
+$this->phrasen['testtool/procotoringConfirmText']='<b>Ich stimme der digitalen Beaufsichtigung beim Online-Reihungstest (Proctoring) zu. <br /> 
+I agree to the digital supervision of the online placement test (proctoring).</b>';
 $this->phrasen['testtool/loginNoetig']='Bitte beachten Sie, dass der Reihungstest erst <b>unmittelbar</b> vor Ihrem <b>Reihungstesttermin</b> von uns aktiviert wird.<br>
 										Please note that the test will be activated by us <b>immediately</b> before your <b>placement test date</b>.';
 $this->phrasen['testtool/start']='Reihungstest jetzt starten';

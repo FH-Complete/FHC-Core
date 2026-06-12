@@ -63,7 +63,7 @@ export default {
 			const vm = this;
 			tinymce.init({
 				target: this.$refs.editor.$refs.input, //Important: not selector: to enable multiple import of component
-				//height: 800,
+				min_height: 300,
 				//plugins: ['lists'],
 				toolbar: 'styleselect | bold italic underline | alignleft aligncenter alignright alignjustify | link',
 				plugins: 'link',
@@ -133,6 +133,7 @@ export default {
 			return this.$api
 				.call(ApiMessages.getDataVorlage(vorlage_kurzbz))
 				.then(response => {
+					this.editor.setContent(response.data.text);
 					this.formData.body = response.data.text;
 					this.formData.subject = response.data.subject;
 				}).catch(this.$fhcAlert.handleSystemError);
@@ -203,24 +204,6 @@ export default {
 		},
 	},
 	watch: {
-		'formData.body': {
-			handler(newVal) {
-				const tinymcsVal = this.editor.getContent();
-
-				if (newVal && tinymcsVal != newVal) {
-					//Inhalt des Editors aktualisieren
-					this.editor.setContent(newVal);
-				}
-			}
-		},
-		'formData.vorlage_kurzbz': {
-			handler(newVal){
-				if (newVal && newVal != null) {
-					this.formData.subject = newVal;
-					return this.getDataVorlage(newVal);
-				}
-			}
-		},
 		messageId: {
 			immediate: true,
 			handler: async function (newMessageId) {
@@ -231,6 +214,7 @@ export default {
 					this.replyData = result.data;
 
 					if (this.replyData.length > 0) {
+						this.editor.setContent(this.replyData[0].replyBody);
 						this.formData.subject = this.replyData[0].replySubject;
 						this.formData.body = this.replyData[0].replyBody;
 						this.formData.relationmessage_id = newMessageId;
@@ -290,19 +274,6 @@ export default {
 
 			})
 			.catch(this.$fhcAlert.handleSystemError);
-
-		//case of reply
-		if(this.messageId) {
-			this.$api
-				.call(ApiMessages.getReplyData(this.messageId))
-				.then(result => {
-					this.replyData = result.data;
-					this.formData.subject = this.replyData[0].replySubject;
-					this.formData.body = this.replyData[0].replyBody;
-					this.formData.relationmessage_id = this.messageId;
-				})
-				.catch(this.$fhcAlert.handleSystemError);
-		}
 	},
 	async mounted() {
 		this.initTinyMCE();
@@ -342,7 +313,7 @@ export default {
 
 				<div class="row">
 					<div class="col-sm-8">
-						<form-form class="row g-3 mt-2 h-100" ref="formMessage">
+						<form-form class="row g-3 mt-2 align-content-start" ref="formMessage">
 
 							<div class="row mb-3">
 
@@ -367,7 +338,7 @@ export default {
 							</div>
 
 							<!--Tiny MCE-->
-							<div class="row mb-3 h-100 tiny-90">
+							<div class="row mb-3 tiny-90">
 								<form-input
 									ref="editor"
 									:label="$p.t('global','nachricht')  + ' *'"

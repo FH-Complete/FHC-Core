@@ -34,7 +34,7 @@ if (!$db = new basis_db())
 	die('Fehler beim Oeffnen der Datenbankverbindung');
 
 // Start session
-session_start();
+require_once './session_init.php';
 
 // If language is changed by language select menu, reset language and session variables
 if(isset($_GET['sprache_user']) && !empty($_GET['sprache_user']))
@@ -61,8 +61,12 @@ $p = new phrasen($sprache_user);
 <?php
 $gebiet_hasMathML = false; // true, wenn irgendein Gebiet eine/n Frage/Vorschlag im MathML-Format enthält
 $invalid_gebiete = false;
-
-if (isset($_SESSION['pruefling_id']))
+if ((isset($_SESSION['externe_ueberwachung']) && $_SESSION['externe_ueberwachung'] === true) &&
+	isset($_SESSION['externe_ueberwachung_verified']) && $_SESSION['externe_ueberwachung_verified'] === false)
+{
+	exit;
+}
+else if (isset($_SESSION['pruefling_id']))
 {
 	//content_id fuer Einfuehrung auslesen
 	$qry = "SELECT content_id FROM testtool.tbl_ablauf_vorgaben WHERE studiengang_kz=".$db->db_add_param($_SESSION['studiengang_kz'])." LIMIT 1";
@@ -73,7 +77,7 @@ if (isset($_SESSION['pruefling_id']))
 
 // Link zur Startseite
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool navButton" href="login.php" target="content">'.$p->t('testtool/startseite').'</a>
+			<a class="ItemTesttool navButton" href="login.php" onclick="return loadContent(this.href);">'.$p->t('testtool/startseite').'</a>
 		</td></tr>';
 
 // Link zur Einleitung
@@ -83,7 +87,7 @@ if (isset($_SESSION['pruefling_id']))
 		{
 			echo '
 				<tr id="tr-einleitung"><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-					<a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" target="content">'.$p->t('testtool/einleitung').'</a>
+					<a class="ItemTesttool navButton" href="../../cms/content.php?content_id='.$content_id->content_id.'&sprache='.$sprache_user.'" onclick="return loadContent(this.href);">'.$p->t('testtool/einleitung').'</a>
 				</td></tr>
 			';
 		}
@@ -183,6 +187,7 @@ if (isset($_SESSION['pruefling_id']))
 			}
 
 			$qry .= "
+				AND ps_status.bewerbung_abgeschicktamum IS NOT NULL
 
 		/* Order to get last semester when using distinct on */
 		ORDER BY
@@ -289,7 +294,7 @@ if (isset($_SESSION['pruefling_id']))
 			}
 			$lastsemester = $row->semester;
 
-			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px;">';
+			echo '<table border="0" cellspacing="0" cellpadding="0" id="Gebiet" style="display: visible; border-collapse: separate; border-spacing: 0 3px; margin-top: 5px;">';
 			echo '<tr><td class="HeaderTesttool">'. ($row->semester == '1' ? $p->t('testtool/basisgebiete') : $p->t('testtool/quereinstiegsgebiete')).'</td></tr>';
 		}
 
@@ -379,10 +384,13 @@ if (isset($_SESSION['pruefling_id']))
 				}
 			}
 
+
 			echo '<tr>
 					<!--<td width="10" class="ItemTesttoolLeft" nowrap>&nbsp;</td>-->
+
 						<td class="'.$class.'">
-							<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="document.location.reload()" target="content" style="'.$style.'">'.$gebietbezeichnung.'</a>
+								<a class="'.$class.'" href="frage.php?gebiet_id='.$row->gebiet_id.'" onclick="return loadContent(this.href);"  style="'.$style.'">'.$gebietbezeichnung.'</a>
+								
 						</td>
 					<!--<td width="10" class="ItemTesttoolRight" nowrap>&nbsp;</td>-->
 					</tr>';
@@ -398,10 +406,33 @@ if (isset($_SESSION['pruefling_id']))
 		echo '</table>';
 	}
 
+	if (isset($_SESSION['pruefling_id']) && !empty($_SESSION['alleGebiete']))
+	{
+		$alleGebiete = array_map('intval', $_SESSION['alleGebiete']);
+		$pruefling_id = (int)$_SESSION['pruefling_id'];
+
+		$qry = "SELECT COUNT(DISTINCT gebiet_id) AS anzahl
+				FROM testtool.tbl_pruefling_frage
+					JOIN testtool.tbl_frage USING(frage_id)
+				WHERE gebiet_id IN (". implode(',', $alleGebiete) .")
+					AND pruefling_id = ". $pruefling_id;
+
+		$result_check = $db->db_query($qry);
+		$row_check = $db->db_fetch_object($result_check);
+
+		if ((int)$row_check->anzahl === count($alleGebiete))
+		{
+			echo '<tr><td>
+					<div class="alert alert-success small" style="margin-left: 20px; width: 170px; margin-top: 3px;" role="alert">
+						<strong>'.$p->t('testtool/alleGebietGestartet').'</strong>
+					</div>
+				</td></tr>';
+		}
+	}
 	// Link zum Logout
 
 	echo '<tr><td class="ItemTesttool" style="margin-left: 20px;" nowrap>
-			<a class="ItemTesttool navButton" href="login.php?logout=true" target="content">Logout</a>
+			<a class="ItemTesttool navButton" href="login.php?logout=true" onclick="return loadContent(this.href);">Logout</a>
 		</td></tr>';
 
 	echo '</td></tr></table>';
@@ -439,5 +470,22 @@ else
                 '</td></tr>');
         }
     });
+
+	function loadContent(url)
+	{
+		if (parent && typeof parent.loadInContent === 'function')
+		{
+			parent.loadInContent(url);
+			return false;
+		}
+
+		let frame = parent?.frames?.["content"];
+		if (frame)
+		{
+			frame.location.href = url;
+			return false;
+		}
+	}
+
 </script>
 </html>
