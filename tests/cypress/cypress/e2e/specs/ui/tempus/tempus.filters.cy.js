@@ -89,14 +89,10 @@ context("Tempus filter tests", () => {
         waitForOk("@fetchPlanData");
         tempusPage.waitForCalendarToFinishLoading();
 
-        tempusPage
-          .getSelectedRoomIndicator(selectedRoom)
-          .should("be.visible");
+        tempusPage.getSelectedRoomIndicator(selectedRoom).should("be.visible");
         tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
-        tempusPage
-          .getSelectedRoomRemoveButton(selectedRoom)
-          .click();
+        tempusPage.getSelectedRoomRemoveButton(selectedRoom).click();
         waitForOk("@fetchPlanData");
         tempusPage.waitForCalendarToFinishLoading();
 
@@ -119,7 +115,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedLecturer = tempusPage.getFirstLecturer(JSON.parse(eventJSON));
+        const selectedLecturer = tempusPage.getFirstLecturer(
+          JSON.parse(eventJSON),
+        );
         expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
 
         const lecturerSearch =
@@ -183,7 +181,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedLecturer = tempusPage.getFirstLecturer(JSON.parse(eventJSON));
+        const selectedLecturer = tempusPage.getFirstLecturer(
+          JSON.parse(eventJSON),
+        );
         expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
 
         const lecturerSearch =
@@ -247,7 +247,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedLecturer = tempusPage.getFirstLecturer(JSON.parse(eventJSON));
+        const selectedLecturer = tempusPage.getFirstLecturer(
+          JSON.parse(eventJSON),
+        );
         expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
 
         const lecturerSearch =
@@ -296,7 +298,9 @@ context("Tempus filter tests", () => {
       .then((eventJSON) => {
         expect(eventJSON).to.exist;
 
-        const selectedLecturer = tempusPage.getFirstLecturer(JSON.parse(eventJSON));
+        const selectedLecturer = tempusPage.getFirstLecturer(
+          JSON.parse(eventJSON),
+        );
         expect(selectedLecturer?.kurzbz, "first event lecturer").to.exist;
 
         const lecturerSearch =
@@ -330,15 +334,15 @@ context("Tempus filter tests", () => {
               .getSelectedLecturerWishToggle(selectedLecturerName)
               .should("be.visible")
               .click();
-            tempusPage
-              .getLecturerWishOverlays()
-              .should("have.length", 0)
+            tempusPage.getLecturerWishOverlays().should("have.length", 0);
 
             tempusPage
               .getSelectedLecturerWishToggle(selectedLecturerName)
               .should("be.visible")
               .click();
-            tempusPage.getLecturerWishOverlays().should("have.length.greaterThan", 0);
+            tempusPage
+              .getLecturerWishOverlays()
+              .should("have.length.greaterThan", 0);
           });
       });
   });

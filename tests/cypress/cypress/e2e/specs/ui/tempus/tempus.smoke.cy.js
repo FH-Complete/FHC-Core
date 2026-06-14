@@ -5,7 +5,7 @@ context("Tempus smoke tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
   });
-  
+
   it("can access Tempus page with valid credentials", () => {
     tempusPage.getTempusOverview().should("be.visible");
   });
@@ -75,13 +75,10 @@ context("Tempus smoke tests", () => {
     tempusPage
       .getReservationDragHandle()
       .scrollIntoView()
-      .drag(
-        tempusPage.selectors.calendarBaseGrid,
-        {
-          waitForAnimations: false,
-          animationDistanceThreshold: 0,
-        },
-      );
+      .drag(tempusPage.selectors.calendarBaseGrid, {
+        waitForAnimations: false,
+        animationDistanceThreshold: 0,
+      });
 
     tempusPage.getReservationModal().should("be.visible");
   });

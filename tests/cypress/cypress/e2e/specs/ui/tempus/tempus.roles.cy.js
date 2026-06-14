@@ -1,4 +1,6 @@
 import { waitForOk } from "../../../../support/helpers/network";
+import { getDateForDay } from "../../../../support/helpers/date";
+import { tempusApi } from "../../../../support/api/tempusApi";
 import {
   LEKTOR,
   PLANER,
@@ -9,7 +11,14 @@ import {
 context("Tempus role preview tests", () => {
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
-    return tempusPage.clearMondayFirstColumnAfterTest();
+
+    tempusApi
+      .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
+      .then((events) => {
+        events.forEach((event) => {
+          tempusApi.deleteKalenderEvent(event.kalender_id);
+        });
+      });
   });
 
   it("shows the same number of calendar events for all role previews", () => {
@@ -36,8 +45,6 @@ context("Tempus role preview tests", () => {
   });
 
   it("on planner event change shows unchanged event on other roles", () => {
-    tempusPage.clearMondayFirstColumnBeforeAndAfter();
-
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
@@ -89,8 +96,6 @@ context("Tempus role preview tests", () => {
   });
 
   it("sync after planner preview event change loads event in same way on all previews", () => {
-    tempusPage.clearMondayFirstColumnBeforeAndAfter();
-
     tempusPage.syncAndReloadPlanner();
 
     tempusPage
@@ -142,8 +147,6 @@ context("Tempus role preview tests", () => {
   });
 
   it.skip("live unlock after planner preview event change loads event in same way on planner and lektor, but not on student preview", () => {
-    tempusPage.clearMondayFirstColumnBeforeAndAfter();
-
     tempusPage.syncAndReloadPlanner();
 
     tempusPage

@@ -1,7 +1,18 @@
 import { waitForOk } from "../../../../support/helpers/network";
+import { getDateForDay } from "../../../../support/helpers/date";
 import { tempusPage } from "../../../../support/pages/tempus.po";
+import { tempusApi } from "../../../../support/api/tempusApi";
 
 const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
+
+const deleteMondayEvents = () =>
+  tempusApi
+    .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
+    .then((events) => {
+      events.forEach((event) => {
+        tempusApi.deleteKalenderEvent(event.kalender_id);
+      });
+    });
 
 context("Tempus course picker tests", () => {
   before(() => {
@@ -11,7 +22,6 @@ context("Tempus course picker tests", () => {
 
   beforeEach(() => {
     tempusPage.visitAndWaitForPlanner();
-    return tempusPage.clearMondayFirstColumnAfterTest();
   });
 
   it("can select one course and show preview of its events", () => {
@@ -51,13 +61,14 @@ context("Tempus course picker tests", () => {
   });
 
   it("can drag and drop one course event into the calendar", () => {
-    tempusPage.clearMondayFirstColumnBeforeAndAfter();
-
+    deleteMondayEvents();
     tempusPage.getCalendarSection().should("exist");
     tempusPage.waitForCalendarToFinishLoading();
 
     tempusPage.selectCourseByName(TARGETED_STUDY_PLAN_SHORT_CODE);
     waitForOk("@fetchCoursePickerCourses");
+
+    cy.wait(1000);
 
     tempusPage.getCalendarEvents().then(($events) => {
       cy.wrap($events.length).as("initialEventCount");
@@ -72,7 +83,6 @@ context("Tempus course picker tests", () => {
     tempusPage.waitForCalendarToFinishLoading();
 
     cy.get("@initialEventCount").then((initialEventCount) => {
-      console.log("Initial event count:", initialEventCount);
       tempusPage
         .getCalendarEvents()
         .should("have.length", initialEventCount + 1);
