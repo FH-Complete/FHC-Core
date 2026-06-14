@@ -74,12 +74,14 @@ export default {
           return await this.getParsedClassTimeSlotValidityPeriodData();
         },
         ajaxResponse: (url, params, response) => response,
-        persistenceID: "class_schedule_validity_periods_table12333451",
+        persistenceID: "class_schedule_validity_periods_table",
         selectableRows: true,
-        maxHeight:"100%",
+        maxHeight: "100%",
         columns: [
           {
-            title: this.$capitalize(this.$p.t("ui", "unterrichtszeitenGueltigkeitId")),
+            title: this.$capitalize(
+              this.$p.t("ui", "unterrichtszeitenGueltigkeitId"),
+            ),
             field: "unterrichtszeitengueltigkeit_id",
             visible: false,
           },
@@ -112,15 +114,17 @@ export default {
             field: "unterrichtszeiten_typ_bezeichnung_mehrsprachig",
             width: 150,
             formatter: (cell, formatterParams, onRendered) => {
-              console.log(cell.getData())
-              if (!cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig) {
-                return "sdsd";
+              if (
+                !cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig
+              ) {
+                return "";
               }
-               return this.userLanguage?.value === "English"
-                ? cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig[1]
-                : cell.getData().unterrichtszeiten_typ_bezeichnung_mehrsprachig[0];
+              return this.userLanguage?.value === "English"
+                ? cell.getData()
+                    .unterrichtszeiten_typ_bezeichnung_mehrsprachig[1]
+                : cell.getData()
+                    .unterrichtszeiten_typ_bezeichnung_mehrsprachig[0];
             },
-          
           },
           {
             title: this.$capitalize(this.$p.t("lehre", "sem")),
@@ -248,7 +252,6 @@ export default {
               "btn btn-sm btn-outline-secondary fhc-btn-for-org-unit-and-study-plan-grouping";
             button.style.marginLeft = "10px";
             button.innerHTML = '<i class="fa fa-eye"></i>';
-            button.title = 22;
 
             button.dataset.organizationalUnitShortCode = data[0].oe_kurzbz;
             button.dataset.studyPlanId = data[0].studienplan_id;
@@ -304,14 +307,14 @@ export default {
     },
     dropdownParsedOrganizationalUnits() {
       return this.organizationalUnits
-      .filter((unit) => unit.aktiv)
-      .map((unit) => {
-        return {
-          label: `[${unit.organisationseinheittyp_kurzbz}] ${unit.bezeichnung}`,
-          value: unit.oe_kurzbz,
-        };
-      })
-      .sort((a, b) => a.label.localeCompare(b.label));
+        .filter((unit) => unit.aktiv)
+        .map((unit) => {
+          return {
+            label: `[${unit.organisationseinheittyp_kurzbz}] ${unit.bezeichnung}`,
+            value: unit.oe_kurzbz,
+          };
+        })
+        .sort((a, b) => a.label.localeCompare(b.label));
     },
     dropdownParsedSemesters() {
       return this.allSemesters.map((semester) => {
@@ -325,7 +328,7 @@ export default {
     },
     hasLehreUnterrichtszeitenTypRPermission() {
       return this.permissions["lehre/unterrichtszeiten_typ_r"] || false;
-    }
+    },
   },
   methods: {
     async getParsedClassTimeSlotValidityPeriodData() {
@@ -347,7 +350,10 @@ export default {
         return getAllClassTimeValidityPeriodsResponse.data.map(
           function (period) {
             period.organisationseinheit_bezeichnung_extended =
-              "[" + period.organisationseinheit_organisationseinheittyp_kurzbz + "] " + period.organisationseinheit_bezeichnung;
+              "[" +
+              period.organisationseinheit_organisationseinheittyp_kurzbz +
+              "] " +
+              period.organisationseinheit_bezeichnung;
             if (!period.studienplan_bezeichnung) {
               period.studienplan_bezeichnung = generalWord;
             }
