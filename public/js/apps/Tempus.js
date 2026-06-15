@@ -37,7 +37,8 @@ app
 	.use(router)
 	.use(primevue.config.default, {
 		zIndex: {
-			overlay: 1100
+			overlay: 1100,
+			tooltip: 99999
 		}
 	})
 	.use(Phrasen)

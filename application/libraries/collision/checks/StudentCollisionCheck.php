@@ -130,12 +130,19 @@ class StudentCollisionCheck implements ICollisionCheck
 		if (isError($result2) || !hasData($result2)) return [];
 
 		$conflicts = [];
-		foreach (getData($result2) as $row) {
-			if (isset($curUids[$row->uid])) {
-				$conflicts[] = $this->_ci->phraseslib->t('ui', 'student_kollision')
-					. ': ' . $row->uid
-					. ' (' . date('d.m.Y H:i', strtotime($row->von))
-					. ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+		foreach (getData($result2) as $row)
+		{
+			if (isset($curUids[$row->uid]))
+			{
+				$conflicts[] = [
+					'message' =>
+						$this->_ci->phraseslib->t('ui', 'student_kollision')
+						. ': ' . $row->uid
+						. ' (' . date('d.m.Y H:i', strtotime($row->von))
+						. ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')',
+					'errorCode' => 'student_collision'
+				];
+
 			}
 		}
 
@@ -231,7 +238,9 @@ class StudentCollisionCheck implements ICollisionCheck
 
 		$grouped = [];
 		foreach (getData($result) as $row)
+		{
 			$grouped[$row->kalender_id][] = true;
+		}
 
 		return $grouped;
 	}

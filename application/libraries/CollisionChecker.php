@@ -40,7 +40,7 @@ class CollisionChecker
 
 			if (!empty($result))
 			{
-				$errors[] = $result;
+				$errors = array_merge($errors, $result);
 			}
 		}
 

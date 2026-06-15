@@ -86,6 +86,7 @@ export default {
 			},
 			currentMode: this.mode,
 			teachingunits: null,
+			hoursplan: null,
 			showRaster: true,
 		};
 	},
@@ -184,6 +185,15 @@ export default {
 					end: el.ende
 				}));
 			});
+
+		this.$api
+			.call(ApiKalender.getCalendarHours())
+			.then(res => {
+				this.hoursplan = {
+					start: res.data.start,
+					end: res.data.end
+				};
+			});
 	},
 	template: /* html */`
 	<fhc-calendar
@@ -198,6 +208,7 @@ export default {
 		:events="visibleEvents || []"
 		:backgrounds="backgrounds"
 		:time-grid="showRaster ? teachingunits : null"
+		:hours-plan="hoursplan"
 		show-btns
 		:draggable-events="true"
 		:resizable-events="true"

@@ -29,6 +29,7 @@ export default {
 			locale: Vue.computed(() => this.locale),
 			timezone: Vue.computed(() => this.timezone),
 			timeGrid: Vue.computed(() => this.timeGrid),
+			hoursPlan: Vue.computed(() => this.hoursPlan),
 			draggableEvents: Vue.computed(() => {
 				if (!this.draggableEvents)
 					return () => false;
@@ -118,6 +119,7 @@ export default {
 			default: undefined
 		},
 		timeGrid: Array,
+		hoursPlan: Object,
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		resizableEvents: [Boolean, Array, Function],

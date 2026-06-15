@@ -42,7 +42,10 @@ class RoomCollisionCheck implements ICollisionCheck
 
 		return array_map(function($row)
 		{
-			return $this->_ci->phraseslib->t('ui', 'raum_kollision') . ': ' . $row->ort_kurzbz . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+			return [
+				'errorCode' => 'room_collision',
+				'message' => $this->_ci->phraseslib->t('ui', 'raum_kollision') . ': ' . $row->ort_kurzbz . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')'
+			];
 		}, getData($result));
 	}
 
@@ -68,7 +71,9 @@ class RoomCollisionCheck implements ICollisionCheck
 
 		$grouped = [];
 		foreach (getData($result) as $row)
+		{
 			$grouped[$row->kalender_id][] = true;
+		}
 
 		return $grouped;
 	}

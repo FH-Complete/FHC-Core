@@ -145,7 +145,12 @@ class VerbandCollisionCheck implements ICollisionCheck
 			if (!isError($result) && hasData($result))
 			{
 				foreach (getData($result) as $row)
-					$collisions[] = $this->_ci->phraseslib->t('ui', 'verband_kollision') . ': ' . $row->gruppenname . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+				{
+					$collisions[] = [
+						'message' => $this->_ci->phraseslib->t('ui', 'verband_kollision') . ': ' . $row->gruppenname . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')',
+						'errorCode' => 'verband_collision',
+					];
+				}
 			}
 		}
 
@@ -236,7 +241,12 @@ class VerbandCollisionCheck implements ICollisionCheck
 			if (!isError($result) && hasData($result))
 			{
 				foreach (getData($result) as $row)
-					$collisions[] = $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->gruppenname . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+				{
+					$collisions[] = [
+						'errorCode' => 'reservation_collision',
+						'message' => $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->gruppenname . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')'
+					];
+				}
 			}
 		}
 
@@ -342,7 +352,9 @@ class VerbandCollisionCheck implements ICollisionCheck
 
 		$grouped = [];
 		foreach (getData($result) as $row)
+		{
 			$grouped[$row->kalender_id][] = true;
+		}
 
 		return $grouped;
 	}

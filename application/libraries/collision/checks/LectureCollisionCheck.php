@@ -67,8 +67,12 @@ class LectureCollisionCheck implements ICollisionCheck
 		);
 		$result = $this->_ci->KalenderModel->load();
 		if (!isError($result) && hasData($result))
+		{
 			foreach (getData($result) as $row)
+			{
 				$grouped[$row->kalender_id][] = true;
+			}
+		}
 
 		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
@@ -90,8 +94,12 @@ class LectureCollisionCheck implements ICollisionCheck
 		);
 		$result = $this->_ci->KalenderModel->load();
 		if (!isError($result) && hasData($result))
+		{
 			foreach (getData($result) as $row)
+			{
 				$grouped[$row->kalender_id][] = true;
+			}
+		}
 
 		$this->_ci->KalenderModel->addSelect('DISTINCT ON (tbl_kalender.kalender_id) tbl_kalender.kalender_id');
 		$this->_ci->KalenderModel->addJoin('lehre.tbl_kalender_lehreinheit current_kalender_le', 'current_kalender_le.kalender_id = tbl_kalender.kalender_id');
@@ -111,9 +119,12 @@ class LectureCollisionCheck implements ICollisionCheck
 
 
 		if (!isError($result) && hasData($result))
+		{
 			foreach (getData($result) as $row)
+			{
 				$grouped[$row->kalender_id][] = true;
-
+			}
+		}
 
 		return $grouped;
 	}
@@ -174,8 +185,12 @@ class LectureCollisionCheck implements ICollisionCheck
 
 		if (isError($result) || !hasData($result)) return [];
 
-		return array_map(function($row) {
-			return $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+		return array_map(function($row)
+		{
+			return [
+				'message' => $this->_ci->phraseslib->t('ui', 'ma_le_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')',
+				'errorCode' => 'lector_collision',
+			];
 		}, getData($result));
 	}
 
@@ -206,8 +221,12 @@ class LectureCollisionCheck implements ICollisionCheck
 
 		if (isError($result) || !hasData($result)) return [];
 
-		return array_map(function($row) {
-			return $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->uid . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')';
+		return array_map(function($row)
+		{
+			return [
+				'message' => $this->_ci->phraseslib->t('ui', 'reservierung_kollision') . ': ' . $row->uid . ' (' . date('d.m.Y H:i', strtotime($row->von)) . ' - ' . date('d.m.Y H:i', strtotime($row->bis)) . ')',
+				'errorCode' => 'reservation_collision',
+			];
 		}, getData($result));
 	}
 
@@ -227,8 +246,13 @@ class LectureCollisionCheck implements ICollisionCheck
 
 		if (isError($result) || !hasData($result)) return [];
 
-		return array_map(function($row) {
-			return $this->_ci->phraseslib->t('ui', 'ma_zeitsperre_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->vondatum . ' ' . $row->von_beginn)) . ' - ' . date('d.m.Y H:i', strtotime($row->bisdatum . ' ' . $row->bis_ende)) . ')';		}, getData($result));
+		return array_map(function($row)
+		{
+			return [
+				'message' => $this->_ci->phraseslib->t('ui', 'ma_zeitsperre_kollision') . ': ' . $row->mitarbeiter_uid . ' (' . date('d.m.Y H:i', strtotime($row->vondatum . ' ' . $row->von_beginn)) . ' - ' . date('d.m.Y H:i', strtotime($row->bisdatum . ' ' . $row->bis_ende)) . ')',
+				'errorCode' => 'absences_collision',
+			];
+		}, getData($result));
 	}
 
 }
