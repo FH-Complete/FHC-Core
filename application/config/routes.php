@@ -64,6 +64,7 @@ $route['api/v1/system/[S|s]prache/(:any)'] = 'api/v1/system/sprache2/$1';
 $route['Cis/LvPlan/.*'] = 'Cis/LvPlan/index/$1';
 $route['Cis/MyLvPlan/.*'] = 'Cis/MyLvPlan/index/$1';
 $route['Cis/MyLv/.*'] = 'Cis/MyLv/index/$1';
+$route['Cis/Coodle'] = 'Cis/Coodle';
 
 $route['Abgabetool/Assistenz'] = 'Cis/Abgabetool/Assistenz';
 $route['Abgabetool/Assistenz/(:any)'] = 'Cis/Abgabetool/Assistenz/$1';
