@@ -13,7 +13,8 @@ export default {
 	},
 	inject: {
 		timeGrid: "timeGrid",
-		timezone: "timezone"
+		timezone: "timezone",
+		hoursPlan: { from: "hoursPlan", default: null },
 	},
 	props: {
 		day: {
@@ -39,8 +40,9 @@ export default {
 					};
 				});
 			} else {
-				// create 07:00-23:00
-				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }));
+				const start = this.hoursPlan?.start ?? 7;
+				const end = this.hoursPlan?.end ?? 23;
+				return Array.from({ length: end - start + 1 }, (e, i) => luxon.Duration.fromObject({ hours: i + start }));
 			}
 		}
 	},

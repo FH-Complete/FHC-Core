@@ -16,6 +16,7 @@ class Kalender extends FHCAPI_Controller
 	{
 		parent::__construct([
 			'getStunden' => self::PERM_LOGGED,
+			'getCalendarHours' => self::PERM_LOGGED,
 			'getPlan' => self::PERM_LOGGED,
 			'getPlanByOrt' => self::PERM_LOGGED,
 			'getRaumvorschlag' => self::PERM_LOGGED,
@@ -38,9 +39,11 @@ class Kalender extends FHCAPI_Controller
 		$this->_ci->load->library('LogLib');
 		$this->_ci->load->library('form_validation');
 		$this->_ci->load->library('KalenderLib');
+		$this->_ci->load->library('RaumvorschlagLib');
 		$this->loadPhrases([
 			'ui'
 		]);
+		$this->_ci->load->config('tempus');
 
 
 		$this->_ci->loglib->setConfigs(array(
@@ -69,6 +72,17 @@ class Kalender extends FHCAPI_Controller
 		$stunden = $this->getDataOrTerminateWithError($stunden);
 
 		$this->terminateWithSuccess($stunden);
+	}
+
+	public function getCalendarHours()
+	{
+		$calender_start = $this->_ci->config->item('calendar_start') ?? 7;
+		$calender_end = $this->_ci->config->item('calendar_end') ?? 23;
+
+		$this->terminateWithSuccess(array(
+			'start' => $calender_start,
+			'end' => $calender_end
+		));
 	}
 
 	public function getPlan()
@@ -206,47 +220,17 @@ class Kalender extends FHCAPI_Controller
 		$result = $this->_ci->kalenderlib->updateKalenderEvent($kalender_id, $updateFields->ort_kurzbz ?? null,  $updateFields->start_time ?? null,  $updateFields->end_time ?? null);
 
 		if (isError($result))
-			$this->terminateWithError(getError($result));
+			$this->terminateWithError(getError($result),  $result->code);
 
-		$this->terminateWithSuccess('Erfolgreich');
+		$this->terminateWithSuccess();
 	}
 
 	public function getRaumvorschlag()
 	{
 		$this->_ci->form_validation->set_data($_GET);
-		$this->_ci->form_validation->set_rules('start_date',"start_date","required");
-		$this->_ci->form_validation->set_rules('end_date',"end_date","required");
-
-		if($this->_ci->form_validation->run() === FALSE)
-			$this->terminateWithValidationErrors($this->_ci->form_validation->error_array());
-
-		$start_date = $this->_ci->input->get('start_date', TRUE);
-		$end_date = $this->_ci->input->get('end_date', TRUE);
 
 		$filter = $this->_checkFilter(self::ALLOWED_ROOM_FILTER);
-
-		if (isset($filter->lehreinheit_id))
-		{
-			$result = $this->_ci->kalenderlib->getRaumvorschlagByLehreinheitID(
-				$start_date,
-				$end_date,
-				$filter->lehreinheit_id
-			);
-		}
-
-		if (isset($filter->kalender_id))
-		{
-			$result = $this->_ci->kalenderlib->getRaumvorschlagByKalenderID(
-				$start_date,
-				$end_date,
-				$filter->kalender_id
-			);
-		}
-
-		if (isError($result))
-			$this->terminateWithError(getError($result));
-
-		$this->terminateWithSuccess(getData($result));
+		$this->terminateWithSuccess($this->_ci->raumvorschlaglib->getVorschlaege($filter->kalender_id));
 	}
 
 	public function getHistory()
@@ -282,13 +266,13 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	public function sync()
 	{
 		$result = $this->_ci->kalenderlib->sync();
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess(getData($result));
 	}
 	public function syncToLecturer()
 	{
@@ -305,7 +289,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess(getData($result));
 	}
 	public function syncToStudent()
 	{
@@ -322,7 +306,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess($result);
+		$this->terminateWithSuccess(getData($result));
 	}
 	public function addKalenderEvent()
 	{
@@ -345,7 +329,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess('Erfolgreich');
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	public function addReservierung()
@@ -372,7 +356,7 @@ class Kalender extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess('Erfolgreich');
+		$this->terminateWithSuccess(getData($result));
 	}
 
 	private function _checkFilter($filters)

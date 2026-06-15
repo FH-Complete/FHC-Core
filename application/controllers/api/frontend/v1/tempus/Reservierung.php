@@ -65,7 +65,7 @@ class Reservierung extends FHCAPI_Controller
 		$studiengaenge = $this->_ci->StudiengangModel->loadWhere(array('aktiv' => true));
 
 		if (isError($studiengaenge))
-			$this->terminateWithError($studiengaenge);
+			$this->terminateWithError(getError($studiengaenge));
 		$language = getUserLanguage() == 'German' ? 0 : 1;
 		$this->_ci->KalenderEventRolleModel->addOrder('sort');
 		$this->_ci->KalenderEventRolleModel->addSelect('rolle_kurzbz, array_to_json(bezeichnung_mehrsprachig::varchar[])->>'. $language. ' as bezeichnung');
@@ -193,7 +193,7 @@ class Reservierung extends FHCAPI_Controller
 		if (isError($result))
 			$this->terminateWithError(getError($result));
 
-		$this->terminateWithSuccess('Erfolgreich');
+		$this->terminateWithSuccess($result);
 	}
 
 

@@ -217,14 +217,12 @@ export default {
 	},
 	methods: {
 		async openRaumauswahl(orig) {
-			if (!orig?.lehreinheit_id)
+			if (!orig?.kalender_id)
 				return;
 			this.raumModal = orig;
 
 			await this.$api.call(ApiKalender.getRaumvorschlag(
-				orig.isostart,
-				orig.isoend,
-				orig.lehreinheit_id[0]
+				orig.kalender_id
 			)).then(result => {
 
 				this.raumVorschlaege = result.data ?? [];
@@ -956,11 +954,12 @@ export default {
 					<li
 						v-for="raum in raumVorschlaege"
 						:key="raum.ort_kurzbz"
-						class="list-group-item list-group-item-action"
+						class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
 						style="cursor:pointer"
 						@click="selectRaum(raum.ort_kurzbz)"
 					>
-						<i class="fa-solid fa-door-open me-2"></i>{{ raum.ort_kurzbz }}
+						<span><i class="fa-solid fa-door-open me-2"></i>{{ raum.ort_kurzbz }}</span>
+						<span class="text-muted" v-tooltip="{ value: raum.details.join('\\n'), class: 'custom-tooltip' }">{{ raum.score }}</span>
 					</li>
 				</ul>
 				<p v-else class="text-muted mb-0">Keine freien Räume gefunden.</p>

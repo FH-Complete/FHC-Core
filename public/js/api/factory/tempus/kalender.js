@@ -68,6 +68,12 @@ export default {
 			url: '/api/frontend/v1/tempus/Kalender/getStunden',
 		};
 	},
+	getCalendarHours() {
+		return {
+			method: 'get',
+			url: '/api/frontend/v1/tempus/Kalender/getCalendarHours',
+		};
+	},
 	updateKalenderEvent(kalender_id, updatedInfos) {
 		return {
 			method: 'post',
@@ -82,11 +88,11 @@ export default {
 			params: { lehreinheit_id, ort_kurzbz, start_date, end_date}
 		};
 	},
-	getRaumvorschlag(start_date, end_date, lehreinheit_id) {
+	getRaumvorschlag(kalender_id) {
 		return {
 			method: 'get',
 			url: '/api/frontend/v1/tempus/Kalender/getRaumvorschlag',
-			params: { start_date, end_date, lehreinheit_id}
+			params: { kalender_id }
 		};
 	},
 
