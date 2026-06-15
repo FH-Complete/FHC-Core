@@ -50,7 +50,8 @@ class Abgabe extends FHCAPI_Controller
 			'getStudentProjektarbeitAbgabeFile' => array('basis/abgabe_student:rw', 'basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
 			'postStudentProjektarbeitZusatzdaten' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
 			'getSignaturStatusForProjektarbeitAbgaben' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
-			'sendZweitbetreuerTokenMail' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw')
+			'sendZweitbetreuerTokenMail' => array('basis/abgabe_lektor:rw', 'basis/abgabe_assistenz:rw'),
+			'fetchProjektarbeitenHistory' => array('basis/abgabe_assistenz:rw')
 		]);
 
 		$this->load->library('PhrasesLib');
@@ -1547,6 +1548,37 @@ class Abgabe extends FHCAPI_Controller
 		}
 		
 		$this->sendUploadEmailZweitbegutachterToken($bperson_id, $projektarbeit_id, $student_uid);
+	}
+
+	// basically what getStudentProjektarbeiten intends to do for the student page but 
+	// designed for the assistenz timeline component -> more extensive loading upfront
+	// with every abgabetermin fetched here aswell
+	public function fetchProjektarbeitenHistory() {
+		$student_uid = $this->input->post('student_uid');
+		$this->load->model('education/Projektarbeit_model', 'ProjektarbeitModel');
+
+		$projektarbeiten = $this->ProjektarbeitModel->getProjektarbeitenForStudent($student_uid);
+
+		$mapFunc = function($projektarbeit) {
+			return $projektarbeit->projektarbeit_id;
+		};
+		$projektarbeiten_ids = array_map($mapFunc, $projektarbeiten->retval);
+		
+		if(count($projektarbeiten_ids) > 0) {
+			$ret = $this->ProjektarbeitModel->getProjektarbeitenAbgabetermine($projektarbeiten_ids);
+			$projektabgaben = $this->getDataOrTerminateWithError($ret, 'general');
+		}
+
+		forEach($projektarbeiten->retval as $pa) {
+
+			$filterFunc = function($projektabgabe) use ($pa) {
+				return $projektabgabe->projektarbeit_id == $pa->projektarbeit_id;
+			};
+
+			$pa->abgabetermine = array_values(array_filter($projektabgaben, $filterFunc));
+		}
+		
+		$this->terminateWithSuccess($projektarbeiten->retval);
 	}
 
 	/**

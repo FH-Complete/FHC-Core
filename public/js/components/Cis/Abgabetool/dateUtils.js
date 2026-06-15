@@ -14,7 +14,7 @@ export function formatISODate(dateParam) {
 export function formatDateTime(dateParam) {
 	if (!dateParam) return '';
 
-	const date = luxon.DateTime.fromFormat(dateParam, "yyyy-MM-dd HH:mm:ss");
+	const date = luxon.DateTime.fromSQL(dateParam);
 	return date.isValid ? date.toFormat("dd.MM.yyyy HH:mm") : '';
 }
 
