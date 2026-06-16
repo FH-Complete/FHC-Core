@@ -58748,7 +58748,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Akutelle Einstellung speichern',
+				'text' => 'Aktuelle Einstellung speichern',
 				'description' => '',
 				'insertvon' => 'system'
 			),
