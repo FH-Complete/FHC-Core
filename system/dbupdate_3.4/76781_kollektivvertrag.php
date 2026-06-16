@@ -9,6 +9,7 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 
 CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag (
     kollektivvertrag_kurzbz character varying(32) NOT NULL,
+    oe_kurzbz character varying(32),
     bezeichnung varchar(64) NOT NULL,
     aktiv boolean DEFAULT FALSE,
     sort smallint,
@@ -16,12 +17,14 @@ CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag (
     insertamum timestamp without time zone DEFAULT now() NOT NULL,
     updatevon character varying(32),
     updateamum timestamp without time zone,
-    CONSTRAINT tbl_kollektivvertrag_pkey PRIMARY KEY (kollektivvertrag_kurzbz)
+    CONSTRAINT tbl_kollektivvertrag_pkey PRIMARY KEY (kollektivvertrag_kurzbz),
+    CONSTRAINT tbl_kollektivvertrag_oe_kurzbz_fk FOREIGN KEY (oe_kurzbz) REFERENCES tbl_organisationseinheit(oe_kurzbz) MATCH FULL ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_kollektivvertrag TO vilesci;
 
-INSERT INTO hr.tbl_kollektivvertrag(kollektivvertrag_kurzbz, bezeichnung, aktiv, sort, insertvon, insertamum) VALUES('IT','KV IT',true,1,'system',NOW());
+INSERT INTO hr.tbl_kollektivvertrag(kollektivvertrag_kurzbz, oe_kurzbz, bezeichnung, aktiv, sort, insertvon, insertamum) VALUES('IT','gmbh','KV IT',true,1,'system',NOW());
+INSERT INTO hr.tbl_kollektivvertrag(kollektivvertrag_kurzbz, oe_kurzbz, bezeichnung, aktiv, sort, insertvon, insertamum) VALUES('XY','gst','KV IT',true,1,'system',NOW());
     ";
 
 
@@ -75,12 +78,12 @@ ON CONFLICT (verwendungsgruppe_kurzbz) DO NOTHING;
 	}
 }
 
-if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_name='tbl_kollektivvertrag_verwendungsgruppenjahre' AND table_schema='hr'"))
+if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table_name='tbl_kollektivvertrag_verwendungsgruppenjahr' AND table_schema='hr'"))
 {
 	if ($db->db_num_rows($result) == 0)
 	{
 		$qry = "
-CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag_verwendungsgruppenjahre (
+CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag_verwendungsgruppenjahr (
     kv_jahre integer NOT NULL,
     bezeichnung varchar(64) NOT NULL,
     verwendungsgruppe_kurzbz character varying(32) NOT NULL,
@@ -89,13 +92,13 @@ CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag_verwendungsgruppenjahre (
     insertamum timestamp without time zone DEFAULT now() NOT NULL,
     updatevon character varying(32),
     updateamum timestamp without time zone,
-    CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahre_pkey PRIMARY KEY (kv_jahre),
-	CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahre_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
+    CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahr_pkey PRIMARY KEY (kv_jahre),
+	CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahr_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
-GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_kollektivvertrag_verwendungsgruppenjahre TO vilesci;
+GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE hr.tbl_kollektivvertrag_verwendungsgruppenjahr TO vilesci;
 
-INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahre(kv_jahre, bezeichnung, verwendungsgruppe_kurzbz, aktiv, insertvon, insertamum) VALUES
+INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung, verwendungsgruppe_kurzbz, aktiv, insertvon, insertamum) VALUES
 ('0','nach 0','VG1',true, 'system',NOW()),
 ('2','nach 2','VG1',true, 'system',NOW()),
 ('4','nach 4','VG1',true, 'system',NOW()),
@@ -133,7 +136,7 @@ ON CONFLICT (kv_jahre) DO NOTHING;
 		if (! $db->db_query($qry))
 			echo '<strong>KV-Stufe: ' . $db->db_last_error() . '</strong><br>';
 		else
-			echo 'hr.tbl_kollektivvertrag_verwendungsgruppenjahre wurde neu erstellt<br>';
+			echo 'hr.tbl_kollektivvertrag_verwendungsgruppenjahr wurde neu erstellt<br>';
 	}
 }
 
@@ -151,7 +154,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_kollektivvertrag (
     CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_pk PRIMARY KEY (vertragsbestandteil_id),
 	CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id) REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
 	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kv_jahre_fk FOREIGN KEY (kv_jahre) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppenjahre (kv_jahre) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kv_jahre_fk FOREIGN KEY (kv_jahre) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppenjahr (kv_jahre) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 COMMENT ON TABLE hr.tbl_vertragsbestandteil_kollektivvertrag IS E'Zuordnung zur Einstufung im Kollektivvertrag';
