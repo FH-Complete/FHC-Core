@@ -385,7 +385,9 @@ export default {
 			}
 		},
 		async applyPreset(preset) {
-			preset = this.syncPresetWithConfig(preset);
+			if (preset.id) {
+				preset = this.syncPresetWithConfig(preset);
+			}
 
 			let columns = this.$props.tabulator
 				.getColumnDefinitions()
