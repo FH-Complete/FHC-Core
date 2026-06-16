@@ -145,7 +145,7 @@ export const AbgabetoolMitarbeiter = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: true},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, sorter: this.notenSorter, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, visible: true, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, width: 500, visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'betreuer_full_name', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -264,6 +264,11 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		notenSorter(a, b, aRow, bRow, column, dir, sorterParams) {
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.note - bData.note
+		},
 		async openBenotung(type, link) {
 			if(type === 'new') {
 				window.open(link, '_blank')
@@ -1209,14 +1214,19 @@ export const AbgabetoolMitarbeiter = {
 			return (projekt.typ + projekt.kurzbz)?.toUpperCase()	
 		},
 		setupData(data){
-			
-			
 			this.domain = data[1]
 			
 			this.projektarbeiten = data[0]?.retval?.map(projekt => {
 				this.checkAbgabetermineProjektarbeit(projekt)
 				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
+				if(this.notenOptions && projekt.note) {
+					const opt = this.notenOptions.find(n => n.note == projekt.note)
+					// TODO: mehrsprachig englisch -> nevermind the english field in
+					// notenoption->bezeichnung_mehrsprachig is ALWAYS german
+					projekt.note_bez = opt?.bezeichnung
+				}
+				
 				return {
 					...projekt,
 					details: {

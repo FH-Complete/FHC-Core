@@ -211,7 +211,7 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, formatter: this.centeredTextFormatter, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -433,6 +433,7 @@ export const AbgabetoolAssistenz = {
 							if (!val) return '';
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
+						sorter: this.notenSorterFlat,
 						minWidth: 100,
 						tooltip: false,
 						headerFilter: this.notenHeaderFilterEditor,
@@ -521,6 +522,18 @@ export const AbgabetoolAssistenz = {
 		};
 	},
 	methods: {
+		notenSorterFlat(a, b, aRow, bRow, column, dir, sorterParams) {
+			// flat table has their own sort since the field is called sligthly different in that context
+			// since note would be bestanden/nicht bestanden and that hardly needs sorting
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.pa_note - bData.pa_note
+		},
+		notenSorter(a, b, aRow, bRow, column, dir, sorterParams) {
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.note - bData.note
+		},
 		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
 			if (!this.notenOptions) return;
 
@@ -1785,7 +1798,8 @@ export const AbgabetoolAssistenz = {
 				if(this.notenOptions && projekt.note) {
 					const opt = this.notenOptions.find(n => n.note == projekt.note)
 				
-					// TODO: mehrsprachig englisch
+					// TODO: mehrsprachig englisch -> nevermind the english field in
+					// notenoption->bezeichnung_mehrsprachig is ALWAYS german
 					projekt.note_bez = opt.bezeichnung
 				}
 
