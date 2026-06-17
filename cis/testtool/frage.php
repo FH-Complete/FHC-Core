@@ -80,9 +80,17 @@ echo '
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/xhtml; charset=UTF-8" />
+	<link rel="stylesheet" href="../../vendor/components/jqueryui/themes/base/jquery-ui.min.css" type="text/css" />
 	<link rel="stylesheet" href="../../vendor/twbs/bootstrap3/dist/css/bootstrap.min.css" type="text/css"/>
 	<link href="../../skin/style.css.php" rel="stylesheet" type="text/css" />
+	<style>
+		.ui-dialog-titlebar-close
+		{
+			visibility: hidden !important;
+		}
+	</style>
 	<script type="text/javascript" src="../../vendor/components/jquery/jquery.min.js"></script>
+	<script type="text/javascript" src="../../vendor/components/jqueryui/jquery-ui.min.js"></script>
 	<script type="text/javascript" src="../../vendor/twbs/bootstrap3/dist/js/bootstrap.min.js"></script>
 	<script language="Javascript" type="text/javascript">
 	//<![CDATA[
@@ -131,22 +139,78 @@ echo '
 		}
 	}
 
-	function GebietStarten(bezeichnung,stunde,minute,sekunde,gebiet_id)
+	function GebietStarten(bezeichnung, stunde, minute, sekunde, gebiet_id)
 	{
-		var check = confirm(<?php echo "'".$p->t('testtool/okKlickenUmZuStarten')."'"?>+' '+stunde+'h '+minute+'m '+sekunde+'s');
-		if (check == true) {
-			var sprache_user = <?php echo "'".$sprache_user."'"?>;
-			document.location.href = 'frage.php?gebiet_id='+gebiet_id+'&start=true';
+		let message = <?php echo "'".$p->t('testtool/okKlickenUmZuStarten')."'"?> + ' ' + stunde + 'h ' + minute + 'm ' + sekunde + 's';
+		let title = <?php echo "'".$p->t('testtool/startGebiet')."'"?>;
+		let abbrechen = <?php echo "'".$p->t('testtool/abbrechen')."'"?>;
+
+		if ($('#gebiet-dialog').length === 0)
+		{
+			$('body').append(
+				'<div id="gebiet-dialog" title="' + title + '">' +
+					'<p id="gebiet-dialog-msg">' + message + '</p>' +
+				'</div>'
+			);
 		}
-		else {
-			return false;
-		}
+
+		$('#gebiet-dialog').dialog({
+			modal: true,
+			width: 400,
+			resizable: false,
+			buttons: [
+				{
+					text: 'OK',
+					click: function() {
+						$(this).dialog('close');
+						document.location.href = 'frage.php?gebiet_id=' + gebiet_id + '&start=true';
+					}
+				},
+				{
+					text: abbrechen,
+					click: function() {
+						$(this).dialog('close');
+					}
+				}
+			]
+		});
 	}
+
+	let letzteFrageBestaetigt = false;
 
 	function letzteFrage()
 	{
-		alert(<?php echo "'".$p->t("testtool/alleFragenBeantwortet")."'"?>);
-		return true;
+		if (letzteFrageBestaetigt)
+			return true;
+
+		let message = <?php echo "'".$p->t("testtool/alleFragenBeantwortet")."'"?>;
+
+		if ($('#fertig-dialog').length === 0)
+		{
+			$('body').append(
+				'<div id="fertig-dialog">' +
+					'<p>' + message + '</p>' +
+				'</div>'
+			);
+		}
+
+		$('#fertig-dialog').dialog({
+			modal: true,
+			width: 400,
+			resizable: false,
+			buttons: [
+				{
+					text: 'OK',
+					click: function() {
+						$(this).dialog('close');
+						letzteFrageBestaetigt = true;
+						$('[name="submitantwort"]').click();
+					}
+				}
+			]
+		});
+
+		return false;
 	}
 
 	$(document).ready(function () {
@@ -647,7 +711,7 @@ if($frage->frage_id!='')
 	}
 
 	$letzte = $frage->getNextFrage($gebiet_id, $_SESSION['pruefling_id'], $frage_id, $demo);
-	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"letzteFrage()\"":"").">";
+	echo "<form action=\"$PHP_SELF?gebiet_id=$gebiet_id&amp;frage_id=$frage->frage_id\" method=\"POST\" ".(!$letzte && !$levelgebiet?"onsubmit=\"return letzteFrage()\"":"").">";
 	echo '
 		<div class="row text-center">
 			<table class="table" style="width: 600px; margin-left: auto; margin-right: auto;">
