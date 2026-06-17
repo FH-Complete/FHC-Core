@@ -270,6 +270,14 @@ class PrestudentstatusCheckLib
 	}
 
 	/**
+	 * Getter for status before student.
+	 */
+	public function getStatusAbfolgeVorStudent()
+	{
+		return $this->_statusAbfolgeVorStudent;
+	}
+
+	/**
 	 * Runs all checks on Status History and saves it in cache.
 	 *
 	 * @param integer				$prestudent_id
@@ -289,7 +297,8 @@ class PrestudentstatusCheckLib
 		$new_studiensemester_kurzbz,
 		$new_ausbildungssemester,
 		$old_studiensemester_kurzbz,
-		$old_ausbildungssemester
+		$old_ausbildungssemester,
+		$new_studienplan_id = null
 	) {
 		// Generate key for caching
 		$primary = implode('|', [
@@ -299,7 +308,8 @@ class PrestudentstatusCheckLib
 			$new_studiensemester_kurzbz,
 			$new_ausbildungssemester,
 			$old_studiensemester_kurzbz,
-			$old_ausbildungssemester
+			$old_ausbildungssemester,
+			$new_studienplan_id
 		]);
 
 		if (isset($this->_cache_history[$primary]))
@@ -315,7 +325,8 @@ class PrestudentstatusCheckLib
 			$new_studiensemester_kurzbz,
 			$new_ausbildungssemester,
 			$old_studiensemester_kurzbz,
-			$old_ausbildungssemester
+			$old_ausbildungssemester,
+			$new_studienplan_id
 		);
 
 		if (isError($result))
@@ -335,7 +346,8 @@ class PrestudentstatusCheckLib
 			'abbrechersemester' => true,
 			'diplomant' => true,
 			'student' => true,
-			'studentPerskz' => true
+			'studentPerskz' => true,
+			'studentOrgform' => true
 		];
 
 		for ($n = 0, $c = 1; $c < $historyCount; $n++, $c++) {
@@ -346,6 +358,7 @@ class PrestudentstatusCheckLib
 				&& !$checks['diplomant']
 				&& !$checks['student']
 				&& !$checks['studentPerskz']
+				&& !$checks['studentOrgform']
 			)
 				break; // early out
 
@@ -382,10 +395,12 @@ class PrestudentstatusCheckLib
 
 			if (($checks['diplomant']
 				|| $checks['student']
+				|| $checks['studentOrgform']
 				|| $checks['studentPerskz'])
 				&& $next->status_kurzbz == self::STUDENT_STATUS
 			) {
-				$restl_stati = array_unique(array_column(array_slice($history, $c), 'status_kurzbz'));
+				$restl_history = array_slice($history, $c);
+				$restl_stati = array_unique(array_column($restl_history, 'status_kurzbz'));
 
 				// keine Studenten nach Diplomand Status
 				if ($checks['diplomant']
@@ -393,28 +408,49 @@ class PrestudentstatusCheckLib
 				)
 					$checks['diplomant'] = false;
 
+				$existingStati = array_intersect($restl_stati, $this->_statusAbfolgeVorStudent);
 				// vor Studentenstatus müssen bestimmte Status vorhanden sein
 				if ($checks['student']
-					&& array_values(array_intersect($restl_stati, $this->_statusAbfolgeVorStudent)) != array_values($this->_statusAbfolgeVorStudent)
+					&& array_diff($existingStati, $this->_statusAbfolgeVorStudent) != array_diff($this->_statusAbfolgeVorStudent, $existingStati)
 				)
+				{
 					$checks['student'] = false;
+				}
 
 				// korrektes Personenkennzeichen zu erstem Student status
-				if ($checks['studentPerskz'] && !in_array(self::STUDENT_STATUS, $restl_stati))
+				if (!in_array(self::STUDENT_STATUS, $restl_stati))
 				{
-					$this->_ci->StudentModel->addLimit('1');
-					$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
+					if ($checks['studentPerskz'])
+					{
+						$this->_ci->StudentModel->addLimit('1');
+						$result = $this->_ci->StudentModel->loadWhere(['prestudent_id' => $prestudent_id]);
 
-					if (isError($result))
-						return $result;
+						if (isError($result))
+							return $result;
 
-					if (!hasData($result))
-						return error('Prestudent without student entry');
+						if (!hasData($result))
+							return error('Prestudent without student entry');
 
-					$personenkennzeichen = getData($result)[0]->matrikelnr;
+						$personenkennzeichen = getData($result)[0]->matrikelnr;
 
-					$jahr = $this->_ci->StudiensemesterModel->getStudienjahrNumberFromStudiensemester($next->studiensemester_kurzbz);
-					$checks['studentPerskz'] = $jahr == mb_substr($personenkennzeichen, 0, 2);
+						$jahr = $this->_ci->StudiensemesterModel->getStudienjahrNumberFromStudiensemester($next->studiensemester_kurzbz);
+						$checks['studentPerskz'] = $jahr == mb_substr($personenkennzeichen, 0, 2);
+					}
+
+					if ($checks['studentOrgform'])
+					{
+						$bewerber = null;
+						foreach ($restl_history as $h)
+						{
+							if ($h->status_kurzbz == 'Bewerber')
+							{
+								$bewerber = $h;
+								break;
+							}
+						}
+
+						if (isset($bewerber)) $checks['studentOrgform'] = $bewerber->orgform_kurzbz == $next->orgform_kurzbz;
+					}
 				}
 			}
 		}
@@ -654,6 +690,47 @@ class PrestudentstatusCheckLib
 			return $result;
 
 		return success(getData($result)['student']);
+	}
+
+	/**
+	 * Checks if Orgform of student staus is the same as Bewerber Orgform.
+	 *
+	 * @param integer				$prestudent_id
+	 * @param string				$status_kurzbz
+	 * @param DateTime				$new_date
+	 * @param string				$new_studiensemester_kurzbz
+	 * @param integer				$new_ausbildungssemester
+	 * @param string				$old_studiensemester_kurzbz
+	 * @param integer				$old_ausbildungssemester
+	 * @param integer				$new_studienplan_id
+	 *
+	 * @return stdClass
+	 */
+	public function checkFirstStudentOrgform(
+		$prestudent_id,
+		$status_kurzbz,
+		$new_date,
+		$new_studiensemester_kurzbz,
+		$new_ausbildungssemester,
+		$old_studiensemester_kurzbz,
+		$old_ausbildungssemester,
+		$new_studienplan_id
+	) {
+		$result = $this->prepareStatusHistory(
+			$prestudent_id,
+			$status_kurzbz,
+			$new_date,
+			$new_studiensemester_kurzbz,
+			$new_ausbildungssemester,
+			$old_studiensemester_kurzbz,
+			$old_ausbildungssemester,
+			$new_studienplan_id
+		);
+
+		if (isError($result))
+			return $result;
+
+		return success(getData($result)['studentOrgform']);
 	}
 
 	/**

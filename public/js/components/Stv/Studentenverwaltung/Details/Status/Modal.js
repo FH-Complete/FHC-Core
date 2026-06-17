@@ -281,7 +281,9 @@ export default{
 				auto-apply
 				:enable-time-picker="false"
 				text-input
+				locale="de"
 				format="dd.MM.yyyy"
+				model-type="yyyy-MM-dd"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
 				:disabled="bisLocked"
@@ -296,7 +298,9 @@ export default{
 				auto-apply
 				:enable-time-picker="false"
 				text-input
+				locale="de"
 				format="dd.MM.yyyy"
+				model-type="yyyy-MM-dd"
 				preview-format="dd.MM.yyyy"
 				:teleport="true"
 				:disabled="bisLocked"
@@ -310,7 +314,9 @@ export default{
 				:label="$p.t('lehre/bewerbung_abgeschickt_am')"
 				auto-apply
 				:enable-time-picker="false"
+				locale="de"
 				format="dd.MM.yyyy"
+				model-type="yyyy-MM-dd"
 				text-input
 				preview-format="dd.MM.yyyy"
 				:teleport="true"

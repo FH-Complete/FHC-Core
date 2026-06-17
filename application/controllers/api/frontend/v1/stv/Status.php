@@ -377,6 +377,29 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}],
+			['history_student', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryStudent(
+					$prestudent_id,
+					$status_kurzbz,
+					$datum,
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
 			['history_abbrecher', function () use (
 				$isBerechtigtNoStudstatusCheck,
 				$prestudent_id,
@@ -456,6 +479,7 @@ class Status extends FHCAPI_Controller
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
+			'history_student' => $this->p->t('lehre', 'error_wrongStatusOrderBeforeStudent', [implode(', ', $this->prestudentstatuschecklib->getStatusAbfolgeVorStudent())]),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
 			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
 			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
@@ -1007,6 +1031,29 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}],
+			['history_student', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryStudent(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					''
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
 			['history_abbrecher', function () use (
 				$isBerechtigtNoStudstatusCheck,
 				$prestudent_id,
@@ -1057,6 +1104,31 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}],
+			['history_student_orgform', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$studienplan_id
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkFirstStudentOrgform(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					'',
+					'',
+					$studienplan_id
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
 			['wrong_personenkennzeichen', function () use (
 				$isBerechtigtNoStudstatusCheck,
 				$prestudent_id,
@@ -1086,8 +1158,10 @@ class Status extends FHCAPI_Controller
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
+			'history_student' => $this->p->t('lehre', 'error_wrongStatusOrderBeforeStudent', [implode(', ', $this->prestudentstatuschecklib->getStatusAbfolgeVorStudent())]),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
 			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
+			'history_student_orgform' => $this->p->t('lehre', 'error_bewerberOrgformUngleichStudentOrgform'),
 			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
 		]);
 
@@ -1180,6 +1254,7 @@ class Status extends FHCAPI_Controller
 		$authUID = getAuthUID();
 		$studiensemester_kurzbz = $this->input->post('studiensemester_kurzbz') ?: $oldstatus->studiensemester_kurzbz;
 		$ausbildungssemester = $this->input->post('ausbildungssemester') ?: $oldstatus->ausbildungssemester;
+		$studienplan_id = $this->input->post('studienplan_id');
 		$datum = $this->input->post('datum') ?: $oldstatus->datum;
 
 		//Form Validation
@@ -1336,6 +1411,31 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}],
+			['history_student', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkStatusHistoryStudent(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
 			['history_abbrecher', function () use (
 				$isBerechtigtNoStudstatusCheck,
 				$prestudent_id,
@@ -1390,6 +1490,33 @@ class Status extends FHCAPI_Controller
 
 				return $this->getDataOrTerminateWithError($result);
 			}],
+			['history_student_orgform', function () use (
+				$isBerechtigtNoStudstatusCheck,
+				$prestudent_id,
+				$status_kurzbz,
+				$datum,
+				$studiensemester_kurzbz,
+				$ausbildungssemester,
+				$key_studiensemester_kurzbz,
+				$key_ausbildungssemester,
+				$studienplan_id
+			) {
+				if ($isBerechtigtNoStudstatusCheck)
+					return true; // Skip if access right says so
+
+				$result = $this->prestudentstatuschecklib->checkFirstStudentOrgform(
+					$prestudent_id,
+					$status_kurzbz,
+					new DateTime($datum),
+					$studiensemester_kurzbz,
+					$ausbildungssemester,
+					$key_studiensemester_kurzbz,
+					$key_ausbildungssemester,
+					$studienplan_id
+				);
+
+				return $this->getDataOrTerminateWithError($result);
+			}],
 			['wrong_personenkennzeichen', function () use (
 				$isBerechtigtNoStudstatusCheck,
 				$prestudent_id,
@@ -1420,8 +1547,10 @@ class Status extends FHCAPI_Controller
 			'history_timesequence' => $this->p->t('lehre', 'error_statuseintrag_zeitabfolge'),
 			'history_laststatus' => $this->p->t('lehre', 'error_endstatus'),
 			'history_unterbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecher'),
+			'history_student' => $this->p->t('lehre', 'error_wrongStatusOrderBeforeStudent', [implode(', ', $this->prestudentstatuschecklib->getStatusAbfolgeVorStudent())]),
 			'history_abbrecher' => $this->p->t('lehre', 'error_consecutiveUnterbrecherAbbrecher'),
 			'history_diplomant' => $this->p->t('lehre', 'error_consecutiveDiplomandStudent'),
+			'history_student_orgform' => $this->p->t('lehre', 'error_bewerberOrgformUngleichStudentOrgform'),
 			'wrong_personenkennzeichen' => $this->p->t('lehre', 'error_personenkennzeichenPasstNichtZuStudiensemester')
 		]);
 

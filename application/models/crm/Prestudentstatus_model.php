@@ -579,16 +579,20 @@ class Prestudentstatus_model extends DB_Model
 		$new_studiensemester_kurzbz,
 		$new_ausbildungssemester,
 		$old_studiensemester_kurzbz,
-		$old_ausbildungssemester
+		$old_ausbildungssemester,
+		$new_studienplan_id
 	) {
 		$new_date = $new_date->format('Y-m-d');
 
-		$this->addSelect('status_kurzbz');
-		$this->addSelect('studiensemester_kurzbz');
-		$this->addSelect('ausbildungssemester');
-		$this->addSelect('datum');
-		$this->addSelect('insertamum');
-		$this->addSelect('ext_id');
+		$this->addSelect('tbl_prestudentstatus.status_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.studiensemester_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.ausbildungssemester');
+		$this->addSelect('tbl_prestudentstatus.datum');
+		$this->addSelect('tbl_prestudentstatus.insertamum');
+		$this->addSelect('tbl_studienplan.orgform_kurzbz');
+		$this->addSelect('tbl_prestudentstatus.ext_id');
+
+		$this->addJoin('lehre.tbl_studienplan', 'studienplan_id', 'LEFT');
 
 		if ($old_studiensemester_kurzbz || $old_ausbildungssemester) {
 			$this->db->not_group_start();
@@ -607,13 +611,19 @@ class Prestudentstatus_model extends DB_Model
 				$this->escape($status_kurzbz) . " AS status_kurzbz, " .
 				$this->escape($new_studiensemester_kurzbz) . " AS studiensemester_kurzbz, " .
 				$this->escape($new_ausbildungssemester) . " AS ausbildungssemester, " .
-				$this->escape($new_date) . "::date AS datum," .
+				$this->escape($new_date) . "::date AS datum, " .
 				$this->escape(date('c')) . "::date AS insertamum," .
+				(
+					is_numeric($new_studienplan_id)
+					? "(SELECT orgform_kurzbz FROM lehre.tbl_studienplan WHERE studienplan_id = ".$this->escape($new_studienplan_id).")"
+					: "''"
+				) . " AS orgform_kurzbz, ".
 				"NULL AS ext_id";
 
 		$this->addJoin('public.tbl_studiensemester sem', 'studiensemester_kurzbz');
 
 		$this->addOrder('s.datum', 'DESC');
+		$this->addOrder('sem.start', 'DESC');
 		$this->addOrder('s.insertamum', 'DESC');
 		$this->addOrder('s.ext_id', 'DESC');
 
