@@ -343,7 +343,7 @@ class StudentListLib
 					FROM
 					  public.tbl_studiensemester
 					WHERE
-					  studiensemester_kurzbz = {$studiensemester_kurzbz_escaped}
+					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
 				  )
 				  AND COALESCE(n.ende, '2170-12-31') >= (
 					SELECT
@@ -351,7 +351,7 @@ class StudentListLib
 					FROM
 					  public.tbl_studiensemester
 					WHERE
-					  studiensemester_kurzbz = '{$studiensemester_kurzbz_escaped}'
+					  studiensemester_kurzbz = " . $studiensemester_kurzbz_escaped . "
 				  )
 				) AS tag
 				GROUP BY tag.prestudent_id
