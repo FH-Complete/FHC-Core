@@ -194,7 +194,7 @@ export default {
 			return this.$api
 				.call(ApiStvProjektarbeit.getLehrveranstaltungen(
 					this.student.uid,
-					this.newProjektarbeit ? this.student.studiengang_kz : null,
+					this.student.studiengang_kz,
 					this.studiensemester,
 					this.additional_lehrveranstaltung_id
 				))
