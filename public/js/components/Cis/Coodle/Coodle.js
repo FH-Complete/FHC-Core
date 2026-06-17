@@ -1,13 +1,78 @@
 import CoodleSurvey from "./Components/CoodleSurvey.js";
 
+import ApiAuthinfo from "../../../api/factory/authinfo.js";
+
 export default {
 	name: "Coodle",
 	components: { CoodleSurvey },
 	props: {},
 	data() {
 		return {
-			view: "activeSurveysTable",
-			survey: null,
+			uid: null,
+			// todo: return view to activeSurveysTable and survey to null
+			view: "survey",
+			survey: {
+				id: 1,
+				creator: {
+					uid: "ma1434",
+					name: "Adis Posko",
+				},
+				title: "Test Meeting",
+				description:
+					"To discuss many important matters. \n Another line of the description.",
+				timeslotDuration: 75,
+				maxSelections: 2,
+				areParticipantsAnonymized: false,
+				areSelectionsAnonymized: false,
+				selectedTimeslotId: null,
+				endsAt: "2026-06-23 23:30:30",
+				completedAt: null,
+				canceledAt: null,
+				createdAt: "2026-06-14 23:30:30",
+				updatedAt: "2026-06-15 16:00:00",
+				timeslots: [
+					{
+						id: 1,
+						startsAt: "2026-06-26 12:30:00",
+					},
+					{
+						id: 2,
+						startsAt: "2026-06-26 14:00:00",
+					},
+					{
+						id: 3,
+						startsAt: "2026-06-25 07:00:00",
+					},
+				],
+				participants: [
+					{
+						uid: "ma1434",
+						name: "Adis Posko",
+						selection: [2],
+					},
+					{
+						uid: "ma1435",
+						name: "Test User 1",
+						selection: [],
+					},
+					{
+						uid: "ma1436",
+						name: "Test User 2",
+						selection: null,
+					},
+					{
+						uid: "ma1437",
+						name: "Test User 3",
+						selection: [2,3],
+					},
+				],
+				sums: {
+					1: 0,
+					2: 2,
+					3: 1,
+					"none": 1,
+				},
+			},
 		};
 	},
 	computed: {
@@ -32,6 +97,15 @@ export default {
 			this.view = tab;
 			this.survey = null;
 		},
+		async getAuthUid() {
+			const authUidResponse = await this.$api.call(
+				ApiAuthinfo.getAuthUID(),
+			);
+			this.uid = authUidResponse.data.uid;
+		},
+	},
+	async created() {
+		await this.getAuthUid();
 	},
 	template: /*html*/ `
 	<div class="h-100 d-flex flex-column gap-2">
@@ -59,10 +133,10 @@ export default {
 				+ Create new survey
 			</div>
 		</div>
-		<div class="flex-grow-1">
+		<div class="flex-grow-1 mt-1">
 			<span v-if="view === 'activeSurveysTable'">active surveys table placeholder</span>
 			<span v-else-if="view === 'pastSurveysTable'">past surveys table placeholder</span>
-			<coodle-survey v-else-if="view === 'survey'" :survey="survey" />
+			<coodle-survey v-else-if="view === 'survey'" :survey="survey" :uid="uid" />
 		</div>
 	</div>`,
 };
