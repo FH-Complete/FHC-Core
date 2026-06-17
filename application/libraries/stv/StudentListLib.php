@@ -253,7 +253,7 @@ class StudentListLib
 	 */
 	public function execute($studiensemester_kurzbz)
 	{
-		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurbz);
+		$this->addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz);
 
 		$stdsemEsc = $studiensemester_kurzbz ? $this->_ci->PrestudentModel->escape($studiensemester_kurzbz) : 'NULL';
 
@@ -302,7 +302,7 @@ class StudentListLib
 	 * @param string studiensemester_kurzbz
 	 *
 	 */
-	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurbz)
+	 protected function addSelectAndJoinForTagsIfConfigured($studiensemester_kurzbz)
 	 {
 		if (defined('STV_TAGS_ENABLED') && STV_TAGS_ENABLED) {
 			$this->_ci->load->config('stv');
