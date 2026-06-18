@@ -1,14 +1,20 @@
-import CoodleSurveyVotingTable from "./CoodleSurveyVotingTable.js";
+import CoodleSurveyVotingTable from "./CoodleSurvey/CoodleSurveyVotingTable.js";
+import CoodleSurveyCalendar from "./CoodleSurvey/CoodleSurveyCalendar.js";
+import CoodleSurveyParticipants from "./CoodleSurvey/CoodleSurveyParticipants.js";
+import CoodleSurveyDurationSelector from "./CoodleSurvey/CoodleSurveyDurationSelector.js";
+import CoodleSurveyBasicInfo from "./CoodleSurvey/CoodleSurveyBasicInfo.js";
 
-import {
-	formatDate,
-	numberPadding,
-	addMinutesToDate,
-} from "../../../../helpers/DateHelpers.js";
+import { formatDate, numberPadding } from "../../../../helpers/DateHelpers.js";
 
 export default {
 	name: "CoodleSurvey",
-	components: { CoodleSurveyVotingTable },
+	components: {
+		CoodleSurveyVotingTable,
+		CoodleSurveyCalendar,
+		CoodleSurveyParticipants,
+		CoodleSurveyDurationSelector,
+		CoodleSurveyBasicInfo,
+	},
 	props: {
 		survey: { type: Object | null },
 		uid: { type: String | null },
@@ -75,57 +81,6 @@ export default {
 				return "New survey";
 			}
 		},
-		formattedSurveyDescription() {
-			return this.$props.survey?.description?.replaceAll("\n", "<br>");
-		},
-		formattedSurveyTimeslotDuration() {
-			const minutes = this.$props.survey.timeslotDuration % 60;
-			const hours = (this.$props.survey.timeslotDuration - minutes) / 60;
-			let formattedDuration = hours ? hours + " hr " : "";
-			formattedDuration += minutes + " min";
-			return formattedDuration;
-		},
-		formattedSurveyEndsAt() {
-			if (this.$props.survey?.endsAt) {
-				return formatDate(this.$props.survey.endsAt);
-			} else {
-				return "";
-			}
-		},
-		formattedSurveyCreatedAt() {
-			if (this.$props.survey?.createdAt) {
-				return formatDate(this.$props.survey.createdAt);
-			} else {
-				return "";
-			}
-		},
-		formattedSurveyUpdatedAt() {
-			if (this.$props.survey?.updatedAt) {
-				return formatDate(this.$props.survey.updatedAt);
-			} else {
-				return "";
-			}
-		},
-		formattedSurveyCanceledAt() {
-			if (this.$props.survey?.canceledAt) {
-				return formatDate(this.$props.survey.canceledAt);
-			} else {
-				return "";
-			}
-		},
-		formattedSurveyCompletedAt() {
-			if (this.$props.survey?.completedAt) {
-				return formatDate(this.$props.survey.completedAt);
-			} else {
-				return "";
-			}
-		},
-		surveyCreatorProfileHref() {
-			return this.$router.resolve({
-				name: "ProfilView",
-				params: { uid: this.survey?.creator?.uid },
-			}).href;
-		},
 		parsedSelectedTimeslot() {
 			return this.$props.survey?.selectedTimeslotId
 				? this.parseTimeslot(
@@ -149,7 +104,7 @@ export default {
 	},
 	watch: {
 		survey: {
-			handler() {
+			async handler() {
 				this.setSurveyFormData();
 				if (!this.survey?.id) {
 					this.isEditInProgress = true;
@@ -157,38 +112,52 @@ export default {
 			},
 			deep: true,
 		},
+		isEditInProgress() {
+			if (!this.isEditInProgress) {
+				this.setSurveyFormData();
+			}
+		},
 	},
 	methods: {
 		setSurveyFormData() {
 			if (this.$props.survey) {
 				this.surveyFormData = { ...this.$props.survey };
-				return;
+			} else {
+				let defaultEndsAtDate = new Date();
+				defaultEndsAtDate.setDate(defaultEndsAtDate.getDate() + 7);
+
+				this.surveyFormData = {
+					id: null,
+					creator: null,
+					title: "",
+					description: "",
+					timeslotDuration: 60,
+					maxSelections: 1,
+					areParticipantsAnonymized: false,
+					areSelectionsAnonymized: false,
+					selectedTimeslot: null,
+					endsAt: defaultEndsAtDate.toISOString().slice(0, 10),
+					completedAt: null,
+					canceledAt: null,
+					updatedAt: null,
+					createdAt: null,
+					timeslots: [],
+					participants: [],
+				};
 			}
 
-			this.surveyFormData = {
-				id: null,
-				creator: null,
-				title: "",
-				description: "",
-				timeslotDuration: 60,
-				maxSelections: 1,
-				areParticipantsAnonymized: false,
-				areSelectionsAnonymized: false,
-				selectedTimeslot: null,
-				endsAt: null, //todo: set to current date + 7
-				completedAt: null,
-				canceledAt: null,
-				updatedAt: null,
-				createdAt: null,
-				timeslots: [],
-				participants: [],
-			};
+			this.surveyFormData.participants.forEach(
+				(participant) => {
+					participant.isCalendarShown = false;
+				},
+			);
 		},
 		parseTimeslot(timeslot) {
 			const timeslotStartsAt = new Date(timeslot.startsAt + " UTC");
-			const timeslotEndsAt = addMinutesToDate(
-				timeslotStartsAt,
-				this.$props.survey?.timeslotDuration ?? 0,
+			let timeslotEndsAt = new Date(timeslot.startsAt + " UTC");
+			timeslotEndsAt.setMinutes(
+				timeslotEndsAt.getMinutes() +
+					(this.$props.survey?.timeslotDuration ?? 0),
 			);
 
 			return {
@@ -222,6 +191,10 @@ export default {
 				return;
 			}
 			console.log("canceling...");
+			// todo
+		},
+		submitForm() {
+			console.log("submitting...");
 			// todo
 		},
 	},
@@ -269,90 +242,64 @@ export default {
 					</ul>
 				</div>
 			</div>
-		</div>	
+		</div>
 		<div class="card-body">
-			<div v-if="!isEditInProgress" class="d-flex flex-column gap-3">
-				<span v-if="$props.survey?.completedAt" class="fst-italic">
-					{{ "This survey was completed on " + formattedSurveyCompletedAt + ". " }}
-					<span v-if="$props.survey?.selectedTimeslotId">
-						{{
-							"The timeslot (((timeslot))) was selected.".replace(
-								"(((timeslot)))",
-								parsedSelectedTimeslot.weekday +
-									" " +
-									parsedSelectedTimeslot.fullDate +
-									" " +
-									parsedSelectedTimeslot.startTime +
-									"-" +
-									parsedSelectedTimeslot.endTime
-							)
-						}}
-					</span>
-					<span v-else>{{ "No timeslot was selected." }}</span>
-				</span>
-				<span v-else-if="$props.survey?.canceledAt" class="fst-italic">
-					{{ "This survey was canceled on " + formattedSurveyCanceledAt + "." }}
-				</span>
-				<span
-					v-if="$props.survey?.description?.length"
-					class="text-wrap"
-					v-html="formattedSurveyDescription"
-				></span>
-				<div class="d-flex flex-column gap-1">
-					<div>
-						{{ "Created by " }}
-						<a :href="surveyCreatorProfileHref" :target="'_blank'">{{ this.$props.survey?.creator?.name }}</a>
-						{{ " on " + formattedSurveyCreatedAt}}
-					</div>
-					<div>{{ "Last edited on " + formattedSurveyUpdatedAt }}</div>
-					<div>{{ "Planned to end on " + formattedSurveyEndsAt }}</div>
-				</div>
-				<div class="d-flex flex-column gap-1">
-					<div class="d-flex flex-row">
-						<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-							<i class="fa-solid fa-clock fa-lg"></i>
-						</div>
-						<span>
-							<span class="fw-bold">{{ "Proposed appointment duration: " }}</span>
-							{{ formattedSurveyTimeslotDuration }}
-						</span>
-					</div>
-					<div class="d-flex flex-row">
-						<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-							<i class="fa-solid fa-calendar-check fa-lg"></i>
-						</div>
-						<span>
-							<span class="fw-bold">{{ "Maximum selectable timeslots: " }}</span>
-							{{ $props.survey.maxSelections}}
-						</span>
-					</div>
-					<div class="d-flex flex-row">
-						<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-							<i class="fa-solid fa-user-slash fa-lg"></i>
-						</div>
-						<span>
-							<span class="fw-bold">{{ "Are participants anonymized: " }}</span>
-							{{ $props.survey.areParticipantsAnonymized ? "yes" : "no" }}
-						</span>
-					</div>
-					<div class="d-flex flex-row">
-						<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-							<i class="fa-solid fa-person-booth fa-lg"></i>
-						</div>
-						<span>
-							<span class="fw-bold">{{ "Are votes anonymized: " }}</span>
-							{{ $props.survey.areSelectionsAnonymized ? "yes" : "no" }}
-						</span>
-					</div>
-				</div>
-				<hr class="my-2">
-				<div class="d-flex flex-column gap-2">
+			<div class="d-flex flex-column gap-3">
+				<coodle-survey-basic-info
+					v-if="$props.survey"
+					v-model:surveyFormDataModelValue="surveyFormData"
+					:survey="$props.survey"
+					:parsedSelectedTimeslot="parsedSelectedTimeslot"
+					:isEditInProgress="isEditInProgress"
+				/>
+				<hr>
+				<div v-if="!isEditInProgress" class="d-flex flex-column gap-2">
 					<coodle-survey-voting-table
 						v-if="$props.survey"
 						:uid="$props.uid"
-						:survey="$props.survey"
 						:timeslots="parsedTimeslotsForVotingTable"
+						:survey="$props.survey"
 					/>
+				</div>
+				<div v-else class="d-flex flex-column gap-3">
+					<div class="row">
+						<div class="col-12 col-lg-4">
+							<coodle-survey-participants
+								v-if="surveyFormData?.participants"
+								v-model:participantsModelValue="surveyFormData.participants"
+							/>
+						</div>
+						<div class="col-12 col-lg-8">
+							<div class="d-flex flex-column gap-3">
+								<coodle-survey-duration-selector
+									v-if="surveyFormData?.timeslotDuration"
+									v-model:durationModelValue="surveyFormData.timeslotDuration"
+									:survey="$props.survey"
+								/>
+								<coodle-survey-calendar />
+							</div>
+						</div>
+					</div>
+					<div class="d-flex flex-row gap-2 justify-content-end align-items-start px-0">
+						<div>
+							<div
+								@click="isEditInProgress = false"
+								:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
+								class="btn text-nowrap"
+								>
+								{{ "Cancel" }}
+							</div>
+						</div>
+						<div>
+							<div
+								@click="submitForm()"
+								:class="isDarkMode ? 'btn-light' : 'btn-dark'"
+								class="btn text-nowrap"
+							>
+								{{ "Save" }}
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

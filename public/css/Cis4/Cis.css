@@ -33,6 +33,10 @@ html {
 	background-color: var(--fhc-primary) !important;
 }
 
+.fhc-primary-border-color {
+	border-color: var(--fhc-primary) !important;
+}
+
 .fhc-primary-highlight-bg {
 	background-color: var(--fhc-primary-highlight) !important;
 }
@@ -860,4 +864,12 @@ html {
 	border: 1px solid rgba(0, 0, 0, 0.15);
 	border-radius: 0.5rem;
 	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+#coodleParticipantsSearchResults {
+	background-color: var(--fhc-background);
+    border: 1px solid var(--fhc-border);
+}
+.coodleParticipantSearchResult:hover {
+	opacity: 80%;	
 }

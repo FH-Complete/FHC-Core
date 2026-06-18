@@ -61,14 +61,3 @@ export function formatDate(d) {
 		);
 	}
 }
-
-/**
- * adds some number of minutes to a date
- *
- * @param {Date} d - the date to which the minutes are added
- * @param {int} m - number of minutes
- * @returns {Date} updated date
- */
-export function addMinutesToDate(d, m) {
-	return new Date(d.getTime() + m * 60000);
-}

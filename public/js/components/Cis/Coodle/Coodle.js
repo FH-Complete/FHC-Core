@@ -9,8 +9,9 @@ export default {
 	data() {
 		return {
 			uid: null,
-			// todo: return view to activeSurveysTable and survey to null
 			view: "survey",
+			// survey: null,
+		// todo: delete comment after dev
 			survey: {
 				id: 1,
 				creator: {
@@ -19,13 +20,13 @@ export default {
 				},
 				title: "Test Meeting",
 				description:
-					"To discuss many important matters. \n Another line of the description.",
+					"To discuss many important matters.\nAnother line of the description.",
 				timeslotDuration: 75,
 				maxSelections: 2,
 				areParticipantsAnonymized: false,
 				areSelectionsAnonymized: false,
 				selectedTimeslotId: null,
-				endsAt: "2026-06-23 23:30:30",
+				endsAt: "2026-06-23",
 				completedAt: null,
 				canceledAt: null,
 				createdAt: "2026-06-14 23:30:30",
@@ -43,6 +44,14 @@ export default {
 						id: 3,
 						startsAt: "2026-06-25 07:00:00",
 					},
+					{
+						id: 4,
+						startsAt: "2026-06-24 09:00:00",
+					},
+					{
+						id: 5,
+						startsAt: "2026-06-27 12:30:00",
+					},
 				],
 				participants: [
 					{
@@ -57,12 +66,12 @@ export default {
 					},
 					{
 						uid: "ma1436",
-						name: "Test User 2",
+						name: "Test Userrr 2",
 						selection: null,
 					},
 					{
 						uid: "ma1437",
-						name: "Test User 3",
+						name: "Test Userrrrr 3",
 						selection: [2,3],
 					},
 				],
@@ -70,6 +79,8 @@ export default {
 					1: 0,
 					2: 2,
 					3: 1,
+					4: 0,
+					5: 0,
 					"none": 1,
 				},
 			},

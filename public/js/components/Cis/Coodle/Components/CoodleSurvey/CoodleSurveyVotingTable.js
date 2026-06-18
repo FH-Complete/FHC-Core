@@ -143,6 +143,7 @@ export default {
 		},
 		submitVote() {
 			// todo
+			console.log("voting...");
 		},
 		submitFinalSelection() {
 			if (!this.$props.survey.id) return;
@@ -153,7 +154,7 @@ export default {
 				window.alert("You haven't made a selection!");
 				return;
 			} else if (this.selectedTimeslotId === "none") {
-				selectedTimeslot = "\"No appointment is possible\"";
+				selectedTimeslot = '"No appointment is possible"';
 			} else {
 				const selectedTimeslotInfo = this.$props.timeslots.find(
 					(timeslot) => timeslot.id === this.selectedTimeslotId,
@@ -181,6 +182,37 @@ export default {
 			) {
 				return;
 			}
+
+			let participantsThatHaveNotVoted =
+				this.participantsWithoutAuthUser.reduce((sum, participant) => {
+					return (
+						sum +
+						(!Object.values(participant.selection).filter(
+							(isSelected) => isSelected,
+						).length
+							? 1
+							: 0)
+					);
+				}, 0);
+
+			if (
+				!Object.values(this.authUserParticipant.selection).filter(
+					(isSelected) => isSelected,
+				).length
+			) {
+				participantsThatHaveNotVoted++;
+			}
+
+			if (participantsThatHaveNotVoted) {
+				if (
+					!window.confirm(
+						"Not all participants have voted. Are you sure you want to proceed?",
+					)
+				) {
+					return;
+				}
+			}
+
 			console.log("finalizing...");
 			// todo
 		},
