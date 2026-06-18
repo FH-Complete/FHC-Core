@@ -58177,6 +58177,29 @@ I have been informed that I am under no obligation to consent to the transmissio
 		)
 	),
 	// ### Phrases Dashboard Admin END
+
+	//****************************	 FHTW Addon start
+	array(
+		'app' => 'core',
+		'category' => 'fhtw',
+		'phrase' => 'studienzweig',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Studienzweig',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Study branch',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	//****************************	 FHTW Addon end
 );
 
 
