@@ -58377,6 +58377,46 @@ I have been informed that I am under no obligation to consent to the transmissio
 			)
 		)
 	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseOnlyOneStudent',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte nur eine/n Studierende/n markieren!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select only one student!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'alert_chooseGroupSem',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Bitte eine Gruppe auswählen!',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Please select a group!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
 );
 
 
