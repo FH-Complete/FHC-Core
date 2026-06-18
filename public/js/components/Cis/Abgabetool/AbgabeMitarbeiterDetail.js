@@ -2,7 +2,8 @@ import BsModal from '../../Bootstrap/Modal.js';
 import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import { getDateStyleClass } from "./getDateStyleClass.js";
-import { compareISODateValues, formatISODate, getViennaTodayISO } from "./dateUtils.js";
+import {compareISODateValues, formatDateTime, formatISODate, getViennaTodayISO} from "./dateUtils.js";
+
 
 export const AbgabeMitarbeiterDetail = {
 	name: "AbgabeMitarbeiterDetail",
@@ -77,6 +78,19 @@ export const AbgabeMitarbeiterDetail = {
 		}
 	},
 	methods: {
+		getSavedTerminInfoString(termin) {
+			const isUpdate = termin.updateamum != null;
+
+			const fullname = isUpdate
+				? termin.updatevon_fullname
+				: termin.insertvon_fullname;
+
+			const datetime = isUpdate
+				? termin.updateamum
+				: termin.insertamum;
+
+			return this.$p.t('ui/savedAtByV3', [formatDateTime(datetime), fullname])
+		},
 		terminIsInvalid(termin) {
 			return termin.note?.positiv == false && !termin.beurteilungsnotiz	
 		},
@@ -817,7 +831,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-9">
 							<Dropdown
 								:style="{'width': '100%'}"
-								:disabled="!termin.allowedToSave"
+								:disabled="!termin.allowedToSave || termin.abgabedatum !== null || termin.noteBackend"
 								:placeholder="getPlaceholderTermin(termin)"
 								v-model="termin.bezeichnung"
 								@change="handleChangeAbgabetyp(termin)"
@@ -905,7 +919,7 @@ export const AbgabeMitarbeiterDetail = {
 						<div class="col-12 col-md-3 fw-bold align-content-center">
 								 {{ $capitalize( $p.t('abgabetool/c4actions') )}}
 						</div>
-						<div class="col-12 col-md-9">
+						<div class="col-12 col-md-5">
 							<div class="row">
 								<div class="col-auto">
 									<button v-if="termin.allowedToSave && !terminIsInvalid(termin)" style="max-height: 40px;" class="btn btn-primary border-0" @click="saveTermin(termin)">
@@ -932,6 +946,9 @@ export const AbgabeMitarbeiterDetail = {
 									</div>
 								</div>
 							</div>
+						</div>
+						<div class="col-12 col-md-4 align-content-center text-end text-muted small">
+							{{getSavedTerminInfoString(termin)}}
 						</div>
 					</div>
 				</AccordionTab>

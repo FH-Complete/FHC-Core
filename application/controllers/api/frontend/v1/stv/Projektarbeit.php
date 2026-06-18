@@ -287,10 +287,7 @@ class Projektarbeit extends FHCAPI_Controller
 	 */
 	public function getNoten()
 	{
-		$this->NoteModel->addOrder('notenwert', 'ASC');
-		$this->NoteModel->addOrder('bezeichnung', 'ASC');
-
-		$result = $this->NoteModel->load();
+		$result = $this->NoteModel->getAllActive();
 
 		if (isError($result)) return $this->terminateWithError(getError($result), self::ERROR_TYPE_GENERAL);
 

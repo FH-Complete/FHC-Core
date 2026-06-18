@@ -137,15 +137,31 @@ export const AbgabetoolMitarbeiter = {
 						cssClass: 'sticky-col',
 						visible: true
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 85, visible: true, tooltip: false, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 140, visible: true, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, visible: false,tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4studstatus'))), field: 'studienstatus', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, sorter: this.notenSorter, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, formatter: this.centeredTextFormatter, visible: true, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, width: 500, visible: true},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4betreuerartv2'))), field: 'betreuerart_beschreibung',formatter: this.centeredTextFormatter, visible: true, minWidth: 100, width: 200},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'betreuer_full_name', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPre'))), field: 'betreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerVorname'))), field: 'betreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerNachname'))), field: 'betreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: true},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerTitelPost'))), field: 'betreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerv2'))), field: 'zweitbetreuer_full_name', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPre'))), field: 'zweitbetreuer_titelpre', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerVorname'))), field: 'zweitbetreuer_vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerNachname'))), field: 'zweitbetreuer_nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4zweitbetreuerTitelPost'))), field: 'zweitbetreuer_titelpost', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
+
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4prevAbgabetermin'))),
 						headerFilter: dateFilter,
 						headerFilterFunc: this.headerFilterTerminCol,
@@ -248,6 +264,11 @@ export const AbgabetoolMitarbeiter = {
 			]};
 	},
 	methods: {
+		notenSorter(a, b, aRow, bRow, column, dir, sorterParams) {
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.note - bData.note
+		},
 		async openBenotung(type, link) {
 			if(type === 'new') {
 				window.open(link, '_blank')
@@ -277,6 +298,7 @@ export const AbgabetoolMitarbeiter = {
 			}
 		},
 		formAction(cell) {
+			
 			const actionButtons = document.createElement('div');
 			actionButtons.className = "d-flex gap-3";
 			actionButtons.style.display = "flex";
@@ -316,8 +338,26 @@ export const AbgabetoolMitarbeiter = {
 			} else if(data.abgabetermine?.find(termin => termin.paabgabetyp_kurzbz == 'end' && termin.abgabedatum !== null) && data.beurteilungLinkOld) {
 				actionButtons.append(createButton('fa fa-user-check', 'abgabetool/c4benoten', () => this.openBenotung('old', data.beurteilungLinkOld)))
 			}
+			
+			if(this.checkForZweitbetreuerTokenMailAvailability(data)) {
+				actionButtons.append(createButton('fa fa-envelope-open-text', 'abgabetool/c4zweitBegutachterTokenMailSenden', () => this.sendZweitbetreuerToken(data)))
 
+			}
+			
 			return actionButtons;
+		},
+		checkForZweitbetreuerTokenMailAvailability(data) {
+			const hasEndabgabeWithUpload = !!data.abgabetermine.find(termin => termin.abgabedatum !== null && termin.paabgabetyp_kurzbz == 'end')
+			const hasZweitbetreuerWithoutBenutzerUid = data.zweitbetreuer_person_id !== null && data.zweitbetreuer_benutzer_uid === null
+			
+			return hasEndabgabeWithUpload && hasZweitbetreuerWithoutBenutzerUid
+		},
+		sendZweitbetreuerToken(data) {
+
+			this.$api.call(ApiAbgabe.sendZweitbetreuerTokenMail(data.projektarbeit_id, data.betreuer_person_id, data.student_uid))
+				.then(res => {
+					if(res.meta.status == 'success') this.$fhcAlert.alertSuccess(this.$p.t('abgabetool/c4zweitBegutachterTokenMailSuccess'))
+				})
 		},
 		getDateStyleHtml(dateStyle) {
 			const iconMap = {
@@ -1174,14 +1214,19 @@ export const AbgabetoolMitarbeiter = {
 			return (projekt.typ + projekt.kurzbz)?.toUpperCase()	
 		},
 		setupData(data){
-			
-			
 			this.domain = data[1]
 			
 			this.projektarbeiten = data[0]?.retval?.map(projekt => {
 				this.checkAbgabetermineProjektarbeit(projekt)
 				projekt.selectable = projekt.betreuerart_kurzbz !== 'Zweitbegutachter'
 
+				if(this.notenOptions && projekt.note) {
+					const opt = this.notenOptions.find(n => n.note == projekt.note)
+					// TODO: mehrsprachig englisch -> nevermind the english field in
+					// notenoption->bezeichnung_mehrsprachig is ALWAYS german
+					projekt.note_bez = opt?.bezeichnung
+				}
+				
 				return {
 					...projekt,
 					details: {
@@ -1249,7 +1294,7 @@ export const AbgabetoolMitarbeiter = {
 			}
 
 			this.serienTermin.upload_allowed = newVal.upload_allowed_default
-		},
+		}
 	},
 	computed: {
 		countsToHTML() {

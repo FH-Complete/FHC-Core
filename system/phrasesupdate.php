@@ -1036,7 +1036,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn möglicherweise vorhanden',
+				'text' => 'Bewerber*In möglicherweise vorhanden',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -2129,6 +2129,26 @@ $phrases = array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Clear filter',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'ui',
+		'phrase' => 'savedAtByV3',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Gespeichert am {0} von {1}',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Saved on {0} by {1}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -3771,7 +3791,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'LektorIn',
+				'text' => 'Lektor*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -4400,7 +4420,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn',
+				'text' => 'Bewerber*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5300,7 +5320,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn parken',
+				'text' => 'Bewerber*In parken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5320,7 +5340,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn ausparken',
+				'text' => 'Bewerber*In ausparken',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5400,7 +5420,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn geparkt bis',
+				'text' => 'Bewerber*In geparkt bis',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5460,7 +5480,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn zurückstellen',
+				'text' => 'Bewerber*In zurückstellen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5500,7 +5520,7 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BewerberIn zurückgestellt bis',
+				'text' => 'Bewerber*In zurückgestellt bis',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -5580,8 +5600,8 @@ $phrases = array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Geparkte und zurückgestellte BewerberInnen werden von der Bearbeitung temporär ausgenommen.
-Geparkte BewerberInnen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte BewerberInnen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.
+				'text' => 'Geparkte und zurückgestellte Bewerber*Innen werden von der Bearbeitung temporär ausgenommen.
+Geparkte Bewerber*Innen werden zum angegebenen Datum automatisch entparkt, während zurückgestellte Bewerber*Innen nur manuell durch Drücken des Buttons den Zurückgestellt-Status verlieren.
 Bei einer Zurückstellung dient das Datum nur der Erinnerung.',
 				'description' => '',
 				'insertvon' => 'system'
@@ -8811,7 +8831,7 @@ The invoice will be sent to you again. <u><strong>The amount is only to be trans
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ANNEHMEN<br>(LektorIn)',
+				'text' => 'ANNEHMEN<br>(Lektor*In)',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -13682,7 +13702,7 @@ Any unusual occurrences
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'StudentIn',
+				'text' => 'Student*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -15858,7 +15878,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Alle anzeigen, die auf Empfehlung von LektorIn warten.",
+				'text' => "Alle anzeigen, die auf Empfehlung von Lektor*In warten.",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -25145,7 +25165,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'StudentIn ({prestudent_id})',
+				'text' => 'Student*In ({prestudent_id})',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -28188,7 +28208,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'MitarbeiterIn',
+				'text' => 'Mitarbeiter*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -29191,7 +29211,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'MitarbeiterIn',
+					'text' => 'Mitarbeiter*In',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29231,7 +29251,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Mitarbeiter Information',
+					'text' => 'Mitarbeiter*In Information',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29251,7 +29271,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'StudentIn',
+					'text' => 'Student*In',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -29271,7 +29291,7 @@ array(
 			'phrases' => array(
 				array(
 					'sprache' => 'German',
-					'text' => 'Student Information',
+					'text' => 'Student*In Information',
 					'description' => '',
 					'insertvon' => 'system'
 				),
@@ -37852,7 +37872,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'In welches Semester sollen diese {count} PrestudentInnen ({status})verschoben werden?',
+				'text' => 'In welches Semester sollen diese {count} Prestudent*Innen ({status})verschoben werden?',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40097,7 +40117,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'InteressentIn',
+				'text' => 'Interessent*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -40277,7 +40297,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PreStudentIn',
+				'text' => 'PreStudent*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -41241,7 +41261,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'LektorIn',
+				'text' => 'Lektor*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -41381,7 +41401,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'StudentIn hat keinen Status in diesem Semester',
+				'text' => 'Student*In hat keinen Status in diesem Semester',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -42289,7 +42309,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Dokumentabgabe - MitarbeiterInbereich",
+				'text' => "Dokumentabgabe - Mitarbeiter*Inbereich",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44095,7 +44115,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "BetreuerIn",
+				'text' => "Betreuer*In",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -44170,7 +44190,7 @@ array(
 	array(
 		'app' => 'core',
 		'category' => 'abgabetool',
-		'phrase' => 'c4abgabeStudentenbereich',
+		'phrase' => 'c4abgabeStudentenbereichv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
@@ -45135,7 +45155,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Projektarbeit Detailansicht MitarbeiterIn",
+				'text' => "Projektarbeit Detailansicht Mitarbeiter*In",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45691,7 +45711,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "E-Mail BetreuerIn",
+				'text' => "E-Mail Betreuer*In",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45731,7 +45751,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "ErstbetreuerIn Beurteilung herunterladen",
+				'text' => "Erstbetreuer*In Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45751,7 +45771,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "ZweitbetreuerIn Beurteilung herunterladen",
+				'text' => "Zweitbetreuer*In Beurteilung herunterladen",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45931,7 +45951,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Fehler beim Laden der Projektarbeit - StudentIn Zuordnung",
+				'text' => "Fehler beim Laden der Projektarbeit - Student*In Zuordnung",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -45951,7 +45971,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => "Kein zugeteilter StudentIn gefunden für Projektarbeit",
+				'text' => "Kein zugeteilter Student*In gefunden für Projektarbeit",
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46226,7 +46246,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ErstbetreuerIn',
+				'text' => 'Erstbetreuer*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46246,7 +46266,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZweitbetreuerIn',
+				'text' => 'Zweitbetreuer*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -46453,6 +46473,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Error sending E-Mail to second Reviewer!',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitBegutachterTokenMailSenden',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Access Token E-Mail an Zweitbegutachter*In senden',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Send access token email to second reviewer',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4zweitBegutachterTokenMailSuccess',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Access Token E-Mail an Zweitbegutachter*In wurde erfolgreich versandt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'Access token email has been successfully sent to second reviewer.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -46911,7 +46971,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BetreuerIn Berufspraktikum oder Projektarbeit',
+				'text' => 'Betreuer*In Berufspraktikum oder Projektarbeit',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47192,7 +47252,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ErstbetreuerIn Titel Pre',
+				'text' => 'Erstbetreuer*In Titel Pre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47212,7 +47272,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ErstbetreuerIn Vorname',
+				'text' => 'Erstbetreuer*In Vorname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47232,7 +47292,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ErstbetreuerIn Nachname',
+				'text' => 'Erstbetreuer*In Nachname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47252,7 +47312,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ErstbetreuerIn Titel Post',
+				'text' => 'Erstbetreuer*In Titel Post',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47272,7 +47332,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZweitbetreuerIn Titel Pre',
+				'text' => 'Zweitbetreuer*In Titel Pre',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47292,7 +47352,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZweitbetreuerIn Vorname',
+				'text' => 'Zweitbetreuer*In Vorname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47312,7 +47372,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZweitbetreuerIn Nachname',
+				'text' => 'Zweitbetreuer*In Nachname',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47332,7 +47392,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ZweitbetreuerIn Titel Post',
+				'text' => 'Zweitbetreuer*In Titel Post',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -47419,6 +47479,46 @@ array(
 			array(
 				'sprache' => 'English',
 				'text' => 'Invalid characters detected in thesis title.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4abgabetypAendernNichtErlaubt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ändern des Abgabetyps ist nach erfolgtem Upload oder einer erfolgten Benotung nicht erlaubt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not allowed to change the submission type after the upload is complete or after grades have been assigned.',
+				'description' => '',
+				'insertvon' => 'system'
+			)
+		)
+	),
+	array(
+		'app' => 'core',
+		'category' => 'abgabetool',
+		'phrase' => 'c4datumAendernNichtErlaubt',
+		'insertvon' => 'system',
+		'phrases' => array(
+			array(
+				'sprache' => 'German',
+				'text' => 'Ändern des Termin Zieldatums ist nach erfolgtem Upload oder einer erfolgten Benotung nicht erlaubt.',
+				'description' => '',
+				'insertvon' => 'system'
+			),
+			array(
+				'sprache' => 'English',
+				'text' => 'You are not allowed to change the deadline date after the upload is complete or after grades have been assigned.',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -48099,7 +48199,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PrüferIn 1',
+				'text' => 'Prüfer*In 1',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48119,7 +48219,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PrüferIn 2',
+				'text' => 'Prüfer*In 2',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -48139,7 +48239,7 @@ array(
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'PrüferIn 3',
+				'text' => 'Prüfer*In 3',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -49243,7 +49343,7 @@ array(
 	'phrases' => array(
 		array(
 			'sprache' => 'German',
-			'text' => 'PrestudentIn ID',
+			'text' => 'Prestudent*In ID',
 			'description' => '',
 			'insertvon' => 'system'
 		),
@@ -51909,7 +52009,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'LektorIn hinzufügen',
+				'text' => 'Lektor*In hinzufügen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -52291,7 +52391,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'SenderIn',
+				'text' => 'Sender*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -52311,7 +52411,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'EmpfängerIn',
+				'text' => 'Empfänger*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -52351,7 +52451,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'EmpfängerIn ID',
+				'text' => 'Empfänger*In ID',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -54388,7 +54488,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Bitte StudentIn auswählen!',
+				'text' => 'Bitte Student*In auswählen!',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -54853,7 +54953,7 @@ and represent the current state of research on the topic. The prescribed citatio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'MitarbeiterIn',
+				'text' => 'Mitarbeiter*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -56289,7 +56389,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BetreuerIn',
+				'text' => 'Betreuer*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -56309,7 +56409,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BetreuerIn',
+				'text' => 'Betreuer*In',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -56529,7 +56629,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen nicht möglich, dieser Projektarbeit sind bereits BetreuerInnen zugewiesen',
+				'text' => 'Löschen nicht möglich, dieser Projektarbeit sind bereits Betreuer*Innen zugewiesen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -56569,7 +56669,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'ProjektbetreuerIn ungültig',
+				'text' => 'Projektbetreuer*In ungültig',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -56589,7 +56689,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'Löschen nicht möglich, ProjektbetreuerIn hat bereits einen Vertrag',
+				'text' => 'Löschen nicht möglich, Projektbetreuer*In hat bereits einen Vertrag',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57029,7 +57129,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BetreuerIn bearbeiten',
+				'text' => 'Betreuer*In bearbeiten',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -57044,12 +57144,12 @@ I have been informed that I am under no obligation to consent to the transmissio
 	array(
 		'app' => 'core',
 		'category' => 'projektarbeit',
-		'phrase' => 'betreuerSpeichern',
+		'phrase' => 'betreuerSpeichernv2',
 		'insertvon' => 'system',
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'BetreuerIn speichern',
+				'text' => 'Betreuer*In speichern',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58186,7 +58286,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'Saved on {date} von {name}',
+				'text' => 'Saved on {date} by {name}',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -58906,7 +59006,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'StudentIn ist in diesem Semester keinem Lehrverband zugeteilt',
+				'text' => 'Student*In ist in diesem Semester keinem Lehrverband zugeteilt',
 				'description' => '',
 				'insertvon' => 'system'
 			),

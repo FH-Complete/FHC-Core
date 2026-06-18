@@ -7,15 +7,17 @@ import ApiAbgabe from '../../../api/factory/abgabe.js'
 import ApiStudiensemester from '../../../api/factory/studiensemester.js';
 import AbgabeterminStatusLegende from "./StatusLegende.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
+import AbgabeStudentTimeline from "./AbgabeStudentTimeline.js";
 import { splitMailsHelper } from "../../../helpers/EmailHelpers.js"
 import { getDateStyleClass} from "./getDateStyleClass.js";
-import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
 import { compareISODateValues, formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
 export const AbgabetoolAssistenz = {
 	name: "AbgabetoolAssistenz",
 	components: {
 		AbgabeterminStatusLegende,
+		AbgabeStudentTimeline,
 		BsModal,
 		BsOffcanvas,
 		CoreFilterCmpt,
@@ -76,7 +78,7 @@ export const AbgabetoolAssistenz = {
 			colLayoutRestoredFlat: false,
 			sortRestoredFlat: false,
 			stateRestoredFlat: false,
-			timelineProjekt: null,
+			timelineProjekte: [],
 			selectedStudiengangOption: null,
 			studiengaengeOptions: null,
 			detailIsFullscreen: false,
@@ -209,7 +211,7 @@ export const AbgabetoolAssistenz = {
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4orgformv2'))), field: 'orgform', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4projekttyp'))), field: 'projekttyp_kurzbz', formatter: this.centeredTextFormatter, minWidth: 150, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4stg'))), field: 'stg', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 50, visible: false},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4note'))), field: 'note_bez', headerFilter: true, sorter: this.notenSorter, visible: false, minWidth: 200, formatter: this.centeredTextFormatter},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4sem'))), field: 'studiensemester_kurzbz', headerFilter: true, visible: false, formatter: this.centeredTextFormatter, minWidth: 100},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4titel'))), field: 'titel', headerFilter: true,  formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4erstbetreuerv2'))), field: 'erstbetreuer', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100, visible: false},
@@ -431,6 +433,7 @@ export const AbgabetoolAssistenz = {
 							if (!val) return '';
 							return val?.bezeichnung ?? this.notenOptions?.find(n => n.note == val)?.bezeichnung ?? val;
 						},
+						sorter: this.notenSorterFlat,
 						minWidth: 100,
 						tooltip: false,
 						headerFilter: this.notenHeaderFilterEditor,
@@ -519,6 +522,18 @@ export const AbgabetoolAssistenz = {
 		};
 	},
 	methods: {
+		notenSorterFlat(a, b, aRow, bRow, column, dir, sorterParams) {
+			// flat table has their own sort since the field is called sligthly different in that context
+			// since note would be bestanden/nicht bestanden and that hardly needs sorting
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.pa_note - bData.pa_note
+		},
+		notenSorter(a, b, aRow, bRow, column, dir, sorterParams) {
+			const aData = aRow.getData()
+			const bData = bRow.getData()
+			return aData.note - bData.note
+		},
 		notenHeaderFilterEditor(cell, onRendered, success, cancel, editorParams) {
 			if (!this.notenOptions) return;
 
@@ -611,7 +626,7 @@ export const AbgabetoolAssistenz = {
 			return filterVal.some(val => val == noteId); // loose equality: filter vals are numbers, noteId might be string
 		},
 		handleFilterActiveChanged(active) {
-			if(!active && this.allSemOption) {
+			if(!active && this.allSemOption && this.stateRestored) {
 				this.curSem = this.allSemOption
 			}
 		},
@@ -1361,6 +1376,11 @@ export const AbgabetoolAssistenz = {
 			// calculate Abgabetermin time diff to now and assign last and next to projekt
 			projekt.abgabetermine.forEach(termin => {
 
+				// only set this if it has not been set yet and abgabetermin has a note (qgate)
+				if(!termin.noteBackend && termin.note) {
+					termin.noteBackend = termin.note
+				}
+				
 				termin.bezeichnung = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz === termin.paabgabetyp_kurzbz)
 				
 				// while already looping through each termin, calculate datestyle beforehand
@@ -1778,7 +1798,8 @@ export const AbgabetoolAssistenz = {
 				if(this.notenOptions && projekt.note) {
 					const opt = this.notenOptions.find(n => n.note == projekt.note)
 				
-					// TODO: mehrsprachig englisch
+					// TODO: mehrsprachig englisch -> nevermind the english field in
+					// notenoption->bezeichnung_mehrsprachig is ALWAYS german
 					projekt.note_bez = opt.bezeichnung
 				}
 
@@ -1851,20 +1872,17 @@ export const AbgabetoolAssistenz = {
 				if(typeof termin.note !== 'object') {
 					termin.note = this.allowedNotenOptions.find(opt => opt.note == termin.note)
 				}
-
-				// only set this if it has not been set yet and abgabetermin has a note (qgate)
-				if(!termin.noteBackend && termin.note) {
-					termin.noteBackend = termin.note
-				}
 				
 				termin.file = []
 
 				// assistenz should be able to edit every abgabe
 				// update 21-01-2026: actually blocking operations on finished projektarbeiten seems like a decent idea
+				const terminHasAbgabe = termin.abgabedatum != null
+				const terminHasNote = termin.noteBackend
 				termin.allowedToSave = paIsBenotet ? false : true
 
 				// assistenz are not allowed to delete deadlines with existing submissions
-				termin.allowedToDelete = paIsBenotet ? false : !termin.abgabedatum && !termin.note
+				termin.allowedToDelete = paIsBenotet || terminHasNote || terminHasAbgabe ? false : true
 				
 			})
 			
@@ -1876,21 +1894,54 @@ export const AbgabetoolAssistenz = {
 			this.$refs.modalContainerAbgabeDetail.show()
 		},
 		openTimeline(val) {
-			const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)
-			if(!projekt) {
+			
+			this.$api.call(ApiAbgabe.fetchProjektarbeitenHistory(val.student_uid)).then(res => {
+				console.log(res)
 
-				this.$fhcAlert.alertInfo('Keine projektarbeit gefunden')
-				
-				return
-			}
-			projekt.abgabetermine.forEach(termin => {
-				// show note only on termine with abgabetypen which are benotbar
-				const terminTypOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == termin.paabgabetyp_kurzbz)
-				termin.benotbar = terminTypOpt.benotbar 
+				res.data.forEach(projekt => {
+					projekt.abgabetermine?.forEach(termin => {
+						// only set this if it has not been set yet and abgabetermin has a note (qgate)
+						if(!termin.noteBackend && termin.note) {
+							termin.noteBackend = this.notenOptions.find(opt => termin.note == opt.note)
+						}
+						
+						termin.dateStyle = getDateStyleClass(termin, this.notenOptions)
+						
+						const terminTypOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == termin.paabgabetyp_kurzbz)
+						if (terminTypOpt) termin.benotbar = terminTypOpt.benotbar
+					})
+				})
+
+				// keep the history API stub for future use
+
+
+				this.timelineProjekte = res.data
+				this.$refs.drawer.show()
 			})
-			this.timelineProjekt = projekt
-			this.$refs.drawer.show()
 		},
+		// openTimeline(val) {
+		//	
+		// 	this.$api.call(ApiAbgabe.fetchProjektarbeitenHistory(val.student_uid)).then(res => {
+		// 		console.log(res)
+		// 	})
+		//	
+		// 	const projekt = this.projektarbeiten.find(p => p.projektarbeit_id == val.projektarbeit_id)
+		// 	if(!projekt) {
+		//
+		// 		this.$fhcAlert.alertInfo('Keine projektarbeit gefunden')
+		//		
+		// 		return
+		// 	}
+		//	
+		// 	projekt.abgabetermine.forEach(termin => {
+		// 		// show note only on termine with abgabetypen which are benotbar
+		// 		const terminTypOpt = this.abgabeTypeOptions.find(opt => opt.paabgabetyp_kurzbz == termin.paabgabetyp_kurzbz)
+		// 		termin.benotbar = terminTypOpt.benotbar 
+		// 	})
+		//	
+		// 	this.timelineProjekt = projekt
+		// 	this.$refs.drawer.show()
+		// },
 		paabgabetypFormatter(cell) {
 			const key = cell.getValue()
 			return this.$p.t('abgabetool/c4paatyp' + key)
@@ -2100,8 +2151,14 @@ export const AbgabetoolAssistenz = {
 			if (!this.projektarbeiten) return [];
 			return this.projektarbeiten.flatMap(pa =>
 				pa.abgabetermine.map(termin => {
-					const allowedToSave = pa.note !== null ? false : true
-					const allowedToDelete = pa.note !== null ? false : !termin.abgabedatum && !termin.note
+					const terminHasAbgabe = termin.abgabedatum != null
+					const terminHasNote = termin.noteBackend
+					
+					// IN multiedit changing anything for a termin with an existing note is not allowed anymore, to avoid
+					// confusing UX behaviour why some fields could be edited and others not -> just edit in detail view
+					const allowedToSave = pa.note !== null || terminHasNote || terminHasAbgabe ? false : true
+					const allowedToDelete = pa.note !== null || terminHasNote || terminHasAbgabe ? false : true
+					
 					return {
 						allowedToSave,
 						allowedToDelete,
@@ -2554,102 +2611,11 @@ export const AbgabetoolAssistenz = {
 				{{ $p.t('abgabetool/c4projektarbeitTimelineTitle') }}
 			</template>
 
-			<div class="row" style="margin-bottom: 12px;">
-				<Inplace
-					closable
-					:closeButtonProps="{
-						style: {
-							position: 'absolute',
-							top: '80px',
-							right: '80px',
-							zIndex: 1
-						}
-					}"
-				>
-					<template #display> {{ $capitalize($p.t('abgabetool/showStudentDetails'))}} </template>
-					<template #content>
-						<div class="col-auto">
-							<div class="row">
-								<div class="col-3">Student: </div>
-								<div class="col-7">{{timelineProjekt?.student_vorname}} {{timelineProjekt?.student_nachname}}</div>
-							</div>
-							<div class="row">
-								<div class="col-3">Uid: </div>
-								<div class="col-7">{{timelineProjekt?.student_uid}}</div>
-							</div>
-							<div class="row">
-								<div class="col-3">{{timelineProjekt?.betreuerart}}: </div>
-								<div class="col-7">{{timelineProjekt?.erstbetreuer_full_name}}</div>
-							</div>
-							<div class="row">
-								<div class="col-3">Titel: </div>
-								<div class="col-7">{{timelineProjekt?.titel}}</div>
-							</div>
-						</div>
-					</template>
-				</Inplace>
-			</div>
-		
-			<Timeline 
-				:value="timelineProjekt?.abgabetermine"
-				align="right"
-			>	
-				<template #marker="slotProps">
-					<div :class="slotProps.item.dateStyle + '-header'" style="height: 48px; width:48px; padding: 0px; display: flex; align-items: center; justify-content: center;">
-						<i v-if="slotProps.item.dateStyle == 'verspaetet'" class="fa-solid fa-triangle-exclamation"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'verpasst'" class="fa-solid fa-calendar-xmark"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'abzugeben'" class="fa-solid fa-hourglass-half"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'standard'" class="fa-solid fa-clock"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'abgegeben'" class="fa-solid fa-paperclip"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'beurteilungerforderlich'" class="fa-solid fa-list-check"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'bestanden'" class="fa-solid fa-check"></i>
-						<i v-else-if="slotProps.item.dateStyle == 'nichtbestanden'" class="fa-solid fa-circle-exclamation"></i>
-					
-					</div>
-				</template>
-			
-				<template #opposite="slotProps">
-					<div class="row g-1">
-						<div class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4zieldatumv2')) }}:
-						</div>
-						<div class="col-7">
-							{{ formatDate(slotProps.item.datum) }}
-						</div>
-					</div>
-				</template>
-				
-				<template #content="slotProps">
-				 	<div class="row g-1">
-						<div class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4abgabetyp')) }}:
-						</div>
-						<div class="col-7">
-							{{ getItemBezeichnung(slotProps.item) }}
-						</div>
-				
-						<div class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4abgabedatum')) }}:
-						</div>
-						<div class="col-7">
-							{{ formatDate(slotProps.item.abgabedatum) }}
-						</div>
-						
-						<div v-if="slotProps.item.benotbar" class="col-5 fw-semibold text-end">
-							{{ $capitalize($p.t('abgabetool/c4note')) }}:
-						</div>
-						<div v-if="slotProps.item.benotbar" class="col-7">
-							{{ getItemNote(slotProps.item) }}
-						</div>
-				 	</div>
-				 	<hr/>
-				</template>
-				
-			</Timeline>
-			
-			<template #footer>
-				<AbgabeterminStatusLegende></AbgabeterminStatusLegende>
-			</template>
+			<AbgabeStudentTimeline
+				:projekte="timelineProjekte"
+				:notenOptions="notenOptions"
+				:formatDateFn="formatDate"
+			/>
 		</BsOffcanvas>
 		
 		<div id="abgabetable" style="max-height:40vw;">
@@ -2713,6 +2679,7 @@ export const AbgabetoolAssistenz = {
 			>
 				<template #actions>
 					<Dropdown
+						v-if="curSem"
 						@change="semesterChanged" 
 						:placeholder="$capitalize($p.t('lehre/studiensemester'))" 
 						:style="{'scroll-behavior': 'auto !important'}" 

@@ -11,6 +11,13 @@ export function formatISODate(dateParam) {
 	return date.isValid ? date.toFormat('dd.MM.yyyy') : '';
 }
 
+export function formatDateTime(dateParam) {
+	if (!dateParam) return '';
+
+	const date = luxon.DateTime.fromSQL(dateParam);
+	return date.isValid ? date.toFormat("dd.MM.yyyy HH:mm") : '';
+}
+
 export function toViennaDate(dateParam) {
 	if (!dateParam) return null;
 

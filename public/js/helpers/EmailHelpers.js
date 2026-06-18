@@ -1,6 +1,5 @@
 export async function splitMailsHelper(mails, event, subject, body, alertPluginRef, phrasenPluginRef) {
 	await phrasenPluginRef.loadCategory('ui');
-	debugger
 	let splititem = ",";
 	let maillist = mails.join(splititem);
 	let useBcc = event?.ctrlKey || event?.metaKey;

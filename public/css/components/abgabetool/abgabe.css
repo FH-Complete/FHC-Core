@@ -396,3 +396,13 @@
 		opacity: 0;
 	}
 }
+
+.p-timeline-event-opposite {
+	flex: 0 0 90px;
+	max-width: 90px;
+}
+
+.p-timeline-event-content {
+	flex: 1 1 auto;
+	min-width: 0;
+}

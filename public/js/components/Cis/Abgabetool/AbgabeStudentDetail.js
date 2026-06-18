@@ -410,7 +410,7 @@ export const AbgabeStudentDetail = {
 
 		<div v-if="projektarbeit">
 		
-			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereich') )}}</h5>
+			<h5>{{$capitalize( $p.t('abgabetool/c4abgabeStudentenbereichv2') )}}</h5>
 			<div class="row">
 				<div class="col-8">
 					<p>{{$capitalize( $p.t('person/student') ) }}: {{projektarbeit?.student}}</p>
@@ -658,7 +658,7 @@ export const AbgabeStudentDetail = {
 					</label>
 					<Textarea 
 						v-model="editingTitel" 
-						rows="10" 
+						rows="2" 
 						maxlength="1024" 
 						class="form-control w-100"
 						@keydown.enter.prevent="saveTitel"

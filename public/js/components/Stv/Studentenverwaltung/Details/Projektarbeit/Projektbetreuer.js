@@ -293,6 +293,21 @@ export default {
 						this.$refs.projektbetreuerTable.tabulator.replaceData(this.addIds(result.data));
 					})
 					.catch(this.$fhcAlert.handleSystemError);
+
+				// get other initial data
+				this.$api
+					.call(ApiStvProjektbetreuer.getBetreuerarten())
+					.then(result => {
+						this.arrBetreuerart = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
+
+				this.$api
+					.call(ApiStvProjektbetreuer.getNoten())
+					.then(result => {
+						this.arrNoten = result.data;
+					})
+					.catch(this.$fhcAlert.handleSystemError);
 			} else {
 				this.emptyBetreuerList();
 			}
@@ -547,6 +562,9 @@ export default {
 
 			</form-form>
 
+			<button class="btn btn-primary" v-show="betreuerFormOpened" @click="saveProjektbetreuer">
+				{{ $p.t('projektarbeit', 'betreuerSpeichernv2') }}
+			</button>
 			<!-- <div class = "mt-5" v-if="beurteilungDownloadLink !== null">
 				<div class="mb-1">
 					<a :href="beurteilungDownloadLink" class="btn btn-primary d-block" :class="{ 'disabled' : beurteilungDownloadLink === ''}">
