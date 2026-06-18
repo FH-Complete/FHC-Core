@@ -63,11 +63,6 @@ export default {
 		isFutureEvent() {
 			const eventStart = luxon.DateTime.fromISO(`${this.event.datum}T${this.event.beginn}`);
 			return eventStart > luxon.DateTime.now();
-		}
-	},
-	methods: {
-		handleDelete() {
-			this.$emit('delete-event', this.event);
 		},
 		timeSlotDisplayClasses() {
 			switch (this.$props.timeSlotDisplayBehavior) {
@@ -78,6 +73,11 @@ export default {
 				default:
 					return "d-none d-xl-grid";
 			}
+		},
+	},
+	methods: {
+		handleDelete() {
+			this.$emit('delete-event', this.event);
 		},
 	},
 	template: /* html */`
