@@ -709,7 +709,7 @@ class UDFLib
 				if (isset($field[self::LIST_VALUES]['enum'])) {
 					$field['options'] = $field[self::LIST_VALUES]['enum'];
 				} elseif (isset($field[self::LIST_VALUES]['sql'])) {
-					$res = $this->_ci->UDFModel->execReadOnlyQuery($field[self::LIST_VALUES]['sql']);
+					$res = $this->_ci->UDFModel->execReadOnlyQuery($field[self::LIST_VALUES]['sql'], [getUserLanguage()]);
 					$field['options'] = hasData($res) ? getData($res) : [];
 				}
 			}
