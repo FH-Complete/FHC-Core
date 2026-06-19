@@ -42,6 +42,9 @@ class Tag_Controller extends FHCAPI_Controller
 
 	public function getTag($readonly_tags = null)
 	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
+
 		$id = $this->input->get('id');
 
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
@@ -66,7 +69,7 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel, 
 			tbl_notiz.text, 
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
@@ -96,10 +99,11 @@ class Tag_Controller extends FHCAPI_Controller
 	public function getTags($tags = null)
 	{
 		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
 
 		$this->NotiztypModel->addSelect(
 			"typ_kurzbz as tag_typ_kurzbz,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			style,
 			beschreibung,
 			tag,
@@ -282,10 +286,12 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->terminateWithSuccess($deleteNotiz);
 	}
 
-	public function getAllTags($readonly_tags = false){
+	public function getAllTags($readonly_tags = false)
+	{
+		$language = $this->_getLanguageIndex();
+		$index_bezeichnung_mehrsprachig = $language - 1;
 		$prestudent_id = $this->input->get('prestudent_id');
 
-		//TODO check for readonly: necessary?
 		if (is_array($readonly_tags) && !isEmptyArray($readonly_tags))
 		{
 			$readonly_tags = $this->_filterTag($readonly_tags, true);
@@ -307,7 +313,7 @@ class Tag_Controller extends FHCAPI_Controller
 		$this->NotizModel->addSelect(
 			"tbl_notiz.titel,
 			tbl_notiz.text,
-			array_to_json(bezeichnung_mehrsprachig::varchar[])->>0 as bezeichnung,
+			array_to_json(bezeichnung_mehrsprachig::varchar[])->>". $index_bezeichnung_mehrsprachig . " as bezeichnung,
 			tbl_notiz.notiz_id,
 			tbl_notiz_typ.style,
 			tbl_notiz_typ.automatisiert,
