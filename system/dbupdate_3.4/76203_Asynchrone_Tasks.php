@@ -3,7 +3,7 @@
 // Add column pid to system.tbl_jobsqueue
 if (!$result = @$db->db_query('SELECT "pid" FROM "system"."tbl_jobsqueue" LIMIT 1'))
 {
-	$qry = 'ALTER TABLE "system"."tbl_jobsqueue" ADD "pid" INT NULL DEFAULT 0;';
+	$qry = 'ALTER TABLE "system"."tbl_jobsqueue" ADD "pid" INT NULL DEFAULT NULL;';
 	if (!$db->db_query($qry))
 		echo '<strong>system.tbl_jobsqueue: '.$db->db_last_error().'</strong><br>';
 	else

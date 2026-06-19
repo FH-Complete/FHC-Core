@@ -16,5 +16,5 @@ $config['lrt_max_number_system'] = 100;
 $config['lrt_max_run_timeout'] = 48;
 
 // List of existing LRT types
-$config['lrt_types'] = array('LRTDocumentConvertion');
+$config['lrt_types'] = array('LRTDummy');
 

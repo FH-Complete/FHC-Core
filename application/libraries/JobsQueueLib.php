@@ -256,7 +256,29 @@ class JobsQueueLib
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
+	// Protected methods
+
+	/**
+	 * Checks if the given job contains a valid type
+	 */
+	protected function _checkJobType($type, $types)
+	{
+		return $this->_inArray($type, $types, self::PROPERTY_TYPE);
+	}
+
+	//------------------------------------------------------------------------------------------------------------------
 	// Private methods
+	
+	/**
+	 * Drop not allowed properties from the given job
+	 */
+	private function _dropNotAllowedPropertiesNewJob(&$job)
+	{
+		unset($job->{self::PROPERTY_JOBID});
+		unset($job->{self::PROPERTY_CREATIONTIME});
+		unset($job->{self::PROPERTY_TYPE});
+	}
+
 
 	/**
 	 * Checks the job object structure when needed for insert
@@ -284,34 +306,6 @@ class JobsQueueLib
 	}
 
 	/**
-	 * Checks the job object structure when needed for update
-	 */
-	private function _checkUpdateJobStructure(&$job)
-	{
-		// If job is a valid object
-		if (is_object($job) && property_exists($job, self::PROPERTY_JOBID)) return true; // it is valid!
-
-		// If not object then object it!
-		if (!is_object($job)) $job = new stdClass();
-
-		// If an error property was not already previously stored then store an error message in job object
-		if (!property_exists($job, self::PROPERTY_ERROR))
-		{
-			$job->{self::PROPERTY_ERROR} = 'The structure of the provided job is not valid';
-		}
-
-		return false; // better sorry than wrong
-	}
-
-	/**
-	 * Checks if the given job contains a valid type
-	 */
-	private function _checkJobType($type, $types)
-	{
-		return $this->_inArray($type, $types, self::PROPERTY_TYPE);
-	}
-
-	/**
 	 * Checks if the given job contains a valid status
 	 */
 	private function _checkJobStatus(&$job, $statuses)
@@ -336,6 +330,26 @@ class JobsQueueLib
 	}
 
 	/**
+	 * Checks the job object structure when needed for update
+	 */
+	private function _checkUpdateJobStructure(&$job)
+	{
+		// If job is a valid object
+		if (is_object($job) && property_exists($job, self::PROPERTY_JOBID)) return true; // it is valid!
+
+		// If not object then object it!
+		if (!is_object($job)) $job = new stdClass();
+
+		// If an error property was not already previously stored then store an error message in job object
+		if (!property_exists($job, self::PROPERTY_ERROR))
+		{
+			$job->{self::PROPERTY_ERROR} = 'The structure of the provided job is not valid';
+		}
+
+		return false; // better sorry than wrong
+	}
+
+	/**
 	 * Search in an array the given value
 	 * The elements of the given array are objects
 	 * The given value is compared with the property specified by the $propertyName parameter of each object of the given array
@@ -354,16 +368,6 @@ class JobsQueueLib
 		}
 
 		return $found;
-	}
-
-	/**
-	 * Drop not allowed properties from the given job
-	 */
-	private function _dropNotAllowedPropertiesNewJob(&$job)
-	{
-		unset($job->{self::PROPERTY_JOBID});
-		unset($job->{self::PROPERTY_CREATIONTIME});
-		unset($job->{self::PROPERTY_TYPE});
 	}
 
 	/**
