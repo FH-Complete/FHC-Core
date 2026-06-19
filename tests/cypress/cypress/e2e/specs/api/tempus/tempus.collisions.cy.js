@@ -3,33 +3,55 @@ import { getDateForDay } from "../../../../support/helpers/date";
 
 const TARGETED_STUDY_PLAN_SHORT_CODE = "STG5";
 
+const resetEventsBeforeTest = () => {
+  tempusApi
+    .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
+    .then((events) => {
+      events.forEach((event) => {
+        tempusApi.deleteKalenderEvent(event.kalender_id);
+      });
+    });
+  tempusApi
+    .getPlannerEvents(getDateForDay("tuesday"), getDateForDay("tuesday"))
+    .then((events) => {
+      events.forEach((event) => {
+        if (
+          event.type === "lehreinheit" &&
+          event.beginn === "20:15:00" &&
+          event.ende === "21:00:00"
+        ) {
+          tempusApi.updateKalenderEvent(
+            event.kalender_id,
+            `${event.datum} 19:30`,
+            `${event.datum} 20:15`,
+          );
+        }
+      });
+    });
+  tempusApi
+    .getPlannerEvents(getDateForDay("sunday"), getDateForDay("sunday"))
+    .then((events) => {
+      events.forEach((event) => {
+        if (
+          event.type === "lehreinheit" &&
+          event.beginn === "18:35:00" &&
+          event.ende === "19:20:00" &&
+          event.lektor.some((lector) => lector.kurzbz === "DemoLKT1")
+        ) {
+          tempusApi.updateKalenderEvent(
+            event.kalender_id,
+            `${event.datum} 17:50`,
+            `${event.datum} 18:35`,
+          );
+        }
+      });
+    });
+};
+
 describe("Tempus Kalender API", () => {
   beforeEach(() => {
     cy.login();
-    tempusApi
-      .getPlannerEvents(getDateForDay("monday"), getDateForDay("monday"))
-      .then((events) => {
-        events.forEach((event) => {
-          tempusApi.deleteKalenderEvent(event.kalender_id);
-        });
-      });
-    tempusApi
-      .getPlannerEvents(getDateForDay("tuesday"), getDateForDay("tuesday"))
-      .then((events) => {
-        events.forEach((event) => {
-          if (
-            event.type === "lehreinheit" &&
-            event.beginn === "20:15:00" &&
-            event.ende === "21:00:00"
-          ) {
-            tempusApi.updateKalenderEvent(
-              event.kalender_id,
-              `${event.datum} 19:30`,
-              `${event.datum} 20:15`,
-            );
-          }
-        });
-      });
+    resetEventsBeforeTest();
   });
 
   it("event creation works for non collision case", () => {
@@ -97,7 +119,6 @@ describe("Tempus Kalender API", () => {
               tempusApi
                 .createKalenderEvent(lehreinheitId, startDateTime, endDateTime)
                 .then((response) => {
-                  console.log(response.body.errors);
                   expect(response.status).to.eq(500);
                   expect(response.body).to.have.nested.property(
                     "meta.status",
@@ -106,13 +127,7 @@ describe("Tempus Kalender API", () => {
                   expect(response.body.errors).to.be.an("array");
 
                   let hasTimeLockCollisionError = response.body.errors.some(
-                    (error) =>
-                      error.message
-                        .toLowerCase()
-                        .includes("zeitsperre kollision") ||
-                      error.message
-                        .toLowerCase()
-                        .includes("time lock collision"),
+                    (error) => error.errorCode === "absences_collision",
                   );
                   expect(
                     hasTimeLockCollisionError,
@@ -154,7 +169,6 @@ describe("Tempus Kalender API", () => {
               tempusApi
                 .createKalenderEvent(lehreinheitId, startDateTime, endDateTime)
                 .then((response) => {
-                  console.log(response.body.errors);
                   expect(response.status).to.eq(500);
                   expect(response.body).to.have.nested.property(
                     "meta.status",
@@ -162,11 +176,7 @@ describe("Tempus Kalender API", () => {
                   );
                   expect(response.body.errors).to.be.an("array");
                   let hasStudentGroupCollisionError = response.body.errors.some(
-                    (error) =>
-                      error.message
-                        .toLowerCase()
-                        .includes("verband kollision") ||
-                      error.message.toLowerCase().includes("student collision"),
+                    (error) => error.errorCode === "verband_collision",
                   );
                   expect(
                     hasStudentGroupCollisionError,
@@ -219,7 +229,6 @@ describe("Tempus Kalender API", () => {
                     endDateTime,
                   )
                   .then((response) => {
-                    console.log(response.body.errors);
                     expect(response.status).to.eq(500);
                     expect(response.body).to.have.nested.property(
                       "meta.status",
@@ -227,13 +236,7 @@ describe("Tempus Kalender API", () => {
                     );
                     expect(response.body.errors).to.be.an("array");
                     let hasStudentCollisionError = response.body.errors.some(
-                      (error) =>
-                        error.message
-                          .toLowerCase()
-                          .includes("studierende kollision") ||
-                        error.message
-                          .toLowerCase()
-                          .includes("student collision"),
+                      (error) => error.errorCode === "student_collision",
                     );
                     expect(
                       hasStudentCollisionError,
@@ -286,7 +289,6 @@ describe("Tempus Kalender API", () => {
                       endDateTime,
                     )
                     .then((response) => {
-                      console.log(response.body.errors);
                       expect(response.status).to.eq(500);
                       expect(response.body).to.have.nested.property(
                         "meta.status",
@@ -294,13 +296,7 @@ describe("Tempus Kalender API", () => {
                       );
                       expect(response.body.errors).to.be.an("array");
                       let hasLectorCollisionError = response.body.errors.some(
-                        (error) =>
-                          error.message
-                            .toLowerCase()
-                            .includes("lektorin kollision") ||
-                          error.message
-                            .toLowerCase()
-                            .includes("lector collision"),
+                        (error) => error.errorCode === "lector_collision",
                       );
                       expect(
                         hasLectorCollisionError,
@@ -390,9 +386,7 @@ describe("Tempus Kalender API", () => {
                 expect(response.body.errors).to.be.an("array");
 
                 let hasRoomCollisionError = response.body.errors.some(
-                  (error) =>
-                    error.message.toLowerCase().includes("raum kollision") ||
-                    error.message.toLowerCase().includes("room collision"),
+                  (error) => error.errorCode === "room_collision",
                 );
                 expect(
                   hasRoomCollisionError,
@@ -440,15 +434,12 @@ describe("Tempus Kalender API", () => {
                   "error",
                 );
                 expect(response.body.errors).to.be.an("array");
-                console.log(response.body.errors);
                 let hasStudentGroupCollisionError = response.body.errors.some(
-                  (error) =>
-                    error.message.toLowerCase().includes("verband kollision") ||
-                    error.message.toLowerCase().includes("student collision"),
+                  (error) => error.errorCode === "verband_collision",
                 );
                 expect(
                   hasStudentGroupCollisionError,
-                  "response contains student collision error",
+                  "response contains student group collision error",
                 ).to.be.true;
               });
           });
@@ -490,13 +481,8 @@ describe("Tempus Kalender API", () => {
                 "error",
               );
               expect(response.body.errors).to.be.an("array");
-              console.log(response.body.errors);
               let hasDirectStudentCollisionError = response.body.errors.some(
-                (error) =>
-                  error.message
-                    .toLowerCase()
-                    .includes("studierende kollision") ||
-                  error.message.toLowerCase().includes("student collision"),
+                (error) => error.errorCode === "student_collision",
               );
               expect(
                 hasDirectStudentCollisionError,
@@ -515,7 +501,6 @@ describe("Tempus Kalender API", () => {
       tempusApi
         .getPlannerEvents(getDateForDay("saturday"), getDateForDay("saturday"))
         .then((events) => {
-          console.log(events);
           const sourceEvent = events.find(
             (event) =>
               event.type === "lehreinheit" &&
@@ -543,11 +528,8 @@ describe("Tempus Kalender API", () => {
                 "error",
               );
               expect(response.body.errors).to.be.an("array");
-              console.log(response.body.errors);
               let hasLectorCollisionError = response.body.errors.some(
-                (error) =>
-                  error.message.toLowerCase().includes("lektorin kollision") ||
-                  error.message.toLowerCase().includes("lector collision"),
+                (error) => error.errorCode === "lector_collision",
               );
               expect(
                 hasLectorCollisionError,
@@ -596,15 +578,95 @@ describe("Tempus Kalender API", () => {
               expect(response.body.errors).to.be.an("array");
 
               let hasTimeLockCollisionError = response.body.errors.some(
-                (error) =>
-                  error.message
-                    .toLowerCase()
-                    .includes("zeitsperre kollision") ||
-                  error.message.toLowerCase().includes("time lock collision"),
+                (error) => error.errorCode === "absences_collision",
               );
               expect(
                 hasTimeLockCollisionError,
                 "response contains time lock collision error",
+              ).to.be.true;
+            });
+        });
+    });
+  });
+
+  it("event update works for entries without collision", () => {
+    let settingsData = tempusApi.getSettingsData();
+    tempusApi.updateSettingsData(settingsData).then((response) => {
+      tempusApi
+        .getPlannerEvents(getDateForDay("sunday"), getDateForDay("sunday"))
+        .then((events) => {
+          const sourceEvent = events.find(
+            (event) =>
+              event.beginn === "17:50:00" &&
+              event.ende === "18:35:00" &&
+              event.lektor.some((lector) => lector.kurzbz === "DemoLKT1"),
+          );
+          expect(
+            sourceEvent,
+            "source event with fixed time and resources for collision test",
+          ).to.exist;
+
+          const startDateTime = `${sourceEvent.datum} 18:35`;
+          const endDateTime = `${sourceEvent.datum} 19:20`;
+
+          tempusApi
+            .updateKalenderEvent(
+              sourceEvent.kalender_id,
+              startDateTime,
+              endDateTime,
+            )
+            .then((response) => {
+              console.log(response);
+              expect(response.status).to.eq(200);
+              expect(response.body).to.have.nested.property(
+                "meta.status",
+                "success",
+              );
+            });
+        });
+    });
+  });
+
+  it("prohibited event update due to resources collision", () => {
+    let settingsData = tempusApi.getSettingsData();
+    tempusApi.updateSettingsData(settingsData).then((response) => {
+      tempusApi
+        .getPlannerEvents(getDateForDay("sunday"), getDateForDay("sunday"))
+        .then((events) => {
+          const sourceEvent = events.find(
+            (event) =>
+              event.beginn === "19:30:00" &&
+              event.ende === "20:15:00" &&
+              event.lektor.some((lector) => lector.kurzbz === "DemoLKT4"),
+          );
+          expect(
+            sourceEvent,
+            "source event with fixed time and resources for collision test",
+          ).to.exist;
+
+          const startDateTime = `${sourceEvent.datum} 20:15`;
+          const endDateTime = `${sourceEvent.datum} 21:00`;
+
+          tempusApi
+            .updateKalenderEvent(
+              sourceEvent.kalender_id,
+              startDateTime,
+              endDateTime,
+            )
+            .then((response) => {
+              console.log(response);
+              expect(response.status).to.eq(500);
+              expect(response.body).to.have.nested.property(
+                "meta.status",
+                "error",
+              );
+              expect(response.body.errors).to.be.an("array");
+              let hasResourcesCollisionError = response.body.errors.some(
+                (error) => error.errorCode === "resource_collision",
+              );
+              expect(
+                hasResourcesCollisionError,
+                "response contains resources collision error",
               ).to.be.true;
             });
         });
@@ -647,13 +709,8 @@ describe("Tempus Kalender API", () => {
                 "error",
               );
               expect(response.body.errors).to.be.an("array");
-              console.log(response.body.errors);
               let hasReservationCollisionError = response.body.errors.some(
-                (error) =>
-                  error.message
-                    .toLowerCase()
-                    .includes("reservierung kollision") ||
-                  error.message.toLowerCase().includes("reservation collision"),
+                (error) => error.errorCode === "reservation_collision",
               );
               expect(
                 hasReservationCollisionError,
@@ -700,15 +757,12 @@ describe("Tempus Kalender API", () => {
                 "error",
               );
               expect(response.body.errors).to.be.an("array");
-              console.log(response.body.errors);
               let hasReservationCollisionError = response.body.errors.some(
-                (error) =>
-                  error.message.toLowerCase().includes("lektorin kollision") ||
-                  error.message.toLowerCase().includes("reservation collision"),
+                (error) => error.errorCode === "lector_collision",
               );
               expect(
                 hasReservationCollisionError,
-                "response contains reservation collision error",
+                "response contains lector collision error",
               ).to.be.true;
             });
         });

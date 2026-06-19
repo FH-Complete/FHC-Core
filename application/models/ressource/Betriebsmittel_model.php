@@ -31,4 +31,26 @@ class Betriebsmittel_model extends DB_Model
 
 		return $this->execQuery($qry);
 	}
+
+	public function getSchedulableEntriesByDatetimeInterval($from, $to)
+	{
+		$qry = "SELECT
+					*
+				FROM
+					wawi.tbl_betriebsmittel
+				WHERE
+					verplanen=true
+					AND 
+				NOT EXISTS(
+					SELECT 1 FROM lehre.tbl_betriebsmittel_kalender
+					JOIN lehre.tbl_kalender ON tbl_kalender.eindeutige_gruppen_id = tbl_betriebsmittel_kalender.eindeutige_kalender_gruppen_id
+					WHERE
+						betriebsmittel_id=tbl_betriebsmittel.betriebsmittel_id
+					AND tbl_kalender.von <= ?
+					AND tbl_kalender.bis >= ?
+				)";
+
+
+		return $this->execQuery($qry, array($from, $to));
+	}
 }

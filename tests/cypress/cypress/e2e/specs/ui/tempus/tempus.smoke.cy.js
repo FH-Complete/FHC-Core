@@ -57,6 +57,19 @@ context("Tempus smoke tests", () => {
     tempusPage.getRaumauswahlModal().should("be.visible");
   });
 
+  it("shows resources modal when selecting Ressourcen zuordnen from event context menu", () => {
+    tempusPage.waitForCalendarToFinishLoading();
+    tempusPage
+      .getCalendarEventsWithLehreinheit()
+      .should("have.length.greaterThan", 0);
+
+    tempusPage.getCalendarEventsWithLehreinheit().first().rightclick();
+    tempusPage.getEventContextMenuOption("Ressourcen zuordnen").click();
+    waitForOk("@fetchResourceSuggestions");
+
+    tempusPage.getResourcesModal().should("be.visible");
+  });
+
   it("shows history modal when selecting History from event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);

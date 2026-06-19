@@ -19,6 +19,7 @@ class MigrateKalender extends Auth_Controller
 		parent::__construct(array(
 			'migrateStundenplan' => ['admin:rw'],
 			'migrateReservierung' => ['admin:rw'],
+			'migrateStundenplanBetriebsmittelEntries' => ['admin:rw']
 		));
 		$this->load->model('ressource/Kalender_model', 'KalenderModel');
 		$this->load->model('ressource/Kalender_Lehreinheit_model', 'KalenderLehreinheitModel');
@@ -147,66 +148,6 @@ class MigrateKalender extends Auth_Controller
 						$this->_insertSync($fehlende, $kalender_id);
 					}
 				}
-				/*if(hasData($SyncResult))
-				{
-					//bereits vorhanden
-					// TODO Update
-				}
-				else
-				{
-					// Neuen Eintrag anlegen
-
-					$von = $rowstpl->datum.' '.$rowstpl->beginn;
-					$bis = $rowstpl->datum.' '.$rowstpl->ende;
-					$typ = 'lehreinheit';
-					$status = 'live';
-					$insertamum = $rowstpl->insertamum;
-					$insertvon = $rowstpl->insertvon;
-					$updateamum = $rowstpl->updateamum;
-					$updatevon = $rowstpl->updatevon;
-
-					$resultKalenderInsert = $this->KalenderModel->insert(
-						array(
-							'von' => $von,
-							'bis' => $bis,
-							'typ' => $typ,
-							'status_kurzbz' => $status,
-							'vorgaenger_kalender_id' => null,
-							'insertamum' => $insertamum,
-							'insertvon' => $insertvon,
-							'updateamum' => $updateamum,
-							'updatevon' => $updatevon
-						)
-					);
-
-					if(isSuccess($resultKalenderInsert))
-					{
-						$kalender_id = getData($resultKalenderInsert);
-
-						$resultKalenderInsert = $this->KalenderLehreinheitModel->insert(
-							array(
-								'kalender_id' => $kalender_id,
-								'lehreinheit_id' => $rowstpl->lehreinheit_id,
-							)
-						);
-
-						$resultKalenderInsert = $this->KalenderOrtModel->insert(
-							array(
-								'kalender_id' => $kalender_id,
-								'ort_kurzbz' => $rowstpl->ort_kurzbz,
-							)
-						);
-
-						$resultSyncInsert = $this->SyncModel->insert(
-							array(
-								'stundenplandev_id' => $rowstpl->stundenplandev_id,
-								'kalender_id' => $kalender_id,
-								'lastupdate' => date('Y-m-d H:i:s')
-							)
-						);
-
-					}
-				}*/
 			}
 		}
 	}
@@ -267,58 +208,6 @@ class MigrateKalender extends Auth_Controller
 						 JOIN lehre.tbl_stunde s_von ON s_von.stunde = b.stunde_von
 						 JOIN lehre.tbl_stunde s_bis ON s_bis.stunde = b.stunde_bis
 				ORDER BY b.reservierung_id DESC;";
-		/*$qry = "WITH per_stunde AS (
-					SELECT
-						datum,
-						titel,
-						beschreibung, ort_kurzbz, studiengang_kz, stunde,
-						veranstaltung_id,
-						array_agg(DISTINCT uid) AS uids,
-						array_agg(DISTINCT reservierung_id::text) AS reservierung_ids,
-						array_agg(DISTINCT ROW(semester, verband, gruppe)::text) AS svg_kombis,
-						array_agg(DISTINCT gruppe_kurzbz) AS gruppen_kurzbz,
-						MIN(reservierung_id) AS reservierung_id,
-						MAX(insertamum) AS insertamum,
-						MAX(insertvon) AS insertvon
-					FROM campus.tbl_reservierung
-					WHERE datum >= ? AND datum <= ?
-					GROUP BY datum, titel, beschreibung, ort_kurzbz, studiengang_kz, stunde, veranstaltung_id
-				),
-				numbered AS (
-					SELECT
-						per_stunde.*,
-						stunde - ROW_NUMBER() OVER (PARTITION BY datum, titel, beschreibung, ort_kurzbz, studiengang_kz, veranstaltung_id ORDER BY stunde) AS grp
-					FROM per_stunde
-				),
-				grouped AS (
-					SELECT
-						MIN(reservierung_id) AS reservierung_id,
-						ort_kurzbz, studiengang_kz, datum,
-						MIN(stunde) AS stunde_von,
-						MAX(stunde) AS stunde_bis,
-						titel, beschreibung,
-						array_agg(DISTINCT gruppe_kurzbz_elem) AS gruppen_kurzbz,
-						array_agg(DISTINCT uid_elem) AS uids,
-						array_agg(DISTINCT res_id) AS reservierung_ids,
-						array_agg(DISTINCT svg_elem) AS svg_kombis,
-						veranstaltung_id,
-						MAX(insertamum) AS insertamum,
-						MAX(insertvon) AS insertvon
-					FROM numbered,
-						unnest(uids) AS uid_elem,
-						unnest(reservierung_ids) AS res_id,
-						unnest(gruppen_kurzbz) AS gruppe_kurzbz_elem,
-						unnest(svg_kombis) AS svg_elem
-					GROUP BY datum, titel, beschreibung, ort_kurzbz, studiengang_kz, veranstaltung_id, grp
-				)
-				SELECT
-					grouped.*,
-					(datum + s_von.beginn) AS von,
-					(datum + s_bis.ende) AS bis
-				FROM grouped
-					JOIN lehre.tbl_stunde s_von ON s_von.stunde = grouped.stunde_von
-					JOIN lehre.tbl_stunde s_bis ON s_bis.stunde = grouped.stunde_bis
-				ORDER BY grouped.reservierung_id DESC";*/
 
 		array_push($params, $von, $bis);
 		$reservierung_data = $db->execReadOnlyQuery($qry, $params);
@@ -367,6 +256,107 @@ class MigrateKalender extends Auth_Controller
 		}
 	}
 
+	public function migrateStundenplanBetriebsmittelEntries() {
+		$this->setKalendarEntriesGroupIDs();
+		$this->setKalendarEntriesGroupIDsForChildren();
+
+		$dbModel = new DB_Model();
+
+		$deleteOldImportedTempusEntriesQuery = "DELETE from lehre.tbl_betriebsmittel_kalender WHERE quelle != 'tempus_neu' OR quelle IS NULL;";
+		$createHelperTypeQuery = "DO $$
+			BEGIN
+				IF NOT EXISTS (
+					SELECT 1
+					FROM pg_type
+					WHERE typname = 'betriebsmittel_info'
+				) THEN
+					CREATE TYPE betriebsmittel_info AS (
+						betriebsmittel_id bigint,
+						insertamum timestamp,
+						insertvon text
+					);
+				END IF;
+			END $$;";
+		
+		$query = $deleteOldImportedTempusEntriesQuery . 
+				 $createHelperTypeQuery .
+		"WITH test AS (
+			SELECT 
+				tk.eindeutige_gruppen_id AS eindeutige_gruppen_id,
+				array_agg(tk.kalender_id),
+				array_agg(
+					ROW(tsb.betriebsmittel_id, tsb.insertamum, tsb.insertvon)::betriebsmittel_info
+				) AS betriebsmittel_data
+			FROM sync.tbl_stundenplandev_kalender AS sk
+			JOIN lehre.tbl_kalender tk ON tk.kalender_id = sk.kalender_id
+			JOIN lehre.tbl_stundenplan_betriebsmittel tsb ON tsb.stundenplandev_id = sk.stundenplandev_id 
+			GROUP BY tk.eindeutige_gruppen_id 
+			)
+			INSERT INTO lehre.tbl_betriebsmittel_kalender (
+				eindeutige_kalender_gruppen_id, 
+				betriebsmittel_id,
+				insertamum,
+				insertvon
+				)
+			SELECT
+				t.eindeutige_gruppen_id,
+				bm.betriebsmittel_id,
+				bm.insertamum,
+				bm.insertvon
+			FROM test t
+			CROSS JOIN LATERAL unnest(t.betriebsmittel_data) AS bm
+			ON CONFLICT (eindeutige_kalender_gruppen_id, betriebsmittel_id) DO NOTHING;
+			;";
+
+		$dbModel->db->query($query);
+	}
+
+	private function setKalendarEntriesGroupIDs() {
+		$dbModel = new DB_Model();
+
+		$query = "UPDATE lehre.tbl_kalender
+			SET eindeutige_gruppen_id = gen_random_uuid()
+			WHERE vorgaenger_kalender_id IS NULL
+			AND eindeutige_gruppen_id IS NULL;";
+
+		$dbModel->db->query($query);
+
+	}
+
+	private function setKalendarEntriesGroupIDsForChildren() {
+		$dbModel = new DB_Model();
+
+		$query = "WITH RECURSIVE tree AS 
+			(
+				SELECT
+					kalender_id,
+					vorgaenger_kalender_id,
+					kalender_id AS root_id,
+					eindeutige_gruppen_id as root_eindeutige_gruppen_id
+				FROM lehre.tbl_kalender
+				WHERE vorgaenger_kalender_id IS NULL
+
+				UNION ALL
+
+				SELECT
+					i.kalender_id,
+					i.vorgaenger_kalender_id,
+					t.root_id,
+					t.root_eindeutige_gruppen_id 
+				FROM lehre.tbl_kalender i
+				JOIN tree t
+				ON i.vorgaenger_kalender_id = t.kalender_id
+				where i.eindeutige_gruppen_id is NULL
+			
+			)
+			UPDATE lehre.tbl_kalender k
+			SET eindeutige_gruppen_id = t.root_eindeutige_gruppen_id
+			FROM tree t
+			WHERE k.kalender_id = t.kalender_id
+			AND k.eindeutige_gruppen_id IS NULL;";
+
+		$dbModel->db->query($query);
+	}
 
 	private function _insertKalender($block, $typ)
 	{

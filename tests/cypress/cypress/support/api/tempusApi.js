@@ -92,6 +92,7 @@ export const tempusApi = {
     kollision_student: false,
     ignore_reservierung: false,
     ignore_zeitsperre: false,
+    ignore_resources_collisions: false,
   }),
 
   updateSettingsData: (options) =>

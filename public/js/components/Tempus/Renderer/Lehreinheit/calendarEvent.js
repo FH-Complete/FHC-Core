@@ -64,8 +64,14 @@ export default {
 	template: /*html*/`
 	<div
 		:class="classes"
+		class="position-relative"
 		@wheel.stop
 	>
+		<div v-if="event.has_assigned_resources" class="position-absolute top-0 start-0 m-1" >
+			<i
+			  class="fa-solid fa-table-list text-muted"
+			></i>
+		</div>
 		<div
 			v-if="!event.allDayEvent && event?.beginn && event?.ende"
 			class="event-time d-none d-xl-grid h-100"

@@ -143,6 +143,7 @@ VALUES
 (51006, 26);
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
 -- Calendar setup for Stundenraster disabled tests
 INSERT INTO lehre.tbl_kalender
 (von, bis, typ, status_kurzbz, vorgaenger_kalender_id, insertamum, insertvon, updateamum, updatevon) VALUES
@@ -155,8 +156,44 @@ INSERT INTO lehre.tbl_kalender_lehreinheit
 VALUES
 (51002, 27),
 (51006, 28);
-
 -- ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+-- Calendar setup for resources tests
+INSERT INTO lehre.tbl_kalender
+(von, bis, typ, status_kurzbz, vorgaenger_kalender_id, eindeutige_gruppen_id, insertamum, insertvon, updateamum, updatevon)
+VALUES
+(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '19:30:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', 'lehreinheit', 'live', NULL, 'ec1bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '20:15:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '21:00:00', 'lehreinheit', 'live', NULL, 'ec2bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '17:50:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '18:35:00', 'lehreinheit', 'live', NULL, 'ec3bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin'),
+(date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '18:35:00', date_trunc('week', CURRENT_DATE) + INTERVAL '6 day' + TIME '19:20:00', 'lehreinheit', 'live', NULL, 'ec4bd001-facf-4b21-a671-bcb2d4f037fd', now(), 'demoadmin', NULL, 'demoadmin')
+;
+
+INSERT INTO lehre.tbl_kalender_lehreinheit
+(lehreinheit_id, kalender_id)
+VALUES
+(51004, 29),
+(51006, 30),
+(51006, 31),
+(51004, 32);
+
+INSERT INTO public.tbl_variablenname
+(name, defaultwert)
+VALUES('ignore_resources_collisions', 'false');
+
+INSERT INTO public.tbl_variable
+(name, uid, wert)
+VALUES('ignore_resources_collisions', 'demoadmin', 'false');
+
+INSERT INTO lehre.tbl_betriebsmittel_kalender
+(eindeutige_kalender_gruppen_id, betriebsmittel_id, anmerkung, quelle, insertamum, insertvon, updateamum, updatevon)
+VALUES
+('ec1bd001-facf-4b21-a671-bcb2d4f037fd'::uuid, 1, '', 'tempus_neu', '2026-06-17 16:48:59.669', 'demoadmin', '2026-06-17 17:13:23.000', 'demoadmin'),
+('ec2bd001-facf-4b21-a671-bcb2d4f037fd'::uuid, 1, '', 'tempus_neu', '2026-06-17 16:48:59.669', 'demoadmin', '2026-06-17 17:13:23.000', 'demoadmin'),
+('ec3bd001-facf-4b21-a671-bcb2d4f037fd'::uuid, 2, '', 'tempus_neu', '2026-06-17 16:48:59.669', 'demoadmin', '2026-06-17 17:13:23.000', 'demoadmin'),
+('ec4bd001-facf-4b21-a671-bcb2d4f037fd'::uuid, 3, '', 'tempus_neu', '2026-06-17 16:48:59.669', 'demoadmin', '2026-06-17 17:13:23.000', 'demoadmin');
+-- //////////////////////////////////////////////////////////////////////////////////////////////////--
+
 
 INSERT INTO lehre.tbl_kalender_event
 (kalender_id, titel, beschreibung)
@@ -169,3 +206,5 @@ VALUES(26, 'teilnehmer', 'demolektor4', NULL, NULL, NULL, NULL, NULL, NULL, NULL
 INSERT INTO campus.tbl_zeitsperre
 (zeitsperre_id, zeitsperretyp_kurzbz, mitarbeiter_uid, bezeichnung, vondatum, vonstunde, bisdatum, bisstunde, vertretung_uid, updateamum, updatevon, insertamum, insertvon, erreichbarkeit_kurzbz, freigabeamum, freigabevon)
 VALUES(1, 'DienstV', 'demolektor1', 'Test', date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, date_trunc('week', CURRENT_DATE) + INTERVAL '5 day', NULL, 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', '2007-04-02 11:04:31.000', 'demoadmin', 't', NULL, NULL);
+
+

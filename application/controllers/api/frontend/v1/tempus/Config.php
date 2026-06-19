@@ -31,7 +31,7 @@ class Config extends FHCAPI_Controller
 
 		$config = [];
 
-		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), ['ignore_kollision', 'kollision_student', 'ignore_reservierung', 'ignore_zeitsperre']);
+		$result = $this->_ci->VariableModel->getVariables(getAuthUID(), ['ignore_kollision', 'kollision_student', 'ignore_reservierung', 'ignore_zeitsperre', 'ignore_resources_collisions']);
 
 		$data = $this->getDataOrTerminateWithError($result);
 		$config['ignore_kollision'] = [
@@ -60,7 +60,11 @@ class Config extends FHCAPI_Controller
 			"value" => ($data['ignore_zeitsperre'] ?? 'false') === 'true'
 		];
 
-
+		$config['ignore_resources_collisions'] = [
+			"type"  => "checkbox",
+			"label" => $this->p->t('ui', 'ignore_resources_collisions'),
+			"value" => ($data['ignore_resources_collisions'] ?? 'false') === 'true'
+		];
 
 		$this->terminateWithSuccess($config);
 	}
@@ -108,6 +112,11 @@ class Config extends FHCAPI_Controller
 			getAuthUID(),
 			'ignore_zeitsperre',
 			$this->input->post('ignore_zeitsperre') === true ? 'true' : 'false'
+		);
+		$this->_ci->VariableModel->setVariable(
+			getAuthUID(),
+			'ignore_resources_collisions',
+			$this->input->post('ignore_resources_collisions') === true ? 'true' : 'false'
 		);
 		$this->terminateWithSuccess();
 	}

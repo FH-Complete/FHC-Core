@@ -66,6 +66,10 @@ class TempusPage {
     }).as("fetchRoomSuggestions");
     cy.intercept({
       method: "GET",
+      url: "**/betriebsmittel/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/32",
+    }).as("fetchResourcesSuggestions");
+    cy.intercept({
+      method: "GET",
       url: "**/tempus/coursepicker/getByStg**",
     }).as("fetchCoursePickerCourses");
     cy.intercept({
@@ -284,6 +288,10 @@ class TempusPage {
       .closest(".bootstrap-modal.show");
   getRaumauswahlRoomOptions = () =>
     this.getRaumauswahlModal().find(".list-group-item");
+  getResourcesModal = () =>
+    cy
+      .get("[data-cy='resourcesAssignmentModal']")
+      .closest(".bootstrap-modal.show");
   getCalendarEventRoom = (id) =>
     this.getCalendarEventById(id).find(".event-place");
   getStundenrasterToggle = () =>
