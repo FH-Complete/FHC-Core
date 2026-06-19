@@ -3,6 +3,7 @@ import CoodleSurveyCalendar from "./CoodleSurvey/CoodleSurveyCalendar.js";
 import CoodleSurveyParticipants from "./CoodleSurvey/CoodleSurveyParticipants.js";
 import CoodleSurveyDurationSelector from "./CoodleSurvey/CoodleSurveyDurationSelector.js";
 import CoodleSurveyBasicInfo from "./CoodleSurvey/CoodleSurveyBasicInfo.js";
+import CoodleSurveyHeader from "./CoodleSurvey/CoodleSurveyHeader.js";
 
 import { formatDate, numberPadding } from "../../../../helpers/DateHelpers.js";
 
@@ -14,6 +15,7 @@ export default {
 		CoodleSurveyParticipants,
 		CoodleSurveyDurationSelector,
 		CoodleSurveyBasicInfo,
+		CoodleSurveyHeader,
 	},
 	props: {
 		survey: { type: Object | null },
@@ -51,35 +53,6 @@ export default {
 	computed: {
 		isDarkMode() {
 			return this.$theme.theme_name.value == "dark";
-		},
-		isAuthUserSurveyCreator() {
-			return (
-				this.$props.uid &&
-				this.$props.uid === this.$props.survey?.creator?.uid
-			);
-		},
-		isAuthUserSurveyParticipant() {
-			return (
-				this.$props.uid &&
-				this.$props.survey?.participants
-					?.map((participant) => participant.uid)
-					.includes(this.$props.uid)
-			);
-		},
-		isSurveyActive() {
-			return (
-				!this.$props.survey.completedAt &&
-				!this.$props.survey.canceledAt
-			);
-		},
-		headerTitle() {
-			if (this.survey?.id && !this.isEditInProgress) {
-				return this.survey.title;
-			} else if (this.survey?.id && this.isEditInProgress) {
-				return "Edit survey";
-			} else {
-				return "New survey";
-			}
 		},
 		parsedSelectedTimeslot() {
 			return this.$props.survey?.selectedTimeslotId
@@ -177,22 +150,6 @@ export default {
 					numberPadding(timeslotEndsAt.getMinutes()),
 			};
 		},
-		cancelSurvey() {
-			if (!this.$props.survey?.id) return;
-
-			if (
-				!window.confirm(
-					'Are you sure you want to cancel Coodle survey "(((surveyTitle)))"?'.replace(
-						"(((surveyTitle)))",
-						this.$props.survey?.title,
-					),
-				)
-			) {
-				return;
-			}
-			console.log("canceling...");
-			// todo
-		},
 		submitForm() {
 			console.log("submitting...");
 			// todo
@@ -205,43 +162,12 @@ export default {
 	template: /*html*/ `
 	<div class="card mb-4">
 		<div class="card-header">
-			<div class="d-flex flex-row align-items-center justify-content-between">
-				<h4 class="text-wrap m-0">{{ headerTitle }}</h4>
-				<div
-					v-if="isAuthUserSurveyCreator && !isEditInProgress && isSurveyActive"
-					class="dropdown"
-				>
-					<div
-						role="button"
-						class="px-2"
-						data-bs-toggle="dropdown"
-						data-bs-auto-close="true"
-						aria-expanded="false"
-					>
-						<i class="fa-solid fa-ellipsis-vertical fa-lg"></i>
-					</div>
-					<ul class="dropdown-menu dropdown-menu-end" style="min-width:0;'">
-						<li>
-							<div
-								@click="isEditInProgress = true"
-								role="button"
-								class="dropdown-item px-3 py-1"
-							>
-								{{ "Edit survey" }}
-							</div>
-						</li>
-						<li>
-							<div
-								@click="cancelSurvey()"
-								role="button"
-								class="dropdown-item px-3 py-1"
-							>
-								{{ "Cancel survey" }}
-							</div>
-						</li>
-					</ul>
-				</div>
-			</div>
+			<coodle-survey-header
+				@editSurvey="isEditInProgress = true"
+				:survey="$props.survey"
+				:isEditInProgress="isEditInProgress"
+				:uid="$props.uid"
+			/>
 		</div>
 		<div class="card-body">
 			<div class="d-flex flex-column gap-3">

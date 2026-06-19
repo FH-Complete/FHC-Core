@@ -219,6 +219,7 @@ export default {
 	},
 	created() {
 		this.setData();
+		this.setEditableAuthUserSelection();
 	},
 	template: /*html*/ `
 	<div>
