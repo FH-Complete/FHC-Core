@@ -188,7 +188,7 @@ class MigrateKalender extends Auth_Controller
 							 array_agg(DISTINCT r.uid) AS uids,
 							 array_agg(DISTINCT r.gruppe_kurzbz) AS gruppen_kurzbz,
 							 array_agg(DISTINCT ROW(r.semester, r.verband, r.gruppe)::text) AS svg_kombis,
-							 MIN(r.ort_kurzbz) AS ort_kurzbz,
+							 array_agg(DISTINCT r.ort_kurzbz) AS orte_kurzbz,
 							 MIN(r.studiengang_kz) AS studiengang_kz,
 							 MIN(r.veranstaltung_id) AS veranstaltung_id,
 							 MIN(r.reservierung_id) AS reservierung_id,
@@ -440,6 +440,21 @@ class MigrateKalender extends Auth_Controller
 				}
 			}
 
+			$rooms = is_array($block->orte_kurzbz) ? $block->orte_kurzbz : explode(',', $block->orte_kurzbz ?? '');
+			foreach ($rooms as $room_kurzbz)
+			{
+				$room_kurzbz = trim($room_kurzbz);
+				if (!empty($room_kurzbz))
+				{
+					$this->KalenderOrtModel->insert(
+						array (
+							'kalender_id' => $kalender_id,
+							'ort_kurzbz' => $room_kurzbz
+						)
+					);
+				}
+			}
+
 			foreach ($block->svg_kombis as $kombi_str)
 			{
 				$kombi_str = trim($kombi_str, '()');
@@ -463,14 +478,6 @@ class MigrateKalender extends Auth_Controller
 				));
 			}
 		}
-
-
-		$this->KalenderOrtModel->insert(
-			array (
-				'kalender_id' => $kalender_id,
-				'ort_kurzbz' => $block->ort_kurzbz
-			)
-		);
 
 		return $kalender_id;
 	}
