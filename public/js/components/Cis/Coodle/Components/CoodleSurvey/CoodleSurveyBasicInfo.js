@@ -105,29 +105,35 @@ export default {
 			<span v-else-if="$props.survey?.canceledAt" class="fst-italic">
 				{{ "This survey was canceled on " + formattedSurveyCanceledAt + "." }}
 			</span>
-			<span
-				v-if="$props.survey?.description?.length"
-				class="text-wrap"
-				v-html="formattedSurveyDescription"
-			></span>
-			<div class="d-flex flex-column gap-1">
-				<div>
-					{{ "Created by " }}
-					<a :href="surveyCreatorProfileHref" :target="'_blank'" class="fhc-primary-color">
+			<div class="d-flex flex-row gap-3 flex-wrap">
+				<div class="d-flex flex-row">
+					<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
+						<i class="fa-solid fa-user fa-lg"></i>
+					</div>
+					<span>
+						<span class="fw-bold">{{ "Created by: " }}</span>
 						{{ this.$props.survey?.creator?.name }}
-					</a>
-					{{ " on " + formattedSurveyCreatedAt}}
+						<a :href="surveyCreatorProfileHref" target="_blank" class="fhc-primary-color">
+							<i class="fa-solid fa-up-right-from-square"></i>
+						</a>
+						{{ " on " + formattedSurveyCreatedAt}}
+					</span>
 				</div>
-				<div>{{ "Last edited on " + formattedSurveyUpdatedAt }}</div>
-				<div>{{ "Planned to end on " + formattedSurveyEndsAt }}</div>
-			</div>
-			<div class="d-flex flex-column gap-1">
+				<div class="d-flex flex-row">
+					<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
+						<i class="fa-solid fa-calendar fa-lg"></i>
+					</div>
+					<span>
+						<span class="fw-bold">{{ "Planned to end on: " }}</span>
+						{{ formattedSurveyEndsAt }}
+					</span>
+				</div>
 				<div class="d-flex flex-row">
 					<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
 						<i class="fa-solid fa-clock fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Proposed appointment duration: " }}</span>
+						<span class="fw-bold">{{ "Appointment duration: " }}</span>
 						{{ formattedSurveyTimeslotDuration }}
 					</span>
 				</div>
@@ -142,10 +148,10 @@ export default {
 				</div>
 				<div class="d-flex flex-row">
 					<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-						<i class="fa-solid fa-user-slash fa-lg"></i>
+						<i class="fa-solid fa-user-secret fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Are participants anonymized: " }}</span>
+						<span class="fw-bold">{{ "Are participants anonymous: " }}</span>
 						{{ $props.survey?.areParticipantsAnonymized ? "yes" : "no" }}
 					</span>
 				</div>
@@ -154,11 +160,16 @@ export default {
 						<i class="fa-solid fa-eye-slash fa-lg"></i>
 					</div>
 					<span>
-						<span class="fw-bold">{{ "Are votes anonymized: " }}</span>
+						<span class="fw-bold">{{ "Are votes anonymous: " }}</span>
 						{{ $props.survey?.areSelectionsAnonymized ? "yes" : "no" }}
 					</span>
 				</div>
 			</div>
+			<span
+				v-if="$props.survey?.description?.length"
+				class="text-wrap fst-italic"
+				v-html="formattedSurveyDescription"
+			></span>
 		</template>
 		<template v-else>
 			<div class="row">
