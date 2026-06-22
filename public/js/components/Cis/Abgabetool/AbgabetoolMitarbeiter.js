@@ -5,7 +5,7 @@ import VueDatePicker from '../../vueDatepicker.js.php';
 import ApiAbgabe from '../../../api/factory/abgabe.js'
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass } from "./getDateStyleClass.js";
-import { dateFilter } from '../../../tabulator/filters/Dates.js';
+import { dateFilter } from '../../../tabulator/filters/DatesManual.js';
 import {splitMailsHelper} from "../../../helpers/EmailHelpers.js";
 import { formatISODate, getViennaTodayISO, toViennaDate } from "./dateUtils.js";
 
@@ -137,7 +137,7 @@ export const AbgabetoolMitarbeiter = {
 						cssClass: 'sticky-col',
 						visible: true
 					},
-					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, minWidth: 140, visible: true, tooltip: false, cssClass: 'sticky-col'},
+					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4details'))), field: 'details', formatter: this.formAction, headerFilter: false, headerSort: false, width: 140, minWidth: 50, visible: true, tooltip: false, cssClass: 'sticky-col'},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4personenkennzeichen'))), headerFilter: true, field: 'pkz', formatter: this.pkzTextFormatter, minWidth: 140, visible: false,tooltip: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4vorname'))), field: 'vorname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: false},
 					{title: Vue.computed(() => this.$capitalize(this.$p.t('abgabetool/c4nachname'))), field: 'nachname', headerFilter: true, formatter: this.centeredTextFormatter, minWidth: 100,visible: true},
