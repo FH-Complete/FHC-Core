@@ -264,7 +264,7 @@ export default {
 						</tr>
 						<tr>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
-								<div class="px-2 d-flex flex-column align-items-start">
+								<div class="px-2 d-flex flex-column align-items-start text-nowrap">
 									<span>{{ timeslot.startTime + " -" }}</span>
 									<span>{{ timeslot.endTime }}</span>
 								</div>
@@ -272,7 +272,7 @@ export default {
 						</tr>
 						<tr v-for="participant in participantsWithoutAuthUser">
 							<td class="border-1 px-2 py-1">
-								<div class="d-flex flex-row gap-1 justify-content-between align-items-center">
+								<div class="d-flex flex-row gap-1 justify-content-between align-items-center flex-nowrap">
 									{{ participant.name }}
 									<a :href="getParticipantProfileHref(participant)" target="_blank" class="px-1 fhc-primary-color">
 										<i class="fa-solid fa-up-right-from-square"></i>
