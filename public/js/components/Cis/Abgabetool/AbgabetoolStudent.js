@@ -4,7 +4,6 @@ import ApiAuthinfo from '../../../api/factory/authinfo.js';
 import BsModal from "../../Bootstrap/Modal.js";
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import { getDateStyleClass} from "./getDateStyleClass.js";
-import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import { validateThesisTitle } from './titleValidation.js'
 
 export const AbgabetoolStudent = {
@@ -325,8 +324,6 @@ export const AbgabetoolStudent = {
 	async created() {
 		// make sure zoom media query doesnt spill ever to other CIS4 sites
 		document.documentElement.classList.add('abgabetool');
-		
-		this.$api.call(ApiAuthinfo.getAuthUID()).then(res => this.uid = res.data.uid)
 		
 		this.phrasenPromise = this.$p.loadCategory(['abgabetool', 'global'])
 		this.phrasenPromise.then(()=> {this.phrasenResolved = true})
