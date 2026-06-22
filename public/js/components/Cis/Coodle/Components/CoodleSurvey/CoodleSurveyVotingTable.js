@@ -272,7 +272,7 @@ export default {
 						</tr>
 						<tr v-for="participant in participantsWithoutAuthUser">
 							<td class="border-1 px-2 py-1">
-								<div class="d-flex flex-row gap-1 justify-content-between align-items-center flex-nowrap">
+								<div class="d-flex flex-row gap-1 justify-content-between align-items-center">
 									{{ participant.name }}
 									<a :href="getParticipantProfileHref(participant)" target="_blank" class="px-1 fhc-primary-color">
 										<i class="fa-solid fa-up-right-from-square"></i>
