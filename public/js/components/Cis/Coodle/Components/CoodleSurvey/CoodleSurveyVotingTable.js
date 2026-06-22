@@ -216,6 +216,16 @@ export default {
 			console.log("finalizing...");
 			// todo
 		},
+		getParticipantProfileHref(participant) {
+			if (!participant?.uid) {
+				return "";
+			}
+
+			return this.$router.resolve({
+				name: "ProfilView",
+				params: { uid: participant.uid },
+			}).href;
+		},
 	},
 	created() {
 		this.setData();
@@ -233,175 +243,188 @@ export default {
 				"You can select up to (((n))) options.".replace("(((n)))", $props.survey?.maxSelections)
 			}}
 		</span>
-		<table>
-			<tr>
-				<td class="border-1"></td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="px-1 d-flex flex-column align-items-center">
-						<span>{{ timeslot.month.slice(0,3) }}</span>
-						<span class="fs-5 fw-bold">{{ timeslot.date }}</span>
-						<span>{{ timeslot.weekday.slice(0,3) }}</span>
+		<div class="d-flex flex-row">
+			<div class="d-flex flex-column flex-shrink-1" style="max-width:100%;">
+				<div class="overflow-x-auto">
+					<table>
+						<tr>
+							<td class="border-1"></td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="px-1 d-flex flex-column align-items-center">
+									<span>{{ timeslot.month.slice(0,3) }}</span>
+									<span class="fs-5 fw-bold">{{ timeslot.date }}</span>
+									<span>{{ timeslot.weekday.slice(0,3) }}</span>
+								</div>
+							</td>
+							<td class="border-1"></td>
+						</tr>
+						<tr>
+							<td class="border-1"></td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="px-2 d-flex flex-column align-items-start">
+									<span>{{ timeslot.startTime + " -" }}</span>
+									<span>{{ timeslot.endTime }}</span>
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="px-2 py-1">
+									{{ "No appointment is possible" }}
+								</div>
+							</td>
+						</tr>
+						<tr v-for="participant in participantsWithoutAuthUser">
+							<td class="border-1 px-2 py-1">
+								<div class="d-flex flex-row gap-1 justify-content-between align-items-center">
+									{{ participant.name }}
+									<a :href="getParticipantProfileHref(participant)" target="_blank" class="px-1 fhc-primary-color">
+										<i class="fa-solid fa-up-right-from-square"></i>
+									</a>
+								</div>
+							</td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="d-flex justify-content-center">
+									<i v-if="participant.selection[timeslot.id]" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="d-flex justify-content-center">
+									<i v-if="participant.selection.none" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+						</tr>
+						<tr
+							v-if="authUserParticipant"
+							:style="!isVotingInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
+						>
+							<td class="border-1 px-2 py-1">{{ authUserParticipant.name }}</td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="d-flex justify-content-center py-3">
+									<input
+										v-if="isSurveyActive"
+										v-model="editableAuthUserSelection[timeslot.id]"
+										:disabled="
+											!isVotingInProgress ||
+											(!editableAuthUserSelection[timeslot.id] && hasReachedMaxSelections) ||
+											editableAuthUserSelection.none
+										"
+										:role="!isVotingInProgress ||
+											(!editableAuthUserSelection[timeslot.id] && hasReachedMaxSelections) ||
+											editableAuthUserSelection.none ? '' : 'button'"
+										type="checkbox"
+										style="width: 20px; height: 20px;"
+									/>
+									<i v-else-if="authUserParticipant.selection[timeslot.id]" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="d-flex justify-content-center py-3">
+									<input
+										v-if="isSurveyActive"
+										v-model="editableAuthUserSelection.none"
+										:disabled="!isVotingInProgress"
+										:role="isVotingInProgress ? 'button' : ''"
+										type="checkbox"
+										style="width: 20px; height: 20px;"
+									/>
+									<i v-else-if="authUserParticipant.selection.none" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+						</tr>
+						<tr v-if="$props.survey.sums" class="fw-bold">
+							<td class="border-1 px-2 py-1">{{ "Vote tally" }}</td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="d-flex flex-row justify-content-center">
+									{{ $props.survey.sums[timeslot.id] }}
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="d-flex flex-row justify-content-center">
+									{{ $props.survey.sums.none }}
+								</div>
+							</td>
+						</tr>
+						<tr
+							v-if="isAuthUserSurveyCreator || $props.survey.completedAt"
+							:style="!isFinalSelectionInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
+							class="fw-bold"
+						>
+							<td class="border-1 px-2 py-1">{{ "Final timeslot" }}</td>
+							<td v-for="timeslot in $props.timeslots" class="border-1">
+								<div class="d-flex flex-row justify-content-center py-3">
+									<input
+										v-if="isSurveyActive"
+										v-model="selectedTimeslotId"
+										:value="timeslot.id"
+										:disabled="!isFinalSelectionInProgress"
+										:role="isFinalSelectionInProgress ? 'button' : ''"
+										type="radio"
+										style="width: 20px; height: 20px;"
+									/>
+									<i v-else-if="selectedTimeslotId === timeslot.id" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+							<td class="border-1">
+								<div class="d-flex flex-row justify-content-center py-3">
+									<input
+										v-if="isSurveyActive"
+										v-model="selectedTimeslotId"
+										:value="'none'"
+										:disabled="!isFinalSelectionInProgress"
+										:role="isFinalSelectionInProgress ? 'button' : ''"
+										type="radio"
+										style="width: 20px; height: 20px;"
+									/>
+									<i v-else-if="selectedTimeslotId === 'none'" class="fa-solid fa-check"></i>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<div v-if="isSurveyActive" class="d-flex flex-row gap-2 mt-3 justify-content-end">
+					<div
+						v-if="authUserParticipant && !isVotingInProgress && !isFinalSelectionInProgress"
+						@click="isVotingInProgress = true"
+						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
+						class="btn text-nowrap"
+					>
+						Vote
 					</div>
-				</td>
-				<td class="border-1"></td>
-			</tr>
-			<tr>
-				<td class="border-1"></td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="px-2 d-flex flex-column align-items-start">
-						<span>{{ timeslot.startTime + " -" }}</span>
-						<span>{{ timeslot.endTime }}</span>
+					<div
+						v-if="isAuthUserSurveyCreator && !isVotingInProgress && !isFinalSelectionInProgress"
+						@click="isFinalSelectionInProgress = true"
+						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
+						class="btn text-nowrap"
+					>
+						Finalize survey
 					</div>
-				</td>
-				<td class="border-1">
-					<div class="px-2 py-1">
-						{{ "No appointment is possible" }}
+					<div
+						v-if="isVotingInProgress || isFinalSelectionInProgress"
+						@click="() => {
+							isVotingInProgress = false;	
+							isFinalSelectionInProgress = false;	
+						}"
+						:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
+						class="btn text-nowrap"
+					>
+						Cancel
 					</div>
-				</td>
-			</tr>
-			<tr v-for="participant in participantsWithoutAuthUser">
-				<td class="border-1 px-2 py-1">{{ participant.name }}</td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="d-flex justify-content-center">
-						<i v-if="participant.selection[timeslot.id]" class="fa-solid fa-check"></i>
+					<div
+						v-if="isVotingInProgress"
+						@click="submitVote()"
+						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
+						class="btn text-nowrap"
+					>
+						Submit vote
 					</div>
-				</td>
-				<td class="border-1">
-					<div class="d-flex justify-content-center">
-						<i v-if="participant.selection.none" class="fa-solid fa-check"></i>
+					<div
+						v-if="isFinalSelectionInProgress"
+						@click="submitFinalSelection()"
+						:class="isDarkMode ? 'btn-light' : 'btn-dark'"
+						class="btn text-nowrap"
+					>
+						Submit final selection
 					</div>
-				</td>
-			</tr>
-			<tr
-				v-if="authUserParticipant"
-				:style="!isVotingInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
-			>
-				<td class="border-1 px-2 py-1">{{ authUserParticipant.name }}</td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="d-flex justify-content-center py-3">
-						<input
-							v-if="isSurveyActive"
-							v-model="editableAuthUserSelection[timeslot.id]"
-							:disabled="
-								!isVotingInProgress ||
-								(!editableAuthUserSelection[timeslot.id] && hasReachedMaxSelections) ||
-								editableAuthUserSelection.none
-							"
-							:role="!isVotingInProgress ||
-								(!editableAuthUserSelection[timeslot.id] && hasReachedMaxSelections) ||
-								editableAuthUserSelection.none ? '' : 'button'"
-							type="checkbox"
-							style="width: 20px; height: 20px;"
-						/>
-						<i v-else-if="authUserParticipant.selection[timeslot.id]" class="fa-solid fa-check"></i>
-					</div>
-				</td>
-				<td class="border-1">
-					<div class="d-flex justify-content-center py-3">
-						<input
-							v-if="isSurveyActive"
-							v-model="editableAuthUserSelection.none"
-							:disabled="!isVotingInProgress"
-							:role="isVotingInProgress ? 'button' : ''"
-							type="checkbox"
-							style="width: 20px; height: 20px;"
-						/>
-						<i v-else-if="authUserParticipant.selection.none" class="fa-solid fa-check"></i>
-					</div>
-				</td>
-			</tr>
-			<tr v-if="$props.survey.sums" class="fw-bold">
-				<td class="border-1 px-2 py-1">{{ "Vote tally" }}</td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="d-flex flex-row justify-content-center">
-						{{ $props.survey.sums[timeslot.id] }}
-					</div>
-				</td>
-				<td class="border-1">
-					<div class="d-flex flex-row justify-content-center">
-						{{ $props.survey.sums.none }}
-					</div>
-				</td>
-			</tr>
-			<tr
-				v-if="isAuthUserSurveyCreator || $props.survey.completedAt"
-				:style="!isFinalSelectionInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
-				class="fw-bold"
-			>
-				<td class="border-1 px-2 py-1">{{ "Final timeslot" }}</td>
-				<td v-for="timeslot in $props.timeslots" class="border-1">
-					<div class="d-flex flex-row justify-content-center py-3">
-						<input
-							v-if="isSurveyActive"
-							v-model="selectedTimeslotId"
-							:value="timeslot.id"
-							:disabled="!isFinalSelectionInProgress"
-							:role="isFinalSelectionInProgress ? 'button' : ''"
-							type="radio"
-							style="width: 20px; height: 20px;"
-						/>
-						<i v-else-if="selectedTimeslotId === timeslot.id" class="fa-solid fa-check"></i>
-					</div>
-				</td>
-				<td class="border-1">
-					<div class="d-flex flex-row justify-content-center py-3">
-						<input
-							v-if="isSurveyActive"
-							v-model="selectedTimeslotId"
-							:value="'none'"
-							:disabled="!isFinalSelectionInProgress"
-							:role="isFinalSelectionInProgress ? 'button' : ''"
-							type="radio"
-							style="width: 20px; height: 20px;"
-						/>
-						<i v-else-if="selectedTimeslotId === 'none'" class="fa-solid fa-check"></i>
-					</div>
-				</td>
-			</tr>
-		</table>
-		<div v-if="isSurveyActive" class="d-flex flex-row gap-2 mt-3">
-			<div
-				v-if="authUserParticipant && !isVotingInProgress && !isFinalSelectionInProgress"
-				@click="isVotingInProgress = true"
-				:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
-				class="btn text-nowrap"
-			>
-				Vote
-			</div>
-			<div
-				v-if="isAuthUserSurveyCreator && !isVotingInProgress && !isFinalSelectionInProgress"
-				@click="isFinalSelectionInProgress = true"
-				:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
-				class="btn text-nowrap"
-			>
-				Finalize survey
-			</div>
-			<div
-				v-if="isVotingInProgress || isFinalSelectionInProgress"
-				@click="() => {
-					isVotingInProgress = false;	
-					isFinalSelectionInProgress = false;	
-				}"
-				:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
-				class="btn text-nowrap"
-			>
-				Cancel
-			</div>
-			<div
-				v-if="isVotingInProgress"
-				@click="submitVote()"
-				:class="isDarkMode ? 'btn-light' : 'btn-dark'"
-				class="btn text-nowrap"
-			>
-				Submit vote
-			</div>
-			<div
-				v-if="isFinalSelectionInProgress"
-				@click="submitFinalSelection()"
-				:class="isDarkMode ? 'btn-light' : 'btn-dark'"
-				class="btn text-nowrap"
-			>
-				Submit final selection
+				</div>
 			</div>
 		</div>
 	</div>

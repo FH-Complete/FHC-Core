@@ -113,7 +113,9 @@ export default {
 			<div class="d-flex flex-column gap-1">
 				<div>
 					{{ "Created by " }}
-					<a :href="surveyCreatorProfileHref" :target="'_blank'">{{ this.$props.survey?.creator?.name }}</a>
+					<a :href="surveyCreatorProfileHref" :target="'_blank'" class="fhc-primary-color">
+						{{ this.$props.survey?.creator?.name }}
+					</a>
 					{{ " on " + formattedSurveyCreatedAt}}
 				</div>
 				<div>{{ "Last edited on " + formattedSurveyUpdatedAt }}</div>
