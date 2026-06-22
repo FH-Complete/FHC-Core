@@ -908,7 +908,7 @@ export default {
           ? "deemphasized-event"
           : "deemphasized-event-long";
 
-        if (!isInsideScrolledView) timeout = 500;
+        if (!isInsideScrolledView) timeout = 300;
 
         setTimeout(() => {
           eventEl.classList.add(emphasizeUpdateClassName);

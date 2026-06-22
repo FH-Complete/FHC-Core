@@ -189,12 +189,14 @@ body {
   position: relative;
   z-index: 10;
   animation: modernFocus 1s ease-out;
+  border-radius: 0.25rem;
 }
 
 .updated-event-long {
   position: relative;
   z-index: 10;
   animation: modernFocus 1.8s ease-out;
+  border-radius: 0.25rem;
 }
 
 @keyframes modernFocus {
