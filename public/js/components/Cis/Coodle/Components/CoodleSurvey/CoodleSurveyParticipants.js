@@ -1,5 +1,7 @@
 import CoodleApi from "../../../../../api/factory/coodle.js";
 
+import { debounce } from "../../../../../helpers/DebounceHelper.js";
+
 export default {
 	name: "CoodleSurveyParticipants",
 	components: {},
@@ -102,6 +104,26 @@ export default {
 					type: "user",
 				},
 			],
+			searchParticipantsAbortController: null,
+			searchParticipants: debounce(async () => {
+				if (this.searchInput.length < 2) return;
+
+				if (this.searchParticipantsAbortController)
+					this.searchParticipantsAbortController.abort();
+				this.searchParticipantsAbortController = new AbortController();
+
+				this.isSearchingForParticipants = true;
+
+				// todo: delete comment
+				// this.searchResults = this.searchResultsDevExample;
+				const participantsSearchResponse = await this.$api.call(
+					CoodleApi.searchParticipants(this.searchInput),
+					{ signal: this.searchParticipantsAbortController.signal },
+				);
+				this.searchResults = participantsSearchResponse.data;
+
+				this.isSearchingForParticipants = false;
+			}, 300),
 		};
 	},
 	computed: {
@@ -130,18 +152,6 @@ export default {
 			setTimeout(() => {
 				this.areSearchResultsShown = false;
 			}, 100);
-		},
-		async searchParticipants() {
-			if (this.searchInput.length < 2) return;
-
-			this.isSearchingForParticipants = true;
-
-			// todo: delete comment
-			// this.searchResults = this.searchResultsDevExample;
-			const participantsSearchResponse = await this.$api.call(CoodleApi.searchParticipants(this.searchInput));
-			this.searchResults = participantsSearchResponse.data;
-
-			this.isSearchingForParticipants = false;
 		},
 		selectSearchResult(searchResult) {
 			if (
