@@ -32,6 +32,7 @@ class KalenderLib
 		$end_date = date('Y-m-d', strtotime($end_date . ' +1 day'));
 
 		$this->_ci->KalenderModel->addSelect('tbl_kalender.kalender_id,
+												tbl_kalender.eindeutige_gruppen_id,
 												tbl_kalender.status_kurzbz,
 												tbl_kalender.typ,
 												tbl_kalender.von,
@@ -130,6 +131,8 @@ class KalenderLib
 
 		$this->_ci->KalenderModel->db->where('tbl_kalender.von >=', $start_date);
 		$this->_ci->KalenderModel->db->where('tbl_kalender.bis <', $end_date);
+
+		$this->_ci->KalenderModel->addOrder('tbl_kalender.eindeutige_gruppen_id', 'DESC');
 	}
 
 	private function _mapEvents($data, $collisionCheck = true)
@@ -151,6 +154,8 @@ class KalenderLib
 				$bis = new DateTime($row->bis);
 
 				$events[$id] = (object) [
+					'kalender_id' => $id,
+					'eindeutige_gruppen_id' => $row->eindeutige_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
 					'ende' => $bis->format('H:i:s'),
@@ -166,7 +171,6 @@ class KalenderLib
 					'farbe' => isset($row->farbe) ? $row->farbe : '',
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
-					'kalender_id' => $id,
 					'lehreinheit_id' => [],
 					'lektor' => [],
 					'teilnehmer_gruppe' => [],

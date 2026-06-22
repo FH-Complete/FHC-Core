@@ -1,7 +1,12 @@
 // TODO(chris): load events that are longer than the interval without doubling it
 
-export function useEventLoader(rangeInterval, getPromiseFunc) {
+export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = true, isLoaderInitiallyVisible = true) {
+	let hasFirstLoadOccurred = false;
 	let loading_id = 0;
+	
+	let tempEventsHolder = [];
+	let rangeIntervalHolder = null;
+
 	const events = Vue.ref([]);
 	const loadingEvents = Vue.ref([]);
 	const allEvents = Vue.computed(() => events.value.concat(loadingEvents.value));
@@ -100,13 +105,15 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 
 		if (start.ts >= end.ts)
 			return result;
-
-		loadingEvents.value.push({
-			loading_id: loading_id++,
-			type: "loading",
-			isostart: start.toISODate() + 'T' + start.toISOTime(),
-			isoend: end.toISODate() + 'T' + end.toISOTime()
-		});
+ 
+		if (isLoaderVisible && (!hasFirstLoadOccurred && isLoaderInitiallyVisible)) {
+			loadingEvents.value.push({
+				loading_id: loading_id++,
+				type: "loading",
+				isostart: start.toISODate() + 'T' + start.toISOTime(),
+				isoend: end.toISODate() + 'T' + end.toISOTime()
+			});
+		}
 
 		return mergePromiseArr(getPromiseFunc(start, end), result);
 	};
@@ -115,7 +122,14 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 		const range = Vue.toValue(rangeInterval);
 		if (!(range instanceof luxon.Interval))
 			return;
+
+		if (!rangeIntervalHolder || !range.equals(rangeIntervalHolder)) {
+			hasFirstLoadOccurred = false;
+			rangeIntervalHolder = range;
+		}
+		
 		const promises = markEventsLoaded(range.start, range.end);
+
 		Promise
 			.allSettled(promises)
 			.then(results => {
@@ -127,18 +141,23 @@ export function useEventLoader(rangeInterval, getPromiseFunc) {
 						if (res.value.meta.lv)
 							lv.value = res.value.meta.lv;
 
-						events.value = events.value.concat(res.value.data);
+						tempEventsHolder = tempEventsHolder.concat(res.value.data);
 						loadingEvents.value = [];
 					}
 				})
+
+				events.value = tempEventsHolder;
+ 
 			});
+
+		hasFirstLoadOccurred = true;
 	};
 
 	Vue.watchEffect(reload);
 
 	const reset = () => {
 		loading_id = 0;
-		events.value = [];
+		tempEventsHolder = [];
 		loadingEvents.value = [];
 		eventsLoaded.splice(0, eventsLoaded.length);
 		reload();

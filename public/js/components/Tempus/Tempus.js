@@ -163,6 +163,7 @@ export default {
         assignedResources: [],
         areFormButtonsDisplayed: false,
       },
+      currentlyUpdatedEvent: null,
     };
   },
   computed: {
@@ -399,25 +400,99 @@ export default {
       if (hasStg) filter.stg = this.stg;
       if (hasLektoren) filter.uid = this.lecturers.map((l) => l.uid);
 
+      let response = null;
       if (this.previewRole === "lektor")
-        return [
+        response = [
           this.$api.call(
             ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()),
           ),
         ];
 
       if (this.previewRole === "student")
-        return [
+        response = [
           this.$api.call(
             ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()),
           ),
         ];
 
-      return [
+      response = [
         this.$api.call(
           ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
         ),
       ];
+
+      if (response) {
+        response[0].then((result) => {
+          if (!this.currentlyUpdatedEvent) return;
+
+          document.querySelectorAll(".updated-event").forEach((el) => {
+            el.classList.remove("updated-event");
+          });
+          document.querySelectorAll(".updated-event-long").forEach((el) => {
+            el.classList.remove("updated-event-long");
+          });
+          document.querySelectorAll(".deemphasized-event").forEach((el) => {
+            el.classList.remove("deemphasized-event");
+          });
+          document
+            .querySelectorAll(".deemphasized-event-long")
+            .forEach((el) => {
+              el.classList.remove("deemphasized-event-long");
+            });
+
+          setTimeout(() => {
+            const eventEl = document.querySelector(
+              `[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_gruppen_id}"]`,
+            );
+            if (!eventEl) return;
+
+            const calendar = document.querySelector(".fhc-calendar-base-grid");
+            const eventRect = eventEl.getBoundingClientRect();
+
+            const offset = 300;
+
+            const isInsideScrolledView =
+              eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+              eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
+              eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+              eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
+
+            const rect = eventEl.getBoundingClientRect();
+            if (!isInsideScrolledView) {
+              eventEl.scrollIntoView({
+                behavior: "smooth",
+                inline: "center",
+                block: "nearest",
+              });
+            }
+
+            let timeout = 0;
+            let emphasizeUpdateClassName = isInsideScrolledView
+              ? "updated-event"
+              : "updated-event-long";
+            let deemphasizedUpdateClassName = isInsideScrolledView
+              ? "deemphasized-event"
+              : "deemphasized-event-long";
+
+            if (!isInsideScrolledView) timeout = 500;
+
+            setTimeout(() => {
+              eventEl.classList.add(emphasizeUpdateClassName);
+              document
+                .querySelectorAll(".fhc-calendar-base-grid-line-event")
+                .forEach((el) => {
+                  if (el !== eventEl) {
+                    el.classList.add(deemphasizedUpdateClassName);
+                  }
+                });
+            }, timeout);
+
+            this.currentlyUpdatedEvent = null;
+          }, 100);
+        });
+      }
+
+      return response;
     },
     toDateTime(value, timezone) {
       if (luxon.DateTime.isDateTime(value)) return value;
@@ -502,7 +577,11 @@ export default {
           ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos),
         )
         .then(() => {
-          if (onSuccess) onSuccess();
+          if (onSuccess) {
+            onSuccess();
+            this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
+            this.currentlyUpdatedEvent = obj.orig;
+          }
         });
     },
 
@@ -720,37 +799,41 @@ export default {
       );
       if (getAssignedResources.meta.status === "success") {
         return getAssignedResources.data
-        .filter((unit) => !!unit)
-        .map((unit) => {
-          return {
-            isNoteTextareaShown: unit.anmerkung && unit.anmerkung.trim() !== "",
-            ...unit,
-          };
-        }).filter((unit) => !!unit)
+          .filter((unit) => !!unit)
+          .map((unit) => {
+            return {
+              isNoteTextareaShown:
+                unit.anmerkung && unit.anmerkung.trim() !== "",
+              ...unit,
+            };
+          })
+          .filter((unit) => !!unit);
       } else {
-        this.$fhcAlert.alertError(this.$p.t("ui", "failed_assigned_resources_fetch_error_message"));
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_assigned_resources_fetch_error_message"),
+        );
       }
 
       return [];
     },
     async fetchSchedulableResourcesByCalender(calendarID) {
-      let getSchedulableResourcesByCalendar =
-        await this.$api.call(
-          ApiOperationalResourceToCalender.getSchedulableResourcesByCalendar(calendarID),
-        );
-      if (
-        getSchedulableResourcesByCalendar.meta.status ===
-        "success"
-      ) {
+      let getSchedulableResourcesByCalendar = await this.$api.call(
+        ApiOperationalResourceToCalender.getSchedulableResourcesByCalendar(
+          calendarID,
+        ),
+      );
+      if (getSchedulableResourcesByCalendar.meta.status === "success") {
         return getSchedulableResourcesByCalendar.data;
       } else {
-        this.$fhcAlert.alertError(this.$p.t("ui", "failed_schedulable_resources_fetch_error_message"));
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_schedulable_resources_fetch_error_message"),
+        );
       }
 
       return [];
     },
     filterAvailableResources(event) {
-      this.resourcesAssignmentModal.filteredAvailableResources 
+      this.resourcesAssignmentModal.filteredAvailableResources;
       const query = event.query.toLowerCase();
       if (!query) {
         return (this.resourcesAssignmentModal.filteredAvailableResources = [
@@ -764,21 +847,23 @@ export default {
 
       return (this.resourcesAssignmentModal.filteredAvailableResources =
         this.dropdownParsedAvailableResources
-        .filter((unit) => {          
-          return !this.resourcesAssignmentModal.assignedResources.some(
-            (assigned) => assigned.betriebsmittel_id === unit.value,
-          );
-        })
-        .filter((unit) => {
-          return unit.label.toLowerCase().includes(query);
-        }));
+          .filter((unit) => {
+            return !this.resourcesAssignmentModal.assignedResources.some(
+              (assigned) => assigned.betriebsmittel_id === unit.value,
+            );
+          })
+          .filter((unit) => {
+            return unit.label.toLowerCase().includes(query);
+          }));
     },
     toggleAssignedResourceNoteInput(resource) {
       const index = this.resourcesAssignmentModal.assignedResources.findIndex(
         (assigned) => assigned.betriebsmittel_id === resource.betriebsmittel_id,
       );
       if (index !== -1) {
-        this.resourcesAssignmentModal.assignedResources[index].isNoteTextareaShown =
+        this.resourcesAssignmentModal.assignedResources[
+          index
+        ].isNoteTextareaShown =
           !this.resourcesAssignmentModal.assignedResources[index]
             .isNoteTextareaShown;
       }
@@ -788,35 +873,42 @@ export default {
     removeAssignedResource(resource) {
       this.resourcesAssignmentModal.assignedResources =
         this.resourcesAssignmentModal.assignedResources.filter(
-          (assigned) => assigned.betriebsmittel_id !== resource.betriebsmittel_id,
+          (assigned) =>
+            assigned.betriebsmittel_id !== resource.betriebsmittel_id,
         );
 
       this.resourcesAssignmentModal.areFormButtonsDisplayed = true;
     },
     async refreshResourcesAssignmentModalData(calenderItem) {
       this.resourcesAssignmentModal.availableResources =
-        await this.fetchSchedulableResourcesByCalender(calenderItem.kalender_id);
+        await this.fetchSchedulableResourcesByCalender(
+          calenderItem.kalender_id,
+        );
       this.resourcesAssignmentModal.filteredAvailableResources = [
         ...this.dropdownParsedAvailableResources,
       ];
- 
-      this.resourcesAssignmentModal.assignedResources =  await this.fetchAssignedResourcesByCalender(calenderItem.kalender_id);
+
+      this.resourcesAssignmentModal.assignedResources =
+        await this.fetchAssignedResourcesByCalender(calenderItem.kalender_id);
       this.resourcesAssignmentModal.selectedAvailableResource = null;
       this.resourcesAssignmentModal.areFormButtonsDisplayed = false;
     },
     async saveAssignedResourcesToCalendarItem(calenderItem, assignedResources) {
-      let getSchedulableResourcesByCalendar =
-        await this.$api.call(
-          ApiOperationalResourceToCalender.storeResourcesToCalendarRelationship(calenderItem.kalender_id, assignedResources)
+      let getSchedulableResourcesByCalendar = await this.$api.call(
+        ApiOperationalResourceToCalender.storeResourcesToCalendarRelationship(
+          calenderItem.kalender_id,
+          assignedResources,
+        ),
+      );
+      if (getSchedulableResourcesByCalendar.meta.status === "success") {
+        this.$fhcAlert.alertSuccess(
+          this.$p.t("ui", "assigned_resources_save_success_message"),
         );
-      if (
-        getSchedulableResourcesByCalendar.meta.status ===
-        "success"
-      ) {
-        this.$fhcAlert.alertSuccess(this.$p.t("ui", "assigned_resources_save_success_message"));
         await this.refreshResourcesAssignmentModalData(calenderItem);
       } else {
-        this.$fhcAlert.alertError(this.$p.t("ui", "failed_assigned_resources_save_error_message"));
+        this.$fhcAlert.alertError(
+          this.$p.t("ui", "failed_assigned_resources_save_error_message"),
+        );
       }
 
       this.$refs.calendar.resetEventLoader();

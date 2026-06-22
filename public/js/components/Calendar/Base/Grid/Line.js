@@ -71,7 +71,7 @@ export default {
 		></line-background>
 		<line-event
 			v-for="(event, i) in eventsWithRowInfo"
-			:key="i"
+			:key="event.orig.eindeutige_gruppen_id || i"
 			:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
 			:event="event"
 			@resize-start="$emit('resize-start', $event)"

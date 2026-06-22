@@ -110,6 +110,7 @@ export default {
 		style="z-index: 2"
 		:draggable="draggable"
 		:data-id="'event-' + event.orig.kalender_id"
+		:data-group-id="'event-group-' + event.orig.eindeutige_gruppen_id"
 		ref="eventEl"
 		@dragstart="onDragStart"
 		v-draggable:move.noimage="draggable ? dragKalenderCollection : {}"
