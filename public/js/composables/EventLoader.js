@@ -1,22 +1,28 @@
 // TODO(chris): load events that are longer than the interval without doubling it
 
-export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = true, isLoaderInitiallyVisible = true) {
+export function useEventLoader(
+	rangeInterval,
+	getPromiseFunc,
+	isLoaderVisible = true,
+	isLoaderInitiallyVisible = true,
+) {
 	let hasFirstLoadOccurred = false;
 	let loading_id = 0;
-	
+
 	let tempEventsHolder = [];
 	let rangeIntervalHolder = null;
 
 	const events = Vue.ref([]);
 	const loadingEvents = Vue.ref([]);
-	const allEvents = Vue.computed(() => events.value.concat(loadingEvents.value));
+	const allEvents = Vue.computed(() =>
+		events.value.concat(loadingEvents.value),
+	);
 	const lv = Vue.ref(null);
 	const eventsLoaded = [];
 
 	const mergePromiseArr = (n, o) => {
-		if (Array.isArray(n))
-			return o.concat(n);
-		return o.push(n), o;
+		if (Array.isArray(n)) return o.concat(n);
+		return (o.push(n), o);
 	};
 
 	const markEventsLoaded = (start, end) => {
@@ -25,10 +31,10 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 			// empty: add new chunk
 			eventsLoaded.push(start.ts, end.ts);
 		} else {
-			if (eventsLoaded[eventsLoaded.length-1] + 1 == start.ts) {
+			if (eventsLoaded[eventsLoaded.length - 1] + 1 == start.ts) {
 				// add to the end of last chunk
-				eventsLoaded[eventsLoaded.length-1] = end.ts;
-			} else if (eventsLoaded[eventsLoaded.length-1] < start.ts) {
+				eventsLoaded[eventsLoaded.length - 1] = end.ts;
+			} else if (eventsLoaded[eventsLoaded.length - 1] < start.ts) {
 				// add new chunk after the last chunk
 				eventsLoaded.push(start.ts, end.ts);
 			} else if (eventsLoaded[0] == end.ts + 1) {
@@ -37,14 +43,13 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 			} else if (eventsLoaded[0] > end.ts) {
 				eventsLoaded.unshift(start.ts, end.ts);
 			} else {
-				let index = eventsLoaded.findIndex(e => e >= start.ts);
+				let index = eventsLoaded.findIndex((e) => e >= start.ts);
 
 				if (index % 2) {
 					// starts inside an existing chunk
-					if (eventsLoaded[index] >= end.ts)
-						return []; // Already loaded
+					if (eventsLoaded[index] >= end.ts) return []; // Already loaded
 
-					let indexIsLast = (index == eventsLoaded.length - 1);
+					let indexIsLast = index == eventsLoaded.length - 1;
 
 					if (indexIsLast || eventsLoaded[index + 1] > end.ts) {
 						// extend an existing chunk
@@ -53,14 +58,16 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 						start = start.plus(nStart - start.ts);
 						if (!indexIsLast && eventsLoaded[index + 1] == end.ts + 1)
 							eventsLoaded.splice(index, 2);
-						else
-							eventsLoaded[index] = end.ts;
+						else eventsLoaded[index] = end.ts;
 					} else {
 						// merge exising chunks
 						// and load the rest if necessary
 						if (eventsLoaded[index + 2] < end.ts) {
 							let rStart = eventsLoaded[index + 2] + 1;
-							result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
+							result = mergePromiseArr(
+								markEventsLoaded(start.plus(rStart - start.ts), end),
+								result,
+							);
 						}
 
 						let nStart = eventsLoaded[index] + 1;
@@ -76,24 +83,32 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 						// and load the rest if necessary
 						if (eventsLoaded[1] < end.ts) {
 							let rStart = eventsLoaded[1] + 1;
-							result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
+							result = mergePromiseArr(
+								markEventsLoaded(start.plus(rStart - start.ts), end),
+								result,
+							);
 						}
 						let nEnd = eventsLoaded[0] - 1;
 						end = end.plus(nEnd - end.ts);
 						eventsLoaded[0] = start.ts;
 					} else if (eventsLoaded[index] == start.ts) {
 						// starts at the same position as an existing chunk
-						if (eventsLoaded[index + 1] >= end.ts)
-							return []; // Already loaded
+						if (eventsLoaded[index + 1] >= end.ts) return []; // Already loaded
 						// load the rest
 						let rStart = eventsLoaded[index + 1] + 1;
-						result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
+						result = mergePromiseArr(
+							markEventsLoaded(start.plus(rStart - start.ts), end),
+							result,
+						);
 					} else {
 						// extend an existing chunk
 						// and load the rest if necessary
 						if (eventsLoaded[index + 1] < end.ts) {
 							let rStart = eventsLoaded[index + 1] + 1;
-							result = mergePromiseArr(markEventsLoaded(start.plus(rStart - start.ts), end), result);
+							result = mergePromiseArr(
+								markEventsLoaded(start.plus(rStart - start.ts), end),
+								result,
+							);
 						}
 						let nEnd = eventsLoaded[index] - 1;
 						end = end.plus(nEnd - end.ts);
@@ -103,15 +118,14 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 			}
 		}
 
-		if (start.ts >= end.ts)
-			return result;
- 
-		if (isLoaderVisible && (!hasFirstLoadOccurred && isLoaderInitiallyVisible)) {
+		if (start.ts >= end.ts) return result;
+
+		if (isLoaderVisible && !hasFirstLoadOccurred && isLoaderInitiallyVisible) {
 			loadingEvents.value.push({
 				loading_id: loading_id++,
-				type: "loading",
+				type: 'loading',
 				isostart: start.toISODate() + 'T' + start.toISOTime(),
-				isoend: end.toISODate() + 'T' + end.toISOTime()
+				isoend: end.toISODate() + 'T' + end.toISOTime(),
 			});
 		}
 
@@ -120,35 +134,27 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 
 	const reload = () => {
 		const range = Vue.toValue(rangeInterval);
-		if (!(range instanceof luxon.Interval))
-			return;
+		if (!(range instanceof luxon.Interval)) return;
 
 		if (!rangeIntervalHolder || !range.equals(rangeIntervalHolder)) {
 			hasFirstLoadOccurred = false;
 			rangeIntervalHolder = range;
 		}
-		
+
 		const promises = markEventsLoaded(range.start, range.end);
 
-		Promise
-			.allSettled(promises)
-			.then(results => {
-				results.forEach(res => {
-					if (
-						res.status === 'fulfilled'
-						&& res.value.meta.status === "success"
-					) {
-						if (res.value.meta.lv)
-							lv.value = res.value.meta.lv;
+		Promise.allSettled(promises).then((results) => {
+			results.forEach((res) => {
+				if (res.status === 'fulfilled' && res.value.meta.status === 'success') {
+					if (res.value.meta.lv) lv.value = res.value.meta.lv;
 
-						tempEventsHolder = tempEventsHolder.concat(res.value.data);
-						loadingEvents.value = [];
-					}
-				})
-
-				events.value = tempEventsHolder;
- 
+					tempEventsHolder = tempEventsHolder.concat(res.value.data);
+					loadingEvents.value = [];
+				}
 			});
+
+			events.value = tempEventsHolder;
+		});
 
 		hasFirstLoadOccurred = true;
 	};
@@ -158,11 +164,11 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 	const reset = () => {
 		loading_id = 0;
 		tempEventsHolder = [];
-		loadingEvents.value = [];
+		//loadingEvents.value = [];
 		eventsLoaded.splice(0, eventsLoaded.length);
 
 		reload();
-	}
+	};
 
-	return { events: allEvents, lv, reset }
+	return { events: allEvents, lv, reset };
 }
