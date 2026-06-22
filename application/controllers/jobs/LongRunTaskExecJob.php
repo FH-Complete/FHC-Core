@@ -53,5 +53,29 @@ class LongRunTaskExecJob extends JQW_Controller
 
 		$this->logInfo('Execute long run tasks ended');
 	}
+
+	/**
+	 *
+	 */
+	public function killHangingLRTs()
+	{
+		$this->logInfo('Kill hanging LRTs started');
+
+		// Get all the LRTs that is possible to execute now
+		$lrtsResult = $this->longruntasklib->getHangingLRTs();
+		if (isError($lrtsResult)) return $lrtsResult;
+
+		if (hasData($lrtsResult))
+		{
+			// For each LRT
+			foreach (getData($lrtsResult) as $lrt)
+			{
+				// Kill the process with a SIGKILL
+				exec('kill -9 '.$lrt->pid.' > /dev/null 2>&1');
+			}
+		}
+
+		$this->logInfo('Kill hanging LRTs ended');
+	}
 }
 

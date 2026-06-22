@@ -12,6 +12,7 @@ class LongRunTaskLib extends JobsQueueLib
 	// Config names
 	const CFG_LRT_MAX_NUMBER_SYSTEM = 'lrt_max_number_system';
 	const CFG_LRT_TYPES = 'lrt_types';
+	const CFG_LRT_MAX_RUN = 'lrt_max_run_timeout';
 
 	// LRT object properties
 	const PROPERTY_UID = 'uid';
@@ -50,6 +51,26 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
+	 *
+	 */
+	public function getHangingLRTs()
+	{
+		// Return the result of the query
+		return $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+		          FROM system.tbl_jobsqueue jq
+			 WHERE jq.type IN ?
+			   AND jq.status = ?
+			   AND jq.starttime < NOW() - INTERVAL \''.$this->_ci->config->item(self::CFG_LRT_MAX_RUN).' hours\'
+		      ORDER BY jq.creationtime DESC',
+			array(
+				$this->_ci->config->item(self::CFG_LRT_TYPES),
+				JobsQueueLib::STATUS_RUNNING
+			)
+		);
+	}
+
+	/**
 	 * Execute a LRT in background
 	 * - Checks if the wanted LRT exists in the applcation/controllers/lrts directory
 	 * - Then executes it in background via CI CLI
@@ -58,7 +79,6 @@ class LongRunTaskLib extends JobsQueueLib
 	public function executeLrt($lrt)
 	{
 		$output = array();
-		$return_var = -1;
 
 		// If does _not_ exist a LRT implementation for this LRT type, then return an error
 		if (!file_exists(APPPATH.'controllers/lrts/'.$lrt->{self::PROPERTY_TYPE}.'.php'))
@@ -70,16 +90,22 @@ class LongRunTaskLib extends JobsQueueLib
 		exec(
 			// Command
 			'/usr/bin/php '.APPPATH.'../index.ci.php lrts/'.$lrt->{self::PROPERTY_TYPE}.'/run '.$lrt->{self::PROPERTY_JOBID}.' > /dev/null 2>&1 & echo $!',
-			$output, // Here goes the output from the standard output and error
-			$return_var // Status of the command once executed (== 0 success, !=0 error)
+			$output // Here goes the output from the standard output and error
 		);
 
 		// If a pid has not been returned
 		if (isEmptyArray($output) || !is_numeric($output[0])) return error('Not a valid pid has been returned');
 
-		// Set the pid of this LRT into the database
-		$pidResult = $this->_ci->JobsQueueModel->update($lrt->{self::PROPERTY_JOBID}, array('pid' => $output[0]));
-		if (isError($pidResult)) return $pidResult;
+		// Set the pid, status and starttime of this LRT into the database
+		$updateLrtResult = $this->_ci->JobsQueueModel->update(
+			$lrt->{self::PROPERTY_JOBID},
+			array(
+				'pid' => $output[0],
+				'starttime' => 'NOW()',
+				'status' => self::STATUS_RUNNING
+			)
+		);
+		if (isError($updateLrtResult)) return $updateLrtResult;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
