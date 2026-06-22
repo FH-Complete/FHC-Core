@@ -159,6 +159,7 @@ class KalenderLib
 				$bis = new DateTime($row->bis);
 
 				$events[$id] = (object) [
+					'kalender_id' => $id,					
 					'eindeutige_kalender_gruppen_id' => $row->eindeutige_kalender_gruppen_id,
 					'type' => $row->typ,
 					'beginn' => $von->format('H:i:s'),
@@ -175,7 +176,6 @@ class KalenderLib
 					'farbe' => isset($row->farbe) ? $row->farbe : '',
 					'lehrveranstaltung_id' => $row->lehrveranstaltung_id,
 					'organisationseinheit' => isset($row->oe_kurzbz) ? $row->oe_kurzbz : '',
-					'kalender_id' => $id,
 					'lehreinheit_id' => [],
 					'lektor' => [],
 					'teilnehmer_gruppe' => [],

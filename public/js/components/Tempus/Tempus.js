@@ -14,43 +14,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import CoreSearchbar from "../searchbar/searchbar.js";
-import NavLanguage from "../navigation/Language.js";
-import VerticalSplit from "../verticalsplit/verticalsplit.js";
-import FhcCalendar from "../Calendar/Tempus.js";
-import FhcCoursepicker from "./Coursepicker.js";
-import LectureSelection from "./Filters/LectureSelection.js";
-import VerbandSelection from "./Filters/VerbandSelection.js";
-import RoomSelection from "./Filters/RoomSelection.js";
-import ParkingSlot from "./ParkingSlot.js";
-import ApiKalender from "../../api/factory/tempus/kalender.js";
-import ApiSearchbar from "../../api/factory/searchbar.js";
-import ApiRenderers from "../../api/factory/renderers.js";
-import ApiTempusConfig from "../../api/factory/tempus/config.js";
-import ApiOperationalResourceToCalender from "../../api/factory/operationalResourceToCalender.js";
-import AppMenu from "../AppMenu.js";
-import drop from "../../directives/drop.js";
-import AppConfig from "../AppConfig.js";
+import CoreSearchbar from '../searchbar/searchbar.js';
+import NavLanguage from '../navigation/Language.js';
+import VerticalSplit from '../verticalsplit/verticalsplit.js';
+import FhcCalendar from '../Calendar/Tempus.js';
+import FhcCoursepicker from './Coursepicker.js';
+import LectureSelection from './Filters/LectureSelection.js';
+import VerbandSelection from './Filters/VerbandSelection.js';
+import RoomSelection from './Filters/RoomSelection.js';
+import ParkingSlot from './ParkingSlot.js';
+import ApiKalender from '../../api/factory/tempus/kalender.js';
+import ApiSearchbar from '../../api/factory/searchbar.js';
+import ApiRenderers from '../../api/factory/renderers.js';
+import ApiTempusConfig from '../../api/factory/tempus/config.js';
+import ApiOperationalResourceToCalender from '../../api/factory/operationalResourceToCalender.js';
+import AppMenu from '../AppMenu.js';
+import drop from '../../directives/drop.js';
+import AppConfig from '../AppConfig.js';
 
-import BsModal from "../Bootstrap/Modal.js";
+import BsModal from '../Bootstrap/Modal.js';
 
 import BaseTreemenu from '../Base/Treemenu.js';
 
-import ApiStudiengangTree from "../../api/factory/tempus/studiengangtree.js";
-import ApiInfo from "../../api/factory/tempus/info.js";
-import StvStudiensemester from "../Stv/Studentenverwaltung/Studiensemester.js";
-import FormInput from "../../../js/components/Form/Input.js";
-import Reservierung from "./Reservierung.js";
-import { getTempusShortcuts } from "./shortcuts.js";
-import KeyboardShortcuts from "./KeyboardShortcuts.js";
-import { useContextMenuActions } from "../../composables/Tempus/ContextMenuActions.js";
-import MultiWeekPlanModal from "./MultiWeekPlanModal.js";
-import { getTempusSearchbarOptions } from "./Filters/searchbarOptions.js";
-import RaumauswahlModal from "./RaumauswahlModal.js";
-import LehreinheitModal from "./LehreinheitModal.js";
+import ApiStudiengangTree from '../../api/factory/tempus/studiengangtree.js';
+import ApiInfo from '../../api/factory/tempus/info.js';
+import StvStudiensemester from '../Stv/Studentenverwaltung/Studiensemester.js';
+import FormInput from '../../../js/components/Form/Input.js';
+import Reservierung from './Reservierung.js';
+import { getTempusShortcuts } from './shortcuts.js';
+import KeyboardShortcuts from './KeyboardShortcuts.js';
+import { useContextMenuActions } from '../../composables/Tempus/ContextMenuActions.js';
+import MultiWeekPlanModal from './MultiWeekPlanModal.js';
+import { getTempusSearchbarOptions } from './Filters/searchbarOptions.js';
+import RaumauswahlModal from './RaumauswahlModal.js';
+import LehreinheitModal from './LehreinheitModal.js';
 
 export default {
-	name: "Tempus",
+	name: 'Tempus',
 	components: {
 		CoreSearchbar,
 		VerticalSplit,
@@ -72,7 +72,7 @@ export default {
 		KeyboardShortcuts,
 		MultiWeekPlanModal,
 		RaumauswahlModal,
-		LehreinheitModal
+		LehreinheitModal,
 	},
 	props: {
 		defaultSemester: String,
@@ -98,7 +98,8 @@ export default {
 			contextMenuActions: useContextMenuActions({
 				openRaumauswahl: (orig) => this.$refs.raumModal.show(orig),
 				openLehreinheit: (orig) => this.$refs.lehreinheitModal.show(orig),
-				openResourcesAssignmentModal: (orig) => this.openResourcesAssignmentModal(orig),
+				openResourcesAssignmentModal: (orig) =>
+					this.openResourcesAssignmentModal(orig),
 				openHistory: (orig) => this.openHistory(orig),
 				deleteEntry: (orig) => this.deleteEntry(orig),
 				syncToLecturer: (orig) => this.syncToLecturer(orig),
@@ -113,7 +114,7 @@ export default {
 	data() {
 		return {
 			appconfig: {},
-			currentMode: "week",
+			currentMode: 'week',
 			configEndpoints: ApiTempusConfig,
 			endpoint: ApiStudiengangTree,
 			raumVorschlaege: [],
@@ -133,7 +134,7 @@ export default {
 			},
 			renderers: null,
 			ort_kurzbz: null,
-			view: "room",
+			view: 'room',
 			parkedKeys: new Set(),
 			lecturers: [],
 			studiengaenge: [],
@@ -146,14 +147,14 @@ export default {
 			studiensemester_kurzbz: null,
 
 			visibleStatusArray: {},
-			visibleStatus: ["all"],
+			visibleStatus: ['all'],
 			selectedStudiensemester:
 				this.studiensemester_kurzbz ?? this.defaultSemester,
 			calendarDate: luxon.DateTime.now()
 				.setZone(this.config.timezone)
 				.toISODate(),
 			historyEntries: [],
-			previewRole: "planer",
+			previewRole: 'planer',
 			multiWeekModal: {
 				show: false,
 				lehreinheitId: null,
@@ -170,6 +171,7 @@ export default {
 				assignedResources: [],
 				areFormButtonsDisplayed: false,
 			},
+			currentlyUpdatedEvent: null,
 		};
 	},
 	computed: {
@@ -189,9 +191,9 @@ export default {
 			}));
 		},
 		visibleStatusValue() {
-			if (this.visibleStatus.includes("all"))
+			if (this.visibleStatus.includes('all'))
 				return this.visibleStatusOptions.filter(
-					(visibleStatus) => visibleStatus.key === "all",
+					(visibleStatus) => visibleStatus.key === 'all',
 				);
 			return this.visibleStatus.map((status) => ({
 				key: status,
@@ -287,7 +289,6 @@ export default {
 		},
 
 		onSelectVerband({ path, stg_kz, semester, orgform_kurzbz, name }) {
-
 			let exists = this.studiengaenge.some(
 				(stg) =>
 					stg.stg_kz == stg_kz &&
@@ -321,12 +322,12 @@ export default {
 			if (this.lastRange) this.handleRange(this.lastRange);
 		},
 		addToFilter: function (filter, type) {
-			if (type === "ort") {
+			if (type === 'ort') {
 				const ort_kurzbz = filter.ort_kurzbz;
 				if (!this.rooms.some((room) => room.ort_kurzbz === ort_kurzbz)) {
 					this.rooms.push({ ort_kurzbz });
 				}
-			} else if (type === "mitarbeiter") {
+			} else if (type === 'mitarbeiter') {
 				const uid = filter.uid;
 				const label = filter.name;
 				if (!this.lecturers.some((l) => l.uid === uid)) {
@@ -371,83 +372,148 @@ export default {
 				.call(ApiTempusConfig.updateCollision())
 				.then(() => {
 					this.$refs.config.reload();
-					this.$fhcAlert.alertSuccess(this.$p.t("ui/settings_saved"));
+					this.$fhcAlert.alertSuccess(this.$p.t('ui/settings_saved'));
 				})
 				.catch(this.$fhcAlert.handleSystemErrors);
 		},
 		toggleStatus(selected) {
 			if (!selected || selected.length === 0) {
-				this.visibleStatus = ["all"];
+				this.visibleStatus = ['all'];
 				return;
 			}
-			const hasAll = selected.includes("all");
-			const hadAll = this.visibleStatus.includes("all");
+			const hasAll = selected.includes('all');
+			const hadAll = this.visibleStatus.includes('all');
 
 			if (hasAll && !hadAll) {
-				this.visibleStatus = ["all"];
+				this.visibleStatus = ['all'];
 				return;
 			}
-			this.visibleStatus = selected.filter((k) => k !== "all");
-			if (this.visibleStatus.length === 0) this.visibleStatus = ["all"];
+			this.visibleStatus = selected.filter((k) => k !== 'all');
+			if (this.visibleStatus.length === 0) this.visibleStatus = ['all'];
 		},
 		searchfunction(params) {
 			return this.$api.call(ApiSearchbar.search(params));
 		},
 		getPromiseFunc(start, end) {
-			const hasRooms = this.rooms.length > 0;
+			const hasRoom = !!this.ort_kurzbz;
 			const hasLektoren = this.lecturers.length > 0;
-			const hasStg = this.studiengaenge.length > 0;
+			const hasStg = !!this.stg;
 
 			const filter = {};
 
-			if (hasRooms) filter.ort = this.rooms.map((room) => room.ort_kurzbz);
-			if (hasStg) {
-				filter.stg = this.studiengaenge.map(
-					({ stg_kz, semester, orgform_kurzbz }) => ({
-						stg_kz,
-						semester,
-						orgform_kurzbz,
-					}),
-				);
-			}
-			if (hasLektoren)
-				filter.uid = this.lecturers.map((lecture) => lecture.uid);
+			if (hasRoom) filter.ort = this.ort_kurzbz;
+			if (hasStg) filter.stg = this.stg;
+			if (hasLektoren) filter.uid = this.lecturers.map((l) => l.uid);
 
-			if (this.previewRole === "lektor")
-				return [
+			let response = null;
+			if (this.previewRole === 'lektor')
+				response = [
 					this.$api.call(
 						ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()),
 					),
 				];
 
-			if (this.previewRole === "student")
-				return [
+			if (this.previewRole === 'student')
+				response = [
 					this.$api.call(
 						ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()),
 					),
 				];
 
-			return [
+			response = [
 				this.$api.call(
 					ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
 				),
 			];
+
+			if (response) {
+				response[0].then((result) => {
+					if (!this.currentlyUpdatedEvent) return;
+
+					document.querySelectorAll('.updated-event').forEach((el) => {
+						el.classList.remove('updated-event');
+					});
+					document.querySelectorAll('.updated-event-long').forEach((el) => {
+						el.classList.remove('updated-event-long');
+					});
+					document.querySelectorAll('.deemphasized-event').forEach((el) => {
+						el.classList.remove('deemphasized-event');
+					});
+					document
+						.querySelectorAll('.deemphasized-event-long')
+						.forEach((el) => {
+							el.classList.remove('deemphasized-event-long');
+						});
+
+					setTimeout(() => {
+						const eventEl = document.querySelector(
+							`[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_gruppen_id}"]`,
+						);
+						if (!eventEl) return;
+
+						const calendar = document.querySelector('.fhc-calendar-base-grid');
+						const eventRect = eventEl.getBoundingClientRect();
+
+						const offset = 300;
+
+						const isInsideScrolledView =
+							eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+							eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
+							eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+							eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
+
+						const rect = eventEl.getBoundingClientRect();
+						if (!isInsideScrolledView) {
+							eventEl.scrollIntoView({
+								behavior: 'smooth',
+								inline: 'center',
+								block: 'nearest',
+							});
+						}
+
+						let timeout = 0;
+						let emphasizeUpdateClassName = isInsideScrolledView
+							? 'updated-event'
+							: 'updated-event-long';
+						let deemphasizedUpdateClassName = isInsideScrolledView
+							? 'deemphasized-event'
+							: 'deemphasized-event-long';
+
+						if (!isInsideScrolledView) timeout = 500;
+
+						setTimeout(() => {
+							eventEl.classList.add(emphasizeUpdateClassName);
+							document
+								.querySelectorAll('.fhc-calendar-base-grid-line-event')
+								.forEach((el) => {
+									if (el !== eventEl) {
+										el.classList.add(deemphasizedUpdateClassName);
+									}
+								});
+						}, timeout);
+
+						this.currentlyUpdatedEvent = null;
+					}, 100);
+				});
+			}
+
+			return response;
 		},
 		toDateTime(value, timezone) {
 			if (luxon.DateTime.isDateTime(value)) return value;
 
 			if (value?.date?.isValid) return value.date;
 
-			if (typeof value === "number")
+			if (typeof value === 'number')
 				return luxon.DateTime.fromMillis(value, { zone: timezone });
 
 			if (value instanceof Date)
 				return luxon.DateTime.fromJSDate(value, { zone: timezone });
 
-			if (typeof value === "string")
+			if (typeof value === 'string')
 				return luxon.DateTime.fromISO(value, { zone: timezone });
 
-			return luxon.DateTime.invalid("invalid datetime");
+			return luxon.DateTime.invalid('invalid datetime');
 		},
 		getLastEndOfSameDay(startDT, ends) {
 			if (!ends?.length) return null;
@@ -483,15 +549,15 @@ export default {
 			const endDT = luxon.DateTime.fromISO(end);
 
 			if (!startDT.isValid || !endDT.isValid) {
-				alert("Ungültiges Datum");
+				alert('Ungültiges Datum');
 				return null;
 			}
 
 			return {
 				startDT,
 				endDT,
-				start_time: startDT.toFormat("yyyy-MM-dd HH:mm"),
-				end_time: endDT.toFormat("yyyy-MM-dd HH:mm"),
+				start_time: startDT.toFormat('yyyy-MM-dd HH:mm'),
+				end_time: endDT.toFormat('yyyy-MM-dd HH:mm'),
 			};
 		},
 
@@ -508,7 +574,7 @@ export default {
 			const updatedInfos = {
 				ort_kurzbz: this.rooms.length
 					? this.rooms.map((room) => room.ort_kurzbz)
-					: obj.orig.ort_kurzbz ?? [],
+					: (obj.orig.ort_kurzbz ?? []),
 				start_time,
 				end_time,
 			};
@@ -518,18 +584,22 @@ export default {
 					ApiKalender.updateKalenderEvent(obj.orig.kalender_id, updatedInfos),
 				)
 				.then(() => {
-					if (onSuccess) onSuccess();
+					if (onSuccess) {
+						onSuccess();
+						this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
+						this.currentlyUpdatedEvent = obj.orig;
+					}
 				});
 		},
 
 		resizeHandler(payload) {
-			if (this.previewRole !== "planer")
+			if (this.previewRole !== 'planer')
 				//TODO (david) testzweck
 				return;
 			const { item, start, end } = payload;
 			const obj = item[0];
 			if (!obj?.orig?.kalender_id)
-				return alert("Kein gültiges Kalender-Event zum Resizen");
+				return alert('Kein gültiges Kalender-Event zum Resizen');
 
 			const dates = this._parseDates(start, end);
 
@@ -549,19 +619,19 @@ export default {
 		},
 
 		dropHandler(payload) {
-			if (this.previewRole !== "planer")
+			if (this.previewRole !== 'planer')
 				//TODO (david) testzweck
 				return;
 			const { item, start, end } = payload;
-			if (!item?.length) return alert("Keine Daten gedroppt");
+			if (!item?.length) return alert('Keine Daten gedroppt');
 
 			const obj = item[0];
-			if (!obj?.type) return alert("Unbekannter Drop-Typ");
+			if (!obj?.type) return alert('Unbekannter Drop-Typ');
 
 			if (payload.targetKalenderId) {
-				if (obj.type !== "lehreinheit" || !obj.orig?.lehreinheit_id)
+				if (obj.type !== 'lehreinheit' || !obj.orig?.lehreinheit_id)
 					return alert(
-						"Nur Lehreinheiten können einem Termin hinzugefügt werden",
+						'Nur Lehreinheiten können einem Termin hinzugefügt werden',
 					);
 
 				return this.$api
@@ -573,7 +643,7 @@ export default {
 					)
 					.then(() => {
 						this.$refs.calendar.resetEventLoader();
-						this.bcc.postMessage("dropped");
+						this.bcc.postMessage('dropped');
 					});
 			}
 
@@ -582,10 +652,10 @@ export default {
 
 			const { startDT, endDT, start_time, end_time } = dates;
 
-			if (obj.type === "reservierung") {
+			if (obj.type === 'reservierung') {
 				this.reservierungPending = true;
 				this.$refs.reservierung.show(start_time, end_time);
-			} else if (obj.type === "lehreinheit") {
+			} else if (obj.type === 'lehreinheit') {
 				if (obj.multiweek) {
 					this.openMultiWeekPreview(
 						obj.orig.lehreinheit_id,
@@ -602,7 +672,7 @@ export default {
 							obj.orig.lehreinheit_id,
 							this.rooms.length
 								? this.rooms.map((r) => r.ort_kurzbz)
-								: obj.orig.ort_kurzbz ?? [],
+								: (obj.orig.ort_kurzbz ?? []),
 							start_time,
 							end_time,
 						),
@@ -611,9 +681,9 @@ export default {
 					.then((result) => {
 						this.$refs.calendar.resetEventLoader();
 						this.$refs.coursepicker.reload();
-						this.bcc.postMessage("dropped");
+						this.bcc.postMessage('dropped');
 					});
-			} else if (obj.type === "kalender") {
+			} else if (obj.type === 'kalender') {
 				return this._updateKalenderEvent(
 					obj,
 					startDT,
@@ -626,11 +696,11 @@ export default {
 							id: obj.orig.kalender_id,
 						});
 						this.$refs.calendar.resetEventLoader();
-						this.bcc.postMessage("dropped");
+						this.bcc.postMessage('dropped');
 					},
 				);
 			} else {
-				alert("Unbekannter Drop-Typ: " + obj.type);
+				alert('Unbekannter Drop-Typ: ' + obj.type);
 			}
 		},
 		openMultiWeekPreview(lehreinheit_id, ort_kurzbz, start_time, end_time) {
@@ -646,17 +716,17 @@ export default {
 		onMultiWeekConfirmed() {
 			this.$refs.calendar.resetEventLoader();
 			this.$refs.coursepicker.reload();
-			this.bcc.postMessage("dropped");
+			this.bcc.postMessage('dropped');
 		},
 		handleRange(range) {
 			if (!range?.start || !range?.end) return;
 
-			if (this.currentMode === "week") {
+			if (this.currentMode === 'week') {
 				//Workaround because, updateRange is emitting 2 times
-				const startDay = range.start.startOf("day");
-				const endDay = range.end.startOf("day");
+				const startDay = range.start.startOf('day');
+				const endDay = range.end.startOf('day');
 
-				const days = Math.round(endDay.diff(startDay, "days").days) + 1;
+				const days = Math.round(endDay.diff(startDay, 'days').days) + 1;
 				if (days > 8) return;
 			}
 
@@ -764,20 +834,20 @@ export default {
 					calenderId,
 				),
 			);
-			if (getAssignedResources.meta.status === "success") {
+			if (getAssignedResources.meta.status === 'success') {
 				return getAssignedResources.data
 					.filter((unit) => !!unit)
 					.map((unit) => {
 						return {
 							isNoteTextareaShown:
-								unit.anmerkung && unit.anmerkung.trim() !== "",
+								unit.anmerkung && unit.anmerkung.trim() !== '',
 							...unit,
 						};
 					})
 					.filter((unit) => !!unit);
 			} else {
 				this.$fhcAlert.alertError(
-					this.$p.t("ui", "failed_assigned_resources_fetch_error_message"),
+					this.$p.t('ui', 'failed_assigned_resources_fetch_error_message'),
 				);
 			}
 
@@ -789,11 +859,11 @@ export default {
 					calendarID,
 				),
 			);
-			if (getSchedulableResourcesByCalendar.meta.status === "success") {
+			if (getSchedulableResourcesByCalendar.meta.status === 'success') {
 				return getSchedulableResourcesByCalendar.data;
 			} else {
 				this.$fhcAlert.alertError(
-					this.$p.t("ui", "failed_schedulable_resources_fetch_error_message"),
+					this.$p.t('ui', 'failed_schedulable_resources_fetch_error_message'),
 				);
 			}
 
@@ -830,7 +900,7 @@ export default {
 			if (index !== -1) {
 				this.resourcesAssignmentModal.assignedResources[
 					index
-					].isNoteTextareaShown =
+				].isNoteTextareaShown =
 					!this.resourcesAssignmentModal.assignedResources[index]
 						.isNoteTextareaShown;
 			}
@@ -867,14 +937,14 @@ export default {
 					assignedResources,
 				),
 			);
-			if (getSchedulableResourcesByCalendar.meta.status === "success") {
+			if (getSchedulableResourcesByCalendar.meta.status === 'success') {
 				this.$fhcAlert.alertSuccess(
-					this.$p.t("ui", "assigned_resources_save_success_message"),
+					this.$p.t('ui', 'assigned_resources_save_success_message'),
 				);
 				await this.refreshResourcesAssignmentModalData(calenderItem);
 			} else {
 				this.$fhcAlert.alertError(
-					this.$p.t("ui", "failed_assigned_resources_save_error_message"),
+					this.$p.t('ui', 'failed_assigned_resources_save_error_message'),
 				);
 			}
 
@@ -925,7 +995,7 @@ export default {
 				this.$refs.parking.unpark({ type: event.type, id: event.kalender_id });
 			} else {
 				this.$refs.parking.park(null, {
-					type: "kalender",
+					type: 'kalender',
 					id: event.kalender_id,
 					orig: event,
 				});
@@ -960,14 +1030,14 @@ export default {
 				this.$refs.calendar.resetEventLoader();
 			},
 		},
-		"resourcesAssignmentModal.selectedAvailableResource": function (newVal) {
+		'resourcesAssignmentModal.selectedAvailableResource': function (newVal) {
 			if (!newVal) return;
 
 			this.resourcesAssignmentModal.assignedResources.push({
 				betriebsmittel_kalender_id: null,
 				betriebsmittel_id: newVal.data.betriebsmittel_id,
 				beschreibung: newVal.data.beschreibung,
-				anmerkung: "",
+				anmerkung: '',
 				isNoteTextareaShown: false,
 			});
 
@@ -976,9 +1046,9 @@ export default {
 	},
 	mounted() {
 		this.reservierungPending = false;
-		this.bcc = new BroadcastChannel("fhc-dnd");
-		this.bcc.addEventListener("message", (e) => {
-			if (e.data === "dropped" && !this.reservierungPending)
+		this.bcc = new BroadcastChannel('fhc-dnd');
+		this.bcc.addEventListener('message', (e) => {
+			if (e.data === 'dropped' && !this.reservierungPending)
 				this.$refs.calendar.resetEventLoader();
 		});
 	},
@@ -1020,9 +1090,9 @@ export default {
 								`link[href="${data[rendertype].calendarEventStyles}"]`,
 							)
 						) {
-							var link = document.createElement("link");
-							link.type = "text/css";
-							link.rel = "stylesheet";
+							var link = document.createElement('link');
+							link.type = 'text/css';
+							link.rel = 'stylesheet';
 							link.href = data[rendertype].calendarEventStyles;
 							head.appendChild(link);
 						}
@@ -1042,7 +1112,7 @@ export default {
 
 		this.$api.call(ApiTempusConfig.getHeader()).then((res) => {
 			this.visibleStatusArray = res.data.visible_status;
-			this.visibleStatus = ["all"];
+			this.visibleStatus = ['all'];
 		});
 		this.$api.call(ApiInfo.getStudiengaenge()).then((res) => {
 			this.studiengaenge_all = res.data;
