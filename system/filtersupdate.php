@@ -1638,6 +1638,84 @@ $filters = array(
 			}',
 		'oe_kurzbz' => null,
 	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'lrts24hours',
+		'description' => '{Last 24 hours LRTs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All Long Run Tasks logs from the last 24 hours",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "LRT"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "24",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
+	array(
+		'app' => 'core',
+		'dataset_name' => 'logs',
+		'filter_kurzbz' => 'lrts48hours',
+		'description' => '{Last 48 hours LRTs logs}',
+		'sort' => 2,
+		'default_filter' => false,
+		'filter' => '
+			{
+				"name": "All Long Run Tasks logs from the last 48 hours",
+				"columns": [
+					{"name": "RequestId"},
+					{"name": "ExecutionTime"},
+					{"name": "ExecutedBy"},
+					{"name": "Description"},
+					{"name": "Data"}
+				],
+				"filters": [
+					{
+						"name": "WebserviceType",
+						"operation": "contains",
+						"condition": "job"
+					},
+					{
+						"name": "RequestId",
+						"operation": "contains",
+						"condition": "LRT"
+					},
+					{
+						"name": "ExecutionTime",
+						"operation": "lt",
+						"condition": "48",
+						"option": "hours"
+					}
+				]
+			}
+		',
+		'oe_kurzbz' => null,
+	),
 );
 
 // Loop through the filters array
