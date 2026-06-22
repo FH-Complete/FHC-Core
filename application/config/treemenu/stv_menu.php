@@ -2,12 +2,12 @@
 if (! defined('BASEPATH')) exit('No direct script access allowed');
 
 $config['stv_menu'] = array(
-	'library' => 'treemenu/StvMenuLib',
+	'library' => 'treemenu/TreeMenuLib',
 	'children' => array(
 		'stg' => array(
 			'library' => 'treemenu/StgLib',
-/*
 			'children' => array(
+/*
 				'pre' => array(
 					'library' => 'treemenu/PrestudentLib'
 				),
@@ -19,9 +19,11 @@ $config['stv_menu'] = array(
 						)
 					)
 				),
+*/
 				'orgform' => array(
 					'library' => 'treemenu/OrgFormLib',
 					'children' => array(
+/*
 						'pre' => array(
 							'library' => 'treemenu/PrestudentLib'
 						),
@@ -33,10 +35,10 @@ $config['stv_menu'] = array(
 								)
 							)
 						)
+*/
 					)
 				)
 			)
-*/
 		),
 		'inout' => array(
 			'library' => 'treemenu/InOutLib'

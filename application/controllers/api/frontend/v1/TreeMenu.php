@@ -37,25 +37,17 @@ class TreeMenu extends FHCAPI_Controller
 
 	public function fullMenu($treemenu=null)
 	{
-		if(is_null($treemenu))
-		{
-			$this->terminateWithError('missing parameter treemenu.');
-		}
-
-		$this->loadMenuConfig($treemenu);
-
-		$bhdebug = (object) array(
-				'treemenu' => $treemenu,
-				'treemenuconfig' => $this->treemenuconfig
-
-		);
-		$this->addMeta('bhdebug', $bhdebug);
-
-		$data = array();
-		$this->terminateWithSuccess($data);
+		$includeSubMenu = true;
+		$this->getMenu($treemenu, $includeSubMenu);
 	}
 
 	public function partMenu($treemenu=null)
+	{
+		$includeSubMenu = false;
+		$this->getMenu($treemenu, $includeSubMenu);
+	}
+
+	protected function getMenu($treemenu=null, $includeSubMenu=false)
 	{
 		if(is_null($treemenu))
 		{
@@ -64,7 +56,8 @@ class TreeMenu extends FHCAPI_Controller
 
 		$this->loadMenuConfig($treemenu);
 
-		$startconfig = $this->findStartLib($this->treemenuconfig, array_keys($this->uri->uri_to_assoc(7)));
+		$uri = $this->uri->uri_to_assoc(7);
+		$startconfig = $this->findStartLib($this->treemenuconfig, array_keys($uri));
 
 		$libpath = $startconfig['library'];
 		$children = isset($startconfig['children']) ? $startconfig['children'] : array();
@@ -79,7 +72,7 @@ class TreeMenu extends FHCAPI_Controller
 		$bhdebug = (object) array(
 			'treemenu' => $treemenu,
 			'treemenuconfig' => $this->treemenuconfig,
-			'uri' => $this->uri->uri_to_assoc(7),
+			'uri' => $uri,
 			'libpath' => $libpath,
 			'libname' => $libname,
 			'children' => $children,
@@ -88,6 +81,7 @@ class TreeMenu extends FHCAPI_Controller
 		$this->addMeta('bhdebug', $bhdebug);
 		//$this->addMeta('bhci', $this);
 
+		$this->$libname->init($uri, $includeSubMenu);
 		$data = $this->$libname->getSubMenu();
 		$this->terminateWithSuccess($data);
 	}

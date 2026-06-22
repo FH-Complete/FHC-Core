@@ -8,31 +8,32 @@ require_once APPPATH . 'libraries/treemenu/TreeMenuLib.php';
  */
 class StgLib extends TreeMenuLib
 {
-	public function getNodes()
+	protected function getData()
 	{
 		$this->ci->load->model('organisation/Studiengang_model', 'StudiengangModel');
+		$this->ci->StudiengangModel->addOrder('typ');
+		$this->ci->StudiengangModel->addOrder('kurzbz');
 		$res = $this->ci->StudiengangModel->loadWhere(array('aktiv' => true));
 		$stgs = hasData($res) ? getData($res) : array();
 
 		$this->ci->addMeta('bhstg', $stgs);
-		$nodes = array_map(
-			function($stg) {
-				return array(
-					'name' => strtoupper($stg->typ . $stg->kurzbz) . ' ' . $stg->bezeichnung,
-					'link' => 'stg/' . $stg->studiengang_kz,
-					'leaf' => false
-				);
-			},
-			$stgs
-		);
 
-		return $nodes;
+		return $stgs;
 	}
 
-	public function getSubMenu()
+	protected function getParamsForNextLevel($element=null)
 	{
-		return [
-			'StgLib' => 'test123'
-		];
+		if($element)
+		{
+			$paramsstg = array_merge($this->params, array('stg' => $element->studiengang_kz));
+			return $paramsstg;
+		}
+		return $this->params;
+	}
+
+	protected function getName($element)
+	{
+		$name = strtoupper($element->typ . $element->kurzbz) . ' ' . $element->bezeichnung;
+		return $name;
 	}
 }

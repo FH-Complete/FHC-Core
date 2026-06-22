@@ -7,17 +7,8 @@ require_once APPPATH . 'libraries/treemenu/TreeMenuLib.php';
  */
 class StvMenuLib extends TreeMenuLib
 {
-	public function getSubMenu()
+	public function getNodes($params=array(), $includeSubMenu=false)
 	{
-		$nodes = array();
-
-		foreach($this->children_config as $childconfig)
-		{
-			$childlib = basename($childconfig['library']);
-			$childnodes = $this->ci->$childlib->getNodes();
-			$nodes = array_merge($nodes, $childnodes);
-		}
-
-		return $nodes;
+		return [];
 	}
 }

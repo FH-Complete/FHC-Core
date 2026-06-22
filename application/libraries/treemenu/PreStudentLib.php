@@ -2,13 +2,13 @@
 require_once APPPATH . 'libraries/treemenu/TreeMenuLib.php';
 
 /**
- * Description of InOutLib
+ * Description of PreStudentLib
  *
  * @author bambi
  */
-class InOutLib extends TreeMenuLib
+class PreStudentLib extends TreeMenuLib
 {
-	public function getNodes($params=array(), $includeSubMenu=false)
+	public function getNodes($params=array())
 	{
 		return [
 			[
