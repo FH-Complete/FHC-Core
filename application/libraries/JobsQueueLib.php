@@ -64,14 +64,29 @@ class JobsQueueLib
 	 */
 	public function getOldestJobs($type, $maxAmount = null)
 	{
-		$this->_ci->JobsQueueModel->resetQuery();
-
-		$this->_ci->JobsQueueModel->addOrder('creationtime', 'ASC');
+		$types = $type; // default is array
+		$limit = 0; // default query limit
 
 		// If the maximum amount of jobs to retrieve have been specified
-		if (is_numeric($maxAmount)) $this->_ci->JobsQueueModel->addLimit($maxAmount);
+		if (is_numeric($maxAmount)) $limit = $maxAmount;
 
-		return $this->_ci->JobsQueueModel->loadWhere(array('status' => self::STATUS_NEW, 'type' => $type));
+		// If it is a string then include it into an array
+		if (!isEmptyString($type) && is_string($type)) $types = array($type);
+
+		// Return the result of the query
+		return $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+			  FROM system.tbl_jobsqueue jq
+			 WHERE jq.type IN ?
+			   AND jq.status = ?
+		      ORDER BY jq.creationtime DESC
+			 LIMIT ?',
+			array(
+				$types,
+				self::STATUS_NEW,
+				$limit
+			)
+		);
 	}
 
 	/**
@@ -79,11 +94,23 @@ class JobsQueueLib
 	 */
 	public function getJobsByTypeStatus($type, $status)
 	{
-		$this->_ci->JobsQueueModel->resetQuery();
+		$types = $type; // default is array
 
-		$this->_ci->JobsQueueModel->addOrder('creationtime', 'DESC');
+		// If it is a string then include it into an array
+		if (!isEmptyString($type) && is_string($type)) $types = array($type);
 
-		return $this->_ci->JobsQueueModel->loadWhere(array('status' => $status, 'type' => $type));
+		// Return the result of the query
+		return $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+			  FROM system.tbl_jobsqueue jq
+			 WHERE jq.type IN ?
+			   AND jq.status = ?
+		      ORDER BY jq.creationtime DESC',
+			array(
+				$types,
+				$status
+			)
+		);
 	}
 
 	/**

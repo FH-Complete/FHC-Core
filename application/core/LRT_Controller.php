@@ -15,6 +15,8 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  */
 abstract class LRT_Controller extends JQW_Controller
 {
+	protected $_jobid; // record id for this LRT
+
 	/**
 	 * Constructor
 	 */
@@ -32,6 +34,29 @@ abstract class LRT_Controller extends JQW_Controller
 
 		// Loads LongRunTaskLib library
 		$this->load->library('LongRunTaskLib');
+
+		$this->_jobid = null; // default value
+	}
+
+	/**
+	 * Destructor, once the LRT execution is over...
+	 */
+	public function __destruct()
+	{
+		// Check if the property has been set
+		if ($this->_jobid == null)
+		{
+			$this->logError(
+				'The method '.get_class($this).'->run must assign the value of the jobid parameter to the property _jobid at the very beginning: $this->_jobid = $jobid;'
+			);
+		}
+		else // If set then
+		{
+			// Set the status of this LRT as done
+			$setStatusResult = $this->longruntasklib->setStatus($this->_jobid, LongRunTaskLib::STATUS_DONE);
+			// If an error occurred then log it
+			if (isError($setStatusResult)) $this->logError($setStatusResult);
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -47,7 +72,7 @@ abstract class LRT_Controller extends JQW_Controller
 	 */
 	protected function getLrt($jobid)
 	{
-		$this->longruntasklib->getLrt($jobid);
+		return $this->longruntasklib->getLrt($jobid);
 	}
 
 	/**
@@ -55,15 +80,15 @@ abstract class LRT_Controller extends JQW_Controller
 	 */
 	protected function setProgress($jobid, $progress)
 	{
-		$this->longruntasklib->setProgress($jobid, $progress);
+		return $this->longruntasklib->setProgress($jobid, $progress);
 	}
 
 	/**
 	 * 
 	 */
-	protected function setOutuput($jobid, $output)
+	protected function setOutput($jobid, $output)
 	{
-		$this->longruntasklib->setOutuput($jobid, $output);
+		return $this->longruntasklib->setOutuput($jobid, $output);
 	}
 }
 

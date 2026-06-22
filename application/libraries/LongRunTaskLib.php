@@ -50,12 +50,18 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
-	 * 
+	 * Execute a LRT in background
+	 * - Checks if the wanted LRT exists in the applcation/controllers/lrts directory
+	 * - Then executes it in background via CI CLI
+	 * - Stores the LRT pid into the database
 	 */
 	public function executeLrt($lrt)
 	{
+		$output = array();
+		$return_var = -1;
+
 		// If does _not_ exist a LRT implementation for this LRT type, then return an error
-		if ((include_once 'application/controllers/lrts/'.$lrt->{self::PROPERTY_TYPE}.'.php') !== true)
+		if (!file_exists(APPPATH.'controllers/lrts/'.$lrt->{self::PROPERTY_TYPE}.'.php'))
 		{
 			return error('The required LRT implementation has not been found');
 		}
@@ -63,10 +69,17 @@ class LongRunTaskLib extends JobsQueueLib
 		// Execute the LRT implementation (a CI controller from CLI) providing as parameter the jobid
 		exec(
 			// Command
-			'/usr/bin/php '.APPPATH.'../index.ci.php lrts/'.$lrt->{self::PROPERTY_TYPE}.'/run '.$lrt->{self::PROPERTY_JOBID}.' &',
+			'/usr/bin/php '.APPPATH.'../index.ci.php lrts/'.$lrt->{self::PROPERTY_TYPE}.'/run '.$lrt->{self::PROPERTY_JOBID}.' > /dev/null 2>&1 & echo $!',
 			$output, // Here goes the output from the standard output and error
 			$return_var // Status of the command once executed (== 0 success, !=0 error)
 		);
+
+		// If a pid has not been returned
+		if (isEmptyArray($output) || !is_numeric($output[0])) return error('Not a valid pid has been returned');
+
+		// Set the pid of this LRT into the database
+		$pidResult = $this->_ci->JobsQueueModel->update($lrt->{self::PROPERTY_JOBID}, array('pid' => $output[0]));
+		if (isError($pidResult)) return $pidResult;
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -141,6 +154,14 @@ class LongRunTaskLib extends JobsQueueLib
 	public function setOutuput($jobid, $output)
 	{
 		return $this->_ci->JobsQueueModel->update($jobid, array('output' => json_encode($output)));
+	}
+
+	/**
+	 * 
+	 */
+	public function setStatus($jobid, $status)
+	{
+		return $this->_ci->JobsQueueModel->update($jobid, array('status' => $status));
 	}
 }
 

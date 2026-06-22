@@ -31,7 +31,7 @@ class LongRunTaskExecJob extends JQW_Controller
 	}
 
 	/**
-	 *
+	 * Executes all the new LRTs
 	 */
 	public function execEmAll()
 	{
@@ -41,13 +41,14 @@ class LongRunTaskExecJob extends JQW_Controller
 		$lrtsResult = $this->longruntasklib->getLRTs();
 		if (isError($lrtsResult)) return $lrtsResult;
 
-		// For each LRT
-		foreach (getData($lrtsResult) as $lrt)
+		if (hasData($lrtsResult))
 		{
-			// Execute the task
-			$execResult = $this->longruntasklib->executeLrt($lrt);
-			// If an error occurred log it and continue with the next one
-			if (isError($execResult)) $this->logError(getError($execResult));
+			// For each LRT
+			foreach (getData($lrtsResult) as $lrt)
+			{
+				// Execute the task
+				$this->longruntasklib->executeLrt($lrt);
+			}
 		}
 
 		$this->logInfo('Execute long run tasks ended');
