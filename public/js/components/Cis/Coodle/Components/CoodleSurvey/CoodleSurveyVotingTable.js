@@ -292,7 +292,7 @@ export default {
 						</tr>
 						<tr
 							v-if="authUserParticipant"
-							:style="!isVotingInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
+							:class="{'fhc-body-bg': isVotingInProgress}"
 						>
 							<td class="border-1 px-2 py-1">{{ authUserParticipant.name }}</td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
@@ -343,7 +343,7 @@ export default {
 						</tr>
 						<tr
 							v-if="isAuthUserSurveyCreator || $props.survey.completedAt"
-							:style="!isFinalSelectionInProgress ? '' : 'background-color:' + (isDarkMode ? '#111111' : '#EEEEEE')"
+							:class="{'fhc-body-bg': isFinalSelectionInProgress}"
 							class="fw-bold"
 						>
 							<td class="border-1 px-2 py-1">{{ "Final timeslot" }}</td>
