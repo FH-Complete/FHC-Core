@@ -423,72 +423,7 @@ export default {
 
       if (response) {
         response[0].then((result) => {
-          if (!this.currentlyUpdatedEvent) return;
-
-          document.querySelectorAll(".updated-event").forEach((el) => {
-            el.classList.remove("updated-event");
-          });
-          document.querySelectorAll(".updated-event-long").forEach((el) => {
-            el.classList.remove("updated-event-long");
-          });
-          document.querySelectorAll(".deemphasized-event").forEach((el) => {
-            el.classList.remove("deemphasized-event");
-          });
-          document
-            .querySelectorAll(".deemphasized-event-long")
-            .forEach((el) => {
-              el.classList.remove("deemphasized-event-long");
-            });
-
-          setTimeout(() => {
-            const eventEl = document.querySelector(
-              `[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_gruppen_id}"]`,
-            );
-            if (!eventEl) return;
-
-            const calendar = document.querySelector(".fhc-calendar-base-grid");
-            const eventRect = eventEl.getBoundingClientRect();
-
-            const offset = 300;
-
-            const isInsideScrolledView =
-              eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
-              eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
-              eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
-              eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
-
-            const rect = eventEl.getBoundingClientRect();
-            if (!isInsideScrolledView) {
-              eventEl.scrollIntoView({
-                behavior: "smooth",
-                inline: "center",
-                block: "nearest",
-              });
-            }
-
-            let timeout = 0;
-            let emphasizeUpdateClassName = isInsideScrolledView
-              ? "updated-event"
-              : "updated-event-long";
-            let deemphasizedUpdateClassName = isInsideScrolledView
-              ? "deemphasized-event"
-              : "deemphasized-event-long";
-
-            if (!isInsideScrolledView) timeout = 500;
-
-            setTimeout(() => {
-              eventEl.classList.add(emphasizeUpdateClassName);
-              document
-                .querySelectorAll(".fhc-calendar-base-grid-line-event")
-                .forEach((el) => {
-                  if (el !== eventEl) {
-                    el.classList.add(deemphasizedUpdateClassName);
-                  }
-                });
-            }, timeout);
-
-            this.currentlyUpdatedEvent = null;
-          }, 100);
+          this.scrollToAndEmphasizeUpdatedEvent();
         });
       }
 
@@ -922,6 +857,72 @@ export default {
         assignedResources: [],
         areFormButtonsDisplayed: false,
       };
+    },
+    scrollToAndEmphasizeUpdatedEvent() {
+      if (!this.currentlyUpdatedEvent) return;
+
+      document.querySelectorAll(".updated-event").forEach((el) => {
+        el.classList.remove("updated-event");
+      });
+      document.querySelectorAll(".updated-event-long").forEach((el) => {
+        el.classList.remove("updated-event-long");
+      });
+      document.querySelectorAll(".deemphasized-event").forEach((el) => {
+        el.classList.remove("deemphasized-event");
+      });
+      document.querySelectorAll(".deemphasized-event-long").forEach((el) => {
+        el.classList.remove("deemphasized-event-long");
+      });
+
+      setTimeout(() => {
+        const eventEl = document.querySelector(
+          `[data-group-id="event-group-${this.currentlyUpdatedEvent.eindeutige_gruppen_id}"]`,
+        );
+        if (!eventEl) return;
+
+        const calendar = document.querySelector(".fhc-calendar-base-grid");
+        const eventRect = eventEl.getBoundingClientRect();
+
+        const offset = 300;
+
+        const isInsideScrolledView =
+          eventEl.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+          eventEl.offsetLeft + eventEl.offsetWidth > calendar.scrollLeft &&
+          eventEl.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+          eventEl.offsetTop + eventEl.offsetHeight > calendar.scrollTop;
+
+        const rect = eventEl.getBoundingClientRect();
+        if (!isInsideScrolledView) {
+          eventEl.scrollIntoView({
+            behavior: "smooth",
+            inline: "center",
+            block: "nearest",
+          });
+        }
+
+        let timeout = 0;
+        let emphasizeUpdateClassName = isInsideScrolledView
+          ? "updated-event"
+          : "updated-event-long";
+        let deemphasizedUpdateClassName = isInsideScrolledView
+          ? "deemphasized-event"
+          : "deemphasized-event-long";
+
+        if (!isInsideScrolledView) timeout = 500;
+
+        setTimeout(() => {
+          eventEl.classList.add(emphasizeUpdateClassName);
+          document
+            .querySelectorAll(".fhc-calendar-base-grid-line-event")
+            .forEach((el) => {
+              if (el !== eventEl) {
+                el.classList.add(deemphasizedUpdateClassName);
+              }
+            });
+        }, timeout);
+
+        this.currentlyUpdatedEvent = null;
+      }, 100);
     },
   },
   watch: {
