@@ -255,7 +255,7 @@ class Projektarbeit_model extends DB_Model
 				 LEFT JOIN public.tbl_mitarbeiter ma ON ben.uid = ma.mitarbeiter_uid
 		WHERE (ben.aktiv OR ben.aktiv IS NULL)
 				AND projektarbeit_id = ?
-				AND lehre.tbl_projektbetreuer.betreuerart_kurzbz = ANY('{Erstbetreuer,Erstbegutachter,Senatsvorsitz}')";
+				AND lehre.tbl_projektbetreuer.betreuerart_kurzbz = ANY('{Begutachter, Betreuer, Erstbetreuer,Erstbegutachter,Senatsvorsitz}')";
 
 		return $this->execReadOnlyQuery($qry, [$projektarbeit_id]);
 	}
