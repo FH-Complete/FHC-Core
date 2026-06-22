@@ -50,8 +50,7 @@ export const AbgabetoolStudent = {
 			siginfolink_german: null,
 			siginfolink_english: null,
 			editingTitel: '',
-			editingProjektarbeit: null,
-			uid: null
+			editingProjektarbeit: null
 		};
 	},
 	computed: {
