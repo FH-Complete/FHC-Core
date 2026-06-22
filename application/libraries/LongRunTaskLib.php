@@ -13,6 +13,7 @@ class LongRunTaskLib extends JobsQueueLib
 	const CFG_LRT_MAX_NUMBER_SYSTEM = 'lrt_max_number_system';
 	const CFG_LRT_TYPES = 'lrt_types';
 	const CFG_LRT_MAX_RUN = 'lrt_max_run_timeout';
+	const CFG_LRT_MAX_NUMBER_USER = 'lrt_max_number_single_user';
 
 	// LRT object properties
 	const PROPERTY_UID = 'uid';
@@ -136,6 +137,31 @@ class LongRunTaskLib extends JobsQueueLib
 		$dbResult = $this->_ci->JobStatusesModel->load();
 		if (isError($dbResult)) return $dbResult;
 		$statuses = getData($dbResult);
+
+		// Get all the running task for this uid
+		// Return the result of the query
+                $runningLRTbyUIDResult = $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+			  FROM system.tbl_jobsqueue jq
+			 WHERE jq.type = ?
+			   AND jq.status = ?
+			   AND jq.uid = ?
+			',
+			array(
+				$type,
+				self::STATUS_RUNNING,
+				$uid
+			)
+                );
+
+		// If an error occurred then return it
+		if (isError($runningLRTbyUIDResult)) return $runningLRTbyUIDResult;
+
+		// If the running tasks for this user are too many
+		if (count(getData($runningLRTbyUIDResult)) >= $this->_ci->config->item(self::CFG_LRT_MAX_NUMBER_USER))
+		{
+			return error('Too many running tasks for this user');
+		}
 
 		// Create an object that represent the new tbl_jobsqueue record with the provided input
 		$lrt = $this->generateJobs(self::STATUS_NEW, $jsonLrtInput)[0];
