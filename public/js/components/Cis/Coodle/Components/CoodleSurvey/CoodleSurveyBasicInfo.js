@@ -14,6 +14,10 @@ export default {
 			return this.$props.survey?.description?.replaceAll("\n", "<br>");
 		},
 		formattedSurveyTimeslotDuration() {
+			if (this.isNewSurvey) {
+				return "";
+			}
+
 			const minutes = this.$props.survey.timeslotDuration % 60;
 			const hours = (this.$props.survey.timeslotDuration - minutes) / 60;
 			let formattedDuration = hours ? hours + " hr " : "";
@@ -56,10 +60,17 @@ export default {
 			}
 		},
 		surveyCreatorProfileHref() {
+			if (this.isNewSurvey) {
+				return "";
+			}
+
 			return this.$router.resolve({
 				name: "ProfilView",
 				params: { uid: this.survey?.creator?.uid },
 			}).href;
+		},
+		isNewSurvey() {
+			return !this.$props.survey?.id;
 		},
 		surveyFormData: {
 			get() {
@@ -124,7 +135,7 @@ export default {
 					</div>
 					<span>
 						<span class="fw-bold">{{ "Maximum selectable timeslots: " }}</span>
-						{{ $props.survey.maxSelections}}
+						{{ $props.survey?.maxSelections}}
 					</span>
 				</div>
 				<div class="d-flex flex-row">
@@ -133,22 +144,21 @@ export default {
 					</div>
 					<span>
 						<span class="fw-bold">{{ "Are participants anonymized: " }}</span>
-						{{ $props.survey.areParticipantsAnonymized ? "yes" : "no" }}
+						{{ $props.survey?.areParticipantsAnonymized ? "yes" : "no" }}
 					</span>
 				</div>
 				<div class="d-flex flex-row">
 					<div class="d-flex flex-row justify-content-center align-items-center" style="width: 30px;">
-						<i class="fa-solid fa-person-booth fa-lg"></i>
+						<i class="fa-solid fa-eye-slash fa-lg"></i>
 					</div>
 					<span>
 						<span class="fw-bold">{{ "Are votes anonymized: " }}</span>
-						{{ $props.survey.areSelectionsAnonymized ? "yes" : "no" }}
+						{{ $props.survey?.areSelectionsAnonymized ? "yes" : "no" }}
 					</span>
 				</div>
 			</div>
 		</template>
 		<template v-else>
-			<span class="fst-italic">{{ "Required inputs are marked with *." }}</span>
 			<div class="row">
 				<div class="d-flex flex-column gap-2 col-12 col-md-6 pb-2">
 					<div class="d-flex flex-column gap-1">

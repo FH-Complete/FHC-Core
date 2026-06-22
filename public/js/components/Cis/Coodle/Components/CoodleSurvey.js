@@ -21,6 +21,7 @@ export default {
 		survey: { type: Object | null },
 		uid: { type: String | null },
 	},
+	emits: ["surveyCreationCanceled"],
 	data() {
 		return {
 			surveyFormData: null,
@@ -79,7 +80,7 @@ export default {
 		survey: {
 			async handler() {
 				this.setSurveyFormData();
-				if (!this.survey?.id) {
+				if (!this.$props.survey?.id) {
 					this.isEditInProgress = true;
 				}
 			},
@@ -119,11 +120,9 @@ export default {
 				};
 			}
 
-			this.surveyFormData.participants.forEach(
-				(participant) => {
-					participant.isCalendarShown = false;
-				},
-			);
+			this.surveyFormData.participants.forEach((participant) => {
+				participant.isCalendarShown = false;
+			});
 		},
 		parseTimeslot(timeslot) {
 			const timeslotStartsAt = new Date(timeslot.startsAt + " UTC");
@@ -154,9 +153,18 @@ export default {
 			console.log("submitting...");
 			// todo
 		},
+		cancelEditForm() {
+			this.isEditInProgress = false;
+			if (!this.$props.survey?.id) {
+				this.$emit("surveyCreationCanceled");
+			}
+		},
 	},
 	created() {
 		this.setSurveyFormData();
+		if (!this.$props.survey?.id) {
+			this.isEditInProgress = true;
+		}
 		// todo: localize weekdays and months
 	},
 	template: /*html*/ `
@@ -171,8 +179,13 @@ export default {
 		</div>
 		<div class="card-body">
 			<div class="d-flex flex-column gap-3">
+				<span
+					v-if="isEditInProgress"
+					class="fst-italic"
+				>
+					{{ "Required inputs are marked with *." }}
+				</span>
 				<coodle-survey-basic-info
-					v-if="$props.survey"
 					v-model:surveyFormDataModelValue="surveyFormData"
 					:survey="$props.survey"
 					:parsedSelectedTimeslot="parsedSelectedTimeslot"
@@ -189,13 +202,13 @@ export default {
 				</div>
 				<div v-else class="d-flex flex-column gap-3">
 					<div class="row">
-						<div class="col-12 col-lg-4">
+						<div class="col-12 col-xl-4">
 							<coodle-survey-participants
 								v-if="surveyFormData?.participants"
 								v-model:participantsModelValue="surveyFormData.participants"
 							/>
 						</div>
-						<div class="col-12 col-lg-8">
+						<div class="col-12 col-xl-8">
 							<div class="d-flex flex-column gap-3">
 								<coodle-survey-duration-selector
 									v-if="surveyFormData?.timeslotDuration"
@@ -209,7 +222,7 @@ export default {
 					<div class="d-flex flex-row gap-2 justify-content-end align-items-start px-0">
 						<div>
 							<div
-								@click="isEditInProgress = false"
+								@click="cancelEditForm()"
 								:class="isDarkMode ? 'btn-outline-light' : 'btn-outline-dark'"
 								class="btn text-nowrap"
 								>

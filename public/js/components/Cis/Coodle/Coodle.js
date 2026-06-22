@@ -11,7 +11,7 @@ export default {
 			uid: null,
 			view: "survey",
 			// survey: null,
-		// todo: delete comment after dev
+			// todo: delete example survey after dev
 			survey: {
 				id: 1,
 				creator: {
@@ -72,7 +72,7 @@ export default {
 					{
 						uid: "ma1437",
 						name: "Test Userrrrr 3",
-						selection: [2,3],
+						selection: [2, 3],
 					},
 				],
 				sums: {
@@ -81,7 +81,7 @@ export default {
 					3: 1,
 					4: 0,
 					5: 0,
-					"none": 1,
+					none: 1,
 				},
 			},
 		};
@@ -147,7 +147,12 @@ export default {
 		<div class="flex-grow-1 mt-1">
 			<span v-if="view === 'activeSurveysTable'">active surveys table placeholder</span>
 			<span v-else-if="view === 'pastSurveysTable'">past surveys table placeholder</span>
-			<coodle-survey v-else-if="view === 'survey'" :survey="survey" :uid="uid" />
+			<coodle-survey
+				v-else-if="view === 'survey'"
+				@surveyCreationCanceled="switchToTab('activeSurveysTable')"
+				:survey="survey"
+				:uid="uid"
+			/>
 		</div>
 	</div>`,
 };

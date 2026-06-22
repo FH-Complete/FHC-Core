@@ -1,3 +1,5 @@
+import CoodleApi from "../../../../../api/factory/coodle.js";
+
 export default {
 	name: "CoodleSurveyParticipants",
 	components: {},
@@ -12,7 +14,7 @@ export default {
 			searchResults: [],
 			areSearchResultsShown: false,
 			// todo: increase depending on feedback
-			warningGroupSize: 5,
+			warningGroupSize: 10,
 			// todo: remove
 			searchResultsDevExample: [
 				{
@@ -36,7 +38,6 @@ export default {
 					type: "user",
 				},
 				{
-					uid: "ABC-DEF",
 					name: "ABC-DEF",
 					type: "group",
 					users: [
@@ -51,7 +52,6 @@ export default {
 					],
 				},
 				{
-					uid: "GHI-JKL",
 					name: "GHI-JKL",
 					type: "group",
 					users: [
@@ -131,18 +131,22 @@ export default {
 				this.areSearchResultsShown = false;
 			}, 100);
 		},
-		searchParticipants() {
+		async searchParticipants() {
+			if (this.searchInput.length < 2) return;
+
 			this.isSearchingForParticipants = true;
 
-			// todo
-			this.searchResults = this.searchResultsDevExample;
+			// todo: delete comment
+			// this.searchResults = this.searchResultsDevExample;
+			const participantsSearchResponse = await this.$api.call(CoodleApi.searchParticipants(this.searchInput));
+			this.searchResults = participantsSearchResponse.data;
 
 			this.isSearchingForParticipants = false;
 		},
 		selectSearchResult(searchResult) {
 			if (
 				searchResult.type === "group" &&
-				searchResult.users.length > this.warningGroupSize
+				searchResult.users.length >= this.warningGroupSize
 			) {
 				let warningMessage =
 					"Group (((groupName))) contains (((n))) users. Are you sure you want to add all (((n))) users to your survey?";
@@ -166,18 +170,20 @@ export default {
 			this.addParticipants(addedParticipants);
 		},
 		addParticipants(newParticipants) {
-			newParticipants = newParticipants.filter((newParticipant) => {
-				return !this.participants.some(
-					(existingParticipant) =>
-						existingParticipant.uid === newParticipant.uid,
-				);
-			}).map((newParticipant) => {
-				return {
-					uid: newParticipant.uid,
-					name: newParticipant.name,
-					isCalendarShown: false,
-				}
-			});
+			newParticipants = newParticipants
+				.filter((newParticipant) => {
+					return !this.participants.some(
+						(existingParticipant) =>
+							existingParticipant.uid === newParticipant.uid,
+					);
+				})
+				.map((newParticipant) => {
+					return {
+						uid: newParticipant.uid,
+						name: newParticipant.name,
+						isCalendarShown: false,
+					};
+				});
 
 			this.participants = this.participants.concat(newParticipants);
 		},
