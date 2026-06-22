@@ -248,7 +248,7 @@ export default {
 				<div class="overflow-x-auto">
 					<table>
 						<tr>
-							<td class="border-1" rowspan="2"></td>
+							<td rowspan="2" class="border-1"></td>
 							<td v-for="timeslot in $props.timeslots" class="border-1">
 								<div class="px-1 d-flex flex-column align-items-center">
 									<span>{{ timeslot.month.slice(0,3) }}</span>
@@ -256,7 +256,7 @@ export default {
 									<span>{{ timeslot.weekday.slice(0,3) }}</span>
 								</div>
 							</td>
-							<td class="border-1" rowspan="2">
+							<td rowspan="2" class="border-1">
 								<div class="px-2 py-1">
 									{{ "No appointment is possible" }}
 								</div>
