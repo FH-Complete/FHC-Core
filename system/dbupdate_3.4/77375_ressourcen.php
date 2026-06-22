@@ -14,12 +14,17 @@ if($db->db_num_rows($result) === 0)
 		echo '<br>lehre.tbl_kalender column eindeutige_gruppen_id hinzugefuegt';
 }
 
-$result = $db->db_query("SELECT count(*) FROM public.tbl_variablenname WHERE name = 'ignore_resources_collisions'");
+$result = $db->db_query("SELECT 1 FROM public.tbl_variablenname WHERE name = 'ignore_resources_collisions'");
 if($db->db_num_rows($result) === 0)
 {
 	$qry = "INSERT INTO public.tbl_variablenname
 			(name, defaultwert)
 			VALUES('ignore_resources_collisions', 'false')";
+
+	if(!$db->db_query($qry))
+		echo '<strong>public.tbl_variablenname: '.$db->db_last_error().'</strong><br>';
+	else
+		echo '<br>public.tbl_variablenname column ignore_resources_collisions hinzugefuegt';
 }
 
 if(!$result = @$db->db_query("SELECT 1 FROM lehre.tbl_betriebsmittel_kalender LIMIT 1"))
