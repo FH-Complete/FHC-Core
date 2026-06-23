@@ -52,7 +52,7 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
-	 *
+	 * Get all the LRT that are running more then CFG_LRT_MAX_RUN hours
 	 */
 	public function getHangingLRTs()
 	{
@@ -107,6 +107,20 @@ class LongRunTaskLib extends JobsQueueLib
 			)
 		);
 		if (isError($updateLrtResult)) return $updateLrtResult;
+	}
+
+	/**
+	 * Set the LRT in the queue as failed
+	 */
+	public function lrtExecFailed($jobid)
+	{
+		return $this->_ci->JobsQueueModel->update(
+			$jobid,
+			array(
+				'endtime' => 'NOW()',
+				'status' => self::STATUS_FAILED
+			)
+		);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -209,11 +223,17 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
-	 * 
+	 * Set the LRT in the queue as successfully ended
 	 */
-	public function setStatus($jobid, $status)
+	public function lrtExecOver($jobid)
 	{
-		return $this->_ci->JobsQueueModel->update($jobid, array('status' => $status));
+		return $this->_ci->JobsQueueModel->update(
+			$jobid,
+			array(
+				'endtime' => 'NOW()',
+				'status' => self::STATUS_DONE
+			)
+		);
 	}
 }
 

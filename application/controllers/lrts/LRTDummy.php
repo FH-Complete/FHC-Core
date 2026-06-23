@@ -21,7 +21,7 @@ class LRTDummy extends LRT_Controller
 		$this->_jobid = $jobid;
 
 		// Get the LRT record related to the provided jobid
-		$lrtResult = $this->getLrt($jobid);
+		$lrtResult = $this->getLrt();
 
 		// If an error occurred or the record has not been found
 		if (isError($lrtResult) || !hasData($lrtResult))
@@ -48,7 +48,7 @@ class LRTDummy extends LRT_Controller
 				{
 					sleep(1);
 					// Set the progress
-					$setProgressResult = $this->setProgress($jobid, (($i + 1) / (int)$input->sleep) * 100);
+					$setProgressResult = $this->setProgress((($i + 1) / (int)$input->sleep) * 100);
 					if (isError($setProgressResult))
 					{
 						$this->logError($setProgressResult);
@@ -62,7 +62,7 @@ class LRTDummy extends LRT_Controller
 					$this->logInfo('The user '.$lrt->uid.' slept for '.$input->sleep.' seconds');
 
 					// Set the output
-					$setOutputResult = $this->setOutput($jobid, 'The user '.$lrt->uid.' slept for '.$input->sleep.' seconds');
+					$setOutputResult = $this->setOutput('The user '.$lrt->uid.' slept for '.$input->sleep.' seconds');
 					if (isError($setOutputResult))
 					{
 						$this->logError($setOutputResult);

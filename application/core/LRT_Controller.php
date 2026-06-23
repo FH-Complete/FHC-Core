@@ -13,7 +13,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  * - Any implementation of a Long Run Task should extends this class to
  * properly operate with the LRT system
  */
-abstract class LRT_Controller extends JQW_Controller
+abstract class LRT_Controller extends JOB_Controller
 {
 	protected $_jobid; // record id for this LRT
 
@@ -43,20 +43,12 @@ abstract class LRT_Controller extends JQW_Controller
 	 */
 	public function __destruct()
 	{
-		// Check if the property has been set
-		if ($this->_jobid == null)
-		{
-			$this->logError(
-				'The method '.get_class($this).'->run must assign the value of the jobid parameter to the property _jobid at the very beginning: $this->_jobid = $jobid;'
-			);
-		}
-		else // If set then
-		{
-			// Set the status of this LRT as done
-			$setStatusResult = $this->longruntasklib->setStatus($this->_jobid, LongRunTaskLib::STATUS_DONE);
-			// If an error occurred then log it
-			if (isError($setStatusResult)) $this->logError($setStatusResult);
-		}
+		// Sends email to the user
+
+		// Set the status and the endtime of this LRT as done
+		$lrtExecOverResult = $this->longruntasklib->lrtExecOver($this->_jobid);
+		// If an error occurred then log it
+		if (isError($lrtExecOverResult)) $this->logError($lrtExecOverResult);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -70,25 +62,25 @@ abstract class LRT_Controller extends JQW_Controller
 	/**
 	 *
 	 */
-	protected function getLrt($jobid)
+	protected function getLrt()
 	{
-		return $this->longruntasklib->getLrt($jobid);
+		return $this->longruntasklib->getLrt($this->_jobid);
 	}
 
 	/**
 	 * 
 	 */
-	protected function setProgress($jobid, $progress)
+	protected function setProgress($progress)
 	{
-		return $this->longruntasklib->setProgress($jobid, $progress);
+		return $this->longruntasklib->setProgress($this->_jobid, $progress);
 	}
 
 	/**
 	 * 
 	 */
-	protected function setOutput($jobid, $output)
+	protected function setOutput($output)
 	{
-		return $this->longruntasklib->setOutuput($jobid, $output);
+		return $this->longruntasklib->setOutuput($this->_jobid, $output);
 	}
 }
 

@@ -9,7 +9,7 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  * - This is a Job Queue Worker that gets scheduled LRTs from the queue and executes them
  * - Once all the LRTs have been started checks if there are LRTs that are running for too long and kills them
  */
-class LongRunTaskExecJob extends JQW_Controller
+class LongRunTaskExecJob extends JOB_Controller
 {
 	/**
 	 * Constructor
@@ -72,6 +72,10 @@ class LongRunTaskExecJob extends JQW_Controller
 			{
 				// Kill the process with a SIGKILL
 				exec('kill -9 '.$lrt->pid.' > /dev/null 2>&1');
+
+				// Set the LRT as failed
+				$lrtExecFailedResult = $this->longruntasklib->lrtExecFailed($lrt->jobid);
+				if (isError($lrtExecFailedResult)) $this->logError(getError(lrtExecFailedResult));
 			}
 		}
 

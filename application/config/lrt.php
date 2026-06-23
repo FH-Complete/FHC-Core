@@ -13,7 +13,7 @@ $config['lrt_max_number_single_user'] = 10;
 $config['lrt_max_number_system'] = 100;
 
 // Maximum running time in hours for a single LRT before killing it
-$config['lrt_max_run_timeout'] = 48;
+$config['lrt_max_run_timeout'] = 24;
 
 // List of existing LRT types
 $config['lrt_types'] = array('LRTDummy');
