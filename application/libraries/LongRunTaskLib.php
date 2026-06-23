@@ -17,6 +17,7 @@ class LongRunTaskLib extends JobsQueueLib
 
 	// LRT object properties
 	const PROPERTY_UID = 'uid';
+	const PROPERTY_PID = 'pid';
 
 	/**
 	 * Constructor
@@ -37,7 +38,7 @@ class LongRunTaskLib extends JobsQueueLib
 	 * The maximum number of returned queued LRTs is limited by:
 	 * number of currently running LRTs - maximum allowed number of LRTs for the system
 	 */
-	public function getLRTs()
+	public function getNewLRTs()
 	{
 		// Get all the running LRTs
 		$runningLrtsResult = $this->getJobsByTypeStatus($this->_ci->config->item(self::CFG_LRT_TYPES), JobsQueueLib::STATUS_RUNNING);
@@ -72,6 +73,25 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
+	 * Get all the LRT that are currently running
+	 */
+	public function getRunningLRTs()
+	{
+		// Return the result of the query
+		return $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+		          FROM system.tbl_jobsqueue jq
+			 WHERE jq.type IN ?
+			   AND jq.status = ?
+		      ORDER BY jq.creationtime DESC',
+			array(
+				$this->_ci->config->item(self::CFG_LRT_TYPES),
+				JobsQueueLib::STATUS_RUNNING
+			)
+		);
+	}
+
+	/**
 	 * Execute a LRT in background
 	 * - Checks if the wanted LRT exists in the applcation/controllers/lrts directory
 	 * - Then executes it in background via CI CLI
@@ -90,7 +110,12 @@ class LongRunTaskLib extends JobsQueueLib
 		// Execute the LRT implementation (a CI controller from CLI) providing as parameter the jobid
 		exec(
 			// Command
-			'/usr/bin/php '.APPPATH.'../index.ci.php lrts/'.$lrt->{self::PROPERTY_TYPE}.'/run '.$lrt->{self::PROPERTY_JOBID}.' > /dev/null 2>&1 & echo $!',
+			sprintf(
+				'/usr/bin/php %s/../index.ci.php lrts/%s/run %s > /dev/null 2>&1 & echo $!',
+				APPPATH,
+				$lrt->{self::PROPERTY_TYPE},
+				$lrt->{self::PROPERTY_JOBID}
+			),
 			$output // Here goes the output from the standard output and error
 		);
 
@@ -110,17 +135,78 @@ class LongRunTaskLib extends JobsQueueLib
 	}
 
 	/**
-	 * Set the LRT in the queue as failed
+	 * Kill the provided LRT
+	 * To avoid to kill a process that is not this LRT,
+	 * since the same PID can be assigned to another process once this ended
 	 */
-	public function lrtExecFailed($jobid)
+	public function killLrt($lrt)
 	{
-		return $this->_ci->JobsQueueModel->update(
-			$jobid,
+		// Try to get the pid of this LRT from the system
+		$pid = exec(
+			sprintf(
+				'ps -eo pid,cmd | grep "index.ci.php lrts/%s/run %s" | grep -v grep | awk \'{print $1}\'',
+				$lrt->{self::PROPERTY_TYPE},
+				$lrt->{self::PROPERTY_JOBID}
+			)
+		);
+
+		// If the pid is the same then kill the process with a SIGKILL
+		if ($pid == $lrt->{self::PROPERTY_PID}) exec('kill -9 '.$lrt->{self::PROPERTY_PID}.' > /dev/null 2>&1');
+
+		// Set the LRT as failed in any case
+		$lrtExecFailedResult = $this->_ci->JobsQueueModel->update(
+			$lrt->{self::PROPERTY_JOBID},
 			array(
 				'endtime' => 'NOW()',
 				'status' => self::STATUS_FAILED
 			)
 		);
+		// If an error occurred then return it
+		if (isError($lrtExecFailedResult)) return $lrtExecFailedResult;
+	}
+
+	/**
+	 *
+	 */
+	public function checkExecution($lrt)
+	{
+		// If the LRT stopped running
+		if (!$this->_isRunning($lrt))
+		{
+			// Loads MessageLib library
+			$this->_ci->load->library('MessageLib');
+			// Load the BenutzerModel
+			$this->_ci->load->model('person/Benutzer_model', 'BenutzerModel');
+
+			// Get the benutzer for this uid
+			$benutzerResult = $this->_ci->BenutzerModel->loadWhere(array('uid' => $lrt->{LongRunTaskLib::PROPERTY_UID}));
+			// If an error occurred then return it
+			if (isError($benutzerResult)) return $benutzerResult;
+			// If no benutzer has been found
+			if (!hasData($benutzerResult)) return error('No benutzer found, uid: '.$lrt->{LongRunTaskLib::PROPERTY_UID});
+
+			$benutzer = getData($benutzerResult)[0];
+
+			// Sends a message to the user
+			$messageResult = $this->_ci->messagelib->sendMessageUser(
+			        $benutzer->person_id,
+			        'Long run task ended',
+			        'The long run task '.$lrt->{self::PROPERTY_TYPE}.' ended, output: '.$lrt->{self::PROPERTY_OUTPUT}
+			);
+			// If an error occurred then return it
+			if (isError($messageResult)) return $messageResult;
+
+			// Set the LRT as done
+			$lrtExecOverResult = $this->_ci->JobsQueueModel->update(
+				$lrt->{self::PROPERTY_JOBID},
+				array(
+					'endtime' => 'NOW()',
+					'status' => self::STATUS_DONE
+				)
+			);
+			// If an error occurred then return it
+			if (isError($lrtExecOverResult)) return $lrtExecOverResult;
+		}
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -222,18 +308,25 @@ class LongRunTaskLib extends JobsQueueLib
 		return $this->_ci->JobsQueueModel->update($jobid, array('output' => json_encode($output)));
 	}
 
+	//------------------------------------------------------------------------------------------------------------------
+	// Private methods
+
 	/**
-	 * Set the LRT in the queue as successfully ended
+	 * Return true if the LRT is still running
 	 */
-	public function lrtExecOver($jobid)
+	private function _isRunning($lrt)
 	{
-		return $this->_ci->JobsQueueModel->update(
-			$jobid,
-			array(
-				'endtime' => 'NOW()',
-				'status' => self::STATUS_DONE
+		// Try to get the pid of this LRT from the system
+		$pid = exec(
+			sprintf(
+				'ps -eo pid,cmd | grep "index.ci.php lrts/%s/run %s" | grep -v grep | awk \'{print $1}\'',
+				$lrt->{self::PROPERTY_TYPE},
+				$lrt->{self::PROPERTY_JOBID}
 			)
 		);
+
+		// If the pid is the same then the LRT is still running
+		return $pid == $lrt->{self::PROPERTY_PID};
 	}
 }
 

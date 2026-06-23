@@ -38,7 +38,8 @@ class LongRunTaskExecJob extends JOB_Controller
 		$this->logInfo('Execute long run tasks started');
 
 		// Get all the LRTs that is possible to execute now
-		$lrtsResult = $this->longruntasklib->getLRTs();
+		$lrtsResult = $this->longruntasklib->getNewLRTs();
+		// If an error occurred then return it
 		if (isError($lrtsResult)) return $lrtsResult;
 
 		if (hasData($lrtsResult))
@@ -47,7 +48,8 @@ class LongRunTaskExecJob extends JOB_Controller
 			foreach (getData($lrtsResult) as $lrt)
 			{
 				// Execute the task
-				$this->longruntasklib->executeLrt($lrt);
+				$executeLrtResult = $this->longruntasklib->executeLrt($lrt);
+				if (isError($executeLrtResult)) $this->logError($executeLrtResult);
 			}
 		}
 
@@ -55,7 +57,7 @@ class LongRunTaskExecJob extends JOB_Controller
 	}
 
 	/**
-	 *
+	 * Kills all the hanging LRTs
 	 */
 	public function killHangingLRTs()
 	{
@@ -63,6 +65,7 @@ class LongRunTaskExecJob extends JOB_Controller
 
 		// Get all the LRTs that is possible to execute now
 		$lrtsResult = $this->longruntasklib->getHangingLRTs();
+		// If an error occurred then return it
 		if (isError($lrtsResult)) return $lrtsResult;
 
 		if (hasData($lrtsResult))
@@ -70,16 +73,40 @@ class LongRunTaskExecJob extends JOB_Controller
 			// For each LRT
 			foreach (getData($lrtsResult) as $lrt)
 			{
-				// Kill the process with a SIGKILL
-				exec('kill -9 '.$lrt->pid.' > /dev/null 2>&1');
-
-				// Set the LRT as failed
-				$lrtExecFailedResult = $this->longruntasklib->lrtExecFailed($lrt->jobid);
-				if (isError($lrtExecFailedResult)) $this->logError(getError(lrtExecFailedResult));
+				// Kill the task
+				$killLrtResult = $this->longruntasklib->killLrt($lrt);
+				if (isError($killLrtResult)) $this->logError($killLrtResult);
 			}
 		}
 
 		$this->logInfo('Kill hanging LRTs ended');
+	}
+
+	/**
+	 * 
+	 */
+	public function checkExecution()
+	{
+		$this->logInfo('Check execution long run tasks started');
+
+		// Get the related LRT data from the queue
+		$lrtsResult = $this->longruntasklib->getRunningLRTs();
+		// If an error occurred then return it
+		if (isError($lrtsResult)) return $lrtsResult;
+
+		// If there are running LRTs
+		if (hasData($lrtsResult))
+		{
+			// For each LRT
+			foreach (getData($lrtsResult) as $lrt)
+			{
+				// Check the LRT execution
+				$checkExecutionResult = $this->longruntasklib->checkExecution($lrt);
+				if (isError($checkExecutionResult)) $this->logError($checkExecutionResult);
+			}
+		}
+
+		$this->logInfo('Check execution long run tasks ended');
 	}
 }
 

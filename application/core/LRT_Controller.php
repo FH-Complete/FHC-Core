@@ -15,8 +15,6 @@ if (!defined("BASEPATH")) exit("No direct script access allowed");
  */
 abstract class LRT_Controller extends JOB_Controller
 {
-	protected $_jobid; // record id for this LRT
-
 	/**
 	 * Constructor
 	 */
@@ -34,21 +32,6 @@ abstract class LRT_Controller extends JOB_Controller
 
 		// Loads LongRunTaskLib library
 		$this->load->library('LongRunTaskLib');
-
-		$this->_jobid = null; // default value
-	}
-
-	/**
-	 * Destructor, once the LRT execution is over...
-	 */
-	public function __destruct()
-	{
-		// Sends email to the user
-
-		// Set the status and the endtime of this LRT as done
-		$lrtExecOverResult = $this->longruntasklib->lrtExecOver($this->_jobid);
-		// If an error occurred then log it
-		if (isError($lrtExecOverResult)) $this->logError($lrtExecOverResult);
 	}
 
 	//------------------------------------------------------------------------------------------------------------------
@@ -62,25 +45,25 @@ abstract class LRT_Controller extends JOB_Controller
 	/**
 	 *
 	 */
-	protected function getLrt()
+	protected function getLrt($jobid)
 	{
-		return $this->longruntasklib->getLrt($this->_jobid);
+		return $this->longruntasklib->getLrt($jobid);
 	}
 
 	/**
 	 * 
 	 */
-	protected function setProgress($progress)
+	protected function setProgress($jobid, $progress)
 	{
-		return $this->longruntasklib->setProgress($this->_jobid, $progress);
+		return $this->longruntasklib->setProgress($jobid, $progress);
 	}
 
 	/**
 	 * 
 	 */
-	protected function setOutput($output)
+	protected function setOutput($jobid, $output)
 	{
-		return $this->longruntasklib->setOutuput($this->_jobid, $output);
+		return $this->longruntasklib->setOutuput($jobid, $output);
 	}
 }
 
