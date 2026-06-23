@@ -158,7 +158,7 @@ export function useEventLoader(rangeInterval, getPromiseFunc, isLoaderVisible = 
 	const reset = () => {
 		loading_id = 0;
 		tempEventsHolder = [];
-		loadingEvents.value = [];
+		//loadingEvents.value = [];
 		eventsLoaded.splice(0, eventsLoaded.length);
 		reload();
 	}

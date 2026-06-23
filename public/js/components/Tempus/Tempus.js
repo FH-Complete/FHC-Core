@@ -530,8 +530,20 @@ export default {
         return alert("Kein gültiges Kalender-Event zum Resizen");
 
       const dates = this._parseDates(start, end);
-
       if (!dates) return;
+
+      if (
+        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() === dates.startDT.toMillis() &&
+        luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
+          dates.endDT.toMillis()
+      )
+        return;
+
+      this.updateKalenderEventElementDisplay(
+        obj.orig.kalender_id,
+        dates.startDT,
+        dates.endDT,
+      );
 
       return this._updateKalenderEvent(
         obj,
@@ -558,7 +570,20 @@ export default {
       const dates = this._parseDates(start, end);
       if (!dates) return;
 
+      if (
+        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() === dates.startDT.toMillis() &&
+        luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
+          dates.endDT.toMillis()
+      )
+        return;
+
       const { startDT, endDT, start_time, end_time } = dates;
+
+      this.updateKalenderEventElementDisplay(
+        obj.orig.kalender_id,
+        startDT,
+        endDT,
+      );
 
       if (obj.type === "reservierung") {
         this.reservierungPending = true;
@@ -861,18 +886,29 @@ export default {
     scrollToAndEmphasizeUpdatedEvent() {
       if (!this.currentlyUpdatedEvent) return;
 
-      document.querySelectorAll(".updated-event").forEach((el) => {
-        el.classList.remove("updated-event");
-      });
-      document.querySelectorAll(".updated-event-long").forEach((el) => {
-        el.classList.remove("updated-event-long");
-      });
-      document.querySelectorAll(".deemphasized-event").forEach((el) => {
-        el.classList.remove("deemphasized-event");
-      });
-      document.querySelectorAll(".deemphasized-event-long").forEach((el) => {
-        el.classList.remove("deemphasized-event-long");
-      });
+      document
+        .querySelectorAll(".fhc-calendar-base-grid .part-body")
+        .forEach((el) => {
+          el.classList.remove("deemphasized-event", "deemphasized-event-long");
+        });
+      document
+        .querySelectorAll(
+          ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
+        )
+        .forEach((el) => {
+          const spinner = el.querySelector(".spinner-overlay");
+          if (spinner) {
+            spinner.remove();
+          }
+
+          el.classList.remove(
+            "updating-event",
+            "updated-event",
+            "updated-event-long",
+            "deemphasized-event",
+            "deemphasized-event-long",
+          );
+        });
 
       setTimeout(() => {
         const eventEl = document.querySelector(
@@ -912,8 +948,18 @@ export default {
 
         setTimeout(() => {
           eventEl.classList.add(emphasizeUpdateClassName);
+
           document
-            .querySelectorAll(".fhc-calendar-base-grid-line-event")
+            .querySelectorAll(
+              ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
+            )
+            .forEach((el) => {
+              if (el !== eventEl) {
+                el.classList.add(deemphasizedUpdateClassName);
+              }
+            });
+          document
+            .querySelectorAll(".fhc-calendar-base-grid .part-body")
             .forEach((el) => {
               if (el !== eventEl) {
                 el.classList.add(deemphasizedUpdateClassName);
@@ -923,6 +969,54 @@ export default {
 
         this.currentlyUpdatedEvent = null;
       }, 100);
+    },
+    updateKalenderEventElementDisplay(calendarId, startDT, endDT) {
+      if (!calendarId) return alert("Kein gültiges Kalender-Event zum Resizen");
+
+      let newPotentialStart =
+        startDT.diff(luxon.DateTime.fromISO("2026-06-22T00:00")).toMillis() ??
+        1;
+      let newPotentialEnd = endDT
+        .diff(luxon.DateTime.fromISO("2026-06-22T00:00"))
+        .toMillis();
+
+      let element = document.querySelector(`[data-id="event-${calendarId}"]`);
+      if (!element) return alert("Kein gültiges Kalender-Event zum Resizen");
+
+      setTimeout(() => {
+        element.style.gridRowEnd = "t_" + newPotentialEnd;
+        element.style.gridRowStart = "t_" + newPotentialStart;
+      }, 100);
+
+      const outerDiv = document.createElement("div");
+      outerDiv.className = "spinner-overlay";
+
+      const innerDiv = document.createElement("div");
+      innerDiv.className = "spinner";
+
+      outerDiv.appendChild(innerDiv);
+
+      element.appendChild(outerDiv);
+
+      const calendar = document.querySelector(".fhc-calendar-base-grid");
+      const eventRect = element.getBoundingClientRect();
+
+      const offset = 300;
+
+      const isInsideScrolledView =
+        element.offsetLeft < calendar.scrollLeft + calendar.clientWidth &&
+        element.offsetLeft + element.offsetWidth > calendar.scrollLeft &&
+        element.offsetTop < calendar.scrollTop + calendar.clientHeight &&
+        element.offsetTop + element.offsetHeight > calendar.scrollTop;
+
+      const rect = element.getBoundingClientRect();
+      if (!isInsideScrolledView) {
+        element.scrollIntoView({
+          behavior: "smooth",
+          inline: "center",
+          block: "nearest",
+        });
+      }
     },
   },
   watch: {
