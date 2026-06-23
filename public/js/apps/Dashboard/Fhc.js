@@ -77,7 +77,7 @@ const router = VueRouter.createRouter({
 			props: true
 		},
 		{
-			path: `/Cis/Benotungstool/:lv_id/:sem_kurzbz`,
+			path: `/Cis/Benotungstool/:lv_id?/:sem_kurzbz?`,
 			name: 'Benotungstool',
 			component: Benotungstool,
 			props: true

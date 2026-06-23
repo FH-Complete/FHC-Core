@@ -22,6 +22,11 @@ export function bindParams(paramsRef) {
 }
 
 async function fetchLehreinheiten(lv_id, sem_kurzbz) {
+	if (!lv_id || !sem_kurzbz) {
+		options.value = []
+		return
+	}
+	
 	appContext.$api.call(ApiLehre.getLeForLv(lv_id, sem_kurzbz)).then(res => {
 
 		const data =  []
