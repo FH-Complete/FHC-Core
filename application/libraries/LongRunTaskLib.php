@@ -221,6 +221,32 @@ class LongRunTaskLib extends JobsQueueLib
 		if (isEmptyString($type)) return error('The provided type parameter is not a valid string');
 		if (isEmptyString($uid)) return error('The provided uid parameter is not a valid string');
 
+		// Get all the running task for this uid
+		// Return the result of the query
+                $runningLRTbyUIDResult = $this->_ci->JobsQueueModel->execReadOnlyQuery('
+			SELECT jq.*
+			  FROM system.tbl_jobsqueue jq
+			 WHERE jq.status IN ?
+			   AND jq.uid = ?
+			',
+			array(
+				array(
+					self::STATUS_NEW,
+					self::STATUS_RUNNING
+				),
+				$uid
+			)
+                );
+
+		// If an error occurred then return it
+		if (isError($runningLRTbyUIDResult)) return $runningLRTbyUIDResult;
+
+		// If the running tasks for this user are too many
+		if (count(getData($runningLRTbyUIDResult)) >= $this->_ci->config->item(self::CFG_LRT_MAX_NUMBER_USER))
+		{
+			return error('Too many running tasks for this user');
+		}
+
 		// Convert input to JSON and check it
 		$jsonLrtInput = json_encode($lrtInput);
 		if ($jsonLrtInput == null) return error('The provided LRT input is not valid');
@@ -237,31 +263,6 @@ class LongRunTaskLib extends JobsQueueLib
 		$dbResult = $this->_ci->JobStatusesModel->load();
 		if (isError($dbResult)) return $dbResult;
 		$statuses = getData($dbResult);
-
-		// Get all the running task for this uid
-		// Return the result of the query
-                $runningLRTbyUIDResult = $this->_ci->JobsQueueModel->execReadOnlyQuery('
-			SELECT jq.*
-			  FROM system.tbl_jobsqueue jq
-			 WHERE jq.type = ?
-			   AND jq.status = ?
-			   AND jq.uid = ?
-			',
-			array(
-				$type,
-				self::STATUS_RUNNING,
-				$uid
-			)
-                );
-
-		// If an error occurred then return it
-		if (isError($runningLRTbyUIDResult)) return $runningLRTbyUIDResult;
-
-		// If the running tasks for this user are too many
-		if (count(getData($runningLRTbyUIDResult)) >= $this->_ci->config->item(self::CFG_LRT_MAX_NUMBER_USER))
-		{
-			return error('Too many running tasks for this user');
-		}
 
 		// Create an object that represent the new tbl_jobsqueue record with the provided input
 		$lrt = $this->generateJobs(self::STATUS_NEW, $jsonLrtInput)[0];
