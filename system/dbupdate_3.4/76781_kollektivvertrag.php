@@ -69,6 +69,13 @@ INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppe(verwendungsgruppe_kurzbz, 
 ('VG5','IT','VG 5',true,5,'system',NOW()),
 ('VG6','IT','VG 6',true,6,'system',NOW())
 ON CONFLICT (verwendungsgruppe_kurzbz) DO NOTHING;
+
+INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppe(verwendungsgruppe_kurzbz, kollektivvertrag_kurzbz, bezeichnung,aktiv, sort, insertvon, insertamum) VALUES
+('VG1_XY','XY','VG 1',true,1,'system',NOW()),
+('VG2_XY','XY','VG 2',true,2,'system',NOW()),
+('VG3_XY','XY','VG 3',true,3,'system',NOW()),
+('VG4_XY','XY','VG 4',true,4,'system',NOW())
+ON CONFLICT (verwendungsgruppe_kurzbz) DO NOTHING;
 		";
 
 		if (! $db->db_query($qry))
@@ -85,14 +92,14 @@ if ($result = $db->db_query("SELECT * FROM information_schema.tables WHERE table
 		$qry = "
 CREATE TABLE IF NOT EXISTS hr.tbl_kollektivvertrag_verwendungsgruppenjahr (
     kv_jahre integer NOT NULL,
-    bezeichnung varchar(64) NOT NULL,
     verwendungsgruppe_kurzbz character varying(32) NOT NULL,
+    bezeichnung varchar(64) NOT NULL,
     aktiv boolean DEFAULT FALSE,
     insertvon character varying(32) NOT NULL,
     insertamum timestamp without time zone DEFAULT now() NOT NULL,
     updatevon character varying(32),
     updateamum timestamp without time zone,
-    CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahr_pkey PRIMARY KEY (kv_jahre),
+    CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahr_pkey PRIMARY KEY (kv_jahre, verwendungsgruppe_kurzbz),
 	CONSTRAINT tbl_kollektivvertrag_verwendungsgruppenjahr_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
@@ -131,6 +138,29 @@ INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung
 ON CONFLICT (kv_jahre) DO NOTHING;
 
 
+INSERT INTO hr.tbl_kollektivvertrag_verwendungsgruppenjahr(kv_jahre, bezeichnung, verwendungsgruppe_kurzbz, aktiv, insertvon, insertamum) VALUES
+('0','nach 0','VG1_XY',true, 'system',NOW()),
+('2','nach 2','VG1_XY',true, 'system',NOW()),
+('4','nach 4','VG1_XY',true, 'system',NOW()),
+('5','nach 5','VG1_XY',true, 'system',NOW()),
+
+('0','nach 0','VG2_XY',true,'system',NOW()),
+('2','nach 2','VG2_XY',true,'system',NOW()),
+('4','nach 4','VG2_XY',true,'system',NOW()),
+('5','nach 5','VG2_XY',true,'system',NOW()),
+
+('0','nach 0','VG3_XY',true,'system',NOW()),
+('2','nach 2','VG3_XY',true,'system',NOW()),
+('4','nach 4','VG3_XY',true,'system',NOW()),
+('5','nach 5','VG3_XY',true,'system',NOW()),
+
+('0','nach 0','VG4_XY',true,'system',NOW()),
+('2','nach 2','VG4_XY',true,'system',NOW()),
+('4','nach 4','VG4_XY',true,'system',NOW()),
+('5','nach 5','VG4_XY',true,'system',NOW())
+ON CONFLICT (kv_jahre) DO NOTHING;
+
+
 		";
 
 		if (! $db->db_query($qry))
@@ -153,8 +183,7 @@ CREATE TABLE IF NOT EXISTS hr.tbl_vertragsbestandteil_kollektivvertrag (
     kommentar varchar(255),
     CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_pk PRIMARY KEY (vertragsbestandteil_id),
 	CONSTRAINT tbl_vertragsbestandteil_fk FOREIGN KEY (vertragsbestandteil_id) REFERENCES hr.tbl_vertragsbestandteil (vertragsbestandteil_id) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_vg_kurzbz_fk FOREIGN KEY (verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppe (verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE,
-	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kv_jahre_fk FOREIGN KEY (kv_jahre) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppenjahr (kv_jahre) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
+	CONSTRAINT tbl_vertragsbestandteil_kollektivvertrag_kv_jahre_fk FOREIGN KEY (kv_jahre, verwendungsgruppe_kurzbz) REFERENCES hr.tbl_kollektivvertrag_verwendungsgruppenjahr (kv_jahre, verwendungsgruppe_kurzbz) MATCH FULL ON DELETE RESTRICT ON UPDATE CASCADE
 );
 
 COMMENT ON TABLE hr.tbl_vertragsbestandteil_kollektivvertrag IS E'Zuordnung zur Einstufung im Kollektivvertrag';
