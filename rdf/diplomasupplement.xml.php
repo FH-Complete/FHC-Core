@@ -995,7 +995,7 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					// Check ob Lehrveranstaltung ein Praktikum mit eingetragener Firma besitzt
 					$qry = "
 					SELECT
-						tbl_firma.name, lehrveranstaltung_id, firma_id
+						tbl_firma.name, tbl_lehreinheit.lehrveranstaltung_id, firma_id
 					FROM
 						lehre.tbl_projektarbeit
 						JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
@@ -1019,14 +1019,14 @@ if (isset($_REQUEST["xmlformat"]) && $_REQUEST["xmlformat"] == "xml")
 					// Aber kein Auslandssemester war, sonst wirds spaeter hinzugefügt
 					$qry = "
 						SELECT
-							lehrveranstaltung_id, titel, themenbereich, note, titel_english
+							tbl_lehreinheit.lehrveranstaltung_id, titel, themenbereich, note, titel_english
 						FROM
 							lehre.tbl_projektarbeit
 							JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
 						WHERE
 							student_uid=".$db->db_add_param($uid_arr[$i])."
 							AND projekttyp_kurzbz in('Bachelor', 'Diplom')
-							AND lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
+							AND tbl_lehreinheit.lehrveranstaltung_id=".$db->db_add_param($row_stud->lehrveranstaltung_id)."
 							AND NOT EXISTS(SELECT 1
 								FROM bis.tbl_bisio
 								JOIN lehre.tbl_lehreinheit USING(lehreinheit_id)
