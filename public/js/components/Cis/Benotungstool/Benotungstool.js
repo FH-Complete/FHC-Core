@@ -1,6 +1,7 @@
 import {CoreFilterCmpt} from "../../filter/Filter.js";
 import ApiLehre from "../../../api/factory/lehre.js";
 import ApiNoten from "../../../api/factory/noten.js";
+import ApiAuthinfo from "../../../api/factory/authinfo.js";
 import ApiStudiensemester from "../../../api/factory/studiensemester.js";
 import BsModal from '../../Bootstrap/Modal.js';
 import BsOffcanvas from '../../Bootstrap/Offcanvas.js';
@@ -9,7 +10,7 @@ import LehreinheitenModule from '../../DropdownModes/LehreinheitenModule.js';
 import MobilityLegende from '../../Mobility/Legende.js';
 import FhcOverlay from "../../Overlay/FhcOverlay.js";
 import {debounce} from "../../../helpers/debounce.js";
-import {centeredFormatter} from "../../../tabulator/formatter/centered.js";
+import {centeredTextFormatter} from "../../../tabulator/formatter/centered.js";
 
 export const Benotungstool = {
 	name: "Benotungstool",
@@ -30,25 +31,20 @@ export const Benotungstool = {
 	props: {
 		lv_id: {
 			default: null,
-			required: true
+			required: false
 		},
 		sem_kurzbz: {
 			default: null,
-			required: true
-		},
-		viewData: {
-			type: Object,
-			required: true,
-			default: () => ({uid: ''}),
-			validator(value) {
-				return value && value.uid
-			}
+			required: false
 		}
 	},
 	data() {
 		return {
+			uid: null,
 			headerFiltersRestored: false,
 			filtersRestored: false,
+			filteredRows: null,
+			filteredcount: 0,
 			colLayoutRestored: false,
 			sortRestored: false,
 			stateRestored: false,
@@ -137,10 +133,32 @@ export const Benotungstool = {
 						this.undoSelection(cell)
 					}
 				}
+			},
+			{
+				event: 'dataFiltered',
+				handler: (filters, rows) => {
+					this.filteredRows = rows;
+					this.filteredcount = rows.length;
+					
+					if (!this.selectedUids.length) return;
+
+					const visibleData = new Set(rows.map(r => r.getData()));
+					const filteredOut = this.selectedUids.filter(su => !visibleData.has(su));
+					if (!filteredOut.length) return;
+
+					const filteredOutSet = new Set(filteredOut);
+					this.$refs.notenTable.tabulator.getSelectedRows()
+						.filter(r => filteredOutSet.has(r.getData()))
+						.forEach(r => r.deselect());
+				}
 			}
 			]};
 	},
 	methods: {
+		async fetchAuthUID() {
+			const authIdResponse = await this.$api.call(ApiAuthinfo.getAuthUID());
+			this.uid = authIdResponse.data.uid;
+		},
 		loadState() {
 			return JSON.parse(localStorage.getItem(this.persistenceID) || "null");
 		},
@@ -724,12 +742,13 @@ export const Benotungstool = {
 				virtualDom: true,
 				virtualDomBuffer: 5000,
 				index: 'uid',
-				layout: 'fitDataStretch',
+				layout: 'fitData',
 				placeholder: this.$capitalize(this.$p.t('global/noDataAvailable')),
 				selectable: true,
 				selectableRangeMode: "click", // shift+click
 				selectablePersistence: false, // reset selection on table reload
 				selectableCheck: this.selectableCheck,
+				rowHeight: 30,
 				rowFormatter: this.fixTabulatorSelectionFormatter,
 				columns: this.getColumnsDefinition(),
 				persistence: false,
@@ -797,18 +816,18 @@ export const Benotungstool = {
 				field: 'selectCol',
 				title: ''
 			})
-			columns.push({title: 'UID', field: 'uid', tooltip: false, widthGrow: 1, topCalc: this.sumCalcFunc, formatter: centeredFormatter, cssClass: 'sticky-col'})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, widthGrow: 1, variableHeight: true})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', formatter: centeredFormatter, tooltip: false, widthGrow: 1})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', formatter: centeredFormatter, headerFilter: true, tooltip: false, widthGrow: 1})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', formatter: centeredFormatter, headerFilter: true, widthGrow: 1})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', widthGrow: 1, formatter: this.percentFormatter})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', formatter: centeredFormatter, headerFilter: true, widthGrow: 1, visible: false})
+			columns.push({title: 'UID', field: 'uid', tooltip: false,  topCalc: this.sumCalcFunc, formatter: centeredTextFormatter, cssClass: 'sticky-col'})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mail'))), field: 'email', formatter: this.mailFormatter, tooltip: false,  visible: false, variableHeight: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4antrittCountv2'))), field: 'hoechsterAntritt', formatter: centeredTextFormatter, tooltip: false})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4vorname'))), field: 'vorname', formatter: centeredTextFormatter, headerFilter: true, tooltip: false})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4nachname'))), field: 'nachname', formatter: centeredTextFormatter, headerFilter: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4anwesenheitsquote'))), field: 'anwquote', formatter: this.percentFormatter})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4mobility'))), field: 'mobility_zusatz', formatter: centeredTextFormatter, headerFilter: true, visible: false})
 			if(this.config?.CIS_GESAMTNOTE_PRUEFUNG_MOODLE_LE_NOTE) {
-				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4teilnoten'))), field: 'teilnote', widthGrow: 1, formatter: this.teilnotenFormatter, variableHeight: true})
+				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4teilnoten'))), field: 'teilnote', formatter: this.teilnotenFormatter, variableHeight: true})
 			}
 			if(this.config?.CIS_GESAMTNOTE_PUNKTE) {
-				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4punkte'))), field: 'punkte', widthGrow: 1,
+				columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4punkte'))), field: 'punkte', 
 					editor: this.liveNumberEditor,
 					editable: (cell) => {
 						const rowData = cell.getRow().getData();
@@ -856,8 +875,7 @@ export const Benotungstool = {
 					if(val === undefined) return ''
 					if(p || !match?.lkt_ueberschreibbar) style = 'color: gray;font-style: italic; background-color: #f0f0f0;pointer-events: none;opacity: 0.6;user-select: none;cursor: not-allowed;'
 					return '<div style="'+style+'">' + val + '</div>'
-				},
-				widthGrow: 1
+				}
 			})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4notenvorschlagUebernehmen'))), field: 'übernehmen', width: 150, hozAlign: 'center', formatter: this.arrowFormatter, 
 				cellClick: this.saveNote, 
@@ -868,10 +886,9 @@ export const Benotungstool = {
 				headerFilterParams: () => {
 					return { values: ["\u00A0",this.$p.t('benotungstool/c4noteEmpty') ,this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 				},
-				headerFilterFunc: this.notenFilterFunc,
-				widthGrow: 1
+				headerFilterFunc: this.notenFilterFunc
 			})
-			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4freigabe'))), field: 'freigegeben', widthGrow: 1, formatter: this.freigabeFormatter, variableHeight: true})
+			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4freigabe'))), field: 'freigegeben', formatter: this.freigabeFormatter, variableHeight: true})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4zeugnisnote'))),
 				field: 'note',
 				formatter: this.notenFormatter,
@@ -881,8 +898,7 @@ export const Benotungstool = {
 				headerFilterParams: () => {
 					return { values: ["\u00A0", this.$p.t('benotungstool/c4noteEmpty'),this.$p.t('benotungstool/c4positiv'), this.$p.t('benotungstool/c4negativ') ,...this.notenOptions.map(opt => opt.bezeichnung)] }
 				},
-				headerFilterFunc: this.notenFilterFunc,
-				widthGrow: 1
+				headerFilterFunc: this.notenFilterFunc
 			})
 			columns.push({title: Vue.computed(() => this.$capitalize(this.$p.t('benotungstool/c4kommPruef'))),
 				field: 'kommPruef', widthGrow: 1,
@@ -918,19 +934,19 @@ export const Benotungstool = {
 		},
 		selectAllHandler(e, cell) {
 			const table = cell.getTable();
-			const rows = table.getRows();
+			const rows = this.filteredRows ?? table.getRows();
 
-			// custom select all logic
 			const allowed = rows.filter(r => r.getData().selectable);
 			const selected = allowed.every(r => r.isSelected());
 
-			if(selected){
+			if (selected) {
 				allowed.forEach(r => r.deselect());
+				e.target.checked = false;
 			} else {
 				allowed.forEach(r => r.select());
+				e.target.checked = true;
 			}
 
-			// stop built-in handler
 			e.stopPropagation();
 			return false;
 		},
@@ -1031,7 +1047,7 @@ export const Benotungstool = {
 		notenFormatter(cell) {
 			const value = cell.getValue()
 			const field = cell.getField()
-			let style = 'display: flex; justify-content: center; align-items: center; height: 100%;';
+			let style = 'display: flex; justify-content: start; align-items: center; height: 100%;';
 			// Wenn sich die Zeugnisnote von der von Ihnen freigegebenen Note unterscheidet,
 			// wird erstere rot umrandet markiert.
 			
@@ -1494,6 +1510,7 @@ export const Benotungstool = {
 			this.$refs.notenTable.tabulator.redraw(true);
 		},
 		loadNoten(lv_id, sem_kurzbz) {
+			if (!lv_id || !sem_kurzbz) return
 			this.loading = true
 			this.$api.call(ApiNoten.getStudentenNoten(lv_id, sem_kurzbz))
 				.then(res => {
@@ -1515,8 +1532,21 @@ export const Benotungstool = {
 			this.notenTableOptions.height = window.visualViewport.height - rect.top - 50
 			this.$refs.notenTable.tabulator.setHeight(this.notenTableOptions.height)
 		},
+		loadLehrveranstaltungen(sem_kurzbz, preselectLvId = null) {
+			return this.$api.call(ApiLehre.getZugewieseneLv(this.uid, sem_kurzbz)).then(res => {
+				this.lehrveranstaltungen = res.data
+				this.lehrveranstaltungen.forEach(lva => {
+					lva.fullString = `${lva.stg_kurzbz} - ${lva.lv_semester} - ${lva.orgform}: ${lva.lv_bezeichnung}`
+				})
+				this.selectedLehrveranstaltung = preselectLvId
+					? this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == preselectLvId) ?? null
+					: null
+			})
+		},
 		async setupCreated() {
 			this.loading = true
+
+			await this.fetchAuthUID()
 			
 			this.debouncedFetchPunkteForPruefung = debounce(this.fetchNoteForPunktePruefung, 500)
 			
@@ -1524,27 +1554,32 @@ export const Benotungstool = {
 			const configPromise = this.$api.call(ApiNoten.getCisConfig()).then(res => {
 				this.config = res.data
 			})
-			
-			// fetch lva dropdown
-			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, this.sem_kurzbz)).then(res => {
-				this.lehrveranstaltungen = res.data
+
+			this.$api.call(ApiStudiensemester.getAllStudiensemesterAndAktOrNext()).then(res => {
+				this.studiensemester = res.data[0]
 				
-				// build dropdown option string
-				this.lehrveranstaltungen.forEach(lva => {
-					lva.fullString = `${lva.stg_kurzbz} - ${lva.lv_semester}: ${lva.lv_bezeichnung}`
-				})
-				
-				this.selectedLehrveranstaltung = this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == this.lv_id)
+				let defaultSem = this.sem_kurzbz
+					? this.studiensemester.find(s => s.studiensemester_kurzbz === this.sem_kurzbz)
+					: null
+
+				if (!defaultSem) {
+					const aktOrNext = res.data[1]
+					let aktKurzbz = null
+					if (typeof aktOrNext === 'string')        aktKurzbz = aktOrNext
+					else if (Array.isArray(aktOrNext))        aktKurzbz = aktOrNext[0]?.studiensemester_kurzbz ?? aktOrNext[0]
+					else if (aktOrNext && typeof aktOrNext === 'object') aktKurzbz = aktOrNext.studiensemester_kurzbz
+
+					defaultSem = this.studiensemester.find(s => s.studiensemester_kurzbz === aktKurzbz)
+				}
+
+				this.selectedSemester = defaultSem ?? this.studiensemester[0] ?? null
+
+				const sem = this.selectedSemester?.studiensemester_kurzbz
+				if (sem) this.loadLehrveranstaltungen(sem, this.lv_id)
 			})
 			
 			LehreinheitenModule.setupContext(this.$.appContext.config.globalProperties)
 			LehreinheitenModule.bindParams(Vue.ref(Vue.computed(() => this.LeDropdownParams)));
-			
-			// fetch sem_kurzbz dropdown
-			this.$api.call(ApiStudiensemester.getStudiensemester()).then(res => {
-				this.studiensemester = res.data[0]
-				this.selectedSemester = this.studiensemester.find(sem => sem.studiensemester_kurzbz === this.sem_kurzbz)
-			})
 			
 			// fetch noten dropdown
 			this.$api.call(ApiNoten.getNoten()).then(async res => {
@@ -1562,50 +1597,46 @@ export const Benotungstool = {
 		async setupMounted() {
 			this.tableBuiltPromise = new Promise(this.tableResolve)
 			await this.tableBuiltPromise
-			
-			this.loadNoten(this.lv_id, this.sem_kurzbz)
+
+			if (this.lv_id && this.sem_kurzbz) {
+				this.loadNoten(this.lv_id, this.sem_kurzbz)
+			} else {
+				this.loading = false
+			}
 			this.calcMaxTableHeight()
-			
 		},
 		lvChanged(e) {
+			const sem = this.selectedSemester?.studiensemester_kurzbz ?? this.sem_kurzbz
 			this.$router.push({
 				name: "Benotungstool",
 				params: {
-					sem_kurzbz: this.sem_kurzbz,
+					sem_kurzbz: sem,
 					lv_id: e.value.lehrveranstaltung_id
 				}
 			})
 			
 			// reload data
-			this.loadNoten(e.value.lehrveranstaltung_id, this.sem_kurzbz)
+			this.loadNoten(e.value.lehrveranstaltung_id, sem)
 		},
 		ssChanged(e) {
-			// change url params & write history
-			this.$router.push({
-				name: "Benotungstool",
-				params: {
-					sem_kurzbz: e.value.studiensemester_kurzbz,
-					lv_id: this.lv_id
-				}
-			})
+			const sem = e.value.studiensemester_kurzbz
+			const keepLvId = this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? this.lv_id
 
 			this.loading = true
-			// diff lv_id -> reload zugewiesene lv
-			this.$api.call(ApiLehre.getZugewieseneLv(this.viewData?.uid, e.value.studiensemester_kurzbz)).then(res => {
-				this.lehrveranstaltungen = res.data
+			this.loadLehrveranstaltungen(sem, keepLvId).then(() => {
+				const lvId = this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? null
 
-				// build dropdown option string
-				this.lehrveranstaltungen.forEach(lva => {
-					lva.fullString = `${lva.stg_kurzbz} - ${lva.lv_semester}: ${lva.lv_bezeichnung}`
+				this.$router.push({
+					name: "Benotungstool",
+					params: { sem_kurzbz: sem, lv_id: lvId ?? undefined }
 				})
 
-				this.selectedLehrveranstaltung = this.lehrveranstaltungen.find(lva => lva.lehrveranstaltung_id == this.lv_id)
-			}).then(()=>{
-				
-				// reload data
-				this.loadNoten(this.lv_id, e.value.studiensemester_kurzbz)
-			}).finally( () => this.loading = false)
-
+				if (lvId) {
+					this.loadNoten(lvId, sem)
+				} else if (this.$refs.notenTable?.tabulator) {
+					this.$refs.notenTable.tabulator.setData([]) // no matching LV -> clear
+				}
+			}).finally(() => this.loading = false)
 		},
 		getOptionLabel(option) {
 			return option.studiensemester_kurzbz
@@ -1644,6 +1675,8 @@ export const Benotungstool = {
 			const typ = this.pruefung ? this.pruefung.pruefungstyp_kurzbz : this.getPruefungstypForStudentByAntritt(this.pruefungStudent)
 			const note = this.selectedPruefungNote?.note ?? 9 // noch nicht eingetragen
 			const punkte = this.selectedPruefungPunkte ?? 0
+			
+			this.loading = true
 			this.$api.call(ApiNoten.saveStudentPruefung(
 				this.pruefungStudent.uid,
 				note,
@@ -1701,6 +1734,7 @@ export const Benotungstool = {
 			}).finally(()=> {
 				this.pruefungStudent = null
 				this.pruefung = null
+				this.loading = false
 			})
 			
 			this.$refs.modalContainerPruefung.hide()
@@ -1846,6 +1880,7 @@ export const Benotungstool = {
 			})
 		},
 		saveNoteneingabe() {
+			this.loading = true
 			this.$api.call(ApiNoten.saveStudentenNoten(this.password, this.changedNoten, this.lv_id, this.sem_kurzbz))
 				.then((res) => {
 				if(res.meta.status === 'success') {
@@ -1866,6 +1901,8 @@ export const Benotungstool = {
 				this.changedNotenCounter++;
 
 				this.$refs.notenTable.tabulator.redraw(true)
+			}).finally(() => {
+				this.loading = false
 			})
 			
 			this.$refs.modalContainerNotenSpeichern.hide()
@@ -1881,9 +1918,6 @@ export const Benotungstool = {
 		},
 		getOptionLabelNotePruefung(option) {
 			return option.bezeichnung
-		},
-		leChanged(e) {
-			this.selectedLehreinheit = e.value
 		},
 		addPruefung(){
 
@@ -2041,8 +2075,15 @@ export const Benotungstool = {
 		},
 		selectedLehreinheit(newVal) {
 			if(!this.$refs.notenTable) return
-			this.$refs.notenTable.tabulator.clearFilter();
+			this.$refs.notenTable.tabulator.getFilters()
+				.filter(f => f.field === 'lehreinheit_id')
+				.forEach(() => table.removeFilter("lehreinheit_id", "=", undefined))
 			if(newVal) this.$refs.notenTable.tabulator.setFilter("lehreinheit_id", "=", newVal.lehreinheit_id);
+		},
+		selectedLehrveranstaltung(newVal, oldVal) {
+			if (this.selectedLehreinheit) {
+				this.selectedLehreinheit = null
+			}
 		},
 		getKommPruefCount(newVal) {
 			if(!this.config.CIS_GESAMTNOTE_PRUEFUNG_KOMMPRUEF) return 0
@@ -2056,6 +2097,16 @@ export const Benotungstool = {
 		}
 	},
 	computed: {
+		countsToHTML() {
+			return this.$p.t('global/ausgewaehlt')
+				+ ': <strong>' + (this.selectedUids.length || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gefiltert')
+				+ ': <strong>' + (this.filteredcount || 0) + '</strong>'
+				+ ' | '
+				+ this.$p.t('global/gesamt')
+				+ ': <strong>' + (this.studenten?.length || 0) + '</strong>';
+		},
 		maxAntrittCount() {
 			let maxAntritte = 1;
 			
@@ -2077,9 +2128,9 @@ export const Benotungstool = {
 		},
 		LeDropdownParams() {
 			return {
-				lv_id: this.lv_id,
-				sem_kurzbz: this.sem_kurzbz
-			}	
+				lv_id: this.selectedLehrveranstaltung?.lehrveranstaltung_id ?? null,
+				sem_kurzbz: this.selectedSemester?.studiensemester_kurzbz ?? null
+			}
 		},	
 		getStudentenOptions() {
 			return this.studenten ? this.studenten.filter(s => s.selectable) : []
@@ -2128,14 +2179,16 @@ export const Benotungstool = {
 		this.setupMounted()
 	},
 	template: `
-		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="modalContainerNotenImport" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4">
 			<template v-slot:title>{{$capitalize($p.t('benotungstool/c4notenImportieren'))}}</template>
 			<template v-slot:default>
-				<div class="row mt-4 justify-content-center">
-					<div v-html="getNotenimportHinweistext"></div>
+				<div class="row justify-content-center">
+					<div class="col-12" v-html="getNotenimportHinweistext"></div>
 				</div>
-				<div class="row mt-4 justify-content-center">
-					<Textarea v-model="importString" rows="5"></Textarea>
+				<div class="row mt-3 justify-content-center">
+					<div class="col-12">
+						<Textarea v-model="importString" rows="5" class="w-100"></Textarea>
+					</div>
 				</div>
 			</template>
 			<template v-slot:footer>
@@ -2143,13 +2196,12 @@ export const Benotungstool = {
 			</template>
 		</bs-modal>
 
-		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg"
+		<bs-modal ref="modalContainerNeuesPruefungsdatum" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4"
 			@hideBsModal="neuesPruefungsdatumModalVisible = false"
-			@showBsModal="neuesPruefungsdatumModalVisible = true"
-			>
+			@showBsModal="neuesPruefungsdatumModalVisible = true">
 			<template v-slot:title>{{$capitalize($p.t('benotungstool/c4addNewPruefung'))}}</template>
 			<template v-slot:default>
-				<div class="row justify-content-center">
+				<div class="row align-items-center justify-content-center">
 					<div class="col-3 text-center">{{$capitalize($p.t('benotungstool/c4date'))}}:</div>
 					<div class="col-6">
 						<datepicker
@@ -2162,34 +2214,33 @@ export const Benotungstool = {
 						</datepicker>
 					</div>
 				</div>
-				
-				<div class="row mt-4 justify-content-center">
+		
+				<div class="row mt-3 align-items-center justify-content-center">
 					<div class="col-3 text-center">{{$capitalize($p.t('benotungstool/prueflingSelectionv2'))}}:</div>
 					<div class="col-6">
-						<Multiselect 
-							v-model="selectedUids" 
-							:options="getStudentenOptions" 
-							optionLabel="infoString" 
+						<Multiselect
+							v-model="selectedUids"
+							:options="getStudentenOptions"
+							optionLabel="infoString"
 							placeholder="Studenten auswählen"
 							:maxSelectedLabels="3"
 							showToggleAll
 							class="w-100" />
 					</div>
 				</div>
-				
 			</template>
 			<template v-slot:footer>
 				<button type="button" class="btn btn-primary" @click="addPruefung">{{ $capitalize($p.t('benotungstool/c4addNewPruefung')) }}</button>
 			</template>
-		 </bs-modal>
+		</bs-modal>
 
-		<bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="modalContainerNotenSpeichern" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4">
 			<template v-slot:title>{{ $p.t('benotungstool/noteneingabeSpeichern') }}</template>
 			<template v-slot:default>
-				<div class="row mt-4 justify-content-center">
-					 <div v-html="getNotenfreigabeHinweistext"> </div>
+				<div class="row justify-content-center">
+					<div class="col-12" v-html="getNotenfreigabeHinweistext"></div>
 				</div>
-				<div class="row mt-4 justify-content-center">
+				<div class="row mt-3 justify-content-center">
 					<div class="col-auto">
 						<Password v-model="password" :feedback="false" showIcon="fa fa-eye" :toggleMask="true" :promptLabel="$p.t('benotungstool/passwort')"></Password>
 					</div>
@@ -2200,11 +2251,11 @@ export const Benotungstool = {
 			</template>
 		</bs-modal>
 
-		<bs-modal ref="modalContainerPruefung" class="bootstrap-prompt" dialogClass="modal-lg">
+		<bs-modal ref="modalContainerPruefung" class="bootstrap-prompt" dialogClass="modal-lg" bodyClass="px-4 py-4">
 			<template v-slot:title>{{ pruefung ? $capitalize($p.t('benotungstool/editPruefungFor')) : $capitalize($p.t('benotungstool/createPruefungFor')) }} {{pruefungStudent?.vorname}} {{pruefungStudent?.nachname}}</template>
 			<template v-slot:default>
-				<div class="row justify-content-center">
-					<div class="col-1 text-center">{{$capitalize($p.t('benotungstool/c4date'))}}:</div>
+				<div class="row align-items-center justify-content-center">
+					<div class="col-3 text-center">{{$capitalize($p.t('benotungstool/c4date'))}}:</div>
 					<div class="col-6">
 						<datepicker
 							v-model="selectedPruefungDate"
@@ -2216,22 +2267,23 @@ export const Benotungstool = {
 						</datepicker>
 					</div>
 				</div>
-				<div v-if="config?.CIS_GESAMTNOTE_PUNKTE == true" class="row justify-content-center mt-4">
-					<div class="col-1 text-center">{{$capitalize($p.t('benotungstool/c4punkte'))}}:</div>
+				<div v-if="config?.CIS_GESAMTNOTE_PUNKTE == true" class="row mt-3 align-items-center justify-content-center">
+					<div class="col-3 text-center">{{$capitalize($p.t('benotungstool/c4punkte'))}}:</div>
 					<div class="col-6">
-						<InputNumber 
+						<InputNumber
 							v-model="selectedPruefungPunkte"
 							@input="debouncedFetchPunkteForPruefung"
-							inputId="selectedPruefungInput" :min="0" :max="100000">
+							inputId="selectedPruefungInput" :min="0" :max="100000"
+							class="w-100">
 						</InputNumber>
 					</div>
 				</div>
-				<div class="row justify-content-center mt-4">
-					<div class="col-1 text-center">{{$capitalize($p.t('lehre/note'))}}:</div>
+				<div class="row mt-3 align-items-center justify-content-center">
+					<div class="col-3 text-center">{{$capitalize($p.t('lehre/note'))}}:</div>
 					<div class="col-6">
-						<Dropdown :placeholder="$capitalize($p.t('lehre/note'))" 
+						<Dropdown :placeholder="$capitalize($p.t('lehre/note'))"
 							:disabled="config?.CIS_GESAMTNOTE_PUNKTE == true"
-							:style="{'width': '100%'}" :optionLabel="getOptionLabelNotePruefung" 
+							:style="{'width': '100%'}" :optionLabel="getOptionLabelNotePruefung"
 							v-model="selectedPruefungNote" :options="notenOptionsLehre" showClear>
 							<template #optionsgroup="slotProps">
 								<div> {{ option.bezeichnung }} </div>
@@ -2243,7 +2295,7 @@ export const Benotungstool = {
 			<template v-slot:footer>
 				<button type="button" class="btn btn-primary" @click="savePruefungEingabe">{{ $capitalize($p.t('global/speichern')) }}</button>
 			</template>
-		 </bs-modal>
+		</bs-modal>
 
 		<BsOffcanvas
 			ref="drawer"
@@ -2264,49 +2316,53 @@ export const Benotungstool = {
 
 		<FhcOverlay :active="loading"></FhcOverlay>
 
-		<div class="row">
-			<div class="col-4">
+		<div class="row align-items-center">
+			<div class="col-auto me-auto">
 				<h2>{{$capitalize($p.t('benotungstool/benotungstoolTitle'))}}</h2>
-				<h4>{{ lv?.bezeichnung }}</h4>
+				<h4>{{ selectedLehrveranstaltung?.lv_bezeichnung }}</h4>
+			</div>
+		
+			<div class="col-auto d-none d-xxl-flex">
+				<label class="col-form-label">{{$capitalize($p.t('lehre/lehrveranstaltung'))}}:</label>
 			</div>
 			<div class="col-2">
-				<div class="col-lg-auto">
-					<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv"
-						:placeholder="$capitalize($p.t('lehre/lehrveranstaltung'))"
-						v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
-						<template #optionsgroup="slotProps">
-							<div> {{ option.fullString }} </div>
-						</template>
-					</Dropdown>
-				</div>
+				<Dropdown @change="lvChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabelLv"
+					:placeholder="$capitalize($p.t('lehre/lehrveranstaltung'))"
+					v-model="selectedLehrveranstaltung" :options="lehrveranstaltungen" appendTo="self">
+					<template #optionsgroup="slotProps">
+						<div> {{ option.fullString }} </div>
+					</template>
+				</Dropdown>
 			</div>
-
-			<div class="col-2">
-				<div class="col-lg-auto">
-					<Dropdown @change="leChanged" :style="{'width': '100%'}" v-bind="LehreinheitenModule"
-						v-model="selectedLehreinheit" showClear appendTo="self">
-						<template #option="slotProps">
-							<div> 
-								{{ slotProps.option.infoString }} 
-								<i class="fa-solid fa-user"></i> 
-								{{ slotProps.option.studentcount }}
-								<i class="fa-solid fa-calendar-days"></i>
-								{{ slotProps.option.termincount }}
-							</div>
-						</template>
-					</Dropdown>
-				</div>
+		
+			<div class="col-auto d-none d-xxl-flex">
+				<label class="col-form-label">{{$capitalize($p.t('lehre/lehreinheit'))}}:</label>
 			</div>
-			
 			<div class="col-2">
-				<div class="col-lg-auto">
-					<Dropdown @change="ssChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabel" 
-						v-model="selectedSemester" :options="studiensemester" appendTo="self">
-						<template #optionsgroup="slotProps">
-							<div> {{ option.studiensemester_kurzbz }} </div>
-						</template>
-					</Dropdown>
-				</div>
+				<Dropdown @change="leChanged" :style="{'width': '100%'}" v-bind="LehreinheitenModule"
+					v-model="selectedLehreinheit" showClear appendTo="self">
+					<template #option="slotProps">
+						<div>
+							{{ slotProps.option.infoString }}
+							<i class="fa-solid fa-user"></i>
+							{{ slotProps.option.studentcount }}
+							<i class="fa-solid fa-calendar-days"></i>
+							{{ slotProps.option.termincount }}
+						</div>
+					</template>
+				</Dropdown>
+			</div>
+		
+			<div class="col-auto d-none d-xxl-flex">
+				<label class="col-form-label">{{$capitalize($p.t('lehre/studiensemester'))}}:</label>
+			</div>
+			<div class="col-2">
+				<Dropdown @change="ssChanged" :style="{'width': '100%'}" :optionLabel="getOptionLabel"
+					v-model="selectedSemester" :options="studiensemester" appendTo="self">
+					<template #optionsgroup="slotProps">
+						<div> {{ option.studiensemester_kurzbz }} </div>
+					</template>
+				</Dropdown>
 			</div>
 		</div>
 		<hr>
@@ -2315,6 +2371,8 @@ export const Benotungstool = {
 			<core-filter-cmpt
 				v-if="tabulatorCanBeBuilt"
 				@uuidDefined="handleUuidDefined"
+				:description="countsToHTML"
+    			:useSelectionSpan="false"
 				:title="''"
 				ref="notenTable"
 				:tabulator-options="notenTableOptions"
