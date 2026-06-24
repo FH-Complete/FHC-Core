@@ -43,7 +43,9 @@ abstract class AbstractBestandteil implements IValidation
 		} else if($old_value === '' xor $new_value === '') {
 			// handle special case of ''!=0 because of different behavior in PHP 7 vs. 8
 			$this->modifiedcolumns[$columnname] = $columnname;
-		} else if($old_value != $new_value) {		
+		} else if(is_null($old_value) xor is_null($new_value)) {
+			$this->modifiedcolumns[$columnname] = $columnname;
+		} else if($old_value != $new_value) {
 			$this->modifiedcolumns[$columnname] = $columnname;
 		}
 	}
