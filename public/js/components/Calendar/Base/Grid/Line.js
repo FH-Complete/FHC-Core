@@ -60,6 +60,7 @@ export default {
 	template: /* html */`
 	<div
 		class="fhc-calendar-base-grid-line"
+		:data-day="date.toISODate()"
 		style="position:relative;display:grid;grid-auto-flow:dense"
 		:style="'grid-template-' + axisRow + 's:subgrid'"
 	>
@@ -71,7 +72,7 @@ export default {
 		></line-background>
 		<line-event
 			v-for="(event, i) in eventsWithRowInfo"
-			:key="event.orig.eindeutige_gruppen_id || i"
+			:key="event.orig.kalender_id || i"
 			:style="'grid-' + axisRow + ': ' + event.rows.join('/')"
 			:event="event"
 			@resize-start="$emit('resize-start', $event)"

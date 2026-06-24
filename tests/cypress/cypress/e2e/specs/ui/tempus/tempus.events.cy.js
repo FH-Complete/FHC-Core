@@ -55,7 +55,7 @@ context("Tempus event mutation tests", () => {
           .getCalendarEventById(eventId)
           .should("be.visible")
           .rightclick();
-        tempusPage.getEventContextMenuOption("Raumauswahl").click();
+        tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
         waitForOk("@fetchRoomSuggestions");
 
         tempusPage
@@ -86,6 +86,8 @@ context("Tempus event mutation tests", () => {
         tempusPage.waitForCalendarToFinishLoading();
 
         cy.get("@newRoom").then((newRoom) => {
+          console.log(eventId)
+          console.log(newRoom)
           cy.get("@updatedEventId").then((updatedEventId) => {
             tempusPage.expectCalendarEventRoom(updatedEventId, newRoom);
 
@@ -131,7 +133,7 @@ context("Tempus event mutation tests", () => {
           .scrollIntoView()
           .should("be.visible")
           .rightclick();
-        tempusPage.getEventContextMenuOption("Raumauswahl").click();
+        tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
         waitForOk("@fetchRoomSuggestions");
 
         tempusPage

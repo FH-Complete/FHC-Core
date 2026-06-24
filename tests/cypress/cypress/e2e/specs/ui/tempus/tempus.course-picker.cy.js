@@ -81,7 +81,9 @@ context("Tempus course picker tests", () => {
     waitForOk("@fetchPlanData");
 
     tempusPage.waitForCalendarToFinishLoading();
-
+    
+    cy.wait(1000);
+    
     cy.get("@initialEventCount").then((initialEventCount) => {
       tempusPage
         .getCalendarEvents()

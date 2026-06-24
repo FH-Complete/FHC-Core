@@ -1,201 +1,212 @@
 import FhcCalendar from "./Base.js";
 
-import { useEventLoader } from '../../composables/EventLoader.js';
+import { useEventLoader } from "../../composables/EventLoader.js";
 
-import ModeWeek from './Mode/Week.js';
-import ModeMonth from './Mode/Month.js';
-import ModeTable from './Mode/Table.js';
-import ApiKalender from '../../api/factory/tempus/kalender.js';
-import draggable from '../../directives/draggable.js';
-
+import ModeWeek from "./Mode/Week.js";
+import ModeMonth from "./Mode/Month.js";
+import ModeTable from "./Mode/Table.js";
+import ApiKalender from "../../api/factory/tempus/kalender.js";
+import draggable from "../../directives/draggable.js";
 
 export default {
-	name: "CalendarTempus",
-	components: {
-		FhcCalendar
-	},
-	inject: {
-		renderers: {from: 'renderers'},
-		appConfig: {
-			from: 'appConfig',
-			default: {
-				visible_status: 'all'
-			}
-		}
-	},
-	directives: {
-		draggable,
-	},
-	props: {
-		timezone: {
-			type: String,
-			required: true
-		},
-		date: {
-			type: [Date, String, Number, luxon.DateTime],
-			default: luxon.DateTime.local()
-		},
-		mode: {
-			type: String,
-			default: 'Week'
-		},
-		getPromiseFunc: {
-			type: Function,
-			required: true
-		},
-		parkedEvents: {
-			type: Object,
-			default: () => new Set()
-		},
-		visibleLecturers: {
-			type: Array,
-			default: null
-		},
-		extraBackgrounds: {
-			type: Array,
-			default: () => []
-		},
-		visibleStatus: {
-			type: Array,
-			default: () => ['all']
-		},
-	},
-	emits: [
-		"update:date",
-		"update:mode",
-		"update:range",
-		"drop",
-		"resize"
-	],
+  name: "CalendarTempus",
+  components: {
+    FhcCalendar,
+  },
+  inject: {
+    renderers: { from: "renderers" },
+    appConfig: {
+      from: "appConfig",
+      default: {
+        visible_status: "all",
+      },
+    },
+  },
+  directives: {
+    draggable,
+  },
+  props: {
+    timezone: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: [Date, String, Number, luxon.DateTime],
+      default: luxon.DateTime.local(),
+    },
+    mode: {
+      type: String,
+      default: "Week",
+    },
+    getPromiseFunc: {
+      type: Function,
+      required: true,
+    },
+    parkedEvents: {
+      type: Object,
+      default: () => new Set(),
+    },
+    visibleLecturers: {
+      type: Array,
+      default: null,
+    },
+    extraBackgrounds: {
+      type: Array,
+      default: () => [],
+    },
+    visibleStatus: {
+      type: Array,
+      default: () => ["all"],
+    },
+  },
+  emits: ["update:date", "update:mode", "update:range", "drop", "resize"],
 
-	data() {
-		return {
-			modes: {
-				week: Vue.markRaw(ModeWeek),
-				month: Vue.markRaw(ModeMonth),
-				tableList: Vue.markRaw(ModeTable),
-			},
-			modeOptions: {
-				day: {
-					emptyMessage: Vue.computed(() => this.$p.t('lehre/noLvFound')),
-					emptyMessageDetails: Vue.computed(() => this.$p.t('lehre/noLvFound'))
-				},
-				week: {
-					collapseEmptyDays: false
-				}
-			},
-			currentMode: this.mode,
-			teachingunits: null,
-			hoursplan: null,
-			showRaster: true,
-		};
-	},
-	computed: {
-		backgrounds() {
-			let now = luxon.DateTime.now().setZone(this.timezone);
+  data() {
+    return {
+      modes: {
+        week: Vue.markRaw(ModeWeek),
+        month: Vue.markRaw(ModeMonth),
+        tableList: Vue.markRaw(ModeTable),
+      },
+      modeOptions: {
+        day: {
+          emptyMessage: Vue.computed(() => this.$p.t("lehre/noLvFound")),
+          emptyMessageDetails: Vue.computed(() => this.$p.t("lehre/noLvFound")),
+        },
+        week: {
+          collapseEmptyDays: false,
+        },
+      },
+      currentMode: this.mode,
+      teachingunits: null,
+      hoursplan: null,
+      showRaster: true,
+    };
+  },
+  computed: {
+    backgrounds() {
+      let now = luxon.DateTime.now().setZone(this.timezone);
 
-			let past = [];
-			if (this.mode == 'Month')
-			{
-				past = [{
-					class: 'background-past',
-					end: now.startOf('day')
-				}];
-			}
-			else
-			{
-				past = [{
-					class: 'background-past',
-					end: now,
-					label: now.startOf('minute').toISOTime({ suppressSeconds: true, includeOffset: false })
-				}];
-			}
+      let past = [];
+      if (this.mode == "Month") {
+        past = [
+          {
+            class: "background-past",
+            end: now.startOf("day"),
+          },
+        ];
+      } else {
+        past = [
+          {
+            class: "background-past",
+            end: now,
+            label: now
+              .startOf("minute")
+              .toISOTime({ suppressSeconds: true, includeOffset: false }),
+          },
+        ];
+      }
 
-			return [
-				...past,
-				...(this.extraBackgrounds || [])
-			];
-		},
-		visibleEvents()
-		{
-			let list = this.events;
+      return [...past, ...(this.extraBackgrounds || [])];
+    },
+    visibleEvents() {
+      let list = this.events;
 
-			if (Array.isArray(this.visibleLecturers))
-			{
-				const visibleLectures = new Set(this.visibleLecturers);
+      if (Array.isArray(this.visibleLecturers)) {
+        const visibleLectures = new Set(this.visibleLecturers);
 
-				list = list.filter(event => {
-					if (!event.lektor?.length)
-						return true;
-					return event.lektor.some(lektor => visibleLectures.has(lektor.mitarbeiter_uid));
-				});
-			}
+        list = list.filter((event) => {
+          if (!event.lektor?.length) return true;
+          return event.lektor.some((lektor) =>
+            visibleLectures.has(lektor.mitarbeiter_uid),
+          );
+        });
+      }
 
-			if (!this.visibleStatus.length || this.visibleStatus.includes('all'))
-				return list;
+      if (!this.visibleStatus.length || this.visibleStatus.includes("all"))
+        return list;
 
-			return list.filter(event => this.visibleStatus.includes(event.status_kurzbz));
-		},
-	},
-	methods: {
-		eventStyle(event) {
-			if (!event.farbe)
-				return undefined;
-			return '--event-bg:#' + event.farbe;
-		},
-		updateRange(rangeInterval) {
-			this.rangeInterval = rangeInterval;
-			this.$emit('update:range', rangeInterval);
-		},
-		ondrop(payload){
-			this.$emit('drop', payload);
-		},
-		onresize(payload){
-			this.$emit('resize', payload);
-		},
-		resetEventLoader() {
-			this.reset();
-		},
+      return list.filter((event) =>
+        this.visibleStatus.includes(event.status_kurzbz),
+      );
+    },
+  },
+  methods: {
+    eventStyle(event) {
+      if (!event.farbe) return undefined;
+      return "--event-bg:#" + event.farbe;
+    },
+    updateRange(rangeInterval) {
+      this.rangeInterval = rangeInterval;
+      this.$emit("update:range", rangeInterval);
+    },
+    ondrop(payload) {
+      this.$emit("drop", payload);
+    },
+    onresize(payload) {
+      this.$emit("resize", payload);
+    },
+    resetEventLoader() {
+      this.reset();
+    },
+    clearOutCalendarEventEmphasis() {
+      this.$refs.calendar.$el
+        .querySelectorAll(
+          ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
+        )
+        .forEach((el) => {
+          const spinner = el.querySelector(".spinner-overlay");
+          if (spinner) {
+            spinner.remove();
+          }
 
-	},
-	setup(props, context) {
-		const rangeInterval = Vue.ref(null);
+          el.classList.remove(
+            "updating-event",
+            "updated-event",
+            "updated-event-long",
+            "deemphasized-event",
+            "deemphasized-event-long",
+          );
+        });
+    },
+  },
+  setup(props, context) {
+    const rangeInterval = Vue.ref(null);
 
-		const { events, lv, reset } = useEventLoader(rangeInterval, props.getPromiseFunc);
+    const { events, lv, reset } = useEventLoader(
+      rangeInterval,
+      props.getPromiseFunc,
+    );
 
-		Vue.watch(lv, newValue => {
-			context.emit('update:lv', newValue);
-		});
+    Vue.watch(lv, (newValue) => {
+      context.emit("update:lv", newValue);
+    });
 
-		return {
-			rangeInterval,
-			events,
-			lv,
-			reset
-		};
-	},
+    return {
+      rangeInterval,
+      events,
+      lv,
+      reset,
+    };
+  },
 
-	created() {
-		this.$api
-			.call(ApiKalender.getStunden())
-			.then(res => {
-				return this.teachingunits = res.data.map(el => ({
-					id: el.stunde,
-					start: el.beginn,
-					end: el.ende
-				}));
-			});
+  created() {
+    this.$api.call(ApiKalender.getStunden()).then((res) => {
+      return (this.teachingunits = res.data.map((el) => ({
+        id: el.stunde,
+        start: el.beginn,
+        end: el.ende,
+      })));
+    });
 
-		this.$api
-			.call(ApiKalender.getCalendarHours())
-			.then(res => {
-				this.hoursplan = {
-					start: res.data.start,
-					end: res.data.end
-				};
-			});
-	},
-	template: /* html */`
+    this.$api.call(ApiKalender.getCalendarHours()).then((res) => {
+      this.hoursplan = {
+        start: res.data.start,
+        end: res.data.end,
+      };
+    });
+  },
+  template: /* html */ `
 	<fhc-calendar
 		ref="calendar"
 		class="fhc-calendar-lvplan"
@@ -265,5 +276,5 @@ export default {
 				</div>
 			</div>
 		</template>
-	</fhc-calendar>`
-}
+	</fhc-calendar>`,
+};

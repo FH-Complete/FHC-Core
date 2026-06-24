@@ -491,7 +491,15 @@ export default {
       };
     },
 
-    _updateKalenderEvent(obj, startDT, endDT, start_time, end_time, onSuccess) {
+    _updateKalenderEvent(
+      obj,
+      startDT,
+      endDT,
+      start_time,
+      end_time,
+      onSuccess,
+      onError,
+    ) {
       const origStart = luxon.DateTime.fromISO(obj.orig.isostart);
       const origEnd = luxon.DateTime.fromISO(obj.orig.isoend);
 
@@ -517,6 +525,11 @@ export default {
             this.$refs.calendar.$refs.calendar.$refs.mode.$refs.view.$refs.grid.disableAutoScroll();
             this.currentlyUpdatedEvent = obj.orig;
           }
+        })
+        .catch((error) => {
+          if (onError) {
+            onError(error);
+          }
         });
     },
 
@@ -526,14 +539,14 @@ export default {
         return;
       const { item, start, end } = payload;
       const obj = item[0];
-      if (!obj?.orig?.kalender_id)
-        return alert("Kein gültiges Kalender-Event zum Resizen");
+      if (!obj?.orig?.kalender_id) return;
 
       const dates = this._parseDates(start, end);
       if (!dates) return;
 
       if (
-        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() === dates.startDT.toMillis() &&
+        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() ===
+          dates.startDT.toMillis() &&
         luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
           dates.endDT.toMillis()
       )
@@ -554,6 +567,10 @@ export default {
         () => {
           this.$refs.calendar.resetEventLoader();
         },
+        () => {
+          this.$refs.calendar.clearOutCalendarEventEmphasis();
+          this.$refs.calendar.resetEventLoader();
+        },
       );
     },
 
@@ -571,7 +588,8 @@ export default {
       if (!dates) return;
 
       if (
-        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() === dates.startDT.toMillis() &&
+        luxon.DateTime.fromISO(obj.orig.isostart).toMillis() ===
+          dates.startDT.toMillis() &&
         luxon.DateTime.fromISO(obj.orig.isoend).toMillis() ===
           dates.endDT.toMillis()
       )
@@ -616,6 +634,16 @@ export default {
             });
             this.$refs.calendar.resetEventLoader();
             this.bcc.postMessage("dropped");
+          },
+          () => {
+            this.$refs.calendar.clearOutCalendarEventEmphasis();
+            this.updateKalenderEventElementDisplay(
+              obj.orig.kalender_id,
+              luxon.DateTime.fromISO(obj.orig.isostart),
+              luxon.DateTime.fromISO(obj.orig.isoend)
+            );
+            this.$refs.calendar.clearOutCalendarEventEmphasis();
+            this.$refs.calendar.resetEventLoader();
           },
         );
       } else {
@@ -886,29 +914,7 @@ export default {
     scrollToAndEmphasizeUpdatedEvent() {
       if (!this.currentlyUpdatedEvent) return;
 
-      document
-        .querySelectorAll(".fhc-calendar-base-grid .part-body")
-        .forEach((el) => {
-          el.classList.remove("deemphasized-event", "deemphasized-event-long");
-        });
-      document
-        .querySelectorAll(
-          ".fhc-calendar-base-grid .fhc-calendar-base-grid-line-event",
-        )
-        .forEach((el) => {
-          const spinner = el.querySelector(".spinner-overlay");
-          if (spinner) {
-            spinner.remove();
-          }
-
-          el.classList.remove(
-            "updating-event",
-            "updated-event",
-            "updated-event-long",
-            "deemphasized-event",
-            "deemphasized-event-long",
-          );
-        });
+      this.$refs.calendar.clearOutCalendarEventEmphasis();
 
       setTimeout(() => {
         const eventEl = document.querySelector(
@@ -958,34 +964,32 @@ export default {
                 el.classList.add(deemphasizedUpdateClassName);
               }
             });
-          document
-            .querySelectorAll(".fhc-calendar-base-grid .part-body")
-            .forEach((el) => {
-              if (el !== eventEl) {
-                el.classList.add(deemphasizedUpdateClassName);
-              }
-            });
         }, timeout);
 
         this.currentlyUpdatedEvent = null;
       }, 100);
     },
     updateKalenderEventElementDisplay(calendarId, startDT, endDT) {
-      if (!calendarId) return alert("Kein gültiges Kalender-Event zum Resizen");
+      if (!calendarId) return;
 
-      let newPotentialStart =
-        startDT.diff(luxon.DateTime.fromISO("2026-06-22T00:00")).toMillis() ??
-        1;
-      let newPotentialEnd = endDT
-        .diff(luxon.DateTime.fromISO("2026-06-22T00:00"))
-        .toMillis();
+      let startOfDay = startDT.startOf("day");
+      let newPotentialStart = startDT.diff(startOfDay).toMillis() ?? 1;
+      let newPotentialEnd = endDT.diff(startOfDay).toMillis();
 
       let element = document.querySelector(`[data-id="event-${calendarId}"]`);
-      if (!element) return alert("Kein gültiges Kalender-Event zum Resizen");
+      if (!element) return;
+
+      const calendarView = element.closest(".fhc-calendar-mode-week-view");
+      const targetGridLine = calendarView?.querySelector(
+        `.fhc-calendar-base-grid-line[data-day="${startOfDay.toISODate()}"]`,
+      );
+      if (!targetGridLine)
+        return alert("Kein gültiger Kalendertag zum Verschieben gefunden");
 
       setTimeout(() => {
-        element.style.gridRowEnd = "t_" + newPotentialEnd;
+        targetGridLine.appendChild(element);
         element.style.gridRowStart = "t_" + newPotentialStart;
+        element.style.gridRowEnd = "t_" + newPotentialEnd;
       }, 100);
 
       const outerDiv = document.createElement("div");

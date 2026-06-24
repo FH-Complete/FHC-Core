@@ -287,7 +287,7 @@ class TempusPage {
       .contains(".bootstrap-modal.show .modal-title", "Raumauswahl")
       .closest(".bootstrap-modal.show");
   getRaumauswahlRoomOptions = () =>
-    this.getRaumauswahlModal().find(".list-group-item");
+    this.getRaumauswahlModal().find(".list-group-item span");
   getResourcesModal = () =>
     cy
       .get("[data-cy='resourcesAssignmentModal']")
@@ -378,6 +378,7 @@ class TempusPage {
 
   setCurrentSemester = () => {
     this.getSemesterSetterButton().click();
+    waitForOk("@getCurrentSemester");
   };
 
   dropEventOnCalendarPart = (eventId, partIndex, options = {}) => {
