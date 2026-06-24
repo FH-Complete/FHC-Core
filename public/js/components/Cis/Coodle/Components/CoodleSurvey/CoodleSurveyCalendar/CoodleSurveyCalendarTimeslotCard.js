@@ -66,7 +66,7 @@ export default {
 			this.isEditInProgress = false;
 			this.$emit("setIsTimeslotCardEditInProgress", { value: false });
 		},
-		saveChanges() {
+		submitForm() {
 			if (!this.dateInput || !this.startTimeInput) {
 				window.alert("Check your inputs!");
 				return;
@@ -168,7 +168,7 @@ export default {
 							<i class="fa-regular fa-circle-left fa-lg"></i>
 						</div>
 						<div
-							@click="saveChanges()"
+							@click="submitForm()"
 							:title="'Save'"
 							type="button"
 							class="p-1 coodleCalendarTimeslotCardIcon"
