@@ -49,6 +49,7 @@ export default {
 		},
 		events() {
 			// todo: add visible participant schedules
+			console.log(this.timeslotCalendarEvents);
 			return this.timeslotCalendarEvents;
 		},
 		roundedTimeslotDuration() {
@@ -197,7 +198,7 @@ export default {
 					":00",
 				isostart: start.toISOString(),
 				isoend: end.toISOString(),
-				farbe: "FFFFFF",
+				farbe: "DDDDDD",
 			};
 		},
 		updateDurationOfExistingTimeslotCalendarEvents() {
@@ -263,6 +264,11 @@ export default {
 			);
 			this.isTimeslotCardEditInProgress = false;
 		},
+		getEventStyle(event) {
+			if (!event.farbe)
+				return undefined;
+			return '--event-bg:#' + event.farbe;
+		},
 	},
 	created() {
 		this.setTimeslotCalendarEvents();
@@ -294,6 +300,7 @@ export default {
 					<div
 						:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
 						:type="mode == 'day' ? 'button' : undefined"
+ 						:style="getEventStyle(event)"
 					>
 						<component
 							v-if="mode == 'event'"

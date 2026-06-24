@@ -25,7 +25,48 @@ export default {
 	data() {
 		return {
 			surveyFormData: null,
-			// todo: revert to default false
+			participantScheduleColors: [
+				{
+					uid: null,
+					color: "#FF0000"
+				},
+				{
+					uid: null,
+					color: "#00FF00"
+				},
+				{
+					uid: null,
+					color: "#0000FF"
+				},
+				{
+					uid: null,
+					color: "#FF00FF"
+				},
+				{
+					uid: null,
+					color: "#00FFFF"
+				},
+				{
+					uid: null,
+					color: "#FFFF00"
+				},
+				{
+					uid: null,
+					color: "#FFA500"
+				},
+				{
+					uid: null,
+					color: "#800080"
+				},
+				{
+					uid: null,
+					color: "#228B22"
+				},
+				{
+					uid: null,
+					color: "#B87333"
+				},
+			],
 			isEditInProgress: false,
 			weekdays: [
 				"Sunday",
@@ -132,6 +173,10 @@ export default {
 			this.surveyFormData.participants.forEach((participant) => {
 				participant.isCalendarShown = false;
 			});
+
+			this.participantScheduleColors.forEach((participantColor) => {
+				participantColor.uid = null;
+			})
 		},
 		parseTimeslotForDisplay(timeslot) {
 			const timeslotStartsAt = new Date(timeslot.startsAt);
@@ -236,6 +281,7 @@ export default {
 							<coodle-survey-participants
 								v-if="surveyFormData?.participants"
 								v-model:participantsModelValue="surveyFormData.participants"
+								v-model:participantScheduleColorsModelValue="participantScheduleColors"
 							/>
 						</div>
 						<div class="col-12 col-xxl-8">

@@ -7,8 +7,12 @@ export default {
 	components: {},
 	props: {
 		participantsModelValue: Array,
+		participantScheduleColorsModelValue: Array,
 	},
-	emits: ["update:participantsModelValue"],
+	emits: [
+		"update:participantsModelValue",
+		"update:participantScheduleColorsModelValue",
+	],
 	data() {
 		return {
 			searchInput: "",
@@ -17,94 +21,8 @@ export default {
 			areSearchResultsShown: false,
 			// todo: increase depending on feedback
 			warningGroupSize: 10,
-			// todo: remove
-			searchResultsDevExample: [
-				{
-					uid: "ma1000",
-					name: "Test User 10",
-					type: "user",
-				},
-				{
-					uid: "ma1001",
-					name: "Test User 11",
-					type: "user",
-				},
-				{
-					uid: "ma1002",
-					name: "Test User 12",
-					type: "user",
-				},
-				{
-					uid: "ma1003",
-					name: "Test User 13",
-					type: "user",
-				},
-				{
-					name: "ABC-DEF",
-					type: "group",
-					users: [
-						{
-							uid: "ma1003",
-							name: "Test User 13",
-						},
-						{
-							uid: "ma1004",
-							name: "Test User 14",
-						},
-					],
-				},
-				{
-					name: "GHI-JKL",
-					type: "group",
-					users: [
-						{
-							uid: "ma1004",
-							name: "Test User 14",
-						},
-						{
-							uid: "ma1005",
-							name: "Test User 15",
-						},
-						{
-							uid: "ma1006",
-							name: "Test User 16",
-						},
-						{
-							uid: "ma1007",
-							name: "Test User 17",
-						},
-						{
-							uid: "ma1008",
-							name: "Test User 18",
-						},
-						{
-							uid: "ma1009",
-							name: "Test User 19",
-						},
-					],
-				},
-				{
-					uid: "ma1004",
-					name: "Test User 14",
-					type: "user",
-				},
-				{
-					uid: "ma1005",
-					name: "Test User 15",
-					type: "user",
-				},
-				{
-					uid: "ma1006",
-					name: "Test User 16",
-					type: "user",
-				},
-				{
-					uid: "ma1007",
-					name: "Test User 17",
-					type: "user",
-				},
-			],
 			searchParticipantsAbortController: null,
+			// todo: increase
 			searchParticipants: debounce(async () => {
 				if (this.searchInput.length < 2) return;
 
@@ -114,8 +32,6 @@ export default {
 
 				this.isSearchingForParticipants = true;
 
-				// todo: delete comment
-				// this.searchResults = this.searchResultsDevExample;
 				const participantsSearchResponse = await this.$api.call(
 					CoodleApi.searchParticipants(this.searchInput),
 					{ signal: this.searchParticipantsAbortController.signal },
@@ -134,6 +50,24 @@ export default {
 			set(newValue) {
 				this.$emit("update:participantsModelValue", newValue);
 			},
+		},
+		participantScheduleColors: {
+			get() {
+				return this.$props.participantScheduleColorsModelValue;
+			},
+			set(newValue) {
+				this.$emit(
+					"update:participantScheduleColorsModelValue",
+					newValue,
+				);
+			},
+		},
+		isMaxDisplayedParticipantSchedulesReached() {
+			return (
+				this.participants.filter(
+					(participant) => participant.isCalendarShown,
+				).length >= this.participantScheduleColors.length
+			);
 		},
 	},
 	watch: {
@@ -201,8 +135,17 @@ export default {
 			this.participants = this.participants.filter(
 				(participant) => participant.uid !== participantToBeRemoved.uid,
 			);
+
+			let occupiedParticipantColor = this.participantScheduleColors.find(
+				(participantColor) =>
+					participantColor.uid === participantToBeRemoved.uid,
+			);
+			if (!occupiedParticipantColor) return;
+			occupiedParticipantColor.uid = null;
 		},
 		showCalendar(participantForCalendarToBeDisplayed) {
+			if (this.isMaxDisplayedParticipantSchedulesReached) return;
+
 			this.participants = this.participants.map((participant) => {
 				let updatedParticipant = { ...participant };
 				if (
@@ -212,6 +155,24 @@ export default {
 				}
 				return updatedParticipant;
 			});
+
+			this.participantScheduleColors.find(
+				(participantColor) => !participantColor.uid,
+			).uid = participantForCalendarToBeDisplayed.uid;
+		},
+		hideCalendar(participant) {
+			participant.isCalendarShown = false;
+
+			let occupiedParticipantColor = this.participantScheduleColors.find(
+				(participantColor) => participantColor.uid === participant.uid,
+			);
+			if (!occupiedParticipantColor) return;
+			occupiedParticipantColor.uid = null;
+		},
+		getParticipantScheduleColor(participant) {
+			return this.participantScheduleColors.find(
+				(participantColor) => participantColor.uid === participant.uid,
+			)?.color;
 		},
 	},
 	template: /*html*/ `
@@ -268,9 +229,14 @@ export default {
 				<div class="d-flex flex-row align-items-center gap-3">
 					<i
 						v-if="participant.isCalendarShown"
-						@click="participant.isCalendarShown = false"
+						@click="hideCalendar(participant)"
 						type="button"
-						class="fa-solid fa-calendar-check fhc-primary-color"
+						class="fa-solid fa-calendar"
+						:style="{color: getParticipantScheduleColor(participant)}"
+					></i>
+					<i
+						v-else-if="isMaxDisplayedParticipantSchedulesReached"
+						class="fa-regular fa-calendar-xmark"
 					></i>
 					<i
 						v-else
@@ -282,6 +248,9 @@ export default {
 				</div>
 			</div>
 		</div>
+		<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
+			{{ "You can display no more participant schedules!" }}
+		</span>
 	</div>
 	`,
 };
