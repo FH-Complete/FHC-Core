@@ -60,6 +60,7 @@ class Bisio_model extends DB_Model
 			JOIN public.tbl_prestudentstatus pss ON (ps.prestudent_id = pss.prestudent_id)
 			JOIN public.tbl_studiensemester ss ON (pss.studiensemester_kurzbz = ss.studiensemester_kurzbz)
 			WHERE ss.studiensemester_kurzbz = ?
+			AND nation_code <> 'A'
 			AND (
 			  tbl_bisio.von <= ss.ende
 			  AND (
