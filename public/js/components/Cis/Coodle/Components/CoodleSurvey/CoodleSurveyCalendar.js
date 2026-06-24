@@ -48,7 +48,7 @@ export default {
 			];
 		},
 		events() {
-			// todo
+			// todo: add visible participant schedules
 			return this.timeslotCalendarEvents;
 		},
 		roundedTimeslotDuration() {
@@ -69,6 +69,23 @@ export default {
 				this.$emit("update:timeslotsModelValue", value);
 			},
 		},
+		sortedTimeslotCalendarEvents() {
+			return this.timeslotCalendarEvents.sort(
+				(timeslotCalendarEventA, timeslotCalendarEventB) => {
+					let timeslotAStartsAt =
+						timeslotCalendarEventA.datum +
+						timeslotCalendarEventA.beginn;
+					let timeslotBStartsAt =
+						timeslotCalendarEventB.datum +
+						timeslotCalendarEventB.beginn;
+					if (timeslotAStartsAt > timeslotBStartsAt) {
+						return 1;
+					} else {
+						return -1;
+					}
+				},
+			);
+		},
 	},
 	watch: {
 		timeslotDuration: {
@@ -78,7 +95,34 @@ export default {
 		},
 		timeslotCalendarEvents: {
 			handler() {
-				// todo: update form data
+				let oldTimeslotStartTimes = this.timeslots.map(
+					(timeslot) => timeslot.startsAt,
+				);
+				let updatedTimeslotStartTimes = this.timeslotCalendarEvents.map(
+					(timeslotCalendarEvent) =>
+						timeslotCalendarEvent.datum +
+						" " +
+						timeslotCalendarEvent.beginn,
+				);
+
+				let updatedTimeslots = this.timeslots.filter((timeslot) =>
+					updatedTimeslotStartTimes.includes(timeslot.startsAt),
+				);
+
+				updatedTimeslotStartTimes.forEach((startTime) => {
+					if (
+						!updatedTimeslots.some(
+							(timeslot) => timeslot.startsAt === startTime,
+						)
+					) {
+						updatedTimeslots.push({
+							id: null,
+							startsAt: startTime,
+						});
+					}
+				});
+
+				this.timeslots = updatedTimeslots;
 			},
 			deep: true,
 		},
@@ -94,7 +138,6 @@ export default {
 				let startDate = new Date(timeslot.startsAt);
 				return this.generateTimeslotCalendarEvent(startDate);
 			});
-			this.sortTimeslotCalendarEvents();
 		},
 		addTimeslotOnCalendarClick(clickEvent) {
 			if (this.timeslotCalendarEvents.length >= 50) {
@@ -134,7 +177,6 @@ export default {
 			}
 
 			this.timeslotCalendarEvents.push(newTimeslotCalendarEvent);
-			this.sortTimeslotCalendarEventss();
 		},
 		generateTimeslotCalendarEvent(start) {
 			let end = new Date(start.getTime());
@@ -159,17 +201,19 @@ export default {
 			};
 		},
 		updateDurationOfExistingTimeslotCalendarEvents() {
-			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map((timeslotCalendarEvent) => {
-				let start = new Date(timeslotCalendarEvent.isostart);
-				return this.generateTimeslotCalendarEvent(start);
-			});
-			this.sortTimeslotCalendarEvents();
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map(
+				(timeslotCalendarEvent) => {
+					let start = new Date(timeslotCalendarEvent.isostart);
+					return this.generateTimeslotCalendarEvent(start);
+				},
+			);
 		},
 		createTimeslotFromCard(startDate) {
 			if (
 				this.timeslotCalendarEvents.some(
 					(existingTimeslotCalendarEvent) =>
-						existingTimeslotCalendarEvent.isostart === startDate.toISOString(),
+						existingTimeslotCalendarEvent.isostart ===
+						startDate.toISOString(),
 				)
 			) {
 				window.alert("You cannot create duplicates!");
@@ -179,7 +223,6 @@ export default {
 			this.timeslotCalendarEvents.push(
 				this.generateTimeslotCalendarEvent(startDate),
 			);
-			this.sortTimeslotCalendarEvents();
 			this.isTimeslotCardEditInProgress = false;
 		},
 		updateTimeslotFromCard(timeslotCalendarEvent, newStartDate) {
@@ -194,34 +237,31 @@ export default {
 				return;
 			}
 
-			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map((existingTimeslotCalendarEvent) => {
-				if (existingTimeslotCalendarEvent.isostart !== timeslotCalendarEvent.isostart) {
-					return existingTimeslotCalendarEvent;
-				}
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map(
+				(existingTimeslotCalendarEvent) => {
+					if (
+						existingTimeslotCalendarEvent.isostart !==
+						timeslotCalendarEvent.isostart
+					) {
+						return existingTimeslotCalendarEvent;
+					}
 
-				return this.generateTimeslotCalendarEvent(newStartDate);
-			});
+					return this.generateTimeslotCalendarEvent(newStartDate);
+				},
+			);
 
-			this.sortTimeslotCalendarEvents();
 			this.isTimeslotCardEditInProgress = false;
 		},
 		deleteTimeslot(timeslotCalendarEvent) {
-			this.timeslotCalendarEvents = this.timeslotCalendarEvents.filter((existingTimeslotCalendarEvent) => {
-				return existingTimeslotCalendarEvent.isostart !== timeslotCalendarEvent.isostart;
-			});
-			this.sortTimeslotCalendarEvents();
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.filter(
+				(existingTimeslotCalendarEvent) => {
+					return (
+						existingTimeslotCalendarEvent.isostart !==
+						timeslotCalendarEvent.isostart
+					);
+				},
+			);
 			this.isTimeslotCardEditInProgress = false;
-		},
-		sortTimeslotCalendarEvents() {
-			this.timeslotCalendarEvents = this.timeslotCalendarEvents.sort((timeslotA, timeslotB) => {
-				let timeslotAStartDateTime = timeslotA.datum + timeslotA.beginn;
-				let timeslotBStartDateTime = timeslotB.datum + timeslotB.beginn;
-				if (timeslotAStartDateTime > timeslotBStartDateTime) {
-					return 1;
-				} else {
-					return -1;
-				}
-			});
 		},
 	},
 	created() {
@@ -277,7 +317,7 @@ export default {
 				</fhc-calendar>
 			</div>
 		<div class="row">
-			<div v-for="timeslot in timeslotCalendarEvents.concat([null])" class="col-12 col-md-6 col-xl-4">
+			<div v-for="timeslot in sortedTimeslotCalendarEvents.concat([null])" class="col-12 col-md-6 col-xl-4">
 				<coodle-survey-calendar-timeslot-card
 					@createTimeslot="createTimeslotFromCard($event.startDate)"
 					@updateTimeslot="updateTimeslotFromCard(timeslot, $event.newStartDate)"

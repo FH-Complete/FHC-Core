@@ -26,7 +26,7 @@ export default {
 		return {
 			surveyFormData: null,
 			// todo: revert to default false
-			isEditInProgress: true,
+			isEditInProgress: false,
 			weekdays: [
 				"Sunday",
 				"Monday",
