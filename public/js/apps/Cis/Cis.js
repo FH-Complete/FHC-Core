@@ -22,6 +22,7 @@ import OtherLvPlan from "../../components/Cis/LvPlan/OtherLvPlan.js";
 import PaabgabeUebersicht from "../../components/Cis/ProjektabgabeUebersicht/ProjektabgabeUebersicht.js";
 import Benotungstool from "../../components/Cis/Benotungstool/Benotungstool.js";
 import Zeitsperren from "../../components/Cis/Zeitsperren/Zeitsperren.js";
+import Compat from "../../components/Cis/Compat.js";
 
 import ApiRouteInfo from '../../api/factory/routeinfo.js';
 import {capitalize} from "../../helpers/StringHelpers.js";
@@ -33,6 +34,18 @@ const isMobile = window.matchMedia("(max-width: 767px)").matches;
 const router = VueRouter.createRouter({
 	history: VueRouter.createWebHistory(`/${ciPath}`),
 	routes: [
+		{
+			path: `/Cis/Compat/:mode(ci|legacy)/:path(.*)`,
+			name: 'Compat',
+			component: Compat,
+			props: (route) => {
+				return {
+					mode: route.params.mode,
+					path: route.params.path,
+					query_string: VueRouter.stringifyQuery(route.query)
+				};
+			}
+		},
 		{
 			path: `/Cis/Studium`,
 			name: 'Studium',
