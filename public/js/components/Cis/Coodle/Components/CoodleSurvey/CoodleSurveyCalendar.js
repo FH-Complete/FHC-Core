@@ -95,9 +95,9 @@ export default {
 		},
 		timeslotCalendarEvents: {
 			handler() {
-				let oldTimeslotStartTimes = this.timeslots.map(
+				let oldTimeslotStartTimes = this.$props.survey?.timeslots.map(
 					(timeslot) => timeslot.startsAt,
-				);
+				) ?? [];
 				let updatedTimeslotStartTimes = this.timeslotCalendarEvents.map(
 					(timeslotCalendarEvent) =>
 						timeslotCalendarEvent.datum +
@@ -105,7 +105,7 @@ export default {
 						timeslotCalendarEvent.beginn,
 				);
 
-				let updatedTimeslots = this.timeslots.filter((timeslot) =>
+				let updatedTimeslots = this.$props.survey?.timeslots.filter((timeslot) =>
 					updatedTimeslotStartTimes.includes(timeslot.startsAt),
 				);
 
@@ -134,10 +134,10 @@ export default {
 	},
 	methods: {
 		setTimeslotCalendarEvents() {
-			this.timeslotCalendarEvents = this.timeslots.map((timeslot) => {
+			this.timeslotCalendarEvents = this.$props.survey?.timeslots.map((timeslot) => {
 				let startDate = new Date(timeslot.startsAt);
 				return this.generateTimeslotCalendarEvent(startDate);
-			});
+			}) ?? [];
 		},
 		addTimeslotOnCalendarClick(clickEvent) {
 			if (this.timeslotCalendarEvents.length >= 50) {
