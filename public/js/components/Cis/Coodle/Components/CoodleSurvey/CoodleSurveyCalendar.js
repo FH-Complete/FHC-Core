@@ -23,6 +23,7 @@ export default {
 					collapseEmptyDays: false,
 				},
 			},
+			// todo: remove example timeslots
 			timeslots: [
 				{
 					type: "coodle",
@@ -292,6 +293,7 @@ export default {
 					:backgrounds="backgrounds"
 					:draggableEvents="true"			
 					:droppableEvents="true"
+					:onDrop="true"
 				>
 				<template v-slot="{ event, mode }">
 					<div
@@ -299,6 +301,18 @@ export default {
 						:type="mode == 'day' ? 'button' : undefined"
 					>
 						<component
+							v-if="mode == 'event'"
+							:is="renderers[event.type]?.modalContent"
+							:event="event"
+						></component>
+						<component
+							v-else-if="mode == 'eventheader'"
+							:is="renderers[event.type]?.modalTitle"
+							:event="event"
+						></component>
+						<component
+							v-else
+							@click.stop=""
 							@deleteCoodleTimeslot="deleteTimeslot($event.timeslot)"
 							:is="renderers[event.type]?.calendarEvent"
 							:event="event"

@@ -37,6 +37,8 @@ Events::on('loadRenderers', function ($renderers) {
 	$fhc_core_renderers =& $renderers();
 	$fhc_core_renderers["coodle"] = array(
 		'calendarEvent' => absoluteJsImportUrl('public/js/components/Cis/Renderer/Coodle/calendarEvent.js'),
+		'modalTitle' => absoluteJsImportUrl('public/js/components/Cis/Renderer/Coodle/modalTitle.js'),
+		'modalContent' => absoluteJsImportUrl('public/js/components/Cis/Renderer/Coodle/modalContent.js'),
 		'calendarEventStyles' => APP_ROOT . 'public/css/Cis4/CoreCalendarEvents.css'
 	);
 });

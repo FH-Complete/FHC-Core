@@ -36,7 +36,6 @@ export default {
 	},
 	template: /* html */ `
 	<div
-		@click.stop=""
 		class="calendar-event-default h-100 w-100 p-1 d-flex flex-row"
 	>
 		<div
