@@ -873,3 +873,11 @@ html {
 .coodleParticipantSearchResult:hover {
 	opacity: 80%;	
 }
+
+.coodleCalendarTimeslotCard:hover {
+	background-color: var(--fhc-background);
+}
+
+.coodleCalendarTimeslotCardIcon:hover {
+	color: var(--fhc-primary);
+}

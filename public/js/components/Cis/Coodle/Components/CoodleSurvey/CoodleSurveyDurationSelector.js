@@ -57,7 +57,7 @@ export default {
 	},
 	template: /*html*/ `
 	<div class="d-flex flex-column gap-2">
-		<label class="fw-bold">{{ "* " + "Appointment duration (in minutes)" }}</label>
+		<span class="fw-bold">{{ "* " + "Appointment duration (in minutes)" }}</span>
 		<div class="overflow-x-auto">
 			<div class="d-flex flex-row align-items-center gap-2">
 				<div

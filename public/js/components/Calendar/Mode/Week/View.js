@@ -1,7 +1,7 @@
-import CalendarGrid from '../../Base/Grid.js';
-import LabelDay from '../../Base/Label/Day.js';
-import LabelDow from '../../Base/Label/Dow.js';
-import LabelTime from '../../Base/Label/Time.js';
+import CalendarGrid from "../../Base/Grid.js";
+import LabelDay from "../../Base/Label/Day.js";
+import LabelDow from "../../Base/Label/Dow.js";
+import LabelTime from "../../Base/Label/Time.js";
 
 export default {
 	name: "WeekView",
@@ -9,47 +9,54 @@ export default {
 		CalendarGrid,
 		LabelDay,
 		LabelDow,
-		LabelTime
+		LabelTime,
 	},
 	inject: {
 		timeGrid: "timeGrid",
-		timezone: "timezone"
+		timezone: "timezone",
 	},
 	props: {
 		day: {
 			type: luxon.DateTime,
-			required: true
+			required: true,
 		},
-		collapseEmptyDays: Boolean
+		collapseEmptyDays: Boolean,
 	},
 	computed: {
 		start() {
-			return this.day.startOf('week', { useLocaleWeeks: true });
+			return this.day.startOf("week", { useLocaleWeeks: true });
 		},
 		axisMain() {
-			return Array.from({ length: 7 }, (e, i) => this.start.plus({ days: i }));
+			return Array.from({ length: 7 }, (e, i) =>
+				this.start.plus({ days: i }),
+			);
 		},
 		axisParts() {
 			if (this.timeGrid) {
 				// create {start, end} array
-				return this.timeGrid.map(tu => {
+				return this.timeGrid.map((tu) => {
 					return {
 						start: luxon.Duration.fromISOTime(tu.start),
-						end: luxon.Duration.fromISOTime(tu.end)
+						end: luxon.Duration.fromISOTime(tu.end),
 					};
 				});
 			} else {
 				// create 07:00-23:00
-				return Array.from({ length: 17 }, (e, i) => luxon.Duration.fromObject({ hours: i + 7 }));
+				return Array.from({ length: 17 }, (e, i) =>
+					luxon.Duration.fromObject({ hours: i + 7 }),
+				);
 			}
-		}
+		},
 	},
 	methods: {
 		isToday(date) {
-			return date.hasSame(luxon.DateTime.now().setZone(this.timezone), 'day');
-		}
+			return date.hasSame(
+				luxon.DateTime.now().setZone(this.timezone),
+				"day",
+			);
+		},
 	},
-	template: /* html */`
+	template: /* html */ `
 	<div class="fhc-calendar-mode-week-view h-100">
 		<calendar-grid
 			ref="grid"
@@ -73,6 +80,16 @@ export default {
 			<template #part-header="{ part }">
 				<label-time v-bind="{ part }" />
 			</template>
+			<template #part-body="params">
+				<slot name="part-body">
+					<div
+						@click="($event) => {
+							$event.params = params;
+							$emit('emptyCellClicked', $event)
+						}"
+						class="position-absolute h-100 w-100" style="z-index:1"></div>
+				</slot>
+			</template>
 			<template #event="slot">
 				<div v-if="slot.event.type == 'loading'" class="placeholder-glow h-100 opacity-50">
 					<span class="placeholder w-100 h-100" />
@@ -81,5 +98,5 @@ export default {
 			</template>
 		</calendar-grid>
 	</div>
-	`
-}
+	`,
+};

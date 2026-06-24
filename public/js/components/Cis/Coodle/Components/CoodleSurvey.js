@@ -25,7 +25,8 @@ export default {
 	data() {
 		return {
 			surveyFormData: null,
-			isEditInProgress: false,
+			// todo: revert to default false
+			isEditInProgress: true,
 			weekdays: [
 				"Sunday",
 				"Monday",
@@ -179,46 +180,10 @@ export default {
 		</div>
 		<div class="card-body">
 			<div class="d-flex flex-column gap-3">
-				<span
-					v-if="isEditInProgress"
-					class="fst-italic"
-				>
-					{{ "Required inputs are marked with *." }}
-				</span>
-				<coodle-survey-basic-info
-					v-model:surveyFormDataModelValue="surveyFormData"
-					:survey="$props.survey"
-					:parsedSelectedTimeslot="parsedSelectedTimeslot"
-					:isEditInProgress="isEditInProgress"
-				/>
-				<hr>
-				<div v-if="!isEditInProgress" class="d-flex flex-column gap-2">
-					<coodle-survey-voting-table
-						v-if="$props.survey"
-						:uid="$props.uid"
-						:timeslots="parsedTimeslotsForVotingTable"
-						:survey="$props.survey"
-					/>
-				</div>
-				<div v-else class="d-flex flex-column gap-3">
-					<div class="row">
-						<div class="col-12 col-xl-4">
-							<coodle-survey-participants
-								v-if="surveyFormData?.participants"
-								v-model:participantsModelValue="surveyFormData.participants"
-							/>
-						</div>
-						<div class="col-12 col-xl-8">
-							<div class="d-flex flex-column gap-3">
-								<coodle-survey-duration-selector
-									v-if="surveyFormData?.timeslotDuration"
-									v-model:durationModelValue="surveyFormData.timeslotDuration"
-									:survey="$props.survey"
-								/>
-								<coodle-survey-calendar />
-							</div>
-						</div>
-					</div>
+				<div v-if="isEditInProgress" class="d-flex flex-row justify-content-between">
+					<span class="fst-italic">
+						{{ "Required inputs are marked with *." }}
+					</span>
 					<div class="d-flex flex-row gap-2 justify-content-end align-items-start px-0">
 						<div>
 							<div
@@ -236,6 +201,42 @@ export default {
 								class="btn text-nowrap"
 							>
 								{{ "Save" }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+				<coodle-survey-basic-info
+					v-model:surveyFormDataModelValue="surveyFormData"
+					:survey="$props.survey"
+					:parsedSelectedTimeslot="parsedSelectedTimeslot"
+					:isEditInProgress="isEditInProgress"
+				/>
+				<hr>
+				<div v-if="!isEditInProgress" class="d-flex flex-column gap-2">
+					<coodle-survey-voting-table
+						v-if="$props.survey"
+						:uid="$props.uid"
+						:timeslots="parsedTimeslotsForVotingTable"
+						:survey="$props.survey"
+					/>
+				</div>
+				<div v-else class="d-flex flex-column gap-3">
+					<div class="row">
+						<div class="col-12 col-xxl-4 pb-3">
+							<coodle-survey-participants
+								v-if="surveyFormData?.participants"
+								v-model:participantsModelValue="surveyFormData.participants"
+							/>
+						</div>
+						<div class="col-12 col-xxl-8">
+							<div class="d-flex flex-column gap-4">
+								<coodle-survey-duration-selector
+									v-if="surveyFormData?.timeslotDuration"
+									v-model:durationModelValue="surveyFormData.timeslotDuration"
+									:survey="$props.survey"
+								/>
+								<coodle-survey-calendar :surveyFormData="surveyFormData" />
 							</div>
 						</div>
 					</div>

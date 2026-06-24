@@ -290,6 +290,7 @@ export default {
 				:is="modes ? modes[cMode] : null || 'div'"
 				ref="mode"
 				v-model:current-date="cDate"
+				@emptyCellClicked="$emit('emptyCellClicked', $event)"
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"

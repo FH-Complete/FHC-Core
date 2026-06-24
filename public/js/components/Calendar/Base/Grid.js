@@ -399,7 +399,7 @@ export default {
 							style="position:relative"
 							:style="'grid-' + axisCol + ':' + (1+index) + ';grid-' + axisRow + ':ps_' + i + '/pe_' + i"
 						>
-							<slot name="part-body" v-bind="{ index, part }" />
+							<slot name="part-body" v-bind="{ index, part, date }" />
 							<div
 								v-if="snapToGrid && dragging"
 								style="position:absolute;inset:0;z-index:1"
