@@ -57,15 +57,19 @@ export default {
 			return this.$theme.theme_name.value == "dark";
 		},
 		parsedSelectedTimeslot() {
-			return this.$props.survey?.selectedTimeslotId
-				? this.parseTimeslot(
-						this.$props.survey.timeslots.find(
-							(timeslot) =>
-								timeslot.id ===
-								this.$props.survey.selectedTimeslotId,
-						),
-					)
-				: null;
+			if (!this.$props.survey?.selectedTimeslotId) {
+				return null;
+			}
+
+			const selectedTimeslot = this.$props.survey.timeslots.find(
+				(timeslot) =>
+					timeslot.id === this.$props.survey.selectedTimeslotId,
+			);
+			if (!selectedTimeslot) {
+				return null;
+			}
+
+			return this.parseTimeslotForDisplay(selectedTimeslot);
 		},
 		parsedTimeslotsForVotingTable() {
 			return (
@@ -73,7 +77,9 @@ export default {
 					.sort((timeslotA, timeslotB) => {
 						return timeslotA.startsAt < timeslotB.startsAt ? -1 : 1;
 					})
-					.map((timeslot) => this.parseTimeslot(timeslot)) ?? []
+					.map((timeslot) =>
+						this.parseTimeslotForDisplay(timeslot),
+					) ?? []
 			);
 		},
 	},
@@ -83,6 +89,8 @@ export default {
 				this.setSurveyFormData();
 				if (!this.$props.survey?.id) {
 					this.isEditInProgress = true;
+				} else {
+					this.isEditInProgress = false;
 				}
 			},
 			deep: true,
@@ -125,9 +133,9 @@ export default {
 				participant.isCalendarShown = false;
 			});
 		},
-		parseTimeslot(timeslot) {
-			const timeslotStartsAt = new Date(timeslot.startsAt + " UTC");
-			let timeslotEndsAt = new Date(timeslot.startsAt + " UTC");
+		parseTimeslotForDisplay(timeslot) {
+			const timeslotStartsAt = new Date(timeslot.startsAt);
+			let timeslotEndsAt = new Date(timeslot.startsAt);
 			timeslotEndsAt.setMinutes(
 				timeslotEndsAt.getMinutes() +
 					(this.$props.survey?.timeslotDuration ?? 0),
@@ -152,6 +160,7 @@ export default {
 		},
 		submitForm() {
 			console.log("submitting...");
+			console.log(this.surveyFormData);
 			// todo
 		},
 		cancelEditForm() {
@@ -236,7 +245,11 @@ export default {
 									v-model:durationModelValue="surveyFormData.timeslotDuration"
 									:survey="$props.survey"
 								/>
-								<coodle-survey-calendar :surveyFormData="surveyFormData" />
+								<coodle-survey-calendar
+									v-model:timeslotsModelValue="surveyFormData.timeslots"
+									:survey="$props.survey"
+									:timeslotDuration="surveyFormData.timeslotDuration"
+								/>
 							</div>
 						</div>
 					</div>

@@ -9,9 +9,11 @@ export default {
 	components: { CoodleSurveyCalendarTimeslotCard, FhcCalendar },
 	inject: ["renderers"],
 	props: {
-		surveyFormData: Object | null,
+		timeslotsModelValue: Array | null,
+		survey: Object | null,
+		timeslotDuration: Number | null,
 	},
-	emits: [],
+	emits: ["update:timeslotsModelValue"],
 	data() {
 		return {
 			mode: "Week",
@@ -23,81 +25,7 @@ export default {
 					collapseEmptyDays: false,
 				},
 			},
-			// todo: remove example timeslots
-			timeslots: [
-				{
-					type: "coodle",
-					datum: "2026-06-24",
-					beginn: "10:45:00",
-					ende: "12:00:00",
-					isostart: "2026-06-24T08:45:00.000Z",
-					isoend: "2026-06-24T10:00:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-25",
-					beginn: "14:55:00",
-					ende: "16:10:00",
-					isostart: "2026-06-25T12:55:00.000Z",
-					isoend: "2026-06-25T14:10:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-25",
-					beginn: "12:05:00",
-					ende: "13:20:00",
-					isostart: "2026-06-25T10:05:00.000Z",
-					isoend: "2026-06-25T11:20:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-26",
-					beginn: "14:20:00",
-					ende: "15:35:00",
-					isostart: "2026-06-26T12:20:00.000Z",
-					isoend: "2026-06-26T13:35:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-24",
-					beginn: "14:35:00",
-					ende: "15:50:00",
-					isostart: "2026-06-24T12:35:00.000Z",
-					isoend: "2026-06-24T13:50:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-24",
-					beginn: "17:20:00",
-					ende: "18:35:00",
-					isostart: "2026-06-24T15:20:00.000Z",
-					isoend: "2026-06-24T16:35:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-25",
-					beginn: "17:30:00",
-					ende: "18:45:00",
-					isostart: "2026-06-25T15:30:00.000Z",
-					isoend: "2026-06-25T16:45:00.000Z",
-					farbe: "FFFFFF",
-				},
-				{
-					type: "coodle",
-					datum: "2026-06-26",
-					beginn: "18:40:00",
-					ende: "19:55:00",
-					isostart: "2026-06-26T16:40:00.000Z",
-					isoend: "2026-06-26T17:55:00.000Z",
-					farbe: "FFFFFF",
-				},
-			],
+			timeslotCalendarEvents: [],
 			isTimeslotCardEditInProgress: false,
 		};
 	},
@@ -121,31 +49,55 @@ export default {
 		},
 		events() {
 			// todo
-			return this.timeslots;
+			return this.timeslotCalendarEvents;
 		},
 		roundedTimeslotDuration() {
+			if (!this.$props.timeslotDuration) {
+				return 5;
+			}
+
 			return (
-				this.$props.surveyFormData.timeslotDuration -
-				(this.$props.surveyFormData.timeslotDuration % 5)
+				this.$props.timeslotDuration -
+				(this.$props.timeslotDuration % 5)
 			);
+		},
+		timeslots: {
+			get() {
+				return this.timeslotsModelValue;
+			},
+			set(value) {
+				this.$emit("update:timeslotsModelValue", value);
+			},
 		},
 	},
 	watch: {
-		"surveyFormData.timeslotDuration": {
+		timeslotDuration: {
 			handler() {
-				this.updateDurationOfExistingTimeslots();
+				this.updateDurationOfExistingTimeslotCalendarEvents();
 			},
 		},
-		timeslots: {
+		timeslotCalendarEvents: {
 			handler() {
 				// todo: update form data
 			},
 			deep: true,
 		},
+		watch: {
+			survey() {
+				this.setTimeslotCalendarEvents();
+			},
+		},
 	},
 	methods: {
+		setTimeslotCalendarEvents() {
+			this.timeslotCalendarEvents = this.timeslots.map((timeslot) => {
+				let startDate = new Date(timeslot.startsAt);
+				return this.generateTimeslotCalendarEvent(startDate);
+			});
+			this.sortTimeslotCalendarEvents();
+		},
 		addTimeslotOnCalendarClick(clickEvent) {
-			if (this.formatTimeslotForCalendarBasedOnStart.length >= 50) {
+			if (this.timeslotCalendarEvents.length >= 50) {
 				return;
 			}
 
@@ -168,20 +120,23 @@ export default {
 			start.setHours(hours);
 			start.setMinutes(minutes);
 
-			let newTimeslot = this.formatTimeslotForCalendarBasedOnStart(start);
+			let newTimeslotCalendarEvent =
+				this.generateTimeslotCalendarEvent(start);
 
 			if (
-				this.timeslots.some(
-					(timeslot) => timeslot.isostart === newTimeslot.isostart,
+				this.timeslotCalendarEvents.some(
+					(timeslotCalendarEvent) =>
+						timeslotCalendarEvent.isostart ===
+						newTimeslotCalendarEvent.isostart,
 				)
 			) {
 				return;
 			}
 
-			this.timeslots.push(newTimeslot);
-			this.sortTimeslots();
+			this.timeslotCalendarEvents.push(newTimeslotCalendarEvent);
+			this.sortTimeslotCalendarEventss();
 		},
-		formatTimeslotForCalendarBasedOnStart(start) {
+		generateTimeslotCalendarEvent(start) {
 			let end = new Date(start.getTime());
 			end.setMinutes(end.getMinutes() + this.roundedTimeslotDuration);
 
@@ -203,34 +158,35 @@ export default {
 				farbe: "FFFFFF",
 			};
 		},
-		updateDurationOfExistingTimeslots() {
-			this.timeslots = this.timeslots.map((timeslot) => {
-				let start = new Date(timeslot.isostart);
-				return this.formatTimeslotForCalendarBasedOnStart(start);
+		updateDurationOfExistingTimeslotCalendarEvents() {
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map((timeslotCalendarEvent) => {
+				let start = new Date(timeslotCalendarEvent.isostart);
+				return this.generateTimeslotCalendarEvent(start);
 			});
-			this.sortTimeslots();
+			this.sortTimeslotCalendarEvents();
 		},
 		createTimeslotFromCard(startDate) {
 			if (
-				this.timeslots.some(
-					(existingTimeslot) =>
-						existingTimeslot.isostart ===
-						startDate.toISOString(),
+				this.timeslotCalendarEvents.some(
+					(existingTimeslotCalendarEvent) =>
+						existingTimeslotCalendarEvent.isostart === startDate.toISOString(),
 				)
 			) {
 				window.alert("You cannot create duplicates!");
 				return;
 			}
 
-			this.timeslots.push(this.formatTimeslotForCalendarBasedOnStart(startDate));
-			this.sortTimeslots();
+			this.timeslotCalendarEvents.push(
+				this.generateTimeslotCalendarEvent(startDate),
+			);
+			this.sortTimeslotCalendarEvents();
 			this.isTimeslotCardEditInProgress = false;
 		},
-		updateTimeslotFromCard(timeslot, newStartDate) {
+		updateTimeslotFromCard(timeslotCalendarEvent, newStartDate) {
 			if (
-				this.timeslots.some(
-					(existingTimeslot) =>
-						existingTimeslot.isostart ===
+				this.timeslotCalendarEvents.some(
+					(existingTimeslotCalendarEvent) =>
+						existingTimeslotCalendarEvent.isostart ===
 						newStartDate.toISOString(),
 				)
 			) {
@@ -238,26 +194,26 @@ export default {
 				return;
 			}
 
-			this.timeslots = this.timeslots.map((existingTimeslot) => {
-				if (existingTimeslot.isostart !== timeslot.isostart) {
-					return existingTimeslot;
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.map((existingTimeslotCalendarEvent) => {
+				if (existingTimeslotCalendarEvent.isostart !== timeslotCalendarEvent.isostart) {
+					return existingTimeslotCalendarEvent;
 				}
 
-				return this.formatTimeslotForCalendarBasedOnStart(newStartDate);
+				return this.generateTimeslotCalendarEvent(newStartDate);
 			});
 
-			this.sortTimeslots();
+			this.sortTimeslotCalendarEvents();
 			this.isTimeslotCardEditInProgress = false;
 		},
-		deleteTimeslot(timeslot) {
-			this.timeslots = this.timeslots.filter((existingTimeslot) => {
-				return existingTimeslot.isostart !== timeslot.isostart;
+		deleteTimeslot(timeslotCalendarEvent) {
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.filter((existingTimeslotCalendarEvent) => {
+				return existingTimeslotCalendarEvent.isostart !== timeslotCalendarEvent.isostart;
 			});
-			this.sortTimeslots();
+			this.sortTimeslotCalendarEvents();
 			this.isTimeslotCardEditInProgress = false;
 		},
-		sortTimeslots() {
-			this.timeslots = this.timeslots.sort((timeslotA, timeslotB) => {
+		sortTimeslotCalendarEvents() {
+			this.timeslotCalendarEvents = this.timeslotCalendarEvents.sort((timeslotA, timeslotB) => {
 				let timeslotAStartDateTime = timeslotA.datum + timeslotA.beginn;
 				let timeslotBStartDateTime = timeslotB.datum + timeslotB.beginn;
 				if (timeslotAStartDateTime > timeslotBStartDateTime) {
@@ -269,8 +225,7 @@ export default {
 		},
 	},
 	created() {
-		// todo: set timeslots
-		this.sortTimeslots();
+		this.setTimeslotCalendarEvents();
 	},
 	template: /*html*/ `
 	<div class="d-flex flex-column gap-3">
@@ -322,7 +277,7 @@ export default {
 				</fhc-calendar>
 			</div>
 		<div class="row">
-			<div v-for="timeslot in timeslots.concat([null])" class="col-12 col-md-6 col-xl-4">
+			<div v-for="timeslot in timeslotCalendarEvents.concat([null])" class="col-12 col-md-6 col-xl-4">
 				<coodle-survey-calendar-timeslot-card
 					@createTimeslot="createTimeslotFromCard($event.startDate)"
 					@updateTimeslot="updateTimeslotFromCard(timeslot, $event.newStartDate)"
