@@ -26,6 +26,10 @@ export default {
 			localStudent: null
 		};
 	},
+	emits: [
+		'reloadedTags',
+		'reload'
+	],
 	props: {
 		students: Array
 	},
@@ -122,6 +126,9 @@ export default {
 					this.localStudent = result.data;
 				});
 		},
+		handleTagReload(prestudent_id){
+			this.$emit('reloadedTags', prestudent_id );
+		},
 		reloadList() {
 			this.$emit('reload');
 		},
@@ -140,6 +147,7 @@ export default {
 				:currentSemester="currentSemester"
 				typeHeader="student"
 				@reload="reloadList"
+				@reloadedTags="handleTagReload"
 				fotoEditable
 				:isLoading="isLoading"
 			>

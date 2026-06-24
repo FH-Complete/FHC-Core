@@ -15,7 +15,9 @@ class Tags extends Tag_Controller
 			'addTag' => self::BERECHTIGUNG_KURZBZ,
 			'updateTag' => self::BERECHTIGUNG_KURZBZ,
 			'doneTag' => self::BERECHTIGUNG_KURZBZ,
-			'deleteTag' => self::BERECHTIGUNG_KURZBZ
+			'deleteTag' => self::BERECHTIGUNG_KURZBZ,
+			'getAllTags' => self::BERECHTIGUNG_KURZBZ,
+			'rebuildTagsForTypeId' => self::BERECHTIGUNG_KURZBZ,
 		]);
 
 	$this->config->load('stv');
@@ -44,6 +46,14 @@ class Tags extends Tag_Controller
 	public function doneTag($updatable_tags = null)
 	{
 		parent::doneTag($this->config->item('stv_prestudent_tags'));
+	}
+	public function getAllTags($updatable_tags = null)
+	{
+		parent::getAllTags($this->config->item('stv_prestudent_tags'));
+	}
+	public function rebuildTagsForTypeId()
+	{
+		parent::rebuildTagsForTypeId();
 	}
 
 }

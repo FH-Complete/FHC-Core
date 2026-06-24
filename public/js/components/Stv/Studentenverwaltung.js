@@ -478,6 +478,9 @@ export default {
 		},
 		showAlertNoSelectedStudent(){
 			this.$fhcAlert.alertError(this.$p.t('ui', 'alert_chooseStudent'));
+		},
+		handleReloadTags(prestudent){
+			this.$refs.stvList.setPrestudentToLastSelected(prestudent);
 		}
 	},
 	created() {
@@ -732,7 +735,7 @@ export default {
 									<stv-list ref="stvList" v-model:selected="selected" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz" @filterActive="handleCustomFilter"></stv-list>
 								</template>
 								<template #bottom>
-									<stv-details ref="details" :students="selected" @reload="reloadList"></stv-details>
+									<stv-details ref="details" :students="selected" @reload="reloadList" @reloadedTags="handleReloadTags"></stv-details>
 								</template>
 							</vertical-split>
 						</main>

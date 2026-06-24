@@ -315,7 +315,7 @@ export default {
 			+ 'content/statistik/studentenexportextended.xls.php?'
 			+ '&studiensemester_kurzbz=' + this.currentSemester
 			+ '&data=' + this.selectedPrestudents.join(";");
-		},
+		}
 	},
 	created: function() {
 
@@ -634,11 +634,14 @@ export default {
 				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
 			}
 		},
+		setPrestudentToLastSelected(prestudent_id){
+			this.lastSelected = prestudent_id;
+		}
 	},
 	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
 	// TODO(chris): filter component column chooser has no accessibilty features
 	template: `
-	<div class="stv-list h-100 pt-3">	
+	<div class="stv-list h-100 pt-3">
 		<div
 			class="tabulator-container d-flex flex-column h-100"
 			:class="{'has-filter': filter.length}"

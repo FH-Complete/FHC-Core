@@ -54,6 +54,11 @@ export default {
 			default: false
 		}
 	},
+	emits: [
+		'redirectToLeitung',
+		'reload',
+		'reloadedTags'
+	],
 	inject: {
 		tagsEnabled: {
 			from: 'configStvTagsEnabled',
@@ -283,7 +288,6 @@ export default {
 		//methods tags
 		async loadTagsAndRender(prestudent_id) {
 				await this.getAllTags(prestudent_id);
-
 				const container = idTagFormatter(
 					prestudent_id,
 					this.tagData,
@@ -295,6 +299,8 @@ export default {
 
 			this.$refs.tagWrapper.innerHTML = '';
 			this.$refs.tagWrapper.appendChild(container);
+
+			this.$emit('reloadedTags',{prestudent_id});
 		},
 		getAllTags(prestudent_id){
 			return this.$api
