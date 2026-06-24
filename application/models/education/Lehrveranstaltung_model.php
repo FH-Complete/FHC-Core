@@ -1353,7 +1353,9 @@ class Lehrveranstaltung_model extends DB_Model
 				tbl_lehrveranstaltung.semester as lv_semester,
 				tbl_lehrveranstaltung.bezeichnung as lv_bezeichnung,
 				(SELECT kurzbz FROM public.tbl_mitarbeiter
-				 WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor
+				 WHERE mitarbeiter_uid=tbl_lehreinheitmitarbeiter.mitarbeiter_uid) as lektor,
+				 lehre.tbl_lehrveranstaltung.orgform_kurzbz as orgform
+			
 			FROM
 				lehre.tbl_lehreinheit JOIN lehre.tbl_lehreinheitmitarbeiter USING(lehreinheit_id)
 									  JOIN lehre.tbl_lehrveranstaltung USING(lehrveranstaltung_id)
