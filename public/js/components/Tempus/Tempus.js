@@ -401,25 +401,26 @@ export default {
       if (hasLektoren) filter.uid = this.lecturers.map((l) => l.uid);
 
       let response = null;
-      if (this.previewRole === "lektor")
+      if (this.previewRole === "lektor") {
         response = [
           this.$api.call(
             ApiKalender.getPlanLecturer(start.toISODate(), end.toISODate()),
           ),
         ];
-
-      if (this.previewRole === "student")
+      } else if (this.previewRole === "student") {
         response = [
           this.$api.call(
             ApiKalender.getPlanStudent(start.toISODate(), end.toISODate()),
           ),
         ];
+      } else {
+        response = [
+          this.$api.call(
+            ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
+          ),
+        ];
+      }
 
-      response = [
-        this.$api.call(
-          ApiKalender.getPlan(filter, start.toISODate(), end.toISODate()),
-        ),
-      ];
 
       if (response) {
         response[0].then((result) => {
@@ -781,7 +782,7 @@ export default {
     },
     async fetchAssignedResourcesByCalender(calenderId) {
       let getAssignedResources = await this.$api.call(
-        ApiOperationalResourceToCalender.getAssignedResourcesByCalenderId(
+        ApiOperationalResourceToCalender.getAssignedResourcesByCalender(
           calenderId,
         ),
       );

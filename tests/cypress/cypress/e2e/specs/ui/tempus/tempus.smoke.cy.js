@@ -51,7 +51,7 @@ context("Tempus smoke tests", () => {
       .should("have.length.greaterThan", 0);
 
     tempusPage.getCalendarEventsWithLehreinheit().first().rightclick();
-    tempusPage.getEventContextMenuOption("Raumauswahl").click();
+    tempusPage.getEventContextMenuOption("Raumauswahl").click({ force: true });
     waitForOk("@fetchRoomSuggestions");
 
     tempusPage.getRaumauswahlModal().should("be.visible");
@@ -60,12 +60,13 @@ context("Tempus smoke tests", () => {
   it("shows resources modal when selecting Ressourcen zuordnen from event context menu", () => {
     tempusPage.waitForCalendarToFinishLoading();
     tempusPage
-      .getCalendarEventsWithLehreinheit()
+      .getCalendarEventsByWeekdayAndStartTime("Sunday", "17:50:00")
       .should("have.length.greaterThan", 0);
 
-    tempusPage.getCalendarEventsWithLehreinheit().first().rightclick();
-    tempusPage.getEventContextMenuOption("Ressourcen zuordnen").click();
-    waitForOk("@fetchResourceSuggestions");
+    tempusPage.getCalendarEventsByWeekdayAndStartTime("Sunday", "17:50:00").first().rightclick();
+    tempusPage.getEventContextMenuOption("Ressourcen zuordnen").click({ force: true });
+    waitForOk("@fetchResourcesSuggestions");
+    waitForOk("@fetchAssignedResources");
 
     tempusPage.getResourcesModal().should("be.visible");
   });
@@ -75,7 +76,7 @@ context("Tempus smoke tests", () => {
     tempusPage.getCalendarEvents().should("have.length.greaterThan", 0);
 
     tempusPage.getCalendarEvents().first().rightclick();
-    tempusPage.getEventContextMenuOption("History").click();
+    tempusPage.getEventContextMenuOption("History").click({ force: true });
     waitForOk("@fetchEventHistory");
 
     tempusPage.getHistoryModal().should("be.visible");

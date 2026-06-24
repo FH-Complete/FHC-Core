@@ -9,7 +9,7 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 	public function __construct()
 	{
 		parent::__construct([
-			'getAssignedResourcesByCalenderId' => ['admin:r', 'assistenz:r'],
+			'getAssignedResourcesByCalender' => ['admin:r', 'assistenz:r'],
 			'storeResourcesToCalendarRelationship' => ['admin:w', 'assistenz:w'],
 			'getSchedulableResourcesByCalendar' => ['admin:r', 'assistenz:r'],
 		]);
@@ -38,7 +38,7 @@ class OperationalResourceToCalenderAPI extends FHCAPI_Controller
 		$this->terminateWithSuccess($this->getDataOrTerminateWithError($result));
 	}
 
-	public function getAssignedResourcesByCalenderId($calenderID)
+	public function getAssignedResourcesByCalender($calenderID)
 	{
 		if (!isset($calenderID)) $this->terminateWithError("Missing required parameter 'kalender_id'");
 

@@ -66,8 +66,12 @@ class TempusPage {
     }).as("fetchRoomSuggestions");
     cy.intercept({
       method: "GET",
-      url: "**/betriebsmittel/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/32",
+      url: "**/tempus/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/**",
     }).as("fetchResourcesSuggestions");
+    cy.intercept({
+      method: "GET",
+      url: "**/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/**",
+    }).as("fetchAssignedResources");
     cy.intercept({
       method: "GET",
       url: "**/tempus/coursepicker/getByStg**",

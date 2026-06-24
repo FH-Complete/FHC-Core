@@ -22,10 +22,10 @@ export default {
       url: "/api/frontend/v1/tempus/OperationalResourceToCalenderAPI/getSchedulableResourcesByCalendar/" + calendarID,
     };
   },
-  getAssignedResourcesByCalenderId(calenderID) {
+  getAssignedResourcesByCalender(calenderID) {
     return {
       method: "get",
-      url: "/api/frontend/v1/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalenderId/" + calenderID,
+      url: "/api/frontend/v1/tempus/OperationalResourceToCalenderAPI/getAssignedResourcesByCalender/" + calenderID,
     };
   },
   storeResourcesToCalendarRelationship(calenderID, assignedResources) {
