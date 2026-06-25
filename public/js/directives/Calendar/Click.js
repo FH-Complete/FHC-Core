@@ -9,10 +9,13 @@ function saveAddClickListener(el, source, value) {
 	const listener = evt => {
 		evt.preventDefault();
 		evt.stopPropagation();
+		if (typeof value === "function") {
+			value = value(evt);
+		}
 		const customEvent = new CustomEvent('cal-click', {
 			cancelable: true,
 			bubbles: true,
-			detail: { source, value }
+			detail: { source, value },
 		});
 		evt.target.dispatchEvent(customEvent);
 	}

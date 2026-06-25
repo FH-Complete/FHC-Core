@@ -83,11 +83,8 @@ export default {
 			<template #part-body="params">
 				<slot name="part-body">
 					<div
-						@click="($event) => {
-							$event.params = params;
-							$emit('emptyCellClicked', $event)
-						}"
-						class="position-absolute h-100 w-100" style="z-index:1"></div>
+						@click="$emit('emptyClicked', { event: $event, params })"
+						class="position-absolute h-100 w-100"></div>
 				</slot>
 			</template>
 			<template #event="slot">

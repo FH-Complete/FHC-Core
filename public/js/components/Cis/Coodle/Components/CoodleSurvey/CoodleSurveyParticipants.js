@@ -64,10 +64,14 @@ export default {
 		},
 		isMaxDisplayedParticipantSchedulesReached() {
 			return (
-				this.participants.filter(
-					(participant) => participant.isCalendarShown,
-				).length >= this.participantScheduleColors.length
+				this.displayedParticipantSchedulesCount >=
+				this.participantScheduleColors.length
 			);
+		},
+		displayedParticipantSchedulesCount() {
+			return this.participants.filter(
+				(participant) => participant.isCalendarShown,
+			).length;
 		},
 	},
 	watch: {
@@ -143,7 +147,7 @@ export default {
 			if (!occupiedParticipantColor) return;
 			occupiedParticipantColor.uid = null;
 		},
-		showCalendar(participantForCalendarToBeDisplayed) {
+		showSchedule(participantForCalendarToBeDisplayed) {
 			if (this.isMaxDisplayedParticipantSchedulesReached) return;
 
 			this.participants = this.participants.map((participant) => {
@@ -160,7 +164,7 @@ export default {
 				(participantColor) => !participantColor.uid,
 			).uid = participantForCalendarToBeDisplayed.uid;
 		},
-		hideCalendar(participant) {
+		hideSchedule(participant) {
 			participant.isCalendarShown = false;
 
 			let occupiedParticipantColor = this.participantScheduleColors.find(
@@ -168,6 +172,14 @@ export default {
 			);
 			if (!occupiedParticipantColor) return;
 			occupiedParticipantColor.uid = null;
+		},
+		hideAllSchedules() {
+			this.participants.forEach((participant) => {
+				participant.isCalendarShown = false;
+			});
+			this.participantScheduleColors.forEach((participantColor) => {
+				participantColor.uid = null;
+			});
 		},
 		getParticipantScheduleColor(participant) {
 			return this.participantScheduleColors.find(
@@ -229,7 +241,7 @@ export default {
 				<div class="d-flex flex-row align-items-center gap-3">
 					<i
 						v-if="participant.isCalendarShown"
-						@click="hideCalendar(participant)"
+						@click="hideSchedule(participant)"
 						type="button"
 						class="fa-solid fa-calendar"
 						:style="{color: getParticipantScheduleColor(participant)}"
@@ -240,7 +252,7 @@ export default {
 					></i>
 					<i
 						v-else
-						@click="showCalendar(participant)"
+						@click="showSchedule(participant)"
 						type="button"
 						class="fa-regular fa-calendar"
 					></i>
@@ -250,6 +262,14 @@ export default {
 		</div>
 		<span v-if="isMaxDisplayedParticipantSchedulesReached" class="fst-italic">
 			{{ "You can display no more participant schedules!" }}
+		</span>
+		<span
+			v-if="displayedParticipantSchedulesCount"
+			@click="hideAllSchedules()"
+			type="button"
+			class="text-decoration-underline"
+		>
+			{{ "Hide all participant schedules" }}
 		</span>
 	</div>
 	`,

@@ -55,13 +55,13 @@ export default {
 		events() {
 			let events = this.timeslotCalendarEvents;
 
-			const participantWithVisibleSchedules =
+			const participantsWithDisplayedSchedules =
 				this.$props.surveyFormDataParticipants.filter(
 					(participant) => participant.isCalendarShown,
 				);
-			participantWithVisibleSchedules.forEach((participant) => {
+			participantsWithDisplayedSchedules.forEach((participant) => {
 				let participantEvents =
-					cachedParticipantSchedules[participant.uid] ?? [];
+					this.cachedParticipantSchedules[participant.uid] ?? [];
 				participantEvents = participantEvents.map((event) => {
 					event.farbe =
 						this.$props.participantScheduleColors.find(
@@ -158,6 +158,20 @@ export default {
 			},
 			deep: true,
 		},
+		surveyFormDataParticipants: {
+			handler() {
+				let participantsWithDisplayedSchedules =
+					this.$props.surveyFormDataParticipants.filter(
+						(participant) => participant.isCalendarShown,
+					);
+				participantsWithDisplayedSchedules.forEach((participant) => {
+					if (!this.cachedParticipantSchedules[participant.uid]) {
+						this.fetchParticipantSchedule(participant.uid);
+					}
+				});
+			},
+			deep: true,
+		},
 	},
 	methods: {
 		setTimeslotCalendarEvents() {
@@ -167,13 +181,13 @@ export default {
 					return this.generateTimeslotCalendarEvent(startDate);
 				}) ?? [];
 		},
-		addTimeslotOnCalendarClick(clickEvent) {
+		addTimeslotOnCalendarClick(event) {
 			if (this.timeslotCalendarEvents.length >= 50) {
 				return;
 			}
 
-			const elementRectangle = clickEvent.target.getBoundingClientRect();
-			const relativeClickLocation = clickEvent.y - elementRectangle.top;
+			const elementRectangle = event.event.target.getBoundingClientRect();
+			const relativeClickLocation = event.event.y - elementRectangle.top;
 			let minutes =
 				Math.floor(
 					(relativeClickLocation / elementRectangle.height) * 12,
@@ -182,12 +196,12 @@ export default {
 				minutes = 0;
 			}
 
-			let hours = clickEvent.params?.part?.values?.hours ?? 12;
+			let hours = event.params?.part?.values?.hours ?? 12;
 			if (hours < 7 || hours > 22) {
 				hours = 12;
 			}
 
-			let start = new Date(clickEvent.params.date.ts);
+			let start = new Date(event.params.date.ts);
 			start.setHours(hours);
 			start.setMinutes(minutes);
 
@@ -291,6 +305,9 @@ export default {
 			);
 			this.isTimeslotCardEditInProgress = false;
 		},
+		fetchParticipantSchedule(uid) {
+			// todo: fetch, format as events, add as array with uid as key to cachedParticipantSchedules
+		},
 		getEventStyle(event) {
 			if (!event.farbe) return undefined;
 			return "--event-bg:#" + event.farbe;
@@ -300,33 +317,33 @@ export default {
 		this.setTimeslotCalendarEvents();
 	},
 	template: /*html*/ `
-	<div class="d-flex flex-column gap-3">
+	<div id="coodleCalendar" class="d-flex flex-column gap-3">
 		<div class="d-flex flex-column">
 			<span class="fw-bold">{{ "Timeslot selection" }}</span>
 			<span class="fst-italic">{{ "You can add timeslots directly to the calendar or from the list down below." }}</span>
 		</div>
-			<div style="height:800px;">
-				<fhc-calendar 
-					@emptyCellClicked="addTimeslotOnCalendarClick($event)"
-					:ref="'coodleCalendar'"
-					:timezone="timezone"
-					:modes="modes"
-					:modeOptions="modeOptions"
-					:mode="'Week'"
-					:timeGrid="null"
-					:locale="$p.user_locale.value"
-					:events="events"
-					:backgrounds="backgrounds"
-					:draggableEvents="true"			
-					:droppableEvents="true"
-					:onDrop="true"
-					:isAutoScrollEnabled="false"
-				>
+		<div style="height:800px;">
+			<fhc-calendar
+				@emptyClicked="addTimeslotOnCalendarClick($event)"
+				:ref="'coodleCalendar'"
+				:timezone="timezone"
+				:modes="modes"
+				:modeOptions="modeOptions"
+				:mode="'Week'"
+				:timeGrid="null"
+				:locale="$p.user_locale.value"
+				:events="events"
+				:backgrounds="backgrounds"
+				:draggableEvents="true"			
+				:droppableEvents="true"
+				:onDrop="true"
+				:isAutoScrollEnabled="false"
+			>
 				<template v-slot="{ event, mode }">
 					<div
 						:class="'event-type-' + event.type + ' ' + mode + 'PageContainer'"
 						:type="mode == 'day' ? 'button' : undefined"
- 						:style="getEventStyle(event)"
+						:style="getEventStyle(event)"
 					>
 						<component
 							v-if="mode == 'event'"
@@ -347,8 +364,8 @@ export default {
 						></component>
 					</div>
 				</template>
-				</fhc-calendar>
-			</div>
+			</fhc-calendar>
+		</div>
 		<div class="row">
 			<div v-for="timeslot in sortedTimeslotCalendarEvents.concat([null])" class="col-12 col-md-6 col-xl-4">
 				<coodle-survey-calendar-timeslot-card

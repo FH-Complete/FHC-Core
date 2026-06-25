@@ -2,6 +2,7 @@ import GridLine from './Grid/Line.js';
 import GridLineEvent from './Grid/Line/Event.js';
 
 import CalDnd from '../../../directives/Calendar/DragAndDrop.js';
+import CalClick from '../../../directives/Calendar/Click.js';
 
 export default {
 	name: "CalendarGrid",
@@ -10,7 +11,7 @@ export default {
 		GridLineEvent
 	},
 	directives: {
-		CalDnd
+		CalDnd,
 	},
 	inject: {
 		originalEvents: "events",

@@ -116,7 +116,8 @@ export default {
 		"update:date",
 		"update:mode",
 		"update:range",
-		"drop"
+		"drop",
+		"emptyClicked",
 	],
 	data() {
 		return {
@@ -297,10 +298,10 @@ export default {
 				:is="modes ? modes[cMode] : null || 'div'"
 				ref="mode"
 				v-model:current-date="cDate"
-				@emptyCellClicked="$emit('emptyCellClicked', $event)"
 				@update:range="$emit('update:range', $event)"
 				@request-modal-open="showEventModal"
 				@request-modal-close="hideEventModal"
+				@emptyClicked="$emit('emptyClicked', $event)"
 				v-bind="modeOptions ? modeOptions[cMode] : null || {}"
 			>
 				<template v-slot="slot"><slot v-bind="slot" /></template>
