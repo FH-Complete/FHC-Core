@@ -189,7 +189,7 @@ export default {
 							<div class="d-flex flex-column gap-1">
 								<label
 									for="surveyMaxSelectionsInput"
-									class="fw-bold text-nowrap text-truncate"
+									class="fw-bold text-wrap"
 								>
 									{{ "Maximum number of selections" }}
 								</label>
@@ -205,7 +205,7 @@ export default {
 							<div class="d-flex flex-column gap-1">
 								<label
 									for="surveyEndsAtInput"
-									class="fw-bold text-nowrap text-truncate"
+									class="fw-bold text-wrap"
 								>
 									{{ "* " + "Planned end date" }}
 								</label>
@@ -222,7 +222,7 @@ export default {
 								<div class="col-12 col-lg-6 d-flex flex-row align-items-center gap-2 pb-2">
 									<label
 										for="surveyAreParticipantsAnonymizedInput"
-										class="fw-bold text-nowrap text-truncate"
+										class="fw-bold text-wrap"
 									>
 										{{ "Are participants anonymous?" }}
 									</label>
@@ -236,7 +236,7 @@ export default {
 								<div class="col-12 col-lg-6 d-flex flex-row align-items-center gap-2 pb-2">
 									<label
 										for="surveyAreSelectionsAnonymizedInput"
-										class="fw-bold text-nowrap text-truncate"
+										class="fw-bold text-wrap"
 									>
 										{{ "Are votes anonymous?" }}
 									</label>
