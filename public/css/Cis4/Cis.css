@@ -882,7 +882,11 @@ html {
 	color: var(--fhc-primary);
 }
 
-#coodleCalendar .fhc-calendar-base .part-body,
+#coodleCalendar .fhc-calendar-base .part-body {
+	z-index: 1 !important;
+}
+
 #coodleCalendar .fhc-calendar-base .fhc-calendar-base-grid-line-background {
 	z-index: 1 !important;
+	pointer-events: none;
 }
