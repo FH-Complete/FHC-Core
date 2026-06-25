@@ -11,6 +11,8 @@ export default {
 	props: {
 		timeslotsModelValue: Array | null,
 		survey: Object | null,
+		surveyFormDataParticipants: Array,
+		participantScheduleColors: Array,
 		timeslotDuration: Number | null,
 	},
 	emits: ["update:timeslotsModelValue"],
@@ -26,6 +28,7 @@ export default {
 				},
 			},
 			timeslotCalendarEvents: [],
+			cachedParticipantSchedules: {},
 			isTimeslotCardEditInProgress: false,
 		};
 	},
@@ -48,9 +51,27 @@ export default {
 			];
 		},
 		events() {
-			// todo: add visible participant schedules
-			console.log(this.timeslotCalendarEvents);
-			return this.timeslotCalendarEvents;
+			let events = this.timeslotCalendarEvents;
+
+			const participantWithVisibleSchedules =
+				this.$props.surveyFormDataParticipants.filter(
+					(participant) => participant.isCalendarShown,
+				);
+			participantWithVisibleSchedules.forEach((participant) => {
+				let participantEvents =
+					cachedParticipantSchedules[participant.uid] ?? [];
+				participantEvents = participantEvents.map((event) => {
+					event.farbe =
+						this.$props.participantScheduleColors.find(
+							(participantColor) =>
+								participantColor.uid === participant.uid,
+						)?.color ?? "DDDDDD";
+					return event;
+				});
+				events = events.concat(participantEvents);
+			});
+
+			return events;
 		},
 		roundedTimeslotDuration() {
 			if (!this.$props.timeslotDuration) {
@@ -96,9 +117,10 @@ export default {
 		},
 		timeslotCalendarEvents: {
 			handler() {
-				let oldTimeslotStartTimes = this.$props.survey?.timeslots.map(
-					(timeslot) => timeslot.startsAt,
-				) ?? [];
+				let oldTimeslotStartTimes =
+					this.$props.survey?.timeslots.map(
+						(timeslot) => timeslot.startsAt,
+					) ?? [];
 				let updatedTimeslotStartTimes = this.timeslotCalendarEvents.map(
 					(timeslotCalendarEvent) =>
 						timeslotCalendarEvent.datum +
@@ -106,9 +128,10 @@ export default {
 						timeslotCalendarEvent.beginn,
 				);
 
-				let updatedTimeslots = this.$props.survey?.timeslots.filter((timeslot) =>
-					updatedTimeslotStartTimes.includes(timeslot.startsAt),
-				);
+				let updatedTimeslots =
+					this.$props.survey?.timeslots.filter((timeslot) =>
+						updatedTimeslotStartTimes.includes(timeslot.startsAt),
+					) ?? [];
 
 				updatedTimeslotStartTimes.forEach((startTime) => {
 					if (
@@ -127,18 +150,20 @@ export default {
 			},
 			deep: true,
 		},
-		watch: {
-			survey() {
+		survey: {
+			handler() {
 				this.setTimeslotCalendarEvents();
 			},
+			deep: true,
 		},
 	},
 	methods: {
 		setTimeslotCalendarEvents() {
-			this.timeslotCalendarEvents = this.$props.survey?.timeslots.map((timeslot) => {
-				let startDate = new Date(timeslot.startsAt);
-				return this.generateTimeslotCalendarEvent(startDate);
-			}) ?? [];
+			this.timeslotCalendarEvents =
+				this.$props.survey?.timeslots.map((timeslot) => {
+					let startDate = new Date(timeslot.startsAt);
+					return this.generateTimeslotCalendarEvent(startDate);
+				}) ?? [];
 		},
 		addTimeslotOnCalendarClick(clickEvent) {
 			if (this.timeslotCalendarEvents.length >= 50) {
@@ -265,9 +290,8 @@ export default {
 			this.isTimeslotCardEditInProgress = false;
 		},
 		getEventStyle(event) {
-			if (!event.farbe)
-				return undefined;
-			return '--event-bg:#' + event.farbe;
+			if (!event.farbe) return undefined;
+			return "--event-bg:#" + event.farbe;
 		},
 	},
 	created() {

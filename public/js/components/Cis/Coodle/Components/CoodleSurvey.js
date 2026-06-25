@@ -295,6 +295,8 @@ export default {
 									v-model:timeslotsModelValue="surveyFormData.timeslots"
 									:survey="$props.survey"
 									:timeslotDuration="surveyFormData.timeslotDuration"
+									:surveyFormDataParticipants="surveyFormData.participants"
+									:participantScheduleColors="participantScheduleColors"
 								/>
 							</div>
 						</div>
