@@ -41,7 +41,7 @@ export default {
 	},
 	template: /* html */`
 	<span
-		class="menu-entry d-flex align-items-center w-100 h-100"
+		class="treemenu-entry d-flex align-items-center w-100 h-100"
 		:title="title"
 		v-drop:[dropConfig]="(evt, data) => $emit('drop', { drop: node.data, drag: data })"
 	>

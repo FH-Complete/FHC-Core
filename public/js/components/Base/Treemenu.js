@@ -1,14 +1,14 @@
-import MenuEntry from './Menu/Entry.js';
+import TreemenuEntry from './Treemenu/Entry.js';
 
 import dragClick from '../../directives/dragClick.js';
 
-import ApiMenu from '../../api/factory/menu.js';
+import ApiTreemenu from '../../api/factory/treemenu.js';
 
 export default {
 	components: {
 		PvTreetable: primevue.treetable,
 		PvColumn: primevue.column,
-		MenuEntry
+		TreemenuEntry
 	},
 	directives: {
 		dragClick
@@ -96,7 +96,7 @@ export default {
 					this.loading = true;
 					
 					return this.$api
-						.call(ApiMenu.get(this.config, node.data.path))
+						.call(ApiTreemenu.get(this.config, node.data.path))
 						.then(result => {
 							const subNodes = result.data.map(this.mapResultToTreeData);
 							const realNode = this.findNodeByKey(node.key);
@@ -224,7 +224,7 @@ export default {
 		filterFav() {
 			this.favorites.on = !this.favorites.on;
 			this.$api
-				.call(ApiMenu.favorites.set(
+				.call(ApiTreemenu.favorites.set(
 					JSON.stringify(this.favorites)
 				));
 		},
@@ -238,7 +238,7 @@ export default {
 			}
 
 			this.$api
-				.call(ApiMenu.favorites.set(
+				.call(ApiTreemenu.favorites.set(
 					JSON.stringify(this.favorites)
 				));
 		},
@@ -261,7 +261,7 @@ export default {
 	},
 	mounted() {
 		this.$api
-			.call(ApiMenu.get(this.config))
+			.call(ApiTreemenu.get(this.config))
 			.then(result => {
 				this.nodes = result.data.map(el => {
 					el.root = true;
@@ -273,7 +273,7 @@ export default {
 			.catch(this.$fhcAlert.handleSystemError);
 
 		this.$api
-			.call(ApiMenu.favorites.get())
+			.call(ApiTreemenu.favorites.get())
 			.then(result => {
 				if (result.data) {
 					this.favorites = JSON.parse(result.data);
@@ -316,7 +316,7 @@ export default {
 				</div>
 			</template>
 			<template #body="{ node }">
-				<menu-entry
+				<treemenu-entry
 					:node="node"
 					:data-tree-item-key="node.key"
 					v-drag-click="() => toggleTreeNode(node)"

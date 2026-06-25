@@ -1,11 +1,11 @@
-import BaseMenu from '../../Base/Menu.js';
+import BaseTreemenu from '../../Base/Treemenu.js';
 
 import ApiStvGroups from '../../../api/factory/stv/group.js';
 import ApiStvDetails from '../../../api/factory/stv/details.js';
 
 export default {
 	components: {
-		BaseMenu
+		BaseTreemenu
 	},
 	inject: {
 		$reloadList: {
@@ -83,7 +83,7 @@ export default {
 	},
 	template: /* html */`
 	<div class="overflow-auto" tabindex="-1">
-		<base-menu
+		<base-treemenu
 			ref="menu"
 			config="stv"
 			:preselected-key="preselectedKey"

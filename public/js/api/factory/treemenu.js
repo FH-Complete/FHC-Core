@@ -19,7 +19,7 @@ export default {
 	get(config, path = '') {
 		return {
 			method: 'get',
-			url: '/api/frontend/v1/menu/' + config + '/' + path
+			url: '/api/frontend/v1/treemenu/' + config + '/' + path
 		};
 	},
 	// TODO(chris): handle favorites per config

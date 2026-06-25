@@ -24,7 +24,7 @@ if (! defined('BASEPATH')) exit('No direct script access allowed');
  * Provides data to the ajax get calls about menues
  * This controller works with JSON calls on the HTTP GET or POST and the output is always JSON
  */
-class Menu extends FHCAPI_Controller
+class Treemenu extends FHCAPI_Controller
 {
 	public function __construct()
 	{
