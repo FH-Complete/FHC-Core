@@ -105,6 +105,8 @@ export default {
 			}
 		},
 		switchToTab(tab) {
+			if (this.view === tab) return;
+
 			this.view = tab;
 			this.survey = null;
 		},
@@ -142,6 +144,13 @@ export default {
 				class="btn text-nowrap"
 			>
 				+ Create new survey
+			</div>
+			<div
+				@click="switchToTab('privacySettings')"
+				:class="getTabStylingClass(view === 'privacySettings')"
+				class="btn text-nowrap"
+			>
+				Coodle privacy settings
 			</div>
 		</div>
 		<div class="flex-grow-1 mt-1">
