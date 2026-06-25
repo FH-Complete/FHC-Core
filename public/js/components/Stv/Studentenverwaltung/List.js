@@ -1,643 +1,1095 @@
-import {CoreFilterCmpt} from "../../filter/Filter.js";
-import ListNew from './List/New.js';
-import CoreTag from '../../Tag/Tag.js';
+import { CoreFilterCmpt } from "../../filter/Filter.js";
+import ListNew from "./List/New.js";
+import CoreTag from "../../Tag/Tag.js";
 import { tagHeaderFilter } from "../../../tabulator/filters/extendedHeaderFilter.js";
-import { addTagInTable, deleteTagInTable, updateTagInTable } from "../../../../js/helpers/TagHelper.js";
+import {
+  addTagInTable,
+  deleteTagInTable,
+  updateTagInTable,
+} from "../../../../js/helpers/TagHelper.js";
 import { tagFormatter } from "../../../../js/tabulator/formatter/tags.js";
 
 import ApiTag from "../../../api/factory/stv/tag.js";
-import ListFilter from './List/Filter.js';
+import ListFilter from "./List/Filter.js";
 
-import { capitalize } from '../../../helpers/StringHelpers.js';
+import { capitalize } from "../../../helpers/StringHelpers.js";
 
-import draggable from '../../../directives/draggable.js';
+import draggable from "../../../directives/draggable.js";
 
 export default {
-	name: "ListPrestudents",
-	components: {
-		CoreFilterCmpt,
-		ListNew,
-		CoreTag,
-		ListFilter
-	},
-	directives: {
-		draggable
-	},
-	inject: {
-		lists: {
-			from: 'lists',
-			required: true
-		},
-		$reloadList: {
-			from: '$reloadList',
-			required: true
-		},
-		currentSemester: {
-			from: 'currentSemester',
-			required: true
-		},
-		tagsEnabled: {
-			from: 'configStvTagsEnabled',
-			default: false
-		},
-	},
-	props: {
-		selected: Array,
-		studiengangKz: Number,
-		studiensemesterKurzbz: String
-	},
-	emits: [
-		'update:selected',
-		'filterActive'
-	],
-	data() {
-		function dateFormatter(cell)
-		{
-			let val = cell.getValue();
-			if (!val)
-				return '&nbsp;';
-			let date = new Date(val);
-			return date.toLocaleDateString('de-AT', {
-				"day": "2-digit",
-				"month": "2-digit",
-				"year": "numeric"
-			});
-		}
+  name: "ListPrestudents",
+  components: {
+    CoreFilterCmpt,
+    ListNew,
+    CoreTag,
+    ListFilter,
+  },
+  directives: {
+    draggable,
+  },
+  inject: {
+    lists: {
+      from: "lists",
+      required: true,
+    },
+    $reloadList: {
+      from: "$reloadList",
+      required: true,
+    },
+    currentSemester: {
+      from: "currentSemester",
+      required: true,
+    },
+    tagsEnabled: {
+      from: "configStvTagsEnabled",
+      default: false,
+    },
+  },
+  props: {
+    selected: Array,
+    studiengangKz: Number,
+    studiensemesterKurzbz: String,
+  },
+  emits: ["update:selected", "filterActive"],
+  data() {
+    function dateFormatter(cell) {
+      let val = cell.getValue();
+      if (!val) return "&nbsp;";
+      let date = new Date(val);
+      return date.toLocaleDateString("de-AT", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+      });
+    }
 
-		return {
-			tabulatorOptions: {
-				columns:[
-					{title:"UID", field:"uid", headerFilter: true},
-					{title:"TitelPre", field:"titelpre", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Nachname", field:"nachname", headerFilter: true},
-					{title:"Vorname", field:"vorname", headerFilter: true},
-					{title:"Wahlname", field:"wahlname", visible:false, headerFilter: true},
-					{title:"Vornamen", field:"vornamen", visible:false, headerFilter: true},
-					{title:"TitelPost", field:"titelpost", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Ersatzkennzeichen", field:"ersatzkennzeichen", headerFilter: true},
-					{
-						title: "Geburtsdatum",
-						field: "gebdatum",
-						formatter: dateFormatter, 
-						headerFilter: true,
-						headerFilterFunc(headerValue, rowValue) {
-							const matches = headerValue.match(/^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/);
-							let comparestr = headerValue;
-							if(matches !== null) {
-								const year = (matches[4] !== undefined) ? matches[4] : '';
-								const month = matches[3];
-								const day = (matches[2] !== undefined) ? matches[2] : '';
-								comparestr = year + '-' + month + '-' + day;
-							}
-							return rowValue.match(comparestr);
-						}
-					},
-					{title:"Geschlecht", field:"geschlecht", headerFilter: "list", headerFilterParams: {values:{'m':'männlich','w':'weiblich','x':'divers','u':'unbekannt'}, listOnEmpty:true, autocomplete:true}},
-					{title:"Sem.", field:"semester_berechnet", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Verb.", field:"verband", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Grp.", field:"gruppe", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Studiengang", field:"studiengang", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Studiengang_kz", field:"studiengang_kz", visible:false, headerFilter: true},
-					{title:"Personenkennzeichen", field:"matrikelnr", headerFilter: true},
-					{title:"PersonID", field:"person_id", headerFilter: true},
-					{title:"Status", field:"status", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Status Datum", field:"status_datum", visible:false, formatter:dateFormatter},
-					{title:"Status Bestaetigung", field:"status_bestaetigung", visible:false, formatter:dateFormatter, headerFilter: true},
-					{title:"EMail (Privat)", field:"mail_privat", visible:false, headerFilter: true},
-					{title:"EMail (Intern)", field:"mail_intern", visible:false, headerFilter: true},
-					{title:"Anmerkungen", field:"anmerkungen", visible:false, headerFilter: true},
-					{title:"AnmerkungPre", field:"anmerkung", visible:false, headerFilter: true},
-					{title:"OrgForm", field:"orgform_kurzbz", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"Aufmerksamdurch", field:"aufmerksamdurch_kurzbz", visible:false},
-					{title:"Gesamtpunkte", field:"punkte", visible:false},
-					{title:"Aufnahmegruppe", field:"aufnahmegruppe_kurzbz", visible:false},
-					{title:"Dual", field:"dual", visible:false, 
-						formatter:'tickCross', formatterParams: {
-							tickElement: '<i class="fas fa-check text-success"></i>',
-							crossElement: '<i class="fas fa-times text-danger"></i>'
-						},						
-						headerFilter:"tickCross", headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						}, headerFilterEmptyCheck:function(value){return value === null}
-					},
-					{title:"Matrikelnummer", field:"matr_nr", visible:false, headerFilter: true},
-					{title:"Studienplan", field:"studienplan_bezeichnung", headerFilter: "list", headerFilterParams: {valuesLookup:true, listOnEmpty:true, autocomplete:true, sort:"asc"}},
-					{title:"PreStudentInnenID", field:"prestudent_id", headerFilter: true},
-					{title:"Priorität", field:"priorisierung_relativ"},
-					{title:"Mentor", field:"mentor", visible:false},
-					{title:"Aktiv", field:"bnaktiv", visible:false, 
-						formatter:'tickCross', formatterParams: {
-							allowEmpty:true,
-							tickElement: '<i class="fas fa-check text-success"></i>',
-							crossElement: '<i class="fas fa-times text-danger"></i>'
-						},						
-						headerFilter:"tickCross", headerFilterParams: {
-							"tristate":true, elementAttributes:{"value":"true"}
-						}, headerFilterEmptyCheck:function(value){return value === null}
-					},
-					{title:"Unruly", field:"unruly", visible:false},
-				],
-				rowFormatter(row) {
-					if (row.getData().bnaktiv === false) {
-						row.getElement().classList.add('text-black','text-opacity-50','fst-italic');
-					}
-					row.getElement().draggable = true
-				},
+    return {
+      initialTagData: [],
+      selectedTagOptions: [],
+      tabulatorOptions: {
+        columns: [
+          { title: "UID", field: "uid", headerFilter: true },
+          {
+            title: "TitelPre",
+            field: "titelpre",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Nachname",
+            field: "nachname",
+            headerFilter: true,
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          { title: "Vorname", field: "vorname", headerFilter: true },
+          {
+            title: "Wahlname",
+            field: "wahlname",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "Vornamen",
+            field: "vornamen",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "TitelPost",
+            field: "titelpost",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Ersatzkennzeichen",
+            field: "ersatzkennzeichen",
+            headerFilter: true,
+          },
+          {
+            title: "Geburtsdatum",
+            field: "gebdatum",
+            formatter: dateFormatter,
+            headerFilter: true,
+            headerFilterFunc(headerValue, rowValue) {
+              const matches = headerValue.match(
+                /^(([0-9]{2})\.)?([0-9]{2})\.([0-9]{4})?$/,
+              );
+              let comparestr = headerValue;
+              if (matches !== null) {
+                const year = matches[4] !== undefined ? matches[4] : "";
+                const month = matches[3];
+                const day = matches[2] !== undefined ? matches[2] : "";
+                comparestr = year + "-" + month + "-" + day;
+              }
+              return rowValue.match(comparestr);
+            },
+          },
+          {
+            title: "Geschlecht",
+            field: "geschlecht",
+            headerFilter: "list",
+            headerFilterParams: {
+              values: {
+                m: "männlich",
+                w: "weiblich",
+                x: "divers",
+                u: "unbekannt",
+              },
+              listOnEmpty: true,
+              autocomplete: true,
+            },
+          },
+          {
+            title: "Sem.",
+            field: "semester_berechnet",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
 
-				ajaxRequestFunc: (url, config, params) => {
-					if( url === '' ) 
-					{
-						return Promise.resolve({ data: []});
-					}
-					/**
-					 * NOTE(chris): Because of a bug in Tabulator
-					 * we need to get the params from elsewhere.
-					 * @see https://github.com/olifolkerd/tabulator/issues/4318
-					 */
-					const apiconfig = {
-						...this.tabulatorOptions.ajaxConfig,
-						url: this.tabulatorOptions.ajaxURL,
-						params: this.tabulatorOptions.ajaxParams
-					};
-					return this.$api.call(apiconfig);
-				},
-				ajaxResponse: (url, params, response) => {
-					return response?.data;
-				},
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Verb.",
+            field: "verband",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Grp.",
+            field: "gruppe",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Studiengang",
+            field: "studiengang",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Studiengang_kz",
+            field: "studiengang_kz",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "Personenkennzeichen",
+            field: "matrikelnr",
+            headerFilter: true,
+          },
+          { title: "PersonID", field: "person_id", headerFilter: true },
+          {
+            title: "Status",
+            field: "status",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Status Datum",
+            field: "status_datum",
+            visible: false,
+            formatter: dateFormatter,
+          },
+          {
+            title: "Status Bestaetigung",
+            field: "status_bestaetigung",
+            visible: false,
+            formatter: dateFormatter,
+            headerFilter: true,
+          },
+          {
+            title: "EMail (Privat)",
+            field: "mail_privat",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "EMail (Intern)",
+            field: "mail_intern",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "Anmerkungen",
+            field: "anmerkungen",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "AnmerkungPre",
+            field: "anmerkung",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "OrgForm",
+            field: "orgform_kurzbz",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "Aufmerksamdurch",
+            field: "aufmerksamdurch_kurzbz",
+            visible: false,
+          },
+          { title: "Gesamtpunkte", field: "punkte", visible: false },
+          {
+            title: "Aufnahmegruppe",
+            field: "aufnahmegruppe_kurzbz",
+            visible: false,
+          },
+          {
+            title: "Dual",
+            field: "dual",
+            visible: false,
+            formatter: "tickCross",
+            formatterParams: {
+              tickElement: '<i class="fas fa-check text-success"></i>',
+              crossElement: '<i class="fas fa-times text-danger"></i>',
+            },
+            headerFilter: "tickCross",
+            headerFilterParams: {
+              tristate: true,
+              elementAttributes: { value: "true" },
+            },
+            headerFilterEmptyCheck: function (value) {
+              return value === null;
+            },
+          },
+          {
+            title: "Matrikelnummer",
+            field: "matr_nr",
+            visible: false,
+            headerFilter: true,
+          },
+          {
+            title: "Studienplan",
+            field: "studienplan_bezeichnung",
+            headerFilter: "list",
+            headerFilterParams: {
+              valuesLookup: true,
+              listOnEmpty: true,
+              autocomplete: true,
+              sort: "asc",
+            },
+          },
+          {
+            title: "PreStudentInnenID",
+            field: "prestudent_id",
+            headerFilter: true,
+          },
+          { title: "Priorität", field: "priorisierung_relativ" },
+          { title: "Mentor", field: "mentor", visible: false },
+          {
+            title: "Aktiv",
+            field: "bnaktiv",
+            visible: false,
+            formatter: "tickCross",
+            formatterParams: {
+              allowEmpty: true,
+              tickElement: '<i class="fas fa-check text-success"></i>',
+              crossElement: '<i class="fas fa-times text-danger"></i>',
+            },
+            headerFilter: "tickCross",
+            headerFilterParams: {
+              tristate: true,
+              elementAttributes: { value: "true" },
+            },
+            headerFilterEmptyCheck: function (value) {
+              return value === null;
+            },
+          },
+          { title: "Unruly", field: "unruly", visible: false },
+        ],
+        rowFormatter(row) {
+          if (row.getData().bnaktiv === false) {
+            row
+              .getElement()
+              .classList.add("text-black", "text-opacity-50", "fst-italic");
+          }
+          row.getElement().draggable = true;
+        },
 
-				layout: 'fitDataStretch',
-				layoutColumnsOnNewData: false,
-				height: '100%',
-				selectableRows: true,
-				selectableRowsRangeMode: 'click',
-				index: 'prestudent_id',
-				persistenceID: 'stv-list-20260223_01'
-			},
-			tabulatorEvents: [
-				{
-					event: 'rowSelectionChanged',
-					handler: this.rowSelectionChanged
-				},
-				{
-					event: 'dataLoading',
-					handler: this.handleDataLoading
-				},
-				{
-					event: 'renderComplete',
-					handler: this.handleRenderComplete
-				},
-				{
-					event: 'dataProcessed',
-					handler: (data) => {
-						this.getAllRows()
-						this.autoSelectRows(data)
-					}
-				},
-				{
-					event: 'dataLoaded',
-					handler: data => {
-						if (Array.isArray(data)) {
-							this.count = data.length;
-							this.allPrestudents = data.map(item => item.prestudent_id);
-						} else {
-							this.count = 0;
-							this.allPrestudents = [];
-						}
-					}
-				},
-				{
-					event: 'dataFiltered',
-					handler: (filters, rows) => this.filteredcount = rows.length
-				},
-				{
-					event: 'rowClick',
-					handler: this.handleRowClick // TODO(chris): this should be in the filter component
-				},
-				{
-					event: 'dataTreeRowExpanded',
-					handler: (data) => {
-						this.getExpandedRows()
-					}
-				},
-				{
-					event: 'dataTreeRowCollapsed',
-					handler: (data) => {
-						this.getExpandedRows()
-					}
-				},
-				{
-					event: 'rowMouseDown',
-					handler: this.handleMouseDown
-				}
-			],
-			focusObj: null, // TODO(chris): this should be in the filter component
-			lastSelected: null,
-			filter: [],
-			count: 0,
-			filteredcount: 0,
-			selectedcount: 0,
-			//tags
-			expanded: [],
-			selectedColumnValues: [],
-			tagEndpoint: ApiTag,
-			currentEndpoint: null,
-			headerFilterActive: false,
-			dragSource: [],
-			oldScrollUrl: '',
-			oldScrollLeft: 0,
-			oldScrollTop: 0,
-			allPrestudents: []
-		}
-	},
-	computed: {
-		countsToHTML: function() {
-			return this.$p.t('global/ausgewaehlt')
-				+ ': <strong>' + (this.selectedcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gefiltert')
-				+ ': '
-				+ '<strong>' + (this.filteredcount || 0) + '</strong>'
-				+ ' | '
-				+ this.$p.t('global/gesamt')
-				+ ': <strong>' + (this.count || 0) + '</strong>';
-		},
-		selectedDragObject() {
-			let items = this.dragSource?.length ? this.dragSource : this.selected;
+        ajaxRequestFunc: (url, config, params) => {
+          if (url === "") {
+            return Promise.resolve({ data: [] });
+          }
+          /**
+           * NOTE(chris): Because of a bug in Tabulator
+           * we need to get the params from elsewhere.
+           * @see https://github.com/olifolkerd/tabulator/issues/4318
+           */
+          const apiconfig = {
+            ...this.tabulatorOptions.ajaxConfig,
+            url: this.tabulatorOptions.ajaxURL,
+            params: this.tabulatorOptions.ajaxParams,
+          };
+          return this.$api.call(apiconfig);
+        },
+        ajaxResponse: (url, params, response) => {
+          return response?.data;
+        },
 
-			return items.map(item => {
-				let type, id;
-				if (item.uid) {
-					type = 'student';
-					id = item.uid;
-				} else if (item.prestudent_id) {
-					type = 'prestudent';
-					id = item.prestudent_id;
-				} else if (item.person_id) {
-					type = 'person';
-					id = item.person_id;
-				}
-				return {
-					...item,
-					type,
-					id
-				};
-			});
-		},
-		//TODO(Manu) check: replace download or additional entry?
-		downloadConfig() {
-			return {
-				csv: {
-					formatter: 'csv',
-					file: this.fileString,
-					options: {
-						delimiter: ';',
-						bom: true,
-					}
-				}
-			};
-		},
-		fileString() {
-			let today = new Date().toLocaleDateString('en-GB')
-				.replace(/\//g, '_');
-			return "StudentList_" + today + ".csv";
-		},
-		selectedPrestudents() {
-			if (this.selected && this.selected.length > 0) {
-				return this.selected.map(item => item.prestudent_id);
-			} else {
-				// fallback whole list of prestudents
-				return this.allPrestudents || [];
-			}
-		},
+        layout: "fitDataStretch",
+        layoutColumnsOnNewData: false,
+        height: "100%",
+        selectableRows: true,
+        selectableRowsRangeMode: "click",
+        index: "prestudent_id",
+        persistence: false,
+      },
+      tabulatorEvents: [
+        {
+          event: "rowSelectionChanged",
+          handler: this.rowSelectionChanged,
+        },
+        {
+          event: "dataLoading",
+          handler: this.handleDataLoading,
+        },
+        {
+          event: "renderComplete",
+          handler: this.handleRenderComplete,
+        },
+        {
+          event: "dataProcessed",
+          handler: (data) => {
+            console.log("dataProcessed", data);
+            this.getAllRows();
+            this.autoSelectRows(data);
+          },
+        },
+        {
+          event: "dataLoaded",
+          handler: (data) => {
+            console.log("dataLoaded", data);
+            if (Array.isArray(data)) {
+              this.count = data.length;
+              this.allPrestudents = data.map((item) => item.prestudent_id);
+            } else {
+              this.count = 0;
+              this.allPrestudents = [];
+            }
+          },
+        },
+        {
+          event: "dataFiltered",
+          handler: (filters, rows) => {
+            console.log("dataFiltered", filters, rows);
+            this.filteredcount = rows.length;
+          },
+        },
+        {
+          event: "rowClick",
+          handler: this.handleRowClick, // TODO(chris): this should be in the filter component
+        },
+        {
+          event: "dataTreeRowExpanded",
+          handler: (data) => {
+            console.log("dataTreeRowExpanded", data);
+            this.getExpandedRows();
+          },
+        },
+        {
+          event: "dataTreeRowCollapsed",
+          handler: (data) => {
+            console.log("dataTreeRowCollapsed", data);
+            this.getExpandedRows();
+          },
+        },
+        {
+          event: "rowMouseDown",
+          handler: this.handleMouseDown,
+        },
+        {
+          event: "columnWidth",
+          handler: (column) => {
+            console.log("columnWidth", column);
+            if (column.getField() !== "tags") return;
 
-		linkXLS(){
-			return FHC_JS_DATA_STORAGE_OBJECT.app_root
-			+ 'content/statistik/studentenexportextended.xls.php?'
-			+ '&studiensemester_kurzbz=' + this.currentSemester
-			+ '&data=' + this.selectedPrestudents.join(";");
-		},
-	},
-	created: function() {
+            column.getCells().forEach((cell) => {
+              cell.getElement().firstElementChild?.fitTags?.();
+            });
+          },
+        },
+      ],
+      focusObj: null, // TODO(chris): this should be in the filter component
+      lastSelected: null,
+      filter: [],
+      count: 0,
+      filteredcount: 0,
+      selectedcount: 0,
+      //tags
+      expanded: [],
+      selectedColumnValues: [],
+      tagEndpoint: ApiTag,
+      currentEndpoint: null,
+      headerFilterActive: false,
+      dragSource: [],
+      oldScrollUrl: "",
+      oldScrollLeft: 0,
+      oldScrollTop: 0,
+      allPrestudents: [],
+    };
+  },
+  computed: {
+    countsToHTML: function () {
+      return (
+        this.$p.t("global/ausgewaehlt") +
+        ": <strong>" +
+        (this.selectedcount || 0) +
+        "</strong>" +
+        " | " +
+        this.$p.t("global/gefiltert") +
+        ": " +
+        "<strong>" +
+        (this.filteredcount || 0) +
+        "</strong>" +
+        " | " +
+        this.$p.t("global/gesamt") +
+        ": <strong>" +
+        (this.count || 0) +
+        "</strong>"
+      );
+    },
+    selectedDragObject() {
+      let items = this.dragSource?.length ? this.dragSource : this.selected;
 
-		if(this.tagsEnabled) {
-			const coltags = {
-				title: 'Tags',
-				field: 'tags',
-				tooltip: false,
-				headerFilter: "input",
-				headerFilterFunc: tagHeaderFilter,
-				headerFilterFuncParams: {field: 'tags'},
-				formatter: (cell) => tagFormatter(cell, this.$refs.tagComponent),
-				width: 150,
-			};
-			this.tabulatorOptions.columns.splice(2, 0, coltags);
-		}
-	},
-	watch: {
-		'$p.user_language.value'(n, o) {
-			if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
-				this.translateTabulator();
-			}
-		},
-	},
-	methods: {
-		translateTabulator() {
-			this.$p
-				.loadCategory(['global', 'person', 'lehre', 'ui', 'profilUpdate', 'admission', 'stv'])
-				.then(() => {
-					const translations = {
-						uid: capitalize(this.$p.t('person/uid')),
-						titelpre: capitalize(this.$p.t('person/titelpre')),
-						nachname: capitalize(this.$p.t('person/nachname')),
-						vorname: capitalize(this.$p.t('person/vorname')),
-						wahlname: capitalize(this.$p.t('person/wahlname')),
-						vornamen: capitalize(this.$p.t('person/vornamen')),
-						titelpost: capitalize(this.$p.t('person/titelpost')),
-						ersatzkennzeichen: capitalize(this.$p.t('person/ersatzkennzeichen')),
-						gebdatum: capitalize(this.$p.t('person/geburtsdatum')),
-						geschlecht: capitalize(this.$p.t('person/geschlecht')),
-						semester_berechnet: capitalize(this.$p.t('lehre/sem')),
-						verband: capitalize(this.$p.t('lehre/verb')),
-						gruppe: capitalize(this.$p.t('lehre/grp')),
-						studiengang: capitalize(this.$p.t('lehre/studiengang')),
-						studiengang_kz: capitalize(this.$p.t('lehre/studiengang_kz')),
-						matrikelnr: capitalize(this.$p.t('person/personenkennzeichen')),
-						person_id: capitalize(this.$p.t('person/person_id')),
-						status: capitalize(this.$p.t('global/status')),
-						status_datum: capitalize(this.$p.t('profilUpdate/statusDate')),
-						status_bestaetigung: capitalize(this.$p.t('global/status_bestaetigung')),
-						mail_privat: capitalize(this.$p.t('person/email_private')),
-						mail_intern: capitalize(this.$p.t('person/email_intern')),
-						anmerkungen: capitalize(this.$p.t('stv/notes_person')),
-						anmerkung: capitalize(this.$p.t('stv/notes_prestudent')),
-						orgform_kurzbz: capitalize(this.$p.t('lehre/orgform')),
-						aufmerksamdurch_kurzbz: capitalize(this.$p.t('person/aufmerksamDurch')),
-						punkte: capitalize(this.$p.t('admission/gesamtpunkte')),
-						aufnahmegruppe_kurzbz: capitalize(this.$p.t('stv/aufnahmegruppe_kurzbz')),
-						dual: capitalize(this.$p.t('lehre/dual_short')),
-						matr_nr: capitalize(this.$p.t('person/matrikelnummer')),
-						studienplan_bezeichnung: capitalize(this.$p.t('lehre/studienplan')),
-						prestudent_id: capitalize(this.$p.t('ui/prestudent_id')),
-						priorisierung_relativ: capitalize(this.$p.t('lehre/prioritaet')),
-						mentor: capitalize(this.$p.t('stv/mentor')),
-						bnaktiv: capitalize(this.$p.t('person/aktiv'))
-					};
+      return items.map((item) => {
+        let type, id;
+        if (item.uid) {
+          type = "student";
+          id = item.uid;
+        } else if (item.prestudent_id) {
+          type = "prestudent";
+          id = item.prestudent_id;
+        } else if (item.person_id) {
+          type = "person";
+          id = item.person_id;
+        }
+        return {
+          ...item,
+          type,
+          id,
+        };
+      });
+    },
+    //TODO(Manu) check: replace download or additional entry?
+    downloadConfig() {
+      return {
+        csv: {
+          formatter: "csv",
+          file: this.fileString,
+          options: {
+            delimiter: ";",
+            bom: true,
+          },
+        },
+      };
+    },
+    fileString() {
+      let today = new Date().toLocaleDateString("en-GB").replace(/\//g, "_");
+      return "StudentList_" + today + ".csv";
+    },
+    selectedPrestudents() {
+      if (this.selected && this.selected.length > 0) {
+        return this.selected.map((item) => item.prestudent_id);
+      } else {
+        // fallback whole list of prestudents
+        return this.allPrestudents || [];
+      }
+    },
 
-					/** NOTE(chris):
-					 * use this approach because updateDefinition
-					 * on the Tabulator columns is way slower and
-					 * freezes up the GUI.
-					 */
-					// Overwrite definition for column show/hide
-					this.$refs.table.tabulator.getColumns().forEach(col => {
-						const trans = translations[col.getField()];
-						if (!trans)
-							return;
-						col.getDefinition().title = trans;
-					});
-					// Overwrite node in dom
-					this.$refs.table.tabulator.element
-						.querySelectorAll('.tabulator-col[tabulator-field]')
-						.forEach(el => {
-							const field = el.getAttribute('tabulator-field');
-							if (!translations[field])
-								return;
+    linkXLS() {
+      return (
+        FHC_JS_DATA_STORAGE_OBJECT.app_root +
+        "content/statistik/studentenexportextended.xls.php?" +
+        "&studiensemester_kurzbz=" +
+        this.currentSemester +
+        "&data=" +
+        this.selectedPrestudents.join(";")
+      );
+    },
+  },
+  created: function () {
+    if (this.tagsEnabled) {
+      const coltags = {
+        title: "Tags",
+        field: "tags",
+        tooltip: false,
+        headerFilter: "list",
+        headerFilterParams: {
+          valuesLookup: () => {
+            console.log("headerFilterParams.valuesLookup called");
+            const options = new Map();
 
-							const title = el.querySelector('.tabulator-col-title');
-							if (!title)
-								return;
+            this.$refs.table.tabulator.getData("active").forEach((row) => {
+              let tags = row.tags;
 
-							title.innerText = translations[field];
-						});
-				});
-		},
-		reload() {
-			this.$refs.table.reloadTable();
-		},
-		actionNewPrestudent() {
-			this.$refs.new.open();
-		},
-		rowSelectionChanged(data, rows, selected, deselected) {
-			this.selectedcount = data.length;
+              if (typeof tags === "string") {
+                try {
+                  tags = JSON.parse(tags);
+                } catch {
+                  return;
+                }
+              }
 
-			if(selected.length > 0 || deselected.length > 0){
-				this.lastSelected = this.selected;
+              if (!Array.isArray(tags)) return;
 
-				//for tags
-				this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
-				this.selectedColumnValues = this.selectedRows.filter(
-					row => row.getData().prestudent_id !== undefined
-						&& row.getData().prestudent_id
-				).map(
-					row => row.getData().prestudent_id
-				);
+              tags
+                .filter((tag) => tag && tag.done !== true)
+                .forEach((tag) => {
+                  options.set(tag.beschreibung, {
+                    label: tag.beschreibung,
+                    value: tag.beschreibung,
+                    style: tag.style,
+                  });
+                });
+            });
 
-				this.$emit('update:selected', data);
-			}
-		},
-		autoSelectRows(data) {
-			if (Array.isArray(this.lastSelected) && this.lastSelected.length){
-				// NOTE(chris): reselect rows on refresh
-				let selected = this.lastSelected.map(el => this.$refs.table.tabulator.getRow(el.prestudent_id))
-				// TODO(chris): unselect current item if it's no longer in the table?
-				// or maybe reselect only the last one?
-				selected = selected.filter(el => el);
+            return [
+              {
+                isHeader: true,
+                label: "test",
+                subOptions: [...options.values()],
+              },
+            ];
+          },
+          itemFormatter: (value, label, item) => {
+            console.log("value, label, item", value, label, item);
+            if (!item.isHeader) return "<span class='m-0 p-0'></span>";
 
-				if (selected.length)
-					this.$refs.table.tabulator.selectRow(selected);
-			} else if(data && this.lastSelected === undefined) {
-				// NOTE(chris): select row if it's the only one (preferably only on startup)
-				if (data.length == 1) {
-					this.$refs.table.tabulator.selectRow(this.$refs.table.tabulator.getRows());
-				}
-			}
-		},
-		updateFilter(filter) {
-			this.filter = filter;
-			this.$emit('filterActive', filter);
-			this.updateUrl();
-		},
-		updateUrl(endpoint, first) {
-			this.lastSelected = first ? undefined : this.selected;
+            let table = document.createElement("table");
+            table.className = "table table-sm mb-0";
+            table.appendChild(document.createElement("thead"));
+            table
+              .querySelector("thead")
+              .appendChild(document.createElement("tr"));
 
-/*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
+            let firstHeading = document.createElement("th");
+            firstHeading.innerHTML = "<strong>" + value + "</strong>";
+            table.querySelector("tr").appendChild(firstHeading);
+
+            let secondHeading = document.createElement("th");
+            secondHeading.innerHTML = "<strong>AND</strong>";
+            table.querySelector("tr").appendChild(secondHeading);
+
+            let thirdHeading = document.createElement("th");
+            thirdHeading.innerHTML = "<strong>OR</strong>";
+            table.querySelector("tr").appendChild(thirdHeading);
+
+            let fourthHeading = document.createElement("th");
+            fourthHeading.innerHTML = "<strong>NOT</strong>";
+            table.querySelector("tr").appendChild(fourthHeading);
+
+            table.appendChild(document.createElement("tbody"));
+
+            item.subOptions.forEach((option) => {
+              let row = document.createElement("tr");
+
+              let firstColumn = document.createElement("td");
+
+              let optionLabel = document.createElement("span");
+              optionLabel.className = "tag " + option.style;
+              optionLabel.innerText = option.label;
+              firstColumn.appendChild(optionLabel);
+              row.appendChild(firstColumn);
+
+              let secondColumn = document.createElement("td");
+              let firstCheckbox = document.createElement("input");
+              firstCheckbox.type = "checkbox";
+              firstCheckbox.label = "test";
+              firstCheckbox.style.cursor = "pointer";
+              firstCheckbox.checked = this.selectedTagOptions.some(
+                (tag) => tag.value === option.value && tag.connector === "AND",
+              );
+              firstCheckbox.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (event.target.checked) {
+                  this.selectedTagOptions.push({
+                    label: option.label,
+                    value: option.value,
+                    connector: "AND",
+                  });
+                } else {
+                  this.selectedTagOptions = this.selectedTagOptions.filter(
+                    (tag) =>
+                      tag.value !== option.value || tag.connector !== "AND",
+                  );
+                }
+                console.log("selectedTagOptions", this.selectedTagOptions);
+              });
+              secondColumn.appendChild(firstCheckbox);
+              row.appendChild(secondColumn);
+
+              let thirdColumn = document.createElement("td");
+              let secondCheckbox = document.createElement("input");
+              secondCheckbox.type = "checkbox";
+              secondCheckbox.label = "test";
+              secondCheckbox.style.cursor = "pointer";
+              secondCheckbox.checked = this.selectedTagOptions.some(
+                (tag) => tag.value === option.value && tag.connector === "OR",
+              );
+              secondCheckbox.addEventListener("click", (event) => {
+                event.stopPropagation();
+                if (event.target.checked) {
+                  this.selectedTagOptions.push({
+                    label: option.label,
+                    value: option.value,
+                    connector: "OR",
+                  });
+                } else {
+                  this.selectedTagOptions = this.selectedTagOptions.filter(
+                    (tag) =>
+                      tag.value !== option.value || tag.connector !== "OR",
+                  );
+                }
+              });
+              thirdColumn.appendChild(secondCheckbox);
+              row.appendChild(thirdColumn);
+
+              let fourthColumn = document.createElement("td");
+              let thirdCheckbox = document.createElement("input");
+              thirdCheckbox.type = "checkbox";
+              thirdCheckbox.label = "test";
+              thirdCheckbox.style.cursor = "pointer";
+              thirdCheckbox.checked = this.selectedTagOptions.some(
+                (tag) => tag.value === option.value && tag.connector === "NOT",
+              );
+              thirdCheckbox.addEventListener("click", (event) => {
+                event.stopPropagation();
+                console.log(event.target.checked);
+                if (event.target.checked) {
+                  this.selectedTagOptions.push({
+                    label: option.label,
+                    value: option.value,
+                    connector: "NOT",
+                  });
+                } else {
+                  this.selectedTagOptions = this.selectedTagOptions.filter(
+                    (tag) =>
+                      tag.value !== option.value || tag.connector !== "NOT",
+                  );
+                }
+              });
+              fourthColumn.appendChild(thirdCheckbox);
+              row.appendChild(fourthColumn);
+
+              row.addEventListener("click", (event) => {
+                event.stopPropagation();
+              });
+
+              table.querySelector("tbody").appendChild(row);
+            });
+            return table;
+          },
+          listOnEmpty: true,
+          autocomplete: true,
+          sort: "asc",
+        },
+        headerFilterFunc: tagHeaderFilter,
+        headerFilterFuncParams: { field: "tags" },
+        formatter: (cell, formatterParams, onRendered) =>
+          tagFormatter(cell, this.$refs.tagComponent, onRendered),
+        width: 150,
+      };
+      this.tabulatorOptions.columns.splice(2, 0, coltags);
+    }
+  },
+  watch: {
+    "$p.user_language.value"(n, o) {
+      if (n !== o && o !== undefined && this.$refs.table.tableBuilt) {
+        this.translateTabulator();
+      }
+    },
+    selectedTagOptions: {
+      handler() {
+        let combinedFilterStatement = null;
+
+        this.selectedTagOptions.forEach((tagOption) => {
+          const { value, connector } = tagOption;
+          
+          let mappedConnector = connector === "AND" ? "&&" : connector === "OR" ? "||" : "!";
+          if (connector === "NOT") {
+            combinedFilterStatement = combinedFilterStatement
+              ? `${combinedFilterStatement} && ${mappedConnector + value}`
+              : value;
+          }
+          else {
+            combinedFilterStatement = combinedFilterStatement
+              ? `${combinedFilterStatement} ${mappedConnector} ${value}`
+              : value;
+          }
+        });
+
+        this.$refs.table.tabulator.setHeaderFilterValue(
+          "tags",
+          combinedFilterStatement,
+        );
+        this.$emit("filterActive", this.selectedTagOptions.length > 0);
+        console.log("selectedTagOptions changed:");
+        console.log(combinedFilterStatement);
+      },
+      deep: true,
+    },
+  },
+  methods: {
+    translateTabulator() {
+      this.$p
+        .loadCategory([
+          "global",
+          "person",
+          "lehre",
+          "ui",
+          "profilUpdate",
+          "admission",
+          "stv",
+        ])
+        .then(() => {
+          const translations = {
+            uid: capitalize(this.$p.t("person/uid")),
+            titelpre: capitalize(this.$p.t("person/titelpre")),
+            nachname: capitalize(this.$p.t("person/nachname")),
+            vorname: capitalize(this.$p.t("person/vorname")),
+            wahlname: capitalize(this.$p.t("person/wahlname")),
+            vornamen: capitalize(this.$p.t("person/vornamen")),
+            titelpost: capitalize(this.$p.t("person/titelpost")),
+            ersatzkennzeichen: capitalize(
+              this.$p.t("person/ersatzkennzeichen"),
+            ),
+            gebdatum: capitalize(this.$p.t("person/geburtsdatum")),
+            geschlecht: capitalize(this.$p.t("person/geschlecht")),
+            semester_berechnet: capitalize(this.$p.t("lehre/sem")),
+            verband: capitalize(this.$p.t("lehre/verb")),
+            gruppe: capitalize(this.$p.t("lehre/grp")),
+            studiengang: capitalize(this.$p.t("lehre/studiengang")),
+            studiengang_kz: capitalize(this.$p.t("lehre/studiengang_kz")),
+            matrikelnr: capitalize(this.$p.t("person/personenkennzeichen")),
+            person_id: capitalize(this.$p.t("person/person_id")),
+            status: capitalize(this.$p.t("global/status")),
+            status_datum: capitalize(this.$p.t("profilUpdate/statusDate")),
+            status_bestaetigung: capitalize(
+              this.$p.t("global/status_bestaetigung"),
+            ),
+            mail_privat: capitalize(this.$p.t("person/email_private")),
+            mail_intern: capitalize(this.$p.t("person/email_intern")),
+            anmerkungen: capitalize(this.$p.t("stv/notes_person")),
+            anmerkung: capitalize(this.$p.t("stv/notes_prestudent")),
+            orgform_kurzbz: capitalize(this.$p.t("lehre/orgform")),
+            aufmerksamdurch_kurzbz: capitalize(
+              this.$p.t("person/aufmerksamDurch"),
+            ),
+            punkte: capitalize(this.$p.t("admission/gesamtpunkte")),
+            aufnahmegruppe_kurzbz: capitalize(
+              this.$p.t("stv/aufnahmegruppe_kurzbz"),
+            ),
+            dual: capitalize(this.$p.t("lehre/dual_short")),
+            matr_nr: capitalize(this.$p.t("person/matrikelnummer")),
+            studienplan_bezeichnung: capitalize(this.$p.t("lehre/studienplan")),
+            prestudent_id: capitalize(this.$p.t("ui/prestudent_id")),
+            priorisierung_relativ: capitalize(this.$p.t("lehre/prioritaet")),
+            mentor: capitalize(this.$p.t("stv/mentor")),
+            bnaktiv: capitalize(this.$p.t("person/aktiv")),
+          };
+
+          /** NOTE(chris):
+           * use this approach because updateDefinition
+           * on the Tabulator columns is way slower and
+           * freezes up the GUI.
+           */
+          // Overwrite definition for column show/hide
+          this.$refs.table.tabulator.getColumns().forEach((col) => {
+            const trans = translations[col.getField()];
+            if (!trans) return;
+            col.getDefinition().title = trans;
+          });
+          // Overwrite node in dom
+          this.$refs.table.tabulator.element
+            .querySelectorAll(".tabulator-col[tabulator-field]")
+            .forEach((el) => {
+              const field = el.getAttribute("tabulator-field");
+              if (!translations[field]) return;
+
+              const title = el.querySelector(".tabulator-col-title");
+              if (!title) return;
+
+              title.innerText = translations[field];
+            });
+        });
+    },
+    reload() {
+      this.$refs.table.reloadTable();
+    },
+    actionNewPrestudent() {
+      this.$refs.new.open();
+    },
+    rowSelectionChanged(data, rows, selected, deselected) {
+      console.log("rowSelectionChanged", data, rows, selected, deselected);
+      this.selectedcount = data.length;
+
+      if (selected.length > 0 || deselected.length > 0) {
+        this.lastSelected = this.selected;
+
+        //for tags
+        this.selectedRows = this.$refs.table.tabulator.getSelectedRows();
+        this.selectedColumnValues = this.selectedRows
+          .filter(
+            (row) =>
+              row.getData().prestudent_id !== undefined &&
+              row.getData().prestudent_id,
+          )
+          .map((row) => row.getData().prestudent_id);
+
+        this.$emit("update:selected", data);
+      }
+    },
+    autoSelectRows(data) {
+      if (Array.isArray(this.lastSelected) && this.lastSelected.length) {
+        // NOTE(chris): reselect rows on refresh
+        let selected = this.lastSelected.map((el) =>
+          this.$refs.table.tabulator.getRow(el.prestudent_id),
+        );
+        // TODO(chris): unselect current item if it's no longer in the table?
+        // or maybe reselect only the last one?
+        selected = selected.filter((el) => el);
+
+        if (selected.length) this.$refs.table.tabulator.selectRow(selected);
+      } else if (data && this.lastSelected === undefined) {
+        // NOTE(chris): select row if it's the only one (preferably only on startup)
+        if (data.length == 1) {
+          this.$refs.table.tabulator.selectRow(
+            this.$refs.table.tabulator.getRows(),
+          );
+        }
+      }
+    },
+    updateFilter(filter) {
+      this.filter = filter;
+      this.$emit("filterActive", filter);
+      this.updateUrl();
+    },
+    updateUrl(endpoint, first) {
+      this.lastSelected = first ? undefined : this.selected;
+
+      /*			console.log('function param endpoint: ' + JSON.stringify(endpoint));
 			console.log('current endpoint: ' + JSON.stringify(this.currentEndpoint));*/
 
-			if( endpoint === undefined && this.currentEndpoint === null)
-			{
-				endpoint = { url: '' };
-			}
-			else if( endpoint === undefined )
-			{
-				endpoint = JSON.parse(JSON.stringify(this.currentEndpoint));
-			}
-			else
-			{
-				this.currentEndpoint = JSON.parse(JSON.stringify(endpoint));
-			}
+      if (endpoint === undefined && this.currentEndpoint === null) {
+        endpoint = { url: "" };
+      } else if (endpoint === undefined) {
+        endpoint = JSON.parse(JSON.stringify(this.currentEndpoint));
+      } else {
+        this.currentEndpoint = JSON.parse(JSON.stringify(endpoint));
+      }
 
-			endpoint.url = endpoint.url.replace(
-				'CURRENT_SEMESTER',
-				encodeURIComponent(this.currentSemester)
-				);
+      endpoint.url = endpoint.url.replace(
+        "CURRENT_SEMESTER",
+        encodeURIComponent(this.currentSemester),
+      );
 
-			const params = (endpoint?.params !== undefined) ? endpoint.params : {};
-			let method = (endpoint?.method !== undefined) ? endpoint.method : 'get';
-			if (this.filter.length && !endpoint.url.match(/\/search\//))
-			{
-				params.filter = this.filter;
-				method = 'post';
-			}
+      const params = endpoint?.params !== undefined ? endpoint.params : {};
+      let method = endpoint?.method !== undefined ? endpoint.method : "get";
+      if (this.filter.length && !endpoint.url.match(/\/search\//)) {
+        params.filter = this.filter;
+        method = "post";
+      }
 
-			this.tabulatorOptions.ajaxURL = endpoint.url;
-			this.tabulatorOptions.ajaxParams = { ...params };
-			this.tabulatorOptions.ajaxConfig = {method};
+      this.tabulatorOptions.ajaxURL = endpoint.url;
+      this.tabulatorOptions.ajaxParams = { ...params };
+      this.tabulatorOptions.ajaxConfig = { method };
 
-			if (!this.$refs.table.tableBuilt) {
-				if (this.$refs.table.tabulator) {
-					this.$refs.table.tabulator.on("tableBuilt", () => {
-						this.$refs.table.tabulator.setData(endpoint.url, params, method);
-					});
-				}
-			} else
-				this.$refs.table.tabulator.setData(endpoint.url, params, method);
-		},
-		dragCleanup(evt) {
-			this.dragSource = [];
-			if (evt.dataTransfer.dropEffect == 'none')
-				return; // aborted or wrong target
-			
-			this.$reloadList();
-		},
-		onKeydown(e) { // TODO(chris): this should be in the filter component
-			if (!this.focusObj)
-				return;
+      if (!this.$refs.table.tableBuilt) {
+        if (this.$refs.table.tabulator) {
+          this.$refs.table.tabulator.on("tableBuilt", () => {
+            this.$refs.table.tabulator.setData(endpoint.url, params, method);
+          });
+        }
+      } else this.$refs.table.tabulator.setData(endpoint.url, params, method);
+    },
+    dragCleanup(evt) {
+      this.dragSource = [];
+      if (evt.dataTransfer.dropEffect == "none") return; // aborted or wrong target
 
-			// Ignore typing inside editable elements
-			if (
-				e.target instanceof HTMLInputElement ||
-				e.target instanceof HTMLTextAreaElement ||
-				e.target.isContentEditable
-			)
-				return;
+      this.$reloadList();
+    },
+    onKeydown(e) {
+      // TODO(chris): this should be in the filter component
+      if (!this.focusObj) return;
 
-			var next;
-			switch (e.code) {
-				case 'Enter':
-				case 'Space':
-					e.preventDefault();
-					var e2 = new Event('click', e);
-					e2.altKey = e.altKey;
-					e2.ctrlKey = e.ctrlKey;
-					e2.shiftKey = e.shiftKey;
-					this.focusObj.dispatchEvent(e2);
-					//row.component.toggleSelect();
-					break;
-				case 'ArrowUp':
-					e.preventDefault();
-					next = this.focusObj.previousElementSibling;
-					if (next)
-						this.changeFocus(this.focusObj, next);
-					break;
-				case 'ArrowDown':
-					e.preventDefault();
-					next = this.focusObj.nextElementSibling;
-					if (next)
-						this.changeFocus(this.focusObj, next);
-					break;
-			}
-		},
-		changeFocus(a, b) { // TODO(chris): this should be in the filter component
-			if (b) {
-				b.tabIndex = 0;
-				this.focusObj = b;
-				b.focus();
-			} else {
-				this.focusObj = null;
-			}
-			a.tabIndex = -1;
-			return this.focusObj;
-		},
-		onFocus(e) { // TODO(chris): this should be in the filter component
-			if (!this.focusObj) {
-				var container, target;
-				if (e.target.classList.contains('tabulator-container')) {
-					container = e.target;
-					target = container.querySelector('.tabulator-row');
-				} else if (e.target.classList.contains('tabulator-row')) {
-					container = e.target.closest('.tabulator-container');
-					target = e.target;
-				}
-				if (container && target) {
-					this.changeFocus(container, target);
-				}
-			}
-		},
-		handleRowClick(e, row) { // TODO(chris): this should be in the filter component
-			if (this.focusObj) {
-				let el = row.getElement();
-				if (el != this.focusObj)
-					this.changeFocus(this.focusObj, el);
-			}
-		},
-		clearSelection(){
-			this.lastSelected = [];
-			this.$emit('update:selected',[]);
-		},
-		//methods tags
-		addedTag(addedTag)
-		{
-			addTagInTable(addedTag, this.allRows, 'prestudent_id')
-		},
-		deletedTag(deletedTag)
-		{
-			deleteTagInTable(deletedTag, this.allRows);
-		},
-		updatedTag(updatedTag)
-		{
-			updateTagInTable(updatedTag, this.allRows)
-		},
-		getAllRows() {
-			this.allRows = this.$refs.table.tabulator.getRows();
-		},
-		resetFilter(){
-			this.$refs.listfilter.resetFilter();
-			this.$refs.table.clearFilters();
-		},
-		handleHeaderFilter(filterActive){
-			this.headerFilterActive = filterActive;
-		},
-		handleMouseDown(e, row)
-		{
-			let data = row.getData();
-			let id = data.uid ?? data.prestudent_id ?? data.person_id;
+      // Ignore typing inside editable elements
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        e.target.isContentEditable
+      )
+        return;
 
-			const isAlreadySelected = this.selected?.some(row => (row.uid ?? row.prestudent_id ?? row.person_id) === id);
+      var next;
+      switch (e.code) {
+        case "Enter":
+        case "Space":
+          e.preventDefault();
+          var e2 = new Event("click", e);
+          e2.altKey = e.altKey;
+          e2.ctrlKey = e.ctrlKey;
+          e2.shiftKey = e.shiftKey;
+          this.focusObj.dispatchEvent(e2);
+          //row.component.toggleSelect();
+          break;
+        case "ArrowUp":
+          e.preventDefault();
+          next = this.focusObj.previousElementSibling;
+          if (next) this.changeFocus(this.focusObj, next);
+          break;
+        case "ArrowDown":
+          e.preventDefault();
+          next = this.focusObj.nextElementSibling;
+          if (next) this.changeFocus(this.focusObj, next);
+          break;
+      }
+    },
+    changeFocus(a, b) {
+      // TODO(chris): this should be in the filter component
+      if (b) {
+        b.tabIndex = 0;
+        this.focusObj = b;
+        b.focus();
+      } else {
+        this.focusObj = null;
+      }
+      a.tabIndex = -1;
+      return this.focusObj;
+    },
+    onFocus(e) {
+      // TODO(chris): this should be in the filter component
+      if (!this.focusObj) {
+        var container, target;
+        if (e.target.classList.contains("tabulator-container")) {
+          container = e.target;
+          target = container.querySelector(".tabulator-row");
+        } else if (e.target.classList.contains("tabulator-row")) {
+          container = e.target.closest(".tabulator-container");
+          target = e.target;
+        }
+        if (container && target) {
+          this.changeFocus(container, target);
+        }
+      }
+    },
+    handleRowClick(e, row) {
+      console.log("handleRowClick", e, row);
+      // TODO(chris): this should be in the filter component
+      if (this.focusObj) {
+        let el = row.getElement();
+        if (el != this.focusObj) this.changeFocus(this.focusObj, el);
+      }
+    },
+    clearSelection() {
+      this.lastSelected = [];
+      this.$emit("update:selected", []);
+    },
+    //methods tags
+    addedTag(addedTag) {
+      addTagInTable(addedTag, this.allRows, "prestudent_id");
+    },
+    deletedTag(deletedTag) {
+      deleteTagInTable(deletedTag, this.allRows);
+    },
+    updatedTag(updatedTag) {
+      updateTagInTable(updatedTag, this.allRows);
+    },
+    getAllRows() {
+      this.allRows = this.$refs.table.tabulator.getRows();
+    },
+    resetFilter() {
+      this.$refs.listfilter.resetFilter();
+      this.$refs.table.clearFilters();
+    },
+    handleHeaderFilter(filterActive) {
+      this.headerFilterActive = filterActive;
+    },
+    handleMouseDown(e, row) {
+      console.log("handleMouseDown", e, row);
+      let data = row.getData();
+      let id = data.uid ?? data.prestudent_id ?? data.person_id;
 
-			this.dragSource = (isAlreadySelected && this.selected?.length) ? this.selected : [data];
-		},
-		handleDataLoading() {
-			this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
-			this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
-		},
-		handleRenderComplete() {
-			const table = this.$refs.table.tabulator.element.querySelector('.tabulator-tableholder');
-			if(table) {
-				const curAjaxUrl = this.$refs.table.tabulator.getAjaxUrl();
-				if(this.oldScrollUrl === curAjaxUrl) {
-					table.scrollLeft = this.oldScrollLeft;
-					table.scrollTop = this.oldScrollTop;
-				} else {
-					this.oldScrollLeft = table.scrollLeft;
-					this.oldScrollTop = table.scrollTop;
-				}
-				this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
-			}
-		},
-	},
-	// TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
-	// TODO(chris): filter component column chooser has no accessibilty features
-	template: `
+      const isAlreadySelected = this.selected?.some(
+        (row) => (row.uid ?? row.prestudent_id ?? row.person_id) === id,
+      );
+
+      this.dragSource =
+        isAlreadySelected && this.selected?.length ? this.selected : [data];
+    },
+    handleDataLoading() {
+      console.log("handleDataLoading");
+      this.oldScrollLeft = this.$refs.table.tabulator.rowManager.scrollLeft;
+      this.oldScrollTop = this.$refs.table.tabulator.rowManager.scrollTop;
+    },
+    handleRenderComplete() {
+      console.log("handleRenderComplete");
+      const table = this.$refs.table.tabulator.element.querySelector(
+        ".tabulator-tableholder",
+      );
+      if (table) {
+        const curAjaxUrl = this.$refs.table.tabulator.getAjaxUrl();
+        if (this.oldScrollUrl === curAjaxUrl) {
+          table.scrollLeft = this.oldScrollLeft;
+          table.scrollTop = this.oldScrollTop;
+        } else {
+          this.oldScrollLeft = table.scrollLeft;
+          this.oldScrollTop = table.scrollTop;
+        }
+        this.oldScrollUrl = this.$refs.table.tabulator.getAjaxUrl();
+      }
+    },
+  },
+  // TODO(chris): focusin, focusout, keydown and tabindex should be in the filter component
+  // TODO(chris): filter component column chooser has no accessibilty features
+  template: `
 	<div class="stv-list h-100 pt-3">	
 		<div
 			class="tabulator-container d-flex flex-column h-100"
@@ -725,5 +1177,5 @@ export default {
 			</core-filter-cmpt>
 		</div>
 		<list-new ref="new" :studiengang-kz="studiengangKz" :studiensemester-kurzbz="studiensemesterKurzbz"></list-new>
-	</div>`
+	</div>`,
 };

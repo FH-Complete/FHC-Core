@@ -132,9 +132,9 @@ export function extendedHeaderFilter(headerValue, rowValue, rowData, filterParam
 }
 export function tagHeaderFilter(headerValue, rowValue, rowData, filterParams)
 {
-
+	console.log('tagHeaderFilter', headerValue, rowValue, rowData, filterParams);
 	let data;
-
+	console.log('rowValue', rowValue);
 	try {
 		data = typeof rowValue === 'string' ? JSON.parse(rowValue) : rowValue;
 	} catch (error) {
