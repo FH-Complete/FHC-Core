@@ -7,7 +7,7 @@ class Tag_Controller extends FHCAPI_Controller
 {
 	private $_uid;
 
-	const BERECHTIGUNG_KURZBZ = ['admin:rw', 'assistenz:rw'];
+	const BERECHTIGUNG_KURZBZ = ['admin:rw'];
 
 	public function __construct($permissions)
 	{
