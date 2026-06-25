@@ -162,6 +162,7 @@ export default {
 				:survey="survey"
 				:uid="uid"
 			/>
+			<span v-else-if="view === 'privacySettings'">past surveys table placeholder</span>
 		</div>
 	</div>`,
 };
