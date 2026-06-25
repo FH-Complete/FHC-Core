@@ -1,6 +1,7 @@
 import CoodleSurveyCalendarTimeslotCard from "./CoodleSurveyCalendar/CoodleSurveyCalendarTimeslotCard.js";
 import FhcCalendar from "../../../../Calendar/Base.js";
 import ModeWeek from "../../../../Calendar/Mode/Week.js";
+import ModeDay from "../../../../Calendar/Mode/Day.js";
 
 import { numberPadding } from "../../../../../helpers/DateHelpers.js";
 
@@ -21,6 +22,7 @@ export default {
 			mode: "Week",
 			modes: {
 				week: Vue.markRaw(ModeWeek),
+				day: Vue.markRaw(ModeDay),
 			},
 			modeOptions: {
 				week: {
@@ -312,13 +314,13 @@ export default {
 					:modeOptions="modeOptions"
 					:mode="'Week'"
 					:timeGrid="null"
-					:showBtns="false"
 					:locale="$p.user_locale.value"
 					:events="events"
 					:backgrounds="backgrounds"
 					:draggableEvents="true"			
 					:droppableEvents="true"
 					:onDrop="true"
+					:isAutoScrollEnabled="false"
 				>
 				<template v-slot="{ event, mode }">
 					<div

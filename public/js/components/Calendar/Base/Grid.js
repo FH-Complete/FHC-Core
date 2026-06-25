@@ -15,7 +15,8 @@ export default {
 	inject: {
 		originalEvents: "events",
 		originalBackgrounds: "backgrounds",
-		dropAllowed: "dropAllowed"
+		dropAllowed: "dropAllowed",
+		isAutoScrollEnabled: "isAutoScrollEnabled",
 	},
 	provide() {
 		return {
@@ -267,6 +268,10 @@ export default {
 
 		/* SCROLLING */
 		enableAutoScroll() {
+			if (!this.isAutoScrollEnabled) {
+				return;
+			}
+
 			if (!this.resizeObserver)
 				this.resizeObserver = new ResizeObserver(this.scrollToEarliestEvent);
 			this.resizeObserver.observe(this.$refs.body);

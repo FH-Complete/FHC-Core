@@ -44,7 +44,10 @@ export default {
 				return () => true;
 			}),
 			hasDragoverFunc: Vue.computed(() => this.onDragover),
-			mode: Vue.computed(() => this.mode)
+			mode: Vue.computed(() => this.mode),
+			isAutoScrollEnabled: Vue.computed(
+				() => this.$props.isAutoScrollEnabled,
+			),
 		};
 	},
 	props: {
@@ -97,7 +100,11 @@ export default {
 		draggableEvents: [Boolean, Array, Function],
 		dropableEvents: [Boolean, Array, Function],
 		onDragover: Function,
-		onDrop: Function
+		onDrop: Function,
+		isAutoScrollEnabled: {
+			type: Boolean,
+			default: true,
+		}
 	},
 	emits: [
 		"click:next",
