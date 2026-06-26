@@ -898,3 +898,12 @@ html {
 #coodleCalendar .coodle-calendar-event-clear {
 	pointer-events: auto;
 }
+
+#freeBusyTable th {
+	background-color: var(--fhc-primary) !important;
+	color: var(--fhc-light) !important;
+}
+
+#freeBusyTable .action:hover {
+	opacity:80%;
+}

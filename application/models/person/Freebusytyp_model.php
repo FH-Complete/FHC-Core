@@ -11,4 +11,9 @@ class Freebusytyp_model extends DB_Model
 		$this->dbTable = 'campus.tbl_freebusytyp';
 		$this->pk = 'freebusytyp_kurzbz';
 	}
+
+	public function getAllFreeBusyTypes()
+	{
+		return $this->execReadOnlyQuery("SELECT * FROM " . $this->dbTable);
+	}
 }

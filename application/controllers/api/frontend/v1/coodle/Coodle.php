@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright (C) 2024 fhcomplete.org
+ * Copyright (C) 2026 fhcomplete.org
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,16 +34,6 @@ class Coodle extends FHCAPI_Controller
 		$this->load->library('PermissionLib');
 
 		$this->load->model('person/Benutzer_model', 'BenutzerModel');
-
-		// todo: remove unnecessary crap
-		$this->load->model('ressource/mitarbeiter_model', 'MitarbeiterModel');
-		$this->load->model('person/Person_model', 'PersonModel');
-
-
-		//? put the uid and pid inside the controller for reusability
-		$this->uid = getAuthUID();
-		$this->pid = getAuthPersonID();
-
 	}
 
 	//------------------------------------------------------------------------------------------------------------------

@@ -16,30 +16,39 @@
  */
 
 export default {
-	getFreeBusyUrls() {
+	searchParticipants(searchString) {
+		return {
+			method: "post",
+			url: `/api/frontend/v1/coodle/Coodle/searchParticipants`,
+			params: {
+				searchString,
+			},
+		};
+	},
+	getFreeBusyEntries() {
 		return {
 			method: "get",
-			url: `/api/frontend/v1/coodle/FreeBusy/getFreeBusyUrls`,
+			url: `/api/frontend/v1/coodle/FreeBusy/getFreeBusyEntries`,
 		};
 	},
-	createFreeBusyUrl(params) {
+	createFreeBusyEntry(params) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/createFreeBusyUrl`,
+			url: `/api/frontend/v1/coodle/FreeBusy/createFreeBusyEntry`,
 			params,
 		};
 	},
-	updateFreeBusyUrl(params) {
+	updateFreeBusyEntry(params) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/updateFreeBusyUrl`,
+			url: `/api/frontend/v1/coodle/FreeBusy/updateFreeBusyEntry`,
 			params,
 		};
 	},
-	deleteFreeBusyUrl(id) {
+	deleteFreeBusyEntry(id) {
 		return {
 			method: "post",
-			url: `/api/frontend/v1/coodle/FreeBusy/deleteFreeBusyUrl`,
+			url: `/api/frontend/v1/coodle/FreeBusy/deleteFreeBusyEntry`,
 			params: {
 				id,
 			},
