@@ -312,6 +312,10 @@ export default {
 			if (!event.farbe) return undefined;
 			return "--event-bg:#" + event.farbe;
 		},
+		onEventClick(clickEvent) {
+			console.log(clickEvent);
+			console.log(document.querySelector("#coodleCalendar .grid-body"));
+		},
 	},
 	created() {
 		this.setTimeslotCalendarEvents();
@@ -357,7 +361,7 @@ export default {
 						></component>
 						<component
 							v-else
-							@click.stop=""
+							@click.stop="onEventClick($event)"
 							@deleteCoodleTimeslot="deleteTimeslot($event.timeslot)"
 							:is="renderers[event.type]?.calendarEvent"
 							:event="event"

@@ -890,3 +890,11 @@ html {
 	z-index: 1 !important;
 	pointer-events: none;
 }
+
+#coodleCalendar .fhc-calendar-base-grid-line-event {
+	pointer-events: none;
+}
+
+#coodleCalendar .coodle-calendar-event-clear {
+	pointer-events: auto;
+}

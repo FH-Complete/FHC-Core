@@ -223,7 +223,7 @@ export default {
 		// todo: localize weekdays and months
 	},
 	template: /*html*/ `
-	<div class="card mb-4">
+	<div class="card mb-4" style="min-height:100%">
 		<div class="card-header">
 			<coodle-survey-header
 				@editSurvey="isEditInProgress = true"

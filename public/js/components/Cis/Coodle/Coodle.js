@@ -1,11 +1,11 @@
 import CoodleSurvey from "./Components/CoodleSurvey.js";
+import CoodleFreeBusySettings from "./Components/CoodleFreeBusySettings.js";
 
 import ApiAuthinfo from "../../../api/factory/authinfo.js";
 
 export default {
 	name: "Coodle",
-	components: { CoodleSurvey },
-	props: {},
+	components: { CoodleSurvey, CoodleFreeBusySettings },
 	data() {
 		return {
 			uid: null,
@@ -105,7 +105,7 @@ export default {
 			}
 		},
 		switchToTab(tab) {
-			if (this.view === tab) return;
+			if (this.view === tab && tab !== "survey") return;
 
 			this.view = tab;
 			this.survey = null;
@@ -127,30 +127,34 @@ export default {
 			<div
 				@click="switchToTab('activeSurveysTable')"
 				:class="getTabStylingClass(view === 'activeSurveysTable')"
-				class="btn text-nowrap"
+				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				Active surveys
+				<i class="fa-solid fa-person-booth fa-lg"></i>
+				<span class="text-nowrap">{{ "Active surveys" }}</span>
 			</div>
 			<div
 				@click="switchToTab('pastSurveysTable')"
 				:class="getTabStylingClass(view === 'pastSurveysTable')"
-				class="btn text-nowrap"
+				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				Past surveys
+				<i class="fa-solid fa-flag-checkered fa-lg"></i>
+				<span class="text-nowrap">{{ "Past surveys" }}</span>
 			</div>
 			<div
 				@click="switchToTab('survey')"
 				:class="getTabStylingClass(view === 'survey' && !survey?.id)"
-				class="btn text-nowrap"
+				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				+ Create new survey
+				<i class="fa-solid fa-circle-plus fa-lg"></i>
+				<span class="text-nowrap">{{ "Create new survey" }}</span>
 			</div>
 			<div
-				@click="switchToTab('privacySettings')"
-				:class="getTabStylingClass(view === 'privacySettings')"
-				class="btn text-nowrap"
+				@click="switchToTab('freeBusySettings')"
+				:class="getTabStylingClass(view === 'freeBusySettings')"
+				class="btn d-flex flex-row gap-2 align-items-center py-2"
 			>
-				Coodle privacy settings
+				<i class="fa-solid fa-gear fa-lg"></i>
+				<span class="text-nowrap">{{ "FreeBusy Settings" }}</span>
 			</div>
 		</div>
 		<div class="flex-grow-1 mt-1">
@@ -162,7 +166,7 @@ export default {
 				:survey="survey"
 				:uid="uid"
 			/>
-			<span v-else-if="view === 'privacySettings'">privacy settings placeholder</span>
+			<coodle-free-busy-settings v-else-if="view === 'freeBusySettings'" />
 		</div>
 	</div>`,
 };
