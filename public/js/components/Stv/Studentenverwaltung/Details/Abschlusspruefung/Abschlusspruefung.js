@@ -302,7 +302,7 @@ export default {
 
 			//prepare local Storage
 			let STORAGE_KEY = 'finalExamDefaultData';
-			const id = '20260224_02';
+			const id = '20260625_01';
 			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
 			if (stored[id]) {
@@ -312,6 +312,7 @@ export default {
 				this.formData.datum = data.datum;
 				this.formData.sponsion = data.sponsion;
 				this.formData.akadgrad_id = data.akadgrad_id;
+				this.formData.pruefungsantritt_kurzbz = data.pruefungsantritt_kurzbz;
 
 				if (data.vorsitz_uid) {
 					this.selectedVorsitz = {
@@ -393,11 +394,12 @@ export default {
 		saveOrUpdateLocalStorage(){
 			let STORAGE_KEY = 'finalExamDefaultData';
 
-			const id = '20260224_02';
+			const id = '20260625_01';
 			const stored = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
 
 			stored[id] = {
 				pruefungstyp_kurzbz: this.formData.pruefungstyp_kurzbz,
+				pruefungsantritt_kurzbz: this.formData.pruefungsantritt_kurzbz,
 				vorsitz_uid: this.selectedVorsitz?.mitarbeiter_uid || null,
 				vorsitz_person_id: this.selectedVorsitz?.person_id || null,
 				vorsitz_label: this.selectedVorsitz?.label || null,
