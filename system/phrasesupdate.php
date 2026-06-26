@@ -58185,13 +58185,13 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'raumverwaltung übersicht',
+				'text' => 'Raumverwaltung Übersicht',
 				'description' => '',
 				'insertvon' => 'system'
 			),
 			array(
 				'sprache' => 'English',
-				'text' => 'room management overview',
+				'text' => 'Room management Overview',
 				'description' => '',
 				'insertvon' => 'system'
 			)
@@ -58205,7 +58205,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'raum hinzufügen',
+				'text' => 'Raum hinzufügen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58245,7 +58245,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'max. personen',
+				'text' => 'max. Personen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58465,7 +58465,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'gebäudekomponente',
+				'text' => 'Gebäudeteil',
 				'description' => '',
 				'insertvon' => 'system'
 			),
@@ -58705,7 +58705,7 @@ I have been informed that I am under no obligation to consent to the transmissio
 		'phrases' => array(
 			array(
 				'sprache' => 'German',
-				'text' => 'raumtyp zu raum zuweisen',
+				'text' => 'raumtyp zu Raum zuweisen',
 				'description' => '',
 				'insertvon' => 'system'
 			),
