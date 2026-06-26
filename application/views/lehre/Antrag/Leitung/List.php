@@ -44,6 +44,7 @@ $this->load->view(
 			<studierendenantrag-leitung
 				:stg-a="<?= htmlspecialchars(json_encode(array_values($stgA))); ?>"
 				:stg-l="<?= htmlspecialchars(json_encode(array_values($stgL))); ?>"
+				:abmeldung_enabled="<?= htmlspecialchars(json_encode(($abmeldung_enabled))); ?>"
 				>
 			</studierendenantrag-leitung>
 
